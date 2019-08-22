@@ -14,7 +14,7 @@ The extremely frequent and long delays of maintenance time prior to any events l
 
 The inactiveness of certain artists and voice actors is blocking certain Ship girls from getting an Kai Ni. It's desired to give users the freedom of creating their own Kai Ni (not necessarily being widely recognized).
 
-The severe low probability of certain drops, or ships not being re-available for years (e.g. Iowa before 2018) further adds the urgency for the users to have their own freedom.
+The increasing prevalence of paid items, and severe low probability of certain drops, or ships not being re-available for years (e.g. Iowa before 2018) further adds the urgency for the users to have their own freedom.
 
 ### Features proposed by the new system:
 
