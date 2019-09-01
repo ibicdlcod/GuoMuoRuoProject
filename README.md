@@ -37,3 +37,9 @@ Due to the author's limited spare time, the development of LibreKancolle is expe
 Anyone with love for Kancolle and programming expertise (especially those worked with Kancolle browers and plugins in the past, but notice your experience may not be useful since this is a complete rewrite) may join the team.
 
 LibreKancolle is expected to be written in Qt-based C++ or Python.
+
+> 愿中国青年都摆脱冷气，只是向上走，不必听自暴自弃者流的话。能做事的做事，能发声的发声。有一份热，发一分光。就令萤火一般，也可以在黑暗里发一点光，不必等候炬火。
+>
+> 我们自古以来，就有埋头苦干的人，有拼命硬干的人，有为民请命的人，有舍身求法的人……虽是等于为帝王将相作家谱的所谓“正史”，也往往掩不住他们的光耀，这就是中国的脊梁。
+>
+> 的确对的，谁也没有发现过苍蝇们的缺点和创伤。然而，有缺点的战士终究是战士，完美的苍蝇也终竟不过是苍蝇。
