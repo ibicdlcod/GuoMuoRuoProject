@@ -1,0 +1,6 @@
+temp/
+temp.txt
+.idea/
+mysqlsampledatabase.sql
+*.pyc
+*.dump
