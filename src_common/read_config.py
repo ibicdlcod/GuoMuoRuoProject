@@ -2,7 +2,7 @@ from configparser import ConfigParser
 import os
 
 
-def read_primary_config(filename: str = 'config\\config.ini',
+def read_primary_config(filename: str = os.path.join("config", "config.ini"),
                         section: str = 'general') -> dict:
     """ Read database configuration file and return a dictionary object
     :param filename: name of the configuration file
