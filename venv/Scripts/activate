@@ -75,6 +75,4 @@ if [ -n "${BASH:-}" -o -n "${ZSH_VERSION:-}" ] ; then
     hash -r
 fi
 
-export PYTHONPATH="src_client"
-export PYTHONPATH="src_common"
-export PYTHONPATH="src_server"
+export PYTHONPATH="${PYTHONPATH}:src_client:src_common:src_server"
