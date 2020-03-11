@@ -12,15 +12,15 @@ def accept_wrapper(sock):
     # the following should be convert to log
     print(f"accepted connection from {addr_acc}")
     conn_acc.setblocking(False)
-    data_acc = types.SimpleNamespace(addr=addr_acc, inb = b"", outb = b"")
-    events = selectors.EVENT_READ | selectors.EVENT_WRITE
-    sel.register(conn_acc, events, data=data_acc)
+    data_acc = types.SimpleNamespace(addr=addr_acc, inb=b"", outb=b"")
+    sock_events = selectors.EVENT_READ | selectors.EVENT_WRITE
+    sel.register(conn_acc, sock_events, data=data_acc)
 
 
-def service_connection(key, mask):
-    sock = key.fileobj
-    data_serv = key.data
-    if mask & selectors.EVENT_READ:
+def service_connection(serv_key, serv_mask):
+    sock = serv_key.fileobj
+    data_serv = serv_key.data
+    if serv_mask & selectors.EVENT_READ:
         recv_data = sock.recv(network_default.MAXIMUM_DATA_BLOCK_SIZE)
         if recv_data:
             data_serv.outb += recv_data
@@ -29,7 +29,7 @@ def service_connection(key, mask):
             print(f"closing connection to {data_serv.addr}")
             sel.unregister(sock)
             sock.close()
-    if mask & selectors.EVENT_WRITE:
+    if serv_mask & selectors.EVENT_WRITE:
         if data_serv.outb:
             print(f"echoing: {repr(data_serv.outb)} to {data_serv.addr}")
             sent = sock.send(data_serv.outb)
@@ -63,14 +63,3 @@ if __name__ == '__main__':
         print("caught keyboard interrupt, exiting")
     finally:
         sel.close()
-    # with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-    #     s.bind((network_default.DEFAULT_SERVER_LISTEN, network_default.DEFAULT_PORT))
-    #     s.listen(network_default.MAXIMUM_ALLOWED_CONNECTIONS)
-    #     conn, addr = s.accept()
-    #     with conn:
-    #         print('Connected by', addr)
-    #         while True:
-    #             data = conn.recv(1024)
-    #             if not data:
-    #                 break
-    #             conn.sendall(data)
