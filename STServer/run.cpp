@@ -66,6 +66,7 @@ void Run::run()
 
     listAvailableAddresses();
 
+    qout << EcmaSetter::AllDefault;
     emit finished();
     return;
 }
@@ -144,7 +145,9 @@ void Run::listAvailableAddresses()
             availableAddresses.push_back(ip);
         }
     }
+    qout << Ecma48(64,255,64);
     qPrint(qout, "List of ip addresses:");
+    qout << EcmaSetter::AllDefault;
     qls(availableAddresses);
 }
 
@@ -227,21 +230,20 @@ void Run::qls(const QList<T> input)
     QList<int> k = displayCandidates.keys();
     int min = *std::min_element(k.begin(), k.end());
     QList<QList<T>> displaySelected = displayCandidates[min];
-    qout << EcmaSetter::AllDefault;
 
     for(int i = 0; i < displaySelected.begin()->length(); ++i)
     {
         for(int j = 0; j < displaySelected.length(); ++j)
         {
-            T current_element = *((displaySelected.begin() + j)->constBegin() + i);
-            int fieldwidth = callength(*std::max_element(
-                                           (displaySelected.begin() + j)->begin(),
-                                           (displaySelected.begin() + j)->end(),
-                                           lengthcmp)) + ((j == displaySelected.length() - 1) ? 0 : 1)
-                    - callength(current_element)
-                    + callength(current_element, true);
             if(i < (displaySelected.begin() + j)->length())
             {
+                T current_element = *((displaySelected.begin() + j)->constBegin() + i);
+                int fieldwidth = callength(*std::max_element(
+                                               (displaySelected.begin() + j)->begin(),
+                                               (displaySelected.begin() + j)->end(),
+                                               lengthcmp)) + ((j == displaySelected.length() - 1) ? 0 : 1)
+                        - callength(current_element)
+                        + callength(current_element, true);
                 qout << qSetFieldWidth(fieldwidth);
                 QString str = strfiy(*((displaySelected.begin() + j)->constBegin() + i));
                 qout << str;
