@@ -1,16 +1,16 @@
 #include "qprint.h"
 
-void qprint(const char *in)
+void qprint(QTextStream &stream, const char *in)
 {
     while(*in != '\0')
     {
-        QTextStream(stdout) << *in;
+        stream << *in;
         in++;
     }
-    QTextStream(stdout) << "" << Qt::endl;
+    stream << "" << Qt::endl;
 }
 
-void qprint(QString in)
+void qprint(QTextStream &stream, QString in)
 {
-    QTextStream(stdout) << in << Qt::endl;
+    stream << in << Qt::endl;
 }

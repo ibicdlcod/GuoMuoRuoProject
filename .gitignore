@@ -72,5 +72,6 @@ Thumbs.db
 *.exe
 
 # Qt build
+build-*/
 debug/
 release/

@@ -3,8 +3,8 @@
 
 #include <QTextStream>
 
-void qprint(const char *in);
+void qprint(QTextStream &stream, const char *in);
 
-void qprint(QString in);
+void qprint(QTextStream &stream, QString in);
 
 #endif // QPRINT_H
