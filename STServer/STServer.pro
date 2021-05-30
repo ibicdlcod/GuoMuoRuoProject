@@ -1,5 +1,5 @@
-QT -= gui
-QT += network
+# QT -= gui
+QT += network core
 
 CONFIG += c++11 console
 CONFIG -= app_bundle
@@ -14,7 +14,8 @@ SOURCES += \
         ecma48.cpp \
         main.cpp \
         qprint.cpp \
-        run.cpp
+        run.cpp \
+        wcwidth.cpp
 
 TRANSLATIONS += \
     STServer_zh_CN.ts
@@ -31,4 +32,5 @@ HEADERS += \
     dtlsserver.h \
     ecma48.h \
     qprint.h \
-    run.h
+    run.h \
+    wcwidth.h

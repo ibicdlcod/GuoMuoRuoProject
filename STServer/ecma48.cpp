@@ -1,5 +1,4 @@
 #include "ecma48.h"
-#include <QDebug>
 
 Ecma48::Ecma48(quint8 red,
                quint8 green,
@@ -24,7 +23,9 @@ ConsoleTextStream & operator<<(ConsoleTextStream &stream, EcmaSetter in)
     case EcmaSetter::BgDefault:     code = "49";    break;
     case EcmaSetter::AllDefault:    code = "0";     break;
     }
-    stream << "\x1b[" + code + "m";
+    int currentwidth = stream.fieldWidth();
+    stream << qSetFieldWidth(0) << "\x1b[" + code + "m" << qSetFieldWidth(currentwidth);
+    stream.flush();
     return stream;
 }
 
@@ -40,6 +41,8 @@ ConsoleTextStream & operator<<(ConsoleTextStream &stream, Ecma48 in)
     code.append(";");
     code.append(QString::number(in.blue));
     code.append("m");
-    stream << code;
+    int currentwidth = stream.fieldWidth();
+    stream << qSetFieldWidth(0) << code << qSetFieldWidth(currentwidth);
+    stream.flush();
     return stream;
 }

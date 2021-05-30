@@ -13,7 +13,11 @@ class ConsoleTextStream : public QTextStream
 {
 public:
     ConsoleTextStream();
-    ConsoleTextStream& operator<<(const QString &);
+    ConsoleTextStream& operator<<(QString);
+    ConsoleTextStream& operator<<(int);
+    ConsoleTextStream& operator<<(QTextStreamManipulator &);
+    void setFieldWidth(int width);
+    void setFieldAlignment(QTextStream::FieldAlignment alignment);
 };
 
 class ConsoleInput : public QTextStream

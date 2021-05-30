@@ -2,8 +2,6 @@
 #include <QLocale>
 #include <QTranslator>
 
-#include <QTimer>
-
 #include "run.h"
 
 #ifdef Q_OS_WIN
