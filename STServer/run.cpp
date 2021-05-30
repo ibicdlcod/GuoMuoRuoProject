@@ -5,20 +5,18 @@
 #include <QDebug>
 
 #include "qprint.h"
+#include "ecma48.h"
 
-#include <cstdio>
-#include <iostream>
-//#include <stdio.h>
-//#include <wchar.h>
 #ifdef Q_OS_WIN
 #include <windows.h>
-#ifndef ENABLE_VIRTUAL_TERMINAL_PROCESSING
-#define ENABLE_VIRTUAL_TERMINAL_PROCESSING 0x0004
 #endif
+#ifdef Q_OS_UNIX
+#include <sys/ioctl.h> //ioctl() and TIOCGWINSZ
+#include <unistd.h> // for STDOUT_FILENO
 #endif
 
 Run::Run(QObject *parent)
-    : QObject(parent)
+    : QObject(parent), qout(ConsoleTextStream())
 {
     connect(&server, &DtlsServer::errorMessage, this, &Run::addErrorMessage);
     connect(&server, &DtlsServer::warningMessage, this, &Run::addWarningMessage);
@@ -28,64 +26,51 @@ Run::Run(QObject *parent)
 
 void Run::run()
 {
+    int width;
 #ifdef Q_OS_WIN
-    HANDLE hOut = GetStdHandle(STD_OUTPUT_HANDLE);
-    if (hOut == INVALID_HANDLE_VALUE)
-    {
-        throw GetLastError();
-    }
-
-    DWORD dwMode = 0;
-    if (!GetConsoleMode(hOut, &dwMode))
-    {
-        throw GetLastError();
-    }
-
-    dwMode |= ENABLE_VIRTUAL_TERMINAL_PROCESSING;
-    if (!SetConsoleMode(hOut, dwMode))
-    {
-        throw GetLastError();
-    }
+    CONSOLE_SCREEN_BUFFER_INFO csbi;
+    GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &csbi);
+    width = csbi.srWindow.Right - csbi.srWindow.Left + 1;
+#else
+#ifdef Q_OS_UNIX
+    struct winsize size;
+    ioctl(STDOUT_FILENO, TIOCGWINSZ, &size);
+    width = size.ws_col;
+#else
+    width = 80;
 #endif
-    QTextStream qout = QTextStream(stdout);
+#endif
+
     QString notice;
     QDir serverDir = QDir::current();
     QFile openingwords(serverDir.filePath("openingwords.txt"));
     if(!openingwords.open(QIODevice::ReadOnly | QIODevice::Text))
     {
-        qprint(qout, "Opening words file not found, exiting.");
+        qPrint(qout, "Opening words file not found, exiting.");
         emit finished();
         return;
     }
     else
     {
         QTextStream instream1(&openingwords);
-        notice = instream1.readAll();
+        qout.setFieldAlignment(QTextStream::AlignCenter);
+        qout << Ecma48(255,255,255,true) << Ecma48(0,0,255);
+        while(!instream1.atEnd())
+        {
+            notice = instream1.readLine();
+            qout << qSetFieldWidth(width) << notice << qSetFieldWidth(0) << Qt::endl;
+        }
     }
+    qout << Qt::endl;
 
-    QString cmdline;
+    qout.setFieldAlignment(QTextStream::AlignLeft);
+    qout << Ecma48(192,255,192,true) << Ecma48(0,0,0);
+    qPrint(qout, "What? Admiral Tanaka? He's the real deal, isn't he? Great at battle and bad at politics--so cool!");
+    qout << EcmaSetter::AllDefault;
 
-    qprint(qout, notice);
-    qprint(qout, "Try some Set Graphics Rendition (SGR) terminal escape sequences");
-    qprint(qout, "\x1b[31mThis text has a red foreground using SGR.31.");
-    qprint(qout, "\x1b[1mThis text has a bright (bold) red foreground using SGR.1 to affect the previous color setting.");
-    qprint(qout, "\x1b[mThis text has returned to default colors using SGR.0 implicitly.");
-    qprint(qout, "\x1b[34;46mThis text shows the foreground and background change at the same time.");
-    qprint(qout, "\x1b[0mThis text has returned to default colors using SGR.0 explicitly.");
-    qprint(qout, "\x1b[31;32;33;34;35;36;101;102;103;104;105;106;107mThis text attempts to apply many colors in the same command. Note the colors are applied from left to right so only the right-most option of foreground cyan (SGR.36) and background bright white (SGR.107) is effective.");
-    qprint(qout, "\x1b[49mThis text has restored the background color only.");
-    qprint(qout, "\x1b[39mThis text has restored the foreground color only.");
-
-    /*
-    // Try some Set Graphics Rendition (SGR) terminal escape sequences
-    wprintf(L"\x1b[31mThis text has a red foreground using SGR.31.\r\n");
-    wprintf(L"\x1b[1mThis text has a bright (bold) red foreground using SGR.1 to affect the previous color setting.\r\n");
-    wprintf(L"\x1b[mThis text has returned to default colors using SGR.0 implicitly.\r\n");
-    wprintf(L"\x1b[34;46mThis text shows the foreground and background change at the same time.\r\n");
-    wprintf(L"\x1b[0mThis text has returned to default colors using SGR.0 explicitly.\r\n");
-    wprintf(L"\x1b[31;32;33;34;35;36;101;102;103;104;105;106;107mThis text attempts to apply many colors in the same command. Note the colors are applied from left to right so only the right-most option of foreground cyan (SGR.36) and background bright white (SGR.107) is effective.\r\n");
-    wprintf(L"\x1b[39mThis text has restored the foreground color only.\r\n");
-    wprintf(L"\x1b[49mThis text has restored the background color only.\r\n");*/
+    addErrorMessage("星薇");
+    addWarningMessage("星薇");
+    addInfoMessage("星薇");
 
     emit finished();
     return;
@@ -93,21 +78,67 @@ void Run::run()
 
 void Run::addErrorMessage(const QString &message)
 {
-
+    qout << Ecma48(192,0,0) << message << Qt::endl;
+    qCritical() << message.toUtf8().constData();
 }
 
 void Run::addWarningMessage(const QString &message)
 {
-
+    qout << Ecma48(192,192,0) << message << Qt::endl;
+    qWarning() << message.toUtf8().constData();
 }
 
 void Run::addInfoMessage(const QString &message)
 {
-
+    qout << Ecma48(0,192,0) << message << Qt::endl;
+    qInfo() << message.toUtf8().constData();
 }
 
 void Run::addClientMessage(const QString &peerInfo, const QByteArray &datagram,
                                   const QByteArray &plainText)
 {
+    static const QString formatter = QStringLiteral("---------------\n"
+                                                    "A message from %1\n"
+                                                    "DTLS datagram: %2\n"
+                                                    "As plain text: %3\n");
+    const QString message = formatter.arg(peerInfo, QString::fromUtf8(datagram.toHex(' ')),
+                                       QString::fromUtf8(plainText));
+    qout << Ecma48(0,192,255) << message;
+}
 
+void Run::customMessageHandler(QtMsgType type, const QMessageLogContext &context, const QString &msg)
+{
+    //Q_UNUSED(context);
+
+    QString dt = QDateTime::currentDateTime().toString("dd/MM/yyyy hh:mm:ss");
+    QString txt = QString("[%1] ").arg(dt);
+    QByteArray localMsg = msg.toUtf8();
+    const char *file = context.file ? context.file : "";
+    const char *function = context.function ? context.function : "";
+
+    switch (type)
+    {
+    case QtDebugMsg:
+        txt += QString("{Debug} \t\t %1 (%2:%3, %4)").arg(localMsg.constData()).arg(file).arg(context.line).arg(function);
+        break;
+    case QtInfoMsg:
+        txt += QString("{Info} \t\t %1 (%2:%3, %4)").arg(localMsg.constData()).arg(file).arg(context.line).arg(function);
+        break;
+    case QtWarningMsg:
+        txt += QString("{Warning} \t %1 (%2:%3, %4)").arg(localMsg.constData()).arg(file).arg(context.line).arg(function);
+        break;
+    case QtCriticalMsg:
+        txt += QString("{Critical} \t %1 (%2:%3, %4)").arg(localMsg.constData()).arg(file).arg(context.line).arg(function);
+        break;
+    case QtFatalMsg:
+        txt += QString("{Fatal} \t\t %1 (%2:%3, %4)").arg(localMsg.constData()).arg(file).arg(context.line).arg(function);
+        abort();
+        break;
+    }
+
+    QFile outFile("LogFile.log");
+    outFile.open(QIODevice::WriteOnly | QIODevice::Append);
+
+    QTextStream textStream(&outFile);
+    textStream << txt << Qt::endl;
 }

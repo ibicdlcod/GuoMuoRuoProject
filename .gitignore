@@ -75,3 +75,6 @@ Thumbs.db
 build-*/
 debug/
 release/
+
+# Custom
+*.log

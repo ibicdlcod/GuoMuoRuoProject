@@ -1,10 +1,10 @@
 #ifndef QPRINT_H
 #define QPRINT_H
 
-#include <QTextStream>
+#include "consoletextstream.h"
 
-void qprint(QTextStream &stream, const char *in);
+void qPrint(ConsoleTextStream &, const char *);
 
-void qprint(QTextStream &stream, QString in);
+void qPrint(ConsoleTextStream &, QString);
 
 #endif // QPRINT_H
