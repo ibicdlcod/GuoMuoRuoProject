@@ -2,9 +2,9 @@
 #define RUN_H
 
 #include <QObject>
+#include <QHostAddress>
 
 #include "consoletextstream.h"
-#include "dtlsserver.h"
 #include "wcwidth.h"
 #include "qprint.h"
 
@@ -21,14 +21,14 @@ signals:
 
 private slots:
     void run();
-    void addErrorMessage(const QString &);
-    void addWarningMessage(const QString &);
-    void addInfoMessage(const QString &);
-    void addClientMessage(const QString &peerInfo, const QByteArray &datagram,
-                          const QByteArray &plainText);
-    void listAvailableAddresses();
+
+    void invalidCommand();
+    void showAllCommands();
+    void showCommands(const QList<STCType>);
+    void showHelp(QStringList);
 
 private:
+    int getConsoleWidth();
     template<class T>
     void qls(const QList<T>);
     static int callength(const QString &, bool naive = false);
@@ -38,7 +38,6 @@ private:
     bool parse(QString);
     void exitGracefully();
 
-    DtlsServer server1;
     ConsoleTextStream qout;
     ConsoleInput qin;
     QList<QHostAddress> availableAddresses;

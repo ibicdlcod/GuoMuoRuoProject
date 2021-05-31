@@ -2,9 +2,6 @@
 #include <QLocale>
 #include <QTranslator>
 
-#include "run.h"
-#include "dtlsserver.h"
-
 #ifdef Q_OS_WIN
 #include <windows.h>
 #ifndef ENABLE_VIRTUAL_TERMINAL_PROCESSING
@@ -42,24 +39,33 @@ int main(int argc, char *argv[])
 
     QCoreApplication a(argc, argv);
 
-    DtlsServer server;
-    server.listen(QHostAddress("192.168.0.3"), 22334);
-
     QTranslator translator;
     const QStringList uiLanguages = QLocale::system().uiLanguages();
     for (const QString &locale : uiLanguages) {
-        const QString baseName = "STServer_" + QLocale(locale).name();
+        const QString baseName = "UI_" + QLocale(locale).name();
         if (translator.load(":/i18n/" + baseName)) {
             a.installTranslator(&translator);
             break;
         }
     }
 
-    Run r;
-    qInstallMessageHandler(Run::customMessageHandler);
-    QObject::connect(&r, SIGNAL(finished()), &a, SLOT(quit()));
-    QTimer::singleShot(0, &r, SLOT(run()));
-    /*
-*/
+    try {
+        if(argc <= 1 || std::strcmp(argv[1], "--client") == 0)
+        {
+            // client UI
+        }
+        else if(std::strcmp(argv[1], "--server") == 0)
+        {
+            // server UI
+        }
+        else
+        {
+            throw std::invalid_argument("Either run without arguments or specify --client or --server!");
+        }
+    }  catch (std::invalid_argument &e) {
+        qDebug() << e.what() << Qt::endl << "Press ENTER to exit.";
+        return 1;
+    }
+
     return a.exec();
 }

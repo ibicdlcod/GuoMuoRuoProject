@@ -27,7 +27,6 @@ enum class EcmaSetter
     OverlineOff
 };
 
-
 struct Ecma48 : public QObject
 {
     Q_OBJECT

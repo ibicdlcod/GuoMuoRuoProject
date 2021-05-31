@@ -47,8 +47,8 @@
 ** $QT_END_LICENSE$
 **
 ****************************************************************************/
-#ifndef SERVER_H
-#define SERVER_H
+#ifndef DTLSSERVER_H
+#define DTLSSERVER_H
 
 #include <QtCore>
 #include <QtNetwork>
@@ -104,4 +104,4 @@ private:
 
 QT_END_NAMESPACE
 
-#endif // SERVER_H
+#endif // DTLSSERVER_H

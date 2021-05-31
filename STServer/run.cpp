@@ -1,5 +1,8 @@
 #include "run.h"
 
+#include <QProcess>
+
+#include "consoletextstream.h"
 #include "ecma48.h"
 
 #ifdef Q_OS_WIN
@@ -11,12 +14,12 @@
 #endif
 
 Run::Run(QObject *parent)
-    : QObject(parent), qout(ConsoleTextStream())
+    : QObject(parent), qout(ConsoleTextStream()), qin(ConsoleInput())
 {
-    connect(&server, &DtlsServer::errorMessage, this, &Run::addErrorMessage);
-    connect(&server, &DtlsServer::warningMessage, this, &Run::addWarningMessage);
-    connect(&server, &DtlsServer::infoMessage, this, &Run::addInfoMessage);
-    connect(&server, &DtlsServer::datagramReceived, this, &Run::addClientMessage);
+    connect(&server1, &DtlsServer::errorMessage, this, &Run::addErrorMessage);
+    connect(&server1, &DtlsServer::warningMessage, this, &Run::addWarningMessage);
+    connect(&server1, &DtlsServer::infoMessage, this, &Run::addInfoMessage);
+    connect(&server1, &DtlsServer::datagramReceived, this, &Run::addClientMessage);
 }
 
 void Run::run()
@@ -35,40 +38,152 @@ void Run::run()
     width = 80;
 #endif
 #endif
-
     QString notice;
     QDir serverDir = QDir::current();
     QFile openingwords(serverDir.filePath("openingwords.txt"));
     if(!openingwords.open(QIODevice::ReadOnly | QIODevice::Text))
     {
-        qPrint(qout, "Opening words file not found, exiting.");
+        qPrint(qout, tr("Opening words file not found, exiting."));
         emit finished();
         return;
     }
     else
     {
         QTextStream instream1(&openingwords);
-        qout.setFieldAlignment(QTextStream::AlignCenter);
         qout << Ecma48(255,255,255,true) << Ecma48(0,0,255);
+        qout.setFieldAlignment(QTextStream::AlignCenter);
         while(!instream1.atEnd())
         {
             notice = instream1.readLine();
-            qout << qSetFieldWidth(width) << notice << qSetFieldWidth(0) << Qt::endl;
+            qout.setFieldWidth(width);
+            qout << notice;
+            qout.setFieldWidth(0);
+            qout << Qt::endl;
         }
-        qout << Ecma48(192,255,192,true) << Ecma48(0,0,0);
-        qout << qSetFieldWidth(width)
-             << "What? Admiral Tanaka? He's the real deal, isn't he? Great at battle and bad at politics--so cool!"
-             << qSetFieldWidth(0) << Qt::endl;
+        qout << Qt::endl;
+        qout << Ecma48(192,255,192,true) << Ecma48(64,64,64);
+
+        qout.setFieldWidth(width);
+        qout << tr("What? Admiral Tanaka? He's the real deal, isn't he? Great at battle and bad at politics--so cool!");
+        qout.setFieldWidth(0);
+        qout << Qt::endl;
     }
     qout << EcmaSetter::AllDefault;
     qout.setFieldAlignment(QTextStream::AlignLeft);
     qout << Qt::endl;
 
-    listAvailableAddresses();
+    QString cmdline;
+    while(true)
+    {
+        qout << "STS " + QString(server1.isListening() ? "ACTIVE" : "INACTIVE") + "$ ";
+        cmdline = qin.readLine();
 
-    qout << EcmaSetter::AllDefault;
-    emit finished();
+        if(cmdline.compare("start") == 0)
+        {
+            QProcess *server = new QProcess();
+            server->start("STServerCore", {}, QIODevice::WriteOnly);
+        }
+        if(cmdline.compare("exit") == 0)
+        {
+            break;
+        }
+        parse(cmdline);
+
+        //TBD: record in history
+    }
+
+    exitGracefully();
     return;
+}
+
+bool Run::parse(QString command)
+{
+    QStringList commandParts = command.split(QRegularExpression("\\s+"), Qt::SkipEmptyParts);
+    if(commandParts.length() > 0)
+    {
+        QString primary = commandParts[0];
+
+        // aliases
+        QMap<QString, QString> aliases;
+        aliases["li"] = "listen";
+        aliases["uli"] = "unlisten";
+        aliases["ls"] = "listAvailable";
+
+        if(aliases.contains(primary))
+        {
+            primary = aliases[primary];
+        }
+        // end aliases
+
+        if(primary.compare("listAvailable", Qt::CaseInsensitive) == 0)
+        {
+            listAvailableAddresses();
+        }
+        else if(primary.compare("listen", Qt::CaseInsensitive) == 0)
+        {
+            if(server1.isListening())
+            {
+                qPrint(qout, tr("Server is already running."));
+                return false;
+            }
+            else
+            {
+                if(commandParts.length() < 3)
+                {
+                    qPrint(qout, tr("Usage: listen [ip] [port]"));
+                    return false;
+                }
+                else
+                {
+                    QHostAddress address = QHostAddress(commandParts[1]);
+                    if(address.isNull())
+                    {
+                        qPrint(qout, tr("Ip isn't valid"));
+                        return false;
+                    }
+                    bool ok;
+                    int port = commandParts[2].toInt(&ok);
+                    if(!ok)
+                    {
+                        qPrint(qout, tr("Port isn't int"));
+                        return false;
+                    }
+                    if (server1.listen(address, port)) {
+                        QString msg = tr("Server is listening on address %1 and port %2")
+                                .arg(address.toString())
+                                .arg(port);
+                        qPrint(qout, msg);
+                        addInfoMessage(msg);
+                        return true;
+                    }
+                }
+            }
+        }
+        else if (primary.compare("unlisten", Qt::CaseInsensitive) == 0)
+        {
+            if(!server1.isListening())
+            {
+                qPrint(qout, tr("Server isn't running."));
+                return false;
+            }
+            else
+            {
+                server1.close();
+                qPrint(qout, tr("Server is not accepting new connections"));
+                addInfoMessage(tr("Server is not accepting new connections"));
+                return true;
+            }
+        }
+    }
+    // emit invalidCommand();
+    return false;
+}
+
+void Run::exitGracefully()
+{
+    qout << EcmaSetter::AllDefault;
+    qPrint(qout, tr("ST ended, press ENTER to quit"));
+    emit finished();
 }
 
 inline void Run::addErrorMessage(const QString &message)
@@ -87,14 +202,14 @@ inline void Run::addInfoMessage(const QString &message)
 }
 
 void Run::addClientMessage(const QString &peerInfo, const QByteArray &datagram,
-                                  const QByteArray &plainText)
+                           const QByteArray &plainText)
 {
     static const QString formatter = QStringLiteral("---------------\n"
                                                     "A message from %1\n"
                                                     "DTLS datagram: %2\n"
                                                     "As plain text: %3\n");
     const QString message = formatter.arg(peerInfo, QString::fromUtf8(datagram.toHex(' ')),
-                                       QString::fromUtf8(plainText));
+                                          QString::fromUtf8(plainText));
     qout << Ecma48(0,192,255) << message;
 }
 
@@ -146,7 +261,7 @@ void Run::listAvailableAddresses()
         }
     }
     qout << Ecma48(64,255,64);
-    qPrint(qout, "List of ip addresses:");
+    qPrint(qout, tr("List of ip addresses:"));
     qout << EcmaSetter::AllDefault;
     qls(availableAddresses);
 }
@@ -215,9 +330,9 @@ void Run::qls(const QList<T> input)
         for(int j = 0; j < displays.length(); ++j)
         {
             displayedcolumns += (callength(*std::max_element(
-                                              (displays.constBegin() + j)->constBegin(),
-                                              (displays.constBegin() + j)->constEnd(),
-                                              lengthcmp)) + 1);
+                                               (displays.constBegin() + j)->constBegin(),
+                                               (displays.constBegin() + j)->constEnd(),
+                                               lengthcmp)) + 1);
         }
         displayedcolumns--;
 
@@ -244,12 +359,13 @@ void Run::qls(const QList<T> input)
                                                lengthcmp)) + ((j == displaySelected.length() - 1) ? 0 : 1)
                         - callength(current_element)
                         + callength(current_element, true);
-                qout << qSetFieldWidth(fieldwidth);
+                qout.setFieldWidth(fieldwidth);
                 QString str = strfiy(*((displaySelected.begin() + j)->constBegin() + i));
                 qout << str;
             }
         }
-        qout << qSetFieldWidth(0) << Qt::endl;
+        qout.setFieldWidth(0);
+        qout << Qt::endl;
     }
     qout << Qt::endl;
 }
