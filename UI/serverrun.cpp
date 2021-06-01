@@ -17,7 +17,8 @@
 #include "ecma48.h"
 
 ServerRun::ServerRun(QObject *parent)
-    : QObject(parent), qout(ConsoleTextStream()), qin(ConsoleInput()), server(nullptr)
+    : QObject(parent), qout(ConsoleTextStream()), qin(ConsoleInput()), server(nullptr),
+      readyToQuit(false)
 {
 }
 
@@ -60,48 +61,18 @@ void ServerRun::run()
 
     timer = new QTimer(this);
     QObject::connect(timer, &QTimer::timeout, this, &ServerRun::update);
+    QObject::connect(&qin, &ConsoleInput::textReceived, this, &ServerRun::parse);
     timer->start(1000);
 
-    QString cmdline;
-    while(true)
+    while(!readyToQuit)
     {
         update();
         qout << "STS ";
         qout << ((server && server->isWritable()) ? "RUNNING" : "NOTRUNNING");
         qout << "$ ";
-        cmdline = qin.readline();
-
-        if(cmdline.compare("start") == 0)
-        {
-            server = new QProcess();
-            bool success = QObject::connect(server, &QProcess::errorOccurred,
-                                            this, &ServerRun::processError)
-                    && QObject::connect(server, &QProcess::started,
-                                        this, &ServerRun::serverStarted)
-                    && QObject::connect(server, &QProcess::stateChanged,
-                                        this, &ServerRun::serverChanged)
-                    && QObject::connect(server, &QProcess::finished,
-                                        this, &ServerRun::processFinished)
-                    && QObject::connect(server, &QProcess::readyReadStandardError,
-                                        this, &ServerRun::serverStderr)
-                    && QObject::connect(server, &QProcess::readyReadStandardOutput,
-                                        this, &ServerRun::serverStderr);
-            if(!success)
-            {
-                qFatal("Communication with server process can't be established.");
-            }
-            server->start("build-Server-Desktop_Qt_6_1_0_MinGW_64_bit-Debug/debug/Server.exe",
-                          {"192.168.0.3", QString::number(1826)}, QIODevice::ReadWrite);
-        }
-        if(cmdline.compare("exit") == 0)
-        {
-            exitGracefully();
-            return;
-        }
-        //parse(cmdline);
-
-        //TBD: record in history
+        qin.readline1();
     }
+    return;
 }
 
 void ServerRun::update()
@@ -152,14 +123,14 @@ void ServerRun::serverStderr()
     case 'I': qInfo("%s", output.constData()); break;
     default: qCritical("%s", output.constData()); break;
     }
-    qPrint(qout, QString(output));
+    //qPrint(qout, QString(output));
 }
 
 void ServerRun::serverStdout()
 {
     QByteArray output = server->readAllStandardOutput();
     qInfo("%s", output.constData());
-    qPrint(qout, QString(output));
+    //qPrint(qout, QString(output));
 }
 
 void ServerRun::serverStarted()
@@ -193,6 +164,10 @@ void ServerRun::shutdownServer()
             server->kill();
         }
     }
+    else
+    {
+        qPrint(qout, tr("Server isn't running."));
+    }
     update();
 }
 
@@ -204,6 +179,7 @@ void ServerRun::exitGracefully()
     qout << EcmaSetter::AllDefault;
     qPrint(qout, tr("STS ended, press ENTER to quit"));
     emit finished();
+    readyToQuit = true;
 }
 
 bool ServerRun::parse(QString command)
@@ -222,71 +198,52 @@ bool ServerRun::parse(QString command)
         }
         // end aliases
 
-        if(primary.compare("listAvailable", Qt::CaseInsensitive) == 0)
+        if(primary.compare("start", Qt::CaseInsensitive) == 0)
         {
-            //listAvailableAddresses();
-        }
-        else if(primary.compare("listen", Qt::CaseInsensitive) == 0)
-        {
-            /*
-            if(server1.isListening())
+            if(commandParts.length() < 3)
             {
-                qPrint(qout, tr("Server is already running."));
+                qPrint(qout, "Usage: start [ip] [port]");
                 return false;
             }
             else
             {
-                if(commandParts.length() < 3)
+                server = new QProcess();
+                bool success = QObject::connect(server, &QProcess::errorOccurred,
+                                                this, &ServerRun::processError)
+                        && QObject::connect(server, &QProcess::started,
+                                            this, &ServerRun::serverStarted)
+                        && QObject::connect(server, &QProcess::stateChanged,
+                                            this, &ServerRun::serverChanged)
+                        && QObject::connect(server, &QProcess::finished,
+                                            this, &ServerRun::processFinished)
+                        && QObject::connect(server, &QProcess::readyReadStandardError,
+                                            this, &ServerRun::serverStderr)
+                        && QObject::connect(server, &QProcess::readyReadStandardOutput,
+                                            this, &ServerRun::serverStderr);
+                if(!success)
                 {
-                    qPrint(qout, tr("Usage: listen [ip] [port]"));
-                    return false;
+                    qFatal("Communication with server process can't be established.");
                 }
-                else
-                {
-                    QHostAddress address = QHostAddress(commandParts[1]);
-                    if(address.isNull())
-                    {
-                        qPrint(qout, tr("Ip isn't valid"));
-                        return false;
-                    }
-                    bool ok;
-                    int port = commandParts[2].toInt(&ok);
-                    if(!ok)
-                    {
-                        qPrint(qout, tr("Port isn't int"));
-                        return false;
-                    }
-                    if (server1.listen(address, port)) {
-                        QString msg = tr("Server is listening on address %1 and port %2")
-                                .arg(address.toString())
-                                .arg(port);
-                        qPrint(qout, msg);
-                        addInfoMessage(msg);
-                        return true;
-                    }
-                }
-            }
-            */
-        }
-        else if (primary.compare("unlisten", Qt::CaseInsensitive) == 0)
-        {
-            /*
-            if(!server1.isListening())
-            {
-                qPrint(qout, tr("Server isn't running."));
-                return false;
-            }
-            else
-            {
-                server1.close();
-                qPrint(qout, tr("Server is not accepting new connections"));
-                addInfoMessage(tr("Server is not accepting new connections"));
+                server->start("build-Server-Desktop_Qt_6_1_0_MinGW_64_bit-Debug/debug/Server.exe",
+                              {commandParts[1], commandParts[2]}, QIODevice::ReadWrite);
                 return true;
             }
-            */
+        }
+        else if(primary.compare("stop", Qt::CaseInsensitive) == 0)
+        {
+            shutdownServer();
+            return true;
+        }
+        else if(primary.compare("exit", Qt::CaseInsensitive) == 0)
+        {
+            exitGracefully();
+            return true;
+        }
+        else
+        {
+            invalidCommand();
         }
     }
-    // emit invalidCommand();
     return false;
 }
 
@@ -523,18 +480,12 @@ void ServerRun::customMessageHandler(QtMsgType type, const QMessageLogContext &c
         break;
     case QtCriticalMsg:
         txt += QString("{Critical} \t %1").arg(txt2);
-
-#ifdef Q_OS_WIN
-        WriteConsoleW(GetStdHandle(STD_OUTPUT_HANDLE),
-                      txt.utf16(), txt.size(), NULL, NULL);
-#else
-        std::cout << txt.toUtf8().constData();
-#endif
-        std::cout << std::endl;
-
         break;
     case QtFatalMsg:
         txt += QString("{Fatal} \t\t %1").arg(txt2);
+        abort();
+        break;
+    }
 
 #ifdef Q_OS_WIN
         WriteConsoleW(GetStdHandle(STD_OUTPUT_HANDLE),
@@ -543,10 +494,6 @@ void ServerRun::customMessageHandler(QtMsgType type, const QMessageLogContext &c
         std::cout << txt.toUtf8().constData();
 #endif
         std::cout << std::endl;
-
-        abort();
-        break;
-    }
 
     QFile outFile("LogFile.log");
     outFile.open(QIODevice::WriteOnly | QIODevice::Append);

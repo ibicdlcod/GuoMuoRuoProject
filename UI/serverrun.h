@@ -21,6 +21,7 @@ public:
 
 signals:
     void finished();
+    //void exit(int);
 
 public slots:
     void run();
@@ -34,6 +35,7 @@ private slots:
     void serverStarted();
     void serverChanged(QProcess::ProcessState);
     void shutdownServer();
+    bool parse(QString);
 
 private:
     void invalidCommand();
@@ -49,7 +51,6 @@ private:
     static int callength(const QHostAddress &, bool naive = false);
     static const QString & strfiy(const QString &);
     static QString strfiy(const QHostAddress &);
-    bool parse(QString);
     void exitGracefully();
 
     ConsoleTextStream qout;
@@ -57,6 +58,7 @@ private:
     QList<QHostAddress> availableAddresses;
     QProcess *server;
     QTimer *timer;
+    bool readyToQuit;
 };
 
 #endif // SERVERRUN_H

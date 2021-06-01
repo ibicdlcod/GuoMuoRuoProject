@@ -67,6 +67,7 @@ int main(int argc, char *argv[])
             ServerRun r;
             qInstallMessageHandler(ServerRun::customMessageHandler);
             QObject::connect(&r, &ServerRun::finished, &a, &QCoreApplication::quit);
+            //QObject::connect(&r, &ServerRun::exit, &a, &QCoreApplication::exit, Qt::QueuedConnection);
             QTimer::singleShot(0, &r, &ServerRun::run);
 
             return a.exec();
