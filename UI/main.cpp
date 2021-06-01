@@ -1,7 +1,9 @@
+/* QtCreator generated */
 #include <QCoreApplication>
 #include <QLocale>
 #include <QTranslator>
 
+/* OS Specific */
 #ifdef Q_OS_WIN
 #include <windows.h>
 #ifndef ENABLE_VIRTUAL_TERMINAL_PROCESSING
@@ -10,6 +12,12 @@
 #else
 #include <locale.h>
 #endif
+
+/* Qt Libs */
+#include <QTimer>
+
+/* program header */
+#include "serverrun.h"
 
 int main(int argc, char *argv[])
 {
@@ -48,7 +56,6 @@ int main(int argc, char *argv[])
             break;
         }
     }
-
     try {
         if(argc <= 1 || std::strcmp(argv[1], "--client") == 0)
         {
@@ -57,6 +64,12 @@ int main(int argc, char *argv[])
         else if(std::strcmp(argv[1], "--server") == 0)
         {
             // server UI
+            ServerRun r;
+            qInstallMessageHandler(ServerRun::customMessageHandler);
+            QObject::connect(&r, &ServerRun::finished, &a, &QCoreApplication::quit);
+            QTimer::singleShot(0, &r, &ServerRun::run);
+
+            return a.exec();
         }
         else
         {
@@ -66,6 +79,5 @@ int main(int argc, char *argv[])
         qDebug() << e.what() << Qt::endl << "Press ENTER to exit.";
         return 1;
     }
-
-    return a.exec();
+    return -1;
 }

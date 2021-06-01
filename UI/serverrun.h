@@ -1,33 +1,47 @@
-#ifndef RUN_H
-#define RUN_H
+#ifndef SERVERRUN_H
+#define SERVERRUN_H
 
 #include <QObject>
+
 #include <QHostAddress>
+#include <QProcess>
+#include <QTimer>
 
 #include "consoletextstream.h"
 #include "wcwidth.h"
 #include "qprint.h"
 
-class Run : public QObject
+class ServerRun : public QObject
 {
     Q_OBJECT
 
 public:
-    explicit Run(QObject *parent = nullptr);
+    explicit ServerRun(QObject *parent = nullptr);
     static void customMessageHandler(QtMsgType, const QMessageLogContext &, const QString &);
 
 signals:
     void finished();
 
-private slots:
+public slots:
     void run();
+    void update();
 
-    void invalidCommand();
-    void showAllCommands();
-    void showCommands(const QList<STCType>);
-    void showHelp(QStringList);
+private slots:
+    void processError(QProcess::ProcessError);
+    void processFinished(int, QProcess::ExitStatus);
+    void serverStderr();
+    void serverStdout();
+    void serverStarted();
+    void serverChanged(QProcess::ProcessState);
+    void shutdownServer();
 
 private:
+    void invalidCommand();
+    void showAllCommands();
+    template<class T>
+    void showCommands(const QList<T>);
+    void showHelp(QStringList);
+
     int getConsoleWidth();
     template<class T>
     void qls(const QList<T>);
@@ -41,6 +55,8 @@ private:
     ConsoleTextStream qout;
     ConsoleInput qin;
     QList<QHostAddress> availableAddresses;
+    QProcess *server;
+    QTimer *timer;
 };
 
-#endif // RUN_H
+#endif // SERVERRUN_H

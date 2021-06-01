@@ -9,17 +9,8 @@ CONFIG -= app_bundle
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
-        consoletextstream.cpp \
-        ecma48.cpp \
-        main.cpp \
-        qprint.cpp \
-        serverrun.cpp \
-        wcwidth.cpp
-
-TRANSLATIONS += \
-    UI_zh_CN.ts
-CONFIG += lrelease
-CONFIG += embed_translations
+        dtlsserver.cpp \
+        main.cpp
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
@@ -30,8 +21,4 @@ DISTFILES += \
     .gitignore
 
 HEADERS += \
-    consoletextstream.h \
-    ecma48.h \
-    qprint.h \
-    serverrun.h \
-    wcwidth.h
+    dtlsserver.h

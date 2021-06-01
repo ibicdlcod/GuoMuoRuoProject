@@ -2,6 +2,7 @@
 #define ECMA48_H
 
 #include <QObject>
+
 #include "consoletextstream.h"
 
 enum class EcmaSetter

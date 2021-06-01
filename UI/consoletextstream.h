@@ -2,12 +2,14 @@
 #define CONSOLETEXTSTREAM_H
 
 #include <QTextStream>
-#include <QIODevice>
 
 #ifdef Q_OS_WIN
 #include <windows.h>
 #include <iostream>
 #endif
+
+#include <QIODevice>
+#include <QSocketNotifier>
 
 /* usage of QTextStreamManipulator on this class is prohibited throughout due to unfixable bugs,
  * that is, qout << qSetFieldWidth result in QTextStream & rather than this class.
@@ -24,11 +26,21 @@ public:
 
 ConsoleTextStream & operator<<(ConsoleTextStream &s, QTextStreamManipulator &input);
 
-class ConsoleInput : public QTextStream
+class ConsoleInput : public QObject
 {
+    Q_OBJECT
 public:
-    ConsoleInput();
+    explicit ConsoleInput(QObject *parent = nullptr);
     QString readline();
+
+signals:
+    void textReceived(QString);
+public slots:
+    void readline1();
+
+private:
+    QTextStream stream;
+    QSocketNotifier notifier;
 };
 
 #endif // CONSOLETEXTSTREAM_H

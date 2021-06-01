@@ -1,3 +1,5 @@
+#include <unistd.h>
+
 #include "consoletextstream.h"
 
 ConsoleTextStream::ConsoleTextStream()
@@ -58,9 +60,10 @@ void ConsoleTextStream::setFieldAlignment(QTextStream::FieldAlignment alignment)
     QTextStream::setFieldAlignment(alignment);
 }
 
-ConsoleInput::ConsoleInput()
-    :QTextStream(stdin, QIODevice::ReadOnly)
+ConsoleInput::ConsoleInput(QObject *parent)
+    :QObject(parent), stream(QTextStream(stdin, QIODevice::ReadOnly)), notifier(STDIN_FILENO, QSocketNotifier::Read)
 {
+    QObject::connect(&notifier, &QSocketNotifier::activated, this, &ConsoleInput::readline1);
 }
 
 QString ConsoleInput::readline()
@@ -81,7 +84,28 @@ QString ConsoleInput::readline()
         res.truncate(res.length() - 1);
     return res;
 #else
-    return QTextStream::readLine();
+    return stream.readLine();
 #endif
 }
 
+void ConsoleInput::readline1()
+{
+    QString res;
+#ifdef Q_OS_WIN32
+    const int bufsize = 512;
+    wchar_t buf[bufsize];
+    DWORD read;
+    do {
+        ReadConsoleW(GetStdHandle(STD_INPUT_HANDLE),
+                     buf, bufsize, &read, NULL);
+        res += QString::fromWCharArray(buf, read);
+    } while (read > 0 && res[res.length() - 1] != '\n');
+    // could just do res.truncate(res.length() - 2), but better be safe
+    while (res.length() > 0
+           && (res[res.length() - 1] == '\r' || res[res.length() - 1] == '\n'))
+        res.truncate(res.length() - 1);
+#else
+    res = stream.readLine();
+#endif
+    emit textReceived(res);
+}

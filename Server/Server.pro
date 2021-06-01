@@ -9,15 +9,13 @@ CONFIG -= app_bundle
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
-        consoletextstream.cpp \
-        ecma48.cpp \
+        dtlsserver.cpp \
         main.cpp \
-        qprint.cpp \
-        serverrun.cpp \
-        wcwidth.cpp
+        messagehandler.cpp \
+        run.cpp
 
 TRANSLATIONS += \
-    UI_zh_CN.ts
+    Server_zh_CN.ts
 CONFIG += lrelease
 CONFIG += embed_translations
 
@@ -30,8 +28,6 @@ DISTFILES += \
     .gitignore
 
 HEADERS += \
-    consoletextstream.h \
-    ecma48.h \
-    qprint.h \
-    serverrun.h \
-    wcwidth.h
+    dtlsserver.h \
+    messagehandler.h \
+    run.h
