@@ -31,12 +31,12 @@ class ConsoleInput : public QObject
     Q_OBJECT
 public:
     explicit ConsoleInput(QObject *parent = nullptr);
-    QString readline();
+    QString readlineOld();
 
 signals:
     void textReceived(QString);
 public slots:
-    void readline1();
+    void readline();
 
 private:
     QTextStream stream;

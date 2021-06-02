@@ -1,41 +1,31 @@
-#ifndef SERVERRUN_H
-#define SERVERRUN_H
+#ifndef CONSOLERUN_H
+#define CONSOLERUN_H
 
 #include <QObject>
-
-#include <QHostAddress>
-#include <QProcess>
 #include <QTimer>
+#include <QHostAddress>
+#include <QFile>
 
 #include "consoletextstream.h"
-#include "wcwidth.h"
-#include "qprint.h"
 
-class ServerRun : public QObject
+class ConsoleRun : public QObject
 {
     Q_OBJECT
-
 public:
-    explicit ServerRun(QObject *parent = nullptr);
+    explicit ConsoleRun(QObject *parent = nullptr);
+    ~ConsoleRun();
     static void customMessageHandler(QtMsgType, const QMessageLogContext &, const QString &);
 
 signals:
     void finished();
-    //void exit(int);
 
 public slots:
     void run();
-    void update();
+    //void update();
 
 private slots:
-    void processError(QProcess::ProcessError);
-    void processFinished(int, QProcess::ExitStatus);
-    void serverStderr();
-    void serverStdout();
-    void serverStarted();
-    void serverChanged(QProcess::ProcessState);
-    void shutdownServer();
-    bool parse(const QString &);
+    //virtual void displayprompt();
+    //virtual bool parse(const QString &);
 
 private:
     void invalidCommand();
@@ -47,18 +37,19 @@ private:
     int getConsoleWidth();
     template<class T>
     void qls(const QList<T>);
+
     static int callength(const QString &, bool naive = false);
     static int callength(const QHostAddress &, bool naive = false);
     static const QString & strfiy(const QString &);
     static QString strfiy(const QHostAddress &);
-    void exitGracefully();
 
+    //virtual void exitGracefully();
+
+    QFile *logFile;
+    bool readyToQuit;
+    QTimer *timer;
     ConsoleTextStream qout;
     ConsoleInput qin;
-    QList<QHostAddress> availableAddresses;
-    QProcess *server;
-    QTimer *timer;
-    bool readyToQuit;
 };
 
-#endif // SERVERRUN_H
+#endif // CONSOLERUN_H

@@ -16,6 +16,9 @@
 /* Qt Libs */
 #include <QTimer>
 
+/* Third-party Libs */
+#include <QConsoleListener>
+
 /* program header */
 #include "serverrun.h"
 
@@ -56,6 +59,7 @@ int main(int argc, char *argv[])
             break;
         }
     }
+
     try {
         if(argc <= 1 || std::strcmp(argv[1], "--client") == 0)
         {
@@ -65,10 +69,29 @@ int main(int argc, char *argv[])
         {
             // server UI
             ServerRun r;
-            qInstallMessageHandler(ServerRun::customMessageHandler);
+            //qInstallMessageHandler(ServerRun::customMessageHandler);
             QObject::connect(&r, &ServerRun::finished, &a, &QCoreApplication::quit);
             //QObject::connect(&r, &ServerRun::exit, &a, &QCoreApplication::exit, Qt::QueuedConnection);
-            QTimer::singleShot(0, &r, &ServerRun::run);
+            //QTimer::singleShot(0, &r, &ServerRun::run);
+
+            QConsoleListener console;
+            bool success = a.connect(&console, &QConsoleListener::newLine,
+                                     [&a, &r](const QString &strNewLine) {
+                qDebug() << "Echo :" << strNewLine;
+                // quit
+                if (strNewLine.compare("start", Qt::CaseInsensitive) == 0)
+                {
+                    QTimer::singleShot(0, &r, &ServerRun::run);
+                }
+                if (strNewLine.compare("q", Qt::CaseInsensitive) == 0)
+                {
+                    qDebug() << "Goodbye";
+                    a.quit();
+                }
+            });
+            qDebug() << (success ? "SUCCESS" : "FAILURE");
+
+            qDebug() << "Listening to console input:";
 
             return a.exec();
         }

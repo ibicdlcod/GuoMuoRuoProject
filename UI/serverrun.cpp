@@ -10,6 +10,7 @@
 #include <unistd.h> // for STDOUT_FILENO
 #endif
 
+#include <QConsoleListener>
 #include <QCoreApplication>
 
 #include "serverrun.h"
@@ -61,22 +62,25 @@ void ServerRun::run()
 
     timer = new QTimer(this);
     QObject::connect(timer, &QTimer::timeout, this, &ServerRun::update);
-    QObject::connect(&qin, &ConsoleInput::textReceived, this, &ServerRun::parse);
-    timer->start(1000);
-
+    //QObject::connect(&qin, &ConsoleInput::textReceived, this, &ServerRun::parse);
+    //QObject::connect(&console, &QConsoleListener::newLine, this, &ServerRun::parse);
+    //timer->start(1000);
+    /*
     while(!readyToQuit)
     {
         update();
-        qout << "STS ";
-        qout << ((server && server->isWritable()) ? "RUNNING" : "NOTRUNNING");
-        qout << "$ ";
-        qin.readline1();
-    }
-    return;
+        //qin.readline();
+    }*/
+    qout << "Run ended.\n";
 }
 
 void ServerRun::update()
 {
+    qout << "STS ";
+    qout << ((server && server->isWritable()) ? "RUNNING" : "NOTRUNNING");
+    qout << "$ \n";
+    timer->start(1000); //reset the timer
+    QCoreApplication::processEvents();
     QCoreApplication::processEvents();
     qout.flush();
 }
@@ -182,7 +186,7 @@ void ServerRun::exitGracefully()
     readyToQuit = true;
 }
 
-bool ServerRun::parse(QString command)
+bool ServerRun::parse(const QString &command)
 {
     QStringList commandParts = command.split(QRegularExpression("\\s+"), Qt::SkipEmptyParts);
     if(commandParts.length() > 0)

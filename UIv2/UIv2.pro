@@ -1,5 +1,4 @@
 QT -= gui
-QT += network
 
 CONFIG += c++11 console
 CONFIG -= app_bundle
@@ -9,16 +8,10 @@ CONFIG -= app_bundle
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
-        consolerun.cpp \
-        consoletextstream.cpp \
-        ecma48.cpp \
-        main.cpp \
-        qprint.cpp \
-        serverrun.cpp \
-        wcwidth.cpp
+        main.cpp
 
 TRANSLATIONS += \
-    UI_zh_CN.ts
+    UIv2_zh_CN.ts
 CONFIG += lrelease
 CONFIG += embed_translations
 
@@ -26,16 +19,3 @@ CONFIG += embed_translations
 qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
-
-DISTFILES += \
-    .gitignore
-
-HEADERS += \
-    consolerun.h \
-    consoletextstream.h \
-    ecma48.h \
-    qprint.h \
-    serverrun.h \
-    wcwidth.h
-
-include($$PWD/../QConsoleListener/src/qconsolelistener.pri)

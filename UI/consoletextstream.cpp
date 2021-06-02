@@ -63,10 +63,10 @@ void ConsoleTextStream::setFieldAlignment(QTextStream::FieldAlignment alignment)
 ConsoleInput::ConsoleInput(QObject *parent)
     :QObject(parent), stream(QTextStream(stdin, QIODevice::ReadOnly)), notifier(STDIN_FILENO, QSocketNotifier::Read)
 {
-    QObject::connect(&notifier, &QSocketNotifier::activated, this, &ConsoleInput::readline1);
+    QObject::connect(&notifier, &QSocketNotifier::activated, this, &ConsoleInput::readline);
 }
 
-QString ConsoleInput::readline()
+QString ConsoleInput::readlineOld()
 {
 #ifdef Q_OS_WIN32
     const int bufsize = 512;
@@ -88,7 +88,7 @@ QString ConsoleInput::readline()
 #endif
 }
 
-void ConsoleInput::readline1()
+void ConsoleInput::readline()
 {
     QString res;
 #ifdef Q_OS_WIN32
