@@ -26,10 +26,29 @@ QConsoleListener::QConsoleListener()
 	QObject::connect(m_notifier, &QSocketNotifier::activated,
 #endif 
 	[this]() {
+        /* the following is different from the original at https://github.com/juangburgos/QConsoleListener/blob/master/src/qconsolelistener.cpp
+         * becase windows console can't handle unicode
+         */
+        QString res;
+#ifdef Q_OS_WIN32
+    const int bufsize = 512;
+    wchar_t buf[bufsize];
+    DWORD read;
+    do {
+        ReadConsoleW(GetStdHandle(STD_INPUT_HANDLE),
+                     buf, bufsize, &read, NULL);
+        res += QString::fromWCharArray(buf, read);
+    } while (read > 0 && res[res.length() - 1] != '\n');
+    // could just do res.truncate(res.length() - 2), but better be safe
+    while (res.length() > 0
+           && (res[res.length() - 1] == '\r' || res[res.length() - 1] == '\n'))
+        res.truncate(res.length() - 1);
+#else
 		std::string line;
 		std::getline(std::cin, line);
-		QString strLine = QString::fromStdString(line);
-		Q_EMIT this->finishedGetLine(strLine);
+        res = QString::fromStdString(line);
+#endif
+        Q_EMIT this->finishedGetLine(res);
 	});
 	m_thread.start();
 }
