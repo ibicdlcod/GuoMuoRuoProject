@@ -17,11 +17,6 @@ CLI::CLI(int argc, char ** argv)
 
 }
 
-CLI::~CLI()
-{
-
-}
-
 void CLI::customMessageHandler(QtMsgType type, const QMessageLogContext &context, const QString &msg)
 {
     QString dt = QDateTime::currentDateTime().toString("dd/MM/yyyy hh:mm:ss");
@@ -52,12 +47,12 @@ void CLI::customMessageHandler(QtMsgType type, const QMessageLogContext &context
     }
 
 #ifdef Q_OS_WIN
-        WriteConsoleW(GetStdHandle(STD_OUTPUT_HANDLE),
-                      txt.utf16(), txt.size(), NULL, NULL);
+    WriteConsoleW(GetStdHandle(STD_OUTPUT_HANDLE),
+                  txt.utf16(), txt.size(), NULL, NULL);
 #else
-        std::cout << txt.toUtf8().constData();
+    std::cout << txt.toUtf8().constData();
 #endif
-        std::cout << std::endl;
+    std::cout << std::endl;
 
     if(!logFile->isWritable())
     {
@@ -211,6 +206,19 @@ void CLI::showHelp(const QStringList &)
     qout << tr("Use 'exit' to quit, 'help' to show help, 'commands' to show available commands.") << Qt::endl;
 }
 
+inline int CLI::callength(const QString &input, bool naive)
+{
+    if(naive)
+    {
+        return input.length();
+    }
+    else
+    {
+        const QChar *data = input.constData();
+        return mk_wcswidth(data, input.size());
+    }
+}
+
 int CLI::getConsoleWidth()
 {
     int width;
@@ -323,19 +331,6 @@ void CLI::qls(const QStringList &input)
         }
         qout.setFieldWidth(0);
         qout << Qt::endl;
-    }
-}
-
-inline int CLI::callength(const QString &input, bool naive)
-{
-    if(naive)
-    {
-        return input.length();
-    }
-    else
-    {
-        const QChar *data = input.constData();
-        return mk_wcswidth(data, input.size());
     }
 }
 

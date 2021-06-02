@@ -11,7 +11,6 @@ class CLI : public QCoreApplication
 {
 public:
     explicit CLI(int, char **);
-    ~CLI();
 
 public slots:
     static void customMessageHandler(QtMsgType type, const QMessageLogContext &context, const QString &msg);
@@ -29,11 +28,9 @@ protected:
     void showCommands(bool validOnly);
     void showHelp(const QStringList &);
 
-
+    static int callength(const QString &, bool naive = false);
     int getConsoleWidth();
     void qls(const QStringList &);
-
-    static int callength(const QString &, bool naive = false);
 
     void exitGracefully();
     virtual void exitGraceSpec() = 0;

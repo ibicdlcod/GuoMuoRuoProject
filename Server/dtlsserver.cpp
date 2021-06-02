@@ -51,9 +51,13 @@
 #include "dtlsserver.h"
 
 #include <algorithm>
+#include <QConsoleListener>
 
 QT_BEGIN_NAMESPACE
 
+/* Ugly as fuck, but otherwise your server is either stuck on a blocking readline() or can't properly exit
+ * when executed from a parent process. */
+extern QConsoleListener *console;
 namespace {
 
 QString peer_info(const QHostAddress &address, quint16 port)
@@ -273,4 +277,21 @@ void DtlsServer::shutdown()
 }
 //! [14]
 
+void DtlsServer::parse(const QString &cmdline)
+{
+    if(cmdline.startsWith("SIGTERM"))
+    {
+        close();
+        this->shutdown();
+        emit infoMessage(tr("Server is shutting down"));
+        QTimer::singleShot(2000, this, &DtlsServer::freeConsole);
+    }
+}
+
+void DtlsServer::freeConsole()
+{
+    free(console);
+    emit infoMessage(tr("Server shutdown complete, press ENTER to exit."));
+    emit finished(0);
+}
 QT_END_NAMESPACE

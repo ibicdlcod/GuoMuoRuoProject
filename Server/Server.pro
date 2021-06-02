@@ -11,8 +11,7 @@ CONFIG -= app_bundle
 SOURCES += \
         dtlsserver.cpp \
         main.cpp \
-        messagehandler.cpp \
-        run.cpp
+        messagehandler.cpp
 
 TRANSLATIONS += \
     Server_zh_CN.ts
@@ -24,10 +23,11 @@ qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
+include($$PWD/../QConsoleListener/src/qconsolelistener.pri)
+
 DISTFILES += \
     .gitignore
 
 HEADERS += \
     dtlsserver.h \
-    messagehandler.h \
-    run.h
+    messagehandler.h

@@ -70,6 +70,8 @@ public:
     bool listen(const QHostAddress &address, quint16 port);
     bool isListening() const;
     void close();
+    void shutdown(); // originally private
+    void parse(const QString &cmdline);
 
 signals:
     void errorMessage(const QString &message);
@@ -78,10 +80,12 @@ signals:
 
     void datagramReceived(const QString &peerInfo, const QByteArray &cipherText,
                           const QByteArray &plainText);
+    void finished(int);
 
 private slots:
     void readyRead();
     void pskRequired(QSslPreSharedKeyAuthenticator *auth);
+    void freeConsole();
 
 private:
     void handleNewConnection(const QHostAddress &peerAddress, quint16 peerPort,
@@ -89,7 +93,6 @@ private:
 
     void doHandshake(QDtls *newConnection, const QByteArray &clientHello);
     void decryptDatagram(QDtls *connection, const QByteArray &clientMessage);
-    void shutdown();
 
     bool listening = false;
     QUdpSocket serverSocket;

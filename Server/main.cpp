@@ -3,11 +3,14 @@
 #include <QTranslator>
 
 #include <QTextStream>
+#include <QtDebug>
+
+#include <QConsoleListener>
 
 #include "dtlsserver.h"
 #include "messagehandler.h"
-#include "run.h"
 
+QConsoleListener *console;
 int main(int argc, char *argv[])
 {
     QT_USE_NAMESPACE
@@ -29,11 +32,60 @@ int main(int argc, char *argv[])
     {
         argv_l.append(argv[i]);
     }
+    DtlsServer server;
+    MessageHandler handler;
 
-    Run r(nullptr, argc, argv_l);
-    QObject::connect(&r, &Run::finished, &a, &QCoreApplication::quit);
-    QObject::connect(&r, &Run::exit, &a, &QCoreApplication::exit, Qt::QueuedConnection);
-    QTimer::singleShot(0, &r, &Run::run);
+    bool success = QObject::connect(&server, &DtlsServer::errorMessage,
+                                    &handler, &MessageHandler::errorMessage)
+            && QObject::connect(&server, &DtlsServer::warningMessage,
+                                &handler, &MessageHandler::warningMessage)
+            && QObject::connect(&server, &DtlsServer::infoMessage,
+                                &handler, &MessageHandler::infoMessage)
+            && QObject::connect(&server, &DtlsServer::datagramReceived,
+                                &handler, &MessageHandler::addClientMessage);
+    if(!success)
+    {
+        qFatal("[Fatal] %s", server.tr("Communication with message handler can't be established.").toUtf8().constData());
+    }
 
-    return a.exec();
+    QHostAddress address = QHostAddress(argv[1]);
+    if(address.isNull())
+    {
+        emit server.errorMessage("Ip isn't valid");
+        return 102;
+    }
+    unsigned int port = QString(argv[2]).toInt();
+    if(port < 1024 || port > 49151)
+    {
+        emit server.errorMessage("Port isn't valid");
+        return 103;
+    }
+    if (server.listen(address, port)) {
+        QString msg = server.tr("Server is listening on address %1 and port %2")
+                .arg(address.toString())
+                .arg(port);
+        emit server.infoMessage(msg);
+        bool success0 = QObject::connect(&server, &DtlsServer::finished, &a, &QCoreApplication::exit, Qt::QueuedConnection);
+        if(!success0)
+        {
+            throw std::runtime_error("Exit mechanism failed!");
+        }
+        console = new QConsoleListener(false);
+        bool success = QObject::connect(console, &QConsoleListener::newLine, &server, &DtlsServer::parse);
+        if(!success)
+        {
+            throw std::runtime_error("Connection with input parser failed!");
+        }
+        //free(console);
+        //QTimer::singleShot(0, &server, &DtlsServer::run);
+        return a.exec();
+    }
+    else
+    {
+        QString msg = server.tr("Server failed to listen on address %1 and port %2")
+                .arg(address.toString())
+                .arg(port);
+        emit server.errorMessage(msg);
+        return 104;
+    }
 }

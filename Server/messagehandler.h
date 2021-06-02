@@ -17,8 +17,8 @@ public slots:
     void warningMessage(const QString &message);
     void infoMessage(const QString &message);
 
-    /*void datagramReceived(const QString &peerInfo, const QByteArray &cipherText,
-                          const QByteArray &plainText);*/
+    void addClientMessage(const QString &peerInfo, const QByteArray &datagram,
+                          const QByteArray &plainText);
 };
 
 #endif // MESSAGEHANDLER_H

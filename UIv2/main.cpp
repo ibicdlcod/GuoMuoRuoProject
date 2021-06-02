@@ -75,7 +75,7 @@ int main(int argc, char *argv[])
                     break;
                 }
             }
-            QConsoleListener console;
+            QConsoleListener console(true);
             bool success = QObject::connect(&console, &QConsoleListener::newLine, &a, &CLI::parse);
             if(!success)
             {

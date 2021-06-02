@@ -51,7 +51,7 @@ bool CliServer::parseSpec(const QStringList &commandParts)
                         && QObject::connect(server, &QProcess::readyReadStandardError,
                                             this, &CliServer::serverStderr)
                         && QObject::connect(server, &QProcess::readyReadStandardOutput,
-                                            this, &CliServer::serverStderr);
+                                            this, &CliServer::serverStdout);
                 if(!success)
                 {
                     qFatal("Communication with server process can't be established.");
@@ -145,9 +145,11 @@ void CliServer::shutdownServer()
     {
         server->write("SIGTERM\n");
         qout << tr("Waiting for server finish...") << Qt::endl;
+        server->terminate();
         if(!server->waitForFinished(waitformsec))
         {
-            qout << tr("Server isn't responding after %d msecs, killing.").arg(waitformsec) << Qt::endl;
+            qout << (tr("Server isn't responding after %1 msecs, killing.")).arg(QString::number(waitformsec))
+                 << Qt::endl;
             server->kill();
         }
     }

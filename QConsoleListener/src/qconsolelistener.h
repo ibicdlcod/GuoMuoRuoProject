@@ -16,7 +16,7 @@ class QConsoleListener : public QObject
     Q_OBJECT
 
 public:
-    QConsoleListener();
+    QConsoleListener(bool);
     ~QConsoleListener();
 
 Q_SIGNALS:
@@ -37,4 +37,5 @@ private Q_SLOTS:
 
 private:
 	QThread m_thread;
+    bool consolemode;
 };
