@@ -1,3 +1,5 @@
+This project is https://github.com/juangburgos/QConsoleListener, visit there for its canonical author.
+
 # QConsoleListener
 
 Small Qt library to handle console input asynchronously using signals and slots. Based on [gjorquera's snippet](https://gist.github.com/gjorquera/2576569).
