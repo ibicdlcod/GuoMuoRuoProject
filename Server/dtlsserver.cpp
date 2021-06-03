@@ -159,7 +159,6 @@ void DtlsServer::readyRead()
         emit warningMessage(tr("Failed to extract peer info (address, port)"));
         return;
     }
-S
     const auto client = std::find_if(knownClients.begin(), knownClients.end(),
                                      [&](const std::unique_ptr<QDtls> &connection){
         return connection->peerAddress() == peerAddress && connection->peerPort() == peerPort;
