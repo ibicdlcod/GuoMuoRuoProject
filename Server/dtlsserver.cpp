@@ -33,6 +33,7 @@
 **
 **
 ** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+        QTimer::singleShot(2000, this, &DtlsServer::freeConsole);
 ** "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
 ** LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
 ** A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
@@ -51,13 +52,12 @@
 #include "dtlsserver.h"
 
 #include <algorithm>
-#include <QConsoleListener>
 
 QT_BEGIN_NAMESPACE
 
 /* Ugly as fuck, but otherwise your server is either stuck on a blocking readline() or can't properly exit
  * when executed from a parent process. */
-extern QConsoleListener *console;
+//extern QConsoleListener *console;
 namespace {
 
 QString peer_info(const QHostAddress &address, quint16 port)
@@ -159,7 +159,6 @@ void DtlsServer::readyRead()
         emit warningMessage(tr("Failed to extract peer info (address, port)"));
         return;
     }
-S
     const auto client = std::find_if(knownClients.begin(), knownClients.end(),
                                      [&](const std::unique_ptr<QDtls> &connection){
         return connection->peerAddress() == peerAddress && connection->peerPort() == peerPort;
@@ -280,10 +279,11 @@ void DtlsServer::parse(const QString &cmdline)
 {
     if(cmdline.startsWith("SIGTERM"))
     {
+        emit infoMessage(tr("received SIGTERM"));
         close();
         this->shutdown();
         emit infoMessage(tr("Server is shutting down"));
-        QTimer::singleShot(2000, this, &DtlsServer::freeConsole);
+        QTimer::singleShot(2000, this, &DtlsServer::finished);
     }
     else if(cmdline.startsWith("UNLISTEN"))
     {
@@ -344,10 +344,4 @@ void DtlsServer::parse(const QString &cmdline)
     }
 }
 
-void DtlsServer::freeConsole()
-{
-    free(console);
-    emit infoMessage(tr("Server shutdown complete, press ENTER to exit."));
-    emit finished(0);
-}
 QT_END_NAMESPACE

@@ -1,7 +1,13 @@
 #include "cli.h"
 
+#ifdef Q_OS_UNIX
+#include <sys/ioctl.h> //ioctl() and TIOCGWINSZ
+#include <unistd.h> // for STDOUT_FILENO
+#endif
+
 #include <QDir>
 #include <QRegularExpression>
+#include <iostream>
 #include "ecma48.h"
 #include "wcwidth.h"
 
@@ -92,13 +98,17 @@ void CLI::openingwords()
             qout.setFieldWidth(0);
             qout << Qt::endl;
         }
+        qout << EcmaSetter::AllDefault;
+        qout.setFieldWidth(width);
+        qout << "";
+        qout.setFieldWidth(0);
         qout << Qt::endl;
         qout << Ecma48(192,255,192,true) << Ecma48(64,64,64);
 
         qout.setFieldWidth(width);
         qout << tr("What? Admiral Tanaka? He's the real deal, isn't he? Great at battle and bad at politics--so cool!");
         qout.setFieldWidth(0);
-        qout << Qt::endl;
+        qout << EcmaSetter::AllDefault << Qt::endl;
     }
     qout << EcmaSetter::AllDefault;
     qout.setFieldAlignment(QTextStream::AlignLeft);
@@ -341,8 +351,8 @@ void CLI::exitGracefully()
     {
         timer->stop();
     }
-    qout << EcmaSetter::AllDefault << Ecma48(64,255,64);
-    qout << tr("Goodbye, press ENTER to quit") << Qt::endl;
+    qout << Ecma48(64,255,64) << EcmaSetter::BlinkOn;
+    qout << tr("Goodbye, press ENTER to quit") << EcmaSetter::AllDefault << Qt::endl;
     logFile->close();
     quit();
 }

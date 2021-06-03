@@ -53,6 +53,8 @@
 #include <QtCore>
 #include <QtNetwork>
 
+#include <QConsoleListener>
+
 #include <vector>
 #include <memory>
 
@@ -80,12 +82,11 @@ signals:
 
     void datagramReceived(const QString &peerInfo, const QByteArray &cipherText,
                           const QByteArray &plainText);
-    void finished(int);
+    void finished();
 
 private slots:
     void readyRead();
     void pskRequired(QSslPreSharedKeyAuthenticator *auth);
-    void freeConsole();
 
 private:
     void handleNewConnection(const QHostAddress &peerAddress, quint16 peerPort,

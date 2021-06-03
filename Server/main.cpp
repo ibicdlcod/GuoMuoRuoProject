@@ -65,19 +65,18 @@ int main(int argc, char *argv[])
                 .arg(address.toString())
                 .arg(port);
         emit server.infoMessage(msg);
-        bool success0 = QObject::connect(&server, &DtlsServer::finished, &a, &QCoreApplication::exit, Qt::QueuedConnection);
-        if(!success0)
+        console = new QConsoleListener(false);
+        bool success = QObject::connect(console, &QConsoleListener::newLine, &server, &DtlsServer::parse);
+        bool success1 = QObject::connect(&server, &DtlsServer::finished, console, &QConsoleListener::exit);
+        bool success0 = QObject::connect(&server, &DtlsServer::finished, &a, &QCoreApplication::quit, Qt::QueuedConnection);
+        if(!success0 || !success1)
         {
             throw std::runtime_error("Exit mechanism failed!");
         }
-        console = new QConsoleListener(false);
-        bool success = QObject::connect(console, &QConsoleListener::newLine, &server, &DtlsServer::parse);
         if(!success)
         {
             throw std::runtime_error("Connection with input parser failed!");
         }
-        //free(console);
-        //QTimer::singleShot(0, &server, &DtlsServer::run);
         return a.exec();
     }
     else
