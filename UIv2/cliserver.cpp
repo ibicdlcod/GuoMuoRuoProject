@@ -56,7 +56,7 @@ bool CliServer::parseSpec(const QStringList &commandParts)
                 {
                     qFatal("Communication with server process can't be established.");
                 }
-                server->start("build-Server-Desktop_Qt_6_1_0_MinGW_64_bit-Debug/debug/Server.exe",
+                server->start("debug/Server/Server",
                               {commandParts[1], commandParts[2]}, QIODevice::ReadWrite);
                 return true;
             }
@@ -166,7 +166,7 @@ void CliServer::shutdownServer()
     {
         server->write("SIGTERM\n");
         qout << tr("Waiting for server finish...") << Qt::endl;
-        server->terminate();
+        //server->terminate();
         if(!server->waitForFinished(waitformsec))
         {
             qout << (tr("Server isn't responding after %1 msecs, killing.")).arg(QString::number(waitformsec))

@@ -82,3 +82,8 @@ QConsoleListener::~QConsoleListener()
     m_thread.quit();
     m_thread.wait();
 }
+
+void QConsoleListener::exit()
+{
+    delete this;
+}

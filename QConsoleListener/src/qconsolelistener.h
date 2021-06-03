@@ -32,6 +32,9 @@ private:
     QSocketNotifier *m_notifier;
 #endif
 
+public Q_SLOTS:
+    void exit();
+
 private Q_SLOTS:
 	void on_finishedGetLine(const QString &strNewLine);
 
