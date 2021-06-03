@@ -32,7 +32,7 @@ QConsoleListener::QConsoleListener(bool consolemode)
          * becase windows console can't handle unicode
          */
         QString res;
-#ifdef Q_OS_WIN32
+#ifdef Q_OS_WIN
         /*
         HWND consoleWnd = GetConsoleWindow();
         DWORD dwProcessId;

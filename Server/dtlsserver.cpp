@@ -159,11 +159,10 @@ void DtlsServer::readyRead()
         emit warningMessage(tr("Failed to extract peer info (address, port)"));
         return;
     }
-
+S
     const auto client = std::find_if(knownClients.begin(), knownClients.end(),
                                      [&](const std::unique_ptr<QDtls> &connection){
-        return connection->peerAddress() == peerAddress
-               && connection->peerPort() == peerPort;
+        return connection->peerAddress() == peerAddress && connection->peerPort() == peerPort;
     });
     //! [4]
 
@@ -207,8 +206,8 @@ void DtlsServer::handleNewConnection(const QHostAddress &peerAddress,
     const QString peerInfo = peer_info(peerAddress, peerPort);
     if (cookieSender.verifyClient(&serverSocket, clientHello, peerAddress, peerPort)) {
         emit infoMessage(peerInfo + tr(": verified, starting a handshake"));
-    //! [8]
-    //! [9]
+        //! [8]
+        //! [9]
         std::unique_ptr<QDtls> newConnection{new QDtls{QSslSocket::SslServerMode}};
         newConnection->setDtlsConfiguration(serverConfiguration);
         newConnection->setPeer(peerAddress, peerPort);
@@ -216,7 +215,7 @@ void DtlsServer::handleNewConnection(const QHostAddress &peerAddress,
                                this, &DtlsServer::pskRequired);
         knownClients.push_back(std::move(newConnection));
         doHandshake(knownClients.back().get(), clientHello);
-    //! [9]
+        //! [9]
     } else if (cookieSender.dtlsError() != QDtlsError::NoError) {
         emit errorMessage(tr("DTLS error: ") + cookieSender.dtlsErrorString());
     } else {
@@ -285,6 +284,63 @@ void DtlsServer::parse(const QString &cmdline)
         this->shutdown();
         emit infoMessage(tr("Server is shutting down"));
         QTimer::singleShot(2000, this, &DtlsServer::freeConsole);
+    }
+    else if(cmdline.startsWith("UNLISTEN"))
+    {
+        if(isListening())
+        {
+            emit infoMessage(tr("Server stopped listening."));
+            close();
+        }
+        else
+        {
+            emit infoMessage(tr("Server isn't listening."));
+        }
+    }
+    else if(cmdline.startsWith("RELISTEN"))
+    {
+        if(isListening())
+        {
+            emit infoMessage(tr("Server is already listening."));
+        }
+        else
+        {
+            QStringList commandParts = cmdline.split(QRegularExpression("\\s+"), Qt::SkipEmptyParts);
+            if(commandParts.length() < 3)
+            {
+                emit warningMessage(tr("Usage: RELISTEN [ip] [port]"));
+            }
+            else
+            {
+                QHostAddress address = QHostAddress(commandParts[1]);
+                if(address.isNull())
+                {
+                    emit errorMessage("Ip isn't valid");
+                    return;
+                }
+                unsigned int port = QString(commandParts[2]).toInt();
+                if(port < 1024 || port > 49151)
+                {
+                    emit errorMessage("Port isn't valid");
+                    return;
+                }
+                if (listen(address, port)) {
+                    QString msg = tr("Server is listening on address %1 and port %2")
+                            .arg(address.toString())
+                            .arg(port);
+                    emit infoMessage(msg);
+                    return;
+                }
+                else
+                {
+                    QString msg = tr("Server failed to listen on address %1 and port %2")
+                            .arg(address.toString())
+                            .arg(port);
+                    emit errorMessage(msg);
+                    return;
+                }
+            }
+        }
     }
 }
 

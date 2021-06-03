@@ -66,6 +66,27 @@ bool CliServer::parseSpec(const QStringList &commandParts)
             shutdownServer();
             return true;
         }
+        else if(primary.compare("unlisten", Qt::CaseInsensitive) == 0 && server && server->state()) // QProcess::NotRunning = 0
+        {
+            qout << tr("Server will stop accepting new connections.") << Qt::endl;
+            server->write("UNLISTEN\n");
+            return true;
+        }
+        else if(primary.compare("relisten", Qt::CaseInsensitive) == 0 && server && server->state())
+        {
+            if(commandParts.length() < 3)
+            {
+                qout << tr("Usage: relisten [ip] [port]") << Qt::endl;
+                return true; // if false, then the above message and invalidCommand becomes redundant
+            }
+            qout << tr("Server will resume accepting new connections.") << Qt::endl;
+            /* very ugly, but write() don't accept QString */
+            char command[120];
+            sprintf(command, "RELISTEN %s %s\n", commandParts[1].toUtf8().constData(), commandParts[2].toUtf8().constData());
+            server->write(command);
+            return true;
+        }
+        return false;
     }
     return false;
 }
@@ -163,7 +184,7 @@ const QStringList CliServer::getCommandsSpec()
 {
     QStringList result = QStringList();
     result.append(getCommands());
-    result.append({"start", "stop"});
+    result.append({"start", "stop", "unlisten", "relisten"});
     result.sort(Qt::CaseInsensitive);
     return result;
 }
@@ -175,6 +196,8 @@ const QStringList CliServer::getValidCommands()
     if(server && server->state())
     {
         result.append("stop");
+        result.append("unlisten");
+        result.append("relisten");
     }
     else
     {
@@ -186,5 +209,8 @@ const QStringList CliServer::getValidCommands()
 
 void CliServer::exitGraceSpec()
 {
-    shutdownServer();
+    if(server && server->state())
+    {
+        shutdownServer();
+    }
 }

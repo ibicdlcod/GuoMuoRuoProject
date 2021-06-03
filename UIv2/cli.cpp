@@ -341,9 +341,8 @@ void CLI::exitGracefully()
     {
         timer->stop();
     }
-    qout << EcmaSetter::AllDefault;
-    qout << tr("Goodbye") << Qt::endl;
-    qout << tr("STS ended, press ENTER to quit") << Qt::endl;
+    qout << EcmaSetter::AllDefault << Ecma48(64,255,64);
+    qout << tr("Goodbye, press ENTER to quit") << Qt::endl;
     logFile->close();
     quit();
 }

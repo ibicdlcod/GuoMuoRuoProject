@@ -10,6 +10,7 @@ CONFIG -= app_bundle
 
 SOURCES += \
         cli.cpp \
+        cliclient.cpp \
         cliserver.cpp \
         consoletextstream.cpp \
         ecma48.cpp \
@@ -30,6 +31,7 @@ include($$PWD/../QConsoleListener/src/qconsolelistener.pri)
 
 HEADERS += \
     cli.h \
+    cliclient.h \
     cliserver.h \
     consoletextstream.h \
     ecma48.h \
