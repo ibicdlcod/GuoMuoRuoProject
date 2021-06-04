@@ -70,7 +70,8 @@ signals:
     void errorMessage(const QString &message);
     void warningMessage(const QString &message);
     void infoMessage(const QString &message);
-    void clientResponse(const QString &clientInfo, const QByteArray &datagraam,
+    void clientResponse(const QString &clientInfo,
+                        const QByteArray &datagraam,
                         const QByteArray &plainText);
 
     void finished();
@@ -82,6 +83,9 @@ private slots:
     void pskRequired(QSslPreSharedKeyAuthenticator *auth);
     void pingTimeout();
 
+    /* See https://web.archive.org/web/20201023062748/https://wikiwiki.jp/kanc
+     * olle/%E8%89%A6%E5%A8%98%E8%A9%B3%E7%B4%B0%E3%83%86%E3%83%B3%E3%83%97%E3
+     * %83%AC for why this is named cat. */
     void catbomb();
 
 private:

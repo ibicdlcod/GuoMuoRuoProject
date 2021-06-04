@@ -15,6 +15,8 @@ ConsoleTextStream& ConsoleTextStream::operator<<(QString string)
     if(width > string.length())
     {
         int append_width = width - string.length();
+        if(append_width < 0)
+            append_width = 0;
         int left_append = append_width / 2;
         QTextStream::FieldAlignment alignment = this->fieldAlignment();
         switch (alignment) {

@@ -253,9 +253,9 @@ int CLI::getConsoleWidth()
 
 /* Using Unicode characters in console AT ALL is recommended against
  * (https://stackoverflow.com/a/3971750)
- * TBD: Use QFontMetrics to handle
+ * TODO: Use QFontMetrics to handle
  * https://stackoverflow.com/questions/31732698/getting-font-metrics-without-gui-console-mode
- * TBD: Qt Console can't display unicode correctly
+ * TODO: Qt Console can't display unicode correctly
  * https://bugreports.qt.io/browse/QTCREATORBUG-8099
  */
 void CLI::qls(const QStringList &input)
