@@ -5,12 +5,11 @@
 #include <QTextStream>
 #include <QtDebug>
 
-#include <QConsoleListener>
+#include "qconsolelistener.h"
 
 #include "dtlsserver.h"
 #include "messagehandler.h"
 
-QConsoleListener *console;
 int main(int argc, char *argv[])
 {
     QT_USE_NAMESPACE
@@ -65,6 +64,7 @@ int main(int argc, char *argv[])
                 .arg(address.toString())
                 .arg(port);
         emit server.infoMessage(msg);
+        QConsoleListener *console;
         console = new QConsoleListener(false);
         bool success = QObject::connect(console, &QConsoleListener::newLine, &server, &DtlsServer::parse);
         bool success1 = QObject::connect(&server, &DtlsServer::finished, console, &QConsoleListener::exit);

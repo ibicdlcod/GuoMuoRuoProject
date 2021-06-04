@@ -16,7 +16,7 @@
 #include <QDateTime>
 
 /* Third party */
-#include <QConsoleListener>
+#include "qconsolelistener.h"
 
 /* program headers */
 #include "cliserver.h"

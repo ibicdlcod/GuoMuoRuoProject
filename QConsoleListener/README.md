@@ -1,5 +1,7 @@
 This project is https://github.com/juangburgos/QConsoleListener, visit there for its canonical author.
 
+The ./src/ and ./test/ directories are of original author and unsuited to SpearofTanaka's project config, the contents of ./src/ is copied to ./qconsolelistener.cpp and ./qconsolelistener.h which is actually used.
+
 # QConsoleListener
 
 Small Qt library to handle console input asynchronously using signals and slots. Based on [gjorquera's snippet](https://gist.github.com/gjorquera/2576569).

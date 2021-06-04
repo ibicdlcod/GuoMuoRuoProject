@@ -33,7 +33,6 @@
 **
 **
 ** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-        QTimer::singleShot(2000, this, &DtlsServer::freeConsole);
 ** "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
 ** LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
 ** A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
@@ -55,9 +54,6 @@
 
 QT_BEGIN_NAMESPACE
 
-/* Ugly as fuck, but otherwise your server is either stuck on a blocking readline() or can't properly exit
- * when executed from a parent process. */
-//extern QConsoleListener *console;
 namespace {
 
 QString peer_info(const QHostAddress &address, quint16 port)
@@ -260,7 +256,7 @@ void DtlsServer::decryptDatagram(QDtls *connection, const QByteArray &clientMess
     } else if (connection->dtlsError() == QDtlsError::NoError) {
         emit warningMessage(peerInfo + ": " + tr("0 byte dgram, could be a re-connect attempt?"));
     } else {
-        emit errorMessage(peerInfo + ": " + connection->dtlsErrorString());
+        emit warningMessage(peerInfo + ": " + connection->dtlsErrorString());
     }
 }
 //! [12]

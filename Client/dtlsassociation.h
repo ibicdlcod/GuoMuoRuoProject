@@ -47,66 +47,51 @@
 ** $QT_END_LICENSE$
 **
 ****************************************************************************/
-#ifndef DTLSSERVER_H
-#define DTLSSERVER_H
+#ifndef DTLSASSOCIATION_H
+#define DTLSASSOCIATION_H
 
-#include <QtCore>
 #include <QtNetwork>
-
-#include "qconsolelistener.h"
-
-#include <vector>
-#include <memory>
+#include <QtCore>
 
 QT_BEGIN_NAMESPACE
 
 //! [0]
-class DtlsServer : public QObject
+class DtlsAssociation : public QObject
 {
     Q_OBJECT
 
 public:
-    DtlsServer();
-    ~DtlsServer();
-
-    bool listen(const QHostAddress &address, quint16 port);
-    bool isListening() const;
-    void close();
-    void parse(const QString &cmdline);
+    DtlsAssociation(const QHostAddress &address, quint16 port,
+                    const QString &connectionName);
+    ~DtlsAssociation();
+    void startHandshake();
 
 signals:
     void errorMessage(const QString &message);
     void warningMessage(const QString &message);
     void infoMessage(const QString &message);
-
-    void datagramReceived(const QString &peerInfo, const QByteArray &cipherText,
-                          const QByteArray &plainText);
-    void finished();
+    void serverResponse(const QString &clientInfo, const QByteArray &datagraam,
+                        const QByteArray &plainText);
 
 private slots:
+    void udpSocketConnected();
     void readyRead();
+    void handshakeTimeout();
     void pskRequired(QSslPreSharedKeyAuthenticator *auth);
+    void pingTimeout();
 
 private:
-    void handleNewConnection(const QHostAddress &peerAddress, quint16 peerPort,
-                             const QByteArray &clientHello);
+    QString name;
+    QUdpSocket socket;
+    QDtls crypto;
 
-    void doHandshake(QDtls *newConnection, const QByteArray &clientHello);
-    void decryptDatagram(QDtls *connection, const QByteArray &clientMessage);
+    QTimer pingTimer;
+    unsigned ping = 0;
 
-    void shutdown(); // were public at sometimes of the developmet
-
-    bool listening = false;
-    QUdpSocket serverSocket;
-
-    QSslConfiguration serverConfiguration;
-    QDtlsClientVerifier cookieSender;
-    std::vector<std::unique_ptr<QDtls>> knownClients;
-
-    Q_DISABLE_COPY(DtlsServer)
+    Q_DISABLE_COPY(DtlsAssociation)
 };
 //! [0]
 
 QT_END_NAMESPACE
 
-#endif // DTLSSERVER_H
+#endif // DTLSASSOCIATION_H

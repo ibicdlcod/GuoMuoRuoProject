@@ -13,7 +13,7 @@ QConsoleListener::QConsoleListener(bool consolemode)
     m_notifier = new QWinEventNotifier(GetStdHandle(STD_INPUT_HANDLE));
 #else
     m_notifier = new QSocketNotifier(fileno(stdin), QSocketNotifier::Read);
-#endif 
+#endif
     // NOTE : move to thread because std::getline blocks,
     //        then we sync with main thread using a QueuedConnection with finishedGetLine
     m_notifier->moveToThread(&m_thread);

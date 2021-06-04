@@ -73,8 +73,9 @@ Thumbs.db
 
 # Qt build
 build-*/
-debug/
-release/
+*/debug/
+*/profile/
+*/release/
 
 # Custom
 *.log

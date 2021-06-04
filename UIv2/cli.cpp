@@ -12,8 +12,8 @@
 #include "wcwidth.h"
 
 /* Ugly as fuck, but customMessageHandler had to be a member of CLI in order to use tr() and then said function
- * must be static, static member function can be called even if no objects of the class exist, so get logFile
- * as a static member of CLI won't compile */
+ * must be static, but logFile isn't const at complie time, leaveing no other option
+ */
 extern QFile *logFile;
 
 CLI::CLI(int argc, char ** argv)
@@ -26,28 +26,28 @@ CLI::CLI(int argc, char ** argv)
 void CLI::customMessageHandler(QtMsgType type, const QMessageLogContext &context, const QString &msg)
 {
     QString dt = QDateTime::currentDateTime().toString("dd/MM/yyyy hh:mm:ss");
-    QString txt = QString("\r[%1] ").arg(dt);
+    QString txt = QStringLiteral("\r[%1] ").arg(dt);
     QByteArray localMsg = msg.toUtf8();
     const char *file = context.file ? context.file : "";
     const char *function = context.function ? context.function : "";
 
-    QString txt2 = QString("%1 (%2:%3, %4)").arg(tr(localMsg.constData()), file, QString::number(context.line), function);
+    QString txt2 = QStringLiteral("%1 (%2:%3, %4)").arg(tr(localMsg.constData()), file, QString::number(context.line), function);
     switch (type)
     {
     case QtDebugMsg:
-        txt += QString("{Debug} \t\t %1").arg(txt2);
+        txt += QStringLiteral("{Debug} \t\t %1").arg(txt2);
         break;
     case QtInfoMsg:
-        txt += QString("{Info} \t\t %1").arg(txt2);
+        txt += QStringLiteral("{Info} \t\t %1").arg(txt2);
         break;
     case QtWarningMsg:
-        txt += QString("{Warning} \t %1").arg(txt2);
+        txt += QStringLiteral("{Warning} \t %1").arg(txt2);
         break;
     case QtCriticalMsg:
-        txt += QString("{Critical} \t %1").arg(txt2);
+        txt += QStringLiteral("{Critical} \t %1").arg(txt2);
         break;
     case QtFatalMsg:
-        txt += QString("{Fatal} \t\t %1").arg(txt2);
+        txt += QStringLiteral("{Fatal} \t\t %1").arg(txt2);
         abort();
         break;
     }

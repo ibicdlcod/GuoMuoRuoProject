@@ -56,7 +56,7 @@ bool CliServer::parseSpec(const QStringList &commandParts)
                 {
                     qFatal("Communication with server process can't be established.");
                 }
-                server->start("debug/Server/Server",
+                server->start("Server/debug/Server",
                               {commandParts[1], commandParts[2]}, QIODevice::ReadWrite);
                 return true;
             }
