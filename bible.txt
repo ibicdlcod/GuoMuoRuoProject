@@ -1,0 +1,96 @@
+--English(KJV)--
+/* This work is in the public domain outside the United Kingdom because the author has been deceased at least 100 years.
+ * However, owing to the subsistence of certain long-standing restrictions on publication and distribution, the work is NOT necessarily copyright or restriction free in the United Kingdom. Potential re-users of this content are * advised to check carefully if any restrictions would apply to their intended reuse.
+ */
+37 Thou, O king, art a king of kings: for the God of heaven hath given thee a kingdom, power, and strength, and glory.
+38 And wheresoever the children of men dwell, the beasts of the field and the fowls of the heaven hath he given into thine hand, and hath made thee ruler over them all. Thou art this head of gold.
+
+--French--
+/* Bible_du_Rabbinat_1899 */
+39A Après toi, s’élèvera un autre empire, inférieur au tien.
+--English--
+/* 1900 American Standard Version, which is identical with KJV here, but KJV crown copyright don't apply */
+39B and another third kingdom of brass, which shall bear rule over all the earth.
+--Russian--
+/* Russian Synodal Bible */
+40 А четвертое царство будет крепко, как железо; ибо как железо разбивает и раздробляет все, так и оно, подобно всесокрушающему железу, будет раздроблять и сокрушать.
+41 А что ты видел ноги и пальцы на ногах частью из глины горшечной, а частью из железа, то будет царство разделенное, и в нем останется несколько крепости железа, так как ты видел железо, смешанное с горшечною глиною.
+42 И как персты ног были частью из железа, а частью из глины, так и царство будет частью крепкое, частью хрупкое.
+43 А что ты видел железо, смешанное с глиною горшечною, это значит, что они смешаются через семя человеческое, но не сольются одно с другим, как железо не смешивается с глиною.
+--Uzbek--
+/* bible.com */
+40 Ундан кейин темирдай қаттиқ тўртинчи шоҳлик бўлади. Темир ҳамма нарсани синдириб йўқ қилганидай, ўша шоҳлик ҳам ундан олдинги шоҳликларни бузиб, йўқ қилади.
+41 Сиз ҳайкалнинг оёқлари ва оёқ бармоқларининг бир қисми лойдан, бир қисми темирдан эканлигини кўрдингиз, бу бўлинган шоҳлик бўлади. Лой билан темир бирга қорилгани учун бу шоҳликда бир оз темирнинг кучи бўлади.
+42 Шоҳлик айрим жиҳатдан кучли, айрим жиҳатдан заиф бўлади.
+43 Темир билан лойнинг қоришмаси яна шундан далолат берадики, ўша замон ҳукмдорлари қуда–андачилик йўли билан шоҳликларини мустаҳкам қилмоқчи бўладилар, аммо темир лой билан қовушмагани каби, улар ҳам бир–бири билан қовуша олмайдилар.
+--Estonian--
+/* bible.com */
+unavailable at the moment, https://www.bible.com/bible/309/GEN.1.EEP have no Old Testment besides Genisis
+--Latvian--
+/* bible.com */
+40 Tad nāks ceturtā valsts, cieta kā dzelzs. Un, kā dzelzs satriec un sagrauj visu, tā šī satrieks un sagraus visas pārējās.
+41 Tu redzēji, ka tēlam bija kājas un kāju pirksti pa daļai no māla, pa daļai no dzelzs, un tas norāda uz to, ka šī valsts būs savā būtībā nevienāda veidojuma valsts: tai piemitīs kaut kas no dzelzs stipruma, jo tu redzēji dzelzi, kas maisīta ar māliem;
+42 bet, ka tu redzēji kāju pirkstus pa daļai no dzelzs un pa daļai no māla esam, tas norāda, ka šī valsts būs pa daļai stipra, pa daļai tomēr tieksies arī sadrupt.
+43 Un, ka tu redzēji, ka dzelzs bija maisīta ar mālu, tas norāda, ka abu daļu cilvēki sadzīvē un laulības noslēdzot gan saskaras cits ar citu, bet neviena daļa nesaraujami nesavienojas ar otru, tieši tā kā dzelzs nesavienojas ar mālu.
+--Lithuanian--
+/* bible.com */
+40 Ketvirtoji karalystė bus stipri kaip geležis. Kaip geležis sudaužo ir sutrupina viską, taip ši karalystė sutrupins visas kitas.
+41 Kaip sapne regėjai, kad statulos kojos ir jų pirštai buvo dalinai iš molio ir dalinai iš geležies, taip ketvirtoji karalystė bus pasidalinusi, tačiau geležies stiprumo bus joje, nes tu matei geležį, sumaišytą su moliu.
+42 Kadangi kojų pirštai buvo iš geležies ir molio, tai karalystė bus dalinai stipri ir dalinai trapi.
+43 O kadangi regėjai geležį, maišytą su moliu, tai reiškia, kad jie susimaišys per žmogaus sėklą, tačiau nesusijungs, kaip geležis nesusijungia su moliu.
+--Belarusian--
+/* bible.com */
+40 А чацьвёртае царства будзе моцнае, як жалеза; бо як жалеза разьбівае і трушчыць усё, так і яно падобна да жалеза, якое ўсё зьнішчае, будзе трушчыць і нішчыць.
+41 А што ты бачыў ногі і пальцы на нагах часткова з гліны ганчарнай, а часткова з жалеза, то будзе падзеленае царства, і ў ім застанецца крыху жалезнае моцы, бо ты бачыў жалеза, зьмяшанае з ганчарнаю глінаю.
+42 І як пальцы ног былі часткова з жалеза, а часткова з гліны, так і царства будзе часткова моцнае, часткова крохкае.
+43 А што ты бачыў жалеза, зьмяшанае з ганчарнаю глінаю, гэта азначае, што яны зьмяшаюцца празь семя чалавечае, але ня зьліпнуцца адно з адным, як жалеза ня зьмешваецца з глінаю.
+--Ukrainian--
+/* bible.com */
+40 А царство четверте буде сильне, як залізо, бо залізо товче й розбиває все, так і воно стовче й розіб'є, як залізо, що все розбиває. 
+41 А що ти бачив ноги та пальці частинно з ганчарської глини, частинно з заліза, то це буде поділене царство, і в ньому буде трохи залізної міці, бо ти бачив залізо, змішане з глейкою глиною.
+42 А пальці ніг частинно з заліза, а частинно з глини, то й частина царства буде сильна, а частина буде ламлива.
+43 А що бачив ти залізо, змішане з глейкою глиною, то вони змішані будуть людським насінням, а не будуть прилягати одне до одного, як залізо не змішується з глиною.
+--Moldovian--
+/* Romanian, obviously, as the Soviets did little Bible translating */
+/* http://www.bibliaortodoxa.ro/carte.php?id=16&cap=2 which is the Orthodox Synodal Version */
+40.	Şi un al patrulea regat va fi tare ca fierul şi, după cum fierul sfărâmă şi zdrobeşte totul, aşa şi el va sfărâma şi va preface totul în pulbere, ca fierul care face totul bucăţi.
+41.	Iar picioarele pe care le-ai văzut şi degetele, unele de lut de olar şi altele de fier, înseamnă că va fi un regat împărţit şi va fi tare ca fierul, după cum tu ai văzut fier amestecat cu lut.
+42.	Şi degetele picioarelor, unele de fier şi altele de lut, înseamnă că regatul va fi parte tare, parte şubred.
+43.	Şi după cum ai văzut fierul amestecat cu lutul, aşa se vor amesteca prin înrudiri, dar nu vor avea legătură temeinică între ele, după cum fierul nu se poate amesteca la un loc cu lutul.
+--Georgian--
+/* bible.com */
+40 მეოთხე სამეფო რკინასავით მტკიცე იქნება. როგორც რკინა, ყველაფერს რომ ამსხვრევს და აქუცმაცებს, ასევე ისიც შემმუსვრელ რკინასავით ყოველივეს დააქუცმაცებს და შემუსრავს;
+41 როგორც იხილე, მას ფეხები და ფეხის თითები ნაწილობრივ მეთუნის თიხისა ჰქონდა, ნაწილობრივ – რკინისა, ასევე ის სამეფოც გაყოფილი იქნება: მასში ნაწილობრივ რკინის სიმტკიცე იქნება, რადგან თავადაც დაინახე მეთუნის თიხასთან შერეული რკინა.
+42 როგორც მისი ფეხის თითები ნაწილობრივ რკინისა იყო და ნაწილობრივ თიხისა, ასევე სამეფოც ნაწილობრივ მტკიცე იქნება და ნაწილობრივ – მყიფე.
+43 როგორც შენ თიხაში შერეული რკინა იხილე, ისინიც ისე შეერევიან კაცთა მოდგმის ძალით ერთმანეთს, მაგრამ ვერ შეერწყმიან ერთმანეთს, როგორც რკინა არ შეუდუღდება თიხას.
+--Armenian--
+/* bible.com */
+40 Իսկ չորրորդ թագավորությունը երկաթի նման պինդ կլինի. ինչպես որ երկաթը փշրում ու ջարդում է ամեն բան, սա ևս ամեն ինչ ջարդող երկաթի նման կփշրի ու կկոտրի։
+41 Եվ ոտքերն ու մատները, որ տեսար, մի մասը՝ բրուտի կավից, իսկ մյուս մասը՝ երկաթից. մի բաժանված թագավորություն է լինելու, բայց երկաթի ամրության բաժին է ունենալու, որովհետև երկաթը տղմոտ կավի հետ խառնված տեսար։
+42 Եվ ոտքերի մատները՝ մի մասը երկաթից, մյուս մասը՝ կավից. այդ թագավորությունը մասամբ է ամուր լինելու, իսկ մյուս մասը դյուրաբեկ է լինելու։
+43 Եվ որ տեսար երկաթը՝ խառնված տղմոտ կավի հետ, այսինքն՝ նրանք խառնվելու են մարդկանց սերնդի հետ, բայց միմյանց չպիտի կպչեն. ահա ինչպես երկաթը չի խառնվում կավի հետ։
+--Azerbjiani--
+/* bible.com */
+40 Dördüncü padşahlıq isə dəmir kimi möhkəm olacaq, çünki dəmir hər şeyi qırıb-dağıtdığı kimi o da başqalarını hər şeyi əzən dəmir tək qırıb-əzəcək.
+41 Ayaqların və barmaqların bir hissəsinin dulusçu gilindən, bir hissəsinin isə dəmirdən olduğunu görməyinin mənası budur ki, o bölünmüş padşahlıq olacaq. Onda bir qədər dəmir möhkəmliyi qalacaq, necə ki sən dəmiri dulusçu gili ilə qarışıq görmüsən.
+42 Ayaq barmaqlarının bir hissəsi dəmirdən, bir hissəsi gildən olduğu kimi bu padşahlığın da bir hissəsi möhkəm, bir hissəsi kövrək olacaq.
+43 Dəmiri dulusçu gili ilə qarışıq gördüyünün mənası budur ki, onlar müxtəlif insan nəsilləri vasitəsilə bir-birləri ilə qarışacaq, ancaq dəmir gillə birləşmədiyi kimi onlar da bir-birləri ilə birləşməyəcək.
+--Kazakh--
+/* bible.com */
+40 Содан кейін төртінші, темірдей мықты патшалық шығады. Темір қарудың барлық нәрсені сындырып, талқандай алатыны сияқты, осы патшалық та сол бұрынғы патшалықтарды талқандап күйретеді.
+41-42 Мүсіннің аяғы мен башпайларының жартылай қыштан, жартылай темірден болғанын көрдіңіз ғой. Бұл — сол төртінші патшалықтың екі бөліктен тұратынын бейнелейді. Кейбір бөлімдері темірдей қатты әрі күшті, ал басқалары қыш сияқты морт сынғыш болады.
+43 Өзіңіз көрген сол көріністегі темірдің қышпен араласқаны іспетті, сол бөлімдері де бір-бірімен араласады. Бірақ темірдің қышпен біртұтас бола алмайтынындай, араларында шынайы бірлік болмайды.
+--Kyrgyz--
+unavailable at the moment, https://www.bible.com/bible/2328/GEN.1.%D0%9A%D0%AB%D0%A0%D0%98 have no Old Testment
+--Tajik--
+/* bible.com */
+40 Ва салтанати чорум мисли оҳан қавӣ хоҳад буд; чунон ки оҳан ҳама чизро пора‐пора ва гард‐гард мекунад, он низ, мисли ҳамин оҳани шикананда, ҳамаи ин чизҳоро пора‐пора хоҳад кард ва хоҳад шикаст.
+41 Ва ин ки ту пойҳо ва ангуштонро дидаӣ, ки қисман аз гили кулолгар ва қисман аз оҳан буд, ин яъне мамлакати тақсимшудаест, ки қадаре аз қуввати оҳан дар он хоҳад буд, чунон ки ту оҳани бо гили кулолӣ омехтаро дидаӣ.
+42 Ва чунон ки ангуштони пойҳо қисман аз оҳан ва қисман аз гил буд, ончунон ин салтанат қисман қавӣ ва қисман зудшикан хоҳад буд.
+43 Ва ин ки ту оҳани бо гили кулолӣ омехтаро дидаӣ, ин яъне онҳо бо насли одам омезиш хоҳанд ёфт, валекин бо ҳамдигар пайванд нахоҳанд шуд, чунон ки оҳан бо гил пайванд намешавад.
+--Turkumen--
+/* bible.com */
+40 Dördünji patyşalyk demir ýaly güýçli bolar, çünki demriň ähli zady mynjyradyşy ýaly, ol hem bularyň hemmesini gyryp tükeder.
+41 Aýaklaryň we barmaklaryň ýarysynyň toýundan, ýarysynyň bolsa demirdendigini gördüň. Bu bolsa bölünen patyşalygy aňladýar. Demriň toýun bilen garylandygyny görşüň ýaly, onda biraz demriň güýji bolar.
+42 Aýaklaryň barmaklarynyň ýarysynyň demirden, ýarysynyň hem toýundan bolmagy, bu patyşalygyň bir böleginiň güýçli, bir böleginiň bolsa ejiz boljakdygyny aňladýar.
+43 Görşüň ýaly, demriň toýun bilen garylmagy halklaryň gyz alşyp-berşip, biri-birleri bilen garyşjakdyklaryny aňladýar. Emma demriň toýun bilen garylyp bilmeýşi ýaly, olar hem biri-birleri bilen garyşyp bilmezler.

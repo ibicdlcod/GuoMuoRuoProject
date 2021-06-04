@@ -81,7 +81,7 @@ void CLI::openingwords()
     QFile licenseFile(currentDir.filePath("openingwords.txt")); /* MAGICCONSTANT UNDESIREABLE NO 1 */
     if(!licenseFile.open(QIODevice::ReadOnly | QIODevice::Text))
     {
-        qout << tr("Can't fild icense file, exiting.") << Qt::endl;
+        qout << tr("Can't fild license file, exiting.") << Qt::endl;
         quit();
         return;
     }
