@@ -126,12 +126,19 @@ void CliServer::serverStderr()
 {
     QByteArray output = server->readAllStandardError();
     const char * output_str = output.constData();
-    switch(output_str[7])
+    if(output.startsWith("[Server"))
     {
-    case 'E': qCritical("%s", output.constData()); break;
-    case 'W': qWarning("%s", output.constData()); break;
-    case 'I': qInfo("%s", output.constData()); break;
-    default: qCritical("%s", output.constData()); break;
+        switch(output_str[7])
+        {
+        case 'E': qCritical("%s", output.constData()); break;
+        case 'W': qWarning("%s", output.constData()); break;
+        case 'I': qInfo("%s", output.constData()); break;
+        default: qCritical("%s", output.constData()); break;
+        }
+    }
+    else
+    {
+        qCritical("%s", output.constData());
     }
 }
 

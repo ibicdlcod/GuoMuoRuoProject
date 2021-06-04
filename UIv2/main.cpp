@@ -62,7 +62,7 @@ int main(int argc, char *argv[])
         else if(std::strcmp(argv[1], "--server") == 0)
         {
             // server UI
-            logFile = new QFile("LogFile.log");
+            logFile = new QFile("LogFile.log"); /* MAGICCONSTANT UNDESIREABLE NO 1 */
             if(!logFile->open(QIODevice::WriteOnly | QIODevice::Append))
             {
                 qFatal("Log file cannot be opened");
@@ -83,7 +83,7 @@ int main(int argc, char *argv[])
             }
             qInstallMessageHandler(a.customMessageHandler);
             QTimer::singleShot(0, &a, &CLI::openingwords);
-            QTimer::singleShot(0, &a, &CLI::displayPrompt);
+            QTimer::singleShot(100, &a, &CLI::displayPrompt);
 
             return a.exec();
         }

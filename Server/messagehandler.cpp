@@ -31,7 +31,5 @@ void MessageHandler::addClientMessage(const QString &peerInfo, const QByteArray 
 
     const QString html = formatter.arg(peerInfo, QString::fromUtf8(datagram.toHex(' ')),
                                        QString::fromUtf8(plainText));
-    //QTextStream qout = QTextStream(stdout);
-    //qout << html;
     qInfo("%s", html.toUtf8().constData());
 }

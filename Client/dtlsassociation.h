@@ -70,8 +70,10 @@ signals:
     void errorMessage(const QString &message);
     void warningMessage(const QString &message);
     void infoMessage(const QString &message);
-    void serverResponse(const QString &clientInfo, const QByteArray &datagraam,
+    void clientResponse(const QString &clientInfo, const QByteArray &datagraam,
                         const QByteArray &plainText);
+
+    void finished();
 
 private slots:
     void udpSocketConnected();
@@ -79,6 +81,8 @@ private slots:
     void handshakeTimeout();
     void pskRequired(QSslPreSharedKeyAuthenticator *auth);
     void pingTimeout();
+
+    void catbomb();
 
 private:
     QString name;

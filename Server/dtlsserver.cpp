@@ -187,7 +187,7 @@ void DtlsServer::pskRequired(QSslPreSharedKeyAuthenticator *auth)
 
     emit infoMessage(tr("PSK callback, received a client's identity: '%1'")
                      .arg(QString::fromLatin1(auth->identity())));
-    auth->setPreSharedKey(QByteArrayLiteral("\x1a\x2b\x3c\x4d\x5e\x6f"));
+    auth->setPreSharedKey(QByteArrayLiteral("\x1a\x2b\x3c\x4d\x5e\x6f")); /* MAGICCONSTANT UNDESIREABLE NO 1 */
 }
 //! [13]
 
@@ -321,7 +321,7 @@ void DtlsServer::parse(const QString &cmdline)
                     return;
                 }
                 if (listen(address, port)) {
-                    QString msg = tr("Server is listening on address %1 and port %2")
+                    QString msg = tr("Server is relistening on address %1 and port %2")
                             .arg(address.toString())
                             .arg(port);
                     emit infoMessage(msg);

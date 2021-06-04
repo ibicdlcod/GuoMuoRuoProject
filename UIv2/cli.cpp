@@ -62,7 +62,7 @@ void CLI::customMessageHandler(QtMsgType type, const QMessageLogContext &context
 
     if(!logFile->isWritable())
     {
-        qFatal("Log file cannot be written to");
+        qFatal("Log file cannot be written to.");
     }
 
     if(txt.contains('\0'))
@@ -77,17 +77,17 @@ void CLI::openingwords()
 {
     int width = getConsoleWidth();
     QString notice;
-    QDir serverDir = QDir::current();
-    QFile openingwords(serverDir.filePath("openingwords.txt"));
-    if(!openingwords.open(QIODevice::ReadOnly | QIODevice::Text))
+    QDir currentDir = QDir::current();
+    QFile licenseFile(currentDir.filePath("openingwords.txt")); /* MAGICCONSTANT UNDESIREABLE NO 1 */
+    if(!licenseFile.open(QIODevice::ReadOnly | QIODevice::Text))
     {
-        qout << tr("Opening words file not found, exiting.") << Qt::endl;
+        qout << tr("Can't fild icense file, exiting.") << Qt::endl;
         quit();
         return;
     }
     else
     {
-        QTextStream instream1(&openingwords);
+        QTextStream instream1(&licenseFile);
         qout << Ecma48(255,255,255,true) << Ecma48(0,0,255);
         qout.setFieldAlignment(QTextStream::AlignCenter);
         while(!instream1.atEnd())
@@ -106,7 +106,10 @@ void CLI::openingwords()
         qout << Ecma48(192,255,192,true) << Ecma48(64,64,64);
 
         qout.setFieldWidth(width);
+
+        /* This is considered an integral part of the program rather than magic constants. */
         qout << tr("What? Admiral Tanaka? He's the real deal, isn't he? Great at battle and bad at politics--so cool!");
+
         qout.setFieldWidth(0);
         qout << EcmaSetter::AllDefault << Qt::endl;
     }

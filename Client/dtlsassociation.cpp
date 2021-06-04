@@ -131,7 +131,7 @@ void DtlsAssociation::readyRead()
     if (crypto.isConnectionEncrypted()) {
         const QByteArray plainText = crypto.decryptDatagram(&socket, dgram);
         if (plainText.size()) {
-            emit serverResponse(name, dgram, plainText);
+            emit clientResponse(name, dgram, plainText);
             return;
         }
 
@@ -139,26 +139,27 @@ void DtlsAssociation::readyRead()
             emit errorMessage(tr("%1: shutdown alert received").arg(name));
             socket.close();
             pingTimer.stop();
+            catbomb();
             return;
         }
 
         emit warningMessage(tr("%1: zero-length datagram received?").arg(name));
     } else {
-    //! [7]
-    //! [8]
+        //! [7]
+        //! [8]
         if (!crypto.doHandshake(&socket, dgram)) {
             emit errorMessage(tr("%1: handshake error - %2").arg(name, crypto.dtlsErrorString()));
             return;
         }
-    //! [8]
+        //! [8]
 
-    //! [9]
+        //! [9]
         if (crypto.isConnectionEncrypted()) {
             emit infoMessage(tr("%1: encrypted connection established!").arg(name));
             pingTimer.start();
             pingTimeout();
         } else {
-    //! [9]
+            //! [9]
             emit infoMessage(tr("%1: continuing with handshake ...").arg(name));
         }
     }
@@ -180,7 +181,7 @@ void DtlsAssociation::pskRequired(QSslPreSharedKeyAuthenticator *auth)
 
     emit infoMessage(tr("%1: providing pre-shared key ...").arg(name));
     auth->setIdentity(name.toLatin1());
-    auth->setPreSharedKey(QByteArrayLiteral("\x1a\x2b\x3c\x4d\x5e\x6f"));
+    auth->setPreSharedKey(QByteArrayLiteral("\x1a\x2b\x3c\x4d\x5e\x6f")); /* MAGICCONSTANT UNDESIREABLE NO 1 */
 }
 //! [14]
 
@@ -199,4 +200,21 @@ void DtlsAssociation::pingTimeout()
 }
 //! [10]
 
+void DtlsAssociation::catbomb()
+{
+    /* This is considered an integral part of the program rather than magic constants. */
+    /* See https://en.wikipedia.org/w/index.php?title=The_world_wonders&oldid=1014651994 */
+    /*
+    emit errorMessage(QStringLiteral("%1 %2 %3 %4 %5 %6").arg(tr("TURKEY TROTS TO WATER"),
+                      tr("GG"),
+                      tr("FROM CINCPAC ACTION COM THIRD FLEET INFO COMINCH CTF SEVENTY-SEVEN X"),
+                      tr("WHERE IS RPT WHERE IS TASK FORCE THIRTY FOUR"),
+                      tr("RR"),
+                      tr("THE WORLD WONDERS")));
+                      */
+
+    /* no tr() should be used here */
+    emit errorMessage("[CATBOMB]");
+    QTimer::singleShot(2000, this, &DtlsAssociation::finished);
+}
 QT_END_NAMESPACE
