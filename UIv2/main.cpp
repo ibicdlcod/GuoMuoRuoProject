@@ -3,7 +3,7 @@
 #include <QTranslator>
 
 /* OS Specific */
-#ifdef Q_OS_WIN
+#if defined (Q_OS_WIN)
 #include <windows.h>
 #ifndef ENABLE_VIRTUAL_TERMINAL_PROCESSING
 #define ENABLE_VIRTUAL_TERMINAL_PROCESSING 0x0004
@@ -27,7 +27,7 @@ int main(int argc, char *argv[])
 {
     QT_USE_NAMESPACE
 
-#ifdef Q_OS_WIN
+#if defined (Q_OS_WIN)
     HANDLE hOut = GetStdHandle(STD_OUTPUT_HANDLE);
     if (hOut == INVALID_HANDLE_VALUE)
     {

@@ -9,7 +9,7 @@ ConsoleTextStream::ConsoleTextStream(FILE *fileHandle, QIODeviceBase::OpenMode o
 
 ConsoleTextStream& ConsoleTextStream::operator<<(QString string)
 {
-#ifdef Q_OS_WIN
+#if defined (Q_OS_WIN)
     // begin padding
     int width = QTextStream::fieldWidth();
     if(width > string.length())

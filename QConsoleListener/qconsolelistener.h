@@ -7,7 +7,7 @@
 #include <QThread>
 #include <iostream>
 
-#ifdef Q_OS_WIN
+#if defined (Q_OS_WIN)
 #include <QWinEventNotifier>
 #include <windows.h>
 #else
@@ -29,7 +29,7 @@ Q_SIGNALS:
     void finishedGetLine(const QString &strNewLine);
 
 private:
-#ifdef Q_OS_WIN
+#if defined (Q_OS_WIN)
     QWinEventNotifier *m_notifier;
 #else
     QSocketNotifier *m_notifier;

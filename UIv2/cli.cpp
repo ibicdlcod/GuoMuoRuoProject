@@ -1,6 +1,6 @@
 #include "cli.h"
 
-#ifdef Q_OS_UNIX
+#if defined (Q_OS_UNIX)
 #include <sys/ioctl.h> //ioctl() and TIOCGWINSZ
 #include <unistd.h> // for STDOUT_FILENO
 #endif
@@ -52,7 +52,7 @@ void CLI::customMessageHandler(QtMsgType type, const QMessageLogContext &context
         break;
     }
 
-#ifdef Q_OS_WIN
+#if defined (Q_OS_WIN)
     WriteConsoleW(GetStdHandle(STD_OUTPUT_HANDLE),
                   txt.utf16(), txt.size(), NULL, NULL);
 #else
@@ -235,12 +235,12 @@ inline int CLI::callength(const QString &input, bool naive)
 int CLI::getConsoleWidth()
 {
     int width;
-#ifdef Q_OS_WIN
+#if defined (Q_OS_WIN)
     CONSOLE_SCREEN_BUFFER_INFO csbi;
     GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &csbi);
     width = csbi.srWindow.Right - csbi.srWindow.Left + 1;
 #else
-#ifdef Q_OS_UNIX
+#if defined (Q_OS_UNIX)
     struct winsize size;
     ioctl(STDOUT_FILENO, TIOCGWINSZ, &size);
     width = size.ws_col;

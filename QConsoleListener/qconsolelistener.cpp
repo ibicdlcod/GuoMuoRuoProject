@@ -9,7 +9,7 @@ QConsoleListener::QConsoleListener(bool consolemode)
                 this, &QConsoleListener::on_finishedGetLine,
                 Qt::QueuedConnection
                 );
-#ifdef Q_OS_WIN
+#if defined (Q_OS_WIN)
     m_notifier = new QWinEventNotifier(GetStdHandle(STD_INPUT_HANDLE));
 #else
     m_notifier = new QSocketNotifier(fileno(stdin), QSocketNotifier::Read);
@@ -21,7 +21,7 @@ QConsoleListener::QConsoleListener(bool consolemode)
                 &m_thread , &QThread::finished,
                 m_notifier, &QObject::deleteLater
                 );
-#ifdef Q_OS_WIN
+#if defined (Q_OS_WIN)
     QObject::connect(m_notifier, &QWinEventNotifier::activated,
                  #else
     QObject::connect(m_notifier, &QSocketNotifier::activated,
@@ -31,7 +31,7 @@ QConsoleListener::QConsoleListener(bool consolemode)
          * becase windows console can't handle unicode
          */
         QString res;
-#ifdef Q_OS_WIN
+#if defined (Q_OS_WIN)
         /*
         HWND consoleWnd = GetConsoleWindow();
         DWORD dwProcessId;

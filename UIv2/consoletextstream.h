@@ -3,7 +3,7 @@
 
 #include <QTextStream>
 
-#ifdef Q_OS_WIN
+#if defined (Q_OS_WIN)
 #include <windows.h>
 #include <iostream>
 #endif
