@@ -84,9 +84,15 @@ QConsoleListener::~QConsoleListener()
 
 void QConsoleListener::exit()
 {
-#ifdef Q_OS_WIN // fuck my life
+    /* fuck my life, different COMPILERS (as opposed to operating systems) behaves differently */
+#if defined(_MSC_VER)
+    /* apparently nothing to do */
+#endif
+#if defined (__MINGW32__) || defined (__MINGW64__)
     free(this);
-#else // only tested on linux
+#else /* beware that mingw defines __GNUC__ */
+#if defined(__GNUC__) // only tested on linux
     delete this;
+#endif
 #endif
 }

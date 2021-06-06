@@ -79,6 +79,9 @@ release/
 */debug/
 */profile/
 */release/
+mingw/
+gcc/
+msvc/
 
 # Custom
 *.log

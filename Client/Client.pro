@@ -9,7 +9,7 @@ CONFIG -= app_bundle
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
-        dtlsassociation.cpp \
+        dtlsclient.cpp \
         main.cpp
 
 TRANSLATIONS += \
@@ -25,7 +25,7 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 #include($$PWD/../QConsoleListener/src/qconsolelistener.pri)
 
 HEADERS += \
-    dtlsassociation.h
+    dtlsclient.h
 
 win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../QConsoleListener/release/ -lQConsoleListener
 else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../QConsoleListener/debug/ -lQConsoleListener

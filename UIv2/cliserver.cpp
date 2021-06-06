@@ -56,10 +56,16 @@ bool CliServer::parseSpec(const QStringList &commandParts)
                 {
                     qFatal("Communication with server process can't be established.");
                 }
-#ifdef Q_OS_UNIX
-                QString server_exe = QStringLiteral("debug/Server/Server");
+
+#if defined (__MINGW32__) || defined (__MINGW64__)
+                QString server_exe = QStringLiteral("mingw/Server/debug/Server");
 #else
-                QString server_exe = QStringLiteral("Server/debug/Server");
+#if defined(__GNUC__)
+                QString server_exe = QStringLiteral("gcc/debug/Server/Server");
+#endif
+#endif
+#if defined (_MSC_VER)
+                QString server_exe = QStringLiteral("msvc/Server/debug/Server");
 #endif
                 server->start(server_exe,
                               {commandParts[1], commandParts[2]}, QIODevice::ReadWrite);

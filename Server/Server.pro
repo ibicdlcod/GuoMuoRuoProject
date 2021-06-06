@@ -10,8 +10,7 @@ CONFIG -= app_bundle
 
 SOURCES += \
         dtlsserver.cpp \
-        main.cpp \
-        messagehandler.cpp
+        main.cpp
 
 TRANSLATIONS += \
     Server_zh_CN.ts
@@ -27,8 +26,7 @@ DISTFILES += \
     .gitignore
 
 HEADERS += \
-    dtlsserver.h \
-    messagehandler.h
+    dtlsserver.h
 
 win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../QConsoleListener/release/ -lQConsoleListener
 else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../QConsoleListener/debug/ -lQConsoleListener

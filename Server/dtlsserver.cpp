@@ -110,7 +110,7 @@ bool DtlsServer::listen(const QHostAddress &address, quint16 port)
         shutdown();
         listening = serverSocket.bind(address, port);
         if (!listening)
-            emit errorMessage(serverSocket.errorString());
+            errorMessage(serverSocket.errorString());
     } else {
         listening = true;
     }
@@ -134,7 +134,7 @@ void DtlsServer::readyRead()
     //! [3]
     const qint64 bytesToRead = serverSocket.pendingDatagramSize();
     if (bytesToRead <= 0) {
-        emit warningMessage(tr("A spurious read notification"));
+        warningMessage(tr("A spurious read notification"));
         return;
     }
 
@@ -144,7 +144,7 @@ void DtlsServer::readyRead()
     const qint64 bytesRead = serverSocket.readDatagram(dgram.data(), dgram.size(),
                                                        &peerAddress, &peerPort);
     if (bytesRead <= 0) {
-        emit warningMessage(tr("Failed to read a datagram: ") + serverSocket.errorString());
+        warningMessage(tr("Failed to read a datagram: ") + serverSocket.errorString());
         return;
     }
 
@@ -152,7 +152,7 @@ void DtlsServer::readyRead()
     //! [3]
     //! [4]
     if (peerAddress.isNull() || !peerPort) {
-        emit warningMessage(tr("Failed to extract peer info (address, port)"));
+        warningMessage(tr("Failed to extract peer info (address, port)"));
         return;
     }
     const auto client = std::find_if(knownClients.begin(), knownClients.end(),
@@ -185,7 +185,7 @@ void DtlsServer::pskRequired(QSslPreSharedKeyAuthenticator *auth)
 {
     Q_ASSERT(auth);
 
-    emit infoMessage(tr("PSK callback, received a client's identity: '%1'")
+    infoMessage(tr("PSK callback, received a client's identity: '%1'")
                      .arg(QString::fromLatin1(auth->identity())));
     auth->setPreSharedKey(QByteArrayLiteral("\x1a\x2b\x3c\x4d\x5e\x6f")); /* MAGICCONSTANT UNDESIREABLE NO 1 */
 }
@@ -200,7 +200,7 @@ void DtlsServer::handleNewConnection(const QHostAddress &peerAddress,
 
     const QString peerInfo = peer_info(peerAddress, peerPort);
     if (cookieSender.verifyClient(&serverSocket, clientHello, peerAddress, peerPort)) {
-        emit infoMessage(peerInfo + tr(": verified, starting a handshake"));
+        infoMessage(peerInfo + tr(": verified, starting a handshake"));
         //! [8]
         //! [9]
         std::unique_ptr<QDtls> newConnection{new QDtls{QSslSocket::SslServerMode}};
@@ -212,9 +212,9 @@ void DtlsServer::handleNewConnection(const QHostAddress &peerAddress,
         doHandshake(knownClients.back().get(), clientHello);
         //! [9]
     } else if (cookieSender.dtlsError() != QDtlsError::NoError) {
-        emit errorMessage(tr("DTLS error: ") + cookieSender.dtlsErrorString());
+        errorMessage(tr("DTLS error: ") + cookieSender.dtlsErrorString());
     } else {
-        emit infoMessage(peerInfo + tr(": not verified yet"));
+        infoMessage(peerInfo + tr(": not verified yet"));
     }
 }
 
@@ -223,7 +223,7 @@ void DtlsServer::doHandshake(QDtls *newConnection, const QByteArray &clientHello
 {
     const bool result = newConnection->doHandshake(&serverSocket, clientHello);
     if (!result) {
-        emit errorMessage(newConnection->dtlsErrorString());
+        errorMessage(newConnection->dtlsErrorString());
         return;
     }
 
@@ -231,10 +231,10 @@ void DtlsServer::doHandshake(QDtls *newConnection, const QByteArray &clientHello
                                        newConnection->peerPort());
     switch (newConnection->handshakeState()) {
     case QDtls::HandshakeInProgress:
-        emit infoMessage(peerInfo + tr(": handshake is in progress ..."));
+        infoMessage(peerInfo + tr(": handshake is in progress ..."));
         break;
     case QDtls::HandshakeComplete:
-        emit infoMessage(tr("Connection with %1 encrypted. %2")
+        infoMessage(tr("Connection with %1 encrypted. %2")
                          .arg(peerInfo, connection_info(newConnection)));
         break;
     default:
@@ -251,12 +251,12 @@ void DtlsServer::decryptDatagram(QDtls *connection, const QByteArray &clientMess
     const QString peerInfo = peer_info(connection->peerAddress(), connection->peerPort());
     const QByteArray dgram = connection->decryptDatagram(&serverSocket, clientMessage);
     if (dgram.size()) {
-        emit datagramReceived(peerInfo, clientMessage, dgram);
+        datagramReceived(peerInfo, clientMessage, dgram);
         connection->writeDatagramEncrypted(&serverSocket, tr("to %1: ACK").arg(peerInfo).toLatin1());
     } else if (connection->dtlsError() == QDtlsError::NoError) {
-        emit warningMessage(peerInfo + ": " + tr("0 byte dgram, could be a re-connect attempt?"));
+        warningMessage(peerInfo + ": " + tr("0 byte dgram, could be a re-connect attempt?"));
     } else {
-        emit warningMessage(peerInfo + ": " + connection->dtlsErrorString());
+        warningMessage(peerInfo + ": " + connection->dtlsErrorString());
     }
 }
 //! [12]
@@ -275,56 +275,56 @@ void DtlsServer::parse(const QString &cmdline)
 {
     if(cmdline.startsWith("SIGTERM"))
     {
-        emit infoMessage(tr("received SIGTERM"));
+        infoMessage(tr("received SIGTERM"));
         close();
         this->shutdown();
-        emit infoMessage(tr("Server is shutting down"));
+        infoMessage(tr("Server is shutting down"));
         QTimer::singleShot(2000, this, &DtlsServer::finished);
     }
     else if(cmdline.startsWith("UNLISTEN"))
     {
         if(isListening())
         {
-            emit infoMessage(tr("Server stopped listening."));
+            infoMessage(tr("Server stopped listening."));
             close();
         }
         else
         {
-            emit infoMessage(tr("Server isn't listening."));
+            infoMessage(tr("Server isn't listening."));
         }
     }
     else if(cmdline.startsWith("RELISTEN"))
     {
         if(isListening())
         {
-            emit infoMessage(tr("Server is already listening."));
+            infoMessage(tr("Server is already listening."));
         }
         else
         {
             QStringList commandParts = cmdline.split(QRegularExpression("\\s+"), Qt::SkipEmptyParts);
             if(commandParts.length() < 3)
             {
-                emit warningMessage(tr("Usage: RELISTEN [ip] [port]"));
+                warningMessage(tr("Usage: RELISTEN [ip] [port]"));
             }
             else
             {
                 QHostAddress address = QHostAddress(commandParts[1]);
                 if(address.isNull())
                 {
-                    emit errorMessage("Ip isn't valid");
+                    errorMessage("Ip isn't valid");
                     return;
                 }
-                unsigned int port = QString(commandParts[2]).toInt();
+                quint16 port = QString(commandParts[2]).toInt();
                 if(port < 1024 || port > 49151)
                 {
-                    emit errorMessage("Port isn't valid");
+                    errorMessage("Port isn't valid");
                     return;
                 }
                 if (listen(address, port)) {
                     QString msg = tr("Server is relistening on address %1 and port %2")
                             .arg(address.toString())
                             .arg(port);
-                    emit infoMessage(msg);
+                    infoMessage(msg);
                     return;
                 }
                 else
@@ -332,12 +332,39 @@ void DtlsServer::parse(const QString &cmdline)
                     QString msg = tr("Server failed to listen on address %1 and port %2")
                             .arg(address.toString())
                             .arg(port);
-                    emit errorMessage(msg);
+                    errorMessage(msg);
                     return;
                 }
             }
         }
     }
+}
+
+void DtlsServer::errorMessage(const QString &message)
+{
+    qCritical("[ServerError] %s", message.toUtf8().constData());
+}
+
+void DtlsServer::warningMessage(const QString &message)
+{
+    qWarning("[ServerWarning] %s", message.toUtf8().constData());
+}
+
+void DtlsServer::infoMessage(const QString &message)
+{
+    qInfo("[ServerInfo] %s", message.toUtf8().constData());
+}
+
+void DtlsServer::datagramReceived(const QString &peerInfo, const QByteArray &cipherText, const QByteArray &plainText)
+{
+    static const QString formatter = QStringLiteral("\n---------------"
+                                                    "\nA message from %1"
+                                                    "\nDTLS datagram:\n%2"
+                                                    "\nAs plain text:\n%3\n");
+
+    const QString html = formatter.arg(peerInfo, QString::fromUtf8(cipherText.toHex(' ')),
+                                       QString::fromUtf8(plainText));
+    qInfo("%s", html.toUtf8().constData());
 }
 
 QT_END_NAMESPACE

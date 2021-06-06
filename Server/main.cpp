@@ -8,7 +8,6 @@
 #include "qconsolelistener.h"
 
 #include "dtlsserver.h"
-#include "messagehandler.h"
 
 int main(int argc, char *argv[])
 {
@@ -35,38 +34,23 @@ int main(int argc, char *argv[])
     }
     try {
         DtlsServer server;
-        MessageHandler handler;
-
-        bool success = QObject::connect(&server, &DtlsServer::errorMessage,
-                                        &handler, &MessageHandler::errorMessage)
-                && QObject::connect(&server, &DtlsServer::warningMessage,
-                                    &handler, &MessageHandler::warningMessage)
-                && QObject::connect(&server, &DtlsServer::infoMessage,
-                                    &handler, &MessageHandler::infoMessage)
-                && QObject::connect(&server, &DtlsServer::datagramReceived,
-                                    &handler, &MessageHandler::addClientMessage);
-        if(!success)
-        {
-            throw std::runtime_error("Communication with message handler can't be established.");
-        }
-
         QHostAddress address = QHostAddress(argv[1]);
         if(address.isNull())
         {
-            emit server.errorMessage("Ip isn't valid");
+            server.errorMessage("Ip isn't valid");
             return 102;
         }
-        unsigned int port = QString(argv[2]).toInt();
+        quint16 port = QString(argv[2]).toInt();
         if(port < 1024 || port > 49151)
         {
-            emit server.errorMessage("Port isn't valid");
+            server.errorMessage("Port isn't valid");
             return 103;
         }
         if (server.listen(address, port)) {
             QString msg = server.tr("Server is listening on address %1 and port %2")
                     .arg(address.toString())
                     .arg(port);
-            emit server.infoMessage(msg);
+            server.infoMessage(msg);
             QConsoleListener *console;
             console = new QConsoleListener(false);
             bool listenInput = QObject::connect(console, &QConsoleListener::newLine, &server, &DtlsServer::parse);
@@ -87,7 +71,7 @@ int main(int argc, char *argv[])
             QString msg = server.tr("Server failed to listen on address %1 and port %2")
                     .arg(address.toString())
                     .arg(port);
-            emit server.errorMessage(msg);
+            server.errorMessage(msg);
             return 104;
         }
     }  catch (std::runtime_error &e) {

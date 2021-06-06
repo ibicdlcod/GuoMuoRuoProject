@@ -72,15 +72,19 @@ public:
     bool listen(const QHostAddress &address, quint16 port);
     bool isListening() const;
     void close();
+
+    /* formerly slots */
+    static void errorMessage(const QString &message);
+    static void warningMessage(const QString &message);
+    static void infoMessage(const QString &message);
+
+    static void datagramReceived(const QString &peerInfo, const QByteArray &cipherText,
+                          const QByteArray &plainText);
+
+public slots:
     void parse(const QString &cmdline);
 
 signals:
-    void errorMessage(const QString &message);
-    void warningMessage(const QString &message);
-    void infoMessage(const QString &message);
-
-    void datagramReceived(const QString &peerInfo, const QByteArray &cipherText,
-                          const QByteArray &plainText);
     void finished();
 
 private slots:

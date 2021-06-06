@@ -47,8 +47,8 @@
 ** $QT_END_LICENSE$
 **
 ****************************************************************************/
-#ifndef DTLSASSOCIATION_H
-#define DTLSASSOCIATION_H
+#ifndef DTLSCLIENT_H
+#define DTLSCLIENT_H
 
 #include <QtNetwork>
 #include <QtCore>
@@ -56,24 +56,27 @@
 QT_BEGIN_NAMESPACE
 
 //! [0]
-class DtlsAssociation : public QObject
+class DtlsClient : public QObject
 {
     Q_OBJECT
 
 public:
-    DtlsAssociation(const QHostAddress &address, quint16 port,
+    DtlsClient(const QHostAddress &address, quint16 port,
                     const QString &connectionName);
-    ~DtlsAssociation();
+    ~DtlsClient();
     void startHandshake();
 
-signals:
-    void errorMessage(const QString &message);
+    /* formerly slots */
+    static void errorMessage(const QString &message);
     void warningMessage(const QString &message);
     void infoMessage(const QString &message);
-    void clientResponse(const QString &clientInfo,
-                        const QByteArray &datagraam,
+    void clientResponse(const QString &clientInfo, const QByteArray &datagraam,
                         const QByteArray &plainText);
 
+public slots:
+    void parse(const QString &cmdline);
+
+signals:
     void finished();
 
 private slots:
@@ -99,10 +102,10 @@ private:
     QTimer pingTimer;
     unsigned ping = 0;
 
-    Q_DISABLE_COPY(DtlsAssociation)
+    Q_DISABLE_COPY(DtlsClient)
 };
 //! [0]
 
 QT_END_NAMESPACE
 
-#endif // DTLSASSOCIATION_H
+#endif // DTLSCLIENT_H

@@ -48,12 +48,12 @@
 **
 ****************************************************************************/
 
-#include "dtlsassociation.h"
+#include "dtlsclient.h"
 
 QT_BEGIN_NAMESPACE
 
-DtlsAssociation::DtlsAssociation(const QHostAddress &address, quint16 port,
-                                 const QString &connectionName)
+DtlsClient::DtlsClient(const QHostAddress &address, quint16 port,
+                       const QString &connectionName)
     : name(connectionName),
       crypto(QSslSocket::SslClientMode)
 {
@@ -65,23 +65,23 @@ DtlsAssociation::DtlsAssociation(const QHostAddress &address, quint16 port,
     //! [1]
 
     //! [2]
-    connect(&crypto, &QDtls::handshakeTimeout, this, &DtlsAssociation::handshakeTimeout);
+    connect(&crypto, &QDtls::handshakeTimeout, this, &DtlsClient::handshakeTimeout);
     //! [2]
-    connect(&crypto, &QDtls::pskRequired, this, &DtlsAssociation::pskRequired);
+    connect(&crypto, &QDtls::pskRequired, this, &DtlsClient::pskRequired);
     //! [3]
     socket.connectToHost(address.toString(), port);
     //! [3]
     //! [13]
-    connect(&socket, &QUdpSocket::readyRead, this, &DtlsAssociation::readyRead);
+    connect(&socket, &QUdpSocket::readyRead, this, &DtlsClient::readyRead);
     //! [13]
     //! [4]
     pingTimer.setInterval(5000);
-    connect(&pingTimer, &QTimer::timeout, this, &DtlsAssociation::pingTimeout);
+    connect(&pingTimer, &QTimer::timeout, this, &DtlsClient::pingTimeout);
     //! [4]
 }
 
 //! [12]
-DtlsAssociation::~DtlsAssociation()
+DtlsClient::~DtlsClient()
 {
     if (crypto.isConnectionEncrypted())
         crypto.shutdown(&socket);
@@ -89,31 +89,31 @@ DtlsAssociation::~DtlsAssociation()
 //! [12]
 
 //! [5]
-void DtlsAssociation::startHandshake()
+void DtlsClient::startHandshake()
 {
     if (socket.state() != QAbstractSocket::ConnectedState) {
-        emit infoMessage(tr("%1: connecting UDP socket first ...").arg(name));
-        connect(&socket, &QAbstractSocket::connected, this, &DtlsAssociation::udpSocketConnected);
+        infoMessage(tr("%1: connecting UDP socket first ...").arg(name));
+        connect(&socket, &QAbstractSocket::connected, this, &DtlsClient::udpSocketConnected);
         return;
     }
 
     if (!crypto.doHandshake(&socket))
-        emit errorMessage(tr("%1: failed to start a handshake - %2").arg(name, crypto.dtlsErrorString()));
+        errorMessage(tr("%1: failed to start a handshake - %2").arg(name, crypto.dtlsErrorString()));
     else
-        emit infoMessage(tr("%1: starting a handshake").arg(name));
+        infoMessage(tr("%1: starting a handshake").arg(name));
 }
 //! [5]
 
-void DtlsAssociation::udpSocketConnected()
+void DtlsClient::udpSocketConnected()
 {
-    emit infoMessage(tr("%1: UDP socket is now in ConnectedState, continue with handshake ...").arg(name));
+    infoMessage(tr("%1: UDP socket is now in ConnectedState, continue with handshake ...").arg(name));
     startHandshake();
 }
 
-void DtlsAssociation::readyRead()
+void DtlsClient::readyRead()
 {
     if (socket.pendingDatagramSize() <= 0) {
-        emit warningMessage(tr("%1: spurious read notification?").arg(name));
+        warningMessage(tr("%1: spurious read notification?").arg(name));
         return;
     }
 
@@ -121,7 +121,7 @@ void DtlsAssociation::readyRead()
     QByteArray dgram(socket.pendingDatagramSize(), Qt::Uninitialized);
     const qint64 bytesRead = socket.readDatagram(dgram.data(), dgram.size());
     if (bytesRead <= 0) {
-        emit warningMessage(tr("%1: spurious read notification?").arg(name));
+        warningMessage(tr("%1: spurious read notification?").arg(name));
         return;
     }
 
@@ -131,67 +131,67 @@ void DtlsAssociation::readyRead()
     if (crypto.isConnectionEncrypted()) {
         const QByteArray plainText = crypto.decryptDatagram(&socket, dgram);
         if (plainText.size()) {
-            emit clientResponse(name, dgram, plainText);
+            clientResponse(name, dgram, plainText);
             return;
         }
 
         if (crypto.dtlsError() == QDtlsError::RemoteClosedConnectionError) {
-            emit errorMessage(tr("%1: shutdown alert received").arg(name));
+            errorMessage(tr("%1: shutdown alert received").arg(name));
             socket.close();
             pingTimer.stop();
             catbomb();
             return;
         }
 
-        emit warningMessage(tr("%1: zero-length datagram received?").arg(name));
+        warningMessage(tr("%1: zero-length datagram received?").arg(name));
     } else {
         //! [7]
         //! [8]
         if (!crypto.doHandshake(&socket, dgram)) {
-            emit errorMessage(tr("%1: handshake error - %2").arg(name, crypto.dtlsErrorString()));
+            errorMessage(tr("%1: handshake error - %2").arg(name, crypto.dtlsErrorString()));
             return;
         }
         //! [8]
 
         //! [9]
         if (crypto.isConnectionEncrypted()) {
-            emit infoMessage(tr("%1: encrypted connection established!").arg(name));
+            infoMessage(tr("%1: encrypted connection established!").arg(name));
             pingTimer.start();
             pingTimeout();
         } else {
             //! [9]
-            emit infoMessage(tr("%1: continuing with handshake ...").arg(name));
+            infoMessage(tr("%1: continuing with handshake ...").arg(name));
         }
     }
 }
 
 //! [11]
-void DtlsAssociation::handshakeTimeout()
+void DtlsClient::handshakeTimeout()
 {
-    emit warningMessage(tr("%1: handshake timeout, trying to re-transmit").arg(name));
+    warningMessage(tr("%1: handshake timeout, trying to re-transmit").arg(name));
     if (!crypto.handleTimeout(&socket))
-        emit errorMessage(tr("%1: failed to re-transmit - %2").arg(name, crypto.dtlsErrorString()));
+        errorMessage(tr("%1: failed to re-transmit - %2").arg(name, crypto.dtlsErrorString()));
 }
 //! [11]
 
 //! [14]
-void DtlsAssociation::pskRequired(QSslPreSharedKeyAuthenticator *auth)
+void DtlsClient::pskRequired(QSslPreSharedKeyAuthenticator *auth)
 {
     Q_ASSERT(auth);
 
-    emit infoMessage(tr("%1: providing pre-shared key ...").arg(name));
+    infoMessage(tr("%1: providing pre-shared key ...").arg(name));
     auth->setIdentity(name.toLatin1());
     auth->setPreSharedKey(QByteArrayLiteral("\x1a\x2b\x3c\x4d\x5e\x6f")); /* MAGICCONSTANT UNDESIREABLE NO 1 */
 }
 //! [14]
 
 //! [10]
-void DtlsAssociation::pingTimeout()
+void DtlsClient::pingTimeout()
 {
     static const QString message = QStringLiteral("I am %1, please, accept our ping %2");
     const qint64 written = crypto.writeDatagramEncrypted(&socket, message.arg(name).arg(ping).toLatin1());
     if (written <= 0) {
-        emit errorMessage(tr("%1: failed to send a ping - %2").arg(name, crypto.dtlsErrorString()));
+        errorMessage(tr("%1: failed to send a ping - %2").arg(name, crypto.dtlsErrorString()));
         pingTimer.stop();
         return;
     }
@@ -200,12 +200,12 @@ void DtlsAssociation::pingTimeout()
 }
 //! [10]
 
-void DtlsAssociation::catbomb()
+void DtlsClient::catbomb()
 {
     /* This is considered an integral part of the program rather than magic constants. */
     /* See https://en.wikipedia.org/w/index.php?title=The_world_wonders&oldid=1014651994 */
     /*
-    emit errorMessage(QStringLiteral("%1 %2 %3 %4 %5 %6").arg(tr("TURKEY TROTS TO WATER"),
+    errorMessage(QStringLiteral("%1 %2 %3 %4 %5 %6").arg(tr("TURKEY TROTS TO WATER"),
                       tr("GG"),
                       tr("FROM CINCPAC ACTION COM THIRD FLEET INFO COMINCH CTF SEVENTY-SEVEN X"),
                       tr("WHERE IS RPT WHERE IS TASK FORCE THIRTY FOUR"),
@@ -214,7 +214,46 @@ void DtlsAssociation::catbomb()
                       */
 
     /* no tr() should be used here */
-    emit errorMessage("[CATBOMB]");
-    QTimer::singleShot(2000, this, &DtlsAssociation::finished);
+    errorMessage("[CATBOMB]");
+    QTimer::singleShot(2000, this, &DtlsClient::finished);
+}
+
+void DtlsClient::errorMessage(const QString &message)
+{
+    qCritical("[ClientError] %s", message.toUtf8().constData());
+}
+
+void DtlsClient::warningMessage(const QString &message)
+{
+    qWarning("[ClientWarning] %s", message.toUtf8().constData());
+}
+
+void DtlsClient::infoMessage(const QString &message)
+{
+    qInfo("[ClientInfo] %s", message.toUtf8().constData());
+}
+
+void DtlsClient::clientResponse(const QString &clientInfo, const QByteArray &datagram,
+                                const QByteArray &plainText)
+{
+    static const QString formatter = QStringLiteral("<br>---------------"
+                                                     "<br>%1 received a DTLS datagram:<br> %2"
+                                                     "<br>As plain text:<br> %3");
+
+    const QString html = formatter.arg(clientInfo, QString::fromUtf8(datagram.toHex(' ')),
+                                       QString::fromUtf8(plainText));
+    qInfo("%s", html.toUtf8().constData());
+}
+
+void DtlsClient::parse(const QString &cmdline)
+{
+    if(cmdline.startsWith("SIGTERM"))
+    {
+        infoMessage(tr("received SIGTERM"));
+        if (crypto.isConnectionEncrypted())
+            crypto.shutdown(&socket);
+        infoMessage(tr("Client is shutting down"));
+        QTimer::singleShot(2000, this, &DtlsClient::finished);
+    }
 }
 QT_END_NAMESPACE
