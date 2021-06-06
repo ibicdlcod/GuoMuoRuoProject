@@ -184,7 +184,7 @@ void CliServer::shutdownServer()
     {
         server->write("SIGTERM\n");
         qout << tr("Waiting for server finish...") << Qt::endl;
-        //server->terminate();
+        //server->terminate(); // per documentation, this function is nearly useless on Windows
         if(!server->waitForFinished(waitformsec))
         {
             qout << (tr("Server isn't responding after %1 msecs, killing.")).arg(QString::number(waitformsec))
