@@ -68,6 +68,10 @@ int main(int argc, char *argv[])
                 qFatal("Log file cannot be opened");
             }
             CliServer a(argc, argv);
+            a.setApplicationName("SpearofTanaka Server");
+            a.setApplicationVersion("0.0.0"); // temp
+            a.setOrganizationName("Kantai Self-Governing Patriotic Committee");
+            a.setOrganizationDomain("xxx.xyz"); // temp
             for (const QString &locale : uiLanguages) {
                 const QString baseName = "UIv2_" + QLocale(locale).name();
                 if (translator.load(":/i18n/" + baseName)) {

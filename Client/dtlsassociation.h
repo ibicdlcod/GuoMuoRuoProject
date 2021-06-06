@@ -85,7 +85,10 @@ private slots:
 
     /* See https://web.archive.org/web/20201023062748/https://wikiwiki.jp/kanc
      * olle/%E8%89%A6%E5%A8%98%E8%A9%B3%E7%B4%B0%E3%83%86%E3%83%B3%E3%83%97%E3
-     * %83%AC for why this is named cat. */
+     * %83%AC
+	 * https://wikiwiki.jp/kancolle/%E4%BF%97%E7%A7%B0%E3%83%BB%E3%82%B9%E3%83
+	 * %A9%E3%83%B3%E3%82%B0%E9%9B%86/%E3%81%AA#cat
+	 * for why this is named cat. */
     void catbomb();
 
 private:
