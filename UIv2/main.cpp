@@ -8,17 +8,21 @@
 #ifndef ENABLE_VIRTUAL_TERMINAL_PROCESSING
 #define ENABLE_VIRTUAL_TERMINAL_PROCESSING 0x0004
 #endif
-#else
+#elif defined (Q_OS_UNIX)
 #include <locale.h>
 #endif
 
 /* Qt Libs */
 #include <QDateTime>
 
+/* C++ Libs */
+// unused at the moment
+
 /* Third party */
 #include "qconsolelistener.h"
 
 /* program headers */
+#include "cliclient.h"
 #include "cliserver.h"
 
 QFile *logFile;
@@ -45,56 +49,79 @@ int main(int argc, char *argv[])
     {
         throw GetLastError();
     }
-#else
-    setlocale(LC_ALL, "");
 #endif
 
     QTranslator translator;
+    /* TODO: This is considered harmful, to be replaced by config */
     const QStringList uiLanguages = QLocale::system().uiLanguages();
 
     try {
-        if(argc <= 1 || std::strcmp(argv[1], "--client") == 0)
-        {
-            // client UI
-            qDebug("Client has yet to be implimented.");
-            return 0;
-        }
-        else if(std::strcmp(argv[1], "--server") == 0)
-        {
-            // server UI
-            logFile = new QFile("LogFile.log"); /* MAGICCONSTANT UNDESIREABLE NO 1 */
-            if(!logFile->open(QIODevice::WriteOnly | QIODevice::Append))
-            {
-                qFatal("Log file cannot be opened");
-            }
-            CliServer a(argc, argv);
-            a.setApplicationName("SpearofTanaka Server");
-            a.setApplicationVersion("0.0.0"); // temp
-            a.setOrganizationName("Kantai Self-Governing Patriotic Committee");
-            a.setOrganizationDomain("xxx.xyz"); // temp
-            for (const QString &locale : uiLanguages) {
-                const QString baseName = "UIv2_" + QLocale(locale).name();
-                if (translator.load(":/i18n/" + baseName)) {
-                    a.installTranslator(&translator);
-                    break;
-                }
-            }
-            QConsoleListener console(true);
-            bool success = QObject::connect(&console, &QConsoleListener::newLine, &a, &CLI::parse);
-            if(!success)
-            {
-                throw std::runtime_error("Connection with input parser failed!");
-            }
-            qInstallMessageHandler(a.customMessageHandler);
-            QTimer::singleShot(0, &a, &CLI::openingwords);
-            QTimer::singleShot(100, &a, &CLI::displayPrompt);
+        bool clientActive = (argc <= 1 || std::strcmp(argv[1], "--client") == 0);
+        bool serverActive = (argc > 1 && std::strcmp(argv[1], "--server") == 0);
 
-            return a.exec();
-        }
-        else
+        if(!clientActive && !serverActive)
         {
             throw std::invalid_argument("Either run without arguments or specify --client or --server!");
         }
+        CLI *a = nullptr;
+        if(clientActive)
+        {
+            logFile = new QFile("LogFile.log"); /* MAGICCONSTANT UNDESIREABLE NO 1 */
+            a = new CliClient(argc, argv);
+        }
+        else // I wish for a elif. This else can be deleted but clazy will warn you memory leak
+        {
+            if(serverActive)
+            {
+                /* should be different from client */
+                logFile = new QFile("LogFile.log"); /* MAGICCONSTANT UNDESIREABLE NO 1 */
+                a = new CliServer(argc, argv);
+            }
+        }
+        if(Q_UNLIKELY(!a))
+        {
+            throw std::invalid_argument("Either run without arguments or specify --client or --server!");
+        }
+        if(Q_UNLIKELY(!logFile) || !logFile->open(QIODevice::WriteOnly | QIODevice::Append))
+        {
+            qFatal("Log file cannot be opened");
+        }
+#if defined(Q_OS_UNIX)
+        setlocale(LC_NUMERIC, "C");
+#endif
+        QString appName = "SpearofTanaka";
+        if(clientActive)
+        {
+            appName.append(" Client");
+        }
+        if(serverActive)
+        {
+            appName.append(" Server");
+        }
+        a->setApplicationName(appName);
+        a->setApplicationVersion("0.0.0"); // temp
+        a->setOrganizationName("Kantai Self-Governing Patriotic Committee");
+        a->setOrganizationDomain("xxx.xyz"); // temp
+        for (const QString &locale : uiLanguages) {
+            const QString baseName = "UIv2_" + QLocale(locale).name();
+            if (translator.load(":/i18n/" + baseName)) {
+                a->installTranslator(&translator);
+                break;
+            }
+        }
+        QConsoleListener console(true);
+        bool success = QObject::connect(&console, &QConsoleListener::newLine, a, &CLI::parse);
+        if(!success)
+        {
+            throw std::runtime_error("Connection with input parser failed!");
+        }
+        qInstallMessageHandler(a->customMessageHandler);
+        QTimer::singleShot(0, a, &CLI::openingwords);
+        QTimer::singleShot(100, a, &CLI::displayPrompt);
+
+        int result = a->exec();
+        delete a;
+        return result;
     }  catch (std::invalid_argument &e) {
         qDebug() << "[Invalid Arguments] " << e.what() << Qt::endl << "Press ENTER to exit.";
         return 1;

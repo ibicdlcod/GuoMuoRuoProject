@@ -59,12 +59,9 @@ bool CliServer::parseSpec(const QStringList &commandParts)
 
 #if defined (__MINGW32__) || defined (__MINGW64__)
                 QString server_exe = QStringLiteral("mingw/Server/debug/Server");
-#else
-#if defined(__GNUC__)
+#elif defined(__GNUC__)
                 QString server_exe = QStringLiteral("gcc/debug/Server/Server");
-#endif
-#endif
-#if defined (_MSC_VER)
+#elif defined (_MSC_VER)
                 QString server_exe = QStringLiteral("msvc/Server/debug/Server");
 #endif
                 server->start(server_exe,

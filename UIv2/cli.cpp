@@ -239,14 +239,12 @@ int CLI::getConsoleWidth()
     CONSOLE_SCREEN_BUFFER_INFO csbi;
     GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &csbi);
     width = csbi.srWindow.Right - csbi.srWindow.Left + 1;
-#else
-#if defined (Q_OS_UNIX)
+#elif defined (Q_OS_UNIX)
     struct winsize size;
     ioctl(STDOUT_FILENO, TIOCGWINSZ, &size);
     width = size.ws_col;
 #else
     width = 80;
-#endif
 #endif
     return width;
 }

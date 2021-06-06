@@ -90,9 +90,7 @@ void QConsoleListener::exit()
 #endif
 #if defined (__MINGW32__) || defined (__MINGW64__)
     free(this);
-#else /* beware that mingw defines __GNUC__ */
-#if defined(__GNUC__) // only tested on linux
+#elif defined(__GNUC__) /* beware that mingw defines __GNUC__ */
     delete this;
-#endif
 #endif
 }
