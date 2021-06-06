@@ -73,6 +73,9 @@ Thumbs.db
 
 # Qt build
 build-*/
+debug/
+profile/
+release/
 */debug/
 */profile/
 */release/
