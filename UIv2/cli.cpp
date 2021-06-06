@@ -65,7 +65,7 @@ void CLI::customMessageHandler(QtMsgType type, const QMessageLogContext &context
         qFatal("Log file cannot be written to.");
     }
 
-    if(txt.contains('\0'))
+    if(txt.contains(QChar('\0')))
     {
         qFatal("Log Error");
     }
@@ -82,7 +82,7 @@ void CLI::openingwords()
     if(!licenseFile.open(QIODevice::ReadOnly | QIODevice::Text))
     {
         qout << tr("Can't fild license file, exiting.") << Qt::endl;
-        quit();
+        exitGracefully();
         return;
     }
     else

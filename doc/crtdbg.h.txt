@@ -1,0 +1,2 @@
+--Only applicable when compiling with msvc--
+If "crtdbg.h" is not found please install the entire Windows SDK BEFORE the (Qt Maintainence provided) debugger for msvc.

@@ -1,7 +1,7 @@
 TEMPLATE = subdirs
 
 SUBDIRS += \
-    Client \
     QConsoleListener \
+    Client \
     Server \
     UIv2
