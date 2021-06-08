@@ -22,6 +22,7 @@
 #include "qconsolelistener.h"
 
 /* program headers */
+#include "magic.h"
 #include "cliclient.h"
 #include "cliserver.h"
 
@@ -30,7 +31,6 @@ QFile *logFile;
 int main(int argc, char *argv[])
 {
     QT_USE_NAMESPACE
-
 #if defined (Q_OS_WIN)
     HANDLE hOut = GetStdHandle(STD_OUTPUT_HANDLE);
     if (hOut == INVALID_HANDLE_VALUE)
@@ -66,7 +66,8 @@ int main(int argc, char *argv[])
         CLI *a = nullptr;
         if(clientActive)
         {
-            logFile = new QFile("LogFile.log"); /* MAGICCONSTANT UNDESIREABLE NO 1 */
+#pragma message(M_CONST)
+            logFile = new QFile("LogFile.log");
             a = new CliClient(argc, argv);
         }
         /* I wish for a elif. This else can be deleted but clazy will warn you memory leak in case
@@ -76,7 +77,8 @@ int main(int argc, char *argv[])
             if(serverActive)
             {
                 /* should be different from client */
-                logFile = new QFile("LogFile.log"); /* MAGICCONSTANT UNDESIREABLE NO 1 */
+#pragma message(M_CONST)
+                logFile = new QFile("LogFile.log");
                 a = new CliServer(argc, argv);
             }
         }

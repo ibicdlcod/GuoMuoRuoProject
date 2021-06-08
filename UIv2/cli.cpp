@@ -10,6 +10,7 @@
 #include <iostream>
 #include "consoletextstream.h"
 #include "wcwidth.h"
+#include "magic.h"
 
 /* Ugly as fuck, but customMessageHandler had to be a member of CLI in order to use tr() and then said function
  * must be static, but logFile isn't const at complie time, leaveing no other option
@@ -77,7 +78,8 @@ void CLI::openingwords()
 {
     QString notice;
     QDir currentDir = QDir::current();
-    QFile licenseFile(currentDir.filePath("openingwords.txt")); /* MAGICCONSTANT UNDESIREABLE NO 1 */
+#pragma message(M_CONST)
+    QFile licenseFile(currentDir.filePath("openingwords.txt"));
     if(!licenseFile.open(QIODevice::ReadOnly | QIODevice::Text))
     {
         qout << tr("Can't fild license file, exiting.") << Qt::endl;

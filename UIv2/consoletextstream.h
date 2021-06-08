@@ -54,13 +54,13 @@ public:
         return *this;
     }
 
-    /* Heavy C++17 wizardry */
+    /* Heavy C++17 wizardry, don't try this at home if you are a novice */
     /* https://stackoverflow.com/questions/48764158/is-it-possible-to-use-enable-if-and-is-same-with-variadic-function-templates */
     /* https://stackoverflow.com/questions/495021/why-can-templates-only-be-implemented-in-the-header-file */
     template <typename... Args>
     typename std::enable_if<(std::is_same<Args, Ecma>::value && ...), void>::type printLine(const QString &input, Args&&... all)
     {
-        /* Braces isn't trivial: https://en.cppreference.com/w/cpp/language/fold */
+        /* Braces here isn't trivial: https://en.cppreference.com/w/cpp/language/fold */
         (*this << ... << all);
         int width;
     #if defined (Q_OS_WIN)

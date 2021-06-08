@@ -50,3 +50,10 @@ else:win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../QCon
 else:win32:!win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../QConsoleListener/release/QConsoleListener.lib
 else:win32:!win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../QConsoleListener/debug/QConsoleListener.lib
 else:unix: PRE_TARGETDEPS += $$OUT_PWD/../QConsoleListener/libQConsoleListener.a
+
+win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../Magic/release/ -lMagic
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../Magic/debug/ -lMagic
+else:unix: LIBS += -L$$OUT_PWD/../Magic/ -lMagic
+
+INCLUDEPATH += $$PWD/../Magic
+DEPENDPATH += $$PWD/../Magic

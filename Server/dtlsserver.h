@@ -98,7 +98,7 @@ private:
     void doHandshake(QDtls *newConnection, const QByteArray &clientHello);
     void decryptDatagram(QDtls *connection, const QByteArray &clientMessage);
 
-    void shutdown(); // were public at sometimes of the developmet
+    void shutdown();
 
     bool listening = false;
     QUdpSocket serverSocket;

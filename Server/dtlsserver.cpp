@@ -49,6 +49,7 @@
 ****************************************************************************/
 
 #include "dtlsserver.h"
+#include "magic.h"
 
 #include <algorithm>
 
@@ -187,7 +188,8 @@ void DtlsServer::pskRequired(QSslPreSharedKeyAuthenticator *auth)
 
     infoMessage(tr("PSK callback, received a client's identity: '%1'")
                      .arg(QString::fromLatin1(auth->identity())));
-    auth->setPreSharedKey(QByteArrayLiteral("\x1a\x2b\x3c\x4d\x5e\x6f")); /* MAGICCONSTANT UNDESIREABLE NO 1 */
+#pragma message(M_CONST)
+    auth->setPreSharedKey(QByteArrayLiteral("\x1a\x2b\x3c\x4d\x5e\x6f"));
 }
 //! [13]
 

@@ -46,5 +46,4 @@ private:
     bool consolemode;
 };
 
-
 #endif // QCONSOLELISTENER_H

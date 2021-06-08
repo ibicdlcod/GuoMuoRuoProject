@@ -8,6 +8,7 @@
 #include "qconsolelistener.h"
 
 #include "dtlsclient.h"
+#include "magic.h"
 
 int main(int argc, char *argv[])
 {
@@ -45,7 +46,8 @@ int main(int argc, char *argv[])
             qCritical() << "[ClientError] Port isn't valid";
             return 103;
         }
-        DtlsClient client(address, port, "Alice Zephyr"); /* MAGICCONSTANT UNDESIREABLE NO 1 */
+#pragma message(M_CONST)
+        DtlsClient client(address, port, "Alice Zephyr");
         QConsoleListener *console;
         console = new QConsoleListener(false);
         bool listenInput = QObject::connect(console, &QConsoleListener::newLine, &client, &DtlsClient::parse);

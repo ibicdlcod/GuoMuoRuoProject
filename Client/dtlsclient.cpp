@@ -49,6 +49,7 @@
 ****************************************************************************/
 
 #include "dtlsclient.h"
+#include "magic.h"
 
 QT_BEGIN_NAMESPACE
 
@@ -181,7 +182,8 @@ void DtlsClient::pskRequired(QSslPreSharedKeyAuthenticator *auth)
 
     infoMessage(tr("%1: providing pre-shared key ...").arg(name));
     auth->setIdentity(name.toLatin1());
-    auth->setPreSharedKey(QByteArrayLiteral("\x1a\x2b\x3c\x4d\x5e\x6f")); /* MAGICCONSTANT UNDESIREABLE NO 1 */
+#pragma message(M_CONST)
+    auth->setPreSharedKey(QByteArrayLiteral("\x1a\x2b\x3c\x4d\x5e\x6f"));
 }
 //! [14]
 
