@@ -1,9 +1,7 @@
 #ifndef ECMA48_H
 #define ECMA48_H
 
-#include <QObject>
-
-#include "consoletextstream.h"
+#include <QTextStreamManipulator>
 
 enum class EcmaSetter
 {
@@ -16,7 +14,7 @@ enum class EcmaSetter
     TextDefault,
     BgDefault,
     AllDefault,
-    //new
+    /* new */
     ItalicsOn,
     ItalicsOff,
     DoubleScore,
@@ -28,24 +26,51 @@ enum class EcmaSetter
     OverlineOff
 };
 
-struct Ecma48 : public QObject
+struct Ecma48
 {
-    Q_OBJECT
 public:
-    explicit Ecma48(quint8 red = 0,
-                    quint8 green = 0,
-                    quint8 blue = 0,
+    explicit Ecma48(quint8 red,
+                    quint8 green,
+                    quint8 blue,
                     bool background = false);
     quint8 red;
     quint8 green;
     quint8 blue;
     bool background;
-
-signals:
-
 };
 
-ConsoleTextStream & operator<<(ConsoleTextStream &, EcmaSetter);
-ConsoleTextStream & operator<<(ConsoleTextStream &, Ecma48);
+enum structInt
+{
+    ecmaSetter,
+    ecma48,
+    qtextStreamManipulator
+};
+
+union Ecma
+{
+    structInt member;
+    struct
+    {
+        structInt structId;
+        EcmaSetter setter;
+    } mem1;
+    struct
+    {
+        structInt structId;
+        Ecma48 color;
+    } mem2;
+    struct
+    {
+        structInt structId;
+        QTextStreamManipulator manipulator;
+    } mem3;
+    Ecma(QTextStreamManipulator);
+    Ecma(EcmaSetter);
+    Ecma(quint8 red,
+         quint8 green,
+         quint8 blue,
+         bool background = false);
+    ~Ecma();
+};
 
 #endif // ECMA48_H

@@ -1,4 +1,5 @@
 #include "cliclient.h"
+#include "ecma48.h"
 
 CliClient::CliClient(int argc, char ** argv)
     : CLI(argc, argv), client(nullptr)
@@ -9,7 +10,6 @@ CliClient::CliClient(int argc, char ** argv)
 void CliClient::update()
 {
     /* With the NEW marvelous design, this function doesn't seem necessary. */
-    //timer->start(1000); //reset the timer
     QCoreApplication::processEvents();
     QCoreApplication::processEvents();
     qout.flush();
@@ -21,21 +21,22 @@ bool CliClient::parseSpec(const QStringList &commandParts)
     {
         QString primary = commandParts[0];
 
-        // aliases
+        /* aliases */
         QMap<QString, QString> aliases;
 
         if(aliases.contains(primary))
         {
             primary = aliases[primary];
         }
-        // end aliases
+        /* end aliases */
 
-        if(primary.compare("start", Qt::CaseInsensitive) == 0)
+        if(primary.compare("login", Qt::CaseInsensitive) == 0)
         {
             if(commandParts.length() < 3)
             {
-                qout << tr("Usage: start [ip] [port]") << Qt::endl;
-                return true; // if false, then the above message and invalidCommand becomes redundant
+                qout << tr("Usage: login [ip] [port]") << Qt::endl;
+                /* if false, then the above message and invalidCommand becomes redundant */
+                return true;
             }
             else
             {
@@ -56,34 +57,21 @@ bool CliClient::parseSpec(const QStringList &commandParts)
                 {
                     qFatal("Communication with client process can't be established.");
                 }
-                client->start("Client/debug/Client",
+#if defined (__MINGW32__) || defined (__MINGW64__)
+                QString client_exe = QStringLiteral("mingw/Client/debug/Client");
+#elif defined(__GNUC__)
+                QString client_exe = QStringLiteral("gcc/debug/Client/Client");
+#elif defined (_MSC_VER)
+                QString client_exe = QStringLiteral("msvc/Client/debug/Client");
+#endif
+                client->start(client_exe,
                               {commandParts[1], commandParts[2]}, QIODevice::ReadWrite);
                 return true;
             }
         }
-        else if(primary.compare("stop", Qt::CaseInsensitive) == 0)
+        else if(primary.compare("logout", Qt::CaseInsensitive) == 0)
         {
             shutdownClient();
-            return true;
-        }
-        else if(primary.compare("unlisten", Qt::CaseInsensitive) == 0 && client && client->state()) // QProcess::NotRunning = 0
-        {
-            qout << tr("Client will stop accepting new connections.") << Qt::endl;
-            client->write("UNLISTEN\n");
-            return true;
-        }
-        else if(primary.compare("relisten", Qt::CaseInsensitive) == 0 && client && client->state())
-        {
-            if(commandParts.length() < 3)
-            {
-                qout << tr("Usage: relisten [ip] [port]") << Qt::endl;
-                return true; // if false, then the above message and invalidCommand becomes redundant
-            }
-            qout << tr("Client will resume accepting new connections.") << Qt::endl;
-            /* very ugly, but write() don't accept QString */
-            char command[120];
-            sprintf(command, "RELISTEN %s %s\n", commandParts[1].toUtf8().constData(), commandParts[2].toUtf8().constData());
-            client->write(command);
             return true;
         }
         return false;
@@ -131,7 +119,26 @@ void CliClient::clientStderr()
     {
         switch(output_str[7])
         {
-        case 'E': qCritical("%s", output.constData()); break;
+        case 'E':
+            if(output.startsWith("[ClientError] [CATBOMB]"))
+            {
+                /* This is considered an integral part of the program rather than magic constants. */
+                /* See https://en.wikipedia.org/w/index.php?title=The_world_wonders&oldid=1014651994 */
+                qout.printLine(QStringLiteral("\r%1 %2 %3 %4 %5 %6")
+                               .arg(tr("TURKEY TROTS TO WATER"),
+                                    tr("GG"),
+                                    tr("FROM CINCPAC ACTION COM THIRD FLEET INFO COMINCH CTF SEVENTY-SEVEN X"),
+                                    tr("WHERE IS RPT WHERE IS TASK FORCE THIRTY FOUR"),
+                                    tr("RR"),
+                                    tr("THE WORLD WONDERS")),
+                               Ecma(255,128,192), Ecma(255,255,255,true));
+                qout.printLine("\r\n", Ecma(EcmaSetter::AllDefault));
+            }
+            else
+            {
+                qCritical("%s", output.constData());
+            }
+            break;
         case 'W': qWarning("%s", output.constData()); break;
         case 'I': qInfo("%s", output.constData()); break;
         default: qCritical("%s", output.constData()); break;
@@ -149,7 +156,7 @@ void CliClient::clientStdout()
     qInfo("%s", output.constData());
 }
 
-void CliClient::clientStarted()
+inline void CliClient::clientStarted()
 {
     qout << tr("Client started and running.") << Qt::endl;
 }
@@ -170,11 +177,13 @@ void CliClient::clientChanged(QProcess::ProcessState newstate)
 void CliClient::shutdownClient()
 {
     int waitformsec = 12000;
-    if(client && client->state()) // QProcess::NotRunning = 0
+    /* QProcess::NotRunning = 0 (this comment won't be repeated elsewhere */
+    if(client && client->state())
     {
         client->write("SIGTERM\n");
         qout << tr("Waiting for client finish...") << Qt::endl;
-        //client->terminate();
+        /* per documentation, this function is nearly useless on Windows
+        client->terminate(); */
         if(!client->waitForFinished(waitformsec))
         {
             qout << (tr("Client isn't responding after %1 msecs, killing.")).arg(QString::number(waitformsec))

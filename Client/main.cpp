@@ -59,8 +59,7 @@ int main(int argc, char *argv[])
         {
             throw std::runtime_error("Exit mechanism failed!");
         }
-        QSharedPointer<DtlsClient> newConnection(&client);
-        newConnection->startHandshake();
+        client.startHandshake();
         return a.exec();
     }  catch (std::runtime_error &e) {
         qDebug() << "[Runtime Error] " << e.what() << Qt::endl << "Press ENTER to exit.";

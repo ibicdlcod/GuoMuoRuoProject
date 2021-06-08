@@ -202,17 +202,6 @@ void DtlsClient::pingTimeout()
 
 void DtlsClient::catbomb()
 {
-    /* This is considered an integral part of the program rather than magic constants. */
-    /* See https://en.wikipedia.org/w/index.php?title=The_world_wonders&oldid=1014651994 */
-    /*
-    errorMessage(QStringLiteral("%1 %2 %3 %4 %5 %6").arg(tr("TURKEY TROTS TO WATER"),
-                      tr("GG"),
-                      tr("FROM CINCPAC ACTION COM THIRD FLEET INFO COMINCH CTF SEVENTY-SEVEN X"),
-                      tr("WHERE IS RPT WHERE IS TASK FORCE THIRTY FOUR"),
-                      tr("RR"),
-                      tr("THE WORLD WONDERS")));
-                      */
-
     /* no tr() should be used here */
     errorMessage("[CATBOMB]");
     QTimer::singleShot(2000, this, &DtlsClient::finished);

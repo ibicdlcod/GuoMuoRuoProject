@@ -69,7 +69,9 @@ int main(int argc, char *argv[])
             logFile = new QFile("LogFile.log"); /* MAGICCONSTANT UNDESIREABLE NO 1 */
             a = new CliClient(argc, argv);
         }
-        else // I wish for a elif. This else can be deleted but clazy will warn you memory leak
+        /* I wish for a elif. This else can be deleted but clazy will warn you memory leak in case
+         * clientActive and serverActive is both true, which is impossible */
+        else
         {
             if(serverActive)
             {

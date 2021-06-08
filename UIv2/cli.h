@@ -18,7 +18,7 @@ public slots:
     bool parse(const QString &);
     virtual bool parseSpec(const QStringList &) = 0;
 
-    void displayPrompt(); // TO BE VIRTUAL
+    void displayPrompt();
 
 protected:
     static const QStringList getCommands();

@@ -8,7 +8,7 @@
 #include <QDir>
 #include <QRegularExpression>
 #include <iostream>
-#include "ecma48.h"
+#include "consoletextstream.h"
 #include "wcwidth.h"
 
 /* Ugly as fuck, but customMessageHandler had to be a member of CLI in order to use tr() and then said function
@@ -75,7 +75,6 @@ void CLI::customMessageHandler(QtMsgType type, const QMessageLogContext &context
 
 void CLI::openingwords()
 {
-    int width = getConsoleWidth();
     QString notice;
     QDir currentDir = QDir::current();
     QFile licenseFile(currentDir.filePath("openingwords.txt")); /* MAGICCONSTANT UNDESIREABLE NO 1 */
@@ -88,56 +87,39 @@ void CLI::openingwords()
     else
     {
         QTextStream instream1(&licenseFile);
-        qout << Ecma48(255,255,255,true) << Ecma48(0,0,255);
+
         qout.setFieldAlignment(QTextStream::AlignCenter);
-        while(!instream1.atEnd())
-        {
-            notice = instream1.readLine();
-            qout.setFieldWidth(width);
-            qout << notice;
-            qout.setFieldWidth(0);
-            qout << Qt::endl;
-        }
-        qout << EcmaSetter::AllDefault;
-        qout.setFieldWidth(width);
-        qout << "";
-        qout.setFieldWidth(0);
-        qout << Qt::endl;
-        qout << Ecma48(192,255,192,true) << Ecma48(64,64,64);
 
-        qout.setFieldWidth(width);
-
+        notice = instream1.readAll();
+        qout.printLine(notice, Ecma(255,255,255,true), Ecma(0,0,255));
+        qout.printLine("");
         /* This is considered an integral part of the program rather than magic constants. */
-        qout << tr("What? Admiral Tanaka? He's the real deal, isn't he? Great at battle and bad at politics--so cool!");
-
-        qout.setFieldWidth(0);
-        qout << EcmaSetter::AllDefault << Qt::endl;
+        qout.printLine(tr("What? Admiral Tanaka? He's the real deal, isn't he? Great at battle and bad at politics--so cool!"),
+                       Ecma(192,255,192,true), Ecma(64,64,64));
     }
-    qout << EcmaSetter::AllDefault;
     qout.setFieldAlignment(QTextStream::AlignLeft);
-    qout << Qt::endl;
 }
 
 bool CLI::parse(const QString &input)
 {
-    //qDebug() << input;
     QStringList commandParts = input.split(QRegularExpression("\\s+"), Qt::SkipEmptyParts);
     if(commandParts.length() > 0)
     {
         QString primary = commandParts[0];
 
-        // aliases
+        /* aliases */
         QMap<QString, QString> aliases;
 
         aliases["h"] = "help";
         aliases["q"] = "exit";
         aliases["c"] = "commands";
+        aliases["a"] = "allcommands";
 
         if(aliases.contains(primary))
         {
             primary = aliases[primary];
         }
-        // end aliases
+        /* end aliases */
 
         if(primary.compare("help", Qt::CaseInsensitive) == 0)
         {
@@ -183,7 +165,7 @@ bool CLI::parse(const QString &input)
     return false;
 }
 
-void CLI::displayPrompt()
+inline void CLI::displayPrompt()
 {
     qout << "ST$ ";
 }
@@ -193,7 +175,7 @@ const QStringList CLI::getCommands()
     return {"exit", "help", "commands", "allcommands"};
 }
 
-void CLI::invalidCommand()
+inline void CLI::invalidCommand()
 {
     qout << tr("Invalid Command, use 'commands' for valid commands, 'help' for help, 'exit' to exit.") << Qt::endl;
 }
@@ -204,17 +186,17 @@ void CLI::showCommands(bool validOnly)
     qout << tr("Use 'exit' to quit.") << Qt::endl;
     if(validOnly)
     {
-        qout << tr("Available commands:") << Qt::endl;
+        qout.printLine(tr("Available commands:"), Ecma(0,255,0));
         qls(getValidCommands());
     }
     else
     {
-        qout << tr("All commands:") << Qt::endl;
+        qout.printLine(tr("All commands:"), Ecma(255,255,0));
         qls(getCommandsSpec());
     }
 }
 
-void CLI::showHelp(const QStringList &)
+inline void CLI::showHelp(const QStringList &)
 {
     qout << tr("Use 'exit' to quit, 'help' to show help, 'commands' to show available commands.") << Qt::endl;
 }
@@ -335,12 +317,11 @@ void CLI::qls(const QStringList &input)
                                                lengthcmp)) + ((j == displaySelected.length() - 1) ? 0 : 1)
                         - callength(current_element)
                         + callength(current_element, true);
-                qout.setFieldWidth(fieldwidth);
                 QString str = *((displaySelected.begin() + j)->constBegin() + i);
-                qout << str;
+                qout.print(str, fieldwidth);
             }
         }
-        qout.setFieldWidth(0);
+        qout.print("", 0);
         qout << Qt::endl;
     }
 }
@@ -352,8 +333,8 @@ void CLI::exitGracefully()
     {
         timer->stop();
     }
-    qout << Ecma48(64,255,64) << EcmaSetter::BlinkOn;
-    qout << tr("Goodbye, press ENTER to quit") << EcmaSetter::AllDefault << Qt::endl;
+    qout.printLine(tr("Goodbye, press ENTER to quit"), Ecma(64,255,64), Ecma(EcmaSetter::BlinkOn));
+    qout.reset();
     logFile->close();
     quit();
 }

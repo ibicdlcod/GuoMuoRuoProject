@@ -10,7 +10,7 @@ public:
     explicit CliClient(int, char **);
 
 public slots:
-    void update();
+    Q_DECL_DEPRECATED void update();
 
 private slots:
     bool parseSpec(const QStringList &);

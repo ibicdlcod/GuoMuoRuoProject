@@ -9,7 +9,6 @@ CliServer::CliServer(int argc, char ** argv)
 void CliServer::update()
 {
     /* With the NEW marvelous design, this function doesn't seem necessary. */
-    //timer->start(1000); //reset the timer
     QCoreApplication::processEvents();
     QCoreApplication::processEvents();
     qout.flush();
@@ -21,21 +20,22 @@ bool CliServer::parseSpec(const QStringList &commandParts)
     {
         QString primary = commandParts[0];
 
-        // aliases
+        /* aliases */
         QMap<QString, QString> aliases;
 
         if(aliases.contains(primary))
         {
             primary = aliases[primary];
         }
-        // end aliases
+        /* end aliases */
 
         if(primary.compare("start", Qt::CaseInsensitive) == 0)
         {
             if(commandParts.length() < 3)
             {
                 qout << tr("Usage: start [ip] [port]") << Qt::endl;
-                return true; // if false, then the above message and invalidCommand becomes redundant
+                /* if false, then the above message and invalidCommand becomes redundant */
+                return true;
             }
             else
             {
@@ -56,7 +56,6 @@ bool CliServer::parseSpec(const QStringList &commandParts)
                 {
                     qFatal("Communication with server process can't be established.");
                 }
-
 #if defined (__MINGW32__) || defined (__MINGW64__)
                 QString server_exe = QStringLiteral("mingw/Server/debug/Server");
 #elif defined(__GNUC__)
@@ -74,7 +73,7 @@ bool CliServer::parseSpec(const QStringList &commandParts)
             shutdownServer();
             return true;
         }
-        else if(primary.compare("unlisten", Qt::CaseInsensitive) == 0 && server && server->state()) // QProcess::NotRunning = 0
+        else if(primary.compare("unlisten", Qt::CaseInsensitive) == 0 && server && server->state())
         {
             qout << tr("Server will stop accepting new connections.") << Qt::endl;
             server->write("UNLISTEN\n");
@@ -85,7 +84,8 @@ bool CliServer::parseSpec(const QStringList &commandParts)
             if(commandParts.length() < 3)
             {
                 qout << tr("Usage: relisten [ip] [port]") << Qt::endl;
-                return true; // if false, then the above message and invalidCommand becomes redundant
+                /* if false, then the above message and invalidCommand becomes redundant */
+                return true;
             }
             qout << tr("Server will resume accepting new connections.") << Qt::endl;
             /* very ugly, but write() don't accept QString */
@@ -156,7 +156,7 @@ void CliServer::serverStdout()
     qInfo("%s", output.constData());
 }
 
-void CliServer::serverStarted()
+inline void CliServer::serverStarted()
 {
     qout << tr("Server started and running.") << Qt::endl;
 }
@@ -177,11 +177,12 @@ void CliServer::serverChanged(QProcess::ProcessState newstate)
 void CliServer::shutdownServer()
 {
     int waitformsec = 12000;
-    if(server && server->state()) // QProcess::NotRunning = 0
+    if(server && server->state())
     {
         server->write("SIGTERM\n");
         qout << tr("Waiting for server finish...") << Qt::endl;
-        //server->terminate(); // per documentation, this function is nearly useless on Windows
+        /* per documentation, this function is nearly useless on Windows
+        server->terminate(); */
         if(!server->waitForFinished(waitformsec))
         {
             qout << (tr("Server isn't responding after %1 msecs, killing.")).arg(QString::number(waitformsec))
