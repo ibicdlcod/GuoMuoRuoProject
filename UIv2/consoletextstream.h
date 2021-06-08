@@ -7,6 +7,10 @@
 #include <windows.h>
 #include <iostream>
 #endif
+#if defined (Q_OS_UNIX)
+#include <sys/ioctl.h> //ioctl() and TIOCGWINSZ
+#include <unistd.h> // for STDOUT_FILENO
+#endif
 
 #include <QIODevice>
 #include <QSocketNotifier>

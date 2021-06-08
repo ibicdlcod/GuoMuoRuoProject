@@ -96,7 +96,7 @@ void CLI::openingwords()
         qout.printLine(notice, Ecma(255,255,255,true), Ecma(0,0,255));
         qout.printLine("");
         /* This is considered an integral part of the program rather than magic constants. */
-        qout.printLine(tr("What? Admiral Tanaka? He's the real deal, isn't he? Great at battle and bad at politics--so cool!"),
+        qout.printLine(tr("What? Admiral Tanaka? He's the real deal, isn't he?\nGreat at battle and bad at politics--so cool!"),
                        Ecma(192,255,192,true), Ecma(64,64,64));
     }
     qout.setFieldAlignment(QTextStream::AlignLeft);
@@ -167,7 +167,7 @@ bool CLI::parse(const QString &input)
     return false;
 }
 
-inline void CLI::displayPrompt()
+void CLI::displayPrompt()
 {
     qout << "ST$ ";
 }

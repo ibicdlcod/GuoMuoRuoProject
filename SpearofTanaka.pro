@@ -5,8 +5,7 @@ SUBDIRS += \
     QConsoleListener \
     Client \
     Server \
-    UIv2 \
-    Magic
+    UIv2
 
 Client.depends = QConsoleListener
 Server.depends = QConsoleListener
