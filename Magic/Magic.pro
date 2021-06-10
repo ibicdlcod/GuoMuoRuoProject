@@ -1,7 +1,7 @@
 CONFIG -= qt
 
 TEMPLATE = lib
-DEFINES += MAGIC_LIBRARY
+CONFIG += staticlib
 
 CONFIG += c++11
 
@@ -18,6 +18,6 @@ HEADERS += \
 
 # Default rules for deployment.
 unix {
-    target.path = /usr/lib
+    target.path = $$[QT_INSTALL_PLUGINS]/generic
 }
 !isEmpty(target.path): INSTALLS += target

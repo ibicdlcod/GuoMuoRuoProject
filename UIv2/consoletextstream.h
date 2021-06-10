@@ -7,6 +7,10 @@
 #include <windows.h>
 #include <iostream>
 #endif
+#if defined (Q_OS_UNIX)
+#include <sys/ioctl.h> //ioctl() and TIOCGWINSZ
+#include <unistd.h> // for STDOUT_FILENO
+#endif
 
 #include <QIODevice>
 #include <QSocketNotifier>
@@ -65,17 +69,17 @@ public:
 #pragma message(USED_CXX17)
         (*this << ... << all);
         int width;
-    #if defined (Q_OS_WIN)
+#if defined (Q_OS_WIN)
         CONSOLE_SCREEN_BUFFER_INFO csbi;
         GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &csbi);
         width = csbi.srWindow.Right - csbi.srWindow.Left + 1;
-    #elif defined (Q_OS_UNIX)
+#elif defined (Q_OS_UNIX)
         struct winsize size;
         ioctl(STDOUT_FILENO, TIOCGWINSZ, &size);
         width = size.ws_col;
-    #else
+#else
         width = 80;
-    #endif
+#endif
         /* Obviously, QString::SkipEmptyParts should not be used here, for a file may contain useful empty lines */
         const QStringList noticeLines = input.split(QRegularExpression("[\r\n]"));
         for(QStringList::const_iterator i = noticeLines.constBegin();

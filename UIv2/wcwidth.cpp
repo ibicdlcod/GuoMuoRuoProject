@@ -200,9 +200,9 @@ int mk_wcwidth(char16_t ucs)
               (ucs >= 0xff00 && ucs <= 0xff60) || /* Fullwidth Forms */
               (ucs >= 0xffe0 && ucs <= 0xffe6)));
     /* the below lines are present in original but will get warnings */
-//              (ucs >= 0xffe0 && ucs <= 0xffe6) ||
-//              (ucs >= 0x20000 && ucs <= 0x2fffd) ||
-//              (ucs >= 0x30000 && ucs <= 0x3fffd)));
+    //              (ucs >= 0xffe0 && ucs <= 0xffe6) ||
+    //              (ucs >= 0x20000 && ucs <= 0x2fffd) ||
+    //              (ucs >= 0x30000 && ucs <= 0x3fffd)));
 }
 
 

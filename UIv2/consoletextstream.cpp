@@ -1,7 +1,5 @@
 #include "consoletextstream.h"
 
-#include "consoletextstream.h"
-
 ConsoleTextStream::ConsoleTextStream(FILE *fileHandle, QIODeviceBase::OpenMode openMode = QIODevice::ReadWrite)
     :QTextStream(fileHandle, openMode)
 {

@@ -11,7 +11,7 @@
 class MAGIC_EXPORT Magic
 {
 public:
-    Magic();
+    Magic() = delete;
 };
 
 #endif // MAGIC_H
