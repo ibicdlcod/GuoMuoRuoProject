@@ -24,34 +24,59 @@ CLI::CLI(int argc, char ** argv)
 
 }
 
-void CLI::customMessageHandler(QtMsgType type, const QMessageLogContext &context, const QString &msg)
+void CLI::customMessageHandler(QtMsgType type, const QMessageLogContext &context, const QString &msg_original)
 {
+    QString msg = msg_original;
+    if(msg.endsWith("\n"))
+    {
+        msg.remove(msg.length() - 1, 1);
+    }
     QString dt = QDateTime::currentDateTime().toString("dd/MM/yyyy hh:mm:ss");
     QString txt = QStringLiteral("\r[%1] ").arg(dt);
     QByteArray localMsg = msg.toUtf8();
     const char *file = context.file ? context.file : "";
     const char *function = context.function ? context.function : "";
 
-    QString txt2 = QStringLiteral("%1 (%2:%3, %4)").arg(tr(localMsg.constData()), file, QString::number(context.line), function);
+    QString txt2 = QStringLiteral("%1 (%2:%3, %4)").arg(tr(localMsg.constData()), file, QString::number(context.line), function);\
     switch (type)
     {
     case QtDebugMsg:
-        txt += QStringLiteral("{Debug} \t\t %1").arg(txt2);
+        txt += QStringLiteral("{Debug}    %1").arg(txt2);
         break;
     case QtInfoMsg:
-        txt += QStringLiteral("{Info} \t\t %1").arg(txt2);
+        txt += QStringLiteral("{Info}     %1").arg(txt2);
         break;
     case QtWarningMsg:
-        txt += QStringLiteral("{Warning} \t %1").arg(txt2);
+        txt += QStringLiteral("{Warning}  %1").arg(txt2);
         break;
     case QtCriticalMsg:
-        txt += QStringLiteral("{Critical} \t %1").arg(txt2);
+        txt += QStringLiteral("{Critical} %1").arg(txt2);
         break;
     case QtFatalMsg:
-        txt += QStringLiteral("{Fatal} \t\t %1").arg(txt2);
-        abort();
+        txt += QStringLiteral("{Fatal}    %1").arg(txt2);
         break;
     }
+
+    const char * color;
+    switch(type)
+    {
+    case QtDebugMsg:
+        color = ("\x1b[46;97m");
+        break;
+    case QtInfoMsg:
+        color = ("\x1b[44;97m");
+        break;
+    case QtWarningMsg:
+        color = ("\x1b[43;97m");
+        break;
+    case QtCriticalMsg:
+        color = ("\x1b[101;97m");
+        break;
+    case QtFatalMsg:
+        color = ("\x1b[41;97m");
+        break;
+    }
+    std::cout << color;
 
 #if defined (Q_OS_WIN)
     WriteConsoleW(GetStdHandle(STD_OUTPUT_HANDLE),
@@ -59,7 +84,7 @@ void CLI::customMessageHandler(QtMsgType type, const QMessageLogContext &context
 #else
     std::cout << txt.toUtf8().constData();
 #endif
-    std::cout << std::endl;
+    std::cout << "\x1b[49;39m" << std::endl;
 
     if(!logFile->isWritable())
     {
@@ -72,6 +97,10 @@ void CLI::customMessageHandler(QtMsgType type, const QMessageLogContext &context
     }
     QTextStream textStream(logFile);
     textStream << txt;
+    if(type == QtFatalMsg)
+    {
+        abort();
+    }
 }
 
 void CLI::openingwords()

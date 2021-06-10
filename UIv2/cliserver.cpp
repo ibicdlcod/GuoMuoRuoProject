@@ -158,7 +158,7 @@ void CliServer::serverStdout()
 
 inline void CliServer::serverStarted()
 {
-    qout << tr("Server started and running.") << Qt::endl;
+    //qout << tr("Server started and running.") << Qt::endl;
 }
 
 void CliServer::serverChanged(QProcess::ProcessState newstate)
@@ -166,7 +166,7 @@ void CliServer::serverChanged(QProcess::ProcessState newstate)
     switch(newstate)
     {
     case QProcess::NotRunning:
-        qCritical("Server->NotRunning."); break;
+        qWarning("Server->NotRunning."); break;
     case QProcess::Starting:
         qInfo("Server->Starting."); break;
     case QProcess::Running:
@@ -180,7 +180,7 @@ void CliServer::shutdownServer()
     if(server && server->state())
     {
         server->write("SIGTERM\n");
-        qout << tr("Waiting for server finish...") << Qt::endl;
+        //qout << tr("Waiting for server finish...") << Qt::endl;
         /* per documentation, this function is nearly useless on Windows
         server->terminate(); */
         if(!server->waitForFinished(waitformsec))
