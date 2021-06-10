@@ -95,7 +95,7 @@ void CLI::openingwords()
         notice = instream1.readAll();
         qout.printLine(notice, Ecma(255,255,255,true), Ecma(0,0,255));
         qout.printLine("");
-        /* This is considered an integral part of the program rather than magic constants. */
+#pragma message(NOT_M_CONST)
         qout.printLine(tr("What? Admiral Tanaka? He's the real deal, isn't he? Great at battle and bad at politics--so cool!"),
                        Ecma(192,255,192,true), Ecma(64,64,64));
     }

@@ -1,5 +1,6 @@
 #include "cliclient.h"
 #include "ecma48.h"
+#include "magic.h"
 
 CliClient::CliClient(int argc, char ** argv)
     : CLI(argc, argv), client(nullptr)
@@ -122,7 +123,7 @@ void CliClient::clientStderr()
         case 'E':
             if(output.startsWith("[ClientError] [CATBOMB]"))
             {
-                /* This is considered an integral part of the program rather than magic constants. */
+#pragma message(NOT_M_CONST)
                 /* See https://en.wikipedia.org/w/index.php?title=The_world_wonders&oldid=1014651994 */
                 qout.printLine(QStringLiteral("\r%1 %2 %3 %4 %5 %6")
                                .arg(tr("TURKEY TROTS TO WATER"),
