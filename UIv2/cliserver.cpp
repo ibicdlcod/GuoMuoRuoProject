@@ -39,6 +39,11 @@ bool CliServer::parseSpec(const QStringList &commandParts)
             }
             else
             {
+                if(server && server->state())
+                {
+                    qout << tr("Server already exists, please shut down first.") << Qt::endl;
+                    return true;
+                }
                 server = new QProcess();
                 bool success = QObject::connect(server, &QProcess::errorOccurred,
                                                 this, &CliServer::processError)
@@ -57,11 +62,11 @@ bool CliServer::parseSpec(const QStringList &commandParts)
                     qFatal("Communication with server process can't be established.");
                 }
 #if defined (__MINGW32__) || defined (__MINGW64__)
-                QString server_exe = QStringLiteral("mingw/Server/debug/Server");
+                QString server_exe = QStringLiteral("../Server/debug/Server");
 #elif defined(__GNUC__)
-                QString server_exe = QStringLiteral("gcc/debug/Server/Server");
+                QString server_exe = QStringLiteral("../debug/Server/Server");
 #elif defined (_MSC_VER)
-                QString server_exe = QStringLiteral("msvc/Server/debug/Server");
+                QString server_exe = QStringLiteral("../Server/debug/Server");
 #endif
                 server->start(server_exe,
                               {commandParts[1], commandParts[2]}, QIODevice::ReadWrite);
@@ -132,7 +137,7 @@ void CliServer::processFinished(int exitcode, QProcess::ExitStatus exitst)
 
 void CliServer::serverStderr()
 {
-    QByteArray output = server->readAllStandardError();
+    QByteArray output = server->readAllStandardError().trimmed();
     const char * output_str = output.constData();
     if(output.startsWith("[Server"))
     {
