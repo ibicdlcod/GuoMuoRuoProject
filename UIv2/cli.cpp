@@ -61,19 +61,19 @@ void CLI::customMessageHandler(QtMsgType type, const QMessageLogContext &context
     switch(type)
     {
     case QtDebugMsg:
-        color = ("\x1b[46;97m");
+        color = ("\x1b[48;2;0;255;0;97m");
         break;
     case QtInfoMsg:
-        color = ("\x1b[44;97m");
+        color = ("\x1b[48;2;0;0;255;97m");
         break;
     case QtWarningMsg:
-        color = ("\x1b[43;97m");
+        color = ("\x1b[48;2;255;255;0;30m");
         break;
     case QtCriticalMsg:
-        color = ("\x1b[101;97m");
+        color = ("\x1b[48;2;255;0;0;97m");
         break;
     case QtFatalMsg:
-        color = ("\x1b[41;97m");
+        color = ("\x1b[48;2;128;0;0;97m");
         break;
     }
     std::cout << color;
