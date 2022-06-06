@@ -66,7 +66,7 @@ bool CliClient::parseSpec(const QStringList &commandParts)
 #if defined (__MINGW32__) || defined (__MINGW64__)
                 QString client_exe = QStringLiteral("../Client/debug/Client");
 #elif defined(__GNUC__)
-                QString client_exe = QStringLiteral("../debug/Client/Client");
+                QString client_exe = QStringLiteral("../Client/Client");
 #elif defined (_MSC_VER)
                 QString client_exe = QStringLiteral("../Client/debug/Client");
 #endif
@@ -119,40 +119,46 @@ void CliClient::processFinished(int exitcode, QProcess::ExitStatus exitst)
 
 void CliClient::clientStderr()
 {
-    QByteArray output = client->readAllStandardError().trimmed();
-    const char * output_str = output.constData();
-    if(output.startsWith("[Client"))
+    QList<QByteArray> outputs = client->readAllStandardError().split('\n');
+    for(qsizetype i=0; i<outputs.size(); ++i)
     {
-        switch(output_str[7])
+        QByteArray output = outputs.at(i).trimmed();
+        if(output.simplified().size() < 1)
+            continue;
+        const char * output_str = output.constData();
+        if(output.startsWith("[Client"))
         {
-        case 'E':
-            if(output.startsWith("[ClientError] [CATBOMB]"))
+            switch(output_str[7])
             {
+            case 'E':
+                if(output.startsWith("[ClientError] [CATBOMB]"))
+                {
 #pragma message(NOT_M_CONST)
-                /* See https://en.wikipedia.org/w/index.php?title=The_world_wonders&oldid=1014651994 */
-                qout.printLine(QStringLiteral("%1 %2 %3 %4 %5 %6")
-                               .arg(tr("[CATBOMB] TURKEY TROTS TO WATER"),
-                                    tr("GG"),
-                                    tr("FROM CINCPAC ACTION COM THIRD FLEET INFO COMINCH CTF SEVENTY-SEVEN X"),
-                                    tr("WHERE IS RPT WHERE IS TASK FORCE THIRTY FOUR"),
-                                    tr("RR"),
-                                    tr("THE WORLD WONDERS")),
-                               Ecma(255,128,192), Ecma(255,255,255,true));
-                //qout.printLine("", Ecma(EcmaSetter::AllDefault));
+                    /* See https://en.wikipedia.org/w/index.php?title=The_world_wonders&oldid=1014651994 */
+                    qout.printLine(QStringLiteral("%1 %2 %3 %4 %5 %6")
+                                   .arg(tr("[CATBOMB] TURKEY TROTS TO WATER"),
+                                        tr("GG"),
+                                        tr("FROM CINCPAC ACTION COM THIRD FLEET INFO COMINCH CTF SEVENTY-SEVEN X"),
+                                        tr("WHERE IS RPT WHERE IS TASK FORCE THIRTY FOUR"),
+                                        tr("RR"),
+                                        tr("THE WORLD WONDERS")),
+                                   Ecma(255,128,192), Ecma(255,255,255,true));
+                    //qout.printLine("", Ecma(EcmaSetter::AllDefault));
+                }
+                else
+                {
+                    qCritical("%s", output.constData());
+                }
+                break;
+            case 'W': qWarning("%s", output.constData()); break;
+            case 'I': qInfo("%s", output.constData()); break;
+            default: qCritical("%s", output.constData()); break;
             }
-            else
-            {
-                qCritical("%s", output.constData());
-            }
-            break;
-        case 'W': qWarning("%s", output.constData()); break;
-        case 'I': qInfo("%s", output.constData()); break;
-        default: qCritical("%s", output.constData()); break;
         }
-    }
-    else
-    {
-        qCritical("%s", output.constData());
+        else
+        {
+            qCritical("%s", output.constData());
+        }
     }
 }
 

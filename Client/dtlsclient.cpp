@@ -178,7 +178,10 @@ void DtlsClient::handshakeTimeout()
         errorMessage(tr("%1: failed to re-transmit - %2").arg(name, crypto.dtlsErrorString()));
     if(retransmit_times > maxretransmit)
     {
-        QTimer::singleShot(1000, this, &DtlsClient::maxexceeded);
+        //QTimer::singleShot(1000, this, &DtlsClient::maxexceeded);
+        errorMessage(tr("%1: max restransmit time exceeded!").arg(name));
+        catbomb();
+        //QTimer::singleShot(100, this, &DtlsClient::catbomb);
     }
 }
 //! [11]
@@ -219,8 +222,6 @@ void DtlsClient::catbomb()
 
 void DtlsClient::maxexceeded()
 {
-    errorMessage(tr("%1: max restransmit time exceeded!").arg(name));
-    QTimer::singleShot(100, this, &DtlsClient::catbomb);
 }
 
 void DtlsClient::errorMessage(const QString &message)

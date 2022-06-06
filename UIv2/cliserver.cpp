@@ -64,7 +64,7 @@ bool CliServer::parseSpec(const QStringList &commandParts)
 #if defined (__MINGW32__) || defined (__MINGW64__)
                 QString server_exe = QStringLiteral("../Server/debug/Server");
 #elif defined(__GNUC__)
-                QString server_exe = QStringLiteral("../debug/Server/Server");
+                QString server_exe = QStringLiteral("../Server/Server");
 #elif defined (_MSC_VER)
                 QString server_exe = QStringLiteral("../Server/debug/Server");
 #endif
@@ -137,21 +137,27 @@ void CliServer::processFinished(int exitcode, QProcess::ExitStatus exitst)
 
 void CliServer::serverStderr()
 {
-    QByteArray output = server->readAllStandardError().trimmed();
-    const char * output_str = output.constData();
-    if(output.startsWith("[Server"))
+    QList<QByteArray> outputs = server->readAllStandardError().split('\n');
+    for(qsizetype i=0; i< outputs.size(); ++i)
     {
-        switch(output_str[7])
+        QByteArray output = outputs.at(i).trimmed();
+        if(output.simplified().size() < 1)
+            continue;
+        const char * output_str = output.constData();
+        if(output.startsWith("[Server"))
         {
-        case 'E': qCritical("%s", output.constData()); break;
-        case 'W': qWarning("%s", output.constData()); break;
-        case 'I': qInfo("%s", output.constData()); break;
-        default: qCritical("%s", output.constData()); break;
+            switch(output_str[7])
+            {
+            case 'E': qCritical("%s", output.constData()); break;
+            case 'W': qWarning("%s", output.constData()); break;
+            case 'I': qInfo("%s", output.constData()); break;
+            default: qCritical("%s", output.constData()); break;
+            }
         }
-    }
-    else
-    {
-        qCritical("%s", output.constData());
+        else
+        {
+            qCritical("%s", output.constData());
+        }
     }
 }
 
