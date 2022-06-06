@@ -93,6 +93,7 @@ private slots:
 	 * %A9%E3%83%B3%E3%82%B0%E9%9B%86/%E3%81%AA#cat
 	 * for why this is named cat. */
     void catbomb();
+    void maxexceeded();
 
 private:
     QString name;
@@ -101,6 +102,9 @@ private:
 
     QTimer pingTimer;
     unsigned ping = 0;
+
+    unsigned const int maxretransmit;
+    unsigned int retransmit_times = 0;
 
     Q_DISABLE_COPY(DtlsClient)
 };

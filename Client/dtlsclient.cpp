@@ -56,7 +56,8 @@ QT_BEGIN_NAMESPACE
 DtlsClient::DtlsClient(const QHostAddress &address, quint16 port,
                        const QString &connectionName)
     : name(connectionName),
-      crypto(QSslSocket::SslClientMode)
+      crypto(QSslSocket::SslClientMode),
+      maxretransmit(5)
 {
     //! [1]
     auto configuration = QSslConfiguration::defaultDtlsConfiguration();
@@ -109,6 +110,8 @@ void DtlsClient::udpSocketConnected()
 {
     infoMessage(tr("%1: UDP socket is now in ConnectedState, continue with handshake ...").arg(name));
     startHandshake();
+
+    retransmit_times = 0;
 }
 
 void DtlsClient::readyRead()
@@ -170,8 +173,13 @@ void DtlsClient::readyRead()
 void DtlsClient::handshakeTimeout()
 {
     warningMessage(tr("%1: handshake timeout, trying to re-transmit").arg(name));
+    retransmit_times++;
     if (!crypto.handleTimeout(&socket))
         errorMessage(tr("%1: failed to re-transmit - %2").arg(name, crypto.dtlsErrorString()));
+    if(retransmit_times > maxretransmit)
+    {
+        QTimer::singleShot(1000, this, &DtlsClient::maxexceeded);
+    }
 }
 //! [11]
 
@@ -206,7 +214,13 @@ void DtlsClient::catbomb()
 {
     /* no tr() should be used here */
     errorMessage("[CATBOMB]");
-    QTimer::singleShot(2000, this, &DtlsClient::finished);
+    QTimer::singleShot(500, this, &DtlsClient::finished);
+}
+
+void DtlsClient::maxexceeded()
+{
+    errorMessage(tr("%1: max restransmit time exceeded!").arg(name));
+    QTimer::singleShot(100, this, &DtlsClient::catbomb);
 }
 
 void DtlsClient::errorMessage(const QString &message)

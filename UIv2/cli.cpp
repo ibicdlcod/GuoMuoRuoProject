@@ -111,7 +111,8 @@ void CLI::openingwords()
     QFile licenseFile(currentDir.filePath("openingwords.txt"));
     if(!licenseFile.open(QIODevice::ReadOnly | QIODevice::Text))
     {
-        qout << tr("Can't fild license file, exiting.") << Qt::endl;
+        qout << tr("Can't find license file, exiting.") << Qt::endl;
+        qout.setFieldAlignment(QTextStream::AlignLeft);
         exitGracefully();
         return;
     }

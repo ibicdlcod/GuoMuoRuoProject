@@ -41,6 +41,11 @@ bool CliClient::parseSpec(const QStringList &commandParts)
             }
             else
             {
+                if(client && client->state())
+                {
+                    qout << tr("Client already exists, please shut down first.") << Qt::endl;
+                    return true;
+                }
                 client = new QProcess();
                 bool success = QObject::connect(client, &QProcess::errorOccurred,
                                                 this, &CliClient::processError)
@@ -59,11 +64,11 @@ bool CliClient::parseSpec(const QStringList &commandParts)
                     qFatal("Communication with client process can't be established.");
                 }
 #if defined (__MINGW32__) || defined (__MINGW64__)
-                QString client_exe = QStringLiteral("mingw/Client/debug/Client");
+                QString client_exe = QStringLiteral("../Client/debug/Client");
 #elif defined(__GNUC__)
-                QString client_exe = QStringLiteral("gcc/debug/Client/Client");
+                QString client_exe = QStringLiteral("../debug/Client/Client");
 #elif defined (_MSC_VER)
-                QString client_exe = QStringLiteral("msvc/Client/debug/Client");
+                QString client_exe = QStringLiteral("../Client/debug/Client");
 #endif
                 client->start(client_exe,
                               {commandParts[1], commandParts[2]}, QIODevice::ReadWrite);
@@ -114,7 +119,7 @@ void CliClient::processFinished(int exitcode, QProcess::ExitStatus exitst)
 
 void CliClient::clientStderr()
 {
-    QByteArray output = client->readAllStandardError();
+    QByteArray output = client->readAllStandardError().trimmed();
     const char * output_str = output.constData();
     if(output.startsWith("[Client"))
     {
@@ -125,15 +130,15 @@ void CliClient::clientStderr()
             {
 #pragma message(NOT_M_CONST)
                 /* See https://en.wikipedia.org/w/index.php?title=The_world_wonders&oldid=1014651994 */
-                qout.printLine(QStringLiteral("\r%1 %2 %3 %4 %5 %6")
-                               .arg(tr("TURKEY TROTS TO WATER"),
+                qout.printLine(QStringLiteral("%1 %2 %3 %4 %5 %6")
+                               .arg(tr("[CATBOMB] TURKEY TROTS TO WATER"),
                                     tr("GG"),
                                     tr("FROM CINCPAC ACTION COM THIRD FLEET INFO COMINCH CTF SEVENTY-SEVEN X"),
                                     tr("WHERE IS RPT WHERE IS TASK FORCE THIRTY FOUR"),
                                     tr("RR"),
                                     tr("THE WORLD WONDERS")),
                                Ecma(255,128,192), Ecma(255,255,255,true));
-                qout.printLine("\r\n", Ecma(EcmaSetter::AllDefault));
+                //qout.printLine("", Ecma(EcmaSetter::AllDefault));
             }
             else
             {
@@ -159,7 +164,7 @@ void CliClient::clientStdout()
 
 inline void CliClient::clientStarted()
 {
-    qout << tr("Client started and running.") << Qt::endl;
+    //qout << tr("Client started and running.") << Qt::endl;
 }
 
 void CliClient::clientChanged(QProcess::ProcessState newstate)
