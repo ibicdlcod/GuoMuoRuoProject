@@ -64,7 +64,7 @@ void CLI::customMessageHandler(QtMsgType type, const QMessageLogContext &context
     switch(type)
     {
     case QtDebugMsg:
-        color = ("\x1b[48;2;0;255;0;97m");
+        color = ("\x1b[48;2;0;255;0;30m");
         break;
     case QtInfoMsg:
         color = ("\x1b[48;2;0;0;255;97m");
@@ -138,10 +138,10 @@ void CLI::openingwords()
 bool CLI::parse(const QString &input)
 {
     static QRegularExpression re("\\s+");
-    QStringList commandParts = input.split(re, Qt::SkipEmptyParts);
-    if(commandParts.length() > 0)
+    QStringList cmdParts = input.split(re, Qt::SkipEmptyParts);
+    if(cmdParts.length() > 0)
     {
-        QString primary = commandParts[0];
+        QString primary = cmdParts[0];
 
         /* aliases */
         QMap<QString, QString> aliases;
@@ -159,8 +159,8 @@ bool CLI::parse(const QString &input)
 
         if(primary.compare("help", Qt::CaseInsensitive) == 0)
         {
-            commandParts.removeFirst();
-            showHelp(commandParts);
+            cmdParts.removeFirst();
+            showHelp(cmdParts);
             displayPrompt();
             return true;
         }
@@ -183,7 +183,7 @@ bool CLI::parse(const QString &input)
         }
         else
         {
-            bool success = parseSpec(commandParts);
+            bool success = parseSpec(cmdParts);
             if(!success)
             {
                 invalidCommand();
@@ -199,11 +199,6 @@ bool CLI::parse(const QString &input)
     }
     displayPrompt();
     return false;
-}
-
-void CLI::displayPrompt()
-{
-    qout << "ST$ ";
 }
 
 const QStringList CLI::getCommands()

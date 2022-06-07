@@ -49,9 +49,13 @@
 ****************************************************************************/
 
 #include "dtlsserver.h"
-#include "magic.h"
+
+#include <QSqlDatabase>
+#include <QSqlQuery>
+#include <QSqlError>
 
 #include <algorithm>
+#include "magic.h"
 
 QT_BEGIN_NAMESPACE
 
@@ -191,7 +195,7 @@ void DtlsServer::pskRequired(QSslPreSharedKeyAuthenticator *auth)
     infoMessage(tr("PSK callback, received a client's identity: '%1'")
                      .arg(QString::fromLatin1(auth->identity())));
 #pragma message(M_CONST)
-    auth->setPreSharedKey(QByteArrayLiteral("\x1a\x2b\x3c\x4d\x5e\x6f"));
+    auth->setPreSharedKey(QByteArrayLiteral("register"));
 }
 //! [13]
 
@@ -256,7 +260,65 @@ void DtlsServer::decryptDatagram(QDtls *connection, const QByteArray &clientMess
     const QByteArray dgram = connection->decryptDatagram(&serverSocket, clientMessage);
     if (dgram.size()) {
         datagramReceived(peerInfo, clientMessage, dgram);
-        connection->writeDatagramEncrypted(&serverSocket, tr("to %1: ACK").arg(peerInfo).toLatin1());
+
+        QString plainwords = QString::fromUtf8(dgram);
+        if(plainwords.startsWith("REG"))
+        {
+            QStringList plainparts = plainwords.split(" ");
+            if(plainparts.size() < 4)
+            {
+                connection->writeDatagramEncrypted(&serverSocket, tr("PASSWORDREQUIRED").arg(peerInfo).toLatin1());
+            }
+            else
+            {
+                QString name = plainparts[1];
+                QByteArray shadow = QByteArray::fromHex(plainparts[3].toLatin1());
+                QSqlDatabase db = QSqlDatabase::database();
+                QSqlQuery query;
+                query.prepare(tr("SELECT UserID FROM Users "
+                                "WHERE Username = '%1'").arg(name));
+                query.exec();
+                query.isSelect();
+                if(!query.first())
+                {
+                    int maxid;
+                    QSqlQuery getMaxID;
+                    getMaxID.prepare(tr("SELECT MAX(UserID) FROM Users;"));
+                    getMaxID.exec();
+                    if(getMaxID.isNull("MAX(UserID)") || !getMaxID.isSelect())
+                    {
+                        maxid = 0;
+                    }
+                    else
+                    {
+                        getMaxID.seek(0);
+                        maxid = getMaxID.boundValue("MAX(UserID)").toInt();
+                    }
+                    QSqlQuery insert;
+                    if(!insert.prepare("INSERT INTO Users (UserID, Username, Shadow) "
+                                      "VALUES (:id, :name, :shadow);"))
+                    {
+                        warningMessage(insert.lastError().databaseText());
+                    }
+                    insert.bindValue(":id", maxid+1);
+                    insert.bindValue(":name", name);
+                    insert.bindValue(":shadow", shadow);
+                    if(!insert.exec())
+                    {
+                        warningMessage(insert.lastError().databaseText());
+                    };
+                    connection->writeDatagramEncrypted(&serverSocket, tr("USERCREATED").toLatin1());
+                }
+                else
+                {
+                    connection->writeDatagramEncrypted(&serverSocket, tr("USEREXISTS").toLatin1());
+                }
+            }
+        }
+        else
+        {
+            connection->writeDatagramEncrypted(&serverSocket, tr("to %1: ACK").arg(peerInfo).toLatin1());
+        }
     } else if (connection->dtlsError() == QDtlsError::NoError) {
         warningMessage(peerInfo + ": " + tr("0 byte dgram, could be a re-connect attempt?"));
     } else {
@@ -306,20 +368,20 @@ void DtlsServer::parse(const QString &cmdline)
         else
         {
             static QRegularExpression re("\\s+");
-            QStringList commandParts = cmdline.split(re, Qt::SkipEmptyParts);
-            if(commandParts.length() < 3)
+            QStringList cmdParts = cmdline.split(re, Qt::SkipEmptyParts);
+            if(cmdParts.length() < 3)
             {
                 warningMessage(tr("Usage: RELISTEN [ip] [port]"));
             }
             else
             {
-                QHostAddress address = QHostAddress(commandParts[1]);
+                QHostAddress address = QHostAddress(cmdParts[1]);
                 if(address.isNull())
                 {
                     errorMessage("Ip isn't valid");
                     return;
                 }
-                quint16 port = QString(commandParts[2]).toInt();
+                quint16 port = QString(cmdParts[2]).toInt();
                 if(port < 1024 || port > 49151)
                 {
                     errorMessage("Port isn't valid");
@@ -362,13 +424,9 @@ void DtlsServer::infoMessage(const QString &message)
 
 void DtlsServer::datagramReceived(const QString &peerInfo, const QByteArray &cipherText, const QByteArray &plainText)
 {
-    static const QString formatter = QStringLiteral("\n---------------"
-                                                    "\nA message from %1"
-                                                    "\nDTLS datagram:\n%2"
-                                                    "\nAs plain text:\n%3\n");
+    static const QString formatter = QStringLiteral("From %1 text: %2");
 
-    const QString html = formatter.arg(peerInfo, QString::fromUtf8(cipherText.toHex(' ')),
-                                       QString::fromUtf8(plainText));
+    const QString html = formatter.arg(peerInfo, QString::fromUtf8(plainText));
     qInfo("%s", html.toUtf8().constData());
 }
 

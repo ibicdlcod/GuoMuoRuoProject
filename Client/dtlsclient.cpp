@@ -199,15 +199,15 @@ void DtlsClient::pskRequired(QSslPreSharedKeyAuthenticator *auth)
     infoMessage(tr("%1: providing pre-shared key ...").arg(name));
     auth->setIdentity(name.toLatin1());
 #pragma message(M_CONST)
-    auth->setPreSharedKey(QByteArrayLiteral("\x1a\x2b\x3c\x4d\x5e\x6f"));
+    auth->setPreSharedKey(QByteArrayLiteral("register"));
 
 }
 //! [14]
 
 //! [10]
 void DtlsClient::pingTimeout()
-{
-    static const QString message = QStringLiteral("I am %1, please, accept our ping %2");
+{/*
+    static const QString message = QStringLiteral("PING %1 ATTEMPT %2");
     const qint64 written = crypto.writeDatagramEncrypted(&socket, message.arg(name).arg(ping).toLatin1());
     if (written <= 0) {
         errorMessage(tr("%1: failed to send a ping - %2").arg(name, crypto.dtlsErrorString()));
@@ -216,6 +216,7 @@ void DtlsClient::pingTimeout()
     }
 
     ++ping;
+    */
 }
 //! [10]
 
@@ -251,12 +252,9 @@ void DtlsClient::infoMessage(const QString &message)
 void DtlsClient::serverResponse(const QString &clientInfo, const QByteArray &datagram,
                                 const QByteArray &plainText)
 {
-    static const QString formatter = QStringLiteral("<br>---------------"
-                                                     "<br>%1 received a DTLS datagram:<br> %2"
-                                                     "<br>As plain text:<br> %3");
+    static const QString formatter = QStringLiteral("%1 received text: %2");
 
-    const QString html = formatter.arg(clientInfo, QString::fromUtf8(datagram.toHex(' ')),
-                                       QString::fromUtf8(plainText));
+    const QString html = formatter.arg(clientInfo, QString::fromUtf8(plainText));
     qInfo("%s", html.toUtf8().constData());
 }
 
@@ -272,22 +270,19 @@ void DtlsClient::parse(const QString &cmdline)
     }
     if(cmdline.startsWith("REG"))
     {
-        QStringList cmdparts = cmdline.split(" ");
-        if(cmdparts.size() < 2)
+        QStringList cmdParts = cmdline.split(" ");
+        if(cmdParts.size() < 3)
         {
-            warningMessage("You must specify your password");
+            warningMessage("You must specify your username and password");
+            QCoreApplication::processEvents();
+            return;
         }
+        settings->setValue("Username", cmdParts[1]);
+        static const QString message = QStringLiteral("REG %1 SHADOW %2");
+        const qint64 written = crypto.writeDatagramEncrypted(&socket, message.arg(cmdParts[1]).arg(cmdParts[2]).toLatin1());
 
-#pragma message(SALT_FISH)
-        QByteArray salt = name.toUtf8().append(settings->value("salt",
-                                          "\xe8\xbf\x99\xe6\x98\xaf\xe4\xb8\x80\xe6\x9d\xa1\xe5\x92\xb8\xe9\xb1\xbc").toByteArray());
-        shadow = QPasswordDigestor::deriveKeyPbkdf2(QCryptographicHash::Blake2s_256,
-                                                    cmdparts[1].toUtf8(), salt, 8, 256);
-        static const QString message = QStringLiteral("I am %1, my shadow is:").arg(name);
-        const qint64 written = crypto.writeDatagramEncrypted(&socket, (message.arg(name).toUtf8()).append(shadow));
         if (written <= 0) {
-            errorMessage(tr("%1: failed to send a ping - %2").arg(name, crypto.dtlsErrorString()));
-            pingTimer.stop();
+            errorMessage(tr("%1: failed to send register attmpt - %2").arg(cmdParts[1], crypto.dtlsErrorString()));
             return;
         }
     }

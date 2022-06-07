@@ -11,6 +11,7 @@ public:
 
 public slots:
     Q_DECL_DEPRECATED void update();
+    void displayPrompt();
 
 private slots:
     bool parseSpec(const QStringList &);

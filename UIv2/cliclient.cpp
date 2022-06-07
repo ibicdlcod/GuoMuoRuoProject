@@ -1,6 +1,7 @@
 #include "cliclient.h"
 
 #include <QSettings>
+#include <QPasswordDigestor>
 
 #include "ecma48.h"
 #include "magic.h"
@@ -20,11 +21,16 @@ void CliClient::update()
     qout.flush();
 }
 
-bool CliClient::parseSpec(const QStringList &commandParts)
+void CliClient::displayPrompt()
 {
-    if(commandParts.length() > 0)
+    qout << "ST$ ";
+}
+
+bool CliClient::parseSpec(const QStringList &cmdParts)
+{
+    if(cmdParts.length() > 0)
     {
-        QString primary = commandParts[0];
+        QString primary = cmdParts[0];
 
         /* aliases */
         QMap<QString, QString> aliases;
@@ -37,7 +43,7 @@ bool CliClient::parseSpec(const QStringList &commandParts)
 
         if(primary.compare("connect", Qt::CaseInsensitive) == 0)
         {
-            if(commandParts.length() < 3)
+            if(cmdParts.length() < 3)
             {
                 qout << tr("Usage: connect [ip] [port]") << Qt::endl;
                 /* if false, then the above message and invalidCommand becomes redundant */
@@ -79,7 +85,7 @@ bool CliClient::parseSpec(const QStringList &commandParts)
                     client_exe = settings->value("Client location").toString();
                 }
                 client->start(client_exe,
-                              {commandParts[1], commandParts[2]}, QIODevice::ReadWrite);
+                              {cmdParts[1], cmdParts[2]}, QIODevice::ReadWrite);
                 client->setReadChannel(QProcess::StandardOutput);
                 return true;
             }
@@ -88,6 +94,34 @@ bool CliClient::parseSpec(const QStringList &commandParts)
         {
             shutdownClient();
             return true;
+        }
+        else if(primary.compare("register", Qt::CaseInsensitive) == 0)
+        {
+            if(cmdParts.length() < 3)
+            {
+                qout << tr("Usage: register [username] [password]") << Qt::endl;
+                /* if false, then the above message and invalidCommand becomes redundant */
+                return true;
+            }
+            else if(client && client->state())
+            {
+                QString name = cmdParts[1];
+                QString password = cmdParts[2];
+#pragma message(SALT_FISH)
+                QByteArray salt = name.toUtf8().append(
+                            settings->value("salt",
+                                            "\xe8\xbf\x99\xe6\x98\xaf\xe4\xb8\x80\xe6\x9d\xa1\xe5\x92\xb8\xe9\xb1\xbc").toByteArray());
+                QByteArray shadow = QPasswordDigestor::deriveKeyPbkdf2(QCryptographicHash::Blake2s_256,
+                                                                       cmdParts[2].toUtf8(), salt, 8, 255);
+                client->write(("REG " + cmdParts[1].toUtf8() + " " + QString(shadow.toHex()).toLatin1() + "\n"));
+                qDebug("REG " + cmdParts[1].toUtf8() + " " + QString(shadow.toHex()).toLatin1());
+                return true;
+            }
+            else
+            {
+                qout << tr("Client isn't running, please connect first");
+                return true;
+            }
         }
         return false;
     }
@@ -219,7 +253,7 @@ const QStringList CliClient::getCommandsSpec()
 {
     QStringList result = QStringList();
     result.append(getCommands());
-    result.append({"login", "logout"});
+    result.append({"disconnect", "connect"});
     result.sort(Qt::CaseInsensitive);
     return result;
 }

@@ -69,8 +69,7 @@ int main(int argc, char *argv[])
             shadow = QPasswordDigestor::deriveKeyPbkdf2(QCryptographicHash::Blake2s_256, password, salt, 8, 256);
         }
         */
-#pragma message(M_CONST)
-        DtlsClient client(address, port, "Alice Zephyr");
+        DtlsClient client(address, port, settings->value("Username", "AliceZephyr").toString());
         QConsoleListener *console;
         console = new QConsoleListener(false);
         bool listenInput = QObject::connect(console, &QConsoleListener::newLine, &client, &DtlsClient::parse);

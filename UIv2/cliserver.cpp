@@ -17,11 +17,16 @@ void CliServer::update()
     qout.flush();
 }
 
-bool CliServer::parseSpec(const QStringList &commandParts)
+void CliServer::displayPrompt()
 {
-    if(commandParts.length() > 0)
+    qout << "STServer$ ";
+}
+
+bool CliServer::parseSpec(const QStringList &cmdParts)
+{
+    if(cmdParts.length() > 0)
     {
-        QString primary = commandParts[0];
+        QString primary = cmdParts[0];
 
         /* aliases */
         QMap<QString, QString> aliases;
@@ -34,7 +39,7 @@ bool CliServer::parseSpec(const QStringList &commandParts)
 
         if(primary.compare("start", Qt::CaseInsensitive) == 0)
         {
-            if(commandParts.length() < 3)
+            if(cmdParts.length() < 3)
             {
                 qout << tr("Usage: start [ip] [port]") << Qt::endl;
                 /* if false, then the above message and invalidCommand becomes redundant */
@@ -76,7 +81,7 @@ bool CliServer::parseSpec(const QStringList &commandParts)
                     server_exe = settings->value("Server location").toString();
                 }
                 server->start(server_exe,
-                              {commandParts[1], commandParts[2]}, QIODevice::ReadWrite);
+                              {cmdParts[1], cmdParts[2]}, QIODevice::ReadWrite);
                 return true;
             }
         }
@@ -93,7 +98,7 @@ bool CliServer::parseSpec(const QStringList &commandParts)
         }
         else if(primary.compare("relisten", Qt::CaseInsensitive) == 0 && server && server->state())
         {
-            if(commandParts.length() < 3)
+            if(cmdParts.length() < 3)
             {
                 qout << tr("Usage: relisten [ip] [port]") << Qt::endl;
                 /* if false, then the above message and invalidCommand becomes redundant */
@@ -102,7 +107,7 @@ bool CliServer::parseSpec(const QStringList &commandParts)
             qout << tr("Server will resume accepting new connections.") << Qt::endl;
             /* very ugly, but write() don't accept QString */
             char command[120];
-            sprintf(command, "RELISTEN %s %s\n", commandParts[1].toUtf8().constData(), commandParts[2].toUtf8().constData());
+            sprintf(command, "RELISTEN %s %s\n", cmdParts[1].toUtf8().constData(), cmdParts[2].toUtf8().constData());
             server->write(command);
             return true;
         }

@@ -4,16 +4,28 @@
 
 #include <QTextStream>
 #include <QtDebug>
+#include <QSqlDatabase>
+#include <QSqlError>
+#include <QSqlRecord>
+#include <QSettings>
+#include <QSqlQuery>
 
 #include "qconsolelistener.h"
 
 #include "dtlsserver.h"
+
+QSettings *settings;
 
 int main(int argc, char *argv[])
 {
     QT_USE_NAMESPACE
 
     QCoreApplication a(argc, argv);
+    a.setApplicationName("SpearofTanaka");
+    a.setApplicationVersion("0.0.0"); // temp
+    a.setOrganizationName("Kantai Self-Governing Patriotic Committee");
+    a.setOrganizationDomain("xxx.xyz"); // temp
+    settings = new QSettings();
 
     QTranslator translator;
     const QStringList uiLanguages = QLocale::system().uiLanguages();
@@ -64,7 +76,53 @@ int main(int argc, char *argv[])
             {
                 throw std::runtime_error("Exit mechanism failed!");
             }
-            return a.exec();
+
+            /* User QSqlDatabase db = QSqlDatabase::database(); to access database in elsewhere */
+            /* Use SQLite for current testing */
+
+            QSqlDatabase db = QSqlDatabase::addDatabase(settings->value("SQL driver", "QSQLITE").toString());
+            db.setHostName(settings->value("DB host name", "SpearofTanaka").toString());
+            db.setDatabaseName(settings->value("DB name", "ocean").toString());
+            db.setUserName(settings->value("DB admin name", "admin").toString());
+            /* obviously, a different password is recommended */
+            db.setPassword(settings->value("DB admin password", "10000826").toString());
+            bool ok = db.open();
+            if(!ok)
+            {
+                /* Use the deploy tools if SQL drivers are not loaded */
+                throw db.lastError();
+            }
+            else
+            {
+                qInfo("[ServerInfo] SQL connection successful!");
+                /* Database integrity check, the structure is defined here */
+                QStringList tables = db.tables(QSql::Tables);
+                if(!tables.contains("Users"))
+                {
+                    qInfo("[ServerWarning] User database does not exist, creating...");
+                    QSqlQuery query;
+                    query.prepare("CREATE TABLE Users ( "
+                                  "UserID int NOT NULL, "
+                                  "Username varchar(255) NOT NULL, "
+                                  "Shadow tinyblob"
+                                  ");");
+                    query.exec();
+                }
+                else
+                {
+                    QSqlRecord columns = db.record("Users");
+                    if(columns.contains("UserID")
+                            && columns.contains("Username")
+                            && columns.contains("Shadow"))
+                    {
+                        qInfo("[ServerInfo] User Database is OK.");
+                    }
+                }
+            }
+
+            int result = a.exec();
+            db.close();
+            return result;
         }
         else
         {
@@ -80,5 +138,7 @@ int main(int argc, char *argv[])
     }  catch (std::exception &e) {
         qDebug() << e.what() << Qt::endl << "Press ENTER to exit.";
         return -1;
+    }  catch (QSqlError &e) {
+        qDebug() << e.driverText() << Qt::endl << "Press ENTER to exit.";
     }
 }

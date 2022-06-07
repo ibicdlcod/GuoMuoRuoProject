@@ -17,8 +17,7 @@ public slots:
     void openingwords();
     bool parse(const QString &);
     virtual bool parseSpec(const QStringList &) = 0;
-
-    void displayPrompt();
+    virtual void displayPrompt() = 0;
 
 protected:
     static const QStringList getCommands();
