@@ -177,7 +177,16 @@ void DtlsServer::readyRead()
     if ((*client)->isConnectionEncrypted()) {
         decryptDatagram(client->get(), dgram);
         if ((*client)->dtlsError() == QDtlsError::RemoteClosedConnectionError)
+        {
+            /* Client disconnected, remove from connected users */
+            const QString peerInfo = peer_info(peerAddress, peerPort);
+            if(connectedUsers.contains(peerInfo))
+            {
+                connectedPeers.remove(connectedUsers[peerInfo]);
+                connectedUsers.remove(peerInfo);
+            }
             knownClients.erase(client);
+        }
         return;
     }
     //! [6]
@@ -262,12 +271,16 @@ void DtlsServer::decryptDatagram(QDtls *connection, const QByteArray &clientMess
         datagramReceived(peerInfo, clientMessage, dgram);
 
         QString plainwords = QString::fromUtf8(dgram);
-        if(plainwords.startsWith("REG"))
+        if(plainwords.startsWith("ALTER"))
+        {
+
+        }
+        else if(plainwords.startsWith("REG"))
         {
             QStringList plainparts = plainwords.split(" ");
             if(plainparts.size() < 4)
             {
-                connection->writeDatagramEncrypted(&serverSocket, tr("PASSWORDREQUIRED").arg(peerInfo).toLatin1());
+                connection->writeDatagramEncrypted(&serverSocket, tr("REGNOPASSWORD").arg(peerInfo).toLatin1());
             }
             else
             {
@@ -313,6 +326,51 @@ void DtlsServer::decryptDatagram(QDtls *connection, const QByteArray &clientMess
                 {
                     connection->writeDatagramEncrypted(&serverSocket, tr("USEREXISTS").toLatin1());
                 }
+            }
+        }
+        else if(plainwords.startsWith("LOGIN"))
+        {
+            QStringList plainparts = plainwords.split(" ");
+            if(plainparts.size() < 4)
+            {
+                connection->writeDatagramEncrypted(&serverSocket, tr("NOPASSWORD").arg(peerInfo).toLatin1());
+            }
+            else
+            {
+                QString name = plainparts[1];
+                QByteArray shadow = QByteArray::fromHex(plainparts[3].toLatin1());
+                QSqlDatabase db = QSqlDatabase::database();
+                QSqlQuery query;
+                query.prepare(tr("SELECT UserID FROM Users "
+                                "WHERE Username = :name AND Shadow = :shadow"));
+                query.bindValue(":name", name);
+                query.bindValue(":shadow", shadow);
+                query.exec();
+                query.isSelect();
+                if(!query.first())
+                {
+                    connection->writeDatagramEncrypted(&serverSocket, tr("AUTHINCORRECT").toLatin1());
+                }
+                else
+                {
+                    connectedUsers[peerInfo] = name;
+                    connectedPeers[name] = peerInfo;
+                    connection->writeDatagramEncrypted(&serverSocket, tr("LOGINSUCCESS").toLatin1());
+                }
+            }
+        }
+        else if(plainwords.startsWith("LOGOUT"))
+        {
+            if(connectedUsers.contains(peerInfo))
+            {
+                connection->writeDatagramEncrypted(&serverSocket, tr("LOGOUTSUCCESS: %1")
+                                                   .arg(connectedUsers[peerInfo]).toLatin1());
+                connectedPeers.remove(connectedUsers[peerInfo]);
+                connectedUsers.remove(peerInfo);
+            }
+            else
+            {
+                connection->writeDatagramEncrypted(&serverSocket, tr("LOGOUTINCORRECT").toLatin1());
             }
         }
         else
@@ -424,10 +482,16 @@ void DtlsServer::infoMessage(const QString &message)
 
 void DtlsServer::datagramReceived(const QString &peerInfo, const QByteArray &cipherText, const QByteArray &plainText)
 {
+    Q_UNUSED(cipherText)
+#ifdef QT_DEBUG
     static const QString formatter = QStringLiteral("From %1 text: %2");
 
     const QString html = formatter.arg(peerInfo, QString::fromUtf8(plainText));
     qInfo("%s", html.toUtf8().constData());
+#else
+    Q_UNUSED(peerInfo)
+    Q_UNUSED(plainText)
+#endif
 }
 
 QT_END_NAMESPACE

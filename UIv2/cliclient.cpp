@@ -97,9 +97,9 @@ bool CliClient::parseSpec(const QStringList &cmdParts)
         }
         else if(primary.compare("register", Qt::CaseInsensitive) == 0)
         {
-            if(cmdParts.length() < 3)
+            if(cmdParts.length() < 3 || cmdParts[2].size() < 8)
             {
-                qout << tr("Usage: register [username] [password]") << Qt::endl;
+                qout << tr("Usage: register [username] [password, >8 chars]") << Qt::endl;
                 /* if false, then the above message and invalidCommand becomes redundant */
                 return true;
             }
@@ -112,14 +112,53 @@ bool CliClient::parseSpec(const QStringList &cmdParts)
                             settings->value("salt",
                                             "\xe8\xbf\x99\xe6\x98\xaf\xe4\xb8\x80\xe6\x9d\xa1\xe5\x92\xb8\xe9\xb1\xbc").toByteArray());
                 QByteArray shadow = QPasswordDigestor::deriveKeyPbkdf2(QCryptographicHash::Blake2s_256,
-                                                                       cmdParts[2].toUtf8(), salt, 8, 255);
+                                                                       password.toUtf8(), salt, 8, 255);
                 client->write(("REG " + cmdParts[1].toUtf8() + " " + QString(shadow.toHex()).toLatin1() + "\n"));
-                qDebug("REG " + cmdParts[1].toUtf8() + " " + QString(shadow.toHex()).toLatin1());
                 return true;
             }
             else
             {
-                qout << tr("Client isn't running, please connect first");
+                qout << tr("Client isn't running, please connect first.");
+                return true;
+            }
+        }
+        else if(primary.compare("login", Qt::CaseInsensitive) == 0)
+        {
+            if(cmdParts.length() < 3 || cmdParts[2].size() < 8)
+            {
+                qout << tr("Usage: login [username] [password, >8 chars]") << Qt::endl;
+                /* if false, then the above message and invalidCommand becomes redundant */
+                return true;
+            }
+            else if(client && client->state())
+            {
+                QString name = cmdParts[1];
+                QString password = cmdParts[2];
+#pragma message(SALT_FISH)
+                QByteArray salt = name.toUtf8().append(
+                            settings->value("salt",
+                                            "\xe8\xbf\x99\xe6\x98\xaf\xe4\xb8\x80\xe6\x9d\xa1\xe5\x92\xb8\xe9\xb1\xbc").toByteArray());
+                QByteArray shadow = QPasswordDigestor::deriveKeyPbkdf2(QCryptographicHash::Blake2s_256,
+                                                                       password.toUtf8(), salt, 8, 255);
+                client->write(("LOGIN " + cmdParts[1].toUtf8() + " " + QString(shadow.toHex()).toLatin1() + "\n"));
+                return true;
+            }
+            else
+            {
+                qout << tr("Client isn't running, please connect first.");
+                return true;
+            }
+        }
+        else if(primary.compare("logout", Qt::CaseInsensitive) == 0)
+        {
+            if(client && client->state())
+            {
+                client->write("LOGOUT\n");
+                return true;
+            }
+            else
+            {
+                qout << tr("Client isn't running.");
                 return true;
             }
         }

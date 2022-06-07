@@ -55,20 +55,6 @@ int main(int argc, char *argv[])
             qCritical() << "[ClientError] Port isn't valid";
             return 103;
         }
-        /*
-#pragma message(SALT_FISH)
-        QByteArray salt = username.toUtf8().append(settings->value("salt",
-                                          "\xe8\xbf\x99\xe6\x98\xaf\xe4\xb8\x80\xe6\x9d\xa1\xe5\x92\xb8\xe9\xb1\xbc").toByteArray());
-        QByteArray shadow;
-        if(password.startsWith("--register"))
-        {
-            shadow = "register";
-        }
-        else
-        {
-            shadow = QPasswordDigestor::deriveKeyPbkdf2(QCryptographicHash::Blake2s_256, password, salt, 8, 256);
-        }
-        */
         DtlsClient client(address, port, settings->value("Username", "AliceZephyr").toString());
         QConsoleListener *console;
         console = new QConsoleListener(false);

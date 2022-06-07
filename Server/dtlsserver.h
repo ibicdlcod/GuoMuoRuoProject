@@ -107,6 +107,9 @@ private:
     QDtlsClientVerifier cookieSender;
     std::vector<std::unique_ptr<QDtls>> knownClients;
 
+    QMap<QString, QString> connectedUsers;
+    QMap<QString, QString> connectedPeers;
+
     Q_DISABLE_COPY(DtlsServer)
 };
 //! [0]

@@ -252,10 +252,16 @@ void DtlsClient::infoMessage(const QString &message)
 void DtlsClient::serverResponse(const QString &clientInfo, const QByteArray &datagram,
                                 const QByteArray &plainText)
 {
+    Q_UNUSED(datagram)
+#ifdef QT_DEBUG
     static const QString formatter = QStringLiteral("%1 received text: %2");
 
     const QString html = formatter.arg(clientInfo, QString::fromUtf8(plainText));
     qInfo("%s", html.toUtf8().constData());
+#else
+    Q_UNUSED(clientInfo)
+    Q_UNUSED(plainText)
+#endif
 }
 
 void DtlsClient::parse(const QString &cmdline)
@@ -268,7 +274,7 @@ void DtlsClient::parse(const QString &cmdline)
         infoMessage(tr("Client is shutting down"));
         QTimer::singleShot(2000, this, &DtlsClient::finished);
     }
-    if(cmdline.startsWith("REG"))
+    else if(cmdline.startsWith("REG"))
     {
         QStringList cmdParts = cmdline.split(" ");
         if(cmdParts.size() < 3)
@@ -278,11 +284,40 @@ void DtlsClient::parse(const QString &cmdline)
             return;
         }
         settings->setValue("Username", cmdParts[1]);
+        name = cmdParts[1];
         static const QString message = QStringLiteral("REG %1 SHADOW %2");
         const qint64 written = crypto.writeDatagramEncrypted(&socket, message.arg(cmdParts[1]).arg(cmdParts[2]).toLatin1());
 
         if (written <= 0) {
             errorMessage(tr("%1: failed to send register attmpt - %2").arg(cmdParts[1], crypto.dtlsErrorString()));
+            return;
+        }
+    }
+    else if(cmdline.startsWith("LOGIN"))
+    {
+        QStringList cmdParts = cmdline.split(" ");
+        if(cmdParts.size() < 3)
+        {
+            warningMessage("You must specify your username and password");
+            QCoreApplication::processEvents();
+            return;
+        }
+        settings->setValue("Username", cmdParts[1]);
+        name = cmdParts[1];
+        static const QString message = QStringLiteral("LOGIN %1 SHADOW %2");
+        const qint64 written = crypto.writeDatagramEncrypted(&socket, message.arg(cmdParts[1]).arg(cmdParts[2]).toLatin1());
+
+        if (written <= 0) {
+            errorMessage(tr("%1: failed to send login attmpt - %2").arg(cmdParts[1], crypto.dtlsErrorString()));
+            return;
+        }
+    }
+    else if(cmdline.startsWith("LOGOUT"))
+    {
+        const qint64 written = crypto.writeDatagramEncrypted(&socket, "LOGOUT");
+
+        if (written <= 0) {
+            errorMessage(tr("%1: failed to send logout attmpt - %2").arg(name, crypto.dtlsErrorString()));
             return;
         }
     }
