@@ -1,6 +1,11 @@
 #include "cliclient.h"
+
+#include <QSettings>
+
 #include "ecma48.h"
 #include "magic.h"
+
+extern QSettings *settings;
 
 CliClient::CliClient(int argc, char ** argv)
     : CLI(argc, argv), client(nullptr)
@@ -10,7 +15,6 @@ CliClient::CliClient(int argc, char ** argv)
 
 void CliClient::update()
 {
-    /* With the NEW marvelous design, this function doesn't seem necessary. */
     QCoreApplication::processEvents();
     QCoreApplication::processEvents();
     qout.flush();
@@ -31,11 +35,11 @@ bool CliClient::parseSpec(const QStringList &commandParts)
         }
         /* end aliases */
 
-        if(primary.compare("login", Qt::CaseInsensitive) == 0)
+        if(primary.compare("connect", Qt::CaseInsensitive) == 0)
         {
             if(commandParts.length() < 3)
             {
-                qout << tr("Usage: login [ip] [port]") << Qt::endl;
+                qout << tr("Usage: connect [ip] [port]") << Qt::endl;
                 /* if false, then the above message and invalidCommand becomes redundant */
                 return true;
             }
@@ -70,12 +74,17 @@ bool CliClient::parseSpec(const QStringList &commandParts)
 #elif defined (_MSC_VER)
                 QString client_exe = QStringLiteral("../Client/debug/Client");
 #endif
+                if(settings->contains("Client location"))
+                {
+                    client_exe = settings->value("Client location").toString();
+                }
                 client->start(client_exe,
                               {commandParts[1], commandParts[2]}, QIODevice::ReadWrite);
+                client->setReadChannel(QProcess::StandardOutput);
                 return true;
             }
         }
-        else if(primary.compare("logout", Qt::CaseInsensitive) == 0)
+        else if(primary.compare("disconnect", Qt::CaseInsensitive) == 0)
         {
             shutdownClient();
             return true;
@@ -143,7 +152,6 @@ void CliClient::clientStderr()
                                         tr("RR"),
                                         tr("THE WORLD WONDERS")),
                                    Ecma(255,128,192), Ecma(255,255,255,true));
-                    //qout.printLine("", Ecma(EcmaSetter::AllDefault));
                 }
                 else
                 {
@@ -170,7 +178,7 @@ void CliClient::clientStdout()
 
 inline void CliClient::clientStarted()
 {
-    //qout << tr("Client started and running.") << Qt::endl;
+    /* deprecated */
 }
 
 void CliClient::clientChanged(QProcess::ProcessState newstate)
@@ -188,14 +196,12 @@ void CliClient::clientChanged(QProcess::ProcessState newstate)
 
 void CliClient::shutdownClient()
 {
-    int waitformsec = 12000;
-    /* QProcess::NotRunning = 0 (this comment won't be repeated elsewhere */
+    int waitformsec = settings->value("Client shutdown wait time", 12000).toInt();
+    /* QProcess::NotRunning = 0 (this comment won't be repeated elsewhere) */
     if(client && client->state())
     {
         client->write("SIGTERM\n");
         qout << tr("Waiting for client finish...") << Qt::endl;
-        /* per documentation, this function is nearly useless on Windows
-        client->terminate(); */
         if(!client->waitForFinished(waitformsec))
         {
             qout << (tr("Client isn't responding after %1 msecs, killing.")).arg(QString::number(waitformsec))
@@ -224,11 +230,11 @@ const QStringList CliClient::getValidCommands()
     result.append(getCommands());
     if(client && client->state())
     {
-        result.append("logout");
+        result.append("disconnect");
     }
     else
     {
-        result.append("login");
+        result.append("connect");
     }
     result.sort(Qt::CaseInsensitive);
     return result;

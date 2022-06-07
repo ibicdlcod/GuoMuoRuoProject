@@ -70,7 +70,7 @@ public:
     static void errorMessage(const QString &message);
     void warningMessage(const QString &message);
     void infoMessage(const QString &message);
-    void clientResponse(const QString &clientInfo, const QByteArray &datagraam,
+    void serverResponse(const QString &clientInfo, const QByteArray &datagraam,
                         const QByteArray &plainText);
 
 public slots:
@@ -93,7 +93,6 @@ private slots:
 	 * %A9%E3%83%B3%E3%82%B0%E9%9B%86/%E3%81%AA#cat
 	 * for why this is named cat. */
     void catbomb();
-    void maxexceeded();
 
 private:
     QString name;
@@ -105,6 +104,8 @@ private:
 
     unsigned const int maxretransmit;
     unsigned int retransmit_times = 0;
+
+    bool login_success;
 
     Q_DISABLE_COPY(DtlsClient)
 };

@@ -305,7 +305,8 @@ void DtlsServer::parse(const QString &cmdline)
         }
         else
         {
-            QStringList commandParts = cmdline.split(QRegularExpression("\\s+"), Qt::SkipEmptyParts);
+            static QRegularExpression re("\\s+");
+            QStringList commandParts = cmdline.split(re, Qt::SkipEmptyParts);
             if(commandParts.length() < 3)
             {
                 warningMessage(tr("Usage: RELISTEN [ip] [port]"));

@@ -14,6 +14,7 @@
 
 /* Qt Libs */
 #include <QDateTime>
+#include <QSettings>
 
 /* C++ Libs */
 // unused at the moment
@@ -27,6 +28,7 @@
 #include "cliserver.h"
 
 QFile *logFile;
+QSettings *settings;
 
 int main(int argc, char *argv[])
 {
@@ -51,11 +53,8 @@ int main(int argc, char *argv[])
     }
 #endif
 
-    QTranslator translator;
-    /* TODO: This is considered harmful, to be replaced by config */
-    const QStringList uiLanguages = QLocale::system().uiLanguages();
-
     try {
+
         bool clientActive = (argc <= 1 || std::strcmp(argv[1], "--client") == 0);
         bool serverActive = (argc > 1 && std::strcmp(argv[1], "--server") == 0);
 
@@ -66,8 +65,6 @@ int main(int argc, char *argv[])
         CLI *a = nullptr;
         if(clientActive)
         {
-#pragma message(M_CONST)
-            logFile = new QFile("LogFile.log");
             a = new CliClient(argc, argv);
         }
         /* I wish for a elif. This else can be deleted but clazy will warn you memory leak in case
@@ -76,9 +73,6 @@ int main(int argc, char *argv[])
         {
             if(serverActive)
             {
-                /* should be different from client */
-#pragma message(M_CONST)
-                logFile = new QFile("LogFile.log");
                 a = new CliServer(argc, argv);
             }
         }
@@ -86,26 +80,36 @@ int main(int argc, char *argv[])
         {
             throw std::invalid_argument("Either run without arguments or specify --client or --server!");
         }
+#if defined(Q_OS_UNIX)
+        setlocale(LC_NUMERIC, "C");
+#endif
+        a->setApplicationName("SpearofTanaka");
+        a->setApplicationVersion("0.0.0"); // temp
+        a->setOrganizationName("Kantai Self-Governing Patriotic Committee");
+        a->setOrganizationDomain("xxx.xyz"); // temp
+        settings = new QSettings();
+
+        QString logFileName;
+        if(clientActive)
+        {
+            logFileName = settings->value("Client Log File", "ClientLog.log").toString();
+        }
+        else
+        {
+            if(serverActive)
+            {
+                logFileName = settings->value("Server Log File", "ServerLog.log").toString();
+            }
+        }
+        logFile = new QFile(logFileName);
         if(Q_UNLIKELY(!logFile) || !logFile->open(QIODevice::WriteOnly | QIODevice::Append))
         {
             qFatal("Log file cannot be opened");
         }
-#if defined(Q_OS_UNIX)
-        setlocale(LC_NUMERIC, "C");
-#endif
-        QString appName = "SpearofTanaka";
-        if(clientActive)
-        {
-            appName.append(" Client");
-        }
-        if(serverActive)
-        {
-            appName.append(" Server");
-        }
-        a->setApplicationName(appName);
-        a->setApplicationVersion("0.0.0"); // temp
-        a->setOrganizationName("Kantai Self-Governing Patriotic Committee");
-        a->setOrganizationDomain("xxx.xyz"); // temp
+
+        QTranslator translator;
+        const QStringList uiLanguages = settings->value("Languages", QLocale::system().uiLanguages()).toStringList();
+
         for (const QString &locale : uiLanguages) {
             const QString baseName = "UIv2_" + QLocale(locale).name();
             if (translator.load(":/i18n/" + baseName)) {
@@ -125,6 +129,7 @@ int main(int argc, char *argv[])
 
         int result = a->exec();
         delete a;
+        delete settings;
         return result;
     }  catch (std::invalid_argument &e) {
         qDebug() << "[Invalid Arguments] " << e.what() << Qt::endl << "Press ENTER to exit.";

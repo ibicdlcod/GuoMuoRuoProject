@@ -1,5 +1,9 @@
 #include "cliserver.h"
 
+#include <QSettings>
+
+extern QSettings *settings;
+
 CliServer::CliServer(int argc, char ** argv)
     : CLI(argc, argv), server(nullptr)
 {
@@ -8,7 +12,6 @@ CliServer::CliServer(int argc, char ** argv)
 
 void CliServer::update()
 {
-    /* With the NEW marvelous design, this function doesn't seem necessary. */
     QCoreApplication::processEvents();
     QCoreApplication::processEvents();
     qout.flush();
@@ -68,6 +71,10 @@ bool CliServer::parseSpec(const QStringList &commandParts)
 #elif defined (_MSC_VER)
                 QString server_exe = QStringLiteral("../Server/debug/Server");
 #endif
+                if(settings->contains("Server location"))
+                {
+                    server_exe = settings->value("Server location").toString();
+                }
                 server->start(server_exe,
                               {commandParts[1], commandParts[2]}, QIODevice::ReadWrite);
                 return true;
@@ -169,7 +176,7 @@ void CliServer::serverStdout()
 
 inline void CliServer::serverStarted()
 {
-    //qout << tr("Server started and running.") << Qt::endl;
+    /* deprecated */
 }
 
 void CliServer::serverChanged(QProcess::ProcessState newstate)
@@ -187,13 +194,10 @@ void CliServer::serverChanged(QProcess::ProcessState newstate)
 
 void CliServer::shutdownServer()
 {
-    int waitformsec = 12000;
+    int waitformsec = settings->value("Server shutdown wait time", 12000).toInt();
     if(server && server->state())
     {
         server->write("SIGTERM\n");
-        //qout << tr("Waiting for server finish...") << Qt::endl;
-        /* per documentation, this function is nearly useless on Windows
-        server->terminate(); */
         if(!server->waitForFinished(waitformsec))
         {
             qout << (tr("Server isn't responding after %1 msecs, killing.")).arg(QString::number(waitformsec))

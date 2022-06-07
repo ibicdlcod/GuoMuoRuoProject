@@ -4,17 +4,26 @@
 
 #include <QTextStream>
 #include <QtDebug>
+#include <QSettings>
 
 #include "qconsolelistener.h"
 
 #include "dtlsclient.h"
 #include "magic.h"
 
+QSettings *settings;
+
 int main(int argc, char *argv[])
 {
     QT_USE_NAMESPACE
 
     QCoreApplication a(argc, argv);
+
+    a.setApplicationName("SpearofTanaka");
+    a.setApplicationVersion("0.0.0"); // temp
+    a.setOrganizationName("Kantai Self-Governing Patriotic Committee");
+    a.setOrganizationDomain("xxx.xyz"); // temp
+    settings = new QSettings();
 
     QTranslator translator;
     const QStringList uiLanguages = QLocale::system().uiLanguages();
@@ -46,6 +55,20 @@ int main(int argc, char *argv[])
             qCritical() << "[ClientError] Port isn't valid";
             return 103;
         }
+        /*
+#pragma message(SALT_FISH)
+        QByteArray salt = username.toUtf8().append(settings->value("salt",
+                                          "\xe8\xbf\x99\xe6\x98\xaf\xe4\xb8\x80\xe6\x9d\xa1\xe5\x92\xb8\xe9\xb1\xbc").toByteArray());
+        QByteArray shadow;
+        if(password.startsWith("--register"))
+        {
+            shadow = "register";
+        }
+        else
+        {
+            shadow = QPasswordDigestor::deriveKeyPbkdf2(QCryptographicHash::Blake2s_256, password, salt, 8, 256);
+        }
+        */
 #pragma message(M_CONST)
         DtlsClient client(address, port, "Alice Zephyr");
         QConsoleListener *console;
@@ -62,7 +85,9 @@ int main(int argc, char *argv[])
             throw std::runtime_error("Exit mechanism failed!");
         }
         client.startHandshake();
-        return a.exec();
+        int result = a.exec();
+        delete settings;
+        return result;
     }  catch (std::runtime_error &e) {
         qDebug() << "[Runtime Error] " << e.what() << Qt::endl << "Press ENTER to exit.";
         return 2;

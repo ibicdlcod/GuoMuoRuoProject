@@ -7,7 +7,9 @@
 
 #include <QDir>
 #include <QRegularExpression>
+#include <QSettings>
 #include <iostream>
+
 #include "consoletextstream.h"
 #include "wcwidth.h"
 #include "magic.h"
@@ -16,6 +18,7 @@
  * must be static, but logFile isn't const at complie time, leaveing no other option
  */
 extern QFile *logFile;
+extern QSettings *settings;
 
 CLI::CLI(int argc, char ** argv)
     : QCoreApplication(argc, argv), timer(nullptr),
@@ -107,8 +110,8 @@ void CLI::openingwords()
 {
     QString notice;
     QDir currentDir = QDir::current();
-#pragma message(M_CONST)
-    QFile licenseFile(currentDir.filePath("openingwords.txt"));
+    QString openingwords = settings->value("License Notice", "openingwords.txt").toString();
+    QFile licenseFile(currentDir.filePath(openingwords));
     if(!licenseFile.open(QIODevice::ReadOnly | QIODevice::Text))
     {
         qout << tr("Can't find license file, exiting.") << Qt::endl;
@@ -134,7 +137,8 @@ void CLI::openingwords()
 
 bool CLI::parse(const QString &input)
 {
-    QStringList commandParts = input.split(QRegularExpression("\\s+"), Qt::SkipEmptyParts);
+    static QRegularExpression re("\\s+");
+    QStringList commandParts = input.split(re, Qt::SkipEmptyParts);
     if(commandParts.length() > 0)
     {
         QString primary = commandParts[0];

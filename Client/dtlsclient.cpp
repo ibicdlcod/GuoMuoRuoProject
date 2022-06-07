@@ -49,15 +49,21 @@
 ****************************************************************************/
 
 #include "dtlsclient.h"
+
+#include <QSettings>
+
 #include "magic.h"
 
 QT_BEGIN_NAMESPACE
+
+extern QSettings *settings;
 
 DtlsClient::DtlsClient(const QHostAddress &address, quint16 port,
                        const QString &connectionName)
     : name(connectionName),
       crypto(QSslSocket::SslClientMode),
-      maxretransmit(5)
+      maxretransmit(settings->value("Client maximum restransmit", 5).toInt()),
+      login_success(false)
 {
     //! [1]
     auto configuration = QSslConfiguration::defaultDtlsConfiguration();
@@ -135,7 +141,7 @@ void DtlsClient::readyRead()
     if (crypto.isConnectionEncrypted()) {
         const QByteArray plainText = crypto.decryptDatagram(&socket, dgram);
         if (plainText.size()) {
-            clientResponse(name, dgram, plainText);
+            serverResponse(name, dgram, plainText);
             return;
         }
 
@@ -160,6 +166,7 @@ void DtlsClient::readyRead()
         //! [9]
         if (crypto.isConnectionEncrypted()) {
             infoMessage(tr("%1: encrypted connection established!").arg(name));
+            login_success = true;
             pingTimer.start();
             pingTimeout();
         } else {
@@ -178,10 +185,8 @@ void DtlsClient::handshakeTimeout()
         errorMessage(tr("%1: failed to re-transmit - %2").arg(name, crypto.dtlsErrorString()));
     if(retransmit_times > maxretransmit)
     {
-        //QTimer::singleShot(1000, this, &DtlsClient::maxexceeded);
         errorMessage(tr("%1: max restransmit time exceeded!").arg(name));
         catbomb();
-        //QTimer::singleShot(100, this, &DtlsClient::catbomb);
     }
 }
 //! [11]
@@ -195,6 +200,7 @@ void DtlsClient::pskRequired(QSslPreSharedKeyAuthenticator *auth)
     auth->setIdentity(name.toLatin1());
 #pragma message(M_CONST)
     auth->setPreSharedKey(QByteArrayLiteral("\x1a\x2b\x3c\x4d\x5e\x6f"));
+
 }
 //! [14]
 
@@ -216,12 +222,15 @@ void DtlsClient::pingTimeout()
 void DtlsClient::catbomb()
 {
     /* no tr() should be used here */
-    errorMessage("[CATBOMB]");
+    if(login_success)
+    {
+        errorMessage("[CATBOMB]");
+    }
+    else
+    {
+        errorMessage(tr("Failed to establish connection, check your username, password and server status."));
+    }
     QTimer::singleShot(500, this, &DtlsClient::finished);
-}
-
-void DtlsClient::maxexceeded()
-{
 }
 
 void DtlsClient::errorMessage(const QString &message)
@@ -239,7 +248,7 @@ void DtlsClient::infoMessage(const QString &message)
     qInfo("[ClientInfo] %s", message.toUtf8().constData());
 }
 
-void DtlsClient::clientResponse(const QString &clientInfo, const QByteArray &datagram,
+void DtlsClient::serverResponse(const QString &clientInfo, const QByteArray &datagram,
                                 const QByteArray &plainText)
 {
     static const QString formatter = QStringLiteral("<br>---------------"
@@ -260,6 +269,27 @@ void DtlsClient::parse(const QString &cmdline)
             crypto.shutdown(&socket);
         infoMessage(tr("Client is shutting down"));
         QTimer::singleShot(2000, this, &DtlsClient::finished);
+    }
+    if(cmdline.startsWith("REG"))
+    {
+        QStringList cmdparts = cmdline.split(" ");
+        if(cmdparts.size() < 2)
+        {
+            warningMessage("You must specify your password");
+        }
+
+#pragma message(SALT_FISH)
+        QByteArray salt = name.toUtf8().append(settings->value("salt",
+                                          "\xe8\xbf\x99\xe6\x98\xaf\xe4\xb8\x80\xe6\x9d\xa1\xe5\x92\xb8\xe9\xb1\xbc").toByteArray());
+        shadow = QPasswordDigestor::deriveKeyPbkdf2(QCryptographicHash::Blake2s_256,
+                                                    cmdparts[1].toUtf8(), salt, 8, 256);
+        static const QString message = QStringLiteral("I am %1, my shadow is:").arg(name);
+        const qint64 written = crypto.writeDatagramEncrypted(&socket, (message.arg(name).toUtf8()).append(shadow));
+        if (written <= 0) {
+            errorMessage(tr("%1: failed to send a ping - %2").arg(name, crypto.dtlsErrorString()));
+            pingTimer.stop();
+            return;
+        }
     }
 }
 QT_END_NAMESPACE
