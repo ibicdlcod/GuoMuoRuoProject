@@ -108,7 +108,7 @@ void QConsoleListener::turnOffEchoing()
     tcgetattr(STDIN_FILENO, &oldt);
     termios newt = oldt;
     newt.c_lflag &= ~ECHO;
-    tcsetattr(STDIN_FILENO, TCSANOW, &newt)
+    tcsetattr(STDIN_FILENO, TCSANOW, &newt);
 #endif
 }
 
@@ -125,6 +125,6 @@ void QConsoleListener::turnOnEchoing()
     tcgetattr(STDIN_FILENO, &oldt);
     termios newt = oldt;
     newt.c_lflag |= ECHO;
-    tcsetattr(STDIN_FILENO, TCSANOW, &newt)
+    tcsetattr(STDIN_FILENO, TCSANOW, &newt);
 #endif
 }
