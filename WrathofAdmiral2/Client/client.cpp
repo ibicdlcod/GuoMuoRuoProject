@@ -12,9 +12,8 @@ Client::Client(int argc, char ** argv)
     : CommandLine(argc, argv),
       crypto(QSslSocket::SslClientMode),
       loginSuccess(false),
-      passwordMode(false)
+      registerMode(false)
 {
-    maxRetransmit = 5;
 }
 
 Client::~Client()
@@ -27,7 +26,7 @@ void Client::catbomb()
 {
     if(loginSuccess)
     {
-        errorMessage("[CATBOMB]");
+        qCritical("[CATBOMB]");
 #pragma message(NOT_M_CONST)
         qout.printLine(QStringLiteral("%1 %2 %3 %4 %5 %6")
                        .arg(tr("TURKEY TROTS TO WATER"),
@@ -37,11 +36,14 @@ void Client::catbomb()
                             tr("RR"),
                             tr("THE WORLD WONDERS")),
                        Ecma(255,128,192), Ecma(255,255,255,true));
+        loginSuccess = false;
     }
     else
     {
-        errorMessage(tr("Failed to establish connection, check your username, password and server status."));
+        qout << tr("Failed to establish connection, check your username,"
+                   "password and server status.") << Qt::endl;
     }
+    shutdown();
 }
 
 void Client::displayPrompt()
@@ -49,23 +51,9 @@ void Client::displayPrompt()
     if(passwordMode)
         return;
     if(!loginSuccess)
-    {
         qout << "WAClient$ ";
-    }
     else
-    {
-        qout << settings->value("username", "AliceZephyr").toString() << "@" << (serverName.isNull() ? "WA" : serverName) << "$ ";
-    }
-}
-
-void Client::errorMessage(const QString &message)
-{
-    qCritical() << tr("[Error] ").constData() << message.toUtf8().constData();
-}
-
-void Client::infoMessage(const QString &message)
-{
-    qInfo() << tr("[Info]  ").constData() << message.toUtf8().constData();
+        qout << clientName << "@" << serverName << "$ ";
 }
 
 bool Client::parseSpec(const QStringList &cmdParts)
@@ -82,28 +70,48 @@ bool Client::parseSpec(const QStringList &cmdParts)
                                         "\x80\xe6\x9d\xa1\xe5\x92\xb8\xe9"
                                         "\xb1\xbc").toByteArray());
             shadow = QPasswordDigestor::deriveKeyPbkdf2(QCryptographicHash::Blake2s_256,
-                                                                   password.toUtf8(), salt, 8, 255);
-            //qout << QString(shadow.toHex()).toLatin1() + "\n";
-            passwordMode = false;
+                                                        password.toUtf8(), salt, 8, 255);
             emit turnOnEchoing();
+
+            auto configuration = QSslConfiguration::defaultDtlsConfiguration();
+            configuration.setPeerVerifyMode(QSslSocket::VerifyNone);
+            crypto.setPeer(address, port);
+            crypto.setDtlsConfiguration(configuration);
+            connect(&crypto, &QDtls::handshakeTimeout, this, &Client::handshakeTimeout);
+            connect(&crypto, &QDtls::pskRequired, this, &Client::pskRequired);
+            socket.connectToHost(address.toString(), port);
+            if(!socket.waitForConnected(8000))
+            {
+                qWarning("Failed to connect to server %s:%d",
+                         qUtf8Printable(address.toString()), port);
+                return true;
+            }
+            connect(&socket, &QUdpSocket::readyRead, this, &Client::readyRead);
+            startHandshake();
+            passwordMode = false;
+
             return true;
         }
 
         /* aliases */
         QMap<QString, QString> aliases;
-
         if(aliases.contains(primary))
         {
             primary = aliases[primary];
         }
         /* end aliases */
 
-        if(primary.compare("connect", Qt::CaseInsensitive) == 0)
+        if(primary.compare("connect", Qt::CaseInsensitive) == 0
+                || primary.compare("register", Qt::CaseInsensitive) == 0)
         {
+            retransmitTimes = 0;
+            registerMode = primary.compare("register", Qt::CaseInsensitive) == 0;
             if(cmdParts.length() < 4)
             {
-                qout << tr("Usage: connect [ip] [port] [username]") << Qt::endl;
-                /* if false, then the above message and invalidCommand becomes redundant */
+                if(registerMode)
+                    qout << tr("Usage: register [ip] [port] [username]") << Qt::endl;
+                else
+                    qout << tr("Usage: connect [ip] [port] [username]") << Qt::endl;
                 return true;
             }
             else
@@ -115,7 +123,23 @@ bool Client::parseSpec(const QStringList &cmdParts)
                 }
                 else
                 {
-                    /* TODO: MAIN PART */
+                    address = QHostAddress(cmdParts[1]);
+                    if(address.isNull())
+                    {
+                        qWarning("IP isn't valid");
+                        return true;
+                    }
+                    port = QString(cmdParts[2]).toInt();
+                    if(port < 1024 || port > 49151)
+                    {
+                        qWarning("Port isn't valid, it must fall between 1024 and 49151");
+                        return true;
+                    }
+
+                    clientName = cmdParts[3];
+                    emit turnOffEchoing();
+                    qout << "Enter Password:\n";
+                    passwordMode = true;
                 }
                 return true;
             }
@@ -123,42 +147,19 @@ bool Client::parseSpec(const QStringList &cmdParts)
         else if(primary.compare("disconnect", Qt::CaseInsensitive) == 0)
         {
             if(!crypto.isConnectionEncrypted())
-            {
                 qout << tr("Not under a valid connection.") << Qt::endl;
-            }
             else
             {
-                shutdown();
+                const qint64 written = crypto.writeDatagramEncrypted(&socket, "LOGOUT");
+
+                if (written <= 0) {
+                    qCritical("%s: failed to send logout attmpt - %s",
+                              qUtf8Printable(clientName),
+                              qUtf8Printable(crypto.dtlsErrorString())
+                              );
+                }
+                loginSuccess = false;
             }
-            return true;
-        }
-        else if(primary.compare("register", Qt::CaseInsensitive) == 0)
-        {
-            if(cmdParts.length() < 4)
-            {
-                qout << tr("Usage: register [ip] [port] [username]") << Qt::endl;
-                /* if false, then the above message and invalidCommand becomes redundant */
-                return true;
-            }
-            else
-            {/*
-                QString name = cmdParts[1];
-                QString password = cmdParts[2];
-#pragma message(SALT_FISH)
-                QByteArray salt = name.toUtf8().append(
-                            settings->value("salt",
-                                            "\xe8\xbf\x99\xe6\x98\xaf\xe4\xb8\x80\xe6\x9d\xa1\xe5\x92\xb8\xe9\xb1\xbc").toByteArray());
-                QByteArray shadow = QPasswordDigestor::deriveKeyPbkdf2(QCryptographicHash::Blake2s_256,
-                                                                       password.toUtf8(), salt, 8, 255);
-                client->write(("REG " + cmdParts[1].toUtf8() + " " + QString(shadow.toHex()).toLatin1() + "\n"));
-                return true;*/
-            }
-        }
-        else if(primary.compare("pw", Qt::CaseInsensitive) == 0)
-        {
-            emit turnOffEchoing();
-            qout << "Enter Password:\n";
-            passwordMode = true;
             return true;
         }
         return false;
@@ -167,7 +168,7 @@ bool Client::parseSpec(const QStringList &cmdParts)
 }
 
 void Client::serverResponse(const QString &clientInfo, const QByteArray &datagram,
-                                const QByteArray &plainText)
+                            const QByteArray &plainText)
 {
     Q_UNUSED(datagram)
 #ifdef QT_DEBUG
@@ -188,91 +189,137 @@ void Client::update()
     qout.flush();
 }
 
-void Client::warningMessage(const QString &message)
-{
-    qWarning() << tr("[Warn]  ").constData() << message.toUtf8().constData();
-}
-
 /* private slots */
 void Client::handshakeTimeout()
 {
-    maxRetransmit = settings->value("client/maximum_retransmit", 5).toInt();
-    warningMessage(tr("%1: handshake timeout, trying to re-transmit").arg(clientName));
+    maxRetransmit = settings->value("client/maximum_retransmit", 2).toInt();
+    qWarning("%s: handshake timeout, trying to re-transmit", qUtf8Printable(clientName));
     retransmitTimes++;
     if (!crypto.handleTimeout(&socket))
-        errorMessage(tr("%1: failed to re-transmit - %2").arg(clientName, crypto.dtlsErrorString()));
+        qCritical("%s: failed to re-transmit - %s",
+                  qUtf8Printable(clientName),
+                  qUtf8Printable(crypto.dtlsErrorString())
+                  );
     if(retransmitTimes > maxRetransmit)
     {
-        errorMessage(tr("%1: max restransmit time exceeded!").arg(clientName));
+        qCritical("%s: max restransmit time exceeded!",
+                  qUtf8Printable(clientName)
+                  );
         catbomb();
     }
 }
 
-void Client::pskRequired(QSslPreSharedKeyAuthenticator *auth, bool registering)
+void Client::pskRequired(QSslPreSharedKeyAuthenticator *auth)
 {
     Q_ASSERT(auth);
 
-    infoMessage(tr("%1: providing pre-shared key ...").arg(clientName));
-    auth->setIdentity(clientName.toLatin1());
-    if(registering)
+    qInfo("%s: providing pre-shared key ...", qUtf8Printable(clientName));
+    serverName = auth->identityHint();
+    if(registerMode)
     {
+        auth->setIdentity("NEW_USER");
         auth->setPreSharedKey(QByteArrayLiteral("register"));
     }
     else
     {
-        auth->setPreSharedKey(shadow);
+        auth->setIdentity(clientName.toLatin1());
+        //auth->setPreSharedKey(shadow);
+        auth->setPreSharedKey(QByteArrayLiteral("register"));
     }
 }
 
 void Client::readyRead()
 {
-    if (socket.pendingDatagramSize() <= 0) {
-        warningMessage(tr("%1: spurious read notification?").arg(clientName));
+    if (socket.pendingDatagramSize() <= 0)
+    {
+        qWarning("%s: spurious read notification?", qUtf8Printable(clientName));
         return;
     }
 
-    //! [6]
     QByteArray dgram(socket.pendingDatagramSize(), Qt::Uninitialized);
     const qint64 bytesRead = socket.readDatagram(dgram.data(), dgram.size());
-    if (bytesRead <= 0) {
-        warningMessage(tr("%1: spurious read notification?").arg(clientName));
+    if (bytesRead <= 0)
+    {
+        qWarning("%s: spurious read notification?", qUtf8Printable(clientName));
         return;
     }
 
     dgram.resize(bytesRead);
-    //! [6]
-    //! [7]
-    if (crypto.isConnectionEncrypted()) {
+
+    if (crypto.isConnectionEncrypted())
+    {
         const QByteArray plainText = crypto.decryptDatagram(&socket, dgram);
-        if (plainText.size()) {
+        if (plainText.size())
+        {
             serverResponse(clientName, dgram, plainText);
             return;
         }
 
-        if (crypto.dtlsError() == QDtlsError::RemoteClosedConnectionError) {
-            errorMessage(tr("%1: shutdown alert received").arg(clientName));
+        if (crypto.dtlsError() == QDtlsError::RemoteClosedConnectionError)
+        {
+            qWarning("%s: shutdown alert received", qUtf8Printable(clientName));
             socket.close();
-            catbomb();
+            if(loginSuccess)
+                catbomb();
+            else
+            {
+                shutdown();
+                qout << tr("Disconnected.") << Qt::endl;
+            }
             return;
         }
 
-        warningMessage(tr("%1: zero-length datagram received?").arg(clientName));
-    } else {
-        //! [7]
-        //! [8]
-        if (!crypto.doHandshake(&socket, dgram)) {
-            errorMessage(tr("%1: handshake error - %2").arg(clientName, crypto.dtlsErrorString()));
+        qWarning("%s: zero-length datagram received?", qUtf8Printable(clientName));
+    }
+    else
+    {
+        if (!crypto.doHandshake(&socket, dgram))
+        {
+            qCritical("%s: handshake error - %s",
+                      qUtf8Printable(clientName),
+                      qUtf8Printable(crypto.dtlsErrorString()));
             return;
         }
-        //! [8]
-
-        //! [9]
-        if (crypto.isConnectionEncrypted()) {
-            infoMessage(tr("%1: encrypted connection established!").arg(clientName));
+        if (crypto.isConnectionEncrypted())
+        {
+            qInfo("%s: encrypted connection established!", qUtf8Printable(clientName));
             loginSuccess = true;
-        } else {
-            //! [9]
-            infoMessage(tr("%1: continuing with handshake ...").arg(clientName));
+
+            QString shadowstring = QString(shadow.toHex()).toLatin1();
+            if(registerMode)
+            {
+                static const QString message = QStringLiteral("REG %1 SHADOW %2");
+                const qint64 written = crypto.writeDatagramEncrypted(&socket,
+                                                                     message
+                                                                     .arg(clientName, shadowstring)
+                                                                     .toLatin1());
+
+                if (written <= 0)
+                {
+                    qCritical("%s: register failed - %s",
+                              qUtf8Printable(clientName),
+                              qUtf8Printable(crypto.dtlsErrorString()));
+                }
+            }
+            else
+            {
+                static const QString message = QStringLiteral("LOGIN %1 SHADOW %2");
+                const qint64 written = crypto.writeDatagramEncrypted(&socket,
+                                                                     message
+                                                                     .arg(clientName, shadowstring)
+                                                                     .toLatin1());
+
+                if (written <= 0)
+                {
+                    qCritical("%s: login failed - %s",
+                              qUtf8Printable(clientName),
+                              qUtf8Printable(crypto.dtlsErrorString()));
+                }
+            }
+        }
+        else
+        {
+            qInfo("%s: continuing with handshake...", qUtf8Printable(clientName));
         }
     }
 }
@@ -283,28 +330,48 @@ void Client::shutdown()
     {
         if(!crypto.shutdown(&socket))
         {
-            warningMessage(tr("%1: shutdown socket failed!").arg(clientName));
+            qWarning("%s: shutdown socket failed!", qUtf8Printable(clientName));
         }
     }
+    if(crypto.handshakeState() == QDtls::HandshakeInProgress)
+    {
+        if(!crypto.abortHandshake(&socket))
+        {
+            qWarning(qUtf8Printable(crypto.dtlsErrorString()));
+        }
+    }
+    if(socket.isValid())
+    {
+        socket.close();
+    }
+    disconnect(&socket, &QUdpSocket::readyRead, this, &Client::readyRead);
+    disconnect(&crypto, &QDtls::handshakeTimeout, this, &Client::handshakeTimeout);
+    disconnect(&crypto, &QDtls::pskRequired, this, &Client::pskRequired);
 }
 
 void Client::startHandshake()
 {
-    if (socket.state() != QAbstractSocket::ConnectedState) {
-        infoMessage(tr("%1: connecting UDP socket first ...").arg(clientName));
+    if (socket.state() != QAbstractSocket::ConnectedState)
+    {
+        qInfo("%s: connecting UDP socket first ...", qUtf8Printable(clientName));
         connect(&socket, &QAbstractSocket::connected, this, &Client::udpSocketConnected);
         return;
     }
 
     if (!crypto.doHandshake(&socket))
-        errorMessage(tr("%1: failed to start a handshake - %2").arg(clientName, crypto.dtlsErrorString()));
+    {
+        qCritical("%s: failed to start a handshake - %s",
+                  qUtf8Printable(clientName),
+                  qUtf8Printable(crypto.dtlsErrorString())
+                  );
+    }
     else
-        infoMessage(tr("%1: starting a handshake").arg(clientName));
+        qInfo("%s: starting a handshake ...", qUtf8Printable(clientName));
 }
 
 void Client::udpSocketConnected()
 {
-    infoMessage(tr("%1: UDP socket is now in ConnectedState, continue with handshake ...").arg(clientName));
+    qInfo("%s: UDP socket is now in ConnectedState, continue with handshake ...", qUtf8Printable(clientName));
     startHandshake();
 
     retransmitTimes = 0;
@@ -324,9 +391,7 @@ const QStringList Client::getValidCommands()
     QStringList result = QStringList();
     result.append(getCommands());
     if(crypto.isConnectionEncrypted())
-    {
         result.append("disconnect");
-    }
     else
     {
         result.append("connect");

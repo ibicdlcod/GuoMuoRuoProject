@@ -67,13 +67,10 @@ public:
 public slots:
     void catbomb();
     void displayPrompt();
-    static void errorMessage(const QString &message);
-    void infoMessage(const QString &message);
     bool parseSpec(const QStringList &);
     void serverResponse(const QString &clientInfo, const QByteArray &datagraam,
                         const QByteArray &plainText);
     void update();
-    void warningMessage(const QString &message);
 
 signals:
     void turnOffEchoing();
@@ -81,7 +78,7 @@ signals:
 
 private slots:
     void handshakeTimeout();
-    void pskRequired(QSslPreSharedKeyAuthenticator *auth, bool registering);
+    void pskRequired(QSslPreSharedKeyAuthenticator *auth);
     void readyRead();
     void shutdown();
     void startHandshake();
@@ -94,6 +91,8 @@ private:
 
     QUdpSocket socket;
     QDtls crypto;
+    QHostAddress address;
+    quint16 port;
 
     unsigned int maxRetransmit;
     unsigned int retransmitTimes = 0;
@@ -103,7 +102,7 @@ private:
     QByteArray shadow;
 
     bool loginSuccess;
-    bool passwordMode;
+    bool registerMode;
 
     Q_DISABLE_COPY(Client)
 };

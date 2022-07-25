@@ -38,6 +38,7 @@ protected:
 
     QTimer *timer;
     ConsoleTextStream qout;
+    bool passwordMode;
 };
 
 #endif // COMMANDLINE_H

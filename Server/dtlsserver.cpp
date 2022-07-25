@@ -350,6 +350,7 @@ void DtlsServer::decryptDatagram(QDtls *connection, const QByteArray &clientMess
                 if(!query.first())
                 {
                     connection->writeDatagramEncrypted(&serverSocket, tr("AUTHINCORRECT").toLatin1());
+                    connection->shutdown(&serverSocket);
                 }
                 else
                 {
@@ -367,6 +368,7 @@ void DtlsServer::decryptDatagram(QDtls *connection, const QByteArray &clientMess
                                                    .arg(connectedUsers[peerInfo]).toLatin1());
                 connectedPeers.remove(connectedUsers[peerInfo]);
                 connectedUsers.remove(peerInfo);
+                connection->shutdown(&serverSocket);
             }
             else
             {

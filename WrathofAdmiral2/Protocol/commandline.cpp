@@ -25,7 +25,8 @@ extern QSettings *settings;
 
 CommandLine::CommandLine(int argc, char ** argv)
     : QCoreApplication(argc, argv), timer(nullptr),
-      qout(ConsoleTextStream(stdout, QIODevice::WriteOnly))
+      qout(ConsoleTextStream(stdout, QIODevice::WriteOnly)),
+      passwordMode(false)
 {
 
 }
@@ -154,6 +155,21 @@ void CommandLine::openingwords()
 
 bool CommandLine::parse(const QString &input)
 {
+    if(passwordMode)
+    {
+        bool success = parseSpec(QStringList(input));
+        if(!success)
+        {
+            invalidCommand();
+            displayPrompt();
+            return false;
+        }
+        else
+        {
+            displayPrompt();
+            return true;
+        }
+    }
     static QRegularExpression re("\\s+");
     QStringList cmdParts = input.split(re, Qt::SkipEmptyParts);
     if(cmdParts.length() > 0)
