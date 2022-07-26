@@ -26,7 +26,7 @@ extern QSettings *settings;
 CommandLine::CommandLine(int argc, char ** argv)
     : QCoreApplication(argc, argv), timer(nullptr),
       qout(ConsoleTextStream(stdout, QIODevice::WriteOnly)),
-      passwordMode(false)
+      passwordMode(password::normal)
 {
 
 }
@@ -38,6 +38,7 @@ void CommandLine::customMessageHandler(QtMsgType type, const QMessageLogContext 
     {
         msg.remove(msg.length() - 1, 1);
     }
+    msg.remove(QChar('\"'), Qt::CaseInsensitive);
     QString dt = QDateTime::currentDateTime().toString("dd/MM/yyyy hh:mm:ss");
     QString txt = QStringLiteral("\r[%1] ").arg(dt);
     QByteArray localMsg = msg.toUtf8();
@@ -46,33 +47,36 @@ void CommandLine::customMessageHandler(QtMsgType type, const QMessageLogContext 
     bool msg_off;
 
 #if defined(QT_DEBUG)
-    QString txt2 = QStringLiteral("%1 (%2:%3, %4)").arg(tr(localMsg.constData()), file, QString::number(context.line), function);
+    QString txt2 = QStringLiteral("%1 (%2:%3, %4)").arg(localMsg, file, QString::number(context.line), function);
 #else
-    QString txt2 = QStringLiteral("%1").arg(tr(localMsg.constData()));
+    Q_UNUSED(file)
+    Q_UNUSED(function)
+    QString txt2 = QStringLiteral("%1").arg(localMsg);
 #endif
     switch (type)
     {
     case QtDebugMsg:
-        txt += QStringLiteral("{D}  %1").arg(txt2);
+        txt += QStringLiteral("{DEBUG} %1").arg(txt2);
         msg_off = settings->value("msg_disabled/debug", false).toBool();
         break;
     case QtInfoMsg:
-        txt += QStringLiteral("{I}  %1").arg(txt2);
+        txt += QStringLiteral("{INFO}  %1").arg(txt2);
         msg_off = settings->value("msg_disabled/info", false).toBool();
         break;
     case QtWarningMsg:
-        txt += QStringLiteral("{W}  %1").arg(txt2);
+        txt += QStringLiteral("{WARN}  %1").arg(txt2);
         msg_off = settings->value("msg_disabled/warn", false).toBool();
         break;
     case QtCriticalMsg:
-        txt += QStringLiteral("{C}  %1").arg(txt2);
+        txt += QStringLiteral("{CRIT}  %1").arg(txt2);
         msg_off = settings->value("msg_disabled/crit", false).toBool();
         break;
     case QtFatalMsg:
-        txt += QStringLiteral("{F}  %1").arg(txt2);
+        txt += QStringLiteral("{FATAL} %1").arg(txt2);
         msg_off = settings->value("msg_disabled/fatal", false).toBool();
         break;
     }
+    /* consider use QT_NO_DEBUG_OUTPUT, QT_NO_INFO_OUTPUT, QT_NO_WARNING_OUTPUT */
 
     const char * color;
     switch(type)
@@ -178,7 +182,6 @@ bool CommandLine::parse(const QString &input)
 
         /* aliases */
         QMap<QString, QString> aliases;
-
         aliases["h"] = "help";
         aliases["q"] = "exit";
         aliases["c"] = "commands";

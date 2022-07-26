@@ -38,7 +38,14 @@ protected:
 
     QTimer *timer;
     ConsoleTextStream qout;
-    bool passwordMode;
+    enum password
+    {
+        normal,
+        login,
+        registering,
+        confirm
+    };
+    password passwordMode;
 };
 
 #endif // COMMANDLINE_H

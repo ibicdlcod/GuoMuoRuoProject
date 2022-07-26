@@ -54,8 +54,6 @@
 #include "commandline.h"
 #include <QtNetwork>
 
-QT_BEGIN_NAMESPACE
-
 class Client : public CommandLine
 {
     Q_OBJECT
@@ -89,10 +87,11 @@ private:
     const QStringList getCommandsSpec();
     const QStringList getValidCommands();
 
-    QUdpSocket socket;
-    QDtls crypto;
     QHostAddress address;
     quint16 port;
+
+    QDtls crypto;
+    QUdpSocket socket;
 
     unsigned int maxRetransmit;
     unsigned int retransmitTimes = 0;
@@ -103,6 +102,11 @@ private:
 
     bool loginSuccess;
     bool registerMode;
+
+    const unsigned int defaultMaxRetransmit = 2;
+    const QByteArray defaultSalt = QByteArrayLiteral("\xe8\xbf\x99\xe6\x98\xaf\xe4\xb8"
+                                                     "\x80\xe6\x9d\xa1\xe5\x92\xb8\xe9"
+                                                     "\xb1\xbc");
 
     Q_DISABLE_COPY(Client)
 };

@@ -8,6 +8,8 @@
 #define SALT_FISH __FILE__ STRING(:__LINE__: This is a salt fish.)
 #define USED_CXX17 __FILE__ STRING(:__LINE__: This part uses C++ 17 features. Use macro "__cplusplus" to check whether your compiler supports it.)
 
+#include <QObject>
+
 class Protocol
 {
 public:
