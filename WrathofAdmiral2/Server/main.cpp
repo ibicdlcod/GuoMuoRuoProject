@@ -16,7 +16,7 @@
 #endif
 
 #include "protocol.h"
-#include "client.h"
+#include "server.h"
 
 QFile *logFile;
 QSettings *settings;
@@ -44,13 +44,13 @@ int main(int argc, char *argv[])
     }
 #endif
 
-    Client client(argc, argv);
+    Server server(argc, argv);
 
 #pragma message(NOT_M_CONST)
-    client.setApplicationName("WrathofAdmiral2");
-    client.setApplicationVersion("0.54.1"); // temp
-    client.setOrganizationName("Harusame Software");
-    client.setOrganizationDomain("hsny.xyz"); // temp
+    server.setApplicationName("WrathofAdmiral2 Server");
+    server.setApplicationVersion("0.54.1"); // temp
+    server.setOrganizationName("Harusame Software");
+    server.setOrganizationDomain("hsny.xyz"); // temp
     settings = new QSettings();
 
     QTranslator translator;
@@ -58,9 +58,9 @@ int main(int argc, char *argv[])
     const QStringList uiLanguages = QLocale::system().uiLanguages()
             + settings->value("languages", QStringList()).toStringList();
     for (const QString &locale : uiLanguages) {
-        const QString baseName = "Client_" + QLocale(locale).name();
+        const QString baseName = "Server_" + QLocale(locale).name();
         if (translator.load(":/i18n/" + baseName)) {
-            client.installTranslator(&translator);
+            server.installTranslator(&translator);
             break;
         }
     }
@@ -74,7 +74,7 @@ int main(int argc, char *argv[])
         setlocale(LC_NUMERIC, "C");
 #endif
 
-    QString logFileName = settings->value("client/logfile", "ClientLog.log").toString();
+    QString logFileName = settings->value("server/logfile", "ServerLog.log").toString();
 
     logFile = new QFile(logFileName);
     if(Q_UNLIKELY(!logFile) || !logFile->open(QIODevice::WriteOnly | QIODevice::Append))
@@ -83,15 +83,13 @@ int main(int argc, char *argv[])
     }
 
     QConsoleListener console(true);
-    bool success = QObject::connect(&console, &QConsoleListener::newLine, &client, &Client::parse)
-            && QObject::connect(&client, &Client::turnOffEchoing, &console, &QConsoleListener::turnOffEchoing)
-            && QObject::connect(&client, &Client::turnOnEchoing, &console, &QConsoleListener::turnOnEchoing);
+    bool success = QObject::connect(&console, &QConsoleListener::newLine, &server, &Server::parse);
     if(!success)
     {
         throw std::runtime_error("Connection with input parser failed!");
     }
-    qInstallMessageHandler(client.customMessageHandler);
-    QTimer::singleShot(0, &client, &Client::openingwords);
-    QTimer::singleShot(100, &client, &Client::displayPrompt);
-    return client.exec();
+    qInstallMessageHandler(server.customMessageHandler);
+    QTimer::singleShot(0, &server, &Server::openingwords);
+    QTimer::singleShot(100, &server, &Server::displayPrompt);
+    return server.exec();
 }

@@ -48,67 +48,30 @@
 **
 ****************************************************************************/
 
-#ifndef CLIENT_H
-#define CLIENT_H
+#ifndef SERVER_H
+#define SERVER_H
 
 #include "commandline.h"
 #include <QtNetwork>
 
-class Client : public CommandLine
+class Server : public CommandLine
 {
     Q_OBJECT
 
 public:
-    explicit Client(int, char **);
-    ~Client();
+    explicit Server(int, char **);
+    ~Server();
 
 public slots:
-    void catbomb();
     void displayPrompt();
     bool parseSpec(const QStringList &);
-    void serverResponse(const QString &, const QByteArray &,
-                        const QByteArray &);
-    void update();
-
-signals:
-    void turnOffEchoing();
-    void turnOnEchoing();
-
-private slots:
-    void handshakeTimeout();
-    void pskRequired(QSslPreSharedKeyAuthenticator *);
-    void readyRead();
-    void shutdown();
-    void startHandshake();
-    void udpSocketConnected();
 
 private:
     void exitGraceSpec();
     const QStringList getCommandsSpec();
     const QStringList getValidCommands();
 
-    QHostAddress address;
-    quint16 port;
-
-    QDtls crypto;
-    QUdpSocket socket;
-
-    unsigned int maxRetransmit;
-    unsigned int retransmitTimes = 0;
-
-    QString clientName;
-    QString serverName;
-    QByteArray shadow;
-
-    bool loginSuccess;
-    bool registerMode;
-
-    const unsigned int defaultMaxRetransmit = 2;
-    const QByteArray defaultSalt = QByteArrayLiteral("\xe8\xbf\x99\xe6\x98\xaf\xe4\xb8"
-                                                     "\x80\xe6\x9d\xa1\xe5\x92\xb8\xe9"
-                                                     "\xb1\xbc");
-
-    Q_DISABLE_COPY(Client)
+    Q_DISABLE_COPY(Server)
 };
 
-#endif // CLIENT_H
+#endif // SERVER_H

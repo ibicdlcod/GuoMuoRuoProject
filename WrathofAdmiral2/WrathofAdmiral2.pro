@@ -3,8 +3,9 @@ TEMPLATE = subdirs
 SUBDIRS += \
     Client \
     Protocol \
-    QConsoleListener
+    QConsoleListener \
+    Server
 
-Client.depends += QConsoleListener
 Client.depends += Protocol
+Server.depends += Protocol
 Protocol.depends += QConsoleListener

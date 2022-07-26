@@ -48,67 +48,40 @@
 **
 ****************************************************************************/
 
-#ifndef CLIENT_H
-#define CLIENT_H
+#include "server.h"
 
-#include "commandline.h"
-#include <QtNetwork>
-
-class Client : public CommandLine
+Server::Server(int argc, char ** argv)
+    : CommandLine(argc, argv)
 {
-    Q_OBJECT
 
-public:
-    explicit Client(int, char **);
-    ~Client();
+}
 
-public slots:
-    void catbomb();
-    void displayPrompt();
-    bool parseSpec(const QStringList &);
-    void serverResponse(const QString &, const QByteArray &,
-                        const QByteArray &);
-    void update();
+Server::~Server()
+{
 
-signals:
-    void turnOffEchoing();
-    void turnOnEchoing();
+}
 
-private slots:
-    void handshakeTimeout();
-    void pskRequired(QSslPreSharedKeyAuthenticator *);
-    void readyRead();
-    void shutdown();
-    void startHandshake();
-    void udpSocketConnected();
+void Server::displayPrompt()
+{
 
-private:
-    void exitGraceSpec();
-    const QStringList getCommandsSpec();
-    const QStringList getValidCommands();
+}
 
-    QHostAddress address;
-    quint16 port;
+bool Server::parseSpec(const QStringList &)
+{
+    return false;
+}
 
-    QDtls crypto;
-    QUdpSocket socket;
+void Server::exitGraceSpec()
+{
 
-    unsigned int maxRetransmit;
-    unsigned int retransmitTimes = 0;
+}
 
-    QString clientName;
-    QString serverName;
-    QByteArray shadow;
+const QStringList Server::getCommandsSpec()
+{
+    return QStringList();
+}
 
-    bool loginSuccess;
-    bool registerMode;
-
-    const unsigned int defaultMaxRetransmit = 2;
-    const QByteArray defaultSalt = QByteArrayLiteral("\xe8\xbf\x99\xe6\x98\xaf\xe4\xb8"
-                                                     "\x80\xe6\x9d\xa1\xe5\x92\xb8\xe9"
-                                                     "\xb1\xbc");
-
-    Q_DISABLE_COPY(Client)
-};
-
-#endif // CLIENT_H
+const QStringList Server::getValidCommands()
+{
+    return QStringList();
+}
