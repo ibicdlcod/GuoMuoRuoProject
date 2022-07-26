@@ -14,6 +14,7 @@ SOURCES += \
 
 TRANSLATIONS += \
     Client_zh_CN.ts
+
 CONFIG += lrelease
 CONFIG += embed_translations
 
@@ -28,6 +29,8 @@ else:unix: LIBS += -L$$OUT_PWD/../QConsoleListener/ -lQConsoleListener
 
 INCLUDEPATH += $$PWD/../QConsoleListener
 DEPENDPATH += $$PWD/../QConsoleListener
+#https://stackoverflow.com/questions/13428910/how-to-set-the-environmental-variable-ld-library-path-in-linux
+#https://doc.qt.io/qt-6/ssl.html
 
 win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../QConsoleListener/release/libQConsoleListener.a
 else:win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../QConsoleListener/debug/libQConsoleListener.a

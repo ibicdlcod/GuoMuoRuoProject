@@ -23,9 +23,9 @@ QConsoleListener::QConsoleListener(bool consolemode)
                 );
 #if defined (Q_OS_WIN)
     QObject::connect(m_notifier, &QWinEventNotifier::activated,
-                 #else
+#else
     QObject::connect(m_notifier, &QSocketNotifier::activated,
-                 #endif
+#endif
                      [this]() {
         /* the following is different from the original at https://github.com/juangburgos/QConsoleListener/blob/master/src/qconsolelistener.cpp
          * becase windows console can't handle unicode

@@ -40,11 +40,11 @@ void CommandLine::customMessageHandler(QtMsgType type, const QMessageLogContext 
     }
     msg.remove(QChar('\"'), Qt::CaseInsensitive);
     QString dt = QDateTime::currentDateTime().toString("dd/MM/yyyy hh:mm:ss");
-    QString txt = QStringLiteral("\r[%1] ").arg(dt);
+    QString txt = QStringLiteral("\r");
     QByteArray localMsg = msg.toUtf8();
     const char *file = context.file ? context.file : "";
     const char *function = context.function ? context.function : "";
-    bool msg_off;
+    bool msg_off = false;
 
 #if defined(QT_DEBUG)
     QString txt2 = QStringLiteral("%1 (%2:%3, %4)").arg(localMsg, file, QString::number(context.line), function);
@@ -97,6 +97,7 @@ void CommandLine::customMessageHandler(QtMsgType type, const QMessageLogContext 
         color = ("\x1b[48;2;128;0;0;97m");
         break;
     }
+
     if(!msg_off)
     {
         std::cout << color;
@@ -120,6 +121,7 @@ void CommandLine::customMessageHandler(QtMsgType type, const QMessageLogContext 
         qFatal("Log Error");
     }
     QTextStream textStream(logFile);
+    txt = QStringLiteral("\r[%1] %2").arg(dt, txt);
     textStream << txt;
     if(type == QtFatalMsg)
     {

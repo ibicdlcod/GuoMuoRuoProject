@@ -82,6 +82,8 @@ release/
 mingw/
 gcc/
 msvc/
+.qmake.stash
+static_build/
 
 # Custom
 *.log

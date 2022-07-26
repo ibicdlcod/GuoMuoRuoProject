@@ -30,13 +30,12 @@ void Client::catbomb()
     {
         qCritical() << tr("You have been bombarded by a cute cat.");
 #pragma message(NOT_M_CONST)
-        qout.printLine(QStringLiteral("%1 %2 %3 %4 %5 %6")
-                       .arg(tr("TURKEY TROTS TO WATER"),
-                            tr("GG"),
-                            tr("FROM CINCPAC ACTION COM THIRD FLEET INFO COMINCH CTF SEVENTY-SEVEN X"),
-                            tr("WHERE IS RPT WHERE IS TASK FORCE THIRTY FOUR"),
-                            tr("RR"),
-                            tr("THE WORLD WONDERS")),
+        qout.printLine(QStringLiteral("TURKEY TROTS TO WATER"
+                                      " GG"
+                                      " FROM CINCPAC ACTION COM THIRD FLEET INFO COMINCH CTF SEVENTY-SEVEN X"
+                                      " WHERE IS RPT WHERE IS TASK FORCE THIRTY FOUR"
+                                      " RR"
+                                      " THE WORLD WONDERS"),
                        Ecma(255,128,192), Ecma(255,255,255,true));
         loginSuccess = false;
     }
@@ -44,6 +43,7 @@ void Client::catbomb()
     {
         qWarning() << tr("Failed to establish connection, check your username,"
                          "password and server status.");
+        displayPrompt();
     }
     shutdown();
 }
@@ -225,13 +225,13 @@ void Client::handshakeTimeout()
 {
     maxRetransmit = settings->value("client/maximum_retransmit",
                                     defaultMaxRetransmit).toInt();
-    qWarning() << clientName << ": handshake timeout, trying to re-transmit";
+    qDebug() << clientName << ": handshake timeout, trying to re-transmit";
     retransmitTimes++;
     if (!crypto.handleTimeout(&socket))
         qDebug() << clientName << ": failed to re-transmit -" << crypto.dtlsErrorString();
     if(retransmitTimes > maxRetransmit)
     {
-        qDebug() << clientName << ": max restransmit time exceeded!";
+        qWarning() << clientName << tr(": max restransmit time exceeded!");
         catbomb();
     }
 }
