@@ -101,6 +101,7 @@ private:
     QByteArray shadow;
 
     bool loginSuccess;
+    bool attemptMode;
     bool registerMode;
 
     const unsigned int defaultMaxRetransmit = 2;

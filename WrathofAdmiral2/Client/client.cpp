@@ -62,6 +62,7 @@ Client::Client(int argc, char ** argv)
     : CommandLine(argc, argv),
       crypto(QSslSocket::SslClientMode),
       loginSuccess(false),
+      attemptMode(false),
       registerMode(false)
 {
 }
@@ -76,6 +77,7 @@ void Client::catbomb()
 {
     if(loginSuccess)
     {
+        /* also present when receiving usercreate/userexists, which is undesirable */
         qCritical() << tr("You have been bombarded by a cute cat.");
 #pragma message(NOT_M_CONST)
         qout.printLine(QStringLiteral("TURKEY TROTS TO WATER"
@@ -93,12 +95,13 @@ void Client::catbomb()
                          "password and server status.");
         displayPrompt();
     }
+    attemptMode = false;
     shutdown();
 }
 
 void Client::displayPrompt()
 {
-#if 0
+#if 0 /* this is for non-ASCII test */
     qInfo() << tr("田中飞妈") << 114514;
 #endif
     if(passwordMode != password::normal)
@@ -185,6 +188,17 @@ bool Client::parseSpec(const QStringList &cmdParts)
 
         if(loginMode || registerMode)
         {
+            if(crypto.isConnectionEncrypted())
+            {
+                qInfo() << tr("Already connected, please shut down first.");
+                return true;
+            }
+            else if(attemptMode)
+            {
+                qWarning() << tr("Do not attempt duplicate connections!");
+                return true;
+            }
+            attemptMode = true;
             retransmitTimes = 0;
             if(cmdParts.length() < 4)
             {
@@ -196,31 +210,24 @@ bool Client::parseSpec(const QStringList &cmdParts)
             }
             else
             {
-                if(crypto.isConnectionEncrypted())
+                address = QHostAddress(cmdParts[1]);
+                if(address.isNull())
                 {
-                    qInfo() << tr("Already connected, please shut down first.");
+                    qWarning() << tr("IP isn't valid");
                     return true;
                 }
-                else
+                port = QString(cmdParts[2]).toInt();
+                if(port < 1024 || port > 49151)
                 {
-                    address = QHostAddress(cmdParts[1]);
-                    if(address.isNull())
-                    {
-                        qWarning() << tr("IP isn't valid");
-                        return true;
-                    }
-                    port = QString(cmdParts[2]).toInt();
-                    if(port < 1024 || port > 49151)
-                    {
-                        qWarning() << tr("Port isn't valid, it must fall between 1024 and 49151");
-                        return true;
-                    }
-
-                    clientName = cmdParts[3];
-                    emit turnOffEchoing();
-                    qout << tr("Enter Password:") << Qt::endl;
-                    passwordMode = registerMode ? password::registering : password::login;
+                    qWarning() << tr("Port isn't valid, it must fall between 1024 and 49151");
+                    return true;
                 }
+
+                clientName = cmdParts[3];
+                emit turnOffEchoing();
+                qout << tr("Enter Password:") << Qt::endl;
+                passwordMode = registerMode ? password::registering : password::login;
+
                 return true;
             }
         }
@@ -236,7 +243,7 @@ bool Client::parseSpec(const QStringList &cmdParts)
                     qCritical() << clientName << tr(": failed to send logout attmpt -")
                                 << crypto.dtlsErrorString();
                 }
-                loginSuccess = false;
+                loginSuccess = false; // should be modified to at receiving LOGOUTSUCCESS
                 qInfo() << tr("Attempting to disconnect...");
             }
             return true;
@@ -339,6 +346,7 @@ void Client::readyRead()
             {
                 shutdown();
                 qInfo() << tr("Remote disconnected.");
+                attemptMode = false;
             }
             return;
         }
@@ -457,7 +465,7 @@ const QStringList Client::getValidCommands()
     result.append(getCommands());
     if(crypto.isConnectionEncrypted())
         result.append("disconnect");
-    else
+    else if(!attemptMode)
         result.append({"connect", "register"});
     result.sort(Qt::CaseInsensitive);
     return result;

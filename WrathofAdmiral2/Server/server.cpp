@@ -426,10 +426,12 @@ void Server::decryptDatagram(QDtls *connection, const QByteArray &clientMessage)
                         qWarning() << insert.lastError().databaseText();
                     };
                     connection->writeDatagramEncrypted(&serverSocket, tr("USERCREATED").toLatin1());
+                    connection->shutdown(&serverSocket);
                 }
                 else
                 {
                     connection->writeDatagramEncrypted(&serverSocket, tr("USEREXISTS").toLatin1());
+                    connection->shutdown(&serverSocket);
                 }
             }
         }
