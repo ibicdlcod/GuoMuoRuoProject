@@ -71,7 +71,7 @@ int main(int argc, char *argv[])
         argv_l.append(argv[i]);
     }
 #if defined(Q_OS_UNIX)
-        setlocale(LC_NUMERIC, "C");
+    setlocale(LC_NUMERIC, "C");
 #endif
 
     QString logFileName = settings->value("server/logfile", "ServerLog.log").toString();
@@ -91,5 +91,7 @@ int main(int argc, char *argv[])
     qInstallMessageHandler(server.customMessageHandler);
     QTimer::singleShot(0, &server, &Server::openingwords);
     QTimer::singleShot(100, &server, &Server::displayPrompt);
-    return server.exec();
+
+    int result = server.exec();
+    return result;
 }

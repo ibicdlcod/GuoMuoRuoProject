@@ -51,8 +51,17 @@
 #ifndef SERVER_H
 #define SERVER_H
 
-#include "commandline.h"
 #include <QtNetwork>
+#include <QSslConfiguration>
+#include <QSqlDatabase>
+#include <QSqlQuery>
+#include <QSqlError>
+#include <QSqlRecord>
+
+#include "commandline.h"
+
+#include <vector>
+#include <memory>
 
 class Server : public CommandLine
 {
@@ -62,14 +71,42 @@ public:
     explicit Server(int, char **);
     ~Server();
 
+    void close();
+    void datagramReceived(const QString &, const QByteArray &,
+                          const QByteArray &);
+    bool isListening() const;
+    bool listen(const QHostAddress &, quint16);
+
 public slots:
     void displayPrompt();
     bool parseSpec(const QStringList &);
+    Q_DECL_DEPRECATED void update();
+
+private slots:
+    void readyRead();
+    void pskRequired(QSslPreSharedKeyAuthenticator *);
 
 private:
+    void decryptDatagram(QDtls *, const QByteArray &);
+    void doHandshake(QDtls *, const QByteArray &);
     void exitGraceSpec();
     const QStringList getCommandsSpec();
     const QStringList getValidCommands();
+    void handleNewConnection(const QHostAddress &, quint16,
+                             const QByteArray &);
+    void shutdown();
+
+    bool listening = false;
+    QUdpSocket serverSocket;
+
+    QSslConfiguration serverConfiguration;
+    QDtlsClientVerifier cookieSender;
+    std::vector<std::unique_ptr<QDtls>> knownClients;
+
+    QMap<QString, QString> connectedUsers;
+    QMap<QString, QString> connectedPeers;
+
+    QSqlDatabase db;
 
     Q_DISABLE_COPY(Server)
 };

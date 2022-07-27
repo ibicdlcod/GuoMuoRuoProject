@@ -68,7 +68,7 @@ public slots:
     bool parseSpec(const QStringList &);
     void serverResponse(const QString &, const QByteArray &,
                         const QByteArray &);
-    void update();
+    Q_DECL_DEPRECATED void update();
 
 signals:
     void turnOffEchoing();

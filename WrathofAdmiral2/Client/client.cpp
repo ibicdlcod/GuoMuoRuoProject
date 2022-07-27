@@ -56,8 +56,6 @@
 #include "ecma48.h"
 #include "protocol.h"
 
-#define QT_NO_CAST_FROM_ASCII
-
 extern QSettings *settings;
 
 Client::Client(int argc, char ** argv)
@@ -165,7 +163,7 @@ bool Client::parseSpec(const QStringList &cmdParts)
             }
             else
             {
-                qInfo() << tr("Confirm Password:");
+                qout << tr("Confirm Password:") << Qt::endl;
                 passwordMode = password::confirm;
             }
             return true;
@@ -191,9 +189,9 @@ bool Client::parseSpec(const QStringList &cmdParts)
             if(cmdParts.length() < 4)
             {
                 if(registerMode)
-                    qInfo() << tr("Usage: register [ip] [port] [username]");
+                    qout << tr("Usage: register [ip] [port] [username]") << Qt::endl;
                 else
-                    qInfo() << tr("Usage: connect [ip] [port] [username]");
+                    qout << tr("Usage: connect [ip] [port] [username]") << Qt::endl;
                 return true;
             }
             else
@@ -220,7 +218,7 @@ bool Client::parseSpec(const QStringList &cmdParts)
 
                     clientName = cmdParts[3];
                     emit turnOffEchoing();
-                    qInfo() << tr("Enter Password:");
+                    qout << tr("Enter Password:") << Qt::endl;
                     passwordMode = registerMode ? password::registering : password::login;
                 }
                 return true;
@@ -252,7 +250,7 @@ void Client::serverResponse(const QString &clientInfo, const QByteArray &datagra
                             const QByteArray &plainText)
 {
     Q_UNUSED(datagram)
-#ifdef QT_DEBUG
+#if defined(QT_DEBUG)
     static const QString formatter = QStringLiteral("%1 received text: %2");
 
     const QString html = formatter.arg(clientInfo, QString::fromUtf8(plainText));
@@ -300,8 +298,8 @@ void Client::pskRequired(QSslPreSharedKeyAuthenticator *auth)
     else
     {
         auth->setIdentity(clientName.toLatin1());
-        //auth->setPreSharedKey(shadow);
-        auth->setPreSharedKey(QByteArrayLiteral("register"));
+        auth->setPreSharedKey(shadow);
+        //auth->setPreSharedKey(QByteArrayLiteral("register"));
     }
 }
 
