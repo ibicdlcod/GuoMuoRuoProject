@@ -15,7 +15,7 @@
 #include <locale.h>
 #endif
 
-#include "protocol.h"
+#include "kp.h"
 #include "server.h"
 
 QFile *logFile;

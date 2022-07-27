@@ -13,14 +13,14 @@ SOURCES += \
     commandline.cpp \
     consoletextstream.cpp \
     ecma48.cpp \
-    protocol.cpp \
+    kp.cpp \
     wcwidth.cpp
 
 HEADERS += \
     commandline.h \
     consoletextstream.h \
     ecma48.h \
-    protocol.h \
+    kp.h \
     wcwidth.h
 
 # Default rules for deployment.

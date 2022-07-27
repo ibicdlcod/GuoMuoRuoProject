@@ -1,5 +1,5 @@
-#ifndef PROTOCOL_H
-#define PROTOCOL_H
+#ifndef KP_H
+#define KP_H
 
 #define STRING2(x) #x
 #define STRING(x) STRING2(x)
@@ -9,13 +9,32 @@
 #define USED_CXX17 __FILE__ STRING(:__LINE__: This part uses C++ 17 features. Use macro "__cplusplus" to check whether your compiler supports it.)
 
 #include <QObject>
+#include <QJsonObject>
+#include <QCborValue>
 
-class Protocol
+class KP : public QObject
 {
+    Q_OBJECT
+
 public:
-    Protocol() = delete;
+    KP() = delete;
+
+    enum dgramType{
+        auth
+    };
+    Q_ENUM(dgramType)
+
+    enum authMode{
+        login,
+        reg,
+        logout
+    };
+    Q_ENUM(authMode)
 
     /* See JSON support in Qt, especially QCborValue */
+    static QByteArray clientAuth(authMode, const QString &name = "",
+                                 const QByteArray &shadow = "");
+    static QByteArray serverAuth();
 };
 
-#endif // PROTOCOL_H
+#endif // KP_H

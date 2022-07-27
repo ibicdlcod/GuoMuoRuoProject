@@ -146,7 +146,8 @@ bool Server::listen(const QHostAddress &address, quint16 port)
 
             /* User QSqlDatabase db = QSqlDatabase::database(); to access database in elsewhere */
             /* Use SQLite for current testing */
-            db = QSqlDatabase::addDatabase(settings->value("sql/driver", "QSQLITE").toString());
+            if(!db.isValid())
+                db = QSqlDatabase::addDatabase(settings->value("sql/driver", "QSQLITE").toString());
             db.setHostName(settings->value("sql/global/hostname", "SpearofTanaka").toString());
             db.setDatabaseName(settings->value("sql/db/name", "ocean").toString());
             db.setUserName(settings->value("sql/account/adminname", "admin").toString());
@@ -376,114 +377,135 @@ void Server::decryptDatagram(QDtls *connection, const QByteArray &clientMessage)
     if (dgram.size()) {
         datagramReceived(peerInfo, clientMessage, dgram);
 
-        QString plainwords = QString::fromUtf8(dgram);
-        if(plainwords.startsWith("ALTER"))
-        {
-            /* TODO: LOTS OF STAFF*/
-        }
-        else if(plainwords.startsWith("REG"))
-        {
-            QStringList plainparts = plainwords.split(" ");
-            if(plainparts.size() < 4)
+        QJsonObject djson = QCborValue::fromCbor(dgram).toMap().toJsonObject();
+        try {
+            switch(djson["type"].toInt())
             {
-                connection->writeDatagramEncrypted(&serverSocket, tr("REGNOPASSWORD").arg(peerInfo).toLatin1());
-            }
-            else
+            case KP::dgramType::auth:
             {
-                QString name = plainparts[1];
-                QByteArray shadow = QByteArray::fromHex(plainparts[3].toLatin1());
-                QSqlQuery query;
-                query.prepare(tr("SELECT UserID FROM Users "
-                                 "WHERE Username = '%1'").arg(name));
-                query.exec();
-                query.isSelect();
-                if(!query.first())
+                switch(djson["mode"].toInt())
                 {
-                    int maxid;
-                    QSqlQuery getMaxID;
-                    getMaxID.prepare(tr("SELECT MAX(UserID) FROM Users;"));
-                    getMaxID.exec();
-                    if(getMaxID.isNull("MAX(UserID)") || !getMaxID.isSelect())
+                case KP::authMode::reg:
+                {
+                    QString name = djson["username"].toString();
+                    auto shadow = QByteArray::fromBase64Encoding(
+                                djson["shadow"].toString().toLatin1(), QByteArray::Base64Encoding);
+                    QSqlQuery query;
+                    query.prepare(tr("SELECT UserID FROM Users "
+                                     "WHERE Username = '%1'").arg(name));
+                    query.exec();
+                    query.isSelect();
+                    if(!query.first())
                     {
-                        maxid = 0;
+                        int maxid;
+                        QSqlQuery getMaxID;
+                        getMaxID.prepare(tr("SELECT MAX(UserID) FROM Users;"));
+                        getMaxID.exec();
+                        if(getMaxID.isNull("MAX(UserID)") || !getMaxID.isSelect())
+                        {
+                            maxid = 0;
+                        }
+                        else
+                        {
+                            getMaxID.seek(0);
+                            maxid = getMaxID.boundValue("MAX(UserID)").toInt();
+                        }
+                        QSqlQuery insert;
+                        if(!insert.prepare("INSERT INTO Users (UserID, Username, Shadow) "
+                                           "VALUES (:id, :name, :shadow);"))
+                        {
+                            qWarning() << insert.lastError().databaseText();
+                        }
+                        insert.bindValue(":id", maxid+1);
+                        insert.bindValue(":name", name);
+                        if (shadow.decodingStatus == QByteArray::Base64DecodingStatus::Ok)
+                        {
+                            insert.bindValue(":shadow", shadow.decoded);
+                            if(!insert.exec())
+                            {
+                                qWarning() << insert.lastError().databaseText();
+                            };
+                            connection->writeDatagramEncrypted(&serverSocket, tr("USERCREATED").toLatin1());
+                            connection->shutdown(&serverSocket);
+                        }
+                        else
+                        {
+                            connection->writeDatagramEncrypted(&serverSocket, tr("USERCREATEFAILED").toLatin1());
+                            connection->shutdown(&serverSocket);
+                        }
                     }
                     else
                     {
-                        getMaxID.seek(0);
-                        maxid = getMaxID.boundValue("MAX(UserID)").toInt();
+                        connection->writeDatagramEncrypted(&serverSocket, tr("USEREXISTS").toLatin1());
+                        connection->shutdown(&serverSocket);
                     }
-                    QSqlQuery insert;
-                    if(!insert.prepare("INSERT INTO Users (UserID, Username, Shadow) "
-                                       "VALUES (:id, :name, :shadow);"))
+                }
+                    break;
+                case KP::authMode::login:
+                {
+                    QString name = djson["username"].toString();
+                    auto shadow = QByteArray::fromBase64Encoding(
+                                djson["shadow"].toString().toLatin1(), QByteArray::Base64Encoding);
+                    QSqlQuery query;
+                    query.prepare(tr("SELECT UserID FROM Users "
+                                     "WHERE Username = :name AND Shadow = :shadow"));
+                    query.bindValue(":name", name);
+                    if (shadow.decodingStatus == QByteArray::Base64DecodingStatus::Ok)
                     {
-                        qWarning() << insert.lastError().databaseText();
+                        query.bindValue(":shadow", shadow.decoded);
+                        query.exec();
+                        query.isSelect();
+                        if(!query.first())
+                        {
+                            connection->writeDatagramEncrypted(&serverSocket, tr("AUTHINCORRECT").toLatin1());
+                            connection->shutdown(&serverSocket);
+                        }
+                        else
+                        {
+                            connectedUsers[peerInfo] = name;
+                            connectedPeers[name] = peerInfo;
+                            connection->writeDatagramEncrypted(&serverSocket, tr("LOGINSUCCESS").toLatin1());
+                        }
                     }
-                    insert.bindValue(":id", maxid+1);
-                    insert.bindValue(":name", name);
-                    insert.bindValue(":shadow", shadow);
-                    if(!insert.exec())
+                    else
                     {
-                        qWarning() << insert.lastError().databaseText();
-                    };
-                    connection->writeDatagramEncrypted(&serverSocket, tr("USERCREATED").toLatin1());
-                    connection->shutdown(&serverSocket);
+                        connection->writeDatagramEncrypted(&serverSocket, tr("AUTHINCORRECT").toLatin1());
+                        connection->shutdown(&serverSocket);
+                    }
                 }
-                else
+                    break;
+                case KP::authMode::logout:
                 {
-                    connection->writeDatagramEncrypted(&serverSocket, tr("USEREXISTS").toLatin1());
-                    connection->shutdown(&serverSocket);
+                    if(connectedUsers.contains(peerInfo))
+                    {
+                        connection->writeDatagramEncrypted(&serverSocket, tr("LOGOUTSUCCESS: %1")
+                                                           .arg(connectedUsers[peerInfo]).toLatin1());
+                        connectedPeers.remove(connectedUsers[peerInfo]);
+                        connectedUsers.remove(peerInfo);
+                        connection->shutdown(&serverSocket);
+                    }
+                    else
+                    {
+                        connection->writeDatagramEncrypted(&serverSocket, tr("LOGOUTINCORRECT").toLatin1());
+                    }
+                }
+                    break;
+                default:
+                    throw std::exception("auth type not supported"); break;
                 }
             }
-        }
-        else if(plainwords.startsWith("LOGIN"))
-        {
-            QStringList plainparts = plainwords.split(" ");
-            if(plainparts.size() < 4)
-            {
-                connection->writeDatagramEncrypted(&serverSocket, tr("NOPASSWORD").arg(peerInfo).toLatin1());
+                break;
+            default:
+                throw std::exception("datagram type not supported"); break;
             }
-            else
-            {
-                QString name = plainparts[1];
-                QByteArray shadow = QByteArray::fromHex(plainparts[3].toLatin1());
-                QSqlQuery query;
-                query.prepare(tr("SELECT UserID FROM Users "
-                                 "WHERE Username = :name AND Shadow = :shadow"));
-                query.bindValue(":name", name);
-                query.bindValue(":shadow", shadow);
-                query.exec();
-                query.isSelect();
-                if(!query.first())
-                {
-                    connection->writeDatagramEncrypted(&serverSocket, tr("AUTHINCORRECT").toLatin1());
-                    connection->shutdown(&serverSocket);
-                }
-                else
-                {
-                    connectedUsers[peerInfo] = name;
-                    connectedPeers[name] = peerInfo;
-                    connection->writeDatagramEncrypted(&serverSocket, tr("LOGINSUCCESS").toLatin1());
-                }
-            }
-        }
-        else if(plainwords.startsWith("LOGOUT"))
-        {
-            if(connectedUsers.contains(peerInfo))
-            {
-                connection->writeDatagramEncrypted(&serverSocket, tr("LOGOUTSUCCESS: %1")
-                                                   .arg(connectedUsers[peerInfo]).toLatin1());
-                connectedPeers.remove(connectedUsers[peerInfo]);
-                connectedUsers.remove(peerInfo);
-                connection->shutdown(&serverSocket);
-            }
-            else
-            {
-                connection->writeDatagramEncrypted(&serverSocket, tr("LOGOUTINCORRECT").toLatin1());
-            }
-        }
-        else
-        {
-            connection->writeDatagramEncrypted(&serverSocket, tr("to %1: ACK").arg(peerInfo).toLatin1());
+        } catch (QJsonParseError e) {
+            qWarning() << peerInfo << e.errorString();
+            connection->writeDatagramEncrypted(&serverSocket,
+                                               tr("JSONERROR %1 %2").arg(peerInfo, e.errorString()).toLatin1());
+        } catch (std::exception e) {
+            qWarning() << peerInfo << e.what();
+            connection->writeDatagramEncrypted(&serverSocket,
+                                               tr("ERROR %1 %2").arg(peerInfo, e.what()).toLatin1());
         }
     } else if (connection->dtlsError() == QDtlsError::NoError) {
         qDebug() << peerInfo << ":" << tr("0 byte dgram, could be a re-connect attempt?");
@@ -586,6 +608,6 @@ void Server::shutdown()
             qCritical() << tr("Disconnect failed!");
         }
     }
-
+    db.close();
 }
 QT_END_NAMESPACE

@@ -19,7 +19,7 @@
 #include <type_traits>
 
 #include "ecma48.h"
-#include "protocol.h"
+#include "kp.h"
 
 
 /* Usage of QTextStreamManipulator on this class is prohibited throughout due to unfixable bugs,

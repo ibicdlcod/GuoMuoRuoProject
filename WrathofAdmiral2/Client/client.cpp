@@ -54,7 +54,7 @@
 #include <QPasswordDigestor>
 
 #include "ecma48.h"
-#include "protocol.h"
+#include "kp.h"
 
 extern QSettings *settings;
 
@@ -198,7 +198,6 @@ bool Client::parseSpec(const QStringList &cmdParts)
                 qWarning() << tr("Do not attempt duplicate connections!");
                 return true;
             }
-            attemptMode = true;
             retransmitTimes = 0;
             if(cmdParts.length() < 4)
             {
@@ -210,6 +209,7 @@ bool Client::parseSpec(const QStringList &cmdParts)
             }
             else
             {
+                attemptMode = true;
                 address = QHostAddress(cmdParts[1]);
                 if(address.isNull())
                 {
@@ -237,7 +237,8 @@ bool Client::parseSpec(const QStringList &cmdParts)
                 qInfo() << tr("Not under a valid connection.");
             else
             {
-                const qint64 written = crypto.writeDatagramEncrypted(&socket, "LOGOUT");
+                QByteArray msg = KP::clientAuth(KP::logout);
+                const qint64 written = crypto.writeDatagramEncrypted(&socket, msg);
 
                 if (written <= 0) {
                     qCritical() << clientName << tr(": failed to send logout attmpt -")
@@ -368,11 +369,8 @@ void Client::readyRead()
             QString shadowstring = QString(shadow.toHex()).toLatin1();
             if(registerMode)
             {
-                static const QString message = QStringLiteral("REG %1 SHADOW %2");
-                const qint64 written = crypto.writeDatagramEncrypted(&socket,
-                                                                     message
-                                                                     .arg(clientName, shadowstring)
-                                                                     .toLatin1());
+                QByteArray msg = KP::clientAuth(KP::reg, clientName, shadow);
+                const qint64 written = crypto.writeDatagramEncrypted(&socket, msg);
                 if (written <= 0)
                 {
                     qCritical() << clientName << tr(": register failed -")
@@ -381,11 +379,8 @@ void Client::readyRead()
             }
             else
             {
-                static const QString message = QStringLiteral("LOGIN %1 SHADOW %2");
-                const qint64 written = crypto.writeDatagramEncrypted(&socket,
-                                                                     message
-                                                                     .arg(clientName, shadowstring)
-                                                                     .toLatin1());
+                QByteArray msg = KP::clientAuth(KP::login, clientName, shadow);
+                const qint64 written = crypto.writeDatagramEncrypted(&socket, msg);
                 if (written <= 0)
                 {
                     qCritical() << clientName << tr(": login failed -")
