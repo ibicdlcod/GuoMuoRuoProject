@@ -299,7 +299,6 @@ void Client::pskRequired(QSslPreSharedKeyAuthenticator *auth)
     {
         auth->setIdentity(clientName.toLatin1());
         auth->setPreSharedKey(shadow);
-        //auth->setPreSharedKey(QByteArrayLiteral("register"));
     }
 }
 

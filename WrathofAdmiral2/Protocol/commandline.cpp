@@ -121,7 +121,8 @@ void CommandLine::customMessageHandler(QtMsgType type, const QMessageLogContext 
         qFatal("Log Error");
     }
     QTextStream textStream(logFile);
-    txt = QStringLiteral("\r[%1] %2").arg(dt, txt);
+    txt.remove(QChar('\r'), Qt::CaseInsensitive);
+    txt = QStringLiteral("[%1] %2\n").arg(dt, txt);
     textStream << txt;
     if(type == QtFatalMsg)
     {

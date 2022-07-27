@@ -1,7 +1,9 @@
-export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/(path_to_openssl)
-you can compile old Openssl from source(provided in Qt Maintainence tool)
+Assuming incompatible OpenSSL version
 
-or: https://doc.qt.io/qt-6/ssl.html
+You need this to run:
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/(path_to_openssl)
+
+you can compile old Openssl from source(provided in Qt Maintainence tool)
 
 --------
 build static qt with (1.x) openssl support
@@ -14,13 +16,15 @@ cmake –install qtbase
 ninja qttools/all
 cmake –install qttools
 
+(replace ~/Qt_static with the directory you like)
+
 --------
-in /WrathofAdmiral:
+in ./static_build:
 
 make clean
 
-PATH=~/Qt_static:PATH
+PATH=~/Qt_static:$PATH
 export PATH
 
-qmake -config release WrathofAdmiral.pro
+qmake -config release ../WrathofAdmiral/WrathofAdmiral.pro
 make

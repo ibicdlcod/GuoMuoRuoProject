@@ -363,8 +363,6 @@ void Server::pskRequired(QSslPreSharedKeyAuthenticator *auth)
         {
             auth->setPreSharedKey(query.value(0).toByteArray());
         }
-//#pragma message(M_CONST)
-//        auth->setPreSharedKey(QByteArrayLiteral("register"));
     }
 }
 
@@ -571,6 +569,7 @@ void Server::handleNewConnection(const QHostAddress &peerAddress,
 
 void Server::shutdown()
 {
+    listening = false;
     for (const auto &connection : qExchange(knownClients, {}))
         connection->shutdown(&serverSocket);
 
