@@ -98,7 +98,6 @@ Server::Server(int argc, char ** argv)
     connect(&serverSocket, &QAbstractSocket::readyRead, this, &Server::readyRead);
 
     serverConfiguration = QSslConfiguration::defaultDtlsConfiguration();
-    serverConfiguration.setPreSharedKeyIdentityHint("Alice");
     serverConfiguration.setPeerVerifyMode(QSslSocket::VerifyNone);
 }
 
@@ -141,16 +140,18 @@ bool Server::listen(const QHostAddress &address, quint16 port)
             qCritical () << serverSocket.errorString();
         else
         {
-            serverConfiguration.setPreSharedKeyIdentityHint(settings->value("server/servername", "Alice").toByteArray());
+            serverConfiguration.setPreSharedKeyIdentityHint(
+                        settings->value("server/servername",
+                                        QByteArrayLiteral("Alice")).toByteArray());
 
             /* User QSqlDatabase db = QSqlDatabase::database(); to access database in elsewhere */
             /* Use SQLite for current testing */
-            db = QSqlDatabase::addDatabase(settings->value("SQL driver", "QSQLITE").toString());
-            db.setHostName(settings->value("DB host name", "SpearofTanaka").toString());
-            db.setDatabaseName(settings->value("DB name", "ocean").toString());
-            db.setUserName(settings->value("DB admin name", "admin").toString());
+            db = QSqlDatabase::addDatabase(settings->value("sql/driver", "QSQLITE").toString());
+            db.setHostName(settings->value("sql/global/hostname", "SpearofTanaka").toString());
+            db.setDatabaseName(settings->value("sql/db/name", "ocean").toString());
+            db.setUserName(settings->value("sql/account/adminname", "admin").toString());
             /* obviously, a different password in settings is recommended */
-            db.setPassword(settings->value("DB admin password", "10000826").toString());
+            db.setPassword(settings->value("sql/account/adminpw", "10000826").toString());
             bool ok = db.open();
             if(!ok)
             {
@@ -348,10 +349,9 @@ void Server::pskRequired(QSslPreSharedKeyAuthenticator *auth)
         auth->setPreSharedKey(QByteArrayLiteral("register"));
     else
     {
-        //QSqlDatabase db = QSqlDatabase::database();
         QSqlQuery query;
         query.prepare(tr("SELECT Shadow FROM Users "
-                        "WHERE Username = :name"));
+                         "WHERE Username = :name"));
         query.bindValue(":name", clientName);
         query.exec();
         query.isSelect();
@@ -392,10 +392,9 @@ void Server::decryptDatagram(QDtls *connection, const QByteArray &clientMessage)
             {
                 QString name = plainparts[1];
                 QByteArray shadow = QByteArray::fromHex(plainparts[3].toLatin1());
-                //QSqlDatabase db = QSqlDatabase::database();
                 QSqlQuery query;
                 query.prepare(tr("SELECT UserID FROM Users "
-                                "WHERE Username = '%1'").arg(name));
+                                 "WHERE Username = '%1'").arg(name));
                 query.exec();
                 query.isSelect();
                 if(!query.first())
@@ -415,7 +414,7 @@ void Server::decryptDatagram(QDtls *connection, const QByteArray &clientMessage)
                     }
                     QSqlQuery insert;
                     if(!insert.prepare("INSERT INTO Users (UserID, Username, Shadow) "
-                                      "VALUES (:id, :name, :shadow);"))
+                                       "VALUES (:id, :name, :shadow);"))
                     {
                         qWarning() << insert.lastError().databaseText();
                     }
@@ -445,10 +444,9 @@ void Server::decryptDatagram(QDtls *connection, const QByteArray &clientMessage)
             {
                 QString name = plainparts[1];
                 QByteArray shadow = QByteArray::fromHex(plainparts[3].toLatin1());
-                //QSqlDatabase db = QSqlDatabase::database();
                 QSqlQuery query;
                 query.prepare(tr("SELECT UserID FROM Users "
-                                "WHERE Username = :name AND Shadow = :shadow"));
+                                 "WHERE Username = :name AND Shadow = :shadow"));
                 query.bindValue(":name", name);
                 query.bindValue(":shadow", shadow);
                 query.exec();
@@ -543,7 +541,7 @@ const QStringList Server::getValidCommands()
 }
 
 void Server::handleNewConnection(const QHostAddress &peerAddress,
-                                     quint16 peerPort, const QByteArray &clientHello)
+                                 quint16 peerPort, const QByteArray &clientHello)
 {
     if (!listening)
         return;

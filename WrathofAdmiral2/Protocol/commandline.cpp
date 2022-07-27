@@ -134,6 +134,7 @@ void CommandLine::openingwords()
 {
     QString notice;
     QDir currentDir = QDir::current();
+    /* should be set by the installer */
     QString openingwords = settings->value("license_notice", "openingwords.txt").toString();
     QFile licenseFile(currentDir.filePath(openingwords));
     if(!licenseFile.open(QIODevice::ReadOnly | QIODevice::Text))

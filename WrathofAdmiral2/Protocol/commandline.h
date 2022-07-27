@@ -15,7 +15,9 @@ public:
     explicit CommandLine(int, char **);
 
 public slots:
-    static void customMessageHandler(QtMsgType type, const QMessageLogContext &context, const QString &msg);
+    static void customMessageHandler(QtMsgType,
+                                     const QMessageLogContext &,
+                                     const QString &);
     void openingwords();
     bool parse(const QString &);
     virtual bool parseSpec(const QStringList &) = 0;
@@ -26,7 +28,7 @@ protected:
     virtual const QStringList getCommandsSpec() = 0;
     virtual const QStringList getValidCommands() = 0;
     void invalidCommand();
-    void showCommands(bool validOnly);
+    void showCommands(bool);
     void showHelp(const QStringList &);
 
     static int callength(const QString &, bool naive = false);

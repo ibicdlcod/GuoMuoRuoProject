@@ -118,8 +118,7 @@ bool Client::parseSpec(const QStringList &cmdParts)
         {
             QString password = primary;
             QByteArray salt = clientName.toUtf8().append(
-                        settings->value("salt",
-                                        defaultSalt).toByteArray());
+                        settings->value("salt", defaultSalt).toByteArray());
             if(passwordMode == password::confirm)
             {
                 QByteArray shadow1 = QPasswordDigestor::deriveKeyPbkdf2(
@@ -181,11 +180,12 @@ bool Client::parseSpec(const QStringList &cmdParts)
         }
         /* end aliases */
 
-        if(primary.compare("connect", Qt::CaseInsensitive) == 0
-                || primary.compare("register", Qt::CaseInsensitive) == 0)
+        bool loginMode = primary.compare("connect", Qt::CaseInsensitive) == 0;
+        registerMode = primary.compare("register", Qt::CaseInsensitive) == 0;
+
+        if(loginMode || registerMode)
         {
             retransmitTimes = 0;
-            registerMode = primary.compare("register", Qt::CaseInsensitive) == 0;
             if(cmdParts.length() < 4)
             {
                 if(registerMode)
@@ -289,10 +289,10 @@ void Client::pskRequired(QSslPreSharedKeyAuthenticator *auth)
     Q_ASSERT(auth);
 
     qDebug() << clientName << ": providing pre-shared key ...";
-    serverName = auth->identityHint();
+    serverName = QString(auth->identityHint());
     if(registerMode)
     {
-        auth->setIdentity("NEW_USER");
+        auth->setIdentity(QByteArrayLiteral("NEW_USER"));
         auth->setPreSharedKey(QByteArrayLiteral("register"));
     }
     else
@@ -458,10 +458,7 @@ const QStringList Client::getValidCommands()
     if(crypto.isConnectionEncrypted())
         result.append("disconnect");
     else
-    {
-        result.append("connect");
-        result.append("register");
-    }
+        result.append({"connect", "register"});
     result.sort(Qt::CaseInsensitive);
     return result;
 }
