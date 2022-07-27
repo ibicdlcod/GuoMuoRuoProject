@@ -357,7 +357,8 @@ void Server::pskRequired(QSslPreSharedKeyAuthenticator *auth)
         query.isSelect();
         if(!query.first())
         {
-            auth->setPreSharedKey(QByteArray::number(random()));
+            int x = QRandomGenerator::global()->generate64();
+            auth->setPreSharedKey(QByteArray::number(x));
         }
         else
         {

@@ -15,7 +15,7 @@ class Protocol
 public:
     Protocol() = delete;
 
-    /* QVariant */
+    /* See JSON support in Qt, especially QCborValue */
 };
 
 #endif // PROTOCOL_H

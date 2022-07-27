@@ -41,12 +41,12 @@
     <message>
         <location filename="client.cpp" line="144"/>
         <source>Usage: register [ip] [port] [username]</source>
-        <translation>用法：register [IP][端口][用户名]</translation>
+        <translation>用法：register [IP] [端口] [用户名]</translation>
     </message>
     <message>
         <location filename="client.cpp" line="146"/>
         <source>Usage: connect [ip] [port] [username]</source>
-        <translation>用法：connect [IP][端口][用户名]</translation>
+        <translation>用法：connect [IP] [端口] [用户名]</translation>
     </message>
     <message>
         <location filename="client.cpp" line="153"/>
