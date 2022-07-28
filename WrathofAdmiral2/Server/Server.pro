@@ -13,7 +13,7 @@ SOURCES += \
         server.cpp
 
 TRANSLATIONS += \
-    Server_zh_CN.ts
+    ../Translations/WA2_zh_CN.ts
 
 CONFIG += lrelease
 CONFIG += embed_translations
@@ -51,3 +51,6 @@ else:unix: PRE_TARGETDEPS += $$OUT_PWD/../Protocol/libProtocol.a
 
 HEADERS += \
     server.h
+
+RESOURCES += \
+    ../res_common.qrc

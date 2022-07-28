@@ -29,5 +29,6 @@ unix {
 }
 !isEmpty(target.path): INSTALLS += target
 
-DISTFILES += \
-    Protocol_zh_CN.ts
+RESOURCES += \
+    ../res_common.qrc
+

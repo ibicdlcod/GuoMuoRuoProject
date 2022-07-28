@@ -244,7 +244,6 @@ bool Client::parseSpec(const QStringList &cmdParts)
                     qCritical() << clientName << tr(": failed to send logout attmpt -")
                                 << crypto.dtlsErrorString();
                 }
-                //loginSuccess = false; // should be modified to at receiving LOGOUTSUCCESS
                 qInfo() << tr("Attempting to disconnect...");
             }
             return true;
@@ -448,7 +447,6 @@ void Client::readyRead()
         if (crypto.isConnectionEncrypted())
         {
             qDebug() << clientName << ": encrypted connection established!";
-            //loginSuccess = true;
 
             QString shadowstring = QString(shadow.toHex()).toLatin1();
             if(registerMode)

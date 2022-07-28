@@ -46,6 +46,10 @@ public:
     };
     Q_ENUM(MsgType)
 
+    enum GameState{
+        Port
+    };
+
     /* See JSON support in Qt, especially QCborValue */
     static QByteArray clientAuth(AuthMode, const QString &name = "",
                                  const QByteArray &shadow = "");

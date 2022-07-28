@@ -20,7 +20,7 @@
 
 #include "ecma48.h"
 #include "kp.h"
-
+#include "wcwidth.h"
 
 /* Usage of QTextStreamManipulator on this class is prohibited throughout due to unfixable bugs,
  * that is, qout << qSetFieldWidth result in QTextStream & rather than this class.
@@ -66,7 +66,10 @@ public:
             ++i)
         {
             int length = i->length();
-            QTextStream::setFieldWidth(width * ((length - 1) / width + 1));
+            const QChar *data = i->constData();
+            int raw_length = mk_wcswidth(data, i->size());
+
+            QTextStream::setFieldWidth(width * ((length - 1) / width + 1) - raw_length + length);
             *this << *i;
             QTextStream::setFieldWidth(0);
             *this << Qt::endl;

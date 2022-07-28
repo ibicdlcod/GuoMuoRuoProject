@@ -58,14 +58,7 @@ int main(int argc, char *argv[])
     const QStringList uiLanguages = QLocale::system().uiLanguages()
             + settings->value("languages", QStringList()).toStringList();
     for (const QString &locale : uiLanguages) {
-        const QString baseName = "Client_" + QLocale(locale).name();
-        if (translator.load(":/i18n/" + baseName)) {
-            client.installTranslator(&translator);
-            break;
-        }
-    }
-    for (const QString &locale : uiLanguages) {
-        const QString baseName = "../Protocol/Protocol_" + QLocale(locale).name();
+        const QString baseName = "WA2_" + QLocale(locale).name();
         if (translator.load(":/i18n/" + baseName)) {
             client.installTranslator(&translator);
             break;
