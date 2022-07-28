@@ -123,15 +123,16 @@ void Server::datagramReceived(const QString &peerInfo, const QByteArray &plainTe
                 auto shadow = QByteArray::fromBase64Encoding(
                             djson["shadow"].toString().toLatin1(), QByteArray::Base64Encoding);
                 QSqlQuery query;
-                query.prepare(tr("SELECT UserID FROM Users "
-                                 "WHERE Username = '%1'").arg(name));
+                query.prepare("SELECT UserID FROM Users "
+                              "WHERE Username = :name;");
+                query.bindValue(":name", name);
                 query.exec();
                 query.isSelect();
                 if(!query.first())
                 {
                     int maxid;
                     QSqlQuery getMaxID;
-                    getMaxID.prepare(tr("SELECT MAX(UserID) FROM Users;"));
+                    getMaxID.prepare("SELECT MAX(UserID) FROM Users;");
                     getMaxID.exec();
                     if(getMaxID.isNull("MAX(UserID)") || !getMaxID.isSelect())
                     {
@@ -152,7 +153,7 @@ void Server::datagramReceived(const QString &peerInfo, const QByteArray &plainTe
                     insert.bindValue(":name", name);
                     if(shadow.decodingStatus == QByteArray::Base64DecodingStatus::Ok)
                     {
-                        insert.bindValue(":shadow", shadow.decoded);
+                        insert.bindValue(":sdhadow", shadow.decoded);
                         if(!insert.exec())
                         {
                             qWarning() << insert.lastError().databaseText();
@@ -182,8 +183,8 @@ void Server::datagramReceived(const QString &peerInfo, const QByteArray &plainTe
                 auto shadow = QByteArray::fromBase64Encoding(
                             djson["shadow"].toString().toLatin1(), QByteArray::Base64Encoding);
                 QSqlQuery query;
-                query.prepare(tr("SELECT UserID FROM Users "
-                                 "WHERE Username = :name AND Shadow = :shadow"));
+                query.prepare("SELECT UserID FROM Users "
+                              "WHERE Username = :name AND Shadow = :shadow");
                 query.bindValue(":name", name);
                 if (Q_LIKELY(shadow.decodingStatus == QByteArray::Base64DecodingStatus::Ok))
                 {
@@ -271,12 +272,10 @@ void Server::datagramReceived(const QString &peerInfo, const QByteArray &plainTe
 #if defined(QT_DEBUG)
     static const QString formatter = QStringLiteral("From %1 text: %2");
 
-
     const QString html = formatter.arg(peerInfo, QJsonDocument(djson).toJson());
     qDebug() << html;
 #else
     Q_UNUSED(peerInfo)
-    Q_UNUSED(plainText)
 #endif
 }
 
@@ -496,8 +495,8 @@ void Server::pskRequired(QSslPreSharedKeyAuthenticator *auth)
     else
     {
         QSqlQuery query;
-        query.prepare(tr("SELECT Shadow FROM Users "
-                         "WHERE Username = :name"));
+        query.prepare("SELECT Shadow FROM Users "
+                      "WHERE Username = :name;");
         query.bindValue(":name", clientName);
         query.exec();
         query.isSelect();

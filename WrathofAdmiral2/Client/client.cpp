@@ -346,11 +346,10 @@ void Client::serverResponse(const QString &clientInfo, const QByteArray &plainTe
 #if defined(QT_DEBUG)
     static const QString formatter = QStringLiteral("%1 received text: %2");
 
-    const QString html = formatter.arg(clientInfo, QString::fromUtf8(plainText));
+    const QString html = formatter.arg(clientInfo, QJsonDocument(djson).toJson());
     qDebug() << html;
 #else
     Q_UNUSED(clientInfo)
-    Q_UNUSED(plainText)
 #endif
 }
 

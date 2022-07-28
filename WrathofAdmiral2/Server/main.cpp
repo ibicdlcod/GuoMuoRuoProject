@@ -64,6 +64,13 @@ int main(int argc, char *argv[])
             break;
         }
     }
+    for (const QString &locale : uiLanguages) {
+        const QString baseName = "../Protocol/Protocol_" + QLocale(locale).name();
+        if (translator.load(":/i18n/" + baseName)) {
+            server.installTranslator(&translator);
+            break;
+        }
+    }
 
     QStringList argv_l = QStringList();
     for(int i = 0; i < argc; ++i)
