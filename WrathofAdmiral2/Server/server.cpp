@@ -104,17 +104,11 @@ Server::Server(int argc, char ** argv)
 Server::~Server()
 {
     shutdown();
-    db.close();
 }
 
-void Server::close()
+void Server::datagramReceived(const QString &peerInfo, const QByteArray &plainText,
+                              QDtls *connection)
 {
-    listening = false;
-}
-
-void Server::datagramReceived(const QString &peerInfo, const QByteArray &cipherText, const QByteArray &plainText)
-{
-    Q_UNUSED(cipherText)
 #if defined(QT_DEBUG)
     static const QString formatter = QStringLiteral("From %1 text: %2");
 
@@ -124,6 +118,166 @@ void Server::datagramReceived(const QString &peerInfo, const QByteArray &cipherT
     Q_UNUSED(peerInfo)
     Q_UNUSED(plainText)
 #endif
+    QJsonObject djson = QCborValue::fromCbor(plainText).toMap().toJsonObject();
+    try {
+        switch(djson["type"].toInt())
+        {
+        case KP::DgramType::Auth:
+        {
+            switch(djson["mode"].toInt())
+            {
+            case KP::AuthMode::Reg:
+            {
+                QString name = djson["username"].toString();
+                auto shadow = QByteArray::fromBase64Encoding(
+                            djson["shadow"].toString().toLatin1(), QByteArray::Base64Encoding);
+                QSqlQuery query;
+                query.prepare(tr("SELECT UserID FROM Users "
+                                 "WHERE Username = '%1'").arg(name));
+                query.exec();
+                query.isSelect();
+                if(!query.first())
+                {
+                    int maxid;
+                    QSqlQuery getMaxID;
+                    getMaxID.prepare(tr("SELECT MAX(UserID) FROM Users;"));
+                    getMaxID.exec();
+                    if(getMaxID.isNull("MAX(UserID)") || !getMaxID.isSelect())
+                    {
+                        maxid = 0;
+                    }
+                    else
+                    {
+                        getMaxID.seek(0);
+                        maxid = getMaxID.boundValue("MAX(UserID)").toInt();
+                    }
+                    QSqlQuery insert;
+                    if(!insert.prepare("INSERT INTO Users (UserID, Username, Shadow) "
+                                       "VALUES (:id, :name, :shadow);"))
+                    {
+                        qWarning() << insert.lastError().databaseText();
+                    }
+                    insert.bindValue(":id", maxid+1);
+                    insert.bindValue(":name", name);
+                    if(shadow.decodingStatus == QByteArray::Base64DecodingStatus::Ok)
+                    {
+                        insert.bindValue(":shadow", shadow.decoded);
+                        if(!insert.exec())
+                        {
+                            qWarning() << insert.lastError().databaseText();
+                        };
+                        QByteArray msg = KP::serverAuth(KP::Reg, name, true);
+                        connection->writeDatagramEncrypted(&serverSocket, msg);
+                        connection->shutdown(&serverSocket);
+                    }
+                    else
+                    {
+                        QByteArray msg = KP::serverAuth(KP::Reg, name, false, KP::AuthError::BadShadow);
+                        connection->writeDatagramEncrypted(&serverSocket, msg);
+                        connection->shutdown(&serverSocket);
+                    }
+                }
+                else
+                {
+                    QByteArray msg = KP::serverAuth(KP::Reg, name, false, KP::AuthError::UserExists);
+                    connection->writeDatagramEncrypted(&serverSocket, msg);
+                    connection->shutdown(&serverSocket);
+                }
+            }
+                break;
+            case KP::AuthMode::Login:
+            {
+                QString name = djson["username"].toString();
+                auto shadow = QByteArray::fromBase64Encoding(
+                            djson["shadow"].toString().toLatin1(), QByteArray::Base64Encoding);
+                QSqlQuery query;
+                query.prepare(tr("SELECT UserID FROM Users "
+                                 "WHERE Username = :name AND Shadow = :shadow"));
+                query.bindValue(":name", name);
+                if (Q_LIKELY(shadow.decodingStatus == QByteArray::Base64DecodingStatus::Ok))
+                {
+                    query.bindValue(":shadow", shadow.decoded);
+                    query.exec();
+                    query.isSelect();
+                    if(Q_UNLIKELY(!query.first()))
+                    {
+                        QByteArray msg = KP::serverAuth(KP::Login, name, false, KP::AuthError::BadPassword);
+                        connection->writeDatagramEncrypted(&serverSocket, msg);
+                        connection->shutdown(&serverSocket);
+                    }
+                    else
+                    {
+                        /* TODO: if connectedPeers[name] exists then force-logout all of them */
+                        if(!(connectedPeers[name].isEmpty()))
+                        {
+                            //qFatal("FUCK");
+                            const auto client = std::find_if(knownClients.begin(), knownClients.end(),
+                                                             [&](const std::unique_ptr<QDtls> &othercn){
+                                return connectedPeers[name].compare(
+                                            peer_info(othercn->peerAddress(), othercn->peerPort())) == 0;
+                            });
+
+                            if (client != knownClients.end()) {
+                                if ((*client)->isConnectionEncrypted()) {
+                                    QByteArray msg = KP::serverAuth(KP::Login, name, false,
+                                                                    KP::AuthError::LoggedElsewhere);
+                                    (*client)->writeDatagramEncrypted(&serverSocket, msg);
+                                    (*client)->shutdown(&serverSocket);
+                                }
+                                connectedUsers.remove(peer_info((*client)->peerAddress(), (*client)->peerPort()));
+                                connectedPeers.remove(name);
+                                /* This is a dangerous operation on iterators */
+                                //knownClients.erase(client);
+                            }
+                        }
+                        connectedUsers[peerInfo] = name;
+                        connectedPeers[name] = peerInfo;
+                        QByteArray msg = KP::serverAuth(KP::Login, name, true);
+                        connection->writeDatagramEncrypted(&serverSocket, msg);
+                    }
+                }
+                else
+                {
+                    QByteArray msg = KP::serverAuth(KP::Login, name, false, KP::AuthError::BadShadow);
+                    connection->writeDatagramEncrypted(&serverSocket, msg);
+                    connection->shutdown(&serverSocket);
+                }
+            }
+                break;
+            case KP::AuthMode::Logout:
+            {
+                if(connectedUsers.contains(peerInfo))
+                {
+                    QByteArray msg = KP::serverAuth(KP::Logout, connectedUsers[peerInfo], true);
+                    connection->writeDatagramEncrypted(&serverSocket, msg);
+                    connectedPeers.remove(connectedUsers[peerInfo]);
+                    connectedUsers.remove(peerInfo);
+                    connection->shutdown(&serverSocket);
+                }
+                else
+                {
+                    QByteArray msg = KP::serverAuth(KP::Logout, peerInfo, false);
+                    connection->writeDatagramEncrypted(&serverSocket, msg);
+                }
+            }
+                break;
+            default:
+                throw std::exception("auth type not supported"); break;
+            }
+        }
+            break;
+        default:
+            throw std::exception("datagram type not supported"); break;
+        }
+    } catch (QJsonParseError e) {
+        qWarning() << peerInfo << e.errorString();
+        QByteArray msg = KP::serverParse(KP::JsonError, peerInfo, e.errorString());
+        connection->writeDatagramEncrypted(&serverSocket, msg);
+    } catch (std::exception e) {
+        qWarning() << peerInfo << e.what();
+        QByteArray msg = KP::serverParse(KP::Unsupported, peerInfo, e.what());
+        connection->writeDatagramEncrypted(&serverSocket, msg);
+    }
 }
 
 bool Server::isListening() const
@@ -148,11 +302,11 @@ bool Server::listen(const QHostAddress &address, quint16 port)
             /* Use SQLite for current testing */
             if(!db.isValid())
                 db = QSqlDatabase::addDatabase(settings->value("sql/driver", "QSQLITE").toString());
-            db.setHostName(settings->value("sql/global/hostname", "SpearofTanaka").toString());
-            db.setDatabaseName(settings->value("sql/db/name", "ocean").toString());
-            db.setUserName(settings->value("sql/account/adminname", "admin").toString());
+            db.setHostName(settings->value("sql/hostname", "SpearofTanaka").toString());
+            db.setDatabaseName(settings->value("sql/dbname", "ocean").toString());
+            db.setUserName(settings->value("sql/adminname", "admin").toString());
             /* obviously, a different password in settings is recommended */
-            db.setPassword(settings->value("sql/account/adminpw", "10000826").toString());
+            db.setPassword(settings->value("sql/adminpw", "10000826").toString());
             bool ok = db.open();
             if(!ok)
             {
@@ -190,7 +344,6 @@ bool Server::listen(const QHostAddress &address, quint16 port)
     } else {
         listening = true;
     }
-
     return listening;
 }
 
@@ -231,36 +384,28 @@ bool Server::parseSpec(const QStringList &cmdParts)
             if(cmdParts.length() < 3)
             {
                 qout << tr("Usage: listen [ip] [port]") << Qt::endl;
-                return true;
             }
             QHostAddress address = QHostAddress(cmdParts[1]);
             if(address.isNull())
             {
                 qWarning() << tr("Ip isn't valid");
-                return true;
             }
             quint16 port = QString(cmdParts[2]).toInt();
             if(port < 1024 || port > 49151)
             {
                 qWarning() << tr("Port isn't valid, it must fall between 1024 and 49151");
-                return true;
             }
             if (listen(address, port)) {
                 QString msg = tr("Server is listening on address %1 and port %2")
-                        .arg(address.toString())
-                        .arg(port);
+                        .arg(address.toString()).arg(port);
                 qInfo() << msg;
-                return true;
             }
             else
             {
                 QString msg = tr("Server failed to listen on address %1 and port %2")
-                        .arg(address.toString())
-                        .arg(port);
+                        .arg(address.toString()).arg(port);
                 qCritical() << msg;
-                return true;
             }
-            Q_UNREACHABLE();
             return true;
         }
         else if(primary.compare("unlisten", Qt::CaseInsensitive) == 0)
@@ -268,7 +413,7 @@ bool Server::parseSpec(const QStringList &cmdParts)
             if(listening)
             {
                 qInfo() << tr("Server stopped listening.");
-                close();
+                shutdown();
             }
             else
             {
@@ -292,7 +437,7 @@ void Server::readyRead()
     const qint64 bytesToRead = serverSocket.pendingDatagramSize();
     if (bytesToRead <= 0) {
         qDebug() << tr("Spurious read notification?");
-        return;
+        //return;
     }
 
     QByteArray dgram(bytesToRead, Qt::Uninitialized);
@@ -323,10 +468,11 @@ void Server::readyRead()
         decryptDatagram(client->get(), dgram);
         if ((*client)->dtlsError() == QDtlsError::RemoteClosedConnectionError)
         {
-            /* Client disconnected, remove from connected users */
+            // Client disconnected, remove from connected users
             const QString peerInfo = peer_info(peerAddress, peerPort);
             if(connectedUsers.contains(peerInfo))
             {
+                qDebug() << connectedUsers[peerInfo] << tr("disconnected abruptly.");
                 connectedPeers.remove(connectedUsers[peerInfo]);
                 connectedUsers.remove(peerInfo);
             }
@@ -334,7 +480,6 @@ void Server::readyRead()
         }
         return;
     }
-
     doHandshake(client->get(), dgram);
 }
 
@@ -343,7 +488,6 @@ void Server::pskRequired(QSslPreSharedKeyAuthenticator *auth)
     Q_ASSERT(auth);
 
     QString clientName = QString::fromLatin1(auth->identity());
-
     qInfo() << tr("PSK callback, received a client's identity: '%1'")
                .arg(clientName);
     if(clientName.compare("NEW_USER") == 0)
@@ -375,138 +519,7 @@ void Server::decryptDatagram(QDtls *connection, const QByteArray &clientMessage)
     const QString peerInfo = peer_info(connection->peerAddress(), connection->peerPort());
     const QByteArray dgram = connection->decryptDatagram(&serverSocket, clientMessage);
     if (dgram.size()) {
-        datagramReceived(peerInfo, clientMessage, dgram);
-
-        QJsonObject djson = QCborValue::fromCbor(dgram).toMap().toJsonObject();
-        try {
-            switch(djson["type"].toInt())
-            {
-            case KP::dgramType::auth:
-            {
-                switch(djson["mode"].toInt())
-                {
-                case KP::authMode::reg:
-                {
-                    QString name = djson["username"].toString();
-                    auto shadow = QByteArray::fromBase64Encoding(
-                                djson["shadow"].toString().toLatin1(), QByteArray::Base64Encoding);
-                    QSqlQuery query;
-                    query.prepare(tr("SELECT UserID FROM Users "
-                                     "WHERE Username = '%1'").arg(name));
-                    query.exec();
-                    query.isSelect();
-                    if(!query.first())
-                    {
-                        int maxid;
-                        QSqlQuery getMaxID;
-                        getMaxID.prepare(tr("SELECT MAX(UserID) FROM Users;"));
-                        getMaxID.exec();
-                        if(getMaxID.isNull("MAX(UserID)") || !getMaxID.isSelect())
-                        {
-                            maxid = 0;
-                        }
-                        else
-                        {
-                            getMaxID.seek(0);
-                            maxid = getMaxID.boundValue("MAX(UserID)").toInt();
-                        }
-                        QSqlQuery insert;
-                        if(!insert.prepare("INSERT INTO Users (UserID, Username, Shadow) "
-                                           "VALUES (:id, :name, :shadow);"))
-                        {
-                            qWarning() << insert.lastError().databaseText();
-                        }
-                        insert.bindValue(":id", maxid+1);
-                        insert.bindValue(":name", name);
-                        if (shadow.decodingStatus == QByteArray::Base64DecodingStatus::Ok)
-                        {
-                            insert.bindValue(":shadow", shadow.decoded);
-                            if(!insert.exec())
-                            {
-                                qWarning() << insert.lastError().databaseText();
-                            };
-                            connection->writeDatagramEncrypted(&serverSocket, tr("USERCREATED").toLatin1());
-                            connection->shutdown(&serverSocket);
-                        }
-                        else
-                        {
-                            connection->writeDatagramEncrypted(&serverSocket, tr("USERCREATEFAILED").toLatin1());
-                            connection->shutdown(&serverSocket);
-                        }
-                    }
-                    else
-                    {
-                        connection->writeDatagramEncrypted(&serverSocket, tr("USEREXISTS").toLatin1());
-                        connection->shutdown(&serverSocket);
-                    }
-                }
-                    break;
-                case KP::authMode::login:
-                {
-                    QString name = djson["username"].toString();
-                    auto shadow = QByteArray::fromBase64Encoding(
-                                djson["shadow"].toString().toLatin1(), QByteArray::Base64Encoding);
-                    QSqlQuery query;
-                    query.prepare(tr("SELECT UserID FROM Users "
-                                     "WHERE Username = :name AND Shadow = :shadow"));
-                    query.bindValue(":name", name);
-                    if (shadow.decodingStatus == QByteArray::Base64DecodingStatus::Ok)
-                    {
-                        query.bindValue(":shadow", shadow.decoded);
-                        query.exec();
-                        query.isSelect();
-                        if(!query.first())
-                        {
-                            connection->writeDatagramEncrypted(&serverSocket, tr("AUTHINCORRECT").toLatin1());
-                            connection->shutdown(&serverSocket);
-                        }
-                        else
-                        {
-                            connectedUsers[peerInfo] = name;
-                            connectedPeers[name] = peerInfo;
-                            connection->writeDatagramEncrypted(&serverSocket, tr("LOGINSUCCESS").toLatin1());
-                        }
-                    }
-                    else
-                    {
-                        connection->writeDatagramEncrypted(&serverSocket, tr("AUTHINCORRECT").toLatin1());
-                        connection->shutdown(&serverSocket);
-                    }
-                }
-                    break;
-                case KP::authMode::logout:
-                {
-                    if(connectedUsers.contains(peerInfo))
-                    {
-                        connection->writeDatagramEncrypted(&serverSocket, tr("LOGOUTSUCCESS: %1")
-                                                           .arg(connectedUsers[peerInfo]).toLatin1());
-                        connectedPeers.remove(connectedUsers[peerInfo]);
-                        connectedUsers.remove(peerInfo);
-                        connection->shutdown(&serverSocket);
-                    }
-                    else
-                    {
-                        connection->writeDatagramEncrypted(&serverSocket, tr("LOGOUTINCORRECT").toLatin1());
-                    }
-                }
-                    break;
-                default:
-                    throw std::exception("auth type not supported"); break;
-                }
-            }
-                break;
-            default:
-                throw std::exception("datagram type not supported"); break;
-            }
-        } catch (QJsonParseError e) {
-            qWarning() << peerInfo << e.errorString();
-            connection->writeDatagramEncrypted(&serverSocket,
-                                               tr("JSONERROR %1 %2").arg(peerInfo, e.errorString()).toLatin1());
-        } catch (std::exception e) {
-            qWarning() << peerInfo << e.what();
-            connection->writeDatagramEncrypted(&serverSocket,
-                                               tr("ERROR %1 %2").arg(peerInfo, e.what()).toLatin1());
-        }
+        datagramReceived(peerInfo, dgram, connection);
     } else if (connection->dtlsError() == QDtlsError::NoError) {
         qDebug() << peerInfo << ":" << tr("0 byte dgram, could be a re-connect attempt?");
     } else {
@@ -538,7 +551,6 @@ void Server::doHandshake(QDtls *newConnection, const QByteArray &clientHello)
 
 void Server::exitGraceSpec()
 {
-    close();
     this->shutdown();
     qInfo() << tr("Server is shutting down");
 }
@@ -573,8 +585,7 @@ void Server::handleNewConnection(const QHostAddress &peerAddress,
     const QString peerInfo = peer_info(peerAddress, peerPort);
     if (cookieSender.verifyClient(&serverSocket, clientHello, peerAddress, peerPort)) {
         qDebug() << peerInfo << tr(": verified, starting a handshake");
-        //! [8]
-        //! [9]
+
         std::unique_ptr<QDtls> newConnection{new QDtls{QSslSocket::SslServerMode}};
         newConnection->setDtlsConfiguration(serverConfiguration);
         newConnection->setPeer(peerAddress, peerPort);
@@ -582,7 +593,6 @@ void Server::handleNewConnection(const QHostAddress &peerAddress,
                                this, &Server::pskRequired);
         knownClients.push_back(std::move(newConnection));
         doHandshake(knownClients.back().get(), clientHello);
-        //! [9]
     } else if (cookieSender.dtlsError() != QDtlsError::NoError) {
         qWarning() << tr("DTLS error:") << cookieSender.dtlsErrorString();
     } else {

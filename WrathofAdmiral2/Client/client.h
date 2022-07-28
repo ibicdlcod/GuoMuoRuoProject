@@ -66,8 +66,7 @@ public slots:
     void catbomb();
     void displayPrompt();
     bool parseSpec(const QStringList &);
-    void serverResponse(const QString &, const QByteArray &,
-                        const QByteArray &);
+    void serverResponse(const QString &, const QByteArray &);
     Q_DECL_DEPRECATED void update();
 
 signals:

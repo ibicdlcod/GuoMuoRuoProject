@@ -19,22 +19,42 @@ class KP : public QObject
 public:
     KP() = delete;
 
-    enum dgramType{
-        auth
+    enum DgramType{
+        Auth,
+        Message
     };
-    Q_ENUM(dgramType)
+    Q_ENUM(DgramType)
 
-    enum authMode{
-        login,
-        reg,
-        logout
+    enum AuthMode{
+        Login,
+        Reg,
+        Logout
     };
-    Q_ENUM(authMode)
+    Q_ENUM(AuthMode)
+
+    enum AuthError{
+        BadShadow,
+        BadPassword,
+        LoggedElsewhere,
+        UserExists
+    };
+    Q_ENUM(AuthError)
+
+    enum ParseError{
+        JsonError,
+        Unsupported
+    };
+    Q_ENUM(ParseError)
 
     /* See JSON support in Qt, especially QCborValue */
-    static QByteArray clientAuth(authMode, const QString &name = "",
+    static QByteArray clientAuth(AuthMode, const QString &name = "",
                                  const QByteArray &shadow = "");
-    static QByteArray serverAuth();
+    static QByteArray serverAuth(AuthMode, const QString &,
+                                 bool, AuthError);
+    static QByteArray serverAuth(AuthMode, const QString &,
+                                 bool);
+    static QByteArray serverParse(ParseError, const QString &,
+                                  const QString &);
 };
 
 #endif // KP_H

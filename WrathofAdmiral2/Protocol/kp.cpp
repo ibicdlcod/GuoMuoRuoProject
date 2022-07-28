@@ -6,14 +6,13 @@ Protocol::Protocol()
 }
 */
 
-QByteArray KP::clientAuth(authMode mode, const QString &uname,
+QByteArray KP::clientAuth(AuthMode mode, const QString &uname,
                           const QByteArray &shadow)
 {
-    qDebug() << mode;
     QJsonObject result;
-    result["type"] = dgramType::auth;
+    result["type"] = DgramType::Auth;
     result["mode"] = mode;
-    if(mode != authMode::logout)
+    if(mode != AuthMode::Logout)
     {
         result["username"] = uname;
         /* directly using QString is even less efficient */
@@ -21,19 +20,39 @@ QByteArray KP::clientAuth(authMode mode, const QString &uname,
     }
     return QCborValue::fromJsonValue(result).toCbor();
 }
-/* Client:
- * type = auth
- * mode = login/reg/logout
- * shadow = (data)
- *
- * Server:
- * type = auth
- * success = (bool)
- * mode = login/reg/logout
- * reason = nopassword/incorrect
- *
- */
 
+QByteArray KP::serverAuth(AuthMode mode, const QString &uname,
+                          bool success, AuthError reason)
+{
+    QJsonObject result;
+    result["type"] = DgramType::Auth;
+    result["mode"] = mode;
+    result["username"] = uname;
+    result["success"] = success;
+    result["reason"] = reason;
+    return QCborValue::fromJsonValue(result).toCbor();
+}
+
+QByteArray KP::serverAuth(AuthMode mode, const QString &uname,
+                          bool success)
+{
+    QJsonObject result;
+    result["type"] = DgramType::Auth;
+    result["mode"] = mode;
+    result["username"] = uname;
+    result["success"] = success;
+    return QCborValue::fromJsonValue(result).toCbor();
+}
+
+QByteArray KP::serverParse(ParseError p, const QString &uname, const QString &content)
+{
+    QJsonObject result;
+    result["type"] = DgramType::Message;
+    result["msgtype"] = p;
+    result["username"] = uname;
+    result["content"] = content;
+    return QCborValue::fromJsonValue(result).toCbor();
+}
 //QCborValue::fromJsonValue(gameObject).toCbor();
 //QCborValue::fromCbor(saveData).toMap().toJsonObject())
 

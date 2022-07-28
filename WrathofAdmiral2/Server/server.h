@@ -71,9 +71,8 @@ public:
     explicit Server(int, char **);
     ~Server();
 
-    void close();
     void datagramReceived(const QString &, const QByteArray &,
-                          const QByteArray &);
+                          QDtls *);
     bool isListening() const;
     bool listen(const QHostAddress &, quint16);
 

@@ -237,7 +237,7 @@ bool Client::parseSpec(const QStringList &cmdParts)
                 qInfo() << tr("Not under a valid connection.");
             else
             {
-                QByteArray msg = KP::clientAuth(KP::logout);
+                QByteArray msg = KP::clientAuth(KP::Logout);
                 const qint64 written = crypto.writeDatagramEncrypted(&socket, msg);
 
                 if (written <= 0) {
@@ -254,10 +254,9 @@ bool Client::parseSpec(const QStringList &cmdParts)
     return false;
 }
 
-void Client::serverResponse(const QString &clientInfo, const QByteArray &datagram,
-                            const QByteArray &plainText)
+void Client::serverResponse(const QString &clientInfo, const QByteArray &plainText)
 {
-    Q_UNUSED(datagram)
+    QJsonObject djson = QCborValue::fromCbor(plainText).toMap().toJsonObject();
 #if defined(QT_DEBUG)
     static const QString formatter = QStringLiteral("%1 received text: %2");
 
@@ -333,7 +332,7 @@ void Client::readyRead()
         const QByteArray plainText = crypto.decryptDatagram(&socket, dgram);
         if (plainText.size())
         {
-            serverResponse(clientName, dgram, plainText);
+            serverResponse(clientName, plainText);
             return;
         }
 
@@ -369,7 +368,7 @@ void Client::readyRead()
             QString shadowstring = QString(shadow.toHex()).toLatin1();
             if(registerMode)
             {
-                QByteArray msg = KP::clientAuth(KP::reg, clientName, shadow);
+                QByteArray msg = KP::clientAuth(KP::Reg, clientName, shadow);
                 const qint64 written = crypto.writeDatagramEncrypted(&socket, msg);
                 if (written <= 0)
                 {
@@ -379,7 +378,7 @@ void Client::readyRead()
             }
             else
             {
-                QByteArray msg = KP::clientAuth(KP::login, clientName, shadow);
+                QByteArray msg = KP::clientAuth(KP::Login, clientName, shadow);
                 const qint64 written = crypto.writeDatagramEncrypted(&socket, msg);
                 if (written <= 0)
                 {
