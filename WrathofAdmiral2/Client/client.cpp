@@ -314,14 +314,14 @@ void Client::readyRead()
     if(socket.pendingDatagramSize() <= 0)
     {
         qDebug() << clientName << ": spurious read notification?";
-        return;
+        //return;
     }
 
     QByteArray dgram(socket.pendingDatagramSize(), Qt::Uninitialized);
     const qint64 bytesRead = socket.readDatagram(dgram.data(), dgram.size());
     if (bytesRead <= 0)
     {
-        qDebug() << clientName << ": spurious read notification?";
+        qDebug() << clientName << ": read failed -" << socket.errorString();
         return;
     }
 

@@ -210,7 +210,6 @@ void Server::datagramReceived(const QString &peerInfo, const QByteArray &plainTe
                         /* TODO: if connectedPeers[name] exists then force-logout all of them */
                         if(!(connectedPeers[name].isEmpty()))
                         {
-                            //qFatal("FUCK");
                             const auto client = std::find_if(knownClients.begin(), knownClients.end(),
                                                              [&](const std::unique_ptr<QDtls> &othercn){
                                 return connectedPeers[name].compare(
