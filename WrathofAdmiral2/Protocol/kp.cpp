@@ -44,11 +44,11 @@ QByteArray KP::serverAuth(AuthMode mode, const QString &uname,
     return QCborValue::fromJsonValue(result).toCbor();
 }
 
-QByteArray KP::serverParse(ParseError p, const QString &uname, const QString &content)
+QByteArray KP::serverParse(MsgType pe, const QString &uname, const QString &content)
 {
     QJsonObject result;
     result["type"] = DgramType::Message;
-    result["msgtype"] = p;
+    result["msgtype"] = pe;
     result["username"] = uname;
     result["content"] = content;
     return QCborValue::fromJsonValue(result).toCbor();

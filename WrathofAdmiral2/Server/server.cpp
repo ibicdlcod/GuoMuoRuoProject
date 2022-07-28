@@ -109,15 +109,6 @@ Server::~Server()
 void Server::datagramReceived(const QString &peerInfo, const QByteArray &plainText,
                               QDtls *connection)
 {
-#if defined(QT_DEBUG)
-    static const QString formatter = QStringLiteral("From %1 text: %2");
-
-    const QString html = formatter.arg(peerInfo, QString::fromUtf8(plainText));
-    qDebug() << html;
-#else
-    Q_UNUSED(peerInfo)
-    Q_UNUSED(plainText)
-#endif
     QJsonObject djson = QCborValue::fromCbor(plainText).toMap().toJsonObject();
     try {
         switch(djson["type"].toInt())
@@ -218,7 +209,7 @@ void Server::datagramReceived(const QString &peerInfo, const QByteArray &plainTe
 
                             if (client != knownClients.end()) {
                                 if ((*client)->isConnectionEncrypted()) {
-                                    QByteArray msg = KP::serverAuth(KP::Login, name, false,
+                                    QByteArray msg = KP::serverAuth(KP::Logout, name, true,
                                                                     KP::AuthError::LoggedElsewhere);
                                     (*client)->writeDatagramEncrypted(&serverSocket, msg);
                                     (*client)->shutdown(&serverSocket);
@@ -277,6 +268,16 @@ void Server::datagramReceived(const QString &peerInfo, const QByteArray &plainTe
         QByteArray msg = KP::serverParse(KP::Unsupported, peerInfo, e.what());
         connection->writeDatagramEncrypted(&serverSocket, msg);
     }
+#if defined(QT_DEBUG)
+    static const QString formatter = QStringLiteral("From %1 text: %2");
+
+
+    const QString html = formatter.arg(peerInfo, QJsonDocument(djson).toJson());
+    qDebug() << html;
+#else
+    Q_UNUSED(peerInfo)
+    Q_UNUSED(plainText)
+#endif
 }
 
 bool Server::isListening() const
@@ -383,6 +384,7 @@ bool Server::parseSpec(const QStringList &cmdParts)
             if(cmdParts.length() < 3)
             {
                 qout << tr("Usage: listen [ip] [port]") << Qt::endl;
+                return true;
             }
             QHostAddress address = QHostAddress(cmdParts[1]);
             if(address.isNull())

@@ -244,7 +244,7 @@ bool Client::parseSpec(const QStringList &cmdParts)
                     qCritical() << clientName << tr(": failed to send logout attmpt -")
                                 << crypto.dtlsErrorString();
                 }
-                loginSuccess = false; // should be modified to at receiving LOGOUTSUCCESS
+                //loginSuccess = false; // should be modified to at receiving LOGOUTSUCCESS
                 qInfo() << tr("Attempting to disconnect...");
             }
             return true;
@@ -257,6 +257,92 @@ bool Client::parseSpec(const QStringList &cmdParts)
 void Client::serverResponse(const QString &clientInfo, const QByteArray &plainText)
 {
     QJsonObject djson = QCborValue::fromCbor(plainText).toMap().toJsonObject();
+    try{
+        switch(djson["type"].toInt())
+        {
+        case KP::DgramType::Auth:
+        {
+            switch(djson["mode"].toInt())
+            {
+            case KP::AuthMode::Reg:
+            {
+                if(djson["success"].toBool())
+                    qInfo() << tr("Register success:") << djson["username"].toString();
+                else
+                {
+                    QString reas;
+                    switch(djson["reason"].toInt())
+                    {
+                    case KP::BadShadow: reas = tr("Malformed shadow"); break;
+                    case KP::UserExists: reas = tr("User Exists"); break;
+                    default: throw std::exception("message not implemented"); break;
+                    }
+                    qInfo() << tr("Register failure:") << djson["username"].toString()
+                            << tr("Reason:") << reas;
+                }
+            }
+                break;
+            case KP::AuthMode::Login:
+            {
+                if(djson["success"].toBool())
+                {
+                    qInfo() << tr("Login success:") << djson["username"].toString();
+                    loginSuccess = true;
+                }
+                else
+                {
+                    QString reas;
+                    switch(djson["reason"].toInt())
+                    {
+                    case KP::BadShadow: reas = tr("Malformed shadow"); break;
+                    case KP::BadPassword: reas = tr("Password incorrect"); break;
+                    default: throw std::exception("message not implemented"); break;
+                    }
+                    qInfo() << tr("Login failure:") << djson["username"].toString()
+                            << tr("Reason:") << reas;
+                }
+            }
+                break;
+            case KP::AuthMode::Logout:
+            {
+                if(djson["success"].toBool())
+                {
+                    if(!djson.contains("reason"))
+                        qInfo() << tr("Logout success:") << djson["username"].toString();
+                    else if(djson["reason"] == KP::LoggedElsewhere)
+                        qInfo() << tr("%1: Logged elsewhere, force quitting")
+                                   .arg(djson["username"].toString());
+                    else
+                        throw std::exception("message not implemented");
+                    loginSuccess = false;
+                }
+                else
+                    qInfo() << tr("Logout failure, not online:") << djson["username"].toString();
+            }
+                break;
+            default:
+                throw std::exception("auth type not supported"); break;
+            }
+        }
+            break;
+        case KP::DgramType::Message:
+        {
+            switch(djson["msgtype"].toInt())
+            {
+            case KP::JsonError: qWarning() << tr("Client sent a bad json"); break;
+            case KP::Unsupported: qWarning() << tr("Client sent nsupported message format"); break;
+            default:throw std::exception("message not implemented"); break;
+            }
+        }
+            break;
+        default:
+            throw std::exception("datagram type not supported"); break;
+        }
+    } catch (QJsonParseError e) {
+        qWarning() << (serverName + ": JSONError-") << e.errorString();
+    } catch (std::exception e) {
+        qWarning() << (serverName + ":") << e.what();
+    }
 #if defined(QT_DEBUG)
     static const QString formatter = QStringLiteral("%1 received text: %2");
 
@@ -363,7 +449,7 @@ void Client::readyRead()
         if (crypto.isConnectionEncrypted())
         {
             qDebug() << clientName << ": encrypted connection established!";
-            loginSuccess = true;
+            //loginSuccess = true;
 
             QString shadowstring = QString(shadow.toHex()).toLatin1();
             if(registerMode)

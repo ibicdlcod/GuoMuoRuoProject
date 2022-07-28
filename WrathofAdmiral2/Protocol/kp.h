@@ -40,11 +40,11 @@ public:
     };
     Q_ENUM(AuthError)
 
-    enum ParseError{
+    enum MsgType{
         JsonError,
         Unsupported
     };
-    Q_ENUM(ParseError)
+    Q_ENUM(MsgType)
 
     /* See JSON support in Qt, especially QCborValue */
     static QByteArray clientAuth(AuthMode, const QString &name = "",
@@ -53,7 +53,7 @@ public:
                                  bool, AuthError);
     static QByteArray serverAuth(AuthMode, const QString &,
                                  bool);
-    static QByteArray serverParse(ParseError, const QString &,
+    static QByteArray serverParse(MsgType, const QString &,
                                   const QString &);
 };
 
