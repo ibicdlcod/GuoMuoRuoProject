@@ -249,12 +249,11 @@ bool Client::parseSpec(const QStringList &cmdParts)
                 const qint64 written = crypto.writeDatagramEncrypted(&socket, msg);
 
                 if (written <= 0) {
-                    //= logout-failed
-                    qCritical() << tr("%1: failed to send logout attmpt - %2")
+                    //% "%1: failed to send logout attmpt - %2"
+                    qCritical() << qtTrId("logout-failed")
                                    .arg(clientName, crypto.dtlsErrorString());
                 }
-                //= disconnect-attempt
-                qInfo() << tr("Attempting to disconnect...");
+                qInfo() << qtTrId("disconnect-attempt");
             }
             return true;
         }
@@ -277,23 +276,20 @@ void Client::serverResponse(const QString &clientInfo, const QByteArray &plainTe
             {
                 if(djson["success"].toBool())
                 {
-                    //= register-success
-                    qInfo() << tr("%1: Register success").arg(djson["username"].toString());
+                    //% "%1: register success"
+                    qInfo() << qtTrId("register-success").arg(djson["username"].toString());
                 }
                 else
                 {
                     QString reas;
                     switch(djson["reason"].toInt())
                     {
-                    //= malformed-shadow
-                    case KP::BadShadow: reas = tr("Malformed shadow"); break;
-                    //= user-exists
-                    case KP::UserExists: reas = tr("User Exists"); break;
+                    case KP::BadShadow: reas = qtTrId("malformed-shadow"); break;
+                    case KP::UserExists: reas = qtTrId("user-exists"); break;
                     default: throw std::exception("message not implemented"); break;
                     }
-                    //= register-failed
-                    qInfo() << tr("%1: register failure, reason: %2")
-                               .arg(djson["username"].toString(), reas);
+                    //% "%1: register failure, reason: %2"
+                    qInfo() << qtTrId("register-failed").arg(djson["username"].toString(), reas);
                 }
             }
                 break;
@@ -301,7 +297,7 @@ void Client::serverResponse(const QString &clientInfo, const QByteArray &plainTe
             {
                 if(djson["success"].toBool())
                 {
-                    //% "%1: Login success"
+                    //% "%1: login success"
                     qInfo() << qtTrId("login-success").arg(djson["username"].toString());
                     loginSuccess = true;
                 }
@@ -310,15 +306,12 @@ void Client::serverResponse(const QString &clientInfo, const QByteArray &plainTe
                     QString reas;
                     switch(djson["reason"].toInt())
                     {
-                    //= malformed-shadow
-                    case KP::BadShadow: reas = tr("Malformed shadow"); break;
-                    //= password-incorrect
-                    case KP::BadPassword: reas = tr("Password incorrect"); break;
+                    case KP::BadShadow: reas = qtTrId("malformed-shadow"); break;
+                    case KP::BadPassword: reas = qtTrId("password-incorrect"); break;
                     default: throw std::exception("message not implemented"); break;
                     }
-                    //= login-failed
-                    qInfo() << tr("%1: Login failure, reason: %2")
-                               .arg(djson["username"].toString(), reas);
+                    //% "%1: login failure, reason: %2"
+                    qInfo() << qtTrId("login-failed").arg(djson["username"].toString(), reas);
                 }
             }
                 break;
@@ -328,14 +321,13 @@ void Client::serverResponse(const QString &clientInfo, const QByteArray &plainTe
                 {
                     if(!djson.contains("reason"))
                     {
-                        //= logout-success
-                        qInfo() << tr("%1: Logout success").arg(djson["username"].toString());
+                        //% "%1: logout success"
+                        qInfo() << qtTrId("logout-success").arg(djson["username"].toString());
                     }
                     else if(djson["reason"] == KP::LoggedElsewhere)
                     {
-                        //= logout-forced
-                        qInfo() << tr("%1: Logged elsewhere, force quitting")
-                                   .arg(djson["username"].toString());
+                        //% "%1: logged elsewhere, force quitting"
+                        qInfo() << qtTrId("logout-forced").arg(djson["username"].toString());
                     }
                     else
                         throw std::exception("message not implemented");
@@ -343,8 +335,8 @@ void Client::serverResponse(const QString &clientInfo, const QByteArray &plainTe
                 }
                 else
                 {
-                    //= logout-notonline
-                    qInfo() << tr("%1: Logout failure, not online").arg(djson["username"].toString());
+                    //% "%1: logout failure, not online"
+                    qInfo() << qtTrId("logout-notonline").arg(djson["username"].toString());
                 }
             }
                 break;
@@ -357,11 +349,9 @@ void Client::serverResponse(const QString &clientInfo, const QByteArray &plainTe
         {
             switch(djson["msgtype"].toInt())
             {
-            //= client-bad-json
-            case KP::JsonError: qWarning() << tr("Client sent a bad json"); break;
-            //= client-unsupported-json
-            case KP::Unsupported: qWarning() << tr("Client sent nsupported message format"); break;
-            default:throw std::exception("message not implemented"); break;
+            case KP::JsonError: qWarning() << qtTrId("client-bad-json"); break;
+            case KP::Unsupported: qWarning() << qtTrId("client-unsupported-json"); break;
+            default: throw std::exception("message not implemented"); break;
             }
         }
             break;
@@ -401,8 +391,8 @@ void Client::handshakeTimeout()
         qDebug() << clientName << ": failed to re-transmit -" << crypto.dtlsErrorString();
     if(retransmitTimes > maxRetransmit)
     {
-        //= retransmit-toomuch
-        qWarning() << tr("%1: max restransmit time exceeded!").arg(clientName);
+        //% "%1: max restransmit time exceeded!"
+        qWarning() << qtTrId("retransmit-toomuch").arg(clientName);
         catbomb();
     }
 }
@@ -461,8 +451,7 @@ void Client::readyRead()
             else
             {
                 shutdown();
-                //= remote-disconnect
-                qInfo() << tr("Remote disconnected.");
+                qInfo() << qtTrId("remote-disconnect");
                 attemptMode = false;
             }
             return;
@@ -488,9 +477,8 @@ void Client::readyRead()
                 const qint64 written = crypto.writeDatagramEncrypted(&socket, msg);
                 if (written <= 0)
                 {
-                    //= register-failed
-                    qInfo() << tr("%1: register failure, reason: %2")
-                               .arg(clientName, crypto.dtlsErrorString());
+                    //% "%1: register failure, reason: %2"
+                    qInfo() << qtTrId("register-failed").arg(clientName, crypto.dtlsErrorString());
                 }
             }
             else
@@ -499,9 +487,8 @@ void Client::readyRead()
                 const qint64 written = crypto.writeDatagramEncrypted(&socket, msg);
                 if (written <= 0)
                 {
-                    //= login-failed
-                    qInfo() << tr("%1: Login failure, reason: %2")
-                               .arg(clientName, crypto.dtlsErrorString());
+                    //% "%1: login failure, reason: %2"
+                    qInfo() << qtTrId("login-failed").arg(clientName, crypto.dtlsErrorString());
                 }
             }
         }

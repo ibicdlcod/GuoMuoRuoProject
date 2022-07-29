@@ -314,7 +314,7 @@ bool Server::listen(const QHostAddress &address, quint16 port)
             }
             else
             {
-                qDebug() << tr("SQL connection successful!");
+                qDebug() << "SQL connection successful!";
                 /* Database integrity check, the structure is defined here */
                 QStringList tables = db.tables(QSql::Tables);
                 if(!tables.contains("Users"))
@@ -335,7 +335,7 @@ bool Server::listen(const QHostAddress &address, quint16 port)
                             && columns.contains("Username")
                             && columns.contains("Shadow"))
                     {
-                        qDebug() << tr("User Database is OK.");
+                        qDebug() << "User Database is OK.";
                     }
                 }
             }
@@ -388,15 +388,13 @@ bool Server::parseSpec(const QStringList &cmdParts)
             QHostAddress address = QHostAddress(cmdParts[1]);
             if(address.isNull())
             {
-                //= ip-invalid
-                qWarning() << tr("IP isn't valid");
+                qWarning() << qtTrId("ip-invalid");
                 return true;
             }
             quint16 port = QString(cmdParts[2]).toInt();
             if(port < 1024 || port > 49151)
             {
-                //= port-invalid
-                qWarning() << tr("Port isn't valid, it must fall between 1024 and 49151");
+                qWarning() << qtTrId("port-invalid");
                 return true;
             }
             if (listen(address, port)) {
@@ -440,7 +438,7 @@ void Server::readyRead()
 {
     const qint64 bytesToRead = serverSocket.pendingDatagramSize();
     if (bytesToRead <= 0) {
-        qDebug() << tr("Spurious read notification?");
+        qDebug() << "Spurious read notification?";
         //return;
     }
 
@@ -476,7 +474,7 @@ void Server::readyRead()
             const QString peerInfo = peer_info(peerAddress, peerPort);
             if(connectedUsers.contains(peerInfo))
             {
-                qDebug() << connectedUsers[peerInfo] << tr("disconnected abruptly.");
+                qInfo() << tr("%1: disconnected abruptly").arg(connectedUsers[peerInfo]);
                 connectedPeers.remove(connectedUsers[peerInfo]);
                 connectedUsers.remove(peerInfo);
             }
@@ -525,7 +523,7 @@ void Server::decryptDatagram(QDtls *connection, const QByteArray &clientMessage)
     if (dgram.size()) {
         datagramReceived(peerInfo, dgram, connection);
     } else if (connection->dtlsError() == QDtlsError::NoError) {
-        qDebug() << peerInfo << ":" << tr("0 byte dgram, could be a re-connect attempt?");
+        qDebug() << peerInfo << ":" << "0 byte dgram, could be a re-connect attempt?";
     } else {
         qWarning() << peerInfo << ":" << connection->dtlsErrorString();
     }
@@ -543,10 +541,10 @@ void Server::doHandshake(QDtls *newConnection, const QByteArray &clientHello)
                                        newConnection->peerPort());
     switch (newConnection->handshakeState()) {
     case QDtls::HandshakeInProgress:
-        qDebug() << peerInfo << tr(": handshake is in progress ...");
+        qDebug() << peerInfo << ": handshake is in progress ...";
         break;
     case QDtls::HandshakeComplete:
-        qDebug() << tr("Connection with %1 encrypted. %2").arg(peerInfo, connection_info(newConnection));
+        qDebug() << QString("Connection with %1 encrypted. %2").arg(peerInfo, connection_info(newConnection));
         break;
     default:
         Q_UNREACHABLE();
@@ -588,7 +586,7 @@ void Server::handleNewConnection(const QHostAddress &peerAddress,
 
     const QString peerInfo = peer_info(peerAddress, peerPort);
     if (cookieSender.verifyClient(&serverSocket, clientHello, peerAddress, peerPort)) {
-        qDebug() << peerInfo << tr(": verified, starting a handshake");
+        qDebug() << peerInfo << ": verified, starting a handshake";
 
         std::unique_ptr<QDtls> newConnection{new QDtls{QSslSocket::SslServerMode}};
         newConnection->setDtlsConfiguration(serverConfiguration);
@@ -600,7 +598,7 @@ void Server::handleNewConnection(const QHostAddress &peerAddress,
     } else if (cookieSender.dtlsError() != QDtlsError::NoError) {
         qWarning() << tr("DTLS error:") << cookieSender.dtlsErrorString();
     } else {
-        qDebug() << peerInfo << tr(": not verified yet");
+        qDebug() << peerInfo << ": not verified yet";
     }
 }
 

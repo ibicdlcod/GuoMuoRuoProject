@@ -142,8 +142,7 @@ void CommandLine::openingwords()
     if(!licenseFile.open(QIODevice::ReadOnly | QIODevice::Text))
     {
         /* TODO: check MD5 */
-        //= license-not-found
-        qout << tr("Can't find license file, exiting.") << Qt::endl;
+        qout << qtTrId("licence-not-found") << Qt::endl;
         qout.setFieldAlignment(QTextStream::AlignLeft);
         exitGracefully();
         return;
@@ -158,9 +157,8 @@ void CommandLine::openingwords()
         qout.printLine(notice, Ecma(255,255,255,true), Ecma(0,0,255));
         qout.printLine("");
 #pragma message(NOT_M_CONST)
-        //= naganami
-        qout.printLine(tr("What? Admiral Tanaka? He's the real deal, isn't he?\nGreat at battle and bad at politics--so cool!"),
-                       Ecma(192,255,192,true), Ecma(64,64,64));
+        //% "What? Admiral Tanaka? He's the real deal, isn't he?\nGreat at battle and bad at politics--so cool!"
+        qout.printLine(qtTrId("naganami"), Ecma(192,255,192,true), Ecma(64,64,64));
     }
     qout.setFieldAlignment(QTextStream::AlignLeft);
 }
@@ -252,32 +250,32 @@ const QStringList CommandLine::getCommands()
 
 inline void CommandLine::invalidCommand()
 {
-    //= invalid-command
-    qout << tr("Invalid Command, use 'commands' for valid commands, 'help' for help, 'exit' to exit.") << Qt::endl;
+    //% "Invalid Command, use 'commands' for valid commands, 'help' for help, 'exit' to exit."
+    qout << qtTrId("invalid-command") << Qt::endl;
 }
 
 void CommandLine::showCommands(bool validOnly)
 {
-    //= exit-helper
-    qout << tr("Use 'exit' to quit.") << Qt::endl;
+    //% "Use 'exit' to quit."
+    qout << qtTrId("exit-helper") << Qt::endl;
     if(validOnly)
     {
-        //= good-command
-        qout.printLine(tr("Available commands:"), Ecma(0,255,0));
+        //% "Available commands:"
+        qout.printLine(qtTrId("good-command"), Ecma(0,255,0));
         qls(getValidCommands());
     }
     else
     {
-        //= all-command
-        qout.printLine(tr("All commands:"), Ecma(255,255,0));
+        //% "All commands:"
+        qout.printLine(qtTrId("all-command"), Ecma(255,255,0));
         qls(getCommandsSpec());
     }
 }
 
 inline void CommandLine::showHelp(const QStringList &)
 {
-    //= help
-    qout << tr("Use 'exit' to quit, 'help' to show help, 'commands' to show available commands.") << Qt::endl;
+    //% "Use 'exit' to quit, 'help' to show help, 'commands' to show available commands."
+    qout << qtTrId("help-msg") << Qt::endl;
 }
 
 inline int CommandLine::callength(const QString &input, bool naive)
@@ -412,8 +410,8 @@ void CommandLine::exitGracefully()
     {
         timer->stop();
     }
-    //= goodbye
-    qout.printLine(tr("Goodbye, press ENTER to quit"), Ecma(64,255,64), Ecma(EcmaSetter::BlinkOn));
+    //% "Goodbye, press ENTER to quit."
+    qout.printLine(qtTrId("goodbye"), Ecma(64,255,64), Ecma(EcmaSetter::BlinkOn));
     qout.reset();
     logFile->close();
     quit();
