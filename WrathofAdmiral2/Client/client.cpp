@@ -78,7 +78,8 @@ void Client::catbomb()
     if(loginSuccess)
     {
         /* also present when receiving usercreate/userexists, which is undesirable */
-        qCritical() << tr("You have been bombarded by a cute cat.");
+        //% "You have been bombarded by a cute cat."
+        qCritical() << qtTrId("catbomb");
 #pragma message(NOT_M_CONST)
         qout.printLine(QStringLiteral("TURKEY TROTS TO WATER"
                                       " GG"
@@ -91,8 +92,8 @@ void Client::catbomb()
     }
     else
     {
-        qWarning() << tr("Failed to establish connection, check your username,"
-                         "password and server status.");
+        //% "Failed to establish connection, check your username, password and server status."
+        qWarning() << qtTrId("connection-failed-warning");
         displayPrompt();
     }
     attemptMode = false;
@@ -102,7 +103,8 @@ void Client::catbomb()
 void Client::displayPrompt()
 {
 #if 0 /* this is for non-ASCII test */
-    qInfo() << tr("田中飞妈") << 114514;
+    //% "田中飞妈"
+    qInfo() << qtTrId("fscktanaka") << 114514;
 #endif
     if(passwordMode != password::normal)
         return;
@@ -130,7 +132,7 @@ bool Client::parseSpec(const QStringList &cmdParts)
                 if(shadow1 != shadow)
                 {
                     emit turnOnEchoing();
-                    qWarning() << tr("Password does not match!");
+                    qWarning() << qtTrId("password-mismatch");
                     passwordMode = password::normal;
                     return true;
                 }
@@ -153,9 +155,8 @@ bool Client::parseSpec(const QStringList &cmdParts)
                 socket.connectToHost(address.toString(), port);
                 if(!socket.waitForConnected(8000))
                 {
-                    qWarning() << tr("Failed to connect to server")
-                               << address.toString()
-                               << tr("port") << port;
+                    //% "Failed to connect to server at %1:%2"
+                    qWarning() << qtTrId("wait-for-connect-failure").arg(address.toString()).arg(port);
                     passwordMode = password::normal;
                     return true;
                 }
@@ -165,7 +166,7 @@ bool Client::parseSpec(const QStringList &cmdParts)
             }
             else
             {
-                qout << tr("Confirm Password:") << Qt::endl;
+                qout << qtTrId("password-confirm") << Qt::endl;
                 passwordMode = password::confirm;
             }
             return true;
@@ -190,21 +191,27 @@ bool Client::parseSpec(const QStringList &cmdParts)
         {
             if(crypto.isConnectionEncrypted())
             {
-                qInfo() << tr("Already connected, please shut down first.");
+                qInfo() << qtTrId("connected-already");
                 return true;
             }
             else if(attemptMode)
             {
-                qWarning() << tr("Do not attempt duplicate connections!");
+                qWarning() << qtTrId("connect-duplicate");
                 return true;
             }
             retransmitTimes = 0;
             if(cmdParts.length() < 4)
             {
                 if(registerMode)
-                    qout << tr("Usage: register [ip] [port] [username]") << Qt::endl;
+                {
+                    //% "Usage: register [ip] [port] [username]"
+                    qout << qtTrId("register-usage") << Qt::endl;
+                }
                 else
-                    qout << tr("Usage: connect [ip] [port] [username]") << Qt::endl;
+                {
+                    //% "Usage: connect [ip] [port] [username]"
+                    qout << qtTrId("connect-usage") << Qt::endl;
+                }
                 return true;
             }
             else
@@ -213,19 +220,20 @@ bool Client::parseSpec(const QStringList &cmdParts)
                 address = QHostAddress(cmdParts[1]);
                 if(address.isNull())
                 {
-                    qWarning() << tr("IP isn't valid");
+                    qWarning() << qtTrId("ip-invalid");
                     return true;
                 }
                 port = QString(cmdParts[2]).toInt();
                 if(port < 1024 || port > 49151)
                 {
-                    qWarning() << tr("Port isn't valid, it must fall between 1024 and 49151");
+                    //% "Port isn't valid, it must fall between 1024 and 49151"
+                    qWarning() << qtTrId("port-invalid");
                     return true;
                 }
 
                 clientName = cmdParts[3];
                 emit turnOffEchoing();
-                qout << tr("Enter Password:") << Qt::endl;
+                qout << qtTrId("password-enter") << Qt::endl;
                 passwordMode = registerMode ? password::registering : password::login;
 
                 return true;
@@ -234,16 +242,18 @@ bool Client::parseSpec(const QStringList &cmdParts)
         else if(primary.compare("disconnect", Qt::CaseInsensitive) == 0)
         {
             if(!crypto.isConnectionEncrypted())
-                qInfo() << tr("Not under a valid connection.");
+                qInfo() << qtTrId("disconnect-when-offline");
             else
             {
                 QByteArray msg = KP::clientAuth(KP::Logout);
                 const qint64 written = crypto.writeDatagramEncrypted(&socket, msg);
 
                 if (written <= 0) {
-                    qCritical() << clientName << tr(": failed to send logout attmpt -")
-                                << crypto.dtlsErrorString();
+                    //= logout-failed
+                    qCritical() << tr("%1: failed to send logout attmpt - %2")
+                                   .arg(clientName, crypto.dtlsErrorString());
                 }
+                //= disconnect-attempt
                 qInfo() << tr("Attempting to disconnect...");
             }
             return true;
@@ -266,18 +276,24 @@ void Client::serverResponse(const QString &clientInfo, const QByteArray &plainTe
             case KP::AuthMode::Reg:
             {
                 if(djson["success"].toBool())
-                    qInfo() << tr("Register success:") << djson["username"].toString();
+                {
+                    //= register-success
+                    qInfo() << tr("%1: Register success").arg(djson["username"].toString());
+                }
                 else
                 {
                     QString reas;
                     switch(djson["reason"].toInt())
                     {
+                    //= malformed-shadow
                     case KP::BadShadow: reas = tr("Malformed shadow"); break;
+                    //= user-exists
                     case KP::UserExists: reas = tr("User Exists"); break;
                     default: throw std::exception("message not implemented"); break;
                     }
-                    qInfo() << tr("Register failure:") << djson["username"].toString()
-                            << tr("Reason:") << reas;
+                    //= register-failed
+                    qInfo() << tr("%1: register failure, reason: %2")
+                               .arg(djson["username"].toString(), reas);
                 }
             }
                 break;
@@ -285,7 +301,8 @@ void Client::serverResponse(const QString &clientInfo, const QByteArray &plainTe
             {
                 if(djson["success"].toBool())
                 {
-                    qInfo() << tr("Login success:") << djson["username"].toString();
+                    //% "%1: Login success"
+                    qInfo() << qtTrId("login-success").arg(djson["username"].toString());
                     loginSuccess = true;
                 }
                 else
@@ -293,12 +310,15 @@ void Client::serverResponse(const QString &clientInfo, const QByteArray &plainTe
                     QString reas;
                     switch(djson["reason"].toInt())
                     {
+                    //= malformed-shadow
                     case KP::BadShadow: reas = tr("Malformed shadow"); break;
+                    //= password-incorrect
                     case KP::BadPassword: reas = tr("Password incorrect"); break;
                     default: throw std::exception("message not implemented"); break;
                     }
-                    qInfo() << tr("Login failure:") << djson["username"].toString()
-                            << tr("Reason:") << reas;
+                    //= login-failed
+                    qInfo() << tr("%1: Login failure, reason: %2")
+                               .arg(djson["username"].toString(), reas);
                 }
             }
                 break;
@@ -307,16 +327,25 @@ void Client::serverResponse(const QString &clientInfo, const QByteArray &plainTe
                 if(djson["success"].toBool())
                 {
                     if(!djson.contains("reason"))
-                        qInfo() << tr("Logout success:") << djson["username"].toString();
+                    {
+                        //= logout-success
+                        qInfo() << tr("%1: Logout success").arg(djson["username"].toString());
+                    }
                     else if(djson["reason"] == KP::LoggedElsewhere)
+                    {
+                        //= logout-forced
                         qInfo() << tr("%1: Logged elsewhere, force quitting")
                                    .arg(djson["username"].toString());
+                    }
                     else
                         throw std::exception("message not implemented");
                     loginSuccess = false;
                 }
                 else
-                    qInfo() << tr("Logout failure, not online:") << djson["username"].toString();
+                {
+                    //= logout-notonline
+                    qInfo() << tr("%1: Logout failure, not online").arg(djson["username"].toString());
+                }
             }
                 break;
             default:
@@ -328,7 +357,9 @@ void Client::serverResponse(const QString &clientInfo, const QByteArray &plainTe
         {
             switch(djson["msgtype"].toInt())
             {
+            //= client-bad-json
             case KP::JsonError: qWarning() << tr("Client sent a bad json"); break;
+            //= client-unsupported-json
             case KP::Unsupported: qWarning() << tr("Client sent nsupported message format"); break;
             default:throw std::exception("message not implemented"); break;
             }
@@ -370,7 +401,8 @@ void Client::handshakeTimeout()
         qDebug() << clientName << ": failed to re-transmit -" << crypto.dtlsErrorString();
     if(retransmitTimes > maxRetransmit)
     {
-        qWarning() << clientName << tr(": max restransmit time exceeded!");
+        //= retransmit-toomuch
+        qWarning() << tr("%1: max restransmit time exceeded!").arg(clientName);
         catbomb();
     }
 }
@@ -429,6 +461,7 @@ void Client::readyRead()
             else
             {
                 shutdown();
+                //= remote-disconnect
                 qInfo() << tr("Remote disconnected.");
                 attemptMode = false;
             }
@@ -455,8 +488,9 @@ void Client::readyRead()
                 const qint64 written = crypto.writeDatagramEncrypted(&socket, msg);
                 if (written <= 0)
                 {
-                    qCritical() << clientName << tr(": register failed -")
-                                << crypto.dtlsErrorString();
+                    //= register-failed
+                    qInfo() << tr("%1: register failure, reason: %2")
+                               .arg(clientName, crypto.dtlsErrorString());
                 }
             }
             else
@@ -465,8 +499,9 @@ void Client::readyRead()
                 const qint64 written = crypto.writeDatagramEncrypted(&socket, msg);
                 if (written <= 0)
                 {
-                    qCritical() << clientName << tr(": login failed -")
-                                << crypto.dtlsErrorString();
+                    //= login-failed
+                    qInfo() << tr("%1: Login failure, reason: %2")
+                               .arg(clientName, crypto.dtlsErrorString());
                 }
             }
         }

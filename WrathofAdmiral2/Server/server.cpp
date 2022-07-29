@@ -153,7 +153,7 @@ void Server::datagramReceived(const QString &peerInfo, const QByteArray &plainTe
                     insert.bindValue(":name", name);
                     if(shadow.decodingStatus == QByteArray::Base64DecodingStatus::Ok)
                     {
-                        insert.bindValue(":sdhadow", shadow.decoded);
+                        insert.bindValue(":shadow", shadow.decoded);
                         if(!insert.exec())
                         {
                             qWarning() << insert.lastError().databaseText();
@@ -388,12 +388,16 @@ bool Server::parseSpec(const QStringList &cmdParts)
             QHostAddress address = QHostAddress(cmdParts[1]);
             if(address.isNull())
             {
-                qWarning() << tr("Ip isn't valid");
+                //= ip-invalid
+                qWarning() << tr("IP isn't valid");
+                return true;
             }
             quint16 port = QString(cmdParts[2]).toInt();
             if(port < 1024 || port > 49151)
             {
+                //= port-invalid
                 qWarning() << tr("Port isn't valid, it must fall between 1024 and 49151");
+                return true;
             }
             if (listen(address, port)) {
                 QString msg = tr("Server is listening on address %1 and port %2")

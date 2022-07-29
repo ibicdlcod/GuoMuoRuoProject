@@ -17,6 +17,7 @@ TRANSLATIONS += \
 
 CONFIG += lrelease
 CONFIG += embed_translations
+QMAKE_LRELEASE_FLAGS += -idbased
 
 CONFIG(release, debug|release): DEFINES += QT_NO_DEBUG_OUTPUT
 

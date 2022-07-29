@@ -19,6 +19,8 @@
 
 /* Ugly as fuck, but customMessageHandler had to be a member of CommandLine in order to use tr() and then said function
  * must be static, but logFile isn't const at complie time, leaveing no other option
+ *
+ * (Outdated, se QT_TR_NOOP() and QT_TRANSLATE_NOOP())
  */
 extern QFile *logFile;
 extern QSettings *settings;
@@ -140,6 +142,7 @@ void CommandLine::openingwords()
     if(!licenseFile.open(QIODevice::ReadOnly | QIODevice::Text))
     {
         /* TODO: check MD5 */
+        //= license-not-found
         qout << tr("Can't find license file, exiting.") << Qt::endl;
         qout.setFieldAlignment(QTextStream::AlignLeft);
         exitGracefully();
@@ -155,6 +158,7 @@ void CommandLine::openingwords()
         qout.printLine(notice, Ecma(255,255,255,true), Ecma(0,0,255));
         qout.printLine("");
 #pragma message(NOT_M_CONST)
+        //= naganami
         qout.printLine(tr("What? Admiral Tanaka? He's the real deal, isn't he?\nGreat at battle and bad at politics--so cool!"),
                        Ecma(192,255,192,true), Ecma(64,64,64));
     }
@@ -248,20 +252,23 @@ const QStringList CommandLine::getCommands()
 
 inline void CommandLine::invalidCommand()
 {
+    //= invalid-command
     qout << tr("Invalid Command, use 'commands' for valid commands, 'help' for help, 'exit' to exit.") << Qt::endl;
 }
 
 void CommandLine::showCommands(bool validOnly)
 {
-
+    //= exit-helper
     qout << tr("Use 'exit' to quit.") << Qt::endl;
     if(validOnly)
     {
+        //= good-command
         qout.printLine(tr("Available commands:"), Ecma(0,255,0));
         qls(getValidCommands());
     }
     else
     {
+        //= all-command
         qout.printLine(tr("All commands:"), Ecma(255,255,0));
         qls(getCommandsSpec());
     }
@@ -269,6 +276,7 @@ void CommandLine::showCommands(bool validOnly)
 
 inline void CommandLine::showHelp(const QStringList &)
 {
+    //= help
     qout << tr("Use 'exit' to quit, 'help' to show help, 'commands' to show available commands.") << Qt::endl;
 }
 
@@ -404,6 +412,7 @@ void CommandLine::exitGracefully()
     {
         timer->stop();
     }
+    //= goodbye
     qout.printLine(tr("Goodbye, press ENTER to quit"), Ecma(64,255,64), Ecma(EcmaSetter::BlinkOn));
     qout.reset();
     logFile->close();
