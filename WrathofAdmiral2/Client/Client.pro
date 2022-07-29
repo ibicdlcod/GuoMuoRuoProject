@@ -13,6 +13,7 @@ SOURCES += \
         main.cpp
 
 TRANSLATIONS += \
+    ../Translations/WA2_en_US.ts \
     ../Translations/WA2_zh_CN.ts
 
 CONFIG += lrelease
@@ -58,4 +59,4 @@ HEADERS += \
     client.h
 
 RESOURCES += \
-    ../res_common.qrc
+    ../common.qrc

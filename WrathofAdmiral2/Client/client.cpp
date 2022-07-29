@@ -61,9 +61,9 @@ extern QSettings *settings;
 Client::Client(int argc, char ** argv)
     : CommandLine(argc, argv),
       crypto(QSslSocket::SslClientMode),
-      loginSuccess(false),
       attemptMode(false),
-      registerMode(false)
+      registerMode(false),
+      gameState(KP::Offline)
 {
 }
 
@@ -75,7 +75,7 @@ Client::~Client()
 /* public slots */
 void Client::catbomb()
 {
-    if(loginSuccess)
+    if(loggedIn())
     {
         /* also present when receiving usercreate/userexists, which is undesirable */
         //% "You have been bombarded by a cute cat."
@@ -88,7 +88,7 @@ void Client::catbomb()
                                       " RR"
                                       " THE WORLD WONDERS"),
                        Ecma(255,128,192), Ecma(255,255,255,true));
-        loginSuccess = false;
+        gameState = KP::Offline;
     }
     else
     {
@@ -108,10 +108,10 @@ void Client::displayPrompt()
 #endif
     if(passwordMode != password::normal)
         return;
-    if(!loginSuccess)
+    if(!loggedIn())
         qout << "WAClient$ ";
     else
-        qout << clientName << "@" << serverName << "$ ";
+        qout << QString("%1@%2(%3)$ ").arg(clientName, serverName, gameStateString());
 }
 
 bool Client::parseSpec(const QStringList &cmdParts)
@@ -299,7 +299,7 @@ void Client::serverResponse(const QString &clientInfo, const QByteArray &plainTe
                 {
                     //% "%1: login success"
                     qInfo() << qtTrId("login-success").arg(djson["username"].toString());
-                    loginSuccess = true;
+                    gameState = KP::Port;
                 }
                 else
                 {
@@ -331,7 +331,7 @@ void Client::serverResponse(const QString &clientInfo, const QByteArray &plainTe
                     }
                     else
                         throw std::exception("message not implemented");
-                    loginSuccess = false;
+                    gameState = KP::Offline;
                 }
                 else
                 {
@@ -446,7 +446,7 @@ void Client::readyRead()
         {
             qDebug() << clientName << ": shutdown alert received";
             socket.close();
-            if(loginSuccess)
+            if(loggedIn())
                 catbomb();
             else
             {
@@ -549,6 +549,18 @@ void Client::udpSocketConnected()
     retransmitTimes = 0;
 }
 
+void Client::exitGraceSpec()
+{
+    shutdown();
+}
+
+inline QString Client::gameStateString()
+{
+    QVariant str;
+    str.setValue(gameState);
+    return str.toString();
+}
+
 const QStringList Client::getCommandsSpec()
 {
     QStringList result = QStringList();
@@ -570,7 +582,7 @@ const QStringList Client::getValidCommands()
     return result;
 }
 
-void Client::exitGraceSpec()
+inline bool Client::loggedIn()
 {
-    shutdown();
+    return gameState != KP::Offline;
 }

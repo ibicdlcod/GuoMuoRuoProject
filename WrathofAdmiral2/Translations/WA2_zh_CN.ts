@@ -92,13 +92,13 @@
     <message id="logout-failed">
         <location filename="../Client/client.cpp" line="253"/>
         <source>%1: failed to send logout attmpt - %2</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">%1:下线信息发送失败，错误:%2</translation>
     </message>
     <message id="register-success">
         <location filename="../Client/client.cpp" line="280"/>
         <source>%1: register success</source>
         <oldsource>%1: Register success</oldsource>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">%1:登录成功</translation>
     </message>
     <message id="disconnect-attempt">
         <location filename="../Client/client.cpp" line="256"/>
@@ -165,13 +165,13 @@
         <location filename="../Client/client.cpp" line="352"/>
         <source></source>
         <oldsource>Client sent a bad json</oldsource>
-        <translation type="unfinished">客户端发送了不正确的JSON</translation>
+        <translation type="unfinished">客户端发送了不正确的JSON。</translation>
     </message>
     <message id="client-unsupported-json">
         <location filename="../Client/client.cpp" line="353"/>
         <source></source>
         <oldsource>Client sent nsupported message format</oldsource>
-        <translation type="unfinished">客户端发送了不支持的信息</translation>
+        <translation type="unfinished">客户端发送了不支持的信息。</translation>
     </message>
     <message id="remote-disconnect">
         <location filename="../Client/client.cpp" line="454"/>
@@ -182,7 +182,7 @@
     <message id="licence-not-found">
         <location filename="../Protocol/commandline.cpp" line="145"/>
         <source></source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">找不到许可证文件，退出。</translation>
     </message>
     <message id="naganami">
         <location filename="../Protocol/commandline.cpp" line="161"/>
@@ -219,29 +219,7 @@ Great at battle and bad at politics--so cool!</source>
         <location filename="../Protocol/commandline.cpp" line="414"/>
         <source>Goodbye, press ENTER to quit.</source>
         <oldsource>Goodbye, press ENTER to quit</oldsource>
-        <translation type="unfinished">再见，按ENTER退出程序</translation>
-    </message>
-</context>
-<context>
-    <name>Client</name>
-    <message id="sent-login-failed">
-        <source>%1: login failed - %2</source>
-        <translation type="obsolete">%1:登录信息发送失败，错误:%2</translation>
-    </message>
-    <message id="disconnect-attemp">
-        <source>Attempting to disconnect...</source>
-        <translation type="vanished">试图下线…</translation>
-    </message>
-</context>
-<context>
-    <name>CommandLine</name>
-    <message id="license-not-found">
-        <source>Can&apos;t find license file, exiting.</source>
-        <translation type="vanished">找不到许可证文件，退出。</translation>
-    </message>
-    <message id="help">
-        <source>Use &apos;exit&apos; to quit, &apos;help&apos; to show help, &apos;commands&apos; to show available commands.</source>
-        <translation type="vanished">请使用&quot;commands&quot;查看可用命令，&quot;help&quot;查看帮助，&quot;exit&quot;退出。</translation>
+        <translation type="unfinished">再见，按ENTER退出程序。</translation>
     </message>
 </context>
 <context>

@@ -1,10 +1,6 @@
 #include "kp.h"
 
-/*
-Protocol::Protocol()
-{
-}
-*/
+#include "gamestate.h"
 
 QByteArray KP::clientAuth(AuthMode mode, const QString &uname,
                           const QByteArray &shadow)
@@ -44,7 +40,8 @@ QByteArray KP::serverAuth(AuthMode mode, const QString &uname,
     return QCborValue::fromJsonValue(result).toCbor();
 }
 
-QByteArray KP::serverParse(MsgType pe, const QString &uname, const QString &content)
+QByteArray KP::serverParse(MsgType pe, const QString &uname,
+                           const QString &content)
 {
     QJsonObject result;
     result["type"] = DgramType::Message;
@@ -53,14 +50,3 @@ QByteArray KP::serverParse(MsgType pe, const QString &uname, const QString &cont
     result["content"] = content;
     return QCborValue::fromJsonValue(result).toCbor();
 }
-//QCborValue::fromJsonValue(gameObject).toCbor();
-//QCborValue::fromCbor(saveData).toMap().toJsonObject())
-
-/* use Q_ENUM(); class ee enum A{B,C,D} Q_ENUM(A)
-//QMetaEnum metaEnum = QMetaEnum::fromType<ee::A>();
-//qDebug() << metaEnum.valueToKey(ee::B);
-QVariant a; // do not use QVariant(ee:B)
-a.setValue(ee::B);
-std::cout << a.toString().toStdString() << std::endl;
-qDebug() << ee::B;
-*/

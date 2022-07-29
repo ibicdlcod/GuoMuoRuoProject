@@ -13,10 +13,12 @@ SOURCES += \
         server.cpp
 
 TRANSLATIONS += \
+    ../Translations/WA2_en_US.ts \
     ../Translations/WA2_zh_CN.ts
 
 CONFIG += lrelease
 CONFIG += embed_translations
+QMAKE_LRELEASE_FLAGS += -idbased
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
@@ -53,4 +55,4 @@ HEADERS += \
     server.h
 
 RESOURCES += \
-    ../res_common.qrc
+    ../common.qrc

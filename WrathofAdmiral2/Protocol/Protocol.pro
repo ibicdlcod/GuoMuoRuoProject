@@ -30,5 +30,5 @@ unix {
 !isEmpty(target.path): INSTALLS += target
 
 RESOURCES += \
-    ../res_common.qrc
+    ../common.qrc
 

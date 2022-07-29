@@ -51,8 +51,9 @@
 #ifndef CLIENT_H
 #define CLIENT_H
 
-#include "commandline.h"
 #include <QtNetwork>
+
+#include "commandline.h"
 
 class Client : public CommandLine
 {
@@ -83,8 +84,10 @@ private slots:
 
 private:
     void exitGraceSpec();
+    QString gameStateString();
     const QStringList getCommandsSpec();
     const QStringList getValidCommands();
+    bool loggedIn();
 
     QHostAddress address;
     quint16 port;
@@ -99,9 +102,10 @@ private:
     QString serverName;
     QByteArray shadow;
 
-    bool loginSuccess;
     bool attemptMode;
     bool registerMode;
+
+    KP::GameState gameState;
 
     const unsigned int defaultMaxRetransmit = 2;
     const QByteArray defaultSalt = QByteArrayLiteral("\xe8\xbf\x99\xe6\x98\xaf\xe4\xb8"

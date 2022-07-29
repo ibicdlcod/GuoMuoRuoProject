@@ -14,7 +14,6 @@ enum class EcmaSetter
     TextDefault,
     BgDefault,
     AllDefault,
-    /* new */
     ItalicsOn,
     ItalicsOff,
     DoubleScore,
