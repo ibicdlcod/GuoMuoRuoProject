@@ -122,6 +122,7 @@ void Server::datagramReceived(const QString &peerInfo, const QByteArray &plainTe
                 QString name = djson["username"].toString();
                 auto shadow = QByteArray::fromBase64Encoding(
                             djson["shadow"].toString().toLatin1(), QByteArray::Base64Encoding);
+                QSqlDatabase db = QSqlDatabase::database();
                 QSqlQuery query;
                 query.prepare("SELECT UserID FROM Users "
                               "WHERE Username = :name;");
@@ -182,6 +183,7 @@ void Server::datagramReceived(const QString &peerInfo, const QByteArray &plainTe
                 QString name = djson["username"].toString();
                 auto shadow = QByteArray::fromBase64Encoding(
                             djson["shadow"].toString().toLatin1(), QByteArray::Base64Encoding);
+                QSqlDatabase db = QSqlDatabase::database();
                 QSqlQuery query;
                 query.prepare("SELECT UserID FROM Users "
                               "WHERE Username = :name AND Shadow = :shadow");
@@ -253,18 +255,18 @@ void Server::datagramReceived(const QString &peerInfo, const QByteArray &plainTe
             }
                 break;
             default:
-                throw std::exception("auth type not supported"); break;
+                throw std::domain_error("auth type not supported"); break;
             }
         }
             break;
         default:
-            throw std::exception("datagram type not supported"); break;
+            throw std::domain_error("datagram type not supported"); break;
         }
-    } catch (QJsonParseError e) {
+    } catch (const QJsonParseError &e) {
         qWarning() << peerInfo << e.errorString();
         QByteArray msg = KP::serverParse(KP::JsonError, peerInfo, e.errorString());
         connection->writeDatagramEncrypted(&serverSocket, msg);
-    } catch (std::exception e) {
+    } catch (const std::domain_error &e) {
         qWarning() << peerInfo << e.what();
         QByteArray msg = KP::serverParse(KP::Unsupported, peerInfo, e.what());
         connection->writeDatagramEncrypted(&serverSocket, msg);
@@ -298,9 +300,8 @@ bool Server::listen(const QHostAddress &address, quint16 port)
                                         QByteArrayLiteral("Alice")).toByteArray());
 
             /* User QSqlDatabase db = QSqlDatabase::database(); to access database in elsewhere */
+            QSqlDatabase db = QSqlDatabase::addDatabase(settings->value("sql/driver", "QSQLITE").toString());
             /* Use SQLite for current testing */
-            if(!db.isValid())
-                db = QSqlDatabase::addDatabase(settings->value("sql/driver", "QSQLITE").toString());
             db.setHostName(settings->value("sql/hostname", "SpearofTanaka").toString());
             db.setDatabaseName(settings->value("sql/dbname", "ocean").toString());
             db.setUserName(settings->value("sql/adminname", "admin").toString());
@@ -341,13 +342,6 @@ bool Server::listen(const QHostAddress &address, quint16 port)
                 if(!tables.contains("Equip"))
                 {
                     qWarning() << tr("Equipment database does not exist, creating...");
-                    QSqlQuery query;
-                    query.prepare("CREATE TABLE Equip ( "
-                                  "EquipID int NOT NULL, "
-                                  "Username varchar(255) NOT NULL, "
-                                  "Shadow tinyblob"
-                                  ");");
-                    query.exec();
                 }
             }
         }
@@ -631,6 +625,12 @@ void Server::shutdown()
             qCritical() << tr("Disconnect failed!");
         }
     }
-    db.close();
+    QString defaultDbName;
+    {
+        QSqlDatabase db = QSqlDatabase::database();
+        defaultDbName = db.connectionName();
+    }
+    QSqlDatabase::removeDatabase(defaultDbName);
 }
+
 QT_END_NAMESPACE

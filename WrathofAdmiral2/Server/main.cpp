@@ -92,6 +92,5 @@ int main(int argc, char *argv[])
     QTimer::singleShot(0, &server, &Server::openingwords);
     QTimer::singleShot(100, &server, &Server::displayPrompt);
 
-    int result = server.exec();
-    return result;
+    return server.exec();
 }

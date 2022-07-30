@@ -105,8 +105,6 @@ private:
     QMap<QString, QString> connectedUsers;
     QMap<QString, QString> connectedPeers;
 
-    QSqlDatabase db;
-
     Q_DISABLE_COPY(Server)
 };
 

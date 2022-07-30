@@ -53,7 +53,6 @@
 #include <QSettings>
 #include <QPasswordDigestor>
 
-#include "ecma48.h"
 #include "kp.h"
 
 extern QSettings *settings;
@@ -277,7 +276,7 @@ void Client::serverResponse(const QString &clientInfo, const QByteArray &plainTe
                     {
                     case KP::BadShadow: reas = qtTrId("malformed-shadow"); break;
                     case KP::UserExists: reas = qtTrId("user-exists"); break;
-                    default: throw std::exception("message not implemented"); break;
+                    default: throw std::domain_error("message not implemented"); break;
                     }
                     //% "%1: register failure, reason: %2"
                     qInfo() << qtTrId("register-failed").arg(djson["username"].toString(), reas);
@@ -299,7 +298,7 @@ void Client::serverResponse(const QString &clientInfo, const QByteArray &plainTe
                     {
                     case KP::BadShadow: reas = qtTrId("malformed-shadow"); break;
                     case KP::BadPassword: reas = qtTrId("password-incorrect"); break;
-                    default: throw std::exception("message not implemented"); break;
+                    default: throw std::domain_error("message not implemented"); break;
                     }
                     //% "%1: login failure, reason: %2"
                     qInfo() << qtTrId("login-failed").arg(djson["username"].toString(), reas);
@@ -321,7 +320,7 @@ void Client::serverResponse(const QString &clientInfo, const QByteArray &plainTe
                         qInfo() << qtTrId("logout-forced").arg(djson["username"].toString());
                     }
                     else
-                        throw std::exception("message not implemented");
+                        throw std::domain_error("message not implemented");
                     gameState = KP::Offline;
                 }
                 else
@@ -332,7 +331,7 @@ void Client::serverResponse(const QString &clientInfo, const QByteArray &plainTe
             }
                 break;
             default:
-                throw std::exception("auth type not supported"); break;
+                throw std::domain_error("auth type not supported"); break;
             }
         }
             break;
@@ -342,16 +341,16 @@ void Client::serverResponse(const QString &clientInfo, const QByteArray &plainTe
             {
             case KP::JsonError: qWarning() << qtTrId("client-bad-json"); break;
             case KP::Unsupported: qWarning() << qtTrId("client-unsupported-json"); break;
-            default: throw std::exception("message not implemented"); break;
+            default: throw std::domain_error("message not implemented"); break;
             }
         }
             break;
         default:
-            throw std::exception("datagram type not supported"); break;
+            throw std::domain_error("datagram type not supported"); break;
         }
-    } catch (QJsonParseError e) {
+    } catch (const QJsonParseError &e) {
         qWarning() << (serverName + ": JSONError-") << e.errorString();
-    } catch (std::exception e) {
+    } catch (const std::domain_error &e) {
         qWarning() << (serverName + ":") << e.what();
     }
 #if defined(QT_DEBUG)
