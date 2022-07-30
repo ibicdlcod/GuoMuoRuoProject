@@ -124,6 +124,7 @@ bool Client::parseSpec(const QStringList &cmdParts)
                     emit turnOnEchoing();
                     qWarning() << qtTrId("password-mismatch");
                     passwordMode = password::normal;
+                    attemptMode = false;
                     return true;
                 }
             }
@@ -443,6 +444,7 @@ void Client::readyRead()
                 shutdown();
                 qInfo() << qtTrId("remote-disconnect");
                 attemptMode = false;
+                displayPrompt();
             }
             return;
         }

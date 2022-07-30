@@ -134,15 +134,16 @@ void Server::datagramReceived(const QString &peerInfo, const QByteArray &plainTe
                     int maxid;
                     QSqlQuery getMaxID;
                     getMaxID.prepare("SELECT MAX(UserID) FROM Users;");
-                    getMaxID.exec();
-                    if(getMaxID.isNull("MAX(UserID)") || !getMaxID.isSelect())
+                    getMaxID.exec();                    
+                    if(!getMaxID.isSelect()
+                            || !getMaxID.seek(0)
+                            || getMaxID.isNull("MAX(UserID)"))
                     {
                         maxid = 0;
                     }
                     else
                     {
-                        getMaxID.seek(0);
-                        maxid = getMaxID.boundValue("MAX(UserID)").toInt();
+                        maxid = getMaxID.value(0).toInt();
                     }
                     QSqlQuery insert;
                     if(!insert.prepare("INSERT INTO Users (UserID, Username, Shadow) "
@@ -151,6 +152,7 @@ void Server::datagramReceived(const QString &peerInfo, const QByteArray &plainTe
                         qWarning() << insert.lastError().databaseText();
                     }
                     insert.bindValue(":id", maxid+1);
+                    qDebug() << maxid+1;
                     insert.bindValue(":name", name);
                     if(shadow.decodingStatus == QByteArray::Base64DecodingStatus::Ok)
                     {

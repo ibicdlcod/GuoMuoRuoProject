@@ -98,7 +98,7 @@
         <location filename="../Client/client.cpp" line="280"/>
         <source>%1: register success</source>
         <oldsource>%1: Register success</oldsource>
-        <translation type="unfinished">%1:登录成功</translation>
+        <translation type="unfinished">%1:注册成功</translation>
     </message>
     <message id="disconnect-attempt">
         <location filename="../Client/client.cpp" line="256"/>
