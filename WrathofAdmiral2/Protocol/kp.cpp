@@ -1,7 +1,5 @@
 #include "kp.h"
 
-#include "gamestate.h"
-
 QByteArray KP::clientAuth(AuthMode mode, const QString &uname,
                           const QByteArray &shadow)
 {

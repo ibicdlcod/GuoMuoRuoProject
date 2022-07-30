@@ -335,8 +335,19 @@ bool Server::listen(const QHostAddress &address, quint16 port)
                             && columns.contains("Username")
                             && columns.contains("Shadow"))
                     {
-                        qDebug() << "User Database is OK.";
+                        qInfo() << tr("User Database is OK.");
                     }
+                }
+                if(!tables.contains("Equip"))
+                {
+                    qWarning() << tr("Equipment database does not exist, creating...");
+                    QSqlQuery query;
+                    query.prepare("CREATE TABLE Equip ( "
+                                  "EquipID int NOT NULL, "
+                                  "Username varchar(255) NOT NULL, "
+                                  "Shadow tinyblob"
+                                  ");");
+                    query.exec();
                 }
             }
         }
@@ -553,7 +564,7 @@ void Server::doHandshake(QDtls *newConnection, const QByteArray &clientHello)
 
 void Server::exitGraceSpec()
 {
-    this->shutdown();
+    shutdown();
     qInfo() << tr("Server is shutting down");
 }
 

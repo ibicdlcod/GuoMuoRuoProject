@@ -77,27 +77,18 @@ void Client::catbomb()
 {
     if(loggedIn())
     {
-        /* also present when receiving usercreate/userexists, which is undesirable */
         //% "You have been bombarded by a cute cat."
         qCritical() << qtTrId("catbomb");
-#pragma message(NOT_M_CONST)
-        qout.printLine(QStringLiteral("TURKEY TROTS TO WATER"
-                                      " GG"
-                                      " FROM CINCPAC ACTION COM THIRD FLEET INFO COMINCH CTF SEVENTY-SEVEN X"
-                                      " WHERE IS RPT WHERE IS TASK FORCE THIRTY FOUR"
-                                      " RR"
-                                      " THE WORLD WONDERS"),
-                       Ecma(255,128,192), Ecma(255,255,255,true));
         gameState = KP::Offline;
     }
     else
     {
         //% "Failed to establish connection, check your username, password and server status."
         qWarning() << qtTrId("connection-failed-warning");
-        displayPrompt();
     }
     attemptMode = false;
     shutdown();
+    displayPrompt();
 }
 
 void Client::displayPrompt()
