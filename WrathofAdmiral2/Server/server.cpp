@@ -66,26 +66,22 @@ QString peer_info(const QHostAddress &address, quint16 port)
 
 QString connection_info(QDtls *connection)
 {
-    QString info(Server::tr("Session cipher: "));
-    info += connection->sessionCipher().name();
-
-    info += Server::tr("; session protocol: ");
+    QString prot;
     switch (connection->sessionProtocol()) {
-    /*
-    case QSsl::DtlsV1_0:
-        info += DtlsServer::tr("DTLS 1.0.");
-        break;
-    */
     case QSsl::DtlsV1_2:
-        info += Server::tr("DTLS 1.2.");
+        prot += qtTrId("dtls-1.2");
         break;
     case QSsl::DtlsV1_2OrLater:
-        info += Server::tr("DTLS 1.2 or later.");
+        prot += qtTrId("dtls-1.2+");
         break;
     default:
-        info += Server::tr("Unknown protocol.");
+        prot += qtTrId("protocol-unknown");
     }
 
+    //% "Session cipher: %1; session protocol: %2."
+    QString info = qtTrId("connection-info-serverside")
+            .arg(connection->sessionCipher().name(),
+                 connection->sessionProtocol());
     return info;
 }
 
@@ -134,11 +130,12 @@ void Server::datagramReceived(const QString &peerInfo, const QByteArray &plainTe
                     int maxid;
                     QSqlQuery getMaxID;
                     getMaxID.prepare("SELECT MAX(UserID) FROM Users;");
-                    getMaxID.exec();                    
+                    getMaxID.exec();
                     if(!getMaxID.isSelect()
                             || !getMaxID.seek(0)
                             || getMaxID.isNull("MAX(UserID)"))
                     {
+                        qWarning() << getMaxID.lastError().databaseText();
                         maxid = 0;
                     }
                     else
@@ -152,7 +149,6 @@ void Server::datagramReceived(const QString &peerInfo, const QByteArray &plainTe
                         qWarning() << insert.lastError().databaseText();
                     }
                     insert.bindValue(":id", maxid+1);
-                    qDebug() << maxid+1;
                     insert.bindValue(":name", name);
                     if(shadow.decodingStatus == QByteArray::Base64DecodingStatus::Ok)
                     {
@@ -221,7 +217,7 @@ void Server::datagramReceived(const QString &peerInfo, const QByteArray &plainTe
                                 }
                                 connectedUsers.remove(peer_info((*client)->peerAddress(), (*client)->peerPort()));
                                 connectedPeers.remove(name);
-                                /* This is a dangerous operation on iterators */
+                                /* This will invalidate iterators in readyRead() */
                                 //knownClients.erase(client);
                             }
                         }
@@ -322,12 +318,13 @@ bool Server::listen(const QHostAddress &address, quint16 port)
                 QStringList tables = db.tables(QSql::Tables);
                 if(!tables.contains("Users"))
                 {
-                    qWarning() << tr("User database does not exist, creating...");
+                    //% "User database does not exist, creating..."
+                    qWarning() << qtTrId("user-db-lack");
                     QSqlQuery query;
                     query.prepare("CREATE TABLE Users ( "
-                                  "UserID int NOT NULL, "
-                                  "Username varchar(255) NOT NULL, "
-                                  "Shadow tinyblob"
+                                  "UserID INTEGER PRIMARY KEY, "
+                                  "Username VARCHAR(255) NOT NULL, "
+                                  "Shadow TINYBLOB"
                                   ");");
                     query.exec();
                 }
@@ -338,12 +335,19 @@ bool Server::listen(const QHostAddress &address, quint16 port)
                             && columns.contains("Username")
                             && columns.contains("Shadow"))
                     {
-                        qInfo() << tr("User Database is OK.");
+                        //% "User Database is OK."
+                        qInfo() << qtTrId("user-db-good");
+                    }
+                    else
+                    {
+                        //% "User Database is corrupted."
+                        qCritical() << qtTrId("user-db-bad");
                     }
                 }
                 if(!tables.contains("Equip"))
                 {
-                    qWarning() << tr("Equipment database does not exist, creating...");
+                    //% "Equipment database does not exist, creating..."
+                    qWarning() << qtTrId("equip-db-lack");
                 }
             }
         }
@@ -389,7 +393,8 @@ bool Server::parseSpec(const QStringList &cmdParts)
         {
             if(cmdParts.length() < 3)
             {
-                qout << tr("Usage: listen [ip] [port]") << Qt::endl;
+                //% "Usage: listen [ip] [port]"
+                qout << qtTrId("listen-usage") << Qt::endl;
                 return true;
             }
             QHostAddress address = QHostAddress(cmdParts[1]);
@@ -404,14 +409,17 @@ bool Server::parseSpec(const QStringList &cmdParts)
                 qWarning() << qtTrId("port-invalid");
                 return true;
             }
+            QString msg;
             if (listen(address, port)) {
-                QString msg = tr("Server is listening on address %1 and port %2")
+                //% "Server is listening on address %1 and port %2"
+                msg = qtTrId("server-listen")
                         .arg(address.toString()).arg(port);
                 qInfo() << msg;
             }
             else
             {
-                QString msg = tr("Server failed to listen on address %1 and port %2")
+                //% "Server failed to listen on address %1 and port %2"
+                msg = qtTrId("server-listen-fail")
                         .arg(address.toString()).arg(port);
                 qCritical() << msg;
             }
@@ -421,12 +429,14 @@ bool Server::parseSpec(const QStringList &cmdParts)
         {
             if(listening)
             {
-                qInfo() << tr("Server stopped listening.");
+                //% "Server stopped listening."
+                qInfo() << qtTrId("server-stop");
                 shutdown();
             }
             else
             {
-                qWarning() << tr("Server isn't listening.");
+                //% "Server isn't listening."
+                qWarning() << qtTrId("server-stopped-already");
             }
             return true;
         }
@@ -455,14 +465,16 @@ void Server::readyRead()
     const qint64 bytesRead = serverSocket.readDatagram(dgram.data(), dgram.size(),
                                                        &peerAddress, &peerPort);
     if (bytesRead <= 0) {
-        qWarning() << tr("Failed to read a datagram:") << serverSocket.errorString();
+        //% "Failed to read a datagram: %1"
+        qWarning() << qtTrId("read-dgram-failed").arg(serverSocket.errorString());
         return;
     }
 
     dgram.resize(bytesRead);
 
     if (peerAddress.isNull() || !peerPort) {
-        qWarning() << tr("Failed to extract peer info (address, port)");
+        //% "Failed to extract peer info (address, port)."
+        qWarning() << qtTrId("read-peerinfo-failed");
         return;
     }
     const auto client = std::find_if(knownClients.begin(), knownClients.end(),
@@ -481,7 +493,8 @@ void Server::readyRead()
             const QString peerInfo = peer_info(peerAddress, peerPort);
             if(connectedUsers.contains(peerInfo))
             {
-                qInfo() << tr("%1: disconnected abruptly").arg(connectedUsers[peerInfo]);
+                //% "%1: disconnected abruptly."
+                qInfo() << qtTrId("client-dc").arg(connectedUsers[peerInfo]);
                 connectedPeers.remove(connectedUsers[peerInfo]);
                 connectedUsers.remove(peerInfo);
             }
@@ -497,8 +510,8 @@ void Server::pskRequired(QSslPreSharedKeyAuthenticator *auth)
     Q_ASSERT(auth);
 
     QString clientName = QString::fromLatin1(auth->identity());
-    qInfo() << tr("PSK callback, received a client's identity: '%1'")
-               .arg(clientName);
+    //% "PSK callback, received a client's identity: '%1'"
+    qInfo() << qtTrId("client-id-received").arg(clientName);
     if(clientName.compare("NEW_USER") == 0)
         auth->setPreSharedKey(QByteArrayLiteral("register"));
     else
@@ -561,7 +574,8 @@ void Server::doHandshake(QDtls *newConnection, const QByteArray &clientHello)
 void Server::exitGraceSpec()
 {
     shutdown();
-    qInfo() << tr("Server is shutting down");
+    //% "Server is shutting down"
+    qInfo() << qtTrId("server-shutdown");
 }
 
 const QStringList Server::getCommandsSpec()
@@ -603,7 +617,8 @@ void Server::handleNewConnection(const QHostAddress &peerAddress,
         knownClients.push_back(std::move(newConnection));
         doHandshake(knownClients.back().get(), clientHello);
     } else if (cookieSender.dtlsError() != QDtlsError::NoError) {
-        qWarning() << tr("DTLS error:") << cookieSender.dtlsErrorString();
+        //% "DTLS error: %1"
+        qWarning() << qtTrId("dtls-error").arg(cookieSender.dtlsErrorString());
     } else {
         qDebug() << peerInfo << ": not verified yet";
     }
@@ -620,14 +635,17 @@ void Server::shutdown()
     {
         if(serverSocket.waitForDisconnected(2000))
         {
-            qInfo() << tr("Wait for disconnection...");
+            //% "Wait for disconnection..."
+            qInfo() << qtTrId("wait-for-dc");
         }
         else
         {
-            qCritical() << tr("Disconnect failed!");
+            //% "Disconnect failed!"
+            qCritical() << qtTrId("dc-failed");
         }
     }
     QString defaultDbName;
+    /* nontrivial braces: db should be destoryed for out of scope */
     {
         QSqlDatabase db = QSqlDatabase::database();
         defaultDbName = db.connectionName();

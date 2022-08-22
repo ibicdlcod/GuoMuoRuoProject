@@ -25,7 +25,7 @@
 /* Usage of QTextStreamManipulator on this class is prohibited throughout due to unfixable bugs,
  * that is, qout << qSetFieldWidth result in QTextStream & rather than this class.
  */
-struct ConsoleTextStream : public QTextStream
+class ConsoleTextStream : public QTextStream
 {
 public:
     ConsoleTextStream(FILE *, QIODeviceBase::OpenMode);

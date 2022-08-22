@@ -28,9 +28,8 @@ extern QSettings *settings;
 CommandLine::CommandLine(int argc, char ** argv)
     : QCoreApplication(argc, argv), timer(nullptr),
       qout(ConsoleTextStream(stdout, QIODevice::WriteOnly)),
-      passwordMode(password::normal)
+      passwordMode(Password::normal)
 {
-
 }
 
 void CommandLine::customMessageHandler(QtMsgType type, const QMessageLogContext &context, const QString &msg_original)

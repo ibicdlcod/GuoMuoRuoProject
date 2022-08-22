@@ -92,11 +92,11 @@ void Client::catbomb()
 
 void Client::displayPrompt()
 {
-#if 0 /* this is for non-ASCII test */
+#if defined(NOBODY_PLAYS_KANCOLLE_ANYMORE) /* this is for non-ASCII test */
     //% "田中飞妈"
     qInfo() << qtTrId("fscktanaka") << 114514;
 #endif
-    if(passwordMode != password::normal)
+    if(passwordMode != Password::normal)
         return;
     if(!loggedIn())
         qout << "WAClient$ ";
@@ -109,12 +109,12 @@ bool Client::parseSpec(const QStringList &cmdParts)
     if(cmdParts.length() > 0)
     {
         QString primary = cmdParts[0];
-        if(passwordMode != password::normal)
+        if(passwordMode != Password::normal)
         {
             QString password = primary;
             QByteArray salt = clientName.toUtf8().append(
                         settings->value("salt", defaultSalt).toByteArray());
-            if(passwordMode == password::confirm)
+            if(passwordMode == Password::confirm)
             {
                 QByteArray shadow1 = QPasswordDigestor::deriveKeyPbkdf2(
                             QCryptographicHash::Blake2s_256,
@@ -123,7 +123,7 @@ bool Client::parseSpec(const QStringList &cmdParts)
                 {
                     emit turnOnEchoing();
                     qWarning() << qtTrId("password-mismatch");
-                    passwordMode = password::normal;
+                    passwordMode = Password::normal;
                     attemptMode = false;
                     return true;
                 }
@@ -133,7 +133,7 @@ bool Client::parseSpec(const QStringList &cmdParts)
                 shadow = QPasswordDigestor::deriveKeyPbkdf2(QCryptographicHash::Blake2s_256,
                                                             password.toUtf8(), salt, 8, 255);
             }
-            if(passwordMode != password::registering)
+            if(passwordMode != Password::registering)
             {
                 emit turnOnEchoing();
 
@@ -148,17 +148,17 @@ bool Client::parseSpec(const QStringList &cmdParts)
                 {
                     //% "Failed to connect to server at %1:%2"
                     qWarning() << qtTrId("wait-for-connect-failure").arg(address.toString()).arg(port);
-                    passwordMode = password::normal;
+                    passwordMode = Password::normal;
                     return true;
                 }
                 connect(&socket, &QUdpSocket::readyRead, this, &Client::readyRead);
                 startHandshake();
-                passwordMode = password::normal;
+                passwordMode = Password::normal;
             }
             else
             {
                 qout << qtTrId("password-confirm") << Qt::endl;
-                passwordMode = password::confirm;
+                passwordMode = Password::confirm;
             }
             return true;
         }
@@ -225,7 +225,7 @@ bool Client::parseSpec(const QStringList &cmdParts)
                 clientName = cmdParts[3];
                 emit turnOffEchoing();
                 qout << qtTrId("password-enter") << Qt::endl;
-                passwordMode = registerMode ? password::registering : password::login;
+                passwordMode = registerMode ? Password::registering : Password::login;
 
                 return true;
             }
