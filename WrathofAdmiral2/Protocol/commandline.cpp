@@ -285,8 +285,11 @@ inline int CommandLine::callength(const QString &input, bool naive)
     }
     else
     {
-        const QChar *data = input.constData();
-        return mk_wcswidth(data, input.size());
+        int length = input.length();
+        wchar_t *data;
+        data = reinterpret_cast<wchar_t *>(calloc(length, sizeof(wchar_t)));
+        input.toWCharArray(data);
+        return mk_wcswidth(data, length);
     }
 }
 

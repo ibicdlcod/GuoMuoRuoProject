@@ -14,7 +14,7 @@ SOURCES += \
     consoletextstream.cpp \
     ecma48.cpp \
     kp.cpp \
-    wcwidth.cpp
+    wcwidth.c
 
 HEADERS += \
     commandline.h \

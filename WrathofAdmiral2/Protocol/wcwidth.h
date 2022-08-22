@@ -1,11 +1,17 @@
 #ifndef WCWIDTH_H
 #define WCWIDTH_H
 
-#include <QChar>
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #include <wchar.h>
 
-extern int mk_wcwidth(ushort ucs);
-extern int mk_wcswidth(const QChar *pwcs, size_t n);
+extern int mk_wcwidth(wchar_t ucs);
+extern int mk_wcswidth(const wchar_t *pwcs, size_t n);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // WCWIDTH_H

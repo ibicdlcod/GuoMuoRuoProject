@@ -66,7 +66,9 @@ public:
             ++i)
         {
             int length = i->length();
-            const QChar *data = i->constData();
+            wchar_t *data;
+            data = reinterpret_cast<wchar_t *>(calloc(length, sizeof(wchar_t)));
+            i->toWCharArray(data);
             int raw_length = mk_wcswidth(data, i->size());
 
             QTextStream::setFieldWidth(width * ((length - 1) / width + 1) - raw_length + length);
