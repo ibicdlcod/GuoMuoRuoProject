@@ -70,6 +70,7 @@ public:
             data = reinterpret_cast<wchar_t *>(calloc(length, sizeof(wchar_t)));
             i->toWCharArray(data);
             int raw_length = mk_wcswidth(data, i->size());
+            free(data);
 
             QTextStream::setFieldWidth(width * ((length - 1) / width + 1) - raw_length + length);
             *this << *i;

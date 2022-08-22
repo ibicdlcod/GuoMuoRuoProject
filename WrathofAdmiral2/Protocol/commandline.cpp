@@ -289,7 +289,9 @@ inline int CommandLine::callength(const QString &input, bool naive)
         wchar_t *data;
         data = reinterpret_cast<wchar_t *>(calloc(length, sizeof(wchar_t)));
         input.toWCharArray(data);
-        return mk_wcswidth(data, length);
+        int result = mk_wcswidth(data, length);
+        free(data);
+        return result;
     }
 }
 

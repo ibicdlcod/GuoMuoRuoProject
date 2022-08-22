@@ -66,14 +66,14 @@
     </message>
     <message id="ip-invalid">
         <location filename="../Client/client.cpp" line="214"/>
-        <location filename="../Server/server.cpp" line="403"/>
+        <location filename="../Server/server.cpp" line="463"/>
         <source></source>
         <oldsource>IP isn&apos;t valid</oldsource>
         <translation type="unfinished">IP格式不正确</translation>
     </message>
     <message id="port-invalid">
         <location filename="../Client/client.cpp" line="221"/>
-        <location filename="../Server/server.cpp" line="409"/>
+        <location filename="../Server/server.cpp" line="469"/>
         <source>Port isn&apos;t valid, it must fall between 1024 and 49151</source>
         <translation type="unfinished">端口格式不正确，注意1024以下和49151以上的端口是不能任意使用的</translation>
     </message>
@@ -216,7 +216,7 @@ Great at battle and bad at politics--so cool!</source>
         <translation type="unfinished">请使用&quot;commands&quot;查看可用命令，&quot;help&quot;查看帮助，&quot;exit&quot;退出。</translation>
     </message>
     <message id="goodbye">
-        <location filename="../Protocol/commandline.cpp" line="413"/>
+        <location filename="../Protocol/commandline.cpp" line="418"/>
         <source>Goodbye, press ENTER to quit.</source>
         <oldsource>Goodbye, press ENTER to quit</oldsource>
         <translation type="unfinished">再见，按ENTER退出程序。</translation>
@@ -241,88 +241,110 @@ Great at battle and bad at politics--so cool!</source>
         <source>Session cipher: %1; session protocol: %2.</source>
         <translation type="unfinished"></translation>
     </message>
+    <message id="sql-connect-success">
+        <location filename="../Server/server.cpp" line="317"/>
+        <source>SQL connection successful!</source>
+        <translation type="unfinished"></translation>
+    </message>
     <message id="user-db-lack">
-        <location filename="../Server/server.cpp" line="322"/>
+        <location filename="../Server/server.cpp" line="323"/>
         <source>User database does not exist, creating...</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="user-db-good">
-        <location filename="../Server/server.cpp" line="339"/>
+        <location filename="../Server/server.cpp" line="333"/>
+        <location filename="../Server/server.cpp" line="348"/>
         <source>User Database is OK.</source>
         <translation type="unfinished"></translation>
     </message>
+    <message id="user-db-gen-failure">
+        <location filename="../Server/server.cpp" line="338"/>
+        <source>Create User Database failed.</source>
+        <translation type="unfinished"></translation>
+    </message>
     <message id="user-db-bad">
-        <location filename="../Server/server.cpp" line="344"/>
+        <location filename="../Server/server.cpp" line="353"/>
         <source>User Database is corrupted.</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="equip-db-lack">
-        <location filename="../Server/server.cpp" line="350"/>
+        <location filename="../Server/server.cpp" line="359"/>
         <source>Equipment database does not exist, creating...</source>
         <translation type="unfinished"></translation>
     </message>
+    <message id="equip-db-good">
+        <location filename="../Server/server.cpp" line="400"/>
+        <location filename="../Server/server.cpp" line="410"/>
+        <source>Equipment Database is OK.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="equip-db-gen-failure">
+        <location filename="../Server/server.cpp" line="405"/>
+        <source>Create Equipment Database failed.</source>
+        <translation type="unfinished"></translation>
+    </message>
     <message id="listen-usage">
-        <location filename="../Server/server.cpp" line="397"/>
+        <location filename="../Server/server.cpp" line="457"/>
         <source>Usage: listen [ip] [port]</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="server-listen">
-        <location filename="../Server/server.cpp" line="415"/>
+        <location filename="../Server/server.cpp" line="475"/>
         <source>Server is listening on address %1 and port %2</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="server-listen-fail">
-        <location filename="../Server/server.cpp" line="422"/>
+        <location filename="../Server/server.cpp" line="482"/>
         <source>Server failed to listen on address %1 and port %2</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="server-stop">
-        <location filename="../Server/server.cpp" line="433"/>
+        <location filename="../Server/server.cpp" line="493"/>
         <source>Server stopped listening.</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="server-stopped-already">
-        <location filename="../Server/server.cpp" line="439"/>
+        <location filename="../Server/server.cpp" line="499"/>
         <source>Server isn&apos;t listening.</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="read-dgram-failed">
-        <location filename="../Server/server.cpp" line="469"/>
+        <location filename="../Server/server.cpp" line="529"/>
         <source>Failed to read a datagram: %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="read-peerinfo-failed">
-        <location filename="../Server/server.cpp" line="477"/>
+        <location filename="../Server/server.cpp" line="537"/>
         <source>Failed to extract peer info (address, port).</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="client-dc">
-        <location filename="../Server/server.cpp" line="497"/>
+        <location filename="../Server/server.cpp" line="557"/>
         <source>%1: disconnected abruptly.</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="client-id-received">
-        <location filename="../Server/server.cpp" line="514"/>
+        <location filename="../Server/server.cpp" line="574"/>
         <source>PSK callback, received a client&apos;s identity: &apos;%1&apos;</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="server-shutdown">
-        <location filename="../Server/server.cpp" line="578"/>
+        <location filename="../Server/server.cpp" line="638"/>
         <source>Server is shutting down</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="dtls-error">
-        <location filename="../Server/server.cpp" line="621"/>
+        <location filename="../Server/server.cpp" line="681"/>
         <source>DTLS error: %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="wait-for-dc">
-        <location filename="../Server/server.cpp" line="639"/>
+        <location filename="../Server/server.cpp" line="699"/>
         <source>Wait for disconnection...</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="dc-failed">
-        <location filename="../Server/server.cpp" line="644"/>
+        <location filename="../Server/server.cpp" line="704"/>
         <source>Disconnect failed!</source>
         <translation type="unfinished"></translation>
     </message>

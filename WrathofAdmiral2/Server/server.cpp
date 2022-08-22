@@ -313,7 +313,8 @@ bool Server::listen(const QHostAddress &address, quint16 port)
             }
             else
             {
-                qDebug() << "SQL connection successful!";
+                //% "SQL connection successful!"
+                qInfo() << qtTrId("sql-connect-success");
                 /* Database integrity check, the structure is defined here */
                 QStringList tables = db.tables(QSql::Tables);
                 if(!tables.contains("Users"))
@@ -326,7 +327,16 @@ bool Server::listen(const QHostAddress &address, quint16 port)
                                   "Username VARCHAR(255) NOT NULL, "
                                   "Shadow TINYBLOB"
                                   ");");
-                    query.exec();
+                    if(query.exec())
+                    {
+                        //% "User Database is OK."
+                        qInfo() << qtTrId("user-db-good");
+                    }
+                    else
+                    {
+                        //% "Create User Database failed."
+                        qCritical() << qtTrId("user-db-gen-failure");
+                    }
                 }
                 else
                 {
@@ -335,7 +345,6 @@ bool Server::listen(const QHostAddress &address, quint16 port)
                             && columns.contains("Username")
                             && columns.contains("Shadow"))
                     {
-                        //% "User Database is OK."
                         qInfo() << qtTrId("user-db-good");
                     }
                     else
@@ -348,6 +357,57 @@ bool Server::listen(const QHostAddress &address, quint16 port)
                 {
                     //% "Equipment database does not exist, creating..."
                     qWarning() << qtTrId("equip-db-lack");
+                    QSqlQuery query;
+                    query.prepare("CREATE TABLE Equip ( "
+                                  "EquipID INTEGER PRIMARY KEY, "
+                                  "Equipname VARCHAR(63), "
+                                  "Equiptype INTEGER, "
+                                  "Rarity INTEGER, "
+                                  "Intricacy INTEGER, "
+                                  "Tenacity INTEGER, "
+                                  "Firepower INTEGER, "
+                                  "Armorpenetration INTEGER, "
+                                  "Firingrange INTEGER, "
+                                  "Firingspeed INTEGER, "
+                                  "Torpedo INTEGER, "
+                                  "Bombing INTEGER, "
+                                  "Landattack INTEGER, "
+                                  "Airattack INTEGER, "
+                                  "Interception INTEGER, "
+                                  "Antibomber INTEGER, "
+                                  "Asw INTEGER, "
+                                  "Los INTEGER, "
+                                  "Accuracy INTEGER, "
+                                  "Evasion INTEGER, "
+                                  "Armor INTEGER, "
+                                  "Transport INTEGER, "
+                                  "Flightrange INTEGER, "
+                                  "Require INTEGER, "
+                                  "Require2 INTEGER, "
+                                  "Developenabled INTEGER, "
+                                  "Convertenabled INTEGER, "
+                                  "Requirenum INTEGER, "
+                                  "Require2num INTEGER, "
+                                  "Industrialsilver INTEGER, "
+                                  "Industrialgold INTEGER, "
+                                  "Customflag1 VARCHAR(63), "
+                                  "Customflag2 VARCHAR(63), "
+                                  "Customflag3 VARCHAR(63) "
+                                  ");");
+                    if(query.exec())
+                    {
+                        //% "Equipment Database is OK."
+                        qInfo() << qtTrId("equip-db-good");
+                    }
+                    else
+                    {
+                        //% "Create Equipment Database failed."
+                        qCritical() << qtTrId("equip-db-gen-failure");
+                    }
+                }
+                else
+                {
+                    qInfo() << qtTrId("equip-db-good");
                 }
             }
         }
