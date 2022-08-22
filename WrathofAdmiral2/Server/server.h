@@ -59,6 +59,7 @@
 #include <QSqlRecord>
 
 #include "commandline.h"
+#include "equipment.h"
 
 #include <vector>
 #include <memory>
@@ -88,6 +89,7 @@ private slots:
 private:
     void decryptDatagram(QDtls *, const QByteArray &);
     void doHandshake(QDtls *, const QByteArray &);
+    bool equipmentRefresh();
     void exitGraceSpec();
     const QStringList getCommandsSpec();
     const QStringList getValidCommands();
@@ -104,6 +106,8 @@ private:
 
     QMap<QString, QString> connectedUsers;
     QMap<QString, QString> connectedPeers;
+
+    QList<Equipment> equipRegistry;
 
     Q_DISABLE_COPY(Server)
 };

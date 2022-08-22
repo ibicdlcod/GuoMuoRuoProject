@@ -361,7 +361,7 @@ bool Server::listen(const QHostAddress &address, quint16 port)
                     query.prepare("CREATE TABLE Equip ( "
                                   "EquipID INTEGER PRIMARY KEY, "
                                   "Equipname VARCHAR(63), "
-                                  "Equiptype INTEGER, "
+                                  "Equiptype VARCHAR(63), "
                                   "Rarity INTEGER, "
                                   "Intricacy INTEGER, "
                                   "Tenacity INTEGER, "
@@ -407,7 +407,15 @@ bool Server::listen(const QHostAddress &address, quint16 port)
                 }
                 else
                 {
-                    qInfo() << qtTrId("equip-db-good");
+                    if(equipmentRefresh())
+                    {
+                        qInfo() << qtTrId("equip-db-good");
+                    }
+                    else
+                    {
+                        //% "Equipment Database is corrupted or incompatible."
+                        qCritical() << qtTrId("equip-db-bad");
+                    }
                 }
             }
         }
@@ -576,11 +584,16 @@ void Server::pskRequired(QSslPreSharedKeyAuthenticator *auth)
         auth->setPreSharedKey(QByteArrayLiteral("register"));
     else
     {
+        QSqlDatabase db = QSqlDatabase::database();
         QSqlQuery query;
         query.prepare("SELECT Shadow FROM Users "
                       "WHERE Username = :name;");
         query.bindValue(":name", clientName);
-        query.exec();
+        if(!query.exec())
+        {
+            //% "Pre-shared key retrieve failed: %1"
+            qCritical() << qtTrId("psk-retrieve-failed").arg(clientName);
+        }
         query.isSelect();
         if(!query.first())
         {
@@ -629,6 +642,26 @@ void Server::doHandshake(QDtls *newConnection, const QByteArray &clientHello)
     default:
         Q_UNREACHABLE();
     }
+}
+
+bool Server::equipmentRefresh()
+{
+    QSqlDatabase db = QSqlDatabase::database();
+    QSqlQuery query;
+    query.prepare("SELECT EquipID FROM Equip WHERE EquipID < 65536;");
+    if(!query.exec())
+    {
+        //% "Load equipment database failed!"
+        qCritical() << qtTrId("equip-refresh-failed");
+        return false;
+    }
+    query.isSelect();
+    while(query.next())
+    {
+        Equipment e = Equipment(query.value(0).toInt());
+        equipRegistry.append(e);
+    }
+    return true;
 }
 
 void Server::exitGraceSpec()
