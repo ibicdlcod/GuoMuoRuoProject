@@ -3,8 +3,6 @@
 ** Copyright (C) 2018 The Qt Company Ltd.
 ** Contact: https://www.qt.io/licensing/
 **
-** This file is part of the examples of the Qt Toolkit.
-**
 ** $QT_BEGIN_LICENSE:BSD$
 ** Commercial License Usage
 ** Licensees holding valid commercial Qt licenses may use this file in
@@ -508,6 +506,32 @@ bool Server::parseSpec(const QStringList &cmdParts)
             }
             return true;
         }
+        else if(primary.compare("exportcsv", Qt::CaseInsensitive) == 0)
+        {
+            if(cmdParts.length() > 1
+                    && cmdParts[1].compare("equip", Qt::CaseInsensitive) == 0)
+            {
+                if(exportEquipToCSV())
+                {
+                    //% "Export equipment registry success!"
+                    qInfo() << qtTrId("equip-export-good");
+                }
+                return true;
+            }
+        }
+        else if(primary.compare("importcsv", Qt::CaseInsensitive) == 0)
+        {
+            if(cmdParts.length() > 1
+                    && cmdParts[1].compare("equip", Qt::CaseInsensitive) == 0)
+            {
+                if(importEquipFromCSV())
+                {
+                    //% "Import equipment registry success!"
+                    qInfo() << qtTrId("equip-import-good");
+                }
+                return true;
+            }
+        }
     }
     return false;
 }
@@ -647,8 +671,14 @@ void Server::doHandshake(QDtls *newConnection, const QByteArray &clientHello)
 bool Server::equipmentRefresh()
 {
     QSqlDatabase db = QSqlDatabase::database();
+    if(!db.isValid())
+    {
+        //% "Database uninitialized!"
+        qCritical() << qtTrId("database-uninit");
+        return false;
+    }
     QSqlQuery query;
-    query.prepare("SELECT * FROM Equip WHERE EquipID < 65536;");
+    query.prepare("SELECT * FROM Equip;");
     if(!query.exec())
     {
         //% "Load equipment database failed!"
@@ -664,11 +694,6 @@ bool Server::equipmentRefresh()
     }
     while(query.next())
     {
-        if(!query.value(0).typeName())
-        {
-            qCritical() << qtTrId("equip-refresh-failed");
-            return false;
-        }
         Equipment e;
         for(const QString &fieldname: fieldnames)
         {
@@ -707,6 +732,63 @@ void Server::exitGraceSpec()
     shutdown();
     //% "Server is shutting down"
     qInfo() << qtTrId("server-shutdown");
+}
+
+bool Server::exportEquipToCSV()
+{
+    QString csvFileName = settings->value("server/equip_reg_csv", "Equip.csv").toString();
+
+    QFile *csvFile = new QFile(csvFileName);
+    if(Q_UNLIKELY(!csvFile) || !csvFile->open(QIODevice::WriteOnly))
+    {
+        qFatal("CSV file cannot be opened");
+        return false;
+    }
+
+    QTextStream textStream(csvFile);
+
+    QSqlDatabase db = QSqlDatabase::database();
+    if(!db.isValid())
+    {
+        qCritical() << qtTrId("database-uninit");
+        return false;
+    }
+    QSqlQuery query;
+    query.prepare("SELECT * FROM Equip;");
+    if(!query.exec())
+    {
+        //% "Export equipment database failed!"
+        qCritical() << qtTrId("equip-export-failed");
+        return false;
+    }
+    query.isSelect();
+    QSqlRecord rec = query.record();
+    for(int i = 0; i < rec.count(); ++i)
+    {
+        textStream << rec.fieldName(i) << ",";
+    }
+    while(query.next())
+    {
+        textStream << "\n";
+        for(int i = 0; i < rec.count();
+            ++i)
+        {
+            if((rec.fieldName(i).compare("EquipID", Qt::CaseInsensitive) == 0)
+                    || (rec.fieldName(i).compare("require", Qt::CaseInsensitive) == 0)
+                    || (rec.fieldName(i).compare("require2", Qt::CaseInsensitive) == 0))
+            {
+                Qt::hex(textStream);
+                textStream << "0x" << query.value(i).toInt() << ",";
+                Qt::dec(textStream);
+            }
+            else
+            {
+                textStream << query.value(i).toString() << ",";
+            }
+        }
+    }
+    csvFile->close();
+    return true;
 }
 
 const QStringList Server::getCommandsSpec()
@@ -753,6 +835,68 @@ void Server::handleNewConnection(const QHostAddress &peerAddress,
     } else {
         qDebug() << peerInfo << ": not verified yet";
     }
+}
+
+bool Server::importEquipFromCSV()
+{
+    QString csvFileName = settings->value("server/equip_reg_csv", "Equip.csv").toString();
+
+    QFile *csvFile = new QFile(csvFileName);
+    if(Q_UNLIKELY(!csvFile) || !csvFile->open(QIODevice::ReadOnly))
+    {
+        qFatal("CSV file cannot be opened");
+        return false;
+    }
+
+    QTextStream textStream(csvFile);
+
+    QSqlDatabase db = QSqlDatabase::database();
+    if(!db.isValid())
+    {
+        qCritical() << qtTrId("database-uninit");
+        return false;
+    }
+
+    QString title = textStream.readLine();
+    if(title.endsWith(","))
+        title.chop(1);
+
+    while(!textStream.atEnd())
+    {
+        QString data = textStream.readLine();
+        if(data.endsWith(","))
+            data.chop(1);
+        QStringList dataParts = data.split(",");
+        QString dataNew;
+        for(const QString &dataPiece: dataParts)
+        {
+            if(dataPiece.length() == 0)
+                dataNew.append("NULL");
+            else
+            {
+                bool success;
+                dataPiece.toInt(&success, 0);
+                if(!success)
+                    dataNew.append("'"+dataPiece+"'");
+                else
+                    dataNew.append(dataPiece);
+            }
+            dataNew.append(",");
+        }
+        if(dataNew.endsWith(","))
+            dataNew.chop(1);
+        QSqlQuery query;
+        query.prepare("REPLACE INTO Equip ("+title+") VALUES ("+dataNew+");");
+        if(!query.exec())
+        {
+            //% "Import equipment database failed!"
+            qCritical() << qtTrId("equip-import-failed");
+            qCritical() << query.lastError();
+            return false;
+        }
+    }
+    csvFile->close();
+    return true;
 }
 
 void Server::shutdown()

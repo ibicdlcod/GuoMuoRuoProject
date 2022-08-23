@@ -1,0 +1,9 @@
+EquipID,Equipname,Equiptype,Rarity,Intricacy,Tenacity,Firepower,Armorpenetration,Firingrange,Firingspeed,Torpedo,Bombing,Landattack,Airattack,Interception,Antibomber,Asw,Los,Accuracy,Evasion,Armor,Transport,Flightrange,Require,Require2,Developenabled,Convertenabled,Requirenum,Require2num,Industrialsilver,Industrialgold,Customflag1,Customflag2,Customflag3
+0x2101,jp-12-sing,small-gun-flat,5,1,30,20,5,8,50,,,2,,,,,,10,10,,,,,,1,0,,,,,,,
+0xf2101,,,10,,40,30,7,8,65,,,3,,,,,,17,20,,,,,,,,,,,,,,
+0x2102,jp-12-sing-k2,small-gun-flat,20,2,30,20,6,9,60,,,4,1,,,,,15,20,,,,0x2101,,2,1,1,,,,,,
+0xf2102,,,30,,40,30,8,9,65,,,4,1,,,,,23,40,,,,,,,,,,,,,,
+0x2201,jp-12-sing-flak,small-gun-flak,10,1,10,20,4,11,35,,,1,4,,,,,,,,,,,,1,0,,,,,,,
+0xf2201,,,20,,15,30,6,11,40,,,1,7,,,,,5,5,,,,,,,,,,,,,,
+0x2202,jp-12-sing-flak-e,small-gun-flak,20,1,15,20,5,11,36,,,1,9,,,3,,,15,,,,0x2201,,2,1,1,,,,,,
+0xf2202,,,25,,20,30,7,11,42,,,1,13,,,4,,12,25,,,,,,,,,,,,,,

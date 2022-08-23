@@ -3,8 +3,6 @@
 ** Copyright (C) 2018 The Qt Company Ltd.
 ** Contact: https://www.qt.io/licensing/
 **
-** This file is part of the examples of the Qt Toolkit.
-**
 ** $QT_BEGIN_LICENSE:BSD$
 ** Commercial License Usage
 ** Licensees holding valid commercial Qt licenses may use this file in
@@ -91,10 +89,12 @@ private:
     void doHandshake(QDtls *, const QByteArray &);
     bool equipmentRefresh();
     void exitGraceSpec();
+    bool exportEquipToCSV();
     const QStringList getCommandsSpec();
     const QStringList getValidCommands();
     void handleNewConnection(const QHostAddress &, quint16,
                              const QByteArray &);
+    bool importEquipFromCSV();
     void shutdown();
 
     bool listening = false;
