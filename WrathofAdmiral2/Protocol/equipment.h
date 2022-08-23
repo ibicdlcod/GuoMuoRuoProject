@@ -3,15 +3,18 @@
 
 #include <QString>
 #include <QList>
+#include <QMap>
 
 class Equipment
 {
 public:
-    Equipment(int);
+    Equipment();
 
     int id;
     QString name;
     QString type;
+    QMap<QString, int> attr;
+    /*
     int rarity;
     int intricacy;
     int tenacity;
@@ -39,6 +42,7 @@ public:
     int require2Num;
     int industrialSilver;
     int industrialGold;
+    */
     QStringList customflags;
 };
 

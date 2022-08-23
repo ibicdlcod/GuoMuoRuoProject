@@ -648,7 +648,7 @@ bool Server::equipmentRefresh()
 {
     QSqlDatabase db = QSqlDatabase::database();
     QSqlQuery query;
-    query.prepare("SELECT EquipID FROM Equip WHERE EquipID < 65536;");
+    query.prepare("SELECT * FROM Equip WHERE EquipID < 65536;");
     if(!query.exec())
     {
         //% "Load equipment database failed!"
@@ -656,10 +656,48 @@ bool Server::equipmentRefresh()
         return false;
     }
     query.isSelect();
+    QSqlRecord rec = query.record();
+    QStringList fieldnames;
+    for(int i = 0; i < rec.count(); ++i)
+    {
+        fieldnames.append(rec.fieldName(i));
+    }
     while(query.next())
     {
-        Equipment e = Equipment(query.value(0).toInt());
-        equipRegistry.append(e);
+        if(!query.value(0).typeName())
+        {
+            qCritical() << qtTrId("equip-refresh-failed");
+            return false;
+        }
+        Equipment e;
+        for(const QString &fieldname: fieldnames)
+        {
+            int i = rec.indexOf(fieldname);
+            if(fieldname.compare("EquipID", Qt::CaseInsensitive) == 0)
+            {
+                e.id = query.value(i).toInt();
+            }
+            else if(fieldname.startsWith("Equip", Qt::CaseInsensitive))
+            {
+                if(fieldname.compare("Equipname", Qt::CaseInsensitive) == 0)
+                {
+                    e.name = query.value(i).toString();
+                }
+                if(fieldname.compare("Equiptype", Qt::CaseInsensitive) == 0)
+                {
+                    e.type = query.value(i).toString();
+                }
+            }
+            else if(fieldname.startsWith("Custom", Qt::CaseInsensitive))
+            {
+                e.customflags.append(query.value(i).toString());
+            }
+            else
+            {
+                e.attr[fieldname] = query.value(i).toInt();
+            }
+        }
+        equipRegistry[e.id] = e;
     }
     return true;
 }

@@ -107,7 +107,7 @@ private:
     QMap<QString, QString> connectedUsers;
     QMap<QString, QString> connectedPeers;
 
-    QList<Equipment> equipRegistry;
+    QMap<int, Equipment> equipRegistry;
 
     Q_DISABLE_COPY(Server)
 };
