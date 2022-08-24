@@ -52,6 +52,7 @@
 #include <QPasswordDigestor>
 
 #include "kp.h"
+#include "networkerror.h"
 
 extern QSettings *settings;
 
@@ -104,151 +105,222 @@ void Client::displayPrompt()
 
 bool Client::parseSpec(const QStringList &cmdParts)
 {
-    if(cmdParts.length() > 0)
-    {
-        QString primary = cmdParts[0];
-        if(passwordMode != Password::normal)
+    try {
+        if(cmdParts.length() > 0)
         {
-            QString password = primary;
-            QByteArray salt = clientName.toUtf8().append(
-                        settings->value("salt", defaultSalt).toByteArray());
-            if(passwordMode == Password::confirm)
+            QString primary = cmdParts[0];
+            if(passwordMode != Password::normal)
             {
-                QByteArray shadow1 = QPasswordDigestor::deriveKeyPbkdf2(
-                            QCryptographicHash::Blake2s_256,
-                            password.toUtf8(), salt, 8, 255);
-                if(shadow1 != shadow)
+                QString password = primary;
+                QByteArray salt = clientName.toUtf8().append(
+                            settings->value("salt", defaultSalt).toByteArray());
+                if(passwordMode == Password::confirm)
                 {
-                    emit turnOnEchoing();
-                    qWarning() << qtTrId("password-mismatch");
-                    passwordMode = Password::normal;
-                    attemptMode = false;
-                    return true;
-                }
-            }
-            else
-            {
-                shadow = QPasswordDigestor::deriveKeyPbkdf2(QCryptographicHash::Blake2s_256,
-                                                            password.toUtf8(), salt, 8, 255);
-            }
-            if(passwordMode != Password::registering)
-            {
-                emit turnOnEchoing();
-
-                auto configuration = QSslConfiguration::defaultDtlsConfiguration();
-                configuration.setPeerVerifyMode(QSslSocket::VerifyNone);
-                crypto.setPeer(address, port);
-                crypto.setDtlsConfiguration(configuration);
-                connect(&crypto, &QDtls::handshakeTimeout, this, &Client::handshakeTimeout);
-                connect(&crypto, &QDtls::pskRequired, this, &Client::pskRequired);
-                socket.connectToHost(address.toString(), port);
-                if(!socket.waitForConnected(8000))
-                {
-                    //% "Failed to connect to server at %1:%2"
-                    qWarning() << qtTrId("wait-for-connect-failure").arg(address.toString()).arg(port);
-                    passwordMode = Password::normal;
-                    return true;
-                }
-                connect(&socket, &QUdpSocket::readyRead, this, &Client::readyRead);
-                startHandshake();
-                passwordMode = Password::normal;
-            }
-            else
-            {
-                qout << qtTrId("password-confirm") << Qt::endl;
-                passwordMode = Password::confirm;
-            }
-            return true;
-        }
-
-        /* aliases */
-        QMap<QString, QString> aliases;
-        aliases["cn"] = "connect";
-        aliases["dc"] = "disconnect";
-        aliases["reg"] = "register";
-
-        if(aliases.contains(primary))
-        {
-            primary = aliases[primary];
-        }
-        /* end aliases */
-
-        bool loginMode = primary.compare("connect", Qt::CaseInsensitive) == 0;
-        registerMode = primary.compare("register", Qt::CaseInsensitive) == 0;
-
-        if(loginMode || registerMode)
-        {
-            if(crypto.isConnectionEncrypted())
-            {
-                qInfo() << qtTrId("connected-already");
-                return true;
-            }
-            else if(attemptMode)
-            {
-                qWarning() << qtTrId("connect-duplicate");
-                return true;
-            }
-            retransmitTimes = 0;
-            if(cmdParts.length() < 4)
-            {
-                if(registerMode)
-                {
-                    //% "Usage: register [ip] [port] [username]"
-                    qout << qtTrId("register-usage") << Qt::endl;
+                    QByteArray shadow1 = QPasswordDigestor::deriveKeyPbkdf2(
+                                QCryptographicHash::Blake2s_256,
+                                password.toUtf8(), salt, 8, 255);
+                    if(shadow1 != shadow)
+                    {
+                        emit turnOnEchoing();
+                        qWarning() << qtTrId("password-mismatch");
+                        passwordMode = Password::normal;
+                        attemptMode = false;
+                        return true;
+                    }
                 }
                 else
                 {
-                    //% "Usage: connect [ip] [port] [username]"
-                    qout << qtTrId("connect-usage") << Qt::endl;
+                    shadow = QPasswordDigestor::deriveKeyPbkdf2(QCryptographicHash::Blake2s_256,
+                                                                password.toUtf8(), salt, 8, 255);
+                }
+                if(passwordMode != Password::registering)
+                {
+                    emit turnOnEchoing();
+
+                    auto configuration = QSslConfiguration::defaultDtlsConfiguration();
+                    configuration.setPeerVerifyMode(QSslSocket::VerifyNone);
+                    crypto.setPeer(address, port);
+                    crypto.setDtlsConfiguration(configuration);
+                    connect(&crypto, &QDtls::handshakeTimeout, this, &Client::handshakeTimeout);
+                    connect(&crypto, &QDtls::pskRequired, this, &Client::pskRequired);
+                    socket.connectToHost(address.toString(), port);
+                    if(!socket.waitForConnected(8000))
+                    {
+                        //% "Failed to connect to server at %1:%2"
+                        qWarning() << qtTrId("wait-for-connect-failure").arg(address.toString()).arg(port);
+                        passwordMode = Password::normal;
+                        return true;
+                    }
+                    connect(&socket, &QUdpSocket::readyRead, this, &Client::readyRead);
+                    startHandshake();
+                    passwordMode = Password::normal;
+                }
+                else
+                {
+                    qout << qtTrId("password-confirm") << Qt::endl;
+                    passwordMode = Password::confirm;
                 }
                 return true;
             }
-            else
+
+            /* aliases */
+            QMap<QString, QString> aliases;
+            aliases["cn"] = "connect";
+            aliases["dc"] = "disconnect";
+            aliases["reg"] = "register";
+
+            if(aliases.contains(primary))
             {
-                attemptMode = true;
-                address = QHostAddress(cmdParts[1]);
-                if(address.isNull())
+                primary = aliases[primary];
+            }
+            /* end aliases */
+
+            bool loginMode = primary.compare("connect", Qt::CaseInsensitive) == 0;
+            registerMode = primary.compare("register", Qt::CaseInsensitive) == 0;
+
+            if(loginMode || registerMode)
+            {
+                if(crypto.isConnectionEncrypted())
                 {
-                    qWarning() << qtTrId("ip-invalid");
+                    qInfo() << qtTrId("connected-already");
                     return true;
                 }
-                port = QString(cmdParts[2]).toInt();
-                if(port < 1024 || port > 49151)
+                else if(attemptMode)
                 {
-                    //% "Port isn't valid, it must fall between 1024 and 49151"
-                    qWarning() << qtTrId("port-invalid");
+                    qWarning() << qtTrId("connect-duplicate");
                     return true;
                 }
+                retransmitTimes = 0;
+                if(cmdParts.length() < 4)
+                {
+                    if(registerMode)
+                    {
+                        //% "Usage: register [ip] [port] [username]"
+                        qout << qtTrId("register-usage") << Qt::endl;
+                    }
+                    else
+                    {
+                        //% "Usage: connect [ip] [port] [username]"
+                        qout << qtTrId("connect-usage") << Qt::endl;
+                    }
+                    return true;
+                }
+                else
+                {
+                    attemptMode = true;
+                    address = QHostAddress(cmdParts[1]);
+                    if(address.isNull())
+                    {
+                        qWarning() << qtTrId("ip-invalid");
+                        return true;
+                    }
+                    port = QString(cmdParts[2]).toInt();
+                    if(port < 1024 || port > 49151)
+                    {
+                        //% "Port isn't valid, it must fall between 1024 and 49151"
+                        qWarning() << qtTrId("port-invalid");
+                        return true;
+                    }
 
-                clientName = cmdParts[3];
-                emit turnOffEchoing();
-                qout << qtTrId("password-enter") << Qt::endl;
-                passwordMode = registerMode ? Password::registering : Password::login;
+                    clientName = cmdParts[3];
+                    emit turnOffEchoing();
+                    qout << qtTrId("password-enter") << Qt::endl;
+                    passwordMode = registerMode ? Password::registering : Password::login;
 
+                    return true;
+                }
+            }
+            else if(primary.compare("disconnect", Qt::CaseInsensitive) == 0)
+            {
+                if(!crypto.isConnectionEncrypted())
+                    qInfo() << qtTrId("disconnect-when-offline");
+                else
+                {
+                    QByteArray msg = KP::clientAuth(KP::Logout);
+                    const qint64 written = crypto.writeDatagramEncrypted(&socket, msg);
+
+                    if (written <= 0) {
+                        //% "%1: failed to send logout attmpt - %2"
+                        qCritical() << qtTrId("logout-failed")
+                                       .arg(clientName, crypto.dtlsErrorString());
+                    }
+                    qInfo() << qtTrId("disconnect-attempt");
+                }
                 return true;
             }
-        }
-        else if(primary.compare("disconnect", Qt::CaseInsensitive) == 0)
-        {
-            if(!crypto.isConnectionEncrypted())
-                qInfo() << qtTrId("disconnect-when-offline");
-            else
+            else if(!loggedIn())
             {
-                QByteArray msg = KP::clientAuth(KP::Logout);
-                const qint64 written = crypto.writeDatagramEncrypted(&socket, msg);
-
-                if (written <= 0) {
-                    //% "%1: failed to send logout attmpt - %2"
-                    qCritical() << qtTrId("logout-failed")
-                                   .arg(clientName, crypto.dtlsErrorString());
-                }
-                qInfo() << qtTrId("disconnect-attempt");
+                return false;
             }
-            return true;
+            else if(primary.compare("switch", Qt::CaseInsensitive) == 0)
+            {
+                if(cmdParts.length() < 2)
+                {
+                    //% "Usage: switch [gamestate]"
+                    qout << qtTrId("switch-usage") << Qt::endl;
+                    return true;
+                }
+                else
+                {
+                    QString secondary = cmdParts[1].first(1).toUpper()
+                            + cmdParts[1].sliced(1).toLower();
+
+                    QMetaEnum info = QMetaEnum::fromType<KP::GameState>();
+                    int statevalue = info.keyToValue(secondary.toLatin1().constData());
+                    if(statevalue == -1)
+                    {
+                        //% "Nonexistent gamestate: %1"
+                        qCritical() << qtTrId("game-unexpected-state").arg(secondary);
+                    }
+                    else if(statevalue == KP::Offline)
+                    {
+                        //% "Use 'disconnect' for logout."
+                        qWarning() << qtTrId("gamestate-offline");
+                    }
+                    else
+                    {
+                        gameState = (KP::GameState)statevalue;
+                    }
+                    return true;
+                }
+            }
+            else if(primary.compare("develop", Qt::CaseInsensitive) == 0)
+            {
+                if(gameState != KP::Factory)
+                {
+                    return false;
+                }
+                else if(cmdParts.length() < 2)
+                {
+                    //% "Usage: develop [equipid]"
+                    qout << qtTrId("develop-usage") << Qt::endl;
+                    return true;
+                }
+                else
+                {
+                    int equipid = cmdParts[1].toInt(nullptr, 0);
+                    if(equipid == 0)
+                    {
+                        //% "Equipment id invalid"
+                        qout << qtTrId("develop-invalid-id") << Qt::endl;
+                        return true;
+                    }
+                    QByteArray msg = KP::clientDevelop(equipid, false);
+                    const qint64 written = crypto.writeDatagramEncrypted(&socket, msg);
+                    if (written <= 0)
+                    {
+                        throw NetworkError(crypto.dtlsErrorString());
+                    }
+                    return true;
+                }
+            }
+            return false;
         }
         return false;
+    } catch (NetworkError &e) {
+        qWarning() << (clientName + ":") << e.what();
+        return true;
     }
-    return false;
 }
 
 void Client::serverResponse(const QString &clientInfo, const QByteArray &plainText)
@@ -340,6 +412,21 @@ void Client::serverResponse(const QString &clientInfo, const QByteArray &plainTe
             {
             case KP::JsonError: qWarning() << qtTrId("client-bad-json"); break;
             case KP::Unsupported: qWarning() << qtTrId("client-unsupported-json"); break;
+            case KP::AccessDenied: qWarning() << qtTrId("access-denied-login-first"); break;
+            case KP::DevelopFailed:
+            {
+                if(djson["rulebased"].toBool())
+                {
+                    //% "This equipment does not exist or not open for development."
+                    qWarning() << qtTrId("equip-not-developable");
+                }
+                else
+                {
+                    //% "Equipment development failed."
+                    qInfo() << qtTrId("equip-develop-failed");
+                }
+            }
+                break;
             default: throw std::domain_error("message not implemented"); break;
             }
         }
@@ -460,7 +547,7 @@ void Client::readyRead()
         {
             qDebug() << clientName << ": encrypted connection established!";
 
-            QString shadowstring = QString(shadow.toHex()).toLatin1();
+            //QString shadowstring = QString(shadow.toHex()).toLatin1();
             if(registerMode)
             {
                 QByteArray msg = KP::clientAuth(KP::Reg, clientName, shadow);
@@ -555,7 +642,11 @@ const QStringList Client::getCommandsSpec()
 {
     QStringList result = QStringList();
     result.append(getCommands());
-    result.append({"disconnect", "connect", "register"});
+    result.append({"disconnect",
+                   "connect",
+                   "register",
+                   "develop"
+                  });
     result.sort(Qt::CaseInsensitive);
     return result;
 }
@@ -565,7 +656,13 @@ const QStringList Client::getValidCommands()
     QStringList result = QStringList();
     result.append(getCommands());
     if(crypto.isConnectionEncrypted())
+    {
         result.append("disconnect");
+        if(gameState == KP::Factory)
+        {
+            result.append("develop");
+        }
+    }
     else if(!attemptMode)
         result.append({"connect", "register"});
     result.sort(Qt::CaseInsensitive);

@@ -46,9 +46,11 @@
 **
 ****************************************************************************/
 
+#include "server.h"
+
 #include <algorithm>
 
-#include "server.h"
+#include "kerrors.h"
 
 QT_BEGIN_NAMESPACE
 
@@ -197,7 +199,7 @@ void Server::datagramReceived(const QString &peerInfo, const QByteArray &plainTe
                     }
                     else
                     {
-                        /* TODO: if connectedPeers[name] exists then force-logout all of them */
+                        /* if connectedPeers[name] exists then force-logout all of them */
                         if(!(connectedPeers[name].isEmpty()))
                         {
                             const auto client = std::find_if(knownClients.begin(), knownClients.end(),
@@ -255,16 +257,48 @@ void Server::datagramReceived(const QString &peerInfo, const QByteArray &plainTe
             }
         }
             break;
+        case KP::DgramType::Request:
+        {
+            if(!connectedUsers.contains(peerInfo))
+            {
+                QByteArray msg = KP::accessDenied();
+                connection->writeDatagramEncrypted(&serverSocket, msg);
+            }
+            else
+            {
+                switch(djson["command"].toInt())
+                {
+                case KP::CommandType::Develop:
+                {
+                    int equipid = djson["equipid"].toInt();
+                    if(!equipRegistry.contains(equipid)
+                            || equipRegistry[equipid]->attr[Equipment::Developenabled] < 1)
+                    {
+                        QByteArray msg = KP::serverDevelopFailed(true);
+                        connection->writeDatagramEncrypted(&serverSocket, msg);
+                    }
+                    else
+                    {
+                        ;
+                    }
+                }
+                    break;
+                default:
+                    throw std::domain_error("command type not supported"); break;
+                }
+            }
+        }
+            break;
         default:
             throw std::domain_error("datagram type not supported"); break;
         }
     } catch (const QJsonParseError &e) {
         qWarning() << peerInfo << e.errorString();
-        QByteArray msg = KP::serverParse(KP::JsonError, peerInfo, e.errorString());
+        QByteArray msg = KP::serverParseError(KP::JsonError, peerInfo, e.errorString());
         connection->writeDatagramEncrypted(&serverSocket, msg);
     } catch (const std::domain_error &e) {
         qWarning() << peerInfo << e.what();
-        QByteArray msg = KP::serverParse(KP::Unsupported, peerInfo, e.what());
+        QByteArray msg = KP::serverParseError(KP::Unsupported, peerInfo, e.what());
         connection->writeDatagramEncrypted(&serverSocket, msg);
     }
 #if defined(QT_DEBUG)
@@ -323,8 +357,11 @@ bool Server::listen(const QHostAddress &address, quint16 port)
                     query.prepare("CREATE TABLE Users ( "
                                   "UserID INTEGER PRIMARY KEY, "
                                   "Username VARCHAR(255) NOT NULL, "
-                                  "Shadow TINYBLOB"
-                                  ");");
+                                  "Shadow TINYBLOB,"
+                                  "ResOil INTEGER DEFAULT 10000,"
+                                  "ResAmmo INTEGER DEFAULT 10000,"
+                                  "ResMetal INTEGER DEFAULT 10000,"
+                                  "ResRare INTEGER DEFAULT 5000);");
                     if(query.exec())
                     {
                         //% "User Database is OK."
@@ -339,14 +376,27 @@ bool Server::listen(const QHostAddress &address, quint16 port)
                 else
                 {
                     QSqlRecord columns = db.record("Users");
-                    if(columns.contains("UserID")
-                            && columns.contains("Username")
-                            && columns.contains("Shadow"))
-                    {
+                    QStringList desiredColumns = {
+                        "UserID",
+                        "Username",
+                        "Shadow",
+                        "ResOil",
+                        "ResAmmo",
+                        "ResMetal",
+                        "ResRare"
+                    };
+                    try {
+                        for(const QString &column : desiredColumns)
+                        {
+                            if(!columns.contains(column))
+                            {
+                                //% "column %1 does not exist at table %2"
+                                throw DBError(qtTrId("column-nonexist").arg(column, "Users"));
+                            }
+                        }
                         qInfo() << qtTrId("user-db-good");
-                    }
-                    else
-                    {
+                    } catch (DBError &e) {
+                        qCritical() << e.what();
                         //% "User Database is corrupted."
                         qCritical() << qtTrId("user-db-bad");
                     }
@@ -694,35 +744,45 @@ bool Server::equipmentRefresh()
     }
     while(query.next())
     {
-        Equipment e;
+        QPointer<Equipment> e(new Equipment());
         for(const QString &fieldname: fieldnames)
         {
             int i = rec.indexOf(fieldname);
+            QMetaEnum info = QMetaEnum::fromType<Equipment::AttrType>();
             if(fieldname.compare("EquipID", Qt::CaseInsensitive) == 0)
             {
-                e.id = query.value(i).toInt();
+                e->id = query.value(i).toInt();
             }
             else if(fieldname.startsWith("Equip", Qt::CaseInsensitive))
             {
                 if(fieldname.compare("Equipname", Qt::CaseInsensitive) == 0)
                 {
-                    e.name = query.value(i).toString();
+                    e->name = query.value(i).toString();
                 }
                 if(fieldname.compare("Equiptype", Qt::CaseInsensitive) == 0)
                 {
-                    e.type = query.value(i).toString();
+                    e->type = query.value(i).toString();
                 }
             }
             else if(fieldname.startsWith("Custom", Qt::CaseInsensitive))
             {
-                e.customflags.append(query.value(i).toString());
+                e->customflags.append(query.value(i).toString());
             }
             else
             {
-                e.attr[fieldname] = query.value(i).toInt();
+                int attrvalue = info.keyToValue(fieldname.toLatin1().constData());
+                if(attrvalue == -1)
+                {
+                    //% "Unexpected attribute of equipment: %1"
+                    qCritical() << qtTrId("equip-unexpected-attr").arg(fieldname);
+                }
+                else
+                {
+                    e->attr[(Equipment::AttrType)attrvalue] = query.value(i).toInt();
+                }
             }
         }
-        equipRegistry[e.id] = e;
+        equipRegistry[e->id] = e;
     }
     return true;
 }
@@ -741,7 +801,7 @@ bool Server::exportEquipToCSV()
     QFile *csvFile = new QFile(csvFileName);
     if(Q_UNLIKELY(!csvFile) || !csvFile->open(QIODevice::WriteOnly))
     {
-        qFatal("CSV file cannot be opened");
+        qCritical("CSV file cannot be opened");
         return false;
     }
 
@@ -860,13 +920,13 @@ bool Server::importEquipFromCSV()
     QString title = textStream.readLine();
     if(title.endsWith(","))
         title.chop(1);
+    QStringList titleParts = title.split(",");
 
     while(!textStream.atEnd())
     {
         QString data = textStream.readLine();
-        if(data.endsWith(","))
-            data.chop(1);
         QStringList dataParts = data.split(",");
+        dataParts = dataParts.first(titleParts.length());
         QString dataNew;
         for(const QString &dataPiece: dataParts)
         {

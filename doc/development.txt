@@ -1,0 +1,3 @@
+rarity*(base)+intricacy*(100,100,100,100)
+base:
+small-gun 0-20-15-0

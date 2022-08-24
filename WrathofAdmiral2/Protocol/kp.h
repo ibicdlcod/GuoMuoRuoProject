@@ -21,7 +21,8 @@ public:
 
     enum DgramType{
         Auth,
-        Message
+        Message,
+        Request
     };
     Q_ENUM(DgramType)
 
@@ -42,15 +43,31 @@ public:
 
     enum MsgType{
         JsonError,
-        Unsupported
+        Unsupported,
+        AccessDenied,
+        DevelopFailed
     };
     Q_ENUM(MsgType)
 
     enum GameState{
         Offline,
-        Port
+        Port,
+        Factory
     };
     Q_ENUM(GameState)
+
+    enum ResourceType{
+        ResOil,
+        ResAmmo,
+        ResMetal,
+        ResRare
+    };
+    Q_ENUM(ResourceType)
+
+    enum CommandType{
+        Develop
+    };
+    Q_ENUM(CommandType)
 
     /* See JSON support in Qt, especially QCborValue */
     static QByteArray clientAuth(AuthMode, const QString &name = "",
@@ -59,8 +76,11 @@ public:
                                  bool, AuthError);
     static QByteArray serverAuth(AuthMode, const QString &,
                                  bool);
-    static QByteArray serverParse(MsgType, const QString &,
+    static QByteArray serverParseError(MsgType, const QString &,
                                   const QString &);
+    static QByteArray clientDevelop(int, bool convert = false);
+    static QByteArray accessDenied();
+    static QByteArray serverDevelopFailed(bool ruleBased = true);
 };
 
 #endif // KP_H

@@ -4,45 +4,51 @@
 #include <QString>
 #include <QList>
 #include <QMap>
+#include <QObject>
 
-class Equipment
+class Equipment: public QObject
 {
+    Q_OBJECT
+
 public:
     Equipment();
+
+    enum AttrType{
+        Rarity,
+        Intricacy,
+        Tenacity,
+        Firepower,
+        Armorpenetration,
+        Firingrange,
+        Firingspeed,
+        Torpedo,
+        Bombing,
+        Landattack,
+        Airattack,
+        Interception,
+        Antibomber,
+        Asw,
+        Los,
+        Accuracy,
+        Evasion,
+        Armor,
+        Flightrange,
+        Transport,
+        Require,
+        Require2,
+        Developenabled,
+        Convertenabled,
+        Requirenum,
+        Require2num,
+        Industrialsilver,
+        Industrialgold
+    };
+    Q_ENUM(AttrType)
 
     int id;
     QString name;
     QString type;
-    QMap<QString, int> attr;
-    /*
-    int rarity;
-    int intricacy;
-    int tenacity;
-    int firepower;
-    int armorPenetration;
-    int firingRange;
-    int firingSpeed;
-    int torpedo;
-    int bombing;
-    int landAttack;
-    int airAttack;
-    int interception;
-    int antiBomber;
-    int asw;
-    int los;
-    int accuracy;
-    int evasion;
-    int armor;
-    int transport;
-    int require;
-    int require2;
-    int developEnabled;
-    int convertEnabled;
-    int requireNum;
-    int require2Num;
-    int industrialSilver;
-    int industrialGold;
-    */
+    QMap<AttrType, int> attr;
     QStringList customflags;
 };
 

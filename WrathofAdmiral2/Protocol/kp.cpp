@@ -38,7 +38,7 @@ QByteArray KP::serverAuth(AuthMode mode, const QString &uname,
     return QCborValue::fromJsonValue(result).toCbor();
 }
 
-QByteArray KP::serverParse(MsgType pe, const QString &uname,
+QByteArray KP::serverParseError(MsgType pe, const QString &uname,
                            const QString &content)
 {
     QJsonObject result;
@@ -46,5 +46,32 @@ QByteArray KP::serverParse(MsgType pe, const QString &uname,
     result["msgtype"] = pe;
     result["username"] = uname;
     result["content"] = content;
+    return QCborValue::fromJsonValue(result).toCbor();
+}
+
+QByteArray KP::clientDevelop(int equipid, bool convert)
+{
+    QJsonObject result;
+    result["type"] = DgramType::Request;
+    result["command"] = CommandType::Develop;
+    result["equipid"] = equipid;
+    result["convert"] = convert;
+    return QCborValue::fromJsonValue(result).toCbor();
+}
+
+QByteArray KP::accessDenied()
+{
+    QJsonObject result;
+    result["type"] = DgramType::Message;
+    result["msgtype"] = MsgType::AccessDenied;
+    return QCborValue::fromJsonValue(result).toCbor();
+}
+
+QByteArray KP::serverDevelopFailed(bool ruleBased)
+{
+    QJsonObject result;
+    result["type"] = DgramType::Message;
+    result["msgtype"] = MsgType::DevelopFailed;
+    result["rulebased"] = ruleBased;
     return QCborValue::fromJsonValue(result).toCbor();
 }

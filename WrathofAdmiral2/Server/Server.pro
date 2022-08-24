@@ -9,6 +9,7 @@ CONFIG -= app_bundle
 DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+        kerrors.cpp \
         main.cpp \
         server.cpp
 
@@ -52,6 +53,7 @@ else:win32:!win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$OUT_PWD/
 else:unix: PRE_TARGETDEPS += $$OUT_PWD/../Protocol/libProtocol.a
 
 HEADERS += \
+    kerrors.h \
     server.h
 
 RESOURCES += \
