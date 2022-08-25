@@ -12,26 +12,22 @@
 #include <QJsonObject>
 #include <QCborValue>
 
-class KP : public QObject
-{
-    Q_OBJECT
-
-public:
-    KP() = delete;
+namespace KP {
+    Q_NAMESPACE
 
     enum DgramType{
         Auth,
         Message,
         Request
     };
-    Q_ENUM(DgramType)
+    Q_ENUM_NS(DgramType)
 
     enum AuthMode{
         Login,
         Reg,
         Logout
     };
-    Q_ENUM(AuthMode)
+    Q_ENUM_NS(AuthMode)
 
     enum AuthError{
         BadShadow,
@@ -39,7 +35,7 @@ public:
         LoggedElsewhere,
         UserExists
     };
-    Q_ENUM(AuthError)
+    Q_ENUM_NS(AuthError)
 
     enum MsgType{
         JsonError,
@@ -47,14 +43,14 @@ public:
         AccessDenied,
         DevelopFailed
     };
-    Q_ENUM(MsgType)
+    Q_ENUM_NS(MsgType)
 
     enum GameState{
         Offline,
         Port,
         Factory
     };
-    Q_ENUM(GameState)
+    Q_ENUM_NS(GameState)
 
     enum ResourceType{
         ResOil,
@@ -62,25 +58,25 @@ public:
         ResMetal,
         ResRare
     };
-    Q_ENUM(ResourceType)
+    Q_ENUM_NS(ResourceType)
 
     enum CommandType{
         Develop
     };
-    Q_ENUM(CommandType)
+    Q_ENUM_NS(CommandType)
 
     /* See JSON support in Qt, especially QCborValue */
-    static QByteArray clientAuth(AuthMode, const QString &name = "",
-                                 const QByteArray &shadow = "");
-    static QByteArray serverAuth(AuthMode, const QString &,
-                                 bool, AuthError);
-    static QByteArray serverAuth(AuthMode, const QString &,
-                                 bool);
-    static QByteArray serverParseError(MsgType, const QString &,
-                                  const QString &);
-    static QByteArray clientDevelop(int, bool convert = false);
-    static QByteArray accessDenied();
-    static QByteArray serverDevelopFailed(bool ruleBased = true);
+    QByteArray clientAuth(AuthMode, const QString &name = "",
+                          const QByteArray &shadow = "");
+    QByteArray serverAuth(AuthMode, const QString &,
+                          bool, AuthError);
+    QByteArray serverAuth(AuthMode, const QString &,
+                          bool);
+    QByteArray serverParseError(MsgType, const QString &,
+                           const QString &);
+    QByteArray clientDevelop(int, bool convert = false);
+    QByteArray accessDenied();
+    QByteArray serverDevelopFailed(bool ruleBased = true);
 };
 
 #endif // KP_H

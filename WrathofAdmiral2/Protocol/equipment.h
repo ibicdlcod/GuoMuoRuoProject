@@ -6,8 +6,7 @@
 #include <QMap>
 #include <QObject>
 
-class Equipment: public QObject
-{
+struct Equipment: public QObject {
     Q_OBJECT
 
 public:

@@ -1,4 +1,4 @@
-#ifndef COMMANDLINE_H
+﻿#ifndef COMMANDLINE_H
 #define COMMANDLINE_H
 
 #include <QCoreApplication>
@@ -13,7 +13,15 @@ class CommandLine : public QCoreApplication
 
 public:
     explicit CommandLine(int, char **);
-    virtual ~CommandLine();
+    virtual ~CommandLine() noexcept;
+
+    enum Password{
+        normal,
+        login,
+        registering,
+        confirm
+    };
+    Q_ENUM(Password);
 
 public slots:
     static void customMessageHandler(QtMsgType,
@@ -39,15 +47,7 @@ protected:
     void exitGracefully();
     virtual void exitGraceSpec() = 0;
 
-    QTimer *timer;
     ConsoleTextStream qout;
-    enum Password
-    {
-        normal,
-        login,
-        registering,
-        confirm
-    };
     Password passwordMode;
 };
 

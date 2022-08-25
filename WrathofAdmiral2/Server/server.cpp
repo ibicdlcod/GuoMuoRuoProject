@@ -54,7 +54,7 @@
 
 QT_BEGIN_NAMESPACE
 
-extern QSettings *settings;
+extern std::unique_ptr<QSettings> settings;
 
 namespace {
 
@@ -97,7 +97,7 @@ Server::Server(int argc, char ** argv)
     serverConfiguration.setPeerVerifyMode(QSslSocket::VerifyNone);
 }
 
-Server::~Server()
+Server::~Server() noexcept
 {
     shutdown();
 }

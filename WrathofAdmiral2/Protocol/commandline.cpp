@@ -23,25 +23,23 @@
  * (Outdated, se QT_TR_NOOP() and QT_TRANSLATE_NOOP())
  */
 extern QFile *logFile;
-extern QSettings *settings;
+extern std::unique_ptr<QSettings> settings;
 
 CommandLine::CommandLine(int argc, char ** argv)
-    : QCoreApplication(argc, argv), timer(nullptr),
+    : QCoreApplication(argc, argv),
       qout(ConsoleTextStream(stdout, QIODevice::WriteOnly)),
-      passwordMode(Password::normal)
-{
+      passwordMode(Password::normal) {
 }
 
-CommandLine::~CommandLine()
-{
+CommandLine::~CommandLine() noexcept {
 
 }
 
-void CommandLine::customMessageHandler(QtMsgType type, const QMessageLogContext &context, const QString &msg_original)
-{
+void CommandLine::customMessageHandler(QtMsgType type,
+                                       const QMessageLogContext &context,
+                                       const QString &msg_original) {
     QString msg = msg_original;
-    if(msg.endsWith("\n"))
-    {
+    if(msg.endsWith("\n")) {
         msg.remove(msg.length() - 1, 1);
     }
     msg.remove(QChar('\"'), Qt::CaseInsensitive);
@@ -53,7 +51,8 @@ void CommandLine::customMessageHandler(QtMsgType type, const QMessageLogContext 
     bool msg_off = false;
 
 #if defined(QT_DEBUG)
-    QString txt2 = QStringLiteral("%1 (%2:%3, %4)").arg(localMsg, file, QString::number(context.line), function);
+    QString txt2 = QStringLiteral("%1 (%2:%3, %4)").
+            arg(localMsg, file, QString::number(context.line), function);
 #else
     Q_UNUSED(file)
     Q_UNUSED(function)
@@ -104,8 +103,7 @@ void CommandLine::customMessageHandler(QtMsgType type, const QMessageLogContext 
         break;
     }
 
-    if(!msg_off)
-    {
+    if(!msg_off) {
         std::cout << color;
 #if defined (Q_OS_WIN)
         WriteConsoleW(GetStdHandle(STD_OUTPUT_HANDLE),
@@ -116,20 +114,17 @@ void CommandLine::customMessageHandler(QtMsgType type, const QMessageLogContext 
         std::cout << "\x1b[49;39m" << std::endl;
     }
 
-    if(!logFile->isWritable())
-    {
+    if(!logFile->isWritable()) {
         qFatal("Log file cannot be written to.");
     }
-    if(txt.contains(QChar('\0')))
-    {
+    if(txt.contains(QChar('\0'))) {
         qFatal("Log Error");
     }
     QTextStream textStream(logFile);
     txt.remove(QChar('\r'), Qt::CaseInsensitive);
     txt = QStringLiteral("[%1] %2\n").arg(dt, txt);
     textStream << txt;
-    if(type == QtFatalMsg)
-    {
+    if(type == QtFatalMsg) {
         abort();
     }
 }
@@ -167,7 +162,7 @@ void CommandLine::openingwords()
 
 bool CommandLine::parse(const QString &input)
 {
-    if(passwordMode)
+    if(passwordMode != Password::normal)
     {
         bool success = parseSpec(QStringList(input));
         if(!success)
@@ -318,50 +313,45 @@ int CommandLine::getConsoleWidth()
 /* Using Unicode characters in console AT ALL is recommended against
  * (https://stackoverflow.com/a/3971750)
  * TODO: Use QFontMetrics to handle
- * https://stackoverflow.com/questions/31732698/getting-font-metrics-without-gui-console-mode
+ * https://stackoverflow.com/questions/31732698/
  * TODO: Qt Console can't display unicode correctly
  * https://bugreports.qt.io/browse/QTCREATORBUG-8099
+ * This function is rather too long but non-trivial to refactor,
+ * avoid touching it.
  */
 void CommandLine::qls(const QStringList &input)
 {
-    if(input.length() <= 0)
-    {
+    if(input.length() <= 0) {
         return;
     }
     int width = getConsoleWidth();
-
-    auto lengthcmp = [](QString a, auto&& b) { return callength(a) < callength(b); };
-
+    auto lengthcmp = [](QString a, auto&& b){
+        return callength(a) < callength(b); };
     int maxcolumns = input.length();
     int total = input.length();
     QMap<int, QList<QStringList>> displayCandidates;
-    for(int columns = 1; columns <= maxcolumns; ++columns)
-    {
+    for(int columns = 1; columns <= maxcolumns; ++columns) {
         int rows;
-        if(total % columns == 0)
-        {
+        if(total % columns == 0) {
             rows = total / columns;
         }
-        else
-        {
+        else {
             rows = total / columns + 1;
         }
         QList<QStringList> displays;
         QStringList singlecolumn;
         typedef typename QStringList::const_iterator iter;
-        for(iter i = input.constBegin(); i != input.constEnd(); ++i)
-        {
-            if(singlecolumn.length() < rows && i != (input.constEnd() - 1))
-            {
+        for(iter i = input.constBegin(); i != input.constEnd(); ++i) {
+            if(singlecolumn.length() < rows
+                    && i != (input.constEnd() - 1)) {
                 singlecolumn.append(*i);
             }
-            else if (singlecolumn.length() < rows && i == (input.constEnd() - 1))
-            {
+            else if (singlecolumn.length() < rows
+                     && i == (input.constEnd() - 1)) {
                 singlecolumn.append(*i);
                 displays.append(singlecolumn);
             }
-            else
-            {
+            else {
                 displays.append(singlecolumn);
                 singlecolumn = *(new QStringList());
                 --i;
@@ -369,17 +359,17 @@ void CommandLine::qls(const QStringList &input)
             }
         }
         int displayedcolumns = 0;
-        for(int j = 0; j < displays.length(); ++j)
-        {
-            displayedcolumns += (callength(*std::max_element(
-                                               (displays.constBegin() + j)->constBegin(),
-                                               (displays.constBegin() + j)->constEnd(),
-                                               lengthcmp)) + 1);
+        for(int j = 0; j < displays.length(); ++j) {
+            displayedcolumns
+                    += (callength(
+                            *std::max_element(
+                                (displays.constBegin() + j)->constBegin(),
+                                (displays.constBegin() + j)->constEnd(),
+                                lengthcmp)) + 1);
         }
         displayedcolumns--;
 
-        if(displayedcolumns <= width)
-        {
+        if(displayedcolumns <= width) {
             displayCandidates[rows] = displays;
 
         }
@@ -388,20 +378,21 @@ void CommandLine::qls(const QStringList &input)
     int min = *std::min_element(k.begin(), k.end());
     QList<QStringList> displaySelected = displayCandidates[min];
 
-    for(int i = 0; i < displaySelected.begin()->length(); ++i)
-    {
-        for(int j = 0; j < displaySelected.length(); ++j)
-        {
-            if(i < (displaySelected.begin() + j)->length())
-            {
-                QString current_element = *((displaySelected.begin() + j)->constBegin() + i);
-                int fieldwidth = callength(*std::max_element(
-                                               (displaySelected.begin() + j)->begin(),
-                                               (displaySelected.begin() + j)->end(),
-                                               lengthcmp)) + ((j == displaySelected.length() - 1) ? 0 : 1)
+    for(int i = 0; i < displaySelected.begin()->length(); ++i) {
+        for(int j = 0; j < displaySelected.length(); ++j) {
+            if(i < (displaySelected.begin() + j)->length()) {
+                QString current_element
+                        = *((displaySelected.begin() + j)->constBegin() + i);
+                int fieldwidth = callength(
+                            *std::max_element(
+                                (displaySelected.begin() + j)->begin(),
+                                (displaySelected.begin() + j)->end(),
+                                lengthcmp))
+                        + ((j == displaySelected.length() - 1) ? 0 : 1)
                         - callength(current_element)
                         + callength(current_element, true);
-                QString str = *((displaySelected.begin() + j)->constBegin() + i);
+                QString str = *((displaySelected.begin() + j)
+                                ->constBegin() + i);
                 qout.print(str, fieldwidth);
             }
         }
@@ -413,10 +404,6 @@ void CommandLine::qls(const QStringList &input)
 void CommandLine::exitGracefully()
 {
     exitGraceSpec();
-    if(timer)
-    {
-        timer->stop();
-    }
     //% "Goodbye, press ENTER to quit."
     qout.printLine(qtTrId("goodbye"), Ecma(64,255,64), Ecma(EcmaSetter::BlinkOn));
     qout.reset();

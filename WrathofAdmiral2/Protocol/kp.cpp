@@ -39,7 +39,7 @@ QByteArray KP::serverAuth(AuthMode mode, const QString &uname,
 }
 
 QByteArray KP::serverParseError(MsgType pe, const QString &uname,
-                           const QString &content)
+                                const QString &content)
 {
     QJsonObject result;
     result["type"] = DgramType::Message;

@@ -1,9 +1,9 @@
 #ifndef NETWORKERROR_H
 #define NETWORKERROR_H
 
-#include <stdexcept>
-#include <QString>
 #include <QCoreApplication>
+#include <QString>
+#include <stdexcept>
 
 class NetworkError : public std::runtime_error {
     Q_DECLARE_TR_FUNCTIONS(NetworkError)

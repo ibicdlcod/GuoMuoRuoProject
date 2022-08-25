@@ -1,8 +1,8 @@
 #include <QCoreApplication>
+#include <QFile>
 #include <QLocale>
 #include <QTranslator>
 #include <QSettings>
-#include <QFile>
 #include "qconsolelistener.h"
 
 /* OS Specific */
@@ -15,21 +15,20 @@
 #include <locale.h>
 #endif
 
-#include "kp.h"
 #include "client.h"
+#include "kp.h"
 
 QFile *logFile;
-QSettings *settings;
+std::unique_ptr<QSettings> settings;
 
 void initLog() {
-    QString logFileName= settings->value("client/logfile",
+    QString logFileName = settings->value("client/logfile",
                                          "ClientLog.log").toString();
     logFile = new QFile(logFileName);
     if(Q_UNLIKELY(!logFile)
             || !logFile->open(QIODevice::WriteOnly | QIODevice::Append)) {
         qFatal("Log file cannot be opened");
     }
-
 }
 
 void winConsoleCheck() {
@@ -60,7 +59,7 @@ int main(int argc, char *argv[]) {
     client.setApplicationVersion("0.55.1"); // temp
     client.setOrganizationName("Harusame Software");
     client.setOrganizationDomain("hsny.xyz"); // temp
-    settings = new QSettings();
+    settings = std::make_unique<QSettings>(new QSettings);
 
 #if defined(Q_OS_UNIX)
     setlocale(LC_NUMERIC, "C");
@@ -68,11 +67,12 @@ int main(int argc, char *argv[]) {
 
     QTranslator translator;
     /* For testing purposes */
-    settings->setValue("languages", QStringList("zh_CN"));
+    settings->setValue("language", QStringLiteral("zh_CN"));
 
     QStringList uiLanguages = QLocale::system().uiLanguages();
-    uiLanguages.append(settings->value("languages", QStringList())
-                       .toStringList());
+    if(settings->contains("language")) {
+        uiLanguages.prepend(settings->value("language").toString());
+    }
     for (const QString &locale : uiLanguages) {
         const QString baseName = "WA2_" + QLocale(locale).name();
         if (translator.load(":/i18n/" + baseName)) {

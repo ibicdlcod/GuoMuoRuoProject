@@ -50,7 +50,6 @@
 #define CLIENT_H
 
 #include <QtNetwork>
-
 #include "commandline.h"
 
 class Client : public CommandLine {
@@ -58,12 +57,12 @@ class Client : public CommandLine {
 
 public:
     explicit Client(int, char **);
-    ~Client();
+    ~Client() noexcept;
 
 public slots:
     void catbomb();
-    void displayPrompt();
-    bool parseSpec(const QStringList &);
+    void displayPrompt() override;
+    bool parseSpec(const QStringList &) override;
     void serverResponse(const QString &, const QByteArray &);
     Q_DECL_DEPRECATED void update();
 
@@ -82,10 +81,10 @@ private slots:
 private:
     void doDevelop(const QStringList &);
     void doSwitch(const QStringList &);
-    void exitGraceSpec();
+    void exitGraceSpec() override;
     QString gameStateString() const;
-    const QStringList getCommandsSpec() const;
-    const QStringList getValidCommands() const;
+    const QStringList getCommandsSpec() const override;
+    const QStringList getValidCommands() const override;
     bool loggedIn() const;
     void parseConnectReq(const QStringList &);
     void parseDisconnectReq();
@@ -117,8 +116,8 @@ private:
 
     KP::GameState gameState;
 
-    const unsigned int defaultMaxRetransmit = 2;
-    const QByteArray defaultSalt =
+    static const unsigned int defaultMaxRetransmit = 2;
+    QByteArray defaultSalt =
             QByteArrayLiteral("\xe8\xbf\x99\xe6\x98\xaf\xe4\xb8"
                               "\x80\xe6\x9d\xa1\xe5\x92\xb8\xe9"
                               "\xb1\xbc");

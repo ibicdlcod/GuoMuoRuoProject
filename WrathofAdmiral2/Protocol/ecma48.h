@@ -3,8 +3,7 @@
 
 #include <QTextStreamManipulator>
 
-enum class EcmaSetter
-{
+enum class EcmaSetter {
     UnderscoreOn,
     UnderscoreOff,
     BlinkOn,
@@ -25,8 +24,7 @@ enum class EcmaSetter
     OverlineOff
 };
 
-struct Ecma48
-{
+struct Ecma48 {
 public:
     explicit Ecma48(quint8 red,
                     quint8 green,
@@ -38,28 +36,23 @@ public:
     bool background;
 };
 
-enum structInt
-{
+enum structInt {
     ecmaSetter,
     ecma48,
     qtextStreamManipulator
 };
 
-union Ecma
-{
+union Ecma {
     structInt member;
-    struct
-    {
+    struct {
         structInt structId;
         EcmaSetter setter;
     } mem1;
-    struct
-    {
+    struct {
         structInt structId;
         Ecma48 color;
     } mem2;
-    struct
-    {
+    struct {
         structInt structId;
         QTextStreamManipulator manipulator;
     } mem3;

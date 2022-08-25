@@ -19,7 +19,7 @@
 #include "server.h"
 
 QFile *logFile;
-QSettings *settings;
+std::unique_ptr<QSettings> settings;
 
 int main(int argc, char *argv[])
 {
@@ -51,12 +51,16 @@ int main(int argc, char *argv[])
     server.setApplicationVersion("0.54.1"); // temp
     server.setOrganizationName("Harusame Software");
     server.setOrganizationDomain("hsny.xyz"); // temp
-    settings = new QSettings();
+    settings = std::make_unique<QSettings>(new QSettings);
 
     QTranslator translator;
-    settings->setValue("languages", QStringList("zh_CN")); // this is for testing
-    const QStringList uiLanguages = QLocale::system().uiLanguages()
-            + settings->value("languages", QStringList()).toStringList();
+    /* For testing purposes */
+    settings->setValue("language", QStringLiteral("zh_CN"));
+
+    QStringList uiLanguages = QLocale::system().uiLanguages();
+    if(settings->contains("language")) {
+        uiLanguages.prepend(settings->value("language").toString());
+    }
     for (const QString &locale : uiLanguages) {
         const QString baseName = "WA2_" + QLocale(locale).name();
         if (translator.load(":/i18n/" + baseName)) {

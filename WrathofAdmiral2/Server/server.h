@@ -68,7 +68,7 @@ class Server : public CommandLine
 
 public:
     explicit Server(int, char **);
-    ~Server();
+    ~Server() noexcept;
 
     void datagramReceived(const QString &, const QByteArray &,
                           QDtls *);
@@ -76,8 +76,8 @@ public:
     bool listen(const QHostAddress &, quint16);
 
 public slots:
-    void displayPrompt();
-    bool parseSpec(const QStringList &);
+    void displayPrompt() override;
+    bool parseSpec(const QStringList &) override;
     Q_DECL_DEPRECATED void update();
 
 private slots:
@@ -88,10 +88,10 @@ private:
     void decryptDatagram(QDtls *, const QByteArray &);
     void doHandshake(QDtls *, const QByteArray &);
     bool equipmentRefresh();
-    void exitGraceSpec();
+    void exitGraceSpec() override;
     bool exportEquipToCSV() const;
-    const QStringList getCommandsSpec() const;
-    const QStringList getValidCommands() const;
+    const QStringList getCommandsSpec() const override;
+    const QStringList getValidCommands() const override;
     void handleNewConnection(const QHostAddress &, quint16,
                              const QByteArray &);
     bool importEquipFromCSV();

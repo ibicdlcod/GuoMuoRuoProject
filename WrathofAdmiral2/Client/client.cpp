@@ -47,14 +47,12 @@
 ****************************************************************************/
 
 #include "client.h"
-
 #include <QSettings>
 #include <QPasswordDigestor>
-
 #include "kp.h"
 #include "networkerror.h"
 
-extern QSettings *settings;
+extern std::unique_ptr<QSettings> settings;
 
 Client::Client(int argc, char ** argv)
     : CommandLine(argc, argv),
@@ -62,10 +60,9 @@ Client::Client(int argc, char ** argv)
       attemptMode(false),
       registerMode(false),
       gameState(KP::Offline) {
-
 }
 
-Client::~Client() {
+Client::~Client() noexcept {
     shutdown();
 }
 
