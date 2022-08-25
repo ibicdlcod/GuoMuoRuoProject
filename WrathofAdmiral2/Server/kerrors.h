@@ -12,7 +12,7 @@ class DBError : public std::runtime_error {
 
 public:
     //% "Database Error: %1"
-    DBError(QString what) : std::runtime_error(qtTrId("db-error").arg(what).toStdString()) {}
+    DBError(QString what) : std::runtime_error(what.toStdString()) {}
 };
 
 #endif // KERRORS_H

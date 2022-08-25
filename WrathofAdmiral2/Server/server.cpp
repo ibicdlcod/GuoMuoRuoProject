@@ -86,6 +86,52 @@ QString connection_info(QDtls *connection) {
     return info;
 }
 
+static const QString userT = QStringLiteral("CREATE TABLE Users ( "
+                                            "UserID INTEGER PRIMARY KEY, "
+                                            "Username VARCHAR(255) NOT NULL, "
+                                            "Shadow TINYBLOB,"
+                                            "ResOil INTEGER DEFAULT 10000,"
+                                            "ResAmmo INTEGER DEFAULT 10000,"
+                                            "ResMetal INTEGER DEFAULT 10000,"
+                                            "ResRare INTEGER DEFAULT 5000);");
+
+static const QString equipT = QStringLiteral("CREATE TABLE Equip ( "
+                                             "EquipID INTEGER PRIMARY KEY, "
+                                             "Equipname VARCHAR(63), "
+                                             "Equiptype VARCHAR(63), "
+                                             "Rarity INTEGER, "
+                                             "Intricacy INTEGER, "
+                                             "Tenacity INTEGER, "
+                                             "Firepower INTEGER, "
+                                             "Armorpenetration INTEGER, "
+                                             "Firingrange INTEGER, "
+                                             "Firingspeed INTEGER, "
+                                             "Torpedo INTEGER, "
+                                             "Bombing INTEGER, "
+                                             "Landattack INTEGER, "
+                                             "Airattack INTEGER, "
+                                             "Interception INTEGER, "
+                                             "Antibomber INTEGER, "
+                                             "Asw INTEGER, "
+                                             "Los INTEGER, "
+                                             "Accuracy INTEGER, "
+                                             "Evasion INTEGER, "
+                                             "Armor INTEGER, "
+                                             "Transport INTEGER, "
+                                             "Flightrange INTEGER, "
+                                             "Require INTEGER, "
+                                             "Require2 INTEGER, "
+                                             "Developenabled INTEGER, "
+                                             "Convertenabled INTEGER, "
+                                             "Requirenum INTEGER, "
+                                             "Require2num INTEGER, "
+                                             "Industrialsilver INTEGER, "
+                                             "Industrialgold INTEGER, "
+                                             "Customflag1 VARCHAR(63), "
+                                             "Customflag2 VARCHAR(63), "
+                                             "Customflag3 VARCHAR(63) "
+                                             ");");
+
 }
 
 Server::Server(int argc, char ** argv) : CommandLine(argc, argv) {
@@ -167,35 +213,48 @@ void Server::displayPrompt() {
 }
 
 bool Server::parseSpec(const QStringList &cmdParts) {
-    if(cmdParts.length() > 0) {
-        QString primary = cmdParts[0];
-        primary = settings->value("alias/"+primary, primary).toString();
+    try {
+        if(cmdParts.length() > 0) {
+            QString primary = cmdParts[0];
+            primary = settings->value("alias/"+primary, primary).toString();
 
-        if(primary.compare("listen", Qt::CaseInsensitive) == 0) {
-            parseListen(cmdParts);
-            return true;
-        }
-        else if(primary.compare("unlisten", Qt::CaseInsensitive) == 0) {
-            parseUnlisten();
-            return true;
-        }
-        else if(primary.compare("exportcsv", Qt::CaseInsensitive) == 0) {
-            if(cmdParts.length() > 1
-                    && cmdParts[1].compare("equip", Qt::CaseInsensitive) == 0) {
-                exportEquipToCSV();
+            if(primary.compare("listen", Qt::CaseInsensitive) == 0) {
+                parseListen(cmdParts);
                 return true;
-            } // else return false
-        }
-        else if(primary.compare("importcsv", Qt::CaseInsensitive) == 0)
-        {
-            if(cmdParts.length() > 1
-                    && cmdParts[1].compare("equip", Qt::CaseInsensitive) == 0) {
-                importEquipFromCSV();
+            }
+            else if(primary.compare("unlisten", Qt::CaseInsensitive) == 0) {
+                parseUnlisten();
                 return true;
-            } // else return false
+            }
+            else if(primary.compare("exportcsv", Qt::CaseInsensitive) == 0) {
+                if(cmdParts.length() > 1
+                        && cmdParts[1].compare(
+                            "equip", Qt::CaseInsensitive) == 0) {
+                    exportEquipToCSV();
+                    return true;
+                } // else return false
+            }
+            else if(primary.compare("importcsv", Qt::CaseInsensitive) == 0)
+            {
+                if(cmdParts.length() > 1
+                        && cmdParts[1].compare(
+                            "equip", Qt::CaseInsensitive) == 0) {
+                    importEquipFromCSV();
+                    return true;
+                } // else return false
+            }
         }
+        return false;
+    } catch (DBError &e) {
+        //% "Database Error: %1"
+        qCritical() << qtTrId("db-error").arg(e.what());
+        QSqlDatabase db = QSqlDatabase::database();
+        QSqlError de = db.lastError();
+        if(de.isValid())
+            qCritical() << "DB:" << de.databaseText()
+                        << "/Driver:" << de.driverText();
+        return true;
     }
-    return false;
 }
 
 void Server::update() {
@@ -346,24 +405,24 @@ void Server::doHandshake(QDtls *newConnection,
         qDebug() << QString("Connection with %1 encrypted. %2")
                     .arg(peerInfo, connection_info(newConnection));
         break;
-    default:
-        Q_UNREACHABLE();
+    default: Q_UNREACHABLE();
     }
 }
 
+/* nothing could shrink this function */
 bool Server::equipmentRefresh()
 {
     QSqlDatabase db = QSqlDatabase::database();
     if(!db.isValid()) {
         //% "Database uninitialized!"
-        qCritical() << qtTrId("database-uninit");
+        throw DBError(qtTrId("database-uninit"));
         return false;
     }
     QSqlQuery query;
     query.prepare("SELECT * FROM Equip;");
     if(!query.exec()) {
-        //% "Load equipment database failed!"
-        qCritical() << qtTrId("equip-refresh-failed");
+        //% "Load equipment table failed!"
+        throw DBError(qtTrId("equip-refresh-failed"));
         return false;
     }
     query.isSelect();
@@ -372,105 +431,101 @@ bool Server::equipmentRefresh()
     for(int i = 0; i < rec.count(); ++i) {
         fieldnames.append(rec.fieldName(i));
     }
+    QRegularExpression reid("EquipID",
+                            QRegularExpression::CaseInsensitiveOption);
+    QRegularExpression rename("Equipname",
+                              QRegularExpression::CaseInsensitiveOption);
+    QRegularExpression retype("Equiptype",
+                              QRegularExpression::CaseInsensitiveOption);
+    int indexid = fieldnames.indexOf(reid);
+    int indexname = fieldnames.indexOf(rename);
+    int indextype = fieldnames.indexOf(retype);
+    QList<int> indexcustoms;
+    for(int i = 0; i < rec.count(); ++i) {
+        if(fieldnames[i].startsWith("Custom", Qt::CaseInsensitive))
+            indexcustoms.append(i);
+    }
+    QMetaEnum info = QMetaEnum::fromType<Equipment::AttrType>();
     while(query.next()) {
-        QPointer<Equipment> e(new Equipment());
-        for(const QString &fieldname: fieldnames)
-        {
-            int i = rec.indexOf(fieldname);
-            QMetaEnum info = QMetaEnum::fromType<Equipment::AttrType>();
-            if(fieldname.compare("EquipID", Qt::CaseInsensitive) == 0)
-            {
-                e->id = query.value(i).toInt();
+        QStringList customFlags;
+        QMap<Equipment::AttrType, int> attr;
+        for(int i = 0; i < rec.count(); ++i) {
+            if(i == indexid || i == indexname || i == indextype) {
+                continue;
             }
-            else if(fieldname.startsWith("Equip", Qt::CaseInsensitive))
-            {
-                if(fieldname.compare("Equipname", Qt::CaseInsensitive) == 0)
-                {
-                    e->name = query.value(i).toString();
-                }
-                if(fieldname.compare("Equiptype", Qt::CaseInsensitive) == 0)
-                {
-                    e->type = query.value(i).toString();
-                }
+            if(indexcustoms.contains(i)) {
+                customFlags.append(query.value(i).toString());
             }
-            else if(fieldname.startsWith("Custom", Qt::CaseInsensitive))
-            {
-                e->customflags.append(query.value(i).toString());
-            }
-            else
-            {
-                int attrvalue = info.keyToValue(fieldname.toLatin1().constData());
-                if(attrvalue == -1)
-                {
+            else {
+                QString fieldname = fieldnames[i];
+                int attrvalue = info.keyToValue(
+                            fieldname.toLatin1().constData());
+                if(attrvalue == -1) {
                     //% "Unexpected attribute of equipment: %1"
-                    qCritical() << qtTrId("equip-unexpected-attr").arg(fieldname);
+                    throw DBError(qtTrId("equip-unexpected-attr")
+                                  .arg(fieldname));
                 }
-                else
-                {
-                    e->attr[(Equipment::AttrType)attrvalue] = query.value(i).toInt();
+                else {
+                    attr[(Equipment::AttrType)attrvalue]
+                            = query.value(i).toInt();
                 }
             }
         }
-        equipRegistry[e->id] = e;
+        QPointer<Equipment> e(new Equipment(query.value(indexid).toInt(),
+                                            query.value(indexname).toString(),
+                                            query.value(indextype).toString(),
+                                            std::move(attr),
+                                            std::move(customFlags)
+                                            ));
+        equipRegistry[query.value(indexid).toInt()] = e;
     }
     return true;
 }
 
-void Server::exitGraceSpec()
-{
+void Server::exitGraceSpec() {
     shutdown();
     //% "Server is shutting down"
     qInfo() << qtTrId("server-shutdown");
 }
 
-bool Server::exportEquipToCSV() const
-{
+bool Server::exportEquipToCSV() const {
     QString csvFileName = settings->value("server/equip_reg_csv", "Equip.csv").toString();
-
     QFile *csvFile = new QFile(csvFileName);
-    if(Q_UNLIKELY(!csvFile) || !csvFile->open(QIODevice::WriteOnly))
-    {
-        qCritical("CSV file cannot be opened");
+    if(Q_UNLIKELY(!csvFile) || !csvFile->open(QIODevice::WriteOnly)) {
+        //% "%1: CSV file cannot be opened"
+        qCritical() << qtTrId("bad-csv").arg(csvFileName);
         return false;
     }
-
     QTextStream textStream(csvFile);
 
     QSqlDatabase db = QSqlDatabase::database();
-    if(!db.isValid())
-    {
-        qCritical() << qtTrId("database-uninit");
+    if(!db.isValid()) {
+        throw DBError(qtTrId("database-uninit"));
         return false;
     }
     QSqlQuery query;
     query.prepare("SELECT * FROM Equip;");
-    if(!query.exec())
-    {
-        //% "Export equipment database failed!"
-        qCritical() << qtTrId("equip-export-failed");
+    if(!query.exec()) {
+        //% "Load equipment table failed!"
+        throw DBError(qtTrId("equip-refresh-failed"));
         return false;
     }
     query.isSelect();
     QSqlRecord rec = query.record();
-    for(int i = 0; i < rec.count(); ++i)
-    {
+    for(int i = 0; i < rec.count(); ++i) {
         textStream << rec.fieldName(i) << ",";
     }
-    while(query.next())
-    {
+    static QRegularExpression rehex("^(EquipID|require2?)$",
+                                    QRegularExpression::CaseInsensitiveOption);
+    while(query.next()) {
         textStream << "\n";
-        for(int i = 0; i < rec.count(); ++i)
-        {
-            if((rec.fieldName(i).compare("EquipID", Qt::CaseInsensitive) == 0)
-                    || (rec.fieldName(i).compare("require", Qt::CaseInsensitive) == 0)
-                    || (rec.fieldName(i).compare("require2", Qt::CaseInsensitive) == 0))
-            {
+        for(int i = 0; i < rec.count(); ++i) {
+            if(rehex.match(rec.fieldName(i)).hasMatch()) {
                 Qt::hex(textStream);
                 textStream << "0x" << query.value(i).toInt() << ",";
                 Qt::dec(textStream);
             }
-            else
-            {
+            else {
                 textStream << query.value(i).toString() << ",";
             }
         }
@@ -481,8 +536,7 @@ bool Server::exportEquipToCSV() const
     return true;
 }
 
-const QStringList Server::getCommandsSpec() const
-{
+const QStringList Server::getCommandsSpec() const {
     QStringList result = QStringList();
     result.append(getCommands());
     result.append({"listen", "unlisten"});
@@ -490,8 +544,7 @@ const QStringList Server::getCommandsSpec() const
     return result;
 }
 
-const QStringList Server::getValidCommands() const
-{
+const QStringList Server::getValidCommands() const {
     QStringList result = QStringList();
     result.append(getCommands());
     if(listening)
@@ -503,16 +556,18 @@ const QStringList Server::getValidCommands() const
 }
 
 void Server::handleNewConnection(const QHostAddress &peerAddress,
-                                 quint16 peerPort, const QByteArray &clientHello)
-{
+                                 quint16 peerPort,
+                                 const QByteArray &clientHello){
     if (!listening)
         return;
 
     const QString peerInfo = peer_info(peerAddress, peerPort);
-    if (cookieSender.verifyClient(&serverSocket, clientHello, peerAddress, peerPort)) {
+    if (cookieSender.verifyClient(&serverSocket, clientHello,
+                                  peerAddress, peerPort)) {
         qDebug() << peerInfo << ": verified, starting a handshake";
 
-        std::unique_ptr<QDtls> newConnection{new QDtls{QSslSocket::SslServerMode}};
+        std::unique_ptr<QDtls> newConnection{
+            new QDtls{QSslSocket::SslServerMode}};
         newConnection->setDtlsConfiguration(serverConfiguration);
         newConnection->setPeer(peerAddress, peerPort);
         newConnection->connect(newConnection.get(), &QDtls::pskRequired,
@@ -521,49 +576,41 @@ void Server::handleNewConnection(const QHostAddress &peerAddress,
         doHandshake(knownClients.back().get(), clientHello);
     } else if (cookieSender.dtlsError() != QDtlsError::NoError) {
         //% "DTLS error: %1"
-        qWarning() << qtTrId("dtls-error").arg(cookieSender.dtlsErrorString());
+        qWarning() << qtTrId("dtls-error").
+                      arg(cookieSender.dtlsErrorString());
     } else {
         qDebug() << peerInfo << ": not verified yet";
     }
 }
 
-bool Server::importEquipFromCSV()
-{
+bool Server::importEquipFromCSV() {
     QString csvFileName = settings->value("server/equip_reg_csv", "Equip.csv").toString();
-
     QFile *csvFile = new QFile(csvFileName);
-    if(Q_UNLIKELY(!csvFile) || !csvFile->open(QIODevice::ReadOnly))
-    {
-        qFatal("CSV file cannot be opened");
+    if(Q_UNLIKELY(!csvFile) || !csvFile->open(QIODevice::ReadOnly)) {
+        //% "%1: CSV file cannot be opened"
+        qCritical() << qtTrId("bad-csv").arg(csvFileName);
         return false;
     }
-
     QTextStream textStream(csvFile);
 
     QSqlDatabase db = QSqlDatabase::database();
-    if(!db.isValid())
-    {
-        qCritical() << qtTrId("database-uninit");
+    if(!db.isValid()) {
+        throw DBError(qtTrId("database-uninit"));
         return false;
     }
-
     QString title = textStream.readLine();
     if(title.endsWith(","))
         title.chop(1);
     QStringList titleParts = title.split(",");
-
-    while(!textStream.atEnd())
-    {
+    while(!textStream.atEnd()) {
         QString data = textStream.readLine();
         QStringList dataParts = data.split(",");
         dataParts = dataParts.first(titleParts.length());
         QString dataNew;
-        for(const QString &dataPiece: dataParts)
-        {
+        for(const QString &dataPiece: dataParts) {
             if(dataPiece.length() == 0)
                 dataNew.append("NULL");
-            else
-            {
+            else {
                 bool success;
                 dataPiece.toInt(&success, 0);
                 if(!success)
@@ -577,10 +624,9 @@ bool Server::importEquipFromCSV()
             dataNew.chop(1);
         QSqlQuery query;
         query.prepare("REPLACE INTO Equip ("+title+") VALUES ("+dataNew+");");
-        if(!query.exec())
-        {
+        if(!query.exec()) {
             //% "Import equipment database failed!"
-            qCritical() << qtTrId("equip-import-failed");
+            throw DBError(qtTrId("equip-import-failed"));
             qCritical() << query.lastError();
             return false;
         }
@@ -637,175 +683,176 @@ void Server::parseUnlisten() {
 void Server::receivedAuth(const QJsonObject &djson,
                           const QString &peerInfo,
                           QDtls *connection) {
-    switch(djson["mode"].toInt())
-    {
-    case KP::AuthMode::Reg:
-    {
-        QString name = djson["username"].toString();
-        auto shadow = QByteArray::fromBase64Encoding(
-                    djson["shadow"].toString().toLatin1(), QByteArray::Base64Encoding);
-        QSqlDatabase db = QSqlDatabase::database();
-        QSqlQuery query;
-        query.prepare("SELECT UserID FROM Users "
-                      "WHERE Username = :name;");
-        query.bindValue(":name", name);
-        query.exec();
-        query.isSelect();
-        if(!query.first())
-        {
-            int maxid;
-            QSqlQuery getMaxID;
-            getMaxID.prepare("SELECT MAX(UserID) FROM Users;");
-            getMaxID.exec();
-            if(!getMaxID.isSelect()
-                    || !getMaxID.seek(0)
-                    || getMaxID.isNull("MAX(UserID)"))
-            {
-                qWarning() << getMaxID.lastError().databaseText();
-                maxid = 0;
-            }
-            else
-            {
-                maxid = getMaxID.value(0).toInt();
-            }
-            QSqlQuery insert;
-            if(!insert.prepare("INSERT INTO Users (UserID, Username, Shadow) "
-                               "VALUES (:id, :name, :shadow);"))
-            {
-                qWarning() << insert.lastError().databaseText();
-            }
-            insert.bindValue(":id", maxid+1);
-            insert.bindValue(":name", name);
-            if(shadow.decodingStatus == QByteArray::Base64DecodingStatus::Ok)
-            {
-                insert.bindValue(":shadow", shadow.decoded);
-                if(!insert.exec())
-                {
-                    qWarning() << insert.lastError().databaseText();
-                };
-                QByteArray msg = KP::serverAuth(KP::Reg, name, true);
-                connection->writeDatagramEncrypted(&serverSocket, msg);
-                connection->shutdown(&serverSocket);
-            }
-            else
-            {
-                QByteArray msg = KP::serverAuth(KP::Reg, name, false, KP::AuthError::BadShadow);
-                connection->writeDatagramEncrypted(&serverSocket, msg);
-                connection->shutdown(&serverSocket);
-            }
-        }
-        else
-        {
-            QByteArray msg = KP::serverAuth(KP::Reg, name, false, KP::AuthError::UserExists);
-            connection->writeDatagramEncrypted(&serverSocket, msg);
-            connection->shutdown(&serverSocket);
-        }
-    }
-        break;
-    case KP::AuthMode::Login:
-    {
-        QString name = djson["username"].toString();
-        auto shadow = QByteArray::fromBase64Encoding(
-                    djson["shadow"].toString().toLatin1(), QByteArray::Base64Encoding);
-        QSqlDatabase db = QSqlDatabase::database();
-        QSqlQuery query;
-        query.prepare("SELECT UserID FROM Users "
-                      "WHERE Username = :name AND Shadow = :shadow");
-        query.bindValue(":name", name);
-        if (Q_LIKELY(shadow.decodingStatus == QByteArray::Base64DecodingStatus::Ok))
-        {
-            query.bindValue(":shadow", shadow.decoded);
-            query.exec();
-            query.isSelect();
-            if(Q_UNLIKELY(!query.first()))
-            {
-                QByteArray msg = KP::serverAuth(KP::Login, name, false, KP::AuthError::BadPassword);
-                connection->writeDatagramEncrypted(&serverSocket, msg);
-                connection->shutdown(&serverSocket);
-            }
-            else
-            {
-                /* if connectedPeers[name] exists then force-logout all of them */
-                if(!(connectedPeers[name].isEmpty()))
-                {
-                    const auto client = std::find_if(knownClients.begin(), knownClients.end(),
-                                                     [&](const std::unique_ptr<QDtls> &othercn){
-                        return connectedPeers[name].compare(
-                                    peer_info(othercn->peerAddress(), othercn->peerPort())) == 0;
-                    });
-
-                    if (client != knownClients.end()) {
-                        if ((*client)->isConnectionEncrypted()) {
-                            QByteArray msg = KP::serverAuth(KP::Logout, name, true,
-                                                            KP::AuthError::LoggedElsewhere);
-                            (*client)->writeDatagramEncrypted(&serverSocket, msg);
-                            (*client)->shutdown(&serverSocket);
-                        }
-                        connectedUsers.remove(peer_info((*client)->peerAddress(), (*client)->peerPort()));
-                        connectedPeers.remove(name);
-                        /* This will invalidate iterators in readyRead() */
-                        //knownClients.erase(client);
-                    }
-                }
-                connectedUsers[peerInfo] = name;
-                connectedPeers[name] = peerInfo;
-                QByteArray msg = KP::serverAuth(KP::Login, name, true);
-                connection->writeDatagramEncrypted(&serverSocket, msg);
-            }
-        }
-        else
-        {
-            QByteArray msg = KP::serverAuth(KP::Login, name, false, KP::AuthError::BadShadow);
-            connection->writeDatagramEncrypted(&serverSocket, msg);
-            connection->shutdown(&serverSocket);
-        }
-    }
-        break;
-    case KP::AuthMode::Logout:
-    {
-        if(connectedUsers.contains(peerInfo))
-        {
-            QByteArray msg = KP::serverAuth(KP::Logout, connectedUsers[peerInfo], true);
-            connection->writeDatagramEncrypted(&serverSocket, msg);
-            connectedPeers.remove(connectedUsers[peerInfo]);
-            connectedUsers.remove(peerInfo);
-            connection->shutdown(&serverSocket);
-        }
-        else
-        {
-            QByteArray msg = KP::serverAuth(KP::Logout, peerInfo, false);
-            connection->writeDatagramEncrypted(&serverSocket, msg);
-        }
-    }
-        break;
+    switch(djson["mode"].toInt()) {
+    case KP::AuthMode::Reg: receivedReg(djson, peerInfo, connection); break;
+    case KP::AuthMode::Login: receivedLogin(djson, peerInfo, connection); break;
+    case KP::AuthMode::Logout: receivedLogout(djson, peerInfo, connection); break;
     default:
         throw std::domain_error("auth type not supported"); break;
+    }
+}
+
+void Server::receivedForceLogout(const QString &name) {
+    const auto client = std::find_if(knownClients.begin(), knownClients.end(),
+                                     [&](const std::unique_ptr<QDtls> &othercn){
+        return connectedPeers[name].compare(
+                    peer_info(othercn->peerAddress(), othercn->peerPort())) == 0;
+    });
+
+    if (client != knownClients.end()) {
+        if ((*client)->isConnectionEncrypted()) {
+            QByteArray msg = KP::serverAuth(KP::Logout, name, true,
+                                            KP::AuthError::LoggedElsewhere);
+            (*client)->writeDatagramEncrypted(&serverSocket, msg);
+            (*client)->shutdown(&serverSocket);
+        }
+        connectedUsers.remove(peer_info((*client)->peerAddress(), (*client)->peerPort()));
+        connectedPeers.remove(name);
+        /* This will invalidate iterators in readyRead() */
+        //knownClients.erase(client);
+    }
+}
+
+void Server::receivedLogin(const QJsonObject &djson,
+                           const QString &peerInfo,
+                           QDtls *connection) {
+    QString name = djson["username"].toString();
+    auto shadow = QByteArray::fromBase64Encoding(
+                djson["shadow"].toString().toLatin1(),
+            QByteArray::Base64Encoding);
+    QSqlDatabase db = QSqlDatabase::database();
+    QSqlQuery query;
+    query.prepare("SELECT UserID FROM Users "
+                  "WHERE Username = :name AND Shadow = :shadow");
+    query.bindValue(":name", name);
+    if(Q_LIKELY(shadow.decodingStatus
+                == QByteArray::Base64DecodingStatus::Ok)) {
+        query.bindValue(":shadow", shadow.decoded);
+        query.exec();
+        query.isSelect();
+        if(Q_UNLIKELY(!query.first())) {
+            QByteArray msg = KP::serverAuth(KP::Login, name, false,
+                                            KP::AuthError::BadPassword);
+            connection->writeDatagramEncrypted(&serverSocket, msg);
+            connection->shutdown(&serverSocket);
+        }
+        else {
+            /* if connectedPeers[name] exists then force-logout all of them */
+            if(!(connectedPeers[name].isEmpty())) {
+                receivedForceLogout(name);
+            }
+            connectedUsers[peerInfo] = name;
+            connectedPeers[name] = peerInfo;
+            QByteArray msg = KP::serverAuth(KP::Login, name, true);
+            connection->writeDatagramEncrypted(&serverSocket, msg);
+        }
+    }
+    else {
+        QByteArray msg = KP::serverAuth(KP::Login, name, false,
+                                        KP::AuthError::BadShadow);
+        connection->writeDatagramEncrypted(&serverSocket, msg);
+        connection->shutdown(&serverSocket);
+    }
+}
+
+void Server::receivedLogout(const QJsonObject &djson,
+                            const QString &peerInfo,
+                            QDtls *connection) {
+    Q_UNUSED(djson);
+    if(connectedUsers.contains(peerInfo)) {
+        QByteArray msg = KP::serverAuth(KP::Logout,
+                                        connectedUsers[peerInfo], true);
+        connection->writeDatagramEncrypted(&serverSocket, msg);
+        connectedPeers.remove(connectedUsers[peerInfo]);
+        connectedUsers.remove(peerInfo);
+        connection->shutdown(&serverSocket);
+    }
+    else {
+        QByteArray msg = KP::serverAuth(KP::Logout, peerInfo, false);
+        connection->writeDatagramEncrypted(&serverSocket, msg);
+    }
+}
+
+/* nothing could shrink this function efficiently either */
+void Server::receivedReg(const QJsonObject &djson,
+                         const QString &peerInfo,
+                         QDtls *connection) {
+    Q_UNUSED(peerInfo)
+    QString name = djson["username"].toString();
+    auto shadow = QByteArray::fromBase64Encoding(
+                djson["shadow"].toString().toLatin1(),
+            QByteArray::Base64Encoding);
+    QSqlDatabase db = QSqlDatabase::database();
+    QSqlQuery query;
+    query.prepare("SELECT UserID FROM Users "
+                  "WHERE Username = :name;");
+    query.bindValue(":name", name);
+    query.exec();
+    query.isSelect();
+    if(!query.first()) {
+        int maxid;
+        QSqlQuery getMaxID;
+        getMaxID.prepare("SELECT MAX(UserID) FROM Users;");
+        getMaxID.exec();
+        if(!getMaxID.isSelect() || !getMaxID.seek(0)
+                || getMaxID.isNull("MAX(UserID)")) {
+            //% "Get user ID status failed!"
+            throw DBError(qtTrId("get-userid-max-failed"));
+            maxid = 0;
+        }
+        else {
+            maxid = getMaxID.value(0).toInt();
+        }
+        QSqlQuery insert;
+        if(!insert.prepare("INSERT INTO Users (UserID, Username, Shadow) "
+                           "VALUES (:id, :name, :shadow);")) {
+            qWarning() << insert.lastError().databaseText();
+        }
+        insert.bindValue(":id", maxid+1);
+        insert.bindValue(":name", name);
+        if(shadow.decodingStatus == QByteArray::Base64DecodingStatus::Ok) {
+            insert.bindValue(":shadow", shadow.decoded);
+            if(!insert.exec()) {
+                //% "%1: Add user failure!"
+                throw DBError(qtTrId("add-user-fail").arg(name));
+            };
+            QByteArray msg = KP::serverAuth(KP::Reg, name, true);
+            connection->writeDatagramEncrypted(&serverSocket, msg);
+            connection->shutdown(&serverSocket);
+        }
+        else {
+            QByteArray msg = KP::serverAuth(KP::Reg, name, false,
+                                            KP::AuthError::BadShadow);
+            connection->writeDatagramEncrypted(&serverSocket, msg);
+            connection->shutdown(&serverSocket);
+        }
+    }
+    else {
+        QByteArray msg = KP::serverAuth(KP::Reg, name, false,
+                                        KP::AuthError::UserExists);
+        connection->writeDatagramEncrypted(&serverSocket, msg);
+        connection->shutdown(&serverSocket);
     }
 }
 
 void Server::receivedReq(const QJsonObject &djson,
                          const QString &peerInfo,
                          QDtls *connection) {
-    if(!connectedUsers.contains(peerInfo))
-    {
+    if(!connectedUsers.contains(peerInfo)) {
         QByteArray msg = KP::accessDenied();
         connection->writeDatagramEncrypted(&serverSocket, msg);
     }
-    else
-    {
-        switch(djson["command"].toInt())
-        {
-        case KP::CommandType::Develop:
-        {
+    else {
+        switch(djson["command"].toInt()) {
+        case KP::CommandType::Develop: {
             int equipid = djson["equipid"].toInt();
-            if(!equipRegistry.contains(equipid)
-                    || equipRegistry[equipid]->attr[Equipment::Developenabled] < 1)
+            if(!equipRegistry.contains(equipid))
+                //|| equipRegistry[equipid]->attr[Equipment::Developenabled] < 1)
             {
                 QByteArray msg = KP::serverDevelopFailed(true);
                 connection->writeDatagramEncrypted(&serverSocket, msg);
             }
-            else
-            {
+            else {
                 ;
             }
         }
@@ -814,6 +861,37 @@ void Server::receivedReq(const QJsonObject &djson,
             throw std::domain_error("command type not supported"); break;
         }
     }
+}
+
+void Server::sqlcheckEquip() {
+    if(equipmentRefresh()) {
+        qInfo() << qtTrId("equip-db-good");
+    }
+    else {
+        //% "Equipment Database is corrupted or incompatible."
+        throw DBError(qtTrId("equip-db-bad"));
+    }
+}
+
+void Server::sqlcheckUsers() {
+    QSqlDatabase db = QSqlDatabase::database();
+    QSqlRecord columns = db.record("Users");
+    QStringList desiredColumns = {
+        "UserID",
+        "Username",
+        "Shadow",
+        "ResOil",
+        "ResAmmo",
+        "ResMetal",
+        "ResRare"
+    };
+    for(const QString &column : desiredColumns) {
+        if(!columns.contains(column)) {
+            //% "column %1 does not exist at table %2"
+            throw DBError(qtTrId("column-nonexist").arg(column, "Users"));
+        }
+    }
+    qInfo() << qtTrId("user-db-good");
 }
 
 void Server::sqlinit() {
@@ -831,128 +909,56 @@ void Server::sqlinit() {
     db.setPassword(settings->value("sql/adminpw", "10000826").toString());
     bool ok = db.open();
     if(!ok) {
-        /* Use the deploy tools if SQL drivers are not loaded */
-        throw db.lastError();
+        //% "Open database failed!"
+        throw DBError(qtTrId("open-db-failed"));
     }
-    else
-    {
+    else {
         //% "SQL connection successful!"
         qInfo() << qtTrId("sql-connect-success");
         /* Database integrity check, the structure is defined here */
         QStringList tables = db.tables(QSql::Tables);
         if(!tables.contains("Users")) {
-            //% "User database does not exist, creating..."
-            qWarning() << qtTrId("user-db-lack");
-            QSqlQuery query;
-            query.prepare("CREATE TABLE Users ( "
-                          "UserID INTEGER PRIMARY KEY, "
-                          "Username VARCHAR(255) NOT NULL, "
-                          "Shadow TINYBLOB,"
-                          "ResOil INTEGER DEFAULT 10000,"
-                          "ResAmmo INTEGER DEFAULT 10000,"
-                          "ResMetal INTEGER DEFAULT 10000,"
-                          "ResRare INTEGER DEFAULT 5000);");
-            if(query.exec()) {
-                //% "User Database is OK."
-                qInfo() << qtTrId("user-db-good");
-            }
-            else {
-                //% "Create User Database failed."
-                qCritical() << qtTrId("user-db-gen-failure");
-            }
+            sqlinitUsers();
         }
-        else
-        {
-            QSqlRecord columns = db.record("Users");
-            QStringList desiredColumns = {
-                "UserID",
-                "Username",
-                "Shadow",
-                "ResOil",
-                "ResAmmo",
-                "ResMetal",
-                "ResRare"
-            };
-            try {
-                for(const QString &column : desiredColumns)
-                {
-                    if(!columns.contains(column))
-                    {
-                        //% "column %1 does not exist at table %2"
-                        throw DBError(qtTrId("column-nonexist").arg(column, "Users"));
-                    }
-                }
-                qInfo() << qtTrId("user-db-good");
-            } catch (DBError &e) {
-                qCritical() << e.what();
-                //% "User Database is corrupted."
-                qCritical() << qtTrId("user-db-bad");
-            }
+        else {
+            sqlcheckUsers();
         }
-        if(!tables.contains("Equip"))
-        {
-            //% "Equipment database does not exist, creating..."
-            qWarning() << qtTrId("equip-db-lack");
-            QSqlQuery query;
-            query.prepare("CREATE TABLE Equip ( "
-                          "EquipID INTEGER PRIMARY KEY, "
-                          "Equipname VARCHAR(63), "
-                          "Equiptype VARCHAR(63), "
-                          "Rarity INTEGER, "
-                          "Intricacy INTEGER, "
-                          "Tenacity INTEGER, "
-                          "Firepower INTEGER, "
-                          "Armorpenetration INTEGER, "
-                          "Firingrange INTEGER, "
-                          "Firingspeed INTEGER, "
-                          "Torpedo INTEGER, "
-                          "Bombing INTEGER, "
-                          "Landattack INTEGER, "
-                          "Airattack INTEGER, "
-                          "Interception INTEGER, "
-                          "Antibomber INTEGER, "
-                          "Asw INTEGER, "
-                          "Los INTEGER, "
-                          "Accuracy INTEGER, "
-                          "Evasion INTEGER, "
-                          "Armor INTEGER, "
-                          "Transport INTEGER, "
-                          "Flightrange INTEGER, "
-                          "Require INTEGER, "
-                          "Require2 INTEGER, "
-                          "Developenabled INTEGER, "
-                          "Convertenabled INTEGER, "
-                          "Requirenum INTEGER, "
-                          "Require2num INTEGER, "
-                          "Industrialsilver INTEGER, "
-                          "Industrialgold INTEGER, "
-                          "Customflag1 VARCHAR(63), "
-                          "Customflag2 VARCHAR(63), "
-                          "Customflag3 VARCHAR(63) "
-                          ");");
-            if(query.exec())
-            {
-                //% "Equipment Database is OK."
-                qInfo() << qtTrId("equip-db-good");
-            }
-            else
-            {
-                //% "Create Equipment Database failed."
-                qCritical() << qtTrId("equip-db-gen-failure");
-            }
+        if(!tables.contains("Equip")) {
+            sqlinitEquip();
         }
-        else
-        {
-            if(equipmentRefresh())
-            {
-                qInfo() << qtTrId("equip-db-good");
-            }
-            else
-            {
-                //% "Equipment Database is corrupted or incompatible."
-                qCritical() << qtTrId("equip-db-bad");
-            }
+        else {
+            sqlcheckEquip();
         }
+    }
+}
+
+void Server::sqlinitEquip() {
+    //% "Equipment database does not exist, creating..."
+    qWarning() << qtTrId("equip-db-lack");
+    QSqlQuery query;
+    query.prepare(equipT);
+    if(query.exec()) {
+        //% "Equipment Database is OK."
+        qInfo() << qtTrId("equip-db-good");
+    }
+    else {
+        //% "Create Equipment Database failed."
+        throw DBError(qtTrId("equip-db-gen-failure"));
+    }
+}
+
+void Server::sqlinitUsers() {
+    //% "User database does not exist, creating..."
+    qWarning() << qtTrId("user-db-lack");
+    QSqlQuery query;
+    query.prepare(userT);
+    if(query.exec()) {
+        //% "User Database is OK."
+        qInfo() << qtTrId("user-db-good");
+    }
+    else {
+        //% "Create User Database failed."
+        throw DBError(qtTrId("user-db-gen-failure"));
     }
 }
 QT_END_NAMESPACE

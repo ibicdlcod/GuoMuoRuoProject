@@ -96,8 +96,16 @@ private:
     void parseListen(const QStringList &);
     void parseUnlisten();
     void receivedAuth(const QJsonObject &, const QString &, QDtls *);
+    void receivedForceLogout(const QString &name);
+    void receivedLogin(const QJsonObject &, const QString &, QDtls *);
+    void receivedLogout(const QJsonObject &, const QString &, QDtls *);
+    void receivedReg(const QJsonObject &, const QString &, QDtls *);
     void receivedReq(const QJsonObject &, const QString &, QDtls *);
+    void sqlcheckEquip();
+    void sqlcheckUsers();
     void sqlinit();
+    void sqlinitEquip();
+    void sqlinitUsers();
 
     bool listening = false;
     QUdpSocket serverSocket;

@@ -6,12 +6,10 @@
 #include <QObject>
 #include <QString>
 
-struct Equipment: public QObject {
+class Equipment: public QObject {
     Q_OBJECT
 
 public:
-    Equipment();
-
     enum AttrType{
         Rarity,
         Intricacy,
@@ -44,6 +42,10 @@ public:
     };
     Q_ENUM(AttrType)
 
+    Equipment(int, QString &&, QString &&,
+              QMap<AttrType, int> &&, QStringList &&);
+
+private:
     int id;
     QString name;
     QString type;
