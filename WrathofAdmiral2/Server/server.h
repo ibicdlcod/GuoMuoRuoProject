@@ -89,9 +89,9 @@ private:
     void doHandshake(QDtls *, const QByteArray &);
     bool equipmentRefresh();
     void exitGraceSpec();
-    bool exportEquipToCSV();
-    const QStringList getCommandsSpec();
-    const QStringList getValidCommands();
+    bool exportEquipToCSV() const;
+    const QStringList getCommandsSpec() const;
+    const QStringList getValidCommands() const;
     void handleNewConnection(const QHostAddress &, quint16,
                              const QByteArray &);
     bool importEquipFromCSV();

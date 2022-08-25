@@ -32,6 +32,11 @@ CommandLine::CommandLine(int argc, char ** argv)
 {
 }
 
+CommandLine::~CommandLine()
+{
+
+}
+
 void CommandLine::customMessageHandler(QtMsgType type, const QMessageLogContext &context, const QString &msg_original)
 {
     QString msg = msg_original;
@@ -102,7 +107,6 @@ void CommandLine::customMessageHandler(QtMsgType type, const QMessageLogContext 
     if(!msg_off)
     {
         std::cout << color;
-
 #if defined (Q_OS_WIN)
         WriteConsoleW(GetStdHandle(STD_OUTPUT_HANDLE),
                       txt.utf16(), txt.size(), NULL, NULL);
@@ -116,7 +120,6 @@ void CommandLine::customMessageHandler(QtMsgType type, const QMessageLogContext 
     {
         qFatal("Log file cannot be written to.");
     }
-
     if(txt.contains(QChar('\0')))
     {
         qFatal("Log Error");

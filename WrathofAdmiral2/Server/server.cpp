@@ -794,7 +794,7 @@ void Server::exitGraceSpec()
     qInfo() << qtTrId("server-shutdown");
 }
 
-bool Server::exportEquipToCSV()
+bool Server::exportEquipToCSV() const
 {
     QString csvFileName = settings->value("server/equip_reg_csv", "Equip.csv").toString();
 
@@ -830,8 +830,7 @@ bool Server::exportEquipToCSV()
     while(query.next())
     {
         textStream << "\n";
-        for(int i = 0; i < rec.count();
-            ++i)
+        for(int i = 0; i < rec.count(); ++i)
         {
             if((rec.fieldName(i).compare("EquipID", Qt::CaseInsensitive) == 0)
                     || (rec.fieldName(i).compare("require", Qt::CaseInsensitive) == 0)
@@ -851,7 +850,7 @@ bool Server::exportEquipToCSV()
     return true;
 }
 
-const QStringList Server::getCommandsSpec()
+const QStringList Server::getCommandsSpec() const
 {
     QStringList result = QStringList();
     result.append(getCommands());
@@ -860,7 +859,7 @@ const QStringList Server::getCommandsSpec()
     return result;
 }
 
-const QStringList Server::getValidCommands()
+const QStringList Server::getValidCommands() const
 {
     QStringList result = QStringList();
     result.append(getCommands());

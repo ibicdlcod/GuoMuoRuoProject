@@ -13,6 +13,7 @@ class CommandLine : public QCoreApplication
 
 public:
     explicit CommandLine(int, char **);
+    virtual ~CommandLine();
 
 public slots:
     static void customMessageHandler(QtMsgType,
@@ -25,8 +26,8 @@ public slots:
 
 protected:
     static const QStringList getCommands();
-    virtual const QStringList getCommandsSpec() = 0;
-    virtual const QStringList getValidCommands() = 0;
+    virtual const QStringList getCommandsSpec() const = 0;
+    virtual const QStringList getValidCommands() const = 0;
     void invalidCommand();
     void showCommands(bool);
     void showHelp(const QStringList &);

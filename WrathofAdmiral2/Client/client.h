@@ -53,8 +53,7 @@
 
 #include "commandline.h"
 
-class Client : public CommandLine
-{
+class Client : public CommandLine {
     Q_OBJECT
 
 public:
@@ -81,11 +80,24 @@ private slots:
     void udpSocketConnected();
 
 private:
+    void doDevelop(const QStringList &);
+    void doSwitch(const QStringList &);
     void exitGraceSpec();
-    QString gameStateString();
-    const QStringList getCommandsSpec();
-    const QStringList getValidCommands();
-    bool loggedIn();
+    QString gameStateString() const;
+    const QStringList getCommandsSpec() const;
+    const QStringList getValidCommands() const;
+    bool loggedIn() const;
+    void parseConnectReq(const QStringList &);
+    void parseDisconnectReq();
+    bool parseGameCommands(const QString &, const QStringList &);
+    void parsePassword(const QString &);
+    void readWhenConnected(const QByteArray &);
+    void readWhenUnConnected(const QByteArray &);
+    void receivedAuth(const QJsonObject &);
+    void receivedLogin(const QJsonObject &);
+    void receivedLogout(const QJsonObject &);
+    void receivedMsg(const QJsonObject &);
+    void receivedReg(const QJsonObject &);
 
     QHostAddress address;
     quint16 port;
@@ -106,9 +118,10 @@ private:
     KP::GameState gameState;
 
     const unsigned int defaultMaxRetransmit = 2;
-    const QByteArray defaultSalt = QByteArrayLiteral("\xe8\xbf\x99\xe6\x98\xaf\xe4\xb8"
-                                                     "\x80\xe6\x9d\xa1\xe5\x92\xb8\xe9"
-                                                     "\xb1\xbc");
+    const QByteArray defaultSalt =
+            QByteArrayLiteral("\xe8\xbf\x99\xe6\x98\xaf\xe4\xb8"
+                              "\x80\xe6\x9d\xa1\xe5\x92\xb8\xe9"
+                              "\xb1\xbc");
 
     Q_DISABLE_COPY(Client)
 };
