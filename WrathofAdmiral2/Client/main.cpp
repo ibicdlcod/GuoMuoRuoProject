@@ -1,19 +1,7 @@
 #include <QCoreApplication>
-#include <QFile>
 #include <QLocale>
 #include <QTranslator>
-#include <QSettings>
 #include "qconsolelistener.h"
-
-/* OS Specific */
-#if defined (Q_OS_WIN)
-#include <windows.h>
-#ifndef ENABLE_VIRTUAL_TERMINAL_PROCESSING
-#define ENABLE_VIRTUAL_TERMINAL_PROCESSING 0x0004
-#endif
-#elif defined (Q_OS_UNIX)
-#include <locale.h>
-#endif
 
 #include "client.h"
 #include "kp.h"
@@ -21,35 +9,10 @@
 QFile *logFile;
 std::unique_ptr<QSettings> settings;
 
-void initLog() {
-    QString logFileName = settings->value("client/logfile",
-                                         "ClientLog.log").toString();
-    logFile = new QFile(logFileName);
-    if(Q_UNLIKELY(!logFile)
-            || !logFile->open(QIODevice::WriteOnly | QIODevice::Append)) {
-        qFatal("Log file cannot be opened");
-    }
-}
-
-void winConsoleCheck() {
-    HANDLE hOut = GetStdHandle(STD_OUTPUT_HANDLE);
-    if (hOut == INVALID_HANDLE_VALUE) {
-        throw GetLastError();
-    }
-    DWORD dwMode = 0;
-    if (!GetConsoleMode(hOut, &dwMode)) {
-        throw GetLastError();
-    }
-    dwMode |= ENABLE_VIRTUAL_TERMINAL_PROCESSING;
-    if (!SetConsoleMode(hOut, dwMode)) {
-        throw GetLastError();
-    }
-}
-
 int main(int argc, char *argv[]) {
     QT_USE_NAMESPACE
 #if defined (Q_OS_WIN)
-    winConsoleCheck();
+    KP::winConsoleCheck();
 #endif
 
     Client client(argc, argv);
@@ -80,7 +43,7 @@ int main(int argc, char *argv[]) {
             break;
         }
     }
-    initLog();
+    KP::initLog(false);
 
     QConsoleListener console(true);
     bool success = QObject::connect(&console, &QConsoleListener::newLine,

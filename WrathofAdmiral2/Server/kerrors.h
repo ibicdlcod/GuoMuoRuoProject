@@ -7,8 +7,7 @@
 
 #include "kp.h"
 
-class DBError : public std::runtime_error
-{
+class DBError : public std::runtime_error {
     Q_DECLARE_TR_FUNCTIONS(DBError)
 
 public:

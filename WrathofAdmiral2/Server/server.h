@@ -49,21 +49,19 @@
 #ifndef SERVER_H
 #define SERVER_H
 
-#include <QtNetwork>
-#include <QSslConfiguration>
 #include <QSqlDatabase>
-#include <QSqlQuery>
 #include <QSqlError>
+#include <QSqlQuery>
 #include <QSqlRecord>
+#include <QSslConfiguration>
+#include <QtNetwork>
+#include <memory>
+#include <vector>
 
 #include "commandline.h"
 #include "equipment.h"
 
-#include <vector>
-#include <memory>
-
-class Server : public CommandLine
-{
+class Server : public CommandLine {
     Q_OBJECT
 
 public:
@@ -72,7 +70,6 @@ public:
 
     void datagramReceived(const QString &, const QByteArray &,
                           QDtls *);
-    bool isListening() const;
     bool listen(const QHostAddress &, quint16);
 
 public slots:
@@ -81,8 +78,9 @@ public slots:
     Q_DECL_DEPRECATED void update();
 
 private slots:
-    void readyRead();
     void pskRequired(QSslPreSharedKeyAuthenticator *);
+    void readyRead();
+    void shutdown();
 
 private:
     void decryptDatagram(QDtls *, const QByteArray &);
@@ -95,7 +93,11 @@ private:
     void handleNewConnection(const QHostAddress &, quint16,
                              const QByteArray &);
     bool importEquipFromCSV();
-    void shutdown();
+    void parseListen(const QStringList &);
+    void parseUnlisten();
+    void receivedAuth(const QJsonObject &, const QString &, QDtls *);
+    void receivedReq(const QJsonObject &, const QString &, QDtls *);
+    void sqlinit();
 
     bool listening = false;
     QUdpSocket serverSocket;

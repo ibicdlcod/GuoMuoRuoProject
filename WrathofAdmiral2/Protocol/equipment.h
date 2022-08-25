@@ -1,10 +1,10 @@
 #ifndef EQUIPMENT_H
 #define EQUIPMENT_H
 
-#include <QString>
 #include <QList>
 #include <QMap>
 #include <QObject>
+#include <QString>
 
 struct Equipment: public QObject {
     Q_OBJECT

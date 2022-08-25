@@ -137,8 +137,7 @@ void Client::serverResponse(const QString &clientInfo,
     QJsonObject djson =
             QCborValue::fromCbor(plainText).toMap().toJsonObject();
     try{
-        switch(djson["type"].toInt())
-        {
+        switch(djson["type"].toInt()) {
         case KP::DgramType::Auth: receivedAuth(djson); break;
         case KP::DgramType::Message: receivedMsg(djson); break;
         default:
@@ -151,7 +150,6 @@ void Client::serverResponse(const QString &clientInfo,
     }
 #if defined(QT_DEBUG)
     static const QString formatter = QStringLiteral("%1 received text: %2");
-
     const QString html = formatter
             .arg(clientInfo, QJsonDocument(djson).toJson());
     qDebug() << html;
@@ -208,7 +206,7 @@ void Client::readyRead() {
     const qint64 bytesRead = socket.readDatagram(dgram.data(), dgram.size());
     try {
         if (bytesRead <= 0 && dgram.size() > 0) {
-            //% "Read failed due to: %1"
+            //% "Read datagram failed due to: %1"
             throw NetworkError(qtTrId("read-dgram-failed")
                                .arg(socket.errorString()));
         }
@@ -390,6 +388,7 @@ void Client::parseConnectReq(const QStringList &cmdParts) {
         attemptMode = true;
         address = QHostAddress(cmdParts[1]);
         if(address.isNull()) {
+            //% "IP isn't valid."
             qWarning() << qtTrId("ip-invalid");
             return;
         }

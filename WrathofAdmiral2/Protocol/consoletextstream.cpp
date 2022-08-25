@@ -1,18 +1,15 @@
 #include "consoletextstream.h"
 
 ConsoleTextStream::ConsoleTextStream(FILE *fileHandle, QIODeviceBase::OpenMode openMode = QIODevice::ReadWrite)
-    :QTextStream(fileHandle, openMode)
-{
+    :QTextStream(fileHandle, openMode) {
 
 }
 
-ConsoleTextStream& ConsoleTextStream::operator<<(QString string)
-{
+ConsoleTextStream& ConsoleTextStream::operator<<(QString string) {
 #if defined (Q_OS_WIN)
     /* begin padding */
     int width = QTextStream::fieldWidth();
-    if(width > string.length())
-    {
+    if(width > string.length()) {
         int append_width = width - string.length();
         if(append_width < 0)
             append_width = 0;
@@ -37,22 +34,18 @@ ConsoleTextStream& ConsoleTextStream::operator<<(QString string)
     return *this;
 }
 
-ConsoleTextStream& ConsoleTextStream::operator<<(int input)
-{
+ConsoleTextStream& ConsoleTextStream::operator<<(int input) {
     QTextStream::operator<<(input);
     QTextStream::flush();
     return *this;
 }
 
-ConsoleTextStream& ConsoleTextStream::operator<<(Ecma input)
-{
+ConsoleTextStream& ConsoleTextStream::operator<<(Ecma input) {
     QString code = QStringLiteral("");
-    switch(input.member)
-    {
+    switch(input.member) {
     case structInt::ecmaSetter:
         code.append("\x1b[");
-        switch(input.mem1.setter)
-        {
+        switch(input.mem1.setter) {
         case EcmaSetter::UnderscoreOn:  code.append("4");   break;
         case EcmaSetter::UnderscoreOff: code.append("24");  break;
         case EcmaSetter::BlinkOn:       code.append("5");   break;
@@ -98,4 +91,3 @@ ConsoleTextStream& ConsoleTextStream::operator<<(Ecma input)
     this->flush();
     return *this;
 }
-

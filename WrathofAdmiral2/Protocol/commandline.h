@@ -7,8 +7,7 @@
 
 #include "consoletextstream.h"
 
-class CommandLine : public QCoreApplication
-{
+class CommandLine : public QCoreApplication {
     Q_OBJECT
 
 public:
@@ -27,10 +26,11 @@ public slots:
     static void customMessageHandler(QtMsgType,
                                      const QMessageLogContext &,
                                      const QString &);
+    virtual void displayPrompt() = 0;
     void openingwords();
     bool parse(const QString &);
     virtual bool parseSpec(const QStringList &) = 0;
-    virtual void displayPrompt() = 0;
+    void showHelp(const QStringList &);
 
 protected:
     static const QStringList getCommands();
@@ -38,12 +38,11 @@ protected:
     virtual const QStringList getValidCommands() const = 0;
     void invalidCommand();
     void showCommands(bool);
-    void showHelp(const QStringList &);
-
+    /* utility */
     static int callength(const QString &, bool naive = false);
     int getConsoleWidth();
     void qls(const QStringList &);
-
+    /* exit */
     void exitGracefully();
     virtual void exitGraceSpec() = 0;
 

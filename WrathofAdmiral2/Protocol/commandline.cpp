@@ -17,10 +17,11 @@
 #include "wcwidth.h"
 #include "kp.h"
 
-/* Ugly as fuck, but customMessageHandler had to be a member of CommandLine in order to use tr() and then said function
- * must be static, but logFile isn't const at complie time, leaveing no other option
+/* Ugly as fuck, but customMessageHandler had to be a member of CommandLine
+ * in order to use tr() and then said function must be static, but logFile
+ * isn't const at complie time, leaveing no other option
  *
- * (Outdated, se QT_TR_NOOP() and QT_TRANSLATE_NOOP())
+ * (Outdated, see QT_TR_NOOP() and QT_TRANSLATE_NOOP())
  */
 extern QFile *logFile;
 extern std::unique_ptr<QSettings> settings;
@@ -29,12 +30,14 @@ CommandLine::CommandLine(int argc, char ** argv)
     : QCoreApplication(argc, argv),
       qout(ConsoleTextStream(stdout, QIODevice::WriteOnly)),
       passwordMode(Password::normal) {
+
 }
 
 CommandLine::~CommandLine() noexcept {
 
 }
 
+/* Rather too long, but tested */
 void CommandLine::customMessageHandler(QtMsgType type,
                                        const QMessageLogContext &context,
                                        const QString &msg_original) {
@@ -58,8 +61,7 @@ void CommandLine::customMessageHandler(QtMsgType type,
     Q_UNUSED(function)
     QString txt2 = QStringLiteral("%1").arg(localMsg);
 #endif
-    switch (type)
-    {
+    switch (type) {
     case QtDebugMsg:
         txt += QStringLiteral("{DEBUG} %1").arg(txt2);
         msg_off = settings->value("msg_disabled/debug", false).toBool();
@@ -84,8 +86,7 @@ void CommandLine::customMessageHandler(QtMsgType type,
     /* consider use QT_NO_DEBUG_OUTPUT, QT_NO_INFO_OUTPUT, QT_NO_WARNING_OUTPUT */
 
     const char * color;
-    switch(type)
-    {
+    switch(type) {
     case QtDebugMsg:
         color = ("\x1b[48;2;0;255;0;30m");
         break;
@@ -129,163 +130,124 @@ void CommandLine::customMessageHandler(QtMsgType type,
     }
 }
 
-void CommandLine::openingwords()
-{
+void CommandLine::openingwords() {
     QString notice;
     QDir currentDir = QDir::current();
     /* the default is qt resource system */
-    QString openingwords = settings->value("license_notice", ":/openingwords.txt").toString();
+    QString openingwords = settings->value("license_notice",
+                                           ":/openingwords.txt").toString();
     QFile licenseFile(currentDir.filePath(openingwords));
-    if(!licenseFile.open(QIODevice::ReadOnly | QIODevice::Text))
-    {
-        /* TODO: check MD5 */
+    if(Q_UNLIKELY(!licenseFile.open(QIODevice::ReadOnly | QIODevice::Text))) {
+        //% "Can't find license file, exiting."
         qout << qtTrId("licence-not-found") << Qt::endl;
         qout.setFieldAlignment(QTextStream::AlignLeft);
         exitGracefully();
         return;
     }
-    else
-    {
+    else {
         QTextStream instream1(&licenseFile);
-
         qout.setFieldAlignment(QTextStream::AlignCenter);
-
         notice = instream1.readAll();
         qout.printLine(notice, Ecma(255,255,255,true), Ecma(0,0,255));
         qout.printLine("");
-#pragma message(NOT_M_CONST)
         //% "What? Admiral Tanaka? He's the real deal, isn't he?\nGreat at battle and bad at politics--so cool!"
         qout.printLine(qtTrId("naganami"), Ecma(192,255,192,true), Ecma(64,64,64));
     }
     qout.setFieldAlignment(QTextStream::AlignLeft);
 }
 
-bool CommandLine::parse(const QString &input)
-{
-    if(passwordMode != Password::normal)
-    {
+bool CommandLine::parse(const QString &input) {
+    if(passwordMode != Password::normal) {
         bool success = parseSpec(QStringList(input));
-        if(!success)
-        {
+        if(!success) {
             invalidCommand();
-            displayPrompt();
-            return false;
         }
-        else
-        {
-            displayPrompt();
-            return true;
-        }
+        displayPrompt();
+        return success;
     }
     static QRegularExpression re("\\s+");
     QStringList cmdParts = input.split(re, Qt::SkipEmptyParts);
-    if(cmdParts.length() > 0)
-    {
+    if(cmdParts.length() > 0) {
         QString primary = cmdParts[0];
+        primary = settings->value("alias/"+primary, primary).toString();
 
-        /* aliases */
-        QMap<QString, QString> aliases;
-        aliases["h"] = "help";
-        aliases["q"] = "exit";
-        aliases["c"] = "commands";
-        aliases["a"] = "allcommands";
-
-        if(aliases.contains(primary))
-        {
-            primary = aliases[primary];
-        }
-        /* end aliases */
-
-        if(primary.compare("help", Qt::CaseInsensitive) == 0)
-        {
+        if(primary.compare("help", Qt::CaseInsensitive) == 0) {
             cmdParts.removeFirst();
             showHelp(cmdParts);
             displayPrompt();
             return true;
         }
-        else if(primary.compare("exit", Qt::CaseInsensitive) == 0)
-        {
+        else if(primary.compare("exit", Qt::CaseInsensitive) == 0) {
             exitGracefully();
             return true;
         }
-        else if(primary.compare("commands", Qt::CaseInsensitive) == 0)
-        {
+        else if(primary.compare("commands", Qt::CaseInsensitive) == 0) {
             showCommands(true);
             displayPrompt();
             return true;
         }
-        else if(primary.compare("allcommands", Qt::CaseInsensitive) == 0)
-        {
+        else if(primary.compare("allcommands", Qt::CaseInsensitive) == 0) {
             showCommands(false);
             displayPrompt();
             return true;
         }
-        else
-        {
+        else {
             bool success = parseSpec(cmdParts);
-            if(!success)
-            {
+            if(!success) {
                 invalidCommand();
-                displayPrompt();
-                return false;
             }
-            else
-            {
-                displayPrompt();
-                return true;
-            }
+            displayPrompt();
+            return success;
         }
     }
     displayPrompt();
     return false;
 }
 
-const QStringList CommandLine::getCommands()
-{
+inline void CommandLine::showHelp(const QStringList &cmdParts) {
+    if(cmdParts.isEmpty()) {
+        //% "Use 'exit' to quit, 'help' to show help, "
+        //% "'commands' to show available commands."
+        qout << qtTrId("help-msg") << Qt::endl;
+    }
+    else { /* this trick does not do things nicely */
+        parse(cmdParts[0]);
+    }
+}
+
+const QStringList CommandLine::getCommands() {
     return {"exit", "help", "commands", "allcommands"};
 }
 
-inline void CommandLine::invalidCommand()
-{
-    //% "Invalid Command, use 'commands' for valid commands, 'help' for help, 'exit' to exit."
+inline void CommandLine::invalidCommand() {
+    //% "Invalid Command, use 'commands' for valid commands, "
+    //% "'help' for help, 'exit' to exit."
     qout << qtTrId("invalid-command") << Qt::endl;
 }
 
-void CommandLine::showCommands(bool validOnly)
-{
+void CommandLine::showCommands(bool validOnly){
     //% "Use 'exit' to quit."
     qout << qtTrId("exit-helper") << Qt::endl;
-    if(validOnly)
-    {
+    if(validOnly) {
         //% "Available commands:"
         qout.printLine(qtTrId("good-command"), Ecma(0,255,0));
         qls(getValidCommands());
     }
-    else
-    {
+    else {
         //% "All commands:"
         qout.printLine(qtTrId("all-command"), Ecma(255,255,0));
         qls(getCommandsSpec());
     }
 }
 
-inline void CommandLine::showHelp(const QStringList &)
-{
-    //% "Use 'exit' to quit, 'help' to show help, 'commands' to show available commands."
-    qout << qtTrId("help-msg") << Qt::endl;
-}
-
-inline int CommandLine::callength(const QString &input, bool naive)
-{
-    if(naive)
-    {
+inline int CommandLine::callength(const QString &input, bool naive){
+    if(naive) {
         return input.length();
     }
-    else
-    {
+    else {
         int length = input.length();
         wchar_t *data;
-        data = reinterpret_cast<wchar_t *>(calloc(length, sizeof(wchar_t)));
+        data = (wchar_t *)(calloc(length, sizeof(wchar_t)));
         input.toWCharArray(data);
         int result = mk_wcswidth(data, length);
         free(data);
@@ -293,8 +255,7 @@ inline int CommandLine::callength(const QString &input, bool naive)
     }
 }
 
-int CommandLine::getConsoleWidth()
-{
+int CommandLine::getConsoleWidth() {
     int width;
 #if defined (Q_OS_WIN)
     CONSOLE_SCREEN_BUFFER_INFO csbi;
@@ -319,8 +280,7 @@ int CommandLine::getConsoleWidth()
  * This function is rather too long but non-trivial to refactor,
  * avoid touching it.
  */
-void CommandLine::qls(const QStringList &input)
-{
+void CommandLine::qls(const QStringList &input) {
     if(input.length() <= 0) {
         return;
     }
@@ -401,8 +361,7 @@ void CommandLine::qls(const QStringList &input)
     }
 }
 
-void CommandLine::exitGracefully()
-{
+void CommandLine::exitGracefully() {
     exitGraceSpec();
     //% "Goodbye, press ENTER to quit."
     qout.printLine(qtTrId("goodbye"), Ecma(64,255,64), Ecma(EcmaSetter::BlinkOn));

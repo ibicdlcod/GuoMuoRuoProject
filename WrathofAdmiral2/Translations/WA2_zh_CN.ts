@@ -4,82 +4,82 @@
 <context>
     <name></name>
     <message id="catbomb">
-        <location filename="../Client/client.cpp" line="76"/>
+        <location filename="../Client/client.cpp" line="73"/>
         <source>You have been bombarded by a cute cat.</source>
         <translation type="unfinished">服务器给你扔了一只可爱的猫娘。</translation>
     </message>
     <message id="login-success">
-        <location filename="../Client/client.cpp" line="584"/>
+        <location filename="../Client/client.cpp" line="565"/>
         <source>%1: login success</source>
         <oldsource>%1: Login success</oldsource>
         <translation type="unfinished">%1:登录成功</translation>
     </message>
     <message id="connection-failed-warning">
-        <location filename="../Client/client.cpp" line="82"/>
+        <location filename="../Client/client.cpp" line="79"/>
         <source>Failed to establish connection, check your username, password and server status.</source>
         <oldsource>Failed to establish connection, check your username,password and server status.</oldsource>
         <translation type="unfinished">连接服务器失败，可能是用户名、密码不对或者服务器未在工作。</translation>
     </message>
     <message id="fscktanaka">
-        <location filename="../Client/client.cpp" line="92"/>
+        <location filename="../Client/client.cpp" line="89"/>
         <source>田中飞妈</source>
         <translation type="unfinished">田中飞妈</translation>
     </message>
     <message id="password-mismatch">
-        <location filename="../Client/client.cpp" line="459"/>
+        <location filename="../Client/client.cpp" line="457"/>
         <source>Password mismatch!</source>
         <translation type="unfinished">两次输入密码不一致！</translation>
     </message>
     <message id="wait-for-connect-failure">
-        <location filename="../Client/client.cpp" line="486"/>
+        <location filename="../Client/client.cpp" line="484"/>
         <source>Failed to connect to server at %1:%2</source>
         <translation type="unfinished">未能连接到服务器，位于IP %1 端口 %2</translation>
     </message>
     <message id="password-confirm">
-        <location filename="../Client/client.cpp" line="497"/>
+        <location filename="../Client/client.cpp" line="495"/>
         <source>Confirm Password:</source>
         <translation type="unfinished">密码确认：</translation>
     </message>
     <message id="register-usage">
-        <location filename="../Client/client.cpp" line="383"/>
+        <location filename="../Client/client.cpp" line="381"/>
         <source>Usage: register [ip] [port] [username]</source>
         <translation type="unfinished">用法：register [IP] [端口] [用户名]</translation>
     </message>
     <message id="connect-usage">
-        <location filename="../Client/client.cpp" line="387"/>
+        <location filename="../Client/client.cpp" line="385"/>
         <source>Usage: connect [ip] [port] [username]</source>
         <translation type="unfinished">用法：connect [IP] [端口] [用户名]</translation>
     </message>
     <message id="connected-already">
-        <location filename="../Client/client.cpp" line="371"/>
+        <location filename="../Client/client.cpp" line="369"/>
         <source>Already connected, disconnect first.</source>
         <translation type="unfinished">已在连接中，请先下线。</translation>
     </message>
     <message id="connect-duplicate">
-        <location filename="../Client/client.cpp" line="376"/>
+        <location filename="../Client/client.cpp" line="374"/>
         <source>Do not attempt duplicate connections!</source>
         <translation type="unfinished">不要重复尝试连接！</translation>
     </message>
     <message id="ip-invalid">
-        <location filename="../Client/client.cpp" line="395"/>
+        <location filename="../Client/client.cpp" line="393"/>
         <location filename="../Server/server.cpp" line="519"/>
         <source></source>
         <oldsource>IP isn&apos;t valid</oldsource>
         <translation type="unfinished">IP格式不正确</translation>
     </message>
     <message id="port-invalid">
-        <location filename="../Client/client.cpp" line="401"/>
+        <location filename="../Client/client.cpp" line="399"/>
         <location filename="../Server/server.cpp" line="525"/>
         <source>Port isn&apos;t valid, it must fall between 1024 and 49151</source>
         <translation type="unfinished">端口格式不正确，注意1024以下和49151以上的端口是不能任意使用的</translation>
     </message>
     <message id="password-enter">
-        <location filename="../Client/client.cpp" line="408"/>
+        <location filename="../Client/client.cpp" line="406"/>
         <source>Enter password:</source>
         <translation type="unfinished">输入密码：</translation>
     </message>
     <message id="disconnect-when-offline">
-        <location filename="../Client/client.cpp" line="417"/>
+        <location filename="../Client/client.cpp" line="415"/>
         <source>You are not online.</source>
         <translation type="unfinished">未在有效连接中。</translation>
     </message>
@@ -88,168 +88,168 @@
         <translation type="obsolete">%1:下线信息发送失败，错误:%2</translation>
     </message>
     <message id="switch-usage">
-        <location filename="../Client/client.cpp" line="301"/>
+        <location filename="../Client/client.cpp" line="299"/>
         <source>Usage: switch [gamestate]</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="game-unexpected-state">
-        <location filename="../Client/client.cpp" line="312"/>
+        <location filename="../Client/client.cpp" line="310"/>
         <source>Nonexistent gamestate: %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="gamestate-offline">
-        <location filename="../Client/client.cpp" line="316"/>
+        <location filename="../Client/client.cpp" line="314"/>
         <source>Use &apos;disconnect&apos; for logout.</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="develop-usage">
-        <location filename="../Client/client.cpp" line="279"/>
+        <location filename="../Client/client.cpp" line="277"/>
         <source>Usage: develop [equipid]</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="develop-invalid-id">
-        <location filename="../Client/client.cpp" line="286"/>
+        <location filename="../Client/client.cpp" line="284"/>
         <source>Equipment id invalid.</source>
         <oldsource>Equipment id invalid</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message id="register-success">
-        <location filename="../Client/client.cpp" line="563"/>
+        <location filename="../Client/client.cpp" line="631"/>
         <source>%1: register success</source>
         <oldsource>%1: Register success</oldsource>
         <translation type="unfinished">%1:注册成功</translation>
     </message>
     <message id="disconnect-attempt">
-        <location filename="../Client/client.cpp" line="423"/>
+        <location filename="../Client/client.cpp" line="421"/>
         <source>Attempting to disconnect...</source>
         <translation type="unfinished">试图下线…</translation>
     </message>
     <message id="register-failed">
-        <location filename="../Client/client.cpp" line="575"/>
+        <location filename="../Client/client.cpp" line="642"/>
         <source>%1: register failure, reason: %2</source>
         <translation type="unfinished">%1:注册失败，理由:%2</translation>
     </message>
     <message id="login-failed">
-        <location filename="../Client/client.cpp" line="597"/>
+        <location filename="../Client/client.cpp" line="576"/>
         <source>%1: login failure, reason: %2</source>
         <oldsource>%1: Login failure, reason: %2</oldsource>
         <translation type="unfinished">%1:登录失败，理由:%2</translation>
     </message>
     <message id="logout-success">
-        <location filename="../Client/client.cpp" line="608"/>
+        <location filename="../Client/client.cpp" line="585"/>
         <source>%1: logout success</source>
         <oldsource>%1: Logout success</oldsource>
         <translation type="unfinished">%1:下线成功</translation>
     </message>
     <message id="logout-notonline">
-        <location filename="../Client/client.cpp" line="622"/>
+        <location filename="../Client/client.cpp" line="599"/>
         <source>%1: logout failure, not online</source>
         <oldsource>%1: Logout failure, not online</oldsource>
         <translation type="unfinished">%1:登录失败，不在线上</translation>
     </message>
     <message id="retransmit-toomuch">
-        <location filename="../Client/client.cpp" line="183"/>
+        <location filename="../Client/client.cpp" line="182"/>
         <source>%1: max restransmit time exceeded!</source>
         <translation type="unfinished">%1:重新传输次数超过限制!</translation>
     </message>
     <message id="malformed-shadow">
-        <location filename="../Client/client.cpp" line="570"/>
-        <location filename="../Client/client.cpp" line="592"/>
+        <location filename="../Client/client.cpp" line="571"/>
+        <location filename="../Client/client.cpp" line="637"/>
         <source></source>
         <oldsource>Malformed shadow</oldsource>
         <translation type="unfinished">密文格式不对</translation>
     </message>
     <message id="user-exists">
-        <location filename="../Client/client.cpp" line="571"/>
+        <location filename="../Client/client.cpp" line="638"/>
         <source></source>
         <oldsource>User Exists</oldsource>
         <translation type="unfinished">用户已存在</translation>
     </message>
     <message id="password-incorrect">
-        <location filename="../Client/client.cpp" line="593"/>
+        <location filename="../Client/client.cpp" line="572"/>
         <source></source>
         <oldsource>Password incorrect</oldsource>
         <translation type="unfinished">密码错误</translation>
     </message>
     <message id="logout-forced">
-        <location filename="../Client/client.cpp" line="613"/>
+        <location filename="../Client/client.cpp" line="590"/>
         <source>%1: logged elsewhere, force quitting</source>
         <oldsource>%1: Logged elsewhere, force quitting</oldsource>
         <translation type="unfinished">用户%1在别处登录，已强制下线</translation>
     </message>
     <message id="client-bad-json">
-        <location filename="../Client/client.cpp" line="636"/>
+        <location filename="../Client/client.cpp" line="607"/>
         <source>Client sent a bad JSON.</source>
         <translation type="unfinished">客户端发送了不正确的JSON。</translation>
     </message>
     <message id="client-unsupported-json">
-        <location filename="../Client/client.cpp" line="638"/>
+        <location filename="../Client/client.cpp" line="610"/>
         <source>Client sent an unsupported JSON.</source>
         <translation type="unfinished">客户端发送了不支持的信息。</translation>
     </message>
     <message id="access-denied-login-first">
-        <location filename="../Client/client.cpp" line="640"/>
+        <location filename="../Client/client.cpp" line="613"/>
         <source>You must be logged in in order to perform this operation.</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="equip-not-developable">
-        <location filename="../Client/client.cpp" line="646"/>
+        <location filename="../Client/client.cpp" line="617"/>
         <source>This equipment does not exist or not open for development.</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="equip-develop-failed">
-        <location filename="../Client/client.cpp" line="651"/>
+        <location filename="../Client/client.cpp" line="621"/>
         <source>Equipment development failed.</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="handshake-timeout">
-        <location filename="../Client/client.cpp" line="175"/>
+        <location filename="../Client/client.cpp" line="174"/>
         <source>%1: handshake timeout, trying to re-transmit</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="remote-disconnect">
-        <location filename="../Client/client.cpp" line="517"/>
+        <location filename="../Client/client.cpp" line="515"/>
         <source>Remote disconnected.</source>
         <translation type="unfinished">远程连接断开。</translation>
     </message>
     <message id="licence-not-found">
-        <location filename="../Protocol/commandline.cpp" line="147"/>
-        <source></source>
+        <location filename="../Protocol/commandline.cpp" line="141"/>
+        <source>Can&apos;t find license file, exiting.</source>
         <translation type="unfinished">找不到许可证文件，退出。</translation>
     </message>
     <message id="naganami">
-        <location filename="../Protocol/commandline.cpp" line="163"/>
+        <location filename="../Protocol/commandline.cpp" line="153"/>
         <source>What? Admiral Tanaka? He&apos;s the real deal, isn&apos;t he?
 Great at battle and bad at politics--so cool!</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="invalid-command">
-        <location filename="../Protocol/commandline.cpp" line="256"/>
+        <location filename="../Protocol/commandline.cpp" line="224"/>
         <source>Invalid Command, use &apos;commands&apos; for valid commands, &apos;help&apos; for help, &apos;exit&apos; to exit.</source>
         <translation type="unfinished">命令无效，请使用&quot;commands&quot;查看可用命令，&quot;help&quot;查看帮助，&quot;exit&quot;退出。</translation>
     </message>
     <message id="exit-helper">
-        <location filename="../Protocol/commandline.cpp" line="262"/>
+        <location filename="../Protocol/commandline.cpp" line="230"/>
         <source>Use &apos;exit&apos; to quit.</source>
         <translation type="unfinished">若要退出请使用&quot;exit&quot;。</translation>
     </message>
     <message id="good-command">
-        <location filename="../Protocol/commandline.cpp" line="266"/>
+        <location filename="../Protocol/commandline.cpp" line="234"/>
         <source>Available commands:</source>
         <translation type="unfinished">可用命令：</translation>
     </message>
     <message id="all-command">
-        <location filename="../Protocol/commandline.cpp" line="272"/>
+        <location filename="../Protocol/commandline.cpp" line="240"/>
         <source>All commands:</source>
         <translation type="unfinished">全部命令：</translation>
     </message>
     <message id="help-msg">
-        <location filename="../Protocol/commandline.cpp" line="280"/>
+        <location filename="../Protocol/commandline.cpp" line="210"/>
         <source>Use &apos;exit&apos; to quit, &apos;help&apos; to show help, &apos;commands&apos; to show available commands.</source>
         <translation type="unfinished">请使用&quot;commands&quot;查看可用命令，&quot;help&quot;查看帮助，&quot;exit&quot;退出。</translation>
     </message>
     <message id="goodbye">
-        <location filename="../Protocol/commandline.cpp" line="421"/>
+        <location filename="../Protocol/commandline.cpp" line="375"/>
         <source>Goodbye, press ENTER to quit.</source>
         <oldsource>Goodbye, press ENTER to quit</oldsource>
         <translation type="unfinished">再见，按ENTER退出程序。</translation>
@@ -362,9 +362,10 @@ Great at battle and bad at politics--so cool!</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="read-dgram-failed">
-        <location filename="../Client/client.cpp" line="213"/>
-        <source>Read failed due to: %1</source>
-        <oldsource>Failed to read a datagram: %1</oldsource>
+        <location filename="../Client/client.cpp" line="212"/>
+        <location filename="../Server/server.cpp" line="611"/>
+        <source>Read datagram failed due to: %1</source>
+        <oldsource>Read failed due to: %1</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message id="read-peerinfo-failed">
@@ -437,11 +438,6 @@ Great at battle and bad at politics--so cool!</source>
     <message id="db-error">
         <location filename="../Server/kerrors.h" line="16"/>
         <source>Database Error: %1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message id="resource-lack">
-        <location filename="../Server/kerrors.h" line="26"/>
-        <source>Resource lack Error: %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="network-error">

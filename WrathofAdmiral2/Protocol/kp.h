@@ -12,6 +12,16 @@
 #include <QJsonObject>
 #include <QCborValue>
 
+/* OS Specific */
+#if defined (Q_OS_WIN)
+#include <windows.h>
+#ifndef ENABLE_VIRTUAL_TERMINAL_PROCESSING
+#define ENABLE_VIRTUAL_TERMINAL_PROCESSING 0x0004
+#endif
+#elif defined (Q_OS_UNIX)
+#include <locale.h>
+#endif
+
 namespace KP {
     Q_NAMESPACE
 
@@ -64,6 +74,9 @@ namespace KP {
         Develop
     };
     Q_ENUM_NS(CommandType)
+
+    void initLog(bool server = false);
+    void winConsoleCheck();
 
     /* See JSON support in Qt, especially QCborValue */
     QByteArray clientAuth(AuthMode, const QString &name = "",
