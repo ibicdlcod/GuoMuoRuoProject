@@ -76,7 +76,9 @@ namespace KP {
     Q_ENUM_NS(CommandType)
 
     void initLog(bool server = false);
+#if defined (Q_OS_WIN)
     void winConsoleCheck();
+#endif
 
     /* See JSON support in Qt, especially QCborValue */
     QByteArray clientAuth(AuthMode, const QString &name = "",

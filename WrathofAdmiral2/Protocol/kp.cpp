@@ -22,6 +22,7 @@ void KP::initLog(bool server) {
     }
 }
 
+#if defined (Q_OS_WIN)
 void KP::winConsoleCheck() {
     HANDLE hOut = GetStdHandle(STD_OUTPUT_HANDLE);
     if (hOut == INVALID_HANDLE_VALUE) {
@@ -36,6 +37,7 @@ void KP::winConsoleCheck() {
         throw GetLastError();
     }
 }
+#endif
 
 QByteArray KP::clientAuth(AuthMode mode, const QString &uname,
                           const QByteArray &shadow) {
