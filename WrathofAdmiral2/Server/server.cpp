@@ -961,4 +961,5 @@ void Server::sqlinitUsers() {
         throw DBError(qtTrId("user-db-gen-failure"));
     }
 }
+
 QT_END_NAMESPACE

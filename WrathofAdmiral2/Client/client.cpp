@@ -567,7 +567,9 @@ void Client::receivedLogin(const QJsonObject &djson) {
     else {
         QString reas;
         switch(djson["reason"].toInt()) {
+        //% "Input shadow is malformed."
         case KP::BadShadow: reas = qtTrId("malformed-shadow"); break;
+        //% "Password is incorrect."
         case KP::BadPassword: reas = qtTrId("password-incorrect"); break;
         default: throw std::domain_error("message not implemented"); break;
         }
@@ -634,6 +636,7 @@ void Client::receivedReg(const QJsonObject &djson) {
         QString reas;
         switch(djson["reason"].toInt()) {
         case KP::BadShadow: reas = qtTrId("malformed-shadow"); break;
+        //% "User already exists."
         case KP::UserExists: reas = qtTrId("user-exists"); break;
         default: throw std::domain_error("message not implemented"); break;
         }

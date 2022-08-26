@@ -11,7 +11,6 @@ class DBError : public std::runtime_error {
     Q_DECLARE_TR_FUNCTIONS(DBError)
 
 public:
-    //% "Database Error: %1"
     DBError(QString what) : std::runtime_error(what.toStdString()) {}
 };
 
