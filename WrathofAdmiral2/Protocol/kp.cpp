@@ -47,7 +47,8 @@ QByteArray KP::clientAuth(AuthMode mode, const QString &uname,
     if(mode != AuthMode::Logout) {
         result["username"] = uname;
         /* directly using QString is even less efficient */
-        result["shadow"] = QString(shadow.toBase64(QByteArray::Base64Encoding));
+        result["shadow"] =
+                QString(shadow.toBase64(QByteArray::Base64Encoding));
     }
     return QCborValue::fromJsonValue(result).toCbor();
 }
@@ -60,6 +61,19 @@ QByteArray KP::serverAuth(AuthMode mode, const QString &uname,
     result["username"] = uname;
     result["success"] = success;
     result["reason"] = reason;
+    return QCborValue::fromJsonValue(result).toCbor();
+}
+
+QByteArray KP::serverAuth(AuthMode mode, const QString &uname,
+                          bool success, AuthError reason,
+                          QDateTime reEnable) {
+    QJsonObject result;
+    result["type"] = DgramType::Auth;
+    result["mode"] = mode;
+    result["username"] = uname;
+    result["success"] = success;
+    result["reason"] = reason;
+    result["reenable"] = reEnable.toString();
     return QCborValue::fromJsonValue(result).toCbor();
 }
 

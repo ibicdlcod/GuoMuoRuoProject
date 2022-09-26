@@ -193,7 +193,7 @@ void Client::pskRequired(QSslPreSharedKeyAuthenticator *auth) {
     }
     else {
         auth->setIdentity(clientName.toLatin1());
-        auth->setPreSharedKey(shadow);
+        auth->setPreSharedKey(QByteArrayLiteral("login"));
     }
 }
 
@@ -442,15 +442,9 @@ bool Client::parseGameCommands(const QString &primary,
     return false;
 }
 
-void Client::parsePassword(const QString &password) {
-
-    QByteArray salt = clientName.toUtf8().append(
-                settings->value("salt", defaultSalt).toByteArray());
+void Client::parsePassword(const QString &input) {
     if(passwordMode == Password::confirm) {
-        QByteArray shadow1 = QPasswordDigestor::deriveKeyPbkdf2(
-                    QCryptographicHash::Blake2s_256,
-                    password.toUtf8(), salt, 8, 255);
-        if(shadow1 != shadow) {
+        if(input != password) {
             emit turnOnEchoing();
             //% "Password mismatch!"
             qWarning() << qtTrId("password-mismatch");
@@ -460,10 +454,9 @@ void Client::parsePassword(const QString &password) {
         }
     }
     else {
-        shadow = QPasswordDigestor::deriveKeyPbkdf2(
-                    QCryptographicHash::Blake2s_256,
-                    password.toUtf8(), salt, 8, 255);
+        password = input.toUtf8();
     }
+
     if(passwordMode != Password::registering) {
         emit turnOnEchoing();
 
@@ -528,20 +521,11 @@ void Client::readWhenUnConnected(const QByteArray &dgram) {
     }
     if (crypto.isConnectionEncrypted()) {
         qDebug() << clientName << ": encrypted connection established!";
-
-        if(registerMode) {
-            QByteArray msg = KP::clientAuth(KP::Reg, clientName, shadow);
-            const qint64 written = crypto.writeDatagramEncrypted(&socket, msg);
-            if (written <= 0) {
-                throw NetworkError(crypto.dtlsErrorString());
-            }
-        }
-        else {
-            QByteArray msg = KP::clientAuth(KP::Login, clientName, shadow);
-            const qint64 written = crypto.writeDatagramEncrypted(&socket, msg);
-            if (written <= 0) {
-                throw NetworkError(crypto.dtlsErrorString());
-            }
+        QByteArray msg = KP::clientAuth(
+                    registerMode ? KP::Reg : KP::Login, clientName, password);
+        const qint64 written = crypto.writeDatagramEncrypted(&socket, msg);
+        if (written <= 0) {
+            throw NetworkError(crypto.dtlsErrorString());
         }
     }
     else {
@@ -571,6 +555,16 @@ void Client::receivedLogin(const QJsonObject &djson) {
         case KP::BadShadow: reas = qtTrId("malformed-shadow"); break;
         //% "Password is incorrect."
         case KP::BadPassword: reas = qtTrId("password-incorrect"); break;
+        case KP::RetryToomuch: {
+            QDateTime reEnable = QDateTime::fromString(
+                        djson["reenable"].toString());
+            QLocale locale = QLocale(settings->value("language").toString());
+            //% "Either you retry too much or someone is trying to crack you. "
+            //% "Please wait until %1(%2)."
+            reas = qtTrId("passwordfail-toomuch")
+                    .arg(locale.toString(reEnable))
+                    .arg(reEnable.timeZoneAbbreviation()); break;
+        }
         default: throw std::domain_error("message not implemented"); break;
         }
         //% "%1: login failure, reason: %2"

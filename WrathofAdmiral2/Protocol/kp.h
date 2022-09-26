@@ -43,7 +43,8 @@ namespace KP {
         BadShadow,
         BadPassword,
         LoggedElsewhere,
-        UserExists
+        UserExists,
+        RetryToomuch
     };
     Q_ENUM_NS(AuthError)
 
@@ -85,6 +86,8 @@ namespace KP {
                           const QByteArray &shadow = "");
     QByteArray serverAuth(AuthMode, const QString &,
                           bool, AuthError);
+    QByteArray serverAuth(AuthMode, const QString &,
+                          bool, AuthError, QDateTime);
     QByteArray serverAuth(AuthMode, const QString &,
                           bool);
     QByteArray serverParseError(MsgType, const QString &,

@@ -9,7 +9,7 @@
         <translation type="unfinished">服务器给你扔了一只可爱的猫娘。</translation>
     </message>
     <message id="login-success">
-        <location filename="../Client/client.cpp" line="564"/>
+        <location filename="../Client/client.cpp" line="548"/>
         <source>%1: login success</source>
         <oldsource>%1: Login success</oldsource>
         <translation type="unfinished">%1:登录成功</translation>
@@ -26,17 +26,17 @@
         <translation type="unfinished">田中飞妈</translation>
     </message>
     <message id="password-mismatch">
-        <location filename="../Client/client.cpp" line="456"/>
+        <location filename="../Client/client.cpp" line="450"/>
         <source>Password mismatch!</source>
         <translation type="unfinished">两次输入密码不一致！</translation>
     </message>
     <message id="wait-for-connect-failure">
-        <location filename="../Client/client.cpp" line="483"/>
+        <location filename="../Client/client.cpp" line="476"/>
         <source>Failed to connect to server at %1:%2</source>
         <translation type="unfinished">未能连接到服务器，位于IP %1 端口 %2</translation>
     </message>
     <message id="password-confirm">
-        <location filename="../Client/client.cpp" line="494"/>
+        <location filename="../Client/client.cpp" line="487"/>
         <source>Confirm Password:</source>
         <translation type="unfinished">密码确认：</translation>
     </message>
@@ -62,13 +62,13 @@
     </message>
     <message id="ip-invalid">
         <location filename="../Client/client.cpp" line="392"/>
-        <location filename="../Server/server.cpp" line="648"/>
+        <location filename="../Server/server.cpp" line="649"/>
         <source>IP isn&apos;t valid.</source>
-        <translation type="unfinished">IP格式不正确</translation>
+        <translation type="unfinished">IP格式不正确。</translation>
     </message>
     <message id="port-invalid">
         <location filename="../Client/client.cpp" line="398"/>
-        <location filename="../Server/server.cpp" line="653"/>
+        <location filename="../Server/server.cpp" line="654"/>
         <source>Port isn&apos;t valid, it must fall between 1024 and 49151</source>
         <translation type="unfinished">端口格式不正确，注意1024以下和49151以上的端口是不能任意使用的</translation>
     </message>
@@ -112,8 +112,13 @@
         <oldsource>Equipment id invalid</oldsource>
         <translation type="unfinished"></translation>
     </message>
+    <message id="passwordfail-toomuch">
+        <location filename="../Client/client.cpp" line="564"/>
+        <source>Either you retry too much or someone is trying to crack you. Please wait until %1(%2).</source>
+        <translation type="unfinished">要么你频繁输入了错误的密码，要么攻击者正在猜测你的密码。请等待至%1(%2)再登录。</translation>
+    </message>
     <message id="register-success">
-        <location filename="../Client/client.cpp" line="632"/>
+        <location filename="../Client/client.cpp" line="626"/>
         <source>%1: register success</source>
         <oldsource>%1: Register success</oldsource>
         <translation type="unfinished">%1:注册成功</translation>
@@ -124,24 +129,24 @@
         <translation type="unfinished">试图下线…</translation>
     </message>
     <message id="register-failed">
-        <location filename="../Client/client.cpp" line="644"/>
+        <location filename="../Client/client.cpp" line="638"/>
         <source>%1: register failure, reason: %2</source>
         <translation type="unfinished">%1:注册失败，理由:%2</translation>
     </message>
     <message id="login-failed">
-        <location filename="../Client/client.cpp" line="577"/>
+        <location filename="../Client/client.cpp" line="571"/>
         <source>%1: login failure, reason: %2</source>
         <oldsource>%1: Login failure, reason: %2</oldsource>
         <translation type="unfinished">%1:登录失败，理由:%2</translation>
     </message>
     <message id="logout-success">
-        <location filename="../Client/client.cpp" line="586"/>
+        <location filename="../Client/client.cpp" line="580"/>
         <source>%1: logout success</source>
         <oldsource>%1: Logout success</oldsource>
         <translation type="unfinished">%1:下线成功</translation>
     </message>
     <message id="logout-notonline">
-        <location filename="../Client/client.cpp" line="600"/>
+        <location filename="../Client/client.cpp" line="594"/>
         <source>%1: logout failure, not online</source>
         <oldsource>%1: Logout failure, not online</oldsource>
         <translation type="unfinished">%1:登录失败，不在线上</translation>
@@ -152,49 +157,49 @@
         <translation type="unfinished">%1:重新传输次数超过限制!</translation>
     </message>
     <message id="malformed-shadow">
-        <location filename="../Client/client.cpp" line="571"/>
-        <location filename="../Client/client.cpp" line="638"/>
+        <location filename="../Client/client.cpp" line="555"/>
+        <location filename="../Client/client.cpp" line="632"/>
         <source>Input shadow is malformed.</source>
-        <translation type="unfinished">密文格式不对</translation>
+        <translation type="unfinished">密文格式不对。</translation>
     </message>
     <message id="user-exists">
-        <location filename="../Client/client.cpp" line="640"/>
+        <location filename="../Client/client.cpp" line="634"/>
         <source>User already exists.</source>
-        <translation type="unfinished">用户已存在</translation>
+        <translation type="unfinished">用户已存在。</translation>
     </message>
     <message id="password-incorrect">
-        <location filename="../Client/client.cpp" line="573"/>
+        <location filename="../Client/client.cpp" line="557"/>
         <source>Password is incorrect.</source>
-        <translation type="unfinished">密码错误</translation>
+        <translation type="unfinished">密码错误。</translation>
     </message>
     <message id="logout-forced">
-        <location filename="../Client/client.cpp" line="591"/>
+        <location filename="../Client/client.cpp" line="585"/>
         <source>%1: logged elsewhere, force quitting</source>
         <oldsource>%1: Logged elsewhere, force quitting</oldsource>
         <translation type="unfinished">用户%1在别处登录，已强制下线</translation>
     </message>
     <message id="client-bad-json">
-        <location filename="../Client/client.cpp" line="608"/>
+        <location filename="../Client/client.cpp" line="602"/>
         <source>Client sent a bad JSON.</source>
         <translation type="unfinished">客户端发送了不正确的JSON。</translation>
     </message>
     <message id="client-unsupported-json">
-        <location filename="../Client/client.cpp" line="611"/>
+        <location filename="../Client/client.cpp" line="605"/>
         <source>Client sent an unsupported JSON.</source>
         <translation type="unfinished">客户端发送了不支持的信息。</translation>
     </message>
     <message id="access-denied-login-first">
-        <location filename="../Client/client.cpp" line="614"/>
+        <location filename="../Client/client.cpp" line="608"/>
         <source>You must be logged in in order to perform this operation.</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="equip-not-developable">
-        <location filename="../Client/client.cpp" line="618"/>
+        <location filename="../Client/client.cpp" line="612"/>
         <source>This equipment does not exist or not open for development.</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="equip-develop-failed">
-        <location filename="../Client/client.cpp" line="622"/>
+        <location filename="../Client/client.cpp" line="616"/>
         <source>Equipment development failed.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -204,7 +209,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message id="remote-disconnect">
-        <location filename="../Client/client.cpp" line="514"/>
+        <location filename="../Client/client.cpp" line="507"/>
         <source>Remote disconnected.</source>
         <translation type="unfinished">远程连接断开。</translation>
     </message>
@@ -251,181 +256,184 @@ Great at battle and bad at politics--so cool!</source>
         <translation type="unfinished">再见，按ENTER退出程序。</translation>
     </message>
     <message id="dtls-1.2">
-        <location filename="../Server/server.cpp" line="71"/>
+        <location filename="../Server/server.cpp" line="73"/>
         <source>DTLS 1.2.</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="dtls-1.2+">
-        <location filename="../Server/server.cpp" line="75"/>
+        <location filename="../Server/server.cpp" line="77"/>
         <source>DTLS 1.2 or later.</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="protocol-unknown">
-        <location filename="../Server/server.cpp" line="79"/>
+        <location filename="../Server/server.cpp" line="81"/>
         <source>Unknown protocol.</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="connection-info-serverside">
-        <location filename="../Server/server.cpp" line="83"/>
+        <location filename="../Server/server.cpp" line="85"/>
         <source>Session cipher: %1; session protocol: %2.</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="bad-csv">
-        <location filename="../Server/server.cpp" line="496"/>
-        <location filename="../Server/server.cpp" line="591"/>
+        <location filename="../Server/server.cpp" line="494"/>
+        <location filename="../Server/server.cpp" line="590"/>
         <source>%1: CSV file cannot be opened</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="get-userid-max-failed">
-        <location filename="../Server/server.cpp" line="800"/>
+        <location filename="../Server/server.cpp" line="822"/>
         <source>Get user ID status failed!</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="add-user-fail">
-        <location filename="../Server/server.cpp" line="817"/>
+        <location filename="../Server/server.cpp" line="845"/>
         <source>%1: Add user failure!</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="open-db-failed">
-        <location filename="../Server/server.cpp" line="913"/>
+        <location filename="../Server/server.cpp" line="961"/>
         <source>Open database failed!</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="sql-connect-success">
-        <location filename="../Server/server.cpp" line="917"/>
+        <location filename="../Server/server.cpp" line="965"/>
         <source>SQL connection successful!</source>
         <translation type="unfinished"></translation>
     </message>
+    <message id="equip-db-dr-gen-failure">
+        <location filename="../Server/server.cpp" line="1011"/>
+        <source>Create Equipment Database (Development resources required) failed.</source>
+        <oldsource>Create Equipment Database
+</oldsource>
+        <translation type="unfinished"></translation>
+    </message>
     <message id="user-db-lack">
-        <location filename="../Server/server.cpp" line="952"/>
+        <location filename="../Server/server.cpp" line="1018"/>
         <source>User database does not exist, creating...</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="user-db-good">
-        <location filename="../Server/server.cpp" line="894"/>
-        <location filename="../Server/server.cpp" line="957"/>
+        <location filename="../Server/server.cpp" line="942"/>
+        <location filename="../Server/server.cpp" line="1023"/>
         <source>User Database is OK.</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="user-db-gen-failure">
-        <location filename="../Server/server.cpp" line="961"/>
+        <location filename="../Server/server.cpp" line="1027"/>
         <source>Create User Database failed.</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="column-nonexist">
-        <location filename="../Server/server.cpp" line="891"/>
+        <location filename="../Server/server.cpp" line="918"/>
+        <location filename="../Server/server.cpp" line="939"/>
         <source>column %1 does not exist at table %2</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="equip-db-lack">
-        <location filename="../Server/server.cpp" line="937"/>
+        <location filename="../Server/server.cpp" line="991"/>
         <source>Equipment database does not exist, creating...</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="equip-db-good">
-        <location filename="../Server/server.cpp" line="868"/>
-        <location filename="../Server/server.cpp" line="942"/>
+        <location filename="../Server/server.cpp" line="897"/>
+        <location filename="../Server/server.cpp" line="996"/>
         <source>Equipment Database is OK.</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="equip-db-gen-failure">
-        <location filename="../Server/server.cpp" line="946"/>
+        <location filename="../Server/server.cpp" line="1000"/>
         <source>Create Equipment Database failed.</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="equip-db-bad">
-        <location filename="../Server/server.cpp" line="872"/>
+        <location filename="../Server/server.cpp" line="901"/>
         <source>Equipment Database is corrupted or incompatible.</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="listen-usage">
-        <location filename="../Server/server.cpp" line="643"/>
+        <location filename="../Server/server.cpp" line="644"/>
         <source>Usage: listen [ip] [port]</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="server-listen">
-        <location filename="../Server/server.cpp" line="659"/>
+        <location filename="../Server/server.cpp" line="660"/>
         <source>Server is listening on address %1 and port %2</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="server-listen-fail">
-        <location filename="../Server/server.cpp" line="665"/>
+        <location filename="../Server/server.cpp" line="666"/>
         <source>Server failed to listen on address %1 and port %2</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="server-stop">
-        <location filename="../Server/server.cpp" line="675"/>
+        <location filename="../Server/server.cpp" line="676"/>
         <source>Server stopped listening.</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="server-stopped-already">
-        <location filename="../Server/server.cpp" line="679"/>
+        <location filename="../Server/server.cpp" line="680"/>
         <source>Server isn&apos;t listening.</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="equip-export-good">
-        <location filename="../Server/server.cpp" line="535"/>
+        <location filename="../Server/server.cpp" line="534"/>
         <source>Export equipment registry success!</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="equip-import-good">
-        <location filename="../Server/server.cpp" line="636"/>
+        <location filename="../Server/server.cpp" line="637"/>
         <source>Import equipment registry success!</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="read-dgram-failed">
         <location filename="../Client/client.cpp" line="210"/>
-        <location filename="../Server/server.cpp" line="307"/>
+        <location filename="../Server/server.cpp" line="303"/>
         <source>Read datagram failed due to: %1</source>
         <oldsource>Read failed due to: %1</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message id="read-peerinfo-failed">
-        <location filename="../Server/server.cpp" line="314"/>
+        <location filename="../Server/server.cpp" line="310"/>
         <source>Failed to extract peer info (address, port).</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="client-dc">
-        <location filename="../Server/server.cpp" line="334"/>
+        <location filename="../Server/server.cpp" line="330"/>
         <source>%1: disconnected abruptly.</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="client-id-received">
-        <location filename="../Server/server.cpp" line="271"/>
+        <location filename="../Server/server.cpp" line="283"/>
         <source>PSK callback, received a client&apos;s identity: &apos;%1&apos;</source>
         <translation type="unfinished"></translation>
     </message>
-    <message id="psk-retrieve-failed">
-        <location filename="../Server/server.cpp" line="282"/>
-        <source>Pre-shared key retrieve failed: %1</source>
-        <translation type="unfinished"></translation>
-    </message>
     <message id="database-uninit">
-        <location filename="../Server/server.cpp" line="418"/>
-        <location filename="../Server/server.cpp" line="503"/>
-        <location filename="../Server/server.cpp" line="598"/>
+        <location filename="../Server/server.cpp" line="414"/>
+        <location filename="../Server/server.cpp" line="501"/>
+        <location filename="../Server/server.cpp" line="597"/>
         <source>Database uninitialized!</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="equip-refresh-failed">
-        <location filename="../Server/server.cpp" line="425"/>
-        <location filename="../Server/server.cpp" line="510"/>
+        <location filename="../Server/server.cpp" line="421"/>
+        <location filename="../Server/server.cpp" line="508"/>
         <source>Load equipment table failed!</source>
         <oldsource>Load equipment database failed!</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message id="equip-unexpected-attr">
-        <location filename="../Server/server.cpp" line="465"/>
+        <location filename="../Server/server.cpp" line="462"/>
         <source>Unexpected attribute of equipment: %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="server-shutdown">
-        <location filename="../Server/server.cpp" line="488"/>
+        <location filename="../Server/server.cpp" line="486"/>
         <source>Server is shutting down</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="dtls-error">
-        <location filename="../Server/server.cpp" line="579"/>
+        <location filename="../Server/server.cpp" line="578"/>
         <source>DTLS error: %1</source>
         <translation type="unfinished"></translation>
     </message>
@@ -435,17 +443,17 @@ Great at battle and bad at politics--so cool!</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="wait-for-dc">
-        <location filename="../Server/server.cpp" line="356"/>
+        <location filename="../Server/server.cpp" line="352"/>
         <source>Wait for disconnection...</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="dc-failed">
-        <location filename="../Server/server.cpp" line="360"/>
+        <location filename="../Server/server.cpp" line="356"/>
         <source>Disconnect failed!</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="db-error">
-        <location filename="../Server/server.cpp" line="250"/>
+        <location filename="../Server/kerrors.cpp" line="8"/>
         <source>Database Error: %1</source>
         <translation type="unfinished"></translation>
     </message>

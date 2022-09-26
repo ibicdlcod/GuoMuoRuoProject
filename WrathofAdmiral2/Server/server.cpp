@@ -47,10 +47,12 @@
 ****************************************************************************/
 
 #include "server.h"
-
 #include <algorithm>
-
 #include "kerrors.h"
+
+#ifdef max
+#undef max // apparently some stupid win header interferes with std::max
+#endif
 
 QT_BEGIN_NAMESPACE
 
@@ -147,7 +149,8 @@ static const QString equipDRT = QStringLiteral(
             );
 }
 
-Server::Server(int argc, char ** argv) : CommandLine(argc, argv) {
+Server::Server(int argc, char ** argv)
+    : CommandLine(argc, argv) {
     /* no *settings could be used here */
     connect(&serverSocket, &QAbstractSocket::readyRead,
             this, &Server::readyRead);
@@ -281,23 +284,7 @@ void Server::pskRequired(QSslPreSharedKeyAuthenticator *auth)
     if(clientName.compare("NEW_USER") == 0)
         auth->setPreSharedKey(QByteArrayLiteral("register"));
     else {
-        QSqlDatabase db = QSqlDatabase::database();
-        QSqlQuery query;
-        query.prepare("SELECT Shadow FROM Users "
-                      "WHERE Username = :name;");
-        query.bindValue(":name", clientName);
-        if(!query.exec()) {
-            //% "Pre-shared key retrieve failed: %1"
-            qCritical() << qtTrId("psk-retrieve-failed").arg(clientName);
-        }
-        query.isSelect();
-        if(!query.first()) {
-            int x = QRandomGenerator::global()->generate64();
-            auth->setPreSharedKey(QByteArray::number(x));
-        }
-        else {
-            auth->setPreSharedKey(query.value(0).toByteArray());
-        }
+        auth->setPreSharedKey(QByteArrayLiteral("login"));
     }
 }
 
@@ -727,11 +714,19 @@ void Server::receivedForceLogout(const QString &name) {
     }
 }
 
+/* nothing could shrink this function efficiently either */
 void Server::receivedLogin(const QJsonObject &djson,
                            const QString &peerInfo,
                            QDtls *connection) {
     QString name = djson["username"].toString();
-    auto shadow = QByteArray::fromBase64Encoding(
+    if(QDateTime::currentDateTime() < throttleTime[name]) {
+        QByteArray msg = KP::serverAuth(KP::Login, name, false,
+                                        KP::AuthError::RetryToomuch,
+                                        throttleTime[name]);
+        connection->writeDatagramEncrypted(&serverSocket, msg);
+        connection->shutdown(&serverSocket);
+    }
+    auto password = QByteArray::fromBase64Encoding(
                 djson["shadow"].toString().toLatin1(),
             QByteArray::Base64Encoding);
     QSqlDatabase db = QSqlDatabase::database();
@@ -739,12 +734,24 @@ void Server::receivedLogin(const QJsonObject &djson,
     query.prepare("SELECT UserID FROM Users "
                   "WHERE Username = :name AND Shadow = :shadow");
     query.bindValue(":name", name);
-    if(Q_LIKELY(shadow.decodingStatus
+    if(Q_LIKELY(password.decodingStatus
                 == QByteArray::Base64DecodingStatus::Ok)) {
-        query.bindValue(":shadow", shadow.decoded);
+        QByteArray salt = name.toUtf8().append(
+                    settings->value("salt", defaultSalt).toByteArray());
+        QByteArray shadow = QPasswordDigestor::deriveKeyPbkdf2(
+                    QCryptographicHash::Blake2s_256,
+                    password.decoded, salt, 8, 255);
+        query.bindValue(":shadow", shadow);
         query.exec();
         query.isSelect();
         if(Q_UNLIKELY(!query.first())) {
+            if(throttleCount.contains(name)) {
+                throttleCount[name] = std::max(throttleCount[name] + 1, 62);
+            } else {
+                throttleCount[name] = 1;
+            }
+            throttleTime[name] = QDateTime::currentDateTime().addSecs(
+                        Q_INT64_C(1) << throttleCount[name]);
             QByteArray msg = KP::serverAuth(KP::Login, name, false,
                                             KP::AuthError::BadPassword);
             connection->writeDatagramEncrypted(&serverSocket, msg);
@@ -755,6 +762,7 @@ void Server::receivedLogin(const QJsonObject &djson,
             if(!(connectedPeers[name].isEmpty())) {
                 receivedForceLogout(name);
             }
+            throttleCount.remove(name);
             connectedUsers[peerInfo] = name;
             connectedPeers[name] = peerInfo;
             QByteArray msg = KP::serverAuth(KP::Login, name, true);
@@ -793,7 +801,7 @@ void Server::receivedReg(const QJsonObject &djson,
                          QDtls *connection) {
     Q_UNUSED(peerInfo)
     QString name = djson["username"].toString();
-    auto shadow = QByteArray::fromBase64Encoding(
+    auto password = QByteArray::fromBase64Encoding(
                 djson["shadow"].toString().toLatin1(),
             QByteArray::Base64Encoding);
     QSqlDatabase db = QSqlDatabase::database();
@@ -825,8 +833,13 @@ void Server::receivedReg(const QJsonObject &djson,
         }
         insert.bindValue(":id", maxid+1);
         insert.bindValue(":name", name);
-        if(shadow.decodingStatus == QByteArray::Base64DecodingStatus::Ok) {
-            insert.bindValue(":shadow", shadow.decoded);
+        if(password.decodingStatus == QByteArray::Base64DecodingStatus::Ok) {
+            QByteArray salt = name.toUtf8().append(
+                        settings->value("salt", defaultSalt).toByteArray());
+            QByteArray shadow = QPasswordDigestor::deriveKeyPbkdf2(
+                        QCryptographicHash::Blake2s_256,
+                        password.decoded, salt, 8, 255);
+            insert.bindValue(":shadow", shadow);
             if(!insert.exec()) {
                 //% "%1: Add user failure!"
                 throw DBError(qtTrId("add-user-fail").arg(name),
@@ -993,8 +1006,8 @@ void Server::sqlinitEquipDvRes() {
     QSqlQuery query;
     query.prepare(equipDRT);
     if(!query.exec()) {
-        //% "Create Equipment Database
-        //% (Development resources required) failed."
+        //% "Create Equipment Database "
+        //% "(Development resources required) failed."
         throw DBError(qtTrId("equip-db-dr-gen-failure"),
                       query.lastError());
     }
