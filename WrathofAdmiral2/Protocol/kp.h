@@ -64,10 +64,13 @@ namespace KP {
     Q_ENUM_NS(GameState)
 
     enum ResourceType{
-        ResOil,
-        ResAmmo,
-        ResMetal,
-        ResRare
+        Oil,
+        Explosives,
+        Steel,
+        Rubber,
+        Aluminium,
+        Tungsten,
+        Chromium
     };
     Q_ENUM_NS(ResourceType)
 

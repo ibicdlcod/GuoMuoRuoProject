@@ -15,6 +15,7 @@ SOURCES += \
     ecma48.cpp \
     equipment.cpp \
     kp.cpp \
+    resord.cpp \
     wcwidth.c
 
 HEADERS += \
@@ -23,6 +24,7 @@ HEADERS += \
     ecma48.h \
     equipment.h \
     kp.h \
+    resord.h \
     wcwidth.h
 
 # Default rules for deployment.

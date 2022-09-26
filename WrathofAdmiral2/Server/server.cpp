@@ -93,10 +93,14 @@ static const QString userT = QStringLiteral(
             "UserID INTEGER PRIMARY KEY, "
             "Username VARCHAR(255) NOT NULL, "
             "Shadow TINYBLOB,"
-            "ResOil INTEGER DEFAULT 10000,"
-            "ResAmmo INTEGER DEFAULT 10000,"
-            "ResMetal INTEGER DEFAULT 10000,"
-            "ResRare INTEGER DEFAULT 5000);"
+            "Oil INTEGER DEFAULT 10000,"
+            "Explo INTEGER DEFAULT 10000,"
+            "Steel INTEGER DEFAULT 10000,"
+            "Rub INTEGER DEFAULT 6000,"
+            "Al INTEGER DEFAULT 8000,"
+            "W INTEGER DEFAULT 6000,"
+            "Cr INTEGER DEFAULT 6000"
+            ");"
             );
 
 static const QString equipT = QStringLiteral(
@@ -141,10 +145,13 @@ static const QString equipT = QStringLiteral(
 static const QString equipDRT = QStringLiteral(
             "CREATE TABLE EquipDvRes ( "
             "Equiptype VARCHAR(63) UNIQUE, "
-            "ResOil INTEGER DEFAULT 0,"
-            "ResAmmo INTEGER DEFAULT 0,"
-            "ResMetal INTEGER DEFAULT 0,"
-            "ResRare INTEGER DEFAULT 0"
+            "Oil INTEGER DEFAULT 0,"
+            "Explo INTEGER DEFAULT 0,"
+            "Steel INTEGER DEFAULT 0,"
+            "Rub INTEGER DEFAULT 0,"
+            "Al INTEGER DEFAULT 0,"
+            "W INTEGER DEFAULT 0,"
+            "Cr INTEGER DEFAULT 0"
             ");"
             );
 }
@@ -181,6 +188,10 @@ void Server::datagramReceived(const QString &peerInfo,
         QByteArray msg = KP::serverParseError(
                     KP::JsonError, peerInfo, e.errorString());
         connection->writeDatagramEncrypted(&serverSocket, msg);
+    } catch (DBError &e) {
+        for(QString &i : e.whats()) {
+            qCritical() << i;
+        }
     } catch (const std::domain_error &e) {
         qWarning() << peerInfo << e.what();
         QByteArray msg = KP::serverParseError(
@@ -262,7 +273,7 @@ bool Server::parseSpec(const QStringList &cmdParts) {
         }
         return false;
     } catch (DBError &e) {
-        for(QString i : e.whats()) {
+        for(QString &i : e.whats()) {
             qCritical() << i;
         }
         return true;
@@ -816,11 +827,12 @@ void Server::receivedReg(const QJsonObject &djson,
         QSqlQuery getMaxID;
         getMaxID.prepare("SELECT MAX(UserID) FROM Users;");
         getMaxID.exec();
-        if(!getMaxID.isSelect() || !getMaxID.seek(0)
-                || getMaxID.isNull("MAX(UserID)")) {
+        if(!getMaxID.isSelect() || !getMaxID.seek(0)) {
             //% "Get user ID status failed!"
             throw DBError(qtTrId("get-userid-max-failed"),
                           query.lastError());
+        }
+        else if(getMaxID.isNull("MAX(UserID)")) {
             maxid = 0;
         }
         else {
@@ -907,10 +919,13 @@ void Server::sqlcheckEquipDvRes() {
     QSqlRecord columns = db.record("EquipDvRes");
     QStringList desiredColumns = {
         "Equiptype",
-        "ResOil",
-        "ResAmmo",
-        "ResMetal",
-        "ResRare",
+        "Oil",
+        "Explo",
+        "Steel",
+        "Rub",
+        "Al",
+        "W",
+        "Cr",
     };
     for(const QString &column : desiredColumns) {
         if(!columns.contains(column)) {
@@ -928,10 +943,13 @@ void Server::sqlcheckUsers() {
         "UserID",
         "Username",
         "Shadow",
-        "ResOil",
-        "ResAmmo",
-        "ResMetal",
-        "ResRare"
+        "Oil",
+        "Explo",
+        "Steel",
+        "Rub",
+        "Al",
+        "W",
+        "Cr",
     };
     for(const QString &column : desiredColumns) {
         if(!columns.contains(column)) {

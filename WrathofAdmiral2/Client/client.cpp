@@ -98,8 +98,7 @@ void Client::displayPrompt() {
     }
 }
 
-bool Client::parseSpec(const QStringList &cmdParts)
-{
+bool Client::parseSpec(const QStringList &cmdParts) {
     try {
         if(cmdParts.length() > 0) {
             QString primary = cmdParts[0];
