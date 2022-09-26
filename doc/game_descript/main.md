@@ -10,7 +10,9 @@
 
   - Development
   - Convert-Develop
+  - Technology points
   - Industrial Plant
+  - Aviation Academy
   - Improvement
 
 - Ships
@@ -18,6 +20,11 @@
   - Ship Core
   - Ship Hull
   - Assembly
+
+  - Ship Experience
+  - Remodel
+  - Marriage
+  - Destiny task
 
 - Sorties
 
@@ -38,13 +45,6 @@
 
 - Tasks
 
-- Ship Experience
-
-  - Experience
-  - Remodel
-  - Marriage
-  - Destiny task
-
 - Special Fleets
 
   - Combined Fleet
@@ -56,6 +56,7 @@
 
   - Task Force Mechanic
   - Grand Battle
+  - Medal Collection
 
 - Industrial Support (Ranking)
 
