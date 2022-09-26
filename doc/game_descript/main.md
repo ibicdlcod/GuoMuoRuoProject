@@ -1,5 +1,5 @@
 # WA2 Universe
-- [Philosophy]: ./philosophy.md
+- [Philosophy]: ./philosophy.md	"w"
 
 - Resources
 
