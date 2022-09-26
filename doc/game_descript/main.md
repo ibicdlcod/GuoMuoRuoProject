@@ -1,10 +1,10 @@
 # WA2 Universe
-- [Philosophy]: ./philosophy.md	"w"
+- [Philosophy](./philosophy.md)
 
-- Resources
+- [Resources](./resources.md)
 
-  - Ordinary
-  - Special
+  - Ordinary resources
+  - Special resources
 
 - Equipment
 
