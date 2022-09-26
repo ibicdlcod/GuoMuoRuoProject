@@ -1,5 +1,10 @@
 #include "commandline.h"
 
+#include <QDir>
+#include <QRegularExpression>
+#include <QSettings>
+#include <iostream>
+
 #if defined (Q_OS_WIN)
 #include <windows.h>
 #endif
@@ -7,11 +12,6 @@
 #include <sys/ioctl.h> //ioctl() and TIOCGWINSZ
 #include <unistd.h> // for STDOUT_FILENO
 #endif
-
-#include <QDir>
-#include <QRegularExpression>
-#include <QSettings>
-#include <iostream>
 
 #include "consoletextstream.h"
 #include "wcwidth.h"

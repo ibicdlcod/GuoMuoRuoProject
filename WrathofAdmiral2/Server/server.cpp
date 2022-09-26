@@ -86,52 +86,65 @@ QString connection_info(QDtls *connection) {
     return info;
 }
 
-static const QString userT = QStringLiteral("CREATE TABLE Users ( "
-                                            "UserID INTEGER PRIMARY KEY, "
-                                            "Username VARCHAR(255) NOT NULL, "
-                                            "Shadow TINYBLOB,"
-                                            "ResOil INTEGER DEFAULT 10000,"
-                                            "ResAmmo INTEGER DEFAULT 10000,"
-                                            "ResMetal INTEGER DEFAULT 10000,"
-                                            "ResRare INTEGER DEFAULT 5000);");
+static const QString userT = QStringLiteral(
+            "CREATE TABLE Users ( "
+            "UserID INTEGER PRIMARY KEY, "
+            "Username VARCHAR(255) NOT NULL, "
+            "Shadow TINYBLOB,"
+            "ResOil INTEGER DEFAULT 10000,"
+            "ResAmmo INTEGER DEFAULT 10000,"
+            "ResMetal INTEGER DEFAULT 10000,"
+            "ResRare INTEGER DEFAULT 5000);"
+            );
 
-static const QString equipT = QStringLiteral("CREATE TABLE Equip ( "
-                                             "EquipID INTEGER PRIMARY KEY, "
-                                             "Equipname VARCHAR(63), "
-                                             "Equiptype VARCHAR(63), "
-                                             "Rarity INTEGER, "
-                                             "Intricacy INTEGER, "
-                                             "Tenacity INTEGER, "
-                                             "Firepower INTEGER, "
-                                             "Armorpenetration INTEGER, "
-                                             "Firingrange INTEGER, "
-                                             "Firingspeed INTEGER, "
-                                             "Torpedo INTEGER, "
-                                             "Bombing INTEGER, "
-                                             "Landattack INTEGER, "
-                                             "Airattack INTEGER, "
-                                             "Interception INTEGER, "
-                                             "Antibomber INTEGER, "
-                                             "Asw INTEGER, "
-                                             "Los INTEGER, "
-                                             "Accuracy INTEGER, "
-                                             "Evasion INTEGER, "
-                                             "Armor INTEGER, "
-                                             "Transport INTEGER, "
-                                             "Flightrange INTEGER, "
-                                             "Require INTEGER, "
-                                             "Require2 INTEGER, "
-                                             "Developenabled INTEGER, "
-                                             "Convertenabled INTEGER, "
-                                             "Requirenum INTEGER, "
-                                             "Require2num INTEGER, "
-                                             "Industrialsilver INTEGER, "
-                                             "Industrialgold INTEGER, "
-                                             "Customflag1 VARCHAR(63), "
-                                             "Customflag2 VARCHAR(63), "
-                                             "Customflag3 VARCHAR(63) "
-                                             ");");
+static const QString equipT = QStringLiteral(
+            "CREATE TABLE Equip ( "
+            "EquipID INTEGER PRIMARY KEY, "
+            "Equipname VARCHAR(63), "
+            "Equiptype VARCHAR(63), "
+            "Rarity INTEGER, "
+            "Intricacy INTEGER, "
+            "Tenacity INTEGER, "
+            "Firepower INTEGER, "
+            "Armorpenetration INTEGER, "
+            "Firingrange INTEGER, "
+            "Firingspeed INTEGER, "
+            "Torpedo INTEGER, "
+            "Bombing INTEGER, "
+            "Landattack INTEGER, "
+            "Airattack INTEGER, "
+            "Interception INTEGER, "
+            "Antibomber INTEGER, "
+            "Asw INTEGER, "
+            "Los INTEGER, "
+            "Accuracy INTEGER, "
+            "Evasion INTEGER, "
+            "Armor INTEGER, "
+            "Transport INTEGER, "
+            "Flightrange INTEGER, "
+            "Require INTEGER, "
+            "Require2 INTEGER, "
+            "Developenabled INTEGER, "
+            "Convertenabled INTEGER, "
+            "Requirenum INTEGER, "
+            "Require2num INTEGER, "
+            "Industrialsilver INTEGER, "
+            "Industrialgold INTEGER, "
+            "Customflag1 VARCHAR(63), "
+            "Customflag2 VARCHAR(63), "
+            "Customflag3 VARCHAR(63) "
+            ");"
+            );
 
+static const QString equipDRT = QStringLiteral(
+            "CREATE TABLE EquipDvRes ( "
+            "Equiptype VARCHAR(63) UNIQUE, "
+            "ResOil INTEGER DEFAULT 0,"
+            "ResAmmo INTEGER DEFAULT 0,"
+            "ResMetal INTEGER DEFAULT 0,"
+            "ResRare INTEGER DEFAULT 0"
+            ");"
+            );
 }
 
 Server::Server(int argc, char ** argv) : CommandLine(argc, argv) {
@@ -246,13 +259,9 @@ bool Server::parseSpec(const QStringList &cmdParts) {
         }
         return false;
     } catch (DBError &e) {
-        //% "Database Error: %1"
-        qCritical() << qtTrId("db-error").arg(e.what());
-        QSqlDatabase db = QSqlDatabase::database();
-        QSqlError de = db.lastError();
-        if(de.isValid())
-            qCritical() << "DB:" << de.databaseText()
-                        << "/Driver:" << de.driverText();
+        for(QString i : e.whats()) {
+            qCritical() << i;
+        }
         return true;
     }
 }
@@ -422,7 +431,8 @@ bool Server::equipmentRefresh()
     query.prepare("SELECT * FROM Equip;");
     if(!query.exec()) {
         //% "Load equipment table failed!"
-        throw DBError(qtTrId("equip-refresh-failed"));
+        throw DBError(qtTrId("equip-refresh-failed"),
+                      query.lastError());
         return false;
     }
     query.isSelect();
@@ -463,7 +473,8 @@ bool Server::equipmentRefresh()
                 if(attrvalue == -1) {
                     //% "Unexpected attribute of equipment: %1"
                     throw DBError(qtTrId("equip-unexpected-attr")
-                                  .arg(fieldname));
+                                  .arg(fieldname),
+                                  query.lastError());
                 }
                 else {
                     attr[(Equipment::AttrType)attrvalue]
@@ -507,7 +518,8 @@ bool Server::exportEquipToCSV() const {
     query.prepare("SELECT * FROM Equip;");
     if(!query.exec()) {
         //% "Load equipment table failed!"
-        throw DBError(qtTrId("equip-refresh-failed"));
+        throw DBError(qtTrId("equip-refresh-failed"),
+                      query.lastError());
         return false;
     }
     query.isSelect();
@@ -623,10 +635,12 @@ bool Server::importEquipFromCSV() {
         if(dataNew.endsWith(","))
             dataNew.chop(1);
         QSqlQuery query;
+        /* TODO: properly use prepared statements */
         query.prepare("REPLACE INTO Equip ("+title+") VALUES ("+dataNew+");");
         if(!query.exec()) {
             //% "Import equipment database failed!"
-            throw DBError(qtTrId("equip-import-failed"));
+            throw DBError(qtTrId("equip-import-failed"),
+                          query.lastError());
             qCritical() << query.lastError();
             return false;
         }
@@ -797,7 +811,8 @@ void Server::receivedReg(const QJsonObject &djson,
         if(!getMaxID.isSelect() || !getMaxID.seek(0)
                 || getMaxID.isNull("MAX(UserID)")) {
             //% "Get user ID status failed!"
-            throw DBError(qtTrId("get-userid-max-failed"));
+            throw DBError(qtTrId("get-userid-max-failed"),
+                          query.lastError());
             maxid = 0;
         }
         else {
@@ -814,7 +829,8 @@ void Server::receivedReg(const QJsonObject &djson,
             insert.bindValue(":shadow", shadow.decoded);
             if(!insert.exec()) {
                 //% "%1: Add user failure!"
-                throw DBError(qtTrId("add-user-fail").arg(name));
+                throw DBError(qtTrId("add-user-fail").arg(name),
+                              query.lastError());
             };
             QByteArray msg = KP::serverAuth(KP::Reg, name, true);
             connection->writeDatagramEncrypted(&serverSocket, msg);
@@ -870,6 +886,25 @@ void Server::sqlcheckEquip() {
     else {
         //% "Equipment Database is corrupted or incompatible."
         throw DBError(qtTrId("equip-db-bad"));
+    }
+}
+
+void Server::sqlcheckEquipDvRes() {
+    QSqlDatabase db = QSqlDatabase::database();
+    QSqlRecord columns = db.record("EquipDvRes");
+    QStringList desiredColumns = {
+        "Equiptype",
+        "ResOil",
+        "ResAmmo",
+        "ResMetal",
+        "ResRare",
+    };
+    for(const QString &column : desiredColumns) {
+        if(!columns.contains(column)) {
+            //% "column %1 does not exist at table %2"
+            throw DBError(qtTrId("column-nonexist")
+                          .arg(column, "EquipDvRes"));
+        }
     }
 }
 
@@ -929,6 +964,12 @@ void Server::sqlinit() {
         else {
             sqlcheckEquip();
         }
+        if(!tables.contains("EquipDvRes")) {
+            sqlinitEquipDvRes();
+        }
+        else {
+            sqlcheckEquipDvRes();
+        }
     }
 }
 
@@ -943,7 +984,19 @@ void Server::sqlinitEquip() {
     }
     else {
         //% "Create Equipment Database failed."
-        throw DBError(qtTrId("equip-db-gen-failure"));
+        throw DBError(qtTrId("equip-db-gen-failure"),
+                      query.lastError());
+    }
+}
+
+void Server::sqlinitEquipDvRes() {
+    QSqlQuery query;
+    query.prepare(equipDRT);
+    if(!query.exec()) {
+        //% "Create Equipment Database
+        //% (Development resources required) failed."
+        throw DBError(qtTrId("equip-db-dr-gen-failure"),
+                      query.lastError());
     }
 }
 
@@ -958,7 +1011,8 @@ void Server::sqlinitUsers() {
     }
     else {
         //% "Create User Database failed."
-        throw DBError(qtTrId("user-db-gen-failure"));
+        throw DBError(qtTrId("user-db-gen-failure"),
+                      query.lastError());
     }
 }
 

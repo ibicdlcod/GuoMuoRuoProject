@@ -102,9 +102,11 @@ private:
     void receivedReg(const QJsonObject &, const QString &, QDtls *);
     void receivedReq(const QJsonObject &, const QString &, QDtls *);
     void sqlcheckEquip();
+    void sqlcheckEquipDvRes();
     void sqlcheckUsers();
     void sqlinit();
     void sqlinitEquip();
+    void sqlinitEquipDvRes();
     void sqlinitUsers();
 
     bool listening = false;
