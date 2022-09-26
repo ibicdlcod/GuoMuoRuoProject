@@ -8,6 +8,7 @@
 
 - [Equipment](./equipment.md)
 
+  - Equipment type
   - Development
   - Convert-Develop
   - Technology points

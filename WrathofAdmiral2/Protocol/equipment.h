@@ -6,6 +6,86 @@
 #include <QObject>
 #include <QString>
 
+class EquipType: public QObject {
+    Q_OBJECT
+
+public:
+    enum BasicType{
+        Disabled,
+        MainGun,
+        SupportGun,
+        Torpedo,
+        Midget,
+        Plane,
+        Seaplane,
+        Flyingboat,
+        Autogyro,
+        Liason,
+        DepthC,
+        Sonar,
+        AA,
+        AADirector,
+        ALShell,
+        ALRocket,
+        ALCraft,
+        ALTank,
+        Drum,
+        TPCraft,
+        Radar,
+        RadarSub,
+        Engine,
+        Bulge,
+        SearchLight,
+        StarShell,
+        Repair,
+        Replenish,
+        Food,
+        CommandFac,
+        AircraftPs,
+        SurfacePs,
+        TorpBoat,
+    };
+    Q_ENUM(BasicType)
+
+    enum TypeFlag{
+        /* Plane, Seaplane */
+        Recon = 0x0001,
+        Fight = 0x0002,
+        Torp = 0x0004,
+        Dive = 0x0008,
+        Night = 0x0010,
+        LB = 0x0020,
+        IC = 0x0040,
+        Patrol = 0x0080,
+        Jet = 0x0100,
+        /* MainGun, SupportGun, Radar */
+        Flak = 0x0200,
+        Surface = 0x0400,
+        /* DepthC */
+        Racks = 0x0800,
+        /* Sonar */
+        Active = 0x1000,
+        /* AA */
+        Cannon = 0x2000,
+        /* Engine */
+        Turb = 0x4000,
+        /* TPCraft */
+        Convoy = 0x8000
+    };
+    Q_DECLARE_FLAGS(TypeFlags, TypeFlag)
+    Q_FLAG(TypeFlags)
+
+    EquipType(const QString &);
+    QString toString() const;
+
+private:
+    BasicType base;
+    TypeFlags flags;
+    int size = 0;
+};
+
+Q_DECLARE_OPERATORS_FOR_FLAGS(EquipType::TypeFlags)
+
 class Equipment: public QObject {
     Q_OBJECT
 
@@ -48,7 +128,7 @@ public:
 private:
     int id;
     QString name;
-    QString type;
+    EquipType type;
     QMap<AttrType, int> attr;
     QStringList customflags;
 };

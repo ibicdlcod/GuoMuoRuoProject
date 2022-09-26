@@ -93,15 +93,37 @@ static const QString userT = QStringLiteral(
             "UserID INTEGER PRIMARY KEY, "
             "Username VARCHAR(255) NOT NULL, "
             "Shadow TINYBLOB,"
+            /* Global status */
+            "Experience INTEGER DEFAULT 0,"
+            "Level INTEGER DEFAULT 0,"
+            "InduContrib INTEGER DEFAULT 0,"
+            "FleetSize INTEGER DEFAULT 1,"
+            // used by both develop and construction, maximum is 20
+            "FactorySize INTEGER DEFAULT 4,"
+            // maximum is 12 due to high cost of fairy treat
+            "DockSize INTEGER DEFAULT 4,"
+            /* Resources */
             "Oil INTEGER DEFAULT 10000,"
             "Explo INTEGER DEFAULT 10000,"
             "Steel INTEGER DEFAULT 10000,"
             "Rub INTEGER DEFAULT 6000,"
             "Al INTEGER DEFAULT 8000,"
             "W INTEGER DEFAULT 6000,"
-            "Cr INTEGER DEFAULT 6000"
-            ");"
-            );
+            "Cr INTEGER DEFAULT 6000,"
+            /* Special Resources */
+            "Limitbreak INTEGER DEFAULT 0,"
+            "Silver INTEGER DEFAULT 0,"
+            "Gold INTEGER DEFAULT 0,"
+            "Energizer INTEGER DEFAULT 0,"
+            "Giftbox INTEGER DEFAULT 0,"
+            "DecoratePt INTEGER DEFAULT 0,"
+            "JetEngine INTEGER DEFAULT 0,"
+            "LandCorps INTEGER DEFAULT 0,"
+            "Saury INTEGER DEFAULT 0,"
+            "Sardine INTEGER DEFAULT 0,"
+            "Hishimochi INTEGER DEFAULT 0,"
+            "EmergRepair INTEGER DEFAULT 0"
+            ");");
 
 static const QString equipT = QStringLiteral(
             "CREATE TABLE Equip ( "
@@ -276,6 +298,7 @@ bool Server::parseSpec(const QStringList &cmdParts) {
         for(QString &i : e.whats()) {
             qCritical() << i;
         }
+        shutdown();
         return true;
     }
 }
@@ -943,6 +966,12 @@ void Server::sqlcheckUsers() {
         "UserID",
         "Username",
         "Shadow",
+        "Experience",
+        "Level",
+        "InduContrib",
+        "FleetSize",
+        "FactorySize",
+        "DockSize",
         "Oil",
         "Explo",
         "Steel",
@@ -950,6 +979,18 @@ void Server::sqlcheckUsers() {
         "Al",
         "W",
         "Cr",
+        "Limitbreak",
+        "Silver",
+        "Gold",
+        "Energizer",
+        "Giftbox",
+        "DecoratePt",
+        "JetEngine",
+        "LandCorps",
+        "Saury",
+        "Sardine",
+        "Hishimochi",
+        "EmergRepair"
     };
     for(const QString &column : desiredColumns) {
         if(!columns.contains(column)) {

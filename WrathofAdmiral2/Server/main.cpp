@@ -3,8 +3,8 @@
 #include <QTranslator>
 #include "qconsolelistener.h"
 
-#include "server.h"
 #include "kp.h"
+#include "server.h"
 
 QFile *logFile;
 std::unique_ptr<QSettings> settings;
