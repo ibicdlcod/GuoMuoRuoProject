@@ -6,7 +6,7 @@
   - Ordinary resources
   - Special resources
 
-- Equipment
+- [Equipment](./equipment.md)
 
   - Development
   - Convert-Develop
@@ -20,7 +20,6 @@
   - Ship Core
   - Ship Hull
   - Assembly
-
   - Ship Experience
   - Remodel
   - Marriage
