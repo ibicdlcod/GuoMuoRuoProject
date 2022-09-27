@@ -163,19 +163,6 @@ static const QString equipT = QStringLiteral(
             "Customflag3 VARCHAR(63) "
             ");"
             );
-
-static const QString equipDRT = QStringLiteral(
-            "CREATE TABLE EquipDvRes ( "
-            "Equiptype VARCHAR(63) UNIQUE, "
-            "Oil INTEGER DEFAULT 0,"
-            "Explo INTEGER DEFAULT 0,"
-            "Steel INTEGER DEFAULT 0,"
-            "Rub INTEGER DEFAULT 0,"
-            "Al INTEGER DEFAULT 0,"
-            "W INTEGER DEFAULT 0,"
-            "Cr INTEGER DEFAULT 0"
-            ");"
-            );
 }
 
 Server::Server(int argc, char ** argv)
@@ -937,28 +924,6 @@ void Server::sqlcheckEquip() {
     }
 }
 
-void Server::sqlcheckEquipDvRes() {
-    QSqlDatabase db = QSqlDatabase::database();
-    QSqlRecord columns = db.record("EquipDvRes");
-    QStringList desiredColumns = {
-        "Equiptype",
-        "Oil",
-        "Explo",
-        "Steel",
-        "Rub",
-        "Al",
-        "W",
-        "Cr",
-    };
-    for(const QString &column : desiredColumns) {
-        if(!columns.contains(column)) {
-            //% "column %1 does not exist at table %2"
-            throw DBError(qtTrId("column-nonexist")
-                          .arg(column, "EquipDvRes"));
-        }
-    }
-}
-
 void Server::sqlcheckUsers() {
     QSqlDatabase db = QSqlDatabase::database();
     QSqlRecord columns = db.record("Users");
@@ -1036,12 +1001,6 @@ void Server::sqlinit() {
         else {
             sqlcheckEquip();
         }
-        if(!tables.contains("EquipDvRes")) {
-            sqlinitEquipDvRes();
-        }
-        else {
-            sqlcheckEquipDvRes();
-        }
     }
 }
 
@@ -1057,17 +1016,6 @@ void Server::sqlinitEquip() {
     else {
         //% "Create Equipment Database failed."
         throw DBError(qtTrId("equip-db-gen-failure"),
-                      query.lastError());
-    }
-}
-
-void Server::sqlinitEquipDvRes() {
-    QSqlQuery query;
-    query.prepare(equipDRT);
-    if(!query.exec()) {
-        //% "Create Equipment Database "
-        //% "(Development resources required) failed."
-        throw DBError(qtTrId("equip-db-dr-gen-failure"),
                       query.lastError());
     }
 }

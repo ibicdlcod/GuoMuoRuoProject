@@ -58,6 +58,162 @@ QString EquipType::toString() const {
     return baseStr;
 }
 
+const ResOrd EquipType::devResBase() const {
+    using namespace KP;
+    ResTuple basic;
+    bool flak = flags.testFlag(Flak);
+    bool torp = flags.testFlag(Torp);
+    bool dive = flags.testFlag(Dive);
+    bool lb = flags.testFlag(LB);
+    bool jet = flags.testFlag(Jet);
+    bool recon = flags.testFlag(Recon);
+    bool cannon = flags.testFlag(Cannon);
+    bool convoy = flags.testFlag(Convoy);
+    switch(base) {
+    case Disabled: break;
+    case MainGun:
+        basic[Explosives] = size * 10;
+        basic[Steel] = size * 5;
+        basic[Aluminium] = flak ? 1 : 0;
+        break;
+    case SupportGun:
+        basic[Explosives] = size * 5;
+        basic[Steel] = size * 5;
+        basic[Aluminium] = flak ? 1 : 0;
+        break;
+    case Torpedo:
+        basic[Oil] = size * 10;
+        basic[Explosives] = size * 10;
+        basic[Steel] = size * 5;
+        break;
+    case Midget:
+        basic[Oil] = 20;
+        basic[Explosives] = 10;
+        basic[Steel] = 5;
+        basic[Chromium] = 2;
+        break;
+    case Plane:
+        basic[Oil] = 10 + ((torp || dive) ? 5 : 0)
+                + (lb ? 3 : 0) + (jet ? 10 : 0);
+        basic[Explosives] = 2 + ((torp || dive) ? 5 : 0)
+                + (lb ? 5 : 0) + (recon ? -1 : 0);
+        basic[Aluminium] = 20 + (lb ? 2 : 0) + (jet ? 10 : 0);
+        basic[Rubber] = 2;
+        basic[Chromium] = jet ? 5 : 0;
+        break;
+    case Seaplane:
+        basic[Oil] = 5 + ((torp || dive) ? 2 : 0);
+        basic[Explosives] = (torp || dive) ? 2 : 0;
+        basic[Aluminium] = 10;
+        break;
+    case Flyingboat:
+        basic[Oil] = 50;
+        basic[Explosives] = recon ? 0 : 20;
+        basic[Aluminium] = 10;
+        break;
+    case Autogyro:
+        basic[Aluminium] = 10;
+        break;
+    case Liason:
+        basic[Aluminium] = 5;
+        break;
+    case DepthC:
+        basic[Explosives] = 10;
+        basic[Steel] = 5;
+        break;
+    case Sonar:
+        basic[Steel] = 5;
+        basic[Aluminium] = 10;
+        break;
+    case AA:
+        basic[Explosives] = 10 + (cannon ? 5 : 0);
+        basic[Steel] = 5 + (cannon ? 3 : 0);
+        basic[Aluminium] = 2;
+        break;
+    case AADirector:
+        basic[Explosives] = 5;
+        basic[Aluminium] = 2;
+        break;
+    case APShell:
+        basic[Explosives] = 20;
+        basic[Steel] = 40;
+        basic[Tungsten] = 25;
+        break;
+    case ALShell:
+        basic[Explosives] = 30;
+        basic[Steel] = 20;
+        break;
+    case ALRocket:
+        basic[Explosives] = 20;
+        basic[Steel] = 10;
+        basic[Chromium] = 5;
+        break;
+    case ALCraft:
+        basic[Oil] = 5;
+        basic[Steel] = 20;
+        basic[Rubber] = 30;
+        basic[Tungsten] = 30;
+        break;
+    case ALTank:
+        basic[Oil] = 5;
+        basic[Steel] = 30;
+        basic[Rubber] = 40;
+        basic[Tungsten] = 30;
+        break;
+    case Drum:
+        basic[Steel] = 5;
+        break;
+    case TPCraft:
+        basic[Oil] = convoy ? 20 : 5;
+        basic[Steel] = convoy ? 20 : 10;
+        break;
+    case Radar:
+        basic[Steel] = size * 20;
+        basic[Aluminium] = size * 25 + (flak ? 1 : 0);
+        break;
+    case RadarSub:
+        basic[Steel] = 15;
+        basic[Aluminium] = 20;
+        break;
+    case Engine:
+        basic[Oil] = 10;
+        basic[Steel] = 15;
+        basic[Chromium] = 30;
+        break;
+    case Bulge:
+        basic[Steel] = size * 15;
+        break;
+    case SearchLight:
+        basic[Tungsten] = 50;
+        break;
+    case StarShell:
+        basic[Explosives] = 20;
+        basic[Steel] = 10;
+        basic[Aluminium] = 10;
+        break;
+    case Repair:
+        basic[Oil] = 10;
+        basic[Explosives] = 5;
+        basic[Steel] = 20;
+        basic[Aluminium] = 10;
+        break;
+    case Replenish:
+        basic[Oil] = 30;
+        basic[Explosives] = 30;
+        break;
+    case Food: break; // can't develop
+    case CommandFac: break; // can't develop
+    case AircraftPs: break; // can't develop
+    case SurfacePs: break; // can't develop
+    case TorpBoat:
+        basic[Oil] = 5;
+        basic[Explosives] = 5;
+        basic[Steel] = 5;
+        break;
+    }
+    return ResOrd(basic);
+}
+
 Equipment::Equipment(int id,
                      QString &&name,
                      QString &&type,

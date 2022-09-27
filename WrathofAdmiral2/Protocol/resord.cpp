@@ -18,6 +18,13 @@ ResOrd::ResOrd(ResTuple input) {
         cr = input[KP::Chromium];
 }
 
+ResOrd::ResOrd(int oil, int explo, int steel, int rub,
+               int al, int w, int cr)
+    : oil(oil), explo(explo), steel(steel), rub(rub),
+      al(al), w(w), cr(cr) {
+
+}
+
 constexpr ResOrd& ResOrd::operator+=(const ResOrd& amount) {
     oil += amount.oil;
     explo += amount.explo;

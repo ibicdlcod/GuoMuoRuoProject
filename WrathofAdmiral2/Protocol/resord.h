@@ -14,6 +14,7 @@ class ResOrd
 {
 public:
     ResOrd(ResTuple);
+    Q_DECL_DEPRECATED ResOrd(int, int, int, int, int, int, int);
     constexpr ResOrd& operator+=(const ResOrd&);
     constexpr ResOrd& operator-=(const ResOrd&);
     bool addresources(const ResOrd&, const ResOrd &);

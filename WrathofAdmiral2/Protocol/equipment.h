@@ -5,6 +5,7 @@
 #include <QMap>
 #include <QObject>
 #include <QString>
+#include "resord.h"
 
 class EquipType: public QObject {
     Q_OBJECT
@@ -25,6 +26,7 @@ public:
         Sonar,
         AA,
         AADirector,
+        APShell,
         ALShell,
         ALRocket,
         ALCraft,
@@ -77,6 +79,7 @@ public:
 
     EquipType(const QString &);
     QString toString() const;
+    const ResOrd devResBase() const;
 
 private:
     BasicType base;
