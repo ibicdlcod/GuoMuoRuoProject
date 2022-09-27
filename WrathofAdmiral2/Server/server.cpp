@@ -717,24 +717,26 @@ void Server::receivedAuth(const QJsonObject &djson,
     }
 }
 
-void Server::receivedForceLogout(User &user) {
+void Server::receivedForceLogout(Uid uid) {
     const auto client =
             std::find_if(knownClients.begin(), knownClients.end(),
                          [&](const std::unique_ptr<QDtls> &othercn){
-        return user.isPeerConnected(
-                    PeerInfo(othercn->peerAddress(), othercn->peerPort()));
+        return connectedPeers[uid] ==
+                    PeerInfo(othercn->peerAddress(), othercn->peerPort());
     });
 
     if (client != knownClients.end()) {
         if ((*client)->isConnectionEncrypted()) {
-            QByteArray msg = KP::serverAuth(KP::Logout, user.getname(), true,
+            QByteArray msg = KP::serverAuth(KP::Logout, User::getname(uid),
+                                            true,
                                             KP::AuthError::LoggedElsewhere);
             (*client)->writeDatagramEncrypted(&serverSocket, msg);
             (*client)->shutdown(&serverSocket);
         }
-        user.removePeer();
+        connectedPeers.remove(uid);
         connectedUsers.remove(
-                    PeerInfo((*client)->peerAddress(), (*client)->peerPort()));
+                    PeerInfo((*client)->peerAddress(),
+                             (*client)->peerPort()));
         /* This will invalidate iterators in readyRead() */
         //knownClients.erase(client);
     }
@@ -758,10 +760,9 @@ void Server::receivedLogin(const QJsonObject &djson,
         connection->writeDatagramEncrypted(&serverSocket, msg);
         connection->shutdown(&serverSocket);
     }
-    int userid = query.value(0).toInt();
-    User player = User(userid);
-    QDateTime throttleTime = player.getThrottleTime();
-    if(QDateTime::currentDateTime() < player.getThrottleTime()) {
+    Uid uid = query.value(0).toInt();
+    QDateTime throttleTime = User::getThrottleTime(uid);
+    if(QDateTime::currentDateTime() < throttleTime) {
         QByteArray msg = KP::serverAuth(KP::Login, name, false,
                                         KP::AuthError::RetryToomuch,
                                         throttleTime);
@@ -780,8 +781,8 @@ void Server::receivedLogin(const QJsonObject &djson,
                     password.decoded, salt, 8, 255);
         query.bindValue(":shadow", shadow);
         if(Q_UNLIKELY(shadow != query.value(1).toByteArray())) {
-            player.incrementThrottleCount();
-            player.updateThrottleTime();
+            User::incrementThrottleCount(uid);
+            User::updateThrottleTime(uid);
             QByteArray msg = KP::serverAuth(KP::Login, name, false,
                                             KP::AuthError::BadPassword);
             connection->writeDatagramEncrypted(&serverSocket, msg);
@@ -789,12 +790,12 @@ void Server::receivedLogin(const QJsonObject &djson,
         }
         else {
             /* if connectedPeers[name] exists then force-logout all of them */
-            if(!player.isPeerEmpty()) {
-                receivedForceLogout(player);
+            if(connectedPeers.contains(uid)) {
+                receivedForceLogout(uid);
             }
-            player.removeThrottleCount();
-            player.addPeer(peerInfo);
-            connectedUsers[peerInfo] = std::move(player);
+            User::removeThrottleCount(uid);
+            connectedPeers[uid] = peerInfo;
+            connectedUsers[peerInfo] = uid;
             QByteArray msg = KP::serverAuth(KP::Login, name, true);
             connection->writeDatagramEncrypted(&serverSocket, msg);
         }
@@ -812,11 +813,11 @@ void Server::receivedLogout(const QJsonObject &djson,
                             QDtls *connection) {
     Q_UNUSED(djson);
     if(connectedUsers.contains(peerInfo)) {
+        Uid uid = connectedUsers[peerInfo];
         QByteArray msg =
-                KP::serverAuth(KP::Logout,
-                               connectedUsers[peerInfo].getname(), true);
+                KP::serverAuth(KP::Logout, User::getname(uid), true);
         connection->writeDatagramEncrypted(&serverSocket, msg);
-        connectedUsers[peerInfo].removePeer();
+        connectedPeers.remove(uid);
         connectedUsers.remove(peerInfo);
         connection->shutdown(&serverSocket);
     }

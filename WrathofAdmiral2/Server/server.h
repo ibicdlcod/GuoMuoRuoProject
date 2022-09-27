@@ -99,7 +99,7 @@ private:
     void parseListen(const QStringList &);
     void parseUnlisten();
     void receivedAuth(const QJsonObject &, const PeerInfo &, QDtls *);
-    void receivedForceLogout(Uid);
+    void receivedForceLogout(Uid uid);
     void receivedLogin(const QJsonObject &, const PeerInfo &, QDtls *);
     void receivedLogout(const QJsonObject &, const PeerInfo &, QDtls *);
     void receivedReg(const QJsonObject &, const PeerInfo &, QDtls *);
