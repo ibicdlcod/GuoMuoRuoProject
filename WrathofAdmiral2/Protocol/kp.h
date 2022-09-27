@@ -43,6 +43,7 @@ namespace KP {
         BadShadow,
         BadPassword,
         LoggedElsewhere,
+        UserNonexist,
         UserExists,
         RetryToomuch
     };

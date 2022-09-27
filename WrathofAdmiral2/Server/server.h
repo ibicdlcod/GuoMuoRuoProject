@@ -60,16 +60,19 @@
 
 #include "commandline.h"
 #include "equipment.h"
+#include "peerinfo.h"
+#include "user.h"
 
 class Server : public CommandLine {
     Q_OBJECT
+
+    typedef int Uid;
 
 public:
     explicit Server(int, char **);
     ~Server() noexcept;
 
-    void datagramReceived(const QString &, const QByteArray &,
-                          QDtls *);
+    void datagramReceived(const PeerInfo &, const QByteArray &, QDtls *);
     bool listen(const QHostAddress &, quint16);
 
 public slots:
@@ -95,12 +98,12 @@ private:
     bool importEquipFromCSV();
     void parseListen(const QStringList &);
     void parseUnlisten();
-    void receivedAuth(const QJsonObject &, const QString &, QDtls *);
-    void receivedForceLogout(const QString &name);
-    void receivedLogin(const QJsonObject &, const QString &, QDtls *);
-    void receivedLogout(const QJsonObject &, const QString &, QDtls *);
-    void receivedReg(const QJsonObject &, const QString &, QDtls *);
-    void receivedReq(const QJsonObject &, const QString &, QDtls *);
+    void receivedAuth(const QJsonObject &, const PeerInfo &, QDtls *);
+    void receivedForceLogout(Uid);
+    void receivedLogin(const QJsonObject &, const PeerInfo &, QDtls *);
+    void receivedLogout(const QJsonObject &, const PeerInfo &, QDtls *);
+    void receivedReg(const QJsonObject &, const PeerInfo &, QDtls *);
+    void receivedReq(const QJsonObject &, const PeerInfo &, QDtls *);
     void sqlcheckEquip();
     void sqlcheckUsers();
     void sqlinit();
@@ -114,10 +117,8 @@ private:
     QDtlsClientVerifier cookieSender;
     std::vector<std::unique_ptr<QDtls>> knownClients;
 
-    QMap<QString, QString> connectedUsers;
-    QMap<QString, QString> connectedPeers;
-    QMap<QString, QDateTime> throttleTime;
-    QMap<QString, int> throttleCount;
+    QMap<PeerInfo, Uid> connectedUsers;
+    QMap<Uid, PeerInfo> connectedPeers;
 
     QMap<int, QPointer<Equipment>> equipRegistry;
 

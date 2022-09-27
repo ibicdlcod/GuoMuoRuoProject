@@ -128,6 +128,8 @@ public:
     Equipment(int, QString &&, QString &&,
               QMap<AttrType, int> &&, QStringList &&);
 
+    bool canDevelop(int userid = 0);
+
 private:
     int id;
     QString name;

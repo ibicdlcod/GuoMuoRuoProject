@@ -11,7 +11,9 @@ DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs depr
 SOURCES += \
         kerrors.cpp \
         main.cpp \
-        server.cpp
+        peerinfo.cpp \
+        server.cpp \
+        user.cpp
 
 TRANSLATIONS += \
     ../Translations/WA2_en_US.ts \
@@ -54,7 +56,9 @@ else:unix: PRE_TARGETDEPS += $$OUT_PWD/../Protocol/libProtocol.a
 
 HEADERS += \
     kerrors.h \
-    server.h
+    peerinfo.h \
+    server.h \
+    user.h
 
 RESOURCES += \
     ../common.qrc

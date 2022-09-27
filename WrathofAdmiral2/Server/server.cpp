@@ -49,6 +49,7 @@
 #include "server.h"
 #include <algorithm>
 #include "kerrors.h"
+#include "peerinfo.h"
 
 #ifdef max
 #undef max // apparently some stupid win header interferes with std::max
@@ -59,12 +60,6 @@ QT_BEGIN_NAMESPACE
 extern std::unique_ptr<QSettings> settings;
 
 namespace {
-
-QString peer_info(const QHostAddress &address, quint16 port) {
-    const static QString info = QStringLiteral("(%1:%2)");
-    return info.arg(address.toString()).arg(port);
-}
-
 QString connection_info(QDtls *connection) {
     QString prot;
     switch (connection->sessionProtocol()) {
@@ -94,6 +89,8 @@ static const QString userT = QStringLiteral(
             "Username VARCHAR(255) NOT NULL, "
             "Shadow TINYBLOB,"
             /* Global status */
+            "ThrottleTime TEXT DEFAULT (datetime('now')),"
+            "ThrottleCount TEXT DEFAULT 0,"
             "Experience INTEGER DEFAULT 0,"
             "Level INTEGER DEFAULT 0,"
             "InduContrib INTEGER DEFAULT 0,"
@@ -178,7 +175,7 @@ Server::~Server() noexcept {
     shutdown();
 }
 
-void Server::datagramReceived(const QString &peerInfo,
+void Server::datagramReceived(const PeerInfo &peerInfo,
                               const QByteArray &plainText,
                               QDtls *connection) {
     QJsonObject djson =
@@ -193,24 +190,24 @@ void Server::datagramReceived(const QString &peerInfo,
             throw std::domain_error("datagram type not supported"); break;
         }
     } catch (const QJsonParseError &e) {
-        qWarning() << peerInfo << e.errorString();
+        qWarning() << peerInfo.toString() << e.errorString();
         QByteArray msg = KP::serverParseError(
-                    KP::JsonError, peerInfo, e.errorString());
+                    KP::JsonError, peerInfo.toString(), e.errorString());
         connection->writeDatagramEncrypted(&serverSocket, msg);
     } catch (DBError &e) {
         for(QString &i : e.whats()) {
             qCritical() << i;
         }
     } catch (const std::domain_error &e) {
-        qWarning() << peerInfo << e.what();
+        qWarning() << peerInfo.toString() << e.what();
         QByteArray msg = KP::serverParseError(
-                    KP::Unsupported, peerInfo, e.what());
+                    KP::Unsupported, peerInfo.toString(), e.what());
         connection->writeDatagramEncrypted(&serverSocket, msg);
     }
 #if defined(QT_DEBUG)
     static const QString formatter = QStringLiteral("From %1 text: %2");
     const QString html = formatter.
-            arg(peerInfo, QJsonDocument(djson).toJson());
+            arg(peerInfo.toString(), QJsonDocument(djson).toJson());
     qDebug() << html;
 #else
     Q_UNUSED(peerInfo)
@@ -345,10 +342,11 @@ void Server::readyRead() {
         if ((*client)->dtlsError()
                 == QDtlsError::RemoteClosedConnectionError) {
             // Client disconnected, remove from connected users
-            const QString peerInfo = peer_info(peerAddress, peerPort);
+            const PeerInfo peerInfo = PeerInfo(peerAddress, peerPort);
             if(connectedUsers.contains(peerInfo)) {
                 //% "%1: disconnected abruptly."
-                qInfo() << qtTrId("client-dc").arg(connectedUsers[peerInfo]);
+                qInfo() << qtTrId("client-dc").
+                           arg(User::getname(connectedUsers[peerInfo]));
                 connectedPeers.remove(connectedUsers[peerInfo]);
                 connectedUsers.remove(peerInfo);
             }
@@ -390,37 +388,39 @@ void Server::decryptDatagram(QDtls *connection,
                              const QByteArray &clientMessage) {
     Q_ASSERT(connection->isConnectionEncrypted());
 
-    const QString peerInfo = peer_info(connection->peerAddress(),
+    const PeerInfo peerInfo = PeerInfo(connection->peerAddress(),
                                        connection->peerPort());
     const QByteArray dgram = connection->decryptDatagram(&serverSocket,
                                                          clientMessage);
     if (dgram.size()) {
         datagramReceived(peerInfo, dgram, connection);
     } else if (connection->dtlsError() == QDtlsError::NoError) {
-        qDebug() << peerInfo << ":"
+        qDebug() << peerInfo.toString() << ":"
                  << "0 byte dgram, could be a re-connect attempt?";
     } else {
-        qWarning() << peerInfo << ":" << connection->dtlsErrorString();
+        qWarning() << peerInfo.toString()
+                   << ":" << connection->dtlsErrorString();
     }
 }
 
 void Server::doHandshake(QDtls *newConnection,
                          const QByteArray &clientHello) {
-    const bool result = newConnection->doHandshake(&serverSocket, clientHello);
+    const bool result =
+            newConnection->doHandshake(&serverSocket, clientHello);
     if (!result) {
         qWarning() << newConnection->dtlsErrorString();
         return;
     }
 
-    const QString peerInfo = peer_info(newConnection->peerAddress(),
+    const PeerInfo peerInfo = PeerInfo(newConnection->peerAddress(),
                                        newConnection->peerPort());
     switch (newConnection->handshakeState()) {
     case QDtls::HandshakeInProgress:
-        qDebug() << peerInfo << ": handshake is in progress ...";
+        qDebug() << peerInfo.toString() << ": handshake is in progress ...";
         break;
     case QDtls::HandshakeComplete:
         qDebug() << QString("Connection with %1 encrypted. %2")
-                    .arg(peerInfo, connection_info(newConnection));
+                    .arg(peerInfo.toString(), connection_info(newConnection));
         break;
     default: Q_UNREACHABLE();
     }
@@ -581,10 +581,10 @@ void Server::handleNewConnection(const QHostAddress &peerAddress,
     if (!listening)
         return;
 
-    const QString peerInfo = peer_info(peerAddress, peerPort);
+    const PeerInfo peerInfo = PeerInfo(peerAddress, peerPort);
     if (cookieSender.verifyClient(&serverSocket, clientHello,
                                   peerAddress, peerPort)) {
-        qDebug() << peerInfo << ": verified, starting a handshake";
+        qDebug() << peerInfo.toString() << ": verified, starting a handshake";
 
         std::unique_ptr<QDtls> newConnection{
             new QDtls{QSslSocket::SslServerMode}};
@@ -599,7 +599,7 @@ void Server::handleNewConnection(const QHostAddress &peerAddress,
         qWarning() << qtTrId("dtls-error").
                       arg(cookieSender.dtlsErrorString());
     } else {
-        qDebug() << peerInfo << ": not verified yet";
+        qDebug() << peerInfo.toString() << ": not verified yet";
     }
 }
 
@@ -703,33 +703,38 @@ void Server::parseUnlisten() {
 }
 
 void Server::receivedAuth(const QJsonObject &djson,
-                          const QString &peerInfo,
+                          const PeerInfo &peerInfo,
                           QDtls *connection) {
     switch(djson["mode"].toInt()) {
-    case KP::AuthMode::Reg: receivedReg(djson, peerInfo, connection); break;
-    case KP::AuthMode::Login: receivedLogin(djson, peerInfo, connection); break;
-    case KP::AuthMode::Logout: receivedLogout(djson, peerInfo, connection); break;
+    case KP::AuthMode::Reg:
+        receivedReg(djson, peerInfo, connection); break;
+    case KP::AuthMode::Login:
+        receivedLogin(djson, peerInfo, connection); break;
+    case KP::AuthMode::Logout:
+        receivedLogout(djson, peerInfo, connection); break;
     default:
         throw std::domain_error("auth type not supported"); break;
     }
 }
 
-void Server::receivedForceLogout(const QString &name) {
-    const auto client = std::find_if(knownClients.begin(), knownClients.end(),
-                                     [&](const std::unique_ptr<QDtls> &othercn){
-        return connectedPeers[name].compare(
-                    peer_info(othercn->peerAddress(), othercn->peerPort())) == 0;
+void Server::receivedForceLogout(User &user) {
+    const auto client =
+            std::find_if(knownClients.begin(), knownClients.end(),
+                         [&](const std::unique_ptr<QDtls> &othercn){
+        return user.isPeerConnected(
+                    PeerInfo(othercn->peerAddress(), othercn->peerPort()));
     });
 
     if (client != knownClients.end()) {
         if ((*client)->isConnectionEncrypted()) {
-            QByteArray msg = KP::serverAuth(KP::Logout, name, true,
+            QByteArray msg = KP::serverAuth(KP::Logout, user.getname(), true,
                                             KP::AuthError::LoggedElsewhere);
             (*client)->writeDatagramEncrypted(&serverSocket, msg);
             (*client)->shutdown(&serverSocket);
         }
-        connectedUsers.remove(peer_info((*client)->peerAddress(), (*client)->peerPort()));
-        connectedPeers.remove(name);
+        user.removePeer();
+        connectedUsers.remove(
+                    PeerInfo((*client)->peerAddress(), (*client)->peerPort()));
         /* This will invalidate iterators in readyRead() */
         //knownClients.erase(client);
     }
@@ -737,24 +742,35 @@ void Server::receivedForceLogout(const QString &name) {
 
 /* nothing could shrink this function efficiently either */
 void Server::receivedLogin(const QJsonObject &djson,
-                           const QString &peerInfo,
+                           const PeerInfo &peerInfo,
                            QDtls *connection) {
     QString name = djson["username"].toString();
-    if(QDateTime::currentDateTime() < throttleTime[name]) {
+    QSqlDatabase db = QSqlDatabase::database();
+    QSqlQuery query;
+    query.prepare("SELECT UserID, Shadow FROM Users "
+                  "WHERE Username = :name");
+    query.bindValue(":name", name);
+    query.exec();
+    query.isSelect();
+    if(Q_UNLIKELY(!query.first())) {
+        QByteArray msg = KP::serverAuth(KP::Login, name, false,
+                                        KP::AuthError::UserNonexist);
+        connection->writeDatagramEncrypted(&serverSocket, msg);
+        connection->shutdown(&serverSocket);
+    }
+    int userid = query.value(0).toInt();
+    User player = User(userid);
+    QDateTime throttleTime = player.getThrottleTime();
+    if(QDateTime::currentDateTime() < player.getThrottleTime()) {
         QByteArray msg = KP::serverAuth(KP::Login, name, false,
                                         KP::AuthError::RetryToomuch,
-                                        throttleTime[name]);
+                                        throttleTime);
         connection->writeDatagramEncrypted(&serverSocket, msg);
         connection->shutdown(&serverSocket);
     }
     auto password = QByteArray::fromBase64Encoding(
                 djson["shadow"].toString().toLatin1(),
             QByteArray::Base64Encoding);
-    QSqlDatabase db = QSqlDatabase::database();
-    QSqlQuery query;
-    query.prepare("SELECT UserID FROM Users "
-                  "WHERE Username = :name AND Shadow = :shadow");
-    query.bindValue(":name", name);
     if(Q_LIKELY(password.decodingStatus
                 == QByteArray::Base64DecodingStatus::Ok)) {
         QByteArray salt = name.toUtf8().append(
@@ -763,16 +779,9 @@ void Server::receivedLogin(const QJsonObject &djson,
                     QCryptographicHash::Blake2s_256,
                     password.decoded, salt, 8, 255);
         query.bindValue(":shadow", shadow);
-        query.exec();
-        query.isSelect();
-        if(Q_UNLIKELY(!query.first())) {
-            if(throttleCount.contains(name)) {
-                throttleCount[name] = std::max(throttleCount[name] + 1, 62);
-            } else {
-                throttleCount[name] = 1;
-            }
-            throttleTime[name] = QDateTime::currentDateTime().addSecs(
-                        Q_INT64_C(1) << throttleCount[name]);
+        if(Q_UNLIKELY(shadow != query.value(1).toByteArray())) {
+            player.incrementThrottleCount();
+            player.updateThrottleTime();
             QByteArray msg = KP::serverAuth(KP::Login, name, false,
                                             KP::AuthError::BadPassword);
             connection->writeDatagramEncrypted(&serverSocket, msg);
@@ -780,12 +789,12 @@ void Server::receivedLogin(const QJsonObject &djson,
         }
         else {
             /* if connectedPeers[name] exists then force-logout all of them */
-            if(!(connectedPeers[name].isEmpty())) {
-                receivedForceLogout(name);
+            if(!player.isPeerEmpty()) {
+                receivedForceLogout(player);
             }
-            throttleCount.remove(name);
-            connectedUsers[peerInfo] = name;
-            connectedPeers[name] = peerInfo;
+            player.removeThrottleCount();
+            player.addPeer(peerInfo);
+            connectedUsers[peerInfo] = std::move(player);
             QByteArray msg = KP::serverAuth(KP::Login, name, true);
             connection->writeDatagramEncrypted(&serverSocket, msg);
         }
@@ -799,26 +808,28 @@ void Server::receivedLogin(const QJsonObject &djson,
 }
 
 void Server::receivedLogout(const QJsonObject &djson,
-                            const QString &peerInfo,
+                            const PeerInfo &peerInfo,
                             QDtls *connection) {
     Q_UNUSED(djson);
     if(connectedUsers.contains(peerInfo)) {
-        QByteArray msg = KP::serverAuth(KP::Logout,
-                                        connectedUsers[peerInfo], true);
+        QByteArray msg =
+                KP::serverAuth(KP::Logout,
+                               connectedUsers[peerInfo].getname(), true);
         connection->writeDatagramEncrypted(&serverSocket, msg);
-        connectedPeers.remove(connectedUsers[peerInfo]);
+        connectedUsers[peerInfo].removePeer();
         connectedUsers.remove(peerInfo);
         connection->shutdown(&serverSocket);
     }
     else {
-        QByteArray msg = KP::serverAuth(KP::Logout, peerInfo, false);
+        QByteArray msg = KP::serverAuth(
+                    KP::Logout, peerInfo.toString(), false);
         connection->writeDatagramEncrypted(&serverSocket, msg);
     }
 }
 
 /* nothing could shrink this function efficiently either */
 void Server::receivedReg(const QJsonObject &djson,
-                         const QString &peerInfo,
+                         const PeerInfo &peerInfo,
                          QDtls *connection) {
     Q_UNUSED(peerInfo)
     QString name = djson["username"].toString();
@@ -887,7 +898,7 @@ void Server::receivedReg(const QJsonObject &djson,
 }
 
 void Server::receivedReq(const QJsonObject &djson,
-                         const QString &peerInfo,
+                         const PeerInfo &peerInfo,
                          QDtls *connection) {
     if(!connectedUsers.contains(peerInfo)) {
         QByteArray msg = KP::accessDenied();
@@ -897,8 +908,8 @@ void Server::receivedReq(const QJsonObject &djson,
         switch(djson["command"].toInt()) {
         case KP::CommandType::Develop: {
             int equipid = djson["equipid"].toInt();
-            if(!equipRegistry.contains(equipid))
-                //|| equipRegistry[equipid]->attr[Equipment::Developenabled] < 1)
+            if(!equipRegistry.contains(equipid)
+                    || !equipRegistry[equipid]->canDevelop())
             {
                 QByteArray msg = KP::serverDevelopFailed(true);
                 connection->writeDatagramEncrypted(&serverSocket, msg);

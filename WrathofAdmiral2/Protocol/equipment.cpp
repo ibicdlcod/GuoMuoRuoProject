@@ -225,3 +225,7 @@ Equipment::Equipment(int id,
       attr(attr),
       customflags(customflags) {
 }
+
+bool Equipment::canDevelop([[maybe_unused]] int userid) {
+    return Developenabled == 1;
+}

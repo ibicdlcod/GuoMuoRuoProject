@@ -564,6 +564,7 @@ void Client::receivedLogin(const QJsonObject &djson) {
                     .arg(locale.toString(reEnable))
                     .arg(reEnable.timeZoneAbbreviation()); break;
         }
+        case KP::UserNonexist: reas = qtTrId("user-nonexistent"); break;
         default: throw std::domain_error("message not implemented"); break;
         }
         //% "%1: login failure, reason: %2"
