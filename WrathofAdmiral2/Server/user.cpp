@@ -2,6 +2,7 @@
 #include <QSqlDatabase>
 #include <QSqlError>
 #include <QSqlQuery>
+#include <QTimeZone>
 #include "resord.h"
 
 #ifdef max
@@ -108,6 +109,7 @@ void User::naturalRegen(int uid) {
         const qint64 secsinMin = 60;
         int level = query.value(0).toInt();
         QDateTime priorRecoverTime = query.value(1).toDateTime();
+        priorRecoverTime.setTimeZone(QTimeZone("UTC+0"));
         qint64 regenSecs = priorRecoverTime.secsTo(
                     QDateTime::currentDateTimeUtc());
         regenSecs = std::max(Q_INT64_C(0), regenSecs); //stop timezone trap

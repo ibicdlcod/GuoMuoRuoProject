@@ -44,8 +44,8 @@ void ResOrd::cap(const ResOrd &cap) {
     steel = min(steel, cap.steel);
     rub = min(rub, cap.rub);
     al = min(al, cap.al);
-    w = min(al, cap.w);
-    cr = min(al, cap.cr);
+    w = min(w, cap.w);
+    cr = min(cr, cap.cr);
 }
 
 bool ResOrd::sufficient() {
