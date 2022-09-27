@@ -83,7 +83,7 @@ QString connection_info(QDtls *connection) {
     return info;
 }
 
-static const QString userT = QStringLiteral(
+const QString userT = QStringLiteral(
             "CREATE TABLE Users ( "
             "UserID INTEGER PRIMARY KEY, "
             "Username VARCHAR(255) NOT NULL, "
@@ -107,6 +107,7 @@ static const QString userT = QStringLiteral(
             "Al INTEGER DEFAULT 8000,"
             "W INTEGER DEFAULT 6000,"
             "Cr INTEGER DEFAULT 6000,"
+            "RecoverTime TEXT DEFAULT (datetime('now')),"
             /* Special Resources */
             "Limitbreak INTEGER DEFAULT 0,"
             "Silver INTEGER DEFAULT 0,"
@@ -122,7 +123,7 @@ static const QString userT = QStringLiteral(
             "EmergRepair INTEGER DEFAULT 0"
             ");");
 
-static const QString equipT = QStringLiteral(
+const QString equipT = QStringLiteral(
             "CREATE TABLE Equip ( "
             "EquipID INTEGER PRIMARY KEY, "
             "Equipname VARCHAR(63), "
@@ -298,7 +299,7 @@ void Server::pskRequired(QSslPreSharedKeyAuthenticator *auth)
     Q_ASSERT(auth);
     QString clientName = QString::fromLatin1(auth->identity());
     //% "PSK callback, received a client's identity: '%1'"
-    qInfo() << qtTrId("client-id-received").arg(clientName);
+    qDebug() << qtTrId("client-id-received").arg(clientName);
     if(clientName.compare("NEW_USER") == 0)
         auth->setPreSharedKey(QByteArrayLiteral("register"));
     else {
@@ -346,7 +347,7 @@ void Server::readyRead() {
             if(connectedUsers.contains(peerInfo)) {
                 //% "%1: disconnected abruptly."
                 qInfo() << qtTrId("client-dc").
-                           arg(User::getname(connectedUsers[peerInfo]));
+                           arg(User::getName(connectedUsers[peerInfo]));
                 connectedPeers.remove(connectedUsers[peerInfo]);
                 connectedUsers.remove(peerInfo);
             }
@@ -718,16 +719,17 @@ void Server::receivedAuth(const QJsonObject &djson,
 }
 
 void Server::receivedForceLogout(Uid uid) {
+    PeerInfo currentPeer = connectedPeers[uid];
     const auto client =
             std::find_if(knownClients.begin(), knownClients.end(),
                          [&](const std::unique_ptr<QDtls> &othercn){
-        return connectedPeers[uid] ==
-                    PeerInfo(othercn->peerAddress(), othercn->peerPort());
+        return currentPeer.address.isEqual(othercn->peerAddress())
+                && currentPeer.port == othercn->peerPort();
     });
 
     if (client != knownClients.end()) {
         if ((*client)->isConnectionEncrypted()) {
-            QByteArray msg = KP::serverAuth(KP::Logout, User::getname(uid),
+            QByteArray msg = KP::serverAuth(KP::Logout, User::getName(uid),
                                             true,
                                             KP::AuthError::LoggedElsewhere);
             (*client)->writeDatagramEncrypted(&serverSocket, msg);
@@ -798,6 +800,7 @@ void Server::receivedLogin(const QJsonObject &djson,
             connectedUsers[peerInfo] = uid;
             QByteArray msg = KP::serverAuth(KP::Login, name, true);
             connection->writeDatagramEncrypted(&serverSocket, msg);
+            User::refreshPort(uid);
         }
     }
     else {
@@ -815,7 +818,7 @@ void Server::receivedLogout(const QJsonObject &djson,
     if(connectedUsers.contains(peerInfo)) {
         Uid uid = connectedUsers[peerInfo];
         QByteArray msg =
-                KP::serverAuth(KP::Logout, User::getname(uid), true);
+                KP::serverAuth(KP::Logout, User::getName(uid), true);
         connection->writeDatagramEncrypted(&serverSocket, msg);
         connectedPeers.remove(uid);
         connectedUsers.remove(peerInfo);

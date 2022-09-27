@@ -582,7 +582,7 @@ void Client::receivedLogout(const QJsonObject &djson) {
         }
         else if(djson["reason"] == KP::LoggedElsewhere) {
             //% "%1: logged elsewhere, force quitting"
-            qInfo() << qtTrId("logout-forced")
+            qCritical() << qtTrId("logout-forced")
                        .arg(djson["username"].toString());
         }
         else

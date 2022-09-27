@@ -25,28 +25,6 @@ ResOrd::ResOrd(int oil, int explo, int steel, int rub,
 
 }
 
-constexpr ResOrd& ResOrd::operator+=(const ResOrd& amount) {
-    oil += amount.oil;
-    explo += amount.explo;
-    steel += amount.steel;
-    rub += amount.rub;
-    al += amount.al;
-    w += amount.w;
-    cr += amount.cr;
-    return *this;
-}
-
-constexpr ResOrd& ResOrd::operator-=(const ResOrd& amount) {
-    oil -= amount.oil;
-    explo -= amount.explo;
-    steel -= amount.steel;
-    rub -= amount.rub;
-    al -= amount.al;
-    w -= amount.w;
-    cr -= amount.cr;
-    return *this;
-}
-
 bool ResOrd::addresources(const ResOrd& amount, const ResOrd &maximum) {
     operator+=(amount);
     if(!sufficient()){

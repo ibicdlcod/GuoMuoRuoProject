@@ -10,16 +10,52 @@
 
 typedef QMap<KP::ResourceType, int> ResTuple;
 
+class ResOrd;
+
+namespace User {
+void setResources(int uid, ResOrd goal);
+}
+
 class ResOrd
 {
 public:
     ResOrd(ResTuple);
-    Q_DECL_DEPRECATED ResOrd(int, int, int, int, int, int, int);
-    constexpr ResOrd& operator+=(const ResOrd&);
-    constexpr ResOrd& operator-=(const ResOrd&);
+    ResOrd(int, int, int, int, int, int, int);
+    constexpr ResOrd& operator+=(const ResOrd& amount) {
+        oil += amount.oil;
+        explo += amount.explo;
+        steel += amount.steel;
+        rub += amount.rub;
+        al += amount.al;
+        w += amount.w;
+        cr += amount.cr;
+        return *this;
+    }
+    constexpr ResOrd& operator-=(const ResOrd& amount) {
+        oil -= amount.oil;
+        explo -= amount.explo;
+        steel -= amount.steel;
+        rub -= amount.rub;
+        al -= amount.al;
+        w -= amount.w;
+        cr -= amount.cr;
+        return *this;
+    }
+    constexpr ResOrd& operator*=(qint64 amount) {
+        oil *= amount;
+        explo *= amount;
+        steel *= amount;
+        rub *= amount;
+        al *= amount;
+        w *= amount;
+        cr *= amount;
+        return *this;
+    }
     bool addresources(const ResOrd&, const ResOrd &);
     void cap(const ResOrd&);
     bool sufficient();
+
+    friend void User::setResources(int uid, ResOrd goal);
 
 private:
     int oil;
