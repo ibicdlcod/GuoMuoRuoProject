@@ -111,6 +111,48 @@ void User::init(int uid) {
     }
 }
 
+bool User::isFactoryBusy(int uid, int factoryID) {
+    QSqlDatabase db = QSqlDatabase::database();
+    QSqlQuery query;
+    query.prepare("SELECT CurrentJob "
+                  "FROM Factories "
+                  "WHERE User = :id AND FactoryID = :facto");
+    query.bindValue(":id", uid);
+    query.bindValue(":facto", factoryID);
+    query.exec();
+    query.isSelect();
+    if(Q_UNLIKELY(!query.first())) {
+        qWarning() << qtTrId("user-nonexistent-uid").arg(uid);
+        return true;
+    }
+    else {
+        return query.value(0).toInt() != 0;
+    }
+}
+
+/* int is the result equip/shippart id, 0 means failure */
+std::tuple<bool, int> User::isFactoryFinished(int uid, int factoryID) {
+    QSqlDatabase db = QSqlDatabase::database();
+    QSqlQuery query;
+    query.prepare("SELECT Done, Success, CurrentJob "
+                  "FROM Factories "
+                  "WHERE User = :id AND FactoryID = :facto");
+    query.bindValue(":id", uid);
+    query.bindValue(":facto", factoryID);
+    query.exec();
+    query.isSelect();
+    if(Q_UNLIKELY(!query.first())) {
+        qWarning() << qtTrId("user-nonexistent-uid").arg(uid);
+        return {false, 0};
+    }
+    else {
+        bool done = query.value(0).toBool();
+        bool success = query.value(1).toBool();
+        int finishedJob = query.value(2).toInt();
+        return {done, success ? finishedJob : 0};
+    }
+}
+
 void User::naturalRegen(int uid) {
     QSqlDatabase db = QSqlDatabase::database();
     QSqlQuery query;
@@ -124,21 +166,20 @@ void User::naturalRegen(int uid) {
         return;
     }
     else {
-        const qint64 secsinMin = 60;
         int level = query.value(0).toInt();
         QDateTime priorRecoverTime = query.value(1).toDateTime();
         priorRecoverTime.setTimeZone(QTimeZone("UTC+0"));
         qint64 regenSecs = priorRecoverTime.secsTo(
                     QDateTime::currentDateTimeUtc());
         regenSecs = std::max(Q_INT64_C(0), regenSecs); //stop timezone trap
-        qint64 regenMins = regenSecs / secsinMin;
+        qint64 regenMins = regenSecs / KP::secsinMin;
         int regenPower = 0;
         ResOrd regenAmount = ResOrd(10 + regenPower,
                                     10 + regenPower,
                                     10 + regenPower,
                                     2 + regenPower,
                                     5 + regenPower,
-                                    5 + regenPower,
+                                    2 + regenPower,
                                     2 + regenPower);
         regenAmount *= (qint64)regenMins;
         ResOrd regenCap = ResOrd(2500,
@@ -146,11 +187,11 @@ void User::naturalRegen(int uid) {
                                  2500,
                                  1500,
                                  2000,
-                                 2000,
+                                 1500,
                                  1500);
         regenCap *= (qint64)(level + 24); // 24~144
         ResOrd currentRes = getCurrentResources(uid);
-        currentRes.addresources(regenAmount, regenCap);
+        currentRes.addResources(regenAmount, regenCap);
         setResources(uid, currentRes);
         QSqlQuery query;
         query.prepare("UPDATE Users SET RecoverTime "
@@ -177,10 +218,14 @@ void User::refreshFactory(int uid) {
     QSqlQuery query;
     query.prepare("UPDATE Factories "
                   "SET Done = (datetime('now') > SuccessTime), "
-                  "Success = (FullTime == SuccessTime), "
+                  "Success = (FullTime == SuccessTime) "
                   "WHERE User = :id");
     query.bindValue(":id", uid);
-    query.exec();
+    if(Q_UNLIKELY(!query.exec())){
+        //% "User ID %1: DB failure when refreshing factory"
+        throw DBError(qtTrId("dbfail-when-refresh-factory")
+                      .arg(uid), query.lastError());
+    }
 }
 
 void User::refreshPort(int uid) {

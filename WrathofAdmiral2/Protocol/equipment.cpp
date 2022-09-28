@@ -227,9 +227,13 @@ EquipDef::EquipDef(int id,
 }
 
 bool EquipDef::canDevelop([[maybe_unused]] int userid) const {
-    return Developenabled == 1;
+    return attr[Developenabled] == 1;
 }
 
 const ResOrd EquipDef::devRes() const {
-    return type.devResBase() * (qint64)attr[Intricacy];
+    return type.devResBase() * (qint64)attr[Rarity];
+}
+
+int EquipDef::getRarity() const {
+    return attr[Rarity];
 }

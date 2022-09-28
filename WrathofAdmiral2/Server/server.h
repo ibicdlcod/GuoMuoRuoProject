@@ -56,6 +56,7 @@
 #include <QSslConfiguration>
 #include <QtNetwork>
 #include <memory>
+#include <random>
 #include <vector>
 
 #include "commandline.h"
@@ -123,6 +124,11 @@ private:
     QMap<Uid, PeerInfo> connectedPeers;
 
     QMap<int, QPointer<EquipDef>> equipRegistry;
+
+    std::random_device random;
+    std::mt19937 mt;
+    static constexpr float dOF = 1.0; // degree of freedom
+    std::chi_squared_distribution<float> chi2Dist{dOF};
 
     const QByteArray defaultSalt =
             QByteArrayLiteral("\xe8\xbf\x99\xe6\x98\xaf\xe4\xb8"

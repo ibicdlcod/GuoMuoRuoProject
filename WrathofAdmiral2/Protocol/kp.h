@@ -25,8 +25,11 @@
 namespace KP {
 Q_NAMESPACE
 
+#pragma message(NOT_M_CONST)
 static const int initDock = 4;
 static const int initFactory = 4;
+static const qint64 secsinMin = 60;
+static float baseDevRarity = 8.0;
 
 enum DgramType{
     Auth,
@@ -56,7 +59,9 @@ enum MsgType{
     JsonError,
     Unsupported,
     AccessDenied,
-    DevelopFailed
+    DevelopFailed,
+    DevelopStart,
+    ResourceRequired
 };
 Q_ENUM_NS(MsgType)
 
@@ -79,9 +84,17 @@ enum ResourceType{
 Q_ENUM_NS(ResourceType)
 
 enum CommandType{
+    ChangeState,
     Develop
 };
 Q_ENUM_NS(CommandType)
+
+enum GameError{
+    ResourceLack,
+    DevelopNotOption,
+    FactoryBusy
+};
+Q_ENUM_NS(GameError)
 
 void initLog(bool server = false);
 #if defined (Q_OS_WIN)
@@ -99,10 +112,11 @@ QByteArray serverAuth(AuthMode, const QString &,
                       bool);
 QByteArray serverParseError(MsgType, const QString &,
                             const QString &);
-QByteArray clientDevelop(int, bool convert = false);
+QByteArray clientDevelop(int, bool convert = false, int factoryID = -1);
 QByteArray accessDenied();
-QByteArray serverDevelopFailed(bool ruleBased = true);
-
+QByteArray serverDevelopFailed(GameError);
+QByteArray serverDevelopStart();
+QByteArray clientStateChange(GameState);
 };
 
 #endif // KP_H

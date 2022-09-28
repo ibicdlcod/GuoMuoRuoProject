@@ -274,8 +274,8 @@ void Client::udpSocketConnected() {
 }
 
 void Client::doDevelop(const QStringList &cmdParts) {
-    if(cmdParts.length() < 2) {
-        //% "Usage: develop [equipid]"
+    if(cmdParts.length() < 3) {
+        //% "Usage: develop [equipid] [factoryslot]"
         qout << qtTrId("develop-usage") << Qt::endl;
         return;
     }
@@ -286,7 +286,8 @@ void Client::doDevelop(const QStringList &cmdParts) {
             qout << qtTrId("develop-invalid-id") << Qt::endl;
             return;
         }
-        QByteArray msg = KP::clientDevelop(equipid, false);
+        int factoSlot = cmdParts[2].toInt();
+        QByteArray msg = KP::clientDevelop(equipid, false, factoSlot);
         const qint64 written = crypto.writeDatagramEncrypted(&socket, msg);
         if (written <= 0) {
             throw NetworkError(crypto.dtlsErrorString());
@@ -317,6 +318,11 @@ void Client::doSwitch(const QStringList &cmdParts) {
         }
         else {
             gameState = (KP::GameState)statevalue;
+            QByteArray msg = KP::clientStateChange(gameState);
+            const qint64 written = crypto.writeDatagramEncrypted(&socket, msg);
+            if (written <= 0) {
+                throw NetworkError(crypto.dtlsErrorString());
+            }
         }
         return;
     }
@@ -341,7 +347,8 @@ const QStringList Client::getCommandsSpec() const {
     result.append({"disconnect",
                    "connect",
                    "register",
-                   "develop"
+                   "develop",
+                   "switch"
                   });
     result.sort(Qt::CaseInsensitive);
     return result;
@@ -359,7 +366,7 @@ const QStringList Client::getValidCommands() const {
         }
     }
     else if(!attemptMode)
-        result.append({"connect", "register"});
+        result.append({"connect", "register", "switch"});
     result.sort(Qt::CaseInsensitive);
     return result;
 }
@@ -615,14 +622,22 @@ void Client::receivedMsg(const QJsonObject &djson) {
         //% "You must be logged in in order to perform this operation."
         qWarning() << qtTrId("access-denied-login-first"); break;
     case KP::DevelopFailed: {
-        if(djson["rulebased"].toBool()) {
+        switch(djson["reason"].toInt()) {
+        case KP::DevelopNotOption:
             //% "This equipment does not exist or not open for development."
             qWarning() << qtTrId("equip-not-developable");
-        }
-        else {
+            break;
+        case KP::FactoryBusy:
+            //% "You have not selected an available factory slot."
+            qInfo() << qtTrId("factory-busy");
+        case KP::ResourceLack:
+            //% "You have not selected an available factory slot."
+            qInfo() << qtTrId("factory-busy");
+        default:
             //% "Equipment development failed."
             qInfo() << qtTrId("equip-develop-failed");
         }
+
     } break;
     default: throw std::domain_error("message not implemented"); break;
     }

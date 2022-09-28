@@ -178,13 +178,13 @@ const QString userF = QStringLiteral(
             );
 }
 
-Server::Server(int argc, char ** argv)
-    : CommandLine(argc, argv) {
+Server::Server(int argc, char ** argv) : CommandLine(argc, argv) {
     /* no *settings could be used here */
     connect(&serverSocket, &QAbstractSocket::readyRead,
             this, &Server::readyRead);
     serverConfiguration = QSslConfiguration::defaultDtlsConfiguration();
     serverConfiguration.setPeerVerifyMode(QSslSocket::VerifyNone);
+    mt = std::mt19937(random());
 }
 
 Server::~Server() noexcept {
@@ -688,6 +688,7 @@ bool Server::importEquipFromCSV() {
     csvFile->close();
     //% "Import equipment registry success!"
     qInfo() << qtTrId("equip-import-good");
+    equipmentRefresh();
     return true;
 }
 
@@ -832,6 +833,7 @@ void Server::receivedLogin(const QJsonObject &djson,
             QByteArray msg = KP::serverAuth(KP::Login, name, true);
             connection->writeDatagramEncrypted(&serverSocket, msg);
             User::refreshPort(uid);
+            User::refreshFactory(uid);
         }
     }
     else {
@@ -941,17 +943,82 @@ void Server::receivedReq(const QJsonObject &djson,
         connection->writeDatagramEncrypted(&serverSocket, msg);
     }
     else {
+        Uid uid = connectedUsers[peerInfo];
         switch(djson["command"].toInt()) {
+        case KP::CommandType::ChangeState: {
+            switch(djson["state"].toInt()) {
+            /* TODO:Should update to client as well? */
+            case KP::GameState::Port: User::refreshPort(uid); break;
+            case KP::GameState::Factory: User::refreshFactory(uid); break;
+            default:
+                throw std::domain_error("command type not supported"); break;
+            }
+        }
+            break;
         case KP::CommandType::Develop: {
             int equipid = djson["equipid"].toInt();
             if(!equipRegistry.contains(equipid)
-                    || !equipRegistry[equipid]->canDevelop())
-            {
-                QByteArray msg = KP::serverDevelopFailed(true);
+                    || !equipRegistry[equipid]->canDevelop(uid)) {
+                QByteArray msg =
+                        KP::serverDevelopFailed(KP::DevelopNotOption);
+                connection->writeDatagramEncrypted(&serverSocket, msg);
+            }
+            else if(User::isFactoryBusy(uid, djson["factory"].toInt())) {
+                QByteArray msg = KP::serverDevelopFailed(KP::FactoryBusy);
                 connection->writeDatagramEncrypted(&serverSocket, msg);
             }
             else {
-                ;
+                QPointer<EquipDef> equip = equipRegistry[equipid];
+                ResOrd resRequired = equip->devRes();
+                QByteArray msg = resRequired.resourceDesired();
+                connection->writeDatagramEncrypted(&serverSocket, msg);
+                ResOrd currentRes = User::getCurrentResources(uid);
+                if(!currentRes.addResources(resRequired * -1)){
+                    QByteArray msg =
+                            KP::serverDevelopFailed(KP::ResourceLack);
+                    connection->writeDatagramEncrypted(&serverSocket, msg);
+                }
+                else {
+                    User::setResources(uid, currentRes);
+                    int stagesReq = equip->getRarity();
+                    int stagesActual = std::floor(chi2Dist(mt)
+                                                  * KP::baseDevRarity);
+                    if(stagesActual > stagesReq)
+                        stagesActual = stagesReq;
+                    QDateTime startTime = QDateTime::currentDateTimeUtc();
+                    QDateTime fullTime = startTime.addSecs(
+                                stagesReq * KP::secsinMin);
+                    QDateTime successTime = startTime.addSecs(
+                                stagesActual * KP::secsinMin);
+                    QSqlDatabase db = QSqlDatabase::database();
+                    QSqlQuery query;
+                    query.prepare("UPDATE Factories "
+                                  "SET StartTime = :st, "
+                                  "Fulltime = :full, "
+                                  "SuccessTime = :succ, "
+                                  "Done = 0, "
+                                  "Success = 0, "
+                                  "CurrentJob = :eqid "
+                                  "WHERE User = :id AND FactoryID = :fid");
+                    query.bindValue(":id", uid);
+                    query.bindValue(":fid", djson["factory"].toInt());
+                    static QString format =
+                            QStringLiteral("yyyy-MM-dd hh:mm:ss");
+                    query.bindValue(":st", startTime.toString(format));
+                    query.bindValue(":full", fullTime.toString(format));
+                    query.bindValue(":succ", successTime.toString(format));
+                    query.bindValue(":eqid", equipid);
+                    if(query.exec()) {
+                        QByteArray msg =
+                                KP::serverDevelopStart();
+                        connection->writeDatagramEncrypted(&serverSocket, msg);
+                    }
+                    else {
+                        //% "Database failed when developing."
+                        throw DBError(qtTrId("dbfail-developing"),
+                                      query.lastError());
+                    }
+                }
             }
         }
             break;
@@ -979,8 +1046,8 @@ void Server::sqlcheckFacto() {
         "FactoryID",
         "CurrentJob",
         "StartTime",
-        "FullStages",
-        "SuccessStages",
+        "FullTime",
+        "SuccessTime",
         "Done",
         "Success",
     };

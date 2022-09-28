@@ -130,6 +130,7 @@ public:
 
     bool canDevelop(int userid = 0) const;
     const ResOrd devRes() const;
+    int getRarity() const;
 
 private:
     int id;

@@ -1,4 +1,5 @@
 #include "resord.h"
+#include "kp.h"
 
 ResOrd::ResOrd(ResTuple input) {
     oil = explo = steel = rub = al = w = cr = 0;
@@ -25,7 +26,19 @@ ResOrd::ResOrd(int oil, int explo, int steel, int rub,
 
 }
 
-bool ResOrd::addresources(const ResOrd& amount, const ResOrd &maximum) {
+bool ResOrd::addResources(const ResOrd &amount) {
+    operator+=(amount);
+    if(!sufficient()){
+        operator-=(amount);
+        return false;
+    }
+    else {
+        return true;
+    }
+}
+
+bool ResOrd::addResources(const ResOrd &amount,
+                          const ResOrd &maximum) {
     operator+=(amount);
     if(!sufficient()){
         operator-=(amount);
@@ -46,6 +59,20 @@ void ResOrd::cap(const ResOrd &cap) {
     al = min(al, cap.al);
     w = min(w, cap.w);
     cr = min(cr, cap.cr);
+}
+
+QByteArray ResOrd::resourceDesired() {
+    QJsonObject result;
+    result["type"] = KP::DgramType::Message;
+    result["msgtype"] = KP::MsgType::ResourceRequired;
+    result["oil"] = oil;
+    result["explo"] = explo;
+    result["steel"] = steel;
+    result["rub"] = rub;
+    result["al"] = al;
+    result["w"] = w;
+    result["cr"] = cr;
+    return QCborValue::fromJsonValue(result).toCbor();
 }
 
 bool ResOrd::sufficient() {

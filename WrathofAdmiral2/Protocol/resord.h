@@ -62,8 +62,10 @@ public:
         cr *= amount;
         return *this;
     }
-    bool addresources(const ResOrd&, const ResOrd &);
+    bool addResources(const ResOrd&);
+    bool addResources(const ResOrd&, const ResOrd &);
     void cap(const ResOrd&);
+    QByteArray resourceDesired();
     bool sufficient();
 
     friend void User::setResources(int uid, ResOrd goal);
