@@ -96,9 +96,9 @@ const QString userT = QStringLiteral(
             "InduContrib INTEGER DEFAULT 0,"
             "FleetSize INTEGER DEFAULT 1,"
             // used by both develop and construction, maximum is 20
-            "FactorySize INTEGER DEFAULT :initfactory,"
+            "FactorySize INTEGER DEFAULT %1,"
             // maximum is 12 due to high cost of fairy treat
-            "DockSize INTEGER DEFAULT :initdock,"
+            "DockSize INTEGER DEFAULT %2,"
             /* Resources */
             "Oil INTEGER DEFAULT 10000,"
             "Explo INTEGER DEFAULT 10000,"
@@ -121,7 +121,7 @@ const QString userT = QStringLiteral(
             "Sardine INTEGER DEFAULT 0,"
             "Hishimochi INTEGER DEFAULT 0,"
             "EmergRepair INTEGER DEFAULT 0"
-            ");");
+            ");").arg(KP::initFactory).arg(KP::initDock);
 
 const QString equipT = QStringLiteral(
             "CREATE TABLE Equip ( "
@@ -168,8 +168,8 @@ const QString userF = QStringLiteral(
             "FactoryID INTEGER,"
             "CurrentJob INTEGER DEFAULT 0,"
             "StartTime TEXT, "
-            "FullStages INTEGER, "
-            "SuccessStages INTEGER,"
+            "FullTime TEXT, "
+            "SuccessTime TEXT,"
             "Done BOOL,"
             "Success BOOL,"
             "FOREIGN KEY(User) REFERENCES Users(UserID),"
@@ -1117,8 +1117,6 @@ void Server::sqlinitUsers() {
     qWarning() << qtTrId("user-db-lack");
     QSqlQuery query;
     query.prepare(userT);
-    query.bindValue(":initfactory", KP::initFactory);
-    query.bindValue(":initdock", KP::initDock);
     if(query.exec()) {
         //% "User Database is OK."
         qInfo() << qtTrId("user-db-good");

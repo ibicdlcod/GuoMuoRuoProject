@@ -23,85 +23,86 @@
 #endif
 
 namespace KP {
-    Q_NAMESPACE
+Q_NAMESPACE
 
-    enum DgramType{
-        Auth,
-        Message,
-        Request
-    };
-    Q_ENUM_NS(DgramType)
+static const int initDock = 4;
+static const int initFactory = 4;
 
-    enum AuthMode{
-        Login,
-        Reg,
-        Logout
-    };
-    Q_ENUM_NS(AuthMode)
+enum DgramType{
+    Auth,
+    Message,
+    Request
+};
+Q_ENUM_NS(DgramType)
 
-    enum AuthError{
-        BadShadow,
-        BadPassword,
-        LoggedElsewhere,
-        UserNonexist,
-        UserExists,
-        RetryToomuch
-    };
-    Q_ENUM_NS(AuthError)
+enum AuthMode{
+    Login,
+    Reg,
+    Logout
+};
+Q_ENUM_NS(AuthMode)
 
-    enum MsgType{
-        JsonError,
-        Unsupported,
-        AccessDenied,
-        DevelopFailed
-    };
-    Q_ENUM_NS(MsgType)
+enum AuthError{
+    BadShadow,
+    BadPassword,
+    LoggedElsewhere,
+    UserNonexist,
+    UserExists,
+    RetryToomuch
+};
+Q_ENUM_NS(AuthError)
 
-    enum GameState{
-        Offline,
-        Port,
-        Factory
-    };
-    Q_ENUM_NS(GameState)
+enum MsgType{
+    JsonError,
+    Unsupported,
+    AccessDenied,
+    DevelopFailed
+};
+Q_ENUM_NS(MsgType)
 
-    enum ResourceType{
-        Oil,
-        Explosives,
-        Steel,
-        Rubber,
-        Aluminium,
-        Tungsten,
-        Chromium
-    };
-    Q_ENUM_NS(ResourceType)
+enum GameState{
+    Offline,
+    Port,
+    Factory
+};
+Q_ENUM_NS(GameState)
 
-    enum CommandType{
-        Develop
-    };
-    Q_ENUM_NS(CommandType)
+enum ResourceType{
+    Oil,
+    Explosives,
+    Steel,
+    Rubber,
+    Aluminium,
+    Tungsten,
+    Chromium
+};
+Q_ENUM_NS(ResourceType)
 
-    void initLog(bool server = false);
+enum CommandType{
+    Develop
+};
+Q_ENUM_NS(CommandType)
+
+void initLog(bool server = false);
 #if defined (Q_OS_WIN)
-    void winConsoleCheck();
+void winConsoleCheck();
 #endif
 
-    /* See JSON support in Qt, especially QCborValue */
-    QByteArray clientAuth(AuthMode, const QString &name = "",
-                          const QByteArray &shadow = "");
-    QByteArray serverAuth(AuthMode, const QString &,
-                          bool, AuthError);
-    QByteArray serverAuth(AuthMode, const QString &,
-                          bool, AuthError, QDateTime);
-    QByteArray serverAuth(AuthMode, const QString &,
-                          bool);
-    QByteArray serverParseError(MsgType, const QString &,
-                           const QString &);
-    QByteArray clientDevelop(int, bool convert = false);
-    QByteArray accessDenied();
-    QByteArray serverDevelopFailed(bool ruleBased = true);
+/* See JSON support in Qt, especially QCborValue */
+QByteArray clientAuth(AuthMode, const QString &name = "",
+                      const QByteArray &shadow = "");
+QByteArray serverAuth(AuthMode, const QString &,
+                      bool, AuthError);
+QByteArray serverAuth(AuthMode, const QString &,
+                      bool, AuthError, QDateTime);
+QByteArray serverAuth(AuthMode, const QString &,
+                      bool);
+QByteArray serverParseError(MsgType, const QString &,
+                            const QString &);
+QByteArray clientDevelop(int, bool convert = false);
+QByteArray accessDenied();
+QByteArray serverDevelopFailed(bool ruleBased = true);
 
-    const int initDock = 4;
-    const int initFactory = 4;
 };
 
 #endif // KP_H

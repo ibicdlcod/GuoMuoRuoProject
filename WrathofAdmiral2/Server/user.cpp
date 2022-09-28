@@ -157,7 +157,7 @@ void User::naturalRegen(int uid) {
                       "= datetime(RecoverTime, '+"
                       + QString::number(regenMins)
                       + " minutes') "
-                      "WHERE UserID = :id");
+                        "WHERE UserID = :id");
         query.bindValue(":id", uid);
         if(Q_UNLIKELY(!query.exec())) {
             //% "User ID %1: natural regeneration failed!"
@@ -173,7 +173,14 @@ void User::naturalRegen(int uid) {
 }
 
 void User::refreshFactory(int uid) {
-
+    QSqlDatabase db = QSqlDatabase::database();
+    QSqlQuery query;
+    query.prepare("UPDATE Factories "
+                  "SET Done = (datetime('now') > SuccessTime), "
+                  "Success = (FullTime == SuccessTime), "
+                  "WHERE User = :id");
+    query.bindValue(":id", uid);
+    query.exec();
 }
 
 void User::refreshPort(int uid) {
