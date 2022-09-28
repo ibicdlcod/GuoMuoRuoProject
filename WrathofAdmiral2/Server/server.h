@@ -88,6 +88,8 @@ private slots:
 
 private:
     void decryptDatagram(QDtls *, const QByteArray &);
+    void doDevelop(Uid, int, int, QDtls *);
+    void doFetch(Uid, int, QDtls *);
     void doHandshake(QDtls *, const QByteArray &);
     bool equipmentRefresh();
     void exitGraceSpec() override;

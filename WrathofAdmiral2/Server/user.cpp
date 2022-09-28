@@ -182,13 +182,7 @@ void User::naturalRegen(int uid) {
                                     2 + regenPower,
                                     2 + regenPower);
         regenAmount *= (qint64)regenMins;
-        ResOrd regenCap = ResOrd(2500,
-                                 2500,
-                                 2500,
-                                 1500,
-                                 2000,
-                                 1500,
-                                 1500);
+        ResOrd regenCap = ResOrd(2500, 2500, 2500, 1500, 2000, 1500, 1500);
         regenCap *= (qint64)(level + 24); // 24~144
         ResOrd currentRes = getCurrentResources(uid);
         currentRes.addResources(regenAmount, regenCap);

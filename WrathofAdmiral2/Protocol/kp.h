@@ -30,6 +30,7 @@ static const int initDock = 4;
 static const int initFactory = 4;
 static const qint64 secsinMin = 60;
 static float baseDevRarity = 8.0;
+static const int equipIdMax = 0x100000;
 
 enum DgramType{
     Auth,
@@ -61,7 +62,9 @@ enum MsgType{
     AccessDenied,
     DevelopFailed,
     DevelopStart,
-    ResourceRequired
+    ResourceRequired,
+    FairyBusy,
+    Penguin
 };
 Q_ENUM_NS(MsgType)
 
@@ -85,7 +88,8 @@ Q_ENUM_NS(ResourceType)
 
 enum CommandType{
     ChangeState,
-    Develop
+    Develop,
+    Fetch
 };
 Q_ENUM_NS(CommandType)
 
@@ -102,21 +106,24 @@ void winConsoleCheck();
 #endif
 
 /* See JSON support in Qt, especially QCborValue */
+QByteArray accessDenied();
 QByteArray clientAuth(AuthMode, const QString &name = "",
                       const QByteArray &shadow = "");
+QByteArray clientDevelop(int, bool convert = false, int factoryID = -1);
+QByteArray clientFetch(int factoryID = -1);
+QByteArray clientStateChange(GameState);
 QByteArray serverAuth(AuthMode, const QString &,
                       bool, AuthError);
 QByteArray serverAuth(AuthMode, const QString &,
                       bool, AuthError, QDateTime);
 QByteArray serverAuth(AuthMode, const QString &,
                       bool);
-QByteArray serverParseError(MsgType, const QString &,
-                            const QString &);
-QByteArray clientDevelop(int, bool convert = false, int factoryID = -1);
-QByteArray accessDenied();
 QByteArray serverDevelopFailed(GameError);
 QByteArray serverDevelopStart();
-QByteArray clientStateChange(GameState);
+QByteArray serverFairyBusy(int);
+QByteArray serverParseError(MsgType, const QString &,
+                            const QString &);
+QByteArray serverPenguin();
 };
 
 #endif // KP_H

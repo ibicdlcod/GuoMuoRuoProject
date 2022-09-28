@@ -296,6 +296,22 @@ void Client::doDevelop(const QStringList &cmdParts) {
     }
 }
 
+void Client::doFetch(const QStringList &cmdParts) {
+    if(cmdParts.length() < 2) {
+        //% "Usage: fetch [factoryslot]"
+        qout << qtTrId("fetch-usage") << Qt::endl;
+        return;
+    }
+    else {
+        int factoSlot = cmdParts[1].toInt();
+        QByteArray msg = KP::clientFetch(factoSlot);
+        const qint64 written = crypto.writeDatagramEncrypted(&socket, msg);
+        if (written <= 0) {
+            throw NetworkError(crypto.dtlsErrorString());
+        }
+        return;
+    }
+}
 void Client::doSwitch(const QStringList &cmdParts) {
     if(cmdParts.length() < 2) {
         //% "Usage: switch [gamestate]"
@@ -348,7 +364,8 @@ const QStringList Client::getCommandsSpec() const {
                    "connect",
                    "register",
                    "develop",
-                   "switch"
+                   "switch",
+                   "fetch"
                   });
     result.sort(Qt::CaseInsensitive);
     return result;
@@ -363,6 +380,7 @@ const QStringList Client::getValidCommands() const {
         if(gameState == KP::Factory)
         {
             result.append("develop");
+            result.append("fetch");
         }
     }
     else if(!attemptMode)
@@ -450,6 +468,15 @@ bool Client::parseGameCommands(const QString &primary,
         }
         else {
             doDevelop(cmdParts);
+            return true;
+        }
+    }
+    else if(primary.compare("fetch", Qt::CaseInsensitive) == 0) {
+        if(gameState != KP::Factory) {
+            return false;
+        }
+        else {
+            doFetch(cmdParts);
             return true;
         }
     }
@@ -630,15 +657,44 @@ void Client::receivedMsg(const QJsonObject &djson) {
         case KP::FactoryBusy:
             //% "You have not selected an available factory slot."
             qInfo() << qtTrId("factory-busy");
+            break;
         case KP::ResourceLack:
-            //% "You have not selected an available factory slot."
-            qInfo() << qtTrId("factory-busy");
+            //% "You do not have sufficient resources."
+            qInfo() << qtTrId("resource-lack");
+            break;
         default:
             //% "Equipment development failed."
             qInfo() << qtTrId("equip-develop-failed");
+            break;
         }
-
     } break;
+    case KP::ResourceRequired: {
+        //% "This operation requires %1oil/%2explosives/%3steel/%4rubber/%5aluminum/%6tungsten/%7chromium"
+        qInfo() << qtTrId("resource-require")
+                   .arg(djson["oil"].toInt())
+                .arg(djson["explo"].toInt())
+                .arg(djson["steel"].toInt())
+                .arg(djson["rub"].toInt())
+                .arg(djson["al"].toInt())
+                .arg(djson["w"].toInt())
+                .arg(djson["cr"].toInt());
+    }
+        break;
+    case KP::DevelopStart:
+        //% "Start developing equipment."
+        qInfo() << qtTrId("develop-start"); break;
+    case KP::FairyBusy: {
+        if(djson["job"] != 0) {
+            //% "Fairy is still working."
+            qInfo() << qtTrId("fairy-busy"); break;
+        } else {
+            //% "Factory slot is empty."
+            qInfo() << qtTrId("factory-empty"); break;
+        }
+    }
+    case KP::Penguin:
+        //% "You got a cute penguin."
+        qInfo() << qtTrId("develop-penguin"); break;
     default: throw std::domain_error("message not implemented"); break;
     }
 }

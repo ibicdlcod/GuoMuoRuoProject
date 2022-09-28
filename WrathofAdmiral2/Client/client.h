@@ -80,6 +80,7 @@ private slots:
 
 private:
     void doDevelop(const QStringList &);
+    void doFetch(const QStringList &);
     void doSwitch(const QStringList &);
     void exitGraceSpec() override;
     QString gameStateString() const;

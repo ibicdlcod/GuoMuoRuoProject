@@ -39,6 +39,13 @@ void KP::winConsoleCheck() {
 }
 #endif
 
+QByteArray KP::accessDenied() {
+    QJsonObject result;
+    result["type"] = DgramType::Message;
+    result["msgtype"] = MsgType::AccessDenied;
+    return QCborValue::fromJsonValue(result).toCbor();
+}
+
 QByteArray KP::clientAuth(AuthMode mode, const QString &uname,
                           const QByteArray &shadow) {
     QJsonObject result;
@@ -50,6 +57,32 @@ QByteArray KP::clientAuth(AuthMode mode, const QString &uname,
         result["shadow"] =
                 QString(shadow.toBase64(QByteArray::Base64Encoding));
     }
+    return QCborValue::fromJsonValue(result).toCbor();
+}
+
+QByteArray KP::clientDevelop(int equipid, bool convert, int factoryID) {
+    QJsonObject result;
+    result["type"] = DgramType::Request;
+    result["command"] = CommandType::Develop;
+    result["equipid"] = equipid;
+    result["convert"] = convert;
+    result["factory"] = factoryID;
+    return QCborValue::fromJsonValue(result).toCbor();
+}
+
+QByteArray KP::clientFetch(int factoryID) {
+    QJsonObject result;
+    result["type"] = DgramType::Request;
+    result["command"] = CommandType::Fetch;
+    result["factory"] = factoryID;
+    return QCborValue::fromJsonValue(result).toCbor();
+}
+
+QByteArray KP::clientStateChange(GameState state) {
+    QJsonObject result;
+    result["type"] = DgramType::Request;
+    result["command"] = CommandType::ChangeState;
+    result["state"] = state;
     return QCborValue::fromJsonValue(result).toCbor();
 }
 
@@ -87,33 +120,6 @@ QByteArray KP::serverAuth(AuthMode mode, const QString &uname,
     return QCborValue::fromJsonValue(result).toCbor();
 }
 
-QByteArray KP::serverParseError(MsgType pe, const QString &uname,
-                                const QString &content) {
-    QJsonObject result;
-    result["type"] = DgramType::Message;
-    result["msgtype"] = pe;
-    result["username"] = uname;
-    result["content"] = content;
-    return QCborValue::fromJsonValue(result).toCbor();
-}
-
-QByteArray KP::clientDevelop(int equipid, bool convert, int factoryID) {
-    QJsonObject result;
-    result["type"] = DgramType::Request;
-    result["command"] = CommandType::Develop;
-    result["equipid"] = equipid;
-    result["convert"] = convert;
-    result["factory"] = factoryID;
-    return QCborValue::fromJsonValue(result).toCbor();
-}
-
-QByteArray KP::accessDenied() {
-    QJsonObject result;
-    result["type"] = DgramType::Message;
-    result["msgtype"] = MsgType::AccessDenied;
-    return QCborValue::fromJsonValue(result).toCbor();
-}
-
 QByteArray KP::serverDevelopFailed(GameError error) {
     QJsonObject result;
     result["type"] = DgramType::Message;
@@ -129,10 +135,27 @@ QByteArray KP::serverDevelopStart() {
     return QCborValue::fromJsonValue(result).toCbor();
 }
 
-QByteArray KP::clientStateChange(GameState state) {
+QByteArray KP::serverFairyBusy(int jobID) {
     QJsonObject result;
-    result["type"] = DgramType::Request;
-    result["command"] = CommandType::ChangeState;
-    result["state"] = state;
+    result["type"] = DgramType::Message;
+    result["msgtype"] = MsgType::FairyBusy;
+    result["job"] = jobID;
+    return QCborValue::fromJsonValue(result).toCbor();
+}
+
+QByteArray KP::serverParseError(MsgType pe, const QString &uname,
+                                const QString &content) {
+    QJsonObject result;
+    result["type"] = DgramType::Message;
+    result["msgtype"] = pe;
+    result["username"] = uname;
+    result["content"] = content;
+    return QCborValue::fromJsonValue(result).toCbor();
+}
+
+QByteArray KP::serverPenguin() {
+    QJsonObject result;
+    result["type"] = DgramType::Message;
+    result["msgtype"] = MsgType::Penguin;
     return QCborValue::fromJsonValue(result).toCbor();
 }
