@@ -99,6 +99,9 @@ namespace KP {
     QByteArray clientDevelop(int, bool convert = false);
     QByteArray accessDenied();
     QByteArray serverDevelopFailed(bool ruleBased = true);
+
+    const int initDock = 4;
+    const int initFactory = 4;
 };
 
 #endif // KP_H

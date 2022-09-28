@@ -41,6 +41,17 @@ public:
         cr -= amount.cr;
         return *this;
     }
+    const ResOrd operator*(qint64 amount) const {
+        return ResOrd(
+                    oil * amount,
+                    explo * amount,
+                    steel * amount,
+                    rub * amount,
+                    al * amount,
+                    w * amount,
+                    cr * amount
+                    );
+    }
     constexpr ResOrd& operator*=(qint64 amount) {
         oil *= amount;
         explo *= amount;

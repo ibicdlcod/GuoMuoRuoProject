@@ -89,7 +89,7 @@ private:
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(EquipType::TypeFlags)
 
-class Equipment: public QObject {
+class EquipDef: public QObject {
     Q_OBJECT
 
 public:
@@ -125,10 +125,11 @@ public:
     };
     Q_ENUM(AttrType)
 
-    Equipment(int, QString &&, QString &&,
-              QMap<AttrType, int> &&, QStringList &&);
+    EquipDef(int, QString &&, QString &&,
+             QMap<AttrType, int> &&, QStringList &&);
 
-    bool canDevelop(int userid = 0);
+    bool canDevelop(int userid = 0) const;
+    const ResOrd devRes() const;
 
 private:
     int id;

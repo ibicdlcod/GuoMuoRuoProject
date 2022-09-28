@@ -4,6 +4,7 @@
 #include <QSqlQuery>
 #include <QTimeZone>
 #include "resord.h"
+#include "kerrors.h"
 
 #ifdef max
 #undef max
@@ -93,6 +94,23 @@ void User::incrementThrottleCount(int uid) {
     }
 }
 
+void User::init(int uid) {
+    QSqlDatabase db = QSqlDatabase::database();
+    /* factory */
+    for(int i = 0; i < KP::initFactory; ++i) {
+        QSqlQuery query;
+        query.prepare("INSERT INTO Factories (User,FactoryID)"
+                      " VALUES (:id,:count)");
+        query.bindValue(":id", uid);
+        query.bindValue(":count", i);
+        if(Q_UNLIKELY(!query.exec())) {
+            //% "Set User Factory Up failed!"
+            throw DBError(qtTrId("init-userfactory-failed"),
+                          query.lastError());
+        }
+    }
+}
+
 void User::naturalRegen(int uid) {
     QSqlDatabase db = QSqlDatabase::database();
     QSqlQuery query;
@@ -152,6 +170,10 @@ void User::naturalRegen(int uid) {
             qDebug() << qtTrId("natural-regen").arg(uid);
         }
     }
+}
+
+void User::refreshFactory(int uid) {
+
 }
 
 void User::refreshPort(int uid) {

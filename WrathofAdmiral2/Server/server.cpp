@@ -96,9 +96,9 @@ const QString userT = QStringLiteral(
             "InduContrib INTEGER DEFAULT 0,"
             "FleetSize INTEGER DEFAULT 1,"
             // used by both develop and construction, maximum is 20
-            "FactorySize INTEGER DEFAULT 4,"
+            "FactorySize INTEGER DEFAULT :initfactory,"
             // maximum is 12 due to high cost of fairy treat
-            "DockSize INTEGER DEFAULT 4,"
+            "DockSize INTEGER DEFAULT :initdock,"
             /* Resources */
             "Oil INTEGER DEFAULT 10000,"
             "Explo INTEGER DEFAULT 10000,"
@@ -159,6 +159,21 @@ const QString equipT = QStringLiteral(
             "Customflag1 VARCHAR(63), "
             "Customflag2 VARCHAR(63), "
             "Customflag3 VARCHAR(63) "
+            ");"
+            );
+
+const QString userF = QStringLiteral(
+            "CREATE TABLE Factories ("
+            "User INTEGER,"
+            "FactoryID INTEGER,"
+            "CurrentJob INTEGER DEFAULT 0,"
+            "StartTime TEXT, "
+            "FullStages INTEGER, "
+            "SuccessStages INTEGER,"
+            "Done BOOL,"
+            "Success BOOL,"
+            "FOREIGN KEY(User) REFERENCES Users(UserID),"
+            "CONSTRAINT noduplicate UNIQUE(User, FactoryID)"
             ");"
             );
 }
@@ -303,7 +318,23 @@ void Server::pskRequired(QSslPreSharedKeyAuthenticator *auth)
     if(clientName.compare("NEW_USER") == 0)
         auth->setPreSharedKey(QByteArrayLiteral("register"));
     else {
-        auth->setPreSharedKey(QByteArrayLiteral("login"));
+        QSqlDatabase db = QSqlDatabase::database();
+        QSqlQuery query;
+        query.prepare("SELECT Shadow FROM Users "
+                      "WHERE Username = :name;");
+        query.bindValue(":name", clientName);
+        if(!query.exec()) {
+            //% "Pre-shared key retrieve failed: %1"
+            qCritical() << qtTrId("psk-retrieve-failed").arg(clientName);
+        }
+        query.isSelect();
+        if(!query.first()) {
+            int x = QRandomGenerator::global()->generate64();
+            auth->setPreSharedKey(QByteArray::number(x));
+        }
+        else {
+            auth->setPreSharedKey(query.value(0).toByteArray());
+        }
     }
 }
 
@@ -464,10 +495,10 @@ bool Server::equipmentRefresh()
         if(fieldnames[i].startsWith("Custom", Qt::CaseInsensitive))
             indexcustoms.append(i);
     }
-    QMetaEnum info = QMetaEnum::fromType<Equipment::AttrType>();
+    QMetaEnum info = QMetaEnum::fromType<EquipDef::AttrType>();
     while(query.next()) {
         QStringList customFlags;
-        QMap<Equipment::AttrType, int> attr;
+        QMap<EquipDef::AttrType, int> attr;
         for(int i = 0; i < rec.count(); ++i) {
             if(i == indexid || i == indexname || i == indextype) {
                 continue;
@@ -486,17 +517,17 @@ bool Server::equipmentRefresh()
                                   query.lastError());
                 }
                 else {
-                    attr[(Equipment::AttrType)attrvalue]
+                    attr[(EquipDef::AttrType)attrvalue]
                             = query.value(i).toInt();
                 }
             }
         }
-        QPointer<Equipment> e(new Equipment(query.value(indexid).toInt(),
-                                            query.value(indexname).toString(),
-                                            query.value(indextype).toString(),
-                                            std::move(attr),
-                                            std::move(customFlags)
-                                            ));
+        QPointer<EquipDef> e(new EquipDef(query.value(indexid).toInt(),
+                                          query.value(indexname).toString(),
+                                          query.value(indextype).toString(),
+                                          std::move(attr),
+                                          std::move(customFlags)
+                                          ));
         equipRegistry[query.value(indexid).toInt()] = e;
     }
     return true;
@@ -885,6 +916,7 @@ void Server::receivedReg(const QJsonObject &djson,
             QByteArray msg = KP::serverAuth(KP::Reg, name, true);
             connection->writeDatagramEncrypted(&serverSocket, msg);
             connection->shutdown(&serverSocket);
+            User::init(maxid+1);
         }
         else {
             QByteArray msg = KP::serverAuth(KP::Reg, name, false,
@@ -937,6 +969,29 @@ void Server::sqlcheckEquip() {
         //% "Equipment Database is corrupted or incompatible."
         throw DBError(qtTrId("equip-db-bad"));
     }
+}
+
+void Server::sqlcheckFacto() {
+    QSqlDatabase db = QSqlDatabase::database();
+    QSqlRecord columns = db.record("Factories");
+    QStringList desiredColumns = {
+        "User",
+        "FactoryID",
+        "CurrentJob",
+        "StartTime",
+        "FullStages",
+        "SuccessStages",
+        "Done",
+        "Success",
+    };
+    for(const QString &column : desiredColumns) {
+        if(!columns.contains(column)) {
+            //% "column %1 does not exist at table %2"
+            throw DBError(qtTrId("column-nonexist").arg(column, "Factories"));
+        }
+    }
+    //% "Factory database OK."
+    qInfo() << qtTrId("factory-db-good");
 }
 
 void Server::sqlcheckUsers() {
@@ -1016,6 +1071,12 @@ void Server::sqlinit() {
         else {
             sqlcheckEquip();
         }
+        if(!tables.contains("Factories")) {
+            sqlinitFacto();
+        }
+        else {
+            sqlcheckFacto();
+        }
     }
 }
 
@@ -1035,11 +1096,29 @@ void Server::sqlinitEquip() {
     }
 }
 
+void Server::sqlinitFacto() {
+    //% "Factory database does not exist, creating..."
+    qWarning() << qtTrId("facto-db-lack");
+    QSqlQuery query;
+    query.prepare(userF);
+    if(query.exec()) {
+        //% "Factory Database is OK."
+        qInfo() << qtTrId("facto-db-good");
+    }
+    else {
+        //% "Create Factory Database failed."
+        throw DBError(qtTrId("facto-db-gen-failure"),
+                      query.lastError());
+    }
+}
+
 void Server::sqlinitUsers() {
     //% "User database does not exist, creating..."
     qWarning() << qtTrId("user-db-lack");
     QSqlQuery query;
     query.prepare(userT);
+    query.bindValue(":initfactory", KP::initFactory);
+    query.bindValue(":initdock", KP::initDock);
     if(query.exec()) {
         //% "User Database is OK."
         qInfo() << qtTrId("user-db-good");

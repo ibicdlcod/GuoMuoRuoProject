@@ -214,11 +214,11 @@ const ResOrd EquipType::devResBase() const {
     return ResOrd(basic);
 }
 
-Equipment::Equipment(int id,
-                     QString &&name,
-                     QString &&type,
-                     QMap<AttrType, int> &&attr,
-                     QStringList &&customflags)
+EquipDef::EquipDef(int id,
+                   QString &&name,
+                   QString &&type,
+                   QMap<AttrType, int> &&attr,
+                   QStringList &&customflags)
     : id(id),
       name(name),
       type(type),
@@ -226,6 +226,10 @@ Equipment::Equipment(int id,
       customflags(customflags) {
 }
 
-bool Equipment::canDevelop([[maybe_unused]] int userid) {
+bool EquipDef::canDevelop([[maybe_unused]] int userid) const {
     return Developenabled == 1;
+}
+
+const ResOrd EquipDef::devRes() const {
+    return type.devResBase() * (qint64)attr[Intricacy];
 }

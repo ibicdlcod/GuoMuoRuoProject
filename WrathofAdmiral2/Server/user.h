@@ -11,7 +11,9 @@ namespace User {
     const QString getName(int uid);
     QDateTime getThrottleTime(int uid);
     void incrementThrottleCount(int uid);
+    void init(int uid);
     void naturalRegen(int uid);
+    void refreshFactory(int uid);
     void refreshPort(int uid);
     void removeThrottleCount(int uid);
     void setResources(int uid, ResOrd goal);

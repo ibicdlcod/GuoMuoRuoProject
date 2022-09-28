@@ -105,9 +105,11 @@ private:
     void receivedReg(const QJsonObject &, const PeerInfo &, QDtls *);
     void receivedReq(const QJsonObject &, const PeerInfo &, QDtls *);
     void sqlcheckEquip();
+    void sqlcheckFacto();
     void sqlcheckUsers();
     void sqlinit();
     void sqlinitEquip();
+    void sqlinitFacto();
     void sqlinitUsers();
 
     bool listening = false;
@@ -120,7 +122,7 @@ private:
     QMap<PeerInfo, Uid> connectedUsers;
     QMap<Uid, PeerInfo> connectedPeers;
 
-    QMap<int, QPointer<Equipment>> equipRegistry;
+    QMap<int, QPointer<EquipDef>> equipRegistry;
 
     const QByteArray defaultSalt =
             QByteArrayLiteral("\xe8\xbf\x99\xe6\x98\xaf\xe4\xb8"

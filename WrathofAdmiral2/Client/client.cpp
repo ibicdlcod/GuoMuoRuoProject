@@ -192,7 +192,12 @@ void Client::pskRequired(QSslPreSharedKeyAuthenticator *auth) {
     }
     else {
         auth->setIdentity(clientName.toLatin1());
-        auth->setPreSharedKey(QByteArrayLiteral("login"));
+        QByteArray salt = clientName.toUtf8().append(
+                    settings->value("salt", defaultSalt).toByteArray());
+        QByteArray shadow = QPasswordDigestor::deriveKeyPbkdf2(
+                    QCryptographicHash::Blake2s_256,
+                    password, salt, 8, 255);
+        auth->setPreSharedKey(shadow);
     }
 }
 
@@ -318,6 +323,9 @@ void Client::doSwitch(const QStringList &cmdParts) {
 }
 
 void Client::exitGraceSpec() {
+    if(crypto.isConnectionEncrypted()) {
+        parseDisconnectReq();
+    }
     shutdown();
 }
 
@@ -552,7 +560,7 @@ void Client::receivedLogin(const QJsonObject &djson) {
         switch(djson["reason"].toInt()) {
         //% "Input shadow is malformed."
         case KP::BadShadow: reas = qtTrId("malformed-shadow"); break;
-        //% "Password is incorrect."
+            //% "Password is incorrect."
         case KP::BadPassword: reas = qtTrId("password-incorrect"); break;
         case KP::RetryToomuch: {
             QDateTime reEnable = QDateTime::fromString(
@@ -583,7 +591,7 @@ void Client::receivedLogout(const QJsonObject &djson) {
         else if(djson["reason"] == KP::LoggedElsewhere) {
             //% "%1: logged elsewhere, force quitting"
             qCritical() << qtTrId("logout-forced")
-                       .arg(djson["username"].toString());
+                           .arg(djson["username"].toString());
         }
         else
             throw std::domain_error("message not implemented");
@@ -630,7 +638,7 @@ void Client::receivedReg(const QJsonObject &djson) {
         QString reas;
         switch(djson["reason"].toInt()) {
         case KP::BadShadow: reas = qtTrId("malformed-shadow"); break;
-        //% "User already exists."
+            //% "User already exists."
         case KP::UserExists: reas = qtTrId("user-exists"); break;
         default: throw std::domain_error("message not implemented"); break;
         }
