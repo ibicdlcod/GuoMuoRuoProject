@@ -108,10 +108,12 @@ private:
     void receivedReg(const QJsonObject &, const PeerInfo &, QDtls *);
     void receivedReq(const QJsonObject &, const PeerInfo &, QDtls *);
     void sqlcheckEquip();
+    void sqlcheckEquipU();
     void sqlcheckFacto();
     void sqlcheckUsers();
     void sqlinit();
     void sqlinitEquip();
+    void sqlinitEquipU();
     void sqlinitFacto();
     void sqlinitUsers();
 

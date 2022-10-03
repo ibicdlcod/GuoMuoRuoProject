@@ -143,6 +143,15 @@ QByteArray KP::serverFairyBusy(int jobID) {
     return QCborValue::fromJsonValue(result).toCbor();
 }
 
+QByteArray KP::serverNewEquip(int serial, int equipDid) {
+    QJsonObject result;
+    result["type"] = DgramType::Message;
+    result["msgtype"] = MsgType::NewEquip;
+    result["serial"] = serial;
+    result["equipdef"] = equipDid;
+    return QCborValue::fromJsonValue(result).toCbor();
+}
+
 QByteArray KP::serverParseError(MsgType pe, const QString &uname,
                                 const QString &content) {
     QJsonObject result;

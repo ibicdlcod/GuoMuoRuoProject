@@ -26,11 +26,11 @@ namespace KP {
 Q_NAMESPACE
 
 #pragma message(NOT_M_CONST)
-static const int initDock = 4;
-static const int initFactory = 4;
-static const qint64 secsinMin = 60;
-static float baseDevRarity = 8.0;
-static const int equipIdMax = 0x100000;
+static constexpr int initDock = 4;
+static constexpr int initFactory = 4;
+static constexpr qint64 secsinMin = 60;
+static constexpr float baseDevRarity = 8.0;
+static constexpr int equipIdMax = 0x100000;
 
 enum DgramType{
     Auth,
@@ -64,7 +64,8 @@ enum MsgType{
     DevelopStart,
     ResourceRequired,
     FairyBusy,
-    Penguin
+    Penguin,
+    NewEquip
 };
 Q_ENUM_NS(MsgType)
 
@@ -121,6 +122,7 @@ QByteArray serverAuth(AuthMode, const QString &,
 QByteArray serverDevelopFailed(GameError);
 QByteArray serverDevelopStart();
 QByteArray serverFairyBusy(int);
+QByteArray serverNewEquip(int, int);
 QByteArray serverParseError(MsgType, const QString &,
                             const QString &);
 QByteArray serverPenguin();

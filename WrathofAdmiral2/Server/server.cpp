@@ -123,7 +123,7 @@ const QString userT = QStringLiteral(
             "EmergRepair INTEGER DEFAULT 0"
             ");").arg(KP::initFactory).arg(KP::initDock);
 
-const QString equipT = QStringLiteral(
+const QString equipU = QStringLiteral(
             "CREATE TABLE Equip ( "
             "EquipID INTEGER PRIMARY KEY, "
             "Equipname VARCHAR(63), "
@@ -176,6 +176,19 @@ const QString userF = QStringLiteral(
             "CONSTRAINT noduplicate UNIQUE(User, FactoryID)"
             ");"
             );
+
+const QString userE = QStringLiteral(
+            "CREATE TABLE UserEquip ("
+            "User INTEGER, "
+            "EquipSerial INTEGER, "
+            "EquipDef INTEGER, "
+            "Star INTEGER, "
+            "FOREIGN KEY(User) REFERENCES Users(UserID), "
+            "FOREIGN KEY(EquipDef) REFERENCES Equip(EquipID), "
+            "CONSTRAINT noduplicate UNIQUE(User, EquipSerial) "
+            "CONSTRAINT Star_Valid CHECK (Star >= 0 AND Star < 16)"
+            ");"
+            );
 }
 
 Server::Server(int argc, char ** argv) : CommandLine(argc, argv) {
@@ -189,6 +202,8 @@ Server::Server(int argc, char ** argv) : CommandLine(argc, argv) {
 
 Server::~Server() noexcept {
     shutdown();
+    disconnect(&serverSocket, &QAbstractSocket::readyRead,
+               this, &Server::readyRead);
 }
 
 void Server::datagramReceived(const PeerInfo &peerInfo,
@@ -376,10 +391,11 @@ void Server::readyRead() {
             // Client disconnected, remove from connected users
             const PeerInfo peerInfo = PeerInfo(peerAddress, peerPort);
             if(connectedUsers.contains(peerInfo)) {
+                Uid dcuser = connectedUsers[peerInfo];
                 //% "%1: disconnected abruptly."
                 qInfo() << qtTrId("client-dc").
-                           arg(User::getName(connectedUsers[peerInfo]));
-                connectedPeers.remove(connectedUsers[peerInfo]);
+                           arg(User::getName(dcuser));
+                connectedPeers.remove(dcuser);
                 connectedUsers.remove(peerInfo);
             }
             knownClients.erase(client);
@@ -461,6 +477,7 @@ void Server::doDevelop(Uid uid, int equipid,
         }
         else {
             User::setResources(uid, currentRes);
+            /* TODO: to be modified by technology points */
             int stagesReq = equip->getRarity();
             int stagesActual = std::floor(chi2Dist(mt)
                                           * KP::baseDevRarity);
@@ -474,11 +491,8 @@ void Server::doDevelop(Uid uid, int equipid,
             QSqlDatabase db = QSqlDatabase::database();
             QSqlQuery query;
             query.prepare("UPDATE Factories "
-                          "SET StartTime = :st, "
-                          "Fulltime = :full, "
-                          "SuccessTime = :succ, "
-                          "Done = 0, "
-                          "Success = 0, "
+                          "SET StartTime = :st, Fulltime = :full, "
+                          "SuccessTime = :succ, Done = 0, Success = 0, "
                           "CurrentJob = :eqid "
                           "WHERE User = :id AND FactoryID = :fid");
             query.bindValue(":id", uid);
@@ -504,6 +518,7 @@ void Server::doDevelop(Uid uid, int equipid,
 }
 
 void Server::doFetch(Uid uid, int factoryid, QDtls *connection) {
+    User::refreshFactory(uid);
     QSqlDatabase db = QSqlDatabase::database();
     QSqlQuery query;
     query.prepare("SELECT CurrentJob, Done, Success,"
@@ -534,7 +549,9 @@ void Server::doFetch(Uid uid, int factoryid, QDtls *connection) {
             }
             if(jobID < KP::equipIdMax) {
                 if(success) {
-                    // TODO: get equip
+                    QByteArray msg = KP::serverNewEquip(
+                                User::newEquip(uid, jobID), jobID);
+                    connection->writeDatagramEncrypted(&serverSocket, msg);
                 }
                 else {
                     // TODO: get tech points
@@ -546,11 +563,8 @@ void Server::doFetch(Uid uid, int factoryid, QDtls *connection) {
             QSqlDatabase db = QSqlDatabase::database();
             QSqlQuery query;
             query.prepare("UPDATE Factories "
-                          "SET StartTime = NULL, "
-                          "Fulltime = NULL, "
-                          "SuccessTime = NULL, "
-                          "Done = 0, "
-                          "Success = 0, "
+                          "SET StartTime = NULL, Fulltime = NULL, "
+                          "SuccessTime = NULL, Done = 0, Success = 0, "
                           "CurrentJob = 0 "
                           "WHERE User = :id AND FactoryID = :fid");
             query.bindValue(":id", uid);
@@ -1102,9 +1116,28 @@ void Server::sqlcheckEquip() {
         qInfo() << qtTrId("equip-db-good");
     }
     else {
-        //% "Equipment Database is corrupted or incompatible."
+        //% "Equipment database is corrupted or incompatible."
         throw DBError(qtTrId("equip-db-bad"));
     }
+}
+
+void Server::sqlcheckEquipU() {
+    QSqlDatabase db = QSqlDatabase::database();
+    QSqlRecord columns = db.record("UserEquip");
+    QStringList desiredColumns = {
+        "User",
+        "EquipSerial",
+        "EquipDef",
+        "Star"
+    };
+    for(const QString &column : desiredColumns) {
+        if(!columns.contains(column)) {
+            //% "column %1 does not exist at table %2"
+            throw DBError(qtTrId("column-nonexist").arg(column, "UserEquip"));
+        }
+    }
+    //% "Equipment database for user is OK."
+    qInfo() << qtTrId("equip-user-db-good");
 }
 
 void Server::sqlcheckFacto() {
@@ -1198,21 +1231,19 @@ void Server::sqlinit() {
         if(!tables.contains("Users")) {
             sqlinitUsers();
         }
-        else {
-            sqlcheckUsers();
-        }
+        sqlcheckUsers();
         if(!tables.contains("Equip")) {
             sqlinitEquip();
         }
-        else {
-            sqlcheckEquip();
-        }
+        sqlcheckEquip();
         if(!tables.contains("Factories")) {
             sqlinitFacto();
         }
-        else {
-            sqlcheckFacto();
+        sqlcheckFacto();
+        if(!tables.contains("UserEquip")) {
+            sqlinitEquipU();
         }
+        sqlcheckEquipU();
     }
 }
 
@@ -1220,14 +1251,30 @@ void Server::sqlinitEquip() {
     //% "Equipment database does not exist, creating..."
     qWarning() << qtTrId("equip-db-lack");
     QSqlQuery query;
-    query.prepare(equipT);
+    query.prepare(equipU);
     if(query.exec()) {
-        //% "Equipment Database is OK."
+        //% "Equipment database is OK."
         qInfo() << qtTrId("equip-db-good");
     }
     else {
-        //% "Create Equipment Database failed."
+        //% "Create Equipment database failed."
         throw DBError(qtTrId("equip-db-gen-failure"),
+                      query.lastError());
+    }
+}
+
+void Server::sqlinitEquipU() {
+    //% "Equipment database for user does not exist, creating..."
+    qWarning() << qtTrId("equip-db-user-lack");
+    QSqlQuery query;
+    query.prepare(equipU);
+    if(query.exec()) {
+        //% "Equipment database for user is OK."
+        qInfo() << qtTrId("equip-db-user-good");
+    }
+    else {
+        //% "Create Equipment database for user failed."
+        throw DBError(qtTrId("equip-db-user-gen-failure"),
                       query.lastError());
     }
 }
@@ -1238,11 +1285,11 @@ void Server::sqlinitFacto() {
     QSqlQuery query;
     query.prepare(userF);
     if(query.exec()) {
-        //% "Factory Database is OK."
+        //% "Factory database is OK."
         qInfo() << qtTrId("facto-db-good");
     }
     else {
-        //% "Create Factory Database failed."
+        //% "Create Factory database failed."
         throw DBError(qtTrId("facto-db-gen-failure"),
                       query.lastError());
     }
@@ -1254,11 +1301,11 @@ void Server::sqlinitUsers() {
     QSqlQuery query;
     query.prepare(userT);
     if(query.exec()) {
-        //% "User Database is OK."
+        //% "User database is OK."
         qInfo() << qtTrId("user-db-good");
     }
     else {
-        //% "Create User Database failed."
+        //% "Create User database failed."
         throw DBError(qtTrId("user-db-gen-failure"),
                       query.lastError());
     }

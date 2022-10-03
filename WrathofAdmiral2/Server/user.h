@@ -17,6 +17,7 @@ void init(int uid);
 bool isFactoryBusy(int uid, int factoryID);
 std::tuple<bool, int> isFactoryFinished(int uid, int factoryID);
 void naturalRegen(int uid);
+int newEquip(int uid, int equipDid);
 void refreshFactory(int uid);
 void refreshPort(int uid);
 void removeThrottleCount(int uid);

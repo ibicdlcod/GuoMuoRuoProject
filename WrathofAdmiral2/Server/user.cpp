@@ -207,6 +207,41 @@ void User::naturalRegen(int uid) {
     }
 }
 
+int User::newEquip(int uid, int equipDid) {
+    QSqlDatabase db = QSqlDatabase::database();
+    QSqlQuery query;
+    query.prepare("SELECT MAX(EquipSerial) FROM UserEquip "
+                  "WHERE User = :id");
+    query.bindValue(":id", uid);
+    query.exec();
+    query.isSelect();
+    int serial;
+    if(Q_UNLIKELY(!query.first()) || query.value(0).isNull()) {
+        serial = 1;
+    }
+    else {
+        serial = query.value(0).toInt() + 1;
+    }
+    QSqlQuery query2;
+    query2.prepare("INSERT INTO UserEquip (User, EquipSerial, EquipDef, Star)"
+                   "VALUES (:id, :serial, :def, :star);");
+    query2.bindValue(":id", uid);
+    query2.bindValue(":serial", serial);
+    query2.bindValue(":def", equipDid);
+    query2.bindValue(":star", 0);
+    if(Q_UNLIKELY(!query2.exec())) {
+        //% "User id %1: new equipment failed!"
+        throw DBError(qtTrId("new-equip-failed").arg(uid), query.lastError());
+        return 0;
+    }
+    else {
+        //% "User id %1: new equipment %2 definition %3"
+        qDebug() << qtTrId("new-equip").arg(uid)
+                    .arg(serial).arg(equipDid);
+        return serial;
+    }
+}
+
 void User::refreshFactory(int uid) {
     QSqlDatabase db = QSqlDatabase::database();
     QSqlQuery query;

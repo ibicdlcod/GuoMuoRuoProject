@@ -377,6 +377,7 @@ const QStringList Client::getValidCommands() const {
     if(crypto.isConnectionEncrypted())
     {
         result.append("disconnect");
+        result.append("switch");
         if(gameState == KP::Factory)
         {
             result.append("develop");
@@ -669,7 +670,8 @@ void Client::receivedMsg(const QJsonObject &djson) {
         }
     } break;
     case KP::ResourceRequired: {
-        //% "This operation requires %1oil/%2explosives/%3steel/%4rubber/%5aluminum/%6tungsten/%7chromium"
+        //% "This operation requires %1oil/%2explosives/%3steel/"
+        //% "%4rubber/%5aluminum/%6tungsten/%7chromium"
         qInfo() << qtTrId("resource-require")
                    .arg(djson["oil"].toInt())
                 .arg(djson["explo"].toInt())
@@ -685,8 +687,9 @@ void Client::receivedMsg(const QJsonObject &djson) {
         qInfo() << qtTrId("develop-start"); break;
     case KP::FairyBusy: {
         if(djson["job"] != 0) {
-            //% "Fairy is still working."
-            qInfo() << qtTrId("fairy-busy"); break;
+            //% "Fairy is still working on %1."
+            qInfo() << qtTrId("fairy-busy").arg(djson["job"].toString());
+            break;
         } else {
             //% "Factory slot is empty."
             qInfo() << qtTrId("factory-empty"); break;
@@ -695,6 +698,10 @@ void Client::receivedMsg(const QJsonObject &djson) {
     case KP::Penguin:
         //% "You got a cute penguin."
         qInfo() << qtTrId("develop-penguin"); break;
+    case KP::NewEquip:
+        //% "You get new equipment %1, serial number %2"
+        qInfo() << qtTrId("develop-success").arg(djson["equipdef"].toString())
+                .arg(djson["serial"].toString()); break;
     default: throw std::domain_error("message not implemented"); break;
     }
 }
