@@ -24,6 +24,7 @@
 #include <QSsl>
 #include <QSslCertificate>
 #include <QSslKey>
+#include <QSslSocket>
 
 class SslServer : public QTcpServer {
     Q_OBJECT
@@ -42,6 +43,12 @@ public:
     bool setSslPrivateKey(const QString &fileName, QSsl::KeyAlgorithm algorithm = QSsl::Rsa, QSsl::EncodingFormat format = QSsl::Pem, const QByteArray &passPhrase = QByteArray());
 
     void setSslProtocol(QSsl::SslProtocol protocol);
+
+signals:
+    void connectionReadyread(QSslSocket *);
+
+public slots:
+    void readyRead();
 
 protected:
     void incomingConnection(qintptr socketDescriptor) override final;

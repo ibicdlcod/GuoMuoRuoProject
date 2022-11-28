@@ -80,12 +80,12 @@ public:
 public slots:
     void displayPrompt() override;
     bool parseSpec(const QStringList &) override;
+    void readyRead(QSslSocket *);
     Q_DECL_DEPRECATED void update();
 
 private slots:
     void handleNewConnection();
     void pskRequired(QSslPreSharedKeyAuthenticator *);
-    void readyRead();
     void shutdown();
 
 private:

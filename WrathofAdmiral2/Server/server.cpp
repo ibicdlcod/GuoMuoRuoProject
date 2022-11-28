@@ -355,9 +355,7 @@ void Server::pskRequired(QSslPreSharedKeyAuthenticator *auth)
     }
 }
 
-void Server::readyRead() {
-    QSslSocket *currentsocket = dynamic_cast<QSslSocket*>
-            (sslServer.nextPendingConnection());
+void Server::readyRead(QSslSocket *currentsocket) {
     const qint64 bytesToRead = currentsocket->bytesAvailable();
     if (bytesToRead <= 0) {
         qDebug() << "Spurious read notification?";
@@ -735,6 +733,7 @@ void Server::handleNewConnection(){
         return;
     QSslSocket *currentsocket = dynamic_cast<QSslSocket*>
             (sslServer.nextPendingConnection());
+
     currentsocket->write("FUCK\n");
 }
 
@@ -820,6 +819,8 @@ void Server::parseListen(const QStringList &cmdParts) {
         msg = qtTrId("server-listen")
                 .arg(address.toString()).arg(port);
         qInfo() << msg;
+        //connect(&sslServer, &SslServer::connectionReadyread,
+                //this, &Server::readyRead);
     }
     else {
         //% "Server failed to listen on address %1 and port %2"
