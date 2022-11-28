@@ -262,8 +262,6 @@ bool Server::listen(const QHostAddress &address, quint16 port) {
     if(listening) {
         QObject::connect(&sslServer, &QTcpServer::newConnection,
                          this, &Server::handleNewConnection);
-        QObject::connect(&sslServer, &QTcpServer::hasPendingConnections,
-                            this, &Server::readyRead);
     }
     return listening;
 }
@@ -377,23 +375,23 @@ void Server::readyRead(QSslSocket *currentsocket) {
         return;
     }
 
-    if (currentsocket->isEncrypted()) {
-        decryptDatagram(currentsocket, dgram);
-        if (currentsocket->error()
-                == QAbstractSocket::RemoteHostClosedError) {
-            // Client disconnected, remove from connected users
-            const PeerInfo peerInfo = PeerInfo(peerAddress, peerPort);
-            if(connectedUsers.contains(peerInfo)) {
-                Uid dcuser = connectedUsers[peerInfo];
+    decryptDatagram(currentsocket, dgram);
+    if (currentsocket->error()
+            == QAbstractSocket::RemoteHostClosedError) {
+        // Client disconnected, remove from connected users
+        for(auto begin = connectedPeers.keyValueBegin(),
+            end = connectedPeers.keyValueEnd();
+            begin != end; begin++){
+            if(begin->second == currentsocket) {
                 //% "%1: disconnected abruptly."
                 qInfo() << qtTrId("client-dc").
-                           arg(User::getName(dcuser));
-                connectedPeers.remove(dcuser);
-                connectedUsers.remove(peerInfo);
+                           arg(User::getName(begin->first));
+                connectedPeers.remove(begin->first);
+                break;
             }
         }
-        return;
     }
+    return;
 }
 
 void Server::shutdown() {
@@ -731,10 +729,10 @@ const QStringList Server::getValidCommands() const {
 void Server::handleNewConnection(){
     if (!listening)
         return;
-    QSslSocket *currentsocket = dynamic_cast<QSslSocket*>
+    QSslSocket *currentsocket = dynamic_cast<QSslSocket *>
             (sslServer.nextPendingConnection());
-
-    currentsocket->write("FUCK\n");
+    QByteArray msg = KP::serverHello();
+    currentsocket->write(msg);
 }
 
 bool Server::importEquipFromCSV() {
@@ -819,8 +817,8 @@ void Server::parseListen(const QStringList &cmdParts) {
         msg = qtTrId("server-listen")
                 .arg(address.toString()).arg(port);
         qInfo() << msg;
-        //connect(&sslServer, &SslServer::connectionReadyread,
-                //this, &Server::readyRead);
+        connect(&sslServer, &SslServer::connectionReadyread,
+                this, &Server::readyRead);
     }
     else {
         //% "Server failed to listen on address %1 and port %2"
@@ -858,23 +856,14 @@ void Server::receivedAuth(const QJsonObject &djson,
 }
 
 void Server::receivedForceLogout(Uid uid) {
-    PeerInfo currentPeer = connectedPeers[uid];
-    for(QSslSocket *client = dynamic_cast<QSslSocket *>(
-            sslServer.nextPendingConnection()); client != nullptr;)
-    {
-        if(client->peerAddress().isEqual(currentPeer.address)
-                && client->peerPort() == currentPeer.port) {
-            if(client->isEncrypted()) {
-                QByteArray msg = KP::serverAuth(KP::Logout, User::getName(uid),
-                                                true,
-                                                KP::AuthError::LoggedElsewhere);
-                client->write(msg);
-                client->disconnectFromHost();
-                connectedPeers.remove(uid);
-                connectedUsers.remove(PeerInfo(client->peerAddress(),
-                                               client->peerPort()));
-            }
-        }
+    QSslSocket *client = connectedPeers[uid];
+    if(client->isEncrypted()) {
+        QByteArray msg = KP::serverAuth(KP::Logout, User::getName(uid),
+                                        true,
+                                        KP::AuthError::LoggedElsewhere);
+        client->write(msg);
+        client->disconnectFromHost();
+        connectedPeers.remove(uid);
     }
 }
 
@@ -930,8 +919,7 @@ void Server::receivedLogin(const QJsonObject &djson,
                 receivedForceLogout(uid);
             }
             User::removeThrottleCount(uid);
-            connectedPeers[uid] = peerInfo;
-            connectedUsers[peerInfo] = uid;
+            connectedPeers[uid] = connection;
             QByteArray msg = KP::serverAuth(KP::Login, name, true);
             connection->write(msg);
             User::refreshPort(uid);
@@ -949,20 +937,19 @@ void Server::receivedLogin(const QJsonObject &djson,
 void Server::receivedLogout(const QJsonObject &djson,
                             const PeerInfo &peerInfo,
                             QSslSocket *connection) {
-    Q_UNUSED(djson);
-    if(connectedUsers.contains(peerInfo)) {
-        Uid uid = connectedUsers[peerInfo];
-        QByteArray msg =
-                KP::serverAuth(KP::Logout, User::getName(uid), true);
-        connection->write(msg);
-        connectedPeers.remove(uid);
-        connectedUsers.remove(peerInfo);
-        connection->disconnectFromHost();
-    }
-    else {
+    QString name = djson["username"].toString();
+    Uid uid = User::getUid(name);
+    if(!connectedPeers.contains(uid) || connectedPeers[uid] != connection) {
         QByteArray msg = KP::serverAuth(
                     KP::Logout, peerInfo.toString(), false);
         connection->write(msg);
+    }
+    else {
+        QByteArray msg =
+                KP::serverAuth(KP::Logout, name, true);
+        connection->write(msg);
+        connectedPeers.remove(uid);
+        connection->disconnectFromHost();
     }
 }
 
@@ -1040,34 +1027,38 @@ void Server::receivedReg(const QJsonObject &djson,
 void Server::receivedReq(const QJsonObject &djson,
                          const PeerInfo &peerInfo,
                          QSslSocket *connection) {
-    if(!connectedUsers.contains(peerInfo)) {
-        QByteArray msg = KP::accessDenied();
-        connection->write(msg);
-    }
-    else {
-        Uid uid = connectedUsers[peerInfo];
-        switch(djson["command"].toInt()) {
-        case KP::CommandType::ChangeState: {
-            switch(djson["state"].toInt()) {
-            /* TODO:Should update to client as well? */
-            case KP::GameState::Port: User::refreshPort(uid); break;
-            case KP::GameState::Factory: User::refreshFactory(uid); break;
+    /* this is inefficient */
+    for(auto begin = connectedPeers.keyValueBegin(),
+        end = connectedPeers.keyValueEnd();
+        begin != end; begin++){
+        if(begin->second == connection) {
+            Uid uid = begin->first;
+            switch(djson["command"].toInt()) {
+            case KP::CommandType::ChangeState: {
+                switch(djson["state"].toInt()) {
+                /* TODO:Should update to client as well? */
+                case KP::GameState::Port: User::refreshPort(uid); break;
+                case KP::GameState::Factory: User::refreshFactory(uid); break;
+                default:
+                    throw std::domain_error("command type not supported"); break;
+                }
+            }
+                break;
+            case KP::CommandType::Develop: {
+                int equipid = djson["equipid"].toInt();
+                doDevelop(uid, equipid, djson["factory"].toInt(), connection);
+            }
+                break;
+            case KP::CommandType::Fetch:
+                doFetch(uid, djson["factory"].toInt(), connection); break;
             default:
                 throw std::domain_error("command type not supported"); break;
             }
-        }
-            break;
-        case KP::CommandType::Develop: {
-            int equipid = djson["equipid"].toInt();
-            doDevelop(uid, equipid, djson["factory"].toInt(), connection);
-        }
-            break;
-        case KP::CommandType::Fetch:
-            doFetch(uid, djson["factory"].toInt(), connection); break;
-        default:
-            throw std::domain_error("command type not supported"); break;
+            return;
         }
     }
+    QByteArray msg = KP::accessDenied();
+    connection->write(msg);
 }
 
 void Server::sqlcheckEquip() {

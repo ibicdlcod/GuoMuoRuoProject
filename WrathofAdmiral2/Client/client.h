@@ -114,6 +114,7 @@ private:
 
     bool attemptMode;
     bool registerMode;
+    bool logoutPending;
 
     KP::GameState gameState;
 

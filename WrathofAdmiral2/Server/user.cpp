@@ -54,6 +54,24 @@ const QString User::getName(int uid) {
     }
 }
 
+int User::getUid(QString name) {
+    QSqlDatabase db = QSqlDatabase::database();
+    QSqlQuery query;
+    query.prepare("SELECT UserID FROM Users "
+                  "WHERE Username = :name");
+    query.bindValue(":name", name);
+    query.exec();
+    query.isSelect();
+    if(Q_UNLIKELY(!query.first())) {
+        //% "User Name %1 does not exist."
+        qWarning() << qtTrId("user-nonexistent-name").arg(name);
+        return 0;
+    }
+    else {
+        return query.value(0).toInt();
+    }
+}
+
 QDateTime User::getThrottleTime(int uid) {
     QSqlDatabase db = QSqlDatabase::database();
     QSqlQuery query;

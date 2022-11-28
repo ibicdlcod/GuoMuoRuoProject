@@ -51,8 +51,8 @@ QByteArray KP::clientAuth(AuthMode mode, const QString &uname,
     QJsonObject result;
     result["type"] = DgramType::Auth;
     result["mode"] = mode;
+    result["username"] = uname;
     if(mode != AuthMode::Logout) {
-        result["username"] = uname;
         /* directly using QString is even less efficient */
         result["shadow"] =
                 QString(shadow.toBase64(QByteArray::Base64Encoding));
@@ -140,6 +140,13 @@ QByteArray KP::serverFairyBusy(int jobID) {
     result["type"] = DgramType::Message;
     result["msgtype"] = MsgType::FairyBusy;
     result["job"] = jobID;
+    return QCborValue::fromJsonValue(result).toCbor();
+}
+
+QByteArray KP::serverHello() {
+    QJsonObject result;
+    result["type"] = DgramType::Message;
+    result["msgtype"] = MsgType::Hello;
     return QCborValue::fromJsonValue(result).toCbor();
 }
 

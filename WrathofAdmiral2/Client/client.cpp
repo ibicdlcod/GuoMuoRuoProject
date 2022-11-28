@@ -58,6 +58,7 @@ Client::Client(int argc, char ** argv)
     : CommandLine(argc, argv),
       attemptMode(false),
       registerMode(false),
+      logoutPending(false),
       gameState(KP::Offline) {
     QObject::connect(&socket, &QSslSocket::preSharedKeyAuthenticationRequired,
                      this, &Client::pskRequired);
@@ -74,7 +75,7 @@ void Client::catbomb() {
         qCritical() << qtTrId("catbomb");
         gameState = KP::Offline;
     }
-    else {
+    else if(attemptMode){
         //% "Failed to establish connection, check your username, "
         //% "password and server status."
         qWarning() << qtTrId("connection-failed-warning");
@@ -244,12 +245,16 @@ void Client::shutdown() {
     case QAbstractSocket::ConnectedState: socket.close(); break;
     default: break;
     }
-    disconnect(&socket, &QUdpSocket::readyRead,
+    disconnect(&socket, &QSslSocket::readyRead,
                this, &Client::readyRead);
     disconnect(&socket, &QSslSocket::handshakeInterruptedOnError,
                this, &Client::handshakeInterrupted);
     disconnect(&socket, &QSslSocket::preSharedKeyAuthenticationRequired,
                this, &Client::pskRequired);
+    disconnect(&socket, &QAbstractSocket::disconnected,
+               this, &Client::catbomb);
+    disconnect(&socket, &QAbstractSocket::errorOccurred,
+               this, &Client::errorOccurred);
 }
 
 void Client::doDevelop(const QStringList &cmdParts) {
@@ -429,7 +434,7 @@ void Client::parseDisconnectReq() {
         qInfo() << qtTrId("disconnect-when-offline");
     }
     else {
-        QByteArray msg = KP::clientAuth(KP::Logout);
+        QByteArray msg = KP::clientAuth(KP::Logout, clientName);
         const qint64 written = socket.write(msg);
         //% "Attempting to disconnect..."
         qInfo() << qtTrId("disconnect-attempt");
@@ -516,18 +521,21 @@ void Client::parsePassword(const QString &input) {
 }
 
 void Client::readWhenConnected(const QByteArray &dgram) {
-    if (socket.isEncrypted() && gameState == KP::Offline) {
-        qDebug() << clientName << ": encrypted connection established!";
-        QByteArray msg = KP::clientAuth(
-                    registerMode ? KP::Reg : KP::Login, clientName, password);
-        const qint64 written = socket.write(msg);
-        if (written <= 0) {
-            throw NetworkError(socket.errorString());
-        }
-    }
     const QByteArray plainText = dgram;
     if (plainText.size()) {
         serverResponse(clientName, plainText);
+        if (socket.isEncrypted() && gameState == KP::Offline
+                && !logoutPending) {
+            qDebug() << clientName << ": encrypted connection established!";
+            QByteArray msg = KP::clientAuth(
+                        registerMode ? KP::Reg : KP::Login,
+                        clientName, password);
+            const qint64 written = socket.write(msg);
+            if (written <= 0) {
+                throw NetworkError(socket.errorString());
+            }
+        }
+        logoutPending = false;
         return;
     }
 
@@ -549,7 +557,7 @@ void Client::readWhenConnected(const QByteArray &dgram) {
 }
 
 void Client::readWhenUnConnected(const QByteArray &dgram) {
-    Q_UNUSED(dgram)
+    Q_UNUSED(dgram)/*
     if (socket.isEncrypted()) {
         qDebug() << clientName << ": encrypted connection established!";
         QByteArray msg = KP::clientAuth(
@@ -561,7 +569,7 @@ void Client::readWhenUnConnected(const QByteArray &dgram) {
     }
     else {
         qDebug() << clientName << ": continuing with handshake...";
-    }
+    }*/
 }
 
 void Client::receivedAuth(const QJsonObject &djson) {
@@ -603,6 +611,7 @@ void Client::receivedLogin(const QJsonObject &djson) {
         qInfo() << qtTrId("login-failed")
                    .arg(djson["username"].toString(), reas);
     }
+    attemptMode = false;
 }
 
 void Client::receivedLogout(const QJsonObject &djson) {
@@ -620,12 +629,14 @@ void Client::receivedLogout(const QJsonObject &djson) {
         else
             throw std::domain_error("message not implemented");
         gameState = KP::Offline;
+        logoutPending = true;
     }
     else {
         //% "%1: logout failure, not online"
         qInfo() << qtTrId("logout-notonline")
                    .arg(djson["username"].toString());
     }
+    attemptMode = false;
 }
 
 void Client::receivedMsg(const QJsonObject &djson) {
@@ -691,6 +702,9 @@ void Client::receivedMsg(const QJsonObject &djson) {
         //% "You get new equipment %1, serial number %2"
         qInfo() << qtTrId("develop-success").arg(djson["equipdef"].toString(),
                 djson["serial"].toString()); break;
+    case KP::Hello:
+        //% "Server is alive and responding."
+        qInfo() << qtTrId("server-hello"); break;
     default: throw std::domain_error("message not implemented"); break;
     }
 }
@@ -713,4 +727,5 @@ void Client::receivedReg(const QJsonObject &djson) {
         qInfo() << qtTrId("register-failed")
                    .arg(djson["username"].toString(), reas);
     }
+    attemptMode = false;
 }

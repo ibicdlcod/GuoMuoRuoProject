@@ -122,8 +122,8 @@ private:
 
     QSslConfiguration serverConfiguration;
 
-    QMap<PeerInfo, Uid> connectedUsers;
-    QMap<Uid, PeerInfo> connectedPeers;
+    //QMap<PeerInfo, Uid> connectedUsers;
+    QMap<Uid, QSslSocket *> connectedPeers;
 
     QMap<int, QPointer<EquipDef>> equipRegistry;
 

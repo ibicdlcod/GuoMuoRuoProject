@@ -65,7 +65,8 @@ enum MsgType{
     ResourceRequired,
     FairyBusy,
     Penguin,
-    NewEquip
+    NewEquip,
+    Hello
 };
 Q_ENUM_NS(MsgType)
 
@@ -108,7 +109,7 @@ void winConsoleCheck();
 
 /* See JSON support in Qt, especially QCborValue */
 QByteArray accessDenied();
-QByteArray clientAuth(AuthMode, const QString &name = "",
+QByteArray clientAuth(AuthMode, const QString &name,
                       const QByteArray &shadow = "");
 QByteArray clientDevelop(int, bool convert = false, int factoryID = -1);
 QByteArray clientFetch(int factoryID = -1);
@@ -122,6 +123,7 @@ QByteArray serverAuth(AuthMode, const QString &,
 QByteArray serverDevelopFailed(GameError);
 QByteArray serverDevelopStart();
 QByteArray serverFairyBusy(int);
+QByteArray serverHello();
 QByteArray serverNewEquip(int, int);
 QByteArray serverParseError(MsgType, const QString &,
                             const QString &);

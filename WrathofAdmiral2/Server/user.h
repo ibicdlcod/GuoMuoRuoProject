@@ -11,6 +11,7 @@ namespace User {
 
 ResOrd getCurrentResources(int uid);
 const QString getName(int uid);
+int getUid(QString name);
 QDateTime getThrottleTime(int uid);
 void incrementThrottleCount(int uid);
 void init(int uid);

@@ -39,13 +39,13 @@ void SslServer::incomingConnection(qintptr socketDescriptor) {
     // Add to the internal list of pending connections (see Qt doc: http://qt-project.org/doc/qt-5/qtcpserver.html#addPendingConnection)
     this->addPendingConnection(sslSocket);
 
-    //QObject::connect(sslSocket, &QSslSocket::readyRead,
-                     //this, &SslServer::readyRead);
+    QObject::connect(sslSocket, &QSslSocket::readyRead,
+                     this, &SslServer::readyRead);
 }
 
 void SslServer::readyRead(){
-    //emit connectionReadyread(reinterpret_cast<QSslSocket *>
-    //                         (QObject::sender()));
+    emit connectionReadyread(reinterpret_cast<QSslSocket *>
+                             (QObject::sender()));
 }
 
 

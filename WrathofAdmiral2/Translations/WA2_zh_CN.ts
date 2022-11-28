@@ -175,7 +175,7 @@
         <location filename="../Client/client.cpp" line="637"/>
         <source>%1: logout failure, not online</source>
         <oldsource>%1: Logout failure, not online</oldsource>
-        <translation type="unfinished">%1:登录失败，不在线上</translation>
+        <translation type="unfinished">%1:下线失败，不在线上</translation>
     </message>
     <message id="retransmit-toomuch">
         <location filename="../Client/client.cpp" line="179"/>
