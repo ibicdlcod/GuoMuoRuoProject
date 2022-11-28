@@ -700,8 +700,8 @@ void Client::receivedMsg(const QJsonObject &djson) {
         qInfo() << qtTrId("develop-penguin"); break;
     case KP::NewEquip:
         //% "You get new equipment %1, serial number %2"
-        qInfo() << qtTrId("develop-success").arg(djson["equipdef"].toString())
-                .arg(djson["serial"].toString()); break;
+        qInfo() << qtTrId("develop-success").arg(djson["equipdef"].toString(),
+                djson["serial"].toString()); break;
     default: throw std::domain_error("message not implemented"); break;
     }
 }
