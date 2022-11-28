@@ -71,12 +71,12 @@ signals:
     void turnOnEchoing();
 
 private slots:
-    void handshakeTimeout();
+    void encrypted();
+    void errorOccurred(QAbstractSocket::SocketError);
+    void handshakeInterrupted(const QSslError &);
     void pskRequired(QSslPreSharedKeyAuthenticator *);
     void readyRead();
     void shutdown();
-    void startHandshake();
-    void udpSocketConnected();
 
 private:
     void doDevelop(const QStringList &);
@@ -102,8 +102,8 @@ private:
     QHostAddress address;
     quint16 port;
 
-    QDtls crypto;
-    QUdpSocket socket;
+    QSslSocket socket;
+    QSslConfiguration conf;
 
     unsigned int maxRetransmit;
     unsigned int retransmitTimes = 0;

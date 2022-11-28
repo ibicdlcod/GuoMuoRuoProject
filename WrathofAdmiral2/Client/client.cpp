@@ -56,10 +56,11 @@ extern std::unique_ptr<QSettings> settings;
 
 Client::Client(int argc, char ** argv)
     : CommandLine(argc, argv),
-      crypto(QSslSocket::SslClientMode),
       attemptMode(false),
       registerMode(false),
       gameState(KP::Offline) {
+    QObject::connect(&socket, &QSslSocket::preSharedKeyAuthenticationRequired,
+                     this, &Client::pskRequired);
 }
 
 Client::~Client() noexcept {
@@ -164,16 +165,25 @@ void Client::update() {
 }
 
 /* private slots */
-void Client::handshakeTimeout() {
+void Client::encrypted() {
+    retransmitTimes = 0;
+}
+
+void Client::errorOccurred(QAbstractSocket::SocketError error) {
+    Q_UNUSED(error)
+    //% "Network error: %1"
+    qWarning() << qtTrId("network-error").arg(socket.errorString());
+}
+
+void Client::handshakeInterrupted(const QSslError &error) {
     maxRetransmit = settings->value("client/maximum_retransmit",
                                     defaultMaxRetransmit).toInt();
+    //% "Network error: %1"
+    qWarning() << qtTrId("network-error").arg(error.errorString());
     //% "%1: handshake timeout, trying to re-transmit"
     qWarning() << qtTrId("handshake-timeout").arg(clientName);
     retransmitTimes++;
-    if (!crypto.handleTimeout(&socket)) {
-        qDebug() << clientName << ": failed to re-transmit - "
-                 << crypto.dtlsErrorString();
-    }
+    socket.continueInterruptedHandshake();
     if(retransmitTimes > maxRetransmit) {
         //% "%1: max restransmit time exceeded!"
         qWarning() << qtTrId("retransmit-toomuch").arg(clientName);
@@ -202,12 +212,12 @@ void Client::pskRequired(QSslPreSharedKeyAuthenticator *auth) {
 }
 
 void Client::readyRead() {
-    if(socket.pendingDatagramSize() <= 0) {
+    if(socket.bytesAvailable() <= 0) {
         qDebug() << clientName << ": spurious read notification?";
     }
 
-    QByteArray dgram(socket.pendingDatagramSize(), Qt::Uninitialized);
-    const qint64 bytesRead = socket.readDatagram(dgram.data(), dgram.size());
+    QByteArray dgram(socket.bytesAvailable(), Qt::Uninitialized);
+    const qint64 bytesRead = socket.read(dgram.data(), dgram.size());
     try {
         if (bytesRead <= 0 && dgram.size() > 0) {
             //% "Read datagram failed due to: %1"
@@ -215,7 +225,7 @@ void Client::readyRead() {
                                .arg(socket.errorString()));
         }
         dgram.resize(bytesRead);
-        if (crypto.isConnectionEncrypted()) {
+        if (socket.isEncrypted()) {
             readWhenConnected(dgram);
         }
         else {
@@ -227,50 +237,19 @@ void Client::readyRead() {
 }
 
 void Client::shutdown() {
-    if(crypto.isConnectionEncrypted()) {
-        if(!crypto.shutdown(&socket)) {
-            qDebug() << clientName << ": shutdown socket failed!";
-        }
-    }
-    if(crypto.handshakeState() == QDtls::HandshakeInProgress) {
-        if(!crypto.abortHandshake(&socket)) {
-            qDebug() << crypto.dtlsErrorString();
-        }
-    }
-    if(socket.isValid()) {
-        socket.close();
+    switch(socket.state()) {
+    case QAbstractSocket::UnconnectedState: break;
+    case QAbstractSocket::HostLookupState: [[fallthrough]];
+    case QAbstractSocket::ConnectingState: socket.abort(); break;
+    case QAbstractSocket::ConnectedState: socket.close(); break;
+    default: break;
     }
     disconnect(&socket, &QUdpSocket::readyRead,
                this, &Client::readyRead);
-    disconnect(&crypto, &QDtls::handshakeTimeout,
-               this, &Client::handshakeTimeout);
-    disconnect(&crypto, &QDtls::pskRequired,
+    disconnect(&socket, &QSslSocket::handshakeInterruptedOnError,
+               this, &Client::handshakeInterrupted);
+    disconnect(&socket, &QSslSocket::preSharedKeyAuthenticationRequired,
                this, &Client::pskRequired);
-}
-
-void Client::startHandshake() {
-    if (socket.state() != QAbstractSocket::ConnectedState) {
-        qDebug() << clientName << ": connecting UDP socket first ...";
-        connect(&socket, &QAbstractSocket::connected,
-                this, &Client::udpSocketConnected);
-        return;
-    }
-
-    if (!crypto.doHandshake(&socket)) {
-        qDebug() << clientName << ": failed to start a handshake -"
-                 << crypto.dtlsErrorString();
-    }
-    else
-        qDebug() << clientName << ": starting a handshake ...";
-}
-
-void Client::udpSocketConnected() {
-    qDebug() << clientName
-             << ": UDP socket is now in ConnectedState, "
-             << "continue with handshake ...";
-    startHandshake();
-
-    retransmitTimes = 0;
 }
 
 void Client::doDevelop(const QStringList &cmdParts) {
@@ -288,9 +267,9 @@ void Client::doDevelop(const QStringList &cmdParts) {
         }
         int factoSlot = cmdParts[2].toInt();
         QByteArray msg = KP::clientDevelop(equipid, false, factoSlot);
-        const qint64 written = crypto.writeDatagramEncrypted(&socket, msg);
+        const qint64 written = socket.write(msg);
         if (written <= 0) {
-            throw NetworkError(crypto.dtlsErrorString());
+            throw NetworkError(socket.errorString());
         }
         return;
     }
@@ -305,9 +284,9 @@ void Client::doFetch(const QStringList &cmdParts) {
     else {
         int factoSlot = cmdParts[1].toInt();
         QByteArray msg = KP::clientFetch(factoSlot);
-        const qint64 written = crypto.writeDatagramEncrypted(&socket, msg);
+        const qint64 written = socket.write(msg);
         if (written <= 0) {
-            throw NetworkError(crypto.dtlsErrorString());
+            throw NetworkError(socket.errorString());
         }
         return;
     }
@@ -335,9 +314,9 @@ void Client::doSwitch(const QStringList &cmdParts) {
         else {
             gameState = (KP::GameState)statevalue;
             QByteArray msg = KP::clientStateChange(gameState);
-            const qint64 written = crypto.writeDatagramEncrypted(&socket, msg);
+            const qint64 written = socket.write(msg);
             if (written <= 0) {
-                throw NetworkError(crypto.dtlsErrorString());
+                throw NetworkError(socket.errorString());
             }
         }
         return;
@@ -345,7 +324,7 @@ void Client::doSwitch(const QStringList &cmdParts) {
 }
 
 void Client::exitGraceSpec() {
-    if(crypto.isConnectionEncrypted()) {
+    if(socket.isEncrypted()) {
         parseDisconnectReq();
     }
     shutdown();
@@ -374,7 +353,7 @@ const QStringList Client::getCommandsSpec() const {
 const QStringList Client::getValidCommands() const {
     QStringList result = QStringList();
     result.append(getCommands());
-    if(crypto.isConnectionEncrypted())
+    if(socket.isEncrypted())
     {
         result.append("disconnect");
         result.append("switch");
@@ -395,7 +374,10 @@ inline bool Client::loggedIn() const {
 }
 
 void Client::parseConnectReq(const QStringList &cmdParts) {
-    if(crypto.isConnectionEncrypted()) {
+    conf.addCaCertificates(settings->value("trustedcert",
+                                           ":/sslserver.pem").toString());
+    socket.setSslConfiguration(conf);
+    if(socket.isEncrypted()) {
         //% "Already connected, disconnect first."
         qInfo() << qtTrId("connected-already");
         return;
@@ -442,17 +424,17 @@ void Client::parseConnectReq(const QStringList &cmdParts) {
 }
 
 void Client::parseDisconnectReq() {
-    if(!crypto.isConnectionEncrypted()) {
+    if(!socket.isEncrypted()) {
         //% "You are not online."
         qInfo() << qtTrId("disconnect-when-offline");
     }
     else {
         QByteArray msg = KP::clientAuth(KP::Logout);
-        const qint64 written = crypto.writeDatagramEncrypted(&socket, msg);
+        const qint64 written = socket.write(msg);
         //% "Attempting to disconnect..."
         qInfo() << qtTrId("disconnect-attempt");
         if (written <= 0) {
-            throw NetworkError(crypto.dtlsErrorString());
+            throw NetworkError(socket.errorString());
         }
     }
 }
@@ -502,26 +484,28 @@ void Client::parsePassword(const QString &input) {
     if(passwordMode != Password::registering) {
         emit turnOnEchoing();
 
-        auto configuration = QSslConfiguration::defaultDtlsConfiguration();
-        configuration.setPeerVerifyMode(QSslSocket::VerifyNone);
-        crypto.setPeer(address, port);
-        crypto.setDtlsConfiguration(configuration);
-        connect(&crypto, &QDtls::handshakeTimeout,
-                this, &Client::handshakeTimeout);
-        connect(&crypto, &QDtls::pskRequired,
+        connect(&socket, &QSslSocket::handshakeInterruptedOnError,
+                this, &Client::handshakeInterrupted);
+        connect(&socket, &QSslSocket::preSharedKeyAuthenticationRequired,
                 this, &Client::pskRequired);
-        socket.connectToHost(address.toString(), port);
+        connect(&socket, &QAbstractSocket::disconnected,
+                this, &Client::catbomb);
+        connect(&socket, &QAbstractSocket::errorOccurred,
+                this, &Client::errorOccurred);
+        socket.connectToHostEncrypted(address.toString(), port);
+        //connect(&socket, &QSslSocket::encrypted, this, &Client::handshakeOK);
         if(!socket.waitForConnected(
                     settings->value("connect_wait_time_msec", 8000)
                     .toInt())) {
             //% "Failed to connect to server at %1:%2"
             qWarning() << qtTrId("wait-for-connect-failure")
                           .arg(address.toString()).arg(port);
+            attemptMode = false;
             passwordMode = Password::normal;
             return;
         }
-        connect(&socket, &QUdpSocket::readyRead, this, &Client::readyRead);
-        startHandshake();
+        connect(&socket, &QSslSocket::readyRead, this, &Client::readyRead);
+        //startHandshake();
         passwordMode = Password::normal;
     }
     else {
@@ -532,13 +516,22 @@ void Client::parsePassword(const QString &input) {
 }
 
 void Client::readWhenConnected(const QByteArray &dgram) {
-    const QByteArray plainText = crypto.decryptDatagram(&socket, dgram);
+    if (socket.isEncrypted() && gameState == KP::Offline) {
+        qDebug() << clientName << ": encrypted connection established!";
+        QByteArray msg = KP::clientAuth(
+                    registerMode ? KP::Reg : KP::Login, clientName, password);
+        const qint64 written = socket.write(msg);
+        if (written <= 0) {
+            throw NetworkError(socket.errorString());
+        }
+    }
+    const QByteArray plainText = dgram;
     if (plainText.size()) {
         serverResponse(clientName, plainText);
         return;
     }
 
-    if (crypto.dtlsError() == QDtlsError::RemoteClosedConnectionError) {
+    if (socket.error() == QAbstractSocket::RemoteHostClosedError) {
         qDebug() << clientName << ": shutdown alert received";
         socket.close();
         if(loggedIn())
@@ -556,18 +549,14 @@ void Client::readWhenConnected(const QByteArray &dgram) {
 }
 
 void Client::readWhenUnConnected(const QByteArray &dgram) {
-    if (!crypto.doHandshake(&socket, dgram)) {
-        qDebug() << clientName << ": handshake error -"
-                 << crypto.dtlsErrorString();
-        return;
-    }
-    if (crypto.isConnectionEncrypted()) {
+    Q_UNUSED(dgram)
+    if (socket.isEncrypted()) {
         qDebug() << clientName << ": encrypted connection established!";
         QByteArray msg = KP::clientAuth(
                     registerMode ? KP::Reg : KP::Login, clientName, password);
-        const qint64 written = crypto.writeDatagramEncrypted(&socket, msg);
+        const qint64 written = socket.write(msg);
         if (written <= 0) {
-            throw NetworkError(crypto.dtlsErrorString());
+            throw NetworkError(socket.errorString());
         }
     }
     else {

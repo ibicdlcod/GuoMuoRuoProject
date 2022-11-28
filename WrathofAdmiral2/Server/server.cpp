@@ -60,7 +60,7 @@ QT_BEGIN_NAMESPACE
 extern std::unique_ptr<QSettings> settings;
 
 namespace {
-QString connection_info(QDtls *connection) {
+QString connection_info(QSslSocket *connection) {
     QString prot;
     switch (connection->sessionProtocol()) {
     case QSsl::DtlsV1_2:
@@ -193,8 +193,6 @@ const QString userE = QStringLiteral(
 
 Server::Server(int argc, char ** argv) : CommandLine(argc, argv) {
     /* no *settings could be used here */
-    connect(&serverSocket, &QAbstractSocket::readyRead,
-            this, &Server::readyRead);
     serverConfiguration = QSslConfiguration::defaultDtlsConfiguration();
     serverConfiguration.setPeerVerifyMode(QSslSocket::VerifyNone);
     mt = std::mt19937(random());
@@ -202,13 +200,11 @@ Server::Server(int argc, char ** argv) : CommandLine(argc, argv) {
 
 Server::~Server() noexcept {
     shutdown();
-    disconnect(&serverSocket, &QAbstractSocket::readyRead,
-               this, &Server::readyRead);
 }
 
 void Server::datagramReceived(const PeerInfo &peerInfo,
                               const QByteArray &plainText,
-                              QDtls *connection) {
+                              QSslSocket *connection) {
     QJsonObject djson =
             QCborValue::fromCbor(plainText).toMap().toJsonObject();
     try {
@@ -224,7 +220,7 @@ void Server::datagramReceived(const PeerInfo &peerInfo,
         qWarning() << peerInfo.toString() << e.errorString();
         QByteArray msg = KP::serverParseError(
                     KP::JsonError, peerInfo.toString(), e.errorString());
-        connection->writeDatagramEncrypted(&serverSocket, msg);
+        connection->write(msg);
     } catch (DBError &e) {
         for(QString &i : e.whats()) {
             qCritical() << i;
@@ -233,7 +229,7 @@ void Server::datagramReceived(const PeerInfo &peerInfo,
         qWarning() << peerInfo.toString() << e.what();
         QByteArray msg = KP::serverParseError(
                     KP::Unsupported, peerInfo.toString(), e.what());
-        connection->writeDatagramEncrypted(&serverSocket, msg);
+        connection->write(msg);
     }
 #if defined(QT_DEBUG)
     static const QString formatter = QStringLiteral("From %1 text: %2");
@@ -246,12 +242,12 @@ void Server::datagramReceived(const PeerInfo &peerInfo,
 }
 
 bool Server::listen(const QHostAddress &address, quint16 port) {
-    if (address != serverSocket.localAddress()
-            || port != serverSocket.localPort()) {
+    if (address != sslServer.serverAddress()
+            || port != sslServer.serverPort()) {
         shutdown();
-        listening = serverSocket.bind(address, port);
+        listening = sslServer.listen(address, port);
         if (!listening)
-            qCritical () << serverSocket.errorString();
+            qCritical () << sslServer.errorString();
         else {
             serverConfiguration.setPreSharedKeyIdentityHint(
                         settings->value(
@@ -263,6 +259,12 @@ bool Server::listen(const QHostAddress &address, quint16 port) {
     } else {
         listening = true;
     }
+    if(listening) {
+        QObject::connect(&sslServer, &QTcpServer::newConnection,
+                         this, &Server::handleNewConnection);
+        QObject::connect(&sslServer, &QTcpServer::hasPendingConnections,
+                            this, &Server::readyRead);
+    }
     return listening;
 }
 
@@ -271,8 +273,8 @@ void Server::displayPrompt() {
         qout << "WAServer$ ";
     else {
         qout << serverConfiguration.preSharedKeyIdentityHint()
-             << "@" << serverSocket.localAddress().toString()
-             << ":" << serverSocket.localPort() << "$ ";
+             << "@" << sslServer.serverAddress().toString()
+             << ":" << sslServer.serverPort() << "$ ";
     }
 }
 
@@ -354,19 +356,20 @@ void Server::pskRequired(QSslPreSharedKeyAuthenticator *auth)
 }
 
 void Server::readyRead() {
-    const qint64 bytesToRead = serverSocket.pendingDatagramSize();
+    QSslSocket *currentsocket = dynamic_cast<QSslSocket*>
+            (sslServer.nextPendingConnection());
+    const qint64 bytesToRead = currentsocket->bytesAvailable();
     if (bytesToRead <= 0) {
         qDebug() << "Spurious read notification?";
     }
     QByteArray dgram(bytesToRead, Qt::Uninitialized);
-    QHostAddress peerAddress;
-    quint16 peerPort = 0;
-    const qint64 bytesRead = serverSocket.readDatagram(
-                dgram.data(), dgram.size(), &peerAddress, &peerPort);
+    QHostAddress peerAddress = currentsocket->peerAddress();
+    quint16 peerPort = currentsocket->peerPort();
+    const qint64 bytesRead = currentsocket->read(dgram.data(), dgram.size());
     if (bytesRead <= 0) {
         //% "Read datagram failed due to: %1"
         qWarning() << qtTrId("read-dgram-failed").
-                      arg(serverSocket.errorString());
+                      arg(currentsocket->errorString());
         return;
     }
     dgram.resize(bytesRead);
@@ -376,18 +379,10 @@ void Server::readyRead() {
         return;
     }
 
-    const auto client
-            = std::find_if(knownClients.begin(), knownClients.end(),
-                           [&](const std::unique_ptr<QDtls> &connection){
-        return connection->peerAddress() == peerAddress
-                && connection->peerPort() == peerPort;
-    });
-    if (client == knownClients.end())
-        return handleNewConnection(peerAddress, peerPort, dgram);
-    if ((*client)->isConnectionEncrypted()) {
-        decryptDatagram(client->get(), dgram);
-        if ((*client)->dtlsError()
-                == QDtlsError::RemoteClosedConnectionError) {
+    if (currentsocket->isEncrypted()) {
+        decryptDatagram(currentsocket, dgram);
+        if (currentsocket->error()
+                == QAbstractSocket::RemoteHostClosedError) {
             // Client disconnected, remove from connected users
             const PeerInfo peerInfo = PeerInfo(peerAddress, peerPort);
             if(connectedUsers.contains(peerInfo)) {
@@ -398,29 +393,38 @@ void Server::readyRead() {
                 connectedPeers.remove(dcuser);
                 connectedUsers.remove(peerInfo);
             }
-            knownClients.erase(client);
         }
         return;
     }
-    doHandshake(client->get(), dgram);
 }
 
 void Server::shutdown() {
     listening = false;
-    for (const auto &connection : qExchange(knownClients, {}))
-        connection->shutdown(&serverSocket);
+    sslServer.close();
+    QObject::disconnect(&sslServer, &QTcpServer::newConnection,
+                        this, &Server::handleNewConnection);
+    for (const auto &connection = sslServer.nextPendingConnection();
+         connection != nullptr;) {
+        connection->disconnectFromHost();
+    }
 
-    serverSocket.close();
-    if(serverSocket.state() != QAbstractSocket::UnconnectedState) {
-        if(serverSocket.waitForDisconnected(
-                    settings->value("connect_wait_time_msec", 8000)
-                    .toInt())) {
-            //% "Wait for disconnection..."
-            qInfo() << qtTrId("wait-for-dc");
-        }
-        else {
-            //% "Disconnect failed!"
-            qCritical() << qtTrId("dc-failed");
+    if(sslServer.hasPendingConnections()) {
+        for (const auto &connection = sslServer.nextPendingConnection();
+             connection != nullptr;) {
+            QHostAddress peerAddress = connection->peerAddress();
+            quint16 peerPort = connection->peerPort();
+            if(connection->waitForDisconnected(
+                        settings->value("connect_wait_time_msec", 8000)
+                        .toInt())) {
+                //% "Disconnect success: %1 port %2"
+                qInfo() << qtTrId("wait-for-dc")
+                           .arg(peerAddress.toString(), peerPort);
+            }
+            else {
+                //% "Disconnect failed! %1 port %2"
+                qCritical() << qtTrId("dc-failed")
+                               .arg(peerAddress.toString(), peerPort);
+            }
         }
     }
     QString defaultDbName;
@@ -432,48 +436,47 @@ void Server::shutdown() {
     QSqlDatabase::removeDatabase(defaultDbName);
 }
 
-void Server::decryptDatagram(QDtls *connection,
+void Server::decryptDatagram(QSslSocket *connection,
                              const QByteArray &clientMessage) {
-    Q_ASSERT(connection->isConnectionEncrypted());
+    Q_ASSERT(connection->isEncrypted());
 
     const PeerInfo peerInfo = PeerInfo(connection->peerAddress(),
                                        connection->peerPort());
-    const QByteArray dgram = connection->decryptDatagram(&serverSocket,
-                                                         clientMessage);
+    const QByteArray dgram = clientMessage;
     if (dgram.size()) {
         datagramReceived(peerInfo, dgram, connection);
-    } else if (connection->dtlsError() == QDtlsError::NoError) {
+    } else if (connection->error() == QAbstractSocket::UnknownSocketError) {
         qDebug() << peerInfo.toString() << ":"
                  << "0 byte dgram, could be a re-connect attempt?";
     } else {
         qWarning() << peerInfo.toString()
-                   << ":" << connection->dtlsErrorString();
+                   << ":" << connection->errorString();
     }
 }
 
 void Server::doDevelop(Uid uid, int equipid,
-                       int factoryid, QDtls *connection) {
+                       int factoryid, QSslSocket *connection) {
     /* TODO: this is the no-convert version */
     if(!equipRegistry.contains(equipid)
             || !equipRegistry[equipid]->canDevelop(uid)) {
         QByteArray msg =
                 KP::serverDevelopFailed(KP::DevelopNotOption);
-        connection->writeDatagramEncrypted(&serverSocket, msg);
+        connection->write(msg);
     }
     else if(User::isFactoryBusy(uid, factoryid)) {
         QByteArray msg = KP::serverDevelopFailed(KP::FactoryBusy);
-        connection->writeDatagramEncrypted(&serverSocket, msg);
+        connection->write(msg);
     }
     else {
         QPointer<EquipDef> equip = equipRegistry[equipid];
         ResOrd resRequired = equip->devRes();
         QByteArray msg = resRequired.resourceDesired();
-        connection->writeDatagramEncrypted(&serverSocket, msg);
+        connection->write(msg);
         ResOrd currentRes = User::getCurrentResources(uid);
         if(!currentRes.addResources(resRequired * -1)){
             QByteArray msg =
                     KP::serverDevelopFailed(KP::ResourceLack);
-            connection->writeDatagramEncrypted(&serverSocket, msg);
+            connection->write(msg);
         }
         else {
             User::setResources(uid, currentRes);
@@ -506,7 +509,7 @@ void Server::doDevelop(Uid uid, int equipid,
             if(query.exec()) {
                 QByteArray msg =
                         KP::serverDevelopStart();
-                connection->writeDatagramEncrypted(&serverSocket, msg);
+                connection->write(msg);
             }
             else {
                 //% "Database failed when developing."
@@ -517,7 +520,7 @@ void Server::doDevelop(Uid uid, int equipid,
     }
 }
 
-void Server::doFetch(Uid uid, int factoryid, QDtls *connection) {
+void Server::doFetch(Uid uid, int factoryid, QSslSocket *connection) {
     User::refreshFactory(uid);
     QSqlDatabase db = QSqlDatabase::database();
     QSqlQuery query;
@@ -538,20 +541,20 @@ void Server::doFetch(Uid uid, int factoryid, QDtls *connection) {
         bool done = query.value(1).toBool();
         if(!done) {
             QByteArray msg = KP::serverFairyBusy(jobID);
-            connection->writeDatagramEncrypted(&serverSocket, msg);
+            connection->write(msg);
         }
         else {
             bool success = query.value(2).toBool();
             int secondsSpent = query.value(3).toInt();
             if(!success) {
                 QByteArray msg = KP::serverPenguin();
-                connection->writeDatagramEncrypted(&serverSocket, msg);
+                connection->write(msg);
             }
             if(jobID < KP::equipIdMax) {
                 if(success) {
                     QByteArray msg = KP::serverNewEquip(
                                 User::newEquip(uid, jobID), jobID);
-                    connection->writeDatagramEncrypted(&serverSocket, msg);
+                    connection->write(msg);
                 }
                 else {
                     // TODO: get tech points
@@ -575,29 +578,6 @@ void Server::doFetch(Uid uid, int factoryid, QDtls *connection) {
                               query.lastError());
             }
         }
-    }
-}
-
-void Server::doHandshake(QDtls *newConnection,
-                         const QByteArray &clientHello) {
-    const bool result =
-            newConnection->doHandshake(&serverSocket, clientHello);
-    if (!result) {
-        qWarning() << newConnection->dtlsErrorString();
-        return;
-    }
-
-    const PeerInfo peerInfo = PeerInfo(newConnection->peerAddress(),
-                                       newConnection->peerPort());
-    switch (newConnection->handshakeState()) {
-    case QDtls::HandshakeInProgress:
-        qDebug() << peerInfo.toString() << ": handshake is in progress ...";
-        break;
-    case QDtls::HandshakeComplete:
-        qDebug() << QString("Connection with %1 encrypted. %2")
-                    .arg(peerInfo.toString(), connection_info(newConnection));
-        break;
-    default: Q_UNREACHABLE();
     }
 }
 
@@ -750,32 +730,12 @@ const QStringList Server::getValidCommands() const {
     return result;
 }
 
-void Server::handleNewConnection(const QHostAddress &peerAddress,
-                                 quint16 peerPort,
-                                 const QByteArray &clientHello){
+void Server::handleNewConnection(){
     if (!listening)
         return;
-
-    const PeerInfo peerInfo = PeerInfo(peerAddress, peerPort);
-    if (cookieSender.verifyClient(&serverSocket, clientHello,
-                                  peerAddress, peerPort)) {
-        qDebug() << peerInfo.toString() << ": verified, starting a handshake";
-
-        std::unique_ptr<QDtls> newConnection{
-            new QDtls{QSslSocket::SslServerMode}};
-        newConnection->setDtlsConfiguration(serverConfiguration);
-        newConnection->setPeer(peerAddress, peerPort);
-        newConnection->connect(newConnection.get(), &QDtls::pskRequired,
-                               this, &Server::pskRequired);
-        knownClients.push_back(std::move(newConnection));
-        doHandshake(knownClients.back().get(), clientHello);
-    } else if (cookieSender.dtlsError() != QDtlsError::NoError) {
-        //% "DTLS error: %1"
-        qWarning() << qtTrId("dtls-error").
-                      arg(cookieSender.dtlsErrorString());
-    } else {
-        qDebug() << peerInfo.toString() << ": not verified yet";
-    }
+    QSslSocket *currentsocket = dynamic_cast<QSslSocket*>
+            (sslServer.nextPendingConnection());
+    currentsocket->write("FUCK\n");
 }
 
 bool Server::importEquipFromCSV() {
@@ -852,6 +812,9 @@ void Server::parseListen(const QStringList &cmdParts) {
         return;
     }
     QString msg;
+    sslServer.setSslLocalCertificate(":/sslserver.pem");
+    sslServer.setSslPrivateKey(":/sslserver.key");
+    sslServer.setSslProtocol(QSsl::TlsV1_3);
     if (listen(address, port)) {
         //% "Server is listening on address %1 and port %2"
         msg = qtTrId("server-listen")
@@ -880,7 +843,7 @@ void Server::parseUnlisten() {
 
 void Server::receivedAuth(const QJsonObject &djson,
                           const PeerInfo &peerInfo,
-                          QDtls *connection) {
+                          QSslSocket *connection) {
     switch(djson["mode"].toInt()) {
     case KP::AuthMode::Reg:
         receivedReg(djson, peerInfo, connection); break;
@@ -895,34 +858,29 @@ void Server::receivedAuth(const QJsonObject &djson,
 
 void Server::receivedForceLogout(Uid uid) {
     PeerInfo currentPeer = connectedPeers[uid];
-    const auto client =
-            std::find_if(knownClients.begin(), knownClients.end(),
-                         [&](const std::unique_ptr<QDtls> &othercn){
-        return currentPeer.address.isEqual(othercn->peerAddress())
-                && currentPeer.port == othercn->peerPort();
-    });
-
-    if (client != knownClients.end()) {
-        if ((*client)->isConnectionEncrypted()) {
-            QByteArray msg = KP::serverAuth(KP::Logout, User::getName(uid),
-                                            true,
-                                            KP::AuthError::LoggedElsewhere);
-            (*client)->writeDatagramEncrypted(&serverSocket, msg);
-            (*client)->shutdown(&serverSocket);
+    for(QSslSocket *client = dynamic_cast<QSslSocket *>(
+            sslServer.nextPendingConnection()); client != nullptr;)
+    {
+        if(client->peerAddress().isEqual(currentPeer.address)
+                && client->peerPort() == currentPeer.port) {
+            if(client->isEncrypted()) {
+                QByteArray msg = KP::serverAuth(KP::Logout, User::getName(uid),
+                                                true,
+                                                KP::AuthError::LoggedElsewhere);
+                client->write(msg);
+                client->disconnectFromHost();
+                connectedPeers.remove(uid);
+                connectedUsers.remove(PeerInfo(client->peerAddress(),
+                                               client->peerPort()));
+            }
         }
-        connectedPeers.remove(uid);
-        connectedUsers.remove(
-                    PeerInfo((*client)->peerAddress(),
-                             (*client)->peerPort()));
-        /* This will invalidate iterators in readyRead() */
-        //knownClients.erase(client);
     }
 }
 
 /* nothing could shrink this function efficiently either */
 void Server::receivedLogin(const QJsonObject &djson,
                            const PeerInfo &peerInfo,
-                           QDtls *connection) {
+                           QSslSocket *connection) {
     QString name = djson["username"].toString();
     QSqlDatabase db = QSqlDatabase::database();
     QSqlQuery query;
@@ -934,8 +892,8 @@ void Server::receivedLogin(const QJsonObject &djson,
     if(Q_UNLIKELY(!query.first())) {
         QByteArray msg = KP::serverAuth(KP::Login, name, false,
                                         KP::AuthError::UserNonexist);
-        connection->writeDatagramEncrypted(&serverSocket, msg);
-        connection->shutdown(&serverSocket);
+        connection->write(msg);
+        connection->disconnectFromHost();
     }
     Uid uid = query.value(0).toInt();
     QDateTime throttleTime = User::getThrottleTime(uid);
@@ -943,8 +901,8 @@ void Server::receivedLogin(const QJsonObject &djson,
         QByteArray msg = KP::serverAuth(KP::Login, name, false,
                                         KP::AuthError::RetryToomuch,
                                         throttleTime);
-        connection->writeDatagramEncrypted(&serverSocket, msg);
-        connection->shutdown(&serverSocket);
+        connection->write(msg);
+        connection->disconnectFromHost();
     }
     auto password = QByteArray::fromBase64Encoding(
                 djson["shadow"].toString().toLatin1(),
@@ -962,8 +920,8 @@ void Server::receivedLogin(const QJsonObject &djson,
             User::updateThrottleTime(uid);
             QByteArray msg = KP::serverAuth(KP::Login, name, false,
                                             KP::AuthError::BadPassword);
-            connection->writeDatagramEncrypted(&serverSocket, msg);
-            connection->shutdown(&serverSocket);
+            connection->write(msg);
+            connection->disconnectFromHost();
         }
         else {
             /* if connectedPeers[name] exists then force-logout all of them */
@@ -974,7 +932,7 @@ void Server::receivedLogin(const QJsonObject &djson,
             connectedPeers[uid] = peerInfo;
             connectedUsers[peerInfo] = uid;
             QByteArray msg = KP::serverAuth(KP::Login, name, true);
-            connection->writeDatagramEncrypted(&serverSocket, msg);
+            connection->write(msg);
             User::refreshPort(uid);
             User::refreshFactory(uid);
         }
@@ -982,35 +940,35 @@ void Server::receivedLogin(const QJsonObject &djson,
     else {
         QByteArray msg = KP::serverAuth(KP::Login, name, false,
                                         KP::AuthError::BadShadow);
-        connection->writeDatagramEncrypted(&serverSocket, msg);
-        connection->shutdown(&serverSocket);
+        connection->write(msg);
+        connection->disconnectFromHost();
     }
 }
 
 void Server::receivedLogout(const QJsonObject &djson,
                             const PeerInfo &peerInfo,
-                            QDtls *connection) {
+                            QSslSocket *connection) {
     Q_UNUSED(djson);
     if(connectedUsers.contains(peerInfo)) {
         Uid uid = connectedUsers[peerInfo];
         QByteArray msg =
                 KP::serverAuth(KP::Logout, User::getName(uid), true);
-        connection->writeDatagramEncrypted(&serverSocket, msg);
+        connection->write(msg);
         connectedPeers.remove(uid);
         connectedUsers.remove(peerInfo);
-        connection->shutdown(&serverSocket);
+        connection->disconnectFromHost();
     }
     else {
         QByteArray msg = KP::serverAuth(
                     KP::Logout, peerInfo.toString(), false);
-        connection->writeDatagramEncrypted(&serverSocket, msg);
+        connection->write(msg);
     }
 }
 
 /* nothing could shrink this function efficiently either */
 void Server::receivedReg(const QJsonObject &djson,
                          const PeerInfo &peerInfo,
-                         QDtls *connection) {
+                         QSslSocket *connection) {
     Q_UNUSED(peerInfo)
     QString name = djson["username"].toString();
     auto password = QByteArray::fromBase64Encoding(
@@ -1059,31 +1017,31 @@ void Server::receivedReg(const QJsonObject &djson,
                               query.lastError());
             };
             QByteArray msg = KP::serverAuth(KP::Reg, name, true);
-            connection->writeDatagramEncrypted(&serverSocket, msg);
-            connection->shutdown(&serverSocket);
+            connection->write(msg);
+            connection->disconnectFromHost();
             User::init(maxid+1);
         }
         else {
             QByteArray msg = KP::serverAuth(KP::Reg, name, false,
                                             KP::AuthError::BadShadow);
-            connection->writeDatagramEncrypted(&serverSocket, msg);
-            connection->shutdown(&serverSocket);
+            connection->write(msg);
+            connection->disconnectFromHost();
         }
     }
     else {
         QByteArray msg = KP::serverAuth(KP::Reg, name, false,
                                         KP::AuthError::UserExists);
-        connection->writeDatagramEncrypted(&serverSocket, msg);
-        connection->shutdown(&serverSocket);
+        connection->write(msg);
+        connection->disconnectFromHost();
     }
 }
 
 void Server::receivedReq(const QJsonObject &djson,
                          const PeerInfo &peerInfo,
-                         QDtls *connection) {
+                         QSslSocket *connection) {
     if(!connectedUsers.contains(peerInfo)) {
         QByteArray msg = KP::accessDenied();
-        connection->writeDatagramEncrypted(&serverSocket, msg);
+        connection->write(msg);
     }
     else {
         Uid uid = connectedUsers[peerInfo];

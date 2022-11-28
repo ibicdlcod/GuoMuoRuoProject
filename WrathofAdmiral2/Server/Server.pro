@@ -13,6 +13,7 @@ SOURCES += \
         main.cpp \
         peerinfo.cpp \
         server.cpp \
+        sslserver.cpp \
         user.cpp
 
 TRANSLATIONS += \
@@ -58,6 +59,7 @@ HEADERS += \
     kerrors.h \
     peerinfo.h \
     server.h \
+    sslserver.h \
     user.h
 
 RESOURCES += \

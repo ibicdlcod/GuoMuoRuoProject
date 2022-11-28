@@ -62,6 +62,7 @@
 #include "commandline.h"
 #include "equipment.h"
 #include "peerinfo.h"
+#include "sslserver.h"
 #include "user.h"
 
 class Server : public CommandLine {
@@ -73,7 +74,7 @@ public:
     explicit Server(int, char **);
     ~Server() noexcept;
 
-    void datagramReceived(const PeerInfo &, const QByteArray &, QDtls *);
+    void datagramReceived(const PeerInfo &, const QByteArray &, QSslSocket *);
     bool listen(const QHostAddress &, quint16);
 
 public slots:
@@ -82,31 +83,30 @@ public slots:
     Q_DECL_DEPRECATED void update();
 
 private slots:
+    void handleNewConnection();
     void pskRequired(QSslPreSharedKeyAuthenticator *);
     void readyRead();
     void shutdown();
 
 private:
-    void decryptDatagram(QDtls *, const QByteArray &);
-    void doDevelop(Uid, int, int, QDtls *);
-    void doFetch(Uid, int, QDtls *);
-    void doHandshake(QDtls *, const QByteArray &);
+    void decryptDatagram(QSslSocket *, const QByteArray &);
+    void doDevelop(Uid, int, int, QSslSocket *);
+    void doFetch(Uid, int, QSslSocket *);
+    void doHandshake(QSslSocket *, const QByteArray &);
     bool equipmentRefresh();
     void exitGraceSpec() override;
     bool exportEquipToCSV() const;
     const QStringList getCommandsSpec() const override;
     const QStringList getValidCommands() const override;
-    void handleNewConnection(const QHostAddress &, quint16,
-                             const QByteArray &);
     bool importEquipFromCSV();
     void parseListen(const QStringList &);
     void parseUnlisten();
-    void receivedAuth(const QJsonObject &, const PeerInfo &, QDtls *);
+    void receivedAuth(const QJsonObject &, const PeerInfo &, QSslSocket *);
     void receivedForceLogout(Uid uid);
-    void receivedLogin(const QJsonObject &, const PeerInfo &, QDtls *);
-    void receivedLogout(const QJsonObject &, const PeerInfo &, QDtls *);
-    void receivedReg(const QJsonObject &, const PeerInfo &, QDtls *);
-    void receivedReq(const QJsonObject &, const PeerInfo &, QDtls *);
+    void receivedLogin(const QJsonObject &, const PeerInfo &, QSslSocket *);
+    void receivedLogout(const QJsonObject &, const PeerInfo &, QSslSocket *);
+    void receivedReg(const QJsonObject &, const PeerInfo &, QSslSocket *);
+    void receivedReq(const QJsonObject &, const PeerInfo &, QSslSocket *);
     void sqlcheckEquip();
     void sqlcheckEquipU();
     void sqlcheckFacto();
@@ -118,11 +118,9 @@ private:
     void sqlinitUsers();
 
     bool listening = false;
-    QUdpSocket serverSocket;
+    SslServer sslServer;
 
     QSslConfiguration serverConfiguration;
-    QDtlsClientVerifier cookieSender;
-    std::vector<std::unique_ptr<QDtls>> knownClients;
 
     QMap<PeerInfo, Uid> connectedUsers;
     QMap<Uid, PeerInfo> connectedPeers;
