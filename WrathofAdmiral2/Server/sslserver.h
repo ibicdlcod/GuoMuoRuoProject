@@ -37,10 +37,14 @@ public:
     QSsl::SslProtocol getSslProtocol() const;
 
     void setSslLocalCertificate(const QSslCertificate &certificate);
-    bool setSslLocalCertificate(const QString &path, QSsl::EncodingFormat format = QSsl::Pem);
+    bool setSslLocalCertificate(const QString &path,
+                                QSsl::EncodingFormat format = QSsl::Pem);
 
     void setSslPrivateKey(const QSslKey &key);
-    bool setSslPrivateKey(const QString &fileName, QSsl::KeyAlgorithm algorithm = QSsl::Rsa, QSsl::EncodingFormat format = QSsl::Pem, const QByteArray &passPhrase = QByteArray());
+    bool setSslPrivateKey(const QString &fileName,
+                          QSsl::KeyAlgorithm algorithm = QSsl::Rsa,
+                          QSsl::EncodingFormat format = QSsl::Pem,
+                          const QByteArray &passPhrase = QByteArray());
 
     void setSslProtocol(QSsl::SslProtocol protocol);
 

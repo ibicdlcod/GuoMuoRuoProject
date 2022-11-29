@@ -62,6 +62,8 @@ Client::Client(int argc, char ** argv)
       gameState(KP::Offline) {
     QObject::connect(&socket, &QSslSocket::preSharedKeyAuthenticationRequired,
                      this, &Client::pskRequired);
+    QObject::connect(&socket, &QSslSocket::encrypted,
+                     this, &Client::encrypted);
 }
 
 Client::~Client() noexcept {
@@ -405,7 +407,6 @@ void Client::parseConnectReq(const QStringList &cmdParts) {
         return;
     }
     else {
-        attemptMode = true;
         address = QHostAddress(cmdParts[1]);
         if(address.isNull()) {
             //% "IP isn't valid."
@@ -418,6 +419,7 @@ void Client::parseConnectReq(const QStringList &cmdParts) {
             qWarning() << qtTrId("port-invalid");
             return;
         }
+        attemptMode = true;
 
         clientName = cmdParts[3];
         emit turnOffEchoing();
@@ -498,7 +500,6 @@ void Client::parsePassword(const QString &input) {
         connect(&socket, &QAbstractSocket::errorOccurred,
                 this, &Client::errorOccurred);
         socket.connectToHostEncrypted(address.toString(), port);
-        //connect(&socket, &QSslSocket::encrypted, this, &Client::handshakeOK);
         if(!socket.waitForConnected(
                     settings->value("connect_wait_time_msec", 8000)
                     .toInt())) {
@@ -557,19 +558,8 @@ void Client::readWhenConnected(const QByteArray &dgram) {
 }
 
 void Client::readWhenUnConnected(const QByteArray &dgram) {
-    Q_UNUSED(dgram)/*
-    if (socket.isEncrypted()) {
-        qDebug() << clientName << ": encrypted connection established!";
-        QByteArray msg = KP::clientAuth(
-                    registerMode ? KP::Reg : KP::Login, clientName, password);
-        const qint64 written = socket.write(msg);
-        if (written <= 0) {
-            throw NetworkError(socket.errorString());
-        }
-    }
-    else {
-        qDebug() << clientName << ": continuing with handshake...";
-    }*/
+    Q_UNUSED(dgram)
+    qDebug() << "Unexpected data when unconnected"
 }
 
 void Client::receivedAuth(const QJsonObject &djson) {
