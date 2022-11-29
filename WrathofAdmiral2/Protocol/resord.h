@@ -65,7 +65,7 @@ public:
     bool addResources(const ResOrd&);
     bool addResources(const ResOrd&, const ResOrd &);
     void cap(const ResOrd&);
-    QByteArray resourceDesired();
+    QByteArray resourceDesired() const;
     bool sufficient();
 
     friend void User::setResources(int uid, ResOrd goal);

@@ -61,7 +61,7 @@ void ResOrd::cap(const ResOrd &cap) {
     cr = min(cr, cap.cr);
 }
 
-QByteArray ResOrd::resourceDesired() {
+QByteArray ResOrd::resourceDesired() const {
     QJsonObject result;
     result["type"] = KP::DgramType::Message;
     result["msgtype"] = KP::MsgType::ResourceRequired;

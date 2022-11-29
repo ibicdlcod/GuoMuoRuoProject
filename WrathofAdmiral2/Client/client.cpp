@@ -559,7 +559,7 @@ void Client::readWhenConnected(const QByteArray &dgram) {
 
 void Client::readWhenUnConnected(const QByteArray &dgram) {
     Q_UNUSED(dgram)
-    qDebug() << "Unexpected data when unconnected"
+    qDebug() << "Unexpected data when unconnected";
 }
 
 void Client::receivedAuth(const QJsonObject &djson) {
@@ -591,8 +591,8 @@ void Client::receivedLogin(const QJsonObject &djson) {
             //% "Either you retry too much or someone is trying to crack you. "
             //% "Please wait until %1(%2)."
             reas = qtTrId("passwordfail-toomuch")
-                    .arg(locale.toString(reEnable))
-                    .arg(reEnable.timeZoneAbbreviation()); break;
+                    .arg(locale.toString(reEnable),
+                         reEnable.timeZoneAbbreviation()); break;
         }
         case KP::UserNonexist: reas = qtTrId("user-nonexistent"); break;
         default: throw std::domain_error("message not implemented"); break;

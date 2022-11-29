@@ -60,7 +60,7 @@ QT_BEGIN_NAMESPACE
 extern std::unique_ptr<QSettings> settings;
 
 namespace {
-QString connection_info(QSslSocket *connection) {
+[[maybe_unused]] QString connection_info(QSslSocket *connection) {
     QString prot;
     switch (connection->sessionProtocol()) {
     case QSsl::DtlsV1_2:
@@ -185,7 +185,7 @@ const QString userE = QStringLiteral(
             "Star INTEGER, "
             "FOREIGN KEY(User) REFERENCES Users(UserID), "
             "FOREIGN KEY(EquipDef) REFERENCES Equip(EquipID), "
-            "CONSTRAINT noduplicate UNIQUE(User, EquipSerial) "
+            "CONSTRAINT noduplicate UNIQUE(User, EquipSerial), "
             "CONSTRAINT Star_Valid CHECK (Star >= 0 AND Star < 16)"
             ");"
             );
@@ -541,7 +541,7 @@ void Server::doFetch(Uid uid, int factoryid, QSslSocket *connection) {
         }
         else {
             bool success = query.value(2).toBool();
-            int secondsSpent = query.value(3).toInt();
+            [[maybe_unused]] int secondsSpent = query.value(3).toInt();
             if(!success) {
                 QByteArray msg = KP::serverPenguin();
                 connection->write(msg);
@@ -871,6 +871,7 @@ void Server::receivedForceLogout(Uid uid) {
 void Server::receivedLogin(const QJsonObject &djson,
                            const PeerInfo &peerInfo,
                            QSslSocket *connection) {
+    Q_UNUSED(peerInfo)
     QString name = djson["username"].toString();
     QSqlDatabase db = QSqlDatabase::database();
     QSqlQuery query;
@@ -1027,6 +1028,7 @@ void Server::receivedReg(const QJsonObject &djson,
 void Server::receivedReq(const QJsonObject &djson,
                          const PeerInfo &peerInfo,
                          QSslSocket *connection) {
+    Q_UNUSED(peerInfo)
     /* this is inefficient */
     for(auto begin = connectedPeers.keyValueBegin(),
         end = connectedPeers.keyValueEnd();
@@ -1217,7 +1219,7 @@ void Server::sqlinitEquipU() {
     //% "Equipment database for user does not exist, creating..."
     qWarning() << qtTrId("equip-db-user-lack");
     QSqlQuery query;
-    query.prepare(equipU);
+    query.prepare(userE);
     if(query.exec()) {
         //% "Equipment database for user is OK."
         qInfo() << qtTrId("equip-db-user-good");

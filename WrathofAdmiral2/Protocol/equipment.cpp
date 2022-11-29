@@ -24,10 +24,11 @@ EquipType::EquipType(const QString &basis) {
         else {
             flagsStr.remove(0, 1);
             QMetaEnum info = QMetaEnum::fromType<TypeFlags>();
-            flags = TypeFlags(info.keysToValue(
-                                  flagsStr.toLatin1().constData()));
-            if(flags == -1)
+            auto flagsnum = info.keysToValue(flagsStr.toLatin1().constData());
+            if(flagsnum == -1)
                 flags = TypeFlags();
+            else
+                flags = TypeFlags(flagsnum);
         }
         QString sizeStr = m.captured(4);
         if(sizeStr.isNull())
