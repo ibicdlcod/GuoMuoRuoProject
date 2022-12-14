@@ -30,6 +30,8 @@ void KP::winConsoleCheck() {
     }
     DWORD dwMode = 0;
     if (!GetConsoleMode(hOut, &dwMode)) {
+        //% "This program must be run in the terminal."
+        qFatal(qtTrId("terminial-required").toUtf8());
         throw GetLastError();
     }
     dwMode |= ENABLE_VIRTUAL_TERMINAL_PROCESSING;

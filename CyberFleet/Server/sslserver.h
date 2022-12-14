@@ -19,34 +19,20 @@
 #ifndef SSLSERVER_H
 #define SSLSERVER_H
 
-#include <QTcpServer>
 #include <QString>
 #include <QSsl>
 #include <QSslCertificate>
 #include <QSslKey>
+#include <QSslServer>
 #include <QSslSocket>
 
-class SslServer : public QTcpServer {
+class SslServer : public QSslServer {
     Q_OBJECT
 
 public:
     explicit SslServer(QObject *parent = nullptr);
-
-    const QSslCertificate &getSslLocalCertificate() const;
-    const QSslKey &getSslPrivateKey() const;
-    QSsl::SslProtocol getSslProtocol() const;
-
-    void setSslLocalCertificate(const QSslCertificate &certificate);
-    bool setSslLocalCertificate(const QString &path,
-                                QSsl::EncodingFormat format = QSsl::Pem);
-
-    void setSslPrivateKey(const QSslKey &key);
-    bool setSslPrivateKey(const QString &fileName,
-                          QSsl::KeyAlgorithm algorithm = QSsl::Rsa,
-                          QSsl::EncodingFormat format = QSsl::Pem,
-                          const QByteArray &passPhrase = QByteArray());
-
-    void setSslProtocol(QSsl::SslProtocol protocol);
+    QByteArray preSharedKeyIdentityHint();
+    void setSslConfiguration(const QSslConfiguration &);
 
 signals:
     void connectionReadyread(QSslSocket *);
@@ -58,9 +44,7 @@ protected:
     void incomingConnection(qintptr socketDescriptor) override final;
 
 private:
-    QSslCertificate m_sslLocalCertificate;
-    QSslKey m_sslPrivateKey;
-    QSsl::SslProtocol m_sslProtocol;
+    QSslConfiguration serverConfiguration;
 };
 
 #endif // SSLSERVER_H

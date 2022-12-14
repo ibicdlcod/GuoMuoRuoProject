@@ -32,14 +32,6 @@ QConsoleListener::QConsoleListener(bool consolemode)
          */
         QString res;
 #if defined (Q_OS_WIN)
-        /*
-        HWND consoleWnd = GetConsoleWindow();
-        DWORD dwProcessId;
-        GetWindowThreadProcessId(consoleWnd, &dwProcessId);
-        qCritical() << GetCurrentProcessId() << std::endl;
-        qCritical() << dwProcessId << std::endl;
-        if (GetCurrentProcessId()==dwProcessId)
-        */
         if(this->consolemode)
         {
             const int bufsize = 512;

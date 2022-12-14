@@ -46,84 +46,97 @@
 **
 ****************************************************************************/
 
-#ifndef CLIENT_H
-#define CLIENT_H
+#ifndef SERVER_H
+#define SERVER_H
 
+#include <QSqlDatabase>
+#include <QSqlError>
+#include <QSqlQuery>
+#include <QSqlRecord>
+#include <QSslConfiguration>
 #include <QtNetwork>
-#include "commandline.h"
+#include <memory>
+#include <random>
+#include <vector>
 
-class Client : public CommandLine {
+#include "commandline.h"
+#include "equipment.h"
+#include "peerinfo.h"
+#include "sslserver.h"
+#include "user.h"
+
+class Server : public CommandLine {
     Q_OBJECT
 
+    typedef int Uid;
+
 public:
-    explicit Client(int, char **);
-    ~Client() noexcept;
+    explicit Server(int, char **);
+    ~Server() noexcept override;
+
+    void datagramReceived(const PeerInfo &, const QByteArray &, QSslSocket *);
+    bool listen(const QHostAddress &, quint16);
 
 public slots:
-    void catbomb();
     void displayPrompt() override;
     bool parseSpec(const QStringList &) override;
-    void serverResponse(const QString &, const QByteArray &);
+    void readyRead(QSslSocket *);
     Q_DECL_DEPRECATED void update();
 
-signals:
-    void turnOffEchoing();
-    void turnOnEchoing();
-
 private slots:
-    void encrypted();
-    void errorOccurred(QAbstractSocket::SocketError);
-    void handshakeInterrupted(const QSslError &);
-    void pskRequired(QSslPreSharedKeyAuthenticator *);
-    void readyRead();
+    void alertReceived(QSslSocket *socket, QSsl::AlertLevel level,
+                       QSsl::AlertType type, const QString &description);
+    void handleNewConnection();
+    void pskRequired(QSslSocket *, QSslPreSharedKeyAuthenticator *);
     void shutdown();
+    void sslErrors(QSslSocket *, const QList<QSslError> &);
 
 private:
-    void doDevelop(const QStringList &);
-    void doFetch(const QStringList &);
-    void doSwitch(const QStringList &);
+    void decryptDatagram(QSslSocket *, const QByteArray &);
+    void doDevelop(Uid, int, int, QSslSocket *);
+    void doFetch(Uid, int, QSslSocket *);
+    void doHandshake(QSslSocket *, const QByteArray &);
+    bool equipmentRefresh();
     void exitGraceSpec() override;
-    QString gameStateString() const;
+    bool exportEquipToCSV() const;
     const QStringList getCommandsSpec() const override;
     const QStringList getValidCommands() const override;
-    bool loggedIn() const;
-    void parseConnectReq(const QStringList &);
-    void parseDisconnectReq();
-    bool parseGameCommands(const QString &, const QStringList &);
-    void parsePassword(const QString &);
-    void readWhenConnected(const QByteArray &);
-    void readWhenUnConnected(const QByteArray &);
-    void receivedAuth(const QJsonObject &);
-    void receivedLogin(const QJsonObject &);
-    void receivedLogout(const QJsonObject &);
-    void receivedMsg(const QJsonObject &);
-    void receivedReg(const QJsonObject &);
+    bool importEquipFromCSV();
+    void parseListen(const QStringList &);
+    void parseUnlisten();
+    void receivedAuth(const QJsonObject &, const PeerInfo &, QSslSocket *);
+    void receivedForceLogout(Uid uid);
+    void receivedLogin(const QJsonObject &, const PeerInfo &, QSslSocket *);
+    void receivedLogout(const QJsonObject &, const PeerInfo &, QSslSocket *);
+    void receivedReg(const QJsonObject &, const PeerInfo &, QSslSocket *);
+    void receivedReq(const QJsonObject &, const PeerInfo &, QSslSocket *);
+    void sqlcheckEquip();
+    void sqlcheckEquipU();
+    void sqlcheckFacto();
+    void sqlcheckUsers();
+    void sqlinit();
+    void sqlinitEquip();
+    void sqlinitEquipU();
+    void sqlinitFacto();
+    void sqlinitUsers();
 
-    QHostAddress address;
-    quint16 port;
+    bool listening = false;
+    SslServer sslServer;
+    //QMap<PeerInfo, Uid> connectedUsers;
+    QMap<Uid, QSslSocket *> connectedPeers;
 
-    QSslSocket socket;
-    QSslConfiguration conf;
+    QMap<int, QPointer<EquipDef>> equipRegistry;
 
-    unsigned int maxRetransmit;
-    unsigned int retransmitTimes = 0;
+    std::random_device random;
+    std::mt19937 mt;
+    static constexpr float dOF = 1.0; // degree of freedom
+    std::chi_squared_distribution<float> chi2Dist{dOF};
 
-    QString clientName;
-    QString serverName;
-    QByteArray password;
-
-    bool attemptMode;
-    bool registerMode;
-    bool logoutPending;
-
-    KP::GameState gameState;
-
-    static const unsigned int defaultMaxRetransmit = 2;
     const QByteArray defaultSalt =
             QByteArrayLiteral("\xe8\xbf\x99\xe6\x98\xaf\xe4\xb8"
                               "\x80\xe6\x9d\xa1\xe5\x92\xb8\xe9"
                               "\xb1\xbc");
-    Q_DISABLE_COPY(Client)
+    Q_DISABLE_COPY(Server)
 };
 
-#endif // CLIENT_H
+#endif // SERVER_H

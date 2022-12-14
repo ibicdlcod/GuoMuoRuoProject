@@ -50,6 +50,7 @@
 #include <algorithm>
 #include "kerrors.h"
 #include "peerinfo.h"
+#include "sslserver.h"
 
 #ifdef max
 #undef max // apparently some stupid win header interferes with std::max
@@ -193,8 +194,6 @@ const QString userE = QStringLiteral(
 
 Server::Server(int argc, char ** argv) : CommandLine(argc, argv) {
     /* no *settings could be used here */
-    serverConfiguration = QSslConfiguration::defaultDtlsConfiguration();
-    serverConfiguration.setPeerVerifyMode(QSslSocket::VerifyNone);
     mt = std::mt19937(random());
 }
 
@@ -249,10 +248,6 @@ bool Server::listen(const QHostAddress &address, quint16 port) {
         if (!listening)
             qCritical () << sslServer.errorString();
         else {
-            serverConfiguration.setPreSharedKeyIdentityHint(
-                        settings->value(
-                            "server/servername",
-                            QByteArrayLiteral("Alice")).toByteArray());
 
             sqlinit();
         }
@@ -270,7 +265,7 @@ void Server::displayPrompt() {
     if(!listening)
         qout << "WAServer$ ";
     else {
-        qout << serverConfiguration.preSharedKeyIdentityHint()
+        qout << sslServer.preSharedKeyIdentityHint()
              << "@" << sslServer.serverAddress().toString()
              << ":" << sslServer.serverPort() << "$ ";
     }
@@ -324,7 +319,8 @@ void Server::update() {
     qout.flush();
 }
 
-void Server::pskRequired(QSslPreSharedKeyAuthenticator *auth)
+void Server::pskRequired(QSslSocket *socket,
+                         QSslPreSharedKeyAuthenticator *auth)
 {
     Q_ASSERT(auth);
     QString clientName = QString::fromLatin1(auth->identity());
@@ -430,6 +426,12 @@ void Server::shutdown() {
         defaultDbName = db.connectionName();
     }
     QSqlDatabase::removeDatabase(defaultDbName);
+}
+
+void Server::sslErrors(QSslSocket *socket, const QList<QSslError> &errors) {
+    for(auto &error: errors) {
+        qCritical() << error.errorString();
+    }
 }
 
 void Server::decryptDatagram(QSslSocket *connection,
@@ -726,6 +728,11 @@ const QStringList Server::getValidCommands() const {
     return result;
 }
 
+void Server::alertReceived(QSslSocket *socket, QSsl::AlertLevel level,
+                           QSsl::AlertType type, const QString &description) {
+    qDebug() << description;
+}
+
 void Server::handleNewConnection(){
     if (!listening)
         return;
@@ -808,17 +815,58 @@ void Server::parseListen(const QStringList &cmdParts) {
         qWarning() << qtTrId("port-invalid");
         return;
     }
+    // TODO: This should be configureable
+    QSslConfiguration conf;
+    const auto certs
+            = QSslCertificate::fromPath(
+                ":/sslserver.pem",
+                QSsl::Pem, QSslCertificate::PatternSyntax::FixedString);
+    if(certs.isEmpty()) {
+        //% "Server lack a certificate."
+        QString msg = qtTrId("no-cert")
+                .arg(address.toString()).arg(port);
+        qInfo() << msg;
+        return;
+    }
+    conf.setLocalCertificate(certs.at(0));
+    QFile keyFile(":/sslserver.key");
+    if(!keyFile.open(QIODevice::ReadOnly)) {
+        //% "Server lack a private key."
+        QString msg = qtTrId("no-private-key")
+                .arg(address.toString()).arg(port);
+        qInfo() << msg;
+        return;
+    }
+    const auto key = QSslKey(keyFile.readAll(), QSsl::Rsa,
+                             QSsl::Pem, QSsl::PrivateKey, QByteArray());
+    if(key.isNull()) {
+        //% "Server private key can't be read."
+        QString msg = qtTrId("corrupt-private-key")
+                .arg(address.toString()).arg(port);
+        qInfo() << msg;
+        return;
+    }
+    conf.setPrivateKey(key);
+    conf.setProtocol(QSsl::TlsV1_3);
+    conf.setPreSharedKeyIdentityHint(
+                settings->value(
+                    "server/servername",
+                    QByteArrayLiteral("Alice")).toByteArray());
+    sslServer.setSslConfiguration(conf);
     QString msg;
-    sslServer.setSslLocalCertificate(":/sslserver.pem");
-    sslServer.setSslPrivateKey(":/sslserver.key");
-    sslServer.setSslProtocol(QSsl::TlsV1_3);
-    if (listen(address, port)) {
+    if(listen(address, port)) {
         //% "Server is listening on address %1 and port %2"
         msg = qtTrId("server-listen")
                 .arg(address.toString()).arg(port);
         qInfo() << msg;
         connect(&sslServer, &SslServer::connectionReadyread,
                 this, &Server::readyRead);
+        connect(&sslServer, &SslServer::preSharedKeyAuthenticationRequired,
+                this, &Server::pskRequired);
+        connect(&sslServer, &SslServer::sslErrors,
+                this, &Server::sslErrors);
+        connect(&sslServer, &SslServer::alertReceived,
+                this, &Server::alertReceived);
     }
     else {
         //% "Server failed to listen on address %1 and port %2"
@@ -1065,6 +1113,7 @@ void Server::receivedReq(const QJsonObject &djson,
 
 void Server::sqlcheckEquip() {
     if(equipmentRefresh()) {
+        //% "Equipment database is OK."
         qInfo() << qtTrId("equip-db-good");
     }
     else {
@@ -1111,7 +1160,7 @@ void Server::sqlcheckFacto() {
             throw DBError(qtTrId("column-nonexist").arg(column, "Factories"));
         }
     }
-    //% "Factory database OK."
+    //% "Factory database is OK."
     qInfo() << qtTrId("factory-db-good");
 }
 
@@ -1154,6 +1203,7 @@ void Server::sqlcheckUsers() {
             throw DBError(qtTrId("column-nonexist").arg(column, "Users"));
         }
     }
+    //% "User database is OK."
     qInfo() << qtTrId("user-db-good");
 }
 
@@ -1204,11 +1254,7 @@ void Server::sqlinitEquip() {
     qWarning() << qtTrId("equip-db-lack");
     QSqlQuery query;
     query.prepare(equipU);
-    if(query.exec()) {
-        //% "Equipment database is OK."
-        qInfo() << qtTrId("equip-db-good");
-    }
-    else {
+    if(!query.exec()) {
         //% "Create Equipment database failed."
         throw DBError(qtTrId("equip-db-gen-failure"),
                       query.lastError());
@@ -1220,11 +1266,7 @@ void Server::sqlinitEquipU() {
     qWarning() << qtTrId("equip-db-user-lack");
     QSqlQuery query;
     query.prepare(userE);
-    if(query.exec()) {
-        //% "Equipment database for user is OK."
-        qInfo() << qtTrId("equip-db-user-good");
-    }
-    else {
+    if(!query.exec()) {
         //% "Create Equipment database for user failed."
         throw DBError(qtTrId("equip-db-user-gen-failure"),
                       query.lastError());
@@ -1236,11 +1278,7 @@ void Server::sqlinitFacto() {
     qWarning() << qtTrId("facto-db-lack");
     QSqlQuery query;
     query.prepare(userF);
-    if(query.exec()) {
-        //% "Factory database is OK."
-        qInfo() << qtTrId("facto-db-good");
-    }
-    else {
+    if(!query.exec()) {
         //% "Create Factory database failed."
         throw DBError(qtTrId("facto-db-gen-failure"),
                       query.lastError());
@@ -1252,11 +1290,7 @@ void Server::sqlinitUsers() {
     qWarning() << qtTrId("user-db-lack");
     QSqlQuery query;
     query.prepare(userT);
-    if(query.exec()) {
-        //% "User database is OK."
-        qInfo() << qtTrId("user-db-good");
-    }
-    else {
+    if(!query.exec()) {
         //% "Create User database failed."
         throw DBError(qtTrId("user-db-gen-failure"),
                       query.lastError());

@@ -181,7 +181,6 @@ void Client::errorOccurred(QAbstractSocket::SocketError error) {
 void Client::handshakeInterrupted(const QSslError &error) {
     maxRetransmit = settings->value("client/maximum_retransmit",
                                     defaultMaxRetransmit).toInt();
-    //% "Network error: %1"
     qWarning() << qtTrId("network-error").arg(error.errorString());
     //% "%1: handshake timeout, trying to re-transmit"
     qWarning() << qtTrId("handshake-timeout").arg(clientName);
@@ -499,6 +498,7 @@ void Client::parsePassword(const QString &input) {
                 this, &Client::catbomb);
         connect(&socket, &QAbstractSocket::errorOccurred,
                 this, &Client::errorOccurred);
+        socket.setProtocol(QSsl::TlsV1_3);
         socket.connectToHostEncrypted(address.toString(), port);
         if(!socket.waitForConnected(
                     settings->value("connect_wait_time_msec", 8000)
@@ -594,7 +594,9 @@ void Client::receivedLogin(const QJsonObject &djson) {
                     .arg(locale.toString(reEnable),
                          reEnable.timeZoneAbbreviation()); break;
         }
-        case KP::UserNonexist: reas = qtTrId("user-nonexistent"); break;
+        case KP::UserNonexist:
+            //% "User does not exist."
+            reas = qtTrId("user-nonexistent"); break;
         default: throw std::domain_error("message not implemented"); break;
         }
         //% "%1: login failure, reason: %2"

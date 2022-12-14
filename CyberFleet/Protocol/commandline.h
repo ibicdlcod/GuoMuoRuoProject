@@ -12,7 +12,7 @@ class CommandLine : public QCoreApplication {
 
 public:
     explicit CommandLine(int, char **);
-    virtual ~CommandLine() noexcept;
+    virtual ~CommandLine() noexcept = default;
 
     enum Password{
         normal,

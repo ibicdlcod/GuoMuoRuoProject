@@ -33,10 +33,6 @@ CommandLine::CommandLine(int argc, char ** argv)
 
 }
 
-CommandLine::~CommandLine() noexcept {
-
-}
-
 /* Rather too long, but tested */
 void CommandLine::customMessageHandler(QtMsgType type,
                                        const QMessageLogContext &context,
