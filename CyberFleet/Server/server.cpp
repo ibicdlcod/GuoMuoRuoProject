@@ -261,6 +261,7 @@ bool Server::listen(const QHostAddress &address, quint16 port) {
     return listening;
 }
 
+/* public slots */
 void Server::displayPrompt() {
     if(!listening)
         qout << "WAServer$ ";
@@ -313,42 +314,6 @@ bool Server::parseSpec(const QStringList &cmdParts) {
     }
 }
 
-void Server::update() {
-    QCoreApplication::processEvents();
-    QCoreApplication::processEvents();
-    qout.flush();
-}
-
-void Server::pskRequired(QSslSocket *socket,
-                         QSslPreSharedKeyAuthenticator *auth)
-{
-    Q_ASSERT(auth);
-    QString clientName = QString::fromLatin1(auth->identity());
-    //% "PSK callback, received a client's identity: '%1'"
-    qDebug() << qtTrId("client-id-received").arg(clientName);
-    if(clientName.compare("NEW_USER") == 0)
-        auth->setPreSharedKey(QByteArrayLiteral("register"));
-    else {
-        QSqlDatabase db = QSqlDatabase::database();
-        QSqlQuery query;
-        query.prepare("SELECT Shadow FROM Users "
-                      "WHERE Username = :name;");
-        query.bindValue(":name", clientName);
-        if(!query.exec()) {
-            //% "Pre-shared key retrieve failed: %1"
-            qCritical() << qtTrId("psk-retrieve-failed").arg(clientName);
-        }
-        query.isSelect();
-        if(!query.first()) {
-            int x = QRandomGenerator::global()->generate64();
-            auth->setPreSharedKey(QByteArray::number(x));
-        }
-        else {
-            auth->setPreSharedKey(query.value(0).toByteArray());
-        }
-    }
-}
-
 void Server::readyRead(QSslSocket *currentsocket) {
     const qint64 bytesToRead = currentsocket->bytesAvailable();
     if (bytesToRead <= 0) {
@@ -388,6 +353,58 @@ void Server::readyRead(QSslSocket *currentsocket) {
         }
     }
     return;
+}
+
+void Server::update() {
+    QCoreApplication::processEvents();
+    QCoreApplication::processEvents();
+    qout.flush();
+}
+
+/* private slots */
+
+void Server::alertReceived(QSslSocket *socket, QSsl::AlertLevel level,
+                           QSsl::AlertType type, const QString &description) {
+    qDebug() << description;
+}
+
+void Server::handleNewConnection(){
+    if (!listening)
+        return;
+    QSslSocket *currentsocket = dynamic_cast<QSslSocket *>
+            (sslServer.nextPendingConnection());
+    QByteArray msg = KP::serverHello();
+    currentsocket->write(msg);
+}
+
+void Server::pskRequired(QSslSocket *socket,
+                         QSslPreSharedKeyAuthenticator *auth)
+{
+    Q_ASSERT(auth);
+    QString clientName = QString::fromLatin1(auth->identity());
+    //% "PSK callback, received a client's identity: '%1'"
+    qDebug() << qtTrId("client-id-received").arg(clientName);
+    if(clientName.compare("NEW_USER") == 0)
+        auth->setPreSharedKey(QByteArrayLiteral("register"));
+    else {
+        QSqlDatabase db = QSqlDatabase::database();
+        QSqlQuery query;
+        query.prepare("SELECT Shadow FROM Users "
+                      "WHERE Username = :name;");
+        query.bindValue(":name", clientName);
+        if(!query.exec()) {
+            //% "Pre-shared key retrieve failed: %1"
+            qCritical() << qtTrId("psk-retrieve-failed").arg(clientName);
+        }
+        query.isSelect();
+        if(!query.first()) {
+            int x = QRandomGenerator::global()->generate64();
+            auth->setPreSharedKey(QByteArray::number(x));
+        }
+        else {
+            auth->setPreSharedKey(query.value(0).toByteArray());
+        }
+    }
 }
 
 void Server::shutdown() {
@@ -433,6 +450,8 @@ void Server::sslErrors(QSslSocket *socket, const QList<QSslError> &errors) {
         qCritical() << error.errorString();
     }
 }
+
+/* private */
 
 void Server::decryptDatagram(QSslSocket *connection,
                              const QByteArray &clientMessage) {
@@ -726,20 +745,6 @@ const QStringList Server::getValidCommands() const {
         result.append("listen");
     result.sort(Qt::CaseInsensitive);
     return result;
-}
-
-void Server::alertReceived(QSslSocket *socket, QSsl::AlertLevel level,
-                           QSsl::AlertType type, const QString &description) {
-    qDebug() << description;
-}
-
-void Server::handleNewConnection(){
-    if (!listening)
-        return;
-    QSslSocket *currentsocket = dynamic_cast<QSslSocket *>
-            (sslServer.nextPendingConnection());
-    QByteArray msg = KP::serverHello();
-    currentsocket->write(msg);
 }
 
 bool Server::importEquipFromCSV() {
