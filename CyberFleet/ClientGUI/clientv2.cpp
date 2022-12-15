@@ -731,6 +731,10 @@ const QStringList Clientv2::getCommands() {
 }
 
 void Clientv2::backToNavalBase() {
+    if(!loggedIn()) {
+        emit qout(qtTrId("access-denied-login-first"));
+        return;
+    }
     parse("switch Port");
 }
 
@@ -884,6 +888,19 @@ void Clientv2::showHelp(const QStringList &cmdParts) {
     }
 }
 
+void Clientv2::switchToFactory() {
+    if(!loggedIn()) {
+        emit qout(qtTrId("access-denied-login-first"));
+        return;
+    }
+    if(gameState == KP::Factory) {
+        return;
+    } else {
+        gameState = KP::Factory;
+        emit gamestateChanged(KP::Factory);
+    }
+}
+
 inline void Clientv2::invalidCommand() {
     //% "Invalid Command, use 'commands' for valid commands, "
     //% "'help' for help, 'exit' to exit."
@@ -907,7 +924,7 @@ void Clientv2::showCommands(bool validOnly){
 
 //severely steamlined
 void Clientv2::qls(const QStringList &input) {
-   emit qout(input.join(" "));
+    emit qout(input.join(" "));
 }
 
 void Clientv2::exitGracefully() {

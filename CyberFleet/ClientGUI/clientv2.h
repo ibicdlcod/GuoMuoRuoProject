@@ -76,6 +76,7 @@ public:
         confirm
     };
     Q_ENUM(Password);
+    bool loggedIn() const;
 
 public slots:
     void catbomb();
@@ -87,6 +88,7 @@ public slots:
     void backToNavalBase();
     bool parse(const QString &);
     void showHelp(const QStringList &);
+    void switchToFactory();
 
 signals:
     void aboutToQuit();
@@ -110,7 +112,6 @@ private:
     QString gameStateString() const;
     const QStringList getCommandsSpec() const;
     const QStringList getValidCommands() const;
-    bool loggedIn() const;
     void parseConnectReq(const QStringList &);
     void parseDisconnectReq();
     bool parseGameCommands(const QString &, const QStringList &);

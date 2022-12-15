@@ -10,5 +10,6 @@ SUBDIRS += \
 
 Client.depends += Protocol
 ClientGUI.depends += Protocol
+ClientGUI.depends += FactorySlot
 Server.depends += Protocol
 Protocol.depends += QConsoleListener

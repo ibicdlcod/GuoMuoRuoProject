@@ -21,19 +21,18 @@ public:
 signals:
     void receivedMessage(const QString &);
 
-public slots:
-    void closeOpeningwords();
-    void gamestateChanged(KP::GameState);
-    void printMessage(QString, QColor background = QColor("white"),
-                      QColor foreground = QColor("black"));
-
 private slots:
+    void gamestateChanged(KP::GameState);
     void parseConnectReq();
     void parseRegReq();
+    void printMessage(QString, QColor background = QColor("white"),
+                      QColor foreground = QColor("black"));
     void processCmd();
+    void switchToDevelop();
 
 private:
     Ui::MainWindow *ui;
     bool pwConfirmMode = false;
+    KP::FactoryState factoryState = KP::Development;
 };
 #endif // MAINWINDOW_H

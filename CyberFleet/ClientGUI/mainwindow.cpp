@@ -65,6 +65,10 @@ MainWindow::MainWindow(QWidget *parent, int argc, char ** argv)
                      this, &MainWindow::gamestateChanged);
     QObject::connect(ui->actionBack_to_naval_base, &QAction::triggered,
                      &engine, &Clientv2::backToNavalBase);
+    QObject::connect(ui->actionDevelop_Equipment, &QAction::triggered,
+                     &engine, &Clientv2::switchToFactory);
+    QObject::connect(ui->actionDevelop_Equipment, &QAction::triggered,
+                     this, &MainWindow::switchToDevelop);
 
     ui->PasswordEdit->setEchoMode(QLineEdit::Password);
 }
@@ -74,9 +78,6 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-void MainWindow::closeOpeningwords() {
-}
-
 void MainWindow::gamestateChanged(KP::GameState state) {
     state == KP::Offline ? ui->LoginScreen->show() :
                            ui->LoginScreen->hide();
@@ -84,12 +85,6 @@ void MainWindow::gamestateChanged(KP::GameState state) {
                         ui->PortArea->hide();
     state == KP::Factory ? ui->FactoryArea -> show() :
                            ui->FactoryArea->hide();
-}
-void MainWindow::printMessage(QString text, QColor background,
-                              QColor foreground) {
-    ui->LogBrowser->setTextBackgroundColor(background);
-    ui->LogBrowser->setTextColor(foreground);
-    ui->LogBrowser->append(text);
 }
 
 void MainWindow::parseConnectReq() {
@@ -131,8 +126,24 @@ void MainWindow::parseRegReq() {
     }
 }
 
+void MainWindow::printMessage(QString text, QColor background,
+                              QColor foreground) {
+    ui->LogBrowser->setTextBackgroundColor(background);
+    ui->LogBrowser->setTextColor(foreground);
+    ui->LogBrowser->append(text);
+}
 
 void MainWindow::processCmd() {
     emit receivedMessage(ui->CommandPrompt->toPlainText());
     ui->CommandPrompt->clear();
+}
+
+void MainWindow::switchToDevelop() {
+    Clientv2 &engine = Clientv2::getInstance();
+    if(!engine.loggedIn()) {
+        return;
+    }
+    factoryState = KP::Development;
+    //% "Develop Equipment"
+    ui->FactoryLabel->setText(qtTrId("develop-equipment"));
 }

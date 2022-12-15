@@ -95,6 +95,9 @@
            <height>0</height>
           </size>
          </property>
+         <property name="styleSheet">
+          <string notr="true">background-color: rgb(191, 191, 255);</string>
+         </property>
          <layout class="QGridLayout" name="gridLayout_2">
           <item row="0" column="0">
            <spacer name="horizontalSpacer_2">

@@ -102,6 +102,14 @@ enum GameError{
 };
 Q_ENUM_NS(GameError)
 
+enum FactoryState{
+    Development,
+    Deprecation,
+    ConvertDevelop,
+    IndustrialPlant
+};
+Q_ENUM_NS(FactoryState)
+
 void initLog(bool server = false);
 #if defined (Q_OS_WIN)
 void winConsoleCheck();

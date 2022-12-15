@@ -5,23 +5,27 @@
     <name></name>
     <message id="catbomb">
         <location filename="../Client/client.cpp" line="77"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="78"/>
         <source>You have been bombarded by a cute cat.</source>
         <translation type="unfinished">服务器给你扔了一只可爱的猫娘。</translation>
     </message>
     <message id="login-success">
         <location filename="../Client/client.cpp" line="577"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="579"/>
         <source>%1: login success</source>
         <oldsource>%1: Login success</oldsource>
         <translation type="unfinished">%1:登录成功</translation>
     </message>
     <message id="connection-failed-warning">
         <location filename="../Client/client.cpp" line="83"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="85"/>
         <source>Failed to establish connection, check your username, password and server status.</source>
         <oldsource>Failed to establish connection, check your username,password and server status.</oldsource>
         <translation type="unfinished">连接服务器失败，可能是用户名、密码不对或者服务器未在工作。</translation>
     </message>
     <message id="fscktanaka">
         <location filename="../Client/client.cpp" line="93"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="95"/>
         <source>田中飞妈</source>
         <translation type="unfinished">田中飞妈</translation>
     </message>
@@ -29,76 +33,91 @@
         <location filename="../Client/client.cpp" line="178"/>
         <location filename="../Client/client.cpp" line="184"/>
         <location filename="../Client/networkerror.cpp" line="4"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="181"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="187"/>
+        <location filename="../ClientGUI/networkerror.cpp" line="4"/>
         <source>Network error: %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="handshake-timeout">
         <location filename="../Client/client.cpp" line="186"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="189"/>
         <source>%1: handshake timeout, trying to re-transmit</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="develop-usage">
         <location filename="../Client/client.cpp" line="264"/>
-        <source>Usage: develop [equipid] [FactorySlot]</source>
+        <source>Usage: develop [equipid] [factoryslot]</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="develop-invalid-id">
         <location filename="../Client/client.cpp" line="271"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="274"/>
         <source>Equipment id invalid.</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="fetch-usage">
         <location filename="../Client/client.cpp" line="287"/>
-        <source>Usage: fetch [FactorySlot]</source>
+        <source>Usage: fetch [factoryslot]</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="switch-usage">
         <location filename="../Client/client.cpp" line="303"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="306"/>
         <source>Usage: switch [gamestate]</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="game-unexpected-state">
         <location filename="../Client/client.cpp" line="314"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="317"/>
         <source>Nonexistent gamestate: %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="gamestate-offline">
         <location filename="../Client/client.cpp" line="318"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="321"/>
         <source>Use &apos;disconnect&apos; for logout.</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="password-mismatch">
         <location filename="../Client/client.cpp" line="480"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="482"/>
         <source>Password mismatch!</source>
         <translation type="unfinished">两次输入密码不一致！</translation>
     </message>
     <message id="wait-for-connect-failure">
         <location filename="../Client/client.cpp" line="507"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="508"/>
         <source>Failed to connect to server at %1:%2</source>
         <translation type="unfinished">未能连接到服务器，位于IP %1 端口 %2</translation>
     </message>
     <message id="password-confirm">
         <location filename="../Client/client.cpp" line="519"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="521"/>
         <source>Confirm Password:</source>
         <translation type="unfinished">密码确认：</translation>
     </message>
     <message id="register-usage">
         <location filename="../Client/client.cpp" line="400"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="404"/>
         <source>Usage: register [ip] [port] [username]</source>
         <translation type="unfinished">用法：register [IP] [端口] [用户名]</translation>
     </message>
     <message id="connect-usage">
         <location filename="../Client/client.cpp" line="404"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="408"/>
         <source>Usage: connect [ip] [port] [username]</source>
         <translation type="unfinished">用法：connect [IP] [端口] [用户名]</translation>
     </message>
     <message id="connected-already">
         <location filename="../Client/client.cpp" line="388"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="392"/>
         <source>Already connected, disconnect first.</source>
         <translation type="unfinished">已在连接中，请先下线。</translation>
     </message>
     <message id="connect-duplicate">
         <location filename="../Client/client.cpp" line="393"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="397"/>
         <source>Do not attempt duplicate connections!</source>
         <translation type="unfinished">不要重复尝试连接！</translation>
     </message>
@@ -124,6 +143,7 @@
     </message>
     <message id="read-dgram-failed">
         <location filename="../Client/client.cpp" line="226"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="229"/>
         <location filename="../Server/server.cpp" line="328"/>
         <source>Read datagram failed due to: %1</source>
         <translation type="unfinished"></translation>
@@ -224,12 +244,14 @@
     </message>
     <message id="ip-invalid">
         <location filename="../Client/client.cpp" line="412"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="416"/>
         <location filename="../Server/server.cpp" line="815"/>
         <source>IP isn&apos;t valid.</source>
         <translation type="unfinished">IP格式不正确。</translation>
     </message>
     <message id="port-invalid">
         <location filename="../Client/client.cpp" line="418"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="422"/>
         <location filename="../Server/server.cpp" line="820"/>
         <source>Port isn&apos;t valid, it must fall between 1024 and 49151</source>
         <translation type="unfinished">端口格式不正确，注意1024以下和49151以上的端口是不能任意使用的</translation>
@@ -363,11 +385,13 @@
     </message>
     <message id="password-enter">
         <location filename="../Client/client.cpp" line="426"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="429"/>
         <source>Enter password:</source>
         <translation type="unfinished">输入密码：</translation>
     </message>
     <message id="disconnect-when-offline">
         <location filename="../Client/client.cpp" line="435"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="438"/>
         <source>You are not online.</source>
         <translation type="unfinished">未在有效连接中。</translation>
     </message>
@@ -377,188 +401,242 @@
     </message>
     <message id="passwordfail-toomuch">
         <location filename="../Client/client.cpp" line="593"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="596"/>
         <source>Either you retry too much or someone is trying to crack you. Please wait until %1(%2).</source>
         <translation type="unfinished">要么你频繁输入了错误的密码，要么攻击者正在猜测你的密码。请等待至%1(%2)再登录。</translation>
     </message>
     <message id="register-success">
         <location filename="../Client/client.cpp" line="707"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="711"/>
         <source>%1: register success</source>
         <oldsource>%1: Register success</oldsource>
         <translation type="unfinished">%1:注册成功</translation>
     </message>
     <message id="disconnect-attempt">
         <location filename="../Client/client.cpp" line="441"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="444"/>
         <source>Attempting to disconnect...</source>
         <translation type="unfinished">试图下线…</translation>
     </message>
     <message id="register-failed">
         <location filename="../Client/client.cpp" line="719"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="723"/>
         <source>%1: register failure, reason: %2</source>
         <translation type="unfinished">%1:注册失败，理由:%2</translation>
     </message>
     <message id="login-failed">
         <location filename="../Client/client.cpp" line="603"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="606"/>
         <source>%1: login failure, reason: %2</source>
         <oldsource>%1: Login failure, reason: %2</oldsource>
         <translation type="unfinished">%1:登录失败，理由:%2</translation>
     </message>
     <message id="logout-success">
         <location filename="../Client/client.cpp" line="613"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="616"/>
         <source>%1: logout success</source>
         <oldsource>%1: Logout success</oldsource>
         <translation type="unfinished">%1:下线成功</translation>
     </message>
     <message id="logout-notonline">
         <location filename="../Client/client.cpp" line="628"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="632"/>
         <source>%1: logout failure, not online</source>
         <oldsource>%1: Logout failure, not online</oldsource>
         <translation type="unfinished">%1:下线失败，不在线上</translation>
     </message>
     <message id="retransmit-toomuch">
         <location filename="../Client/client.cpp" line="191"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="194"/>
         <source>%1: max restransmit time exceeded!</source>
         <translation type="unfinished">%1:重新传输次数超过限制!</translation>
     </message>
     <message id="malformed-shadow">
         <location filename="../Client/client.cpp" line="584"/>
         <location filename="../Client/client.cpp" line="713"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="587"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="717"/>
         <source>Input shadow is malformed.</source>
         <translation type="unfinished">密文格式不对。</translation>
     </message>
     <message id="access-denied-login-first">
         <location filename="../Client/client.cpp" line="643"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="647"/>
         <source>You must be logged in in order to perform this operation.</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="equip-not-developable">
         <location filename="../Client/client.cpp" line="648"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="652"/>
         <source>This equipment does not exist or not open for development.</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="factory-busy">
         <location filename="../Client/client.cpp" line="652"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="656"/>
         <source>You have not selected an available factory slot.</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="resource-lack">
         <location filename="../Client/client.cpp" line="656"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="660"/>
         <source>You do not have sufficient resources.</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="equip-develop-failed">
         <location filename="../Client/client.cpp" line="660"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="664"/>
         <source>Equipment development failed.</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="resource-require">
         <location filename="../Client/client.cpp" line="667"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="671"/>
         <source>This operation requires %1oil/%2explosives/%3steel/%4rubber/%5aluminum/%6tungsten/%7chromium</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="develop-start">
         <location filename="../Client/client.cpp" line="679"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="683"/>
         <source>Start developing equipment.</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="fairy-busy">
         <location filename="../Client/client.cpp" line="683"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="687"/>
         <source>Fairy is still working on %1.</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="factory-empty">
         <location filename="../Client/client.cpp" line="687"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="691"/>
         <source>Factory slot is empty.</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="develop-penguin">
         <location filename="../Client/client.cpp" line="692"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="696"/>
         <source>You got a cute penguin.</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="develop-success">
         <location filename="../Client/client.cpp" line="695"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="699"/>
         <source>You get new equipment %1, serial number %2</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="server-hello">
         <location filename="../Client/client.cpp" line="699"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="703"/>
         <source>Server is alive and responding.</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="user-exists">
         <location filename="../Client/client.cpp" line="715"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="719"/>
         <source>User already exists.</source>
         <translation type="unfinished">用户已存在。</translation>
     </message>
     <message id="password-incorrect">
         <location filename="../Client/client.cpp" line="586"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="589"/>
         <source>Password is incorrect.</source>
         <translation type="unfinished">密码错误。</translation>
     </message>
     <message id="user-nonexistent">
         <location filename="../Client/client.cpp" line="599"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="602"/>
         <source>User does not exist.</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="logout-forced">
         <location filename="../Client/client.cpp" line="618"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="621"/>
         <source>%1: logged elsewhere, force quitting</source>
         <oldsource>%1: Logged elsewhere, force quitting</oldsource>
         <translation type="unfinished">用户%1在别处登录，已强制下线</translation>
     </message>
     <message id="client-bad-json">
         <location filename="../Client/client.cpp" line="637"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="641"/>
         <source>Client sent a bad JSON.</source>
         <translation type="unfinished">客户端发送了不正确的JSON。</translation>
     </message>
     <message id="client-unsupported-json">
         <location filename="../Client/client.cpp" line="640"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="644"/>
         <source>Client sent an unsupported JSON.</source>
         <translation type="unfinished">客户端发送了不支持的信息。</translation>
     </message>
     <message id="remote-disconnect">
         <location filename="../Client/client.cpp" line="551"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="553"/>
         <source>Remote disconnected.</source>
         <translation type="unfinished">远程连接断开。</translation>
     </message>
     <message id="licence-not-found">
-        <location filename="../ClientGUI/mainwindow.cpp" line="23"/>
+        <location filename="../ClientGUI/mainwindow.cpp" line="26"/>
         <location filename="../Protocol/commandline.cpp" line="138"/>
         <source>Can&apos;t find license file, exiting.</source>
         <translation type="unfinished">找不到许可证文件，退出。</translation>
     </message>
     <message id="naganami-words">
-        <location filename="../ClientGUI/mainwindow.cpp" line="39"/>
+        <location filename="../ClientGUI/mainwindow.cpp" line="41"/>
         <source>What? Admiral Tanaka? He&apos;s the real deal, isn&apos;t he?
 Great at battle and bad at politics--so cool!</source>
         <translation type="unfinished">什么？要说田中少将？他可真是个人物！会打仗，不会做人。挺好的嘛！</translation>
     </message>
     <message id="license-continue">
-        <location filename="../ClientGUI/mainwindow.cpp" line="47"/>
+        <location filename="../ClientGUI/mainwindow.cpp" line="49"/>
         <source>Continue</source>
         <translation type="unfinished">继续</translation>
     </message>
+    <message id="confirm-password">
+        <location filename="../ClientGUI/mainwindow.cpp" line="117"/>
+        <source>Confirm Password:</source>
+        <translation type="unfinished">密码确认：</translation>
+    </message>
+    <message id="password">
+        <location filename="../ClientGUI/mainwindow.cpp" line="124"/>
+        <source>Password:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="develop-equipment">
+        <location filename="../ClientGUI/mainwindow.cpp" line="144"/>
+        <source>Develop Equipment</source>
+        <translation type="unfinished">装备开发</translation>
+    </message>
     <message id="invalid-command">
+        <location filename="../ClientGUI/clientv2.cpp" line="899"/>
         <location filename="../Protocol/commandline.cpp" line="221"/>
         <source>Invalid Command, use &apos;commands&apos; for valid commands, &apos;help&apos; for help, &apos;exit&apos; to exit.</source>
         <translation type="unfinished">命令无效，请使用&quot;commands&quot;查看可用命令，&quot;help&quot;查看帮助，&quot;exit&quot;退出。</translation>
     </message>
     <message id="exit-helper">
+        <location filename="../ClientGUI/clientv2.cpp" line="904"/>
         <location filename="../Protocol/commandline.cpp" line="226"/>
         <source>Use &apos;exit&apos; to quit.</source>
         <translation type="unfinished">若要退出请使用&quot;exit&quot;。</translation>
     </message>
     <message id="good-command">
+        <location filename="../ClientGUI/clientv2.cpp" line="907"/>
         <location filename="../Protocol/commandline.cpp" line="229"/>
         <source>Available commands:</source>
         <translation type="unfinished">可用命令：</translation>
     </message>
     <message id="all-command">
+        <location filename="../ClientGUI/clientv2.cpp" line="912"/>
         <location filename="../Protocol/commandline.cpp" line="234"/>
         <source>All commands:</source>
         <translation type="unfinished">全部命令：</translation>
     </message>
+    <message id="goodbye-gui">
+        <location filename="../ClientGUI/clientv2.cpp" line="925"/>
+        <source>Goodbye.</source>
+        <translation type="unfinished"></translation>
+    </message>
     <message id="help-msg">
+        <location filename="../ClientGUI/clientv2.cpp" line="880"/>
         <location filename="../Protocol/commandline.cpp" line="207"/>
         <source>Use &apos;exit&apos; to quit, &apos;help&apos; to show help, &apos;commands&apos; to show available commands.</source>
         <translation type="unfinished">请使用&quot;commands&quot;查看可用命令，&quot;help&quot;查看帮助，&quot;exit&quot;退出。</translation>
@@ -648,38 +726,218 @@ Great at battle and bad at politics--so cool!</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ClientGUI/mainwindow.ui" line="78"/>
-        <source>Fleet</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../ClientGUI/mainwindow.ui" line="94"/>
-        <source>Supply</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../ClientGUI/mainwindow.ui" line="110"/>
-        <source>Refit</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../ClientGUI/mainwindow.ui" line="126"/>
-        <source>Dock</source>
+        <location filename="../ClientGUI/mainwindow.ui" line="74"/>
+        <source>Hello!</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../ClientGUI/mainwindow.ui" line="142"/>
-        <source>Factory</source>
+        <source>Port:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ClientGUI/mainwindow.ui" line="224"/>
-        <source>Continue</source>
-        <extracomment>License Continue</extracomment>
+        <location filename="../ClientGUI/mainwindow.ui" line="170"/>
+        <source>Server:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ClientGUI/mainwindow.ui" line="177"/>
+        <source>Password:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ClientGUI/mainwindow.ui" line="184"/>
+        <source>Username:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ClientGUI/mainwindow.ui" line="198"/>
+        <source>Connect</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ClientGUI/mainwindow.ui" line="208"/>
+        <source>Register</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ClientGUI/mainwindow.ui" line="253"/>
+        <source>Factory 4</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ClientGUI/mainwindow.ui" line="260"/>
+        <source>Factory 17</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ClientGUI/mainwindow.ui" line="267"/>
+        <source>Factory 2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ClientGUI/mainwindow.ui" line="274"/>
+        <source>Factory 3</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ClientGUI/mainwindow.ui" line="281"/>
+        <source>Factory 7</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ClientGUI/mainwindow.ui" line="288"/>
+        <source>Factory 11</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../ClientGUI/mainwindow.ui" line="295"/>
+        <source>Factory 6</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ClientGUI/mainwindow.ui" line="302"/>
+        <source>Factory 15</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ClientGUI/mainwindow.ui" line="309"/>
+        <source>Factory 14</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ClientGUI/mainwindow.ui" line="316"/>
+        <source>Factory 8</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ClientGUI/mainwindow.ui" line="323"/>
+        <source>Factory 1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ClientGUI/mainwindow.ui" line="330"/>
+        <source>Factory 5</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ClientGUI/mainwindow.ui" line="337"/>
+        <source>Factory 13</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ClientGUI/mainwindow.ui" line="344"/>
+        <source>Factory 0</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ClientGUI/mainwindow.ui" line="351"/>
+        <source>Factory 10</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ClientGUI/mainwindow.ui" line="358"/>
+        <source>Factory 16</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ClientGUI/mainwindow.ui" line="365"/>
+        <source>Factory 12</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ClientGUI/mainwindow.ui" line="372"/>
+        <source>Factory 9</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ClientGUI/mainwindow.ui" line="379"/>
+        <source>Factory 18</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ClientGUI/mainwindow.ui" line="386"/>
+        <source>Factory 19</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ClientGUI/mainwindow.ui" line="393"/>
+        <source>Factory 20</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ClientGUI/mainwindow.ui" line="400"/>
+        <source>Factory 21</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ClientGUI/mainwindow.ui" line="407"/>
+        <source>Factory 22</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ClientGUI/mainwindow.ui" line="414"/>
+        <source>Factory 23</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ClientGUI/mainwindow.ui" line="426"/>
+        <source>Equipment Development</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ClientGUI/mainwindow.ui" line="589"/>
+        <source>Sortie</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ClientGUI/mainwindow.ui" line="594"/>
+        <source>Fleet</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ClientGUI/mainwindow.ui" line="599"/>
+        <source>Supply</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ClientGUI/mainwindow.ui" line="604"/>
+        <source>Refit</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ClientGUI/mainwindow.ui" line="609"/>
+        <source>Dock</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ClientGUI/mainwindow.ui" line="614"/>
+        <source>Factory</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ClientGUI/mainwindow.ui" line="646"/>
+        <source>Develop Equipment</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ClientGUI/mainwindow.ui" line="651"/>
+        <source>Back to naval base</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ClientGUI/mainwindow.ui" line="516"/>
+        <source>Continue</source>
+        <extracomment>License Continue</extracomment>
+        <translation type="unfinished">继续</translation>
+    </message>
+    <message>
+        <location filename="../ClientGUI/mainwindow.ui" line="620"/>
+        <source>Naval Base</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ClientGUI/mainwindow.ui" line="635"/>
         <source>toolBar</source>
         <translation type="unfinished"></translation>
     </message>
@@ -687,10 +945,9 @@ Great at battle and bad at politics--so cool!</source>
 <context>
     <name>naganami-words</name>
     <message>
-        <location filename="../ClientGUI/mainwindow.cpp" line="37"/>
         <source>What? Admiral Tanaka? He&apos;s the real deal, isn&apos;t he?
 Great at battle and bad at politics--so cool!</source>
-        <translation type="unfinished">什么？要说田中少将？他可真是个人物！会打仗，不会做人。挺好的嘛！</translation>
+        <translation type="obsolete">什么？要说田中少将？他可真是个人物！会打仗，不会做人。挺好的嘛！</translation>
     </message>
 </context>
 </TS>
