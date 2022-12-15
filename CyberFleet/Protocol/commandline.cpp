@@ -200,7 +200,7 @@ bool CommandLine::parse(const QString &input) {
     return false;
 }
 
-inline void CommandLine::showHelp(const QStringList &cmdParts) {
+void CommandLine::showHelp(const QStringList &cmdParts) {
     if(cmdParts.isEmpty()) {
         //% "Use 'exit' to quit, 'help' to show help, "
         //% "'commands' to show available commands."

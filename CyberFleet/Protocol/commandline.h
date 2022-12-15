@@ -31,9 +31,9 @@ public slots:
     bool parse(const QString &);
     virtual bool parseSpec(const QStringList &) = 0;
     void showHelp(const QStringList &);
+    static const QStringList getCommands();
 
 protected:
-    static const QStringList getCommands();
     virtual const QStringList getCommandsSpec() const = 0;
     virtual const QStringList getValidCommands() const = 0;
     void invalidCommand();

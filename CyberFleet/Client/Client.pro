@@ -62,3 +62,6 @@ HEADERS += \
 
 RESOURCES += \
     ../common.qrc
+
+DISTFILES += \
+    ../resources/icon.ico
