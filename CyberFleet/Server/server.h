@@ -110,6 +110,7 @@ private:
     void receivedLogout(const QJsonObject &, const PeerInfo &, QSslSocket *);
     void receivedReg(const QJsonObject &, const PeerInfo &, QSslSocket *);
     void receivedReq(const QJsonObject &, const PeerInfo &, QSslSocket *);
+    void refreshClientFactory(Uid uid, QSslSocket *connection);
     void sqlcheckEquip();
     void sqlcheckEquipU();
     void sqlcheckFacto();

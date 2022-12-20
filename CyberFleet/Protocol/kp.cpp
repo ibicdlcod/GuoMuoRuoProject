@@ -72,6 +72,14 @@ QByteArray KP::clientDevelop(int equipid, bool convert, int factoryID) {
     return QCborValue::fromJsonValue(result).toCbor();
 }
 
+QByteArray KP::clientFactoryRefresh() {
+    QJsonObject result;
+    result["type"] = DgramType::Request;
+    result["command"] = CommandType::Refresh;
+    result["view"] = GameState::Factory;
+    return QCborValue::fromJsonValue(result).toCbor();
+}
+
 QByteArray KP::clientFetch(int factoryID) {
     QJsonObject result;
     result["type"] = DgramType::Request;

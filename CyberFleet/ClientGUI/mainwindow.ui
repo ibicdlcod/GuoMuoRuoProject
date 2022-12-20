@@ -620,6 +620,7 @@ border-color: rgb(255, 255, 255);</string>
      <string>Naval Base</string>
     </property>
     <addaction name="actionBack_to_naval_base"/>
+    <addaction name="actionQuit"/>
    </widget>
    <addaction name="menuNaval_Base"/>
    <addaction name="menuSortie"/>
@@ -651,6 +652,11 @@ border-color: rgb(255, 255, 255);</string>
     <string>Back to naval base</string>
    </property>
   </action>
+  <action name="actionQuit">
+   <property name="text">
+    <string>Quit</string>
+   </property>
+  </action>
  </widget>
  <customwidgets>
   <customwidget>
@@ -659,6 +665,43 @@ border-color: rgb(255, 255, 255);</string>
    <header>factoryslot.h</header>
   </customwidget>
  </customwidgets>
+ <tabstops>
+  <tabstop>ServerEdit</tabstop>
+  <tabstop>PortEdit</tabstop>
+  <tabstop>UsernameEdit</tabstop>
+  <tabstop>PasswordEdit</tabstop>
+  <tabstop>pushButton_7</tabstop>
+  <tabstop>pushButton_6</tabstop>
+  <tabstop>Factory_Slot_4</tabstop>
+  <tabstop>Factory_Slot_17</tabstop>
+  <tabstop>Factory_Slot_2</tabstop>
+  <tabstop>Factory_Slot_3</tabstop>
+  <tabstop>Factory_Slot_7</tabstop>
+  <tabstop>Factory_Slot_11</tabstop>
+  <tabstop>Factory_Slot_6</tabstop>
+  <tabstop>Factory_Slot_15</tabstop>
+  <tabstop>Factory_Slot_14</tabstop>
+  <tabstop>Factory_Slot_8</tabstop>
+  <tabstop>Factory_Slot_1</tabstop>
+  <tabstop>Factory_Slot_5</tabstop>
+  <tabstop>Factory_Slot_13</tabstop>
+  <tabstop>Factory_Slot_0</tabstop>
+  <tabstop>Factory_Slot_10</tabstop>
+  <tabstop>Factory_Slot_16</tabstop>
+  <tabstop>Factory_Slot_12</tabstop>
+  <tabstop>Factory_Slot_9</tabstop>
+  <tabstop>Factory_Slot_18</tabstop>
+  <tabstop>Factory_Slot_19</tabstop>
+  <tabstop>Factory_Slot_20</tabstop>
+  <tabstop>Factory_Slot_21</tabstop>
+  <tabstop>Factory_Slot_22</tabstop>
+  <tabstop>Factory_Slot_23</tabstop>
+  <tabstop>LicenseText</tabstop>
+  <tabstop>Naganami</tabstop>
+  <tabstop>ContinueButton</tabstop>
+  <tabstop>LogBrowser</tabstop>
+  <tabstop>CommandPrompt</tabstop>
+ </tabstops>
  <resources/>
  <connections>
   <connection>

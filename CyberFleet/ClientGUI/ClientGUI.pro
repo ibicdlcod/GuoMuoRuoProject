@@ -10,6 +10,7 @@ CONFIG += c++17
 
 SOURCES += \
     clientv2.cpp \
+    developwindow.cpp \
     keyenterreceiver.cpp \
     main.cpp \
     mainwindow.cpp \
@@ -17,11 +18,13 @@ SOURCES += \
 
 HEADERS += \
     clientv2.h \
+    developwindow.h \
     keyenterreceiver.h \
     mainwindow.h \
     networkerror.h
 
 FORMS += \
+    developwindow.ui \
     mainwindow.ui
 
 # Default rules for deployment.

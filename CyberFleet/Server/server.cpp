@@ -49,6 +49,7 @@
 #include "server.h"
 #include <algorithm>
 #include "kerrors.h"
+#include "kp.h"
 #include "peerinfo.h"
 #include "sslserver.h"
 
@@ -1082,7 +1083,7 @@ void Server::receivedReq(const QJsonObject &djson,
                          const PeerInfo &peerInfo,
                          QSslSocket *connection) {
     Q_UNUSED(peerInfo)
-    /* this is inefficient */
+    /* TODO: this is inefficient */
     for(auto begin = connectedPeers.keyValueBegin(),
         end = connectedPeers.keyValueEnd();
         begin != end; begin++){
@@ -1091,11 +1092,13 @@ void Server::receivedReq(const QJsonObject &djson,
             switch(djson["command"].toInt()) {
             case KP::CommandType::ChangeState: {
                 switch(djson["state"].toInt()) {
-                /* TODO:Should update to client as well? */
+                /* TODO: Should update to client as well? */
                 case KP::GameState::Port: User::refreshPort(uid); break;
-                case KP::GameState::Factory: User::refreshFactory(uid); break;
+                case KP::GameState::Factory: User::refreshFactory(uid);
+                    refreshClientFactory(uid, connection); break;
                 default:
-                    throw std::domain_error("command type not supported"); break;
+                    throw std::domain_error("command type not supported");
+                    break;
                 }
             }
                 break;
@@ -1106,6 +1109,15 @@ void Server::receivedReq(const QJsonObject &djson,
                 break;
             case KP::CommandType::Fetch:
                 doFetch(uid, djson["factory"].toInt(), connection); break;
+            case KP::CommandType::Refresh:
+                switch(djson["view"].toInt()) {
+                case KP::GameState::Factory: refreshClientFactory
+                            (uid, connection); break;
+                default:
+                    throw std::domain_error("command type not supported");
+                    break;
+                }
+                break;
             default:
                 throw std::domain_error("command type not supported"); break;
             }
@@ -1113,6 +1125,31 @@ void Server::receivedReq(const QJsonObject &djson,
         }
     }
     QByteArray msg = KP::accessDenied();
+    connection->write(msg);
+}
+
+void Server::refreshClientFactory(Uid uid, QSslSocket *connection) {
+    QSqlDatabase db = QSqlDatabase::database();
+    QSqlQuery query;
+    query.prepare("SELECT FactoryID, FullTime, Done FROM Factories "
+                  "WHERE User = :id");
+    query.bindValue(":id", uid);
+    query.exec();
+    query.isSelect();
+    QJsonObject result;
+    QJsonArray itemArray;
+    while(query.next()) {
+        QJsonObject item;
+        item["factoryid"] = query.value(0).toInt();
+        item["completetime"] = query.value(1).toDateTime().toString();
+        item["done"] = query.value(2).toBool();
+        itemArray.append(item);
+    }
+    result["type"] = KP::DgramType::Info;
+    result["infotype"] = KP::InfoType::FactoryInfo;
+    result["content"] = itemArray;
+    QByteArray msg = QCborValue::fromJsonValue(result).toCbor();
+    qCritical() << msg;
     connection->write(msg);
 }
 

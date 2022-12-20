@@ -35,7 +35,8 @@ static constexpr int equipIdMax = 0x100000;
 enum DgramType{
     Auth,
     Message,
-    Request
+    Request,
+    Info
 };
 Q_ENUM_NS(DgramType)
 
@@ -91,7 +92,8 @@ Q_ENUM_NS(ResourceType)
 enum CommandType{
     ChangeState,
     Develop,
-    Fetch
+    Fetch,
+    Refresh
 };
 Q_ENUM_NS(CommandType)
 
@@ -110,6 +112,11 @@ enum FactoryState{
 };
 Q_ENUM_NS(FactoryState)
 
+enum InfoType{
+    FactoryInfo
+};
+Q_ENUM_NS(InfoType)
+
 void initLog(bool server = false);
 #if defined (Q_OS_WIN)
 void winConsoleCheck();
@@ -120,6 +127,7 @@ QByteArray accessDenied();
 QByteArray clientAuth(AuthMode, const QString &name,
                       const QByteArray &shadow = "");
 QByteArray clientDevelop(int, bool convert = false, int factoryID = -1);
+QByteArray clientFactoryRefresh();
 QByteArray clientFetch(int factoryID = -1);
 QByteArray clientStateChange(GameState);
 QByteArray serverAuth(AuthMode, const QString &,

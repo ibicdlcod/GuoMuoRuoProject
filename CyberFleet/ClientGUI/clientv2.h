@@ -79,22 +79,23 @@ public:
     bool loggedIn() const;
 
 public slots:
+    void backToNavalBase();
     void catbomb();
     void displayPrompt();
+    bool parse(const QString &);
+    void parseDisconnectReq();
     bool parseSpec(const QStringList &);
     void serverResponse(const QString &, const QByteArray &);
-    Q_DECL_DEPRECATED void update();
-
-    void backToNavalBase();
-    bool parse(const QString &);
     void showHelp(const QStringList &);
     void switchToFactory();
+    Q_DECL_DEPRECATED void update();
 
 signals:
     void aboutToQuit();
     void gamestateChanged(KP::GameState);
     void qout(QString, QColor background = QColor("white"),
               QColor foreground = QColor("black"));
+    void receivedFactoryRefresh(const QJsonObject &);
 
 private slots:
     void encrypted();
@@ -108,31 +109,28 @@ private:
     void doDevelop(const QStringList &);
     void doFetch(const QStringList &);
     void doSwitch(const QStringList &);
+    void doRefreshFactory();
+    void exitGracefully();
     void exitGraceSpec();
     QString gameStateString() const;
+    static const QStringList getCommands();
     const QStringList getCommandsSpec() const;
+    int getConsoleWidth();
     const QStringList getValidCommands() const;
+    void invalidCommand();
     void parseConnectReq(const QStringList &);
-    void parseDisconnectReq();
     bool parseGameCommands(const QString &, const QStringList &);
     void parsePassword(const QString &);
+    void qls(const QStringList &);
     void readWhenConnected(const QByteArray &);
     void readWhenUnConnected(const QByteArray &);
     void receivedAuth(const QJsonObject &);
+    void receivedInfo(const QJsonObject &);
     void receivedLogin(const QJsonObject &);
     void receivedLogout(const QJsonObject &);
     void receivedMsg(const QJsonObject &);
     void receivedReg(const QJsonObject &);
-
-    static const QStringList getCommands();
-    void invalidCommand();
     void showCommands(bool);
-    /* utility */
-    static int callength(const QString &, bool naive = false);
-    int getConsoleWidth();
-    void qls(const QStringList &);
-    /* exit */
-    void exitGracefully();
 
     explicit Clientv2(QObject * parent = nullptr);
 

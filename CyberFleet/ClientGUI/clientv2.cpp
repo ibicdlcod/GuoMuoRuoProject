@@ -71,7 +71,25 @@ Clientv2::~Clientv2() noexcept {
     shutdown();
 }
 
+/* public */
+inline bool Clientv2::loggedIn() const {
+    return gameState != KP::Offline;
+}
+
 /* public slots */
+void Clientv2::backToNavalBase() {
+    if(!loggedIn()) {
+        emit qout(qtTrId("access-denied-login-first"));
+        return;
+    }
+    if(gameState == KP::Port) {
+        return;
+    } else {
+        gameState = KP::Port;
+        emit gamestateChanged(KP::Port);
+    }
+}
+
 void Clientv2::catbomb() {
     if(loggedIn()) {
         //% "You have been bombarded by a cute cat."
@@ -104,6 +122,54 @@ void Clientv2::displayPrompt() {
         qout << QString("%1@%2(%3)$ ")
                 .arg(clientName, serverName, gameStateString());
     }*/
+}
+
+bool Clientv2::parse(const QString &input) {
+    if(passwordMode != Password::normal) {
+        bool success = parseSpec(QStringList(input));
+        if(!success) {
+            invalidCommand();
+        }
+        displayPrompt();
+        return success;
+    }
+    static QRegularExpression re("\\s+");
+    QStringList cmdParts = input.split(re, Qt::SkipEmptyParts);
+    if(cmdParts.length() > 0) {
+        QString primary = cmdParts[0];
+        primary = settings->value("alias/"+primary, primary).toString();
+
+        if(primary.compare("help", Qt::CaseInsensitive) == 0) {
+            cmdParts.removeFirst();
+            showHelp(cmdParts);
+            displayPrompt();
+            return true;
+        }
+        else if(primary.compare("exit", Qt::CaseInsensitive) == 0) {
+            exitGracefully();
+            return true;
+        }
+        else if(primary.compare("commands", Qt::CaseInsensitive) == 0) {
+            showCommands(true);
+            displayPrompt();
+            return true;
+        }
+        else if(primary.compare("allcommands", Qt::CaseInsensitive) == 0) {
+            showCommands(false);
+            displayPrompt();
+            return true;
+        }
+        else {
+            bool success = parseSpec(cmdParts);
+            if(!success) {
+                invalidCommand();
+            }
+            displayPrompt();
+            return success;
+        }
+    }
+    displayPrompt();
+    return false;
 }
 
 bool Clientv2::parseSpec(const QStringList &cmdParts) {
@@ -146,6 +212,7 @@ void Clientv2::serverResponse(const QString &clientInfo,
     try{
         switch(djson["type"].toInt()) {
         case KP::DgramType::Auth: receivedAuth(djson); break;
+        case KP::DgramType::Info: receivedInfo(djson); break;
         case KP::DgramType::Message: receivedMsg(djson); break;
         default:
             throw std::domain_error("datagram type not supported"); break;
@@ -163,6 +230,30 @@ void Clientv2::serverResponse(const QString &clientInfo,
 #else
     Q_UNUSED(clientInfo)
 #endif
+}
+
+void Clientv2::showHelp(const QStringList &cmdParts) {
+    if(cmdParts.isEmpty()) {
+        //% "Use 'exit' to quit, 'help' to show help, "
+        //% "'commands' to show available commands."
+        emit qout(qtTrId("help-msg"));
+    }
+    else { /* this trick does not do things nicely */
+        parse(cmdParts[0]);
+    }
+}
+
+void Clientv2::switchToFactory() {
+    if(!loggedIn()) {
+        emit qout(qtTrId("access-denied-login-first"));
+        return;
+    }
+    if(gameState == KP::Factory) {
+        return;
+    } else {
+        gameState = KP::Factory;
+        emit gamestateChanged(KP::Factory);
+    }
 }
 
 void Clientv2::update() {
@@ -261,6 +352,7 @@ void Clientv2::shutdown() {
                         this, &Clientv2::errorOccurred);
 }
 
+/* private */
 void Clientv2::doDevelop(const QStringList &cmdParts) {
     if(cmdParts.length() < 3) {
         //% "Usage: develop [equipid] [FactorySlot]"
@@ -300,6 +392,7 @@ void Clientv2::doFetch(const QStringList &cmdParts) {
         return;
     }
 }
+
 void Clientv2::doSwitch(const QStringList &cmdParts) {
     if(cmdParts.length() < 2) {
         //% "Usage: switch [gamestate]"
@@ -331,6 +424,22 @@ void Clientv2::doSwitch(const QStringList &cmdParts) {
         }
         return;
     }
+}
+
+void Clientv2::doRefreshFactory() {
+    QByteArray msg = KP::clientFactoryRefresh();
+    const qint64 written = socket.write(msg);
+    if (written <= 0) {
+        throw NetworkError(socket.errorString());
+    }
+}
+
+void Clientv2::exitGracefully() {
+    exitGraceSpec();
+    //% "Goodbye."
+    emit qout(qtTrId("goodbye-gui"), QColor("black"), QColor(64,255,64));
+    logFile->close();
+    emit aboutToQuit();
 }
 
 void Clientv2::exitGraceSpec() {
@@ -377,10 +486,6 @@ const QStringList Clientv2::getValidCommands() const {
         result.append({"connect", "register", "switch"});
     result.sort(Qt::CaseInsensitive);
     return result;
-}
-
-inline bool Clientv2::loggedIn() const {
-    return gameState != KP::Offline;
 }
 
 void Clientv2::parseConnectReq(const QStringList &cmdParts) {
@@ -470,6 +575,15 @@ bool Clientv2::parseGameCommands(const QString &primary,
         else {
             doFetch(cmdParts);
             return true;
+        }
+    }
+    else if(primary.compare("refresh", Qt::CaseInsensitive) == 0) {
+        if(cmdParts.length() > 1
+                && cmdParts[1].compare("Factory", Qt::CaseInsensitive) == 0) {
+            doRefreshFactory();
+            return true;
+        } else {
+            return false;
         }
     }
     return false;
@@ -569,6 +683,13 @@ void Clientv2::receivedAuth(const QJsonObject &djson) {
     case KP::AuthMode::Reg: receivedReg(djson); break;
     case KP::AuthMode::Login: receivedLogin(djson); break;
     case KP::AuthMode::Logout: receivedLogout(djson); break;
+    default: throw std::domain_error("auth type not supported"); break;
+    }
+}
+
+void Clientv2::receivedInfo(const QJsonObject &djson) {
+    switch(djson["infotype"].toInt()) {
+    case KP::InfoType::FactoryInfo: emit receivedFactoryRefresh(djson); break;
     default: throw std::domain_error("auth type not supported"); break;
     }
 }
@@ -730,62 +851,6 @@ const QStringList Clientv2::getCommands() {
     return CommandLine::getCommands();
 }
 
-void Clientv2::backToNavalBase() {
-    if(!loggedIn()) {
-        emit qout(qtTrId("access-denied-login-first"));
-        return;
-    }
-    parse("switch Port");
-}
-
-bool Clientv2::parse(const QString &input) {
-    if(passwordMode != Password::normal) {
-        bool success = parseSpec(QStringList(input));
-        if(!success) {
-            invalidCommand();
-        }
-        displayPrompt();
-        return success;
-    }
-    static QRegularExpression re("\\s+");
-    QStringList cmdParts = input.split(re, Qt::SkipEmptyParts);
-    if(cmdParts.length() > 0) {
-        QString primary = cmdParts[0];
-        primary = settings->value("alias/"+primary, primary).toString();
-
-        if(primary.compare("help", Qt::CaseInsensitive) == 0) {
-            cmdParts.removeFirst();
-            showHelp(cmdParts);
-            displayPrompt();
-            return true;
-        }
-        else if(primary.compare("exit", Qt::CaseInsensitive) == 0) {
-            exitGracefully();
-            return true;
-        }
-        else if(primary.compare("commands", Qt::CaseInsensitive) == 0) {
-            showCommands(true);
-            displayPrompt();
-            return true;
-        }
-        else if(primary.compare("allcommands", Qt::CaseInsensitive) == 0) {
-            showCommands(false);
-            displayPrompt();
-            return true;
-        }
-        else {
-            bool success = parseSpec(cmdParts);
-            if(!success) {
-                invalidCommand();
-            }
-            displayPrompt();
-            return success;
-        }
-    }
-    displayPrompt();
-    return false;
-}
-
 /* Rather too long, but tested */
 void customMessageHandler(QtMsgType type,
                           const QMessageLogContext &context,
@@ -877,30 +942,6 @@ void customMessageHandler(QtMsgType type,
     }
 }
 
-void Clientv2::showHelp(const QStringList &cmdParts) {
-    if(cmdParts.isEmpty()) {
-        //% "Use 'exit' to quit, 'help' to show help, "
-        //% "'commands' to show available commands."
-        emit qout(qtTrId("help-msg"));
-    }
-    else { /* this trick does not do things nicely */
-        parse(cmdParts[0]);
-    }
-}
-
-void Clientv2::switchToFactory() {
-    if(!loggedIn()) {
-        emit qout(qtTrId("access-denied-login-first"));
-        return;
-    }
-    if(gameState == KP::Factory) {
-        return;
-    } else {
-        gameState = KP::Factory;
-        emit gamestateChanged(KP::Factory);
-    }
-}
-
 inline void Clientv2::invalidCommand() {
     //% "Invalid Command, use 'commands' for valid commands, "
     //% "'help' for help, 'exit' to exit."
@@ -925,12 +966,4 @@ void Clientv2::showCommands(bool validOnly){
 //severely steamlined
 void Clientv2::qls(const QStringList &input) {
     emit qout(input.join(" "));
-}
-
-void Clientv2::exitGracefully() {
-    exitGraceSpec();
-    //% "Goodbye."
-    emit qout(qtTrId("goodbye-gui"), QColor("black"), QColor(64,255,64));
-    logFile->close();
-    emit aboutToQuit();
 }
