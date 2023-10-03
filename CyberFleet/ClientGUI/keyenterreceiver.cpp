@@ -3,8 +3,7 @@
 #include <QKeyEvent>
 
 KeyEnterReceiver::KeyEnterReceiver(QObject *parent)
-    : QObject{parent}
-{
+    : QObject{parent} {
 
 }
 

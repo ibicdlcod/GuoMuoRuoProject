@@ -2,6 +2,7 @@
 #include <QLocale>
 #include <QTranslator>
 #include "qconsolelistener.h"
+#include "../steam/steam_api.h"
 
 #include "kp.h"
 #include "server.h"
@@ -9,7 +10,18 @@
 QFile *logFile;
 std::unique_ptr<QSettings> settings;
 
+static const int STEAM_ERROR = 1;
+
 int main(int argc, char *argv[]) {
+
+    if(SteamAPI_RestartAppIfNecessary(2632870)) { // keep steam_appid.txt
+        return STEAM_ERROR;
+    }
+    if(!SteamAPI_Init()) {
+        qFatal("Fatal Error - Steam must be running to play this game (SteamAPI_Init() failed).\n");
+        return STEAM_ERROR;
+    }
+
     QT_USE_NAMESPACE
 #if defined (Q_OS_WIN)
     KP::winConsoleCheck();

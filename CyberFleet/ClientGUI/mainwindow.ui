@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>MainWindow</string>
+   <string>CyberFleet GUI</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <property name="styleSheet">
@@ -247,66 +247,24 @@
           <string notr="true">background-color: rgb(170, 255, 255);</string>
          </property>
          <layout class="QGridLayout" name="gridLayout_3">
-          <item row="6" column="1">
-           <widget class="FactorySlot" name="Factory_Slot_4">
+          <item row="4" column="4">
+           <widget class="FactorySlot" name="Factory_Slot_20">
             <property name="text">
-             <string>Factory 4</string>
+             <string>Factory 20</string>
             </property>
            </widget>
           </item>
-          <item row="7" column="3">
-           <widget class="FactorySlot" name="Factory_Slot_17">
+          <item row="7" column="4">
+           <widget class="FactorySlot" name="Factory_Slot_23">
             <property name="text">
-             <string>Factory 17</string>
+             <string>Factory 23</string>
             </property>
            </widget>
           </item>
-          <item row="4" column="1">
-           <widget class="FactorySlot" name="Factory_Slot_2">
+          <item row="6" column="4">
+           <widget class="FactorySlot" name="Factory_Slot_22">
             <property name="text">
-             <string>Factory 2</string>
-            </property>
-           </widget>
-          </item>
-          <item row="5" column="1">
-           <widget class="FactorySlot" name="Factory_Slot_3">
-            <property name="text">
-             <string>Factory 3</string>
-            </property>
-           </widget>
-          </item>
-          <item row="3" column="2">
-           <widget class="FactorySlot" name="Factory_Slot_7">
-            <property name="text">
-             <string>Factory 7</string>
-            </property>
-           </widget>
-          </item>
-          <item row="7" column="2">
-           <widget class="FactorySlot" name="Factory_Slot_11">
-            <property name="text">
-             <string>Factory 11</string>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="2">
-           <widget class="FactorySlot" name="Factory_Slot_6">
-            <property name="text">
-             <string>Factory 6</string>
-            </property>
-           </widget>
-          </item>
-          <item row="5" column="3">
-           <widget class="FactorySlot" name="Factory_Slot_15">
-            <property name="text">
-             <string>Factory 15</string>
-            </property>
-           </widget>
-          </item>
-          <item row="4" column="3">
-           <widget class="FactorySlot" name="Factory_Slot_14">
-            <property name="text">
-             <string>Factory 14</string>
+             <string>Factory 22</string>
             </property>
            </widget>
           </item>
@@ -317,38 +275,24 @@
             </property>
            </widget>
           </item>
-          <item row="3" column="1">
-           <widget class="FactorySlot" name="Factory_Slot_1">
+          <item row="5" column="1">
+           <widget class="FactorySlot" name="Factory_Slot_3">
             <property name="text">
-             <string>Factory 1</string>
+             <string>Factory 3</string>
             </property>
            </widget>
           </item>
-          <item row="7" column="1">
-           <widget class="FactorySlot" name="Factory_Slot_5">
+          <item row="4" column="1">
+           <widget class="FactorySlot" name="Factory_Slot_2">
             <property name="text">
-             <string>Factory 5</string>
+             <string>Factory 2</string>
             </property>
            </widget>
           </item>
-          <item row="3" column="3">
-           <widget class="FactorySlot" name="Factory_Slot_13">
+          <item row="2" column="2">
+           <widget class="FactorySlot" name="Factory_Slot_6">
             <property name="text">
-             <string>Factory 13</string>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="1">
-           <widget class="FactorySlot" name="Factory_Slot_0">
-            <property name="text">
-             <string>Factory 0</string>
-            </property>
-           </widget>
-          </item>
-          <item row="6" column="2">
-           <widget class="FactorySlot" name="Factory_Slot_10">
-            <property name="text">
-             <string>Factory 10</string>
+             <string>Factory 6</string>
             </property>
            </widget>
           </item>
@@ -359,17 +303,24 @@
             </property>
            </widget>
           </item>
-          <item row="2" column="3">
-           <widget class="FactorySlot" name="Factory_Slot_12">
+          <item row="7" column="2">
+           <widget class="FactorySlot" name="Factory_Slot_11">
             <property name="text">
-             <string>Factory 12</string>
+             <string>Factory 11</string>
             </property>
            </widget>
           </item>
-          <item row="5" column="2">
-           <widget class="FactorySlot" name="Factory_Slot_9">
+          <item row="5" column="4">
+           <widget class="FactorySlot" name="Factory_Slot_21">
             <property name="text">
-             <string>Factory 9</string>
+             <string>Factory 21</string>
+            </property>
+           </widget>
+          </item>
+          <item row="6" column="1">
+           <widget class="FactorySlot" name="Factory_Slot_4">
+            <property name="text">
+             <string>Factory 4</string>
             </property>
            </widget>
           </item>
@@ -387,34 +338,6 @@
             </property>
            </widget>
           </item>
-          <item row="4" column="4">
-           <widget class="FactorySlot" name="Factory_Slot_20">
-            <property name="text">
-             <string>Factory 20</string>
-            </property>
-           </widget>
-          </item>
-          <item row="5" column="4">
-           <widget class="FactorySlot" name="Factory_Slot_21">
-            <property name="text">
-             <string>Factory 21</string>
-            </property>
-           </widget>
-          </item>
-          <item row="6" column="4">
-           <widget class="FactorySlot" name="Factory_Slot_22">
-            <property name="text">
-             <string>Factory 22</string>
-            </property>
-           </widget>
-          </item>
-          <item row="7" column="4">
-           <widget class="FactorySlot" name="Factory_Slot_23">
-            <property name="text">
-             <string>Factory 23</string>
-            </property>
-           </widget>
-          </item>
           <item row="0" column="1" colspan="4">
            <widget class="QLabel" name="FactoryLabel">
             <property name="font">
@@ -427,6 +350,83 @@
             </property>
             <property name="alignment">
              <set>Qt::AlignCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="3">
+           <widget class="FactorySlot" name="Factory_Slot_14">
+            <property name="text">
+             <string>Factory 14</string>
+            </property>
+           </widget>
+          </item>
+          <item row="7" column="1">
+           <widget class="FactorySlot" name="Factory_Slot_5">
+            <property name="text">
+             <string>Factory 5</string>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="1">
+           <widget class="FactorySlot" name="Factory_Slot_1">
+            <property name="text">
+             <string>Factory 1</string>
+            </property>
+           </widget>
+          </item>
+          <item row="6" column="2">
+           <widget class="FactorySlot" name="Factory_Slot_10">
+            <property name="text">
+             <string>Factory 10</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="3">
+           <widget class="FactorySlot" name="Factory_Slot_12">
+            <property name="text">
+             <string>Factory 12</string>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="2">
+           <widget class="FactorySlot" name="Factory_Slot_7">
+            <property name="text">
+             <string>Factory 7</string>
+            </property>
+           </widget>
+          </item>
+          <item row="7" column="3">
+           <widget class="FactorySlot" name="Factory_Slot_17">
+            <property name="text">
+             <string>Factory 17</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="1">
+           <widget class="FactorySlot" name="Factory_Slot_0">
+            <property name="text">
+             <string>Factory 0</string>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="3">
+           <widget class="FactorySlot" name="Factory_Slot_13">
+            <property name="text">
+             <string>Factory 13</string>
+            </property>
+           </widget>
+          </item>
+          <item row="5" column="2">
+           <widget class="FactorySlot" name="Factory_Slot_9">
+            <property name="text">
+             <string>Factory 9</string>
+            </property>
+           </widget>
+          </item>
+          <item row="5" column="3">
+           <widget class="FactorySlot" name="Factory_Slot_15">
+            <property name="text">
+             <string>Factory 15</string>
             </property>
            </widget>
           </item>
@@ -581,7 +581,7 @@ border-color: rgb(255, 255, 255);</string>
      <x>0</x>
      <y>0</y>
      <width>916</width>
-     <height>22</height>
+     <height>21</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuSortie">

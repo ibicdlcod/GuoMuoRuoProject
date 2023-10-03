@@ -70,3 +70,10 @@ else:win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$PWD/../../build
 else:win32:!win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$PWD/../../build-CyberFleet-Desktop_Qt_6_6_0_MSVC2019_64bit-Debug/FactorySlot/debug/FactorySlotplugin.lib
 else:win32:!win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$PWD/../../build-CyberFleet-Desktop_Qt_6_6_0_MSVC2019_64bit-Debug/FactorySlot/debug/FactorySlotplugind.lib
 else:unix: PRE_TARGETDEPS += $$PWD/../../build-CyberFleet-Desktop_Qt_6_6_0_MSVC2019_64bit-Debug/FactorySlot/debug/libFactorySlotplugind.a
+
+win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../redistributable_bin/win64/ -lsteam_api64
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../redistributable_bin/win64/ -lsteam_api64
+else:unix: LIBS += -L$$PWD/../redistributable_bin/win64/ -lsteam_api
+
+INCLUDEPATH += $$PWD/../redistributable_bin
+DEPENDPATH += $$PWD/../redistributable_bin

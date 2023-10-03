@@ -64,3 +64,10 @@ HEADERS += \
 
 RESOURCES += \
     ../common.qrc
+
+win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../redistributable_bin/win64/ -lsteam_api64
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../redistributable_bin/win64/ -lsteam_api64
+else:unix: LIBS += -L$$PWD/../redistributable_bin/win64/ -lsteam_api
+
+INCLUDEPATH += $$PWD/../redistributable_bin
+DEPENDPATH += $$PWD/../redistributable_bin
