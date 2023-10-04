@@ -51,16 +51,17 @@
 #include <QPasswordDigestor>
 #include "kp.h"
 #include "networkerror.h"
+#include "steamauth.h"
 
 extern QFile *logFile;
 extern std::unique_ptr<QSettings> settings;
 
 Clientv2::Clientv2(QObject *parent)
     : QObject{parent},
-      attemptMode(false),
-      registerMode(false),
-      logoutPending(false),
-      gameState(KP::Offline) {
+    attemptMode(false),
+    registerMode(false),
+    logoutPending(false),
+    gameState(KP::Offline) {
     QObject::connect(&socket, &QSslSocket::preSharedKeyAuthenticationRequired,
                      this, &Clientv2::pskRequired);
     QObject::connect(&socket, &QSslSocket::encrypted,
@@ -74,6 +75,25 @@ Clientv2::~Clientv2() noexcept {
 /* public */
 inline bool Clientv2::loggedIn() const {
     return gameState != KP::Offline;
+}
+
+void Clientv2::sendEncryptedAppTicket(uint8 rgubTicket [], uint32 cubTicket) {
+    QByteArray msg = KP::clientSteamAuth(rgubTicket, cubTicket);
+    qDebug("Success 3");
+    if(!socket.waitForEncrypted(100)) {
+        qCritical("Encrypted connection yet established.");
+        throw NetworkError(socket.errorString());
+        return;
+    }
+    qDebug("Success 4");
+    const qint64 written = socket.write(msg);
+    if (written <= 0) {
+        throw NetworkError(socket.errorString());
+    }
+    else {
+        qDebug("Encrypted App Ticket successfully sent.");
+    }
+    return;
 }
 
 /* public slots */
@@ -108,6 +128,7 @@ void Clientv2::catbomb() {
 }
 
 void Clientv2::displayPrompt() {
+    uiRefresh();
 #if defined(NOBODY_PLAYS_KANCOLLE_ANYMORE) /* this is for non-ASCII test */
     //% "田中飞妈"
     qInfo() << qtTrId("fscktanaka");
@@ -208,7 +229,7 @@ bool Clientv2::parseSpec(const QStringList &cmdParts) {
 void Clientv2::serverResponse(const QString &clientInfo,
                               const QByteArray &plainText) {
     QJsonObject djson =
-            QCborValue::fromCbor(plainText).toMap().toJsonObject();
+        QCborValue::fromCbor(plainText).toMap().toJsonObject();
     try{
         switch(djson["type"].toInt()) {
         case KP::DgramType::Auth: receivedAuth(djson); break;
@@ -225,7 +246,7 @@ void Clientv2::serverResponse(const QString &clientInfo,
 #if defined(QT_DEBUG)
     static const QString formatter = QStringLiteral("%1 received text: %2");
     const QString html = formatter
-            .arg(clientInfo, QJsonDocument(djson).toJson());
+                             .arg(clientInfo, QJsonDocument(djson).toJson());
     qDebug() << html;
 #else
     Q_UNUSED(clientInfo)
@@ -243,6 +264,7 @@ void Clientv2::showHelp(const QStringList &cmdParts) {
     }
 }
 
+/* should be generalized */
 void Clientv2::switchToFactory() {
     if(!loggedIn()) {
         emit qout(qtTrId("access-denied-login-first"));
@@ -254,6 +276,11 @@ void Clientv2::switchToFactory() {
         gameState = KP::Factory;
         emit gamestateChanged(KP::Factory);
     }
+}
+
+void Clientv2::uiRefresh() {
+    qDebug("UIREFRESH");
+    SteamAPI_RunCallbacks();
 }
 
 void Clientv2::update() {
@@ -299,10 +326,10 @@ void Clientv2::pskRequired(QSslPreSharedKeyAuthenticator *auth) {
     else {
         auth->setIdentity(clientName.toLatin1());
         QByteArray salt = clientName.toUtf8().append(
-                    settings->value("salt", defaultSalt).toByteArray());
+            settings->value("salt", defaultSalt).toByteArray());
         QByteArray shadow = QPasswordDigestor::deriveKeyPbkdf2(
-                    QCryptographicHash::Blake2s_256,
-                    password, salt, 8, 255);
+            QCryptographicHash::Blake2s_256,
+            password, salt, 8, 255);
         auth->setPreSharedKey(shadow);
     }
 }
@@ -318,7 +345,7 @@ void Clientv2::readyRead() {
         if (bytesRead <= 0 && dgram.size() > 0) {
             //% "Read datagram failed due to: %1"
             throw NetworkError(qtTrId("read-dgram-failed")
-                               .arg(socket.errorString()));
+                                   .arg(socket.errorString()));
         }
         dgram.resize(bytesRead);
         if (socket.isEncrypted()) {
@@ -401,7 +428,7 @@ void Clientv2::doSwitch(const QStringList &cmdParts) {
     }
     else {
         QString secondary = cmdParts[1].first(1).toUpper()
-                + cmdParts[1].sliced(1).toLower();
+                            + cmdParts[1].sliced(1).toLower();
 
         QMetaEnum info = QMetaEnum::fromType<KP::GameState>();
         int statevalue = info.keyToValue(secondary.toLatin1().constData());
@@ -459,12 +486,12 @@ const QStringList Clientv2::getCommandsSpec() const {
     QStringList result = QStringList();
     result.append(getCommands());
     result.append({"disconnect",
-                   "connect",
-                   "register",
-                   "develop",
-                   "switch",
-                   "fetch"
-                  });
+        "connect",
+        "register",
+        "develop",
+        "switch",
+        "fetch"
+    });
     result.sort(Qt::CaseInsensitive);
     return result;
 }
@@ -489,6 +516,9 @@ const QStringList Clientv2::getValidCommands() const {
 }
 
 void Clientv2::parseConnectReq(const QStringList &cmdParts) {
+    sauth.RetrieveEncryptedAppTicket();
+    SteamAPI_RunCallbacks();
+
     conf.addCaCertificates(settings->value("trustedcert",
                                            ":/sslserver.pem").toString());
     socket.setSslConfiguration(conf);
@@ -579,7 +609,7 @@ bool Clientv2::parseGameCommands(const QString &primary,
     }
     else if(primary.compare("refresh", Qt::CaseInsensitive) == 0) {
         if(cmdParts.length() > 1
-                && cmdParts[1].compare("Factory", Qt::CaseInsensitive) == 0) {
+            && cmdParts[1].compare("Factory", Qt::CaseInsensitive) == 0) {
             doRefreshFactory();
             return true;
         } else {
@@ -616,11 +646,11 @@ void Clientv2::parsePassword(const QString &input) {
         socket.setProtocol(QSsl::TlsV1_3);
         socket.connectToHostEncrypted(address.toString(), port);
         if(!socket.waitForConnected(
-                    settings->value("connect_wait_time_msec", 8000)
+                settings->value("connect_wait_time_msec", 8000)
                     .toInt())) {
             //% "Failed to connect to server at %1:%2"
             qWarning() << qtTrId("wait-for-connect-failure")
-                          .arg(address.toString()).arg(port);
+                              .arg(address.toString()).arg(port);
             attemptMode = false;
             passwordMode = Password::normal;
             return;
@@ -642,17 +672,18 @@ void Clientv2::readWhenConnected(const QByteArray &dgram) {
     if (plainText.size()) {
         serverResponse(clientName, plainText);
         if (socket.isEncrypted() && gameState == KP::Offline
-                && !logoutPending) {
+            && !logoutPending) {
             qDebug() << clientName << ": encrypted connection established!";
             QByteArray msg = KP::clientAuth(
-                        registerMode ? KP::Reg : KP::Login,
-                        clientName, password);
+                registerMode ? KP::Reg : KP::Login,
+                clientName, password);
             const qint64 written = socket.write(msg);
             if (written <= 0) {
                 throw NetworkError(socket.errorString());
             }
         }
         logoutPending = false;
+        SteamAPI_RunCallbacks();
         return;
     }
 
@@ -700,6 +731,7 @@ void Clientv2::receivedLogin(const QJsonObject &djson) {
         qInfo() << qtTrId("login-success").arg(djson["username"].toString());
         gameState = KP::Port;
         emit gamestateChanged(KP::Port);
+        SteamAPI_RunCallbacks();
     }
     else {
         QString reas;
@@ -710,13 +742,13 @@ void Clientv2::receivedLogin(const QJsonObject &djson) {
         case KP::BadPassword: reas = qtTrId("password-incorrect"); break;
         case KP::RetryToomuch: {
             QDateTime reEnable = QDateTime::fromString(
-                        djson["reenable"].toString());
+                djson["reenable"].toString());
             QLocale locale = QLocale(settings->value("language").toString());
             //% "Either you retry too much or someone is trying to crack you. "
             //% "Please wait until %1(%2)."
             reas = qtTrId("passwordfail-toomuch")
-                    .arg(locale.toString(reEnable),
-                         reEnable.timeZoneAbbreviation()); break;
+                       .arg(locale.toString(reEnable),
+                            reEnable.timeZoneAbbreviation()); break;
         }
         case KP::UserNonexist:
             //% "User does not exist."
@@ -725,7 +757,7 @@ void Clientv2::receivedLogin(const QJsonObject &djson) {
         }
         //% "%1: login failure, reason: %2"
         qInfo() << qtTrId("login-failed")
-                   .arg(djson["username"].toString(), reas);
+                       .arg(djson["username"].toString(), reas);
     }
     attemptMode = false;
 }
@@ -735,12 +767,12 @@ void Clientv2::receivedLogout(const QJsonObject &djson) {
         if(!djson.contains("reason")) {
             //% "%1: logout success"
             qInfo() << qtTrId("logout-success")
-                       .arg(djson["username"].toString());
+                           .arg(djson["username"].toString());
         }
         else if(djson["reason"] == KP::LoggedElsewhere) {
             //% "%1: logged elsewhere, force quitting"
             qCritical() << qtTrId("logout-forced")
-                           .arg(djson["username"].toString());
+                               .arg(djson["username"].toString());
         }
         else
             throw std::domain_error("message not implemented");
@@ -751,7 +783,7 @@ void Clientv2::receivedLogout(const QJsonObject &djson) {
     else {
         //% "%1: logout failure, not online"
         qInfo() << qtTrId("logout-notonline")
-                   .arg(djson["username"].toString());
+                       .arg(djson["username"].toString());
     }
     attemptMode = false;
 }
@@ -790,15 +822,15 @@ void Clientv2::receivedMsg(const QJsonObject &djson) {
         //% "This operation requires %1oil/%2explosives/%3steel/"
         //% "%4rubber/%5aluminum/%6tungsten/%7chromium"
         qInfo() << qtTrId("resource-require")
-                   .arg(djson["oil"].toInt())
-                .arg(djson["explo"].toInt())
-                .arg(djson["steel"].toInt())
-                .arg(djson["rub"].toInt())
-                .arg(djson["al"].toInt())
-                .arg(djson["w"].toInt())
-                .arg(djson["cr"].toInt());
+                       .arg(djson["oil"].toInt())
+                       .arg(djson["explo"].toInt())
+                       .arg(djson["steel"].toInt())
+                       .arg(djson["rub"].toInt())
+                       .arg(djson["al"].toInt())
+                       .arg(djson["w"].toInt())
+                       .arg(djson["cr"].toInt());
     }
-        break;
+    break;
     case KP::DevelopStart:
         //% "Start developing equipment."
         qInfo() << qtTrId("develop-start"); break;
@@ -818,7 +850,7 @@ void Clientv2::receivedMsg(const QJsonObject &djson) {
     case KP::NewEquip:
         //% "You get new equipment %1, serial number %2"
         qInfo() << qtTrId("develop-success").arg(djson["equipdef"].toString(),
-                djson["serial"].toString()); break;
+                                                 djson["serial"].toString()); break;
     case KP::Hello:
         //% "Server is alive and responding."
         qInfo() << qtTrId("server-hello"); break;
@@ -830,7 +862,7 @@ void Clientv2::receivedReg(const QJsonObject &djson) {
     if(djson["success"].toBool()) {
         //% "%1: register success"
         qInfo() << qtTrId("register-success")
-                   .arg(djson["username"].toString());
+                       .arg(djson["username"].toString());
     }
     else {
         QString reas;
@@ -842,7 +874,7 @@ void Clientv2::receivedReg(const QJsonObject &djson) {
         }
         //% "%1: register failure, reason: %2"
         qInfo() << qtTrId("register-failed")
-                   .arg(djson["username"].toString(), reas);
+                       .arg(djson["username"].toString(), reas);
     }
     attemptMode = false;
 }
@@ -869,7 +901,7 @@ void customMessageHandler(QtMsgType type,
 
 #if defined(QT_DEBUG)
     QString txt2 = QStringLiteral("%1 (%2:%3, %4)").
-            arg(localMsg, file, QString::number(context.line), function);
+                   arg(localMsg, file, QString::number(context.line), function);
 #else
     Q_UNUSED(file)
     Q_UNUSED(function)

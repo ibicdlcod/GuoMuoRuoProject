@@ -47,7 +47,9 @@
 ****************************************************************************/
 
 #include "server.h"
+#include <QFile>
 #include <algorithm>
+#include "../steam/steamencryptedappticket.h"
 #include "kerrors.h"
 #include "kp.h"
 #include "peerinfo.h"
@@ -80,117 +82,130 @@ namespace {
 
     //% "Session cipher: %1; session protocol: %2."
     QString info = qtTrId("connection-info-serverside")
-            .arg(connection->sessionCipher().name(),
-                 connection->sessionProtocol());
+                       .arg(connection->sessionCipher().name(),
+                            connection->sessionProtocol());
     return info;
 }
 
+uint8 charToInt(char data) {
+    if('0' <= data && data <= '9') {
+        return data - '0';
+    }
+    else if('a' <= data && data <= 'f') {
+        return data - 'a' + 10;
+    }
+    else {
+        qFatal("Illicit hex file");
+        return 0;
+    }
+}
+
 const QString userT = QStringLiteral(
-            "CREATE TABLE Users ( "
-            "UserID INTEGER PRIMARY KEY, "
-            "Username VARCHAR(255) NOT NULL, "
-            "Shadow TINYBLOB,"
-            /* Global status */
-            "ThrottleTime TEXT DEFAULT (datetime('now')),"
-            "ThrottleCount TEXT DEFAULT 0,"
-            "Experience INTEGER DEFAULT 0,"
-            "Level INTEGER DEFAULT 0,"
-            "InduContrib INTEGER DEFAULT 0,"
-            "FleetSize INTEGER DEFAULT 1,"
-            // used by both develop and construction, maximum is 20
-            "FactorySize INTEGER DEFAULT %1,"
-            // maximum is 12 due to high cost of fairy treat
-            "DockSize INTEGER DEFAULT %2,"
-            /* Resources */
-            "Oil INTEGER DEFAULT 10000,"
-            "Explo INTEGER DEFAULT 10000,"
-            "Steel INTEGER DEFAULT 10000,"
-            "Rub INTEGER DEFAULT 6000,"
-            "Al INTEGER DEFAULT 8000,"
-            "W INTEGER DEFAULT 6000,"
-            "Cr INTEGER DEFAULT 6000,"
-            "RecoverTime TEXT DEFAULT (datetime('now')),"
-            /* Special Resources */
-            "Limitbreak INTEGER DEFAULT 0,"
-            "Silver INTEGER DEFAULT 0,"
-            "Gold INTEGER DEFAULT 0,"
-            "Energizer INTEGER DEFAULT 0,"
-            "Giftbox INTEGER DEFAULT 0,"
-            "DecoratePt INTEGER DEFAULT 0,"
-            "JetEngine INTEGER DEFAULT 0,"
-            "LandCorps INTEGER DEFAULT 0,"
-            "Saury INTEGER DEFAULT 0,"
-            "Sardine INTEGER DEFAULT 0,"
-            "Hishimochi INTEGER DEFAULT 0,"
-            "EmergRepair INTEGER DEFAULT 0"
-            ");").arg(KP::initFactory).arg(KP::initDock);
+                          "CREATE TABLE Users ( "
+                          "UserID INTEGER PRIMARY KEY, "
+                          "Username VARCHAR(255) NOT NULL, "
+                          "Shadow TINYBLOB,"
+                          /* Global status */
+                          "ThrottleTime TEXT DEFAULT (datetime('now')),"
+                          "ThrottleCount TEXT DEFAULT 0,"
+                          "Experience INTEGER DEFAULT 0,"
+                          "Level INTEGER DEFAULT 0,"
+                          "InduContrib INTEGER DEFAULT 0,"
+                          "FleetSize INTEGER DEFAULT 1,"
+                          // used by both develop and construction, maximum is 20
+                          "FactorySize INTEGER DEFAULT %1,"
+                          // maximum is 12 due to high cost of fairy treat
+                          "DockSize INTEGER DEFAULT %2,"
+                          /* Resources */
+                          "Oil INTEGER DEFAULT 10000,"
+                          "Explo INTEGER DEFAULT 10000,"
+                          "Steel INTEGER DEFAULT 10000,"
+                          "Rub INTEGER DEFAULT 6000,"
+                          "Al INTEGER DEFAULT 8000,"
+                          "W INTEGER DEFAULT 6000,"
+                          "Cr INTEGER DEFAULT 6000,"
+                          "RecoverTime TEXT DEFAULT (datetime('now')),"
+                          /* Special Resources */
+                          "Limitbreak INTEGER DEFAULT 0,"
+                          "Silver INTEGER DEFAULT 0,"
+                          "Gold INTEGER DEFAULT 0,"
+                          "Energizer INTEGER DEFAULT 0,"
+                          "Giftbox INTEGER DEFAULT 0,"
+                          "DecoratePt INTEGER DEFAULT 0,"
+                          "JetEngine INTEGER DEFAULT 0,"
+                          "LandCorps INTEGER DEFAULT 0,"
+                          "Saury INTEGER DEFAULT 0,"
+                          "Sardine INTEGER DEFAULT 0,"
+                          "Hishimochi INTEGER DEFAULT 0,"
+                          "EmergRepair INTEGER DEFAULT 0"
+                          ");").arg(KP::initFactory).arg(KP::initDock);
 
 const QString equipU = QStringLiteral(
-            "CREATE TABLE Equip ( "
-            "EquipID INTEGER PRIMARY KEY, "
-            "Equipname VARCHAR(63), "
-            "Equiptype VARCHAR(63), "
-            "Rarity INTEGER, "
-            "Intricacy INTEGER, "
-            "Tenacity INTEGER, "
-            "Firepower INTEGER, "
-            "Armorpenetration INTEGER, "
-            "Firingrange INTEGER, "
-            "Firingspeed INTEGER, "
-            "Torpedo INTEGER, "
-            "Bombing INTEGER, "
-            "Landattack INTEGER, "
-            "Airattack INTEGER, "
-            "Interception INTEGER, "
-            "Antibomber INTEGER, "
-            "Asw INTEGER, "
-            "Los INTEGER, "
-            "Accuracy INTEGER, "
-            "Evasion INTEGER, "
-            "Armor INTEGER, "
-            "Transport INTEGER, "
-            "Flightrange INTEGER, "
-            "Require INTEGER, "
-            "Require2 INTEGER, "
-            "Developenabled INTEGER, "
-            "Convertenabled INTEGER, "
-            "Requirenum INTEGER, "
-            "Require2num INTEGER, "
-            "Industrialsilver INTEGER, "
-            "Industrialgold INTEGER, "
-            "Customflag1 VARCHAR(63), "
-            "Customflag2 VARCHAR(63), "
-            "Customflag3 VARCHAR(63) "
-            ");"
-            );
+    "CREATE TABLE Equip ( "
+    "EquipID INTEGER PRIMARY KEY, "
+    "Equipname VARCHAR(63), "
+    "Equiptype VARCHAR(63), "
+    "Rarity INTEGER, "
+    "Intricacy INTEGER, "
+    "Tenacity INTEGER, "
+    "Firepower INTEGER, "
+    "Armorpenetration INTEGER, "
+    "Firingrange INTEGER, "
+    "Firingspeed INTEGER, "
+    "Torpedo INTEGER, "
+    "Bombing INTEGER, "
+    "Landattack INTEGER, "
+    "Airattack INTEGER, "
+    "Interception INTEGER, "
+    "Antibomber INTEGER, "
+    "Asw INTEGER, "
+    "Los INTEGER, "
+    "Accuracy INTEGER, "
+    "Evasion INTEGER, "
+    "Armor INTEGER, "
+    "Transport INTEGER, "
+    "Flightrange INTEGER, "
+    "Require INTEGER, "
+    "Require2 INTEGER, "
+    "Developenabled INTEGER, "
+    "Convertenabled INTEGER, "
+    "Requirenum INTEGER, "
+    "Require2num INTEGER, "
+    "Industrialsilver INTEGER, "
+    "Industrialgold INTEGER, "
+    "Customflag1 VARCHAR(63), "
+    "Customflag2 VARCHAR(63), "
+    "Customflag3 VARCHAR(63) "
+    ");"
+    );
 
 const QString userF = QStringLiteral(
-            "CREATE TABLE Factories ("
-            "User INTEGER,"
-            "FactoryID INTEGER,"
-            "CurrentJob INTEGER DEFAULT 0,"
-            "StartTime TEXT, "
-            "FullTime TEXT, "
-            "SuccessTime TEXT,"
-            "Done BOOL,"
-            "Success BOOL,"
-            "FOREIGN KEY(User) REFERENCES Users(UserID),"
-            "CONSTRAINT noduplicate UNIQUE(User, FactoryID)"
-            ");"
-            );
+    "CREATE TABLE Factories ("
+    "User INTEGER,"
+    "FactoryID INTEGER,"
+    "CurrentJob INTEGER DEFAULT 0,"
+    "StartTime TEXT, "
+    "FullTime TEXT, "
+    "SuccessTime TEXT,"
+    "Done BOOL,"
+    "Success BOOL,"
+    "FOREIGN KEY(User) REFERENCES Users(UserID),"
+    "CONSTRAINT noduplicate UNIQUE(User, FactoryID)"
+    ");"
+    );
 
 const QString userE = QStringLiteral(
-            "CREATE TABLE UserEquip ("
-            "User INTEGER, "
-            "EquipSerial INTEGER, "
-            "EquipDef INTEGER, "
-            "Star INTEGER, "
-            "FOREIGN KEY(User) REFERENCES Users(UserID), "
-            "FOREIGN KEY(EquipDef) REFERENCES Equip(EquipID), "
-            "CONSTRAINT noduplicate UNIQUE(User, EquipSerial), "
-            "CONSTRAINT Star_Valid CHECK (Star >= 0 AND Star < 16)"
-            ");"
-            );
+    "CREATE TABLE UserEquip ("
+    "User INTEGER, "
+    "EquipSerial INTEGER, "
+    "EquipDef INTEGER, "
+    "Star INTEGER, "
+    "FOREIGN KEY(User) REFERENCES Users(UserID), "
+    "FOREIGN KEY(EquipDef) REFERENCES Equip(EquipID), "
+    "CONSTRAINT noduplicate UNIQUE(User, EquipSerial), "
+    "CONSTRAINT Star_Valid CHECK (Star >= 0 AND Star < 16)"
+    ");"
+    );
 }
 
 Server::Server(int argc, char ** argv) : CommandLine(argc, argv) {
@@ -206,7 +221,7 @@ void Server::datagramReceived(const PeerInfo &peerInfo,
                               const QByteArray &plainText,
                               QSslSocket *connection) {
     QJsonObject djson =
-            QCborValue::fromCbor(plainText).toMap().toJsonObject();
+        QCborValue::fromCbor(plainText).toMap().toJsonObject();
     try {
         switch(djson["type"].toInt()) {
         case KP::DgramType::Auth:
@@ -219,7 +234,7 @@ void Server::datagramReceived(const PeerInfo &peerInfo,
     } catch (const QJsonParseError &e) {
         qWarning() << peerInfo.toString() << e.errorString();
         QByteArray msg = KP::serverParseError(
-                    KP::JsonError, peerInfo.toString(), e.errorString());
+            KP::JsonError, peerInfo.toString(), e.errorString());
         connection->write(msg);
     } catch (DBError &e) {
         for(QString &i : e.whats()) {
@@ -228,13 +243,13 @@ void Server::datagramReceived(const PeerInfo &peerInfo,
     } catch (const std::domain_error &e) {
         qWarning() << peerInfo.toString() << e.what();
         QByteArray msg = KP::serverParseError(
-                    KP::Unsupported, peerInfo.toString(), e.what());
+            KP::Unsupported, peerInfo.toString(), e.what());
         connection->write(msg);
     }
 #if defined(QT_DEBUG)
     static const QString formatter = QStringLiteral("From %1 text: %2");
     const QString html = formatter.
-            arg(peerInfo.toString(), QJsonDocument(djson).toJson());
+                         arg(peerInfo.toString(), QJsonDocument(djson).toJson());
     qDebug() << html;
 #else
     Q_UNUSED(peerInfo)
@@ -243,7 +258,7 @@ void Server::datagramReceived(const PeerInfo &peerInfo,
 
 bool Server::listen(const QHostAddress &address, quint16 port) {
     if (address != sslServer.serverAddress()
-            || port != sslServer.serverPort()) {
+        || port != sslServer.serverPort()) {
         shutdown();
         listening = sslServer.listen(address, port);
         if (!listening)
@@ -289,8 +304,8 @@ bool Server::parseSpec(const QStringList &cmdParts) {
             }
             else if(primary.compare("exportcsv", Qt::CaseInsensitive) == 0) {
                 if(cmdParts.length() > 1
-                        && cmdParts[1].compare(
-                            "equip", Qt::CaseInsensitive) == 0) {
+                    && cmdParts[1].compare(
+                           "equip", Qt::CaseInsensitive) == 0) {
                     exportEquipToCSV();
                     return true;
                 } // else return false
@@ -298,8 +313,8 @@ bool Server::parseSpec(const QStringList &cmdParts) {
             else if(primary.compare("importcsv", Qt::CaseInsensitive) == 0)
             {
                 if(cmdParts.length() > 1
-                        && cmdParts[1].compare(
-                            "equip", Qt::CaseInsensitive) == 0) {
+                    && cmdParts[1].compare(
+                           "equip", Qt::CaseInsensitive) == 0) {
                     importEquipFromCSV();
                     return true;
                 } // else return false
@@ -339,11 +354,11 @@ void Server::readyRead(QSslSocket *currentsocket) {
 
     decryptDatagram(currentsocket, dgram);
     if (currentsocket->error()
-            == QAbstractSocket::RemoteHostClosedError) {
+        == QAbstractSocket::RemoteHostClosedError) {
         // Client disconnected, remove from connected users
         for(auto begin = connectedPeers.keyValueBegin(),
-            end = connectedPeers.keyValueEnd();
-            begin != end; begin++){
+             end = connectedPeers.keyValueEnd();
+             begin != end; begin++){
             if(begin->second == currentsocket) {
                 //% "%1: disconnected abruptly."
                 qInfo() << qtTrId("client-dc").
@@ -373,7 +388,7 @@ void Server::handleNewConnection(){
     if (!listening)
         return;
     QSslSocket *currentsocket = dynamic_cast<QSslSocket *>
-            (sslServer.nextPendingConnection());
+        (sslServer.nextPendingConnection());
     QByteArray msg = KP::serverHello();
     currentsocket->write(msg);
 }
@@ -424,16 +439,16 @@ void Server::shutdown() {
             QHostAddress peerAddress = connection->peerAddress();
             quint16 peerPort = connection->peerPort();
             if(connection->waitForDisconnected(
-                        settings->value("connect_wait_time_msec", 8000)
+                    settings->value("connect_wait_time_msec", 8000)
                         .toInt())) {
                 //% "Disconnect success: %1 port %2"
                 qInfo() << qtTrId("wait-for-dc")
-                           .arg(peerAddress.toString(), peerPort);
+                               .arg(peerAddress.toString(), peerPort);
             }
             else {
                 //% "Disconnect failed! %1 port %2"
                 qCritical() << qtTrId("dc-failed")
-                               .arg(peerAddress.toString(), peerPort);
+                                   .arg(peerAddress.toString(), peerPort);
             }
         }
     }
@@ -476,9 +491,9 @@ void Server::doDevelop(Uid uid, int equipid,
                        int factoryid, QSslSocket *connection) {
     /* TODO: this is the no-convert version */
     if(!equipRegistry.contains(equipid)
-            || !equipRegistry[equipid]->canDevelop(uid)) {
+        || !equipRegistry[equipid]->canDevelop(uid)) {
         QByteArray msg =
-                KP::serverDevelopFailed(KP::DevelopNotOption);
+            KP::serverDevelopFailed(KP::DevelopNotOption);
         connection->write(msg);
     }
     else if(User::isFactoryBusy(uid, factoryid)) {
@@ -493,7 +508,7 @@ void Server::doDevelop(Uid uid, int equipid,
         ResOrd currentRes = User::getCurrentResources(uid);
         if(!currentRes.addResources(resRequired * -1)){
             QByteArray msg =
-                    KP::serverDevelopFailed(KP::ResourceLack);
+                KP::serverDevelopFailed(KP::ResourceLack);
             connection->write(msg);
         }
         else {
@@ -506,9 +521,9 @@ void Server::doDevelop(Uid uid, int equipid,
                 stagesActual = stagesReq;
             QDateTime startTime = QDateTime::currentDateTimeUtc();
             QDateTime fullTime = startTime.addSecs(
-                        stagesReq * KP::secsinMin);
+                stagesReq * KP::secsinMin);
             QDateTime successTime = startTime.addSecs(
-                        stagesActual * KP::secsinMin);
+                stagesActual * KP::secsinMin);
             QSqlDatabase db = QSqlDatabase::database();
             QSqlQuery query;
             query.prepare("UPDATE Factories "
@@ -519,14 +534,14 @@ void Server::doDevelop(Uid uid, int equipid,
             query.bindValue(":id", uid);
             query.bindValue(":fid", factoryid);
             static QString format =
-                    QStringLiteral("yyyy-MM-dd hh:mm:ss");
+                QStringLiteral("yyyy-MM-dd hh:mm:ss");
             query.bindValue(":st", startTime.toString(format));
             query.bindValue(":full", fullTime.toString(format));
             query.bindValue(":succ", successTime.toString(format));
             query.bindValue(":eqid", equipid);
             if(query.exec()) {
                 QByteArray msg =
-                        KP::serverDevelopStart();
+                    KP::serverDevelopStart();
                 connection->write(msg);
             }
             else {
@@ -571,7 +586,7 @@ void Server::doFetch(Uid uid, int factoryid, QSslSocket *connection) {
             if(jobID < KP::equipIdMax) {
                 if(success) {
                     QByteArray msg = KP::serverNewEquip(
-                                User::newEquip(uid, jobID), jobID);
+                        User::newEquip(uid, jobID), jobID);
                     connection->write(msg);
                 }
                 else {
@@ -650,16 +665,16 @@ bool Server::equipmentRefresh()
             else {
                 QString fieldname = fieldnames[i];
                 int attrvalue = info.keyToValue(
-                            fieldname.toLatin1().constData());
+                    fieldname.toLatin1().constData());
                 if(attrvalue == -1) {
                     //% "Unexpected attribute of equipment: %1"
                     throw DBError(qtTrId("equip-unexpected-attr")
-                                  .arg(fieldname),
+                                      .arg(fieldname),
                                   query.lastError());
                 }
                 else {
                     attr[(EquipDef::AttrType)attrvalue]
-                            = query.value(i).toInt();
+                        = query.value(i).toInt();
                 }
             }
         }
@@ -824,13 +839,13 @@ void Server::parseListen(const QStringList &cmdParts) {
     // TODO: This should be configureable
     QSslConfiguration conf;
     const auto certs
-            = QSslCertificate::fromPath(
-                ":/sslserver.pem",
-                QSsl::Pem, QSslCertificate::PatternSyntax::FixedString);
+        = QSslCertificate::fromPath(
+            ":/sslserver.pem",
+            QSsl::Pem, QSslCertificate::PatternSyntax::FixedString);
     if(certs.isEmpty()) {
         //% "Server lack a certificate."
         QString msg = qtTrId("no-cert")
-                .arg(address.toString()).arg(port);
+                          .arg(address.toString()).arg(port);
         qInfo() << msg;
         return;
     }
@@ -839,7 +854,7 @@ void Server::parseListen(const QStringList &cmdParts) {
     if(!keyFile.open(QIODevice::ReadOnly)) {
         //% "Server lack a private key."
         QString msg = qtTrId("no-private-key")
-                .arg(address.toString()).arg(port);
+                          .arg(address.toString()).arg(port);
         qInfo() << msg;
         return;
     }
@@ -848,14 +863,14 @@ void Server::parseListen(const QStringList &cmdParts) {
     if(key.isNull()) {
         //% "Server private key can't be read."
         QString msg = qtTrId("corrupt-private-key")
-                .arg(address.toString()).arg(port);
+                          .arg(address.toString()).arg(port);
         qInfo() << msg;
         return;
     }
     conf.setPrivateKey(key);
     conf.setProtocol(QSsl::TlsV1_3);
     conf.setPreSharedKeyIdentityHint(
-                settings->value(
+        settings->value(
                     "server/servername",
                     QByteArrayLiteral("Alice")).toByteArray());
     sslServer.setSslConfiguration(conf);
@@ -863,7 +878,7 @@ void Server::parseListen(const QStringList &cmdParts) {
     if(listen(address, port)) {
         //% "Server is listening on address %1 and port %2"
         msg = qtTrId("server-listen")
-                .arg(address.toString()).arg(port);
+                  .arg(address.toString()).arg(port);
         qInfo() << msg;
         connect(&sslServer, &SslServer::connectionReadyread,
                 this, &Server::readyRead);
@@ -877,7 +892,7 @@ void Server::parseListen(const QStringList &cmdParts) {
     else {
         //% "Server failed to listen on address %1 and port %2"
         msg = qtTrId("server-listen-fail")
-                .arg(address.toString()).arg(port);
+                  .arg(address.toString()).arg(port);
         qCritical() << msg;
     }
 }
@@ -950,15 +965,15 @@ void Server::receivedLogin(const QJsonObject &djson,
         connection->disconnectFromHost();
     }
     auto password = QByteArray::fromBase64Encoding(
-                djson["shadow"].toString().toLatin1(),
-            QByteArray::Base64Encoding);
+        djson["shadow"].toString().toLatin1(),
+        QByteArray::Base64Encoding);
     if(Q_LIKELY(password.decodingStatus
-                == QByteArray::Base64DecodingStatus::Ok)) {
+                 == QByteArray::Base64DecodingStatus::Ok)) {
         QByteArray salt = name.toUtf8().append(
-                    settings->value("salt", defaultSalt).toByteArray());
+            settings->value("salt", defaultSalt).toByteArray());
         QByteArray shadow = QPasswordDigestor::deriveKeyPbkdf2(
-                    QCryptographicHash::Blake2s_256,
-                    password.decoded, salt, 8, 255);
+            QCryptographicHash::Blake2s_256,
+            password.decoded, salt, 8, 255);
         query.bindValue(":shadow", shadow);
         if(Q_UNLIKELY(shadow != query.value(1).toByteArray())) {
             User::incrementThrottleCount(uid);
@@ -996,12 +1011,12 @@ void Server::receivedLogout(const QJsonObject &djson,
     Uid uid = User::getUid(name);
     if(!connectedPeers.contains(uid) || connectedPeers[uid] != connection) {
         QByteArray msg = KP::serverAuth(
-                    KP::Logout, peerInfo.toString(), false);
+            KP::Logout, peerInfo.toString(), false);
         connection->write(msg);
     }
     else {
         QByteArray msg =
-                KP::serverAuth(KP::Logout, name, true);
+            KP::serverAuth(KP::Logout, name, true);
         connection->write(msg);
         connectedPeers.remove(uid);
         connection->disconnectFromHost();
@@ -1015,8 +1030,8 @@ void Server::receivedReg(const QJsonObject &djson,
     Q_UNUSED(peerInfo)
     QString name = djson["username"].toString();
     auto password = QByteArray::fromBase64Encoding(
-                djson["shadow"].toString().toLatin1(),
-            QByteArray::Base64Encoding);
+        djson["shadow"].toString().toLatin1(),
+        QByteArray::Base64Encoding);
     QSqlDatabase db = QSqlDatabase::database();
     QSqlQuery query;
     query.prepare("SELECT UserID FROM Users "
@@ -1042,17 +1057,17 @@ void Server::receivedReg(const QJsonObject &djson,
         }
         QSqlQuery insert;
         if(!insert.prepare("INSERT INTO Users (UserID, Username, Shadow) "
-                           "VALUES (:id, :name, :shadow);")) {
+                            "VALUES (:id, :name, :shadow);")) {
             qWarning() << insert.lastError().databaseText();
         }
         insert.bindValue(":id", maxid+1);
         insert.bindValue(":name", name);
         if(password.decodingStatus == QByteArray::Base64DecodingStatus::Ok) {
             QByteArray salt = name.toUtf8().append(
-                        settings->value("salt", defaultSalt).toByteArray());
+                settings->value("salt", defaultSalt).toByteArray());
             QByteArray shadow = QPasswordDigestor::deriveKeyPbkdf2(
-                        QCryptographicHash::Blake2s_256,
-                        password.decoded, salt, 8, 255);
+                QCryptographicHash::Blake2s_256,
+                password.decoded, salt, 8, 255);
             insert.bindValue(":shadow", shadow);
             if(!insert.exec()) {
                 //% "%1: Add user failure!"
@@ -1082,15 +1097,66 @@ void Server::receivedReg(const QJsonObject &djson,
 void Server::receivedReq(const QJsonObject &djson,
                          const PeerInfo &peerInfo,
                          QSslSocket *connection) {
-    Q_UNUSED(peerInfo)
+    if(djson["command"].toInt() == KP::CommandType::SteamAuth) {
+        qDebug("STEAMAUTH");
+        QJsonArray rgubArray = djson["rgubTicket"].toArray();
+        const uint32 cubTicket = djson["cubTicket"].toInteger(0);
+        uint8 *rgubTicket = new uint8[cubTicket];
+        for(unsigned int i = 0; i < cubTicket; ++i) {
+            rgubTicket[i] = rgubArray[i].toInteger();
+        }
+        uint8 rgubDecrypted[1024];
+        uint32 cubDecrypted = sizeof(rgubDecrypted);
+
+        QFile appSecreKeyFile("AppSecretKey");
+        if(!appSecreKeyFile.open(QIODevice::ReadOnly)) {
+            //% "Server lack a private key."
+            QString msg = qtTrId("no-private-key")
+                              .arg(peerInfo.address.toString())
+                              .arg(peerInfo.port);
+            qCritical() << msg;
+
+            QByteArray msg2 = KP::serverLackPrivate();
+            connection->write(msg2);
+            delete [] rgubTicket;
+            return;
+        }
+        else {
+            char *data = new char[2];
+            uint8 rgubKey[k_nSteamEncryptedAppTicketSymmetricKeyLen]
+                = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
+                };
+            int pos = 0;
+            while(!appSecreKeyFile.atEnd() &&
+                   pos < k_nSteamEncryptedAppTicketSymmetricKeyLen){
+                appSecreKeyFile.read(data, 2);
+                rgubKey[pos] = charToInt(data[0]) * 16 + charToInt(data[1]);
+                pos++;
+            }
+            if(!SteamEncryptedAppTicket_BDecryptTicket(
+                    rgubTicket, cubTicket, rgubDecrypted, &cubDecrypted,
+                    rgubKey, sizeof(rgubKey))) {
+                qCritical("Ticket failed to decrypt\n");
+                return;
+            }
+            else {
+                qInfo("Ticket decrypt success");
+            }
+            //delete [] data;
+        }
+        delete [] rgubTicket;
+    }
     /* TODO: this is inefficient */
     for(auto begin = connectedPeers.keyValueBegin(),
-        end = connectedPeers.keyValueEnd();
-        begin != end; begin++){
+         end = connectedPeers.keyValueEnd();
+         begin != end; begin++){
         if(begin->second == connection) {
             Uid uid = begin->first;
             switch(djson["command"].toInt()) {
-            case KP::CommandType::ChangeState: {
+            case KP::CommandType::ChangeState:
                 switch(djson["state"].toInt()) {
                 /* TODO: Should update to client as well? */
                 case KP::GameState::Port: User::refreshPort(uid); break;
@@ -1100,19 +1166,19 @@ void Server::receivedReq(const QJsonObject &djson,
                     throw std::domain_error("command type not supported");
                     break;
                 }
-            }
                 break;
             case KP::CommandType::Develop: {
                 int equipid = djson["equipid"].toInt();
                 doDevelop(uid, equipid, djson["factory"].toInt(), connection);
             }
-                break;
+            break;
             case KP::CommandType::Fetch:
-                doFetch(uid, djson["factory"].toInt(), connection); break;
+                doFetch(uid, djson["factory"].toInt(), connection);
+                break;
             case KP::CommandType::Refresh:
                 switch(djson["view"].toInt()) {
                 case KP::GameState::Factory: refreshClientFactory
-                            (uid, connection); break;
+                        (uid, connection); break;
                 default:
                     throw std::domain_error("command type not supported");
                     break;
@@ -1149,7 +1215,7 @@ void Server::refreshClientFactory(Uid uid, QSslSocket *connection) {
     result["infotype"] = KP::InfoType::FactoryInfo;
     result["content"] = itemArray;
     QByteArray msg = QCborValue::fromJsonValue(result).toCbor();
-    qCritical() << msg;
+    //qCritical() << msg;
     connection->write(msg);
 }
 
@@ -1253,8 +1319,8 @@ void Server::sqlinit() {
     /* User QSqlDatabase db = QSqlDatabase::database();
      * to access database in elsewhere */
     QSqlDatabase db =
-            QSqlDatabase::addDatabase(
-                settings->value("sql/driver", "QSQLITE").toString());
+        QSqlDatabase::addDatabase(
+            settings->value("sql/driver", "QSQLITE").toString());
     /* Use SQLite for current testing */
     db.setHostName(settings->value("sql/hostname",
                                    "SpearofTanaka").toString());

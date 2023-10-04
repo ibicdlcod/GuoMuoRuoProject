@@ -11,6 +11,7 @@
 #include <QObject>
 #include <QJsonObject>
 #include <QCborValue>
+#include "../steam/isteamuser.h"
 
 /* OS Specific */
 #if defined (Q_OS_WIN)
@@ -67,7 +68,8 @@ enum MsgType{
     FairyBusy,
     Penguin,
     NewEquip,
-    Hello
+    Hello,
+    LackPrivate
 };
 Q_ENUM_NS(MsgType)
 
@@ -93,7 +95,8 @@ enum CommandType{
     ChangeState,
     Develop,
     Fetch,
-    Refresh
+    Refresh,
+    SteamAuth
 };
 Q_ENUM_NS(CommandType)
 
@@ -130,6 +133,7 @@ QByteArray clientDevelop(int, bool convert = false, int factoryID = -1);
 QByteArray clientFactoryRefresh();
 QByteArray clientFetch(int factoryID = -1);
 QByteArray clientStateChange(GameState);
+QByteArray clientSteamAuth(uint8 [], uint32);
 QByteArray serverAuth(AuthMode, const QString &,
                       bool, AuthError);
 QByteArray serverAuth(AuthMode, const QString &,
@@ -140,6 +144,7 @@ QByteArray serverDevelopFailed(GameError);
 QByteArray serverDevelopStart();
 QByteArray serverFairyBusy(int);
 QByteArray serverHello();
+QByteArray serverLackPrivate();
 QByteArray serverNewEquip(int, int);
 QByteArray serverParseError(MsgType, const QString &,
                             const QString &);

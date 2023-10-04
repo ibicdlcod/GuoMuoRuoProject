@@ -1,4 +1,5 @@
 #include "kp.h"
+#include "qjsonarray.h"
 #include <QFile>
 #include <QSettings>
 
@@ -17,7 +18,7 @@ void KP::initLog(bool server) {
     }
     logFile = new QFile(logFileName);
     if(Q_UNLIKELY(!logFile)
-            || !logFile->open(QIODevice::WriteOnly | QIODevice::Append)) {
+        || !logFile->open(QIODevice::WriteOnly | QIODevice::Append)) {
         qFatal("Log file cannot be opened");
     }
 }
@@ -57,7 +58,7 @@ QByteArray KP::clientAuth(AuthMode mode, const QString &uname,
     if(mode != AuthMode::Logout) {
         /* directly using QString is even less efficient */
         result["shadow"] =
-                QString(shadow.toBase64(QByteArray::Base64Encoding));
+            QString(shadow.toBase64(QByteArray::Base64Encoding));
     }
     return QCborValue::fromJsonValue(result).toCbor();
 }
@@ -93,6 +94,19 @@ QByteArray KP::clientStateChange(GameState state) {
     result["type"] = DgramType::Request;
     result["command"] = CommandType::ChangeState;
     result["state"] = state;
+    return QCborValue::fromJsonValue(result).toCbor();
+}
+
+QByteArray KP::clientSteamAuth(uint8 rgubTicket [], uint32 cubTicket) {
+    QJsonObject result;
+    result["type"] = DgramType::Request;
+    result["command"] = CommandType::SteamAuth;
+    QJsonArray rgubArray = QJsonArray();
+    for(unsigned int i = 0; i < cubTicket; ++i) {
+        rgubArray.append(rgubTicket[i]);
+    }
+    result["rgubTicket"] = rgubArray;
+    result["cubTicket"] = (qint64)cubTicket;
     return QCborValue::fromJsonValue(result).toCbor();
 }
 
@@ -157,6 +171,13 @@ QByteArray KP::serverHello() {
     QJsonObject result;
     result["type"] = DgramType::Message;
     result["msgtype"] = MsgType::Hello;
+    return QCborValue::fromJsonValue(result).toCbor();
+}
+
+QByteArray KP::serverLackPrivate() {
+    QJsonObject result;
+    result["type"] = DgramType::Message;
+    result["msgtype"] = MsgType::LackPrivate;
     return QCborValue::fromJsonValue(result).toCbor();
 }
 

@@ -14,14 +14,16 @@ SOURCES += \
     keyenterreceiver.cpp \
     main.cpp \
     mainwindow.cpp \
-    networkerror.cpp
+    networkerror.cpp \
+    steamauth.cpp
 
 HEADERS += \
     clientv2.h \
     developwindow.h \
     keyenterreceiver.h \
     mainwindow.h \
-    networkerror.h
+    networkerror.h \
+    steamauth.h
 
 FORMS += \
     developwindow.ui \
@@ -73,7 +75,6 @@ else:unix: PRE_TARGETDEPS += $$PWD/../../build-CyberFleet-Desktop_Qt_6_6_0_MSVC2
 
 win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../redistributable_bin/win64/ -lsteam_api64
 else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../redistributable_bin/win64/ -lsteam_api64
-else:unix: LIBS += -L$$PWD/../redistributable_bin/win64/ -lsteam_api
 
 INCLUDEPATH += $$PWD/../redistributable_bin
 DEPENDPATH += $$PWD/../redistributable_bin
