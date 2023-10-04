@@ -227,7 +227,7 @@ EquipDef::EquipDef(int id,
       customflags(customflags) {
 }
 
-bool EquipDef::canDevelop([[maybe_unused]] int userid) const {
+bool EquipDef::canDevelop([[maybe_unused]] CSteamID userid) const {
     return attr[Developenabled] == 1;
 }
 

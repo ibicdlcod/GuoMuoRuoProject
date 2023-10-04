@@ -48,6 +48,7 @@
 
 #include "server.h"
 #include <QFile>
+#include <QThread>
 #include <algorithm>
 #include "../steam/steamencryptedappticket.h"
 #include "kerrors.h"
@@ -99,6 +100,12 @@ uint8 charToInt(char data) {
         return 0;
     }
 }
+
+const QString newUserT = QStringLiteral(
+    "CREATE TABLE NewUsers ( "
+    "UserID BLOB PRIMARY KEY, "
+    "UserType TEXT );"
+    );
 
 const QString userT = QStringLiteral(
                           "CREATE TABLE Users ( "
@@ -206,6 +213,8 @@ const QString userE = QStringLiteral(
     "CONSTRAINT Star_Valid CHECK (Star >= 0 AND Star < 16)"
     ");"
     );
+
+const int elapsedMaxTolerence = 30;
 }
 
 Server::Server(int argc, char ** argv) : CommandLine(argc, argv) {
@@ -224,8 +233,6 @@ void Server::datagramReceived(const PeerInfo &peerInfo,
         QCborValue::fromCbor(plainText).toMap().toJsonObject();
     try {
         switch(djson["type"].toInt()) {
-        case KP::DgramType::Auth:
-            receivedAuth(djson, peerInfo, connection); break;
         case KP::DgramType::Request:
             receivedReq(djson, peerInfo, connection); break;
         default:
@@ -362,7 +369,7 @@ void Server::readyRead(QSslSocket *currentsocket) {
             if(begin->second == currentsocket) {
                 //% "%1: disconnected abruptly."
                 qInfo() << qtTrId("client-dc").
-                           arg(User::getName(begin->first));
+                           arg(begin->first.ConvertToUint64());
                 connectedPeers.remove(begin->first);
                 break;
             }
@@ -487,7 +494,7 @@ void Server::decryptDatagram(QSslSocket *connection,
     }
 }
 
-void Server::doDevelop(Uid uid, int equipid,
+void Server::doDevelop(CSteamID &uid, int equipid,
                        int factoryid, QSslSocket *connection) {
     /* TODO: this is the no-convert version */
     if(!equipRegistry.contains(equipid)
@@ -531,7 +538,7 @@ void Server::doDevelop(Uid uid, int equipid,
                           "SuccessTime = :succ, Done = 0, Success = 0, "
                           "CurrentJob = :eqid "
                           "WHERE User = :id AND FactoryID = :fid");
-            query.bindValue(":id", uid);
+            query.bindValue(":id", uid.ConvertToUint64());
             query.bindValue(":fid", factoryid);
             static QString format =
                 QStringLiteral("yyyy-MM-dd hh:mm:ss");
@@ -553,7 +560,7 @@ void Server::doDevelop(Uid uid, int equipid,
     }
 }
 
-void Server::doFetch(Uid uid, int factoryid, QSslSocket *connection) {
+void Server::doFetch(CSteamID &uid, int factoryid, QSslSocket *connection) {
     User::refreshFactory(uid);
     QSqlDatabase db = QSqlDatabase::database();
     QSqlQuery query;
@@ -561,7 +568,7 @@ void Server::doFetch(Uid uid, int factoryid, QSslSocket *connection) {
                   "strftime('%s', SuccessTime)-strftime('%s', StartTime) "
                   "FROM Factories "
                   "WHERE User = :id AND FactoryID = :fid");
-    query.bindValue(":id", uid);
+    query.bindValue(":id", uid.ConvertToUint64());
     query.bindValue(":fid", factoryid);
     query.exec();
     query.isSelect();
@@ -603,7 +610,7 @@ void Server::doFetch(Uid uid, int factoryid, QSslSocket *connection) {
                           "SuccessTime = NULL, Done = 0, Success = 0, "
                           "CurrentJob = 0 "
                           "WHERE User = :id AND FactoryID = :fid");
-            query.bindValue(":id", uid);
+            query.bindValue(":id", uid.ConvertToUint64());
             query.bindValue(":fid", factoryid);
             if(!query.exec()) {
                 //% "Database failed when fetching product."
@@ -909,27 +916,10 @@ void Server::parseUnlisten() {
     }
 }
 
-void Server::receivedAuth(const QJsonObject &djson,
-                          const PeerInfo &peerInfo,
-                          QSslSocket *connection) {
-    switch(djson["mode"].toInt()) {
-    case KP::AuthMode::Reg:
-        receivedReg(djson, peerInfo, connection); break;
-    case KP::AuthMode::Login:
-        receivedLogin(djson, peerInfo, connection); break;
-    case KP::AuthMode::Logout:
-        receivedLogout(djson, peerInfo, connection); break;
-    default:
-        throw std::domain_error("auth type not supported"); break;
-    }
-}
-
-void Server::receivedForceLogout(Uid uid) {
+void Server::receivedForceLogout(CSteamID &uid) {
     QSslSocket *client = connectedPeers[uid];
     if(client->isEncrypted()) {
-        QByteArray msg = KP::serverAuth(KP::Logout, User::getName(uid),
-                                        true,
-                                        KP::AuthError::LoggedElsewhere);
+        QByteArray msg = KP::serverLogout(KP::LogoutType::LoggedElsewhere);
         client->write(msg);
         client->disconnectFromHost();
         connectedPeers.remove(uid);
@@ -937,159 +927,56 @@ void Server::receivedForceLogout(Uid uid) {
 }
 
 /* nothing could shrink this function efficiently either */
-void Server::receivedLogin(const QJsonObject &djson,
+void Server::receivedLogin(CSteamID &uid,
                            const PeerInfo &peerInfo,
                            QSslSocket *connection) {
+    uint64 uidInt = uid.ConvertToUint64();
+
     Q_UNUSED(peerInfo)
-    QString name = djson["username"].toString();
     QSqlDatabase db = QSqlDatabase::database();
     QSqlQuery query;
-    query.prepare("SELECT UserID, Shadow FROM Users "
-                  "WHERE Username = :name");
-    query.bindValue(":name", name);
+    query.prepare("SELECT UserID FROM NewUsers "
+                  "WHERE UserID = :uid");
+    query.bindValue(":uid", uidInt); // test
     query.exec();
     query.isSelect();
     if(Q_UNLIKELY(!query.first())) {
-        QByteArray msg = KP::serverAuth(KP::Login, name, false,
-                                        KP::AuthError::UserNonexist);
-        connection->write(msg);
-        connection->disconnectFromHost();
-    }
-    Uid uid = query.value(0).toInt();
-    QDateTime throttleTime = User::getThrottleTime(uid);
-    if(QDateTime::currentDateTime() < throttleTime) {
-        QByteArray msg = KP::serverAuth(KP::Login, name, false,
-                                        KP::AuthError::RetryToomuch,
-                                        throttleTime);
-        connection->write(msg);
-        connection->disconnectFromHost();
-    }
-    auto password = QByteArray::fromBase64Encoding(
-        djson["shadow"].toString().toLatin1(),
-        QByteArray::Base64Encoding);
-    if(Q_LIKELY(password.decodingStatus
-                 == QByteArray::Base64DecodingStatus::Ok)) {
-        QByteArray salt = name.toUtf8().append(
-            settings->value("salt", defaultSalt).toByteArray());
-        QByteArray shadow = QPasswordDigestor::deriveKeyPbkdf2(
-            QCryptographicHash::Blake2s_256,
-            password.decoded, salt, 8, 255);
-        query.bindValue(":shadow", shadow);
-        if(Q_UNLIKELY(shadow != query.value(1).toByteArray())) {
-            User::incrementThrottleCount(uid);
-            User::updateThrottleTime(uid);
-            QByteArray msg = KP::serverAuth(KP::Login, name, false,
-                                            KP::AuthError::BadPassword);
-            connection->write(msg);
-            connection->disconnectFromHost();
-        }
-        else {
-            /* if connectedPeers[name] exists then force-logout all of them */
-            if(connectedPeers.contains(uid)) {
-                receivedForceLogout(uid);
-            }
-            User::removeThrottleCount(uid);
-            connectedPeers[uid] = connection;
-            QByteArray msg = KP::serverAuth(KP::Login, name, true);
-            connection->write(msg);
-            User::refreshPort(uid);
-            User::refreshFactory(uid);
-        }
-    }
-    else {
-        QByteArray msg = KP::serverAuth(KP::Login, name, false,
-                                        KP::AuthError::BadShadow);
-        connection->write(msg);
-        connection->disconnectFromHost();
-    }
-}
-
-void Server::receivedLogout(const QJsonObject &djson,
-                            const PeerInfo &peerInfo,
-                            QSslSocket *connection) {
-    QString name = djson["username"].toString();
-    Uid uid = User::getUid(name);
-    if(!connectedPeers.contains(uid) || connectedPeers[uid] != connection) {
-        QByteArray msg = KP::serverAuth(
-            KP::Logout, peerInfo.toString(), false);
-        connection->write(msg);
-    }
-    else {
-        QByteArray msg =
-            KP::serverAuth(KP::Logout, name, true);
-        connection->write(msg);
-        connectedPeers.remove(uid);
-        connection->disconnectFromHost();
-    }
-}
-
-/* nothing could shrink this function efficiently either */
-void Server::receivedReg(const QJsonObject &djson,
-                         const PeerInfo &peerInfo,
-                         QSslSocket *connection) {
-    Q_UNUSED(peerInfo)
-    QString name = djson["username"].toString();
-    auto password = QByteArray::fromBase64Encoding(
-        djson["shadow"].toString().toLatin1(),
-        QByteArray::Base64Encoding);
-    QSqlDatabase db = QSqlDatabase::database();
-    QSqlQuery query;
-    query.prepare("SELECT UserID FROM Users "
-                  "WHERE Username = :name;");
-    query.bindValue(":name", name);
-    query.exec();
-    query.isSelect();
-    if(!query.first()) {
-        int maxid;
-        QSqlQuery getMaxID;
-        getMaxID.prepare("SELECT MAX(UserID) FROM Users;");
-        getMaxID.exec();
-        if(!getMaxID.isSelect() || !getMaxID.seek(0)) {
-            //% "Get user ID status failed!"
-            throw DBError(qtTrId("get-userid-max-failed"),
-                          query.lastError());
-        }
-        else if(getMaxID.isNull("MAX(UserID)")) {
-            maxid = 0;
-        }
-        else {
-            maxid = getMaxID.value(0).toInt();
-        }
+        /* new user */
         QSqlQuery insert;
-        if(!insert.prepare("INSERT INTO Users (UserID, Username, Shadow) "
-                            "VALUES (:id, :name, :shadow);")) {
+        if(!insert.prepare("INSERT INTO NewUsers (UserID, UserType) "
+                            "VALUES (:uid, :type);")) {
             qWarning() << insert.lastError().databaseText();
         }
-        insert.bindValue(":id", maxid+1);
-        insert.bindValue(":name", name);
-        if(password.decodingStatus == QByteArray::Base64DecodingStatus::Ok) {
-            QByteArray salt = name.toUtf8().append(
-                settings->value("salt", defaultSalt).toByteArray());
-            QByteArray shadow = QPasswordDigestor::deriveKeyPbkdf2(
-                QCryptographicHash::Blake2s_256,
-                password.decoded, salt, 8, 255);
-            insert.bindValue(":shadow", shadow);
-            if(!insert.exec()) {
-                //% "%1: Add user failure!"
-                throw DBError(qtTrId("add-user-fail").arg(name),
-                              query.lastError());
-            };
-            QByteArray msg = KP::serverAuth(KP::Reg, name, true);
-            connection->write(msg);
+        insert.bindValue(":uid", uidInt);
+        insert.bindValue(":type", "commoner");
+        if(!insert.exec()) {
+            //% "%1: Add user failure!"
+            throw DBError(qtTrId("add-user-fail").arg(uidInt),
+                          query.lastError());
             connection->disconnectFromHost();
-            User::init(maxid+1);
+            return;
         }
         else {
-            QByteArray msg = KP::serverAuth(KP::Reg, name, false,
-                                            KP::AuthError::BadShadow);
-            connection->write(msg);
-            connection->disconnectFromHost();
+            /* new user initialization here */
         }
     }
     else {
-        QByteArray msg = KP::serverAuth(KP::Reg, name, false,
-                                        KP::AuthError::UserExists);
+        /* existing user */
+    }
+    connectedPeers[uid] = connection;
+}
+
+void Server::receivedLogout(CSteamID &uid,
+                            const PeerInfo &peerInfo,
+                            QSslSocket *connection) {
+    if(!connectedPeers.contains(uid) || connectedPeers[uid] != connection) {
+        QByteArray msg = KP::serverLogout(KP::LogoutFailure);
         connection->write(msg);
+    }
+    else {
+        QByteArray msg = KP::serverLogout(KP::LogoutSuccess);
+        connection->write(msg);
+        connectedPeers.remove(uid);
         connection->disconnectFromHost();
     }
 }
@@ -1098,7 +985,6 @@ void Server::receivedReq(const QJsonObject &djson,
                          const PeerInfo &peerInfo,
                          QSslSocket *connection) {
     if(djson["command"].toInt() == KP::CommandType::SteamAuth) {
-        qDebug("STEAMAUTH");
         QJsonArray rgubArray = djson["rgubTicket"].toArray();
         const uint32 cubTicket = djson["cubTicket"].toInteger(0);
         uint8 *rgubTicket = new uint8[cubTicket];
@@ -1108,8 +994,8 @@ void Server::receivedReq(const QJsonObject &djson,
         uint8 rgubDecrypted[1024];
         uint32 cubDecrypted = sizeof(rgubDecrypted);
 
-        QFile appSecreKeyFile("AppSecretKey");
-        if(!appSecreKeyFile.open(QIODevice::ReadOnly)) {
+        QFile appSecretKeyFile("AppSecretKey");
+        if(!appSecretKeyFile.open(QIODevice::ReadOnly)) {
             //% "Server lack a private key."
             QString msg = qtTrId("no-private-key")
                               .arg(peerInfo.address.toString())
@@ -1130,31 +1016,99 @@ void Server::receivedReq(const QJsonObject &djson,
                     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
                 };
             int pos = 0;
-            while(!appSecreKeyFile.atEnd() &&
+            while(!appSecretKeyFile.atEnd() &&
                    pos < k_nSteamEncryptedAppTicketSymmetricKeyLen){
-                appSecreKeyFile.read(data, 2);
+                appSecretKeyFile.read(data, 2);
                 rgubKey[pos] = charToInt(data[0]) * 16 + charToInt(data[1]);
                 pos++;
             }
+            delete [] data;
             if(!SteamEncryptedAppTicket_BDecryptTicket(
                     rgubTicket, cubTicket, rgubDecrypted, &cubDecrypted,
                     rgubKey, sizeof(rgubKey))) {
-                qCritical("Ticket failed to decrypt\n");
+                qCritical(qtTrId("%1: Ticket failed to decrypt")
+                              .arg(peerInfo.toString()).toUtf8());
+                QByteArray msg = KP::serverLogFail(KP::TicketFailedToDecrypt);
+                connection->write(msg);
+                delete [] rgubTicket;
+                return;
+            }
+            qInfo("Ticket decrypt success");
+            if(!SteamEncryptedAppTicket_BIsTicketForApp(
+                    rgubDecrypted,
+                    cubDecrypted, 2632870)) {
+                qCritical(qtTrId("%1: Ticket is not from correct App ID")
+                              .arg(peerInfo.toString()).toUtf8());
+                QByteArray msg = KP::serverLogFail(KP::TicketIsntFromCorrectAppID);
+                connection->write(msg);
+                delete [] rgubTicket;
+                return;
+            }
+            qInfo("Ticket decrypt from correct App ID");
+            QDateTime now = QDateTime::currentDateTime();
+            QDateTime requestThen = QDateTime();
+            requestThen.setSecsSinceEpoch(
+                SteamEncryptedAppTicket_GetTicketIssueTime(
+                    rgubDecrypted,
+                    cubDecrypted));
+            qint64 elapsed = requestThen.secsTo(now);
+            qInfo(qtTrId("Elapsed: %1 second(s)").arg(elapsed).toUtf8());
+            if(elapsed > elapsedMaxTolerence) {
+                qCritical(qtTrId("%1: Request timeout")
+                              .arg(peerInfo.toString()).toUtf8());
+                QByteArray msg = KP::serverLogFail(KP::RequestTimeout);
+                connection->write(msg);
+                delete [] rgubTicket;
+                return;
+            }
+            CSteamID steamID;
+            SteamEncryptedAppTicket_GetTicketSteamID(
+                rgubDecrypted,
+                cubDecrypted,
+                &steamID);
+            if(steamID == k_steamIDNil) {
+                qCritical(qtTrId("%1: Steam ID invalid")
+                              .arg(peerInfo.toString()).toUtf8());
+                QByteArray msg = KP::serverLogFail(KP::SteamIdInvalid);
+                connection->write(msg);
+                delete [] rgubTicket;
                 return;
             }
             else {
-                qInfo("Ticket decrypt success");
+                /* We are logged in here */
+                qulonglong idnum = steamID.ConvertToUint64();
+                qInfo(QString("User login: %1").arg(idnum).toUtf8());
+                if(connectedPeers.contains(steamID)) {
+                    receivedForceLogout(steamID);
+                }
+                receivedLogin(steamID, peerInfo, connection);
+                delete [] rgubTicket;
+                return;
             }
-            //delete [] data;
         }
-        delete [] rgubTicket;
+        return;
     }
+    else if(djson["command"].toInt() == KP::CommandType::SteamLogout) {
+        /* TODO: UNFINISHED */
+        connection->disconnectFromHost();
+        return;
+    }
+    else if(djson["command"].toInt() == KP::CommandType::CHello) {
+        /* TODO: UNFINISHED */
+        qDebug("CHELLO");
+        QByteArray msg = KP::weighAnchor();
+        connection->write(msg);
+        //User::refreshPort(uid);
+        //User::refreshFactory(uid);
+        return;
+    }
+
     /* TODO: this is inefficient */
     for(auto begin = connectedPeers.keyValueBegin(),
          end = connectedPeers.keyValueEnd();
          begin != end; begin++){
         if(begin->second == connection) {
-            Uid uid = begin->first;
+            CSteamID uid = begin->first;
             switch(djson["command"].toInt()) {
             case KP::CommandType::ChangeState:
                 switch(djson["state"].toInt()) {
@@ -1194,12 +1148,12 @@ void Server::receivedReq(const QJsonObject &djson,
     connection->write(msg);
 }
 
-void Server::refreshClientFactory(Uid uid, QSslSocket *connection) {
+void Server::refreshClientFactory(CSteamID &uid, QSslSocket *connection) {
     QSqlDatabase db = QSqlDatabase::database();
     QSqlQuery query;
     query.prepare("SELECT FactoryID, FullTime, Done FROM Factories "
                   "WHERE User = :id");
-    query.bindValue(":id", uid);
+    query.bindValue(":id", uid.ConvertToUint64());
     query.exec();
     query.isSelect();
     QJsonObject result;
@@ -1342,6 +1296,9 @@ void Server::sqlinit() {
             sqlinitUsers();
         }
         sqlcheckUsers();
+        if(!tables.contains("NewUsers")) {
+            sqlinitNewUsers();
+        }
         if(!tables.contains("Equip")) {
             sqlinitEquip();
         }
@@ -1398,6 +1355,18 @@ void Server::sqlinitUsers() {
     qWarning() << qtTrId("user-db-lack");
     QSqlQuery query;
     query.prepare(userT);
+    if(!query.exec()) {
+        //% "Create User database failed."
+        throw DBError(qtTrId("user-db-gen-failure"),
+                      query.lastError());
+    }
+}
+
+void Server::sqlinitNewUsers() {
+    //% "User database does not exist, creating..."
+    qWarning() << qtTrId("user-db-lack");
+    QSqlQuery query;
+    query.prepare(newUserT);
     if(!query.exec()) {
         //% "Create User database failed."
         throw DBError(qtTrId("user-db-gen-failure"),

@@ -49,20 +49,6 @@ QByteArray KP::accessDenied() {
     return QCborValue::fromJsonValue(result).toCbor();
 }
 
-QByteArray KP::clientAuth(AuthMode mode, const QString &uname,
-                          const QByteArray &shadow) {
-    QJsonObject result;
-    result["type"] = DgramType::Auth;
-    result["mode"] = mode;
-    result["username"] = uname;
-    if(mode != AuthMode::Logout) {
-        /* directly using QString is even less efficient */
-        result["shadow"] =
-            QString(shadow.toBase64(QByteArray::Base64Encoding));
-    }
-    return QCborValue::fromJsonValue(result).toCbor();
-}
-
 QByteArray KP::clientDevelop(int equipid, bool convert, int factoryID) {
     QJsonObject result;
     result["type"] = DgramType::Request;
@@ -89,6 +75,13 @@ QByteArray KP::clientFetch(int factoryID) {
     return QCborValue::fromJsonValue(result).toCbor();
 }
 
+QByteArray KP::clientHello() {
+    QJsonObject result;
+    result["type"] = DgramType::Request;
+    result["command"] = CommandType::CHello;
+    return QCborValue::fromJsonValue(result).toCbor();
+}
+
 QByteArray KP::clientStateChange(GameState state) {
     QJsonObject result;
     result["type"] = DgramType::Request;
@@ -110,37 +103,10 @@ QByteArray KP::clientSteamAuth(uint8 rgubTicket [], uint32 cubTicket) {
     return QCborValue::fromJsonValue(result).toCbor();
 }
 
-QByteArray KP::serverAuth(AuthMode mode, const QString &uname,
-                          bool success, AuthError reason) {
+QByteArray KP::clientSteamLogout() {
     QJsonObject result;
-    result["type"] = DgramType::Auth;
-    result["mode"] = mode;
-    result["username"] = uname;
-    result["success"] = success;
-    result["reason"] = reason;
-    return QCborValue::fromJsonValue(result).toCbor();
-}
-
-QByteArray KP::serverAuth(AuthMode mode, const QString &uname,
-                          bool success, AuthError reason,
-                          QDateTime reEnable) {
-    QJsonObject result;
-    result["type"] = DgramType::Auth;
-    result["mode"] = mode;
-    result["username"] = uname;
-    result["success"] = success;
-    result["reason"] = reason;
-    result["reenable"] = reEnable.toString();
-    return QCborValue::fromJsonValue(result).toCbor();
-}
-
-QByteArray KP::serverAuth(AuthMode mode, const QString &uname,
-                          bool success) {
-    QJsonObject result;
-    result["type"] = DgramType::Auth;
-    result["mode"] = mode;
-    result["username"] = uname;
-    result["success"] = success;
+    result["type"] = DgramType::Request;
+    result["command"] = CommandType::SteamLogout;
     return QCborValue::fromJsonValue(result).toCbor();
 }
 
@@ -181,6 +147,32 @@ QByteArray KP::serverLackPrivate() {
     return QCborValue::fromJsonValue(result).toCbor();
 }
 
+QByteArray KP::serverLogFail(KP::AuthFailType reason) {
+    QJsonObject result;
+    result["type"] = DgramType::Auth;
+    result["mode"] = AuthMode::NewLogin;
+    result["success"] = false;
+    result["reason"] = reason;
+    return QCborValue::fromJsonValue(result).toCbor();
+}
+
+QByteArray KP::serverLogSuccess(bool newUser) {
+    QJsonObject result;
+    result["type"] = DgramType::Auth;
+    result["mode"] = AuthMode::NewLogin;
+    result["success"] = true;
+    result["newuser"] = newUser;
+    return QCborValue::fromJsonValue(result).toCbor();
+}
+
+QByteArray KP::serverLogout(KP::LogoutType reason) {
+    QJsonObject result;
+    result["type"] = DgramType::Auth;
+    result["mode"] = AuthMode::Logout;
+    result["reason"] = reason;
+    return QCborValue::fromJsonValue(result).toCbor();
+}
+
 QByteArray KP::serverNewEquip(int serial, int equipDid) {
     QJsonObject result;
     result["type"] = DgramType::Message;
@@ -204,5 +196,12 @@ QByteArray KP::serverPenguin() {
     QJsonObject result;
     result["type"] = DgramType::Message;
     result["msgtype"] = MsgType::Penguin;
+    return QCborValue::fromJsonValue(result).toCbor();
+}
+
+QByteArray KP::weighAnchor() {
+    QJsonObject result;
+    result["type"] = DgramType::Message;
+    result["msgtype"] = MsgType::AllowClientStart;
     return QCborValue::fromJsonValue(result).toCbor();
 }

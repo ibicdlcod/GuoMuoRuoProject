@@ -33,13 +33,11 @@ void SteamAuth::OnEncryptedAppTicketResponse(
         uint32 cubTicket;
 
         if(SteamUser()->GetEncryptedAppTicket(rgubTicket, sizeof(rgubTicket), &cubTicket)) {
-            // Normally at this point you would transmit the encrypted ticket to a trusted service that knows the decryption key
-            // This code is just to demonstrate the ticket decrypting library
-            // DecryptTicket( rgubTicket, cubTicket );
             try {
                 Clientv2::getInstance().sendEncryptedAppTicket(rgubTicket, cubTicket);
             } catch (NetworkError e) {
-                qCritical("FUCK");
+                qCritical("Network error when sending Encrypted Ticket");
+                qCritical(e.what());
             }
         }
         else {

@@ -70,7 +70,7 @@ public:
 
     friend void User::setResources(int uid, ResOrd goal);
 
-private:
+//private:
     int oil;
     int explo;
     int steel;

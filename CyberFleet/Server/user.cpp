@@ -10,16 +10,17 @@
 #undef max
 #endif
 
-ResOrd User::getCurrentResources(int uid) {
+ResOrd User::getCurrentResources(CSteamID &uid) {
     QSqlDatabase db = QSqlDatabase::database();
     QSqlQuery query;
     query.prepare("SELECT Oil,Explo,Steel,Rub,Al,W,Cr"
                   " FROM Users WHERE UserID = :id");
-    query.bindValue(":id", uid);
+    query.bindValue(":id", uid.ConvertToUint64());
     query.exec();
     query.isSelect();
     if(Q_UNLIKELY(!query.first())) {
-        qWarning() << qtTrId("user-nonexistent-uid").arg(uid);
+        qWarning() << qtTrId("user-nonexistent-uid")
+                          .arg(uid.ConvertToUint64());
         return ResOrd(ResTuple());
     }
     else {
@@ -36,90 +37,14 @@ ResOrd User::getCurrentResources(int uid) {
     }
 }
 
-const QString User::getName(int uid) {
-    QSqlDatabase db = QSqlDatabase::database();
-    QSqlQuery query;
-    query.prepare("SELECT Username FROM Users "
-                  "WHERE UserID = :id");
-    query.bindValue(":id", uid);
-    query.exec();
-    query.isSelect();
-    if(Q_UNLIKELY(!query.first())) {
-        //% "User ID %1 does not exist."
-        qWarning() << qtTrId("user-nonexistent-uid").arg(uid);
-        return QString();
-    }
-    else {
-        return query.value(0).toString();
-    }
-}
-
-int User::getUid(QString name) {
-    QSqlDatabase db = QSqlDatabase::database();
-    QSqlQuery query;
-    query.prepare("SELECT UserID FROM Users "
-                  "WHERE Username = :name");
-    query.bindValue(":name", name);
-    query.exec();
-    query.isSelect();
-    if(Q_UNLIKELY(!query.first())) {
-        //% "User Name %1 does not exist."
-        qWarning() << qtTrId("user-nonexistent-name").arg(name);
-        return 0;
-    }
-    else {
-        return query.value(0).toInt();
-    }
-}
-
-QDateTime User::getThrottleTime(int uid) {
-    QSqlDatabase db = QSqlDatabase::database();
-    QSqlQuery query;
-    query.prepare("SELECT ThrottleTime FROM Users "
-                  "WHERE UserID = :id");
-    query.bindValue(":id", uid);
-    query.exec();
-    query.isSelect();
-    if(Q_UNLIKELY(!query.first())) {
-        //qWarning() << qtTrId("user-nonexistent-uid").arg(uid);
-        return QDateTime();
-    }
-    else {
-        return query.value(0).toDateTime();
-    }
-}
-
-void User::incrementThrottleCount(int uid) {
-    QSqlDatabase db = QSqlDatabase::database();
-    QSqlQuery query;
-    query.prepare("SELECT ThrottleCount FROM Users "
-                  "WHERE UserID = :id");
-    query.bindValue(":id", uid);
-    query.exec();
-    query.isSelect();
-    if(Q_UNLIKELY(!query.first())) {
-        //qWarning() << qtTrId("user-nonexistent-uid").arg(uid);
-    }
-    else {
-        int count = query.value(0).toInt();
-        if(count < 62) {
-            query.prepare("UPDATE Users SET ThrottleCount = :count "
-                          "WHERE UserID = :id");
-            query.bindValue(":id", uid);
-            query.bindValue(":count", count+1);
-            query.exec();
-        }
-    }
-}
-
-void User::init(int uid) {
+void User::init(CSteamID &uid) {
     QSqlDatabase db = QSqlDatabase::database();
     /* factory */
     for(int i = 0; i < KP::initFactory; ++i) {
         QSqlQuery query;
         query.prepare("INSERT INTO Factories (User,FactoryID)"
                       " VALUES (:id,:count)");
-        query.bindValue(":id", uid);
+        query.bindValue(":id", uid.ConvertToUint64());
         query.bindValue(":count", i);
         if(Q_UNLIKELY(!query.exec())) {
             //% "Set User Factory Up failed!"
@@ -129,18 +54,19 @@ void User::init(int uid) {
     }
 }
 
-bool User::isFactoryBusy(int uid, int factoryID) {
+bool User::isFactoryBusy(CSteamID &uid, int factoryID) {
     QSqlDatabase db = QSqlDatabase::database();
     QSqlQuery query;
     query.prepare("SELECT CurrentJob "
                   "FROM Factories "
                   "WHERE User = :id AND FactoryID = :facto");
-    query.bindValue(":id", uid);
+    query.bindValue(":id", uid.ConvertToUint64());
     query.bindValue(":facto", factoryID);
     query.exec();
     query.isSelect();
     if(Q_UNLIKELY(!query.first())) {
-        qWarning() << qtTrId("user-nonexistent-uid").arg(uid);
+        qWarning() << qtTrId("user-nonexistent-uid")
+                          .arg(uid.ConvertToUint64());
         return true;
     }
     else {
@@ -149,18 +75,19 @@ bool User::isFactoryBusy(int uid, int factoryID) {
 }
 
 /* int is the result equip/shippart id, 0 means failure */
-std::tuple<bool, int> User::isFactoryFinished(int uid, int factoryID) {
+std::tuple<bool, int> User::isFactoryFinished(CSteamID &uid, int factoryID) {
     QSqlDatabase db = QSqlDatabase::database();
     QSqlQuery query;
     query.prepare("SELECT Done, Success, CurrentJob "
                   "FROM Factories "
                   "WHERE User = :id AND FactoryID = :facto");
-    query.bindValue(":id", uid);
+    query.bindValue(":id", uid.ConvertToUint64());
     query.bindValue(":facto", factoryID);
     query.exec();
     query.isSelect();
     if(Q_UNLIKELY(!query.first())) {
-        qWarning() << qtTrId("user-nonexistent-uid").arg(uid);
+        qWarning() << qtTrId("user-nonexistent-uid")
+                          .arg(uid.ConvertToUint64());
         return {false, 0};
     }
     else {
@@ -171,16 +98,17 @@ std::tuple<bool, int> User::isFactoryFinished(int uid, int factoryID) {
     }
 }
 
-void User::naturalRegen(int uid) {
+void User::naturalRegen(CSteamID &uid) {
     QSqlDatabase db = QSqlDatabase::database();
     QSqlQuery query;
     query.prepare("SELECT Level,RecoverTime"
                   " FROM Users WHERE UserID = :id");
-    query.bindValue(":id", uid);
+    query.bindValue(":id", uid.ConvertToUint64());
     query.exec();
     query.isSelect();
     if(Q_UNLIKELY(!query.first())) {
-        qWarning() << qtTrId("user-nonexistent-uid").arg(uid);
+        qWarning() << qtTrId("user-nonexistent-uid")
+                          .arg(uid.ConvertToUint64());
         return;
     }
     else {
@@ -188,7 +116,7 @@ void User::naturalRegen(int uid) {
         QDateTime priorRecoverTime = query.value(1).toDateTime();
         priorRecoverTime.setTimeZone(QTimeZone("UTC+0"));
         qint64 regenSecs = priorRecoverTime.secsTo(
-                    QDateTime::currentDateTimeUtc());
+            QDateTime::currentDateTimeUtc());
         regenSecs = std::max(Q_INT64_C(0), regenSecs); //stop timezone trap
         qint64 regenMins = regenSecs / KP::secsinMin;
         int regenPower = 0;
@@ -211,26 +139,28 @@ void User::naturalRegen(int uid) {
                       + QString::number(regenMins)
                       + " minutes') "
                         "WHERE UserID = :id");
-        query.bindValue(":id", uid);
+        query.bindValue(":id", uid.ConvertToUint64());
         if(Q_UNLIKELY(!query.exec())) {
             //% "User ID %1: natural regeneration failed!"
-            qWarning() << qtTrId("natural-regen-failed").arg(uid);
+            qWarning() << qtTrId("natural-regen-failed")
+                              .arg(uid.ConvertToUint64());
             qWarning() << query.lastError();
             return;
         }
         else {
             //% "User ID %1: natural regeneration"
-            qDebug() << qtTrId("natural-regen").arg(uid);
+            qDebug() << qtTrId("natural-regen")
+                            .arg(uid.ConvertToUint64());
         }
     }
 }
 
-int User::newEquip(int uid, int equipDid) {
+int User::newEquip(CSteamID &uid, int equipDid) {
     QSqlDatabase db = QSqlDatabase::database();
     QSqlQuery query;
     query.prepare("SELECT MAX(EquipSerial) FROM UserEquip "
                   "WHERE User = :id");
-    query.bindValue(":id", uid);
+    query.bindValue(":id", uid.ConvertToUint64());
     query.exec();
     query.isSelect();
     int serial;
@@ -243,52 +173,45 @@ int User::newEquip(int uid, int equipDid) {
     QSqlQuery query2;
     query2.prepare("INSERT INTO UserEquip (User, EquipSerial, EquipDef, Star)"
                    "VALUES (:id, :serial, :def, :star);");
-    query2.bindValue(":id", uid);
+    query2.bindValue(":id", uid.ConvertToUint64());
     query2.bindValue(":serial", serial);
     query2.bindValue(":def", equipDid);
     query2.bindValue(":star", 0);
     if(Q_UNLIKELY(!query2.exec())) {
         //% "User id %1: new equipment failed!"
-        throw DBError(qtTrId("new-equip-failed").arg(uid), query.lastError());
+        throw DBError(qtTrId("new-equip-failed")
+                          .arg(uid.ConvertToUint64()),
+                      query.lastError());
         return 0;
     }
     else {
         //% "User id %1: new equipment %2 definition %3"
-        qDebug() << qtTrId("new-equip").arg(uid)
-                    .arg(serial).arg(equipDid);
+        qDebug() << qtTrId("new-equip").arg(uid.ConvertToUint64())
+                        .arg(serial).arg(equipDid);
         return serial;
     }
 }
 
-void User::refreshFactory(int uid) {
+void User::refreshFactory(CSteamID &uid) {
     QSqlDatabase db = QSqlDatabase::database();
     QSqlQuery query;
     query.prepare("UPDATE Factories "
                   "SET Done = (datetime('now') > SuccessTime), "
                   "Success = (FullTime == SuccessTime) "
                   "WHERE User = :id");
-    query.bindValue(":id", uid);
+    query.bindValue(":id", uid.ConvertToUint64());
     if(Q_UNLIKELY(!query.exec())){
         //% "User ID %1: DB failure when refreshing factory"
         throw DBError(qtTrId("dbfail-when-refresh-factory")
-                      .arg(uid), query.lastError());
+                          .arg(uid.ConvertToUint64()), query.lastError());
     }
 }
 
-void User::refreshPort(int uid) {
+void User::refreshPort(CSteamID &uid) {
     naturalRegen(uid);
 }
 
-void User::removeThrottleCount(int uid) {
-    QSqlDatabase db = QSqlDatabase::database();
-    QSqlQuery query;
-    query.prepare("UPDATE Users SET ThrottleCount = 0 "
-                  "WHERE UserID = :id");
-    query.bindValue(":id", uid);
-    query.exec();
-}
-
-void User::setResources(int uid, ResOrd goal) {
+void User::setResources(CSteamID &uid, ResOrd goal) {
     goal.cap(ResOrd(3600000,
                     3600000,
                     3600000,
@@ -314,38 +237,14 @@ void User::setResources(int uid, ResOrd goal) {
     query.bindValue(":al", goal.al);
     query.bindValue(":w", goal.w);
     query.bindValue(":cr", goal.cr);
-    query.bindValue(":id", uid);
+    query.bindValue(":id", uid.ConvertToUint64());
     if(Q_UNLIKELY(!query.exec())) {
         //% "User id %1: set resources failed!"
-        qWarning() << qtTrId("set-resources-failed").arg(uid);
+        qWarning() << qtTrId("set-resources-failed").arg(uid.ConvertToUint64());
         qWarning() << query.lastError();
     }
     else {
         //% "User id %1: set resources"
-        qDebug() << qtTrId("set-resources").arg(uid);
-    }
-}
-
-void User::updateThrottleTime(int uid) {
-    QSqlDatabase db = QSqlDatabase::database();
-    QSqlQuery query;
-    query.prepare("SELECT ThrottleCount FROM Users "
-                  "WHERE UserID = :id");
-    query.bindValue(":id", uid);
-    query.exec();
-    query.isSelect();
-    int count;
-    if(Q_UNLIKELY(!query.first())) {
-        //qWarning() << qtTrId("user-nonexistent-uid").arg(uid);
-    }
-    else {
-        count = query.value(0).toInt();
-        query.prepare("UPDATE Users "
-                      "SET ThrottleTime = datetime('now', '+"
-                      + QString::number(Q_INT64_C(1) << count) +
-                      " seconds') "
-                      "WHERE UserID = :id");
-        query.bindValue(":id", uid);
-        query.exec();
+        qDebug() << qtTrId("set-resources").arg(uid.ConvertToUint64());
     }
 }

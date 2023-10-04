@@ -3,27 +3,22 @@
 
 #include <QDateTime>
 #include <QObject>
+#include "../steam/steamclientpublic.h"
 #include "equipment.h"
 #include "peerinfo.h"
 #include "resord.h"
 
 namespace User {
 
-ResOrd getCurrentResources(int uid);
-const QString getName(int uid);
-int getUid(QString name);
-QDateTime getThrottleTime(int uid);
-void incrementThrottleCount(int uid);
-void init(int uid);
-bool isFactoryBusy(int uid, int factoryID);
-std::tuple<bool, int> isFactoryFinished(int uid, int factoryID);
-void naturalRegen(int uid);
-int newEquip(int uid, int equipDid);
-void refreshFactory(int uid);
-void refreshPort(int uid);
-void removeThrottleCount(int uid);
-void setResources(int uid, ResOrd goal);
-void updateThrottleTime(int uid);
+ResOrd getCurrentResources(CSteamID &uid);
+void init(CSteamID &uid);
+bool isFactoryBusy(CSteamID &uid, int factoryID);
+std::tuple<bool, int> isFactoryFinished(CSteamID &uid, int factoryID);
+void naturalRegen(CSteamID &uid);
+int newEquip(CSteamID &uid, int equipDid);
+void refreshFactory(CSteamID &uid);
+void refreshPort(CSteamID &uid);
+void setResources(CSteamID &uid, ResOrd goal);
 
 };
 

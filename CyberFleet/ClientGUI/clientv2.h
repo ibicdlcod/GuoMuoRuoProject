@@ -132,7 +132,7 @@ private:
     void receivedLogin(const QJsonObject &);
     void receivedLogout(const QJsonObject &);
     void receivedMsg(const QJsonObject &);
-    void receivedReg(const QJsonObject &);
+    void receivedNewLogin(const QJsonObject &);
     void showCommands(bool);
 
     explicit Clientv2(QObject * parent = nullptr);

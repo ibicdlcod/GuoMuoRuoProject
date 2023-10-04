@@ -49,6 +49,7 @@
 #include "clientv2.h"
 #include <QSettings>
 #include <QPasswordDigestor>
+#include "../steam/isteamfriends.h"
 #include "kp.h"
 #include "networkerror.h"
 #include "steamauth.h"
@@ -79,13 +80,11 @@ inline bool Clientv2::loggedIn() const {
 
 void Clientv2::sendEncryptedAppTicket(uint8 rgubTicket [], uint32 cubTicket) {
     QByteArray msg = KP::clientSteamAuth(rgubTicket, cubTicket);
-    qDebug("Success 3");
-    if(!socket.waitForEncrypted(100)) {
+    if(!socket.waitForEncrypted(500)) {
         qCritical("Encrypted connection yet established.");
         throw NetworkError(socket.errorString());
         return;
     }
-    qDebug("Success 4");
     const qint64 written = socket.write(msg);
     if (written <= 0) {
         throw NetworkError(socket.errorString());
@@ -230,6 +229,14 @@ void Clientv2::serverResponse(const QString &clientInfo,
                               const QByteArray &plainText) {
     QJsonObject djson =
         QCborValue::fromCbor(plainText).toMap().toJsonObject();
+#if defined(QT_DEBUG)
+    static const QString formatter = QStringLiteral("%1 received text: %2");
+    const QString html = formatter
+                             .arg(clientInfo, QJsonDocument(djson).toJson());
+    qDebug() << html;
+#else
+    Q_UNUSED(clientInfo)
+#endif
     try{
         switch(djson["type"].toInt()) {
         case KP::DgramType::Auth: receivedAuth(djson); break;
@@ -243,14 +250,6 @@ void Clientv2::serverResponse(const QString &clientInfo,
     } catch (const std::domain_error &e) {
         qWarning() << (serverName + ":") << e.what();
     }
-#if defined(QT_DEBUG)
-    static const QString formatter = QStringLiteral("%1 received text: %2");
-    const QString html = formatter
-                             .arg(clientInfo, QJsonDocument(djson).toJson());
-    qDebug() << html;
-#else
-    Q_UNUSED(clientInfo)
-#endif
 }
 
 void Clientv2::showHelp(const QStringList &cmdParts) {
@@ -573,7 +572,7 @@ void Clientv2::parseDisconnectReq() {
         qInfo() << qtTrId("disconnect-when-offline");
     }
     else {
-        QByteArray msg = KP::clientAuth(KP::Logout, clientName);
+        QByteArray msg = KP::clientSteamLogout();
         const qint64 written = socket.write(msg);
         //% "Attempting to disconnect..."
         qInfo() << qtTrId("disconnect-attempt");
@@ -668,15 +667,18 @@ void Clientv2::parsePassword(const QString &input) {
 }
 
 void Clientv2::readWhenConnected(const QByteArray &dgram) {
+#if defined(QT_DEBUG)
+    static const QString formatter = QStringLiteral("From Server text: %1");
+    const QString html = formatter.arg(dgram);
+    qDebug() << html;
+#endif
     const QByteArray plainText = dgram;
     if (plainText.size()) {
         serverResponse(clientName, plainText);
         if (socket.isEncrypted() && gameState == KP::Offline
             && !logoutPending) {
             qDebug() << clientName << ": encrypted connection established!";
-            QByteArray msg = KP::clientAuth(
-                registerMode ? KP::Reg : KP::Login,
-                clientName, password);
+            QByteArray msg = KP::clientHello();
             const qint64 written = socket.write(msg);
             if (written <= 0) {
                 throw NetworkError(socket.errorString());
@@ -711,8 +713,7 @@ void Clientv2::readWhenUnConnected(const QByteArray &dgram) {
 
 void Clientv2::receivedAuth(const QJsonObject &djson) {
     switch(djson["mode"].toInt()) {
-    case KP::AuthMode::Reg: receivedReg(djson); break;
-    case KP::AuthMode::Login: receivedLogin(djson); break;
+    case KP::AuthMode::NewLogin: receivedNewLogin(djson); break;
     case KP::AuthMode::Logout: receivedLogout(djson); break;
     default: throw std::domain_error("auth type not supported"); break;
     }
@@ -723,43 +724,6 @@ void Clientv2::receivedInfo(const QJsonObject &djson) {
     case KP::InfoType::FactoryInfo: emit receivedFactoryRefresh(djson); break;
     default: throw std::domain_error("auth type not supported"); break;
     }
-}
-
-void Clientv2::receivedLogin(const QJsonObject &djson) {
-    if(djson["success"].toBool()) {
-        //% "%1: login success"
-        qInfo() << qtTrId("login-success").arg(djson["username"].toString());
-        gameState = KP::Port;
-        emit gamestateChanged(KP::Port);
-        SteamAPI_RunCallbacks();
-    }
-    else {
-        QString reas;
-        switch(djson["reason"].toInt()) {
-        //% "Input shadow is malformed."
-        case KP::BadShadow: reas = qtTrId("malformed-shadow"); break;
-            //% "Password is incorrect."
-        case KP::BadPassword: reas = qtTrId("password-incorrect"); break;
-        case KP::RetryToomuch: {
-            QDateTime reEnable = QDateTime::fromString(
-                djson["reenable"].toString());
-            QLocale locale = QLocale(settings->value("language").toString());
-            //% "Either you retry too much or someone is trying to crack you. "
-            //% "Please wait until %1(%2)."
-            reas = qtTrId("passwordfail-toomuch")
-                       .arg(locale.toString(reEnable),
-                            reEnable.timeZoneAbbreviation()); break;
-        }
-        case KP::UserNonexist:
-            //% "User does not exist."
-            reas = qtTrId("user-nonexistent"); break;
-        default: throw std::domain_error("message not implemented"); break;
-        }
-        //% "%1: login failure, reason: %2"
-        qInfo() << qtTrId("login-failed")
-                       .arg(djson["username"].toString(), reas);
-    }
-    attemptMode = false;
 }
 
 void Clientv2::receivedLogout(const QJsonObject &djson) {
@@ -854,27 +818,37 @@ void Clientv2::receivedMsg(const QJsonObject &djson) {
     case KP::Hello:
         //% "Server is alive and responding."
         qInfo() << qtTrId("server-hello"); break;
+    case KP::AllowClientStart:
+        gameState = KP::Port;
+        emit gamestateChanged(KP::Port);
+        //% "You can now play the game."
+        qInfo() << qtTrId("client-start"); break;
+        break;
     default: throw std::domain_error("message not implemented"); break;
     }
 }
 
-void Clientv2::receivedReg(const QJsonObject &djson) {
+void Clientv2::receivedNewLogin(const QJsonObject &djson) {
     if(djson["success"].toBool()) {
-        //% "%1: register success"
-        qInfo() << qtTrId("register-success")
-                       .arg(djson["username"].toString());
+        //% "%1: login success"
+        qInfo() << qtTrId("login-success")
+                       .arg(SteamFriends()->GetPersonaName());
+        gameState = KP::Port;
+        emit gamestateChanged(KP::Port);
+        SteamAPI_RunCallbacks();
     }
     else {
         QString reas;
         switch(djson["reason"].toInt()) {
-        case KP::BadShadow: reas = qtTrId("malformed-shadow"); break;
-            //% "User already exists."
-        case KP::UserExists: reas = qtTrId("user-exists"); break;
+        case KP::TicketFailedToDecrypt: reas = qtTrId("ticket-decrypt-fail"); break;
+        case KP::TicketIsntFromCorrectAppID: reas = qtTrId("ticket-incorrect-appid"); break;
+        case KP::RequestTimeout: reas = qtTrId("ticket-timeout"); break;
+        case KP::SteamIdInvalid: reas = qtTrId("steam-id-invalid"); break;
         default: throw std::domain_error("message not implemented"); break;
         }
-        //% "%1: register failure, reason: %2"
-        qInfo() << qtTrId("register-failed")
-                       .arg(djson["username"].toString(), reas);
+        //% "%1: login failure, reason: %2"
+        qInfo() << qtTrId("login-failed")
+                       .arg(SteamFriends()->GetPersonaName(), reas);
     }
     attemptMode = false;
 }

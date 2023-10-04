@@ -128,7 +128,7 @@ public:
     EquipDef(int, QString &&, QString &&,
              QMap<AttrType, int> &&, QStringList &&);
 
-    bool canDevelop(int userid = 0) const;
+    bool canDevelop(CSteamID userid = k_steamIDNil) const;
     const ResOrd devRes() const;
     int getRarity() const;
 

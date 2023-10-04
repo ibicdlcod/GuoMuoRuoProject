@@ -44,19 +44,17 @@ Q_ENUM_NS(DgramType)
 enum AuthMode{
     Login,
     Reg,
-    Logout
+    Logout,
+    NewLogin
 };
 Q_ENUM_NS(AuthMode)
 
-enum AuthError{
-    BadShadow,
-    BadPassword,
+enum LogoutType{
     LoggedElsewhere,
-    UserNonexist,
-    UserExists,
-    RetryToomuch
+    LogoutFailure,
+    LogoutSuccess
 };
-Q_ENUM_NS(AuthError)
+Q_ENUM_NS(LogoutType)
 
 enum MsgType{
     JsonError,
@@ -69,7 +67,8 @@ enum MsgType{
     Penguin,
     NewEquip,
     Hello,
-    LackPrivate
+    LackPrivate,
+    AllowClientStart
 };
 Q_ENUM_NS(MsgType)
 
@@ -96,7 +95,9 @@ enum CommandType{
     Develop,
     Fetch,
     Refresh,
-    SteamAuth
+    SteamAuth,
+    SteamLogout,
+    CHello
 };
 Q_ENUM_NS(CommandType)
 
@@ -120,6 +121,14 @@ enum InfoType{
 };
 Q_ENUM_NS(InfoType)
 
+enum AuthFailType{
+    TicketFailedToDecrypt,
+    TicketIsntFromCorrectAppID,
+    RequestTimeout,
+    SteamIdInvalid
+};
+Q_ENUM_NS(AuthFailType)
+
 void initLog(bool server = false);
 #if defined (Q_OS_WIN)
 void winConsoleCheck();
@@ -127,28 +136,26 @@ void winConsoleCheck();
 
 /* See JSON support in Qt, especially QCborValue */
 QByteArray accessDenied();
-QByteArray clientAuth(AuthMode, const QString &name,
-                      const QByteArray &shadow = "");
 QByteArray clientDevelop(int, bool convert = false, int factoryID = -1);
 QByteArray clientFactoryRefresh();
 QByteArray clientFetch(int factoryID = -1);
+QByteArray clientHello();
 QByteArray clientStateChange(GameState);
 QByteArray clientSteamAuth(uint8 [], uint32);
-QByteArray serverAuth(AuthMode, const QString &,
-                      bool, AuthError);
-QByteArray serverAuth(AuthMode, const QString &,
-                      bool, AuthError, QDateTime);
-QByteArray serverAuth(AuthMode, const QString &,
-                      bool);
+QByteArray clientSteamLogout();
 QByteArray serverDevelopFailed(GameError);
 QByteArray serverDevelopStart();
 QByteArray serverFairyBusy(int);
 QByteArray serverHello();
 QByteArray serverLackPrivate();
+QByteArray serverLogFail(AuthFailType);
+QByteArray serverLogSuccess(bool);
+QByteArray serverLogout(LogoutType);
 QByteArray serverNewEquip(int, int);
 QByteArray serverParseError(MsgType, const QString &,
                             const QString &);
 QByteArray serverPenguin();
+QByteArray weighAnchor();
 };
 
 #endif // KP_H

@@ -68,8 +68,6 @@
 class Server : public CommandLine {
     Q_OBJECT
 
-    typedef int Uid;
-
 public:
     explicit Server(int, char **);
     ~Server() noexcept override;
@@ -93,8 +91,8 @@ private slots:
 
 private:
     void decryptDatagram(QSslSocket *, const QByteArray &);
-    void doDevelop(Uid, int, int, QSslSocket *);
-    void doFetch(Uid, int, QSslSocket *);
+    void doDevelop(CSteamID &, int, int, QSslSocket *);
+    void doFetch(CSteamID &, int, QSslSocket *);
     void doHandshake(QSslSocket *, const QByteArray &);
     bool equipmentRefresh();
     void exitGraceSpec() override;
@@ -104,13 +102,11 @@ private:
     bool importEquipFromCSV();
     void parseListen(const QStringList &);
     void parseUnlisten();
-    void receivedAuth(const QJsonObject &, const PeerInfo &, QSslSocket *);
-    void receivedForceLogout(Uid uid);
-    void receivedLogin(const QJsonObject &, const PeerInfo &, QSslSocket *);
-    void receivedLogout(const QJsonObject &, const PeerInfo &, QSslSocket *);
-    void receivedReg(const QJsonObject &, const PeerInfo &, QSslSocket *);
+    void receivedForceLogout(CSteamID &);
+    void receivedLogin(CSteamID &, const PeerInfo &, QSslSocket *);
+    void receivedLogout(CSteamID &, const PeerInfo &, QSslSocket *);
     void receivedReq(const QJsonObject &, const PeerInfo &, QSslSocket *);
-    void refreshClientFactory(Uid uid, QSslSocket *connection);
+    void refreshClientFactory(CSteamID &, QSslSocket *);
     void sqlcheckEquip();
     void sqlcheckEquipU();
     void sqlcheckFacto();
@@ -120,11 +116,12 @@ private:
     void sqlinitEquipU();
     void sqlinitFacto();
     void sqlinitUsers();
+    void sqlinitNewUsers();
 
     bool listening = false;
     SslServer sslServer;
-    //QMap<PeerInfo, Uid> connectedUsers;
-    QMap<Uid, QSslSocket *> connectedPeers;
+    //QMap<PeerInfo, CSteamID> connectedUsers;
+    QMap<CSteamID, QSslSocket *> connectedPeers;
 
     QMap<int, QPointer<EquipDef>> equipRegistry;
 
