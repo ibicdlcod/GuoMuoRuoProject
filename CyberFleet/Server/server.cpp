@@ -411,27 +411,7 @@ void Server::pskRequired(QSslSocket *socket,
     QString clientName = QString::fromLatin1(auth->identity());
     //% "PSK callback, received a client's identity: '%1'"
     qDebug() << qtTrId("client-id-received").arg(clientName);
-    if(clientName.compare("NEW_USER") == 0)
-        auth->setPreSharedKey(QByteArrayLiteral("register"));
-    else {
-        QSqlDatabase db = QSqlDatabase::database();
-        QSqlQuery query;
-        query.prepare("SELECT Shadow FROM Users "
-                      "WHERE Username = :name;");
-        query.bindValue(":name", clientName);
-        if(!query.exec()) {
-            //% "Pre-shared key retrieve failed: %1"
-            qCritical() << qtTrId("psk-retrieve-failed").arg(clientName);
-        }
-        query.isSelect();
-        if(!query.first()) {
-            int x = QRandomGenerator::global()->generate64();
-            auth->setPreSharedKey(QByteArray::number(x));
-        }
-        else {
-            auth->setPreSharedKey(query.value(0).toByteArray());
-        }
-    }
+    auth->setPreSharedKey(QByteArrayLiteral("A.Zephyr"));
 }
 
 void Server::shutdown() {
@@ -1030,6 +1010,9 @@ void Server::receivedAuth(const QJsonObject &djson,
     }
     else if(djson["command"].toInt() == KP::CommandType::SteamLogout) {
         /* TODO: UNFINISHED, should send logout message */
+        QByteArray msg = KP::serverLogout(KP::LogoutSuccess);
+        connection->write(msg);
+        connection->flush();
         connectedPeers.remove(connectedUsers[connection]);
         connectedUsers.remove(connection);
         connection->disconnectFromHost();

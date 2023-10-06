@@ -177,6 +177,7 @@ QByteArray KP::serverLogout(KP::LogoutType reason) {
     result["type"] = DgramType::Auth;
     result["mode"] = AuthMode::Logout;
     result["reason"] = reason;
+    result["success"] = (reason != KP::LogoutFailure);
     return QCborValue::fromJsonValue(result).toCbor();
 }
 

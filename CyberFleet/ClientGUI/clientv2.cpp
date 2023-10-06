@@ -318,6 +318,8 @@ void Clientv2::pskRequired(QSslPreSharedKeyAuthenticator *auth) {
 
     qDebug() << clientName << ": providing pre-shared key ...";
     serverName = QString(auth->identityHint());
+    auth->setIdentity(QByteArrayLiteral("Admiral"));
+    auth->setPreSharedKey(QByteArrayLiteral("A.Zephyr"));
     if(registerMode) {
         auth->setIdentity(QByteArrayLiteral("NEW_USER"));
         auth->setPreSharedKey(QByteArrayLiteral("register"));
@@ -729,6 +731,9 @@ void Clientv2::receivedInfo(const QJsonObject &djson) {
 void Clientv2::receivedLogout(const QJsonObject &djson) {
     if(djson["success"].toBool()) {
         if(!djson.contains("reason")) {
+            throw std::domain_error("message not implemented");
+        }
+        else if(djson["reason"] == KP::LogoutSuccess) {
             //% "%1: logout success"
             qInfo() << qtTrId("logout-success")
                            .arg(djson["username"].toString());
