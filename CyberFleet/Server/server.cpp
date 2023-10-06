@@ -233,6 +233,8 @@ void Server::datagramReceived(const PeerInfo &peerInfo,
         QCborValue::fromCbor(plainText).toMap().toJsonObject();
     try {
         switch(djson["type"].toInt()) {
+        case KP::DgramType::Auth:
+            receivedAuth(djson, peerInfo, connection); break;
         case KP::DgramType::Request:
             receivedReq(djson, peerInfo, connection); break;
         default:
@@ -363,6 +365,7 @@ void Server::readyRead(QSslSocket *currentsocket) {
     if (currentsocket->error()
         == QAbstractSocket::RemoteHostClosedError) {
         // Client disconnected, remove from connected users
+        /* TODO: is it really safe? */
         for(auto begin = connectedPeers.keyValueBegin(),
              end = connectedPeers.keyValueEnd();
              begin != end; begin++){
@@ -371,6 +374,7 @@ void Server::readyRead(QSslSocket *currentsocket) {
                 qInfo() << qtTrId("client-dc").
                            arg(begin->first.ConvertToUint64());
                 connectedPeers.remove(begin->first);
+                connectedUsers.remove(begin->second);
                 break;
             }
         }
@@ -923,6 +927,7 @@ void Server::receivedForceLogout(CSteamID &uid) {
         client->write(msg);
         client->disconnectFromHost();
         connectedPeers.remove(uid);
+        connectedUsers.remove(client);
     }
 }
 
@@ -964,6 +969,7 @@ void Server::receivedLogin(CSteamID &uid,
         /* existing user */
     }
     connectedPeers[uid] = connection;
+    connectedUsers[connection] = uid;
 }
 
 void Server::receivedLogout(CSteamID &uid,
@@ -977,6 +983,7 @@ void Server::receivedLogout(CSteamID &uid,
         QByteArray msg = KP::serverLogout(KP::LogoutSuccess);
         connection->write(msg);
         connectedPeers.remove(uid);
+        connectedUsers.remove(connection);
         connection->disconnectFromHost();
     }
 }
@@ -984,6 +991,7 @@ void Server::receivedLogout(CSteamID &uid,
 void Server::receivedReq(const QJsonObject &djson,
                          const PeerInfo &peerInfo,
                          QSslSocket *connection) {
+    /* the following two should be moved to receivedAuth */
     if(djson["command"].toInt() == KP::CommandType::SteamAuth) {
         QJsonArray rgubArray = djson["rgubTicket"].toArray();
         const uint32 cubTicket = djson["cubTicket"].toInteger(0);
@@ -1089,17 +1097,10 @@ void Server::receivedReq(const QJsonObject &djson,
         return;
     }
     else if(djson["command"].toInt() == KP::CommandType::SteamLogout) {
-        /* TODO: UNFINISHED */
+        /* TODO: UNFINISHED, should send logout message */
+        connectedPeers.remove(connectedUsers[connection]);
+        connectedUsers.remove(connection);
         connection->disconnectFromHost();
-        return;
-    }
-    else if(djson["command"].toInt() == KP::CommandType::CHello) {
-        /* TODO: UNFINISHED */
-        qDebug("CHELLO");
-        QByteArray msg = KP::weighAnchor();
-        connection->write(msg);
-        //User::refreshPort(uid);
-        //User::refreshFactory(uid);
         return;
     }
 
@@ -1109,7 +1110,14 @@ void Server::receivedReq(const QJsonObject &djson,
          begin != end; begin++){
         if(begin->second == connection) {
             CSteamID uid = begin->first;
+            QByteArray msg;
             switch(djson["command"].toInt()) {
+            case KP::CommandType::CHello:
+                qDebug("CHELLO");
+                msg = KP::weighAnchor();
+                connection->write(msg);
+                User::refreshPort(uid);
+                User::refreshFactory(uid);
             case KP::CommandType::ChangeState:
                 switch(djson["state"].toInt()) {
                 /* TODO: Should update to client as well? */

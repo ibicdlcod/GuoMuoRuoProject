@@ -68,7 +68,8 @@ enum MsgType{
     NewEquip,
     Hello,
     LackPrivate,
-    AllowClientStart
+    AllowClientStart,
+    AllowClientEnd
 };
 Q_ENUM_NS(MsgType)
 
@@ -136,6 +137,7 @@ void winConsoleCheck();
 
 /* See JSON support in Qt, especially QCborValue */
 QByteArray accessDenied();
+QByteArray catbomb();
 QByteArray clientDevelop(int, bool convert = false, int factoryID = -1);
 QByteArray clientFactoryRefresh();
 QByteArray clientFetch(int factoryID = -1);

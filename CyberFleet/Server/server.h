@@ -102,6 +102,7 @@ private:
     bool importEquipFromCSV();
     void parseListen(const QStringList &);
     void parseUnlisten();
+    void receivedAuth(const QJsonObject &, const PeerInfo &, QSslSocket *);
     void receivedForceLogout(CSteamID &);
     void receivedLogin(CSteamID &, const PeerInfo &, QSslSocket *);
     void receivedLogout(CSteamID &, const PeerInfo &, QSslSocket *);
@@ -120,9 +121,11 @@ private:
 
     bool listening = false;
     SslServer sslServer;
-    //QMap<PeerInfo, CSteamID> connectedUsers;
+    QMap<QSslSocket *, CSteamID> connectedUsers;
     QMap<CSteamID, QSslSocket *> connectedPeers;
 
+    QJsonObject equipRegistryJ;
+    /* ↓deprecated */
     QMap<int, QPointer<EquipDef>> equipRegistry;
 
     std::random_device random;

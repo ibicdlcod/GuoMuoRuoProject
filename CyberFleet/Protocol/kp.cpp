@@ -49,6 +49,13 @@ QByteArray KP::accessDenied() {
     return QCborValue::fromJsonValue(result).toCbor();
 }
 
+QByteArray KP::catbomb() {
+    QJsonObject result;
+    result["type"] = DgramType::Message;
+    result["msgtype"] = MsgType::AllowClientFinish;
+    return QCborValue::fromJsonValue(result).toCbor();
+}
+
 QByteArray KP::clientDevelop(int equipid, bool convert, int factoryID) {
     QJsonObject result;
     result["type"] = DgramType::Request;
