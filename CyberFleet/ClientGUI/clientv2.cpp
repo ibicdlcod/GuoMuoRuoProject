@@ -517,8 +517,6 @@ const QStringList Clientv2::getValidCommands() const {
 }
 
 void Clientv2::parseConnectReq(const QStringList &cmdParts) {
-    sauth.RetrieveEncryptedAppTicket();
-    SteamAPI_RunCallbacks();
 
     conf.addCaCertificates(settings->value("trustedcert",
                                            ":/sslserver.pem").toString());
@@ -559,6 +557,9 @@ void Clientv2::parseConnectReq(const QStringList &cmdParts) {
             return;
         }
         attemptMode = true;
+
+        sauth.RetrieveEncryptedAppTicket();
+        SteamAPI_RunCallbacks();
 
         clientName = cmdParts[3];
         //% "Enter password:"
