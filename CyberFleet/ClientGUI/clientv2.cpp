@@ -822,7 +822,16 @@ void Clientv2::receivedMsg(const QJsonObject &djson) {
         gameState = KP::Port;
         emit gamestateChanged(KP::Port);
         //% "You can now play the game."
-        qInfo() << qtTrId("client-start"); break;
+        qInfo() << qtTrId("client-start");
+        displayPrompt();
+        SteamAPI_RunCallbacks();
+        break;
+    case KP::AllowClientFinish:
+        gameState = KP::Offline;
+        emit gamestateChanged(KP::Offline);
+        qInfo() << qtTrId("client-finish");
+        shutdown();
+        displayPrompt();
         break;
     default: throw std::domain_error("message not implemented"); break;
     }

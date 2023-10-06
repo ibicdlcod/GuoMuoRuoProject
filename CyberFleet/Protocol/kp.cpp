@@ -84,7 +84,7 @@ QByteArray KP::clientFetch(int factoryID) {
 
 QByteArray KP::clientHello() {
     QJsonObject result;
-    result["type"] = DgramType::Request;
+    result["type"] = DgramType::Auth;
     result["command"] = CommandType::CHello;
     return QCborValue::fromJsonValue(result).toCbor();
 }
@@ -99,7 +99,7 @@ QByteArray KP::clientStateChange(GameState state) {
 
 QByteArray KP::clientSteamAuth(uint8 rgubTicket [], uint32 cubTicket) {
     QJsonObject result;
-    result["type"] = DgramType::Request;
+    result["type"] = DgramType::Auth;
     result["command"] = CommandType::SteamAuth;
     QJsonArray rgubArray = QJsonArray();
     for(unsigned int i = 0; i < cubTicket; ++i) {
@@ -112,7 +112,7 @@ QByteArray KP::clientSteamAuth(uint8 rgubTicket [], uint32 cubTicket) {
 
 QByteArray KP::clientSteamLogout() {
     QJsonObject result;
-    result["type"] = DgramType::Request;
+    result["type"] = DgramType::Auth;
     result["command"] = CommandType::SteamLogout;
     return QCborValue::fromJsonValue(result).toCbor();
 }

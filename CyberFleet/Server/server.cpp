@@ -920,77 +920,9 @@ void Server::parseUnlisten() {
     }
 }
 
-void Server::receivedForceLogout(CSteamID &uid) {
-    QSslSocket *client = connectedPeers[uid];
-    if(client->isEncrypted()) {
-        QByteArray msg = KP::serverLogout(KP::LogoutType::LoggedElsewhere);
-        client->write(msg);
-        client->disconnectFromHost();
-        connectedPeers.remove(uid);
-        connectedUsers.remove(client);
-    }
-}
-
-/* nothing could shrink this function efficiently either */
-void Server::receivedLogin(CSteamID &uid,
-                           const PeerInfo &peerInfo,
-                           QSslSocket *connection) {
-    uint64 uidInt = uid.ConvertToUint64();
-
-    Q_UNUSED(peerInfo)
-    QSqlDatabase db = QSqlDatabase::database();
-    QSqlQuery query;
-    query.prepare("SELECT UserID FROM NewUsers "
-                  "WHERE UserID = :uid");
-    query.bindValue(":uid", uidInt); // test
-    query.exec();
-    query.isSelect();
-    if(Q_UNLIKELY(!query.first())) {
-        /* new user */
-        QSqlQuery insert;
-        if(!insert.prepare("INSERT INTO NewUsers (UserID, UserType) "
-                            "VALUES (:uid, :type);")) {
-            qWarning() << insert.lastError().databaseText();
-        }
-        insert.bindValue(":uid", uidInt);
-        insert.bindValue(":type", "commoner");
-        if(!insert.exec()) {
-            //% "%1: Add user failure!"
-            throw DBError(qtTrId("add-user-fail").arg(uidInt),
-                          query.lastError());
-            connection->disconnectFromHost();
-            return;
-        }
-        else {
-            /* new user initialization here */
-        }
-    }
-    else {
-        /* existing user */
-    }
-    connectedPeers[uid] = connection;
-    connectedUsers[connection] = uid;
-}
-
-void Server::receivedLogout(CSteamID &uid,
-                            const PeerInfo &peerInfo,
-                            QSslSocket *connection) {
-    if(!connectedPeers.contains(uid) || connectedPeers[uid] != connection) {
-        QByteArray msg = KP::serverLogout(KP::LogoutFailure);
-        connection->write(msg);
-    }
-    else {
-        QByteArray msg = KP::serverLogout(KP::LogoutSuccess);
-        connection->write(msg);
-        connectedPeers.remove(uid);
-        connectedUsers.remove(connection);
-        connection->disconnectFromHost();
-    }
-}
-
-void Server::receivedReq(const QJsonObject &djson,
-                         const PeerInfo &peerInfo,
-                         QSslSocket *connection) {
+void Server::receivedAuth(const QJsonObject &djson,
+                          const PeerInfo &peerInfo,
+                          QSslSocket *connection) {
     /* the following two should be moved to receivedAuth */
     if(djson["command"].toInt() == KP::CommandType::SteamAuth) {
         QJsonArray rgubArray = djson["rgubTicket"].toArray();
@@ -1103,7 +1035,94 @@ void Server::receivedReq(const QJsonObject &djson,
         connection->disconnectFromHost();
         return;
     }
+    else if(djson["command"].toInt() == KP::CommandType::CHello) {
+        if(connectedUsers.contains(connection)) {
+            QByteArray msg = KP::weighAnchor();
+            connection->write(msg);
+            CSteamID uid = connectedUsers[connection];
+            User::refreshPort(uid);
+            User::refreshFactory(uid);
+        }
+        else {
+            QByteArray msg = KP::serverLogFail(KP::SteamAuthFail);
+            connection->write(msg);
+            msg = KP::catbomb();
+            connection->write(msg);
+            connection->disconnectFromHost();
+        }
+    }
+}
+void Server::receivedForceLogout(CSteamID &uid) {
+    QSslSocket *client = connectedPeers[uid];
+    if(client->isEncrypted()) {
+        QByteArray msg = KP::serverLogout(KP::LogoutType::LoggedElsewhere);
+        client->write(msg);
+        client->disconnectFromHost();
+        connectedPeers.remove(uid);
+        connectedUsers.remove(client);
+    }
+}
 
+/* nothing could shrink this function efficiently either */
+void Server::receivedLogin(CSteamID &uid,
+                           const PeerInfo &peerInfo,
+                           QSslSocket *connection) {
+    uint64 uidInt = uid.ConvertToUint64();
+
+    Q_UNUSED(peerInfo)
+    QSqlDatabase db = QSqlDatabase::database();
+    QSqlQuery query;
+    query.prepare("SELECT UserID FROM NewUsers "
+                  "WHERE UserID = :uid");
+    query.bindValue(":uid", uidInt); // test
+    query.exec();
+    query.isSelect();
+    if(Q_UNLIKELY(!query.first())) {
+        /* new user */
+        QSqlQuery insert;
+        if(!insert.prepare("INSERT INTO NewUsers (UserID, UserType) "
+                            "VALUES (:uid, :type);")) {
+            qWarning() << insert.lastError().databaseText();
+        }
+        insert.bindValue(":uid", uidInt);
+        insert.bindValue(":type", "commoner");
+        if(!insert.exec()) {
+            //% "%1: Add user failure!"
+            throw DBError(qtTrId("add-user-fail").arg(uidInt),
+                          query.lastError());
+            connection->disconnectFromHost();
+            return;
+        }
+        else {
+            /* new user initialization here */
+        }
+    }
+    else {
+        /* existing user */
+    }
+    connectedPeers[uid] = connection;
+    connectedUsers[connection] = uid;
+}
+
+void Server::receivedLogout(CSteamID &uid,
+                            const PeerInfo &peerInfo,
+                            QSslSocket *connection) {
+    if(!connectedPeers.contains(uid) || connectedPeers[uid] != connection) {
+        QByteArray msg = KP::serverLogout(KP::LogoutFailure);
+        connection->write(msg);
+    }
+    else {
+        QByteArray msg = KP::serverLogout(KP::LogoutSuccess);
+        connection->write(msg);
+        connectedPeers.remove(uid);
+        connectedUsers.remove(connection);
+        connection->disconnectFromHost();
+    }
+}
+
+void Server::receivedReq(const QJsonObject &djson,
+                         const PeerInfo &peerInfo,
+                         QSslSocket *connection) {
     /* TODO: this is inefficient */
     for(auto begin = connectedPeers.keyValueBegin(),
          end = connectedPeers.keyValueEnd();
@@ -1111,13 +1130,13 @@ void Server::receivedReq(const QJsonObject &djson,
         if(begin->second == connection) {
             CSteamID uid = begin->first;
             QByteArray msg;
-            switch(djson["command"].toInt()) {
+            switch(djson["command"].toInt()) {/*
             case KP::CommandType::CHello:
                 qDebug("CHELLO");
                 msg = KP::weighAnchor();
                 connection->write(msg);
                 User::refreshPort(uid);
-                User::refreshFactory(uid);
+                User::refreshFactory(uid);*/
             case KP::CommandType::ChangeState:
                 switch(djson["state"].toInt()) {
                 /* TODO: Should update to client as well? */

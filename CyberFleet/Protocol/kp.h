@@ -69,7 +69,7 @@ enum MsgType{
     Hello,
     LackPrivate,
     AllowClientStart,
-    AllowClientEnd
+    AllowClientFinish
 };
 Q_ENUM_NS(MsgType)
 
@@ -126,7 +126,8 @@ enum AuthFailType{
     TicketFailedToDecrypt,
     TicketIsntFromCorrectAppID,
     RequestTimeout,
-    SteamIdInvalid
+    SteamIdInvalid,
+    SteamAuthFail
 };
 Q_ENUM_NS(AuthFailType)
 
