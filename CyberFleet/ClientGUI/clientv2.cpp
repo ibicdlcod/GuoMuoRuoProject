@@ -101,7 +101,30 @@ void Clientv2::sendEncryptedAppTicket(uint8 rgubTicket [], uint32 cubTicket) {
 
 /* public slots */
 void Clientv2::autoPassword() {
-    parse("x");
+    QObject::connect(&socket, &QSslSocket::handshakeInterruptedOnError,
+                     this, &Clientv2::handshakeInterrupted);
+    QObject::connect(&socket,
+                     &QSslSocket::preSharedKeyAuthenticationRequired,
+                     this, &Clientv2::pskRequired);
+    QObject::connect(&socket, &QAbstractSocket::disconnected,
+                     this, &Clientv2::catbomb);
+    QObject::connect(&socket, &QAbstractSocket::errorOccurred,
+                     this, &Clientv2::errorOccurred);
+    socket.setProtocol(QSsl::TlsV1_3);
+    socket.connectToHostEncrypted(address.toString(), port);
+    if(!socket.waitForConnected(
+            settings->value("connect_wait_time_msec", 8000)
+                .toInt())) {
+        //% "Failed to connect to server at %1:%2"
+        qWarning() << qtTrId("wait-for-connect-failure")
+                          .arg(address.toString()).arg(port);
+        attemptMode = false;
+        return;
+    }
+    QObject::connect(&socket, &QSslSocket::readyRead,
+                     this, &Clientv2::readyRead);
+
+    SteamAPI_RunCallbacks();
 }
 
 void Clientv2::backToNavalBase() {
@@ -569,11 +592,12 @@ void Clientv2::parseConnectReq(const QStringList &cmdParts) {
         sauth.RetrieveEncryptedAppTicket();
         SteamAPI_RunCallbacks();
 
+        QTimer::singleShot(2000, this, &Clientv2::autoPassword);/*
         clientName = cmdParts[3];
         //% "Enter password:"
         emit qout(qtTrId("password-enter"));
         passwordMode = registerMode ? Password::registering : Password::login;
-        QTimer::singleShot(2000, this, &Clientv2::autoPassword);
+        QTimer::singleShot(2000, this, &Clientv2::autoPassword);*/
 
         return;
     }

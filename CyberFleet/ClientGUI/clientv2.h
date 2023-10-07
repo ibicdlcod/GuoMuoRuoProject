@@ -100,6 +100,7 @@ signals:
     void qout(QString, QColor background = QColor("white"),
               QColor foreground = QColor("black"));
     void receivedFactoryRefresh(const QJsonObject &);
+    //void sentAppTicket();
 
 private slots:
     void encrypted();
