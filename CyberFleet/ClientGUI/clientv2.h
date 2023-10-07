@@ -81,6 +81,7 @@ public:
     void sendEncryptedAppTicket(uint8 [], uint32);
 
 public slots:
+    void autoPassword();
     void backToNavalBase();
     void catbomb();
     void displayPrompt();

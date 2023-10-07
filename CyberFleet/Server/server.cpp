@@ -1083,6 +1083,11 @@ void Server::receivedLogin(CSteamID &uid,
     else {
         /* existing user */
     }
+    qDebug("VERIFYCOMPLETE");
+    QByteArray msg = KP::serverVerifyComplete();
+    if(connection->write(msg) <= 0) {
+        qWarning("Verifycomplete not sent");
+    }
     connectedPeers[uid] = connection;
     connectedUsers[connection] = uid;
 }
@@ -1113,13 +1118,7 @@ void Server::receivedReq(const QJsonObject &djson,
         if(begin->second == connection) {
             CSteamID uid = begin->first;
             QByteArray msg;
-            switch(djson["command"].toInt()) {/*
-            case KP::CommandType::CHello:
-                qDebug("CHELLO");
-                msg = KP::weighAnchor();
-                connection->write(msg);
-                User::refreshPort(uid);
-                User::refreshFactory(uid);*/
+            switch(djson["command"].toInt()) {
             case KP::CommandType::ChangeState:
                 switch(djson["state"].toInt()) {
                 /* TODO: Should update to client as well? */

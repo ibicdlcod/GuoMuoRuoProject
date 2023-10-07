@@ -207,6 +207,13 @@ QByteArray KP::serverPenguin() {
     return QCborValue::fromJsonValue(result).toCbor();
 }
 
+QByteArray KP::serverVerifyComplete() {
+    QJsonObject result;
+    result["type"] = DgramType::Message;
+    result["msgtype"] = MsgType::VerifyComplete;
+    return QCborValue::fromJsonValue(result).toCbor();
+}
+
 QByteArray KP::weighAnchor() {
     QJsonObject result;
     result["type"] = DgramType::Message;

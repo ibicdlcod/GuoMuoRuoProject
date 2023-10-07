@@ -80,10 +80,14 @@ inline bool Clientv2::loggedIn() const {
 
 void Clientv2::sendEncryptedAppTicket(uint8 rgubTicket [], uint32 cubTicket) {
     QByteArray msg = KP::clientSteamAuth(rgubTicket, cubTicket);
-    if(!socket.waitForEncrypted(500)) {
+    if(!socket.waitForEncrypted()) {
         qCritical("Encrypted connection yet established.");
         throw NetworkError(socket.errorString());
         return;
+    }
+    else {
+        qInfo("Encrypted connection established, "
+              "sending encrypted app ticket");
     }
     const qint64 written = socket.write(msg);
     if (written <= 0) {
@@ -96,6 +100,10 @@ void Clientv2::sendEncryptedAppTicket(uint8 rgubTicket [], uint32 cubTicket) {
 }
 
 /* public slots */
+void Clientv2::autoPassword() {
+    parse("x");
+}
+
 void Clientv2::backToNavalBase() {
     if(!loggedIn()) {
         emit qout(qtTrId("access-denied-login-first"));
@@ -565,6 +573,8 @@ void Clientv2::parseConnectReq(const QStringList &cmdParts) {
         //% "Enter password:"
         emit qout(qtTrId("password-enter"));
         passwordMode = registerMode ? Password::registering : Password::login;
+        QTimer::singleShot(2000, this, &Clientv2::autoPassword);
+
         return;
     }
 }
@@ -823,7 +833,8 @@ void Clientv2::receivedMsg(const QJsonObject &djson) {
                                                  djson["serial"].toString()); break;
     case KP::Hello:
         //% "Server is alive and responding."
-        qInfo() << qtTrId("server-hello"); break;
+        qInfo() << qtTrId("server-hello");
+        break;
     case KP::AllowClientStart:
         gameState = KP::Port;
         emit gamestateChanged(KP::Port);
@@ -859,6 +870,7 @@ void Clientv2::receivedNewLogin(const QJsonObject &djson) {
         case KP::TicketIsntFromCorrectAppID: reas = qtTrId("ticket-incorrect-appid"); break;
         case KP::RequestTimeout: reas = qtTrId("ticket-timeout"); break;
         case KP::SteamIdInvalid: reas = qtTrId("steam-id-invalid"); break;
+        case KP::SteamAuthFail: reas = qtTrId("steam-auth-fail"); break;
         default: throw std::domain_error("message not implemented"); break;
         }
         //% "%1: login failure, reason: %2"

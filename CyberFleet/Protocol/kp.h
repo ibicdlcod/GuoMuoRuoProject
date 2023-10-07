@@ -69,7 +69,8 @@ enum MsgType{
     Hello,
     LackPrivate,
     AllowClientStart,
-    AllowClientFinish
+    AllowClientFinish,
+    VerifyComplete
 };
 Q_ENUM_NS(MsgType)
 
@@ -158,6 +159,7 @@ QByteArray serverNewEquip(int, int);
 QByteArray serverParseError(MsgType, const QString &,
                             const QString &);
 QByteArray serverPenguin();
+QByteArray serverVerifyComplete();
 QByteArray weighAnchor();
 };
 
