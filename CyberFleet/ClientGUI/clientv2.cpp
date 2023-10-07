@@ -627,6 +627,12 @@ bool Clientv2::parseGameCommands(const QString &primary,
     return false;
 }
 
+void Clientv2::parseQuit() {
+    if(gameState != KP::Offline)
+        parseDisconnectReq();
+    exitGracefully();
+}
+
 void Clientv2::readWhenConnected(const QByteArray &dgram) {
 #if defined(QT_DEBUG)
     static const QString formatter = QStringLiteral("From Server text: %1");

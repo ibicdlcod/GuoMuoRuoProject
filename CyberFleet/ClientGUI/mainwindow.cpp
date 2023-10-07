@@ -70,8 +70,10 @@ MainWindow::MainWindow(QWidget *parent, int argc, char ** argv)
                      &engine, &Clientv2::switchToFactory);
     QObject::connect(ui->actionDevelop_Equipment, &QAction::triggered,
                      this, &MainWindow::switchToDevelop);
-    QObject::connect(ui->actionQuit, &QAction::triggered,
+    QObject::connect(ui->actionLogout, &QAction::triggered,
                      &engine, &Clientv2::parseDisconnectReq);
+    QObject::connect(ui->actionExit, &QAction::triggered,
+                     &engine, &Clientv2::parseQuit);
     QObject::connect(&engine, &Clientv2::receivedFactoryRefresh,
                      this, &MainWindow::doFactoryRefresh);
     slotfs.append(ui->Factory_Slot_0);
@@ -104,11 +106,13 @@ MainWindow::MainWindow(QWidget *parent, int argc, char ** argv)
         (*iter)->setSlotnum(iter - slotfs.begin());
         (*iter)->setStatus();
     }
-    ui->PasswordEdit->setEchoMode(QLineEdit::Password);
+
+    portarea = new PortArea(ui->PortArea);
 }
 
 MainWindow::~MainWindow()
 {
+    delete portarea;
     delete ui;
 }
 
@@ -145,49 +149,26 @@ void MainWindow::doFactoryRefresh(const QJsonObject &input) {
 void MainWindow::gamestateChanged(KP::GameState state) {
     state == KP::Offline ? ui->LoginScreen->show() :
                            ui->LoginScreen->hide();
-    state == KP::Port ? ui->PortArea->show() :
-                        ui->PortArea->hide();
+    if(state == KP::Port) {
+        ui->PortArea->show();
+        portarea->resize(ui->PortArea->width(),ui->PortArea->height());
+    }
+    else {
+        ui->PortArea->hide();
+    }
     state == KP::Factory ? (ui->FactoryArea->show(), factoryRefresh()) :
                            ui->FactoryArea->hide();
+
 }
 
 void MainWindow::parseConnectReq() {
     QStringList cmd1 = {QStringLiteral("connect"),
                         ui->ServerEdit->text(),
-                        ui->PortEdit->text(),
-                        ui->UsernameEdit->text(),
+                        ui->PortEdit->text()
                        };
     QString cmd1Comb = cmd1.join(" ");
-    QString cmd2 = ui->PasswordEdit->text();
     Clientv2 &engine = Clientv2::getInstance();
     engine.parse(cmd1Comb);
-    engine.parse(cmd2);
-}
-
-void MainWindow::parseRegReq() {
-    if(!pwConfirmMode) {
-        QStringList cmd1 = {QStringLiteral("register"),
-                            ui->ServerEdit->text(),
-                            ui->PortEdit->text(),
-                            ui->UsernameEdit->text(),
-                           };
-        QString cmd1Comb = cmd1.join(" ");
-        QString cmd2 = ui->PasswordEdit->text();
-        Clientv2 &engine = Clientv2::getInstance();
-        engine.parse(cmd1Comb);
-        engine.parse(cmd2);
-        ui->PasswordEdit->clear();
-        //% "Confirm Password:"
-        ui->label_4->setText(qtTrId("confirm-password"));
-        pwConfirmMode = true;
-    } else {
-        QString cmd3 = ui->PasswordEdit->text();
-        Clientv2 &engine = Clientv2::getInstance();
-        engine.parse(cmd3);
-        //% "Password:"
-        ui->label_4->setText(qtTrId("password"));
-        pwConfirmMode = false;
-    }
 }
 
 void MainWindow::printMessage(QString text, QColor background,
@@ -216,4 +197,13 @@ void MainWindow::switchToDevelop() {
     factoryState = KP::Development;
     //% "Develop Equipment"
     ui->FactoryLabel->setText(qtTrId("develop-equipment"));
+}
+
+/* reimplement */
+void MainWindow::resizeEvent(QResizeEvent *event)
+{
+    if(!ui->PortArea->isHidden()) {
+        portarea->resize(ui->PortArea->width(),ui->PortArea->height());
+    }
+    QWidget::resizeEvent(event);
 }

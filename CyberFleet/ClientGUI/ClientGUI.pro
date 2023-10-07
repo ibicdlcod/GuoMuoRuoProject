@@ -11,23 +11,29 @@ CONFIG += c++17
 SOURCES += \
     clientv2.cpp \
     developwindow.cpp \
+    form.cpp \
     keyenterreceiver.cpp \
     main.cpp \
     mainwindow.cpp \
     networkerror.cpp \
+    portarea.cpp \
     steamauth.cpp
 
 HEADERS += \
     clientv2.h \
     developwindow.h \
+    form.h \
     keyenterreceiver.h \
     mainwindow.h \
     networkerror.h \
+    portarea.h \
     steamauth.h
 
 FORMS += \
     developwindow.ui \
-    mainwindow.ui
+    form.ui \
+    mainwindow.ui \
+    portarea.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

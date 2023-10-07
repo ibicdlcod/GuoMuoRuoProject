@@ -87,6 +87,7 @@ public slots:
     void displayPrompt();
     bool parse(const QString &);
     void parseDisconnectReq();
+    void parseQuit();
     bool parseSpec(const QStringList &);
     void serverResponse(const QString &, const QByteArray &);
     void showHelp(const QStringList &);

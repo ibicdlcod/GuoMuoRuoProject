@@ -39,8 +39,8 @@
        <item>
         <widget class="QWidget" name="PortArea" native="true">
          <property name="sizePolicy">
-          <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
-           <horstretch>1</horstretch>
+          <sizepolicy hsizetype="Minimum" vsizetype="Expanding">
+           <horstretch>99</horstretch>
            <verstretch>0</verstretch>
           </sizepolicy>
          </property>
@@ -50,35 +50,7 @@
            <height>0</height>
           </size>
          </property>
-         <layout class="QHBoxLayout" name="horizontalLayout_4">
-          <item>
-           <widget class="QLabel" name="label_5">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-              <horstretch>100</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
-            <property name="minimumSize">
-             <size>
-              <width>400</width>
-              <height>0</height>
-             </size>
-            </property>
-            <property name="font">
-             <font>
-              <pointsize>100</pointsize>
-             </font>
-            </property>
-            <property name="text">
-             <string>Hello!</string>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignCenter</set>
-            </property>
-           </widget>
-          </item>
-         </layout>
+         <layout class="QHBoxLayout" name="horizontalLayout_4"/>
         </widget>
        </item>
        <item>
@@ -129,29 +101,15 @@
            <layout class="QVBoxLayout" name="verticalLayout_3">
             <item>
              <layout class="QGridLayout" name="gridLayout">
+              <item row="1" column="0">
+               <widget class="QLabel" name="label">
+                <property name="text">
+                 <string>Server:</string>
+                </property>
+               </widget>
+              </item>
               <item row="2" column="1">
                <widget class="QLineEdit" name="PortEdit">
-                <property name="styleSheet">
-                 <string notr="true">background-color: rgb(255, 255, 255);</string>
-                </property>
-               </widget>
-              </item>
-              <item row="2" column="0">
-               <widget class="QLabel" name="label_2">
-                <property name="text">
-                 <string>Port:</string>
-                </property>
-               </widget>
-              </item>
-              <item row="3" column="1">
-               <widget class="QLineEdit" name="UsernameEdit">
-                <property name="styleSheet">
-                 <string notr="true">background-color: rgb(255, 255, 255);</string>
-                </property>
-               </widget>
-              </item>
-              <item row="4" column="1">
-               <widget class="QLineEdit" name="PasswordEdit">
                 <property name="styleSheet">
                  <string notr="true">background-color: rgb(255, 255, 255);</string>
                 </property>
@@ -164,24 +122,10 @@
                 </property>
                </widget>
               </item>
-              <item row="1" column="0">
-               <widget class="QLabel" name="label">
+              <item row="2" column="0">
+               <widget class="QLabel" name="label_2">
                 <property name="text">
-                 <string>Server:</string>
-                </property>
-               </widget>
-              </item>
-              <item row="4" column="0">
-               <widget class="QLabel" name="label_4">
-                <property name="text">
-                 <string>Password:</string>
-                </property>
-               </widget>
-              </item>
-              <item row="3" column="0">
-               <widget class="QLabel" name="label_3">
-                <property name="text">
-                 <string>Username:</string>
+                 <string>Port:</string>
                 </property>
                </widget>
               </item>
@@ -196,16 +140,6 @@
                 </property>
                 <property name="text">
                  <string>Connect</string>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QPushButton" name="pushButton_6">
-                <property name="styleSheet">
-                 <string notr="true">background-color: rgb(255, 170, 170);</string>
-                </property>
-                <property name="text">
-                 <string>Register</string>
                 </property>
                </widget>
               </item>
@@ -232,9 +166,9 @@
        <item>
         <widget class="QWidget" name="FactoryArea" native="true">
          <property name="sizePolicy">
-          <sizepolicy hsizetype="Minimum" vsizetype="Expanding">
-           <horstretch>255</horstretch>
-           <verstretch>99</verstretch>
+          <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+           <horstretch>1</horstretch>
+           <verstretch>0</verstretch>
           </sizepolicy>
          </property>
          <property name="minimumSize">
@@ -620,7 +554,8 @@ border-color: rgb(255, 255, 255);</string>
      <string>Naval Base</string>
     </property>
     <addaction name="actionBack_to_naval_base"/>
-    <addaction name="actionQuit"/>
+    <addaction name="actionLogout"/>
+    <addaction name="actionExit"/>
    </widget>
    <addaction name="menuNaval_Base"/>
    <addaction name="menuSortie"/>
@@ -652,9 +587,14 @@ border-color: rgb(255, 255, 255);</string>
     <string>Back to naval base</string>
    </property>
   </action>
-  <action name="actionQuit">
+  <action name="actionLogout">
    <property name="text">
-    <string>Quit</string>
+    <string>Logout</string>
+   </property>
+  </action>
+  <action name="actionExit">
+   <property name="text">
+    <string>Exit program</string>
    </property>
   </action>
  </widget>
@@ -668,10 +608,7 @@ border-color: rgb(255, 255, 255);</string>
  <tabstops>
   <tabstop>ServerEdit</tabstop>
   <tabstop>PortEdit</tabstop>
-  <tabstop>UsernameEdit</tabstop>
-  <tabstop>PasswordEdit</tabstop>
   <tabstop>pushButton_7</tabstop>
-  <tabstop>pushButton_6</tabstop>
   <tabstop>Factory_Slot_4</tabstop>
   <tabstop>Factory_Slot_17</tabstop>
   <tabstop>Factory_Slot_2</tabstop>
@@ -765,22 +702,6 @@ border-color: rgb(255, 255, 255);</string>
     <hint type="destinationlabel">
      <x>8</x>
      <y>334</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>pushButton_6</sender>
-   <signal>clicked()</signal>
-   <receiver>MainWindow</receiver>
-   <slot>parseRegReq()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>42</x>
-     <y>197</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>4</x>
-     <y>107</y>
     </hint>
    </hints>
   </connection>
