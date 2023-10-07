@@ -81,8 +81,9 @@ inline bool Clientv2::loggedIn() const {
 void Clientv2::sendEncryptedAppTicket(uint8 rgubTicket [], uint32 cubTicket) {
     QByteArray msg = KP::clientSteamAuth(rgubTicket, cubTicket);
     if(!socket.waitForEncrypted()) {
-        qCritical("Encrypted connection yet established.");
-        throw NetworkError(socket.errorString());
+        qCritical("Encrypted connection yet established "
+                  "(do not reattempt connection within a minute!)");
+        //throw NetworkError(socket.errorString());
         return;
     }
     else {
@@ -163,8 +164,6 @@ void Clientv2::displayPrompt() {
     //% "田中飞妈"
     qInfo() << qtTrId("fscktanaka");
 #endif
-    if(passwordMode != Password::normal)
-        return;
     /* TODO: convert to GUI */
     /*
     if(!loggedIn())
@@ -176,14 +175,6 @@ void Clientv2::displayPrompt() {
 }
 
 bool Clientv2::parse(const QString &input) {
-    if(passwordMode != Password::normal) {
-        bool success = parseSpec(QStringList(input));
-        if(!success) {
-            invalidCommand();
-        }
-        displayPrompt();
-        return success;
-    }
     static QRegularExpression re("\\s+");
     QStringList cmdParts = input.split(re, Qt::SkipEmptyParts);
     if(cmdParts.length() > 0) {
@@ -227,10 +218,6 @@ bool Clientv2::parseSpec(const QStringList &cmdParts) {
     try {
         if(cmdParts.length() > 0) {
             QString primary = cmdParts[0];
-            if(passwordMode != Password::normal) {
-                parsePassword(primary);
-                return true;
-            }
             primary = settings->value("alias/"+primary, primary).toString();
             bool loginMode = primary.compare("connect", Qt::CaseInsensitive) == 0;
             registerMode = primary.compare("register", Qt::CaseInsensitive) == 0;
@@ -351,19 +338,6 @@ void Clientv2::pskRequired(QSslPreSharedKeyAuthenticator *auth) {
     serverName = QString(auth->identityHint());
     auth->setIdentity(QByteArrayLiteral("Admiral"));
     auth->setPreSharedKey(QByteArrayLiteral("A.Zephyr"));
-    if(registerMode) {
-        auth->setIdentity(QByteArrayLiteral("NEW_USER"));
-        auth->setPreSharedKey(QByteArrayLiteral("register"));
-    }
-    else {
-        auth->setIdentity(clientName.toLatin1());
-        QByteArray salt = clientName.toUtf8().append(
-            settings->value("salt", defaultSalt).toByteArray());
-        QByteArray shadow = QPasswordDigestor::deriveKeyPbkdf2(
-            QCryptographicHash::Blake2s_256,
-            password, salt, 8, 255);
-        auth->setPreSharedKey(shadow);
-    }
 }
 
 void Clientv2::readyRead() {
@@ -563,13 +537,13 @@ void Clientv2::parseConnectReq(const QStringList &cmdParts) {
         return;
     }
     retransmitTimes = 0;
-    if(cmdParts.length() < 4) {
+    if(cmdParts.length() < 3) {
         if(registerMode) {
-            //% "Usage: register [ip] [port] [username]"
+            //% "Usage: register [ip] [port]"
             emit qout(qtTrId("register-usage"));
         }
         else {
-            //% "Usage: connect [ip] [port] [username]"
+            //% "Usage: connect [ip] [port]"
             emit qout(qtTrId("connect-usage"));
         }
         return;
@@ -592,12 +566,10 @@ void Clientv2::parseConnectReq(const QStringList &cmdParts) {
         sauth.RetrieveEncryptedAppTicket();
         SteamAPI_RunCallbacks();
 
-        QTimer::singleShot(2000, this, &Clientv2::autoPassword);/*
-        clientName = cmdParts[3];
-        //% "Enter password:"
-        emit qout(qtTrId("password-enter"));
-        passwordMode = registerMode ? Password::registering : Password::login;
-        QTimer::singleShot(2000, this, &Clientv2::autoPassword);*/
+        QTimer::singleShot(
+            (settings->value("client/auto_password_time", 1000).toInt()),
+            this, &Clientv2::autoPassword);
+        clientName = SteamFriends()->GetPersonaName();
 
         return;
     }
@@ -653,54 +625,6 @@ bool Clientv2::parseGameCommands(const QString &primary,
         }
     }
     return false;
-}
-
-void Clientv2::parsePassword(const QString &input) {
-    if(passwordMode == Password::confirm) {
-        if(input != password) {
-            //% "Password mismatch!"
-            qWarning() << qtTrId("password-mismatch");
-            passwordMode = Password::normal;
-            attemptMode = false;
-            return;
-        }
-    }
-    else {
-        password = input.toUtf8();
-    }
-
-    if(passwordMode != Password::registering) {
-        QObject::connect(&socket, &QSslSocket::handshakeInterruptedOnError,
-                         this, &Clientv2::handshakeInterrupted);
-        QObject::connect(&socket,
-                         &QSslSocket::preSharedKeyAuthenticationRequired,
-                         this, &Clientv2::pskRequired);
-        QObject::connect(&socket, &QAbstractSocket::disconnected,
-                         this, &Clientv2::catbomb);
-        QObject::connect(&socket, &QAbstractSocket::errorOccurred,
-                         this, &Clientv2::errorOccurred);
-        socket.setProtocol(QSsl::TlsV1_3);
-        socket.connectToHostEncrypted(address.toString(), port);
-        if(!socket.waitForConnected(
-                settings->value("connect_wait_time_msec", 8000)
-                    .toInt())) {
-            //% "Failed to connect to server at %1:%2"
-            qWarning() << qtTrId("wait-for-connect-failure")
-                              .arg(address.toString()).arg(port);
-            attemptMode = false;
-            passwordMode = Password::normal;
-            return;
-        }
-        QObject::connect(&socket, &QSslSocket::readyRead,
-                         this, &Clientv2::readyRead);
-        //startHandshake();
-        passwordMode = Password::normal;
-    }
-    else {
-        //% "Confirm Password:"
-        emit qout(qtTrId("password-confirm"));
-        passwordMode = Password::confirm;
-    }
 }
 
 void Clientv2::readWhenConnected(const QByteArray &dgram) {

@@ -125,7 +125,6 @@ private:
     void invalidCommand();
     void parseConnectReq(const QStringList &);
     bool parseGameCommands(const QString &, const QStringList &);
-    void parsePassword(const QString &);
     void qls(const QStringList &);
     void readWhenConnected(const QByteArray &);
     void readWhenUnConnected(const QByteArray &);
@@ -139,8 +138,6 @@ private:
 
     explicit Clientv2(QObject * parent = nullptr);
 
-    Password passwordMode;
-
     QHostAddress address;
     quint16 port;
 
@@ -152,7 +149,6 @@ private:
 
     QString clientName;
     QString serverName;
-    QByteArray password;
 
     bool attemptMode;
     bool registerMode;
