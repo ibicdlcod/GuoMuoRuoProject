@@ -73,47 +73,6 @@ void MainWindow::adjustArea(QFrame *input, const QSize &size) {
     input->resize(size);
 }
 
-void MainWindow::adjustLicenseArea() {
-    licenseArea->resize(ui->License->frameSize());
-}
-
-void MainWindow::adjustLoginArea() {
-    newLoginScreen->resize(ui->LoginScreen->frameSize());
-}
-
-void MainWindow::adjustPortArea() {
-    portArea->resize(ui->PortArea->frameSize());
-}
-
-void MainWindow::developClicked(bool checked, int slotnum) {
-    DevelopWindow w;
-    if(w.exec() == QDialog::Rejected)
-        qDebug() << "FUCK" << slotnum << Qt::endl;
-    else {
-        Clientv2 &engine = Clientv2::getInstance();
-        QString msg = QStringLiteral("develop %1 %2")
-                          .arg(w.EquipIdDesired()).arg(slotnum);
-        qDebug() << msg;
-        engine.parse(msg);
-    }
-}
-
-void MainWindow::doFactoryRefresh(const QJsonObject &input) {
-    QJsonArray content = input["content"].toArray();
-    for(int i = 0; i < content.size(); ++i) {
-        slotfs[i]->setOpen(true);
-        QJsonObject item = content[i].toObject();
-        if(!item["done"].toBool()) {
-            slotfs[i]->setCompleteTime(
-                QDateTime::fromString(
-                    item["completetime"].toString()));
-        } else {
-            slotfs[i]->setComplete(true);
-        }
-        slotfs[i]->setStatus();
-    }
-}
-
 void MainWindow::gamestateInit() {
     gamestateChanged(KP::Offline);
     QTimer::singleShot(1, this,
@@ -167,17 +126,18 @@ void MainWindow::switchToDevelop() {
 }
 
 /* reimplement */
-void MainWindow::resizeEvent(QResizeEvent *event)
-{
+void MainWindow::resizeEvent(QResizeEvent *event) {
     if(!ui->PortArea->isHidden()) {
-        portArea->resize(ui->PortArea->width(), ui->PortArea->height());
+        adjustArea(portArea, ui->PortArea->size());
     }
     if(!ui->License->isHidden()) {
-        licenseArea->resize(ui->License->width(), ui->License->height());
+        adjustArea(licenseArea, ui->License->size());
     }
     if(!ui->LoginScreen->isHidden()) {
-        newLoginScreen->resize(ui->LoginScreen->width(),
-                               ui->LoginScreen->height());
+        adjustArea(newLoginScreen, ui->LoginScreen->size());
+    }
+    if(!ui->FactoryArea->isHidden()) {
+        adjustArea(factoryArea, ui->FactoryArea->size());
     }
     QWidget::resizeEvent(event);
 }

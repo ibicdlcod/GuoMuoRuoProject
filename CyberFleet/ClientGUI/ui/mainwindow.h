@@ -31,14 +31,8 @@ protected:
 
 private slots:
     void adjustArea(QFrame *, const QSize &);
-    void adjustLicenseArea();
-    void adjustLoginArea();
-    void adjustPortArea();
-    void developClicked(bool checked = false, int slotnum = 0);
-    void doFactoryRefresh(const QJsonObject &);
     void gamestateChanged(KP::GameState);
     void gamestateInit();
-    //void parseConnectReq();
     void printMessage(QString, QColor background = QColor("white"),
                       QColor foreground = QColor("black"));
     void processCmd();
