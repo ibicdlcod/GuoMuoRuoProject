@@ -28,6 +28,7 @@ protected:
     void resizeEvent(QResizeEvent *event) override;
 
 private slots:
+    void adjustLicenseArea();
     void developClicked(bool checked = false, int slotnum = 0);
     void doFactoryRefresh(const QJsonObject &);
     void gamestateChanged(KP::GameState);
@@ -37,7 +38,6 @@ private slots:
     void processCmd();
     void factoryRefresh();
     void switchToDevelop();
-    void adjustLicenseArea();
 
 private:
     Ui::MainWindow *ui;

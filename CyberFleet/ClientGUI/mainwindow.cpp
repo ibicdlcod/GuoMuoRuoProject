@@ -16,38 +16,7 @@ MainWindow::MainWindow(QWidget *parent, int argc, char ** argv)
     ui->setupUi(this);
     ui->PortArea->hide();
     ui->FactoryArea->hide();
-    ui->LoginScreen->hide();/*
-    QString notice;
-    QDir currentDir = QDir::current();
-    QString openingwords = settings->value("license_notice",
-                                           ":/openingwords.txt").toString();
-    QFile licenseFile(currentDir.filePath(openingwords));
-    if(Q_UNLIKELY(!licenseFile.open(QIODevice::ReadOnly | QIODevice::Text))) {
-        //% "Can't find license file, exiting."
-        qFatal(qtTrId("licence-not-found").toUtf8());
-    }
-    else {
-        QTextStream instream1(&licenseFile);
-        ui->LicenseText->setAlignment(Qt::AlignCenter);
-        notice = instream1.readAll();
-    }
-    ui->LicenseText->setText(notice);
-    ui->LicenseText->selectAll();
-    ui->LicenseText->setAlignment(Qt::AlignCenter);
-    ui->LicenseText->setTextColor(QColor("white"));
-    auto textCursor = ui->LicenseText->textCursor();
-    textCursor.clearSelection();
-    ui->LicenseText->setTextCursor(textCursor);
-    //% "What? Admiral Tanaka? He's the real deal, isn't he?\nGreat at battle and bad at politics--so cool!"
-    ui->Naganami->setText(qtTrId("naganami-words"));
-    ui->Naganami->selectAll();
-    ui->Naganami->setAlignment(Qt::AlignCenter);
-    ui->Naganami->setTextColor(QColor("white"));
-    textCursor = ui->Naganami->textCursor();
-    textCursor.clearSelection();
-    ui->Naganami->setTextCursor(textCursor);
-    //% "Continue"
-    ui->ContinueButton->setText(qtTrId("license-continue")); */
+    ui->LoginScreen->hide();
 
     KeyEnterReceiver *key = new KeyEnterReceiver();
     ui->CommandPrompt->installEventFilter(key);
@@ -119,7 +88,12 @@ MainWindow::MainWindow(QWidget *parent, int argc, char ** argv)
 MainWindow::~MainWindow()
 {
     delete portArea;
+    delete licenseArea;
     delete ui;
+}
+
+void MainWindow::adjustLicenseArea() {
+    licenseArea->resize(ui->License->frameSize());
 }
 
 void MainWindow::developClicked(bool checked, int slotnum) {
@@ -130,7 +104,7 @@ void MainWindow::developClicked(bool checked, int slotnum) {
     else {
         Clientv2 &engine = Clientv2::getInstance();
         QString msg = QStringLiteral("develop %1 %2")
-                .arg(w.EquipIdDesired()).arg(slotnum);
+                          .arg(w.EquipIdDesired()).arg(slotnum);
         qDebug() << msg;
         engine.parse(msg);
     }
@@ -143,8 +117,8 @@ void MainWindow::doFactoryRefresh(const QJsonObject &input) {
         QJsonObject item = content[i].toObject();
         if(!item["done"].toBool()) {
             slotfs[i]->setCompleteTime(
-                        QDateTime::fromString(
-                            item["completetime"].toString()));
+                QDateTime::fromString(
+                    item["completetime"].toString()));
         } else {
             slotfs[i]->setComplete(true);
         }
@@ -154,7 +128,7 @@ void MainWindow::doFactoryRefresh(const QJsonObject &input) {
 
 void MainWindow::gamestateChanged(KP::GameState state) {
     state == KP::Offline ? ui->LoginScreen->show() :
-                           ui->LoginScreen->hide();
+        ui->LoginScreen->hide();
     if(state == KP::Port) {
         ui->PortArea->show();
         portArea->resize(ui->PortArea->width(),ui->PortArea->height());
@@ -163,15 +137,16 @@ void MainWindow::gamestateChanged(KP::GameState state) {
         ui->PortArea->hide();
     }
     state == KP::Factory ? (ui->FactoryArea->show(), factoryRefresh()) :
-                           ui->FactoryArea->hide();
+        ui->FactoryArea->hide();
 
 }
 
 void MainWindow::parseConnectReq() {
-    QStringList cmd1 = {QStringLiteral("connect"),
-                        ui->ServerEdit->text(),
-                        ui->PortEdit->text()
-                       };
+    QStringList cmd1 = {
+        QStringLiteral("connect"),
+        ui->ServerEdit->text(),
+        ui->PortEdit->text()
+    };
     QString cmd1Comb = cmd1.join(" ");
     Clientv2 &engine = Clientv2::getInstance();
     engine.parse(cmd1Comb);
@@ -205,15 +180,14 @@ void MainWindow::switchToDevelop() {
     ui->FactoryLabel->setText(qtTrId("develop-equipment"));
 }
 
-void MainWindow::adjustLicenseArea() {
-    licenseArea->resize(ui->License->frameSize());
-}
-
 /* reimplement */
 void MainWindow::resizeEvent(QResizeEvent *event)
 {
     if(!ui->PortArea->isHidden()) {
-        portArea->resize(ui->PortArea->width(),ui->PortArea->height());
+        portArea->resize(ui->PortArea->width(), ui->PortArea->height());
+    }
+    if(!ui->License->isHidden()) {
+        licenseArea->resize(ui->License->width(), ui->License->height());
     }
     QWidget::resizeEvent(event);
 }
