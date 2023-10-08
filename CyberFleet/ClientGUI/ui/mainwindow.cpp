@@ -43,7 +43,7 @@ MainWindow::MainWindow(QWidget *parent, int argc, char ** argv)
                      &engine, &Clientv2::parseDisconnectReq);
     QObject::connect(ui->actionExit, &QAction::triggered,
                      &engine, &Clientv2::parseQuit);
-
+/*
     QObject::connect(&engine, &Clientv2::receivedFactoryRefresh,
                      this, &MainWindow::doFactoryRefresh);
     slotfs.append(ui->Factory_Slot_0);
@@ -76,7 +76,7 @@ MainWindow::MainWindow(QWidget *parent, int argc, char ** argv)
         (*iter)->setSlotnum(iter - slotfs.begin());
         (*iter)->setStatus();
     }
-
+*/
     portArea = new PortArea(ui->PortArea);
     licenseArea = new LicenseArea(ui->License);
     newLoginScreen = new NewLoginS(ui->LoginScreen);
@@ -105,6 +105,10 @@ void MainWindow::adjustLicenseArea() {
 
 void MainWindow::adjustLoginArea() {
     newLoginScreen->resize(ui->LoginScreen->frameSize());
+}
+
+void MainWindow::adjustPortArea() {
+    portArea->resize(ui->PortArea->frameSize());
 }
 
 void MainWindow::developClicked(bool checked, int slotnum) {
@@ -145,10 +149,10 @@ void MainWindow::gamestateChanged(KP::GameState state) {
     state == KP::Offline ? ui->LoginScreen->show()
                          : ui->LoginScreen->hide();
     state == KP::Port ? (
-        ui->PortArea->show(),
-        portArea->resize(ui->PortArea->size()))
-                      : ui->PortArea->hide();
-
+                            ui->PortArea->show(),
+                            QTimer::singleShot(1, this, &MainWindow::adjustPortArea)
+                        )
+        : ui->PortArea->hide();
     state == KP::Factory ? (ui->FactoryArea->show(), factoryRefresh(),
                             factoryArea->resize(ui->FactoryArea->size())) :
         ui->FactoryArea->hide();
@@ -179,7 +183,7 @@ void MainWindow::switchToDevelop() {
     }
     factoryState = KP::Development;
     //% "Develop Equipment"
-    ui->FactoryLabel->setText(qtTrId("develop-equipment"));
+    factoryArea->switchToDevelop();
 }
 
 /* reimplement */

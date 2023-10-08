@@ -78,3 +78,7 @@ void FactoryArea::doFactoryRefresh(const QJsonObject &input) {
         slotfs[i]->setStatus();
     }
 }
+
+void FactoryArea::switchToDevelop() {
+    ui->FactoryLabel->setText(qtTrId("develop-equipment"));
+}

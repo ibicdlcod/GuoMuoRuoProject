@@ -1,13 +1,13 @@
 #ifndef PORTAREA_H
 #define PORTAREA_H
 
-#include <QWidget>
+#include <QFrame>
 
 namespace Ui {
 class PortArea;
 }
 
-class PortArea : public QWidget
+class PortArea : public QFrame
 {
     Q_OBJECT
 

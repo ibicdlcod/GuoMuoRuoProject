@@ -2,7 +2,7 @@
 #include "ui_portarea.h"
 
 PortArea::PortArea(QWidget *parent) :
-    QWidget(parent),
+    QFrame(parent),
     ui(new Ui::PortArea)
 {
     ui->setupUi(this);

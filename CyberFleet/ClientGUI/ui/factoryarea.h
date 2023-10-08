@@ -16,6 +16,8 @@ public:
     explicit FactoryArea(QWidget *parent = nullptr);
     ~FactoryArea();
 
+    void switchToDevelop();
+
 private slots:
     void developClicked(bool checked = false, int slotnum = 0);
     void doFactoryRefresh(const QJsonObject &);

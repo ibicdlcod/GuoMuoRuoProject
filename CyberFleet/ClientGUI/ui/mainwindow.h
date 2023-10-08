@@ -32,6 +32,7 @@ protected:
 private slots:
     void adjustLicenseArea();
     void adjustLoginArea();
+    void adjustPortArea();
     void developClicked(bool checked = false, int slotnum = 0);
     void doFactoryRefresh(const QJsonObject &);
     void gamestateChanged(KP::GameState);
