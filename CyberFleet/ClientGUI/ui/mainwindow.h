@@ -30,6 +30,7 @@ protected:
     void resizeEvent(QResizeEvent *event) override;
 
 private slots:
+    void adjustArea(QFrame *, const QSize &);
     void adjustLicenseArea();
     void adjustLoginArea();
     void adjustPortArea();

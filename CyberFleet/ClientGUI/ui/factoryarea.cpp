@@ -64,6 +64,7 @@ void FactoryArea::developClicked(bool checked, int slotnum) {
 }
 
 void FactoryArea::doFactoryRefresh(const QJsonObject &input) {
+    qDebug("FACTORYREFRESH");
     QJsonArray content = input["content"].toArray();
     for(int i = 0; i < content.size(); ++i) {
         slotfs[i]->setOpen(true);

@@ -43,45 +43,15 @@ MainWindow::MainWindow(QWidget *parent, int argc, char ** argv)
                      &engine, &Clientv2::parseDisconnectReq);
     QObject::connect(ui->actionExit, &QAction::triggered,
                      &engine, &Clientv2::parseQuit);
-/*
-    QObject::connect(&engine, &Clientv2::receivedFactoryRefresh,
-                     this, &MainWindow::doFactoryRefresh);
-    slotfs.append(ui->Factory_Slot_0);
-    slotfs.append(ui->Factory_Slot_1);
-    slotfs.append(ui->Factory_Slot_2);
-    slotfs.append(ui->Factory_Slot_3);
-    slotfs.append(ui->Factory_Slot_4);
-    slotfs.append(ui->Factory_Slot_5);
-    slotfs.append(ui->Factory_Slot_6);
-    slotfs.append(ui->Factory_Slot_7);
-    slotfs.append(ui->Factory_Slot_8);
-    slotfs.append(ui->Factory_Slot_9);
-    slotfs.append(ui->Factory_Slot_10);
-    slotfs.append(ui->Factory_Slot_11);
-    slotfs.append(ui->Factory_Slot_12);
-    slotfs.append(ui->Factory_Slot_13);
-    slotfs.append(ui->Factory_Slot_14);
-    slotfs.append(ui->Factory_Slot_15);
-    slotfs.append(ui->Factory_Slot_16);
-    slotfs.append(ui->Factory_Slot_17);
-    slotfs.append(ui->Factory_Slot_18);
-    slotfs.append(ui->Factory_Slot_19);
-    slotfs.append(ui->Factory_Slot_20);
-    slotfs.append(ui->Factory_Slot_21);
-    slotfs.append(ui->Factory_Slot_22);
-    slotfs.append(ui->Factory_Slot_23);
-    for(auto iter = slotfs.begin(); iter < slotfs.end(); ++iter) {
-        QObject::connect((*iter), &FactorySlot::clickedSpec,
-                         this, &MainWindow::developClicked);
-        (*iter)->setSlotnum(iter - slotfs.begin());
-        (*iter)->setStatus();
-    }
-*/
+
     portArea = new PortArea(ui->PortArea);
     licenseArea = new LicenseArea(ui->License);
     newLoginScreen = new NewLoginS(ui->LoginScreen);
     factoryArea = new FactoryArea(ui->FactoryArea);
-    QTimer::singleShot(1, this, &MainWindow::adjustLicenseArea);
+    QTimer::singleShot(1, this,
+                       [this]
+                       {adjustArea(licenseArea,
+                                    ui->License->frameSize());});
     QObject::connect(licenseArea, &LicenseArea::showLicenseComplete,
                      ui->LoginScreen, &QWidget::show);
     QObject::connect(licenseArea, &LicenseArea::showLicenseComplete,
@@ -97,6 +67,10 @@ MainWindow::~MainWindow()
     delete portArea;
     delete licenseArea;
     delete ui;
+}
+
+void MainWindow::adjustArea(QFrame *input, const QSize &size) {
+    input->resize(size);
 }
 
 void MainWindow::adjustLicenseArea() {
@@ -142,17 +116,23 @@ void MainWindow::doFactoryRefresh(const QJsonObject &input) {
 
 void MainWindow::gamestateInit() {
     gamestateChanged(KP::Offline);
-    QTimer::singleShot(1, this, &MainWindow::adjustLoginArea);
+    QTimer::singleShot(1, this,
+                       [this]
+                       {adjustArea(newLoginScreen,
+                                    ui->LoginScreen->frameSize());});
 }
 
 void MainWindow::gamestateChanged(KP::GameState state) {
     state == KP::Offline ? ui->LoginScreen->show()
                          : ui->LoginScreen->hide();
     state == KP::Port ? (
-                            ui->PortArea->show(),
-                            QTimer::singleShot(1, this, &MainWindow::adjustPortArea)
-                        )
-        : ui->PortArea->hide();
+        ui->PortArea->show(),
+        QTimer::singleShot(1, this,
+                           [this]
+                           {adjustArea(portArea,
+                                        ui->PortArea->frameSize());})
+        )
+                      : ui->PortArea->hide();
     state == KP::Factory ? (ui->FactoryArea->show(), factoryRefresh(),
                             factoryArea->resize(ui->FactoryArea->size())) :
         ui->FactoryArea->hide();
