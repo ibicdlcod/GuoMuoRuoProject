@@ -55,7 +55,7 @@
         <widget class="QWidget" name="PortArea" native="true">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Minimum" vsizetype="Expanding">
-           <horstretch>99</horstretch>
+           <horstretch>1</horstretch>
            <verstretch>0</verstretch>
           </sizepolicy>
          </property>
@@ -92,7 +92,7 @@
         <widget class="QWidget" name="FactoryArea" native="true">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
-           <horstretch>1</horstretch>
+           <horstretch>99</horstretch>
            <verstretch>0</verstretch>
           </sizepolicy>
          </property>

@@ -7,6 +7,7 @@
 #include "portarea.h"
 #include "licensearea.h"
 #include "newlogins.h"
+#include "factoryarea.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -48,8 +49,9 @@ private:
     KP::FactoryState factoryState = KP::Development;
     QList<FactorySlot *> slotfs;
 
-    PortArea *portArea;
+    FactoryArea *factoryArea;
     LicenseArea *licenseArea;
     NewLoginS *newLoginScreen;
+    PortArea *portArea;
 };
 #endif // MAINWINDOW_H

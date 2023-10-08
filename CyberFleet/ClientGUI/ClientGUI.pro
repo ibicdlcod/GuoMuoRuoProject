@@ -14,6 +14,7 @@ SOURCES += \
     networkerror.cpp \
     steamauth.cpp \
     ui/developwindow.cpp \
+    ui/factoryarea.cpp \
     ui/keyenterreceiver.cpp \
     ui/licensearea.cpp \
     ui/mainwindow.cpp \
@@ -25,6 +26,7 @@ HEADERS += \
     networkerror.h \
     steamauth.h \
     ui/developwindow.h \
+    ui/factoryarea.h \
     ui/keyenterreceiver.h \
     ui/licensearea.h \
     ui/mainwindow.h \
@@ -33,6 +35,7 @@ HEADERS += \
 
 FORMS += \
     ui/developwindow.ui \
+    ui/factoryarea.ui \
     ui/licensearea.ui \
     ui/mainwindow.ui \
     ui/newlogins.ui \

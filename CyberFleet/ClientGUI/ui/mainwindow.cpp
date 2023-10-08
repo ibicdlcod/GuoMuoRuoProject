@@ -43,6 +43,7 @@ MainWindow::MainWindow(QWidget *parent, int argc, char ** argv)
                      &engine, &Clientv2::parseDisconnectReq);
     QObject::connect(ui->actionExit, &QAction::triggered,
                      &engine, &Clientv2::parseQuit);
+
     QObject::connect(&engine, &Clientv2::receivedFactoryRefresh,
                      this, &MainWindow::doFactoryRefresh);
     slotfs.append(ui->Factory_Slot_0);
@@ -78,6 +79,8 @@ MainWindow::MainWindow(QWidget *parent, int argc, char ** argv)
 
     portArea = new PortArea(ui->PortArea);
     licenseArea = new LicenseArea(ui->License);
+    newLoginScreen = new NewLoginS(ui->LoginScreen);
+    factoryArea = new FactoryArea(ui->FactoryArea);
     QTimer::singleShot(1, this, &MainWindow::adjustLicenseArea);
     QObject::connect(licenseArea, &LicenseArea::showLicenseComplete,
                      ui->LoginScreen, &QWidget::show);
@@ -85,7 +88,6 @@ MainWindow::MainWindow(QWidget *parent, int argc, char ** argv)
                      ui->License, &QWidget::hide);
     QObject::connect(licenseArea, &LicenseArea::showLicenseComplete,
                      this, &MainWindow::gamestateInit);
-    newLoginScreen = new NewLoginS(ui->LoginScreen);
     QObject::connect(licenseArea, &LicenseArea::showLicenseComplete,
                      newLoginScreen, &QWidget::show);
 }
@@ -106,7 +108,6 @@ void MainWindow::adjustLoginArea() {
 }
 
 void MainWindow::developClicked(bool checked, int slotnum) {
-    Q_UNUSED(checked)
     DevelopWindow w;
     if(w.exec() == QDialog::Rejected)
         qDebug() << "FUCK" << slotnum << Qt::endl;
@@ -141,31 +142,18 @@ void MainWindow::gamestateInit() {
 }
 
 void MainWindow::gamestateChanged(KP::GameState state) {
-    state == KP::Offline ? ui->LoginScreen->show() :
-        ui->LoginScreen->hide();
-    if(state == KP::Port) {
-        ui->PortArea->show();
-        portArea->resize(ui->PortArea->width(),ui->PortArea->height());
-    }
-    else {
-        ui->PortArea->hide();
-    }
-    state == KP::Factory ? (ui->FactoryArea->show(), factoryRefresh()) :
-        ui->FactoryArea->hide();
+    state == KP::Offline ? ui->LoginScreen->show()
+                         : ui->LoginScreen->hide();
+    state == KP::Port ? (
+        ui->PortArea->show(),
+        portArea->resize(ui->PortArea->size()))
+                      : ui->PortArea->hide();
 
+    state == KP::Factory ? (ui->FactoryArea->show(), factoryRefresh(),
+                            factoryArea->resize(ui->FactoryArea->size())) :
+        ui->FactoryArea->hide();
 }
-/*
-void MainWindow::parseConnectReq() {
-    QStringList cmd1 = {
-        QStringLiteral("connect"),
-        ui->ServerEdit->text(),
-        ui->PortEdit->text()
-    };
-    QString cmd1Comb = cmd1.join(" ");
-    Clientv2 &engine = Clientv2::getInstance();
-    engine.parse(cmd1Comb);
-}
-*/
+
 void MainWindow::printMessage(QString text, QColor background,
                               QColor foreground) {
     ui->LogBrowser->setTextBackgroundColor(background);
