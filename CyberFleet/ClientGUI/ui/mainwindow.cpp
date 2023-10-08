@@ -83,6 +83,8 @@ MainWindow::MainWindow(QWidget *parent, int argc, char ** argv)
                      ui->LoginScreen, &QWidget::show);
     QObject::connect(licenseArea, &LicenseArea::showLicenseComplete,
                      ui->License, &QWidget::hide);
+    QObject::connect(licenseArea, &LicenseArea::showLicenseComplete,
+                     this, &MainWindow::gamestateInit);
     newLoginScreen = new NewLoginS(ui->LoginScreen);
     QObject::connect(licenseArea, &LicenseArea::showLicenseComplete,
                      newLoginScreen, &QWidget::show);
@@ -97,6 +99,10 @@ MainWindow::~MainWindow()
 
 void MainWindow::adjustLicenseArea() {
     licenseArea->resize(ui->License->frameSize());
+}
+
+void MainWindow::adjustLoginArea() {
+    newLoginScreen->resize(ui->LoginScreen->frameSize());
 }
 
 void MainWindow::developClicked(bool checked, int slotnum) {
@@ -127,6 +133,11 @@ void MainWindow::doFactoryRefresh(const QJsonObject &input) {
         }
         slotfs[i]->setStatus();
     }
+}
+
+void MainWindow::gamestateInit() {
+    gamestateChanged(KP::Offline);
+    QTimer::singleShot(1, this, &MainWindow::adjustLoginArea);
 }
 
 void MainWindow::gamestateChanged(KP::GameState state) {
@@ -191,6 +202,10 @@ void MainWindow::resizeEvent(QResizeEvent *event)
     }
     if(!ui->License->isHidden()) {
         licenseArea->resize(ui->License->width(), ui->License->height());
+    }
+    if(!ui->LoginScreen->isHidden()) {
+        newLoginScreen->resize(ui->LoginScreen->width(),
+                               ui->LoginScreen->height());
     }
     QWidget::resizeEvent(event);
 }

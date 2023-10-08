@@ -15,11 +15,8 @@ public:
     explicit NewLoginS(QWidget *parent = nullptr);
     ~NewLoginS();
 
-signals:
-    void showLicenseComplete();
-
 private slots:
-    void complete();
+    void parseConnectReq();
 
 private:
     Ui::NewLoginS *ui;
