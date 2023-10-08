@@ -83,9 +83,9 @@ MainWindow::MainWindow(QWidget *parent, int argc, char ** argv)
                      ui->LoginScreen, &QWidget::show);
     QObject::connect(licenseArea, &LicenseArea::showLicenseComplete,
                      ui->License, &QWidget::hide);
-    loginScreen = new LoginScreen(ui->LoginScreen);
+    newLoginScreen = new NewLoginS(ui->LoginScreen);
     QObject::connect(licenseArea, &LicenseArea::showLicenseComplete,
-                     loginScreen, &QWidget::show);
+                     newLoginScreen, &QWidget::show);
 }
 
 MainWindow::~MainWindow()

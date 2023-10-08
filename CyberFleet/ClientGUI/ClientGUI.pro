@@ -18,6 +18,7 @@ SOURCES += \
     ui/keyenterreceiver.cpp \
     ui/licensearea.cpp \
     ui/mainwindow.cpp \
+    ui/newlogins.cpp \
     ui/portarea.cpp
 
 HEADERS += \
@@ -29,6 +30,7 @@ HEADERS += \
     ui/keyenterreceiver.h \
     ui/licensearea.h \
     ui/mainwindow.h \
+    ui/newlogins.h \
     ui/portarea.h
 
 FORMS += \
@@ -36,6 +38,7 @@ FORMS += \
     ui/developwindow.ui \
     ui/licensearea.ui \
     ui/mainwindow.ui \
+    ui/newlogins.ui \
     ui/portarea.ui
 
 # Default rules for deployment.

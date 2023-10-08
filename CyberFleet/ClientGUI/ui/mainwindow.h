@@ -7,6 +7,7 @@
 #include "portarea.h"
 #include "licensearea.h"
 #include "loginscreen.h"
+#include "newlogins.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -49,5 +50,6 @@ private:
     PortArea *portArea;
     LicenseArea *licenseArea;
     LoginScreen *loginScreen;
+    NewLoginS *newLoginScreen;
 };
 #endif // MAINWINDOW_H
