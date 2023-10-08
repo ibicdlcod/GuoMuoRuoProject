@@ -15,6 +15,12 @@ public:
     explicit LicenseArea(QWidget *parent = nullptr);
     ~LicenseArea();
 
+signals:
+    void showLicenseComplete();
+
+private slots:
+    void complete();
+
 private:
     Ui::LicenseArea *ui;
 };

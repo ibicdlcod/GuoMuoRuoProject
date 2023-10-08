@@ -16,10 +16,9 @@ MainWindow::MainWindow(QWidget *parent, int argc, char ** argv)
     ui->setupUi(this);
     ui->PortArea->hide();
     ui->FactoryArea->hide();
-    ui->LoginScreen->hide();
+    ui->LoginScreen->hide();/*
     QString notice;
     QDir currentDir = QDir::current();
-    /* the default is qt resource system */
     QString openingwords = settings->value("license_notice",
                                            ":/openingwords.txt").toString();
     QFile licenseFile(currentDir.filePath(openingwords));
@@ -48,7 +47,7 @@ MainWindow::MainWindow(QWidget *parent, int argc, char ** argv)
     textCursor.clearSelection();
     ui->Naganami->setTextCursor(textCursor);
     //% "Continue"
-    ui->ContinueButton->setText(qtTrId("license-continue"));
+    ui->ContinueButton->setText(qtTrId("license-continue")); */
 
     KeyEnterReceiver *key = new KeyEnterReceiver();
     ui->CommandPrompt->installEventFilter(key);
@@ -111,6 +110,10 @@ MainWindow::MainWindow(QWidget *parent, int argc, char ** argv)
     portArea = new PortArea(ui->PortArea);
     licenseArea = new LicenseArea(ui->License);
     QTimer::singleShot(1, this, &MainWindow::adjustLicenseArea);
+    QObject::connect(licenseArea, &LicenseArea::showLicenseComplete,
+                     ui->LoginScreen, &QWidget::show);
+    QObject::connect(licenseArea, &LicenseArea::showLicenseComplete,
+                     ui->License, &QWidget::hide);
 }
 
 MainWindow::~MainWindow()
@@ -203,9 +206,6 @@ void MainWindow::switchToDevelop() {
 }
 
 void MainWindow::adjustLicenseArea() {
-    qDebug() << "CHANGE";
-    qDebug() << ui->License->frameSize().width();
-    qDebug() << ui->License->frameSize().height();
     licenseArea->resize(ui->License->frameSize());
 }
 
