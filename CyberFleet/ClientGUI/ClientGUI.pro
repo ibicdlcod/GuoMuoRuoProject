@@ -11,8 +11,8 @@ CONFIG += c++17
 SOURCES += \
     clientv2.cpp \
     developwindow.cpp \
-    form.cpp \
     keyenterreceiver.cpp \
+    licensearea.cpp \
     main.cpp \
     mainwindow.cpp \
     networkerror.cpp \
@@ -22,8 +22,8 @@ SOURCES += \
 HEADERS += \
     clientv2.h \
     developwindow.h \
-    form.h \
     keyenterreceiver.h \
+    licensearea.h \
     mainwindow.h \
     networkerror.h \
     portarea.h \
@@ -31,7 +31,7 @@ HEADERS += \
 
 FORMS += \
     developwindow.ui \
-    form.ui \
+    licensearea.ui \
     mainwindow.ui \
     portarea.ui
 

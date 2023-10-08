@@ -3,6 +3,7 @@
 
 #include <QDir>
 #include <QSettings>
+#include <QResizeEvent>
 #include "developwindow.h"
 #include "keyenterreceiver.h"
 
@@ -107,12 +108,14 @@ MainWindow::MainWindow(QWidget *parent, int argc, char ** argv)
         (*iter)->setStatus();
     }
 
-    portarea = new PortArea(ui->PortArea);
+    portArea = new PortArea(ui->PortArea);
+    licenseArea = new LicenseArea(ui->License);
+    QTimer::singleShot(1, this, &MainWindow::adjustLicenseArea);
 }
 
 MainWindow::~MainWindow()
 {
-    delete portarea;
+    delete portArea;
     delete ui;
 }
 
@@ -151,7 +154,7 @@ void MainWindow::gamestateChanged(KP::GameState state) {
                            ui->LoginScreen->hide();
     if(state == KP::Port) {
         ui->PortArea->show();
-        portarea->resize(ui->PortArea->width(),ui->PortArea->height());
+        portArea->resize(ui->PortArea->width(),ui->PortArea->height());
     }
     else {
         ui->PortArea->hide();
@@ -199,11 +202,18 @@ void MainWindow::switchToDevelop() {
     ui->FactoryLabel->setText(qtTrId("develop-equipment"));
 }
 
+void MainWindow::adjustLicenseArea() {
+    qDebug() << "CHANGE";
+    qDebug() << ui->License->frameSize().width();
+    qDebug() << ui->License->frameSize().height();
+    licenseArea->resize(ui->License->frameSize());
+}
+
 /* reimplement */
 void MainWindow::resizeEvent(QResizeEvent *event)
 {
     if(!ui->PortArea->isHidden()) {
-        portarea->resize(ui->PortArea->width(),ui->PortArea->height());
+        portArea->resize(ui->PortArea->width(),ui->PortArea->height());
     }
     QWidget::resizeEvent(event);
 }

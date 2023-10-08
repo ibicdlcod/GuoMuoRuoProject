@@ -5,6 +5,7 @@
 #include "clientv2.h"
 #include "factoryslot.h"
 #include "portarea.h"
+#include "licensearea.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -36,6 +37,7 @@ private slots:
     void processCmd();
     void factoryRefresh();
     void switchToDevelop();
+    void adjustLicenseArea();
 
 private:
     Ui::MainWindow *ui;
@@ -43,6 +45,7 @@ private:
     KP::FactoryState factoryState = KP::Development;
     QList<FactorySlot *> slotfs;
 
-    PortArea *portarea;
+    PortArea *portArea;
+    LicenseArea *licenseArea;
 };
 #endif // MAINWINDOW_H
