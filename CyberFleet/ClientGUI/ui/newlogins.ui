@@ -114,6 +114,11 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>ServerEdit</tabstop>
+  <tabstop>PortEdit</tabstop>
+  <tabstop>ConnectButton</tabstop>
+ </tabstops>
  <resources/>
  <connections>
   <connection>

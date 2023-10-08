@@ -154,7 +154,7 @@ void MainWindow::gamestateChanged(KP::GameState state) {
         ui->FactoryArea->hide();
 
 }
-
+/*
 void MainWindow::parseConnectReq() {
     QStringList cmd1 = {
         QStringLiteral("connect"),
@@ -165,7 +165,7 @@ void MainWindow::parseConnectReq() {
     Clientv2 &engine = Clientv2::getInstance();
     engine.parse(cmd1Comb);
 }
-
+*/
 void MainWindow::printMessage(QString text, QColor background,
                               QColor foreground) {
     ui->LogBrowser->setTextBackgroundColor(background);

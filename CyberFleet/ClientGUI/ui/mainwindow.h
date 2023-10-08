@@ -6,7 +6,6 @@
 #include "factoryslot.h"
 #include "portarea.h"
 #include "licensearea.h"
-#include "loginscreen.h"
 #include "newlogins.h"
 
 QT_BEGIN_NAMESPACE
@@ -36,7 +35,7 @@ private slots:
     void doFactoryRefresh(const QJsonObject &);
     void gamestateChanged(KP::GameState);
     void gamestateInit();
-    void parseConnectReq();
+    //void parseConnectReq();
     void printMessage(QString, QColor background = QColor("white"),
                       QColor foreground = QColor("black"));
     void processCmd();
@@ -51,7 +50,6 @@ private:
 
     PortArea *portArea;
     LicenseArea *licenseArea;
-    LoginScreen *loginScreen;
     NewLoginS *newLoginScreen;
 };
 #endif // MAINWINDOW_H

@@ -10,7 +10,6 @@ CONFIG += c++17
 
 SOURCES += \
     clientv2.cpp \
-    ui/loginscreen.cpp \
     main.cpp \
     networkerror.cpp \
     steamauth.cpp \
@@ -23,7 +22,6 @@ SOURCES += \
 
 HEADERS += \
     clientv2.h \
-    ui/loginscreen.h \
     networkerror.h \
     steamauth.h \
     ui/developwindow.h \
@@ -34,7 +32,6 @@ HEADERS += \
     ui/portarea.h
 
 FORMS += \
-    ui/loginscreen.ui \
     ui/developwindow.ui \
     ui/licensearea.ui \
     ui/mainwindow.ui \
