@@ -5,6 +5,7 @@
 #include <QSettings>
 #include <QTranslator>
 #include "../steam/steam_api.h"
+#include "../steam/isteamutils.h"
 
 #include "clientv2.h"
 #include "kp.h"
@@ -38,15 +39,20 @@ int main(int argc, char *argv[]) {
     settings = std::make_unique<QSettings>(new QSettings);
 
     /* Multilingual Support */
-
 #if defined(Q_OS_UNIX)
     setlocale(LC_NUMERIC, "C");
 #endif
-
     QTranslator translator;
-    // ↓ For testing purposes
-    settings->setValue("language", QStringLiteral("zh_CN"));
-
+    QString steamLanguage = SteamUtils()->GetSteamUILanguage();
+    QMap<QString, QString> LanguageView;
+    LanguageView["english"] = QStringLiteral("en_US");
+    LanguageView["schinese"] = QStringLiteral("zh_CN");
+    if(LanguageView.contains(steamLanguage)) {
+        settings->setValue("language", LanguageView[steamLanguage]);
+    }
+    else {
+        qWarning() << "Language not supported";
+    }
     QStringList uiLanguages = QLocale::system().uiLanguages();
     if(settings->contains("language")) {
         uiLanguages.prepend(settings->value("language").toString());
@@ -67,6 +73,7 @@ int main(int argc, char *argv[]) {
     w.show();
     /* End GUI */
 
+    // ↓ Start event loop
     int execvalue = client.exec();
 
     // ↓ Steam shutdown

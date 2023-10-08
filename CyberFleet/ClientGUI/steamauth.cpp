@@ -6,6 +6,7 @@
 #include <QString>
 #include <QTextStream>
 
+/* Part of Steam Authentication */
 void SteamAuth::RetrieveEncryptedAppTicket() {
     uint32 k_unSecretData = 0x5444;
 
@@ -19,7 +20,7 @@ void SteamAuth::RetrieveEncryptedAppTicket() {
 void SteamAuth::OnEncryptedAppTicketResponse(
     EncryptedAppTicketResponse_t *pEncryptedAppTicketResponse,
     bool bIOFailure) {
-    if(bIOFailure){
+    if(bIOFailure) {
         qWarning(qtTrId("There has been an IO Failure when requesting the "
                         "Encrypted App Ticket.\n").toUtf8());
         return;
@@ -64,3 +65,4 @@ void SteamAuth::OnEncryptedAppTicketResponse(
         break;
     }
 }
+/* End Part of Steam Authentication */

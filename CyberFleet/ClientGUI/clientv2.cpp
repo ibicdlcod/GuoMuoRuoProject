@@ -57,16 +57,21 @@
 extern QFile *logFile;
 extern std::unique_ptr<QSettings> settings;
 
+/* Initialize client and do necessary connections */
 Clientv2::Clientv2(QObject *parent)
     : QObject{parent},
     attemptMode(false),
-    registerMode(false),
     logoutPending(false),
     gameState(KP::Offline) {
     QObject::connect(&socket, &QSslSocket::preSharedKeyAuthenticationRequired,
                      this, &Clientv2::pskRequired);
     QObject::connect(&socket, &QSslSocket::encrypted,
                      this, &Clientv2::encrypted);
+
+    // May cause issues?
+    timer = new QTimer(this);
+    connect(timer, &QTimer::timeout, this, &Clientv2::uiRefresh);
+    timer->start(1000);
 }
 
 Clientv2::~Clientv2() noexcept {
@@ -78,6 +83,7 @@ inline bool Clientv2::loggedIn() const {
     return gameState != KP::Offline;
 }
 
+/* Part of steam verification */
 void Clientv2::sendEncryptedAppTicket(uint8 rgubTicket [], uint32 cubTicket) {
     QByteArray msg = KP::clientSteamAuth(rgubTicket, cubTicket);
     if(!socket.waitForEncrypted()) {
@@ -101,6 +107,7 @@ void Clientv2::sendEncryptedAppTicket(uint8 rgubTicket [], uint32 cubTicket) {
 }
 
 /* public slots */
+/* Make actual connections */
 void Clientv2::autoPassword() {
     QObject::connect(&socket, &QSslSocket::handshakeInterruptedOnError,
                      this, &Clientv2::handshakeInterrupted);
@@ -128,12 +135,9 @@ void Clientv2::autoPassword() {
     SteamAPI_RunCallbacks();
 }
 
+/* Back to port */
 void Clientv2::backToNavalBase() {
-    if(!loggedIn()) {
-        emit qout(qtTrId("access-denied-login-first"));
-        return;
-    }
-    if(gameState == KP::Port) {
+    if(!loginCheck() || gameState == KP::Port) {
         return;
     } else {
         gameState = KP::Port;
@@ -141,6 +145,7 @@ void Clientv2::backToNavalBase() {
     }
 }
 
+/* Connection is lost */
 void Clientv2::catbomb() {
     if(loggedIn()) {
         //% "You have been bombarded by a cute cat."
@@ -158,22 +163,16 @@ void Clientv2::catbomb() {
     displayPrompt();
 }
 
+/* Originally used in CLI */
 void Clientv2::displayPrompt() {
     uiRefresh();
 #if defined(NOBODY_PLAYS_KANCOLLE_ANYMORE) /* this is for non-ASCII test */
     //% "田中飞妈"
     qInfo() << qtTrId("fscktanaka");
 #endif
-    /* TODO: convert to GUI */
-    /*
-    if(!loggedIn())
-        qout << "WAClient$ ";
-    else {
-        qout << QString("%1@%2(%3)$ ")
-                .arg(clientName, serverName, gameStateString());
-    }*/
 }
 
+/* Parse CLI commands */
 bool Clientv2::parse(const QString &input) {
     static QRegularExpression re("\\s+");
     QStringList cmdParts = input.split(re, Qt::SkipEmptyParts);
@@ -201,6 +200,7 @@ bool Clientv2::parse(const QString &input) {
             displayPrompt();
             return true;
         }
+        /* Not consistently present commands */
         else {
             bool success = parseSpec(cmdParts);
             if(!success) {
@@ -214,14 +214,14 @@ bool Clientv2::parse(const QString &input) {
     return false;
 }
 
+/* Parse CLI commands, continued */
 bool Clientv2::parseSpec(const QStringList &cmdParts) {
     try {
         if(cmdParts.length() > 0) {
             QString primary = cmdParts[0];
             primary = settings->value("alias/"+primary, primary).toString();
             bool loginMode = primary.compare("connect", Qt::CaseInsensitive) == 0;
-            registerMode = primary.compare("register", Qt::CaseInsensitive) == 0;
-            if(loginMode || registerMode) {
+            if(loginMode) {
                 parseConnectReq(cmdParts);
                 return true;
             }
@@ -243,6 +243,7 @@ bool Clientv2::parseSpec(const QStringList &cmdParts) {
     }
 }
 
+/* Parse server JSON response */
 void Clientv2::serverResponse(const QString &clientInfo,
                               const QByteArray &plainText) {
     QJsonObject djson =
@@ -270,6 +271,7 @@ void Clientv2::serverResponse(const QString &clientInfo,
     }
 }
 
+/* Show help in command line */
 void Clientv2::showHelp(const QStringList &cmdParts) {
     if(cmdParts.isEmpty()) {
         //% "Use 'exit' to quit, 'help' to show help, "
@@ -281,7 +283,7 @@ void Clientv2::showHelp(const QStringList &cmdParts) {
     }
 }
 
-/* should be generalized */
+/* Not generalized because used as slots */
 void Clientv2::switchToFactory() {
     if(!loggedIn()) {
         emit qout(qtTrId("access-denied-login-first"));
@@ -295,27 +297,32 @@ void Clientv2::switchToFactory() {
     }
 }
 
+/* Refresh UI? */
 void Clientv2::uiRefresh() {
-    qDebug("UIREFRESH");
+    //qDebug("UIREFRESH");
     SteamAPI_RunCallbacks();
 }
 
+/* Update engine */
 void Clientv2::update() {
     QCoreApplication::processEvents();
     QCoreApplication::processEvents();
 }
 
 /* private slots */
+/* Called when encrypted() signal is emitted */
 void Clientv2::encrypted() {
     retransmitTimes = 0;
 }
 
+/* Network */
 void Clientv2::errorOccurred(QAbstractSocket::SocketError error) {
     Q_UNUSED(error)
     //% "Network error: %1"
     qWarning() << qtTrId("network-error").arg(socket.errorString());
 }
 
+/* Network */
 void Clientv2::handshakeInterrupted(const QSslError &error) {
     maxRetransmit = settings->value("client/maximum_retransmit",
                                     defaultMaxRetransmit).toInt();
@@ -331,15 +338,16 @@ void Clientv2::handshakeInterrupted(const QSslError &error) {
     }
 }
 
+/* Network */
 void Clientv2::pskRequired(QSslPreSharedKeyAuthenticator *auth) {
     Q_ASSERT(auth);
-
     qDebug() << clientName << ": providing pre-shared key ...";
     serverName = QString(auth->identityHint());
     auth->setIdentity(QByteArrayLiteral("Admiral"));
     auth->setPreSharedKey(QByteArrayLiteral("A.Zephyr"));
 }
 
+/* Network */
 void Clientv2::readyRead() {
     if(socket.bytesAvailable() <= 0) {
         qDebug() << clientName << ": spurious read notification?";
@@ -365,6 +373,7 @@ void Clientv2::readyRead() {
     }
 }
 
+/* Shutdown connections */
 void Clientv2::shutdown() {
     switch(socket.state()) {
     case QAbstractSocket::UnconnectedState: break;
@@ -386,6 +395,7 @@ void Clientv2::shutdown() {
 }
 
 /* private */
+/* Develop equipment */
 void Clientv2::doDevelop(const QStringList &cmdParts) {
     if(cmdParts.length() < 3) {
         //% "Usage: develop [equipid] [FactorySlot]"
@@ -409,6 +419,7 @@ void Clientv2::doDevelop(const QStringList &cmdParts) {
     }
 }
 
+/* Get developed equipment */
 void Clientv2::doFetch(const QStringList &cmdParts) {
     if(cmdParts.length() < 2) {
         //% "Usage: fetch [FactorySlot]"
@@ -426,6 +437,7 @@ void Clientv2::doFetch(const QStringList &cmdParts) {
     }
 }
 
+/* Switch view */
 void Clientv2::doSwitch(const QStringList &cmdParts) {
     if(cmdParts.length() < 2) {
         //% "Usage: switch [gamestate]"
@@ -459,6 +471,7 @@ void Clientv2::doSwitch(const QStringList &cmdParts) {
     }
 }
 
+/* Request current factory state to server */
 void Clientv2::doRefreshFactory() {
     QByteArray msg = KP::clientFactoryRefresh();
     const qint64 written = socket.write(msg);
@@ -467,14 +480,17 @@ void Clientv2::doRefreshFactory() {
     }
 }
 
+/* Exit */
 void Clientv2::exitGracefully() {
     exitGraceSpec();
+    disconnect(timer, &QTimer::timeout, this, &Clientv2::uiRefresh);
     //% "Goodbye."
     emit qout(qtTrId("goodbye-gui"), QColor("black"), QColor(64,255,64));
     logFile->close();
     emit aboutToQuit();
 }
 
+/* Exit */
 void Clientv2::exitGraceSpec() {
     if(socket.isEncrypted()) {
         parseDisconnectReq();
@@ -482,12 +498,14 @@ void Clientv2::exitGraceSpec() {
     shutdown();
 }
 
+/* Enum -> String */
 inline QString Clientv2::gameStateString() const {
     QVariant str;
     str.setValue(gameState);
     return str.toString();
 }
 
+/* Relic of CLI ui */
 const QStringList Clientv2::getCommandsSpec() const {
     QStringList result = QStringList();
     result.append(getCommands());
@@ -502,6 +520,7 @@ const QStringList Clientv2::getCommandsSpec() const {
     return result;
 }
 
+/* Relic of CLI ui */
 const QStringList Clientv2::getValidCommands() const {
     QStringList result = QStringList();
     result.append(getCommands());
@@ -521,6 +540,7 @@ const QStringList Clientv2::getValidCommands() const {
     return result;
 }
 
+/* Parse connection request */
 void Clientv2::parseConnectReq(const QStringList &cmdParts) {
 
     conf.addCaCertificates(settings->value("trustedcert",
@@ -538,17 +558,12 @@ void Clientv2::parseConnectReq(const QStringList &cmdParts) {
     }
     retransmitTimes = 0;
     if(cmdParts.length() < 3) {
-        if(registerMode) {
-            //% "Usage: register [ip] [port]"
-            emit qout(qtTrId("register-usage"));
-        }
-        else {
-            //% "Usage: connect [ip] [port]"
-            emit qout(qtTrId("connect-usage"));
-        }
+        //% "Usage: connect [ip] [port]"
+        emit qout(qtTrId("connect-usage"));
         return;
     }
     else {
+        /* Send App ticek to server */
         address = QHostAddress(cmdParts[1]);
         if(address.isNull()) {
             //% "IP isn't valid."
@@ -575,6 +590,7 @@ void Clientv2::parseConnectReq(const QStringList &cmdParts) {
     }
 }
 
+/* Parse disconnection request */
 void Clientv2::parseDisconnectReq() {
     if(!socket.isEncrypted()) {
         //% "You are not online."
@@ -591,6 +607,7 @@ void Clientv2::parseDisconnectReq() {
     }
 }
 
+/* Parse CLI commands actually related to game */
 bool Clientv2::parseGameCommands(const QString &primary,
                                  const QStringList &cmdParts) {
     if(primary.compare("switch", Qt::CaseInsensitive) == 0) {
@@ -627,12 +644,14 @@ bool Clientv2::parseGameCommands(const QString &primary,
     return false;
 }
 
+/* Parse quit */
 void Clientv2::parseQuit() {
     if(gameState != KP::Offline)
         parseDisconnectReq();
     exitGracefully();
 }
 
+/* Read server datagrams */
 void Clientv2::readWhenConnected(const QByteArray &dgram) {
 #if defined(QT_DEBUG)
     static const QString formatter = QStringLiteral("From Server text: %1");
@@ -673,11 +692,13 @@ void Clientv2::readWhenConnected(const QByteArray &dgram) {
     qDebug() << clientName << ": zero-length datagram received?";
 }
 
+/* Should not trigger this */
 void Clientv2::readWhenUnConnected(const QByteArray &dgram) {
     Q_UNUSED(dgram)
     qDebug() << "Unexpected data when unconnected";
 }
 
+/* Part of parser */
 void Clientv2::receivedAuth(const QJsonObject &djson) {
     switch(djson["mode"].toInt()) {
     case KP::AuthMode::NewLogin: receivedNewLogin(djson); break;
@@ -686,6 +707,7 @@ void Clientv2::receivedAuth(const QJsonObject &djson) {
     }
 }
 
+/* Part of parser */
 void Clientv2::receivedInfo(const QJsonObject &djson) {
     switch(djson["infotype"].toInt()) {
     case KP::InfoType::FactoryInfo: emit receivedFactoryRefresh(djson); break;
@@ -693,6 +715,7 @@ void Clientv2::receivedInfo(const QJsonObject &djson) {
     }
 }
 
+/* Part of parser */
 void Clientv2::receivedLogout(const QJsonObject &djson) {
     if(djson["success"].toBool()) {
         if(!djson.contains("reason")) {
@@ -722,6 +745,7 @@ void Clientv2::receivedLogout(const QJsonObject &djson) {
     attemptMode = false;
 }
 
+/* Part of parser */
 void Clientv2::receivedMsg(const QJsonObject &djson) {
     switch(djson["msgtype"].toInt()) {
     //% "Client sent a bad JSON."
@@ -808,6 +832,7 @@ void Clientv2::receivedMsg(const QJsonObject &djson) {
     }
 }
 
+/* Parse server login messages */
 void Clientv2::receivedNewLogin(const QJsonObject &djson) {
     if(djson["success"].toBool()) {
         //% "%1: login success"
@@ -834,6 +859,7 @@ void Clientv2::receivedNewLogin(const QJsonObject &djson) {
     attemptMode = false;
 }
 
+/* CLI */
 const QStringList Clientv2::getCommands() {
     return CommandLine::getCommands();
 }
@@ -929,12 +955,23 @@ void customMessageHandler(QtMsgType type,
     }
 }
 
+/* Command that are not supported */
 inline void Clientv2::invalidCommand() {
     //% "Invalid Command, use 'commands' for valid commands, "
     //% "'help' for help, 'exit' to exit."
     emit qout(qtTrId("invalid-command"));
 }
 
+/* Guard against unauthorized entry */
+bool Clientv2::loginCheck() {
+    if(!loggedIn()) {
+        emit qout(qtTrId("access-denied-login-first"));
+        return false;
+    }
+    return true;
+}
+
+/* CLI */
 void Clientv2::showCommands(bool validOnly){
     //% "Use 'exit' to quit."
     emit qout(qtTrId("exit-helper"));
@@ -950,7 +987,7 @@ void Clientv2::showCommands(bool validOnly){
     }
 }
 
-//severely steamlined
+/* Relic of CLI */
 void Clientv2::qls(const QStringList &input) {
     emit qout(input.join(" "));
 }

@@ -116,7 +116,7 @@ private:
     void sqlinitEquip();
     void sqlinitEquipU();
     void sqlinitFacto();
-    void sqlinitUsers();
+    void sqlinitUserA();
     void sqlinitNewUsers();
 
     bool listening = false;

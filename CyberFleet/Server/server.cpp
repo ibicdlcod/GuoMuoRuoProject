@@ -104,7 +104,17 @@ uint8 charToInt(char data) {
 const QString newUserT = QStringLiteral(
     "CREATE TABLE NewUsers ( "
     "UserID BLOB PRIMARY KEY, "
-    "UserType TEXT );"
+    "UserType TEXT DEFAULT 'commoner'"
+    ");"
+    );
+
+const QString userA = QStringLiteral(
+    "CREATE TABLE UserAttr ( "
+    "UserID BLOB NOT NULL, "
+    "Attribute TEXT NOT NULL, "
+    "Intvalue INTEGER DEFAULT 0, "
+    "FOREIGN KEY(UserID) REFERENCES NewUsers(UserID)"
+    ");"
     );
 
 const QString userT = QStringLiteral(
@@ -1083,7 +1093,6 @@ void Server::receivedLogin(CSteamID &uid,
     else {
         /* existing user */
     }
-    qDebug("VERIFYCOMPLETE");
     QByteArray msg = KP::serverVerifyComplete();
     if(connection->write(msg) <= 0) {
         qWarning("Verifycomplete not sent");
@@ -1301,13 +1310,13 @@ void Server::sqlinit() {
         qInfo() << qtTrId("sql-connect-success");
         /* Database integrity check, the structure is defined here */
         QStringList tables = db.tables(QSql::Tables);
-        if(!tables.contains("Users")) {
-            sqlinitUsers();
-        }
-        sqlcheckUsers();
         if(!tables.contains("NewUsers")) {
             sqlinitNewUsers();
         }
+        if(!tables.contains("UserAttr")) {
+            sqlinitUserA();
+        }
+        //sqlcheckUsers();
         if(!tables.contains("Equip")) {
             sqlinitEquip();
         }
@@ -1359,11 +1368,11 @@ void Server::sqlinitFacto() {
     }
 }
 
-void Server::sqlinitUsers() {
+void Server::sqlinitUserA() {
     //% "User database does not exist, creating..."
     qWarning() << qtTrId("user-db-lack");
     QSqlQuery query;
-    query.prepare(userT);
+    query.prepare(userA);
     if(!query.exec()) {
         //% "Create User database failed."
         throw DBError(qtTrId("user-db-gen-failure"),

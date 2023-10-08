@@ -124,6 +124,7 @@ private:
     int getConsoleWidth();
     const QStringList getValidCommands() const;
     void invalidCommand();
+    bool loginCheck();
     void parseConnectReq(const QStringList &);
     bool parseGameCommands(const QString &, const QStringList &);
     void qls(const QStringList &);
@@ -152,7 +153,6 @@ private:
     QString serverName;
 
     bool attemptMode;
-    bool registerMode;
     bool logoutPending;
 
     KP::GameState gameState;
@@ -164,6 +164,8 @@ private:
                               "\xb1\xbc");
 
     SteamAuth sauth;
+
+    QTimer *timer;
 
     Q_DISABLE_COPY(Clientv2)
 };
