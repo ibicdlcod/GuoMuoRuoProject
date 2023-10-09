@@ -756,9 +756,12 @@ bool Server::importEquipFromCSV() {
         else {
             QStringList lineParts = text.split(",");
             if(lineParts.size() < 4)
-                qCritical("FUCK");
+                qCritical("incomplete equip type definition");
             else {
-                //EquipType::strToIntRep(lineParts[3]);
+                int type = EquipType::strToIntRep(lineParts[3]);
+                if(type == 0 && !lineParts[1].isEmpty()) {
+                    qWarning() << lineParts[0] << "\t" << lineParts[3];
+                }
             }
         }
     }
@@ -807,8 +810,8 @@ bool Server::importEquipFromCSV() {
     //% "Import equipment registry success!"
     qInfo() << qtTrId("equip-import-good");
     equipmentRefresh();
-    return true;
     */
+    return true;
 }
 
 void Server::parseListen(const QStringList &cmdParts) {
