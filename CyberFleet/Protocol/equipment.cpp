@@ -2,7 +2,7 @@
 #include <QRegularExpression>
 #include <QVariant>
 #include <QMetaEnum>
-
+/*
 EquipType::EquipType(const QString &basis) {
 
     static QRegularExpression rehex(
@@ -238,3 +238,4 @@ const ResOrd EquipDef::devRes() const {
 int EquipDef::getRarity() const {
     return attr[Rarity];
 }
+*/

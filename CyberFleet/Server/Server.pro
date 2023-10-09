@@ -8,6 +8,13 @@ CONFIG -= app_bundle
 # In order to do so, uncomment the following line.
 DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
+HEADERS += \
+    kerrors.h \
+    peerinfo.h \
+    server.h \
+    sslserver.h \
+    user.h
+
 SOURCES += \
         kerrors.cpp \
         main.cpp \
@@ -19,6 +26,9 @@ SOURCES += \
 TRANSLATIONS += \
     ../Translations/WA2_en_US.ts \
     ../Translations/WA2_zh_CN.ts
+
+RESOURCES += \
+    ../common.qrc
 
 CONFIG += lrelease
 CONFIG += embed_translations
@@ -54,16 +64,6 @@ else:win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../Prot
 else:win32:!win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../Protocol/release/Protocol.lib
 else:win32:!win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../Protocol/debug/Protocol.lib
 else:unix: PRE_TARGETDEPS += $$OUT_PWD/../Protocol/libProtocol.a
-
-HEADERS += \
-    kerrors.h \
-    peerinfo.h \
-    server.h \
-    sslserver.h \
-    user.h
-
-RESOURCES += \
-    ../common.qrc
 
 win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../redistributable_bin/win64/ -lsteam_api64
 else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../redistributable_bin/win64/ -lsteam_api64

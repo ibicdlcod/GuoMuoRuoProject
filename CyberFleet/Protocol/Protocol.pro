@@ -14,6 +14,7 @@ SOURCES += \
     consoletextstream.cpp \
     ecma48.cpp \
     equipment.cpp \
+    equiptype.cpp \
     kp.cpp \
     resord.cpp \
     wcwidth.c
@@ -23,6 +24,7 @@ HEADERS += \
     consoletextstream.h \
     ecma48.h \
     equipment.h \
+    equiptype.h \
     kp.h \
     resord.h \
     wcwidth.h

@@ -51,7 +51,7 @@ int main(int argc, char *argv[]) {
         settings->setValue("language", LanguageView[steamLanguage]);
     }
     else {
-        qWarning() << "Language not supported";
+        qWarning() << "Language not natively supported";
     }
     QStringList uiLanguages = QLocale::system().uiLanguages();
     if(settings->contains("language")) {

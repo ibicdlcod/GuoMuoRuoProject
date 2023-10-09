@@ -9,7 +9,7 @@ Constructing ships and Developing equipment which is precisely on your current t
 ## How the level is calculated
 
 $$
-level=\sum_{i=1}^{\infty}v_i*(a^{w_i}-1)a^{-\sum_{j=1}^iw_j}
+level=\sum_{i=1}^{\infty}v_i(a^{w_i}-1)a^{-\sum_{j=1}^iw_j}
 $$
 
 v_i is each component's own characteristic tech level, in descending order. w_i is the weight of v_i.

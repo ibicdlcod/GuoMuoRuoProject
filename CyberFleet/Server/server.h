@@ -116,8 +116,9 @@ private:
     void sqlinitEquip();
     void sqlinitEquipU();
     void sqlinitFacto();
-    void sqlinitUserA();
-    void sqlinitNewUsers();
+    void sqlinitUserA() const;
+    void sqlinitNewUsers() const;
+    void userInit(CSteamID &);
 
     bool listening = false;
     SslServer sslServer;
@@ -126,7 +127,7 @@ private:
 
     QJsonObject equipRegistryJ;
     /* ↓deprecated */
-    QMap<int, QPointer<EquipDef>> equipRegistry;
+    //QMap<int, QPointer<EquipDef>> equipRegistry;
 
     std::random_device random;
     std::mt19937 mt;

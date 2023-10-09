@@ -55,6 +55,7 @@
 #include "kp.h"
 #include "peerinfo.h"
 #include "sslserver.h"
+#include "equiptype.h"
 
 #ifdef max
 #undef max // apparently some stupid win header interferes with std::max
@@ -101,6 +102,7 @@ uint8 charToInt(char data) {
     }
 }
 
+/* User registery */
 const QString newUserT = QStringLiteral(
     "CREATE TABLE NewUsers ( "
     "UserID BLOB PRIMARY KEY, "
@@ -108,6 +110,7 @@ const QString newUserT = QStringLiteral(
     ");"
     );
 
+/* User-bound attributes */
 const QString userA = QStringLiteral(
     "CREATE TABLE UserAttr ( "
     "UserID BLOB NOT NULL, "
@@ -117,45 +120,14 @@ const QString userA = QStringLiteral(
     ");"
     );
 
-const QString userT = QStringLiteral(
-                          "CREATE TABLE Users ( "
-                          "UserID INTEGER PRIMARY KEY, "
-                          "Username VARCHAR(255) NOT NULL, "
-                          "Shadow TINYBLOB,"
-                          /* Global status */
-                          "ThrottleTime TEXT DEFAULT (datetime('now')),"
-                          "ThrottleCount TEXT DEFAULT 0,"
-                          "Experience INTEGER DEFAULT 0,"
-                          "Level INTEGER DEFAULT 0,"
-                          "InduContrib INTEGER DEFAULT 0,"
-                          "FleetSize INTEGER DEFAULT 1,"
-                          // used by both develop and construction, maximum is 20
-                          "FactorySize INTEGER DEFAULT %1,"
-                          // maximum is 12 due to high cost of fairy treat
-                          "DockSize INTEGER DEFAULT %2,"
-                          /* Resources */
-                          "Oil INTEGER DEFAULT 10000,"
-                          "Explo INTEGER DEFAULT 10000,"
-                          "Steel INTEGER DEFAULT 10000,"
-                          "Rub INTEGER DEFAULT 6000,"
-                          "Al INTEGER DEFAULT 8000,"
-                          "W INTEGER DEFAULT 6000,"
-                          "Cr INTEGER DEFAULT 6000,"
-                          "RecoverTime TEXT DEFAULT (datetime('now')),"
-                          /* Special Resources */
-                          "Limitbreak INTEGER DEFAULT 0,"
-                          "Silver INTEGER DEFAULT 0,"
-                          "Gold INTEGER DEFAULT 0,"
-                          "Energizer INTEGER DEFAULT 0,"
-                          "Giftbox INTEGER DEFAULT 0,"
-                          "DecoratePt INTEGER DEFAULT 0,"
-                          "JetEngine INTEGER DEFAULT 0,"
-                          "LandCorps INTEGER DEFAULT 0,"
-                          "Saury INTEGER DEFAULT 0,"
-                          "Sardine INTEGER DEFAULT 0,"
-                          "Hishimochi INTEGER DEFAULT 0,"
-                          "EmergRepair INTEGER DEFAULT 0"
-                          ");").arg(KP::initFactory).arg(KP::initDock);
+/* Equipment registry */
+const QString equipReg = QStringLiteral(
+    "CREATE TABLE EquipReg ( "
+    "EquipID INTEGER PRIMARY KEY, "
+    "Attribute TEXT NOT NULL, "
+    "Intvalue INTEGER DEFAULT 0"
+    ");"
+    );
 
 const QString equipU = QStringLiteral(
     "CREATE TABLE Equip ( "
@@ -491,6 +463,7 @@ void Server::decryptDatagram(QSslSocket *connection,
 void Server::doDevelop(CSteamID &uid, int equipid,
                        int factoryid, QSslSocket *connection) {
     /* TODO: this is the no-convert version */
+    /*
     if(!equipRegistry.contains(equipid)
         || !equipRegistry[equipid]->canDevelop(uid)) {
         QByteArray msg =
@@ -514,7 +487,6 @@ void Server::doDevelop(CSteamID &uid, int equipid,
         }
         else {
             User::setResources(uid, currentRes);
-            /* TODO: to be modified by technology points */
             int stagesReq = equip->getRarity();
             int stagesActual = std::floor(chi2Dist(mt)
                                           * KP::baseDevRarity);
@@ -552,6 +524,7 @@ void Server::doDevelop(CSteamID &uid, int equipid,
             }
         }
     }
+*/
 }
 
 void Server::doFetch(CSteamID &uid, int factoryid, QSslSocket *connection) {
@@ -615,9 +588,10 @@ void Server::doFetch(CSteamID &uid, int factoryid, QSslSocket *connection) {
     }
 }
 
-/* nothing could shrink this function */
+/* deprecated */
 bool Server::equipmentRefresh()
 {
+    /*
     QSqlDatabase db = QSqlDatabase::database();
     if(!db.isValid()) {
         //% "Database uninitialized!"
@@ -687,6 +661,7 @@ bool Server::equipmentRefresh()
                                           ));
         equipRegistry[query.value(indexid).toInt()] = e;
     }
+*/
     return true;
 }
 
@@ -773,7 +748,21 @@ bool Server::importEquipFromCSV() {
         return false;
     }
     QTextStream textStream(csvFile);
-
+    QString title = textStream.readLine();
+    while(!textStream.atEnd()) {
+        QString text = textStream.readLine();
+        if(text.startsWith(","))
+            continue;
+        else {
+            QStringList lineParts = text.split(",");
+            if(lineParts.size() < 4)
+                qCritical("FUCK");
+            else {
+                //EquipType::strToIntRep(lineParts[3]);
+            }
+        }
+    }
+/*
     QSqlDatabase db = QSqlDatabase::database();
     if(!db.isValid()) {
         throw DBError(qtTrId("database-uninit"));
@@ -804,7 +793,7 @@ bool Server::importEquipFromCSV() {
         if(dataNew.endsWith(","))
             dataNew.chop(1);
         QSqlQuery query;
-        /* TODO: properly use prepared statements */
+        // TODO: properly use prepared statements
         query.prepare("REPLACE INTO Equip ("+title+") VALUES ("+dataNew+");");
         if(!query.exec()) {
             //% "Import equipment database failed!"
@@ -819,6 +808,7 @@ bool Server::importEquipFromCSV() {
     qInfo() << qtTrId("equip-import-good");
     equipmentRefresh();
     return true;
+    */
 }
 
 void Server::parseListen(const QStringList &cmdParts) {
@@ -1087,6 +1077,7 @@ void Server::receivedLogin(CSteamID &uid,
             return;
         }
         else {
+            userInit(uid);
             /* new user initialization here */
         }
     }
@@ -1191,7 +1182,7 @@ void Server::refreshClientFactory(CSteamID &uid, QSslSocket *connection) {
     connection->write(msg);
 }
 
-void Server::sqlcheckEquip() {
+void Server::sqlcheckEquip() {/*
     if(equipmentRefresh()) {
         //% "Equipment database is OK."
         qInfo() << qtTrId("equip-db-good");
@@ -1199,7 +1190,7 @@ void Server::sqlcheckEquip() {
     else {
         //% "Equipment database is corrupted or incompatible."
         throw DBError(qtTrId("equip-db-bad"));
-    }
+    }*/
 }
 
 void Server::sqlcheckEquipU() {
@@ -1317,7 +1308,7 @@ void Server::sqlinit() {
             sqlinitUserA();
         }
         //sqlcheckUsers();
-        if(!tables.contains("Equip")) {
+        if(!tables.contains("EquipReg")) {
             sqlinitEquip();
         }
         sqlcheckEquip();
@@ -1336,7 +1327,7 @@ void Server::sqlinitEquip() {
     //% "Equipment database does not exist, creating..."
     qWarning() << qtTrId("equip-db-lack");
     QSqlQuery query;
-    query.prepare(equipU);
+    query.prepare(equipReg);
     if(!query.exec()) {
         //% "Create Equipment database failed."
         throw DBError(qtTrId("equip-db-gen-failure"),
@@ -1368,7 +1359,7 @@ void Server::sqlinitFacto() {
     }
 }
 
-void Server::sqlinitUserA() {
+void Server::sqlinitUserA() const {
     //% "User database does not exist, creating..."
     qWarning() << qtTrId("user-db-lack");
     QSqlQuery query;
@@ -1380,7 +1371,7 @@ void Server::sqlinitUserA() {
     }
 }
 
-void Server::sqlinitNewUsers() {
+void Server::sqlinitNewUsers() const {
     //% "User database does not exist, creating..."
     qWarning() << qtTrId("user-db-lack");
     QSqlQuery query;
@@ -1389,6 +1380,56 @@ void Server::sqlinitNewUsers() {
         //% "Create User database failed."
         throw DBError(qtTrId("user-db-gen-failure"),
                       query.lastError());
+    }
+}
+
+void Server::userInit(CSteamID &uid) {
+    static const QMap<QString, int> defaults
+        = {
+            std::pair(QStringLiteral("FleetSize"), 1),
+            std::pair(QStringLiteral("FactorySize"), 4),
+            std::pair(QStringLiteral("Docksize"), 2),
+            std::pair(QStringLiteral("O"), 10000), // oil
+            std::pair(QStringLiteral("E"), 10000), // explosives
+            std::pair(QStringLiteral("S"), 10000), // steel
+            std::pair(QStringLiteral("R"), 6000),  // rubber
+            std::pair(QStringLiteral("A"), 8000),  // alminium
+            std::pair(QStringLiteral("W"), 6000),  // tungsten
+            std::pair(QStringLiteral("C"), 6000)   // chromium
+        };
+    QSqlQuery insert;
+    for (auto i = defaults.cbegin(), end = defaults.cend();
+         i != end; ++i) {
+        if(!insert.prepare("INSERT INTO UserAttr (UserID, Attribute, Intvalue) "
+                            "VALUES (:uid, :attr, :value);")) {
+            qWarning() << insert.lastError().databaseText();
+        }
+        insert.bindValue(":uid", uid.ConvertToUint64());
+        insert.bindValue(":attr", i.key());
+        insert.bindValue(":value", i.value());
+        if(!insert.exec()) {
+            //% "%1: User data init failure!"
+            throw DBError(qtTrId("user-data-init-fail").
+                          arg(uid.ConvertToUint64()),
+                          insert.lastError());
+            return;
+        }
+    }
+    QSqlQuery insertTime;
+    if(!insert.prepare("INSERT INTO UserAttr (UserID, Attribute, Intvalue) "
+                        "VALUES (:uid, :attr, :value);")) {
+        qWarning() << insert.lastError().databaseText();
+    }
+    insert.bindValue(":uid", uid.ConvertToUint64());
+    insert.bindValue(":attr", "RecoverTime");
+    insert.bindValue(":value", QDateTime::currentDateTimeUtc()
+                  .currentSecsSinceEpoch());
+    if(!insert.exec()) {
+        //% "%1: User data init failure!"
+        throw DBError(qtTrId("user-data-init-fail").
+                      arg(uid.ConvertToUint64()),
+                      insert.lastError());
+        return;
     }
 }
 

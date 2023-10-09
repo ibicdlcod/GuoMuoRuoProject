@@ -6,7 +6,7 @@
 #include <QObject>
 #include <QString>
 #include "resord.h"
-
+/*
 class EquipType: public QObject {
     Q_OBJECT
 
@@ -50,7 +50,6 @@ public:
     Q_ENUM(BasicType)
 
     enum TypeFlag{
-        /* Plane, Seaplane */
         Recon = 0x0001,
         Fight = 0x0002,
         Torp = 0x0004,
@@ -60,18 +59,12 @@ public:
         IC = 0x0040,
         Patrol = 0x0080,
         Jet = 0x0100,
-        /* MainGun, SupportGun, Radar */
         Flak = 0x0200,
         Surface = 0x0400,
-        /* DepthC */
         Racks = 0x0800,
-        /* Sonar */
         Active = 0x1000,
-        /* AA */
         Cannon = 0x2000,
-        /* Engine */
         Turb = 0x4000,
-        /* TPCraft */
         Convoy = 0x8000
     };
     Q_DECLARE_FLAGS(TypeFlags, TypeFlag)
@@ -139,5 +132,5 @@ private:
     QMap<AttrType, int> attr;
     QStringList customflags;
 };
-
+*/
 #endif // EQUIPMENT_H

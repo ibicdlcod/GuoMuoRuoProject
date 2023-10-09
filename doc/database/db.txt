@@ -1,5 +1,6 @@
 NewUsers: UserID blob UserType text("admin/commoner")
 UserAttr: UserID blob foreign key Attribute text Intvalue int
-Equip: EquipID int Equipname text Attribute text Intvalue
+EquipDef: EquipID int Attribute text Intvalue
+Equipname: EquipID foreign key zh_CN text en_US text
 UserFactory: UserID blob foreign key FactoryID int CurrentJob int StartTime text FullTime text SuccessTime text Done bool Success bool COSTRAINT noduplicate UNIQUE(UserID, FactoryID)
 UserEquip: UserID blob foreign key EquipSerial int EquipDef int foreign key Star 
