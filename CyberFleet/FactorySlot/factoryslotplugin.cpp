@@ -36,7 +36,7 @@ QString FactorySlotPlugin::name() const
 
 QString FactorySlotPlugin::group() const
 {
-    return QStringLiteral("Display Widgets [Examples]");
+    return QStringLiteral("Custom");
 }
 
 QIcon FactorySlotPlugin::icon() const

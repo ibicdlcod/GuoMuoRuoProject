@@ -79,7 +79,7 @@ Clientv2::~Clientv2() noexcept {
 }
 
 /* public */
-inline bool Clientv2::loggedIn() const {
+bool Clientv2::loggedIn() const {
     return gameState != KP::Offline;
 }
 
