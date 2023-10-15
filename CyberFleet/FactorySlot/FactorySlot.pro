@@ -3,7 +3,7 @@ TARGET      = $$qtLibraryTarget(FactorySlotplugin)
 TEMPLATE    = lib
 
 RESOURCES   = icons.qrc
-LIBS        += -L. 
+LIBS        += -L.
 
 greaterThan(QT_MAJOR_VERSION, 4) {
     QT += designer
