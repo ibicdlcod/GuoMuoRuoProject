@@ -543,7 +543,7 @@ const QStringList Clientv2::getValidCommands() const {
 /* Parse connection request */
 void Clientv2::parseConnectReq(const QStringList &cmdParts) {
 
-    conf.addCaCertificates(settings->value("trustedcert",
+    conf.addCaCertificates(settings->value("cert/pem",
                                            ":/sslserver.pem").toString());
     socket.setSslConfiguration(conf);
     if(socket.isEncrypted()) {

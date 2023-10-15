@@ -765,7 +765,7 @@ bool Server::importEquipFromCSV() {
             }
         }
     }
-/*
+    /*
     QSqlDatabase db = QSqlDatabase::database();
     if(!db.isValid()) {
         throw DBError(qtTrId("database-uninit"));
@@ -834,23 +834,25 @@ void Server::parseListen(const QStringList &cmdParts) {
     QSslConfiguration conf;
     const auto certs
         = QSslCertificate::fromPath(
-            ":/sslserver.pem",
+            settings->value("cert/serverpem",
+                            ":/sslserver.pem").toString(),
             QSsl::Pem, QSslCertificate::PatternSyntax::FixedString);
     if(certs.isEmpty()) {
         //% "Server lack a certificate."
         QString msg = qtTrId("no-cert")
                           .arg(address.toString()).arg(port);
-        qInfo() << msg;
+        qCritical() << msg;
         return;
     }
     conf.setLocalCertificate(certs.at(0));
     /* THIS IS NOT SAFE! */
-    QFile keyFile(":/sslserver.key");
+    QFile keyFile(settings->value("cert/serverkey",
+                                  "server.key").toString());
     if(!keyFile.open(QIODevice::ReadOnly)) {
         //% "Server lack a private key."
         QString msg = qtTrId("no-private-key")
                           .arg(address.toString()).arg(port);
-        qInfo() << msg;
+        qCritical() << msg;
         return;
     }
     const auto key = QSslKey(keyFile.readAll(), QSsl::Rsa,
@@ -1427,7 +1429,7 @@ void Server::userInit(CSteamID &uid) {
     insert.bindValue(":uid", uid.ConvertToUint64());
     insert.bindValue(":attr", "RecoverTime");
     insert.bindValue(":value", QDateTime::currentDateTimeUtc()
-                  .currentSecsSinceEpoch());
+                                   .currentSecsSinceEpoch());
     if(!insert.exec()) {
         //% "%1: User data init failure!"
         throw DBError(qtTrId("user-data-init-fail").

@@ -1,9 +1,8 @@
 <RCC>
     <qresource prefix="/">
         <file>openingwords.txt</file>
-        <file>sslserver.key</file>
-        <file>sslserver.pem</file>
         <file>Assets/Image/Sea.jpg</file>
+        <file>sslserver.pem</file>
     </qresource>
-    <qresource prefix="/icon" lang="English"/>
+    <qresource lang="English" prefix="/icon"/>
 </RCC>
