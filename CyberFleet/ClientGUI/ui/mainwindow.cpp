@@ -60,17 +60,25 @@ MainWindow::MainWindow(QWidget *parent, int argc, char ** argv)
                      this, &MainWindow::gamestateInit);
     QObject::connect(licenseArea, &LicenseArea::showLicenseComplete,
                      newLoginScreen, &QWidget::show);
+    QTimer::singleShot(settings->value("client/license_area_persist",
+                                       5000).toInt(), this,
+                       [this]{
+                           this->licenseArea->complete();
+                       });
 }
 
 MainWindow::~MainWindow()
 {
     delete portArea;
     delete licenseArea;
+    delete newLoginScreen;
+    delete factoryArea;
     delete ui;
 }
 
 void MainWindow::adjustArea(QFrame *input, const QSize &size) {
-    input->resize(size);
+    QTimer::singleShot(1, this,
+                       [input, size]{input->resize(size);});
 }
 
 void MainWindow::gamestateInit() {

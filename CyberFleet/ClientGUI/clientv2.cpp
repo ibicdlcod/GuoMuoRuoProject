@@ -89,7 +89,7 @@ void Clientv2::sendEncryptedAppTicket(uint8 rgubTicket [], uint32 cubTicket) {
     if(!socket.waitForEncrypted()) {
         qCritical("Encrypted connection yet established "
                   "(do not reattempt connection within a minute!)");
-        //throw NetworkError(socket.errorString());
+        throw NetworkError(socket.errorString());
         return;
     }
     else {
@@ -544,7 +544,8 @@ const QStringList Clientv2::getValidCommands() const {
 void Clientv2::parseConnectReq(const QStringList &cmdParts) {
 
     conf.addCaCertificates(settings->value("cert/pem",
-                                           ":/sslserver.pem").toString());
+                                           ":/harusoft.pem").toString());
+    qDebug() << conf.caCertificates()[0];
     socket.setSslConfiguration(conf);
     if(socket.isEncrypted()) {
         //% "Already connected, disconnect first."

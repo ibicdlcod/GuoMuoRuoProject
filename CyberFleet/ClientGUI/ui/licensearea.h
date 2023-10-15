@@ -18,7 +18,7 @@ public:
 signals:
     void showLicenseComplete();
 
-private slots:
+public slots:
     void complete();
 
 private:

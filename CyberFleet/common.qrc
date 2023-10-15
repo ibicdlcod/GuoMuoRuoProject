@@ -3,6 +3,7 @@
         <file>openingwords.txt</file>
         <file>Assets/Image/Sea.jpg</file>
         <file>sslserver.pem</file>
+        <file>harusoft.pem</file>
     </qresource>
-    <qresource lang="English" prefix="/icon"/>
+    <qresource prefix="/icon" lang="English"/>
 </RCC>

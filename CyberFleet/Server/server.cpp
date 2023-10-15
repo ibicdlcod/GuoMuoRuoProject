@@ -835,7 +835,7 @@ void Server::parseListen(const QStringList &cmdParts) {
     const auto certs
         = QSslCertificate::fromPath(
             settings->value("cert/serverpem",
-                            ":/sslserver.pem").toString(),
+                            ":/harusoft.pem").toString(),
             QSsl::Pem, QSslCertificate::PatternSyntax::FixedString);
     if(certs.isEmpty()) {
         //% "Server lack a certificate."
@@ -847,7 +847,7 @@ void Server::parseListen(const QStringList &cmdParts) {
     conf.setLocalCertificate(certs.at(0));
     /* THIS IS NOT SAFE! */
     QFile keyFile(settings->value("cert/serverkey",
-                                  "server.key").toString());
+                                  "serverprivate.key").toString());
     if(!keyFile.open(QIODevice::ReadOnly)) {
         //% "Server lack a private key."
         QString msg = qtTrId("no-private-key")
