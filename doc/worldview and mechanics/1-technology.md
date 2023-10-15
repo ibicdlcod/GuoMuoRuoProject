@@ -48,7 +48,9 @@ All Kanmusu and equipment will count toward the calculation.
 
 For ships: All ships of the same class and all equipment she can handle will count toward the calculation.
 
-For equipment: All equipment of this exact type and [its children on the technology tree], and [all Kanmusu it is particularly suited to] will count toward the calculation. The two concepts will be dealt later.
+For equipment: All equipment of this exact type and [its precedent and all children on the technology tree], and [all Kanmusu it is particularly suited to] will count toward the calculation. The two concepts will be dealt later.
+
+An equipment that does not have a predecessor will have it's local technology not counted when developing.
 
 ## Combined Effects
 
@@ -62,4 +64,44 @@ c: Difference of global and local (may subject to change)
 
 ## How characteristic tech level are determined
 
-Generally (variations may exist): [(date this ship/equipment is functional)-(Jul 1 1921)]/500 days
+Generally (variations may exist):
+
+| year this ship/equipment is functional | tech level |
+| :------------------------------------: | :--------: |
+|            1921 or earlier             |     0      |
+|                  1922                  |    1/3     |
+|                  1923                  |    2/3     |
+|                  1924                  |     1      |
+|                  1925                  |    4/3     |
+|                  1926                  |    5/3     |
+|                  1927                  |     2      |
+|                  1928                  |    7/3     |
+|                  1929                  |    8/3     |
+|                  1930                  |     3      |
+|                  1931                  |    10/3    |
+|                  1932                  |    11/3    |
+|                  1933                  |     4      |
+|                  1934                  |    4.5     |
+|                  1935                  |     5      |
+|                  1936                  |    5.5\    |
+|                  1937                  |     6      |
+|                  1938                  |    6.5     |
+|                  1939                  |     7      |
+|                  1940                  |    7.5     |
+|                  1941                  |     8      |
+|                  1942                  |     9      |
+|                  1943                  |     10     |
+|                  1944                  |     11     |
+|                  1945                  |     12     |
+|                  1946                  |     13     |
+|                  1947                  |    13.5    |
+|                  1948                  |     14     |
+|                  1949                  |   14.25    |
+|                  1950                  |    14.5    |
+|                  1951                  |   14.75    |
+|                  1952                  |     15     |
+|                  1953                  |   15.25    |
+|                  1954                  |    15.5    |
+|                  1955                  |   15.75    |
+|                  1956                  |     16     |
+

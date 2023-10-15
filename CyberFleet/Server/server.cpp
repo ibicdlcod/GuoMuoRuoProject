@@ -105,7 +105,7 @@ uint8 charToInt(char data) {
 /* User registery */
 const QString newUserT = QStringLiteral(
     "CREATE TABLE NewUsers ( "
-    "UserID BLOB PRIMARY KEY, "
+    "UserID BLOB PRIMARY , "
     "UserType TEXT DEFAULT 'commoner'"
     ");"
     );
@@ -271,7 +271,7 @@ bool Server::listen(const QHostAddress &address, quint16 port) {
 /* public slots */
 void Server::displayPrompt() {
     if(!listening)
-        qout << "WAServer$ ";
+        qout << "CyberFleet$ ";
     else {
         qout << sslServer.preSharedKeyIdentityHint()
              << "@" << sslServer.serverAddress().toString()
@@ -844,6 +844,7 @@ void Server::parseListen(const QStringList &cmdParts) {
         return;
     }
     conf.setLocalCertificate(certs.at(0));
+    /* THIS IS NOT SAFE! */
     QFile keyFile(":/sslserver.key");
     if(!keyFile.open(QIODevice::ReadOnly)) {
         //% "Server lack a private key."
