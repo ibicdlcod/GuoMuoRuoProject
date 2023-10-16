@@ -2,7 +2,7 @@
 #define FACTORYAREA_H
 
 #include <QFrame>
-#include "../../FactorySlot/factoryslot.h"
+#include "FactorySlot/factoryslot.h"
 
 namespace Ui {
 class FactoryArea;

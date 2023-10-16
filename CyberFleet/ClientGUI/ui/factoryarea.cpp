@@ -42,7 +42,6 @@ FactoryArea::FactoryArea(QWidget *parent) :
         (*iter)->setSlotnum(iter - slotfs.begin());
         (*iter)->setStatus();
     }
-
 }
 
 FactoryArea::~FactoryArea()

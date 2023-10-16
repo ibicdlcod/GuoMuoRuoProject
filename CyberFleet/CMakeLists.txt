@@ -20,8 +20,8 @@ include_directories(${root_SOURCE_DIR}/FactorySlot)
 add_subdirectory(FactorySlot)
 
 set(TS_FILES
-    translations/CyberFleet2_zh_CN.ts
-    translations/CyberFleet2_en_US.ts)
+    Translations/CyberFleet2_zh_CN.ts
+    Translations/CyberFleet2_en_US.ts)
 
 set(CLIENT_SOURCES
     ClientGUI/clientv2.cpp
@@ -147,7 +147,9 @@ target_link_libraries(CFClient PRIVATE CFProtocol)
 if (${CMAKE_SYSTEM_NAME} MATCHES "Windows")
     target_link_libraries(CFClient PRIVATE factoryslot/FactorySlot)
 else ()
-    target_link_libraries(CFClient PRIVATE ${CMAKE_BINARY_DIR}/factoryslot/libFactorySlot.so)
+    #qt_import_plugins(CFClient INCLUDE FactorySlot)
+    #target_link_libraries(CFClient PRIVATE ${CMAKE_BINARY_DIR}/Factoryslot/libFactorySlot.so)
+    target_link_libraries(CFClient PUBLIC FactorySlot)
 endif()
 target_link_libraries(CFClient PRIVATE ${STEAM_LIBRARY})
 target_link_libraries(CFClient PRIVATE ${STEAM_APPENCRYPT_LIBRARY})
