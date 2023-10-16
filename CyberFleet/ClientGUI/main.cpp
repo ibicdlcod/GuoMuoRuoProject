@@ -9,7 +9,7 @@
 #include "../steam/isteamutils.h"
 
 #include "clientv2.h"
-#include "kp.h"
+#include "../Protocol/kp.h"
 
 QFile *logFile;
 std::unique_ptr<QSettings> settings;
@@ -61,7 +61,7 @@ int main(int argc, char *argv[]) {
         uiLanguages.prepend(settings->value("language").toString());
     }
     for (const QString &locale : uiLanguages) {
-        const QString baseName = "WA2_" + QLocale(locale).name();
+        const QString baseName = "CyberFleet2_" + QLocale(locale).name();
         if (translator.load(":/i18n/" + baseName)) {
             client.installTranslator(&translator);
             break;

@@ -210,7 +210,7 @@
   <customwidget>
    <class>FactorySlot</class>
    <extends>QPushButton</extends>
-   <header>factoryslot.h</header>
+   <header>../../FactorySlot/factoryslot.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

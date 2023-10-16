@@ -1,6 +1,6 @@
 #include "factoryarea.h"
 #include "ui_factoryarea.h"
-#include "clientv2.h"
+#include "../clientv2.h"
 #include "developwindow.h"
 
 FactoryArea::FactoryArea(QWidget *parent) :

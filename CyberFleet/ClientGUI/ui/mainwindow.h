@@ -2,8 +2,8 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
-#include "clientv2.h"
-#include "factoryslot.h"
+#include "../clientv2.h"
+#include "../../FactorySlot/factoryslot.h"
 #include "portarea.h"
 #include "licensearea.h"
 #include "newlogins.h"

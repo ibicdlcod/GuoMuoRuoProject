@@ -4,7 +4,7 @@
 #include "qconsolelistener.h"
 #include "../steam/steam_api.h"
 
-#include "kp.h"
+#include "../Protocol/kp.h"
 #include "server.h"
 
 QFile *logFile;
@@ -49,7 +49,7 @@ int main(int argc, char *argv[]) {
         uiLanguages.prepend(settings->value("language").toString());
     }
     for (const QString &locale : uiLanguages) {
-        const QString baseName = "WA2_" + QLocale(locale).name();
+        const QString baseName = "CyberFleet2_" + QLocale(locale).name();
         if (translator.load(":/i18n/" + baseName)) {
             server.installTranslator(&translator);
             break;

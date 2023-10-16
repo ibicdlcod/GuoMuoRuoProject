@@ -4,9 +4,9 @@
 #include <QDateTime>
 #include <QObject>
 #include "../steam/steamclientpublic.h"
-#include "equipment.h"
+#include "../Protocol/equipment.h"
+#include "../Protocol/resord.h"
 #include "peerinfo.h"
-#include "resord.h"
 
 namespace User {
 

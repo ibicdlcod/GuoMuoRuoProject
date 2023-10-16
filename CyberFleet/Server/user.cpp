@@ -3,7 +3,7 @@
 #include <QSqlError>
 #include <QSqlQuery>
 #include <QTimeZone>
-#include "resord.h"
+#include "../Protocol/resord.h"
 #include "kerrors.h"
 
 #ifdef max

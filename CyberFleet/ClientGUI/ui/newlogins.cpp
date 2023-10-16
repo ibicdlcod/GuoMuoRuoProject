@@ -1,5 +1,5 @@
 #include "newlogins.h"
-#include "clientv2.h"
+#include "../clientv2.h"
 #include "ui_newlogins.h"
 #include <QDir>
 #include <QSettings>

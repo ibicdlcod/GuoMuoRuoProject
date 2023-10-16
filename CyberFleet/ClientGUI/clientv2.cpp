@@ -50,7 +50,7 @@
 #include <QSettings>
 #include <QPasswordDigestor>
 #include "../steam/isteamfriends.h"
-#include "kp.h"
+#include "../Protocol/kp.h"
 #include "networkerror.h"
 #include "steamauth.h"
 

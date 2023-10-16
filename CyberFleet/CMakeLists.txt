@@ -16,8 +16,8 @@ find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Core Gui Widgets LinguistTools
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core Gui UiPlugin Widgets LinguistTools
     Sql Network)
 
-include_directories(${root_SOURCE_DIR}/factoryslot)
-add_subdirectory(factoryslot)
+include_directories(${root_SOURCE_DIR}/FactorySlot)
+add_subdirectory(FactorySlot)
 
 set(TS_FILES
     translations/CyberFleet2_zh_CN.ts
@@ -31,37 +31,59 @@ set(CLIENT_SOURCES
     ClientGUI/networkerror.h
     ClientGUI/steamauth.cpp
     ClientGUI/steamauth.h
+    ClientGUI/ui/developwindow.cpp
+    ClientGUI/ui/developwindow.h
+    ClientGUI/ui/developwindow.ui
+    ClientGUI/ui/factoryarea.cpp
+    ClientGUI/ui/factoryarea.h
+    ClientGUI/ui/factoryarea.ui
+    ClientGUI/ui/keyenterreceiver.cpp
+    ClientGUI/ui/keyenterreceiver.h
+    ClientGUI/ui/licensearea.cpp
+    ClientGUI/ui/licensearea.h
+    ClientGUI/ui/licensearea.ui
+    ClientGUI/ui/mainwindow.cpp
+    ClientGUI/ui/mainwindow.h
+    ClientGUI/ui/mainwindow.ui
+    ClientGUI/ui/newlogins.cpp
+    ClientGUI/ui/newlogins.h
+    ClientGUI/ui/newlogins.ui
+    ClientGUI/ui/portarea.cpp
+    ClientGUI/ui/portarea.h
+    ClientGUI/ui/portarea.ui
     ${TS_FILES}
 )
 set(SERVER_SOURCES
-    server/main.cpp
-    server/kerrors.cpp
-    server/kerrors.h
-    server/qconsolelistener.cpp
-    server/qconsolelistener.h
-    server/server.cpp
-    server/server.h
-    server/sslserver.cpp
-    server/sslserver.h
-    server/user.cpp
-    server/user.h
+    Server/kerrors.cpp
+    Server/kerrors.h
+    Server/main.cpp
+    Server/peerinfo.cpp
+    Server/peerinfo.h
+    Server/server.cpp
+    Server/server.h
+    Server/sslserver.cpp
+    Server/sslserver.h
+    Server/user.cpp
+    Server/user.h
     ${TS_FILES}
 )
 set(PROTOCOL_SOURCES
-    protocol/commandline.cpp
-    protocol/commandline.h
-    protocol/consoletextstream.cpp
-    protocol/consoletextstream.h
-    protocol/ecma48.cpp
-    protocol/ecma48.h
-    protocol/equipment.cpp
-    protocol/equipment.h
-    protocol/kp.cpp
-    protocol/kp.h
-    protocol/resord.cpp
-    protocol/resord.h
-    protocol/wcwidth.c
-    protocol/wcwidth.h
+    Protocol/commandline.cpp
+    Protocol/commandline.h
+    Protocol/consoletextstream.cpp
+    Protocol/consoletextstream.h
+    Protocol/ecma48.cpp
+    Protocol/ecma48.h
+    Protocol/equipment.cpp
+    Protocol/equipment.h
+    Protocol/equiptype.cpp
+    Protocol/equiptype.h
+    Protocol/kp.cpp
+    Protocol/kp.h
+    Protocol/resord.cpp
+    Protocol/resord.h
+    Protocol/wcwidth.c
+    Protocol/wcwidth.h
 )
 
 if (${CMAKE_SYSTEM_NAME} MATCHES "Windows")
@@ -84,7 +106,25 @@ qt_add_executable(CFServer
     MANUAL_FINALIZATION
     ${SERVER_SOURCES}
     common.qrc
+    Server/qconsolelistener.cpp Server/qconsolelistener.h
 )
+if (${CMAKE_SYSTEM_NAME} MATCHES "Windows")
+    find_library(STEAM_LIBRARY steam_api64 HINTS redistributable_bin/win64)
+else()
+    find_library(STEAM_LIBRARY steam_api HINTS redistributable_bin/linux64)
+endif()
+if( ${STEAM_LIBRARY} STREQUAL "STEAM_LIBRARY-NOTFOUND")
+    message("Please set STEAM_LIBRARY variable to location of redistributable_bin/(your arch)")
+endif()
+
+if (${CMAKE_SYSTEM_NAME} MATCHES "Windows")
+    find_library(STEAM_APPENCRYPT_LIBRARY sdkencryptedappticket64 HINTS steam/lib/win64)
+else()
+    find_library(STEAM_APPENCRYPT_LIBRARY sdkencryptedappticket HINTS steam/lib/linux64)
+endif()
+if( ${STEAM_APPENCRYPT_LIBRARY} STREQUAL "STEAM_APPENCRYPT_LIBRARY-NOTFOUND")
+    message("Please set STEAM_LIBRARY variable to location of steam/lib/(your arch)")
+endif()
 
 # Define target properties for Android with Qt 6 as:
 #    set_property(TARGET CyberFleet2 APPEND PROPERTY QT_ANDROID_PACKAGE_SOURCE_DIR
@@ -100,7 +140,6 @@ qt6_add_translations(CFServer
     TS_FILES ${TS_FILES}
     LRELEASE_OPTIONS -idbased)
 
-
 target_link_libraries(CFProtocol PRIVATE Qt${QT_VERSION_MAJOR}::Core)
 target_link_libraries(CFClient PRIVATE Qt${QT_VERSION_MAJOR}::Widgets)
 target_link_libraries(CFClient PRIVATE Qt${QT_VERSION_MAJOR}::Network)
@@ -110,10 +149,14 @@ if (${CMAKE_SYSTEM_NAME} MATCHES "Windows")
 else ()
     target_link_libraries(CFClient PRIVATE ${CMAKE_BINARY_DIR}/factoryslot/libFactorySlot.so)
 endif()
+target_link_libraries(CFClient PRIVATE ${STEAM_LIBRARY})
+target_link_libraries(CFClient PRIVATE ${STEAM_APPENCRYPT_LIBRARY})
 target_link_libraries(CFServer PRIVATE Qt${QT_VERSION_MAJOR}::Core)
 target_link_libraries(CFServer PRIVATE Qt${QT_VERSION_MAJOR}::Sql)
 target_link_libraries(CFServer PRIVATE Qt${QT_VERSION_MAJOR}::Network)
 target_link_libraries(CFServer PRIVATE CFProtocol)
+target_link_libraries(CFServer PRIVATE ${STEAM_LIBRARY})
+target_link_libraries(CFServer PRIVATE ${STEAM_APPENCRYPT_LIBRARY})
 
 set_target_properties(CFClient PROPERTIES
     MACOSX_BUNDLE_GUI_IDENTIFIER cyberfleet.xyz
@@ -124,9 +167,9 @@ set_target_properties(CFClient PROPERTIES
 )
 
 qt_finalize_target(CFProtocol)
-qt_finalize_executable(CFClient)
 if (${CMAKE_BUILD_TYPE} MATCHES "Release")
     target_compile_definitions(CFClient PUBLIC QT_DEBUG_NO_OUTPUT)
     target_compile_definitions(CFServer PUBLIC QT_DEBUG_NO_OUTPUT)
 endif()
+qt_finalize_executable(CFClient)
 qt_finalize_executable(CFServer)

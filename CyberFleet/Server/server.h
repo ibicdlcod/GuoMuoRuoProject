@@ -59,8 +59,8 @@
 #include <random>
 #include <vector>
 
-#include "commandline.h"
-#include "equipment.h"
+#include "../Protocol/commandline.h"
+#include "../Protocol/equipment.h"
 #include "peerinfo.h"
 #include "sslserver.h"
 #include "user.h"

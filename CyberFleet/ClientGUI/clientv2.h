@@ -51,7 +51,7 @@
 
 #include <QColor>
 #include <QtNetwork>
-#include "commandline.h"
+#include "../Protocol/commandline.h"
 #include "steamauth.h"
 
 void customMessageHandler(QtMsgType,
