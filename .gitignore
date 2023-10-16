@@ -89,3 +89,4 @@ static_build/
 *.log
 *.ods
 */.qtc_clangd/
+*.user
