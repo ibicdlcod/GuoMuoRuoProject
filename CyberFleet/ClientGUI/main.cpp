@@ -4,6 +4,7 @@
 #include <QFile>
 #include <QSettings>
 #include <QTranslator>
+#include <QStyleFactory>
 #include "../steam/steam_api.h"
 #include "../steam/isteamutils.h"
 
@@ -37,10 +38,13 @@ int main(int argc, char *argv[]) {
 
     settings = std::make_unique<QSettings>(new QSettings);
 
+    QApplication::setStyle(QStyleFactory::create("Fusion"));
+
     /* Multilingual Support */
 #if defined(Q_OS_UNIX)
 //    setlocale(LC_NUMERIC, "C");
 #endif
+
     QTranslator translator;
     QString steamLanguage = SteamUtils()->GetSteamUILanguage();
     QMap<QString, QString> LanguageView;
