@@ -15,14 +15,3 @@ target.path = $$[QT_INSTALL_PLUGINS]/designer
 INSTALLS    += target
 
 include(FactorySlot.pri)
-
-DISTFILES += \
-    factoryslot.pri
-
-HEADERS += \
-    factoryslot.h \
-    factoryslotplugin.h
-
-SOURCES += \
-    factoryslot.cpp \
-    factoryslotplugin.cpp
