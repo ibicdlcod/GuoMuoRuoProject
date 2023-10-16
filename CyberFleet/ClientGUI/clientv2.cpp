@@ -85,23 +85,27 @@ bool Clientv2::loggedIn() const {
 
 /* Part of steam verification */
 void Clientv2::sendEncryptedAppTicket(uint8 rgubTicket [], uint32 cubTicket) {
-    QByteArray msg = KP::clientSteamAuth(rgubTicket, cubTicket);
-    if(!socket.waitForEncrypted(10000)) {
-        qCritical("Encrypted connection yet established "
-                  "(do not reattempt connection within a minute!)");
-        throw NetworkError(socket.errorString());
-        return;
-    }
-    else {
-        qInfo("Encrypted connection established, "
-              "sending encrypted app ticket");
-    }
-    const qint64 written = socket.write(msg);
-    if (written <= 0) {
-        throw NetworkError(socket.errorString());
-    }
-    else {
-        qDebug("Encrypted App Ticket successfully sent.");
+    try {
+        QByteArray msg = KP::clientSteamAuth(rgubTicket, cubTicket);
+        if(!socket.waitForEncrypted()) {
+            qCritical("Encrypted connection yet established "
+                      "(do not reattempt connection within a minute!)");
+            throw NetworkError(socket.errorString());
+        }
+        else {
+            qInfo("Encrypted connection established, "
+                  "sending encrypted app ticket");
+        }
+        const qint64 written = socket.write(msg);
+        if (written <= 0) {
+            throw NetworkError(socket.errorString());
+        }
+        else {
+            qDebug("Encrypted App Ticket successfully sent.");
+        }
+    }  catch (NetworkError &e) {
+        qCritical("Network error when sending Encrypted Ticket");
+        qCritical() << e.what();
     }
     return;
 }

@@ -34,12 +34,7 @@ void SteamAuth::OnEncryptedAppTicketResponse(
         uint32 cubTicket;
 
         if(SteamUser()->GetEncryptedAppTicket(rgubTicket, sizeof(rgubTicket), &cubTicket)) {
-            try {
-                Clientv2::getInstance().sendEncryptedAppTicket(rgubTicket, cubTicket);
-            } catch (NetworkError &e) {
-                qCritical("Network error when sending Encrypted Ticket");
-                qCritical() << e.what();
-            }
+            Clientv2::getInstance().sendEncryptedAppTicket(rgubTicket, cubTicket);
         }
         else {
             qWarning() << qtTrId("GetEncryptedAppTicket failed.\n").toUtf8();

@@ -78,7 +78,6 @@ public:
     };
     Q_ENUM(Password);
     bool loggedIn() const;
-    void sendEncryptedAppTicket(uint8 [], uint32);
 
 public slots:
     void autoPassword();
@@ -89,6 +88,7 @@ public slots:
     void parseDisconnectReq();
     void parseQuit();
     bool parseSpec(const QStringList &);
+    void sendEncryptedAppTicket(uint8 [], uint32);
     void serverResponse(const QString &, const QByteArray &);
     void showHelp(const QStringList &);
     void switchToFactory();
@@ -101,7 +101,6 @@ signals:
     void qout(QString, QColor background = QColor("white"),
               QColor foreground = QColor("black"));
     void receivedFactoryRefresh(const QJsonObject &);
-    //void sentAppTicket();
 
 private slots:
     void encrypted();

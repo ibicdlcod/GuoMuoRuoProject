@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.16)
 
-project(CyberFleet2 VERSION 0.1 LANGUAGES C CXX)
+project(CyberFleet VERSION 0.1 LANGUAGES C CXX)
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
