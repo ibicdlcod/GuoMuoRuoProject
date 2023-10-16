@@ -86,7 +86,7 @@ bool Clientv2::loggedIn() const {
 /* Part of steam verification */
 void Clientv2::sendEncryptedAppTicket(uint8 rgubTicket [], uint32 cubTicket) {
     QByteArray msg = KP::clientSteamAuth(rgubTicket, cubTicket);
-    if(!socket.waitForEncrypted()) {
+    if(!socket.waitForEncrypted(10000)) {
         qCritical("Encrypted connection yet established "
                   "(do not reattempt connection within a minute!)");
         throw NetworkError(socket.errorString());
