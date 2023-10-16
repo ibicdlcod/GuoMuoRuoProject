@@ -9,7 +9,7 @@ class EquipType
 public:
     EquipType();
 
-    static const int strToIntRep(QString);
+    static int strToIntRep(QString);
     static const QString intToStrRep(int);
 
 private:

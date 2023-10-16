@@ -545,7 +545,7 @@ void Clientv2::parseConnectReq(const QStringList &cmdParts) {
 
     conf.addCaCertificates(settings->value("cert/pem",
                                            ":/harusoft.pem").toString());
-    qDebug() << conf.caCertificates()[0];
+    qDebug() << conf.caCertificates().value(0);
     socket.setSslConfiguration(conf);
     if(socket.isEncrypted()) {
         //% "Already connected, disconnect first."

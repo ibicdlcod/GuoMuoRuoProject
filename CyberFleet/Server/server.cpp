@@ -105,7 +105,7 @@ uint8 charToInt(char data) {
 /* User registery */
 const QString newUserT = QStringLiteral(
     "CREATE TABLE NewUsers ( "
-    "UserID BLOB PRIMARY , "
+    "UserID BLOB PRIMARY KEY, "
     "UserType TEXT DEFAULT 'commoner'"
     ");"
     );
@@ -371,7 +371,6 @@ void Server::update() {
 }
 
 /* private slots */
-
 void Server::alertReceived(QSslSocket *socket, QSsl::AlertLevel level,
                            QSsl::AlertType type, const QString &description) {
     qDebug() << description;
@@ -952,8 +951,8 @@ void Server::receivedAuth(const QJsonObject &djson,
             if(!SteamEncryptedAppTicket_BDecryptTicket(
                     rgubTicket, cubTicket, rgubDecrypted, &cubDecrypted,
                     rgubKey, sizeof(rgubKey))) {
-                qCritical(qtTrId("%1: Ticket failed to decrypt")
-                              .arg(peerInfo.toString()).toUtf8());
+                qCritical() << qtTrId("%1: Ticket failed to decrypt")
+                                   .arg(peerInfo.toString()).toUtf8();
                 QByteArray msg = KP::serverLogFail(KP::TicketFailedToDecrypt);
                 connection->write(msg);
                 delete [] rgubTicket;
@@ -963,8 +962,8 @@ void Server::receivedAuth(const QJsonObject &djson,
             if(!SteamEncryptedAppTicket_BIsTicketForApp(
                     rgubDecrypted,
                     cubDecrypted, 2632870)) {
-                qCritical(qtTrId("%1: Ticket is not from correct App ID")
-                              .arg(peerInfo.toString()).toUtf8());
+                qCritical() << qtTrId("%1: Ticket is not from correct App ID")
+                              .arg(peerInfo.toString()).toUtf8();
                 QByteArray msg = KP::serverLogFail(KP::TicketIsntFromCorrectAppID);
                 connection->write(msg);
                 delete [] rgubTicket;
@@ -978,10 +977,10 @@ void Server::receivedAuth(const QJsonObject &djson,
                     rgubDecrypted,
                     cubDecrypted));
             qint64 elapsed = requestThen.secsTo(now);
-            qInfo(qtTrId("Elapsed: %1 second(s)").arg(elapsed).toUtf8());
+            qInfo() << qtTrId("Elapsed: %1 second(s)").arg(elapsed).toUtf8();
             if(elapsed > elapsedMaxTolerence) {
-                qCritical(qtTrId("%1: Request timeout")
-                              .arg(peerInfo.toString()).toUtf8());
+                qCritical() << qtTrId("%1: Request timeout")
+                              .arg(peerInfo.toString()).toUtf8();
                 QByteArray msg = KP::serverLogFail(KP::RequestTimeout);
                 connection->write(msg);
                 delete [] rgubTicket;
@@ -993,8 +992,8 @@ void Server::receivedAuth(const QJsonObject &djson,
                 cubDecrypted,
                 &steamID);
             if(steamID == k_steamIDNil) {
-                qCritical(qtTrId("%1: Steam ID invalid")
-                              .arg(peerInfo.toString()).toUtf8());
+                qCritical() << qtTrId("%1: Steam ID invalid")
+                              .arg(peerInfo.toString()).toUtf8();
                 QByteArray msg = KP::serverLogFail(KP::SteamIdInvalid);
                 connection->write(msg);
                 delete [] rgubTicket;
@@ -1003,7 +1002,7 @@ void Server::receivedAuth(const QJsonObject &djson,
             else {
                 /* We are logged in here */
                 qulonglong idnum = steamID.ConvertToUint64();
-                qInfo(QString("User login: %1").arg(idnum).toUtf8());
+                qInfo() << QString("User login: %1").arg(idnum).toUtf8();
                 if(connectedPeers.contains(steamID)) {
                     receivedForceLogout(steamID);
                 }

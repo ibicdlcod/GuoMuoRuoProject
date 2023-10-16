@@ -1,6 +1,6 @@
-#include "NewLoginS.h"
+#include "newlogins.h"
 #include "clientv2.h"
-#include "ui_NewLoginS.h"
+#include "ui_newlogins.h"
 #include <QDir>
 #include <QSettings>
 

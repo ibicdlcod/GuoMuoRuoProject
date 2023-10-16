@@ -74,7 +74,6 @@ else:unix: PRE_TARGETDEPS += $$OUT_PWD/../Protocol/libProtocol.a
 
 win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../../build-CyberFleet-Desktop_Qt_6_6_0_MSVC2019_64bit-Release/FactorySlot/release/ -lFactorySlotplugin
 else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../../build-CyberFleet-Desktop_Qt_6_6_0_MSVC2019_64bit-Debug/FactorySlot/debug/ -lFactorySlotplugind
-else:unix: LIBS += -L$$PWD/../../build-CyberFleet-Desktop_Qt_6_6_0_MSVC2019_64bit-Debug/FactorySlot/debug/ -lFactorySlotplugind
 
 INCLUDEPATH += $$PWD/../FactorySlot
 DEPENDPATH += $$PWD/../FactorySlot
@@ -83,10 +82,24 @@ win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$PWD/../../build-Cy
 else:win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$PWD/../../build-CyberFleet-Desktop_Qt_6_6_0_MSVC2019_64bit-Debug/FactorySlot/debug/libFactorySlotplugind.a
 else:win32:!win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$PWD/../../build-CyberFleet-Desktop_Qt_6_6_0_MSVC2019_64bit-Release/FactorySlot/release/FactorySlotplugin.lib
 else:win32:!win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$PWD/../../build-CyberFleet-Desktop_Qt_6_6_0_MSVC2019_64bit-Debug/FactorySlot/debug/FactorySlotplugind.lib
-else:unix: PRE_TARGETDEPS += $$PWD/../../build-CyberFleet-Desktop_Qt_6_6_0_GCC_64bit-Debug/FactorySlot/debug/libFactorySlotplugind.a
 
 win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../redistributable_bin/win64/ -lsteam_api64
 else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../redistributable_bin/win64/ -lsteam_api64
 
 INCLUDEPATH += $$PWD/../redistributable_bin
 DEPENDPATH += $$PWD/../redistributable_bin
+
+unix:!macx: LIBS += -L$$PWD/../../build-CyberFleet-Desktop_Qt_6_6_0_GCC_64bit-Debug/FactorySlot/ -lFactorySlotplugin
+
+INCLUDEPATH += $$PWD/../../build-CyberFleet-Desktop_Qt_6_6_0_GCC_64bit-Debug/FactorySlot
+DEPENDPATH += $$PWD/../../build-CyberFleet-Desktop_Qt_6_6_0_GCC_64bit-Debug/FactorySlot
+
+unix:!macx: LIBS += -L$$PWD/../steam/lib/linux64/ -lsdkencryptedappticket
+
+INCLUDEPATH += $$PWD/../steam/lib/linux64
+DEPENDPATH += $$PWD/../steam/lib/linux64
+
+unix:!macx: LIBS += -L$$PWD/../redistributable_bin/linux64/ -lsteam_api
+
+INCLUDEPATH += $$PWD/../redistributable_bin/linux64
+DEPENDPATH += $$PWD/../redistributable_bin/linux64

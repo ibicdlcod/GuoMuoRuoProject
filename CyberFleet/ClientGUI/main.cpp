@@ -26,7 +26,6 @@ int main(int argc, char *argv[]) {
         return STEAM_ERROR;
     }
     /* End Steam initialization */
-
     QApplication client(argc, argv);
 
     /* Metadata */
@@ -40,7 +39,7 @@ int main(int argc, char *argv[]) {
 
     /* Multilingual Support */
 #if defined(Q_OS_UNIX)
-    setlocale(LC_NUMERIC, "C");
+//    setlocale(LC_NUMERIC, "C");
 #endif
     QTranslator translator;
     QString steamLanguage = SteamUtils()->GetSteamUILanguage();

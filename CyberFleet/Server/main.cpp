@@ -37,7 +37,7 @@ int main(int argc, char *argv[]) {
     settings = std::make_unique<QSettings>(new QSettings);
 
 #if defined(Q_OS_UNIX)
-    setlocale(LC_NUMERIC, "C");
+    //setlocale(LC_NUMERIC, "C");
 #endif
 
     QTranslator translator;
