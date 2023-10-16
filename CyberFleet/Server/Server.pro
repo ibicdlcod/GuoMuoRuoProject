@@ -75,3 +75,13 @@ win32: LIBS += -L$$PWD/../steam/lib/win64/ -lsdkencryptedappticket64
 
 INCLUDEPATH += $$PWD/../steam/lib/win64
 DEPENDPATH += $$PWD/../steam/lib/win64
+
+unix:!macx: LIBS += -L$$PWD/../redistributable_bin/linux64/ -lsteam_api
+
+INCLUDEPATH += $$PWD/../redistributable_bin/linux64
+DEPENDPATH += $$PWD/../redistributable_bin/linux64
+
+unix:!macx: LIBS += -L$$PWD/../steam/lib/linux64/ -lsdkencryptedappticket
+
+INCLUDEPATH += $$PWD/../steam/lib/linux64
+DEPENDPATH += $$PWD/../steam/lib/linux64

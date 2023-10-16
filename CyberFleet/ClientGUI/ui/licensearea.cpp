@@ -18,7 +18,7 @@ LicenseArea::LicenseArea(QWidget *parent) :
     QFile licenseFile(currentDir.filePath(openingwords));
     if(Q_UNLIKELY(!licenseFile.open(QIODevice::ReadOnly | QIODevice::Text))) {
         //% "Can't find license file, exiting."
-        qFatal(qtTrId("licence-not-found").toUtf8());
+        qFatal() << qtTrId("licence-not-found").toUtf8();
     }
     else {
         QTextStream instream1(&licenseFile);

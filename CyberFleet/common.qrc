@@ -2,8 +2,7 @@
     <qresource prefix="/">
         <file>openingwords.txt</file>
         <file>Assets/Image/Sea.jpg</file>
-        <file>sslserver.pem</file>
         <file>harusoft.pem</file>
     </qresource>
-    <qresource prefix="/icon" lang="English"/>
+    <qresource lang="English" prefix="/icon"/>
 </RCC>

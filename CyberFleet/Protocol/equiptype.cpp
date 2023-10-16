@@ -16,7 +16,7 @@ const QString EquipType::intToStrRep(int input) {
     return QString("unknown");
 }
 
-const int EquipType::strToIntRep(QString input) {
+int EquipType::strToIntRep(QString input) {
     if(result.contains(input))
         return result.value(input);
     else
