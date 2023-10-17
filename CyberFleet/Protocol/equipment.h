@@ -6,131 +6,25 @@
 #include <QObject>
 #include <QString>
 #include "resord.h"
-/*
-class EquipType: public QObject {
+#include "equiptype.h"
+
+class Equipment: public QObject {
     Q_OBJECT
 
 public:
-    enum BasicType{
-        Disabled,
-        MainGun,
-        SupportGun,
-        Torpedo,
-        Midget,
-        Plane,
-        Seaplane,
-        Flyingboat,
-        Autogyro,
-        Liason,
-        DepthC,
-        Sonar,
-        AA,
-        AADirector,
-        APShell,
-        ALShell,
-        ALRocket,
-        ALCraft,
-        ALTank,
-        Drum,
-        TPCraft,
-        Radar,
-        RadarSub,
-        Engine,
-        Bulge,
-        SearchLight,
-        StarShell,
-        Repair,
-        Replenish,
-        Food,
-        CommandFac,
-        AircraftPs,
-        SurfacePs,
-        TorpBoat,
-    };
-    Q_ENUM(BasicType)
-
-    enum TypeFlag{
-        Recon = 0x0001,
-        Fight = 0x0002,
-        Torp = 0x0004,
-        Dive = 0x0008,
-        Night = 0x0010,
-        LB = 0x0020,
-        IC = 0x0040,
-        Patrol = 0x0080,
-        Jet = 0x0100,
-        Flak = 0x0200,
-        Surface = 0x0400,
-        Racks = 0x0800,
-        Active = 0x1000,
-        Cannon = 0x2000,
-        Turb = 0x4000,
-        Convoy = 0x8000
-    };
-    Q_DECLARE_FLAGS(TypeFlags, TypeFlag)
-    Q_FLAG(TypeFlags)
-
-    EquipType(const QString &);
+    Equipment(int);
     QString toString() const;
     const ResOrd devResBase() const;
-
-private:
-    BasicType base;
-    TypeFlags flags;
-    int size = 0;
-};
-
-Q_DECLARE_OPERATORS_FOR_FLAGS(EquipType::TypeFlags)
-
-class EquipDef: public QObject {
-    Q_OBJECT
-
-public:
-    enum AttrType{
-        Rarity,
-        Intricacy,
-        Tenacity,
-        Firepower,
-        Armorpenetration,
-        Firingrange,
-        Firingspeed,
-        Torpedo,
-        Bombing,
-        Landattack,
-        Airattack,
-        Interception,
-        Antibomber,
-        Asw,
-        Los,
-        Accuracy,
-        Evasion,
-        Armor,
-        Flightrange,
-        Transport,
-        Require,
-        Require2,
-        Developenabled,
-        Convertenabled,
-        Requirenum,
-        Require2num,
-        Industrialsilver,
-        Industrialgold
-    };
-    Q_ENUM(AttrType)
-
-    EquipDef(int, QString &&, QString &&,
-             QMap<AttrType, int> &&, QStringList &&);
-
     bool canDevelop(CSteamID userid = k_steamIDNil) const;
     const ResOrd devRes() const;
-    int getRarity() const;
+    int getTech() const;
 
 private:
-    int id;
-    QString name;
+    int equipRegId;
+    QMap<QString, QString> localNames;
     EquipType type;
-    QMap<AttrType, int> attr;
+    QMap<QString, int> attr;
     QStringList customflags;
 };
-*/
+
 #endif // EQUIPMENT_H

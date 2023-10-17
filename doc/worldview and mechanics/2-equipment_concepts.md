@@ -1,8 +1,10 @@
-## Equipment concepts
+# Equipment concepts
 
-## Father equipment
+## Father and mother equipment
 
-Many equipment have a father, and you must 
+Many equipment have a father, and in this case you must possess the father in order to develop it.
+
+Less commonly some equipment has a mother, in case of virtual one (>16384) you need to fulfill some specific condition in order to develop it. If it is a real one, developing the "son" cost skill points of the "mother" and further effects are described below.
 
 ## Skill points
 
@@ -25,3 +27,6 @@ $$
 
 You can improve any equipment at the cost of 100% of standard skill point. An equipment improved a times would have its actual skill point added by (log_10(a))*standard (a<=10);
 
+## Prototype equipment
+
+Some equipment have "disallow mass production" attribute, when developing it while possessing above maximum (determined by the value of "disallow mass production") the cost goes up exponentially.

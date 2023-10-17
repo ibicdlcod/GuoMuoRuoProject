@@ -1,4 +1,4 @@
-## Technology
+# Technology
 
 You control a fleet headquarters that mainly consists of Kanmusu(ship girl)s and their equipment.
 

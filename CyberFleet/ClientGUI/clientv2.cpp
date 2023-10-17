@@ -399,6 +399,27 @@ void Clientv2::shutdown() {
 }
 
 /* private */
+void Clientv2::doAddEquip(const QStringList &cmdParts) {
+    if(cmdParts.length() < 2) {
+        //% "Usage: addequip [equipid]"
+        emit qout(qtTrId("addequip-usage"));
+        return;
+    }
+    else {
+        int equipid = cmdParts[1].toInt(nullptr, 0);
+        if(equipid == 0) {
+            //% "Equipment id invalid."
+            emit qout(qtTrId("develop-invalid-id"));
+            return;
+        }
+        QByteArray msg = KP::clientAddEquip(equipid);
+        const qint64 written = socket.write(msg);
+        if (written <= 0) {
+            throw NetworkError(socket.errorString());
+        }
+        return;
+    }
+}
 /* Develop equipment */
 void Clientv2::doDevelop(const QStringList &cmdParts) {
     if(cmdParts.length() < 3) {
@@ -549,7 +570,6 @@ void Clientv2::parseConnectReq(const QStringList &cmdParts) {
 
     conf.addCaCertificates(settings->value("cert/pem",
                                            ":/harusoft.pem").toString());
-    qDebug() << conf.caCertificates().value(0);
     socket.setSslConfiguration(conf);
     if(socket.isEncrypted()) {
         //% "Already connected, disconnect first."
@@ -636,6 +656,10 @@ bool Clientv2::parseGameCommands(const QString &primary,
             doFetch(cmdParts);
             return true;
         }
+    }
+    else if(primary.compare("addequip", Qt::CaseInsensitive) == 0) {
+        doAddEquip(cmdParts);
+        return true;
     }
     else if(primary.compare("refresh", Qt::CaseInsensitive) == 0) {
         if(cmdParts.length() > 1
@@ -759,7 +783,7 @@ void Clientv2::receivedMsg(const QJsonObject &djson) {
         //% "Client sent an unsupported JSON."
         qWarning() << qtTrId("client-unsupported-json"); break;
     case KP::AccessDenied:
-        //% "You must be logged in in order to perform this operation."
+        //% "You have insufficient privileges (typically you need to login)."
         qWarning() << qtTrId("access-denied-login-first"); break;
     case KP::DevelopFailed: {
         switch(djson["reason"].toInt()) {

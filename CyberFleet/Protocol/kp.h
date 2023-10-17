@@ -42,7 +42,7 @@ enum DgramType{
 Q_ENUM_NS(DgramType)
 
 enum AuthMode{
-    Login,
+    //Login,
     Reg,
     Logout,
     NewLogin
@@ -99,7 +99,8 @@ enum CommandType{
     Refresh,
     SteamAuth,
     SteamLogout,
-    CHello
+    CHello,
+    AdminAddEquip
 };
 Q_ENUM_NS(CommandType)
 
@@ -140,6 +141,7 @@ void winConsoleCheck();
 /* See JSON support in Qt, especially QCborValue */
 QByteArray accessDenied();
 QByteArray catbomb();
+QByteArray clientAddEquip(int);
 QByteArray clientDevelop(int, bool convert = false, int factoryID = -1);
 QByteArray clientFactoryRefresh();
 QByteArray clientFetch(int factoryID = -1);

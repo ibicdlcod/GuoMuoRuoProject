@@ -14,6 +14,7 @@ ResOrd getCurrentResources(CSteamID &uid);
 void init(CSteamID &uid);
 bool isFactoryBusy(CSteamID &uid, int factoryID);
 std::tuple<bool, int> isFactoryFinished(CSteamID &uid, int factoryID);
+bool isSuperUser(CSteamID &uid);
 void naturalRegen(CSteamID &uid);
 int newEquip(CSteamID &uid, int equipDid);
 void refreshFactory(CSteamID &uid);

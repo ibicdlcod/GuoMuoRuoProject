@@ -8,6 +8,8 @@ class EquipType
 {
 public:
     EquipType();
+    EquipType(int);
+    EquipType(QString);
 
     static int strToIntRep(QString);
     static const QString intToStrRep(int);
@@ -114,7 +116,10 @@ private:
         std::pair("AA-gun",             0x00192000),
         std::pair("AA-control-device",  0x001E2000),
         std::pair("Land-corps",         0x001F0000),
+        std::pair("Virtual-precondition",   0x01000000),
     };
+
+    int internalRep;
 };
 
 #endif // EQUIPTYPE_H

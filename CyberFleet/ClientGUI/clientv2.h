@@ -111,6 +111,7 @@ private slots:
     void shutdown();
 
 private:
+    void doAddEquip(const QStringList &);
     void doDevelop(const QStringList &);
     void doFetch(const QStringList &);
     void doSwitch(const QStringList &);

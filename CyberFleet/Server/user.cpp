@@ -98,6 +98,26 @@ std::tuple<bool, int> User::isFactoryFinished(CSteamID &uid, int factoryID) {
     }
 }
 
+bool User::isSuperUser(CSteamID &uid) {
+
+    QSqlDatabase db = QSqlDatabase::database();
+    QSqlQuery query;
+    query.prepare("SELECT UserType"
+                  " FROM NewUsers WHERE UserID = :id");
+    query.bindValue(":id", QString::number(uid.ConvertToUint64()));
+    query.exec();
+    query.isSelect();
+    if(Q_UNLIKELY(!query.first())) {
+        qWarning() << qtTrId("user-nonexistent-uid")
+                          .arg(uid.ConvertToUint64());
+        return false;
+    }
+    else {
+        return query.value(0).toString().
+               compare("admin", Qt::CaseInsensitive) == 0;
+    }
+}
+
 void User::naturalRegen(CSteamID &uid) {
     QSqlDatabase db = QSqlDatabase::database();
     QSqlQuery query;

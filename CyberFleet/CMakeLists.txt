@@ -141,6 +141,7 @@ qt6_add_translations(CFServer
     LRELEASE_OPTIONS -idbased)
 
 target_link_libraries(CFProtocol PRIVATE Qt${QT_VERSION_MAJOR}::Core)
+target_link_libraries(CFProtocol PRIVATE Qt${QT_VERSION_MAJOR}::Sql)
 target_link_libraries(CFClient PRIVATE Qt${QT_VERSION_MAJOR}::Widgets)
 target_link_libraries(CFClient PRIVATE Qt${QT_VERSION_MAJOR}::Network)
 target_link_libraries(CFClient PRIVATE CFProtocol)

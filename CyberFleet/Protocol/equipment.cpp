@@ -2,6 +2,56 @@
 #include <QRegularExpression>
 #include <QVariant>
 #include <QMetaEnum>
+#include <QSqlQuery>
+#include "../Server/kerrors.h"
+
+Equipment::Equipment(int equipId)
+    : equipRegId(equipId){
+    QStringList supportedLangs = {"ja_JP", "zh_CN", "en_US"};
+
+    for(auto &lang: supportedLangs) {
+        QSqlQuery query;
+        query.prepare(
+            "SELECT "+lang+" FROM EquipName "
+                               "WHERE EquipID = :id;");
+        query.bindValue(":id", equipId);
+        if(!query.exec() || !query.isSelect()) {
+            throw DBError(qtTrId("equip-local-name-lack"),
+                          query.lastError());
+            qCritical() << query.lastError();
+        }
+        else if(query.first()) {
+            localNames[lang] = query.value(0).toString();
+        }
+    }
+
+    QSqlQuery query;
+    query.prepare(
+        "SELECT Intvalue FROM EquipReg "
+        "WHERE EquipID = :id AND Attribute = 'equiptype'");
+    query.bindValue(":id", equipId);
+    if(!query.exec() || !query.isSelect()) {
+        throw DBError(qtTrId("equip-type-lack"),
+                      query.lastError());
+        qCritical() << query.lastError();
+    }
+    else if(query.first()) {
+        type = EquipType(query.value(0).toInt());
+    }
+    QSqlQuery query2;
+    query.prepare(
+        "SELECT Intvalue FROM EquipReg "
+        "WHERE EquipID = :id AND Attribute != 'equiptype'");
+    query.bindValue(":id", equipId);
+    if(!query.exec() || !query.isSelect()) {
+        throw DBError(qtTrId("equip-attr-lack"),
+                      query.lastError());
+        qCritical() << query.lastError();
+    }
+    else if(query.first()) {
+        type = EquipType(query.value(0).toInt());
+    }
+}
 /*
 EquipType::EquipType(const QString &basis) {
 

@@ -1,8 +1,17 @@
 #include "equiptype.h"
 
 EquipType::EquipType()
-{
+    : internalRep(0) {
 
+}
+
+EquipType::EquipType(int type)
+    : internalRep(type) {
+
+}
+
+EquipType::EquipType(QString type) {
+    internalRep = strToIntRep(type);
 }
 
 const QString EquipType::intToStrRep(int input) {

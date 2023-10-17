@@ -125,7 +125,8 @@ const QString equipReg = QStringLiteral(
     "CREATE TABLE EquipReg ( "
     "EquipID INTEGER, "
     "Attribute TEXT NOT NULL, "
-    "Intvalue INTEGER DEFAULT 0"
+    "Intvalue INTEGER DEFAULT 0,"
+    "CONSTRAINT noduplicate UNIQUE(EquipID, Attribute)"
     ");"
     );
 
@@ -199,10 +200,10 @@ const QString userE = QStringLiteral(
     "EquipSerial INTEGER, "
     "EquipDef INTEGER, "
     "Star INTEGER, "
-    "FOREIGN KEY(User) REFERENCES Users(UserID), "
-    "FOREIGN KEY(EquipDef) REFERENCES Equip(EquipID), "
+    "FOREIGN KEY(User) REFERENCES NewUsers(UserID), "
+    "FOREIGN KEY(EquipDef) REFERENCES EquipReg(EquipID), "
     "CONSTRAINT noduplicate UNIQUE(User, EquipSerial), "
-    "CONSTRAINT Star_Valid CHECK (Star >= 0 AND Star < 16)"
+    "CONSTRAINT Star_Valid CHECK (Star >= 0 AND Star < 11)"
     ");"
     );
 
@@ -216,6 +217,9 @@ Server::Server(int argc, char ** argv) : CommandLine(argc, argv) {
 
 Server::~Server() noexcept {
     shutdown();
+    for(auto equip: std::as_const(equipRegistry)) {
+        delete equip;
+    }
 }
 
 void Server::datagramReceived(const PeerInfo &peerInfo,
@@ -265,8 +269,8 @@ bool Server::listen(const QHostAddress &address, quint16 port) {
         if (!listening)
             qCritical () << sslServer.errorString();
         else {
-
             sqlinit();
+            equipmentRefresh();
         }
     } else {
         listening = true;
@@ -597,10 +601,8 @@ void Server::doFetch(CSteamID &uid, int factoryid, QSslSocket *connection) {
     }
 }
 
-/* deprecated */
 bool Server::equipmentRefresh()
 {
-    /*
     QSqlDatabase db = QSqlDatabase::database();
     if(!db.isValid()) {
         //% "Database uninitialized!"
@@ -608,7 +610,7 @@ bool Server::equipmentRefresh()
         return false;
     }
     QSqlQuery query;
-    query.prepare("SELECT * FROM Equip;");
+    query.prepare("SELECT * FROM EquipReg;");
     if(!query.exec()) {
         //% "Load equipment table failed!"
         throw DBError(qtTrId("equip-refresh-failed"),
@@ -617,60 +619,16 @@ bool Server::equipmentRefresh()
     }
     query.isSelect();
     QSqlRecord rec = query.record();
-    QStringList fieldnames;
-    for(int i = 0; i < rec.count(); ++i) {
-        fieldnames.append(rec.fieldName(i));
-    }
-    QRegularExpression reid("EquipID",
-                            QRegularExpression::CaseInsensitiveOption);
-    QRegularExpression rename("Equipname",
-                              QRegularExpression::CaseInsensitiveOption);
-    QRegularExpression retype("Equiptype",
-                              QRegularExpression::CaseInsensitiveOption);
-    int indexid = fieldnames.indexOf(reid);
-    int indexname = fieldnames.indexOf(rename);
-    int indextype = fieldnames.indexOf(retype);
-    QList<int> indexcustoms;
-    for(int i = 0; i < rec.count(); ++i) {
-        if(fieldnames[i].startsWith("Custom", Qt::CaseInsensitive))
-            indexcustoms.append(i);
-    }
-    QMetaEnum info = QMetaEnum::fromType<EquipDef::AttrType>();
+    int idCol = rec.indexOf("EquipID");
     while(query.next()) {
-        QStringList customFlags;
-        QMap<EquipDef::AttrType, int> attr;
-        for(int i = 0; i < rec.count(); ++i) {
-            if(i == indexid || i == indexname || i == indextype) {
-                continue;
-            }
-            if(indexcustoms.contains(i)) {
-                customFlags.append(query.value(i).toString());
-            }
-            else {
-                QString fieldname = fieldnames[i];
-                int attrvalue = info.keyToValue(
-                    fieldname.toLatin1().constData());
-                if(attrvalue == -1) {
-                    //% "Unexpected attribute of equipment: %1"
-                    throw DBError(qtTrId("equip-unexpected-attr")
-                                      .arg(fieldname),
-                                  query.lastError());
-                }
-                else {
-                    attr[(EquipDef::AttrType)attrvalue]
-                        = query.value(i).toInt();
-                }
-            }
-        }
-        QPointer<EquipDef> e(new EquipDef(query.value(indexid).toInt(),
-                                          query.value(indexname).toString(),
-                                          query.value(indextype).toString(),
-                                          std::move(attr),
-                                          std::move(customFlags)
-                                          ));
-        equipRegistry[query.value(indexid).toInt()] = e;
+        openEquips.insert(query.value(idCol).toInt());
     }
-*/
+    equipRegistry.clear();
+    for(auto equipID : std::as_const(openEquips)) {
+        equipRegistry[equipID] = new Equipment(equipID);
+    }
+    //% "Load equipment registry success!"
+    qInfo() << qtTrId("equip-load-good");
     return true;
 }
 
@@ -766,6 +724,7 @@ bool Server::importEquipFromCSV() {
     QTextStream textStream(csvFile);
     QString title = textStream.readLine();
     QStringList titleParts = title.split(",");
+    int importedEquips = 0;
     while(!textStream.atEnd()) {
         QString text = textStream.readLine();
         if(text.startsWith(","))
@@ -838,14 +797,17 @@ bool Server::importEquipFromCSV() {
                     }
                 }
             }
-            qDebug() << lineParts[1];
+            importedEquips++;
+            if(importedEquips % 10 == 0)
+                qDebug() << QString("Imported %1 equipment(s)")
+                                .arg(importedEquips);
         }
     }
     csvFile->close();
     //% "Import equipment registry success!"
-    qInfo() << qtTrId("equip-import-good");/*
+    qInfo() << qtTrId("equip-import-good");
     equipmentRefresh();
-    */
+
     return true;
 }
 
@@ -880,7 +842,7 @@ void Server::parseListen(const QStringList &cmdParts) {
         return;
     }
     conf.setLocalCertificate(certs.at(0));
-    /* THIS IS NOT SAFE! */
+    /* Of course, private key is not shipped with the project. */
     QFile keyFile(settings->value("cert/serverkey",
                                   "serverprivate.key").toString());
     if(!keyFile.open(QIODevice::ReadOnly)) {
@@ -1043,6 +1005,10 @@ void Server::receivedAuth(const QJsonObject &djson,
                     receivedForceLogout(steamID);
                 }
                 receivedLogin(steamID, peerInfo, connection);
+                if(User::isSuperUser(steamID)) {
+                    qWarning() << QString("Superuser login: %1").
+                                  arg(idnum).toUtf8();
+                }
                 delete [] rgubTicket;
                 return;
             }
@@ -1171,6 +1137,15 @@ void Server::receivedReq(const QJsonObject &djson,
                     break;
                 }
                 break;
+            case KP::CommandType::AdminAddEquip: {
+                int equipid = djson["equipid"].toInt();
+                if(!User::isSuperUser(uid)) {
+                    QByteArray msg = KP::accessDenied();
+                }
+                else {
+                    User::newEquip(uid, equipid);
+                }
+            }
             case KP::CommandType::Develop: {
                 int equipid = djson["equipid"].toInt();
                 doDevelop(uid, equipid, djson["factory"].toInt(), connection);

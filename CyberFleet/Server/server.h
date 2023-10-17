@@ -126,9 +126,8 @@ private:
     QMap<QSslSocket *, CSteamID> connectedUsers;
     QMap<CSteamID, QSslSocket *> connectedPeers;
 
-    QJsonObject equipRegistryJ;
-    /* ↓deprecated */
-    //QMap<int, QPointer<EquipDef>> equipRegistry;
+    QSet<int> openEquips;
+    QMap<int, Equipment *> equipRegistry;
 
     std::random_device random;
     std::mt19937 mt;

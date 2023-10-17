@@ -56,6 +56,14 @@ QByteArray KP::catbomb() {
     return QCborValue::fromJsonValue(result).toCbor();
 }
 
+QByteArray KP::clientAddEquip(int equipid) {
+    QJsonObject result;
+    result["type"] = DgramType::Request;
+    result["command"] = CommandType::AdminAddEquip;
+    result["equipid"] = equipid;
+    return QCborValue::fromJsonValue(result).toCbor();
+}
+
 QByteArray KP::clientDevelop(int equipid, bool convert, int factoryID) {
     QJsonObject result;
     result["type"] = DgramType::Request;
