@@ -8,7 +8,7 @@ set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Core Gui Widgets LinguistTools
@@ -63,6 +63,8 @@ set(SERVER_SOURCES
     Server/server.h
     Server/sslserver.cpp
     Server/sslserver.h
+    Server/tech.cpp
+    Server/tech.h
     Server/user.cpp
     Server/user.h
     ${TS_FILES}
@@ -107,6 +109,8 @@ qt_add_executable(CFServer
     ${SERVER_SOURCES}
     common.qrc
     Server/qconsolelistener.cpp Server/qconsolelistener.h
+    Server/tech.cpp Server/tech.h
+
 )
 if (${CMAKE_SYSTEM_NAME} MATCHES "Windows")
     find_library(STEAM_LIBRARY steam_api64 HINTS redistributable_bin/win64)

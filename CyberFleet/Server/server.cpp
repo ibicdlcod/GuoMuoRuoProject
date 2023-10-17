@@ -51,11 +51,12 @@
 #include <QThread>
 #include <algorithm>
 #include "../steam/steamencryptedappticket.h"
-#include "kerrors.h"
+#include "../Protocol/equiptype.h"
 #include "../Protocol/kp.h"
+#include "kerrors.h"
 #include "peerinfo.h"
 #include "sslserver.h"
-#include "../Protocol/equiptype.h"
+#include "tech.h"
 
 #ifdef max
 #undef max // apparently some stupid win header interferes with std::max
