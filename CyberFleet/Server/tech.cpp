@@ -28,6 +28,17 @@ bool Tech::calExperiment(const double wantedTech,
     return random_double <= currentTech;
 }
 
+bool Tech::calExperiment2(const double wantedTech,
+                          const double globalTech,
+                          const double localTech,
+                          const double sigmaConstant,
+                          std::mt19937 &generator) {
+    return calExperiment(wantedTech,
+                         calCapable(globalTech, localTech, wantedTech),
+                         sigmaConstant,
+                         generator);
+}
+
 double Tech::calLevel(const QMap<double, double> &source,
                       const double scopeConstant) {
     /* Note QMap always orders by key, as opposed to QHash */
@@ -57,8 +68,19 @@ double Tech::calLevel(const QMap<double, double> &source,
     return result;
 }
 
+double Tech::calLevelGlobal(const QMap<double, double> &source) {
+    static const double globalScope = 1.02;
+    return calLevel(source, globalScope);
+}
+
+double Tech::calLevelLocal(const QMap<double, double> &source) {
+    static const double localScope = 1.1;
+    return calLevel(source, localScope);
+}
+
 double Tech::calWeightShip(int level) {
-    return level / 10.0;
+    static const double shipLevelPerWeight = 10.0;
+    return level / shipLevelPerWeight;
 }
 
 double calWeightEquip(double requiredSP, double actualSP) {

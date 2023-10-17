@@ -77,7 +77,8 @@ Q_ENUM_NS(MsgType)
 enum GameState{
     Offline,
     Port,
-    Factory
+    Factory,
+    TechView
 };
 Q_ENUM_NS(GameState)
 
