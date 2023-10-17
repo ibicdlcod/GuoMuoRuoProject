@@ -30,8 +30,9 @@ where x is [actual skill points]/[required skill points].
 
 We will deal with skill points later.
 
-## Bonuses and penalties
+## Bonuses and penalties 
 
+When developing/constructing the success rate would be:
 $$
 successrate=\int_{t_{wanted}-t_{current}}^{\infty}\frac{1}{\sigma\sqrt{2\pi}}e^{-\frac{1}{2}(\frac{x}{\sigma})^2}dx
 $$
@@ -48,7 +49,7 @@ All Kanmusu and equipment will count toward the calculation.
 
 For ships: All ships of the same class and all equipment she can handle will count toward the calculation.
 
-For equipment: All equipment of this exact type and [its precedent and all children on the technology tree], and [all Kanmusu it is particularly suited to] will count toward the calculation. The two concepts will be dealt later.
+For equipment: All equipment of this exact type and [its "father" and all paternal children on the technology tree], and [all Kanmusu it is particularly suited to] will count toward the calculation. The two concepts will be dealt later.
 
 An equipment that does not have a predecessor will have it's local technology not counted when developing.
 
@@ -60,7 +61,7 @@ $$
 $$
 be applied on global technology (the reverse is also true)
 
-c: Difference of global and local (may subject to change)
+c: 3
 
 ## How characteristic tech level are determined
 
@@ -83,7 +84,7 @@ Generally (variations may exist):
 |                  1933                  |     4      |
 |                  1934                  |    4.5     |
 |                  1935                  |     5      |
-|                  1936                  |    5.5\    |
+|                  1936                  |    5.5     |
 |                  1937                  |     6      |
 |                  1938                  |    6.5     |
 |                  1939                  |     7      |

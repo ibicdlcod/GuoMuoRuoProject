@@ -12,6 +12,23 @@ public:
     static int strToIntRep(QString);
     static const QString intToStrRep(int);
 
+    static int getSize(const int);
+    static bool isMainGun(const int);
+    static bool isSecGun(const int);
+    static bool isFlak(const int);
+    static bool isSurface(const int);
+    static bool isTorp(const int);
+    static bool isFighter(const int);
+    static bool isTorpBomber(const int);
+    static bool isDiveBomber(const int);
+    static bool isRecon(const int);
+    static bool isPatrol(const int);
+    static bool isLb(const int);
+    static bool isNight(const int);
+    static bool isSeaplane(const int);
+    static bool isRadar(const int);
+    static int getSpecial(const int);
+
 private:
     /* this is C++17 */
     inline static const QMap<QString, int> result = {
@@ -19,7 +36,7 @@ private:
         std::pair("Small-gun-flak",     0xA001),
         std::pair("Mid-gun-flat",       0x8002),
         std::pair("Mid-gun-flak",       0xA002),
-        std::pair("Mig-gun-flat-ca",    0x8003),
+        std::pair("Mid-gun-flat-ca",    0x8003),
         std::pair("Big-gun",            0x8004),
         std::pair("Superbig-gun",       0x8005),
         std::pair("Supremebig-gun",     0x8006),
@@ -67,7 +84,7 @@ private:
         std::pair("Landing-craft",      0x00090000),
         std::pair("Landing-tank",       0x000A0000),
         std::pair("Drum",               0x000B0000),
-        std::pair("TP-material",        0x000C0000),
+        std::pair("Tp-material",        0x000C0000),
         std::pair("Radar-small-flak",   0x2001),
         std::pair("Radar-small-flat",   0x1001),
         std::pair("Radar-small-dual",   0x3001),

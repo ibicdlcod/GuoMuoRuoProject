@@ -123,9 +123,19 @@ const QString userA = QStringLiteral(
 /* Equipment registry */
 const QString equipReg = QStringLiteral(
     "CREATE TABLE EquipReg ( "
-    "EquipID INTEGER PRIMARY KEY, "
+    "EquipID INTEGER, "
     "Attribute TEXT NOT NULL, "
     "Intvalue INTEGER DEFAULT 0"
+    ");"
+    );
+
+/* Equipment name table */
+const QString equipName = QStringLiteral(
+    "CREATE TABLE EquipName ( "
+    "EquipID INTEGER PRIMARY KEY, "
+    "ja_JP TEXT, "
+    "zh_CN TEXT, "
+    "en_US TEXT"
     ");"
     );
 
@@ -739,6 +749,12 @@ const QStringList Server::getValidCommands() const {
 }
 
 bool Server::importEquipFromCSV() {
+    QSqlDatabase db = QSqlDatabase::database();
+    if(!db.isValid()) {
+        throw DBError(qtTrId("database-uninit"));
+        return false;
+    }
+
     QString csvFileName = settings->value("server/equip_reg_csv", "Equip.csv").toString();
     QFile *csvFile = new QFile(csvFileName);
     if(Q_UNLIKELY(!csvFile) || !csvFile->open(QIODevice::ReadOnly)) {
@@ -746,68 +762,88 @@ bool Server::importEquipFromCSV() {
         qCritical() << qtTrId("bad-csv").arg(csvFileName);
         return false;
     }
+
     QTextStream textStream(csvFile);
     QString title = textStream.readLine();
+    QStringList titleParts = title.split(",");
     while(!textStream.atEnd()) {
         QString text = textStream.readLine();
         if(text.startsWith(","))
             continue;
         else {
             QStringList lineParts = text.split(",");
-            if(lineParts.size() < 4)
+            int equipid = lineParts[0].toInt();
+            if(lineParts.size() < 7)
                 qCritical("incomplete equip type definition");
             else {
                 int type = EquipType::strToIntRep(lineParts[3]);
                 if(type == 0 && !lineParts[1].isEmpty()) {
-                    qWarning() << lineParts[0] << "\t" << lineParts[3];
+                    qWarning() << lineParts[0]
+                               << "\tUnsupported type: " << lineParts[3];
+                }
+                for(int i = 0; i < titleParts.length(); ++i) {
+                    if(i == 1) {
+                        QString lang = titleParts[i];
+                        QString content = lineParts[i];
+
+                        QSqlQuery query;
+                        query.prepare(
+                            "REPLACE INTO EquipName "
+                            "(EquipID, "+lang+") "
+                            "VALUES (:id, :value);");
+                        query.bindValue(":id", equipid);
+                        query.bindValue(":value",
+                                        lineParts[i]);
+                        if(!query.exec()) {
+                            //% "Import equipment database failed!"
+                            throw DBError(qtTrId("equip-import-failed"),
+                                          query.lastError());
+                            qCritical() << query.lastError();
+                            return false;
+                        }
+                    }
+                    else if(titleParts[i] == "equiptype") {
+                        QSqlQuery query;
+                        query.prepare(
+                            "REPLACE INTO EquipReg "
+                            "(EquipID, Attribute, Intvalue) "
+                            "VALUES (:id, :attr, :value);");
+                        query.bindValue(":id", equipid);
+                        query.bindValue(":attr", titleParts[i]);
+                        query.bindValue(":value",
+                                        EquipType::strToIntRep(lineParts[i]));
+                        if(!query.exec()) {
+                            //% "Import equipment database failed!"
+                            throw DBError(qtTrId("equip-import-failed"),
+                                          query.lastError());
+                            qCritical() << query.lastError();
+                            return false;
+                        }
+                    }
+                    else if(i > 3){
+                        QSqlQuery query;
+                        query.prepare("REPLACE INTO EquipReg "
+                                      "(EquipID, Attribute, Intvalue) "
+                                      "VALUES (:id, :attr, :value);");
+                        query.bindValue(":id", equipid);
+                        query.bindValue(":attr", titleParts[i]);
+                        query.bindValue(":value", lineParts[i].toInt());
+                        if(!query.exec()) {
+                            //% "Import equipment database failed!"
+                            throw DBError(qtTrId("equip-import-failed"),
+                                          query.lastError());
+                            qCritical() << query.lastError();
+                            return false;
+                        }
+                    }
                 }
             }
-        }
-    }
-    /*
-    QSqlDatabase db = QSqlDatabase::database();
-    if(!db.isValid()) {
-        throw DBError(qtTrId("database-uninit"));
-        return false;
-    }
-    QString title = textStream.readLine();
-    if(title.endsWith(","))
-        title.chop(1);
-    QStringList titleParts = title.split(",");
-    while(!textStream.atEnd()) {
-        QString data = textStream.readLine();
-        QStringList dataParts = data.split(",");
-        dataParts = dataParts.first(titleParts.length());
-        QString dataNew;
-        for(const QString &dataPiece: dataParts) {
-            if(dataPiece.length() == 0)
-                dataNew.append("NULL");
-            else {
-                bool success;
-                dataPiece.toInt(&success, 0);
-                if(!success)
-                    dataNew.append("'"+dataPiece+"'");
-                else
-                    dataNew.append(dataPiece);
-            }
-            dataNew.append(",");
-        }
-        if(dataNew.endsWith(","))
-            dataNew.chop(1);
-        QSqlQuery query;
-        // TODO: properly use prepared statements
-        query.prepare("REPLACE INTO Equip ("+title+") VALUES ("+dataNew+");");
-        if(!query.exec()) {
-            //% "Import equipment database failed!"
-            throw DBError(qtTrId("equip-import-failed"),
-                          query.lastError());
-            qCritical() << query.lastError();
-            return false;
+            qDebug() << lineParts[1];
         }
     }
     csvFile->close();
     //% "Import equipment registry success!"
-    qInfo() << qtTrId("equip-import-good");
+    qInfo() << qtTrId("equip-import-good");/*
     equipmentRefresh();
     */
     return true;
@@ -1014,7 +1050,6 @@ void Server::receivedAuth(const QJsonObject &djson,
         return;
     }
     else if(djson["command"].toInt() == KP::CommandType::SteamLogout) {
-        /* TODO: UNFINISHED, should send logout message */
         QByteArray msg = KP::serverLogout(KP::LogoutSuccess);
         connection->write(msg);
         connection->flush();
@@ -1040,6 +1075,7 @@ void Server::receivedAuth(const QJsonObject &djson,
         }
     }
 }
+
 void Server::receivedForceLogout(CSteamID &uid) {
     QSslSocket *client = connectedPeers[uid];
     if(client->isEncrypted()) {
@@ -1312,19 +1348,18 @@ void Server::sqlinit() {
         if(!tables.contains("UserAttr")) {
             sqlinitUserA();
         }
-        //sqlcheckUsers();
         if(!tables.contains("EquipReg")) {
             sqlinitEquip();
         }
-        sqlcheckEquip();
+        if(!tables.contains("EquipName")) {
+            sqlinitEquipName();
+        }
         if(!tables.contains("Factories")) {
             sqlinitFacto();
         }
-        sqlcheckFacto();
         if(!tables.contains("UserEquip")) {
             sqlinitEquipU();
         }
-        sqlcheckEquipU();
     }
 }
 
@@ -1333,6 +1368,18 @@ void Server::sqlinitEquip() {
     qWarning() << qtTrId("equip-db-lack");
     QSqlQuery query;
     query.prepare(equipReg);
+    if(!query.exec()) {
+        //% "Create Equipment database failed."
+        throw DBError(qtTrId("equip-db-gen-failure"),
+                      query.lastError());
+    }
+}
+
+void Server::sqlinitEquipName() {
+    //% "Equipment name database does not exist, creating..."
+    qWarning() << qtTrId("equip-name-db-lack");
+    QSqlQuery query;
+    query.prepare(equipName);
     if(!query.exec()) {
         //% "Create Equipment database failed."
         throw DBError(qtTrId("equip-db-gen-failure"),
