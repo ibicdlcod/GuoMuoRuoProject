@@ -216,9 +216,8 @@ void User::refreshFactory(CSteamID &uid) {
     QSqlDatabase db = QSqlDatabase::database();
     QSqlQuery query;
     query.prepare("UPDATE Factories "
-                  "SET Done = (datetime('now') > SuccessTime), "
-                  "Success = (FullTime == SuccessTime) "
-                  "WHERE User = :id");
+                  "SET Done = (datetime('now') > SuccessTime) "
+                  "WHERE UserID = :id");
     query.bindValue(":id", uid.ConvertToUint64());
     if(Q_UNLIKELY(!query.exec())){
         //% "User ID %1: DB failure when refreshing factory"

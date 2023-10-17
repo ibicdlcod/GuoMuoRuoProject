@@ -141,57 +141,17 @@ const QString equipName = QStringLiteral(
     ");"
     );
 
-const QString equipU = QStringLiteral(
-    "CREATE TABLE Equip ( "
-    "EquipID INTEGER PRIMARY KEY, "
-    "Equipname VARCHAR(63), "
-    "Equiptype VARCHAR(63), "
-    "Rarity INTEGER, "
-    "Intricacy INTEGER, "
-    "Tenacity INTEGER, "
-    "Firepower INTEGER, "
-    "Armorpenetration INTEGER, "
-    "Firingrange INTEGER, "
-    "Firingspeed INTEGER, "
-    "Torpedo INTEGER, "
-    "Bombing INTEGER, "
-    "Landattack INTEGER, "
-    "Airattack INTEGER, "
-    "Interception INTEGER, "
-    "Antibomber INTEGER, "
-    "Asw INTEGER, "
-    "Los INTEGER, "
-    "Accuracy INTEGER, "
-    "Evasion INTEGER, "
-    "Armor INTEGER, "
-    "Transport INTEGER, "
-    "Flightrange INTEGER, "
-    "Require INTEGER, "
-    "Require2 INTEGER, "
-    "Developenabled INTEGER, "
-    "Convertenabled INTEGER, "
-    "Requirenum INTEGER, "
-    "Require2num INTEGER, "
-    "Industrialsilver INTEGER, "
-    "Industrialgold INTEGER, "
-    "Customflag1 VARCHAR(63), "
-    "Customflag2 VARCHAR(63), "
-    "Customflag3 VARCHAR(63) "
-    ");"
-    );
-
 const QString userF = QStringLiteral(
     "CREATE TABLE Factories ("
-    "User INTEGER,"
+    "UserID BLOB,"
     "FactoryID INTEGER,"
     "CurrentJob INTEGER DEFAULT 0,"
     "StartTime TEXT, "
-    "FullTime TEXT, "
     "SuccessTime TEXT,"
-    "Done BOOL,"
-    "Success BOOL,"
-    "FOREIGN KEY(User) REFERENCES Users(UserID),"
-    "CONSTRAINT noduplicate UNIQUE(User, FactoryID)"
+    "Done BOOL DEFAULT false,"
+    "Success BOOL DEFAULT false,"
+    "FOREIGN KEY(UserID) REFERENCES NewUsers(UserID),"
+    "CONSTRAINT noduplicate UNIQUE(UserID, FactoryID)"
     ");"
     );
 
@@ -750,7 +710,7 @@ bool Server::importEquipFromCSV() {
                         query.prepare(
                             "REPLACE INTO EquipName "
                             "(EquipID, "+lang+") "
-                            "VALUES (:id, :value);");
+                                     "VALUES (:id, :value);");
                         query.bindValue(":id", equipid);
                         query.bindValue(":value",
                                         lineParts[i]);
@@ -962,7 +922,7 @@ void Server::receivedAuth(const QJsonObject &djson,
                     rgubDecrypted,
                     cubDecrypted, 2632870)) {
                 qCritical() << qtTrId("%1: Ticket is not from correct App ID")
-                              .arg(peerInfo.toString()).toUtf8();
+                                   .arg(peerInfo.toString()).toUtf8();
                 QByteArray msg = KP::serverLogFail(KP::TicketIsntFromCorrectAppID);
                 connection->write(msg);
                 delete [] rgubTicket;
@@ -979,7 +939,7 @@ void Server::receivedAuth(const QJsonObject &djson,
             qInfo() << qtTrId("Elapsed: %1 second(s)").arg(elapsed).toUtf8();
             if(elapsed > elapsedMaxTolerence) {
                 qCritical() << qtTrId("%1: Request timeout")
-                              .arg(peerInfo.toString()).toUtf8();
+                                   .arg(peerInfo.toString()).toUtf8();
                 QByteArray msg = KP::serverLogFail(KP::RequestTimeout);
                 connection->write(msg);
                 delete [] rgubTicket;
@@ -992,7 +952,7 @@ void Server::receivedAuth(const QJsonObject &djson,
                 &steamID);
             if(steamID == k_steamIDNil) {
                 qCritical() << qtTrId("%1: Steam ID invalid")
-                              .arg(peerInfo.toString()).toUtf8();
+                                   .arg(peerInfo.toString()).toUtf8();
                 QByteArray msg = KP::serverLogFail(KP::SteamIdInvalid);
                 connection->write(msg);
                 delete [] rgubTicket;
@@ -1119,59 +1079,61 @@ void Server::receivedLogout(CSteamID &uid,
 void Server::receivedReq(const QJsonObject &djson,
                          const PeerInfo &peerInfo,
                          QSslSocket *connection) {
-    /* TODO: this is inefficient */
-    for(auto begin = connectedPeers.keyValueBegin(),
-         end = connectedPeers.keyValueEnd();
-         begin != end; begin++){
-        if(begin->second == connection) {
-            CSteamID uid = begin->first;
-            QByteArray msg;
-            switch(djson["command"].toInt()) {
-            case KP::CommandType::ChangeState:
-                switch(djson["state"].toInt()) {
-                /* TODO: Should update to client as well? */
-                case KP::GameState::Port: User::refreshPort(uid); break;
-                case KP::GameState::Factory: User::refreshFactory(uid);
-                    refreshClientFactory(uid, connection); break;
-                default:
-                    throw std::domain_error("command type not supported");
-                    break;
-                }
-                break;
-            case KP::CommandType::AdminAddEquip: {
-                int equipid = djson["equipid"].toInt();
-                if(!User::isSuperUser(uid)) {
-                    QByteArray msg = KP::accessDenied();
-                }
-                else {
-                    User::newEquip(uid, equipid);
-                }
-            }
-            case KP::CommandType::Develop: {
-                int equipid = djson["equipid"].toInt();
-                doDevelop(uid, equipid, djson["factory"].toInt(), connection);
-            }
+    if(!connectedUsers.contains(connection)) {
+        qWarning() << qtTrId("Connection-not-properly-online");
+        return;
+    }
+    CSteamID uid = connectedUsers[connection];
+    if(!uid.IsValid()) {
+        qWarning() << qtTrId("Invalid-uid: %1")
+                          .arg(uid.ConvertToUint64());
+        return;
+    }
+    QByteArray msg;
+    switch(djson["command"].toInt()) {
+    case KP::CommandType::ChangeState:
+        switch(djson["state"].toInt()) {
+        /* TODO: Should update to client as well? */
+        case KP::GameState::Port: User::refreshPort(uid); break;
+        case KP::GameState::Factory: User::refreshFactory(uid);
+            refreshClientFactory(uid, connection); break;
+        default:
+            throw std::domain_error("command type not supported");
             break;
-            case KP::CommandType::Fetch:
-                doFetch(uid, djson["factory"].toInt(), connection);
-                break;
-            case KP::CommandType::Refresh:
-                switch(djson["view"].toInt()) {
-                case KP::GameState::Factory: refreshClientFactory
-                        (uid, connection); break;
-                default:
-                    throw std::domain_error("command type not supported");
-                    break;
-                }
-                break;
-            default:
-                throw std::domain_error("command type not supported"); break;
-            }
-            return;
+        }
+        break;
+    case KP::CommandType::AdminAddEquip: {
+        int equipid = djson["equipid"].toInt();
+        if(!User::isSuperUser(uid)) {
+            QByteArray msg = KP::accessDenied();
+        }
+        else {
+            User::newEquip(uid, equipid);
         }
     }
-    QByteArray msg = KP::accessDenied();
-    connection->write(msg);
+    case KP::CommandType::Develop: {
+        int equipid = djson["equipid"].toInt();
+        doDevelop(uid, equipid, djson["factory"].toInt(), connection);
+    }
+    break;
+    case KP::CommandType::Fetch:
+        doFetch(uid, djson["factory"].toInt(), connection);
+        break;
+    case KP::CommandType::Refresh:
+        switch(djson["view"].toInt()) {
+        case KP::GameState::Factory: refreshClientFactory
+                (uid, connection); break;
+        default:
+            throw std::domain_error("command type not supported");
+            break;
+        }
+        break;
+    default:
+        throw std::domain_error("command type not supported"); break;
+    }
+    return;
+    QByteArray msg2 = KP::accessDenied();
+    connection->write(msg2);
 }
 
 void Server::refreshClientFactory(CSteamID &uid, QSslSocket *connection) {
@@ -1412,6 +1374,7 @@ void Server::sqlinitNewUsers() const {
 }
 
 void Server::userInit(CSteamID &uid) {
+    qDebug() << "New User, id: " << uid.ConvertToUint64();
     static const QMap<QString, int> defaults
         = {
             std::pair(QStringLiteral("FleetSize"), 1),
@@ -1458,6 +1421,22 @@ void Server::userInit(CSteamID &uid) {
                       arg(uid.ConvertToUint64()),
                       insert.lastError());
         return;
+    }
+    for(int i = 0; i < 4; ++i) {
+        QSqlQuery factoryNew;
+        if(!factoryNew.prepare("INSERT INTO Factories "
+                                "(UserID, FactoryID) "
+                                "VALUES (:uid, :facto);")) {
+            qWarning() << factoryNew.lastError().databaseText();
+        }
+        insert.bindValue(":uid", uid.ConvertToUint64());
+        insert.bindValue(":facto", i);
+        if(!insert.exec()) {
+            throw DBError(qtTrId("user-factory-init-fail").
+                          arg(uid.ConvertToUint64()),
+                          insert.lastError());
+            return;
+        }
     }
 }
 
