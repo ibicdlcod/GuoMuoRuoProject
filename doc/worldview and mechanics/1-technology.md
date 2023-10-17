@@ -24,9 +24,9 @@ A Kanmusu's weight when calculating its technology is its [level]/10.
 
 An equipment's weight when calculating its technology is
 $$
-\frac{9x}{\sqrt{1+x^2}}+1
+\frac{9y}{\sqrt{x^2+y^2}}+1
 $$
-where x is [actual skill points]/[required skill points].
+where y is [actual skill points], x is [required skill points].
 
 We will deal with skill points later.
 
