@@ -379,7 +379,12 @@ void Server::handleNewConnection(){
 }
 
 void Server::offerEquipInfo(QSslSocket *connection, int index = 0) {
+/* warning: large batch size causes problems */
+#if defined (Q_OS_WIN)
     static const int batch = 50;
+#else
+    static const int batch = 10;
+#endif
 
     QJsonArray equipInfos;
     int i = 0;
