@@ -15,11 +15,11 @@ public:
     explicit DevelopWindow(QWidget *parent = nullptr);
     ~DevelopWindow();
 
-    int EquipIdDesired();
+    int equipIdDesired();
 
 signals:
 
-private slots:
+public slots:
     void resetListName(int);
 
 private:

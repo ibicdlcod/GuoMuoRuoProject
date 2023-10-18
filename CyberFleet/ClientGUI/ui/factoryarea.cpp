@@ -56,7 +56,7 @@ void FactoryArea::developClicked(bool checked, int slotnum) {
     else {
         Clientv2 &engine = Clientv2::getInstance();
         QString msg = QStringLiteral("develop %1 %2")
-                          .arg(w.EquipIdDesired()).arg(slotnum);
+                          .arg(w.equipIdDesired()).arg(slotnum);
         qDebug() << msg;
         engine.parse(msg);
     }

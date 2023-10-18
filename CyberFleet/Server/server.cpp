@@ -380,19 +380,19 @@ void Server::handleNewConnection(){
 
 void Server::offerEquipInfo(QSslSocket *connection, int index = 0) {
     static const int batch = 50;
-    qDebug() << "Demandequipinfo";
 
     QJsonArray equipInfos;
     int i = 0;
     for(auto equipIdIter = equipRegistry.keyBegin();
          equipIdIter != equipRegistry.keyEnd();
          ++equipIdIter, ++i) {
-        std::advance(equipIdIter, index * batch);
-        if(i == batch) {/*
-            QTimer::singleShot(100, this,
+        if(i == 0)
+            std::advance(equipIdIter, index * batch);
+        if(i == batch) {
+            QTimer::singleShot(200, this,
                                [this, connection, index]{
                 offerEquipInfo(connection, index + 1);
-            });*/
+            });
             break;
         }
         auto equipid = *equipIdIter;
@@ -418,8 +418,7 @@ void Server::offerEquipInfo(QSslSocket *connection, int index = 0) {
     }
     connection->flush();
     QByteArray msg = KP::serverEquipInfo(equipInfos);
-    qDebug() << "SERVEREQUIPINFO";
-    qDebug() << connection->write(msg);
+    connection->write(msg);
     connection->flush();
 }
 

@@ -1058,7 +1058,12 @@ void Clientv2::updateEquipCache(const QJsonObject &input) {
     }
     QJsonArray equipDefs = input["content"].toArray();
     for(auto equipDef: equipDefs) {
-        QJsonObject equipDValue;
+        QJsonObject equipDValue = equipDef.toObject();
+        int eid = equipDValue.value("eid").toInt();
+        equipRegistryCache[eid] = new Equipment(equipDValue);
     }
-    qDebug() << "NUMBER:" << equipDefs.size();
+
+    qDebug() << qtTrId("Equipment cache length: %1")
+                    .arg(Clientv2::getInstance()
+                             .equipRegistryCache.size());
 }

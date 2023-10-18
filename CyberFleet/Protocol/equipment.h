@@ -14,10 +14,11 @@ class Equipment: public QObject {
 public:
     Equipment(int);
     Equipment(const QJsonObject &);
-    QString toString() const;
+    QString toString(QString) const;
     const ResOrd devResBase() const;
     bool canDevelop(CSteamID userid = k_steamIDNil) const;
     const ResOrd devRes() const;
+    int getId() const;
     int getTech() const;
 
     QMap<QString, QString> localNames;

@@ -60,15 +60,26 @@ Equipment::Equipment(const QJsonObject &input) {
     if(equipRegId == 0)
         return;
     QJsonObject lNames = input["name"].toObject();
-    for(auto iter = lNames.constBegin(); iter != lNames.constEnd(); ++iter)
-        localNames[iter->toString()] =
-            lNames.value(iter->toString()).toString();
+    for(auto &lang: lNames.keys()) {
+        localNames[lang] =
+            lNames.value(lang).toString();
+    }
     type = EquipType(input["type"].toString());
     QJsonObject attrs = input["attr"].toObject();
-    for(auto iter = attrs.constBegin(); iter != attrs.constEnd(); ++iter)
-        attr[iter->toString()] =
-            attrs.value(iter->toString()).toInt();
-}/*
+    for(auto &attrI: attrs.keys()) {
+        attr[attrI] =
+            attrs.value(attrI).toInt();
+    }
+}
+
+QString Equipment::toString(QString lang) const {
+    return localNames[lang];
+}
+
+int Equipment::getId() const {
+    return equipRegId;
+}
+/*
 EquipType::EquipType(const QString &basis) {
 
     static QRegularExpression rehex(

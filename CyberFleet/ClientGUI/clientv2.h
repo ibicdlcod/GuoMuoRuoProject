@@ -54,6 +54,7 @@
 #include "../Protocol/commandline.h"
 #include "../Protocol/equipment.h"
 #include "steamauth.h"
+#include "../ClientGUI/ui/developwindow.h"
 
 void customMessageHandler(QtMsgType,
                           const QMessageLogContext &,
@@ -79,6 +80,9 @@ public:
     };
     Q_ENUM(Password);
     bool loggedIn() const;
+
+    friend int DevelopWindow::equipIdDesired();
+    friend void DevelopWindow::resetListName(int);
 
 public slots:
     void autoPassword();
