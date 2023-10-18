@@ -104,69 +104,85 @@ uint8 charToInt(char data) {
 }
 
 /* User registery */
-const QString newUserT = QStringLiteral(
-    "CREATE TABLE NewUsers ( "
-    "UserID BLOB PRIMARY KEY, "
-    "UserType TEXT DEFAULT 'commoner'"
-    ");"
-    );
+Q_GLOBAL_STATIC(QString,
+                userT,
+                QStringLiteral(
+                    "CREATE TABLE NewUsers ( "
+                    "UserID BLOB PRIMARY KEY, "
+                    "UserType TEXT DEFAULT 'commoner'"
+                    ");"
+                    ));
 
 /* User-bound attributes */
-const QString userA = QStringLiteral(
-    "CREATE TABLE UserAttr ( "
-    "UserID BLOB NOT NULL, "
-    "Attribute TEXT NOT NULL, "
-    "Intvalue INTEGER DEFAULT 0, "
-    "FOREIGN KEY(UserID) REFERENCES NewUsers(UserID)"
-    ");"
-    );
+Q_GLOBAL_STATIC(QString,
+                userA,
+                QStringLiteral(
+                    "CREATE TABLE UserAttr ( "
+                    "UserID BLOB NOT NULL, "
+                    "Attribute TEXT NOT NULL, "
+                    "Intvalue INTEGER DEFAULT 0, "
+                    "FOREIGN KEY(UserID) REFERENCES NewUsers(UserID)"
+                    "CONSTRAINT noduplicate UNIQUE(UserID, Attribute)"
+                    ");"
+                    ));
 
 /* Equipment registry */
-const QString equipReg = QStringLiteral(
-    "CREATE TABLE EquipReg ( "
-    "EquipID INTEGER, "
-    "Attribute TEXT NOT NULL, "
-    "Intvalue INTEGER DEFAULT 0,"
-    "CONSTRAINT noduplicate UNIQUE(EquipID, Attribute)"
-    ");"
-    );
+Q_GLOBAL_STATIC(QString,
+                equipReg,
+                QStringLiteral(
+                    "CREATE TABLE EquipReg ( "
+                    "EquipID INTEGER, "
+                    "Attribute TEXT NOT NULL, "
+                    "Intvalue INTEGER DEFAULT 0,"
+                    "CONSTRAINT noduplicate UNIQUE(EquipID, Attribute)"
+                    ");"
+                    ));
 
 /* Equipment name table */
-const QString equipName = QStringLiteral(
-    "CREATE TABLE EquipName ( "
-    "EquipID INTEGER PRIMARY KEY, "
-    "ja_JP TEXT, "
-    "zh_CN TEXT, "
-    "en_US TEXT"
-    ");"
-    );
+Q_GLOBAL_STATIC(QString,
+                equipName,
+                QStringLiteral(
+                    "CREATE TABLE EquipName ( "
+                    "EquipID INTEGER PRIMARY KEY, "
+                    "ja_JP TEXT, "
+                    "zh_CN TEXT, "
+                    "en_US TEXT"
+                    ");"
+                    ));
 
-const QString userF = QStringLiteral(
-    "CREATE TABLE Factories ("
-    "UserID BLOB,"
-    "FactoryID INTEGER,"
-    "CurrentJob INTEGER DEFAULT 0,"
-    "StartTime TEXT, "
-    "SuccessTime TEXT,"
-    "Done BOOL DEFAULT false,"
-    "Success BOOL DEFAULT false,"
-    "FOREIGN KEY(UserID) REFERENCES NewUsers(UserID),"
-    "CONSTRAINT noduplicate UNIQUE(UserID, FactoryID)"
-    ");"
-    );
+/* Factory slots of users */
+Q_GLOBAL_STATIC(QString,
+                userF,
+                QStringLiteral(
+                    "CREATE TABLE Factories ("
+                    "UserID BLOB,"
+                    "FactoryID INTEGER,"
+                    "CurrentJob INTEGER DEFAULT 0,"
+                    "StartTime TEXT, "
+                    "SuccessTime TEXT,"
+                    "Done BOOL DEFAULT false,"
+                    "Success BOOL DEFAULT false,"
+                    "FOREIGN KEY(UserID) REFERENCES NewUsers(UserID),"
+                    "CONSTRAINT noduplicate UNIQUE(UserID, FactoryID)"
+                    ");"
+                    ));
 
-const QString userE = QStringLiteral(
-    "CREATE TABLE UserEquip ("
-    "User INTEGER, "
-    "EquipSerial INTEGER, "
-    "EquipDef INTEGER, "
-    "Star INTEGER, "
-    "FOREIGN KEY(User) REFERENCES NewUsers(UserID), "
-    "FOREIGN KEY(EquipDef) REFERENCES EquipReg(EquipID), "
-    "CONSTRAINT noduplicate UNIQUE(User, EquipSerial), "
-    "CONSTRAINT Star_Valid CHECK (Star >= 0 AND Star < 11)"
-    ");"
-    );
+
+/* Equipment of users */
+Q_GLOBAL_STATIC(QString,
+                userE,
+                QStringLiteral(
+                    "CREATE TABLE UserEquip ("
+                    "User INTEGER, "
+                    "EquipSerial INTEGER, "
+                    "EquipDef INTEGER, "
+                    "Star INTEGER, "
+                    "FOREIGN KEY(User) REFERENCES NewUsers(UserID), "
+                    "FOREIGN KEY(EquipDef) REFERENCES EquipReg(EquipID), "
+                    "CONSTRAINT noduplicate UNIQUE(User, EquipSerial), "
+                    "CONSTRAINT Star_Valid CHECK (Star >= 0 AND Star < 11)"
+                    ");"
+                    ));
 
 const int elapsedMaxTolerence = 30;
 }
@@ -1139,18 +1155,27 @@ void Server::receivedReq(const QJsonObject &djson,
 void Server::refreshClientFactory(CSteamID &uid, QSslSocket *connection) {
     QSqlDatabase db = QSqlDatabase::database();
     QSqlQuery query;
-    query.prepare("SELECT FactoryID, FullTime, Done FROM Factories "
-                  "WHERE User = :id");
+    query.prepare("SELECT FactoryID,"
+                  "StartTime,"
+                  "SuccessTime,"
+                  "Done, "
+                  "Success "
+                  "FROM Factories "
+                  "WHERE UserID = :id");
     query.bindValue(":id", uid.ConvertToUint64());
-    query.exec();
-    query.isSelect();
+    if(!query.exec() || !query.isSelect()) {
+        throw DBError(qtTrId("factory-state-error"), query.lastError());
+        return;
+    }
     QJsonObject result;
     QJsonArray itemArray;
     while(query.next()) {
         QJsonObject item;
         item["factoryid"] = query.value(0).toInt();
-        item["completetime"] = query.value(1).toDateTime().toString();
-        item["done"] = query.value(2).toBool();
+        item["starttime"] = query.value(1).toDateTime().toString();
+        item["completetime"] = query.value(2).toDateTime().toString();
+        item["done"] = query.value(3).toBool();
+        item["success"] = query.value(4).toBool();
         itemArray.append(item);
     }
     result["type"] = KP::DgramType::Info;
@@ -1305,7 +1330,7 @@ void Server::sqlinitEquip() {
     //% "Equipment database does not exist, creating..."
     qWarning() << qtTrId("equip-db-lack");
     QSqlQuery query;
-    query.prepare(equipReg);
+    query.prepare(*equipReg);
     if(!query.exec()) {
         //% "Create Equipment database failed."
         throw DBError(qtTrId("equip-db-gen-failure"),
@@ -1317,7 +1342,7 @@ void Server::sqlinitEquipName() {
     //% "Equipment name database does not exist, creating..."
     qWarning() << qtTrId("equip-name-db-lack");
     QSqlQuery query;
-    query.prepare(equipName);
+    query.prepare(*equipName);
     if(!query.exec()) {
         //% "Create Equipment database failed."
         throw DBError(qtTrId("equip-db-gen-failure"),
@@ -1329,7 +1354,7 @@ void Server::sqlinitEquipU() {
     //% "Equipment database for user does not exist, creating..."
     qWarning() << qtTrId("equip-db-user-lack");
     QSqlQuery query;
-    query.prepare(userE);
+    query.prepare(*userE);
     if(!query.exec()) {
         //% "Create Equipment database for user failed."
         throw DBError(qtTrId("equip-db-user-gen-failure"),
@@ -1341,7 +1366,7 @@ void Server::sqlinitFacto() {
     //% "Factory database does not exist, creating..."
     qWarning() << qtTrId("facto-db-lack");
     QSqlQuery query;
-    query.prepare(userF);
+    query.prepare(*userF);
     if(!query.exec()) {
         //% "Create Factory database failed."
         throw DBError(qtTrId("facto-db-gen-failure"),
@@ -1353,7 +1378,7 @@ void Server::sqlinitUserA() const {
     //% "User database does not exist, creating..."
     qWarning() << qtTrId("user-db-lack");
     QSqlQuery query;
-    query.prepare(userA);
+    query.prepare(*userA);
     if(!query.exec()) {
         //% "Create User database failed."
         throw DBError(qtTrId("user-db-gen-failure"),
@@ -1365,7 +1390,7 @@ void Server::sqlinitNewUsers() const {
     //% "User database does not exist, creating..."
     qWarning() << qtTrId("user-db-lack");
     QSqlQuery query;
-    query.prepare(newUserT);
+    query.prepare(*userT);
     if(!query.exec()) {
         //% "Create User database failed."
         throw DBError(qtTrId("user-db-gen-failure"),
@@ -1374,7 +1399,6 @@ void Server::sqlinitNewUsers() const {
 }
 
 void Server::userInit(CSteamID &uid) {
-    qDebug() << "New User, id: " << uid.ConvertToUint64();
     static const QMap<QString, int> defaults
         = {
             std::pair(QStringLiteral("FleetSize"), 1),
@@ -1429,12 +1453,12 @@ void Server::userInit(CSteamID &uid) {
                                 "VALUES (:uid, :facto);")) {
             qWarning() << factoryNew.lastError().databaseText();
         }
-        insert.bindValue(":uid", uid.ConvertToUint64());
-        insert.bindValue(":facto", i);
-        if(!insert.exec()) {
+        factoryNew.bindValue(":uid", uid.ConvertToUint64());
+        factoryNew.bindValue(":facto", i);
+        if(!factoryNew.exec()) {
             throw DBError(qtTrId("user-factory-init-fail").
                           arg(uid.ConvertToUint64()),
-                          insert.lastError());
+                          factoryNew.lastError());
             return;
         }
     }
