@@ -52,6 +52,7 @@
 #include <QColor>
 #include <QtNetwork>
 #include "../Protocol/commandline.h"
+#include "../Protocol/equipment.h"
 #include "steamauth.h"
 
 void customMessageHandler(QtMsgType,
@@ -169,6 +170,8 @@ private:
     SteamAuth sauth;
     QByteArray authCache;
     bool authSent = false;
+
+    QMap<int, Equipment *> equipRegistryCache;
 
     QTimer *timer;
 

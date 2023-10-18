@@ -39,20 +39,36 @@ Equipment::Equipment(int equipId)
         type = EquipType(query.value(0).toInt());
     }
     QSqlQuery query2;
-    query.prepare(
-        "SELECT Intvalue FROM EquipReg "
+    query2.prepare(
+        "SELECT Intvalue, Attribute FROM EquipReg "
         "WHERE EquipID = :id AND Attribute != 'equiptype'");
-    query.bindValue(":id", equipId);
-    if(!query.exec() || !query.isSelect()) {
+    query2.bindValue(":id", equipId);
+    if(!query2.exec() || !query2.isSelect()) {
         throw DBError(qtTrId("equip-attr-lack"),
-                      query.lastError());
-        qCritical() << query.lastError();
+                      query2.lastError());
+        qCritical() << query2.lastError();
     }
-    else if(query.first()) {
-        type = EquipType(query.value(0).toInt());
+    else {
+        while(query2.next()) {
+            attr[query2.value(1).toString()]
+                = query2.value(0).toInt();
+        }
     }
 }
-/*
+Equipment::Equipment(const QJsonObject &input) {
+    equipRegId = input["eid"].toInt();
+    if(equipRegId == 0)
+        return;
+    QJsonObject lNames = input["name"].toObject();
+    for(auto iter = lNames.constBegin(); iter != lNames.constEnd(); ++iter)
+        localNames[iter->toString()] =
+            lNames.value(iter->toString()).toString();
+    type = EquipType(input["type"].toString());
+    QJsonObject attrs = input["attr"].toObject();
+    for(auto iter = attrs.constBegin(); iter != attrs.constEnd(); ++iter)
+        attr[iter->toString()] =
+            attrs.value(iter->toString()).toInt();
+}/*
 EquipType::EquipType(const QString &basis) {
 
     static QRegularExpression rehex(

@@ -304,14 +304,10 @@ void Clientv2::switchToFactory() {
     } else {
         gameState = KP::Factory;
         emit gamestateChanged(KP::Factory);
-        qDebug() << "Demand equip info client";
         QByteArray msg = KP::clientDemandEquipInfo();
         const qint64 written = socket.write(msg);
         if (written <= 0) {
             throw NetworkError(socket.errorString());
-        }
-        else {
-            qDebug() << "Demand equip info client success";
         }
     }
 }
@@ -530,6 +526,7 @@ void Clientv2::doRefreshFactory() {
     if (written <= 0) {
         throw NetworkError(socket.errorString());
     }
+    socket.flush();
 }
 
 /* Exit */
@@ -762,6 +759,8 @@ void Clientv2::readWhenUnConnected(const QByteArray &dgram) {
 
 /* Part of parser */
 void Clientv2::receivedAuth(const QJsonObject &djson) {
+    if(!djson.contains("mode")) // filter empty messages
+        return;
     switch(djson["mode"].toInt()) {
     case KP::AuthMode::NewLogin: receivedNewLogin(djson); break;
     case KP::AuthMode::Logout: receivedLogout(djson); break;
@@ -1052,6 +1051,14 @@ void Clientv2::showCommands(bool validOnly){
     }
 }
 
-void Clientv2::updateEquipCache(const QJsonObject &) {
-
+void Clientv2::updateEquipCache(const QJsonObject &input) {
+    if(!input.contains("content")) {
+        qWarning() << qtTrId("server-equip-cache-fail");
+        return;
+    }
+    QJsonArray equipDefs = input["content"].toArray();
+    for(auto equipDef: equipDefs) {
+        QJsonObject equipDValue;
+    }
+    qDebug() << "NUMBER:" << equipDefs.size();
 }

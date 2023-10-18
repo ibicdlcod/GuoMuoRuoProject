@@ -85,6 +85,7 @@ private slots:
     void alertReceived(QSslSocket *socket, QSsl::AlertLevel level,
                        QSsl::AlertType type, const QString &description);
     void handleNewConnection();
+    void offerEquipInfo(QSslSocket *, int);
     void pskRequired(QSslSocket *, QSslPreSharedKeyAuthenticator *);
     void shutdown();
     void sslErrors(QSslSocket *, const QList<QSslError> &);

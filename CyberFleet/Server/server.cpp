@@ -204,6 +204,14 @@ void Server::datagramReceived(const PeerInfo &peerInfo,
                               QSslSocket *connection) {
     QJsonObject djson =
         QCborValue::fromCbor(plainText).toMap().toJsonObject();
+#if defined(QT_DEBUG)
+    static const QString formatter = QStringLiteral("From %1 text: %2");
+    const QString html = formatter.
+                         arg(peerInfo.toString(), QJsonDocument(djson).toJson());
+    qDebug() << html;
+#else
+    Q_UNUSED(peerInfo)
+#endif
     try {
         switch(djson["type"].toInt()) {
         case KP::DgramType::Auth:
@@ -227,15 +235,9 @@ void Server::datagramReceived(const PeerInfo &peerInfo,
         QByteArray msg = KP::serverParseError(
             KP::Unsupported, peerInfo.toString(), e.what());
         connection->write(msg);
+    } catch (std::exception &e) {
+        qCritical() << e.what();
     }
-#if defined(QT_DEBUG)
-    static const QString formatter = QStringLiteral("From %1 text: %2");
-    const QString html = formatter.
-                         arg(peerInfo.toString(), QJsonDocument(djson).toJson());
-    qDebug() << html;
-#else
-    Q_UNUSED(peerInfo)
-#endif
 }
 
 bool Server::listen(const QHostAddress &address, quint16 port) {
@@ -374,6 +376,51 @@ void Server::handleNewConnection(){
         (sslServer.nextPendingConnection());
     QByteArray msg = KP::serverHello();
     currentsocket->write(msg);
+}
+
+void Server::offerEquipInfo(QSslSocket *connection, int index = 0) {
+    static const int batch = 50;
+    qDebug() << "Demandequipinfo";
+
+    QJsonArray equipInfos;
+    int i = 0;
+    for(auto equipIdIter = equipRegistry.keyBegin();
+         equipIdIter != equipRegistry.keyEnd();
+         ++equipIdIter, ++i) {
+        std::advance(equipIdIter, index * batch);
+        if(i == batch) {/*
+            QTimer::singleShot(100, this,
+                               [this, connection, index]{
+                offerEquipInfo(connection, index + 1);
+            });*/
+            break;
+        }
+        auto equipid = *equipIdIter;
+        QJsonObject result;
+        result["eid"] = equipid;
+        Equipment *e = equipRegistry.value(equipid);
+        QJsonObject ename;
+        for(auto lang = e->localNames.keyValueBegin();
+             lang != e->localNames.keyValueEnd();
+             ++lang) {
+            ename[lang->first] = lang->second;
+        }
+        result["name"] = ename;
+        result["type"] = e->type.toString();
+        QJsonObject attrs;
+        for(auto a = e->attr.keyValueBegin();
+             a != e->attr.keyValueEnd();
+             ++a) {
+            attrs[a->first] = a->second;
+        }
+        result["attr"] = attrs;
+        equipInfos.append(result);
+    }
+    connection->flush();
+    QByteArray msg = KP::serverEquipInfo(equipInfos);
+    qDebug() << "SERVEREQUIPINFO";
+    qDebug() << connection->write(msg);
+    connection->flush();
 }
 
 void Server::pskRequired(QSslSocket *socket,
@@ -1144,33 +1191,10 @@ void Server::receivedReq(const QJsonObject &djson,
             break;
         }
         break;
-    case KP::DemandEquipInfo: {
-        qDebug() << "Demandequipinfo";
-        QJsonArray equipInfos;
-        for(auto equipIdIter = equipRegistry.keyBegin();
-             equipIdIter != equipRegistry.keyEnd();
-             ++equipIdIter) {
-            auto equipid = *equipIdIter;
-            QJsonObject result;
-            result["eid"] = equipid;
-            Equipment *e = equipRegistry.value(equipid);
-            QJsonObject ename;
-            for(auto lang = e->localNames.keyValueBegin();
-                 lang != e->localNames.keyValueEnd();
-                 ++lang) {
-                ename[lang->first] = lang->second;
-            }
-            result["name"] = ename;
-            result["type"] = e->type.toString();
-            for(auto a = e->attr.keyValueBegin();
-                 a != e->attr.keyValueEnd();
-                 ++a) {
-                result[a->first] = a->second;
-            }
-            equipInfos.append(result);
-        }
-        QByteArray msg = KP::serverEquipInfo(equipInfos);
-        connection->write(msg);
+    case KP::CommandType::DemandEquipInfo: {
+        QTimer::singleShot(100,
+                           this,
+                           [connection, this]{offerEquipInfo(connection);});
     }
     break;
     default:

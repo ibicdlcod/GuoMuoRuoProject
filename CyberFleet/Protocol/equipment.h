@@ -13,6 +13,7 @@ class Equipment: public QObject {
 
 public:
     Equipment(int);
+    Equipment(const QJsonObject &);
     QString toString() const;
     const ResOrd devResBase() const;
     bool canDevelop(CSteamID userid = k_steamIDNil) const;
