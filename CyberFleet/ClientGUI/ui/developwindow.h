@@ -19,6 +19,9 @@ public:
 
 signals:
 
+private slots:
+    void resetListName(int);
+
 private:
     Ui::DevelopWindow *ui;
 };

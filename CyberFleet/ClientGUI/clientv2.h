@@ -90,6 +90,7 @@ public slots:
     bool parseSpec(const QStringList &);
     void sendEncryptedAppTicket(uint8 [], uint32);
     void serverResponse(const QString &, const QByteArray &);
+    void setTicketCache(uint8 [], uint32);
     void showHelp(const QStringList &);
     void switchToFactory();
     void uiRefresh();
@@ -164,6 +165,8 @@ private:
                               "\xb1\xbc");
 
     SteamAuth sauth;
+    uint8 rgubTicketCache[1024];
+    uint32 cubTicketCache;
 
     QTimer *timer;
 

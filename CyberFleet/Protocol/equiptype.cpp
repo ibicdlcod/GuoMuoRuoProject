@@ -99,3 +99,7 @@ bool EquipType::isRadar(const int type) {
 int EquipType::getSpecial(const int type) {
     return type / 0x10000;
 }
+
+QList<QString> EquipType::allEquipTypes() {
+    return result.keys();
+}

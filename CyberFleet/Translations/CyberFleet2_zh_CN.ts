@@ -16,7 +16,7 @@
     <message id="client-finish">
         <location filename="../ClientGUI/clientv2.cpp" line="856"/>
         <source></source>
-        <translation type="unfinished">装备开发</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message id="login-success">
         <location filename="../ClientGUI/clientv2.cpp" line="868"/>
@@ -281,42 +281,42 @@
     <message id="%1: Ticket failed to decrypt">
         <location filename="../Server/server.cpp" line="929"/>
         <source></source>
-        <translation type="unfinished">装备开发</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message id="%1: Ticket is not from correct App ID">
         <location filename="../Server/server.cpp" line="940"/>
         <source></source>
-        <translation type="unfinished">装备开发</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message id="Elapsed: %1 second(s)">
         <location filename="../Server/server.cpp" line="955"/>
         <source></source>
-        <translation type="unfinished">装备开发</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message id="%1: Request timeout">
         <location filename="../Server/server.cpp" line="957"/>
         <source></source>
-        <translation type="unfinished">装备开发</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message id="%1: Steam ID invalid">
         <location filename="../Server/server.cpp" line="970"/>
         <source></source>
-        <translation type="unfinished">装备开发</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message id="Connection-not-properly-online">
         <location filename="../Server/server.cpp" line="1099"/>
         <source></source>
-        <translation type="unfinished">装备开发</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message id="Invalid-uid: %1">
         <location filename="../Server/server.cpp" line="1104"/>
         <source></source>
-        <translation type="unfinished">装备开发</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message id="factory-state-error">
         <location filename="../Server/server.cpp" line="1167"/>
         <source></source>
-        <translation type="unfinished">装备开发</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message id="column-nonexist">
         <location filename="../Server/server.cpp" line="1212"/>
@@ -407,7 +407,7 @@
     <message id="user-factory-init-fail">
         <location filename="../Server/server.cpp" line="1459"/>
         <source></source>
-        <translation type="unfinished">装备开发</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message id="password-enter">
         <source>Enter password:</source>
@@ -538,27 +538,27 @@
     <message id="ticket-decrypt-fail">
         <location filename="../ClientGUI/clientv2.cpp" line="877"/>
         <source></source>
-        <translation type="unfinished">装备开发</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message id="ticket-incorrect-appid">
         <location filename="../ClientGUI/clientv2.cpp" line="878"/>
         <source></source>
-        <translation type="unfinished">装备开发</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message id="ticket-timeout">
         <location filename="../ClientGUI/clientv2.cpp" line="879"/>
         <source></source>
-        <translation type="unfinished">装备开发</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message id="steam-id-invalid">
         <location filename="../ClientGUI/clientv2.cpp" line="880"/>
         <source></source>
-        <translation type="unfinished">装备开发</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message id="steam-auth-fail">
         <location filename="../ClientGUI/clientv2.cpp" line="881"/>
         <source></source>
-        <translation type="unfinished">装备开发</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message id="user-exists">
         <source>User already exists.</source>
@@ -676,7 +676,7 @@ Great at battle and bad at politics--so cool!</source>
         <location filename="../Server/user.cpp" line="130"/>
         <source></source>
         <oldsource>User ID %1 does not exist.</oldsource>
-        <translation type="unfinished">装备开发</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message id="init-userfactory-failed">
         <location filename="../Server/user.cpp" line="51"/>
@@ -725,27 +725,27 @@ Great at battle and bad at politics--so cool!</source>
     </message>
     <message id="There has been an IO Failure when requesting the Encrypted App Ticket. ">
         <source></source>
-        <translation type="obsolete">装备开发</translation>
+        <translation type="obsolete"></translation>
     </message>
     <message id="GetEncryptedAppTicket failed. ">
         <source></source>
-        <translation type="obsolete">装备开发</translation>
+        <translation type="obsolete"></translation>
     </message>
     <message id="Calling RequestEncryptedAppTicket while not connected to steam results in this error. ">
         <source></source>
-        <translation type="obsolete">装备开发</translation>
+        <translation type="obsolete"></translation>
     </message>
     <message id="Calling RequestEncryptedAppTicket while there is already a pending request results in this error. ">
         <source></source>
-        <translation type="obsolete">装备开发</translation>
+        <translation type="obsolete"></translation>
     </message>
     <message id="Calling RequestEncryptedAppTicket more than once per minute returns this error. ">
         <source></source>
-        <translation type="obsolete">装备开发</translation>
+        <translation type="obsolete"></translation>
     </message>
     <message id="Calling RequestEncryptedAppTicket encountered unknown error %1. ">
         <source></source>
-        <translation type="obsolete">装备开发</translation>
+        <translation type="obsolete"></translation>
     </message>
     <message id="closed-factoryslot">
         <location filename="../FactorySlot/factoryslot.cpp" line="33"/>
@@ -765,32 +765,32 @@ Great at battle and bad at politics--so cool!</source>
     <message id="equip-local-name-lack">
         <location filename="../Protocol/equipment.cpp" line="19"/>
         <source></source>
-        <translation type="unfinished">装备开发</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message id="equip-type-lack">
         <location filename="../Protocol/equipment.cpp" line="34"/>
         <source></source>
-        <translation type="unfinished">装备开发</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message id="equip-attr-lack">
         <location filename="../Protocol/equipment.cpp" line="47"/>
         <source></source>
-        <translation type="unfinished">装备开发</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message id="scope-constant-less-than-1">
         <location filename="../Server/tech.cpp" line="46"/>
         <source></source>
-        <translation type="unfinished">装备开发</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message id="tech-level-less-than-0">
         <location filename="../Server/tech.cpp" line="56"/>
         <source></source>
-        <translation type="unfinished">装备开发</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message id="tech-weight-less-than-0">
         <location filename="../Server/tech.cpp" line="61"/>
         <source></source>
-        <translation type="unfinished">装备开发</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

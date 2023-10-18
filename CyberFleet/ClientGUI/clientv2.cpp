@@ -275,6 +275,13 @@ void Clientv2::serverResponse(const QString &clientInfo,
     }
 }
 
+void Clientv2::setTicketCache(uint8 rgubTicket [], uint32 cubTicket) {
+    std::copy(rgubTicket,
+              rgubTicket + sizeof(rgubTicket),
+              rgubTicketCache);
+    cubTicketCache = cubTicket;
+}
+
 /* Show help in command line */
 void Clientv2::showHelp(const QStringList &cmdParts) {
     if(cmdParts.isEmpty()) {
@@ -698,6 +705,7 @@ void Clientv2::readWhenConnected(const QByteArray &dgram) {
             if (written <= 0) {
                 throw NetworkError(socket.errorString());
             }
+            //sendEncryptedAppTicket(rgubTicketCache, cubTicketCache);
         }
         logoutPending = false;
         SteamAPI_RunCallbacks();

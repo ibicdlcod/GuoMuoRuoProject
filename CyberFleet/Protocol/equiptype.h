@@ -31,6 +31,8 @@ public:
     static bool isRadar(const int);
     static int getSpecial(const int);
 
+    static QList<QString> allEquipTypes();
+
 private:
     /* this is C++17 */
     inline static const QMap<QString, int> result = {
