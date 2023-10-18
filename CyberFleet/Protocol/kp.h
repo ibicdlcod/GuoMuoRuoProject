@@ -101,7 +101,8 @@ enum CommandType{
     SteamAuth,
     SteamLogout,
     CHello,
-    AdminAddEquip
+    AdminAddEquip,
+    DemandEquipInfo
 };
 Q_ENUM_NS(CommandType)
 
@@ -121,7 +122,8 @@ enum FactoryState{
 Q_ENUM_NS(FactoryState)
 
 enum InfoType{
-    FactoryInfo
+    FactoryInfo,
+    EquipInfo
 };
 Q_ENUM_NS(InfoType)
 
@@ -143,6 +145,7 @@ void winConsoleCheck();
 QByteArray accessDenied();
 QByteArray catbomb();
 QByteArray clientAddEquip(int);
+QByteArray clientDemandEquipInfo();
 QByteArray clientDevelop(int, bool convert = false, int factoryID = -1);
 QByteArray clientFactoryRefresh();
 QByteArray clientFetch(int factoryID = -1);
@@ -152,6 +155,7 @@ QByteArray clientSteamAuth(uint8 [], uint32);
 QByteArray clientSteamLogout();
 QByteArray serverDevelopFailed(GameError);
 QByteArray serverDevelopStart();
+QByteArray serverEquipInfo(QJsonArray &);
 QByteArray serverFairyBusy(int);
 QByteArray serverHello();
 QByteArray serverLackPrivate();

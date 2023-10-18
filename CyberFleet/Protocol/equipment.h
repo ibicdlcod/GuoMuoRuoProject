@@ -19,12 +19,13 @@ public:
     const ResOrd devRes() const;
     int getTech() const;
 
-private:
-    int equipRegId;
     QMap<QString, QString> localNames;
     EquipType type;
     QMap<QString, int> attr;
-    QStringList customflags;
+    QStringList customflags; // unused for now
+
+private:
+    int equipRegId;
 };
 
 #endif // EQUIPMENT_H

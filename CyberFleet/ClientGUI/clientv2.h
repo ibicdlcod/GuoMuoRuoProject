@@ -109,6 +109,7 @@ private slots:
     void handshakeInterrupted(const QSslError &);
     void pskRequired(QSslPreSharedKeyAuthenticator *);
     void readyRead();
+    void sendEATActual();
     void shutdown();
 
 private:
@@ -138,6 +139,7 @@ private:
     void receivedMsg(const QJsonObject &);
     void receivedNewLogin(const QJsonObject &);
     void showCommands(bool);
+    void updateEquipCache(const QJsonObject &);
 
     explicit Clientv2(QObject * parent = nullptr);
 
@@ -165,8 +167,8 @@ private:
                               "\xb1\xbc");
 
     SteamAuth sauth;
-    uint8 rgubTicketCache[1024];
-    uint32 cubTicketCache;
+    QByteArray authCache;
+    bool authSent = false;
 
     QTimer *timer;
 

@@ -1144,6 +1144,35 @@ void Server::receivedReq(const QJsonObject &djson,
             break;
         }
         break;
+    case KP::DemandEquipInfo: {
+        qDebug() << "Demandequipinfo";
+        QJsonArray equipInfos;
+        for(auto equipIdIter = equipRegistry.keyBegin();
+             equipIdIter != equipRegistry.keyEnd();
+             ++equipIdIter) {
+            auto equipid = *equipIdIter;
+            QJsonObject result;
+            result["eid"] = equipid;
+            Equipment *e = equipRegistry.value(equipid);
+            QJsonObject ename;
+            for(auto lang = e->localNames.keyValueBegin();
+                 lang != e->localNames.keyValueEnd();
+                 ++lang) {
+                ename[lang->first] = lang->second;
+            }
+            result["name"] = ename;
+            result["type"] = e->type.toString();
+            for(auto a = e->attr.keyValueBegin();
+                 a != e->attr.keyValueEnd();
+                 ++a) {
+                result[a->first] = a->second;
+            }
+            equipInfos.append(result);
+        }
+        QByteArray msg = KP::serverEquipInfo(equipInfos);
+        connection->write(msg);
+    }
+    break;
     default:
         throw std::domain_error("command type not supported"); break;
     }

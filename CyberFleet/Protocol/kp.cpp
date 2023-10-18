@@ -64,6 +64,13 @@ QByteArray KP::clientAddEquip(int equipid) {
     return QCborValue::fromJsonValue(result).toCbor();
 }
 
+QByteArray KP::clientDemandEquipInfo() {
+    QJsonObject result;
+    result["type"] = DgramType::Request;
+    result["command"] = CommandType::DemandEquipInfo;
+    return QCborValue::fromJsonValue(result).toCbor();
+}
+
 QByteArray KP::clientDevelop(int equipid, bool convert, int factoryID) {
     QJsonObject result;
     result["type"] = DgramType::Request;
@@ -137,6 +144,14 @@ QByteArray KP::serverDevelopStart() {
     QJsonObject result;
     result["type"] = DgramType::Message;
     result["msgtype"] = MsgType::DevelopStart;
+    return QCborValue::fromJsonValue(result).toCbor();
+}
+
+QByteArray KP::serverEquipInfo(QJsonArray &input) {
+    QJsonObject result;
+    result["type"] = DgramType::Info;
+    result["infotype"] = InfoType::EquipInfo;
+    result["content"] = input;
     return QCborValue::fromJsonValue(result).toCbor();
 }
 

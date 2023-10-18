@@ -34,6 +34,7 @@ void SteamAuth::OnEncryptedAppTicketResponse(
         uint32 cubTicket;
 
         if(SteamUser()->GetEncryptedAppTicket(rgubTicket, sizeof(rgubTicket), &cubTicket)) {
+            qDebug() << "GetEncryptedAppTicket success!";
             Clientv2::getInstance().sendEncryptedAppTicket(rgubTicket, cubTicket);
         }
         else {

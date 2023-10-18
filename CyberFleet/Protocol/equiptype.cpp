@@ -14,6 +14,14 @@ EquipType::EquipType(QString type) {
     internalRep = strToIntRep(type);
 }
 
+QString EquipType::toString() const {
+    return intToStrRep(internalRep);
+}
+
+int EquipType::toInt() const {
+    return internalRep;
+}
+
 const QString EquipType::intToStrRep(int input) {
     for(auto iter = result.keyValueBegin(),
          end = result.keyValueEnd();

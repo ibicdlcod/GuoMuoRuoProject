@@ -86,8 +86,10 @@ bool Clientv2::loggedIn() const {
 /* Part of steam verification */
 void Clientv2::sendEncryptedAppTicket(uint8 rgubTicket [], uint32 cubTicket) {
     try {
-        QByteArray msg = KP::clientSteamAuth(rgubTicket, cubTicket);
-        if(!socket.waitForEncrypted()) {
+        authCache = KP::clientSteamAuth(rgubTicket, cubTicket);
+        QObject::connect(&socket, &QSslSocket::encrypted,
+                         this, &Clientv2::sendEATActual);/*
+        if(!socket.waitForEncrypted()) { // should not block here?
             qCritical("Encrypted connection yet established "
                       "(do not reattempt connection within a minute!)");
             throw NetworkError(socket.errorString());
@@ -102,7 +104,7 @@ void Clientv2::sendEncryptedAppTicket(uint8 rgubTicket [], uint32 cubTicket) {
         }
         else {
             qDebug("Encrypted App Ticket successfully sent.");
-        }
+        }*/
     }  catch (NetworkError &e) {
         qCritical("Network error when sending Encrypted Ticket");
         qCritical() << e.what();
@@ -155,6 +157,7 @@ void Clientv2::catbomb() {
         //% "You have been bombarded by a cute cat."
         qCritical() << qtTrId("catbomb");
         gameState = KP::Offline;
+        authSent = false;
         emit gamestateChanged(KP::Offline);
     }
     else if(attemptMode){
@@ -276,10 +279,6 @@ void Clientv2::serverResponse(const QString &clientInfo,
 }
 
 void Clientv2::setTicketCache(uint8 rgubTicket [], uint32 cubTicket) {
-    std::copy(rgubTicket,
-              rgubTicket + sizeof(rgubTicket),
-              rgubTicketCache);
-    cubTicketCache = cubTicket;
 }
 
 /* Show help in command line */
@@ -305,6 +304,15 @@ void Clientv2::switchToFactory() {
     } else {
         gameState = KP::Factory;
         emit gamestateChanged(KP::Factory);
+        qDebug() << "Demand equip info client";
+        QByteArray msg = KP::clientDemandEquipInfo();
+        const qint64 written = socket.write(msg);
+        if (written <= 0) {
+            throw NetworkError(socket.errorString());
+        }
+        else {
+            qDebug() << "Demand equip info client success";
+        }
     }
 }
 
@@ -381,6 +389,18 @@ void Clientv2::readyRead() {
         }
     } catch (NetworkError &e) {
         qWarning() << (clientName + ":") << e.what();
+    }
+}
+
+void Clientv2::sendEATActual() {
+    /* still have bugs */
+    const qint64 written = socket.write(authCache);
+    if (written <= 0) {
+        throw NetworkError(socket.errorString());
+    }
+    else {
+        qDebug("Encrypted App Ticket successfully sent.");
+        authSent = true;
     }
 }
 
@@ -684,7 +704,13 @@ bool Clientv2::parseGameCommands(const QString &primary,
 void Clientv2::parseQuit() {
     if(gameState != KP::Offline)
         parseDisconnectReq();
+    authSent = false;
     exitGracefully();
+}
+
+/* Relic of CLI */
+void Clientv2::qls(const QStringList &input) {
+    emit qout(input.join(" "));
 }
 
 /* Read server datagrams */
@@ -698,14 +724,13 @@ void Clientv2::readWhenConnected(const QByteArray &dgram) {
     if (plainText.size()) {
         serverResponse(clientName, plainText);
         if (socket.isEncrypted() && gameState == KP::Offline
-            && !logoutPending) {
+            && !logoutPending && authSent) {
             qDebug() << clientName << ": encrypted connection established!";
             QByteArray msg = KP::clientHello();
             const qint64 written = socket.write(msg);
             if (written <= 0) {
                 throw NetworkError(socket.errorString());
             }
-            //sendEncryptedAppTicket(rgubTicketCache, cubTicketCache);
         }
         logoutPending = false;
         SteamAPI_RunCallbacks();
@@ -748,6 +773,7 @@ void Clientv2::receivedAuth(const QJsonObject &djson) {
 void Clientv2::receivedInfo(const QJsonObject &djson) {
     switch(djson["infotype"].toInt()) {
     case KP::InfoType::FactoryInfo: emit receivedFactoryRefresh(djson); break;
+    case KP::InfoType::EquipInfo: updateEquipCache(djson); break;
     default: throw std::domain_error("auth type not supported"); break;
     }
 }
@@ -771,6 +797,7 @@ void Clientv2::receivedLogout(const QJsonObject &djson) {
         else
             throw std::domain_error("message not implemented");
         gameState = KP::Offline;
+        authSent = false;
         emit gamestateChanged(KP::Offline);
         logoutPending = true;
     }
@@ -860,6 +887,7 @@ void Clientv2::receivedMsg(const QJsonObject &djson) {
         break;
     case KP::AllowClientFinish:
         gameState = KP::Offline;
+        authSent = false;
         emit gamestateChanged(KP::Offline);
         qInfo() << qtTrId("client-finish");
         shutdown();
@@ -1024,7 +1052,6 @@ void Clientv2::showCommands(bool validOnly){
     }
 }
 
-/* Relic of CLI */
-void Clientv2::qls(const QStringList &input) {
-    emit qout(input.join(" "));
+void Clientv2::updateEquipCache(const QJsonObject &) {
+
 }

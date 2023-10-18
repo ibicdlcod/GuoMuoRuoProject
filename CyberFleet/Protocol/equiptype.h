@@ -11,8 +11,10 @@ public:
     EquipType(int);
     EquipType(QString);
 
-    static int strToIntRep(QString);
     static const QString intToStrRep(int);
+    static int strToIntRep(QString);
+    QString toString() const;
+    int toInt() const;
 
     static int getSize(const int);
     static bool isMainGun(const int);
