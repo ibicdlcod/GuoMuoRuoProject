@@ -138,11 +138,11 @@ endif()
 #qt_create_translation(QM_FILES ${CMAKE_SOURCE_DIR} ${TS_FILES})
 
 message("add tr")
-qt_add_translations(CFClient
+qt6_add_translations(CFClient
     TS_FILES ${TS_FILES}
     INCLUDE_DIRECTORIES {root_SOURCE_DIR}
     LRELEASE_OPTIONS -idbased)
-qt_add_translations(CFServer
+qt6_add_translations(CFServer
     TS_FILES ${TS_FILES}
     INCLUDE_DIRECTORIES {root_SOURCE_DIR}
     LRELEASE_OPTIONS -idbased)
