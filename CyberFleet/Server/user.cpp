@@ -160,59 +160,68 @@ bool User::isSuperUser(CSteamID &uid) {
 }
 
 void User::naturalRegen(CSteamID &uid) {
-    QSqlDatabase db = QSqlDatabase::database();
-    QSqlQuery query;
-    query.prepare("SELECT Level,RecoverTime"
-                  " FROM Users WHERE UserID = :id");
-    query.bindValue(":id", uid.ConvertToUint64());
-    query.exec();
-    query.isSelect();
-    if(Q_UNLIKELY(!query.first())) {
-        qWarning() << qtTrId("user-nonexistent-uid")
-                          .arg(uid.ConvertToUint64());
-        return;
-    }
-    else {
-        int level = query.value(0).toInt();
-        QDateTime priorRecoverTime = query.value(1).toDateTime();
-        priorRecoverTime.setTimeZone(QTimeZone("UTC+0"));
-        qint64 regenSecs = priorRecoverTime.secsTo(
-            QDateTime::currentDateTimeUtc());
-        regenSecs = std::max(Q_INT64_C(0), regenSecs); //stop timezone trap
-        qint64 regenMins = regenSecs / KP::secsinMin;
-        int regenPower = 0;
-        ResOrd regenAmount = ResOrd(10 + regenPower,
-                                    10 + regenPower,
-                                    10 + regenPower,
-                                    2 + regenPower,
-                                    5 + regenPower,
-                                    2 + regenPower,
-                                    2 + regenPower);
-        regenAmount *= (qint64)regenMins;
-        ResOrd regenCap = ResOrd(2500, 2500, 2500, 1500, 2000, 1500, 1500);
-        regenCap *= (qint64)(level + 24); // 24~144
-        ResOrd currentRes = getCurrentResources(uid);
-        currentRes.addResources(regenAmount, regenCap);
-        setResources(uid, currentRes);
+    try{
+        QSqlDatabase db = QSqlDatabase::database();
         QSqlQuery query;
-        query.prepare("UPDATE Users SET RecoverTime "
-                      "= datetime(RecoverTime, '+"
-                      + QString::number(regenMins)
-                      + " minutes') "
-                        "WHERE UserID = :id");
+        /* Tech level not yet implemented */
+        double globalTechLevel = 0.0;
+        query.prepare("SELECT Intvalue"
+                      " FROM UserAttr WHERE UserID = :id"
+                      " AND Attribute = 'RecoverTime'");
         query.bindValue(":id", uid.ConvertToUint64());
-        if(Q_UNLIKELY(!query.exec())) {
-            //% "User ID %1: natural regeneration failed!"
-            qWarning() << qtTrId("natural-regen-failed")
-                              .arg(uid.ConvertToUint64());
-            qWarning() << query.lastError();
+        query.exec();
+        query.isSelect();
+        if(Q_UNLIKELY(!query.first())) {
+            throw DBError(qtTrId("user-query-regen-time-fail")
+                              .arg(uid.ConvertToUint64()), query.lastError());
             return;
         }
         else {
-            //% "User ID %1: natural regeneration"
-            qDebug() << qtTrId("natural-regen")
-                            .arg(uid.ConvertToUint64());
+            qint64 priorRecoverTime = query.value(0).toInt() / KP::secsinMin;
+            qint64 currentTimeInt =
+                QDateTime::currentDateTime(QTimeZone::UTC).toSecsSinceEpoch();
+            qint64 currentTimeInMinute = currentTimeInt / KP::secsinMin;
+            qint64 regenMins = currentTimeInMinute - priorRecoverTime;
+            regenMins = std::max(Q_INT64_C(0), regenMins); //stop timezone trap
+            int regenPower = 0; // not yet implemented
+            ResOrd regenAmount = ResOrd(10 + regenPower,
+                                        10 + regenPower,
+                                        10 + regenPower,
+                                        2 + regenPower,
+                                        5 + regenPower,
+                                        2 + regenPower,
+                                        2 + regenPower);
+            qDebug() << regenMins;
+            regenAmount *= (qint64)regenMins;
+            ResOrd regenCap = ResOrd(2500, 2500, 2500, 1500, 2000, 1500, 1500);
+            regenCap *= (qint64)(std::round(globalTechLevel * 8.0) + 24);
+            ResOrd currentRes = getCurrentResources(uid);
+            currentRes.addResources(regenAmount, regenCap);
+            setResources(uid, currentRes);
+            QSqlQuery query;
+            query.prepare("UPDATE UserAttr SET Intvalue"
+                          " = :now "
+                          "WHERE UserID = :id AND Attribute = 'RecoverTime'");
+            query.bindValue(":id", uid.ConvertToUint64());
+            query.bindValue(":now", currentTimeInt);
+            if(Q_UNLIKELY(!query.exec())) {
+                //% "User ID %1: natural regeneration failed!"
+                throw DBError(qtTrId("natural-regen-failed")
+                                  .arg(uid.ConvertToUint64()), query.lastError());
+                return;
+            }
+            else {
+                //% "User ID %1: natural regeneration"
+                qDebug() << qtTrId("natural-regen")
+                                .arg(uid.ConvertToUint64());
+            }
         }
+    } catch (DBError &e) {
+        for(auto what: e.whats()) {
+            qCritical() << what;
+        }
+    } catch (std::exception &e) {
+        qCritical() << e.what();
     }
 }
 
@@ -254,6 +263,7 @@ int User::newEquip(CSteamID &uid, int equipDid) {
 }
 
 void User::refreshFactory(CSteamID &uid) {
+    naturalRegen(uid);
     QSqlDatabase db = QSqlDatabase::database();
     QSqlQuery query;
     query.prepare("UPDATE Factories "
