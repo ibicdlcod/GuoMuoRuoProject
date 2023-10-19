@@ -503,6 +503,11 @@ void Server::decryptDatagram(QSslSocket *connection,
 
 void Server::doDevelop(CSteamID &uid, int equipid,
                        int factoryid, QSslSocket *connection) {
+    if(!equipRegistry.contains(equipid)) {
+        QByteArray msg =
+            KP::serverDevelopFailed(KP::DevelopNotExist);
+        connection->write(msg);
+    }
     /* TODO: this is the no-convert version */
     /*
     if(!equipRegistry.contains(equipid)
@@ -945,6 +950,7 @@ void Server::receivedAuth(const QJsonObject &djson,
         uint8 rgubDecrypted[1024];
         uint32 cubDecrypted = sizeof(rgubDecrypted);
 
+        /* Of course, app secret key is not shipped with the project. */
         QFile appSecretKeyFile("AppSecretKey");
         if(!appSecretKeyFile.open(QIODevice::ReadOnly)) {
             //% "Server lack a private key."
@@ -1173,9 +1179,12 @@ void Server::receivedReq(const QJsonObject &djson,
         int equipid = djson["equipid"].toInt();
         if(!User::isSuperUser(uid)) {
             QByteArray msg = KP::accessDenied();
+            connection->write(msg);
         }
         else {
-            User::newEquip(uid, equipid);
+            QByteArray msg = KP::serverNewEquip(
+                User::newEquip(uid, equipid), equipid);
+            connection->write(msg);
         }
     }
     case KP::CommandType::Develop: {

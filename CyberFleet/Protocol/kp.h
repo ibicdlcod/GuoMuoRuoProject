@@ -31,7 +31,7 @@ static constexpr int initDock = 4;
 static constexpr int initFactory = 4;
 static constexpr qint64 secsinMin = 60;
 static constexpr float baseDevRarity = 8.0;
-static constexpr int equipIdMax = 0x100000;
+static constexpr int equipIdMax = 0x10000;
 
 enum DgramType{
     Auth,
@@ -109,6 +109,7 @@ Q_ENUM_NS(CommandType)
 enum GameError{
     ResourceLack,
     DevelopNotOption,
+    DevelopNotExist,
     FactoryBusy
 };
 Q_ENUM_NS(GameError)

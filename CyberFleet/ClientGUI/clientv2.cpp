@@ -88,23 +88,7 @@ void Clientv2::sendEncryptedAppTicket(uint8 rgubTicket [], uint32 cubTicket) {
     try {
         authCache = KP::clientSteamAuth(rgubTicket, cubTicket);
         QObject::connect(&socket, &QSslSocket::encrypted,
-                         this, &Clientv2::sendEATActual);/*
-        if(!socket.waitForEncrypted()) { // should not block here?
-            qCritical("Encrypted connection yet established "
-                      "(do not reattempt connection within a minute!)");
-            throw NetworkError(socket.errorString());
-        }
-        else {
-            qInfo("Encrypted connection established, "
-                  "sending encrypted app ticket");
-        }
-        const qint64 written = socket.write(msg);
-        if (written <= 0) {
-            throw NetworkError(socket.errorString());
-        }
-        else {
-            qDebug("Encrypted App Ticket successfully sent.");
-        }*/
+                         this, &Clientv2::sendEATActual);
     }  catch (NetworkError &e) {
         qCritical("Network error when sending Encrypted Ticket");
         qCritical() << e.what();
@@ -821,10 +805,23 @@ void Clientv2::receivedMsg(const QJsonObject &djson) {
         qWarning() << qtTrId("access-denied-login-first"); break;
     case KP::DevelopFailed: {
         switch(djson["reason"].toInt()) {
-        case KP::DevelopNotOption:
-            //% "This equipment does not exist or not open for development."
-            qWarning() << qtTrId("equip-not-developable");
+        case KP::DevelopNotExist:
+            //% "This equipment does not exist."
+            qWarning() << qtTrId("equip-not-exist");
             break;
+        case KP::DevelopNotOption: {
+            Equipment *father = equipRegistryCache
+                                    .value(djson["father"].toInt());
+            //% "This equipment requires you to "
+            //% "possess %1 (id: %2) in order to develop."
+            qWarning() <<
+                qtTrId("equip-not-developable")
+                    .arg(father->toString(
+                             settings->value("language", "ja_JP")
+                                 .toString()),
+                         father->getId());
+        }
+        break;
         case KP::FactoryBusy:
             //% "You have not selected an available factory slot."
             qInfo() << qtTrId("factory-busy");
@@ -868,10 +865,36 @@ void Clientv2::receivedMsg(const QJsonObject &djson) {
     case KP::Penguin:
         //% "You got a cute penguin."
         qInfo() << qtTrId("develop-penguin"); break;
-    case KP::NewEquip:
-        //% "You get new equipment %1, serial number %2"
-        qInfo() << qtTrId("develop-success").arg(djson["equipdef"].toString(),
-                                                 djson["serial"].toString()); break;
+    case KP::NewEquip: {
+        qDebug() << djson;
+        qDebug() << equipRegistryCache.value(1);
+        int equipDefInt = djson["equipdef"].toInt();
+        if(equipRegistryCache.contains(equipDefInt)) {
+#ifdef QT_NO_DEBUG
+            //% "You get new equipment '%1', serial number %2"
+            qInfo() <<
+                qtTrId("develop-success")
+                    .arg(equipRegistryCache.value(equipDefInt)->toString(
+                        settings->value("language", "ja_JP").toString()))
+                    .arg(djson["serial"].toInt());
+#else
+            //% "You get new equipment '%1', serial number %2"
+            qInfo() <<
+                qtTrId("develop-success")
+                    .arg(equipRegistryCache.value(equipDefInt)
+                                    ->toString("ja_JP"))
+                    .arg(djson["serial"].toInt());
+#endif
+        }
+        else {
+            //% "You get new equipment with id %1, serial number %2"
+            qInfo() <<
+                qtTrId("develop-success-id")
+                    .arg(djson["equipdef"].toInt())
+                    .arg(djson["serial"].toInt());
+        }
+    }
+    break;
     case KP::Hello:
         //% "Server is alive and responding."
         qInfo() << qtTrId("server-hello");
