@@ -50,17 +50,23 @@ FactoryArea::~FactoryArea()
 }
 
 void FactoryArea::developClicked(bool checked, int slotnum) {
-    DevelopWindow w;
-    if(w.exec() == QDialog::Rejected)
-        qDebug() << "FUCK" << slotnum << Qt::endl;
-    else {
-        Clientv2 &engine = Clientv2::getInstance();
-        QTimer::singleShot(100, engine, &Clientv2::doRefreshFactory);
-        QString msg = QStringLiteral("develop %1 %2")
-                          .arg(w.equipIdDesired()).arg(slotnum);
-        qDebug() << msg;
-        engine.parse(msg);
+    Clientv2 &engine = Clientv2::getInstance();
+    if(slotfs[slotnum]->isComplete()) {
+        engine.doFetch({"fetch", QString::number(slotnum)});
     }
+    else {
+        DevelopWindow w;
+        if(w.exec() == QDialog::Rejected)
+            qDebug() << "FUCK" << slotnum << Qt::endl;
+        else {
+            QTimer::singleShot(100, &engine, &Clientv2::doRefreshFactory);
+            QString msg = QStringLiteral("develop %1 %2")
+                              .arg(w.equipIdDesired()).arg(slotnum);
+            qDebug() << msg;
+            engine.parse(msg);
+        }
+    }
+    engine.doRefreshFactory();
 }
 
 void FactoryArea::doFactoryRefresh(const QJsonObject &input) {

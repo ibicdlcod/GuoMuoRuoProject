@@ -868,7 +868,7 @@ void Clientv2::receivedMsg(const QJsonObject &djson) {
     case KP::Penguin:
         //% "You got a cute penguin."
         qInfo() << qtTrId("develop-penguin");
-        //doRefreshFactory();
+        doRefreshFactory();
         break;
     case KP::NewEquip: {
         qDebug() << djson;
@@ -889,7 +889,7 @@ void Clientv2::receivedMsg(const QJsonObject &djson) {
                     .arg(djson["equipdef"].toInt())
                     .arg(djson["serial"].toInt());
         }
-        //doRefreshFactory();
+        doRefreshFactory();
     }
     break;
     case KP::Hello:

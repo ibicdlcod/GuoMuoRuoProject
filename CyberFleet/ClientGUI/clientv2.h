@@ -80,6 +80,7 @@ public:
     };
     Q_ENUM(Password);
     bool loggedIn() const;
+    void doFetch(const QStringList &);
 
     friend int DevelopWindow::equipIdDesired();
     friend void DevelopWindow::resetListName(int);
@@ -121,7 +122,6 @@ private slots:
 private:
     void doAddEquip(const QStringList &);
     void doDevelop(const QStringList &);
-    void doFetch(const QStringList &);
     void doSwitch(const QStringList &);
     void exitGracefully();
     void exitGraceSpec();

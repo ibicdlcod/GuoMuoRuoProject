@@ -1,9 +1,19 @@
 #include "factoryslot.h"
+#include <QTimeZone>
 
 FactorySlot::FactorySlot(QWidget *parent) :
     QPushButton(parent), slotnum(0)
 {
     connect(this, &FactorySlot::clicked, this, &FactorySlot::clickedHelper);
+    timer = new QTimer(this);
+    connect(timer, &QTimer::timeout, this, &FactorySlot::setStatus);
+    timer->start(1000);
+}
+
+FactorySlot::~FactorySlot() noexcept {
+    disconnect(timer, &QTimer::timeout, this, &FactorySlot::setStatus);
+    timer->stop();
+    delete timer;
 }
 
 bool FactorySlot::isOpen() {
@@ -12,6 +22,10 @@ bool FactorySlot::isOpen() {
 
 bool FactorySlot::isComplete() {
     return completed;
+}
+
+bool FactorySlot::isOnJob() {
+    return completeTime.isValid();
 }
 
 void FactorySlot::setSlotnum(int num) {
@@ -46,7 +60,10 @@ void FactorySlot::setStatus() {
             //% "Completed!"
             this->setText(qtTrId("complete-factoryslot"));
         } else if(completeTime.isValid()) {
-            this->setText(completeTime.toString());
+            QDateTime current = QDateTime::currentDateTime(QTimeZone::UTC);
+            QTime zero = QTime(0, 0);
+            QTime interval = zero.addSecs(current.secsTo(completeTime));
+            this->setText(interval.toString("hh:mm:ss"));
         } else {
             //% "Factory %1"
             this->setText(qtTrId("factory-num-label").arg(slotnum));
