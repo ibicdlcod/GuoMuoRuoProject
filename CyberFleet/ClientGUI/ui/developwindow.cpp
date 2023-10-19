@@ -16,6 +16,17 @@ DevelopWindow::DevelopWindow(QWidget *parent)
     resetListName(0);
     connect(ui->listType, &QComboBox::currentIndexChanged,
             this, &DevelopWindow::resetListName);
+    qDebug() << "DEVELOPWINDOW";
+    QSet<QString> equipGroups = EquipType::getDisplayGroups();
+    QList<QString> sortedGroups;
+    for(auto &equip: equipGroups) {
+        sortedGroups.append(equip);
+    }
+    std::sort(sortedGroups.begin(), sortedGroups.end(),
+              [](const QString &a, const QString &b){
+        return qtTrId(a.toUtf8()) < qtTrId(b.toUtf8());
+    });
+    qDebug() << sortedGroups;
 }
 
 DevelopWindow::~DevelopWindow() {

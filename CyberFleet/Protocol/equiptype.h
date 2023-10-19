@@ -3,6 +3,7 @@
 
 #include <QString>
 #include <QMap>
+#include <QSet>
 
 class EquipType
 {
@@ -15,6 +16,7 @@ public:
     static int strToIntRep(QString);
     QString toString() const;
     int toInt() const;
+    static QSet<QString> getDisplayGroups();
 
     static int getSize(const int);
     static bool isMainGun(const int);
@@ -32,6 +34,7 @@ public:
     static bool isSeaplane(const int);
     static bool isRadar(const int);
     static int getSpecial(const int);
+    static bool isNight2(const int);
 
     static QList<QString> allEquipTypes();
 
@@ -121,6 +124,93 @@ private:
         std::pair("AA-control-device",  0x001E2000),
         std::pair("Land-corps",         0x001F0000),
         std::pair("Virtual-precondition",   0x01000000),
+    };
+
+    inline static const QMap<QString, QString> displaygroup = {
+        std::pair("AA-gun",             "AA"),
+        std::pair("AA-control-device",  "AA"),
+        std::pair("Depthc-projector",   "ASW"),
+        std::pair("Depthc-racks",       "ASW"),
+        std::pair("Sonar-passive-big",  "ASW"),
+        std::pair("Sonar-passive",      "ASW"),
+        std::pair("Sonar-active",       "ASW"),
+        std::pair("Patrol-autogyro",    "ASW"),
+        std::pair("Patrol-liaison",     "ASW"),
+        std::pair("Patrol-liaison-f",   "ASW"),
+        std::pair("Patrol-lb",          "ASW"),
+        std::pair("Attack-lb",          "ATTACKLB"),
+        std::pair("Attack-lb-fight",    "ATTACKLB"),
+        std::pair("Attack-lb-big",      "ATTACKLB"),
+        std::pair("Big-gun",            "BIGGUN"),
+        std::pair("Bomb-dive",          "BOMBDIVE"),
+        std::pair("Bomb-dive-fight",    "BOMBDIVE"),
+        std::pair("Bomb-dive-fight-jet","BOMBDIVE"),
+        std::pair("Bomb-dive-fight-n2", "BOMBDIVE"),
+        std::pair("Bomb-torp",          "BOMBTORP"),
+        std::pair("Bomb-torp-night",    "BOMBTORP"),
+        std::pair("Bomb-torp-fight",    "BOMBTORP"),
+        std::pair("Bomb-torp-dive",     "BOMBTORP"),
+        std::pair("Bomb-torp-n2",       "BOMBTORP"),
+        std::pair("Bulge-medium",       "BULGE"),
+        std::pair("Bulge-large",        "BULGE"),
+        std::pair("Fighter",            "FIGHTER"),
+        std::pair("Fighter-night",      "FIGHTER"),
+        std::pair("Fighter-lb",         "FIGHTERLB"),
+        std::pair("Fighter-lb-interc",  "FIGHTERLB"),
+        std::pair("Landing-craft",      "LAND"),
+        std::pair("Landing-tank",       "LAND"),
+        std::pair("Land-corps",         "LAND"),
+        std::pair("Mid-gun-flat",       "MIDGUN"),
+        std::pair("Mid-gun-flak",       "MIDGUN"),
+        std::pair("Mid-gun-flat-ca",    "MIDGUN"),
+        std::pair("AL-rocket",          "OTHER"),
+        std::pair("Ballon",         	"OTHER"),
+        std::pair("Command-fac",    	"OTHER"),
+        std::pair("Drum",           	"OTHER"),
+        std::pair("Engine-boiler",  	"OTHER"),
+        std::pair("Engine-boiler",  	"OTHER"),
+        std::pair("Engine-turbine", 	"OTHER"),
+        std::pair("Flyingboat",     	"OTHER"),
+        std::pair("Food",           	"OTHER"),
+        std::pair("Repair-fac",     	"OTHER"),
+        std::pair("Repair-item",    	"OTHER"),
+        std::pair("Searchlight",       	"OTHER"),
+        std::pair("Searchlight-big",	"OTHER"),
+        std::pair("Smoke",          	"OTHER"),
+        std::pair("Starshell",      	"OTHER"),
+        std::pair("Tp-material",    	"OTHER"),
+        std::pair("Underway-replenish",	"OTHER"),
+        std::pair("Aircraft-personnel", "PERS"),
+        std::pair("Surface-personnel",  "PERS"),
+        std::pair("Radar-small-flak",   "RADAR"),
+        std::pair("Radar-small-flat",   "RADAR"),
+        std::pair("Radar-small-dual",   "RADAR"),
+        std::pair("Radar-big-flak",     "RADAR"),
+        std::pair("Radar-big-flat",     "RADAR"),
+        std::pair("Radar-big-dual",     "RADAR"),
+        std::pair("Radar-superbig-dual","RADAR"),
+        std::pair("Radar-sub",          "RADAR"),
+        std::pair("Recon",              "RECON"),
+        std::pair("Recon-lb",           "RECON"),
+        std::pair("Recon-fight",        "RECON"),
+        std::pair("Sp-recon",           "RECON"),
+        std::pair("Sp-recon-night",     "RECON"),
+        std::pair("Sp-bomb",            "SEAPLANEBF"),
+        std::pair("Sp-bomb-night",      "SEAPLANEBF"),
+        std::pair("Sp-fight",           "SEAPLANEBF"),
+        std::pair("Second-gun-flat",    "SECGUN"),
+        std::pair("Second-gun-flak",    "SECGUN"),
+        std::pair("Second-gun-flak-big","SECGUN"),
+        std::pair("AP-shell",           "SHELL"),
+        std::pair("AL-shell",           "SHELL"),
+        std::pair("Small-gun-flat",     "SMALLGUNFLAT"),
+        std::pair("Small-gun-flak",     "SMALLGUNFLAK"),
+        std::pair("Superbig-gun",       "SUPERBIGGUN"),
+        std::pair("Supremebig-gun",     "SUPERBIGGUN"),
+        std::pair("Torp",               "TORP"),
+        std::pair("Torp-sub",           "TORP"),
+        std::pair("Midget-sub",         "TORP"),
+        std::pair("Virtual-precondition",   "VIRTUAL"),
     };
 
     int internalRep;

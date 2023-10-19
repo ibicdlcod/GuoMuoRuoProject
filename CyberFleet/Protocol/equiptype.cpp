@@ -22,6 +22,14 @@ int EquipType::toInt() const {
     return internalRep;
 }
 
+QSet<QString> EquipType::getDisplayGroups() {
+    QSet<QString> result;
+    for(auto &value: displaygroup) {
+        result.insert(value);
+    }
+    return result;
+}
+
 const QString EquipType::intToStrRep(int input) {
     for(auto iter = result.keyValueBegin(),
          end = result.keyValueEnd();
@@ -106,6 +114,10 @@ bool EquipType::isRadar(const int type) {
 
 int EquipType::getSpecial(const int type) {
     return type / 0x10000;
+}
+
+bool EquipType::isNight2(const int type) {
+    return getSpecial(type) == 24;
 }
 
 QList<QString> EquipType::allEquipTypes() {
