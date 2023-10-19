@@ -100,6 +100,7 @@ public slots:
     void setTicketCache(uint8 [], uint32);
     void showHelp(const QStringList &);
     void switchToFactory();
+    void switchToTech();
     void uiRefresh();
     Q_DECL_DEPRECATED void update();
 

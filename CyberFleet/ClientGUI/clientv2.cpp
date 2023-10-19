@@ -296,6 +296,24 @@ void Clientv2::switchToFactory() {
     }
 }
 
+void Clientv2::switchToTech() {
+    if(!loggedIn()) {
+        emit qout(qtTrId("access-denied-login-first"));
+        return;
+    }
+    if(gameState == KP::TechView) {
+        return;
+    } else {
+        gameState = KP::TechView;
+        emit gamestateChanged(KP::TechView);/*)
+        QByteArray msg = KP::clientDemandGlobalTech();
+        const qint64 written = socket.write(msg);
+        if (written <= 0) {
+            throw NetworkError(socket.errorString());
+        }*/
+    }
+}
+
 /* Refresh UI? */
 void Clientv2::uiRefresh() {
     //qDebug("UIREFRESH");

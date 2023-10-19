@@ -17,6 +17,7 @@ MainWindow::MainWindow(QWidget *parent, int argc, char ** argv)
     ui->PortArea->hide();
     ui->FactoryArea->hide();
     ui->LoginScreen->hide();
+    ui->TechArea->hide();
 
     KeyEnterReceiver *key = new KeyEnterReceiver();
     ui->CommandPrompt->installEventFilter(key);
@@ -35,6 +36,8 @@ MainWindow::MainWindow(QWidget *parent, int argc, char ** argv)
                      this, &MainWindow::gamestateChanged);
     QObject::connect(ui->actionBack_to_naval_base, &QAction::triggered,
                      &engine, &Clientv2::backToNavalBase);
+    QObject::connect(ui->actionView_Tech, &QAction::triggered,
+                     &engine, &Clientv2::switchToTech);
     QObject::connect(ui->actionDevelop_Equipment, &QAction::triggered,
                      &engine, &Clientv2::switchToFactory);
     QObject::connect(ui->actionDevelop_Equipment, &QAction::triggered,
@@ -48,6 +51,7 @@ MainWindow::MainWindow(QWidget *parent, int argc, char ** argv)
     licenseArea = new LicenseArea(ui->License);
     newLoginScreen = new NewLoginS(ui->LoginScreen);
     factoryArea = new FactoryArea(ui->FactoryArea);
+    techArea = new TechView(ui->TechArea);
     QTimer::singleShot(1, this,
                        [this]
                        {adjustArea(licenseArea,
@@ -73,6 +77,7 @@ MainWindow::~MainWindow()
     delete licenseArea;
     delete newLoginScreen;
     delete factoryArea;
+    delete techArea;
     delete ui;
 }
 
@@ -97,12 +102,18 @@ void MainWindow::gamestateChanged(KP::GameState state) {
         QTimer::singleShot(1, this,
                            [this]
                            {adjustArea(portArea,
-                                        ui->PortArea->frameSize());})
-        )
+                                        ui->PortArea->frameSize());}))
                       : ui->PortArea->hide();
     state == KP::Factory ? (ui->FactoryArea->show(), factoryRefresh(),
                             factoryArea->resize(ui->FactoryArea->size())) :
         ui->FactoryArea->hide();
+    state == KP::TechView ? (
+        ui->TechArea->show(),
+        QTimer::singleShot(1, this,
+                           [this]
+                           {adjustArea(techArea,
+                                        ui->TechArea->frameSize());}))
+                          : ui->TechArea->hide();
 }
 
 void MainWindow::printMessage(QString text, QColor background,

@@ -8,6 +8,7 @@
 #include "licensearea.h"
 #include "newlogins.h"
 #include "factoryarea.h"
+#include "techview.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -49,5 +50,6 @@ private:
     LicenseArea *licenseArea;
     NewLoginS *newLoginScreen;
     PortArea *portArea;
+    TechView *techArea;
 };
 #endif // MAINWINDOW_H

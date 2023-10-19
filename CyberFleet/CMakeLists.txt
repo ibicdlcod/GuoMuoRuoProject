@@ -104,6 +104,7 @@ qt_add_executable(CFClient
     ${CLIENT_SOURCES}
     common.qrc
     ${app_icon_resource_windows}
+    ClientGUI/ui/techview.h ClientGUI/ui/techview.cpp ClientGUI/ui/techview.ui
 )
 qt_add_executable(CFServer
     MANUAL_FINALIZATION
