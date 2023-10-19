@@ -20,8 +20,9 @@ include_directories(${root_SOURCE_DIR}/FactorySlot)
 add_subdirectory(FactorySlot)
 
 set(TS_FILES
-    Translations/CyberFleet2_zh_CN.ts
-    Translations/CyberFleet2_en_US.ts)
+    Translations/CyberFleet2_en_US.ts
+    Translations/CyberFleet2_ja_JP.ts
+    Translations/CyberFleet2_zh_CN.ts)
 
 set(CLIENT_SOURCES
     ClientGUI/clientv2.cpp

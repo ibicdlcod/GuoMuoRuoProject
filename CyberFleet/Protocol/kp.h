@@ -155,6 +155,7 @@ QByteArray clientStateChange(GameState);
 QByteArray clientSteamAuth(uint8 [], uint32);
 QByteArray clientSteamLogout();
 QByteArray serverDevelopFailed(GameError);
+QByteArray serverEquipLackFather(GameError, int);
 QByteArray serverDevelopStart();
 QByteArray serverEquipInfo(QJsonArray &);
 QByteArray serverFairyBusy(int);

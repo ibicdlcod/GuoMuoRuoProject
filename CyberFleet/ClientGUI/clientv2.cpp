@@ -812,14 +812,17 @@ void Clientv2::receivedMsg(const QJsonObject &djson) {
         case KP::DevelopNotOption: {
             Equipment *father = equipRegistryCache
                                     .value(djson["father"].toInt());
-            //% "This equipment requires you to "
-            //% "possess %1 (id: %2) in order to develop."
-            qWarning() <<
-                qtTrId("equip-not-developable")
-                    .arg(father->toString(
-                             settings->value("language", "ja_JP")
-                                 .toString()),
-                         father->getId());
+            if(father != nullptr) {
+                //% "This equipment requires you to possess %1 (id: %2) in order to develop."
+                qInfo() <<
+                    qtTrId("equip-not-developable")
+                        .arg(father->toString(
+                            settings->value("language", "ja_JP")
+                                .toString())).arg(father->getId());
+            }
+            else {
+                qWarning() << qtTrId("Server desires null father!");
+            }
         }
         break;
         case KP::FactoryBusy:
@@ -870,21 +873,12 @@ void Clientv2::receivedMsg(const QJsonObject &djson) {
         qDebug() << equipRegistryCache.value(1);
         int equipDefInt = djson["equipdef"].toInt();
         if(equipRegistryCache.contains(equipDefInt)) {
-#ifdef QT_NO_DEBUG
             //% "You get new equipment '%1', serial number %2"
             qInfo() <<
                 qtTrId("develop-success")
                     .arg(equipRegistryCache.value(equipDefInt)->toString(
                         settings->value("language", "ja_JP").toString()))
                     .arg(djson["serial"].toInt());
-#else
-            //% "You get new equipment '%1', serial number %2"
-            qInfo() <<
-                qtTrId("develop-success")
-                    .arg(equipRegistryCache.value(equipDefInt)
-                                    ->toString("ja_JP"))
-                    .arg(djson["serial"].toInt());
-#endif
         }
         else {
             //% "You get new equipment with id %1, serial number %2"

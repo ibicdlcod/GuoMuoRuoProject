@@ -46,6 +46,7 @@ int main(int argc, char *argv[]) {
 #endif
 
     QTranslator translator;
+#ifdef QT_NO_DEBUG
     QString steamLanguage = SteamUtils()->GetSteamUILanguage();
     QMap<QString, QString> LanguageView;
     LanguageView["english"] = QStringLiteral("en_US");
@@ -56,6 +57,10 @@ int main(int argc, char *argv[]) {
     else {
         qWarning() << "Language not natively supported";
     }
+#else
+    settings->setValue("language", "ja_JP");
+#endif
+
     QStringList uiLanguages = QLocale::system().uiLanguages();
     if(settings->contains("language")) {
         uiLanguages.prepend(settings->value("language").toString());

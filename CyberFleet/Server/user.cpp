@@ -5,6 +5,7 @@
 #include <QTimeZone>
 #include "../Protocol/resord.h"
 #include "kerrors.h"
+#include "server.h"
 
 #ifdef max
 #undef max
@@ -34,6 +35,32 @@ ResOrd User::getCurrentResources(CSteamID &uid) {
         current[Tungsten] = query.value(5).toInt();
         current[Chromium] = query.value(6).toInt();
         return ResOrd(current);
+    }
+}
+
+std::pair<bool, int> User::haveFather(CSteamID &uid, int sonEquipId,
+                      QMap<int, Equipment *> &equipReg) {
+    if(!equipReg.contains(sonEquipId))
+        return {false, 0};
+    else {
+        int fatherEquipId = equipReg.value(sonEquipId)->attr.value("Father");
+        if(fatherEquipId == 0)
+            return {true, 0};
+        QSqlDatabase db = QSqlDatabase::database();
+        QSqlQuery query;
+        query.prepare("SELECT * "
+                      "FROM UserEquip "
+                      "WHERE User = :id AND EquipDef = :father");
+        query.bindValue(":id", uid.ConvertToUint64());
+        query.bindValue(":father", fatherEquipId);
+        query.exec();
+        query.isSelect();
+        if(!query.first()) {
+            return {false, fatherEquipId};
+        }
+        else {
+            return {true, fatherEquipId};
+        }
     }
 }
 

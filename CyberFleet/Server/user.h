@@ -11,6 +11,8 @@
 namespace User {
 
 ResOrd getCurrentResources(CSteamID &uid);
+std::pair<bool, int> haveFather(CSteamID &uid, int sonEquipId,
+                                QMap<int, Equipment *> &);
 void init(CSteamID &uid);
 bool isFactoryBusy(CSteamID &uid, int factoryID);
 std::tuple<bool, int> isFactoryFinished(CSteamID &uid, int factoryID);

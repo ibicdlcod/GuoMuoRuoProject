@@ -396,8 +396,8 @@ void Server::offerEquipInfo(QSslSocket *connection, int index = 0) {
         if(i == batch) {
             QTimer::singleShot(200, this,
                                [this, connection, index]{
-                offerEquipInfo(connection, index + 1);
-            });
+                                   offerEquipInfo(connection, index + 1);
+                               });
             break;
         }
         auto equipid = *equipIdIter;
@@ -507,6 +507,15 @@ void Server::doDevelop(CSteamID &uid, int equipid,
         QByteArray msg =
             KP::serverDevelopFailed(KP::DevelopNotExist);
         connection->write(msg);
+        return;
+    }
+    auto fatherResult = User::haveFather(uid, equipid, equipRegistry);
+    if(!fatherResult.first) {
+        QByteArray msg =
+            KP::serverEquipLackFather(KP::DevelopNotOption,
+                                      fatherResult.second);
+        connection->write(msg);
+        return;
     }
     /* TODO: this is the no-convert version */
     /*
