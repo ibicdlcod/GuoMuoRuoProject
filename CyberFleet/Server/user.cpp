@@ -27,13 +27,13 @@ ResOrd User::getCurrentResources(CSteamID &uid) {
     else {
         using namespace KP;
         ResTuple current;
-        current[Oil] = query.value(0).toInt();
-        current[Explosives] = query.value(1).toInt();
-        current[Steel] = query.value(2).toInt();
-        current[Rubber] = query.value(3).toInt();
-        current[Aluminium] = query.value(4).toInt();
-        current[Tungsten] = query.value(5).toInt();
-        current[Chromium] = query.value(6).toInt();
+        current[O] = query.value(0).toInt();
+        current[E] = query.value(1).toInt();
+        current[S] = query.value(2).toInt();
+        current[R] = query.value(3).toInt();
+        current[A] = query.value(4).toInt();
+        current[W] = query.value(5).toInt();
+        current[C] = query.value(6).toInt();
         return ResOrd(current);
     }
 }
@@ -86,7 +86,7 @@ bool User::isFactoryBusy(CSteamID &uid, int factoryID) {
     QSqlQuery query;
     query.prepare("SELECT CurrentJob "
                   "FROM Factories "
-                  "WHERE User = :id AND FactoryID = :facto");
+                  "WHERE UserID = :id AND FactoryID = :facto");
     query.bindValue(":id", uid.ConvertToUint64());
     query.bindValue(":facto", factoryID);
     query.exec();

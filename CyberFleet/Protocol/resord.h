@@ -21,6 +21,8 @@ class ResOrd
 public:
     ResOrd(ResTuple);
     ResOrd(int, int, int, int, int, int, int);
+
+    QString toString() const;
     constexpr ResOrd& operator+=(const ResOrd& amount) {
         oil += amount.oil;
         explo += amount.explo;

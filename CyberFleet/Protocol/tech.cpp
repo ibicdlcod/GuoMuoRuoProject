@@ -89,7 +89,7 @@ double calWeightEquip(double requiredSP, double actualSP) {
            + 1;
 }
 
-double Tech::techIntToYear(int year) {
+double Tech::techYearToCompact(int year) {
     if(year <= 1921)
         return 0;
     else if(year <= 1933)

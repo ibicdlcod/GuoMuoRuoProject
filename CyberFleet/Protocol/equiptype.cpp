@@ -1,25 +1,25 @@
 #include "equiptype.h"
 
 EquipType::EquipType()
-    : internalRep(0) {
+    : iRep(0) {
 
 }
 
 EquipType::EquipType(int type)
-    : internalRep(type) {
+    : iRep(type) {
 
 }
 
 EquipType::EquipType(QString type) {
-    internalRep = strToIntRep(type);
+    iRep = strToIntRep(type);
 }
 
 QString EquipType::toString() const {
-    return intToStrRep(internalRep);
+    return intToStrRep(iRep);
 }
 
 int EquipType::toInt() const {
-    return internalRep;
+    return iRep;
 }
 
 QSet<QString> EquipType::getDisplayGroups() {
@@ -31,7 +31,7 @@ QSet<QString> EquipType::getDisplayGroups() {
 }
 
 QString EquipType::getTypeGroup() {
-    return displaygroup.value(intToStrRep(internalRep));
+    return displaygroup.value(intToStrRep(iRep));
 }
 
 const QString EquipType::intToStrRep(int input) {
@@ -124,6 +124,288 @@ bool EquipType::isNight2(const int type) {
     return getSpecial(type) == 24;
 }
 
+bool EquipType::isBomber(const int type) {
+    return isTorpBomber(type) || isDiveBomber(type);
+}
+
+bool EquipType::isJet(const int type) {
+    return getSpecial(type) == 28;
+}
+
+int EquipType::getSize() const {
+    return getSize(iRep);
+}
+
+bool EquipType::isMainGun() const {
+    return isMainGun(iRep);
+}
+
+bool EquipType::isSecGun() const {
+    return isSecGun(iRep);
+}
+
+bool EquipType::isFlak() const {
+    return isFlak(iRep);
+}
+
+bool EquipType::isSurface() const {
+    return isSurface(iRep);
+}
+
+bool EquipType::isTorp() const {
+    return isTorp(iRep);
+}
+
+bool EquipType::isFighter() const {
+    return isFighter(iRep);
+}
+
+bool EquipType::isTorpBomber() const {
+    return isTorpBomber(iRep);
+}
+
+bool EquipType::isDiveBomber() const {
+    return isDiveBomber(iRep);
+}
+
+bool EquipType::isRecon() const {
+    return isRecon(iRep);
+}
+
+bool EquipType::isPatrol() const {
+    return isPatrol(iRep);
+}
+
+bool EquipType::isLb() const {
+    return isLb(iRep);
+}
+
+bool EquipType::isNight() const {
+    return isNight(iRep);
+}
+
+bool EquipType::isSeaplane() const {
+    return isSeaplane(iRep);
+}
+
+bool EquipType::isRadar() const {
+    return isRadar(iRep);
+}
+
+int EquipType::getSpecial() const {
+    return getSpecial(iRep);
+}
+
+bool EquipType::isNight2() const {
+    return isNight2(iRep);
+}
+
+bool EquipType::isBomber() const {
+    return isBomber(iRep);
+}
+
+bool EquipType::isJet() const {
+    return isJet(iRep);
+}
+
 QList<QString> EquipType::allEquipTypes() {
     return result.keys();
+}
+
+const ResOrd EquipType::devResBase() const {
+    using namespace KP;
+
+    ResTuple basic = {std::pair(O, 0),
+        std::pair(E, 0),
+        std::pair(S, 0),
+        std::pair(R, 0),
+        std::pair(A, 0),
+        std::pair(W, 0),
+        std::pair(C, 0),};
+    basic[A] += isFlak() ? 1 : 0;
+    if(isMainGun()) {
+        basic[E] += getSize() * 10;
+        basic[S] += getSize() * 5;
+    }
+    else if(isSecGun()) {
+        basic[E] += getSize() * 5;
+        basic[S] += getSize() * 5;
+    }
+    else if(isTorp()) {
+        basic[O] += getSize() * 10;
+        basic[E] += getSize() * 10;
+        basic[S] += getSize() * 5;
+    }
+    else if(isSeaplane()) {
+        basic[O] += 5 + (isBomber() ? 2 : 0);
+        basic[E] += (isBomber() ? 2 : 0);
+        basic[A] += 10;
+    }
+    else if(isPatrol()) {
+        switch(getSize()) {
+        case 0: // patrol-lb
+            basic[O] += 12;
+            basic[E] += 12;
+            basic[A] += 20;
+            basic[R] += 2;
+            break;
+        case 1: // patrol-liason
+            basic[O] += 5;
+            basic[E] += 2;
+            basic[A] += 5;
+            break;
+        case 2: // patrol-autogyro
+            basic[A] += 10;
+            break;
+        }
+    }
+    else if(isRadar()) {
+        if(getSize() == 7) { // sub
+            basic[S] += 15;
+            basic[A] += 20;
+        }
+        else {
+            basic[S] += 15 * getSize();
+            basic[A] += 20 * getSize();
+        }
+    }
+    else if(getSpecial() == 0
+               || getSpecial() == 24
+               || getSpecial() == 28) {
+        // normal planes are here
+        basic[O] += 10;
+        basic[O] += isBomber() ? 2 : 0;
+        basic[O] += isLb() ? 3 : 0;
+        basic[O] += isNight() ? 2 : 0;
+        basic[O] += isNight2() ? 1 : 0;
+        basic[O] += isJet() ? 10 : 0;
+        basic[E] += 2;
+        basic[E] += isBomber() ? 5 : 0;
+        basic[E] += isLb() ? 5 : 0;
+        basic[E] -= isRecon() ? 1 : 0;
+        basic[A] += 20;
+        basic[A] += isLb() ? 4 : 0;
+        basic[A] += isJet() ? 10 : 0;
+        basic[R] += 2;
+        basic[C] += isJet() ? 5 : 0;
+    }
+    else {
+        switch(getSpecial()) { // 0, 24, 28 are above
+        case 1: // Midget
+            basic[O] += 20;
+            basic[E] += 10;
+            basic[S] += 5;
+            basic[C] += 2;
+            break;
+        case 2: // Depth Charge
+            basic[E] += 10 + getSize() * 2;
+            basic[S] += 5 + getSize() * 2;
+            break;
+        case 3: // Smoke
+            basic[O] += 1;
+            break;
+        case 4: // Sonar
+            basic[S] += 5 + getSize() * 2;
+            basic[A] += 10 + getSize() * 2;
+            break;
+        case 6: // AP shell
+            basic[E] += 20;
+            basic[S] += 40;
+            basic[W] += 25;
+            break;
+        case 7: // AL shell
+            basic[E] += 30;
+            basic[S] += 20;
+            break;
+        case 8: // AL rocket
+            basic[E] += 20;
+            basic[S] += 10;
+            basic[C] += 5;
+            break;
+        case 9: // Landing craft
+            basic[O] += 5;
+            basic[S] += 20;
+            basic[R] += 50;
+            basic[W] += 30;
+            break;
+        case 10: // Landing tank;
+            basic[O] += 5;
+            basic[S] += 30;
+            basic[R] += 60;
+            basic[W] += 30;
+            break;
+        case 11: // Drum
+            basic[S] += 2;
+            break;
+        case 13: // Engine-turbine
+            [[fallthrough]];
+        case 14: // Engine-boiler
+            basic[O] += 10;
+            basic[S] += 15;
+            basic[C] += 30;
+            break;
+        case 15: // Searchlight
+            basic[W] += 30 * getSize();
+            break;
+        case 16: // Starshell
+            basic[E] += 20;
+            basic[S] += 10;
+            basic[A] += 10;
+            break;
+        case 18: // Underway replenish
+            basic[O] += 100;
+            basic[E] += 100;
+            basic[R] += 10;
+            basic[W] += 10;
+            break;
+        case 22: // Repair facility
+            basic[S] += 10;
+            basic[W] += 2;
+            basic[C] += 2;
+            break;
+        case 25: // AA-gun
+            basic[E] += 10;
+            basic[E] += 5 * getSize();
+            basic[S] += 5;
+            basic[S] += 3 * getSize();
+            basic[A] += 2;
+            break;
+        case 26: // flying-boat
+            basic[O] += 50;
+            basic[E] += isRecon() ? 0 : 20;
+            basic[A] += 10;
+            break;
+        case 27: // fighter-lb-interc
+            basic[O] += 8;
+            basic[E] += 5;
+            basic[A] += 24;
+            basic[R] += 2;
+            break;
+        case 29: // Bulge
+            basic[S] += 15 * getSize();
+            break;
+        case 30: // AA-control-devcie
+            basic[E] += 5;
+            basic[A] += 2;
+            basic[C] += 2;
+            break;
+        case 31: // Land corps;
+            basic[O] += 2;
+            basic[S] += 20;
+            basic[R] += 20;
+            basic[W] += 20;
+            break;
+        default: // 12, 17, 19, 20, 21, 22, 23
+            /* zero */
+            break;
+        }
+    }
+    /*
+    case TorpBoat:
+        basic[Oil] = 5;
+        basic[Explosives] = 5;
+        basic[Steel] = 5;
+        break;
+    */
+    return ResOrd(basic);
 }

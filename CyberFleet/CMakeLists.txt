@@ -64,8 +64,6 @@ set(SERVER_SOURCES
     Server/server.h
     Server/sslserver.cpp
     Server/sslserver.h
-    Server/tech.cpp
-    Server/tech.h
     Server/user.cpp
     Server/user.h
     ${TS_FILES}
@@ -85,6 +83,8 @@ set(PROTOCOL_SOURCES
     Protocol/kp.h
     Protocol/resord.cpp
     Protocol/resord.h
+    Protocol/tech.cpp
+    Protocol/tech.h
     Protocol/wcwidth.c
     Protocol/wcwidth.h
 )
@@ -110,7 +110,7 @@ qt_add_executable(CFServer
     ${SERVER_SOURCES}
     common.qrc
     Server/qconsolelistener.cpp Server/qconsolelistener.h
-    Server/tech.cpp Server/tech.h
+
 
 )
 if (${CMAKE_SYSTEM_NAME} MATCHES "Windows")

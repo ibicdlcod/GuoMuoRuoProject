@@ -83,13 +83,13 @@ enum GameState{
 Q_ENUM_NS(GameState)
 
 enum ResourceType{
-    Oil,
-    Explosives,
-    Steel,
-    Rubber,
-    Aluminium,
-    Tungsten,
-    Chromium
+    O, // oil
+    E, // Explosives
+    S, // Steel,
+    R, // Rubber,
+    A, // Aluminium,
+    W, // Tungsten,
+    C, // Chromium
 };
 Q_ENUM_NS(ResourceType)
 

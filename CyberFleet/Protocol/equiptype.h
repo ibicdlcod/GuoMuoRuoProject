@@ -4,6 +4,7 @@
 #include <QString>
 #include <QMap>
 #include <QSet>
+#include "resord.h"
 
 class EquipType
 {
@@ -12,12 +13,13 @@ public:
     EquipType(int);
     EquipType(QString);
 
+    const ResOrd devResBase() const;
+    static QSet<QString> getDisplayGroups();
+    QString getTypeGroup();
     static const QString intToStrRep(int);
     static int strToIntRep(QString);
     QString toString() const;
     int toInt() const;
-    static QSet<QString> getDisplayGroups();
-    QString getTypeGroup();
 
     static int getSize(const int);
     static bool isMainGun(const int);
@@ -36,6 +38,29 @@ public:
     static bool isRadar(const int);
     static int getSpecial(const int);
     static bool isNight2(const int);
+    static bool isBomber(const int);
+    static bool isJet(const int);
+
+    int getSize() const;
+    bool isMainGun() const;
+    bool isSecGun() const;
+    bool isFlak() const;
+    bool isSurface() const;
+    bool isTorp() const;
+    bool isFighter() const;
+    bool isTorpBomber() const;
+    bool isDiveBomber() const;
+    bool isRecon() const;
+    bool isPatrol() const;
+    bool isLb() const;
+    bool isNight() const;
+    bool isSeaplane() const;
+    bool isRadar() const;
+    int getSpecial() const;
+    bool isNight2() const;
+
+    bool isBomber() const;
+    bool isJet() const;
 
     static QList<QString> allEquipTypes();
 
@@ -74,6 +99,7 @@ private:
         std::pair("Recon",              0x0080),
         std::pair("Recon-lb",           0x00A0),
         std::pair("Recon-fight",        0x0480),
+        std::pair("Recon-jet",          0x001C0080),
         std::pair("Sp-bomb",            0x0108),
         std::pair("Sp-bomb-night",      0x0118),
         std::pair("Sp-recon",           0x0088),
@@ -86,8 +112,8 @@ private:
         std::pair("Depthc-projector",   0x00020002),
         std::pair("Depthc-racks",       0x00020001),
         std::pair("Sonar-passive-big",  0x00040003),
-        std::pair("Sonar-passive",      0x00040002),
-        std::pair("Sonar-active",       0x00040001),
+        std::pair("Sonar-passive",      0x00040001),
+        std::pair("Sonar-active",       0x00040002),
         std::pair("AP-shell",           0x00060000),
         std::pair("AL-shell",           0x00070000),
         std::pair("AL-rocket",          0x00080000),
@@ -122,6 +148,7 @@ private:
         std::pair("Smoke",              0x00030000),
         std::pair("Ballon",             0x00050000),
         std::pair("AA-gun",             0x00192000),
+        std::pair("AA-cannon",          0x00192001),
         std::pair("AA-control-device",  0x001E2000),
         std::pair("Land-corps",         0x001F0000),
         std::pair("Virtual-precondition",   0x01000000),
@@ -129,6 +156,7 @@ private:
 
     inline static const QMap<QString, QString> displaygroup = {
         std::pair("AA-gun",             qtTrId("AA")),
+        std::pair("AA-cannon",          qtTrId("AA")),
         std::pair("AA-control-device",  qtTrId("AA")),
         std::pair("Depthc-projector",   qtTrId("ASW")),
         std::pair("Depthc-racks",       qtTrId("ASW")),
@@ -194,6 +222,7 @@ private:
         std::pair("Recon",              qtTrId("RECON")),
         std::pair("Recon-lb",           qtTrId("RECON")),
         std::pair("Recon-fight",        qtTrId("RECON")),
+        std::pair("Recon-jet",          qtTrId("RECON")),
         std::pair("Sp-recon",           qtTrId("RECON")),
         std::pair("Sp-recon-night",     qtTrId("RECON")),
         std::pair("Sp-bomb",            qtTrId("SEAPLANEBF")),
@@ -214,7 +243,7 @@ private:
         std::pair("Virtual-precondition",   qtTrId("VIRTUAL")),
     };
 
-    int internalRep;
+    int iRep; // internal representation
 };
 
 #endif // EQUIPTYPE_H

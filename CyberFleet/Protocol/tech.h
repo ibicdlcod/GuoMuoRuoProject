@@ -18,7 +18,7 @@ public:
     static double calLevelLocal(const QMap<double, double> &);
     static double calWeightEquip(double, double);
     static double calWeightShip(int);
-    static double techIntToYear(int);
+    static double techYearToCompact(int);
 };
 
 #endif // TECH_H

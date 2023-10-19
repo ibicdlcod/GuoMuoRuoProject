@@ -56,7 +56,7 @@
 #include "kerrors.h"
 #include "peerinfo.h"
 #include "sslserver.h"
-#include "tech.h"
+#include "../Protocol/tech.h"
 
 #ifdef max
 #undef max // apparently some stupid win header interferes with std::max
@@ -517,19 +517,15 @@ void Server::doDevelop(CSteamID &uid, int equipid,
         connection->write(msg);
         return;
     }
-    /* TODO: this is the no-convert version */
-    /*
-    if(!equipRegistry.contains(equipid)
-        || !equipRegistry[equipid]->canDevelop(uid)) {
-        QByteArray msg =
-            KP::serverDevelopFailed(KP::DevelopNotOption);
-        connection->write(msg);
-    }
-    else if(User::isFactoryBusy(uid, factoryid)) {
+    if(User::isFactoryBusy(uid, factoryid)) {
         QByteArray msg = KP::serverDevelopFailed(KP::FactoryBusy);
         connection->write(msg);
     }
-    else {
+    /* not yet implemented: mother skillpoint requirements */
+
+
+    /* TODO: this is the no-convert version */
+    /*
         QPointer<EquipDef> equip = equipRegistry[equipid];
         ResOrd resRequired = equip->devRes();
         QByteArray msg = resRequired.resourceDesired();
@@ -578,7 +574,6 @@ void Server::doDevelop(CSteamID &uid, int equipid,
                               query.lastError());
             }
         }
-    }
 */
 }
 
@@ -793,8 +788,7 @@ bool Server::importEquipFromCSV() {
                             "(EquipID, "+lang+") "
                                      "VALUES (:id, :value);");
                         query.bindValue(":id", equipid);
-                        query.bindValue(":value",
-                                        lineParts[i]);
+                        query.bindValue(":value", content);
                         if(!query.exec()) {
                             //% "Import equipment database failed!"
                             throw DBError(qtTrId("equip-import-failed"),
@@ -1171,7 +1165,6 @@ void Server::receivedReq(const QJsonObject &djson,
                           .arg(uid.ConvertToUint64());
         return;
     }
-    QByteArray msg;
     switch(djson["command"].toInt()) {
     case KP::CommandType::ChangeState:
         switch(djson["state"].toInt()) {
@@ -1487,39 +1480,44 @@ void Server::userInit(CSteamID &uid) {
             std::pair(QStringLiteral("W"), 6000),  // tungsten
             std::pair(QStringLiteral("C"), 6000)   // chromium
         };
-    QSqlQuery insert;
-    for (auto i = defaults.cbegin(), end = defaults.cend();
-         i != end; ++i) {
-        if(!insert.prepare("INSERT INTO UserAttr (UserID, Attribute, Intvalue) "
-                            "VALUES (:uid, :attr, :value);")) {
-            qWarning() << insert.lastError().databaseText();
+    {
+        QSqlQuery insert;
+        for (auto i = defaults.cbegin(), end = defaults.cend();
+             i != end; ++i) {
+            if(!insert.prepare("INSERT INTO UserAttr (UserID, Attribute, Intvalue) "
+                                "VALUES (:uid, :attr, :value);")) {
+                qWarning() << insert.lastError().databaseText();
+            }
+            insert.bindValue(":uid", uid.ConvertToUint64());
+            insert.bindValue(":attr", i.key());
+            insert.bindValue(":value", i.value());
+            if(!insert.exec()) {
+                //% "%1: User data init failure!"
+                throw DBError(qtTrId("user-data-init-fail").
+                              arg(uid.ConvertToUint64()),
+                              insert.lastError());
+                return;
+            }
         }
-        insert.bindValue(":uid", uid.ConvertToUint64());
-        insert.bindValue(":attr", i.key());
-        insert.bindValue(":value", i.value());
-        if(!insert.exec()) {
+    }
+    {
+        QSqlQuery insertTime;
+        if(!insertTime.prepare("INSERT INTO UserAttr "
+                                "(UserID, Attribute, Intvalue) "
+                                "VALUES (:uid, :attr, :value);")) {
+            qWarning() << insertTime.lastError().databaseText();
+        }
+        insertTime.bindValue(":uid", uid.ConvertToUint64());
+        insertTime.bindValue(":attr", "RecoverTime");
+        insertTime.bindValue(":value", QDateTime::currentDateTimeUtc()
+                                           .currentSecsSinceEpoch());
+        if(!insertTime.exec()) {
             //% "%1: User data init failure!"
             throw DBError(qtTrId("user-data-init-fail").
                           arg(uid.ConvertToUint64()),
-                          insert.lastError());
+                          insertTime.lastError());
             return;
         }
-    }
-    QSqlQuery insertTime;
-    if(!insert.prepare("INSERT INTO UserAttr (UserID, Attribute, Intvalue) "
-                        "VALUES (:uid, :attr, :value);")) {
-        qWarning() << insert.lastError().databaseText();
-    }
-    insert.bindValue(":uid", uid.ConvertToUint64());
-    insert.bindValue(":attr", "RecoverTime");
-    insert.bindValue(":value", QDateTime::currentDateTimeUtc()
-                                   .currentSecsSinceEpoch());
-    if(!insert.exec()) {
-        //% "%1: User data init failure!"
-        throw DBError(qtTrId("user-data-init-fail").
-                      arg(uid.ConvertToUint64()),
-                      insert.lastError());
-        return;
     }
     for(int i = 0; i < 4; ++i) {
         QSqlQuery factoryNew;

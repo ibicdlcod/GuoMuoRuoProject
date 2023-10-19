@@ -15,11 +15,10 @@ public:
     Equipment(int);
     Equipment(const QJsonObject &);
     QString toString(QString) const;
-    const ResOrd devResBase() const;
     bool canDevelop(CSteamID userid = k_steamIDNil) const;
     const ResOrd devRes() const;
     int getId() const;
-    int getTech() const;
+    double getTech() const;
 
     QMap<QString, QString> localNames;
     EquipType type;

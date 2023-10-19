@@ -4,6 +4,7 @@
 #include <QMetaEnum>
 #include <QSqlQuery>
 #include "../Server/kerrors.h"
+#include "tech.h"
 
 Equipment::Equipment(int equipId)
     : equipRegId(equipId){
@@ -76,8 +77,16 @@ QString Equipment::toString(QString lang) const {
     return localNames[lang];
 }
 
+const ResOrd Equipment::devRes() const {
+    return type.devResBase() * (qint64)std::round((getTech() + 1.0) * 10);
+}
+
 int Equipment::getId() const {
     return equipRegId;
+}
+
+double Equipment::getTech() const {
+    return Tech::techYearToCompact(attr["Tech"]);
 }
 /*
 EquipType::EquipType(const QString &basis) {

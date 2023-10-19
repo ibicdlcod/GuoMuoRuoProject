@@ -3,20 +3,20 @@
 
 ResOrd::ResOrd(ResTuple input) {
     oil = explo = steel = rub = al = w = cr = 0;
-    if(input.contains(KP::Oil))
-        oil = input[KP::Oil];
-    if(input.contains(KP::Explosives))
-        explo = input[KP::Explosives];
-    if(input.contains(KP::Steel))
-        steel = input[KP::Steel];
-    if(input.contains(KP::Rubber))
-        rub = input[KP::Rubber];
-    if(input.contains(KP::Aluminium))
-        al = input[KP::Aluminium];
-    if(input.contains(KP::Tungsten))
-        w = input[KP::Tungsten];
-    if(input.contains(KP::Chromium))
-        cr = input[KP::Chromium];
+    if(input.contains(KP::O))
+        oil = input[KP::O];
+    if(input.contains(KP::E))
+        explo = input[KP::E];
+    if(input.contains(KP::S))
+        steel = input[KP::S];
+    if(input.contains(KP::R))
+        rub = input[KP::R];
+    if(input.contains(KP::A))
+        al = input[KP::A];
+    if(input.contains(KP::W))
+        w = input[KP::W];
+    if(input.contains(KP::C))
+        cr = input[KP::C];
 }
 
 ResOrd::ResOrd(int oil, int explo, int steel, int rub,
@@ -24,6 +24,11 @@ ResOrd::ResOrd(int oil, int explo, int steel, int rub,
     : oil(oil), explo(explo), steel(steel), rub(rub),
       al(al), w(w), cr(cr) {
 
+}
+
+QString ResOrd::toString() const {
+    return qtTrId("Oil %1 Explo %2 Steel %3 Rub %4 Al %5 W %6 Cr %7")
+        .arg(oil).arg(explo).arg(steel).arg(rub).arg(al).arg(w).arg(cr);
 }
 
 bool ResOrd::addResources(const ResOrd &amount) {
