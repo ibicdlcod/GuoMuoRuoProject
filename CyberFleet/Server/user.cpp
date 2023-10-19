@@ -14,32 +14,46 @@
 ResOrd User::getCurrentResources(CSteamID &uid) {
     QSqlDatabase db = QSqlDatabase::database();
     QSqlQuery query;
-    query.prepare("SELECT Oil,Explo,Steel,Rub,Al,W,Cr"
-                  " FROM Users WHERE UserID = :id");
+    query.prepare("SELECT Attribute, Intvalue"
+                  " FROM UserAttr WHERE UserID = :id AND ("
+                  "Attribute = 'O' "
+                  "OR Attribute = 'E' "
+                  "OR Attribute = 'S' "
+                  "OR Attribute = 'R' "
+                  "OR Attribute = 'A' "
+                  "OR Attribute = 'W' "
+                  "OR Attribute = 'C');");
     query.bindValue(":id", uid.ConvertToUint64());
     query.exec();
     query.isSelect();
     if(Q_UNLIKELY(!query.first())) {
-        qWarning() << qtTrId("user-nonexistent-uid")
+        qWarning() << qtTrId("user-check-resource-failed")
                           .arg(uid.ConvertToUint64());
         return ResOrd(ResTuple());
     }
     else {
         using namespace KP;
         ResTuple current;
-        current[O] = query.value(0).toInt();
-        current[E] = query.value(1).toInt();
-        current[S] = query.value(2).toInt();
-        current[R] = query.value(3).toInt();
-        current[A] = query.value(4).toInt();
-        current[W] = query.value(5).toInt();
-        current[C] = query.value(6).toInt();
+        QMap<QString, KP::ResourceType> map
+            = {
+                std::pair("O", O),
+                std::pair("E", E),
+                std::pair("S", S),
+                std::pair("R", R),
+                std::pair("A", A),
+                std::pair("W", W),
+                std::pair("C", C),
+            };
+        do { // query.first is already called once
+            current[map.value(query.value(0).toString())]
+                = query.value(1).toInt();
+        } while (query.next());
         return ResOrd(current);
     }
 }
 
 std::pair<bool, int> User::haveFather(CSteamID &uid, int sonEquipId,
-                      QMap<int, Equipment *> &equipReg) {
+                                      QMap<int, Equipment *> &equipReg) {
     if(!equipReg.contains(sonEquipId))
         return {false, 0};
     else {
@@ -258,6 +272,7 @@ void User::refreshPort(CSteamID &uid) {
 }
 
 void User::setResources(CSteamID &uid, ResOrd goal) {
+    assert(goal.sufficient());
     goal.cap(ResOrd(3600000,
                     3600000,
                     3600000,
@@ -265,32 +280,34 @@ void User::setResources(CSteamID &uid, ResOrd goal) {
                     3600000,
                     3600000,
                     3600000));
+    QMap<QString, int> map = {
+        std::pair("O", goal.o),
+        std::pair("E", goal.e),
+        std::pair("S", goal.s),
+        std::pair("R", goal.r),
+        std::pair("A", goal.a),
+        std::pair("W", goal.w),
+        std::pair("C", goal.c)
+    };
     QSqlDatabase db = QSqlDatabase::database();
-    QSqlQuery query;
-    query.prepare("UPDATE Users "
-                  "SET Oil = :oil, "
-                  "Explo = :explo, "
-                  "Steel = :steel, "
-                  "Rub = :rub, "
-                  "Al = :al, "
-                  "W = :w, "
-                  "Cr = :cr "
-                  "WHERE UserID = :id");
-    query.bindValue(":oil", goal.oil);
-    query.bindValue(":explo", goal.explo);
-    query.bindValue(":steel", goal.steel);
-    query.bindValue(":rub", goal.rub);
-    query.bindValue(":al", goal.al);
-    query.bindValue(":w", goal.w);
-    query.bindValue(":cr", goal.cr);
-    query.bindValue(":id", uid.ConvertToUint64());
-    if(Q_UNLIKELY(!query.exec())) {
-        //% "User id %1: set resources failed!"
-        qWarning() << qtTrId("set-resources-failed").arg(uid.ConvertToUint64());
-        qWarning() << query.lastError();
+    for(auto iter = map.keyValueBegin();
+         iter != map.keyValueEnd();
+         ++iter) {
+        QSqlQuery query;
+        query.prepare("UPDATE UserAttr "
+                      "SET Intvalue = :value "
+                      "WHERE UserID = :id AND Attribute = :type");
+        query.bindValue(":value", iter->second);
+        query.bindValue(":id", uid.ConvertToUint64());
+        query.bindValue(":type", iter->first);
+        if(Q_UNLIKELY(!query.exec())) {
+            //% "User id %1: set resources failed!"
+            qWarning() << qtTrId("set-resources-failed").arg(uid.ConvertToUint64());
+            qWarning() << query.lastError();
+            return;
+        }
     }
-    else {
-        //% "User id %1: set resources"
-        qDebug() << qtTrId("set-resources").arg(uid.ConvertToUint64());
-    }
+    //% "User id %1: set resources"
+    qDebug() << qtTrId("set-resources").arg(uid.ConvertToUint64());
+    qDebug() << goal.toString();
 }

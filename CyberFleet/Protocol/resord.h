@@ -24,44 +24,44 @@ public:
 
     QString toString() const;
     constexpr ResOrd& operator+=(const ResOrd& amount) {
-        oil += amount.oil;
-        explo += amount.explo;
-        steel += amount.steel;
-        rub += amount.rub;
-        al += amount.al;
+        o += amount.o;
+        e += amount.e;
+        s += amount.s;
+        r += amount.r;
+        a += amount.a;
         w += amount.w;
-        cr += amount.cr;
+        c += amount.c;
         return *this;
     }
     constexpr ResOrd& operator-=(const ResOrd& amount) {
-        oil -= amount.oil;
-        explo -= amount.explo;
-        steel -= amount.steel;
-        rub -= amount.rub;
-        al -= amount.al;
+        o -= amount.o;
+        e -= amount.e;
+        s -= amount.s;
+        r -= amount.r;
+        a -= amount.a;
         w -= amount.w;
-        cr -= amount.cr;
+        c -= amount.c;
         return *this;
     }
     const ResOrd operator*(qint64 amount) const {
         return ResOrd(
-                    oil * amount,
-                    explo * amount,
-                    steel * amount,
-                    rub * amount,
-                    al * amount,
+            o * amount,
+            e * amount,
+                    s * amount,
+                    r * amount,
+                    a * amount,
                     w * amount,
-                    cr * amount
+                    c * amount
                     );
     }
     constexpr ResOrd& operator*=(qint64 amount) {
-        oil *= amount;
-        explo *= amount;
-        steel *= amount;
-        rub *= amount;
-        al *= amount;
+        o *= amount;
+        e *= amount;
+        s *= amount;
+        r *= amount;
+        a *= amount;
         w *= amount;
-        cr *= amount;
+        c *= amount;
         return *this;
     }
     bool addResources(const ResOrd&);
@@ -73,13 +73,13 @@ public:
     friend void User::setResources(int uid, ResOrd goal);
 
 //private:
-    int oil;
-    int explo;
-    int steel;
-    int rub;
-    int al;
+    int o;
+    int e;
+    int s;
+    int r;
+    int a;
     int w;
-    int cr;
+    int c;
 };
 
 #endif // RESORD_H

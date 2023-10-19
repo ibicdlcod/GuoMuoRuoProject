@@ -11,6 +11,8 @@ class QDESIGNER_WIDGET_EXPORT FactorySlot : public QPushButton
 
 public:
     FactorySlot(QWidget *parent = 0);
+    bool isOpen();
+    bool isComplete();
     void setComplete(bool);
     void setCompleteTime(QDateTime);
     void setOpen(bool);

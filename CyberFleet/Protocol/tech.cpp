@@ -23,6 +23,7 @@ bool Tech::calExperiment(const double wantedTech,
                          const double currentTech,
                          const double sigmaConstant,
                          std::mt19937 &generator) {
+    assert(sigmaConstant > 0.0);
     std::normal_distribution d{wantedTech, sigmaConstant};
     double random_double = d(generator);
     return random_double <= currentTech;

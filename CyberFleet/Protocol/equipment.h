@@ -17,6 +17,7 @@ public:
     QString toString(QString) const;
     bool canDevelop(CSteamID userid = k_steamIDNil) const;
     const ResOrd devRes() const;
+    const int devTimeInSec() const;
     int getId() const;
     double getTech() const;
 

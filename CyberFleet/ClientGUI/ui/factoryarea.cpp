@@ -55,6 +55,7 @@ void FactoryArea::developClicked(bool checked, int slotnum) {
         qDebug() << "FUCK" << slotnum << Qt::endl;
     else {
         Clientv2 &engine = Clientv2::getInstance();
+        QTimer::singleShot(100, engine, &Clientv2::doRefreshFactory);
         QString msg = QStringLiteral("develop %1 %2")
                           .arg(w.equipIdDesired()).arg(slotnum);
         qDebug() << msg;
@@ -69,9 +70,16 @@ void FactoryArea::doFactoryRefresh(const QJsonObject &input) {
         slotfs[i]->setOpen(true);
         QJsonObject item = content[i].toObject();
         if(!item["done"].toBool()) {
-            slotfs[i]->setCompleteTime(
-                QDateTime::fromString(
-                    item["completetime"].toString()));
+            slotfs[i]->setComplete(false);
+            if(!item.contains("completetime")
+                || item["completetime"].toInt() == 0) {
+                slotfs[i]->setCompleteTime(QDateTime());
+            }
+            else {
+                slotfs[i]->setCompleteTime(
+                    QDateTime::fromSecsSinceEpoch(
+                        item["completetime"].toInt(), QTimeZone::UTC));
+            }
         } else {
             slotfs[i]->setComplete(true);
         }

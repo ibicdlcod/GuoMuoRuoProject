@@ -158,8 +158,8 @@ Q_GLOBAL_STATIC(QString,
                     "UserID BLOB,"
                     "FactoryID INTEGER,"
                     "CurrentJob INTEGER DEFAULT 0,"
-                    "StartTime TEXT, "
-                    "SuccessTime TEXT,"
+                    "StartTime INTEGER, "
+                    "SuccessTime INTEGER,"
                     "Done BOOL DEFAULT false,"
                     "Success BOOL DEFAULT false,"
                     "FOREIGN KEY(UserID) REFERENCES NewUsers(UserID),"
@@ -503,67 +503,61 @@ void Server::decryptDatagram(QSslSocket *connection,
 
 void Server::doDevelop(CSteamID &uid, int equipid,
                        int factoryid, QSslSocket *connection) {
-    if(!equipRegistry.contains(equipid)) {
-        QByteArray msg =
-            KP::serverDevelopFailed(KP::DevelopNotExist);
-        connection->write(msg);
-        return;
-    }
-    auto fatherResult = User::haveFather(uid, equipid, equipRegistry);
-    if(!fatherResult.first) {
-        QByteArray msg =
-            KP::serverEquipLackFather(KP::DevelopNotOption,
-                                      fatherResult.second);
-        connection->write(msg);
-        return;
-    }
-    if(User::isFactoryBusy(uid, factoryid)) {
-        QByteArray msg = KP::serverDevelopFailed(KP::FactoryBusy);
-        connection->write(msg);
-    }
-    /* not yet implemented: mother skillpoint requirements */
-
-
-    /* TODO: this is the no-convert version */
-    /*
-        QPointer<EquipDef> equip = equipRegistry[equipid];
+    try{
+        if(!equipRegistry.contains(equipid)) {
+            QByteArray msg =
+                KP::serverDevelopFailed(KP::DevelopNotExist);
+            connection->write(msg);
+            return;
+        }
+        auto fatherResult = User::haveFather(uid, equipid, equipRegistry);
+        if(!fatherResult.first) {
+            QByteArray msg =
+                KP::serverEquipLackFather(KP::DevelopNotOption,
+                                          fatherResult.second);
+            connection->write(msg);
+            return;
+        }
+        if(User::isFactoryBusy(uid, factoryid)) {
+            QByteArray msg = KP::serverDevelopFailed(KP::FactoryBusy);
+            connection->write(msg);
+            return;
+        }
+        /* not yet implemented: mother skillpoint requirements */
+        Equipment *equip = equipRegistry[equipid];
         ResOrd resRequired = equip->devRes();
         QByteArray msg = resRequired.resourceDesired();
         connection->write(msg);
         ResOrd currentRes = User::getCurrentResources(uid);
         if(!currentRes.addResources(resRequired * -1)){
-            QByteArray msg =
-                KP::serverDevelopFailed(KP::ResourceLack);
-            connection->write(msg);
+            connection->flush();
+            QTimer::singleShot(100, this, [this, connection]{
+                QByteArray msg =
+                    KP::serverDevelopFailed(KP::ResourceLack);
+                connection->write(msg);
+            });
         }
-        else {
-            User::setResources(uid, currentRes);
-            int stagesReq = equip->getRarity();
-            int stagesActual = std::floor(chi2Dist(mt)
-                                          * KP::baseDevRarity);
-            if(stagesActual > stagesReq)
-                stagesActual = stagesReq;
-            QDateTime startTime = QDateTime::currentDateTimeUtc();
-            QDateTime fullTime = startTime.addSecs(
-                stagesReq * KP::secsinMin);
-            QDateTime successTime = startTime.addSecs(
-                stagesActual * KP::secsinMin);
+        else{
+            qint64 startTime = QDateTime::currentSecsSinceEpoch();
+            qint64 successTime = startTime + equip->devTimeInSec();
+
             QSqlDatabase db = QSqlDatabase::database();
             QSqlQuery query;
             query.prepare("UPDATE Factories "
-                          "SET StartTime = :st, Fulltime = :full, "
-                          "SuccessTime = :succ, Done = 0, Success = 0, "
+                          "SET StartTime = :st, "
+                          "SuccessTime = :succ, Done = 0, Success = :good, "
                           "CurrentJob = :eqid "
-                          "WHERE User = :id AND FactoryID = :fid");
+                          "WHERE UserID = :id AND FactoryID = :fid");
+            query.bindValue(":st", startTime);
+            query.bindValue(":succ", successTime);
+            query.bindValue(":good", Tech::calExperiment2(0,0,0,1.0,mt));
+            query.bindValue(":eqid", equipid);
             query.bindValue(":id", uid.ConvertToUint64());
             query.bindValue(":fid", factoryid);
-            static QString format =
-                QStringLiteral("yyyy-MM-dd hh:mm:ss");
-            query.bindValue(":st", startTime.toString(format));
-            query.bindValue(":full", fullTime.toString(format));
-            query.bindValue(":succ", successTime.toString(format));
-            query.bindValue(":eqid", equipid);
             if(query.exec()) {
+                qDebug() << "GOOD";
+                currentRes -= resRequired;
+                User::setResources(uid, currentRes);
                 QByteArray msg =
                     KP::serverDevelopStart();
                 connection->write(msg);
@@ -574,17 +568,25 @@ void Server::doDevelop(CSteamID &uid, int equipid,
                               query.lastError());
             }
         }
-*/
+        refreshClientFactory(uid, connection);
+    } catch (DBError &e) {
+        for(QString &i : e.whats()) {
+            qCritical() << i;
+        }
+        return;
+    } catch(std::exception &e) {
+        qCritical() << e.what();
+        return;
+    }
 }
 
 void Server::doFetch(CSteamID &uid, int factoryid, QSslSocket *connection) {
     User::refreshFactory(uid);
     QSqlDatabase db = QSqlDatabase::database();
     QSqlQuery query;
-    query.prepare("SELECT CurrentJob, Done, Success,"
-                  "strftime('%s', SuccessTime)-strftime('%s', StartTime) "
+    query.prepare("SELECT CurrentJob, Done, Success "
                   "FROM Factories "
-                  "WHERE User = :id AND FactoryID = :fid");
+                  "WHERE UserID = :id AND FactoryID = :fid");
     query.bindValue(":id", uid.ConvertToUint64());
     query.bindValue(":fid", factoryid);
     query.exec();
@@ -602,7 +604,6 @@ void Server::doFetch(CSteamID &uid, int factoryid, QSslSocket *connection) {
         }
         else {
             bool success = query.value(2).toBool();
-            [[maybe_unused]] int secondsSpent = query.value(3).toInt();
             if(!success) {
                 QByteArray msg = KP::serverPenguin();
                 connection->write(msg);
@@ -623,10 +624,10 @@ void Server::doFetch(CSteamID &uid, int factoryid, QSslSocket *connection) {
             QSqlDatabase db = QSqlDatabase::database();
             QSqlQuery query;
             query.prepare("UPDATE Factories "
-                          "SET StartTime = NULL, Fulltime = NULL, "
+                          "SET StartTime = NULL, "
                           "SuccessTime = NULL, Done = 0, Success = 0, "
                           "CurrentJob = 0 "
-                          "WHERE User = :id AND FactoryID = :fid");
+                          "WHERE UserID = :id AND FactoryID = :fid");
             query.bindValue(":id", uid.ConvertToUint64());
             query.bindValue(":fid", factoryid);
             if(!query.exec()) {
@@ -1240,8 +1241,8 @@ void Server::refreshClientFactory(CSteamID &uid, QSslSocket *connection) {
     while(query.next()) {
         QJsonObject item;
         item["factoryid"] = query.value(0).toInt();
-        item["starttime"] = query.value(1).toDateTime().toString();
-        item["completetime"] = query.value(2).toDateTime().toString();
+        item["starttime"] = query.value(1).toInt();
+        item["completetime"] = query.value(2).toInt();
         item["done"] = query.value(3).toBool();
         item["success"] = query.value(4).toBool();
         itemArray.append(item);

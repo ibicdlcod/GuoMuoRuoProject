@@ -81,6 +81,10 @@ const ResOrd Equipment::devRes() const {
     return type.devResBase() * (qint64)std::round((getTech() + 1.0) * 10);
 }
 
+const int Equipment::devTimeInSec() const {
+    return 6 * (qint64)std::round((getTech() + 1.0) * 10);
+}
+
 int Equipment::getId() const {
     return equipRegId;
 }

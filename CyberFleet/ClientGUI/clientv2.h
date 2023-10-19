@@ -89,6 +89,7 @@ public slots:
     void backToNavalBase();
     void catbomb();
     void displayPrompt();
+    void doRefreshFactory();
     bool parse(const QString &);
     void parseDisconnectReq();
     void parseQuit();
@@ -122,7 +123,6 @@ private:
     void doDevelop(const QStringList &);
     void doFetch(const QStringList &);
     void doSwitch(const QStringList &);
-    void doRefreshFactory();
     void exitGracefully();
     void exitGraceSpec();
     QString gameStateString() const;

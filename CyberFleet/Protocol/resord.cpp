@@ -2,33 +2,33 @@
 #include "kp.h"
 
 ResOrd::ResOrd(ResTuple input) {
-    oil = explo = steel = rub = al = w = cr = 0;
+    o = e = s = r = a = w = c = 0;
     if(input.contains(KP::O))
-        oil = input[KP::O];
+        o = input[KP::O];
     if(input.contains(KP::E))
-        explo = input[KP::E];
+        e = input[KP::E];
     if(input.contains(KP::S))
-        steel = input[KP::S];
+        s = input[KP::S];
     if(input.contains(KP::R))
-        rub = input[KP::R];
+        r = input[KP::R];
     if(input.contains(KP::A))
-        al = input[KP::A];
+        a = input[KP::A];
     if(input.contains(KP::W))
         w = input[KP::W];
     if(input.contains(KP::C))
-        cr = input[KP::C];
+        c = input[KP::C];
 }
 
 ResOrd::ResOrd(int oil, int explo, int steel, int rub,
                int al, int w, int cr)
-    : oil(oil), explo(explo), steel(steel), rub(rub),
-      al(al), w(w), cr(cr) {
+    : o(oil), e(explo), s(steel), r(rub),
+      a(al), w(w), c(cr) {
 
 }
 
 QString ResOrd::toString() const {
     return qtTrId("Oil %1 Explo %2 Steel %3 Rub %4 Al %5 W %6 Cr %7")
-        .arg(oil).arg(explo).arg(steel).arg(rub).arg(al).arg(w).arg(cr);
+        .arg(o).arg(e).arg(s).arg(r).arg(a).arg(w).arg(c);
 }
 
 bool ResOrd::addResources(const ResOrd &amount) {
@@ -57,30 +57,30 @@ bool ResOrd::addResources(const ResOrd &amount,
 
 void ResOrd::cap(const ResOrd &cap) {
     using std::min;
-    oil = min(oil, cap.oil);
-    explo = min(explo, cap.explo);
-    steel = min(steel, cap.steel);
-    rub = min(rub, cap.rub);
-    al = min(al, cap.al);
+    o = min(o, cap.o);
+    e = min(e, cap.e);
+    s = min(s, cap.s);
+    r = min(r, cap.r);
+    a = min(a, cap.a);
     w = min(w, cap.w);
-    cr = min(cr, cap.cr);
+    c = min(c, cap.c);
 }
 
 QByteArray ResOrd::resourceDesired() const {
     QJsonObject result;
     result["type"] = KP::DgramType::Message;
     result["msgtype"] = KP::MsgType::ResourceRequired;
-    result["oil"] = oil;
-    result["explo"] = explo;
-    result["steel"] = steel;
-    result["rub"] = rub;
-    result["al"] = al;
+    result["oil"] = o;
+    result["explo"] = e;
+    result["steel"] = s;
+    result["rub"] = r;
+    result["al"] = a;
     result["w"] = w;
-    result["cr"] = cr;
+    result["cr"] = c;
     return QCborValue::fromJsonValue(result).toCbor();
 }
 
 bool ResOrd::sufficient() {
-    return !(oil < 0 || explo < 0 || steel < 0 || rub < 0
-             || al < 0 || w < 0 || cr < 0);
+    return !(o < 0 || e < 0 || s < 0 || r < 0
+             || a < 0 || w < 0 || c < 0);
 }

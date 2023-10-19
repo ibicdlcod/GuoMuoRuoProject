@@ -6,6 +6,14 @@ FactorySlot::FactorySlot(QWidget *parent) :
     connect(this, &FactorySlot::clicked, this, &FactorySlot::clickedHelper);
 }
 
+bool FactorySlot::isOpen() {
+    return open;
+}
+
+bool FactorySlot::isComplete() {
+    return completed;
+}
+
 void FactorySlot::setSlotnum(int num) {
     slotnum = num;
 }
