@@ -30,6 +30,10 @@ QSet<QString> EquipType::getDisplayGroups() {
     return result;
 }
 
+QString EquipType::getTypeGroup() {
+    return displaygroup.value(intToStrRep(internalRep));
+}
+
 const QString EquipType::intToStrRep(int input) {
     for(auto iter = result.keyValueBegin(),
          end = result.keyValueEnd();

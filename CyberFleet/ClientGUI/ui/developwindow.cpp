@@ -9,14 +9,7 @@ DevelopWindow::DevelopWindow(QWidget *parent)
     : QDialog{parent},
     ui(new Ui::DevelopWindow) {
     ui->setupUi(this);
-    for(auto &equipType: EquipType::allEquipTypes()) {
-        ui->listType->addItem(equipType);
-    }
-    ui->listType->addItem("All equipments");
-    resetListName(0);
-    connect(ui->listType, &QComboBox::currentIndexChanged,
-            this, &DevelopWindow::resetListName);
-    qDebug() << "DEVELOPWINDOW";
+
     QSet<QString> equipGroups = EquipType::getDisplayGroups();
     QList<QString> sortedGroups;
     for(auto &equip: equipGroups) {
@@ -24,9 +17,18 @@ DevelopWindow::DevelopWindow(QWidget *parent)
     }
     std::sort(sortedGroups.begin(), sortedGroups.end(),
               [](const QString &a, const QString &b){
-        return qtTrId(a.toUtf8()) < qtTrId(b.toUtf8());
-    });
-    qDebug() << sortedGroups;
+                  return a.localeAwareCompare(b) < 0;
+              });
+
+    for(auto &equipType: sortedGroups) {
+        if(equipType.compare("VIRTUAL", Qt::CaseInsensitive) == 0)
+            continue;
+        ui->listType->addItem(equipType);
+    }
+    ui->listType->addItem("All equipments");
+    resetListName(0);
+    connect(ui->listType, &QComboBox::currentIndexChanged,
+            this, &DevelopWindow::resetListName);
 }
 
 DevelopWindow::~DevelopWindow() {
@@ -54,8 +56,12 @@ void DevelopWindow::resetListName(int equiptypeInt) {
     ui->listName->clear();
     for(auto &equipReg:
          Clientv2::getInstance().equipRegistryCache) {
-        if(ui->listType->currentText().compare("All equipments") == 0
-            || equipReg->type.toString()
+        if(
+            (ui->listType->currentText().compare("All equipments") == 0
+                 && equipReg->type.getTypeGroup()
+                        .compare("VIRTUAL", Qt::CaseInsensitive) != 0
+                 && !equipReg->localNames.value("ja_JP").isEmpty())
+            || equipReg->type.getTypeGroup()
                        .compare(ui->listType->currentText(),
                                 Qt::CaseInsensitive) == 0) {
             QString equipName = equipReg->toString(
