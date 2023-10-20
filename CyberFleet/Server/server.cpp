@@ -468,7 +468,9 @@ void Server::offerEquipInfo(QSslSocket *connection, int index = 0) {
         equipInfos.append(result);
     }
     connection->flush();
-    QByteArray msg = KP::serverEquipInfo(equipInfos);
+    QByteArray msg =
+        KP::serverEquipInfo(equipInfos,
+                            (equipRegistry.size() - index * batch) <= batch);
     connection->write(msg);
     connection->flush();
 }

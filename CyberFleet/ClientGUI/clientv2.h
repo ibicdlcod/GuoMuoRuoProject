@@ -79,6 +79,7 @@ public:
         confirm
     };
     Q_ENUM(Password);
+    bool isEquipRegistryCacheGood() const;
     bool loggedIn() const;
     void doFetch(const QStringList &);
 
@@ -89,6 +90,7 @@ public slots:
     void autoPassword();
     void backToNavalBase();
     void catbomb();
+    void demandEquipCache();
     void displayPrompt();
     void doRefreshFactory();
     Equipment * getEquipmentReg(int);
@@ -107,6 +109,7 @@ public slots:
 
 signals:
     void aboutToQuit();
+    void equipRegistryComplete();
     void gamestateChanged(KP::GameState);
     void qout(QString, QColor background = QColor("white"),
               QColor foreground = QColor("black"));
@@ -180,6 +183,7 @@ private:
     bool authSent = false;
 
     QMap<int, Equipment *> equipRegistryCache;
+    bool equipRegistryCacheGood = false;
 
     QTimer *timer;
 

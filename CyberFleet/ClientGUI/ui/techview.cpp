@@ -28,6 +28,24 @@ void TechView::updateGlobalTech(const QJsonObject &djson) {
 }
 
 void TechView::updateGlobalTechViewTable(const QJsonObject &djson) {
+    Clientv2 &engine = Clientv2::getInstance();
+
+    if(!engine.isEquipRegistryCacheGood()) {/*
+        ui->globalViewTable->setColumnCount(1);
+        ui->globalViewTable->setRowCount(1);
+        QTableWidgetItem *newItem = new QTableWidgetItem(
+            "updating equipment data, please wait...");
+        ui->globalViewTable->setItem(0, 0, newItem);
+*/
+        engine.demandEquipCache();
+        connect(&engine, &Clientv2::equipRegistryComplete,
+                this, [this, djson]{updateGlobalTechViewTable(djson);});
+        return;
+    }
+    else {
+        ui->globalViewTable->setColumnCount(0);
+        ui->globalViewTable->setRowCount(0);
+    }
     ui->globalViewTable->setHorizontalHeaderLabels(
         {qtTrId("Serial-num"), qtTrId("Equip-name-def"),
          qtTrId("Equip-tech-level"), qtTrId("Weight")});
@@ -47,7 +65,6 @@ void TechView::updateGlobalTechViewTable(const QJsonObject &djson) {
         ui->globalViewTable->setItem(currentRowCount + i, 0, newItem);
 
         QTableWidgetItem *newItem2;
-        Clientv2 &engine = Clientv2::getInstance();
         Equipment * thisEquip = engine.getEquipmentReg(item["def"].toInt());
         if(thisEquip->isInvalid()) {
             newItem2 = new QTableWidgetItem(

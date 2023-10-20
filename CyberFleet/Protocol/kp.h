@@ -160,7 +160,7 @@ QByteArray clientSteamLogout();
 QByteArray serverDevelopFailed(GameError);
 QByteArray serverDevelopStart();
 QByteArray serverEquipLackFather(GameError, int);
-QByteArray serverEquipInfo(QJsonArray &);
+QByteArray serverEquipInfo(QJsonArray &, bool);
 QByteArray serverFairyBusy(int);
 QByteArray serverGlobalTech(double);
 QByteArray serverGlobalTech(QList<std::tuple<int, int, double>> &, bool, bool);

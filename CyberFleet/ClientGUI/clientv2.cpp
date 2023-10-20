@@ -79,6 +79,10 @@ Clientv2::~Clientv2() noexcept {
 }
 
 /* public */
+bool Clientv2::isEquipRegistryCacheGood() const {
+    return equipRegistryCacheGood;
+}
+
 bool Clientv2::loggedIn() const {
     return gameState != KP::Offline;
 }
@@ -152,6 +156,14 @@ void Clientv2::catbomb() {
     attemptMode = false;
     shutdown();
     displayPrompt();
+}
+
+void Clientv2::demandEquipCache() {
+    QByteArray msg = KP::clientDemandEquipInfo();
+    const qint64 written = socket.write(msg);
+    if (written <= 0) {
+        throw NetworkError(socket.errorString());
+    }
 }
 
 /* Originally used in CLI */
@@ -1118,4 +1130,9 @@ void Clientv2::updateEquipCache(const QJsonObject &input) {
     qDebug() << qtTrId("Equipment cache length: %1")
                     .arg(Clientv2::getInstance()
                              .equipRegistryCache.size());
+    if(input["final"].toBool()) {
+        // Server should be able to set it false again
+        equipRegistryCacheGood = true;
+        emit equipRegistryComplete();
+    }
 }

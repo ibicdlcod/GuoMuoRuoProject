@@ -164,11 +164,12 @@ QByteArray KP::serverDevelopStart() {
     return QCborValue::fromJsonValue(result).toCbor();
 }
 
-QByteArray KP::serverEquipInfo(QJsonArray &input) {
+QByteArray KP::serverEquipInfo(QJsonArray &input, bool final) {
     QJsonObject result;
     result["type"] = DgramType::Info;
     result["infotype"] = InfoType::EquipInfo;
     result["content"] = input;
+    result["final"] = final;
     return QCborValue::fromJsonValue(result).toCbor();
 }
 
