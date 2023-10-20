@@ -1285,6 +1285,7 @@ void Server::receivedReq(const QJsonObject &djson,
                            this,
                            [connection, this]{offerEquipInfo(connection);});
     }
+    break;
     case KP::CommandType::DemandGlobalTech: {
         QTimer::singleShot(100,
                            this,
