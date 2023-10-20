@@ -2,6 +2,8 @@
 #include "ui_techview.h"
 #include "../clientv2.h"
 
+extern std::unique_ptr<QSettings> settings;
+
 TechView::TechView(QWidget *parent) :
     QFrame(parent),
     ui(new Ui::TechView)
@@ -26,7 +28,9 @@ void TechView::updateGlobalTech(const QJsonObject &djson) {
 }
 
 void TechView::updateGlobalTechViewTable(const QJsonObject &djson) {
-    qDebug() << "GOOD";
+    ui->globalViewTable->setHorizontalHeaderLabels(
+        {qtTrId("Serial-num"), qtTrId("Equip-name-def"),
+         qtTrId("Equip-tech-level"), qtTrId("Weight")});
     ui->globalViewTable->setColumnCount(4);
     QJsonArray contents = djson["content"].toArray();
     int currentRowCount = ui->globalViewTable->rowCount();
@@ -41,12 +45,22 @@ void TechView::updateGlobalTechViewTable(const QJsonObject &djson) {
         QTableWidgetItem *newItem = new QTableWidgetItem(
             QString::number(item["serial"].toInt()));
         ui->globalViewTable->setItem(currentRowCount + i, 0, newItem);
-        QTableWidgetItem *newItem2 = new QTableWidgetItem(
-            QString::number(item["def"].toInt()));
-        ui->globalViewTable->setItem(currentRowCount + i, 1, newItem2);/*
+
+        QTableWidgetItem *newItem2;
+        Clientv2 &engine = Clientv2::getInstance();
+        Equipment * thisEquip = engine.getEquipmentReg(item["def"].toInt());
+        if(thisEquip->isInvalid()) {
+            newItem2 = new QTableWidgetItem(
+                QString::number(item["def"].toInt()));
+        }
+        else {
+            newItem2 = new QTableWidgetItem(
+                thisEquip->toString(settings->value("language", "ja_JP").toString()));
+        }
+        ui->globalViewTable->setItem(currentRowCount + i, 1, newItem2);
         QTableWidgetItem *newItem3 = new QTableWidgetItem(
-                                         iter->toObject()["def"].toInt())
-        ui->globalViewTable->setItem(currentRowCount + i, 3, newItem4);*/
+            QString::number(thisEquip->getTech()));
+        ui->globalViewTable->setItem(currentRowCount + i, 2, newItem3);
         QTableWidgetItem *newItem4 = new QTableWidgetItem(
             QString::number(item["weight"].toDouble()));
         ui->globalViewTable->setItem(currentRowCount + i, 3, newItem4);

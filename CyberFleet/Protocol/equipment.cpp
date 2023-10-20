@@ -8,6 +8,9 @@
 
 Equipment::Equipment(int equipId)
     : equipRegId(equipId){
+    if(equipId == 0) {
+        return;
+    }
     QStringList supportedLangs = {"ja_JP", "zh_CN", "en_US"};
 
     for(auto &lang: supportedLangs) {
@@ -92,6 +95,10 @@ int Equipment::getId() const {
 double Equipment::getTech() const {
     return Tech::techYearToCompact(attr["Tech"]);
 }
+
+bool Equipment::isInvalid() const {
+    return equipRegId == 0;
+};
 /*
 EquipType::EquipType(const QString &basis) {
 

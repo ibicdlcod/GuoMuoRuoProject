@@ -51,6 +51,7 @@ int main(int argc, char *argv[]) {
     QMap<QString, QString> LanguageView;
     LanguageView["english"] = QStringLiteral("en_US");
     LanguageView["schinese"] = QStringLiteral("zh_CN");
+    LanguageView["japanese"] = QStringLiteral("ja_JP");
     if(LanguageView.contains(steamLanguage)) {
         settings->setValue("language", LanguageView[steamLanguage]);
     }

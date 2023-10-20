@@ -20,6 +20,7 @@ public:
     const int devTimeInSec() const;
     int getId() const;
     double getTech() const;
+    bool isInvalid() const;
 
     QMap<QString, QString> localNames;
     EquipType type;
