@@ -491,14 +491,14 @@ void Server::offerGlobalTechComponents(
     bool initial) {
 /* warning: large batch size causes problems */
 #if defined (Q_OS_WIN)
-    static const int batch = 2;
+    static const int batch = 50;
 #else
     static const int batch = 10;
 #endif
     if(content.size() <= batch) {
         connection->flush();
         QByteArray msg = KP::serverGlobalTech(content, initial, true);
-        qDebug() << connection->write(msg);
+        connection->write(msg);
         connection->flush();
     }
     else {
@@ -506,7 +506,7 @@ void Server::offerGlobalTechComponents(
         connection->flush();
         QByteArray msg = KP::serverGlobalTech(
             firsts, initial, false);
-        qDebug() << connection->write(msg);
+        connection->write(msg);
         connection->flush();
         QList<std::tuple<int, int, double>> seconds = content;
         seconds.remove(0, batch);
