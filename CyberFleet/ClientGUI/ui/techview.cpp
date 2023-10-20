@@ -41,10 +41,7 @@ void TechView::updateGlobalTechViewTable(const QJsonObject &djson) {
         ui->waitText->setWordWrap(true);
         ui->waitText->setText(
             QStringLiteral("updating equipment data, please wait..."));
-        engine.demandEquipCache();/*
-        connect(&engine, &Clientv2::equipRegistryComplete,
-                this, [this, djson]{updateGlobalTechViewTable(djson);});
-        */
+        engine.demandEquipCache();
         return;
     }
     else {
@@ -59,6 +56,7 @@ void TechView::updateGlobalTechViewTable(const QJsonObject &djson) {
     int currentRowCount = ui->globalViewTable->rowCount();
     if(djson["initial"].toBool()) {
         ui->globalViewTable->clear();
+        currentRowCount = 0;
         ui->globalViewTable->setRowCount(contents.size());
     }
     else {
