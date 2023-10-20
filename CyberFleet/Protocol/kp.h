@@ -163,7 +163,8 @@ QByteArray serverEquipLackFather(GameError, int);
 QByteArray serverEquipInfo(QJsonArray &, bool);
 QByteArray serverFairyBusy(int);
 QByteArray serverGlobalTech(double);
-QByteArray serverGlobalTech(QList<std::tuple<int, int, double>> &, bool, bool);
+QByteArray serverGlobalTech(const QList<std::tuple<
+                                int, int, double>> &, bool, bool);
 QByteArray serverHello();
 QByteArray serverLackPrivate();
 QByteArray serverLogFail(AuthFailType);

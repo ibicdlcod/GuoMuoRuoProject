@@ -189,7 +189,8 @@ QByteArray KP::serverGlobalTech(double tech) {
     return QCborValue::fromJsonValue(result).toCbor();
 }
 
-QByteArray KP::serverGlobalTech(QList<std::tuple<int, int, double>> &content,
+QByteArray KP::serverGlobalTech(const QList<std::tuple<
+                                    int, int, double>> &content,
                                 bool initial, bool final) {
     QJsonObject result;
     result["type"] = DgramType::Info;

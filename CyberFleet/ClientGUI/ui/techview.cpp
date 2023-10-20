@@ -15,6 +15,11 @@ TechView::TechView(QWidget *parent) :
                      this, &TechView::updateGlobalTech);
     QObject::connect(&engine, &Clientv2::receivedGlobalTechInfo2,
                      this, &TechView::updateGlobalTechViewTable);
+    ui->globalViewTable->hide();
+    ui->waitText->show();
+    ui->waitText->setWordWrap(true);
+    ui->waitText->setText(
+        QStringLiteral("updating equipment data, please wait..."));
 }
 
 TechView::~TechView()
@@ -30,7 +35,13 @@ void TechView::updateGlobalTech(const QJsonObject &djson) {
 void TechView::updateGlobalTechViewTable(const QJsonObject &djson) {
     Clientv2 &engine = Clientv2::getInstance();
 
-    if(!engine.isEquipRegistryCacheGood()) {/*
+    if(!engine.isEquipRegistryCacheGood()) {
+        ui->globalViewTable->hide();
+        ui->waitText->show();
+        ui->waitText->setWordWrap(true);
+        ui->waitText->setText(
+            QStringLiteral("updating equipment data, please wait..."));
+        /*
         ui->globalViewTable->setColumnCount(1);
         ui->globalViewTable->setRowCount(1);
         QTableWidgetItem *newItem = new QTableWidgetItem(
@@ -43,8 +54,8 @@ void TechView::updateGlobalTechViewTable(const QJsonObject &djson) {
         return;
     }
     else {
-        ui->globalViewTable->setColumnCount(0);
-        ui->globalViewTable->setRowCount(0);
+        ui->globalViewTable->show();
+        ui->waitText->hide();
     }
     ui->globalViewTable->setHorizontalHeaderLabels(
         {qtTrId("Serial-num"), qtTrId("Equip-name-def"),
@@ -82,5 +93,10 @@ void TechView::updateGlobalTechViewTable(const QJsonObject &djson) {
             QString::number(item["weight"].toDouble()));
         ui->globalViewTable->setItem(currentRowCount + i, 3, newItem4);
         ++i;
+    }
+    if(djson["final"].toBool()) {
+        qDebug() << "FINAL";
+        ui->globalViewTable->sortByColumn(3, Qt::DescendingOrder);
+        ui->globalViewTable->sortByColumn(2, Qt::DescendingOrder);
     }
 }
