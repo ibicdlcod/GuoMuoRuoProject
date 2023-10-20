@@ -17,6 +17,7 @@ public:
 
 private slots:
     void updateGlobalTech(const QJsonObject &);
+    void updateGlobalTechViewTable(const QJsonObject &);
 
 private:
     Ui::TechView *ui;

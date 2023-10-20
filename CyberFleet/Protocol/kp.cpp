@@ -189,10 +189,11 @@ QByteArray KP::serverGlobalTech(double tech) {
 }
 
 QByteArray KP::serverGlobalTech(QList<std::tuple<int, int, double>> &content,
-                                bool final) {
+                                bool initial, bool final) {
     QJsonObject result;
     result["type"] = DgramType::Info;
     result["infotype"] = InfoType::GlobalTechInfo;
+    result["initial"] = initial; // a true result will refresh the client table
     result["final"] = final; // a true result will trigger sorting in client
     QJsonArray contentJSON;
     for(auto &contentPart: content) {

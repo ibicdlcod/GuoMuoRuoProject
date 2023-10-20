@@ -91,6 +91,7 @@ public slots:
     void catbomb();
     void displayPrompt();
     void doRefreshFactory();
+    Equipment * getEquipmentReg(int);
     bool parse(const QString &);
     void parseDisconnectReq();
     void parseQuit();
@@ -111,6 +112,7 @@ signals:
               QColor foreground = QColor("black"));
     void receivedFactoryRefresh(const QJsonObject &);
     void receivedGlobalTechInfo(const QJsonObject &);
+    void receivedGlobalTechInfo2(const QJsonObject &);
 
 private slots:
     void encrypted();

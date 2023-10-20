@@ -531,6 +531,13 @@ void Clientv2::doRefreshFactory() {
     socket.flush();
 }
 
+Equipment * Clientv2::getEquipmentReg(int equipid) {
+    if(!equipRegistryCache.contains(equipid))
+        return new Equipment(0);
+    else
+        return equipRegistryCache.value(equipid);
+}
+
 /* Exit */
 void Clientv2::exitGracefully() {
     exitGraceSpec();
@@ -779,7 +786,7 @@ void Clientv2::receivedInfo(const QJsonObject &djson) {
         if(djson.contains("value"))
             emit receivedGlobalTechInfo(djson);
         else {
-
+            emit receivedGlobalTechInfo2(djson);
         }
         break;
     default: throw std::domain_error("auth type not supported"); break;

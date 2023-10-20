@@ -480,11 +480,12 @@ void Server::offerGlobalTech(QSslSocket *connection, const CSteamID &uid) {
     QByteArray msg = KP::serverGlobalTech(global);
     connection->write(msg);
     connection->flush();
-    offerGlobalTechComponents(connection, result.second);
+    offerGlobalTechComponents(connection, result.second, true);
 }
 
 void Server::offerGlobalTechComponents(
-    QSslSocket *connection, QList<std::tuple<int, int, double>> &content) {
+    QSslSocket *connection, QList<std::tuple<int, int, double>> &content,
+    bool initial) {
 /* warning: large batch size causes problems */
 #if defined (Q_OS_WIN)
     static const int batch = 50;
@@ -493,7 +494,7 @@ void Server::offerGlobalTechComponents(
 #endif
     if(content.size() <= batch) {
         connection->flush();
-        QByteArray msg = KP::serverGlobalTech(content, true);
+        QByteArray msg = KP::serverGlobalTech(content, initial, true);
         qDebug() << msg;
         connection->write(msg);
         connection->flush();
