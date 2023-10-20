@@ -71,6 +71,14 @@ QByteArray KP::clientDemandEquipInfo() {
     return QCborValue::fromJsonValue(result).toCbor();
 }
 
+QByteArray KP::clientDemandGlobalTech() {
+    QJsonObject result;
+    result["type"] = DgramType::Request;
+    result["command"] = CommandType::DemandGlobalTech;
+    return QCborValue::fromJsonValue(result).toCbor();
+
+}
+
 QByteArray KP::clientDevelop(int equipid, bool convert, int factoryID) {
     QJsonObject result;
     result["type"] = DgramType::Request;

@@ -427,6 +427,41 @@ void Server::offerEquipInfo(QSslSocket *connection, int index = 0) {
     connection->flush();
 }
 
+void Server::offerGlobalTech(QSslSocket *connection, const CSteamID &uid) {
+    qDebug() << "OFFERGLOBALTECH";
+    QList<Equipment *> equips;
+    try{
+        QSqlDatabase db = QSqlDatabase::database();
+        QSqlQuery query;
+        query.prepare("SELECT EquipDef"
+                      " FROM UserEquip WHERE User = :id;");
+        query.bindValue(":id", uid.ConvertToUint64());
+        if(!query.exec() || !query.isSelect()) {
+            throw DBError(qtTrId("user-check-resource-failed")
+                              .arg(uid.ConvertToUint64()),
+                          query.lastError());
+        }
+        else { // query.first yet to be called
+            while(query.next()) {
+                equips.append(equipRegistry.value(query.value(0).toInt()));
+            }
+            qDebug() << equips;
+        }
+    } catch (DBError &e) {
+        for(QString &i : e.whats()) {
+            qCritical() << i;
+        }
+        return;
+    } catch (std::exception &e) {
+        qCritical() << e.what();
+    }
+}
+
+void Server::offerGlobalTechComponents(
+    QSslSocket *connection, int index = 0) {
+
+}
+
 void Server::pskRequired(QSslSocket *socket,
                          QSslPreSharedKeyAuthenticator *auth)
 {
@@ -1211,6 +1246,12 @@ void Server::receivedReq(const QJsonObject &djson,
         QTimer::singleShot(100,
                            this,
                            [connection, this]{offerEquipInfo(connection);});
+    }
+    case KP::CommandType::DemandGlobalTech: {
+        QTimer::singleShot(100,
+                           this,
+                           [connection, this, uid]
+                           {offerGlobalTech(connection, uid);});
     }
     break;
     default:

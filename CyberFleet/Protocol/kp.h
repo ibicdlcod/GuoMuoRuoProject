@@ -102,7 +102,8 @@ enum CommandType{
     SteamLogout,
     CHello,
     AdminAddEquip,
-    DemandEquipInfo
+    DemandEquipInfo,
+    DemandGlobalTech
 };
 Q_ENUM_NS(CommandType)
 
@@ -147,6 +148,7 @@ QByteArray accessDenied();
 QByteArray catbomb();
 QByteArray clientAddEquip(int);
 QByteArray clientDemandEquipInfo();
+QByteArray clientDemandGlobalTech();
 QByteArray clientDevelop(int, bool convert = false, int factoryID = -1);
 QByteArray clientFactoryRefresh();
 QByteArray clientFetch(int factoryID = -1);

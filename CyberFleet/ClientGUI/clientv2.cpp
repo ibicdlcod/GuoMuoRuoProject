@@ -305,12 +305,12 @@ void Clientv2::switchToTech() {
         return;
     } else {
         gameState = KP::TechView;
-        emit gamestateChanged(KP::TechView);/*)
+        emit gamestateChanged(KP::TechView);
         QByteArray msg = KP::clientDemandGlobalTech();
         const qint64 written = socket.write(msg);
         if (written <= 0) {
             throw NetworkError(socket.errorString());
-        }*/
+        }
     }
 }
 
