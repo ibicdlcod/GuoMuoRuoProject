@@ -180,6 +180,14 @@ QByteArray KP::serverFairyBusy(int jobID) {
     return QCborValue::fromJsonValue(result).toCbor();
 }
 
+QByteArray KP::serverGlobalTech(double tech) {
+    QJsonObject result;
+    result["type"] = DgramType::Info;
+    result["infotype"] = InfoType::GlobalTechInfo;
+    result["value"] = tech;
+    return QCborValue::fromJsonValue(result).toCbor();
+}
+
 QByteArray KP::serverHello() {
     QJsonObject result;
     result["type"] = DgramType::Message;

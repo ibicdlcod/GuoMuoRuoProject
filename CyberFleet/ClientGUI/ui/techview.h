@@ -15,6 +15,9 @@ public:
     explicit TechView(QWidget *parent = nullptr);
     ~TechView();
 
+private slots:
+    void updateGlobalTech(const QJsonObject &);
+
 private:
     Ui::TechView *ui;
 };

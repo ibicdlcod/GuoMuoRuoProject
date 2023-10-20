@@ -125,7 +125,8 @@ Q_ENUM_NS(FactoryState)
 
 enum InfoType{
     FactoryInfo,
-    EquipInfo
+    EquipInfo,
+    GlobalTechInfo
 };
 Q_ENUM_NS(InfoType)
 
@@ -157,10 +158,11 @@ QByteArray clientStateChange(GameState);
 QByteArray clientSteamAuth(uint8 [], uint32);
 QByteArray clientSteamLogout();
 QByteArray serverDevelopFailed(GameError);
-QByteArray serverEquipLackFather(GameError, int);
 QByteArray serverDevelopStart();
+QByteArray serverEquipLackFather(GameError, int);
 QByteArray serverEquipInfo(QJsonArray &);
 QByteArray serverFairyBusy(int);
+QByteArray serverGlobalTech(double);
 QByteArray serverHello();
 QByteArray serverLackPrivate();
 QByteArray serverLogFail(AuthFailType);

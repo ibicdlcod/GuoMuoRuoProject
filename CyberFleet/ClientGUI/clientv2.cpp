@@ -775,6 +775,13 @@ void Clientv2::receivedInfo(const QJsonObject &djson) {
     switch(djson["infotype"].toInt()) {
     case KP::InfoType::FactoryInfo: emit receivedFactoryRefresh(djson); break;
     case KP::InfoType::EquipInfo: updateEquipCache(djson); break;
+    case KP::InfoType::GlobalTechInfo:
+        if(djson.contains("value"))
+            emit receivedGlobalTechInfo(djson);
+        else {
+
+        }
+        break;
     default: throw std::domain_error("auth type not supported"); break;
     }
 }

@@ -22,7 +22,6 @@ int newEquip(CSteamID &uid, int equipDid);
 void refreshFactory(CSteamID &uid);
 void refreshPort(CSteamID &uid);
 void setResources(CSteamID &uid, ResOrd goal);
-
 };
 
 #endif // USER_H

@@ -110,6 +110,7 @@ signals:
     void qout(QString, QColor background = QColor("white"),
               QColor foreground = QColor("black"));
     void receivedFactoryRefresh(const QJsonObject &);
+    void receivedGlobalTechInfo(const QJsonObject &);
 
 private slots:
     void encrypted();

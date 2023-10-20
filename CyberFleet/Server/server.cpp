@@ -378,6 +378,52 @@ void Server::handleNewConnection(){
     currentsocket->write(msg);
 }
 
+// std::pair(Globaltech, QList(equipserial, equipid, weight))
+std::pair<double, QList<std::tuple<int, int, double>>>
+Server::calGlobalTech(const CSteamID &uid) {
+    QMap<int, Equipment *> equips;
+    QList<std::tuple<int, int, double>> result;
+    try{
+        QSqlDatabase db = QSqlDatabase::database();
+        QSqlQuery query;
+        query.prepare("SELECT EquipDef, EquipSerial"
+                      " FROM UserEquip WHERE User = :id;");
+        query.bindValue(":id", uid.ConvertToUint64());
+        if(!query.exec() || !query.isSelect()) {
+            throw DBError(qtTrId("user-check-resource-failed")
+                              .arg(uid.ConvertToUint64()),
+                          query.lastError());
+        }
+        else { // query.first yet to be called
+            while(query.next()) {
+                int serial = query.value(1).toInt();
+                int def = query.value(0).toInt();
+                double weight = 1.0; // not yet implemented
+                equips[serial] =
+                    equipRegistry.value(def);
+                result.append({serial, def, 1.0});
+            }
+            QList<std::pair<double, double>> source;
+            for(auto iter = equips.cbegin();
+                 iter != equips.cend();
+                 ++iter) {
+                double weight = 1.0; // not yet implemented
+                source.append({iter.value()->getTech(), weight});
+            }
+            return {Tech::calLevelGlobal(source), result};
+        }
+    } catch (DBError &e) {
+        for(QString &i : e.whats()) {
+            qCritical() << i;
+            return{0, {}};
+        }
+    } catch (std::exception &e) {
+        qCritical() << e.what();
+        return{0, {}};
+    }
+    return{0, {}};
+}
+
 void Server::offerEquipInfo(QSslSocket *connection, int index = 0) {
 /* warning: large batch size causes problems */
 #if defined (Q_OS_WIN)
@@ -428,42 +474,12 @@ void Server::offerEquipInfo(QSslSocket *connection, int index = 0) {
 }
 
 void Server::offerGlobalTech(QSslSocket *connection, const CSteamID &uid) {
-    qDebug() << "OFFERGLOBALTECH";
-    QMap<int, Equipment *> equips;
-    try{
-        QSqlDatabase db = QSqlDatabase::database();
-        QSqlQuery query;
-        query.prepare("SELECT EquipDef, EquipSerial"
-                      " FROM UserEquip WHERE User = :id;");
-        query.bindValue(":id", uid.ConvertToUint64());
-        if(!query.exec() || !query.isSelect()) {
-            throw DBError(qtTrId("user-check-resource-failed")
-                              .arg(uid.ConvertToUint64()),
-                          query.lastError());
-        }
-        else { // query.first yet to be called
-            while(query.next()) {
-                equips[query.value(1).toInt()] =
-                    equipRegistry.value(query.value(0).toInt());
-            }
-            QList<std::pair<double, double>> source;
-            for(auto iter = equips.cbegin();
-                 iter != equips.cend();
-                 ++iter) {
-                double weight = 1.0; // not yet implemented
-                source.append({iter.value()->getTech(), weight});
-            }
-            qDebug() << equips;
-            qDebug() << Tech::calLevelGlobal(source);
-        }
-    } catch (DBError &e) {
-        for(QString &i : e.whats()) {
-            qCritical() << i;
-        }
-        return;
-    } catch (std::exception &e) {
-        qCritical() << e.what();
-    }
+    auto result = calGlobalTech(uid);
+    double global = result.first;
+    connection->flush();
+    QByteArray msg = KP::serverGlobalTech(global);
+    connection->write(msg);
+    connection->flush();
 }
 
 void Server::offerGlobalTechComponents(
