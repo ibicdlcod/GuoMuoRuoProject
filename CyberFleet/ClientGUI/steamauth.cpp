@@ -6,10 +6,20 @@
 #include <QString>
 #include <QTextStream>
 
+extern std::unique_ptr<QSettings> settings;
+
 /* Part of Steam Authentication */
 void SteamAuth::RetrieveEncryptedAppTicket() {
     uint32 k_unSecretData = 0x5444;
 
+    if(settings->contains("client/requestEATCall")
+        && settings->value("client/requestEATCall").toDateTime()
+                   .secsTo(QDateTime::currentDateTimeUtc()) < 60) {
+        qWarning() << "Steam API 'RequestEncryptedAppTicket' is subject to a "
+                      "60 second rate limit.";
+    }
+
+    settings->setValue("client/requestEATCall", QDateTime::currentDateTimeUtc());
     SteamAPICall_t hSteamAPICall = SteamUser()->RequestEncryptedAppTicket(
         &k_unSecretData, sizeof(k_unSecretData));
     m_EncryptedAppTicketResponseCallResult.Set(
