@@ -40,41 +40,44 @@ bool Tech::calExperiment2(const double wantedTech,
                          generator);
 }
 
-double Tech::calLevel(const QMap<double, double> &source,
+double Tech::calLevel(QList<std::pair<double, double>> &source,
                       const double scopeConstant) {
-    /* Note QMap always orders by key, as opposed to QHash */
+    /* sort by key desc */
+    std::sort(source.begin(), source.end(),
+              [](std::pair<double, double> a, std::pair<double, double> b){
+        return a.first > b.first;
+    });
     if(scopeConstant <= 1.0) {
         qCritical() << qtTrId("scope-constant-less-than-1");
         return 0.0;
     }
     double result = 0.0;
     double weightSum = 0.0;
-    QList<double> components = source.keys();
-    for(auto iter = components.rbegin();
-         iter != components.rend();
+    for(auto iter = source.begin();
+         iter != source.end();
          iter++) {
-        if(*iter < 0.0) {
+        if(iter->first < 0.0) {
             qCritical() << qtTrId("tech-level-less-than-0");
             return 0.0;
         }
-        double weight = source[*iter];
+        double weight = iter->second;
         if(weight < 0.0) {
             qCritical() << qtTrId("tech-weight-less-than-0");
             return 0.0;
         }
         weightSum += weight;
-        result += (*iter) * (pow(scopeConstant, weight) - 1.0)
+        result += (iter->first) * (pow(scopeConstant, weight) - 1.0)
                   * (pow(scopeConstant, -weightSum));
     }
     return result;
 }
 
-double Tech::calLevelGlobal(const QMap<double, double> &source) {
+double Tech::calLevelGlobal(QList<std::pair<double, double>> &source) {
     static const double globalScope = 1.02;
     return calLevel(source, globalScope);
 }
 
-double Tech::calLevelLocal(const QMap<double, double> &source) {
+double Tech::calLevelLocal(QList<std::pair<double, double>> &source) {
     static const double localScope = 1.1;
     return calLevel(source, localScope);
 }

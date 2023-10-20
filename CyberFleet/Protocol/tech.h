@@ -13,9 +13,9 @@ public:
     static bool calExperiment(double, double, double, std::mt19937 &);
     static bool calExperiment2(double, double, double, double,
                                std::mt19937 &);
-    static double calLevel(const QMap<double, double> &, const double);
-    static double calLevelGlobal(const QMap<double, double> &);
-    static double calLevelLocal(const QMap<double, double> &);
+    static double calLevel(QList<std::pair<double, double>> &, const double);
+    static double calLevelGlobal(QList<std::pair<double, double>> &);
+    static double calLevelLocal(QList<std::pair<double, double>> &);
     static double calWeightEquip(double, double);
     static double calWeightShip(int);
     static double techYearToCompact(int);

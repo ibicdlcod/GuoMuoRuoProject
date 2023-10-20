@@ -429,11 +429,11 @@ void Server::offerEquipInfo(QSslSocket *connection, int index = 0) {
 
 void Server::offerGlobalTech(QSslSocket *connection, const CSteamID &uid) {
     qDebug() << "OFFERGLOBALTECH";
-    QList<Equipment *> equips;
+    QMap<int, Equipment *> equips;
     try{
         QSqlDatabase db = QSqlDatabase::database();
         QSqlQuery query;
-        query.prepare("SELECT EquipDef"
+        query.prepare("SELECT EquipDef, EquipSerial"
                       " FROM UserEquip WHERE User = :id;");
         query.bindValue(":id", uid.ConvertToUint64());
         if(!query.exec() || !query.isSelect()) {
@@ -443,9 +443,18 @@ void Server::offerGlobalTech(QSslSocket *connection, const CSteamID &uid) {
         }
         else { // query.first yet to be called
             while(query.next()) {
-                equips.append(equipRegistry.value(query.value(0).toInt()));
+                equips[query.value(1).toInt()] =
+                    equipRegistry.value(query.value(0).toInt());
+            }
+            QList<std::pair<double, double>> source;
+            for(auto iter = equips.cbegin();
+                 iter != equips.cend();
+                 ++iter) {
+                double weight = 1.0; // not yet implemented
+                source.append({iter.value()->getTech(), weight});
             }
             qDebug() << equips;
+            qDebug() << Tech::calLevelGlobal(source);
         }
     } catch (DBError &e) {
         for(QString &i : e.whats()) {
