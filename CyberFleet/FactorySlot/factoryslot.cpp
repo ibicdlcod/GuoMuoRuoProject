@@ -63,7 +63,11 @@ void FactorySlot::setStatus() {
             QDateTime current = QDateTime::currentDateTime(QTimeZone::UTC);
             QTime zero = QTime(0, 0);
             QTime interval = zero.addSecs(current.secsTo(completeTime));
-            this->setText(interval.toString("hh:mm:ss"));
+            if(interval > zero)
+                this->setText(interval.toString("hh:mm:ss"));
+            else {
+                completed = true;
+            }
         } else {
             //% "Factory %1"
             this->setText(qtTrId("factory-num-label").arg(slotnum));

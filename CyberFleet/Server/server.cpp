@@ -487,7 +487,7 @@ void Server::offerGlobalTech(QSslSocket *connection, const CSteamID &uid) {
 
 void Server::offerGlobalTechComponents(
     QSslSocket *connection, const QList<std::tuple<
-                                int, int, double>> &content,
+        int, int, double>> &content,
     bool initial) {
 /* warning: large batch size causes problems */
 #if defined (Q_OS_WIN)
@@ -511,7 +511,7 @@ void Server::offerGlobalTechComponents(
         QList<std::tuple<int, int, double>> seconds = content;
         seconds.remove(0, batch);
 
-        QTimer::singleShot(200, this, [=](){
+        QTimer::singleShot(200, this, [=, this](){
             offerGlobalTechComponents(connection, seconds, false);
         });
     }
@@ -640,7 +640,12 @@ void Server::doDevelop(CSteamID &uid, int equipid,
                           "WHERE UserID = :id AND FactoryID = :fid");
             query.bindValue(":st", startTime);
             query.bindValue(":succ", successTime);
-            query.bindValue(":good", Tech::calExperiment2(0,0,0,1.0,mt));
+            query.bindValue(":good", Tech::calExperiment2(
+                                         equip->getTech(),
+                                         calGlobalTech(uid).first,
+                                         0.0, // localtech not yet implemented
+                                         1.0,
+                                         mt));
             query.bindValue(":eqid", equipid);
             query.bindValue(":id", uid.ConvertToUint64());
             query.bindValue(":fid", factoryid);

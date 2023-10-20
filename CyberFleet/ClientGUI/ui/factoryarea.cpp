@@ -54,6 +54,9 @@ void FactoryArea::developClicked(bool checked, int slotnum) {
     if(slotfs[slotnum]->isComplete()) {
         engine.doFetch({"fetch", QString::number(slotnum)});
     }
+    else if(slotfs[slotnum]->isOnJob()) {
+        return;
+    }
     else {
         DevelopWindow w;
         if(w.exec() == QDialog::Rejected)
