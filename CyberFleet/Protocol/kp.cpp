@@ -188,6 +188,24 @@ QByteArray KP::serverGlobalTech(double tech) {
     return QCborValue::fromJsonValue(result).toCbor();
 }
 
+QByteArray KP::serverGlobalTech(QList<std::tuple<int, int, double>> &content,
+                                bool final) {
+    QJsonObject result;
+    result["type"] = DgramType::Info;
+    result["infotype"] = InfoType::GlobalTechInfo;
+    result["final"] = final; // a true result will trigger sorting in client
+    QJsonArray contentJSON;
+    for(auto &contentPart: content) {
+        QJsonObject part;
+        part["serial"] = std::get<0>(contentPart);
+        part["def"] = std::get<1>(contentPart);
+        part["weight"] = std::get<2>(contentPart);
+        contentJSON.append(part);
+    }
+    result["content"] = contentJSON;
+    return QCborValue::fromJsonValue(result).toCbor();
+}
+
 QByteArray KP::serverHello() {
     QJsonObject result;
     result["type"] = DgramType::Message;

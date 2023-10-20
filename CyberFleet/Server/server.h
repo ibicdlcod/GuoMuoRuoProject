@@ -89,7 +89,8 @@ private slots:
     calGlobalTech(const CSteamID &);
     void offerEquipInfo(QSslSocket *, int);
     void offerGlobalTech(QSslSocket *, const CSteamID &);
-    void offerGlobalTechComponents(QSslSocket *, int);
+    void offerGlobalTechComponents(QSslSocket *,
+                                   QList<std::tuple<int, int, double>> &);
     void pskRequired(QSslSocket *, QSslPreSharedKeyAuthenticator *);
     void shutdown();
     void sslErrors(QSslSocket *, const QList<QSslError> &);
