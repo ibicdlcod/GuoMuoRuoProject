@@ -300,10 +300,12 @@ void Clientv2::switchToFactory() {
     } else {
         gameState = KP::Factory;
         emit gamestateChanged(KP::Factory);
-        QByteArray msg = KP::clientDemandEquipInfo();
-        const qint64 written = socket.write(msg);
-        if (written <= 0) {
-            throw NetworkError(socket.errorString());
+        if(!equipRegistryCacheGood) {
+            QByteArray msg = KP::clientDemandEquipInfo();
+            const qint64 written = socket.write(msg);
+            if (written <= 0) {
+                throw NetworkError(socket.errorString());
+            }
         }
     }
 }
@@ -318,12 +320,29 @@ void Clientv2::switchToTech() {
     } else {
         gameState = KP::TechView;
         emit gamestateChanged(KP::TechView);
-        QByteArray msg = KP::clientDemandGlobalTech();
-        const qint64 written = socket.write(msg);
-        if (written <= 0) {
-            throw NetworkError(socket.errorString());
+        if(equipRegistryCacheGood) {
+            QByteArray msg = KP::clientDemandGlobalTech();
+            const qint64 written = socket.write(msg);
+            if (written <= 0) {
+                throw NetworkError(socket.errorString());
+            }
+        }
+        else {
+            demandEquipCache();
+            connect(this, &Clientv2::equipRegistryComplete,
+                    this, &Clientv2::switchToTech2);
         }
     }
+}
+
+void Clientv2::switchToTech2() {
+    socket.flush();
+    QByteArray msg = KP::clientDemandGlobalTech();
+    const qint64 written = socket.write(msg);
+    if (written <= 0) {
+        throw NetworkError(socket.errorString());
+    }
+    socket.flush();
 }
 
 /* Refresh UI? */

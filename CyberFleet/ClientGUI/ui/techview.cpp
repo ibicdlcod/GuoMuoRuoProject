@@ -41,16 +41,10 @@ void TechView::updateGlobalTechViewTable(const QJsonObject &djson) {
         ui->waitText->setWordWrap(true);
         ui->waitText->setText(
             QStringLiteral("updating equipment data, please wait..."));
-        /*
-        ui->globalViewTable->setColumnCount(1);
-        ui->globalViewTable->setRowCount(1);
-        QTableWidgetItem *newItem = new QTableWidgetItem(
-            "updating equipment data, please wait...");
-        ui->globalViewTable->setItem(0, 0, newItem);
-*/
-        engine.demandEquipCache();
+        engine.demandEquipCache();/*
         connect(&engine, &Clientv2::equipRegistryComplete,
                 this, [this, djson]{updateGlobalTechViewTable(djson);});
+        */
         return;
     }
     else {
@@ -63,8 +57,10 @@ void TechView::updateGlobalTechViewTable(const QJsonObject &djson) {
     ui->globalViewTable->setColumnCount(4);
     QJsonArray contents = djson["content"].toArray();
     int currentRowCount = ui->globalViewTable->rowCount();
-    if(djson["initial"].toBool())
+    if(djson["initial"].toBool()) {
+        ui->globalViewTable->clear();
         ui->globalViewTable->setRowCount(contents.size());
+    }
     else {
         ui->globalViewTable->setRowCount(contents.size() + currentRowCount);
     }
@@ -95,7 +91,6 @@ void TechView::updateGlobalTechViewTable(const QJsonObject &djson) {
         ++i;
     }
     if(djson["final"].toBool()) {
-        qDebug() << "FINAL";
         ui->globalViewTable->sortByColumn(3, Qt::DescendingOrder);
         ui->globalViewTable->sortByColumn(2, Qt::DescendingOrder);
     }

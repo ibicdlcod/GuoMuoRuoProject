@@ -104,6 +104,7 @@ public slots:
     void showHelp(const QStringList &);
     void switchToFactory();
     void switchToTech();
+    void switchToTech2();
     void uiRefresh();
     Q_DECL_DEPRECATED void update();
 

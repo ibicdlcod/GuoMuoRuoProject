@@ -31,7 +31,7 @@
        <item>
         <widget class="QLabel" name="globalTechValue">
          <property name="text">
-          <string>TextLabel</string>
+          <string>Calculating...</string>
          </property>
          <property name="alignment">
           <set>Qt::AlignCenter</set>

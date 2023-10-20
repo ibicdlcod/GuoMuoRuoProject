@@ -191,7 +191,9 @@ void User::naturalRegen(CSteamID &uid) {
                                         5 + regenPower,
                                         2 + regenPower,
                                         2 + regenPower);
-            qDebug() << regenMins;
+            if(regenMins > 0)
+                qDebug() << regenMins << " minute(s) passed"
+                                         "for regeneration purposes.";
             regenAmount *= (qint64)regenMins;
             ResOrd regenCap = ResOrd(2500, 2500, 2500, 1500, 2000, 1500, 1500);
             regenCap *= (qint64)(std::round(globalTechLevel * 8.0) + 24);

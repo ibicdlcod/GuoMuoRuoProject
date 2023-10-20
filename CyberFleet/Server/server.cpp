@@ -498,7 +498,7 @@ void Server::offerGlobalTechComponents(
     if(content.size() <= batch) {
         connection->flush();
         QByteArray msg = KP::serverGlobalTech(content, initial, true);
-        connection->write(msg);
+        qDebug() << connection->write(msg);
         connection->flush();
     }
     else {
@@ -510,9 +510,8 @@ void Server::offerGlobalTechComponents(
         connection->flush();
         QList<std::tuple<int, int, double>> seconds = content;
         seconds.remove(0, batch);
-        //offerGlobalTechComponents(connection, content, false);
 
-        QTimer::singleShot(100, this, [=](){
+        QTimer::singleShot(200, this, [=](){
             offerGlobalTechComponents(connection, seconds, false);
         });
     }
