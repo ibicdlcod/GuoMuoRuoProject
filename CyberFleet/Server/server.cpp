@@ -431,6 +431,7 @@ void Server::offerEquipInfo(QSslSocket *connection, int index = 0) {
 #else
     static const int batch = 10;
 #endif
+    static const int batchInterval = 4 * batch;
 
     QJsonArray equipInfos;
     int i = 0;
@@ -440,7 +441,7 @@ void Server::offerEquipInfo(QSslSocket *connection, int index = 0) {
         if(i == 0)
             std::advance(equipIdIter, index * batch);
         if(i == batch) {
-            QTimer::singleShot(200, this,
+            QTimer::singleShot(batchInterval, this,
                                [this, connection, index]{
                                    offerEquipInfo(connection, index + 1);
                                });
@@ -493,8 +494,10 @@ void Server::offerGlobalTechComponents(
 #if defined (Q_OS_WIN)
     static const int batch = 50;
 #else
-    static const int batch = 10;
+    static const int batch = 2;
 #endif
+    static const int batchInterval = 4 * batch;
+
     if(content.size() <= batch) {
         connection->flush();
         QByteArray msg = KP::serverGlobalTech(content, initial, true);
@@ -511,7 +514,7 @@ void Server::offerGlobalTechComponents(
         QList<std::tuple<int, int, double>> seconds = content;
         seconds.remove(0, batch);
 
-        QTimer::singleShot(200, this, [=, this](){
+        QTimer::singleShot(batchInterval, this, [=, this](){
             offerGlobalTechComponents(connection, seconds, false);
         });
     }

@@ -2,6 +2,7 @@
 #include "ui_techview.h"
 #include "../clientv2.h"
 
+
 extern std::unique_ptr<QSettings> settings;
 
 TechView::TechView(QWidget *parent) :
@@ -20,6 +21,10 @@ TechView::TechView(QWidget *parent) :
     ui->waitText->setWordWrap(true);
     ui->waitText->setText(
         QStringLiteral("updating equipment data, please wait..."));
+    QHeaderView *horizationalH = ui->globalViewTable->horizontalHeader();
+    horizationalH->setSectionResizeMode(QHeaderView::Stretch);
+    QHeaderView *verticalH = ui->globalViewTable->verticalHeader();
+    verticalH->sectionResizeMode(QHeaderView::ResizeToContents);
 }
 
 TechView::~TechView()
@@ -92,4 +97,8 @@ void TechView::updateGlobalTechViewTable(const QJsonObject &djson) {
         ui->globalViewTable->sortByColumn(3, Qt::DescendingOrder);
         ui->globalViewTable->sortByColumn(2, Qt::DescendingOrder);
     }
+}
+
+void TechView::resizeEvent(QResizeEvent *event) {
+    QWidget::resizeEvent(event);
 }

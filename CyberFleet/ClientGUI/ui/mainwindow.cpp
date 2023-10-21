@@ -158,5 +158,8 @@ void MainWindow::resizeEvent(QResizeEvent *event) {
     if(!ui->FactoryArea->isHidden()) {
         adjustArea(factoryArea, ui->FactoryArea->size());
     }
+    if(!ui->TechArea->isHidden()) {
+        adjustArea(techArea, ui->TechArea->size());
+    }
     QWidget::resizeEvent(event);
 }

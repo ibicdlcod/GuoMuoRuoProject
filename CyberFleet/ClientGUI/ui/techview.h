@@ -15,6 +15,9 @@ public:
     explicit TechView(QWidget *parent = nullptr);
     ~TechView();
 
+protected:
+    void resizeEvent(QResizeEvent *event) override;
+
 private slots:
     void updateGlobalTech(const QJsonObject &);
     void updateGlobalTechViewTable(const QJsonObject &);
