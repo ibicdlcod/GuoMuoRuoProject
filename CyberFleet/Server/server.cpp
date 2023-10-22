@@ -177,8 +177,6 @@ Q_GLOBAL_STATIC(QString,
                     "EquipSerial INTEGER, "
                     "EquipDef INTEGER, "
                     "Star INTEGER, "
-                    "FOREIGN KEY(User) REFERENCES NewUsers(UserID), "
-                    "FOREIGN KEY(EquipDef) REFERENCES EquipReg(EquipID), "
                     "CONSTRAINT noduplicate UNIQUE(User, EquipSerial), "
                     "CONSTRAINT Star_Valid CHECK (Star >= 0 AND Star < 11)"
                     ");"
@@ -378,10 +376,15 @@ void Server::handleNewConnection(){
     currentsocket->write(msg);
 }
 
-// std::pair(Globaltech, QList(equipserial, equipid, weight))
+// jobid=0: std::pair(Globaltech, QList(equipserial, equipid, weight))
+// jobid=1: std::pair(Localtech, QList(equipserial, equipid, weight))
 std::pair<double, QList<std::tuple<int, int, double>>>
-Server::calGlobalTech(const CSteamID &uid) {
+Server::calGlobalTech(const CSteamID &uid, int jobID) {
     QMap<int, Equipment *> equips;
+    QList<int> childIDs = QList<int>();
+    if(jobID != 0 && jobID < KP::equipIdMax) {
+        childIDs = equipChildTree.values(jobID);
+    }
     QList<std::tuple<int, int, double>> result;
     try{
         QSqlDatabase db = QSqlDatabase::database();
@@ -401,14 +404,42 @@ Server::calGlobalTech(const CSteamID &uid) {
                 double weight = 1.0; // not yet implemented
                 equips[serial] =
                     equipRegistry.value(def);
-                result.append({serial, def, 1.0});
+                bool pass = jobID == 0;
+                if(jobID != 0 && jobID < KP::equipIdMax) {
+                    if(!equipRegistry.contains(jobID)) {
+                        qCritical() << qtTrId("local-tech-bad-equipdef");
+                        pass = false;
+                    }
+                    if(def == equipRegistry[jobID]->attr["Father"])
+                        pass = true;
+                    if(def == jobID)
+                        pass = true;
+                    if(childIDs.contains(def))
+                        pass = true;
+                }
+                if(pass)
+                    result.append({serial, def, 1.0});
             }
             QList<std::pair<double, double>> source;
-            for(auto iter = equips.cbegin();
-                 iter != equips.cend();
-                 ++iter) {
-                double weight = 1.0; // not yet implemented
-                source.append({iter.value()->getTech(), weight});
+            if(jobID == 0) {
+                for(auto iter = equips.cbegin();
+                     iter != equips.cend();
+                     ++iter) {
+                    double weight = 1.0; // not yet implemented
+                    source.append({iter.value()->getTech(), weight});
+                }
+            }
+            else {
+                if(jobID < KP::equipIdMax) {
+                    double weight = 1.0; // not yet implemented
+                    source.append({equips.value(equipRegistry[jobID]->attr["Father"])->getTech(), weight});
+                    source.append({equips.value(jobID)->getTech(), weight});
+                    for (auto i : std::as_const(childIDs))
+                        source.append({equips.value(i)->getTech(), weight});
+                }
+                else { // not yet implemented
+
+                }
             }
             return {Tech::calLevelGlobal(source), result};
         }

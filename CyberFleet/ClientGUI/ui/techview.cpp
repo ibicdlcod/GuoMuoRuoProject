@@ -85,8 +85,10 @@ void TechView::updateGlobalTechViewTable(const QJsonObject &djson) {
                 thisEquip->toString(settings->value("language", "ja_JP").toString()));
         }
         ui->globalViewTable->setItem(currentRowCount + i, 1, newItem2);
-        QTableWidgetItem *newItem3 = new QTableWidgetItem(
-            QString::number(thisEquip->getTech()));
+        //QTableWidgetItem *newItem3 = new QTableWidgetItem(
+        //    QString::number(thisEquip->getTech()));
+        QTableWidgetItem *newItem3 = new TableWidgetItemNumber(
+            thisEquip->getTech());
         ui->globalViewTable->setItem(currentRowCount + i, 2, newItem3);
         QTableWidgetItem *newItem4 = new QTableWidgetItem(
             QString::number(item["weight"].toDouble()));
@@ -101,4 +103,8 @@ void TechView::updateGlobalTechViewTable(const QJsonObject &djson) {
 
 void TechView::resizeEvent(QResizeEvent *event) {
     QWidget::resizeEvent(event);
+}
+
+TableWidgetItemNumber::TableWidgetItemNumber(double content) {
+    QTableWidgetItem::setText(QString::number(content));
 }

@@ -86,7 +86,7 @@ private slots:
                        QSsl::AlertType type, const QString &description);
     void handleNewConnection();
     std::pair<double, QList<std::tuple<int, int, double>>>
-    calGlobalTech(const CSteamID &);
+    calGlobalTech(const CSteamID &, int jobID = 0);
     void offerEquipInfo(QSslSocket *, int);
     void offerGlobalTech(QSslSocket *, const CSteamID &);
     void offerGlobalTechComponents(QSslSocket *,

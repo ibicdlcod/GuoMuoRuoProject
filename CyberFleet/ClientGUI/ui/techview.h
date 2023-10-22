@@ -2,6 +2,7 @@
 #define TECHVIEW_H
 
 #include <QFrame>
+#include <QTableWidgetItem>
 
 namespace Ui {
 class TechView;
@@ -24,6 +25,15 @@ private slots:
 
 private:
     Ui::TechView *ui;
+};
+
+class TableWidgetItemNumber: public QTableWidgetItem {
+
+public:
+    explicit TableWidgetItemNumber(double);
+    virtual bool operator<(const QTableWidgetItem &other) const override {
+        return this->text().toDouble() < other.text().toDouble();
+    }
 };
 
 #endif // TECHVIEW_H
