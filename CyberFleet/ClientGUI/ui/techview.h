@@ -15,6 +15,10 @@ class TechView : public QFrame
 public:
     explicit TechView(QWidget *parent = nullptr);
     ~TechView();
+    void resetLocalListName(int);
+
+public slots:
+    void demandLocalTech(int);
 
 protected:
     void resizeEvent(QResizeEvent *event) override;
@@ -22,9 +26,11 @@ protected:
 private slots:
     void updateGlobalTech(const QJsonObject &);
     void updateGlobalTechViewTable(const QJsonObject &);
+    void updateLocalTech(const QJsonObject &);
+    void updateLocalTechViewTable(const QJsonObject &);
 
 private:
-    void resizeColumns();
+    void resizeColumns(bool);
 
     Ui::TechView *ui;
 };

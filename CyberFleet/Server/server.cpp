@@ -384,7 +384,6 @@ Server::calGlobalTech(const CSteamID &uid, int jobID) {
     QList<int> childIDs = QList<int>();
     if(jobID != 0 && jobID < KP::equipIdMax) {
         childIDs = equipChildTree.values(jobID);
-        qDebug() << childIDs;
     }
     QList<std::tuple<int, int, double>> result;
     try{
@@ -424,7 +423,8 @@ Server::calGlobalTech(const CSteamID &uid, int jobID) {
                     source.append({equips.value(def)->getTech(), weight});
                 }
             }
-            return {Tech::calLevelGlobal(source), result};
+            return {jobID == 0 ? Tech::calLevelGlobal(source)
+                               : Tech::calLevelLocal(source), result};
         }
     } catch (DBError &e) {
         for(QString &i : e.whats()) {
@@ -495,7 +495,7 @@ void Server::offerGlobalTech(QSslSocket *connection, const CSteamID &uid,
     auto result = calGlobalTech(uid, jobID);
     double globalValue = result.first;
     connection->flush();
-    QByteArray msg = KP::serverGlobalTech(globalValue);
+    QByteArray msg = KP::serverGlobalTech(globalValue, jobID == 0);
     connection->write(msg);
     connection->flush();
     offerGlobalTechComponents(connection, result.second, true, jobID == 0);
@@ -511,7 +511,7 @@ void Server::offerGlobalTechComponents(
 #else
     static const int batch = 10;
 #endif
-    static const int batchInterval = 1 * batch;
+    static const int batchInterval = 2 * batch;
 
     if(content.size() <= batch) {
         connection->flush();

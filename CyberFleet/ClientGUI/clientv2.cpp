@@ -820,6 +820,13 @@ void Clientv2::receivedInfo(const QJsonObject &djson) {
             emit receivedGlobalTechInfo2(djson);
         }
         break;
+    case KP::InfoType::LocalTechInfo:
+        if(djson.contains("value"))
+            emit receivedLocalTechInfo(djson);
+        else {
+            emit receivedLocalTechInfo2(djson);
+        }
+        break;
     default: throw std::domain_error("auth type not supported"); break;
     }
 }

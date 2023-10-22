@@ -182,10 +182,12 @@ QByteArray KP::serverFairyBusy(int jobID) {
     return QCborValue::fromJsonValue(result).toCbor();
 }
 
-QByteArray KP::serverGlobalTech(double tech) {
+QByteArray KP::serverGlobalTech(double tech, bool global) {
     QJsonObject result;
     result["type"] = DgramType::Info;
-    result["infotype"] = InfoType::GlobalTechInfo;
+    result["infotype"] = global
+                             ? InfoType::GlobalTechInfo
+                             : InfoType::LocalTechInfo;
     result["value"] = tech;
     return QCborValue::fromJsonValue(result).toCbor();
 }

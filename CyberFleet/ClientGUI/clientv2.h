@@ -54,7 +54,8 @@
 #include "../Protocol/commandline.h"
 #include "../Protocol/equipment.h"
 #include "steamauth.h"
-#include "../ClientGUI/ui/developwindow.h"
+#include "ui/developwindow.h"
+#include "ui/techview.h"
 
 void customMessageHandler(QtMsgType,
                           const QMessageLogContext &,
@@ -85,6 +86,8 @@ public:
 
     friend int DevelopWindow::equipIdDesired();
     friend void DevelopWindow::resetListName(int);
+    friend void TechView::demandLocalTech(int);
+    friend void TechView::resetLocalListName(int);
 
 public slots:
     void autoPassword();
@@ -117,6 +120,8 @@ signals:
     void receivedFactoryRefresh(const QJsonObject &);
     void receivedGlobalTechInfo(const QJsonObject &);
     void receivedGlobalTechInfo2(const QJsonObject &);
+    void receivedLocalTechInfo(const QJsonObject &);
+    void receivedLocalTechInfo2(const QJsonObject &);
 
 private slots:
     void encrypted();

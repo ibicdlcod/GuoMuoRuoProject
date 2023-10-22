@@ -163,7 +163,7 @@ QByteArray serverDevelopStart();
 QByteArray serverEquipLackFather(GameError, int);
 QByteArray serverEquipInfo(QJsonArray &, bool);
 QByteArray serverFairyBusy(int);
-QByteArray serverGlobalTech(double);
+QByteArray serverGlobalTech(double, bool);
 QByteArray serverGlobalTech(const QList<std::tuple<
                                 int, int, double>> &, bool, bool, bool);
 QByteArray serverHello();
