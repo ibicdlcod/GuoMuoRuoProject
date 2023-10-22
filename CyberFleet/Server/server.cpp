@@ -494,7 +494,7 @@ void Server::offerGlobalTechComponents(
 #if defined (Q_OS_WIN)
     static const int batch = 50;
 #else
-    static const int batch = 2;
+    static const int batch = 10;
 #endif
     static const int batchInterval = 4 * batch;
 
@@ -821,6 +821,26 @@ bool Server::exportEquipToCSV() const {
     //% "Export equipment registry success!"
     qInfo() << qtTrId("equip-export-good");
     return true;
+}
+
+QSet<int> Server::generateEquipChilds(int ancestor) {
+    QSet<int> result;
+    for(auto iter = equipRegistry.constKeyValueBegin();
+         iter != equipRegistry.constKeyValueEnd();
+         ++iter) {
+        int fatherEquip = iter->second->attr["Father"];
+        int childEquip = iter->first;
+        if(fatherEquip == ancestor) {
+            QSet subset = generateEquipChilds(childEquip);
+            for (auto i = subset.cbegin(),
+                 end = subset.cend();
+                 i != end; ++i)
+                result.insert(*i);
+            //result.insert(generateEquipChilds(childEquip));
+            result.insert(childEquip);
+        }
+    }
+    return result;
 }
 
 const QStringList Server::getCommandsSpec() const {

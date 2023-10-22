@@ -105,6 +105,7 @@ private:
     bool equipmentRefresh();
     void exitGraceSpec() override;
     bool exportEquipToCSV() const;
+    QSet<int> generateEquipChilds(int);
     const QStringList getCommandsSpec() const override;
     const QStringList getValidCommands() const override;
     bool importEquipFromCSV();
@@ -136,6 +137,7 @@ private:
 
     QSet<int> openEquips;
     QMap<int, Equipment *> equipRegistry;
+    QMultiMap<int, int> equipChildTree;
 
     std::random_device random;
     std::mt19937 mt;

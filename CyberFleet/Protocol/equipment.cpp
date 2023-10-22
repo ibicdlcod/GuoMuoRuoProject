@@ -59,6 +59,7 @@ Equipment::Equipment(int equipId)
         }
     }
 }
+
 Equipment::Equipment(const QJsonObject &input) {
     equipRegId = input["eid"].toInt();
     if(equipRegId == 0)
@@ -74,6 +75,10 @@ Equipment::Equipment(const QJsonObject &input) {
         attr[attrI] =
             attrs.value(attrI).toInt();
     }
+}
+
+bool Equipment::operator<(const Equipment &other) const {
+    return equipRegId < other.equipRegId;
 }
 
 QString Equipment::toString(QString lang) const {
