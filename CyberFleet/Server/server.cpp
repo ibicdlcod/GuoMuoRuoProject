@@ -377,13 +377,14 @@ void Server::handleNewConnection(){
 }
 
 // jobid=0: std::pair(Globaltech, QList(equipserial, equipid, weight))
-// jobid=1: std::pair(Localtech, QList(equipserial, equipid, weight))
+// jobid!=0: std::pair(Localtech, QList(equipserial, equipid, weight))
 std::pair<double, QList<std::tuple<int, int, double>>>
 Server::calGlobalTech(const CSteamID &uid, int jobID) {
     QMap<int, Equipment *> equips;
     QList<int> childIDs = QList<int>();
     if(jobID != 0 && jobID < KP::equipIdMax) {
         childIDs = equipChildTree.values(jobID);
+        qDebug() << childIDs;
     }
     QList<std::tuple<int, int, double>> result;
     try{
@@ -398,6 +399,7 @@ Server::calGlobalTech(const CSteamID &uid, int jobID) {
                           query.lastError());
         }
         else { // query.first yet to be called
+            QList<std::pair<double, double>> source;
             while(query.next()) {
                 int serial = query.value(1).toInt();
                 int def = query.value(0).toInt();
@@ -417,28 +419,9 @@ Server::calGlobalTech(const CSteamID &uid, int jobID) {
                     if(childIDs.contains(def))
                         pass = true;
                 }
-                if(pass)
+                if(pass) {
                     result.append({serial, def, 1.0});
-            }
-            QList<std::pair<double, double>> source;
-            if(jobID == 0) {
-                for(auto iter = equips.cbegin();
-                     iter != equips.cend();
-                     ++iter) {
-                    double weight = 1.0; // not yet implemented
-                    source.append({iter.value()->getTech(), weight});
-                }
-            }
-            else {
-                if(jobID < KP::equipIdMax) {
-                    double weight = 1.0; // not yet implemented
-                    source.append({equips.value(equipRegistry[jobID]->attr["Father"])->getTech(), weight});
-                    source.append({equips.value(jobID)->getTech(), weight});
-                    for (auto i : std::as_const(childIDs))
-                        source.append({equips.value(i)->getTech(), weight});
-                }
-                else { // not yet implemented
-
+                    source.append({equips.value(def)->getTech(), weight});
                 }
             }
             return {Tech::calLevelGlobal(source), result};
@@ -462,7 +445,7 @@ void Server::offerEquipInfo(QSslSocket *connection, int index = 0) {
 #else
     static const int batch = 10;
 #endif
-    static const int batchInterval = 4 * batch;
+    static const int batchInterval = 5 * batch;
 
     QJsonArray equipInfos;
     int i = 0;
@@ -508,7 +491,7 @@ void Server::offerEquipInfo(QSslSocket *connection, int index = 0) {
 }
 
 void Server::offerGlobalTech(QSslSocket *connection, const CSteamID &uid) {
-    auto result = calGlobalTech(uid);
+    auto result = calGlobalTech(uid, 0);
     double global = result.first;
     connection->flush();
     QByteArray msg = KP::serverGlobalTech(global);
@@ -796,6 +779,15 @@ bool Server::equipmentRefresh()
     }
     //% "Load equipment registry success!"
     qInfo() << qtTrId("equip-load-good");
+    for(auto iter = equipRegistry.constKeyValueBegin();
+         iter != equipRegistry.constKeyValueEnd();
+         ++iter) {
+        QSet<int> childSet = generateEquipChilds(iter->first);
+        QSetIterator<int> childs(childSet);
+        while(childs.hasNext()) {
+            equipChildTree.insert(iter->first, childs.next());
+        }
+    }
     return true;
 }
 
@@ -1277,11 +1269,11 @@ void Server::receivedLogin(CSteamID &uid,
     }
     else {
         /* existing user */
-    }
+    }/*
     QByteArray msg = KP::serverVerifyComplete();
     if(connection->write(msg) <= 0) {
         qWarning("Verifycomplete not sent");
-    }
+    }*/
     connectedPeers[uid] = connection;
     connectedUsers[connection] = uid;
 }

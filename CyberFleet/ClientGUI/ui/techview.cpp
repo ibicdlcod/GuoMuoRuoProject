@@ -22,7 +22,7 @@ TechView::TechView(QWidget *parent) :
     ui->waitText->setText(
         QStringLiteral("updating equipment data, please wait..."));
     QHeaderView *horizationalH = ui->globalViewTable->horizontalHeader();
-    horizationalH->setSectionResizeMode(QHeaderView::Stretch);
+    horizationalH->setSectionResizeMode(QHeaderView::ResizeToContents);
     QHeaderView *verticalH = ui->globalViewTable->verticalHeader();
     verticalH->sectionResizeMode(QHeaderView::ResizeToContents);
 }
@@ -96,11 +96,28 @@ void TechView::updateGlobalTechViewTable(const QJsonObject &djson) {
     if(djson["final"].toBool()) {
         ui->globalViewTable->sortByColumn(3, Qt::DescendingOrder);
         ui->globalViewTable->sortByColumn(2, Qt::DescendingOrder);
+        resizeColumns();
     }
 }
 
 void TechView::resizeEvent(QResizeEvent *event) {
+    resizeColumns();
     QWidget::resizeEvent(event);
+}
+
+void TechView::resizeColumns() {
+    QHeaderView *horizationalH = ui->globalViewTable->horizontalHeader();
+    horizationalH->setSectionResizeMode(QHeaderView::ResizeToContents);
+    int outerTableWidth = horizationalH->size().width();
+    int innerTableWidth = 0;
+    innerTableWidth += horizationalH->sectionSize(horizationalH->logicalIndex(0));
+    innerTableWidth += horizationalH->sectionSize(horizationalH->logicalIndex(1));
+    innerTableWidth += horizationalH->sectionSize(horizationalH->logicalIndex(2));
+    innerTableWidth += horizationalH->sectionSize(horizationalH->logicalIndex(3));
+    horizationalH->setSectionResizeMode(QHeaderView::Interactive);
+    horizationalH->resizeSection(horizationalH->logicalIndex(1),
+                                 horizationalH->sectionSize(horizationalH->logicalIndex(1)) + outerTableWidth - innerTableWidth);
+
 }
 
 TableWidgetItemNumber::TableWidgetItemNumber(double content) {

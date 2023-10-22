@@ -24,6 +24,8 @@ private slots:
     void updateGlobalTechViewTable(const QJsonObject &);
 
 private:
+    void resizeColumns();
+
     Ui::TechView *ui;
 };
 
