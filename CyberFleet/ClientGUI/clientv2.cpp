@@ -321,7 +321,7 @@ void Clientv2::switchToTech() {
         gameState = KP::TechView;
         emit gamestateChanged(KP::TechView);
         if(equipRegistryCacheGood) {
-            QByteArray msg = KP::clientDemandGlobalTech();
+            QByteArray msg = KP::clientDemandGlobalTech(0);
             const qint64 written = socket.write(msg);
             if (written <= 0) {
                 throw NetworkError(socket.errorString());
@@ -337,7 +337,7 @@ void Clientv2::switchToTech() {
 
 void Clientv2::switchToTech2() {
     socket.flush();
-    QByteArray msg = KP::clientDemandGlobalTech();
+    QByteArray msg = KP::clientDemandGlobalTech(0);
     const qint64 written = socket.write(msg);
     if (written <= 0) {
         throw NetworkError(socket.errorString());

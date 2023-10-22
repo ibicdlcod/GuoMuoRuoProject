@@ -126,7 +126,8 @@ Q_ENUM_NS(FactoryState)
 enum InfoType{
     FactoryInfo,
     EquipInfo,
-    GlobalTechInfo
+    GlobalTechInfo,
+    LocalTechInfo
 };
 Q_ENUM_NS(InfoType)
 
@@ -149,7 +150,7 @@ QByteArray accessDenied();
 QByteArray catbomb();
 QByteArray clientAddEquip(int);
 QByteArray clientDemandEquipInfo();
-QByteArray clientDemandGlobalTech();
+QByteArray clientDemandGlobalTech(int local = 0);
 QByteArray clientDevelop(int, bool convert = false, int factoryID = -1);
 QByteArray clientFactoryRefresh();
 QByteArray clientFetch(int factoryID = -1);
@@ -164,7 +165,7 @@ QByteArray serverEquipInfo(QJsonArray &, bool);
 QByteArray serverFairyBusy(int);
 QByteArray serverGlobalTech(double);
 QByteArray serverGlobalTech(const QList<std::tuple<
-                                int, int, double>> &, bool, bool);
+                                int, int, double>> &, bool, bool, bool);
 QByteArray serverHello();
 QByteArray serverLackPrivate();
 QByteArray serverLogFail(AuthFailType);

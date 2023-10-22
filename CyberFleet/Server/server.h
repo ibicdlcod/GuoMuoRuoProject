@@ -88,11 +88,11 @@ private slots:
     std::pair<double, QList<std::tuple<int, int, double>>>
     calGlobalTech(const CSteamID &, int jobID = 0);
     void offerEquipInfo(QSslSocket *, int);
-    void offerGlobalTech(QSslSocket *, const CSteamID &);
+    void offerGlobalTech(QSslSocket *, const CSteamID &, int jobID = 0);
     void offerGlobalTechComponents(QSslSocket *,
                                    const QList<std::tuple<
                                        int, int, double>> &,
-                                   bool);
+                                   bool, bool);
     void pskRequired(QSslSocket *, QSslPreSharedKeyAuthenticator *);
     void shutdown();
     void sslErrors(QSslSocket *, const QList<QSslError> &);

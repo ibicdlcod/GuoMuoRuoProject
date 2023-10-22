@@ -60,7 +60,7 @@ void FactoryArea::developClicked(bool checked, int slotnum) {
     else {
         DevelopWindow w;
         if(w.exec() == QDialog::Rejected)
-            qDebug() << "FUCK" << slotnum << Qt::endl;
+            qDebug() << "NODEVELOP";
         else {
             QTimer::singleShot(100, &engine, &Clientv2::doRefreshFactory);
             QString msg = QStringLiteral("develop %1 %2")

@@ -490,31 +490,32 @@ void Server::offerEquipInfo(QSslSocket *connection, int index = 0) {
     connection->flush();
 }
 
-void Server::offerGlobalTech(QSslSocket *connection, const CSteamID &uid) {
-    auto result = calGlobalTech(uid, 0);
-    double global = result.first;
+void Server::offerGlobalTech(QSslSocket *connection, const CSteamID &uid,
+                             int jobID) {
+    auto result = calGlobalTech(uid, jobID);
+    double globalValue = result.first;
     connection->flush();
-    QByteArray msg = KP::serverGlobalTech(global);
+    QByteArray msg = KP::serverGlobalTech(globalValue);
     connection->write(msg);
     connection->flush();
-    offerGlobalTechComponents(connection, result.second, true);
+    offerGlobalTechComponents(connection, result.second, true, jobID == 0);
 }
 
 void Server::offerGlobalTechComponents(
     QSslSocket *connection, const QList<std::tuple<
         int, int, double>> &content,
-    bool initial) {
+    bool initial, bool global) {
 /* warning: large batch size causes problems */
 #if defined (Q_OS_WIN)
     static const int batch = 50;
 #else
     static const int batch = 10;
 #endif
-    static const int batchInterval = 4 * batch;
+    static const int batchInterval = 1 * batch;
 
     if(content.size() <= batch) {
         connection->flush();
-        QByteArray msg = KP::serverGlobalTech(content, initial, true);
+        QByteArray msg = KP::serverGlobalTech(content, initial, true, global);
         connection->write(msg);
         connection->flush();
     }
@@ -522,14 +523,14 @@ void Server::offerGlobalTechComponents(
         QList<std::tuple<int, int, double>> firsts = content.first(batch);
         connection->flush();
         QByteArray msg = KP::serverGlobalTech(
-            firsts, initial, false);
+            firsts, initial, false, global);
         connection->write(msg);
         connection->flush();
         QList<std::tuple<int, int, double>> seconds = content;
         seconds.remove(0, batch);
 
         QTimer::singleShot(batchInterval, this, [=, this](){
-            offerGlobalTechComponents(connection, seconds, false);
+            offerGlobalTechComponents(connection, seconds, false, global);
         });
     }
 }
@@ -788,6 +789,8 @@ bool Server::equipmentRefresh()
             equipChildTree.insert(iter->first, childs.next());
         }
     }
+    //% "Load equipment child list success!"
+    qInfo() << qtTrId("equip-child-load-good");
     return true;
 }
 
@@ -1357,8 +1360,11 @@ void Server::receivedReq(const QJsonObject &djson,
     case KP::CommandType::DemandGlobalTech: {
         QTimer::singleShot(100,
                            this,
-                           [connection, this, uid]
-                           {offerGlobalTech(connection, uid);});
+                           [=, this]
+                           {offerGlobalTech(
+                                           connection,
+                                           uid,
+                                           djson["local"].toInt());});
     }
     break;
     default:

@@ -71,10 +71,11 @@ QByteArray KP::clientDemandEquipInfo() {
     return QCborValue::fromJsonValue(result).toCbor();
 }
 
-QByteArray KP::clientDemandGlobalTech() {
+QByteArray KP::clientDemandGlobalTech(int local) {
     QJsonObject result;
     result["type"] = DgramType::Request;
     result["command"] = CommandType::DemandGlobalTech;
+    result["local"] = local;
     return QCborValue::fromJsonValue(result).toCbor();
 
 }
@@ -191,10 +192,12 @@ QByteArray KP::serverGlobalTech(double tech) {
 
 QByteArray KP::serverGlobalTech(const QList<std::tuple<
                                     int, int, double>> &content,
-                                bool initial, bool final) {
+                                bool initial, bool final, bool global) {
     QJsonObject result;
     result["type"] = DgramType::Info;
-    result["infotype"] = InfoType::GlobalTechInfo;
+    result["infotype"] = global
+                             ? InfoType::GlobalTechInfo
+                             : InfoType::LocalTechInfo;
     result["initial"] = initial; // a true result will refresh the client table
     result["final"] = final; // a true result will trigger sorting in client
     QJsonArray contentJSON;

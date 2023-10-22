@@ -106,17 +106,16 @@ void TechView::resizeEvent(QResizeEvent *event) {
 }
 
 void TechView::resizeColumns() {
-    QHeaderView *horizationalH = ui->globalViewTable->horizontalHeader();
-    horizationalH->setSectionResizeMode(QHeaderView::ResizeToContents);
-    int outerTableWidth = horizationalH->size().width();
+    QHeaderView *hH = ui->globalViewTable->horizontalHeader();
+    hH->setSectionResizeMode(QHeaderView::ResizeToContents);
+    int outerTableWidth = hH->size().width();
     int innerTableWidth = 0;
-    innerTableWidth += horizationalH->sectionSize(horizationalH->logicalIndex(0));
-    innerTableWidth += horizationalH->sectionSize(horizationalH->logicalIndex(1));
-    innerTableWidth += horizationalH->sectionSize(horizationalH->logicalIndex(2));
-    innerTableWidth += horizationalH->sectionSize(horizationalH->logicalIndex(3));
-    horizationalH->setSectionResizeMode(QHeaderView::Interactive);
-    horizationalH->resizeSection(horizationalH->logicalIndex(1),
-                                 horizationalH->sectionSize(horizationalH->logicalIndex(1)) + outerTableWidth - innerTableWidth);
+    for(int i = 0; i < 4; ++i)
+        innerTableWidth += hH->sectionSize(hH->logicalIndex(i));
+    hH->setSectionResizeMode(QHeaderView::Interactive);
+    hH->resizeSection(hH->logicalIndex(1),
+                      hH->sectionSize(hH->logicalIndex(1))
+                          + outerTableWidth - innerTableWidth);
 
 }
 
