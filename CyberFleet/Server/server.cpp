@@ -523,7 +523,7 @@ void Server::offerEquipInfo(QSslSocket *connection, int index = 0) {
 }
 
 void Server::offerTechInfo(QSslSocket *connection, const CSteamID &uid,
-                             int jobID) {
+                           int jobID) {
     auto result = calculateTech(uid, jobID);
     double globalValue = result.first;
     connection->flush();
@@ -692,7 +692,7 @@ void Server::doDevelop(CSteamID &uid, int equipid,
             query.bindValue(":succ", successTime);
             query.bindValue(":good", Tech::calExperiment2(
                                          equip->getTech(),
-                                                          calculateTech(uid).first,
+                                         calculateTech(uid).first,
                                          0.0, // localtech not yet implemented
                                          1.0,
                                          mt));
@@ -757,10 +757,14 @@ void Server::doFetch(CSteamID &uid, int factoryid, QSslSocket *connection) {
                     /* get skill points (non-massproduced only)*/
                     uint64 stdSkillPoints = equipRegistry.value(jobID)
                                                 ->skillPointsStd();
-                    double difficultyFactor =
-                        pow(std::max(1.0,
-                                     equipRegistry.value(jobID)->getTech()
-                                                               - calculateTech(uid, 0).first), 2.0);
+                    /* 10*(thisEquipTech - globalTech)^2,
+                     * cannot be lower than 1.0 */
+                    double difficultyFactor = 10.0 *
+                        std::pow(
+                            std::max(
+                                1.0,
+                                equipRegistry.value(jobID)->getTech()
+                                    - calculateTech(uid, 0).first), 2.0);
                     User::addSkillPoints(uid, jobID,
                                          stdSkillPoints / difficultyFactor);
                 }
