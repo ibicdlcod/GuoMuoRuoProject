@@ -163,6 +163,7 @@ QByteArray clientSteamLogout();
 QByteArray serverDevelopFailed(GameError);
 QByteArray serverDevelopStart();
 QByteArray serverEquipLackFather(GameError, int);
+QByteArray serverEquipLackMother(GameError, int, uint64);
 QByteArray serverEquipInfo(QJsonArray &, bool);
 QByteArray serverFairyBusy(int);
 QByteArray serverGlobalTech(double, bool);

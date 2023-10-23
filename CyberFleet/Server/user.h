@@ -14,7 +14,10 @@ int getCurrentFactoryParallel(const CSteamID &, int);
 ResOrd getCurrentResources(const CSteamID &);
 int getEquipAmount(const CSteamID &, int);
 uint64 getSkillPoints(const CSteamID &, int);
-std::pair<bool, int> haveFather(const CSteamID &, int, QMap<int, Equipment *> &);
+std::pair<bool, int> haveFather(const CSteamID &,
+                                int, QMap<int, Equipment *> &);
+std::pair<bool, int> haveMotherSP(const CSteamID &,
+                                  int, QMap<int, Equipment *> &);
 void init(const CSteamID &);
 bool isFactoryBusy(const CSteamID &, int);
 std::tuple<bool, int> isFactoryFinished(const CSteamID &, int);

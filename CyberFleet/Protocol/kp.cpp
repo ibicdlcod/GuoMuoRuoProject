@@ -158,6 +158,16 @@ QByteArray KP::serverEquipLackFather(GameError error, int father) {
     return QCborValue::fromJsonValue(result).toCbor();
 }
 
+QByteArray KP::serverEquipLackMother(GameError error, int mother, uint64 sp) {
+    QJsonObject result;
+    result["type"] = DgramType::Message;
+    result["msgtype"] = MsgType::DevelopFailed;
+    result["reason"] = error;
+    result["mother"] = mother;
+    result["skillpoint"] = (qint64)sp;
+    return QCborValue::fromJsonValue(result).toCbor();
+}
+
 QByteArray KP::serverDevelopStart() {
     QJsonObject result;
     result["type"] = DgramType::Message;

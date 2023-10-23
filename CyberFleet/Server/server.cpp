@@ -681,6 +681,15 @@ void Server::doDevelop(CSteamID &uid, int equipid,
             return;
         }
         /* not yet implemented: mother skillpoint requirements */
+        auto motherResult = User::haveMotherSP(uid, equipid, equipRegistry);
+        if(!std::get<0>(motherResult)) {
+            QByteArray msg =
+                KP::serverEquipLackMother(KP::DevelopNotOption,
+                                          std::get<1>(motherResult),
+                                          std::get<2>(motherResult));
+            connection->write(msg);
+            return;
+        }
         ResOrd resRequired = equip->devRes();
         QByteArray msg = resRequired.resourceDesired();
         connection->write(msg);

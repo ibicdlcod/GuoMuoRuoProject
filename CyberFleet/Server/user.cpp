@@ -170,6 +170,38 @@ std::pair<bool, int> User::haveFather(const CSteamID &uid, int sonEquipId,
     }
 }
 
+std::tuple<bool, int, uint64> User::haveMotherSP(const CSteamID &uid, int sonEquipId,
+                                      QMap<int, Equipment *> &equipReg) {
+    if(!equipReg.contains(sonEquipId))
+        return {false, 0, 0};
+    else {
+        int motherEquipId = equipReg.value(sonEquipId)->attr.value("Mother", 0);
+        if(motherEquipId == 0)
+            return {true, 0, 0};
+        QSqlDatabase db = QSqlDatabase::database();
+        QSqlQuery query;
+        query.prepare("SELECT * "
+                      "FROM UserEquip "
+                      "WHERE User = :id AND EquipDef = :mother");
+        query.bindValue(":id", uid.ConvertToUint64());
+        query.bindValue(":mother", motherEquipId);
+        query.exec();
+        query.isSelect();
+        if(!query.first()) {
+            return {false, motherEquipId, 0};
+        }
+        else {
+            uint64 sonSkillPointReq = equipReg.value(sonEquipId)
+                                          ->skillPointsStd();
+            uint64 motherSkillPoint = getSkillPoints(uid, motherEquipId);
+            if(motherSkillPoint >= sonSkillPointReq)
+                return {true, motherEquipId, sonSkillPointReq};
+            else
+                return {false, motherEquipId, sonSkillPointReq};
+        }
+    }
+}
+
 void User::init(const CSteamID &uid) {
     QSqlDatabase db = QSqlDatabase::database();
     /* factory */

@@ -890,8 +890,16 @@ void Clientv2::receivedMsg(const QJsonObject &djson) {
                             settings->value("language", "ja_JP")
                                 .toString())).arg(father->getId());
             }
-            else {
-                qWarning() << qtTrId("Server desires null father!");
+            Equipment *mother = equipRegistryCache
+                                    .value(djson["mother"].toInt());
+            if(mother != nullptr) {
+                //% "This equipment requires you to possess %3 skillpoints of %1 (id: %2) in order to develop."
+                qInfo() <<
+                    qtTrId("equip-not-developable")
+                        .arg(mother->toString(
+                            settings->value("language", "ja_JP")
+                                .toString())).arg(mother->getId())
+                        .arg(djson["sp"].toInteger());
             }
         }
         break;
