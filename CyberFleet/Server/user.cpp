@@ -165,7 +165,22 @@ std::pair<bool, int> User::haveFather(const CSteamID &uid, int sonEquipId,
             return {false, fatherEquipId};
         }
         else {
-            return {true, fatherEquipId};
+            int father2EquipId = equipReg.value(sonEquipId)->attr.value("Father2", 0);
+            if(father2EquipId == 0)
+                return {true, fatherEquipId};
+            QSqlQuery query;
+            query.prepare("SELECT * "
+                          "FROM UserEquip "
+                          "WHERE User = :id AND EquipDef = :father");
+            query.bindValue(":id", uid.ConvertToUint64());
+            query.bindValue(":father", father2EquipId);
+            query.exec();
+            query.isSelect();
+            if(!query.first()) {
+                return {false, father2EquipId};
+            }
+            else
+                return {true, fatherEquipId};
         }
     }
 }

@@ -885,7 +885,7 @@ void Clientv2::receivedMsg(const QJsonObject &djson) {
             if(father != nullptr) {
                 //% "This equipment requires you to possess %1 (id: %2) in order to develop."
                 qInfo() <<
-                    qtTrId("equip-not-developable")
+                    qtTrId("equip-not-developable-father")
                         .arg(father->toString(
                             settings->value("language", "ja_JP")
                                 .toString())).arg(father->getId());
@@ -895,7 +895,7 @@ void Clientv2::receivedMsg(const QJsonObject &djson) {
             if(mother != nullptr) {
                 //% "This equipment requires you to possess %3 skillpoints of %1 (id: %2) in order to develop."
                 qInfo() <<
-                    qtTrId("equip-not-developable")
+                    qtTrId("equip-not-developable-mother")
                         .arg(mother->toString(
                             settings->value("language", "ja_JP")
                                 .toString())).arg(mother->getId())

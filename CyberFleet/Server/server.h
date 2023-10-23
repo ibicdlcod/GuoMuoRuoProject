@@ -110,6 +110,7 @@ private:
     const QStringList getCommandsSpec() const override;
     const QStringList getValidCommands() const override;
     bool importEquipFromCSV();
+    int newEquip(const CSteamID &, int);
     void newEquipHasMother(const CSteamID &, int);
     void parseListen(const QStringList &);
     void parseUnlisten();
