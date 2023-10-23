@@ -9,18 +9,19 @@
 
 namespace User {
 
-void addSkillPoints(CSteamID &, int, uint64);
-ResOrd getCurrentResources(CSteamID &);
-std::pair<bool, int> haveFather(CSteamID &, int, QMap<int, Equipment *> &);
-void init(CSteamID &);
-bool isFactoryBusy(CSteamID &, int);
-std::tuple<bool, int> isFactoryFinished(CSteamID &, int);
-bool isSuperUser(CSteamID &);
-void naturalRegen(CSteamID &);
-int newEquip(CSteamID &, int);
-void refreshFactory(CSteamID &);
-void refreshPort(CSteamID &);
-void setResources(CSteamID &, ResOrd);
+void addSkillPoints(const CSteamID &, int, uint64);
+ResOrd getCurrentResources(const CSteamID &);
+uint64 getSkillPoints(const CSteamID &, int);
+std::pair<bool, int> haveFather(const CSteamID &, int, QMap<int, Equipment *> &);
+void init(const CSteamID &);
+bool isFactoryBusy(const CSteamID &, int);
+std::tuple<bool, int> isFactoryFinished(const CSteamID &, int);
+bool isSuperUser(const CSteamID &);
+void naturalRegen(const CSteamID &);
+int newEquip(const CSteamID &, int);
+void refreshFactory(const CSteamID &);
+void refreshPort(const CSteamID &);
+void setResources(const CSteamID &, ResOrd);
 };
 
 #endif // USER_H

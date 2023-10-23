@@ -12,25 +12,9 @@
 #undef max
 #endif
 
-void User::addSkillPoints(CSteamID &uid, int equipId, uint64 skillPoints) {
+void User::addSkillPoints(const CSteamID &uid, int equipId, uint64 skillPoints) {
     QSqlDatabase db = QSqlDatabase::database();
-    QSqlQuery query;
-    uint64 existingSP = 0;
-
-    query.prepare("SELECT Intvalue "
-                  "FROM UserEquipSP WHERE User = :id "
-                  "AND EquipDef = :eid ");
-    query.bindValue(":id", uid.ConvertToUint64());
-    query.bindValue(":eid", equipId);
-    //query.bindValue(":sp", skillPoints);
-    if(Q_UNLIKELY(!query.exec() || !query.isSelect())) {
-        throw DBError(qtTrId("user-get-skillpoint-failed")
-                          .arg(uid.ConvertToUint64()).arg(equipId),
-                      query.lastError());
-    }
-    else if(query.first()) {
-        existingSP = query.value(0).toLongLong();
-    }
+    uint64 existingSP = getSkillPoints(uid, equipId);
 
     QSqlQuery query2;
     query2.prepare("REPLACE INTO UserEquipSP (User, EquipDef, Intvalue) "
@@ -51,7 +35,7 @@ void User::addSkillPoints(CSteamID &uid, int equipId, uint64 skillPoints) {
     }
 }
 
-ResOrd User::getCurrentResources(CSteamID &uid) {
+ResOrd User::getCurrentResources(const CSteamID &uid) {
     QSqlDatabase db = QSqlDatabase::database();
     QSqlQuery query;
     query.prepare("SELECT Attribute, Intvalue"
@@ -92,7 +76,30 @@ ResOrd User::getCurrentResources(CSteamID &uid) {
     }
 }
 
-std::pair<bool, int> User::haveFather(CSteamID &uid, int sonEquipId,
+uint64 User::getSkillPoints(const CSteamID &uid, int equipId) {
+    QSqlDatabase db = QSqlDatabase::database();
+    QSqlQuery query;
+
+    query.prepare("SELECT Intvalue "
+                  "FROM UserEquipSP WHERE User = :id "
+                  "AND EquipDef = :eid ");
+    query.bindValue(":id", uid.ConvertToUint64());
+    query.bindValue(":eid", equipId);
+    //query.bindValue(":sp", skillPoints);
+    if(Q_UNLIKELY(!query.exec() || !query.isSelect())) {
+        throw DBError(qtTrId("user-get-skillpoint-failed")
+                          .arg(uid.ConvertToUint64()).arg(equipId),
+                      query.lastError());
+        return 0;
+    }
+    else if(query.first()) {
+        return query.value(0).toLongLong();
+    }
+    else
+        return 0;
+}
+
+std::pair<bool, int> User::haveFather(const CSteamID &uid, int sonEquipId,
                                       QMap<int, Equipment *> &equipReg) {
     if(!equipReg.contains(sonEquipId))
         return {false, 0};
@@ -118,7 +125,7 @@ std::pair<bool, int> User::haveFather(CSteamID &uid, int sonEquipId,
     }
 }
 
-void User::init(CSteamID &uid) {
+void User::init(const CSteamID &uid) {
     QSqlDatabase db = QSqlDatabase::database();
     /* factory */
     for(int i = 0; i < KP::initFactory; ++i) {
@@ -135,7 +142,7 @@ void User::init(CSteamID &uid) {
     }
 }
 
-bool User::isFactoryBusy(CSteamID &uid, int factoryID) {
+bool User::isFactoryBusy(const CSteamID &uid, int factoryID) {
     QSqlDatabase db = QSqlDatabase::database();
     QSqlQuery query;
     query.prepare("SELECT CurrentJob "
@@ -156,7 +163,7 @@ bool User::isFactoryBusy(CSteamID &uid, int factoryID) {
 }
 
 /* int is the result equip/shippart id, 0 means failure */
-std::tuple<bool, int> User::isFactoryFinished(CSteamID &uid, int factoryID) {
+std::tuple<bool, int> User::isFactoryFinished(const CSteamID &uid, int factoryID) {
     QSqlDatabase db = QSqlDatabase::database();
     QSqlQuery query;
     query.prepare("SELECT Done, Success, CurrentJob "
@@ -179,7 +186,7 @@ std::tuple<bool, int> User::isFactoryFinished(CSteamID &uid, int factoryID) {
     }
 }
 
-bool User::isSuperUser(CSteamID &uid) {
+bool User::isSuperUser(const CSteamID &uid) {
     QSqlDatabase db = QSqlDatabase::database();
     QSqlQuery query;
     query.prepare("SELECT UserType"
@@ -198,7 +205,7 @@ bool User::isSuperUser(CSteamID &uid) {
     }
 }
 
-void User::naturalRegen(CSteamID &uid) {
+void User::naturalRegen(const CSteamID &uid) {
     try{
         QSqlDatabase db = QSqlDatabase::database();
         QSqlQuery query;
@@ -258,7 +265,7 @@ void User::naturalRegen(CSteamID &uid) {
             }
         }
     } catch (DBError &e) {
-        for(auto what: e.whats()) {
+        for(auto &what: e.whats()) {
             qCritical() << what;
         }
     } catch (std::exception &e) {
@@ -266,7 +273,7 @@ void User::naturalRegen(CSteamID &uid) {
     }
 }
 
-int User::newEquip(CSteamID &uid, int equipDid) {
+int User::newEquip(const CSteamID &uid, int equipDid) {
     QSqlDatabase db = QSqlDatabase::database();
     QSqlQuery query;
     query.prepare("SELECT MAX(EquipSerial) FROM UserEquip "
@@ -303,7 +310,7 @@ int User::newEquip(CSteamID &uid, int equipDid) {
     }
 }
 
-void User::refreshFactory(CSteamID &uid) {
+void User::refreshFactory(const CSteamID &uid) {
     naturalRegen(uid);
     QSqlDatabase db = QSqlDatabase::database();
     QSqlQuery query;
@@ -318,11 +325,11 @@ void User::refreshFactory(CSteamID &uid) {
     }
 }
 
-void User::refreshPort(CSteamID &uid) {
+void User::refreshPort(const CSteamID &uid) {
     naturalRegen(uid);
 }
 
-void User::setResources(CSteamID &uid, ResOrd goal) {
+void User::setResources(const CSteamID &uid, ResOrd goal) {
     assert(goal.sufficient());
     goal.cap(ResOrd(3600000,
                     3600000,

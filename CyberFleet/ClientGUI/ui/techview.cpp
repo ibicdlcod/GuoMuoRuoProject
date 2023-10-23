@@ -20,6 +20,8 @@ TechView::TechView(QWidget *parent) :
                      this, &TechView::updateLocalTech);
     QObject::connect(&engine, &Clientv2::receivedLocalTechInfo2,
                      this, &TechView::updateLocalTechViewTable);
+    QObject::connect(&engine, &Clientv2::equipRegistryComplete,
+                     this->ui->waitText, &QLabel::hide);
     ui->globalViewTable->hide();
     ui->waitText->show();
     ui->waitText->setWordWrap(true);

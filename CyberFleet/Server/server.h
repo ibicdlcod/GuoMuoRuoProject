@@ -84,12 +84,13 @@ public slots:
 private slots:
     void alertReceived(QSslSocket *socket, QSsl::AlertLevel level,
                        QSsl::AlertType type, const QString &description);
-    void handleNewConnection();
     std::pair<double, QList<std::tuple<int, int, double>>>
-    calGlobalTech(const CSteamID &, int jobID = 0);
+    calculateTech(const CSteamID &, int jobID = 0);
+    void handleNewConnection();
+    double getSkillPointsEffect(const CSteamID &, int);
     void offerEquipInfo(QSslSocket *, int);
-    void offerGlobalTech(QSslSocket *, const CSteamID &, int jobID = 0);
-    void offerGlobalTechComponents(QSslSocket *,
+    void offerTechInfo(QSslSocket *, const CSteamID &, int jobID = 0);
+    void offerTechInfoComponents(QSslSocket *,
                                    const QList<std::tuple<
                                        int, int, double>> &,
                                    bool, bool);

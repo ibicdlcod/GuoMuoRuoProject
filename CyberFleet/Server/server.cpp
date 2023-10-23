@@ -194,6 +194,7 @@ Q_GLOBAL_STATIC(QString,
                     "FOREIGN KEY(User) REFERENCES NewUsers(UserID),"
                     "FOREIGN KEY(EquipDef) REFERENCES EquipName(EquipID),"
                     "CONSTRAINT noduplicate UNIQUE(User, EquipDef) "
+                    //"CONSTRAINT Skill_Valid CHECK (Intvalue >= 0)"
                     ");"
                     ));
 
@@ -394,7 +395,7 @@ void Server::handleNewConnection(){
 // jobid=0: std::pair(Globaltech, QList(equipserial, equipid, weight))
 // jobid!=0: std::pair(Localtech, QList(equipserial, equipid, weight))
 std::pair<double, QList<std::tuple<int, int, double>>>
-Server::calGlobalTech(const CSteamID &uid, int jobID) {
+Server::calculateTech(const CSteamID &uid, int jobID) {
     QMap<int, Equipment *> equips;
     QList<int> childIDs = QList<int>();
     if(jobID != 0 && jobID < KP::equipIdMax) {
@@ -417,7 +418,7 @@ Server::calGlobalTech(const CSteamID &uid, int jobID) {
             while(query.next()) {
                 int serial = query.value(1).toInt();
                 int def = query.value(0).toInt();
-                double weight = 1.0; // not yet implemented
+                double weight = 1.0 + getSkillPointsEffect(uid, def) * 9.0;
                 equips[serial] =
                     equipRegistry.value(def);
                 bool pass = jobID == 0;
@@ -458,6 +459,15 @@ Server::calGlobalTech(const CSteamID &uid, int jobID) {
         return{0, {}};
     }
     return{0, {}};
+}
+
+double Server::getSkillPointsEffect(const CSteamID &uid, int equipId) {
+    if(!equipRegistry.contains(equipId)) {
+        qWarning() << qtTrId("equipid-invalid-skill-points-effect");
+    }
+    double x = User::getSkillPoints(uid, equipId);
+    double y = equipRegistry.value(equipId)->skillPointsStd();
+    return x * std::pow(y * y + x * x, -0.5);
 }
 
 void Server::offerEquipInfo(QSslSocket *connection, int index = 0) {
@@ -512,18 +522,18 @@ void Server::offerEquipInfo(QSslSocket *connection, int index = 0) {
     connection->flush();
 }
 
-void Server::offerGlobalTech(QSslSocket *connection, const CSteamID &uid,
+void Server::offerTechInfo(QSslSocket *connection, const CSteamID &uid,
                              int jobID) {
-    auto result = calGlobalTech(uid, jobID);
+    auto result = calculateTech(uid, jobID);
     double globalValue = result.first;
     connection->flush();
     QByteArray msg = KP::serverGlobalTech(globalValue, jobID == 0);
     connection->write(msg);
     connection->flush();
-    offerGlobalTechComponents(connection, result.second, true, jobID == 0);
+    offerTechInfoComponents(connection, result.second, true, jobID == 0);
 }
 
-void Server::offerGlobalTechComponents(
+void Server::offerTechInfoComponents(
     QSslSocket *connection, const QList<std::tuple<
         int, int, double>> &content,
     bool initial, bool global) {
@@ -552,7 +562,7 @@ void Server::offerGlobalTechComponents(
         seconds.remove(0, batch);
 
         QTimer::singleShot(batchInterval, this, [=, this](){
-            offerGlobalTechComponents(connection, seconds, false, global);
+            offerTechInfoComponents(connection, seconds, false, global);
         });
     }
 }
@@ -682,7 +692,7 @@ void Server::doDevelop(CSteamID &uid, int equipid,
             query.bindValue(":succ", successTime);
             query.bindValue(":good", Tech::calExperiment2(
                                          equip->getTech(),
-                                         calGlobalTech(uid).first,
+                                                          calculateTech(uid).first,
                                          0.0, // localtech not yet implemented
                                          1.0,
                                          mt));
@@ -744,10 +754,15 @@ void Server::doFetch(CSteamID &uid, int factoryid, QSslSocket *connection) {
                 connection->write(msg);
                 if(jobID < KP::equipIdMax &&
                     equipRegistry.value(jobID)->disallowMassProduction()) {
-                    /* get skill points */
+                    /* get skill points (non-massproduced only)*/
                     uint64 stdSkillPoints = equipRegistry.value(jobID)
                                                 ->skillPointsStd();
-                    User::addSkillPoints(uid, jobID, stdSkillPoints / 100);
+                    double difficultyFactor =
+                        pow(std::max(1.0,
+                                     equipRegistry.value(jobID)->getTech()
+                                                               - calculateTech(uid, 0).first), 2.0);
+                    User::addSkillPoints(uid, jobID,
+                                         stdSkillPoints / difficultyFactor);
                 }
             }
             else if(jobID < KP::equipIdMax) {
@@ -1391,7 +1406,7 @@ void Server::receivedReq(const QJsonObject &djson,
         QTimer::singleShot(100,
                            this,
                            [=, this]
-                           {offerGlobalTech(
+                           {offerTechInfo(
                                  connection,
                                  uid,
                                  djson["local"].toInt());});
