@@ -10,6 +10,7 @@
 
 namespace User {
 
+void addSkillPoints(CSteamID &uid, int equipId, uint64 skillPoints);
 ResOrd getCurrentResources(CSteamID &uid);
 std::pair<bool, int> haveFather(CSteamID &uid, int sonEquipId,
                                 QMap<int, Equipment *> &);

@@ -61,6 +61,8 @@ TechView::~TechView()
 void TechView::demandLocalTech(int index) {
     Q_UNUSED(index)
 
+    ui->localViewTable->clear();
+
     Clientv2 &engine = Clientv2::getInstance();
     for(auto &equipReg:
          engine.equipRegistryCache) {

@@ -13,6 +13,8 @@ public:
     EquipType(int);
     EquipType(QString);
 
+    bool operator==(const EquipType &) const;
+
     const ResOrd devResBase() const;
     static QSet<QString> getDisplayGroups();
     QString getTypeGroup();

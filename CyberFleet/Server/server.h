@@ -124,6 +124,7 @@ private:
     void sqlinit();
     void sqlinitEquip();
     void sqlinitEquipName();
+    void sqlinitEquipSP();
     void sqlinitEquipU();
     void sqlinitFacto();
     void sqlinitUserA() const;

@@ -24,6 +24,7 @@ public:
     int getId() const;
     double getTech() const;
     bool isInvalid() const;
+    int skillPointsStd() const;
 
     QMap<QString, QString> localNames;
     EquipType type;

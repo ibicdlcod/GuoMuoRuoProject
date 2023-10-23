@@ -14,6 +14,10 @@ EquipType::EquipType(QString type) {
     iRep = strToIntRep(type);
 }
 
+bool EquipType::operator==(const EquipType &other) const {
+    return iRep == other.iRep;
+}
+
 QString EquipType::toString() const {
     return intToStrRep(iRep);
 }

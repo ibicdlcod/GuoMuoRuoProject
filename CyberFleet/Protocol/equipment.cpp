@@ -104,6 +104,11 @@ double Equipment::getTech() const {
 bool Equipment::isInvalid() const {
     return equipRegId == 0;
 };
+
+int Equipment::skillPointsStd() const {
+    static const double factor = 1.25;
+    return std::lround(std::pow(factor, getTech()) * 10000.0);
+}
 /*
 EquipType::EquipType(const QString &basis) {
 

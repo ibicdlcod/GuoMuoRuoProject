@@ -6,6 +6,7 @@
 #include "../Protocol/resord.h"
 #include "kerrors.h"
 #include "server.h"
+#include "peerinfo.h"
 
 #ifdef max
 #undef max

@@ -167,18 +167,33 @@ Q_GLOBAL_STATIC(QString,
                     ");"
                     ));
 
-
 /* Equipment of users */
 Q_GLOBAL_STATIC(QString,
                 userE,
                 QStringLiteral(
                     "CREATE TABLE UserEquip ("
-                    "User INTEGER, "
+                    "User BLOB, "
                     "EquipSerial INTEGER, "
                     "EquipDef INTEGER, "
                     "Star INTEGER, "
+                    "FOREIGN KEY(User) REFERENCES NewUsers(UserID),"
+                    // ↓ does not work because equipid isn't primary key
+                    //"FOREIGN KEY(EquipDef) REFERENCES EquipReg(EquipID),"
                     "CONSTRAINT noduplicate UNIQUE(User, EquipSerial), "
                     "CONSTRAINT Star_Valid CHECK (Star >= 0 AND Star < 11)"
+                    ");"
+                    ));
+
+/* Equipment skill points */
+Q_GLOBAL_STATIC(QString,
+                userSP,
+                QStringLiteral(
+                    "CREATE TABLE UserEquipSP ("
+                    "User BLOB, "
+                    "EquipDef INTEGER, "
+                    "Intvalue INTEGER, "
+                    "FOREIGN KEY(User) REFERENCES NewUsers(UserID),"
+                    "CONSTRAINT noduplicate UNIQUE(User, EquipDef) "
                     ");"
                     ));
 
@@ -420,7 +435,7 @@ Server::calGlobalTech(const CSteamID &uid, int jobID) {
                 }
                 if(pass) {
                     result.append({serial, def, 1.0});
-                    source.append({equips.value(def)->getTech(), weight});
+                    source.append({equips.value(serial)->getTech(), weight});
                 }
             }
             return {jobID == 0 ? Tech::calLevelGlobal(source)
@@ -1190,6 +1205,12 @@ void Server::receivedAuth(const QJsonObject &djson,
                 if(User::isSuperUser(steamID)) {
                     qWarning() << QString("Superuser login: %1").
                                   arg(idnum).toUtf8();
+                    /*
+                    for(auto &equip: equipRegistry) {
+                        if(equip->type != EquipType("Virtual-precondition"))
+                            User::newEquip(steamID, equip->getId());
+                    }
+                    */
                 }
                 delete [] rgubTicket;
                 return;
@@ -1546,6 +1567,9 @@ void Server::sqlinit() {
         if(!tables.contains("UserEquip")) {
             sqlinitEquipU();
         }
+        if(!tables.contains("UserEquipSP")) {
+            sqlinitEquipSP();
+        }
     }
 }
 
@@ -1569,6 +1593,16 @@ void Server::sqlinitEquipName() {
     if(!query.exec()) {
         //% "Create Equipment database failed."
         throw DBError(qtTrId("equip-db-gen-failure"),
+                      query.lastError());
+    }
+}
+
+void Server::sqlinitEquipSP() {
+    qWarning() << qtTrId("equip-db-user-sp-lack");
+    QSqlQuery query;
+    query.prepare(*userSP);
+    if(!query.exec()) {
+        throw DBError(qtTrId("equip-db-user-sp-gen-failure"),
                       query.lastError());
     }
 }
