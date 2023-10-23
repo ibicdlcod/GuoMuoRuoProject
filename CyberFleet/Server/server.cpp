@@ -438,14 +438,15 @@ Server::calculateTech(const CSteamID &uid, int jobID) {
                     result.append({serial, def, weight});
                     source.append({equips.value(serial)->getTech(), weight});
                 }
-            }/*
+            }
             if(jobID != 0 && jobID < KP::equipIdMax) {
+                double weight = getSkillPointsEffect(uid, jobID) * 9.0;
                 if(equipRegistry.value(jobID)->disallowMassProduction()){
-                    result.append({0, jobID, 0.0});
+                    result.append({0, jobID, weight});
                     source.append({equipRegistry.value(jobID)->getTech(),
-                                   0.0});
+                                   weight});
                 }
-            }*/
+            }
             return {jobID == 0 ? Tech::calLevelGlobal(source)
                                : Tech::calLevelLocal(source), result};
         }
@@ -650,6 +651,22 @@ void Server::doDevelop(CSteamID &uid, int equipid,
             connection->write(msg);
             return;
         }
+        Equipment *equip = equipRegistry[equipid];
+        if(equip->disallowProduction()) {
+            QByteArray msg =
+                KP::serverDevelopFailed(KP::ProductionDisallowed);
+            connection->write(msg);
+            return;
+        }
+        if(equip->disallowMassProduction() && (
+                User::getEquipAmount(uid, equipid)
+                    + User::getCurrentFactoryParallel(uid, equipid)
+                >= equip->attr["Disallowmassproduction"])) {
+            QByteArray msg =
+                KP::serverDevelopFailed(KP::MassProductionDisallowed);
+            connection->write(msg);
+            return;
+        }
         auto fatherResult = User::haveFather(uid, equipid, equipRegistry);
         if(!fatherResult.first) {
             QByteArray msg =
@@ -664,7 +681,6 @@ void Server::doDevelop(CSteamID &uid, int equipid,
             return;
         }
         /* not yet implemented: mother skillpoint requirements */
-        Equipment *equip = equipRegistry[equipid];
         ResOrd resRequired = equip->devRes();
         QByteArray msg = resRequired.resourceDesired();
         connection->write(msg);
@@ -760,11 +776,11 @@ void Server::doFetch(CSteamID &uid, int factoryid, QSslSocket *connection) {
                     /* 10*(thisEquipTech - globalTech)^2,
                      * cannot be lower than 1.0 */
                     double difficultyFactor = 10.0 *
-                        std::pow(
-                            std::max(
-                                1.0,
-                                equipRegistry.value(jobID)->getTech()
-                                    - calculateTech(uid, 0).first), 2.0);
+                                              std::pow(
+                                                  std::max(
+                                                      1.0,
+                                                      equipRegistry.value(jobID)->getTech()
+                                                          - calculateTech(uid, 0).first), 2.0);
                     User::addSkillPoints(uid, jobID,
                                          stdSkillPoints / difficultyFactor);
                 }

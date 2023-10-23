@@ -26,9 +26,16 @@ DevelopWindow::DevelopWindow(QWidget *parent)
         ui->listType->addItem(equipType);
     }
     ui->listType->addItem("All equipments");
-    resetListName(0);
+
+    ui->listType->setCurrentIndex(Clientv2::getInstance().equipBigTypeIndex);
+
+    resetListName(Clientv2::getInstance().equipBigTypeIndex);
+    ui->listName->setCurrentIndex(Clientv2::getInstance().equipIndex);
+
     connect(ui->listType, &QComboBox::currentIndexChanged,
             this, &DevelopWindow::resetListName);
+    connect(ui->listName, &QComboBox::currentIndexChanged,
+            this, &DevelopWindow::resetEquipName);
 }
 
 DevelopWindow::~DevelopWindow() {
@@ -53,6 +60,11 @@ int DevelopWindow::equipIdDesired() {
 }
 
 void DevelopWindow::resetListName(int equiptypeInt) {
+    Clientv2::getInstance().equipBigTypeIndex = equiptypeInt;
+    if(!initial)
+        Clientv2::getInstance().equipIndex = 0;
+    initial = false;
+
     ui->listName->clear();
     for(auto &equipReg:
          Clientv2::getInstance().equipRegistryCache) {
@@ -72,4 +84,8 @@ void DevelopWindow::resetListName(int equiptypeInt) {
             ui->listName->addItem(equipName);
         }
     }
+}
+
+void DevelopWindow::resetEquipName(int equipInt) {
+    Clientv2::getInstance().equipIndex = equipInt;
 }

@@ -111,7 +111,9 @@ enum GameError{
     ResourceLack,
     DevelopNotOption,
     DevelopNotExist,
-    FactoryBusy
+    FactoryBusy,
+    MassProductionDisallowed,
+    ProductionDisallowed
 };
 Q_ENUM_NS(GameError)
 

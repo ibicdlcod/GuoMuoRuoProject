@@ -903,6 +903,12 @@ void Clientv2::receivedMsg(const QJsonObject &djson) {
             //% "You do not have sufficient resources."
             qInfo() << qtTrId("resource-lack");
             break;
+        case KP::MassProductionDisallowed:
+            qWarning() << qtTrId("massproduction-disallowed");
+            break;
+        case KP::ProductionDisallowed:
+            qWarning() << qtTrId("production-disallowed");
+            break;
         default:
             //% "Equipment development failed."
             qInfo() << qtTrId("equip-develop-failed");

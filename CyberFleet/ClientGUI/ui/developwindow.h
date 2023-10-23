@@ -21,9 +21,11 @@ signals:
 
 public slots:
     void resetListName(int);
+    void resetEquipName(int);
 
 private:
     Ui::DevelopWindow *ui;
+    bool initial = true;
 };
 
 #endif // DEVELOPWINDOW_H

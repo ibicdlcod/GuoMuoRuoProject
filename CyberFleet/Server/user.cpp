@@ -35,6 +35,29 @@ void User::addSkillPoints(const CSteamID &uid, int equipId, uint64 skillPoints) 
     }
 }
 
+int User::getCurrentFactoryParallel(const CSteamID &uid, int equipId) {
+    QSqlDatabase db = QSqlDatabase::database();
+    QSqlQuery query;
+
+    query.prepare("SELECT * "
+                  "FROM Factories WHERE UserID = :id "
+                  "AND CurrentJob = :eid ");
+    query.bindValue(":id", uid.ConvertToUint64());
+    query.bindValue(":eid", equipId);
+    if(Q_UNLIKELY(!query.exec() || !query.isSelect())) {
+        throw DBError(qtTrId("user-get-factory-developing-failed")
+                          .arg(uid.ConvertToUint64()).arg(equipId),
+                      query.lastError());
+        return 0;
+    }
+    else {
+        int result = 0;
+        while(query.next())
+            result++;
+        return result;
+    }
+}
+
 ResOrd User::getCurrentResources(const CSteamID &uid) {
     QSqlDatabase db = QSqlDatabase::database();
     QSqlQuery query;
@@ -76,6 +99,29 @@ ResOrd User::getCurrentResources(const CSteamID &uid) {
     }
 }
 
+int User::getEquipAmount(const CSteamID &uid, int equipId) {
+    QSqlDatabase db = QSqlDatabase::database();
+    QSqlQuery query;
+
+    query.prepare("SELECT EquipSerial "
+                  "FROM UserEquip WHERE User = :id "
+                  "AND EquipDef = :eid ");
+    query.bindValue(":id", uid.ConvertToUint64());
+    query.bindValue(":eid", equipId);
+    if(Q_UNLIKELY(!query.exec() || !query.isSelect())) {
+        throw DBError(qtTrId("user-get-equip-amount-failed")
+                          .arg(uid.ConvertToUint64()).arg(equipId),
+                      query.lastError());
+        return 0;
+    }
+    else {
+        int result = 0;
+        while(query.next())
+            result++;
+        return result;
+    }
+}
+
 uint64 User::getSkillPoints(const CSteamID &uid, int equipId) {
     QSqlDatabase db = QSqlDatabase::database();
     QSqlQuery query;
@@ -85,7 +131,6 @@ uint64 User::getSkillPoints(const CSteamID &uid, int equipId) {
                   "AND EquipDef = :eid ");
     query.bindValue(":id", uid.ConvertToUint64());
     query.bindValue(":eid", equipId);
-    //query.bindValue(":sp", skillPoints);
     if(Q_UNLIKELY(!query.exec() || !query.isSelect())) {
         throw DBError(qtTrId("user-get-skillpoint-failed")
                           .arg(uid.ConvertToUint64()).arg(equipId),

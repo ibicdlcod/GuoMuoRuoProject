@@ -89,6 +89,9 @@ public:
     friend void TechView::demandLocalTech(int);
     friend void TechView::resetLocalListName(int);
 
+    int equipBigTypeIndex = 0;
+    int equipIndex = 0;
+
 public slots:
     void autoPassword();
     void backToNavalBase();
