@@ -16,11 +16,13 @@ public:
     Equipment(const QJsonObject &);
 
     bool operator<(const Equipment &) const;
-
     QString toString(QString) const;
+
     bool canDevelop(CSteamID userid = k_steamIDNil) const;
     const ResOrd devRes() const;
     const int devTimeInSec() const;
+    bool disallowMassProduction() const;
+    bool disallowProduction() const;
     int getId() const;
     double getTech() const;
     bool isInvalid() const;

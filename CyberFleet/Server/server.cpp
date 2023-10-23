@@ -109,7 +109,7 @@ Q_GLOBAL_STATIC(QString,
                 QStringLiteral(
                     "CREATE TABLE NewUsers ( "
                     "UserID BLOB PRIMARY KEY, "
-                    "UserType TEXT DEFAULT 'commoner'"
+                    "UserType TEXT NOT NULL DEFAULT 'commoner'"
                     ");"
                     ));
 
@@ -131,7 +131,7 @@ Q_GLOBAL_STATIC(QString,
                 equipReg,
                 QStringLiteral(
                     "CREATE TABLE EquipReg ( "
-                    "EquipID INTEGER, "
+                    "EquipID INTEGER NOT NULL, "
                     "Attribute TEXT NOT NULL, "
                     "Intvalue INTEGER DEFAULT 0,"
                     "CONSTRAINT noduplicate UNIQUE(EquipID, Attribute)"
@@ -155,8 +155,8 @@ Q_GLOBAL_STATIC(QString,
                 userF,
                 QStringLiteral(
                     "CREATE TABLE Factories ("
-                    "UserID BLOB,"
-                    "FactoryID INTEGER,"
+                    "UserID BLOB NOT NULL,"
+                    "FactoryID INTEGER NOT NULL,"
                     "CurrentJob INTEGER DEFAULT 0,"
                     "StartTime INTEGER, "
                     "SuccessTime INTEGER,"
@@ -172,13 +172,12 @@ Q_GLOBAL_STATIC(QString,
                 userE,
                 QStringLiteral(
                     "CREATE TABLE UserEquip ("
-                    "User BLOB, "
-                    "EquipSerial INTEGER, "
-                    "EquipDef INTEGER, "
-                    "Star INTEGER, "
+                    "User BLOB NOT NULL, "
+                    "EquipSerial INTEGER NOT NULL, "
+                    "EquipDef INTEGER NOT NULL, "
+                    "Star INTEGER DEFAULT 0, "
                     "FOREIGN KEY(User) REFERENCES NewUsers(UserID),"
-                    // ↓ does not work because equipid isn't primary key
-                    //"FOREIGN KEY(EquipDef) REFERENCES EquipReg(EquipID),"
+                    "FOREIGN KEY(EquipDef) REFERENCES EquipName(EquipID),"
                     "CONSTRAINT noduplicate UNIQUE(User, EquipSerial), "
                     "CONSTRAINT Star_Valid CHECK (Star >= 0 AND Star < 11)"
                     ");"
@@ -189,10 +188,11 @@ Q_GLOBAL_STATIC(QString,
                 userSP,
                 QStringLiteral(
                     "CREATE TABLE UserEquipSP ("
-                    "User BLOB, "
-                    "EquipDef INTEGER, "
-                    "Intvalue INTEGER, "
+                    "User BLOB NOT NULL, "
+                    "EquipDef INTEGER NOT NULL, "
+                    "Intvalue INTEGER DEFAULT 0, "
                     "FOREIGN KEY(User) REFERENCES NewUsers(UserID),"
+                    "FOREIGN KEY(EquipDef) REFERENCES EquipName(EquipID),"
                     "CONSTRAINT noduplicate UNIQUE(User, EquipDef) "
                     ");"
                     ));
@@ -434,10 +434,17 @@ Server::calGlobalTech(const CSteamID &uid, int jobID) {
                         pass = true;
                 }
                 if(pass) {
-                    result.append({serial, def, 1.0});
+                    result.append({serial, def, weight});
                     source.append({equips.value(serial)->getTech(), weight});
                 }
-            }
+            }/*
+            if(jobID != 0 && jobID < KP::equipIdMax) {
+                if(equipRegistry.value(jobID)->disallowMassProduction()){
+                    result.append({0, jobID, 0.0});
+                    source.append({equipRegistry.value(jobID)->getTech(),
+                                   0.0});
+                }
+            }*/
             return {jobID == 0 ? Tech::calLevelGlobal(source)
                                : Tech::calLevelLocal(source), result};
         }
@@ -735,16 +742,18 @@ void Server::doFetch(CSteamID &uid, int factoryid, QSslSocket *connection) {
             if(!success) {
                 QByteArray msg = KP::serverPenguin();
                 connection->write(msg);
+                if(jobID < KP::equipIdMax &&
+                    equipRegistry.value(jobID)->disallowMassProduction()) {
+                    /* get skill points */
+                    uint64 stdSkillPoints = equipRegistry.value(jobID)
+                                                ->skillPointsStd();
+                    User::addSkillPoints(uid, jobID, stdSkillPoints / 100);
+                }
             }
-            if(jobID < KP::equipIdMax) {
-                if(success) {
-                    QByteArray msg = KP::serverNewEquip(
-                        User::newEquip(uid, jobID), jobID);
-                    connection->write(msg);
-                }
-                else {
-                    // TODO: get tech points
-                }
+            else if(jobID < KP::equipIdMax) {
+                QByteArray msg = KP::serverNewEquip(
+                    User::newEquip(uid, jobID), jobID);
+                connection->write(msg);
             }
             else {
                 // TODO:is ship part
@@ -960,7 +969,7 @@ bool Server::importEquipFromCSV() {
                     else if(titleParts[i] == "equiptype") {
                         QSqlQuery query;
                         query.prepare(
-                            "REPLACE INTO EquipReg "
+                            "   REPLACE INTO EquipReg "
                             "(EquipID, Attribute, Intvalue) "
                             "VALUES (:id, :attr, :value);");
                         query.bindValue(":id", equipid);
@@ -1383,9 +1392,9 @@ void Server::receivedReq(const QJsonObject &djson,
                            this,
                            [=, this]
                            {offerGlobalTech(
-                                           connection,
-                                           uid,
-                                           djson["local"].toInt());});
+                                 connection,
+                                 uid,
+                                 djson["local"].toInt());});
     }
     break;
     default:

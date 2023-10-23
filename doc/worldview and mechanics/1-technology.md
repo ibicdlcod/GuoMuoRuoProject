@@ -49,7 +49,7 @@ All Kanmusu and equipment will count toward the calculation.
 
 For ships: All ships of the same class and all equipment she can handle will count toward the calculation.
 
-For equipment: All equipment of this exact type and [its "father" and all paternal children on the technology tree], [Skillpoints of this equipment factor, capped at 100%] and [all Kanmusu it is particularly suited to] will count toward the calculation. The two concepts will be dealt later.
+For equipment: All equipment of this exact type and [its "father" and all paternal children on the technology tree], and [all Kanmusu it is particularly suited to] will count toward the calculation. The two concepts will be dealt later.
 
 An equipment that does not have a predecessor will have it's local technology not counted when developing.
 

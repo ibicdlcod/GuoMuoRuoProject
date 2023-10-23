@@ -136,6 +136,10 @@ bool EquipType::isJet(const int type) {
     return getSpecial(type) == 28;
 }
 
+bool EquipType::isVirtual(const int type) {
+    return type == 0x01000000;
+}
+
 int EquipType::getSize() const {
     return getSize(iRep);
 }
@@ -210,6 +214,10 @@ bool EquipType::isBomber() const {
 
 bool EquipType::isJet() const {
     return isJet(iRep);
+}
+
+bool EquipType::isVirtual() const {
+    return isVirtual(iRep);
 }
 
 QList<QString> EquipType::allEquipTypes() {

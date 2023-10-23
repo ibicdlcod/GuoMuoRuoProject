@@ -12,6 +12,45 @@
 #undef max
 #endif
 
+void User::addSkillPoints(CSteamID &uid, int equipId, uint64 skillPoints) {
+    QSqlDatabase db = QSqlDatabase::database();
+    QSqlQuery query;
+    uint64 existingSP = 0;
+
+    query.prepare("SELECT Intvalue "
+                  "FROM UserEquipSP WHERE User = :id "
+                  "AND EquipDef = :eid ");
+    query.bindValue(":id", uid.ConvertToUint64());
+    query.bindValue(":eid", equipId);
+    //query.bindValue(":sp", skillPoints);
+    if(Q_UNLIKELY(!query.exec() || !query.isSelect())) {
+        throw DBError(qtTrId("user-get-skillpoint-failed")
+                          .arg(uid.ConvertToUint64()).arg(equipId),
+                      query.lastError());
+    }
+    else if(query.first()) {
+        existingSP = query.value(0).toLongLong();
+    }
+
+    QSqlQuery query2;
+    query2.prepare("REPLACE INTO UserEquipSP (User, EquipDef, Intvalue) "
+                   "VALUES (:id, :eid, :sp)");
+    query2.bindValue(":id", uid.ConvertToUint64());
+    query2.bindValue(":eid", equipId);
+    query2.bindValue(":sp", skillPoints + existingSP);
+    if(Q_UNLIKELY(!query2.exec())) {
+        throw DBError(qtTrId("user-add-skillpoint-failed")
+                          .arg(uid.ConvertToUint64()).arg(equipId),
+                      query2.lastError());
+    }
+    else {
+        //% User %1: add skillpoint of equipment %2 success, result: %3
+        qDebug() << qtTrId("user-add-skillpoint-success")
+                        .arg(uid.ConvertToUint64()).arg(equipId)
+                        .arg(skillPoints + existingSP);
+    }
+}
+
 ResOrd User::getCurrentResources(CSteamID &uid) {
     QSqlDatabase db = QSqlDatabase::database();
     QSqlQuery query;
@@ -141,7 +180,6 @@ std::tuple<bool, int> User::isFactoryFinished(CSteamID &uid, int factoryID) {
 }
 
 bool User::isSuperUser(CSteamID &uid) {
-
     QSqlDatabase db = QSqlDatabase::database();
     QSqlQuery query;
     query.prepare("SELECT UserType"

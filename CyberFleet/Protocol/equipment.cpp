@@ -93,6 +93,17 @@ const int Equipment::devTimeInSec() const {
     return 6 * (qint64)std::round((getTech() + 1.0) * 10);
 }
 
+bool Equipment::disallowMassProduction() const {
+    return attr.contains("Disallowmassproduction")
+           && attr.value("Disallowmassproduction") > 0;
+}
+
+bool Equipment::disallowProduction() const {
+    return type.isVirtual() || (
+               attr.contains("Disallowmassproduction")
+               && attr.value("Disallowmassproduction") == -1);
+}
+
 int Equipment::getId() const {
     return equipRegId;
 }

@@ -6,23 +6,21 @@
 #include "../steam/steamclientpublic.h"
 #include "../Protocol/equipment.h"
 #include "../Protocol/resord.h"
-#include "peerinfo.h"
 
 namespace User {
 
-void addSkillPoints(CSteamID &uid, int equipId, uint64 skillPoints);
-ResOrd getCurrentResources(CSteamID &uid);
-std::pair<bool, int> haveFather(CSteamID &uid, int sonEquipId,
-                                QMap<int, Equipment *> &);
-void init(CSteamID &uid);
-bool isFactoryBusy(CSteamID &uid, int factoryID);
-std::tuple<bool, int> isFactoryFinished(CSteamID &uid, int factoryID);
-bool isSuperUser(CSteamID &uid);
-void naturalRegen(CSteamID &uid);
-int newEquip(CSteamID &uid, int equipDid);
-void refreshFactory(CSteamID &uid);
-void refreshPort(CSteamID &uid);
-void setResources(CSteamID &uid, ResOrd goal);
+void addSkillPoints(CSteamID &, int, uint64);
+ResOrd getCurrentResources(CSteamID &);
+std::pair<bool, int> haveFather(CSteamID &, int, QMap<int, Equipment *> &);
+void init(CSteamID &);
+bool isFactoryBusy(CSteamID &, int);
+std::tuple<bool, int> isFactoryFinished(CSteamID &, int);
+bool isSuperUser(CSteamID &);
+void naturalRegen(CSteamID &);
+int newEquip(CSteamID &, int);
+void refreshFactory(CSteamID &);
+void refreshPort(CSteamID &);
+void setResources(CSteamID &, ResOrd);
 };
 
 #endif // USER_H
