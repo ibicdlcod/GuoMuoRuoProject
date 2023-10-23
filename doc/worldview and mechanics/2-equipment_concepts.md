@@ -16,7 +16,7 @@ Each equipment have a standard skill point determined by its tech level:
 $$
 S=(\frac{5}{4})^{tech}\times10000
 $$
-Gain: equal to kanmusu's, unless its "mother" is a real equipment, then it could NOT gain skill points in battle but can transfer skill points from its "mother equipment" at a ratio of (tech of "son equipment" : 1)
+Gain: equal to kanmusu's, unless its "mother" is a real equipment, then it could NOT gain skill points in battle but can transfer skill points from its "mother equipment" at a ratio of (\sqrt{tech of "son equipment"} : 1)
 
 Losses: Kanmusu mounting it get medium damage: ?x (TBD)
 

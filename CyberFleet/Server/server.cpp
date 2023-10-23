@@ -796,7 +796,7 @@ void Server::doFetch(CSteamID &uid, int factoryid, QSslSocket *connection) {
             }
             else if(jobID < KP::equipIdMax) {
                 QByteArray msg = KP::serverNewEquip(
-                    User::newEquip(uid, jobID), jobID);
+                    newEquip(uid, jobID), jobID);
                 connection->write(msg);
             }
             else {
@@ -1060,6 +1060,22 @@ bool Server::importEquipFromCSV() {
     return true;
 }
 
+int Server::newEquip(const CSteamID &uid, int equipId) {
+    newEquipHasMother(uid, equipId);
+    return User::newEquip(uid, equipId);
+}
+
+void Server::newEquipHasMother(const CSteamID &uid, int equipId) {
+    if(!equipRegistry.contains(equipId))
+        return;
+    Equipment *equip = equipRegistry.value(equipId);
+    if(!equipRegistry.contains(equip->attr["Mother"]))
+        return;
+    Equipment *mother = equipRegistry.value(equip->attr["Mother"]);
+    uint64 sonSkillPoints = equip->skillPointsStd() * pow(equip->getTech(), 0.5);
+    User::addSkillPoints(uid, equip->attr["Mother"], -sonSkillPoints);
+}
+
 void Server::parseListen(const QStringList &cmdParts) {
     if(cmdParts.length() < 3) {
         //% "Usage: listen [ip] [port]"
@@ -1261,7 +1277,7 @@ void Server::receivedAuth(const QJsonObject &djson,
                     /*
                     for(auto &equip: equipRegistry) {
                         if(equip->type != EquipType("Virtual-precondition"))
-                            User::newEquip(steamID, equip->getId());
+                            newEquip(steamID, equip->getId());
                     }
                     */
                 }
@@ -1404,7 +1420,7 @@ void Server::receivedReq(const QJsonObject &djson,
         }
         else {
             QByteArray msg = KP::serverNewEquip(
-                User::newEquip(uid, equipid), equipid);
+                newEquip(uid, equipid), equipid);
             connection->write(msg);
         }
     }
