@@ -523,6 +523,17 @@ void Server::offerEquipInfo(QSslSocket *connection, int index = 0) {
     connection->flush();
 }
 
+void Server::offerSPInfo(QSslSocket *connection,
+                         const CSteamID &uid, int equipId) {
+    connection->flush();
+    QByteArray msg =
+        KP::serverSkillPoints(equipId,
+                              User::getSkillPoints(uid, equipId),
+                              equipRegistry.value(equipId)->skillPointsStd());
+    connection->write(msg);
+    connection->flush();
+}
+
 void Server::offerTechInfo(QSslSocket *connection, const CSteamID &uid,
                            int jobID) {
     auto result = calculateTech(uid, jobID);
@@ -1455,6 +1466,16 @@ void Server::receivedReq(const QJsonObject &djson,
                                  connection,
                                  uid,
                                  djson["local"].toInt());});
+    }
+    break;
+    case KP::CommandType::DemandSkillPoints: {
+        QTimer::singleShot(100,
+                           this,
+                           [=, this]
+                           {offerSPInfo(
+                                 connection,
+                                 uid,
+                                 djson["equipid"].toInt());});
     }
     break;
     default:

@@ -4,6 +4,7 @@
 #include <QDir>
 #include <QSettings>
 #include <QResizeEvent>
+#include <QScreen>
 #include "developwindow.h"
 #include "keyenterreceiver.h"
 
@@ -14,6 +15,7 @@ MainWindow::MainWindow(QWidget *parent, int argc, char ** argv)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+    move(screen()->geometry().center() - frameGeometry().center());
     ui->PortArea->hide();
     ui->FactoryArea->hide();
     ui->LoginScreen->hide();

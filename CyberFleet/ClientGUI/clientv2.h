@@ -87,10 +87,12 @@ public:
     friend int DevelopWindow::equipIdDesired();
     friend void DevelopWindow::resetListName(int);
     friend void TechView::demandLocalTech(int);
-    friend void TechView::resetLocalListName(int);
+    friend void TechView::demandSkillPoints(int);
+    friend void TechView::resetLocalListName();
 
     int equipBigTypeIndex = 0;
     int equipIndex = 0;
+    bool equipRegistryCacheGood = false;
 
 public slots:
     void autoPassword();
@@ -125,6 +127,7 @@ signals:
     void receivedGlobalTechInfo2(const QJsonObject &);
     void receivedLocalTechInfo(const QJsonObject &);
     void receivedLocalTechInfo2(const QJsonObject &);
+    void receivedSkillPointInfo(const QJsonObject &);
 
 private slots:
     void encrypted();
@@ -192,7 +195,6 @@ private:
     bool authSent = false;
 
     QMap<int, Equipment *> equipRegistryCache;
-    bool equipRegistryCacheGood = false;
 
     QTimer *timer;
 

@@ -80,6 +80,14 @@ QByteArray KP::clientDemandGlobalTech(int local) {
 
 }
 
+QByteArray KP::clientDemandSkillPoints(int equipId) {
+    QJsonObject result;
+    result["type"] = DgramType::Request;
+    result["command"] = CommandType::DemandSkillPoints;
+    result["equipid"] = equipId;
+    return QCborValue::fromJsonValue(result).toCbor();
+}
+
 QByteArray KP::clientDevelop(int equipid, bool convert, int factoryID) {
     QJsonObject result;
     result["type"] = DgramType::Request;
@@ -288,6 +296,17 @@ QByteArray KP::serverPenguin() {
     QJsonObject result;
     result["type"] = DgramType::Message;
     result["msgtype"] = MsgType::Penguin;
+    return QCborValue::fromJsonValue(result).toCbor();
+}
+
+QByteArray KP::serverSkillPoints(int equipId,
+                                 uint64 currentSP, uint64 standardSP) {
+    QJsonObject result;
+    result["type"] = DgramType::Info;
+    result["infotype"] = InfoType::SkillPointInfo;
+    result["equipid"] = equipId;
+    result["actualSP"] = (qint64)currentSP;
+    result["desiredSP"] = (qint64)standardSP;
     return QCborValue::fromJsonValue(result).toCbor();
 }
 

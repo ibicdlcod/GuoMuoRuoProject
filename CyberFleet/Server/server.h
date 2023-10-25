@@ -94,6 +94,7 @@ private slots:
                                    const QList<std::tuple<
                                        int, int, double>> &,
                                    bool, bool);
+    void offerSPInfo(QSslSocket *, const CSteamID &, int);
     void pskRequired(QSslSocket *, QSslPreSharedKeyAuthenticator *);
     void shutdown();
     void sslErrors(QSslSocket *, const QList<QSslError> &);

@@ -103,7 +103,8 @@ enum CommandType{
     CHello,
     AdminAddEquip,
     DemandEquipInfo,
-    DemandGlobalTech
+    DemandGlobalTech,
+    DemandSkillPoints
 };
 Q_ENUM_NS(CommandType)
 
@@ -129,7 +130,8 @@ enum InfoType{
     FactoryInfo,
     EquipInfo,
     GlobalTechInfo,
-    LocalTechInfo
+    LocalTechInfo,
+    SkillPointInfo
 };
 Q_ENUM_NS(InfoType)
 
@@ -153,6 +155,7 @@ QByteArray catbomb();
 QByteArray clientAddEquip(int);
 QByteArray clientDemandEquipInfo();
 QByteArray clientDemandGlobalTech(int local = 0);
+QByteArray clientDemandSkillPoints(int);
 QByteArray clientDevelop(int, bool convert = false, int factoryID = -1);
 QByteArray clientFactoryRefresh();
 QByteArray clientFetch(int factoryID = -1);
@@ -178,6 +181,7 @@ QByteArray serverNewEquip(int, int);
 QByteArray serverParseError(MsgType, const QString &,
                             const QString &);
 QByteArray serverPenguin();
+QByteArray serverSkillPoints(int, uint64, uint64);
 QByteArray serverVerifyComplete();
 QByteArray weighAnchor();
 };

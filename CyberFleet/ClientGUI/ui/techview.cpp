@@ -22,6 +22,12 @@ TechView::TechView(QWidget *parent) :
                      this, &TechView::updateLocalTechViewTable);
     QObject::connect(&engine, &Clientv2::equipRegistryComplete,
                      this->ui->waitText, &QLabel::hide);
+    QObject::connect(&engine, &Clientv2::equipRegistryComplete,
+                     this, &TechView::resetLocalListName);
+    QObject::connect(this->ui->updateGlobalButton, &QPushButton::clicked,
+                     this, &TechView::demandGlobalTech);
+    QObject::connect(&engine, &Clientv2::receivedSkillPointInfo,
+                     this, &TechView::updateSkillPoints);
     ui->globalViewTable->hide();
     ui->waitText->show();
     ui->waitText->setWordWrap(true);
@@ -48,11 +54,13 @@ TechView::TechView(QWidget *parent) :
         ui->localListType->addItem(equipType);
     }
     ui->localListType->addItem("All equipments");
-    resetLocalListName(0);
+    ui->localListType->setCurrentIndex(0);
     connect(ui->localListType, &QComboBox::activated,
             this, &TechView::resetLocalListName);
     connect(ui->localListValue, &QComboBox::activated,
             this, &TechView::demandLocalTech);
+    connect(ui->localListValue, &QComboBox::activated,
+            this, &TechView::demandSkillPoints);
 }
 
 TechView::~TechView()
@@ -60,10 +68,40 @@ TechView::~TechView()
     delete ui;
 }
 
+void TechView::demandGlobalTech() {
+    Clientv2 &engine = Clientv2::getInstance();
+    if(!engine.equipRegistryCacheGood)
+        return;
+    else {
+        engine.switchToTech2();
+    }
+}
+
 void TechView::demandLocalTech(int index) {
     Q_UNUSED(index)
 
     ui->localViewTable->clear();
+
+    Clientv2 &engine = Clientv2::getInstance();
+    for(auto &equipReg:
+         engine.equipRegistryCache) {
+        for(auto &name: equipReg->localNames) {
+            if(name.compare(ui->localListValue->currentText(),
+                             Qt::CaseInsensitive) == 0) {
+                engine.socket.flush();
+                QByteArray msg = KP::clientDemandSkillPoints(equipReg->getId());
+                const qint64 written = engine.socket.write(msg);
+                if (written <= 0) {
+                    throw NetworkError(engine.socket.errorString());
+                }
+                return;
+            }
+        }
+    }
+}
+
+void TechView::demandSkillPoints(int index) {
+    Q_UNUSED(index)
 
     Clientv2 &engine = Clientv2::getInstance();
     for(auto &equipReg:
@@ -104,9 +142,6 @@ void TechView::updateGlobalTechViewTable(const QJsonObject &djson) {
         ui->globalViewTable->show();
         ui->waitText->hide();
     }
-    ui->globalViewTable->setHorizontalHeaderLabels(
-        {qtTrId("Serial-num"), qtTrId("Equip-name-def"),
-         qtTrId("Equip-tech-level"), qtTrId("Weight")});
     ui->globalViewTable->setColumnCount(4);
     QJsonArray contents = djson["content"].toArray();
     int currentRowCount = ui->globalViewTable->rowCount();
@@ -145,6 +180,9 @@ void TechView::updateGlobalTechViewTable(const QJsonObject &djson) {
         ++i;
     }
     if(djson["final"].toBool()) {
+        ui->globalViewTable->setHorizontalHeaderLabels(
+            {qtTrId("Serial-num"), qtTrId("Equip-name-def"),
+             qtTrId("Equip-tech-level"), qtTrId("Weight")});
         ui->globalViewTable->sortByColumn(3, Qt::DescendingOrder);
         ui->globalViewTable->sortByColumn(2, Qt::DescendingOrder);
         resizeColumns(true);
@@ -215,6 +253,12 @@ void TechView::updateLocalTechViewTable(const QJsonObject &djson) {
     }
 }
 
+void TechView::updateSkillPoints(const QJsonObject &djson) {
+    ui->skillPointsValue->setText(QString("%1/%2")
+                                      .arg(djson["actualSP"].toInteger())
+                                      .arg(djson["desiredSP"].toInteger()));
+}
+
 void TechView::resizeColumns(bool global) {
     QHeaderView *hH = global ? ui->globalViewTable->horizontalHeader()
                               : ui->localViewTable->horizontalHeader();
@@ -229,7 +273,7 @@ void TechView::resizeColumns(bool global) {
                           + outerTableWidth - innerTableWidth);
 }
 
-void TechView::resetLocalListName(int equiptypeInt) {
+void TechView::resetLocalListName() {
     ui->localListValue->clear();
     for(auto &equipReg:
          Clientv2::getInstance().equipRegistryCache) {
@@ -255,6 +299,17 @@ void TechView::resizeEvent(QResizeEvent *event) {
     resizeColumns(true);
     resizeColumns(false);
     QWidget::resizeEvent(event);
+}
+
+void TechView::showEvent(QShowEvent *event) {
+    ui->globalViewTable->setHorizontalHeaderLabels(
+        {qtTrId("Serial-num"), qtTrId("Equip-name-def"),
+         qtTrId("Equip-tech-level"), qtTrId("Weight")});
+
+    ui->localViewTable->setHorizontalHeaderLabels(
+        {qtTrId("Serial-num"), qtTrId("Equip-name-def"),
+         qtTrId("Equip-tech-level"), qtTrId("Weight")});
+    QWidget::showEvent(event);
 }
 
 TableWidgetItemNumber::TableWidgetItemNumber(double content) {

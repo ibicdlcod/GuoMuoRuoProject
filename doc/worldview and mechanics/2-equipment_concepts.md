@@ -22,16 +22,20 @@ Losses: Kanmusu mounting it get medium damage: ?x (TBD)
 
 Heavy damage ?x (TBD)
 
-At 100% standard skill points the equipment is 100% effective. Maximum effectiveness is lower than 141.4%(2^0.5). Therefore an inferior equipment with enough skill points may outperform a superior but unskilled one.
+At 0% stand skill points the equipment is 29.29% effective, at 100% points 100% effective. Maximum effectiveness is 129.29% (2-\sqrt{0.5}). Therefore an inferior equipment with enough skill points may outperform a superior but unskilled one.
 $$
-Efficiency = \frac{\sqrt{2}y}{\sqrt{x^2+y^2}}\space where\space x=stand\space skillpoint,\space y=actual\space skillpoint
+Efficiency = 1-\sqrt{\frac{1}{2}}+\frac{y}{\sqrt{x^2+y^2}}\space where\space x=stand\space skillpoint,\space y=actual\space skillpoint
 $$
 
 ## Improvement
 
-You can improve any equipment at the cost of 100% of standard skill point. An equipment improved a times would have its actual skill point added by (log_10(a))*standard (a<=10);
+You can improve any equipment at the cost of 100% of standard skill point. An equipment improved a times would have its efficiency added by
+$$
+(star/10)*(\sqrt{\frac{1}{2}}-\frac{1}{2})
+$$
+
 
 ## Prototype equipment
 
-Some equipment have "disallow mass production" attribute, when developing it while possessing above maximum (determined by the value of "disallow mass production") the cost goes up exponentially.
+Some equipment have "disallow mass production" attribute, when developing it while possessing above maximum (determined by the value of "disallow mass production") the equipment can no longer be developed.
 

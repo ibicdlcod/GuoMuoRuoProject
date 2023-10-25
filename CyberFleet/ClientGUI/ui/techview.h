@@ -15,19 +15,23 @@ class TechView : public QFrame
 public:
     explicit TechView(QWidget *parent = nullptr);
     ~TechView();
-    void resetLocalListName(int);
+    void resetLocalListName();
 
 public slots:
+    void demandGlobalTech();
     void demandLocalTech(int);
+    void demandSkillPoints(int);
 
 protected:
     void resizeEvent(QResizeEvent *event) override;
+    void showEvent(QShowEvent *event) override;
 
 private slots:
     void updateGlobalTech(const QJsonObject &);
     void updateGlobalTechViewTable(const QJsonObject &);
     void updateLocalTech(const QJsonObject &);
     void updateLocalTechViewTable(const QJsonObject &);
+    void updateSkillPoints(const QJsonObject &);
 
 private:
     void resizeColumns(bool);

@@ -321,11 +321,13 @@ void Clientv2::switchToTech() {
         gameState = KP::TechView;
         emit gamestateChanged(KP::TechView);
         if(equipRegistryCacheGood) {
+            socket.flush();
             QByteArray msg = KP::clientDemandGlobalTech(0);
             const qint64 written = socket.write(msg);
             if (written <= 0) {
                 throw NetworkError(socket.errorString());
             }
+            socket.flush();
         }
         else {
             demandEquipCache();
@@ -826,6 +828,9 @@ void Clientv2::receivedInfo(const QJsonObject &djson) {
         else {
             emit receivedLocalTechInfo2(djson);
         }
+        break;
+    case KP::InfoType::SkillPointInfo:
+        emit receivedSkillPointInfo(djson);
         break;
     default: throw std::domain_error("auth type not supported"); break;
     }
