@@ -69,9 +69,10 @@ Generally (variations may exist):
 
 | year this ship/equipment is functional | tech level |
 | :------------------------------------: | :--------: |
-|            1921 or earlier             |     1      |
-|                  1922                  |     1      |
-|                  1923                  |     1      |
+|                  1908                  |     0      |
+|                  1912                  |    1/4     |
+|                  1916                  |    1/2     |
+|                  1920                  |    3/4     |
 |                  1924                  |     1      |
 |                  1925                  |    4/3     |
 |                  1926                  |    5/3     |

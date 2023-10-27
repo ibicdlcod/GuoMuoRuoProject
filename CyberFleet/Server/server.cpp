@@ -1039,7 +1039,7 @@ bool Server::importEquipFromCSV() {
                             return false;
                         }
                     }
-                    else if(i > 3){
+                    else if(i > 4){
                         QSqlQuery query;
                         query.prepare("REPLACE INTO EquipReg "
                                       "(EquipID, Attribute, Intvalue) "
@@ -1196,8 +1196,8 @@ void Server::receivedAuth(const QJsonObject &djson,
         /* Of course, app secret key is not shipped with the project. */
         QFile appSecretKeyFile("AppSecretKey");
         if(!appSecretKeyFile.open(QIODevice::ReadOnly)) {
-            //% "Server lack a private key."
-            QString msg = qtTrId("no-private-key")
+            //% "Server lack the steam app secret key."
+            QString msg = qtTrId("no-app-secret-key")
                               .arg(peerInfo.address.toString())
                               .arg(peerInfo.port);
             qCritical() << msg;

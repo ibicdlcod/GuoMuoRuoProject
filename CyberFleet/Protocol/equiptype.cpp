@@ -282,8 +282,8 @@ const ResOrd EquipType::devResBase() const {
         }
     }
     else if(getSpecial() == 0
-               || getSpecial() == 24
-               || getSpecial() == 28) {
+             || getSpecial() == 24
+             || getSpecial() == 28) {
         // normal planes are here
         basic[O] += 10;
         basic[O] += isBomber() ? 2 : 0;
@@ -298,6 +298,7 @@ const ResOrd EquipType::devResBase() const {
         basic[A] += 20;
         basic[A] += isLb() ? 4 : 0;
         basic[A] += isJet() ? 10 : 0;
+        basic[S] += isJet() ? 15 : 0;
         basic[R] += 2;
         basic[C] += isJet() ? 5 : 0;
     }

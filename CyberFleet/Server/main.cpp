@@ -30,8 +30,8 @@ int main(int argc, char *argv[]) {
     Server server(argc, argv);
 
 #pragma message(NOT_M_CONST)
-    server.setApplicationName("WrathofAdmiral2 Server");
-    server.setApplicationVersion("0.55.1"); // temp
+    server.setApplicationName("CyberFleet Server");
+    server.setApplicationVersion("0.57.1"); // temp
     server.setOrganizationName("Harusame Software");
     server.setOrganizationDomain("hsny.xyz"); // temp
     settings = std::make_unique<QSettings>(new QSettings);
@@ -41,8 +41,21 @@ int main(int argc, char *argv[]) {
 #endif
 
     QTranslator translator;
-    /* For testing purposes */
-    settings->setValue("language", QStringLiteral("zh_CN"));
+#ifdef QT_NO_DEBUG
+    QString steamLanguage = SteamUtils()->GetSteamUILanguage();
+    QMap<QString, QString> LanguageView;
+    LanguageView["english"] = QStringLiteral("en_US");
+    LanguageView["schinese"] = QStringLiteral("zh_CN");
+    LanguageView["japanese"] = QStringLiteral("ja_JP");
+    if(LanguageView.contains(steamLanguage)) {
+        settings->setValue("language", LanguageView[steamLanguage]);
+    }
+    else {
+        qWarning() << "Language not natively supported";
+    }
+#else
+    settings->setValue("language", "en_US");
+#endif
 
     QStringList uiLanguages = QLocale::system().uiLanguages();
     if(settings->contains("language")) {
