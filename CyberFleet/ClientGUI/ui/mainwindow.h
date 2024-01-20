@@ -28,7 +28,7 @@ signals:
     void cmdMessage(const QString &);
 
 protected:
-    void resizeEvent(QResizeEvent *event) override;
+    void resizeEvent(QResizeEvent *) override;
 
 private slots:
     void adjustArea(QFrame *, const QSize &);
@@ -38,12 +38,12 @@ private slots:
                       QColor foreground = QColor("black"));
     void processCmd();
     void factoryRefresh();
+    void switchToConstruct();
     void switchToDevelop();
 
 private:
     Ui::MainWindow *ui;
     bool pwConfirmMode = false;
-    KP::FactoryState factoryState = KP::Development;
     QList<FactorySlot *> slotfs;
 
     FactoryArea *factoryArea;

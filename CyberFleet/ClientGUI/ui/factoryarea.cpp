@@ -50,24 +50,31 @@ FactoryArea::~FactoryArea()
 }
 
 void FactoryArea::developClicked(bool checked, int slotnum) {
+    Q_UNUSED(checked)
+
     Clientv2 &engine = Clientv2::getInstance();
-    if(slotfs[slotnum]->isComplete()) {
-        engine.doFetch({"fetch", QString::number(slotnum)});
-    }
-    else if(slotfs[slotnum]->isOnJob()) {
-        return;
+    if(factoryState == KP::Development) {
+        if(slotfs[slotnum]->isComplete()) {
+            engine.doFetch({"fetch", QString::number(slotnum)});
+        }
+        else if(slotfs[slotnum]->isOnJob()) {
+            return;
+        }
+        else {
+            DevelopWindow w;
+            if(w.exec() == QDialog::Rejected)
+                qDebug() << "NODEVELOP";
+            else {
+                QTimer::singleShot(100, &engine, &Clientv2::doRefreshFactory);
+                QString msg = QStringLiteral("develop %1 %2")
+                                  .arg(w.equipIdDesired()).arg(slotnum);
+                qDebug() << msg;
+                engine.parse(msg);
+            }
+        }
     }
     else {
-        DevelopWindow w;
-        if(w.exec() == QDialog::Rejected)
-            qDebug() << "NODEVELOP";
-        else {
-            QTimer::singleShot(100, &engine, &Clientv2::doRefreshFactory);
-            QString msg = QStringLiteral("develop %1 %2")
-                              .arg(w.equipIdDesired()).arg(slotnum);
-            qDebug() << msg;
-            engine.parse(msg);
-        }
+
     }
     engine.doRefreshFactory();
 }
@@ -96,6 +103,16 @@ void FactoryArea::doFactoryRefresh(const QJsonObject &input) {
     }
 }
 
+void FactoryArea::setDevelop(bool isDevelop) {
+    if(isDevelop)
+        factoryState = KP::Development;
+    else
+        factoryState = KP::Construction;
+}
+
 void FactoryArea::switchToDevelop() {
-    ui->FactoryLabel->setText(qtTrId("develop-equipment"));
+    if(factoryState == KP::Development)
+        ui->FactoryLabel->setText(qtTrId("develop-equipment"));
+    else
+        ui->FactoryLabel->setText(qtTrId("construct-ships"));
 }

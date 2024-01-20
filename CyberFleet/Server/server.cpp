@@ -290,7 +290,6 @@ bool Server::parseSpec(const QStringList &cmdParts) {
     try {
         if(cmdParts.length() > 0) {
             QString primary = cmdParts[0];
-            primary = settings->value("alias/"+primary, primary).toString();
 
             if(primary.compare("listen", Qt::CaseInsensitive) == 0) {
                 parseListen(cmdParts);

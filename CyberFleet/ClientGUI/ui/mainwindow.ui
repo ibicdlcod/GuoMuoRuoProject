@@ -21,6 +21,21 @@
     <string notr="true"/>
    </property>
    <layout class="QVBoxLayout" name="verticalLayout">
+    <property name="spacing">
+     <number>3</number>
+    </property>
+    <property name="leftMargin">
+     <number>5</number>
+    </property>
+    <property name="topMargin">
+     <number>5</number>
+    </property>
+    <property name="rightMargin">
+     <number>5</number>
+    </property>
+    <property name="bottomMargin">
+     <number>5</number>
+    </property>
     <item>
      <widget class="QFrame" name="MainArea">
       <property name="sizePolicy">
@@ -37,6 +52,9 @@
       </property>
       <property name="frameShadow">
        <enum>QFrame::Raised</enum>
+      </property>
+      <property name="lineWidth">
+       <number>0</number>
       </property>
       <layout class="QHBoxLayout" name="horizontalLayout">
        <item>
@@ -145,7 +163,8 @@
        </size>
       </property>
       <property name="styleSheet">
-       <string notr="true">background-color: rgb(255, 255, 255);</string>
+       <string notr="true">background-color: rgb(255, 255, 255);
+border-style: none;</string>
       </property>
      </widget>
     </item>
@@ -168,7 +187,8 @@
       </property>
       <property name="styleSheet">
        <string notr="true">background-color: rgb(255, 255, 255);
-color: rgb(0, 0, 0);</string>
+color: rgb(0, 0, 0);
+border-style: none;</string>
       </property>
      </widget>
     </item>
@@ -221,6 +241,7 @@ color: rgb(0, 0, 0);</string>
      <string>Factory</string>
     </property>
     <addaction name="actionDevelop_Equipment"/>
+    <addaction name="actionConstruct_Ships"/>
    </widget>
    <widget class="QMenu" name="menuNaval_Base">
     <property name="title">
@@ -269,6 +290,11 @@ color: rgb(0, 0, 0);</string>
   <action name="actionView_Tech">
    <property name="text">
     <string>View Tech</string>
+   </property>
+  </action>
+  <action name="actionConstruct_Ships">
+   <property name="text">
+    <string>Construct Ships</string>
    </property>
   </action>
  </widget>

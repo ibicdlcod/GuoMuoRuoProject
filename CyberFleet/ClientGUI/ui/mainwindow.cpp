@@ -15,6 +15,11 @@ MainWindow::MainWindow(QWidget *parent, int argc, char ** argv)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+
+    /* this is done instead of in *.ui for it does not cascade */
+    ui->MainArea->setObjectName("mainArea");
+    ui->MainArea->setStyleSheet("QWidget#mainArea { border-style: none }");
+
     move(screen()->geometry().center() - frameGeometry().center());
     ui->PortArea->hide();
     ui->FactoryArea->hide();
@@ -44,6 +49,10 @@ MainWindow::MainWindow(QWidget *parent, int argc, char ** argv)
                      &engine, &Clientv2::switchToFactory);
     QObject::connect(ui->actionDevelop_Equipment, &QAction::triggered,
                      this, &MainWindow::switchToDevelop);
+    QObject::connect(ui->actionConstruct_Ships, &QAction::triggered,
+                     &engine, &Clientv2::switchToFactory);
+    QObject::connect(ui->actionConstruct_Ships, &QAction::triggered,
+                     this, &MainWindow::switchToConstruct);
     QObject::connect(ui->actionLogout, &QAction::triggered,
                      &engine, &Clientv2::parseDisconnectReq);
     QObject::connect(ui->actionExit, &QAction::triggered,
@@ -136,13 +145,21 @@ void MainWindow::factoryRefresh() {
     engine.parse(cmd1);
 }
 
+void MainWindow::switchToConstruct() {
+    Clientv2 &engine = Clientv2::getInstance();
+    if(!engine.loggedIn()) {
+        return;
+    }
+    factoryArea->setDevelop(false);
+    factoryArea->switchToDevelop();
+}
+
 void MainWindow::switchToDevelop() {
     Clientv2 &engine = Clientv2::getInstance();
     if(!engine.loggedIn()) {
         return;
     }
-    factoryState = KP::Development;
-    //% "Develop Equipment"
+    factoryArea->setDevelop(true);
     factoryArea->switchToDevelop();
 }
 

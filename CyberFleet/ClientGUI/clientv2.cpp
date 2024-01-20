@@ -181,7 +181,6 @@ bool Clientv2::parse(const QString &input) {
     QStringList cmdParts = input.split(re, Qt::SkipEmptyParts);
     if(cmdParts.length() > 0) {
         QString primary = cmdParts[0];
-        primary = settings->value("alias/"+primary, primary).toString();
 
         if(primary.compare("help", Qt::CaseInsensitive) == 0) {
             cmdParts.removeFirst();
@@ -222,7 +221,7 @@ bool Clientv2::parseSpec(const QStringList &cmdParts) {
     try {
         if(cmdParts.length() > 0) {
             QString primary = cmdParts[0];
-            primary = settings->value("alias/"+primary, primary).toString();
+
             bool loginMode = primary.compare("connect", Qt::CaseInsensitive) == 0;
             if(loginMode) {
                 parseConnectReq(cmdParts);

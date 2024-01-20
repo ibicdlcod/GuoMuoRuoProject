@@ -120,9 +120,7 @@ Q_ENUM_NS(GameError)
 
 enum FactoryState{
     Development,
-    Deprecation,
-    ConvertDevelop,
-    IndustrialPlant
+    Construction
 };
 Q_ENUM_NS(FactoryState)
 

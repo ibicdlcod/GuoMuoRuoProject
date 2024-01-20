@@ -161,11 +161,30 @@ bool CommandLine::parse(const QString &input) {
         displayPrompt();
         return success;
     }
+
+    settings->beginGroup("alias");
+    /* the following should only be enacted once per machine
+    settings->setValue("l", "listen");
+    settings->setValue("ll", "listen 127.0.0.1 1826"); // "listenlocal"
+     */
+    QStringList keys = settings->allKeys();
+    /* ^(alias|alias2|...)\b indicates only first word */
+    static QRegularExpression aliasRe(QString("^(" + keys.join('|') + ")\\b"));
+    QRegularExpressionMatch aliasMatch = aliasRe.match(input);
+    QString inputAliased = input; // get off const
+    if (aliasMatch.hasMatch()) {
+        QString matched = aliasMatch.captured(1);
+        qsizetype matchedStart = aliasMatch.capturedStart(1);
+        qsizetype matchedLength = aliasMatch.capturedLength(1);
+        inputAliased.replace(matchedStart, matchedLength,
+                             settings->value(matched).toString());
+    }
+    settings->endGroup();
+
     static QRegularExpression re("\\s+");
-    QStringList cmdParts = input.split(re, Qt::SkipEmptyParts);
+    QStringList cmdParts = inputAliased.split(re, Qt::SkipEmptyParts);
     if(cmdParts.length() > 0) {
         QString primary = cmdParts[0];
-        primary = settings->value("alias/"+primary, primary).toString();
 
         if(primary.compare("help", Qt::CaseInsensitive) == 0) {
             cmdParts.removeFirst();

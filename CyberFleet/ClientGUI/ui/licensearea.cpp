@@ -10,6 +10,15 @@ LicenseArea::LicenseArea(QWidget *parent) :
     ui(new Ui::LicenseArea)
 {
     ui->setupUi(this);
+
+    /* this is done instead of in *.ui for it does not cascade */
+    ui->LicenseText->setObjectName("licenseText");
+    ui->LicenseText->setStyleSheet("QTextBrowser#licenseText { border-style: none }");
+    ui->BelowLicense->setObjectName("belowLicense");
+    ui->BelowLicense->setStyleSheet("QFrame#belowLicense { border-style: none }");
+    ui->Naganami->setObjectName("naganami");
+    ui->Naganami->setStyleSheet("QTextBrowser#naganami { border-style: none }");
+
     QString notice;
     QDir currentDir = QDir::current();
     /* the default is qt resource system */

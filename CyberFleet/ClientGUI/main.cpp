@@ -6,7 +6,6 @@
 #include <QTranslator>
 #include <QStyleFactory>
 #include "../steam/steam_api.h"
-#include "../steam/isteamutils.h"
 
 #include "clientv2.h"
 #include "../Protocol/kp.h"
@@ -23,7 +22,9 @@ int main(int argc, char *argv[]) {
         return STEAM_ERROR;
     }
     if(!SteamAPI_Init()) {
-        qFatal("Fatal Error - Steam must be running to play this game (SteamAPI_Init() failed).\n");
+        qFatal() <<
+            "Fatal Error - Steam must be running to play this game "
+            "(SteamAPI_Init() failed).\n";
         return STEAM_ERROR;
     }
     /* End Steam initialization */

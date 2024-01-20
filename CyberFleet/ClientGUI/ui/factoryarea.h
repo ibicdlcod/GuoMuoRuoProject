@@ -3,6 +3,7 @@
 
 #include <QFrame>
 #include "FactorySlot/factoryslot.h"
+#include "../../Protocol/kp.h"
 
 namespace Ui {
 class FactoryArea;
@@ -16,6 +17,7 @@ public:
     explicit FactoryArea(QWidget *parent = nullptr);
     ~FactoryArea();
 
+    void setDevelop(bool);
     void switchToDevelop();
 
 private slots:
@@ -25,6 +27,7 @@ private slots:
 private:
     Ui::FactoryArea *ui;
 
+    KP::FactoryState factoryState = KP::Development;
     QList<FactorySlot *> slotfs;
 };
 
