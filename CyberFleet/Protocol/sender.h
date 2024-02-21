@@ -9,6 +9,8 @@
 #include <QTcpSocket>
 #include <QByteArray>
 #include <QUuid>
+#include <QQueue>
+#include <QBuffer>
 
 class Sender : public QObject
 {
@@ -24,6 +26,7 @@ signals:
     void progressed(int);
 
 public slots:
+    void enque(const QByteArray &);
     void start();
 
 private slots:
@@ -35,6 +38,8 @@ private:
     void send();
     bool signalDone();
 
+    QQueue<QByteArray> input;
+    QBuffer buffer;
     QIODevice *m_source;
     QAbstractSocket *m_destination;
     QByteArray m_buffer;

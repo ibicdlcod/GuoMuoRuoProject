@@ -1499,10 +1499,6 @@ void Server::sendTestMessages() {
         return;
     else {
         for(auto connection: std::as_const(connectedPeers)) {
-            QEventLoop loop2;
-            QTimer::singleShot(1000, &loop2, &QEventLoop::quit);
-            loop2.exec();
-
             QList<QString> fuck;
             for(int i=0; i<1024; ++i) {
                 fuck.append("fuck");
@@ -1513,12 +1509,13 @@ void Server::sendTestMessages() {
             QBuffer buffer(&msg);
             buffer.open(QBuffer::ReadOnly);
             Sender f(&buffer, connection);
-            f.start();
+            //f.start();
+            f.enque(msg);
             QEventLoop loop;
             connect(&f, &Sender::done, &loop, &QEventLoop::quit);
-            loop.exec();
+            //loop.exec();
             buffer.close();
-
+/*
             QList<QString> orgasm;
             for(int i=0; i<1024; ++i) {
                 orgasm.append("orgasm");
@@ -1528,14 +1525,10 @@ void Server::sendTestMessages() {
 
             buffer.setBuffer(&msg2);
             buffer.open(QBuffer::ReadOnly);
-            qCritical("fuck");
-            f.start();
+            f.enque(msg2);
             loop.exec();
             buffer.close();
-
-            QEventLoop loop3;
-            QTimer::singleShot(1000, &loop3, &QEventLoop::quit);
-            loop3.exec();
+*/
         }
     }
 }

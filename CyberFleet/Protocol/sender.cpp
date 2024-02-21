@@ -30,8 +30,21 @@ Sender::Sender(QIODevice *source,
     //m_sourceSize = m_source->size();
 }
 
+void Sender::enque(const QByteArray &content) {
+    input.enqueue(content);
+    start();
+}
+
 void Sender::start() {
+    if(input.isEmpty()) {
+        qWarning() << qtTrId("input-buffer-empty");
+        return;
+    }
     if(m_readySend) {
+        buffer.setBuffer(&(input.first()));
+        buffer.open(QBuffer::ReadOnly);
+        m_source = &buffer;
+
         qWarning() << "ready";
         m_partnum = 0;
         m_partnumtotal = 0;
@@ -50,7 +63,8 @@ void Sender::start() {
 
 void Sender::destinationBytesWritten(qint64 length) {
     if (m_destination->bytesToWrite() < m_buffer.size() / 2) {
-        // the transmit buffer is running low, refill
+        // the transmit buffer is running low, refill]
+        qDebug("*");
         send();
     }
     m_hasWritten += length;
@@ -66,6 +80,10 @@ void Sender::destinationError() {
 void Sender::send() {
     m_readySend = false;
     if (signalDone()) {
+        qWarning() << "deque";
+        input.dequeue();
+        buffer.close();
+
         m_partnum = 0;
         m_partnumtotal = 0;
         qWarning() << "switchready1000";
@@ -75,11 +93,8 @@ void Sender::send() {
     if(m_partnum == 0 && m_source->bytesAvailable()) {
         m_partnumtotal = (m_source->bytesAvailable() - 1)
                              / practicalBufferSize + 1;
-        qDebug() << "total:" << m_partnumtotal;
         messageId = QUuid::createUuid();
-        qDebug() << "uid:" << messageId.toByteArray();
     }
-    qDebug() << "part:" << m_partnum;
     qint64 read = m_source->read(m_buffer.data(), m_buffer.size());
     if (read == -1) {
         emit errorOccurred(qtTrId("error-reading-intended-message"));
@@ -127,3 +142,4 @@ void Sender::switchtoReady() {
         start();
     }
 }
+
