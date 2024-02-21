@@ -62,12 +62,12 @@ set(SERVER_SOURCES
     Server/peerinfo.h
     Server/server.cpp
     Server/server.h
-    Server/servermastersender.h
     Server/servermastersender.cpp
+    Server/servermastersender.h
     Server/sslserver.cpp
     Server/sslserver.h
-    Server/qconsolelistener.h
     Server/qconsolelistener.cpp
+    Server/qconsolelistener.h
     Server/user.cpp
     Server/user.h
     ${TS_FILES}
@@ -85,10 +85,12 @@ set(PROTOCOL_SOURCES
     Protocol/equiptype.h
     Protocol/kp.cpp
     Protocol/kp.h
+    Protocol/receiver.cpp
+    Protocol/receiver.h
     Protocol/resord.cpp
     Protocol/resord.h
-    Protocol/sender.h
     Protocol/sender.cpp
+    Protocol/sender.h
     Protocol/tech.cpp
     Protocol/tech.h
     Protocol/wcwidth.c

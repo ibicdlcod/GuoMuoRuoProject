@@ -100,24 +100,28 @@ void Sender::send() {
         return;
     }
     m_hasRead += read;
-    QString prependerString = QStringLiteral("\001")
+    QString prependerString = QStringLiteral("\x01")
                               + QString::number(m_partnumtotal)
-                              + QStringLiteral("\002")
+                              + QStringLiteral("\x09")
                               + QString::number(m_partnum)
-                              + QStringLiteral("\002")
+                              + QStringLiteral("\x09")
                               + messageId.toString(QUuid::WithoutBraces)
-                              + QStringLiteral("\003");
+                              + QStringLiteral("\x09");
     QByteArray prepender = prependerString.toLatin1();
     qint64 preSize = prepender.size();
+    QByteArray appender("\x7f");
     prepender += m_buffer;
-    qint64 written = m_destination->write(prepender.constData(),
-                                          read + preSize);
+    /* prepender have uninitialized trailing bits */
+    QByteArray writeContent = prepender.first(read + preSize) + appender;
+    qint64 writeSize = writeContent.size();
+    qint64 written = m_destination->write(writeContent.constData(),
+                                          writeSize);
     if (written == -1) {
         emit errorOccurred(qtTrId("unable-send-data-connection-broke"));
         qWarning() << m_destination->error();
         return;
     }
-    if (written != read + preSize) {
+    if (written != writeSize) {
         emit errorOccurred(qtTrId("write-buffer-failed-to-fill"));
         qWarning() << m_destination->error();
         return;

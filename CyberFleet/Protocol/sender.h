@@ -1,7 +1,8 @@
 #ifndef SENDER_H
 #define SENDER_H
 
-/* https://stackoverflow.com/questions/18861298/
+/* Source: (but heavily modified)
+ * https://stackoverflow.com/questions/18861298/
  * when-to-check-for-error-when-using-qiodevices-
  * blocking-interface-qtcpsocket-an/20864012
  */

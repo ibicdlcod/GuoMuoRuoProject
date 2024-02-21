@@ -55,6 +55,7 @@
 #include "../Protocol/equiptype.h"
 #include "../Protocol/kp.h"
 #include "../Protocol/tech.h"
+#include "../Protocol/receiver.h"
 #include "kerrors.h"
 #include "peerinfo.h"
 #include "sslserver.h"
@@ -1241,7 +1242,7 @@ void Server::receivedAuth(const QJsonObject &djson,
                 delete [] rgubTicket;
                 return;
             }
-            qInfo("Ticket decrypt success");
+            qDebug("Ticket decrypt success");
             if(!SteamEncryptedAppTicket_BIsTicketForApp(
                     rgubDecrypted,
                     cubDecrypted, 2632870)) {
@@ -1252,7 +1253,7 @@ void Server::receivedAuth(const QJsonObject &djson,
                 delete [] rgubTicket;
                 return;
             }
-            qInfo("Ticket decrypt from correct App ID");
+            qDebug("Ticket decrypt from correct App ID");
             QDateTime now = QDateTime::currentDateTime();
             QDateTime requestThen = QDateTime();
             requestThen.setSecsSinceEpoch(
@@ -1260,7 +1261,7 @@ void Server::receivedAuth(const QJsonObject &djson,
                     rgubDecrypted,
                     cubDecrypted));
             qint64 elapsed = requestThen.secsTo(now);
-            qInfo() << qtTrId("Elapsed: %1 second(s)").arg(elapsed).toUtf8();
+            qDebug() << qtTrId("Elapsed: %1 second(s)").arg(elapsed).toUtf8();
             if(elapsed > elapsedMaxTolerence) {
                 qCritical() << qtTrId("%1: Request timeout")
                                    .arg(peerInfo.toString()).toUtf8();
@@ -1502,13 +1503,26 @@ void Server::sendTestMessages() {
     if(!listening)
         return;
     else {
+        Receiver r;
+
+        QString prependerString = QStringLiteral("\x01")
+                                  + QString::number(1)
+                                  + QStringLiteral("\x09")
+                                  + QString::number(0)
+                                  + QStringLiteral("\x09")
+                                  + QUuid::createUuid().toString(QUuid::WithoutBraces)
+                                  + QStringLiteral("\x09");
+        QByteArray prepender = prependerString.toLatin1();
+        QByteArray appender("\x7f");
+        prepender += KP::clientDemandEquipInfo();
+        prepender += appender;
+        qInfo() << prepender;
+        r.processDgram(prepender);
+        r.processDgram("fuck");
+        r.processDgram("fu" + prepender + "ck");
+        /*
         for(auto connection: std::as_const(connectedPeers)) {
-            QList<QString> fuck;
-            for(int i=0; i<1024; ++i) {
-                fuck.append("fuck");
-            }
-            QString fucklist = fuck.join(" ");
-            QByteArray msg = fucklist.toLatin1();
+            QByteArray msg = KP::clientDemandEquipInfo();
 
             senderM.sendMessage(connection, msg);
 
@@ -1530,6 +1544,7 @@ void Server::sendTestMessages() {
 
             senderM.sendMessage(connection, msg3);
         }
+*/
     }
 }
 
