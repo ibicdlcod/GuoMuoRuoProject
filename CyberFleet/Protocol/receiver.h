@@ -14,6 +14,7 @@ public:
 signals:
     void jsonReceived(const QJsonObject &djson);
     void nonStandardReceived(const QByteArray &dgram);
+    /* should generate a catbomb */
     void timeOut(QUuid);
 
 public slots:

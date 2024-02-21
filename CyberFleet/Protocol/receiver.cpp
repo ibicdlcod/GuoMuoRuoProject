@@ -25,6 +25,7 @@ void Receiver::processDgram(const QByteArray &input) {
             QUuid uuid = QUuid(match.captured(3));
             QString contents = match.captured(4);
             processGoodMsg(totalParts, currentPart, uuid, contents);
+            qCritical() << "GOOD" << totalParts << ":" << currentPart << ":" << uuid;
         }
     }
     inputString.replace(re, "");
@@ -42,6 +43,7 @@ void Receiver::processGoodMsg(qint64 totalParts,
         receivedPartsMap[msgId] = 0;
         receivedStatus[msgId] = QList<QString>(totalParts);
         timers[msgId] = new QTimer(this);
+        timers[msgId]->setSingleShot(true);
         connect(timers[msgId], &QTimer::timeout, this,
                 [=]() {
                     // "Message %1 timeouted when receiving!"
@@ -52,7 +54,7 @@ void Receiver::processGoodMsg(qint64 totalParts,
                     emit timeOut(msgId);
                 }
                 );
-        timers[msgId]->start(maxMsgDelayInMs);
+        //timers[msgId]->start(maxMsgDelayInMs * totalParts);
     }
     else if(totalPartsMap[msgId] != totalParts)
         qCritical() << qtTrId("same-msg-uid-have-inconsistent-total-parts");
@@ -64,7 +66,9 @@ void Receiver::processGoodMsg(qint64 totalParts,
     receivedStatus[msgId][currentPart] = contents;
 
     if((receivedPartsMap[msgId] + 1) == (1 << totalParts)) {
+        qCritical() << "BETTER";
         QString wholeMessage = receivedStatus[msgId].join("");
+        qInfo() << wholeMessage;
         timers[msgId]->stop();
 
         QJsonObject djson =

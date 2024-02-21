@@ -487,7 +487,7 @@ void Server::offerEquipInfo(QSslSocket *connection, int index = 0) {
 #else
     static const int batch = 10;
 #endif
-    static const int batchInterval = 5 * batch;
+    static const int batchInterval = 200;
 
     QJsonArray equipInfos;
     int i = 0;
@@ -528,7 +528,10 @@ void Server::offerEquipInfo(QSslSocket *connection, int index = 0) {
     QByteArray msg =
         KP::serverEquipInfo(equipInfos,
                             (equipRegistry.size() - index * batch) <= batch);
-    connection->write(msg);
+    //old:
+    //connection->write(msg);
+    //new:
+    senderM.sendMessage(connection, msg);
     connection->flush();
 }
 
