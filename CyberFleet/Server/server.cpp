@@ -47,16 +47,18 @@
 ****************************************************************************/
 
 #include "server.h"
+#include <QBuffer>
 #include <QFile>
 #include <QThread>
 #include <algorithm>
 #include "../steam/steamencryptedappticket.h"
 #include "../Protocol/equiptype.h"
 #include "../Protocol/kp.h"
+#include "../Protocol/sender.h"
+#include "../Protocol/tech.h"
 #include "kerrors.h"
 #include "peerinfo.h"
 #include "sslserver.h"
-#include "../Protocol/tech.h"
 
 #ifdef max
 #undef max // apparently some stupid win header interferes with std::max
@@ -255,6 +257,10 @@ void Server::datagramReceived(const PeerInfo &peerInfo,
 }
 
 bool Server::listen(const QHostAddress &address, quint16 port) {
+    if(listening) {
+        qWarning() << "Already listening, unlisten first";
+        return true;
+    }
     if (address != sslServer.serverAddress()
         || port != sslServer.serverPort()) {
         shutdown();
@@ -1372,6 +1378,38 @@ void Server::receivedLogin(CSteamID &uid,
     }
     else {
         /* existing user */
+        /* test
+        QList<QString> fuck;
+        for(int i=0; i<1024; ++i) {
+            fuck.append("fuck");
+        }
+        QString fucklist = fuck.join(" ");
+        QByteArray msg = fucklist.toLatin1();
+
+        QBuffer buffer(&msg);
+        buffer.open(QBuffer::ReadOnly);
+        Sender f(&buffer, connection);
+        f.start();
+        QEventLoop loop;
+        connect(&f, &Sender::done, &loop, &QEventLoop::quit);
+        loop.exec();
+        buffer.close();
+        connection->flush();
+
+        QList<QString> orgasm;
+        for(int i=0; i<1024; ++i) {
+            orgasm.append("orgasm");
+        }
+        QString orgasmlist = orgasm.join(" ");
+        QByteArray msg2 = orgasmlist.toLatin1();
+
+        buffer.setBuffer(&msg2);
+        buffer.open(QBuffer::ReadOnly);
+        qCritical("fuck");
+        f.start();
+        loop.exec();
+        buffer.close();
+        */
     }/*
     QByteArray msg = KP::serverVerifyComplete();
     if(connection->write(msg) <= 0) {

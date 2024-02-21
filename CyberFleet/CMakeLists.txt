@@ -83,6 +83,8 @@ set(PROTOCOL_SOURCES
     Protocol/kp.h
     Protocol/resord.cpp
     Protocol/resord.h
+    Protocol/sender.h
+    Protocol/sender.cpp
     Protocol/tech.cpp
     Protocol/tech.h
     Protocol/wcwidth.c
@@ -111,9 +113,8 @@ qt_add_executable(CFServer
     ${SERVER_SOURCES}
     common.qrc
     Server/qconsolelistener.cpp Server/qconsolelistener.h
-
-
 )
+
 if (${CMAKE_SYSTEM_NAME} MATCHES "Windows")
     find_library(STEAM_LIBRARY steam_api64 HINTS redistributable_bin/win64)
 else()
@@ -151,6 +152,7 @@ qt6_add_translations(CFServer
 
 target_link_libraries(CFProtocol PRIVATE Qt${QT_VERSION_MAJOR}::Core)
 target_link_libraries(CFProtocol PRIVATE Qt${QT_VERSION_MAJOR}::Sql)
+target_link_libraries(CFProtocol PRIVATE Qt${QT_VERSION_MAJOR}::Network)
 target_link_libraries(CFClient PRIVATE Qt${QT_VERSION_MAJOR}::Widgets)
 target_link_libraries(CFClient PRIVATE Qt${QT_VERSION_MAJOR}::Network)
 target_link_libraries(CFClient PRIVATE CFProtocol)
