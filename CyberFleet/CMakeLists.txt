@@ -62,8 +62,12 @@ set(SERVER_SOURCES
     Server/peerinfo.h
     Server/server.cpp
     Server/server.h
+    Server/servermastersender.h
+    Server/servermastersender.cpp
     Server/sslserver.cpp
     Server/sslserver.h
+    Server/qconsolelistener.h
+    Server/qconsolelistener.cpp
     Server/user.cpp
     Server/user.h
     ${TS_FILES}
@@ -112,7 +116,6 @@ qt_add_executable(CFServer
     MANUAL_FINALIZATION
     ${SERVER_SOURCES}
     common.qrc
-    Server/qconsolelistener.cpp Server/qconsolelistener.h
 )
 
 if (${CMAKE_SYSTEM_NAME} MATCHES "Windows")

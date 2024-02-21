@@ -54,7 +54,6 @@
 #include "../steam/steamencryptedappticket.h"
 #include "../Protocol/equiptype.h"
 #include "../Protocol/kp.h"
-#include "../Protocol/sender.h"
 #include "../Protocol/tech.h"
 #include "kerrors.h"
 #include "peerinfo.h"
@@ -1388,6 +1387,8 @@ void Server::receivedLogin(CSteamID &uid,
     }*/
     connectedPeers[uid] = connection;
     connectedUsers[connection] = uid;
+    //senders[uid] = new Sender(connection);
+    //senders[uid]->moveToThread(&senderThread);
 }
 
 void Server::receivedLogout(CSteamID &uid,
@@ -1506,15 +1507,11 @@ void Server::sendTestMessages() {
             QString fucklist = fuck.join(" ");
             QByteArray msg = fucklist.toLatin1();
 
-            QBuffer buffer(&msg);
-            buffer.open(QBuffer::ReadOnly);
-            Sender f(&buffer, connection);
-            //f.start();
+            Sender f(connection);
             f.enque(msg);
             QEventLoop loop;
             //connect(&f, &Sender::done, &loop, &QEventLoop::quit);
             //loop.exec();
-            buffer.close();
 
             QList<QString> orgasm;
             for(int i=0; i<1024; ++i) {
@@ -1523,12 +1520,9 @@ void Server::sendTestMessages() {
             QString orgasmlist = orgasm.join(" ");
             QByteArray msg2 = orgasmlist.toLatin1();
 
-            buffer.setBuffer(&msg2);
-            buffer.open(QBuffer::ReadOnly);
             f.enque(msg2);
-            loop.exec();
-            buffer.close();
-/*
+            //loop.exec();
+
             QList<QString> cock;
             for(int i=0; i<1024; ++i) {
                 cock.append("cock");
@@ -1536,12 +1530,8 @@ void Server::sendTestMessages() {
             QString cocklist = cock.join(" ");
             QByteArray msg3 = cocklist.toLatin1();
 
-            buffer.setBuffer(&msg3);
-            buffer.open(QBuffer::ReadOnly);
             f.enque(msg3);
             loop.exec();
-            buffer.close();
-*/
         }
     }
 }

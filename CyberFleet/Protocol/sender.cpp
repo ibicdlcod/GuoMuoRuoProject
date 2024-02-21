@@ -5,11 +5,9 @@
 /* TODO: this should be customizeable */
 static int practicalBufferSize = 1024;
 
-Sender::Sender(QIODevice *source,
-               QAbstractSocket *destination,
+Sender::Sender(QAbstractSocket *destination,
                QObject *parent) :
     QObject(parent),
-    m_source(source),
     m_destination(destination),
     m_buffer(practicalBufferSize, Qt::Uninitialized),
     m_hasRead(0),
@@ -19,14 +17,12 @@ Sender::Sender(QIODevice *source,
     m_partnum(0),
     m_partnumtotal(0)
 {
-    Q_ASSERT(m_source->isReadable());
     Q_ASSERT(m_destination->isWritable());
     // see bool Connection::operator bool()
     Q_ASSERT(connect(m_destination, &QAbstractSocket::bytesWritten,
                      this, &Sender::destinationBytesWritten));
     Q_ASSERT(connect(m_destination, &QAbstractSocket::errorOccurred,
                      this, &Sender::destinationError));
-    //m_sourceSize = m_source->size();
 }
 
 void Sender::enque(const QByteArray &content) {

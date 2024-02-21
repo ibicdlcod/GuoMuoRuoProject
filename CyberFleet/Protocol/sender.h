@@ -16,8 +16,7 @@ class Sender : public QObject
 {
     Q_OBJECT
 public:
-    explicit Sender(QIODevice *,
-                    QAbstractSocket *,
+    explicit Sender(QAbstractSocket *,
                     QObject *parent = nullptr);
 
 signals:
