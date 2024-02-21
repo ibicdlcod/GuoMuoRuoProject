@@ -1516,10 +1516,15 @@ void Server::sendTestMessages() {
         QByteArray appender("\x7f");
         prepender += KP::clientDemandEquipInfo();
         prepender += appender;
-        qInfo() << prepender;
         r.processDgram(prepender);
-        r.processDgram("fuck");
-        r.processDgram("fu" + prepender + "ck");
+
+        QList<QString> orgasm;
+        for(int i=0; i<1024; ++i) {
+            orgasm.append("orgasm");
+        }
+        QString orgasmlist = orgasm.join(" ");
+        QByteArray msg2 = orgasmlist.toLatin1();
+        r.processDgram(msg2);
         /*
         for(auto connection: std::as_const(connectedPeers)) {
             QByteArray msg = KP::clientDemandEquipInfo();

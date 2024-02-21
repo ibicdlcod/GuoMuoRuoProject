@@ -3,6 +3,8 @@
 #include <QJsonObject>
 #include <QCborMap>
 
+static const int maxMsgDelayInMs = 1000;
+
 Receiver::Receiver(QObject *parent)
     : QObject(parent) {
 
@@ -13,7 +15,6 @@ void Receiver::processDgram(const QByteArray &input) {
      * should be banned in this program */
     QString inputString = QString::fromLatin1(input);
     static QRegularExpression re("\\x01(\\d+)\\x09(\\d+)\\x09(.+?)\\x09(.+?)\\x7f");
-    qDebug() << re.isValid();
 
     QRegularExpressionMatchIterator i = re.globalMatch(inputString);
     while(i.hasNext()) {
@@ -28,8 +29,7 @@ void Receiver::processDgram(const QByteArray &input) {
     }
     inputString.replace(re, "");
     if(!inputString.isEmpty()) {
-        emit nonJsonRecived(inputString.toLatin1());
-        qDebug() << inputString;
+        emit nonStandardReceived(inputString.toLatin1());
     }
 }
 
@@ -41,6 +41,17 @@ void Receiver::processGoodMsg(qint64 totalParts,
         totalPartsMap[msgId] = totalParts;
         receivedPartsMap[msgId] = 0;
         receivedStatus[msgId] = QList<QString>(totalParts);
+        timers[msgId] = new QTimer(this);
+        connect(timers[msgId], &QTimer::timeout, this,
+                [=]() {
+                    // "Message %1 timeouted when receiving!"
+                    qCritical() << qtTrId("receive-msg-timeout").arg(msgId.toString());
+                    totalPartsMap.remove(msgId);
+                    receivedPartsMap.remove(msgId);
+                    receivedStatus.remove(msgId);
+                }
+                );
+        timers[msgId]->start(maxMsgDelayInMs);
     }
     else if(totalPartsMap[msgId] != totalParts)
         qCritical() << qtTrId("same-msg-uid-have-inconsistent-total-parts");
@@ -53,13 +64,12 @@ void Receiver::processGoodMsg(qint64 totalParts,
 
     if((receivedPartsMap[msgId] + 1) == (1 << totalParts)) {
         QString wholeMessage = receivedStatus[msgId].join("");
-        qInfo() << wholeMessage;
+        timers[msgId]->stop();
 
         QJsonObject djson =
             QCborValue::fromCbor(wholeMessage.toLatin1()).toMap().toJsonObject();
         if(!djson.isEmpty()) {
             emit jsonReceived(djson);
-            qDebug() << djson;
         }
         else
             qCritical() << qtTrId("msg-convert-to-json-failed");

@@ -3,6 +3,7 @@
 
 #include <QAbstractSocket>
 #include <QUuid>
+#include <QTimer>
 
 class Receiver : public QObject
 {
@@ -12,7 +13,7 @@ public:
 
 signals:
     void jsonReceived(const QJsonObject &djson);
-    void nonJsonRecived(const QByteArray &dgram);
+    void nonStandardReceived(const QByteArray &dgram);
     void timeOut(QUuid);
 
 public slots:
@@ -25,6 +26,7 @@ private:
     QMap<QUuid, QList<QString>> receivedStatus;
     QMap<QUuid, qint64> totalPartsMap;
     QMap<QUuid, qint64> receivedPartsMap;
+    QMap<QUuid, QTimer *> timers;
 };
 
 #endif // SENDER_H
