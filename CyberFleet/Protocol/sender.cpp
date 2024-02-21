@@ -16,7 +16,6 @@ Sender::Sender(QIODevice *source,
     m_hasWritten(0),
     m_doneSignaled(false),
     m_readySend(true),
-    m_pendingStart(false),
     m_partnum(0),
     m_partnumtotal(0)
 {
@@ -31,6 +30,7 @@ Sender::Sender(QIODevice *source,
 }
 
 void Sender::enque(const QByteArray &content) {
+    qWarning() << "enque";
     input.enqueue(content);
     start();
 }
@@ -48,7 +48,6 @@ void Sender::start() {
         qWarning() << "ready";
         m_partnum = 0;
         m_partnumtotal = 0;
-        m_pendingStart = false;
         m_doneSignaled = false;
         m_hasRead = 0;
         m_hasWritten = 0;
@@ -57,14 +56,12 @@ void Sender::start() {
     }
     else {
         qWarning() << "notready";
-        m_pendingStart = true;
     }
 }
 
 void Sender::destinationBytesWritten(qint64 length) {
     if (m_destination->bytesToWrite() < m_buffer.size() / 2) {
         // the transmit buffer is running low, refill]
-        qDebug("*");
         send();
     }
     m_hasWritten += length;
@@ -138,7 +135,7 @@ bool Sender::signalDone() {
 void Sender::switchtoReady() {
     qWarning() << "switchready";
     m_readySend = true;
-    if(m_pendingStart) {
+    if(!input.isEmpty()) {
         start();
     }
 }

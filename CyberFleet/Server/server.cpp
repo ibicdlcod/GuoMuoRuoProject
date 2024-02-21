@@ -1512,10 +1512,10 @@ void Server::sendTestMessages() {
             //f.start();
             f.enque(msg);
             QEventLoop loop;
-            connect(&f, &Sender::done, &loop, &QEventLoop::quit);
+            //connect(&f, &Sender::done, &loop, &QEventLoop::quit);
             //loop.exec();
             buffer.close();
-/*
+
             QList<QString> orgasm;
             for(int i=0; i<1024; ++i) {
                 orgasm.append("orgasm");
@@ -1526,6 +1526,19 @@ void Server::sendTestMessages() {
             buffer.setBuffer(&msg2);
             buffer.open(QBuffer::ReadOnly);
             f.enque(msg2);
+            loop.exec();
+            buffer.close();
+/*
+            QList<QString> cock;
+            for(int i=0; i<1024; ++i) {
+                cock.append("cock");
+            }
+            QString cocklist = cock.join(" ");
+            QByteArray msg3 = cocklist.toLatin1();
+
+            buffer.setBuffer(&msg3);
+            buffer.open(QBuffer::ReadOnly);
+            f.enque(msg3);
             loop.exec();
             buffer.close();
 */
