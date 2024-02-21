@@ -4,6 +4,7 @@
 
 /* TODO: this should be customizeable */
 static int practicalBufferSize = 1024;
+static int minTimeBetweenMsgs = 100;
 
 Sender::Sender(QAbstractSocket *destination,
                QObject *parent) :
@@ -27,7 +28,6 @@ Sender::Sender(QAbstractSocket *destination,
 }
 
 void Sender::enque(const QByteArray &content) {
-    qWarning() << "enque";
     input.enqueue(content);
     start();
 }
@@ -39,14 +39,13 @@ void Sender::start() {
     }
     if(m_readySend) {
         connect(m_destination, &QAbstractSocket::bytesWritten,
-                this, &Sender::destinationBytesWritten, Qt::UniqueConnection);
+                this, &Sender::destinationBytesWritten);
         connect(m_destination, &QAbstractSocket::errorOccurred,
-                this, &Sender::destinationError, Qt::UniqueConnection);
+                this, &Sender::destinationError);
         buffer.setBuffer(&(input.first()));
         buffer.open(QBuffer::ReadOnly);
         m_source = &buffer;
 
-        qWarning() << "ready";
         m_partnum = 0;
         m_partnumtotal = 0;
         m_doneSignaled = false;
@@ -56,7 +55,7 @@ void Sender::start() {
         send();
     }
     else {
-        qWarning() << "notready";
+
     }
 }
 
@@ -82,14 +81,12 @@ void Sender::send() {
                 this, &Sender::destinationBytesWritten);
         disconnect(m_destination, &QAbstractSocket::errorOccurred,
                 this, &Sender::destinationError);
-        qWarning() << "deque";
         input.dequeue();
         buffer.close();
 
         m_partnum = 0;
         m_partnumtotal = 0;
-        qWarning() << "switchready1000";
-        QTimer::singleShot(1000, this, &Sender::switchtoReady);
+        QTimer::singleShot(minTimeBetweenMsgs, this, &Sender::switchtoReady);
         return;
     }
     if(m_partnum == 0 && m_source->bytesAvailable()) {
@@ -138,7 +135,6 @@ bool Sender::signalDone() {
 }
 
 void Sender::switchtoReady() {
-    qWarning() << "switchready";
     m_readySend = true;
     if(!input.isEmpty()) {
         start();

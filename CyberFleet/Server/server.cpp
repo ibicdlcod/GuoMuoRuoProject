@@ -1502,7 +1502,6 @@ void Server::sendTestMessages() {
     if(!listening)
         return;
     else {
-        qCritical() << senderM.numberofMembers();
         for(auto connection: std::as_const(connectedPeers)) {
             QList<QString> fuck;
             for(int i=0; i<1024; ++i) {
@@ -1512,9 +1511,6 @@ void Server::sendTestMessages() {
             QByteArray msg = fucklist.toLatin1();
 
             senderM.sendMessage(connection, msg);
-            QEventLoop loop;
-            //connect(&f, &Sender::done, &loop, &QEventLoop::quit);
-            //loop.exec();
 
             QList<QString> orgasm;
             for(int i=0; i<1024; ++i) {
@@ -1524,7 +1520,6 @@ void Server::sendTestMessages() {
             QByteArray msg2 = orgasmlist.toLatin1();
 
             senderM.sendMessage(connection, msg2);
-            //loop.exec();
 
             QList<QString> cock;
             for(int i=0; i<1024; ++i) {
@@ -1534,7 +1529,6 @@ void Server::sendTestMessages() {
             QByteArray msg3 = cocklist.toLatin1();
 
             senderM.sendMessage(connection, msg3);
-            loop.exec();
         }
     }
 }
