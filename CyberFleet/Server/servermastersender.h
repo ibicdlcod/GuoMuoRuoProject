@@ -5,11 +5,11 @@
 #include <QAbstractSocket>
 #include "../Protocol/sender.h"
 
-class serverMasterSender : public QObject
+class ServerMasterSender : public QObject
 {
     Q_OBJECT
 public:
-    explicit serverMasterSender(QObject *parent = nullptr);
+    explicit ServerMasterSender(QObject *parent = nullptr);
 
 signals:
 
@@ -17,6 +17,7 @@ public slots:
     void addSender(QAbstractSocket *);
     void removeSender(QAbstractSocket *);
     void sendMessage(QAbstractSocket *, QByteArray);
+    int numberofMembers();
 
 private:
     QMap<QAbstractSocket *, Sender *> agents;

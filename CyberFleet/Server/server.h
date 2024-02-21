@@ -61,7 +61,7 @@
 
 #include "../Protocol/commandline.h"
 #include "../Protocol/equipment.h"
-#include "../Protocol/sender.h"
+#include "servermastersender.h"
 #include "peerinfo.h"
 #include "sslserver.h"
 #include "user.h"
@@ -141,7 +141,7 @@ private:
     SslServer sslServer;
     QMap<QSslSocket *, CSteamID> connectedUsers;
     QMap<CSteamID, QSslSocket *> connectedPeers;
-    QMap<CSteamID, Sender *> senders;
+    ServerMasterSender senderM;
     QThread senderThread;
 
     QSet<int> openEquips;

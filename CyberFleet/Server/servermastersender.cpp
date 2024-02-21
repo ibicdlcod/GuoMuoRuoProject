@@ -1,20 +1,27 @@
 #include "servermastersender.h"
 
-serverMasterSender::serverMasterSender(QObject *parent)
+ServerMasterSender::ServerMasterSender(QObject *parent)
     : QObject{parent}
 {
 
 }
 
-void serverMasterSender::addSender(QAbstractSocket *connection) {
+void ServerMasterSender::addSender(QAbstractSocket *connection) {
     agents[connection] = new Sender(connection);
 }
 
-void serverMasterSender::removeSender(QAbstractSocket *connection) {
+void ServerMasterSender::removeSender(QAbstractSocket *connection) {
     agents.remove(connection);
 }
 
-void serverMasterSender::sendMessage(QAbstractSocket *connection,
+void ServerMasterSender::sendMessage(QAbstractSocket *connection,
                                      QByteArray contents) {
-    agents[connection]->enque(contents);
+    if(agents.contains(connection))
+        agents[connection]->enque(contents);
+    else
+        qWarning() << qtTrId("send-message-over-invalid-connection");
+}
+
+int ServerMasterSender::numberofMembers() {
+    return agents.size();
 }

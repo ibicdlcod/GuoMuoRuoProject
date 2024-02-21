@@ -199,7 +199,7 @@ Q_GLOBAL_STATIC(QString,
                     ");"
                     ));
 
-const int elapsedMaxTolerence = 30;
+const int elapsedMaxTolerence = 60;
 }
 
 Server::Server(int argc, char ** argv) : CommandLine(argc, argv) {
@@ -371,6 +371,7 @@ void Server::readyRead(QSslSocket *currentsocket) {
                            arg(begin->first.ConvertToUint64());
                 connectedPeers.remove(begin->first);
                 connectedUsers.remove(begin->second);
+                senderM.removeSender(begin->second);
                 break;
             }
         }
@@ -1311,6 +1312,7 @@ void Server::receivedAuth(const QJsonObject &djson,
         connection->flush();
         connectedPeers.remove(connectedUsers[connection]);
         connectedUsers.remove(connection);
+        senderM.removeSender(connection);
         connection->disconnectFromHost();
         return;
     }
@@ -1340,6 +1342,7 @@ void Server::receivedForceLogout(CSteamID &uid) {
         client->disconnectFromHost();
         connectedPeers.remove(uid);
         connectedUsers.remove(client);
+        senderM.removeSender(client);
     }
 }
 
@@ -1387,8 +1390,7 @@ void Server::receivedLogin(CSteamID &uid,
     }*/
     connectedPeers[uid] = connection;
     connectedUsers[connection] = uid;
-    //senders[uid] = new Sender(connection);
-    //senders[uid]->moveToThread(&senderThread);
+    senderM.addSender(connection);
 }
 
 void Server::receivedLogout(CSteamID &uid,
@@ -1403,6 +1405,7 @@ void Server::receivedLogout(CSteamID &uid,
         connection->write(msg);
         connectedPeers.remove(uid);
         connectedUsers.remove(connection);
+        senderM.removeSender(connection);
         connection->disconnectFromHost();
     }
 }
@@ -1499,6 +1502,7 @@ void Server::sendTestMessages() {
     if(!listening)
         return;
     else {
+        qCritical() << senderM.numberofMembers();
         for(auto connection: std::as_const(connectedPeers)) {
             QList<QString> fuck;
             for(int i=0; i<1024; ++i) {
@@ -1507,8 +1511,7 @@ void Server::sendTestMessages() {
             QString fucklist = fuck.join(" ");
             QByteArray msg = fucklist.toLatin1();
 
-            Sender f(connection);
-            f.enque(msg);
+            senderM.sendMessage(connection, msg);
             QEventLoop loop;
             //connect(&f, &Sender::done, &loop, &QEventLoop::quit);
             //loop.exec();
@@ -1520,7 +1523,7 @@ void Server::sendTestMessages() {
             QString orgasmlist = orgasm.join(" ");
             QByteArray msg2 = orgasmlist.toLatin1();
 
-            f.enque(msg2);
+            senderM.sendMessage(connection, msg2);
             //loop.exec();
 
             QList<QString> cock;
@@ -1530,7 +1533,7 @@ void Server::sendTestMessages() {
             QString cocklist = cock.join(" ");
             QByteArray msg3 = cocklist.toLatin1();
 
-            f.enque(msg3);
+            senderM.sendMessage(connection, msg3);
             loop.exec();
         }
     }

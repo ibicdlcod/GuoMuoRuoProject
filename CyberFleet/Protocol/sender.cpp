@@ -19,10 +19,11 @@ Sender::Sender(QAbstractSocket *destination,
 {
     Q_ASSERT(m_destination->isWritable());
     // see bool Connection::operator bool()
-    Q_ASSERT(connect(m_destination, &QAbstractSocket::bytesWritten,
-                     this, &Sender::destinationBytesWritten));
-    Q_ASSERT(connect(m_destination, &QAbstractSocket::errorOccurred,
-                     this, &Sender::destinationError));
+    /*
+    connect(m_destination, &QAbstractSocket::bytesWritten,
+                     this, &Sender::destinationBytesWritten);
+    connect(m_destination, &QAbstractSocket::errorOccurred,
+                     this, &Sender::destinationError);*/
 }
 
 void Sender::enque(const QByteArray &content) {
@@ -37,6 +38,10 @@ void Sender::start() {
         return;
     }
     if(m_readySend) {
+        connect(m_destination, &QAbstractSocket::bytesWritten,
+                this, &Sender::destinationBytesWritten, Qt::UniqueConnection);
+        connect(m_destination, &QAbstractSocket::errorOccurred,
+                this, &Sender::destinationError, Qt::UniqueConnection);
         buffer.setBuffer(&(input.first()));
         buffer.open(QBuffer::ReadOnly);
         m_source = &buffer;
@@ -73,6 +78,10 @@ void Sender::destinationError() {
 void Sender::send() {
     m_readySend = false;
     if (signalDone()) {
+        disconnect(m_destination, &QAbstractSocket::bytesWritten,
+                this, &Sender::destinationBytesWritten);
+        disconnect(m_destination, &QAbstractSocket::errorOccurred,
+                this, &Sender::destinationError);
         qWarning() << "deque";
         input.dequeue();
         buffer.close();
