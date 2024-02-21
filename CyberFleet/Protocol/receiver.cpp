@@ -49,6 +49,7 @@ void Receiver::processGoodMsg(qint64 totalParts,
                     totalPartsMap.remove(msgId);
                     receivedPartsMap.remove(msgId);
                     receivedStatus.remove(msgId);
+                    emit timeOut(msgId);
                 }
                 );
         timers[msgId]->start(maxMsgDelayInMs);

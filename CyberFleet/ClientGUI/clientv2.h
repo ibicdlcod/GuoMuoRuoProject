@@ -53,6 +53,7 @@
 #include <QtNetwork>
 #include "../Protocol/commandline.h"
 #include "../Protocol/equipment.h"
+#include "../Protocol/receiver.h"
 #include "steamauth.h"
 #include "ui/developwindow.h"
 #include "ui/techview.h"
@@ -108,6 +109,8 @@ public slots:
     bool parseSpec(const QStringList &);
     void sendEncryptedAppTicket(uint8 [], uint32);
     void serverResponse(const QString &, const QByteArray &);
+    void serverResponseStd(const QJsonObject &);
+    void serverResponseNonStd(const QByteArray &);
     void setTicketCache(uint8 [], uint32);
     void showHelp(const QStringList &);
     void switchToFactory();
@@ -172,6 +175,7 @@ private:
 
     QSslSocket socket;
     QSslConfiguration conf;
+    Receiver recv;
 
     unsigned int maxRetransmit;
     unsigned int retransmitTimes = 0;

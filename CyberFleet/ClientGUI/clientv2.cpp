@@ -60,6 +60,7 @@ extern std::unique_ptr<QSettings> settings;
 /* Initialize client and do necessary connections */
 Clientv2::Clientv2(QObject *parent)
     : QObject{parent},
+    recv(nullptr),
     attemptMode(false),
     logoutPending(false),
     gameState(KP::Offline) {
@@ -67,6 +68,11 @@ Clientv2::Clientv2(QObject *parent)
                      this, &Clientv2::pskRequired);
     QObject::connect(&socket, &QSslSocket::encrypted,
                      this, &Clientv2::encrypted);
+
+    QObject::connect(&recv, &Receiver::jsonReceived,
+                     this, &Clientv2::serverResponseStd);
+    QObject::connect(&recv, &Receiver::nonStandardReceived,
+                     this, &Clientv2::serverResponseNonStd);
 
     // May cause issues?
     timer = new QTimer(this);
@@ -248,12 +254,42 @@ bool Clientv2::parseSpec(const QStringList &cmdParts) {
 /* Parse server JSON response */
 void Clientv2::serverResponse(const QString &clientInfo,
                               const QByteArray &plainText) {
+    recv.processDgram(plainText);
+    return;
+}
+
+void Clientv2::serverResponseStd(const QJsonObject &djson) {
+    qCritical() << "STD";
+#if defined(QT_DEBUG)
+    static const QString formatter = QStringLiteral("Received text: %1");
+    const QString html = formatter
+                             .arg(QJsonDocument(djson).toJson());
+    qDebug() << html;
+#else
+    Q_UNUSED(clientInfo)
+#endif
+    try{
+        switch(djson["type"].toInt()) {
+        case KP::DgramType::Auth: receivedAuth(djson); break;
+        case KP::DgramType::Info: receivedInfo(djson); break;
+        case KP::DgramType::Message: receivedMsg(djson); break;
+        default:
+            throw std::domain_error("datagram type not supported"); break;
+        }
+    } catch (const QJsonParseError &e) {
+        qWarning() << (serverName + ": JSONError -") << e.errorString();
+    } catch (const std::domain_error &e) {
+        qWarning() << (serverName + ":") << e.what();
+    }
+}
+
+void Clientv2::serverResponseNonStd(const QByteArray &plainText) {
     QJsonObject djson =
         QCborValue::fromCbor(plainText).toMap().toJsonObject();
 #if defined(QT_DEBUG)
-    static const QString formatter = QStringLiteral("%1 received text: %2");
+    static const QString formatter = QStringLiteral("Received text: %1");
     const QString html = formatter
-                             .arg(clientInfo, QJsonDocument(djson).toJson());
+                             .arg(QJsonDocument(djson).toJson());
     qDebug() << html;
 #else
     Q_UNUSED(clientInfo)
