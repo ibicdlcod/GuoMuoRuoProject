@@ -8,6 +8,7 @@
 
 #include <QTcpSocket>
 #include <QByteArray>
+#include <QUuid>
 
 class Sender : public QObject
 {
@@ -43,6 +44,9 @@ private:
     bool m_doneSignaled;
     bool m_readySend;
     bool m_pendingStart;
+    qint64 m_partnum;
+    qint64 m_partnumtotal;
+    QUuid messageId;
 };
 
 #endif // SENDER_H

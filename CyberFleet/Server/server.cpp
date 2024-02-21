@@ -313,14 +313,17 @@ bool Server::parseSpec(const QStringList &cmdParts) {
                     return true;
                 } // else return false
             }
-            else if(primary.compare("importcsv", Qt::CaseInsensitive) == 0)
-            {
+            else if(primary.compare("importcsv", Qt::CaseInsensitive) == 0) {
                 if(cmdParts.length() > 1
                     && cmdParts[1].compare(
                            "equip", Qt::CaseInsensitive) == 0) {
                     importEquipFromCSV();
                     return true;
                 } // else return false
+            }
+            else if(primary.compare("test", Qt::CaseInsensitive) == 0) {
+                sendTestMessages();
+                return true;
             }
         }
         return false;
@@ -1378,38 +1381,6 @@ void Server::receivedLogin(CSteamID &uid,
     }
     else {
         /* existing user */
-        /* test
-        QList<QString> fuck;
-        for(int i=0; i<1024; ++i) {
-            fuck.append("fuck");
-        }
-        QString fucklist = fuck.join(" ");
-        QByteArray msg = fucklist.toLatin1();
-
-        QBuffer buffer(&msg);
-        buffer.open(QBuffer::ReadOnly);
-        Sender f(&buffer, connection);
-        f.start();
-        QEventLoop loop;
-        connect(&f, &Sender::done, &loop, &QEventLoop::quit);
-        loop.exec();
-        buffer.close();
-        connection->flush();
-
-        QList<QString> orgasm;
-        for(int i=0; i<1024; ++i) {
-            orgasm.append("orgasm");
-        }
-        QString orgasmlist = orgasm.join(" ");
-        QByteArray msg2 = orgasmlist.toLatin1();
-
-        buffer.setBuffer(&msg2);
-        buffer.open(QBuffer::ReadOnly);
-        qCritical("fuck");
-        f.start();
-        loop.exec();
-        buffer.close();
-        */
     }/*
     QByteArray msg = KP::serverVerifyComplete();
     if(connection->write(msg) <= 0) {
@@ -1521,6 +1492,52 @@ void Server::receivedReq(const QJsonObject &djson,
     return;
     QByteArray msg2 = KP::accessDenied();
     connection->write(msg2);
+}
+
+void Server::sendTestMessages() {
+    if(!listening)
+        return;
+    else {
+        for(auto connection: std::as_const(connectedPeers)) {
+            QEventLoop loop2;
+            QTimer::singleShot(1000, &loop2, &QEventLoop::quit);
+            loop2.exec();
+
+            QList<QString> fuck;
+            for(int i=0; i<1024; ++i) {
+                fuck.append("fuck");
+            }
+            QString fucklist = fuck.join(" ");
+            QByteArray msg = fucklist.toLatin1();
+
+            QBuffer buffer(&msg);
+            buffer.open(QBuffer::ReadOnly);
+            Sender f(&buffer, connection);
+            f.start();
+            QEventLoop loop;
+            connect(&f, &Sender::done, &loop, &QEventLoop::quit);
+            loop.exec();
+            buffer.close();
+
+            QList<QString> orgasm;
+            for(int i=0; i<1024; ++i) {
+                orgasm.append("orgasm");
+            }
+            QString orgasmlist = orgasm.join(" ");
+            QByteArray msg2 = orgasmlist.toLatin1();
+
+            buffer.setBuffer(&msg2);
+            buffer.open(QBuffer::ReadOnly);
+            qCritical("fuck");
+            f.start();
+            loop.exec();
+            buffer.close();
+
+            QEventLoop loop3;
+            QTimer::singleShot(1000, &loop3, &QEventLoop::quit);
+            loop3.exec();
+        }
+    }
 }
 
 void Server::refreshClientFactory(CSteamID &uid, QSslSocket *connection) {

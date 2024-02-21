@@ -16,7 +16,9 @@ Sender::Sender(QIODevice *source,
     m_hasWritten(0),
     m_doneSignaled(false),
     m_readySend(true),
-    m_pendingStart(false)
+    m_pendingStart(false),
+    m_partnum(0),
+    m_partnumtotal(0)
 {
     Q_ASSERT(m_source->isReadable());
     Q_ASSERT(m_destination->isWritable());
@@ -31,6 +33,8 @@ Sender::Sender(QIODevice *source,
 void Sender::start() {
     if(m_readySend) {
         qWarning() << "ready";
+        m_partnum = 0;
+        m_partnumtotal = 0;
         m_pendingStart = false;
         m_doneSignaled = false;
         m_hasRead = 0;
@@ -62,27 +66,49 @@ void Sender::destinationError() {
 void Sender::send() {
     m_readySend = false;
     if (signalDone()) {
+        m_partnum = 0;
+        m_partnumtotal = 0;
         qWarning() << "switchready1000";
         QTimer::singleShot(1000, this, &Sender::switchtoReady);
         return;
     }
+    if(m_partnum == 0 && m_source->bytesAvailable()) {
+        m_partnumtotal = (m_source->bytesAvailable() - 1)
+                             / practicalBufferSize + 1;
+        qDebug() << "total:" << m_partnumtotal;
+        messageId = QUuid::createUuid();
+        qDebug() << "uid:" << messageId.toByteArray();
+    }
+    qDebug() << "part:" << m_partnum;
     qint64 read = m_source->read(m_buffer.data(), m_buffer.size());
     if (read == -1) {
         emit errorOccurred(qtTrId("error-reading-intended-message"));
         return;
     }
     m_hasRead += read;
-    qint64 written = m_destination->write(m_buffer.constData(), read);
+    QString prependerString = QStringLiteral("\001")
+                              + QString::number(m_partnumtotal)
+                              + QStringLiteral("\002")
+                              + QString::number(m_partnum)
+                              + QStringLiteral("\002")
+                              + messageId.toString(QUuid::WithoutBraces)
+                              + QStringLiteral("\003");
+    QByteArray prepender = prependerString.toLatin1();
+    qint64 preSize = prepender.size();
+    prepender += m_buffer;
+    qint64 written = m_destination->write(prepender.constData(),
+                                          read + preSize);
     if (written == -1) {
         emit errorOccurred(qtTrId("unable-send-data-connection-broke"));
         qWarning() << m_destination->error();
         return;
     }
-    if (written != read) {
+    if (written != read + preSize) {
         emit errorOccurred(qtTrId("write-buffer-failed-to-fill"));
         qWarning() << m_destination->error();
         return;
     }
+    m_partnum++;
 }
 
 bool Sender::signalDone() {
