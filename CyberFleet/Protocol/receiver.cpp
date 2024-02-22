@@ -14,7 +14,7 @@ void Receiver::processDgram(const QByteArray &input) {
     /* communication between client and server using non-latin1
      * should be banned in this program */
     QString inputString = QString::fromLatin1(input);
-    static QRegularExpression re("\\x01(\\d+)\\x09(\\d+)\\x09(.+?)\\x09(.+?)\\x7f",
+    static QRegularExpression re("<start>(\\d+?)<mid>(\\d+?)<mid>(.+?)<mid>(.+?)<end>+",
                                  QRegularExpression::DotMatchesEverythingOption);
 
     QRegularExpressionMatchIterator i = re.globalMatch(inputString);
@@ -38,6 +38,10 @@ void Receiver::processGoodMsg(qint64 totalParts,
                               qint64 currentPart,
                               QUuid msgId,
                               const QString &contents) {
+    if(totalParts > 63) {
+        qCritical() << totalParts;
+        return;
+    }
     if(!totalPartsMap.contains(msgId)) {
         totalPartsMap[msgId] = totalParts;
         receivedPartsMap[msgId] = 0;
@@ -46,7 +50,7 @@ void Receiver::processGoodMsg(qint64 totalParts,
         timers[msgId]->setSingleShot(true);
         connect(timers[msgId], &QTimer::timeout, this,
                 [=]() {
-                    // "Message %1 timeouted when receiving!"
+                    //% "Message %1 timeouted when receiving!"
                     qCritical() << qtTrId("receive-msg-timeout").arg(msgId.toString());
                     totalPartsMap.remove(msgId);
                     receivedPartsMap.remove(msgId);

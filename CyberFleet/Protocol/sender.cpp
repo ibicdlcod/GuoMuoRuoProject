@@ -100,16 +100,16 @@ void Sender::send() {
         return;
     }
     m_hasRead += read;
-    QString prependerString = QStringLiteral("\x01")
+    QString prependerString = QStringLiteral("<start>")
                               + QString::number(m_partnumtotal)
-                              + QStringLiteral("\x09")
+                              + QStringLiteral("<mid>")
                               + QString::number(m_partnum)
-                              + QStringLiteral("\x09")
+                              + QStringLiteral("<mid>")
                               + messageId.toString(QUuid::WithoutBraces)
-                              + QStringLiteral("\x09");
+                              + QStringLiteral("<mid>");
     QByteArray prepender = prependerString.toLatin1();
     qint64 preSize = prepender.size();
-    QByteArray appender("\x7f");
+    QByteArray appender("<end>");
     prepender += m_buffer;
     /* prepender have uninitialized trailing bits */
     QByteArray writeContent = prepender.first(read + preSize) + appender;

@@ -259,9 +259,8 @@ void Clientv2::serverResponse(const QString &clientInfo,
 }
 
 void Clientv2::serverResponseStd(const QJsonObject &djson) {
-    qCritical() << "STD";
 #if defined(QT_DEBUG)
-    static const QString formatter = QStringLiteral("Received text: %1");
+    static const QString formatter = QStringLiteral("Received json: %1");
     const QString html = formatter
                              .arg(QJsonDocument(djson).toJson());
     qDebug() << html;
@@ -287,10 +286,18 @@ void Clientv2::serverResponseNonStd(const QByteArray &plainText) {
     QJsonObject djson =
         QCborValue::fromCbor(plainText).toMap().toJsonObject();
 #if defined(QT_DEBUG)
-    static const QString formatter = QStringLiteral("Received text: %1");
-    const QString html = formatter
-                             .arg(QJsonDocument(djson).toJson());
-    qDebug() << html;
+    if(djson.isEmpty()) {
+        static const QString formatter = QStringLiteral("Received text: %1");
+        const QString html = formatter
+                                 .arg(plainText);
+        qWarning() << html;
+    }
+    else {
+        static const QString formatter = QStringLiteral("Received json: %1");
+        const QString html = formatter
+                                 .arg(QJsonDocument(djson).toJson());
+        qDebug() << html;
+    }
 #else
     Q_UNUSED(clientInfo)
 #endif
@@ -790,9 +797,11 @@ void Clientv2::qls(const QStringList &input) {
 /* Read server datagrams */
 void Clientv2::readWhenConnected(const QByteArray &dgram) {
 #if defined(QT_DEBUG)
+    /*
     static const QString formatter = QStringLiteral("From Server text: %1");
     const QString html = formatter.arg(dgram);
     qDebug() << html;
+*/
 #endif
     const QByteArray plainText = dgram;
     if (plainText.size()) {
