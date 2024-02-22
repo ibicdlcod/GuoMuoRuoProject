@@ -54,6 +54,7 @@
 #include "../Protocol/commandline.h"
 #include "../Protocol/equipment.h"
 #include "../Protocol/receiver.h"
+#include "../Protocol/sender.h"
 #include "steamauth.h"
 #include "ui/developwindow.h"
 #include "ui/techview.h"
@@ -176,6 +177,7 @@ private:
     QSslSocket socket;
     QSslConfiguration conf;
     Receiver recv;
+    QPointer<Sender> sender;
 
     unsigned int maxRetransmit;
     unsigned int retransmitTimes = 0;

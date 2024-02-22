@@ -151,6 +151,7 @@ void Clientv2::catbomb() {
         //% "You have been bombarded by a cute cat."
         qCritical() << qtTrId("catbomb");
         gameState = KP::Offline;
+        delete sender;
         authSent = false;
         emit gamestateChanged(KP::Offline);
     }
@@ -899,6 +900,7 @@ void Clientv2::receivedLogout(const QJsonObject &djson) {
         else
             throw std::domain_error("message not implemented");
         gameState = KP::Offline;
+        delete sender;
         authSent = false;
         emit gamestateChanged(KP::Offline);
         logoutPending = true;
@@ -1032,6 +1034,9 @@ void Clientv2::receivedMsg(const QJsonObject &djson) {
     case KP::AllowClientStart:
         gameState = KP::Port;
         emit gamestateChanged(KP::Port);
+        // this might not be platform dependent
+        delete sender;
+        sender = new Sender(&socket);
         //% "You can now play the game."
         qInfo() << qtTrId("client-start");
         displayPrompt();
@@ -1039,6 +1044,7 @@ void Clientv2::receivedMsg(const QJsonObject &djson) {
         break;
     case KP::AllowClientFinish:
         gameState = KP::Offline;
+        delete sender;
         authSent = false;
         emit gamestateChanged(KP::Offline);
         qInfo() << qtTrId("client-finish");

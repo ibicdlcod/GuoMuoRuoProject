@@ -85,15 +85,15 @@ QConsoleListener::QConsoleListener(bool consolemode)
     m_thread.start();
 }
 
-void QConsoleListener::on_finishedGetLine(const QString &strNewLine)
-{
-    Q_EMIT this->newLine(strNewLine);
-}
-
 QConsoleListener::~QConsoleListener()
 {
     m_thread.quit();
     m_thread.wait();
+}
+
+void QConsoleListener::on_finishedGetLine(const QString &strNewLine)
+{
+    Q_EMIT this->newLine(strNewLine);
 }
 
 void QConsoleListener::exit()
