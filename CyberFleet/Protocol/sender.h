@@ -29,6 +29,10 @@ public slots:
     void enque(const QByteArray &);
     void start();
 
+public:
+    QHostAddress peerAddress();
+    quint16 peerPort();
+
 private slots:
     void destinationBytesWritten(qint64);
     void destinationError();

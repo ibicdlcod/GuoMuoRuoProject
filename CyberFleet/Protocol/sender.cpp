@@ -145,3 +145,10 @@ void Sender::switchtoReady() {
     }
 }
 
+QHostAddress Sender::peerAddress() {
+    return m_destination->peerAddress();
+}
+
+quint16 Sender::peerPort() {
+    return m_destination->peerPort();
+}

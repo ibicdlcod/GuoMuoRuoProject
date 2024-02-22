@@ -211,6 +211,8 @@ Server::Server(int argc, char ** argv) : CommandLine(argc, argv) {
             this, &Server::datagramReceivedStd);
     connect(&receiverM, &Receiver::nonStandardReceivedWithInfo,
             this, &Server::datagramReceivedNonStd);
+    connect(&senderM, &ServerMasterSender::errorMessage,
+            this, &Server::senderMErrorMessage);
 }
 
 Server::~Server() noexcept {
@@ -222,6 +224,8 @@ Server::~Server() noexcept {
                this, &Server::datagramReceivedStd);
     disconnect(&receiverM, &Receiver::nonStandardReceivedWithInfo,
                this, &Server::datagramReceivedNonStd);
+    disconnect(&senderM, &ServerMasterSender::errorMessage,
+               this, &Server::senderMErrorMessage);
 }
 
 void Server::datagramReceived(const PeerInfo &peerInfo,
@@ -613,6 +617,10 @@ void Server::pskRequired(QSslSocket *socket,
     //% "PSK callback, received a client's identity: '%1'"
     qDebug() << qtTrId("client-id-received").arg(clientName);
     auth->setPreSharedKey(QByteArrayLiteral("A.Zephyr"));
+}
+
+void Server::senderMErrorMessage(const QString &input) {
+    qWarning() << input;
 }
 
 void Server::shutdown() {

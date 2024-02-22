@@ -415,6 +415,10 @@ void Clientv2::errorOccurred(QAbstractSocket::SocketError error) {
     qWarning() << qtTrId("network-error").arg(socket.errorString());
 }
 
+void Clientv2::errorOccurredStr(const QString &input) {
+    qWarning() << input;
+}
+
 /* Network */
 void Clientv2::handshakeInterrupted(const QSslError &error) {
     maxRetransmit = settings->value("client/maximum_retransmit",
@@ -1037,6 +1041,9 @@ void Clientv2::receivedMsg(const QJsonObject &djson) {
         // this might not be platform dependent
         delete sender;
         sender = new Sender(&socket);
+        // disconnect when sender destoryed
+        connect(sender, &Sender::errorOccurred,
+                this, &Clientv2::errorOccurredStr);
         //% "You can now play the game."
         qInfo() << qtTrId("client-start");
         displayPrompt();

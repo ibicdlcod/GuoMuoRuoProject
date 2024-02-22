@@ -100,6 +100,7 @@ private slots:
                                    bool, bool);
     void offerSPInfo(QSslSocket *, const CSteamID &, int);
     void pskRequired(QSslSocket *, QSslPreSharedKeyAuthenticator *);
+    void senderMErrorMessage(const QString &);
     void shutdown();
     void sslErrors(QSslSocket *, const QList<QSslError> &);
 

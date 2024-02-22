@@ -12,12 +12,18 @@ public:
     explicit ServerMasterSender(QObject *parent = nullptr);
 
 signals:
+    void errorMessage(const QString &);
 
 public slots:
     void addSender(QAbstractSocket *);
     void removeSender(QAbstractSocket *);
     void sendMessage(QAbstractSocket *, const QByteArray &);
+
+public:
     int numberofMembers() const;
+
+private slots:
+    void errorHandle(const QString &);
 
 private:
     QMap<QAbstractSocket *, Sender *> agents;

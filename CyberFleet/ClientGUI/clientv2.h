@@ -136,6 +136,7 @@ signals:
 private slots:
     void encrypted();
     void errorOccurred(QAbstractSocket::SocketError);
+    void errorOccurredStr(const QString &);
     void handshakeInterrupted(const QSslError &);
     void pskRequired(QSslPreSharedKeyAuthenticator *);
     void readyRead();
