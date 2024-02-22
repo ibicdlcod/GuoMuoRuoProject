@@ -481,8 +481,6 @@ double Server::getSkillPointsEffect(const CSteamID &uid, int equipId) {
 }
 
 void Server::offerEquipInfo(QSslSocket *connection, int index = 0) {
-/* warning: large batch size causes problems */
-
     QJsonArray equipInfos;
     int i = 0;
     for(auto equipIdIter = equipRegistry.keyBegin();
@@ -542,34 +540,13 @@ void Server::offerTechInfoComponents(
     QSslSocket *connection, const QList<std::tuple<
         int, int, double>> &content,
     bool initial, bool global) {
-/* warning: large batch size causes problems */
-#if defined (Q_OS_WIN)
-    static const int batch = 50;
-#else
-    static const int batch = 10;
-#endif
-    static const int batchInterval = 2 * batch;
 
-    if(content.size() <= batch) {
-        connection->flush();
-        QByteArray msg = KP::serverGlobalTech(content, initial, true, global);
-        senderM.sendMessage(connection, msg);
-        connection->flush();
-    }
-    else {
-        QList<std::tuple<int, int, double>> firsts = content.first(batch);
-        connection->flush();
-        QByteArray msg = KP::serverGlobalTech(
-            firsts, initial, false, global);
-        senderM.sendMessage(connection, msg);
-        connection->flush();
-        QList<std::tuple<int, int, double>> seconds = content;
-        seconds.remove(0, batch);
-
-        QTimer::singleShot(batchInterval, this, [=, this](){
-            offerTechInfoComponents(connection, seconds, false, global);
-        });
-    }
+    /* see e337bb37ef2ee656321dc9688679a6c6f118cc16 for previous version
+     * if this stopped working */
+    connection->flush();
+    QByteArray msg = KP::serverGlobalTech(content, initial, true, global);
+    senderM.sendMessage(connection, msg);
+    connection->flush();
 }
 
 void Server::pskRequired(QSslSocket *socket,
