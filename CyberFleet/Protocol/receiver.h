@@ -4,7 +4,9 @@
 #include <QAbstractSocket>
 #include <QUuid>
 #include <QTimer>
+#include <bitset>
 
+static const int maxNumberOfParts =
 class Receiver : public QObject
 {
     Q_OBJECT

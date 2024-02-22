@@ -483,7 +483,7 @@ double Server::getSkillPointsEffect(const CSteamID &uid, int equipId) {
 void Server::offerEquipInfo(QSslSocket *connection, int index = 0) {
 /* warning: large batch size causes problems */
 #if defined (Q_OS_WIN)
-    static const int batch = 70;
+    static const int batch = 100;
 #else
     static const int batch = 10;
 #endif
@@ -529,13 +529,7 @@ void Server::offerEquipInfo(QSslSocket *connection, int index = 0) {
     QByteArray msg =
         KP::serverEquipInfo(equipInfos,
                             (equipRegistry.size() - index * batch) <= batch);
-    QSet<QChar> set;
-    for(QChar a: msg) {
-        set.insert(a);
-    }
-    for(QChar a: set) {
-        qWarning() << a;
-    }
+    qWarning() << msg.size();
     //old:
     //connection->write(msg);
     //new:
