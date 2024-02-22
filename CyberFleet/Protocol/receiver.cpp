@@ -14,7 +14,8 @@ void Receiver::processDgram(const QByteArray &input) {
     /* communication between client and server using non-latin1
      * should be banned in this program */
     QString inputString = QString::fromLatin1(input);
-    static QRegularExpression re("\\x01(\\d+)\\x09(\\d+)\\x09(.+?)\\x09(.+?)\\x7f");
+    static QRegularExpression re("\\x01(\\d+)\\x09(\\d+)\\x09(.+?)\\x09(.+?)\\x7f",
+                                 QRegularExpression::DotMatchesEverythingOption);
 
     QRegularExpressionMatchIterator i = re.globalMatch(inputString);
     while(i.hasNext()) {
@@ -25,7 +26,6 @@ void Receiver::processDgram(const QByteArray &input) {
             QUuid uuid = QUuid(match.captured(3));
             QString contents = match.captured(4);
             processGoodMsg(totalParts, currentPart, uuid, contents);
-            qCritical() << "GOOD" << totalParts << ":" << currentPart << ":" << uuid;
         }
     }
     inputString.replace(re, "");
@@ -54,7 +54,7 @@ void Receiver::processGoodMsg(qint64 totalParts,
                     emit timeOut(msgId);
                 }
                 );
-        //timers[msgId]->start(maxMsgDelayInMs * totalParts);
+        timers[msgId]->start(maxMsgDelayInMs * totalParts);
     }
     else if(totalPartsMap[msgId] != totalParts)
         qCritical() << qtTrId("same-msg-uid-have-inconsistent-total-parts");
@@ -66,9 +66,7 @@ void Receiver::processGoodMsg(qint64 totalParts,
     receivedStatus[msgId][currentPart] = contents;
 
     if((receivedPartsMap[msgId] + 1) == (1 << totalParts)) {
-        qCritical() << "BETTER";
         QString wholeMessage = receivedStatus[msgId].join("");
-        qInfo() << wholeMessage;
         timers[msgId]->stop();
 
         QJsonObject djson =

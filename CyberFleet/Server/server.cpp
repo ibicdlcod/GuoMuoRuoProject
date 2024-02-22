@@ -483,11 +483,11 @@ double Server::getSkillPointsEffect(const CSteamID &uid, int equipId) {
 void Server::offerEquipInfo(QSslSocket *connection, int index = 0) {
 /* warning: large batch size causes problems */
 #if defined (Q_OS_WIN)
-    static const int batch = 50;
+    static const int batch = 100;
 #else
     static const int batch = 10;
 #endif
-    static const int batchInterval = 200;
+    static const int batchInterval = 5 * batch;
 
     QJsonArray equipInfos;
     int i = 0;
@@ -501,6 +501,7 @@ void Server::offerEquipInfo(QSslSocket *connection, int index = 0) {
                                [this, connection, index]{
                                    offerEquipInfo(connection, index + 1);
                                });
+
             break;
         }
         auto equipid = *equipIdIter;
