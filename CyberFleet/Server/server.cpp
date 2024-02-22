@@ -241,7 +241,7 @@ void Server::datagramReceived(const PeerInfo &peerInfo,
         qWarning() << peerInfo.toString() << e.errorString();
         QByteArray msg = KP::serverParseError(
             KP::JsonError, peerInfo.toString(), e.errorString());
-        connection->write(msg);
+        senderM.sendMessage(connection, msg);
     } catch (DBError &e) {
         for(QString &i : e.whats()) {
             qCritical() << i;
@@ -250,7 +250,7 @@ void Server::datagramReceived(const PeerInfo &peerInfo,
         qWarning() << peerInfo.toString() << e.what();
         QByteArray msg = KP::serverParseError(
             KP::Unsupported, peerInfo.toString(), e.what());
-        connection->write(msg);
+        senderM.sendMessage(connection, msg);
     } catch (std::exception &e) {
         qCritical() << e.what();
     }
@@ -523,7 +523,7 @@ void Server::offerSPInfo(QSslSocket *connection,
         KP::serverSkillPoints(equipId,
                               User::getSkillPoints(uid, equipId),
                               equipRegistry.value(equipId)->skillPointsStd());
-    connection->write(msg);
+    senderM.sendMessage(connection, msg);
     connection->flush();
 }
 
@@ -533,7 +533,7 @@ void Server::offerTechInfo(QSslSocket *connection, const CSteamID &uid,
     double globalValue = result.first;
     connection->flush();
     QByteArray msg = KP::serverGlobalTech(globalValue, jobID == 0);
-    connection->write(msg);
+    senderM.sendMessage(connection, msg);
     connection->flush();
     offerTechInfoComponents(connection, result.second, true, jobID == 0);
 }
@@ -553,7 +553,7 @@ void Server::offerTechInfoComponents(
     if(content.size() <= batch) {
         connection->flush();
         QByteArray msg = KP::serverGlobalTech(content, initial, true, global);
-        connection->write(msg);
+        senderM.sendMessage(connection, msg);
         connection->flush();
     }
     else {
@@ -561,7 +561,7 @@ void Server::offerTechInfoComponents(
         connection->flush();
         QByteArray msg = KP::serverGlobalTech(
             firsts, initial, false, global);
-        connection->write(msg);
+        senderM.sendMessage(connection, msg);
         connection->flush();
         QList<std::tuple<int, int, double>> seconds = content;
         seconds.remove(0, batch);
@@ -652,14 +652,14 @@ void Server::doDevelop(CSteamID &uid, int equipid,
         if(!equipRegistry.contains(equipid)) {
             QByteArray msg =
                 KP::serverDevelopFailed(KP::DevelopNotExist);
-            connection->write(msg);
+            senderM.sendMessage(connection, msg);
             return;
         }
         Equipment *equip = equipRegistry[equipid];
         if(equip->disallowProduction()) {
             QByteArray msg =
                 KP::serverDevelopFailed(KP::ProductionDisallowed);
-            connection->write(msg);
+            senderM.sendMessage(connection, msg);
             return;
         }
         if(equip->disallowMassProduction() && (
@@ -668,7 +668,7 @@ void Server::doDevelop(CSteamID &uid, int equipid,
                 >= equip->attr["Disallowmassproduction"])) {
             QByteArray msg =
                 KP::serverDevelopFailed(KP::MassProductionDisallowed);
-            connection->write(msg);
+            senderM.sendMessage(connection, msg);
             return;
         }
         auto fatherResult = User::haveFather(uid, equipid, equipRegistry);
@@ -676,12 +676,12 @@ void Server::doDevelop(CSteamID &uid, int equipid,
             QByteArray msg =
                 KP::serverEquipLackFather(KP::DevelopNotOption,
                                           fatherResult.second);
-            connection->write(msg);
+            senderM.sendMessage(connection, msg);
             return;
         }
         if(User::isFactoryBusy(uid, factoryid)) {
             QByteArray msg = KP::serverDevelopFailed(KP::FactoryBusy);
-            connection->write(msg);
+            senderM.sendMessage(connection, msg);
             return;
         }
         /* not yet implemented: mother skillpoint requirements */
@@ -691,19 +691,19 @@ void Server::doDevelop(CSteamID &uid, int equipid,
                 KP::serverEquipLackMother(KP::DevelopNotOption,
                                           std::get<1>(motherResult),
                                           std::get<2>(motherResult));
-            connection->write(msg);
+            senderM.sendMessage(connection, msg);
             return;
         }
         ResOrd resRequired = equip->devRes();
         QByteArray msg = resRequired.resourceDesired();
-        connection->write(msg);
+        senderM.sendMessage(connection, msg);
         ResOrd currentRes = User::getCurrentResources(uid);
         if(!currentRes.addResources(resRequired * -1)){
             connection->flush();
             QTimer::singleShot(100, this, [this, connection]{
                 QByteArray msg =
                     KP::serverDevelopFailed(KP::ResourceLack);
-                connection->write(msg);
+                senderM.sendMessage(connection, msg);
             });
         }
         else{
@@ -734,7 +734,7 @@ void Server::doDevelop(CSteamID &uid, int equipid,
                 User::setResources(uid, currentRes);
                 QByteArray msg =
                     KP::serverDevelopStart();
-                connection->write(msg);
+                senderM.sendMessage(connection, msg);
             }
             else {
                 //% "Database failed when developing."
@@ -774,13 +774,13 @@ void Server::doFetch(CSteamID &uid, int factoryid, QSslSocket *connection) {
         bool done = query.value(1).toBool();
         if(!done) {
             QByteArray msg = KP::serverFairyBusy(jobID);
-            connection->write(msg);
+            senderM.sendMessage(connection, msg);
         }
         else {
             bool success = query.value(2).toBool();
             if(!success) {
                 QByteArray msg = KP::serverPenguin();
-                connection->write(msg);
+                senderM.sendMessage(connection, msg);
                 if(jobID < KP::equipIdMax &&
                     equipRegistry.value(jobID)->disallowMassProduction()) {
                     /* get skill points (non-massproduced only)*/
@@ -801,7 +801,7 @@ void Server::doFetch(CSteamID &uid, int factoryid, QSslSocket *connection) {
             else if(jobID < KP::equipIdMax) {
                 QByteArray msg = KP::serverNewEquip(
                     newEquip(uid, jobID), jobID);
-                connection->write(msg);
+                senderM.sendMessage(connection, msg);
             }
             else {
                 // TODO:is ship part
@@ -1196,7 +1196,7 @@ void Server::receivedAuth(const QJsonObject &djson,
             qCritical() << msg;
 
             QByteArray msg2 = KP::serverLackPrivate();
-            connection->write(msg2);
+            senderM.sendMessage(connection, msg2);
             delete [] rgubTicket;
             return;
         }
@@ -1222,7 +1222,7 @@ void Server::receivedAuth(const QJsonObject &djson,
                 qCritical() << qtTrId("%1: Ticket failed to decrypt")
                                    .arg(peerInfo.toString()).toUtf8();
                 QByteArray msg = KP::serverLogFail(KP::TicketFailedToDecrypt);
-                connection->write(msg);
+                senderM.sendMessage(connection, msg);
                 delete [] rgubTicket;
                 return;
             }
@@ -1233,7 +1233,7 @@ void Server::receivedAuth(const QJsonObject &djson,
                 qCritical() << qtTrId("%1: Ticket is not from correct App ID")
                                    .arg(peerInfo.toString()).toUtf8();
                 QByteArray msg = KP::serverLogFail(KP::TicketIsntFromCorrectAppID);
-                connection->write(msg);
+                senderM.sendMessage(connection, msg);
                 delete [] rgubTicket;
                 return;
             }
@@ -1250,7 +1250,7 @@ void Server::receivedAuth(const QJsonObject &djson,
                 qCritical() << qtTrId("%1: Request timeout")
                                    .arg(peerInfo.toString()).toUtf8();
                 QByteArray msg = KP::serverLogFail(KP::RequestTimeout);
-                connection->write(msg);
+                senderM.sendMessage(connection, msg);
                 delete [] rgubTicket;
                 return;
             }
@@ -1263,7 +1263,7 @@ void Server::receivedAuth(const QJsonObject &djson,
                 qCritical() << qtTrId("%1: Steam ID invalid")
                                    .arg(peerInfo.toString()).toUtf8();
                 QByteArray msg = KP::serverLogFail(KP::SteamIdInvalid);
-                connection->write(msg);
+                senderM.sendMessage(connection, msg);
                 delete [] rgubTicket;
                 return;
             }
@@ -1293,7 +1293,7 @@ void Server::receivedAuth(const QJsonObject &djson,
     }
     else if(djson["command"].toInt() == KP::CommandType::SteamLogout) {
         QByteArray msg = KP::serverLogout(KP::LogoutSuccess);
-        connection->write(msg);
+        senderM.sendMessage(connection, msg);
         connection->flush();
         connectedPeers.remove(connectedUsers[connection]);
         connectedUsers.remove(connection);
@@ -1304,16 +1304,16 @@ void Server::receivedAuth(const QJsonObject &djson,
     else if(djson["command"].toInt() == KP::CommandType::CHello) {
         if(connectedUsers.contains(connection)) {
             QByteArray msg = KP::weighAnchor();
-            connection->write(msg);
+            senderM.sendMessage(connection, msg);
             CSteamID uid = connectedUsers[connection];
             User::refreshPort(uid);
             User::refreshFactory(uid);
         }
         else {
             QByteArray msg = KP::serverLogFail(KP::SteamAuthFail);
-            connection->write(msg);
+            senderM.sendMessage(connection, msg);
             msg = KP::catbomb();
-            connection->write(msg);
+            senderM.sendMessage(connection, msg);
             connection->disconnectFromHost();
         }
     }
@@ -1323,7 +1323,7 @@ void Server::receivedForceLogout(CSteamID &uid) {
     QSslSocket *client = connectedPeers[uid];
     if(client->isEncrypted()) {
         QByteArray msg = KP::serverLogout(KP::LogoutType::LoggedElsewhere);
-        client->write(msg);
+        senderM.sendMessage(client, msg);
         client->disconnectFromHost();
         connectedPeers.remove(uid);
         connectedUsers.remove(client);
@@ -1368,11 +1368,8 @@ void Server::receivedLogin(CSteamID &uid,
     }
     else {
         /* existing user */
-    }/*
-    QByteArray msg = KP::serverVerifyComplete();
-    if(connection->write(msg) <= 0) {
-        qWarning("Verifycomplete not sent");
-    }*/
+    }
+
     connectedPeers[uid] = connection;
     connectedUsers[connection] = uid;
     senderM.addSender(connection);
@@ -1383,11 +1380,11 @@ void Server::receivedLogout(CSteamID &uid,
                             QSslSocket *connection) {
     if(!connectedPeers.contains(uid) || connectedPeers[uid] != connection) {
         QByteArray msg = KP::serverLogout(KP::LogoutFailure);
-        connection->write(msg);
+        senderM.sendMessage(connection, msg);
     }
     else {
         QByteArray msg = KP::serverLogout(KP::LogoutSuccess);
-        connection->write(msg);
+        senderM.sendMessage(connection, msg);
         connectedPeers.remove(uid);
         connectedUsers.remove(connection);
         senderM.removeSender(connection);
@@ -1424,12 +1421,12 @@ void Server::receivedReq(const QJsonObject &djson,
         int equipid = djson["equipid"].toInt();
         if(!User::isSuperUser(uid)) {
             QByteArray msg = KP::accessDenied();
-            connection->write(msg);
+            senderM.sendMessage(connection, msg);
         }
         else {
             QByteArray msg = KP::serverNewEquip(
                 newEquip(uid, equipid), equipid);
-            connection->write(msg);
+            senderM.sendMessage(connection, msg);
         }
     }
     case KP::CommandType::Develop: {
@@ -1480,7 +1477,7 @@ void Server::receivedReq(const QJsonObject &djson,
     }
     return;
     QByteArray msg2 = KP::accessDenied();
-    connection->write(msg2);
+    senderM.sendMessage(connection, msg2);
 }
 
 void Server::sendTestMessages() {
@@ -1568,7 +1565,7 @@ void Server::refreshClientFactory(CSteamID &uid, QSslSocket *connection) {
     result["content"] = itemArray;
     QByteArray msg = QCborValue::fromJsonValue(result).toCbor();
     //qCritical() << msg;
-    connection->write(msg);
+    senderM.sendMessage(connection, msg);
 }
 
 void Server::sqlcheckEquip() {/*

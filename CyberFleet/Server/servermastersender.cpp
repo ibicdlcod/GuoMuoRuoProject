@@ -19,7 +19,7 @@ void ServerMasterSender::sendMessage(QAbstractSocket *connection,
     if(agents.contains(connection))
         agents[connection]->enque(contents);
     else
-        qWarning() << qtTrId("send-message-over-invalid-connection");
+        connection->write(contents);
 }
 
 int ServerMasterSender::numberofMembers() {
