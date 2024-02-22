@@ -482,28 +482,12 @@ double Server::getSkillPointsEffect(const CSteamID &uid, int equipId) {
 
 void Server::offerEquipInfo(QSslSocket *connection, int index = 0) {
 /* warning: large batch size causes problems */
-#if defined (Q_OS_WIN)
-    static const int batch = 600;
-#else
-    static const int batch = 10;
-#endif
-    static const int batchInterval = 5 * batch;
 
     QJsonArray equipInfos;
     int i = 0;
     for(auto equipIdIter = equipRegistry.keyBegin();
          equipIdIter != equipRegistry.keyEnd();
          ++equipIdIter, ++i) {
-        if(i == 0)
-            std::advance(equipIdIter, index * batch);
-        if(i == batch) {
-            QTimer::singleShot(batchInterval, this,
-                               [this, connection, index]{
-                                   offerEquipInfo(connection, index + 1);
-                               });
-
-            break;
-        }
         auto equipid = *equipIdIter;
         QJsonObject result;
         result["eid"] = equipid;
@@ -527,8 +511,7 @@ void Server::offerEquipInfo(QSslSocket *connection, int index = 0) {
     }
     connection->flush();
     QByteArray msg =
-        KP::serverEquipInfo(equipInfos,
-                            (equipRegistry.size() - index * batch) <= batch);
+        KP::serverEquipInfo(equipInfos, true);
     senderM.sendMessage(connection, msg);
     connection->flush();
 }
