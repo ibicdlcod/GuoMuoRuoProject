@@ -6,7 +6,9 @@
 #include <QTimer>
 #include <bitset>
 
-static const int maxNumberOfParts =
+// no more than 200 parts will be used for 537 equip defs
+static const int maxNumberOfParts = 1024;
+
 class Receiver : public QObject
 {
     Q_OBJECT
@@ -28,7 +30,7 @@ private slots:
 private:
     QMap<QUuid, QList<QString>> receivedStatus;
     QMap<QUuid, qint64> totalPartsMap;
-    QMap<QUuid, qint64> receivedPartsMap;
+    QMap<QUuid, std::bitset<maxNumberOfParts>> receivedPartsMap;
     QMap<QUuid, QTimer *> timers;
 };
 

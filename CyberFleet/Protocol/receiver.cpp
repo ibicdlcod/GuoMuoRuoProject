@@ -38,15 +38,9 @@ void Receiver::processGoodMsg(qint64 totalParts,
                               qint64 currentPart,
                               QUuid msgId,
                               const QString &contents) {
-    if(totalParts > 62) {
-        qCritical() << totalParts;
-    }
-    else {
-        qCritical() << totalParts;
-    }
     if(!totalPartsMap.contains(msgId)) {
         totalPartsMap[msgId] = totalParts;
-        receivedPartsMap[msgId] = 0;
+        receivedPartsMap[msgId].reset(); // set to 0
         receivedStatus[msgId] = QList<QString>(totalParts);
         timers[msgId] = new QTimer(this);
         timers[msgId]->setSingleShot(true);
@@ -66,12 +60,12 @@ void Receiver::processGoodMsg(qint64 totalParts,
         qCritical() << qtTrId("same-msg-uid-have-inconsistent-total-parts");
 
     Q_ASSERT(receivedPartsMap.contains(msgId));
-    receivedPartsMap[msgId] += Q_INT64_C(1) << currentPart;
+    receivedPartsMap[msgId].set(currentPart, true);
     Q_ASSERT(receivedStatus.contains(msgId));
     Q_ASSERT(receivedStatus[msgId].length() > currentPart);
     receivedStatus[msgId][currentPart] = contents;
 
-    if((receivedPartsMap[msgId] + Q_INT64_C(1)) == (Q_INT64_C(1) << totalParts)) {
+    if(receivedPartsMap[msgId].count() == totalParts) {
         QString wholeMessage = receivedStatus[msgId].join("");
         timers[msgId]->stop();
 
