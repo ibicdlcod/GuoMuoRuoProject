@@ -238,7 +238,6 @@ void Server::datagramReceived(const PeerInfo &peerInfo,
 void Server::datagramReceivedNonStd(const QByteArray &plainText,
                                     const PeerInfo &peerInfo,
                                     QSslSocket *connection) {
-    qWarning("nonstandard-message-received");
     QJsonObject djson =
         QCborValue::fromCbor(plainText).toMap().toJsonObject();
 #if defined(QT_DEBUG)

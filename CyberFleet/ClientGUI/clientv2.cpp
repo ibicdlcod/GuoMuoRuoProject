@@ -167,10 +167,7 @@ void Clientv2::catbomb() {
 
 void Clientv2::demandEquipCache() {
     QByteArray msg = KP::clientDemandEquipInfo();
-    const qint64 written = socket.write(msg);
-    if (written <= 0) {
-        throw NetworkError(socket.errorString());
-    }
+    sender->enque(msg);
 }
 
 /* Originally used in CLI */
@@ -345,10 +342,7 @@ void Clientv2::switchToFactory() {
         emit gamestateChanged(KP::Factory);
         if(!equipRegistryCacheGood) {
             QByteArray msg = KP::clientDemandEquipInfo();
-            const qint64 written = socket.write(msg);
-            if (written <= 0) {
-                throw NetworkError(socket.errorString());
-            }
+            sender->enque(msg);
         }
     }
 }
@@ -366,10 +360,7 @@ void Clientv2::switchToTech() {
         if(equipRegistryCacheGood) {
             socket.flush();
             QByteArray msg = KP::clientDemandGlobalTech(0);
-            const qint64 written = socket.write(msg);
-            if (written <= 0) {
-                throw NetworkError(socket.errorString());
-            }
+            sender->enque(msg);
             socket.flush();
         }
         else {
@@ -383,10 +374,7 @@ void Clientv2::switchToTech() {
 void Clientv2::switchToTech2() {
     socket.flush();
     QByteArray msg = KP::clientDemandGlobalTech(0);
-    const qint64 written = socket.write(msg);
-    if (written <= 0) {
-        throw NetworkError(socket.errorString());
-    }
+    sender->enque(msg);
     socket.flush();
 }
 
@@ -518,10 +506,11 @@ void Clientv2::doAddEquip(const QStringList &cmdParts) {
             return;
         }
         QByteArray msg = KP::clientAddEquip(equipid);
+        sender->enque(msg);/*
         const qint64 written = socket.write(msg);
         if (written <= 0) {
             throw NetworkError(socket.errorString());
-        }
+        }*/
         return;
     }
 }
@@ -541,10 +530,11 @@ void Clientv2::doDevelop(const QStringList &cmdParts) {
         }
         int factoSlot = cmdParts[2].toInt();
         QByteArray msg = KP::clientDevelop(equipid, false, factoSlot);
+        sender->enque(msg);/*
         const qint64 written = socket.write(msg);
         if (written <= 0) {
             throw NetworkError(socket.errorString());
-        }
+        }*/
         return;
     }
 }
@@ -559,10 +549,11 @@ void Clientv2::doFetch(const QStringList &cmdParts) {
     else {
         int factoSlot = cmdParts[1].toInt();
         QByteArray msg = KP::clientFetch(factoSlot);
+        sender->enque(msg);/*
         const qint64 written = socket.write(msg);
         if (written <= 0) {
             throw NetworkError(socket.errorString());
-        }
+        }*/
         return;
     }
 }
@@ -592,10 +583,7 @@ void Clientv2::doSwitch(const QStringList &cmdParts) {
             gameState = (KP::GameState)statevalue;
             emit gamestateChanged(gameState);
             QByteArray msg = KP::clientStateChange(gameState);
-            const qint64 written = socket.write(msg);
-            if (written <= 0) {
-                throw NetworkError(socket.errorString());
-            }
+            sender->enque(msg);
         }
         return;
     }
@@ -604,10 +592,7 @@ void Clientv2::doSwitch(const QStringList &cmdParts) {
 /* Request current factory state to server */
 void Clientv2::doRefreshFactory() {
     QByteArray msg = KP::clientFactoryRefresh();
-    const qint64 written = socket.write(msg);
-    if (written <= 0) {
-        throw NetworkError(socket.errorString());
-    }
+    sender->enque(msg);
     socket.flush();
 }
 
