@@ -57,7 +57,7 @@
 #include "../Protocol/tech.h"
 #include "../Protocol/receiver.h"
 #include "kerrors.h"
-#include "peerinfo.h"
+#include "../Protocol/peerinfo.h"
 #include "sslserver.h"
 
 #ifdef max
@@ -206,6 +206,11 @@ const int elapsedMaxTolerence = 60;
 Server::Server(int argc, char ** argv) : CommandLine(argc, argv) {
     /* no *settings could be used here */
     mt = std::mt19937(random());
+
+    connect(&receiverM, &Receiver::jsonReceivedWithInfo,
+            this, &Server::datagramReceivedStd);
+    connect(&receiverM, &Receiver::nonStandardReceivedWithInfo,
+            this, &Server::datagramReceivedNonStd);
 }
 
 Server::~Server() noexcept {
@@ -213,13 +218,100 @@ Server::~Server() noexcept {
     for(auto equip: std::as_const(equipRegistry)) {
         delete equip;
     }
+    disconnect(&receiverM, &Receiver::jsonReceivedWithInfo,
+               this, &Server::datagramReceivedStd);
+    disconnect(&receiverM, &Receiver::nonStandardReceivedWithInfo,
+               this, &Server::datagramReceivedNonStd);
 }
 
 void Server::datagramReceived(const PeerInfo &peerInfo,
                               const QByteArray &plainText,
                               QSslSocket *connection) {
+    receiverM.processDgramWithInfo(peerInfo, plainText, connection);
+    return;
     QJsonObject djson =
         QCborValue::fromCbor(plainText).toMap().toJsonObject();
+#if defined(QT_DEBUG)
+    static const QString formatter = QStringLiteral("From %1 text: %2");
+    const QString html = formatter.
+                         arg(peerInfo.toString(), QJsonDocument(djson).toJson());
+    qDebug() << html;
+#else
+    Q_UNUSED(peerInfo)
+#endif
+    try {
+        switch(djson["type"].toInt()) {
+        case KP::DgramType::Auth:
+            receivedAuth(djson, peerInfo, connection); break;
+        case KP::DgramType::Request:
+            receivedReq(djson, peerInfo, connection); break;
+        default:
+            throw std::domain_error("datagram type not supported"); break;
+        }
+    } catch (const QJsonParseError &e) {
+        qWarning() << peerInfo.toString() << e.errorString();
+        QByteArray msg = KP::serverParseError(
+            KP::JsonError, peerInfo.toString(), e.errorString());
+        senderM.sendMessage(connection, msg);
+    } catch (DBError &e) {
+        for(QString &i : e.whats()) {
+            qCritical() << i;
+        }
+    } catch (const std::domain_error &e) {
+        qWarning() << peerInfo.toString() << e.what();
+        QByteArray msg = KP::serverParseError(
+            KP::Unsupported, peerInfo.toString(), e.what());
+        senderM.sendMessage(connection, msg);
+    } catch (std::exception &e) {
+        qCritical() << e.what();
+    }
+}
+
+void Server::datagramReceivedNonStd(const QByteArray &plainText,
+                                    const PeerInfo &peerInfo,
+                                    QSslSocket *connection) {
+    qWarning("nonstandard-message-received");
+    QJsonObject djson =
+        QCborValue::fromCbor(plainText).toMap().toJsonObject();
+#if defined(QT_DEBUG)
+    static const QString formatter = QStringLiteral("From %1 text: %2");
+    const QString html = formatter.
+                         arg(peerInfo.toString(), QJsonDocument(djson).toJson());
+    qDebug() << html;
+#else
+    Q_UNUSED(peerInfo)
+#endif
+    try {
+        switch(djson["type"].toInt()) {
+        case KP::DgramType::Auth:
+            receivedAuth(djson, peerInfo, connection); break;
+        case KP::DgramType::Request:
+            receivedReq(djson, peerInfo, connection); break;
+        default:
+            throw std::domain_error("datagram type not supported"); break;
+        }
+    } catch (const QJsonParseError &e) {
+        qWarning() << peerInfo.toString() << e.errorString();
+        QByteArray msg = KP::serverParseError(
+            KP::JsonError, peerInfo.toString(), e.errorString());
+        senderM.sendMessage(connection, msg);
+    } catch (DBError &e) {
+        for(QString &i : e.whats()) {
+            qCritical() << i;
+        }
+    } catch (const std::domain_error &e) {
+        qWarning() << peerInfo.toString() << e.what();
+        QByteArray msg = KP::serverParseError(
+            KP::Unsupported, peerInfo.toString(), e.what());
+        senderM.sendMessage(connection, msg);
+    } catch (std::exception &e) {
+        qCritical() << e.what();
+    }
+}
+
+void Server::datagramReceivedStd(const QJsonObject &djson,
+                                 const PeerInfo &peerInfo,
+                                 QSslSocket *connection) {
 #if defined(QT_DEBUG)
     static const QString formatter = QStringLiteral("From %1 text: %2");
     const QString html = formatter.
@@ -604,7 +696,6 @@ void Server::sslErrors(QSslSocket *socket, const QList<QSslError> &errors) {
 }
 
 /* private */
-
 void Server::decryptDatagram(QSslSocket *connection,
                              const QByteArray &clientMessage) {
     Q_ASSERT(connection->isEncrypted());

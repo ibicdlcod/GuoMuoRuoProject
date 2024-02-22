@@ -4,7 +4,9 @@
 #include <QAbstractSocket>
 #include <QUuid>
 #include <QTimer>
+#include <QSslSocket>
 #include <bitset>
+#include "peerinfo.h"
 
 // no more than 200 parts will be used for 537 equip defs
 static const int maxNumberOfParts = 1024;
@@ -16,13 +18,22 @@ public:
     explicit Receiver(QObject *parent = nullptr);
 
 signals:
-    void jsonReceived(const QJsonObject &djson);
-    void nonStandardReceived(const QByteArray &dgram);
-    /* should generate a catbomb */
+    void jsonReceived(const QJsonObject &);
+    void jsonReceivedWithInfo(const QJsonObject &,
+                              const PeerInfo &,
+                              QSslSocket *);
+    void nonStandardReceived(const QByteArray &);
+    void nonStandardReceivedWithInfo(const QByteArray &,
+                                     const PeerInfo &,
+                                     QSslSocket *);
+    /* should generate a catbomb, but currently don't */
     void timeOut(QUuid);
 
 public slots:
     void processDgram(const QByteArray &);
+    void processDgramWithInfo(const PeerInfo &,
+                              const QByteArray &,
+                              QSslSocket *);
 
 private slots:
     void processGoodMsg(qint64, qint64, QUuid, const QString &);
@@ -32,6 +43,8 @@ private:
     QMap<QUuid, qint64> totalPartsMap;
     QMap<QUuid, std::bitset<maxNumberOfParts>> receivedPartsMap;
     QMap<QUuid, QTimer *> timers;
+    QMap<QUuid, PeerInfo> peerInfos;
+    QMap<QUuid, QSslSocket *> sslsockets;
 };
 
 #endif // SENDER_H

@@ -52,22 +52,23 @@ set(CLIENT_SOURCES
     ClientGUI/ui/portarea.cpp
     ClientGUI/ui/portarea.h
     ClientGUI/ui/portarea.ui
+    ClientGUI/ui/techview.h
+    ClientGUI/ui/techview.cpp
+    ClientGUI/ui/techview.ui
     ${TS_FILES}
 )
 set(SERVER_SOURCES
     Server/kerrors.cpp
     Server/kerrors.h
     Server/main.cpp
-    Server/peerinfo.cpp
-    Server/peerinfo.h
+    Server/qconsolelistener.cpp
+    Server/qconsolelistener.h
     Server/server.cpp
     Server/server.h
     Server/servermastersender.cpp
     Server/servermastersender.h
     Server/sslserver.cpp
     Server/sslserver.h
-    Server/qconsolelistener.cpp
-    Server/qconsolelistener.h
     Server/user.cpp
     Server/user.h
     ${TS_FILES}
@@ -85,6 +86,8 @@ set(PROTOCOL_SOURCES
     Protocol/equiptype.h
     Protocol/kp.cpp
     Protocol/kp.h
+    Protocol/peerinfo.cpp
+    Protocol/peerinfo.h
     Protocol/receiver.cpp
     Protocol/receiver.h
     Protocol/resord.cpp
@@ -112,7 +115,6 @@ qt_add_executable(CFClient
     ${CLIENT_SOURCES}
     common.qrc
     ${app_icon_resource_windows}
-    ClientGUI/ui/techview.h ClientGUI/ui/techview.cpp ClientGUI/ui/techview.ui
 )
 qt_add_executable(CFServer
     MANUAL_FINALIZATION

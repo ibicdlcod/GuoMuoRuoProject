@@ -16,8 +16,8 @@ signals:
 public slots:
     void addSender(QAbstractSocket *);
     void removeSender(QAbstractSocket *);
-    void sendMessage(QAbstractSocket *, QByteArray);
-    int numberofMembers();
+    void sendMessage(QAbstractSocket *, const QByteArray &);
+    int numberofMembers() const;
 
 private:
     QMap<QAbstractSocket *, Sender *> agents;

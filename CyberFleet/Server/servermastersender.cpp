@@ -15,13 +15,13 @@ void ServerMasterSender::removeSender(QAbstractSocket *connection) {
 }
 
 void ServerMasterSender::sendMessage(QAbstractSocket *connection,
-                                     QByteArray contents) {
+                                     const QByteArray &contents) {
     if(agents.contains(connection))
         agents[connection]->enque(contents);
     else
         connection->write(contents);
 }
 
-int ServerMasterSender::numberofMembers() {
+int ServerMasterSender::numberofMembers() const {
     return agents.size();
 }

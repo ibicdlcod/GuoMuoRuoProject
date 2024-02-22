@@ -23,6 +23,7 @@
 #include <locale.h>
 #endif
 
+/* "Kancolle Protocol */
 namespace KP {
 Q_NAMESPACE
 

@@ -61,8 +61,9 @@
 
 #include "../Protocol/commandline.h"
 #include "../Protocol/equipment.h"
+#include "../Protocol/receiver.h"
+#include "../Protocol/peerinfo.h"
 #include "servermastersender.h"
-#include "peerinfo.h"
 #include "sslserver.h"
 #include "user.h"
 
@@ -74,6 +75,8 @@ public:
     ~Server() noexcept override;
 
     void datagramReceived(const PeerInfo &, const QByteArray &, QSslSocket *);
+    void datagramReceivedNonStd(const QByteArray &, const PeerInfo &, QSslSocket *);
+    void datagramReceivedStd(const QJsonObject &, const PeerInfo &, QSslSocket *);
     bool listen(const QHostAddress &, quint16);
 
 public slots:
@@ -142,7 +145,7 @@ private:
     QMap<QSslSocket *, CSteamID> connectedUsers;
     QMap<CSteamID, QSslSocket *> connectedPeers;
     ServerMasterSender senderM;
-    QThread senderThread;
+    Receiver receiverM;
 
     QSet<int> openEquips;
     QMap<int, Equipment *> equipRegistry;

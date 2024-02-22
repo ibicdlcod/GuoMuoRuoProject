@@ -11,8 +11,7 @@ Receiver::Receiver(QObject *parent)
 }
 
 void Receiver::processDgram(const QByteArray &input) {
-    /* communication between client and server using non-latin1
-     * should be banned in this program */
+    /* this somehow works in non-latin1 scenarios */
     QString inputString = QString::fromLatin1(input);
     static QRegularExpression re("<start>(\\d+?)<mid>(\\d+?)<mid>(.+?)<mid>(.+?)<end>+",
                                  QRegularExpression::DotMatchesEverythingOption);
@@ -31,6 +30,35 @@ void Receiver::processDgram(const QByteArray &input) {
     inputString.replace(re, "");
     if(!inputString.isEmpty()) {
         emit nonStandardReceived(inputString.toLatin1());
+    }
+}
+
+void Receiver::processDgramWithInfo(const PeerInfo &peerInfo,
+                                    const QByteArray &input,
+                                    QSslSocket *connection) {
+    /* must ensure consistency with above function */
+    QString inputString = QString::fromLatin1(input);
+    static QRegularExpression re("<start>(\\d+?)<mid>(\\d+?)<mid>(.+?)<mid>(.+?)<end>+",
+                                 QRegularExpression::DotMatchesEverythingOption);
+
+    QRegularExpressionMatchIterator i = re.globalMatch(inputString);
+    while(i.hasNext()) {
+        QRegularExpressionMatch match = i.next();
+        if (match.hasMatch()) {
+            qint64 totalParts = match.captured(1).toInt();
+            qint64 currentPart = match.captured(2).toInt();
+            QUuid uuid = QUuid(match.captured(3));
+            QString contents = match.captured(4);
+            peerInfos[uuid] = peerInfo;
+            sslsockets[uuid] = connection;
+            processGoodMsg(totalParts, currentPart, uuid, contents);
+        }
+    }
+    inputString.replace(re, "");
+    if(!inputString.isEmpty()) {
+        emit nonStandardReceivedWithInfo(inputString.toLatin1(),
+                                         peerInfo,
+                                         connection);
     }
 }
 
@@ -72,11 +100,27 @@ void Receiver::processGoodMsg(qint64 totalParts,
         QJsonObject djson =
             QCborValue::fromCbor(wholeMessage.toLatin1()).toMap().toJsonObject();
         if(!djson.isEmpty()) {
-            emit jsonReceived(djson);
+            if(sslsockets.contains(msgId) && peerInfos.contains(msgId)) {
+                emit jsonReceivedWithInfo(djson,
+                                          peerInfos[msgId],
+                                          sslsockets[msgId]);
+                sslsockets.remove(msgId);
+                peerInfos.remove(msgId);
+            }
+            else {
+                emit jsonReceived(djson);
+            }
         }
-        else
-            qCritical() << qtTrId("msg-convert-to-json-failed");
-
+        else {
+            qCritical() << qtTrId("msg-convert-to-json-failed") << msgId;
+            if(sslsockets.contains(msgId) && peerInfos.contains(msgId)) {
+                //% PeerInfo: %1
+                qCritical() << qtTrId("peerinfo-handler")
+                                   .arg(peerInfos[msgId].toString());
+                sslsockets.remove(msgId);
+                peerInfos.remove(msgId);
+            }
+        }
         totalPartsMap.remove(msgId);
         receivedPartsMap.remove(msgId);
         receivedStatus.remove(msgId);
