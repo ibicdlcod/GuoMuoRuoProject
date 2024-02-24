@@ -26,7 +26,7 @@ signals:
     void progressed(int);
 
 public slots:
-    void enque(const QByteArray &);
+    void enqueue(const QByteArray &);
     void start();
 
 public:

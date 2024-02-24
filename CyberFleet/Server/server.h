@@ -143,7 +143,7 @@ private:
 
     bool listening = false;
     SslServer sslServer;
-    QMap<QSslSocket *, CSteamID> connectedUsers;
+    QHash<QSslSocket *, CSteamID> connectedUsers;
     QMap<CSteamID, QSslSocket *> connectedPeers;
     ServerMasterSender senderM;
     Receiver receiverM;

@@ -26,7 +26,7 @@ private slots:
     void errorHandle(const QString &);
 
 private:
-    QMap<QAbstractSocket *, Sender *> agents;
+    QHash<QAbstractSocket *, Sender *> agents;
 };
 
 #endif // SERVERMASTERSENDER_H

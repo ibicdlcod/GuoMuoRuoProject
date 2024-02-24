@@ -21,7 +21,7 @@ void ServerMasterSender::removeSender(QAbstractSocket *connection) {
 void ServerMasterSender::sendMessage(QAbstractSocket *connection,
                                      const QByteArray &contents) {
     if(agents.contains(connection))
-        agents[connection]->enque(contents);
+        agents[connection]->enqueue(contents);
     else
         connection->write(contents);
 }

@@ -27,7 +27,7 @@ Sender::Sender(QAbstractSocket *destination,
                      this, &Sender::destinationError);*/
 }
 
-void Sender::enque(const QByteArray &content) {
+void Sender::enqueue(const QByteArray &content) {
     input.enqueue(content);
     start();
 }
