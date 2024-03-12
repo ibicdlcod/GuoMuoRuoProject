@@ -59,8 +59,12 @@ void CommandLine::customMessageHandler(QtMsgType type,
 #endif
     switch (type) {
     case QtDebugMsg:
+#if defined(QT_DEBUG)
         txt += QStringLiteral("{DEBUG} %1").arg(txt2);
         msg_off = settings->value("msg_disabled/debug", false).toBool();
+#else
+        msg_off = true;
+#endif
         break;
     case QtInfoMsg:
         txt += QStringLiteral("{INFO}  %1").arg(txt2);

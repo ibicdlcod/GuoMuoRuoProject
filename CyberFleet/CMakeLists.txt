@@ -192,3 +192,41 @@ if (${CMAKE_BUILD_TYPE} MATCHES "Release")
 endif()
 qt_finalize_executable(CFClient)
 qt_finalize_executable(CFServer)
+
+message(PROJECT_SOURCE_DIR=${CMAKE_CURRENT_SOURCE_DIR})
+message(PROJECT_BINARY_DIR=${CMAKE_CURRENT_BINARY_DIR})
+
+# you still need to manually copy serverprivate.key and AppSecretKey
+# to build directory
+add_custom_command(TARGET CFClient POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+    "${CMAKE_CURRENT_BINARY_DIR}/FactorySlot/FactorySlot.dll"
+    $<TARGET_FILE_DIR:CFClient>)
+add_custom_command(TARGET CFServer POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+    "${CMAKE_CURRENT_BINARY_DIR}/FactorySlot/FactorySlot.dll"
+    $<TARGET_FILE_DIR:CFServer>)
+add_custom_command(TARGET CFClient POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+    "${CMAKE_CURRENT_SOURCE_DIR}/steam_appid.txt"
+    $<TARGET_FILE_DIR:CFClient>)
+add_custom_command(TARGET CFServer POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+    "${CMAKE_CURRENT_SOURCE_DIR}/steam_appid.txt"
+    $<TARGET_FILE_DIR:CFServer>)
+
+if (${CMAKE_SYSTEM_NAME} MATCHES "Windows")
+add_custom_command(TARGET CFClient POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+    "${CMAKE_CURRENT_SOURCE_DIR}/redistributable_bin/win64/steam_api64.dll"
+    $<TARGET_FILE_DIR:CFClient>)
+add_custom_command(TARGET CFServer POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+    "${CMAKE_CURRENT_SOURCE_DIR}/redistributable_bin/win64/steam_api64.dll"
+    $<TARGET_FILE_DIR:CFServer>)
+add_custom_command(TARGET CFServer POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+    "${CMAKE_CURRENT_SOURCE_DIR}/steam/lib/win64/sdkencryptedappticket64.dll"
+    $<TARGET_FILE_DIR:CFServer>)
+else ()
+endif()

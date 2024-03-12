@@ -262,8 +262,6 @@ void Clientv2::serverResponseStd(const QJsonObject &djson) {
     const QString html = formatter
                              .arg(QJsonDocument(djson).toJson());
     qDebug() << html;
-#else
-    Q_UNUSED(clientInfo)
 #endif
     try{
         switch(djson["type"].toInt()) {
@@ -296,8 +294,6 @@ void Clientv2::serverResponseNonStd(const QByteArray &plainText) {
                                  .arg(QJsonDocument(djson).toJson());
         qDebug() << html;
     }
-#else
-    Q_UNUSED(clientInfo)
 #endif
     try{
         switch(djson["type"].toInt()) {
@@ -1105,8 +1101,12 @@ void customMessageHandler(QtMsgType type,
 #endif
     switch (type) {
     case QtDebugMsg:
+#if defined(QT_DEBUG)
         txt += QStringLiteral("{DEBUG} %1").arg(txt2);
         msg_off = settings->value("msg_disabled/debug", false).toBool();
+#else
+        msg_off = true;
+#endif
         break;
     case QtInfoMsg:
         txt += QStringLiteral("{INFO}  %1").arg(txt2);
