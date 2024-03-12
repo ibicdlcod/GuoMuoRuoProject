@@ -1,6 +1,6 @@
 #include "kp.h"
-#include "qjsonarray.h"
 #include <QFile>
+#include <QJsonArray>
 #include <QSettings>
 
 extern QFile *logFile;

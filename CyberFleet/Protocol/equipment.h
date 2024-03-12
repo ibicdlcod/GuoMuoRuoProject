@@ -7,6 +7,7 @@
 #include <QString>
 #include "resord.h"
 #include "equiptype.h"
+#include "steam/steamclientpublic.h"
 
 class Equipment: public QObject {
     Q_OBJECT

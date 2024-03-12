@@ -11,7 +11,7 @@
 #include <QObject>
 #include <QJsonObject>
 #include <QCborValue>
-#include "../steam/isteamuser.h"
+#include "steam/steamtypes.h"
 
 /* OS Specific */
 #if defined (Q_OS_WIN)

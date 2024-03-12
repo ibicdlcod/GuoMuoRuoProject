@@ -51,7 +51,6 @@
 
 #include <QColor>
 #include <QtNetwork>
-#include "../Protocol/commandline.h"
 #include "../Protocol/equipment.h"
 #include "../Protocol/receiver.h"
 #include "../Protocol/sender.h"

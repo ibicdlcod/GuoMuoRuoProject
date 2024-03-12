@@ -15,7 +15,6 @@
 
 #include "consoletextstream.h"
 #include "wcwidth.h"
-#include "kp.h"
 
 /* Ugly as fuck, but customMessageHandler had to be a member of CommandLine
  * in order to use tr() and then said function must be static, but logFile

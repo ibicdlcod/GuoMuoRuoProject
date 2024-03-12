@@ -65,7 +65,6 @@
 #include "../Protocol/peerinfo.h"
 #include "servermastersender.h"
 #include "sslserver.h"
-#include "user.h"
 
 class Server : public CommandLine {
     Q_OBJECT

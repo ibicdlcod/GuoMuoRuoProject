@@ -1,10 +1,10 @@
 #include <QCoreApplication>
 #include <QLocale>
 #include <QTranslator>
-#include "qconsolelistener.h"
 #include "../steam/steam_api.h"
 
 #include "../Protocol/kp.h"
+#include "qconsolelistener.h"
 #include "server.h"
 
 QFile *logFile;

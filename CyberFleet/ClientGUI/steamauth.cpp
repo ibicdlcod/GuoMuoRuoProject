@@ -1,6 +1,5 @@
 #include "steamauth.h"
 #include "clientv2.h"
-#include "networkerror.h"
 #include <QtLogging>
 #include <QtTranslation>
 #include <QString>

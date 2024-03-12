@@ -56,9 +56,10 @@
 #include "../Protocol/kp.h"
 #include "../Protocol/tech.h"
 #include "../Protocol/receiver.h"
-#include "kerrors.h"
 #include "../Protocol/peerinfo.h"
+#include "kerrors.h"
 #include "sslserver.h"
+#include "user.h"
 
 #ifdef max
 #undef max // apparently some stupid win header interferes with std::max

@@ -6,8 +6,6 @@
 #include <QSqlError>
 #include <stdexcept>
 
-#include "../Protocol/kp.h"
-
 class DBError : public std::runtime_error {
     Q_DECLARE_TR_FUNCTIONS(DBError)
 

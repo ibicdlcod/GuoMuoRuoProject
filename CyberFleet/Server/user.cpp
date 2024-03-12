@@ -5,8 +5,6 @@
 #include <QTimeZone>
 #include "../Protocol/resord.h"
 #include "kerrors.h"
-#include "server.h"
-#include "../Protocol/peerinfo.h"
 
 #ifdef max
 #undef max

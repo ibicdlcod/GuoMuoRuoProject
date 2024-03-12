@@ -5,7 +5,6 @@
 #include <QSettings>
 #include <QResizeEvent>
 #include <QScreen>
-#include "developwindow.h"
 #include "keyenterreceiver.h"
 
 extern std::unique_ptr<QSettings> settings;

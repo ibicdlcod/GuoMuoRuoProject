@@ -1,7 +1,7 @@
 #ifndef TECH_H
 #define TECH_H
 
-#include "qmap.h"
+#include <QList>
 #include <random>
 
 class Tech

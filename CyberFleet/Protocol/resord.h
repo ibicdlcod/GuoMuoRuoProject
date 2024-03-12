@@ -70,9 +70,6 @@ public:
     QByteArray resourceDesired() const;
     bool sufficient();
 
-    friend void User::setResources(int uid, ResOrd goal);
-
-//private:
     int o;
     int e;
     int s;
