@@ -31,9 +31,9 @@ int main(int argc, char *argv[]) {
 
 #pragma message(NOT_M_CONST)
     server.setApplicationName("CyberFleet Server");
-    server.setApplicationVersion("0.57.1"); // temp
+    server.setApplicationVersion("0.58.1"); // temp
     server.setOrganizationName("Harusame Software");
-    server.setOrganizationDomain("hsny.xyz"); // temp
+    server.setOrganizationDomain("harusoft.xyz"); // temp
     settings = std::make_unique<QSettings>(new QSettings);
 
 #if defined(Q_OS_UNIX)

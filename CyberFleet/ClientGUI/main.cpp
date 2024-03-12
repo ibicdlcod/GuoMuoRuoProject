@@ -29,12 +29,14 @@ int main(int argc, char *argv[]) {
     }
     /* End Steam initialization */
     QApplication client(argc, argv);
-
+#if defined(Q_OS_UNIX)
+    client.setWindowIcon(QIcon(":/resources/icon.ico"));
+#endif
     /* Metadata */
     client.setApplicationName("CyberFleet");
-    client.setApplicationVersion("0.57.1"); // temp
+    client.setApplicationVersion("0.58.1"); // temp
     client.setOrganizationName("Harusame Software");
-    client.setOrganizationDomain("hsny.xyz"); // temp
+    client.setOrganizationDomain("harusoft.xyz"); // temp
     /* End Metadata */
 
     settings = std::make_unique<QSettings>(new QSettings);

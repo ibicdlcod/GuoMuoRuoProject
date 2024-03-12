@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Exec="/home/hs/GuoMuoRuoProject/build-CyberFleet-Desktop_Qt_6_6_0_GCC_64bit-Debug/CFClient"
+Name=CyberFleet
+GenericName=Ship Collecting Game as Free Software
+Icon=xyz.harusoft.CFClient
+StartupWMClass=xyz.harusoft.CFClient
+Terminal=false
