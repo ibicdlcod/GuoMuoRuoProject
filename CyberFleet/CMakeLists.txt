@@ -147,7 +147,7 @@ endif()
 
 #qt_create_translation(QM_FILES ${CMAKE_SOURCE_DIR} ${TS_FILES})
 
-message("add tr")
+message("add translations")
 qt6_add_translations(CFClient
     TS_FILES ${TS_FILES}
     INCLUDE_DIRECTORIES {root_SOURCE_DIR}
@@ -200,14 +200,6 @@ message(PROJECT_BINARY_DIR=${CMAKE_CURRENT_BINARY_DIR})
 # to build directory
 add_custom_command(TARGET CFClient POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_if_different
-    "${CMAKE_CURRENT_BINARY_DIR}/FactorySlot/FactorySlot.dll"
-    $<TARGET_FILE_DIR:CFClient>)
-add_custom_command(TARGET CFServer POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy_if_different
-    "${CMAKE_CURRENT_BINARY_DIR}/FactorySlot/FactorySlot.dll"
-    $<TARGET_FILE_DIR:CFServer>)
-add_custom_command(TARGET CFClient POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy_if_different
     "${CMAKE_CURRENT_SOURCE_DIR}/steam_appid.txt"
     $<TARGET_FILE_DIR:CFClient>)
 add_custom_command(TARGET CFServer POST_BUILD
@@ -216,17 +208,45 @@ add_custom_command(TARGET CFServer POST_BUILD
     $<TARGET_FILE_DIR:CFServer>)
 
 if (${CMAKE_SYSTEM_NAME} MATCHES "Windows")
-add_custom_command(TARGET CFClient POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy_if_different
-    "${CMAKE_CURRENT_SOURCE_DIR}/redistributable_bin/win64/steam_api64.dll"
-    $<TARGET_FILE_DIR:CFClient>)
-add_custom_command(TARGET CFServer POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy_if_different
-    "${CMAKE_CURRENT_SOURCE_DIR}/redistributable_bin/win64/steam_api64.dll"
-    $<TARGET_FILE_DIR:CFServer>)
-add_custom_command(TARGET CFServer POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy_if_different
-    "${CMAKE_CURRENT_SOURCE_DIR}/steam/lib/win64/sdkencryptedappticket64.dll"
-    $<TARGET_FILE_DIR:CFServer>)
+    add_custom_command(TARGET CFClient POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        "${CMAKE_CURRENT_BINARY_DIR}/FactorySlot/FactorySlot.dll"
+        $<TARGET_FILE_DIR:CFClient>)
+    add_custom_command(TARGET CFServer POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        "${CMAKE_CURRENT_BINARY_DIR}/FactorySlot/FactorySlot.dll"
+        $<TARGET_FILE_DIR:CFServer>)
+    add_custom_command(TARGET CFClient POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        "${CMAKE_CURRENT_SOURCE_DIR}/redistributable_bin/win64/steam_api64.dll"
+        $<TARGET_FILE_DIR:CFClient>)
+    add_custom_command(TARGET CFServer POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        "${CMAKE_CURRENT_SOURCE_DIR}/redistributable_bin/win64/steam_api64.dll"
+        $<TARGET_FILE_DIR:CFServer>)
+    add_custom_command(TARGET CFServer POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        "${CMAKE_CURRENT_SOURCE_DIR}/steam/lib/win64/sdkencryptedappticket64.dll"
+        $<TARGET_FILE_DIR:CFServer>)
 else ()
+    add_custom_command(TARGET CFClient POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        "${CMAKE_CURRENT_BINARY_DIR}/FactorySlot/libFactorySlot.so"
+        $<TARGET_FILE_DIR:CFClient>)
+    add_custom_command(TARGET CFServer POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        "${CMAKE_CURRENT_BINARY_DIR}/FactorySlot/libFactorySlot.so"
+        $<TARGET_FILE_DIR:CFServer>)
+    add_custom_command(TARGET CFClient POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        "${CMAKE_CURRENT_SOURCE_DIR}/redistributable_bin/linux64/libsteam_api.so"
+        $<TARGET_FILE_DIR:CFClient>)
+    add_custom_command(TARGET CFServer POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        "${CMAKE_CURRENT_SOURCE_DIR}/redistributable_bin/linux64/libsteam_api.so"
+        $<TARGET_FILE_DIR:CFServer>)
+    add_custom_command(TARGET CFServer POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        "${CMAKE_CURRENT_SOURCE_DIR}/steam/lib/linux64/libsdkencryptedappticket.so"
+        $<TARGET_FILE_DIR:CFServer>)
 endif()

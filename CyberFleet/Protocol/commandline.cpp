@@ -28,8 +28,8 @@ extern std::unique_ptr<QSettings> settings;
 
 CommandLine::CommandLine(int argc, char ** argv)
     : QCoreApplication(argc, argv),
-      qout(ConsoleTextStream(stdout, QIODevice::WriteOnly)),
-      passwordMode(Password::normal) {
+    qout(ConsoleTextStream(stdout, QIODevice::WriteOnly)),
+    passwordMode(Password::normal) {
 
 }
 
@@ -51,7 +51,7 @@ void CommandLine::customMessageHandler(QtMsgType type,
 
 #if defined(QT_DEBUG)
     QString txt2 = QStringLiteral("%1 (%2:%3, %4)").
-            arg(localMsg, file, QString::number(context.line), function);
+                   arg(localMsg, file, QString::number(context.line), function);
 #else
     Q_UNUSED(file)
     Q_UNUSED(function)
@@ -170,18 +170,22 @@ bool CommandLine::parse(const QString &input) {
     /* the following should only be enacted once per machine
     settings->setValue("l", "listen");
     settings->setValue("ll", "listen 127.0.0.1 1826"); // "listenlocal"
+    settings->clear();
      */
     QStringList keys = settings->allKeys();
     /* ^(alias|alias2|...)\b indicates only first word */
-    static QRegularExpression aliasRe(QString("^(" + keys.join('|') + ")\\b"));
-    QRegularExpressionMatch aliasMatch = aliasRe.match(input);
     QString inputAliased = input; // get off const
-    if (aliasMatch.hasMatch()) {
-        QString matched = aliasMatch.captured(1);
-        qsizetype matchedStart = aliasMatch.capturedStart(1);
-        qsizetype matchedLength = aliasMatch.capturedLength(1);
-        inputAliased.replace(matchedStart, matchedLength,
-                             settings->value(matched).toString());
+    if(!keys.empty()) {
+        static QRegularExpression aliasRe(
+            QString("^(" + keys.join('|') + ")\\b"));
+        QRegularExpressionMatch aliasMatch = aliasRe.match(input);
+        if (aliasMatch.hasMatch()) {
+            QString matched = aliasMatch.captured(1);
+            qsizetype matchedStart = aliasMatch.capturedStart(1);
+            qsizetype matchedLength = aliasMatch.capturedLength(1);
+            inputAliased.replace(matchedStart, matchedLength,
+                                 settings->value(matched).toString());
+        }
     }
     settings->endGroup();
 
@@ -322,7 +326,7 @@ void CommandLine::qls(const QStringList &input) {
         typedef typename QStringList::const_iterator iter;
         for(iter i = input.constBegin(); i != input.constEnd(); ++i) {
             if(singlecolumn.length() < rows
-                    && i != (input.constEnd() - 1)) {
+                && i != (input.constEnd() - 1)) {
                 singlecolumn.append(*i);
             }
             else if (singlecolumn.length() < rows
@@ -340,11 +344,11 @@ void CommandLine::qls(const QStringList &input) {
         int displayedcolumns = 0;
         for(int j = 0; j < displays.length(); ++j) {
             displayedcolumns
-                    += (callength(
-                            *std::max_element(
-                                (displays.constBegin() + j)->constBegin(),
-                                (displays.constBegin() + j)->constEnd(),
-                                lengthcmp)) + 1);
+                += (callength(
+                        *std::max_element(
+                            (displays.constBegin() + j)->constBegin(),
+                            (displays.constBegin() + j)->constEnd(),
+                            lengthcmp)) + 1);
         }
         displayedcolumns--;
 
@@ -361,17 +365,17 @@ void CommandLine::qls(const QStringList &input) {
         for(int j = 0; j < displaySelected.length(); ++j) {
             if(i < (displaySelected.begin() + j)->length()) {
                 QString current_element
-                        = *((displaySelected.begin() + j)->constBegin() + i);
+                    = *((displaySelected.begin() + j)->constBegin() + i);
                 int fieldwidth = callength(
-                            *std::max_element(
-                                (displaySelected.begin() + j)->begin(),
-                                (displaySelected.begin() + j)->end(),
-                                lengthcmp))
-                        + ((j == displaySelected.length() - 1) ? 0 : 1)
-                        - callength(current_element)
-                        + callength(current_element, true);
+                                     *std::max_element(
+                                         (displaySelected.begin() + j)->begin(),
+                                         (displaySelected.begin() + j)->end(),
+                                         lengthcmp))
+                                 + ((j == displaySelected.length() - 1) ? 0 : 1)
+                                 - callength(current_element)
+                                 + callength(current_element, true);
                 QString str = *((displaySelected.begin() + j)
-                                ->constBegin() + i);
+                                    ->constBegin() + i);
                 qout.print(str, fieldwidth);
             }
         }

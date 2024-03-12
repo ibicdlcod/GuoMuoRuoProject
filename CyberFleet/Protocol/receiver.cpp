@@ -73,7 +73,7 @@ void Receiver::processGoodMsg(qint64 totalParts,
         timers[msgId] = new QTimer(this);
         timers[msgId]->setSingleShot(true);
         connect(timers[msgId], &QTimer::timeout, this,
-                [=]() {
+                [this, msgId]() {
                     //% "Message %1 timeouted when receiving!"
                     qCritical() << qtTrId("receive-msg-timeout").arg(msgId.toString());
                     totalPartsMap.remove(msgId);
