@@ -11,10 +11,8 @@ set(CMAKE_AUTORCC ON)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Core Gui Widgets LinguistTools
-    Sql Network)
-find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core Gui UiPlugin Widgets LinguistTools
-    Sql Network)
+find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Core Gui Widgets)
+find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS UiPlugin LinguistTools Sql Network)
 
 include_directories(${root_SOURCE_DIR}/FactorySlot)
 add_subdirectory(FactorySlot)
@@ -148,11 +146,11 @@ endif()
 #qt_create_translation(QM_FILES ${CMAKE_SOURCE_DIR} ${TS_FILES})
 
 message("add translations")
-qt6_add_translations(CFClient
+qt_add_translations(CFClient
     TS_FILES ${TS_FILES}
     INCLUDE_DIRECTORIES {root_SOURCE_DIR}
     LRELEASE_OPTIONS -idbased)
-qt6_add_translations(CFServer
+qt_add_translations(CFServer
     TS_FILES ${TS_FILES}
     INCLUDE_DIRECTORIES {root_SOURCE_DIR}
     LRELEASE_OPTIONS -idbased)
@@ -178,7 +176,7 @@ target_link_libraries(CFServer PRIVATE ${STEAM_LIBRARY})
 target_link_libraries(CFServer PRIVATE ${STEAM_APPENCRYPT_LIBRARY})
 
 set_target_properties(CFClient PROPERTIES
-    MACOSX_BUNDLE_GUI_IDENTIFIER cyberfleet.xyz
+    MACOSX_BUNDLE_GUI_IDENTIFIER xyz.harusoft.cyberfleet
     MACOSX_BUNDLE_BUNDLE_VERSION ${PROJECT_VERSION}
     MACOSX_BUNDLE_SHORT_VERSION_STRING ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}
     MACOSX_BUNDLE TRUE
