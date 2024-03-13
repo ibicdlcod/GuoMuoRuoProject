@@ -25,6 +25,29 @@ MainWindow::MainWindow(QWidget *parent, int argc, char ** argv)
     ui->LoginScreen->hide();
     ui->TechArea->hide();
 
+    ui->ResourcesBar->hide();
+    ui->OilLabel->setPixmap(QPixmap(QStringLiteral(
+        ":/resources/smallimages/oil.png")));
+    ui->ExploLabel->setPixmap(QPixmap(QStringLiteral(
+        ":/resources/smallimages/explosive.png")));
+    ui->SteelLabel->setPixmap(QPixmap(QStringLiteral(
+        ":/resources/smallimages/steel.png")));
+    ui->RubberLabel->setPixmap(QPixmap(QStringLiteral(
+        ":/resources/smallimages/rubber.png")));
+    ui->AluminumLabel->setPixmap(QPixmap(QStringLiteral(
+        ":/resources/smallimages/aluminum.png")));
+    ui->TungstenLabel->setPixmap(QPixmap(QStringLiteral(
+        ":/resources/smallimages/tungsten.png")));
+    ui->ChromiumLabel->setPixmap(QPixmap(QStringLiteral(
+        ":/resources/smallimages/chromium.png")));
+    ui->OilCount->setText(QStringLiteral("0"));
+    ui->ExploCount->setText(QStringLiteral("0"));
+    ui->SteelCount->setText(QStringLiteral("0"));
+    ui->RubberCount->setText(QStringLiteral("0"));
+    ui->AluminumCount->setText(QStringLiteral("0"));
+    ui->TungstenCount->setText(QStringLiteral("0"));
+    ui->ChromiumCount->setText(QStringLiteral("0"));
+
     KeyEnterReceiver *key = new KeyEnterReceiver();
     ui->CommandPrompt->installEventFilter(key);
 
@@ -107,6 +130,8 @@ void MainWindow::gamestateInit() {
 void MainWindow::gamestateChanged(KP::GameState state) {
     state == KP::Offline ? ui->LoginScreen->show()
                          : ui->LoginScreen->hide();
+    state == KP::Offline ? ui->ResourcesBar->hide()
+                         : ui->ResourcesBar->show();
     state == KP::Port ? (
         ui->PortArea->show(),
         QTimer::singleShot(1, this,

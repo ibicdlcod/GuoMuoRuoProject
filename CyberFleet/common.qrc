@@ -4,6 +4,13 @@
         <file>Assets/Image/Sea.jpg</file>
         <file>harusoft.pem</file>
         <file>resources/icon.ico</file>
+        <file>resources/smallimages/aluminum.png</file>
+        <file>resources/smallimages/chromium.png</file>
+        <file>resources/smallimages/explosive.png</file>
+        <file>resources/smallimages/oil.png</file>
+        <file>resources/smallimages/rubber.png</file>
+        <file>resources/smallimages/steel.png</file>
+        <file>resources/smallimages/tungsten.png</file>
     </qresource>
-    <qresource prefix="/icon" lang="English"/>
+    <qresource lang="English" prefix="/icon"/>
 </RCC>

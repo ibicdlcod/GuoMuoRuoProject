@@ -16,9 +16,8 @@ namespace User {
 void setResources(int uid, ResOrd goal);
 }
 
-class ResOrd
+struct ResOrd
 {
-public:
     ResOrd(ResTuple);
     ResOrd(int, int, int, int, int, int, int);
 
@@ -70,13 +69,13 @@ public:
     QByteArray resourceDesired() const;
     bool sufficient();
 
-    int o;
-    int e;
-    int s;
-    int r;
-    int a;
-    int w;
-    int c;
+    int o; // oil
+    int e; // explosives
+    int s; // stell
+    int r; // rubber
+    int a; // aluminum
+    int w; // tungsten
+    int c; // chromium
 };
 
 #endif // RESORD_H
