@@ -385,6 +385,7 @@ void CommandLine::qls(const QStringList &input) {
 
 void CommandLine::exitGracefully() {
     exitGraceSpec();
+#pragma message(NOT_M_CONST)
     //% "Goodbye, press ENTER to quit."
     qout.printLine(qtTrId("goodbye"), Ecma(64,255,64), Ecma(EcmaSetter::BlinkOn));
     qout.reset();

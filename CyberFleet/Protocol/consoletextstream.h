@@ -56,6 +56,7 @@ public:
         ioctl(STDOUT_FILENO, TIOCGWINSZ, &size);
         width = size.ws_col;
 #else
+#pragma message(NOT_M_CONST)
         width = 80;
 #endif
         /* Obviously, QString::SkipEmptyParts should not be used here, for a file may contain useful empty lines */

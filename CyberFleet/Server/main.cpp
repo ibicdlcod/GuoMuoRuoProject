@@ -48,18 +48,18 @@ int main(int argc, char *argv[]) {
     LanguageView["schinese"] = QStringLiteral("zh_CN");
     LanguageView["japanese"] = QStringLiteral("ja_JP");
     if(LanguageView.contains(steamLanguage)) {
-        settings->setValue("language", LanguageView[steamLanguage]);
+        settings->setValue("server/language", LanguageView[steamLanguage]);
     }
     else {
         qWarning() << "Language not natively supported";
     }
 #else
-    settings->setValue("language", "en_US");
+    settings->setValue("server/language", "en_US");
 #endif
 
     QStringList uiLanguages = QLocale::system().uiLanguages();
-    if(settings->contains("language")) {
-        uiLanguages.prepend(settings->value("language").toString());
+    if(settings->contains("server/language")) {
+        uiLanguages.prepend(settings->value("server/language").toString());
     }
     for (const QString &locale : uiLanguages) {
         const QString baseName = "CyberFleet2_" + QLocale(locale).name();
@@ -78,6 +78,7 @@ int main(int argc, char *argv[]) {
     }
     qInstallMessageHandler(server.customMessageHandler);
     QTimer::singleShot(0, &server, &Server::openingwords);
-    QTimer::singleShot(100, &server, &Server::displayPrompt);
+    QTimer::singleShot(settings->value("server/displaypromptdelay", 100).toInt(),
+                       &server, &Server::displayPrompt);
     return server.exec();
 }

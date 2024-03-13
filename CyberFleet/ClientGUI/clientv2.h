@@ -54,6 +54,7 @@
 #include "../Protocol/equipment.h"
 #include "../Protocol/receiver.h"
 #include "../Protocol/sender.h"
+#include "../Protocol/kp.h"
 #include "steamauth.h"
 #include "ui/developwindow.h"
 #include "ui/techview.h"
@@ -190,7 +191,7 @@ private:
 
     KP::GameState gameState;
 
-    static const unsigned int defaultMaxRetransmit = 2;
+#pragma message(NOT_M_CONST)
     const QByteArray defaultSalt =
             QByteArrayLiteral("\xe8\xbf\x99\xe6\x98\xaf\xe4\xb8"
                               "\x80\xe6\x9d\xa1\xe5\x92\xb8\xe9"

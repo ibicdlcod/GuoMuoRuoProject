@@ -7,8 +7,10 @@
 #include <QSslSocket>
 #include <bitset>
 #include "peerinfo.h"
+#include "kp.h"
 
-// no more than 200 parts will be used for 537 equip defs
+// Do not modify
+#pragma message(NOT_M_CONST)
 static const int maxNumberOfParts = 1024;
 
 class Receiver : public QObject

@@ -1,5 +1,8 @@
 #include "tech.h"
 #include <QDebug>
+#include <QSettings>
+
+extern std::unique_ptr<QSettings> settings;
 
 Tech::Tech()
 {
@@ -8,12 +11,14 @@ Tech::Tech()
 
 double Tech::calCapable(double globalTech, double localTech,
                         double wantedTech) {
-    static const double maxDeterimental = 3.0;
+    double maxDeterimental =
+        settings->value("rule/maxtechdifficulty", 3.0).toDouble();
     double min = std::min(globalTech, localTech);
     double max = std::max(globalTech, localTech);
     double detrimentalEffect = 0.0;
     if(min < wantedTech) {
         double lag = wantedTech - min;
+        /* 0.5 is not a magic const because how this function behaves */
         detrimentalEffect = maxDeterimental * lag / pow((1 + lag * lag), 0.5);
     }
     return std::max(min, max - detrimentalEffect);
@@ -73,24 +78,30 @@ double Tech::calLevel(QList<std::pair<double, double>> &source,
 }
 
 double Tech::calLevelGlobal(QList<std::pair<double, double>> &source) {
-    static const double globalScope = 1.02;
+    double globalScope =
+        settings->value("rule/techglobalscope", 1.02).toDouble();
     return calLevel(source, globalScope);
 }
 
 double Tech::calLevelLocal(QList<std::pair<double, double>> &source) {
-    static const double localScope = 1.1;
+    double localScope =
+        settings->value("rule/techlocalscope", 1.1).toDouble();
     return calLevel(source, localScope);
 }
 
 double Tech::calWeightShip(int level) {
-    static const double shipLevelPerWeight = 10.0;
+    double shipLevelPerWeight =
+        settings->value("rule/shiplevelperweight", 10.0).toDouble();
     return level / shipLevelPerWeight;
 }
 
 double calWeightEquip(double requiredSP, double actualSP) {
-    return (9 * actualSP)
+    double skillPointWeightContrib =
+        settings->value("rule/skillpointweightcontrib", 9.0).toDouble();
+    /* 0.5 is not a magic const because how this function behaves */
+    return (skillPointWeightContrib * actualSP)
                / pow((requiredSP * requiredSP + actualSP * actualSP), 0.5)
-           + 1;
+           + 1.0;
 }
 
 double Tech::techYearToCompact(int year) {

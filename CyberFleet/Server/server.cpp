@@ -100,6 +100,9 @@ uint8 charToInt(char data) {
     else if('a' <= data && data <= 'f') {
         return data - 'a' + 10;
     }
+    else if('A' <= data && data <= 'F') {
+        return data - 'A' + 10;
+    }
     else {
         qFatal("Illicit hex file");
         return 0;
@@ -318,7 +321,7 @@ void Server::datagramReceivedStd(const QJsonObject &djson,
 
 bool Server::listen(const QHostAddress &address, quint16 port) {
     if(listening) {
-        qWarning() << "Already listening, unlisten first";
+        qWarning() << qtTrId("already-listening");
         return true;
     }
     if (address != sslServer.serverAddress()
@@ -487,7 +490,11 @@ Server::calculateTech(const CSteamID &uid, int jobID) {
             while(query.next()) {
                 int serial = query.value(1).toInt();
                 int def = query.value(0).toInt();
-                double weight = 1.0 + getSkillPointsEffect(uid, def) * 9.0;
+                double weight
+                    = 1.0 + getSkillPointsEffect(uid, def)
+                                * settings->value
+                                  ("rule/skillpointweightcontrib", 9.0)
+                                      .toDouble();
                 equips[serial] =
                     equipRegistry.value(def);
                 bool pass = jobID == 0;
@@ -509,7 +516,10 @@ Server::calculateTech(const CSteamID &uid, int jobID) {
                 }
             }
             if(jobID != 0 && jobID < KP::equipIdMax) {
-                double weight = getSkillPointsEffect(uid, jobID) * 9.0;
+                double weight = getSkillPointsEffect(uid, jobID)
+                                * settings->value
+                                  ("rule/skillpointweightcontrib", 9.0)
+                                      .toDouble();
                 if(equipRegistry.value(jobID)->disallowMassProduction()){
                     result.append({0, jobID, weight});
                     source.append({equipRegistry.value(jobID)->getTech(),
@@ -537,6 +547,7 @@ double Server::getSkillPointsEffect(const CSteamID &uid, int equipId) {
     }
     double x = User::getSkillPoints(uid, equipId);
     double y = equipRegistry.value(equipId)->skillPointsStd();
+    /* 0.5 is not a magic const because how this function behaves */
     return x * std::pow(y * y + x * x, -0.5);
 }
 
@@ -764,8 +775,8 @@ void Server::doDevelop(CSteamID &uid, int equipid,
             query.bindValue(":good", Tech::calExperiment2(
                                          equip->getTech(),
                                          calculateTech(uid).first,
-                                         0.0, // localtech not yet implemented
-                                         1.0,
+                                         calculateTech(uid, equipid).first, // not tested
+                                         1.0, // sigma constant
                                          mt));
             query.bindValue(":eqid", equipid);
             query.bindValue(":id", uid.ConvertToUint64());
@@ -830,12 +841,15 @@ void Server::doFetch(CSteamID &uid, int factoryid, QSslSocket *connection) {
                                                 ->skillPointsStd();
                     /* 10*(thisEquipTech - globalTech)^2,
                      * cannot be lower than 1.0 */
-                    double difficultyFactor = 10.0 *
-                                              std::pow(
-                                                  std::max(
-                                                      1.0,
-                                                      equipRegistry.value(jobID)->getTech()
-                                                          - calculateTech(uid, 0).first), 2.0);
+                    double difficultyFactor
+                        = settings->value(
+                                      "rule/penguinskillpointsdifficulty",
+                                      10.0).toDouble() *
+                          std::pow(
+                              std::max(
+                                  1.0,
+                                  equipRegistry.value(jobID)->getTech()
+                                      - calculateTech(uid, 0).first), 2.0);
                     User::addSkillPoints(uid, jobID,
                                          stdSkillPoints / difficultyFactor);
                 }
@@ -1125,9 +1139,15 @@ uint64 Server::newEquipHasMotherCal(int equipId) {
     if(equip->disallowMassProduction()
         && equip->attr["Disallowmassproduction"] < 30) {
         double x = equip->attr["Disallowmassproduction"];
-        double skillPointsAmplifier = 1.0
-                                      + 5.0 * (atan(pow(30.0 / x, 0.5))
-                                               - atan(1.0));
+        double skillPointsAmplifier
+            = 1.0
+              + settings->value("rule/maxskillpointsamplifier",
+                                5.0).toDouble()
+                    * (atan(pow(
+                           settings->value("rule/normalproductionstockpile",
+                                           30.0).toDouble()
+                               / x, 0.5))
+                       - atan(1.0));
         sonSkillPoints *= skillPointsAmplifier;
     }
     return sonSkillPoints;
@@ -1148,6 +1168,10 @@ void Server::parseListen(const QStringList &cmdParts) {
     if(cmdParts.length() < 3) {
         //% "Usage: listen [ip] [port]"
         qout << qtTrId("listen-usage") << Qt::endl;
+        return;
+    }
+    if(listening) {
+        qWarning() << qtTrId("already-listening");
         return;
     }
     QHostAddress address = QHostAddress(cmdParts[1]);
@@ -1247,6 +1271,7 @@ void Server::receivedAuth(const QJsonObject &djson,
         for(unsigned int i = 0; i < cubTicket; ++i) {
             rgubTicket[i] = rgubArray[i].toInteger();
         }
+#pragma message(NOT_M_CONST)
         uint8 rgubDecrypted[1024];
         uint32 cubDecrypted = sizeof(rgubDecrypted);
 
@@ -1266,6 +1291,8 @@ void Server::receivedAuth(const QJsonObject &djson,
         }
         else {
             char *data = new char[2];
+            /* Must be modified in steam release,
+             * you can't put AppSecretKey file in it */
             uint8 rgubKey[k_nSteamEncryptedAppTicketSymmetricKeyLen]
                 = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
                     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -1293,6 +1320,7 @@ void Server::receivedAuth(const QJsonObject &djson,
             qDebug("Ticket decrypt success");
             if(!SteamEncryptedAppTicket_BIsTicketForApp(
                     rgubDecrypted,
+#pragma message(NOT_M_CONST)
                     cubDecrypted, 2632870)) {
                 qCritical() << qtTrId("%1: Ticket is not from correct App ID")
                                    .arg(peerInfo.toString()).toUtf8();
@@ -1548,7 +1576,7 @@ void Server::sendTestMessages() {
     if(!listening)
         return;
     else {
-        qWarning() << newEquipHasMotherCal(52);
+        qInfo() << "test";
     }
 }
 

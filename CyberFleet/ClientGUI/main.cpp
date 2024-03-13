@@ -32,6 +32,7 @@ int main(int argc, char *argv[]) {
 #if defined(Q_OS_UNIX)
     client.setWindowIcon(QIcon(":/resources/icon.ico"));
 #endif
+#pragma message(NOT_M_CONST)
     /* Metadata */
     client.setApplicationName("CyberFleet");
     client.setApplicationVersion("0.58.1"); // temp
@@ -56,18 +57,18 @@ int main(int argc, char *argv[]) {
     LanguageView["schinese"] = QStringLiteral("zh_CN");
     LanguageView["japanese"] = QStringLiteral("ja_JP");
     if(LanguageView.contains(steamLanguage)) {
-        settings->setValue("language", LanguageView[steamLanguage]);
+        settings->setValue("client/language", LanguageView[steamLanguage]);
     }
     else {
         qWarning() << "Language not natively supported";
     }
 #else
-    settings->setValue("language", "ja_JP");
+    settings->setValue("client/language", "ja_JP");
 #endif
 
     QStringList uiLanguages = QLocale::system().uiLanguages();
-    if(settings->contains("language")) {
-        uiLanguages.prepend(settings->value("language").toString());
+    if(settings->contains("client/language")) {
+        uiLanguages.prepend(settings->value("client/language").toString());
     }
     for (const QString &locale : uiLanguages) {
         const QString baseName = "CyberFleet2_" + QLocale(locale).name();

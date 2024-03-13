@@ -320,6 +320,7 @@ void User::naturalRegen(const CSteamID &uid) {
             qint64 regenMins = currentTimeInMinute - priorRecoverTime;
             regenMins = std::max(Q_INT64_C(0), regenMins); //stop timezone trap
             int regenPower = 0; // not yet implemented
+#pragma message(NOT_M_CONST)
             ResOrd regenAmount = ResOrd(10 + regenPower,
                                         10 + regenPower,
                                         10 + regenPower,

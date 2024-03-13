@@ -3,8 +3,11 @@
 #include <QVariant>
 #include <QMetaEnum>
 #include <QSqlQuery>
+#include <QSettings>
 #include "../Server/kerrors.h"
 #include "tech.h"
+
+extern std::unique_ptr<QSettings> settings;
 
 Equipment::Equipment(int equipId)
     : equipRegId(equipId){
@@ -86,11 +89,15 @@ QString Equipment::toString(QString lang) const {
 }
 
 const ResOrd Equipment::devRes() const {
-    return type.devResBase() * (qint64)std::round((getTech() + 1.0) * 10);
+    qint64 devResScale = settings->value("rule/devresscale", 10).toLongLong();
+    return type.devResBase() * (qint64)std::round((getTech() + 1.0)
+                                                   * devResScale);
 }
 
 const int Equipment::devTimeInSec() const {
-    return 6 * (qint64)std::round((getTech() + 1.0) * 10);
+    qint64 devTimebase = settings->value("rule/devtimebase", 6).toLongLong();
+    qint64 devResScale = settings->value("rule/devresscale", 10).toLongLong();
+    return devTimebase * (qint64)std::round((getTech() + 1.0) * devResScale);
 }
 
 /* under new doctrine this should always return true */
@@ -118,6 +125,10 @@ bool Equipment::isInvalid() const {
 };
 
 int Equipment::skillPointsStd() const {
-    static const double factor = 1.25;
-    return std::lround(std::pow(factor, getTech()) * 10000.0);
+    double skillPointFactor = settings->value("rule/skillpointfactor",
+                                              1.25).toDouble();
+    double skillPointBase = settings->value("rule/skillpointbase",
+                                            10000.0).toDouble();
+    return std::lround(std::pow(skillPointFactor, getTech())
+                       * skillPointBase);
 }

@@ -227,6 +227,8 @@ QList<QString> EquipType::allEquipTypes() {
 const ResOrd EquipType::devResBase() const {
     using namespace KP;
 
+    /* in principle all this should belong in settings,
+     * but too cumbersome */
     ResTuple basic = {std::pair(O, 0),
         std::pair(E, 0),
         std::pair(S, 0),

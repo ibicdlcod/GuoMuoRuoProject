@@ -9,16 +9,19 @@ extern std::unique_ptr<QSettings> settings;
 
 /* Part of Steam Authentication */
 void SteamAuth::RetrieveEncryptedAppTicket() {
+#pragma message(NOT_M_CONST)
     uint32 k_unSecretData = 0x5444;
+    int steamRateLimit = 60;
 
-    if(settings->contains("client/requestEATCall")
-        && settings->value("client/requestEATCall").toDateTime()
-                   .secsTo(QDateTime::currentDateTimeUtc()) < 60) {
-        qWarning() << "Steam API 'RequestEncryptedAppTicket' is subject to a "
-                      "60 second rate limit.";
+    if(settings->contains("networkclient/requestEATCall")
+        && settings->value("networkclient/requestEATCall").toDateTime()
+                   .secsTo(QDateTime::currentDateTimeUtc()) < steamRateLimit)
+    {
+        //% "Steam API 'RequestEncryptedAppTicket' is subject to a 60 second rate limit."
+        qWarning() << qtTrId("steam-60-sec");
     }
 
-    settings->setValue("client/requestEATCall", QDateTime::currentDateTimeUtc());
+    settings->setValue("networkclient/requestEATCall", QDateTime::currentDateTimeUtc());
     SteamAPICall_t hSteamAPICall = SteamUser()->RequestEncryptedAppTicket(
         &k_unSecretData, sizeof(k_unSecretData));
     m_EncryptedAppTicketResponseCallResult.Set(
@@ -39,6 +42,8 @@ void SteamAuth::OnEncryptedAppTicketResponse(
     {
     case k_EResultOK:
     {
+/* better not to modify it */
+#pragma message(NOT_M_CONST)
         uint8 rgubTicket[1024];
         uint32 cubTicket;
 

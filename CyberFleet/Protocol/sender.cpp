@@ -1,10 +1,13 @@
 #include "sender.h"
 #include <QDebug>
 #include <QTimer>
+#include <QSettings>
+#include "kp.h"
 
-/* TODO: this should be customizeable */
+extern std::unique_ptr<QSettings> settings;
+/* this is deliberately not customized */
+#pragma message(NOT_M_CONST)
 static int practicalBufferSize = 1024;
-static int minTimeBetweenMsgs = 100;
 
 Sender::Sender(QAbstractSocket *destination,
                QObject *parent) :
@@ -78,15 +81,18 @@ void Sender::send() {
     m_readySend = false;
     if (signalDone()) {
         disconnect(m_destination, &QAbstractSocket::bytesWritten,
-                this, &Sender::destinationBytesWritten);
+                   this, &Sender::destinationBytesWritten);
         disconnect(m_destination, &QAbstractSocket::errorOccurred,
-                this, &Sender::destinationError);
+                   this, &Sender::destinationError);
         input.dequeue();
         buffer.close();
 
         m_partnum = 0;
         m_partnumtotal = 0;
-        QTimer::singleShot(minTimeBetweenMsgs, this, &Sender::switchtoReady);
+        QTimer::singleShot(settings->value(
+                                       "networkshared/mintimebetweenmsgsinms",
+                                       100).toInt(),
+                           this, &Sender::switchtoReady);
         return;
     }
     if(m_partnum == 0 && m_source->bytesAvailable()) {

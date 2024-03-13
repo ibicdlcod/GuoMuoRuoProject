@@ -69,6 +69,7 @@ public:
 
 private:
 #pragma message(USED_CXX17)
+    /* see equiptype.xlsx in doc for explanation */
     inline static const QMap<QString, int> result = {
         std::pair("Small-gun-flat",         0x8001),
         std::pair("Small-gun-flak",         0xA001),
@@ -232,8 +233,10 @@ private:
         std::pair("Recon-lb",               qtTrId("RECON")),
         std::pair("Recon-fight",            qtTrId("RECON")),
         std::pair("Recon-jet",              qtTrId("RECON")),
+        std::pair("Sp-recon-small",         qtTrId("RECON")),
         std::pair("Sp-recon",               qtTrId("RECON")),
         std::pair("Sp-recon-night",         qtTrId("RECON")),
+        std::pair("Sp-bomb-small",          qtTrId("SEAPLANEBF")),
         std::pair("Sp-bomb",                qtTrId("SEAPLANEBF")),
         std::pair("Sp-bomb-night",          qtTrId("SEAPLANEBF")),
         std::pair("Sp-fight",               qtTrId("SEAPLANEBF")),

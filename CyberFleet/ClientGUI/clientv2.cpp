@@ -122,7 +122,7 @@ void Clientv2::autoPassword() {
     socket.setProtocol(QSsl::TlsV1_3);
     socket.connectToHostEncrypted(address.toString(), port);
     if(!socket.waitForConnected(
-            settings->value("connect_wait_time_msec", 8000)
+            settings->value("networkclient/connectwaittimemsec", 8000)
                 .toInt())) {
         //% "Failed to connect to server at %1:%2"
         qWarning() << qtTrId("wait-for-connect-failure")
@@ -406,8 +406,8 @@ void Clientv2::errorOccurredStr(const QString &input) {
 
 /* Network */
 void Clientv2::handshakeInterrupted(const QSslError &error) {
-    maxRetransmit = settings->value("client/maximum_retransmit",
-                                    defaultMaxRetransmit).toInt();
+    maxRetransmit = settings->value("networkclient/retransmitmax",
+                                    2).toInt();
     qWarning() << qtTrId("network-error").arg(error.errorString());
     //% "%1: handshake timeout, trying to re-transmit"
     qWarning() << qtTrId("handshake-timeout").arg(clientName);
@@ -604,6 +604,7 @@ Equipment * Clientv2::getEquipmentReg(int equipid) {
 void Clientv2::exitGracefully() {
     exitGraceSpec();
     disconnect(timer, &QTimer::timeout, this, &Clientv2::uiRefresh);
+#pragma message(NOT_M_CONST)
     //% "Goodbye."
     emit qout(qtTrId("goodbye-gui"), QColor("black"), QColor(64,255,64));
     logFile->close();
@@ -663,7 +664,7 @@ const QStringList Clientv2::getValidCommands() const {
 /* Parse connection request */
 void Clientv2::parseConnectReq(const QStringList &cmdParts) {
 
-    conf.addCaCertificates(settings->value("cert/pem",
+    conf.addCaCertificates(settings->value("networkclient/pem",
                                            ":/harusoft.pem").toString());
     socket.setSslConfiguration(conf);
     if(socket.isEncrypted()) {
@@ -702,7 +703,7 @@ void Clientv2::parseConnectReq(const QStringList &cmdParts) {
         SteamAPI_RunCallbacks();
 
         QTimer::singleShot(
-            (settings->value("client/auto_password_time", 1000).toInt()),
+            (settings->value("networkclient/autopasswordtime", 1000).toInt()),
             this, &Clientv2::autoPassword);
         clientName = SteamFriends()->GetPersonaName();
 
@@ -924,7 +925,7 @@ void Clientv2::receivedMsg(const QJsonObject &djson) {
                 qInfo() <<
                     qtTrId("equip-not-developable-father")
                         .arg(father->toString(
-                            settings->value("language", "ja_JP")
+                            settings->value("client/language", "ja_JP")
                                 .toString())).arg(father->getId());
             }
             Equipment *mother = equipRegistryCache
@@ -934,7 +935,7 @@ void Clientv2::receivedMsg(const QJsonObject &djson) {
                 qInfo() <<
                     qtTrId("equip-not-developable-mother")
                         .arg(mother->toString(
-                            settings->value("language", "ja_JP")
+                            settings->value("client/language", "ja_JP")
                                 .toString())).arg(mother->getId())
                         .arg(djson["sp"].toInteger());
             }

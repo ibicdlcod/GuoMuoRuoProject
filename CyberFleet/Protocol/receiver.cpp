@@ -2,8 +2,9 @@
 #include <QRegularExpression>
 #include <QJsonObject>
 #include <QCborMap>
+#include <QSettings>
 
-static const int maxMsgDelayInMs = 1000;
+extern std::unique_ptr<QSettings> settings;
 
 Receiver::Receiver(QObject *parent)
     : QObject(parent) {
@@ -82,7 +83,8 @@ void Receiver::processGoodMsg(qint64 totalParts,
                     emit timeOut(msgId);
                 }
                 );
-        timers[msgId]->start(maxMsgDelayInMs * totalParts);
+        timers[msgId]->start(settings->value("networkshared/maxmsgdelayinms",
+                                             1000).toInt() * totalParts);
     }
     else if(totalPartsMap[msgId] != totalParts)
         qCritical() << qtTrId("same-msg-uid-have-inconsistent-total-parts");
