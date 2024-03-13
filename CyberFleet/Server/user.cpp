@@ -183,8 +183,10 @@ std::pair<bool, int> User::haveFather(const CSteamID &uid, int sonEquipId,
     }
 }
 
-std::tuple<bool, int, uint64> User::haveMotherSP(const CSteamID &uid, int sonEquipId,
-                                      QMap<int, Equipment *> &equipReg) {
+std::tuple<bool, int, uint64> User::haveMotherSP(
+    const CSteamID &uid, int sonEquipId,
+    QMap<int, Equipment *> &equipReg,
+    uint64 sonSkillPointReq) {
     if(!equipReg.contains(sonEquipId))
         return {false, 0, 0};
     else {
@@ -204,8 +206,6 @@ std::tuple<bool, int, uint64> User::haveMotherSP(const CSteamID &uid, int sonEqu
             return {false, motherEquipId, 0};
         }
         else {
-            uint64 sonSkillPointReq = equipReg.value(sonEquipId)
-                                          ->skillPointsStd();
             uint64 motherSkillPoint = getSkillPoints(uid, motherEquipId);
             if(motherSkillPoint >= sonSkillPointReq)
                 return {true, motherEquipId, sonSkillPointReq};

@@ -68,7 +68,7 @@ public:
     static QList<QString> allEquipTypes();
 
 private:
-    /* this is C++17 */
+#pragma message(USED_CXX17)
     inline static const QMap<QString, int> result = {
         std::pair("Small-gun-flat",         0x8001),
         std::pair("Small-gun-flak",         0xA001),
@@ -107,10 +107,12 @@ private:
         std::pair("Recon-lb",               0x00A0),
         std::pair("Recon-fight",            0x0480),
         std::pair("Recon-jet",              0x001C0080),
-        std::pair("Sp-bomb",                0x0108),
-        std::pair("Sp-bomb-night",          0x0118),
-        std::pair("Sp-recon",               0x0088),
-        std::pair("Sp-recon-night",         0x0098),
+        std::pair("Sp-bomb-small",          0x0109),
+        std::pair("Sp-bomb",                0x010A),
+        std::pair("Sp-bomb-night",          0x011A),
+        std::pair("Sp-recon-small",         0x0089),
+        std::pair("Sp-recon",               0x008A),
+        std::pair("Sp-recon-night",         0x009A),
         std::pair("Sp-fight",               0x0408),
         std::pair("Flyingboat",             0x001A0000),
         std::pair("Patrol-autogyro",        0x0042),

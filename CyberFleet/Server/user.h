@@ -17,7 +17,8 @@ uint64 getSkillPoints(const CSteamID &, int);
 std::pair<bool, int> haveFather(const CSteamID &,
                                 int, QMap<int, Equipment *> &);
 std::tuple<bool, int, uint64> haveMotherSP(const CSteamID &,
-                                  int, QMap<int, Equipment *> &);
+                                           int, QMap<int, Equipment *> &,
+                                           uint64);
 void init(const CSteamID &);
 bool isFactoryBusy(const CSteamID &, int);
 std::tuple<bool, int> isFactoryFinished(const CSteamID &, int);

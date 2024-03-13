@@ -249,9 +249,9 @@ const ResOrd EquipType::devResBase() const {
         basic[S] += getSize() * 5;
     }
     else if(isSeaplane()) {
-        basic[O] += 5 + (isBomber() ? 2 : 0);
+        basic[O] += 2 * getSize() + (isBomber() ? 2 : 0);
         basic[E] += (isBomber() ? 2 : 0);
-        basic[A] += 10;
+        basic[A] += 5 * getSize();
     }
     else if(isPatrol()) {
         switch(getSize()) {
@@ -413,12 +413,5 @@ const ResOrd EquipType::devResBase() const {
             break;
         }
     }
-    /*
-    case TorpBoat:
-        basic[Oil] = 5;
-        basic[Explosives] = 5;
-        basic[Steel] = 5;
-        break;
-    */
     return ResOrd(basic);
 }

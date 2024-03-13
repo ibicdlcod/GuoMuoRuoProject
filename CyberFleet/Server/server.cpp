@@ -724,8 +724,10 @@ void Server::doDevelop(CSteamID &uid, int equipid,
             senderM.sendMessage(connection, msg);
             return;
         }
-        /* not yet implemented: mother skillpoint requirements */
-        auto motherResult = User::haveMotherSP(uid, equipid, equipRegistry);
+        /* mother skillpoint requirements */
+        uint64 sonSkillPointReq = newEquipHasMotherCal(equipid);
+        auto motherResult = User::haveMotherSP(uid, equipid, equipRegistry,
+                                               sonSkillPointReq);
         if(!std::get<0>(motherResult)) {
             QByteArray msg =
                 KP::serverEquipLackMother(KP::DevelopNotOption,
@@ -1035,6 +1037,7 @@ bool Server::importEquipFromCSV() {
                                << "\tUnsupported type: " << lineParts[3];
                 }
                 for(int i = 0; i < titleParts.length(); ++i) {
+#pragma message(M_CONST)
                     if(i == 1) {
                         QString lang = titleParts[i];
                         QString content = lineParts[i];
@@ -1072,6 +1075,7 @@ bool Server::importEquipFromCSV() {
                             return false;
                         }
                     }
+#pragma message(M_CONST)
                     else if(i > 4){
                         QSqlQuery query;
                         query.prepare("REPLACE INTO EquipReg "
@@ -1109,6 +1113,26 @@ int Server::newEquip(const CSteamID &uid, int equipId) {
     return User::newEquip(uid, equipId);
 }
 
+uint64 Server::newEquipHasMotherCal(int equipId) {
+    if(!equipRegistry.contains(equipId))
+        return 0;
+    Equipment *equip = equipRegistry.value(equipId);
+    if(!equipRegistry.contains(equip->attr["Mother"]))
+        return 0;
+    Equipment *mother = equipRegistry.value(equip->attr["Mother"]);
+    uint64 sonSkillPoints = equip->skillPointsStd()
+                            * pow(equip->getTech(), 0.2);
+    if(equip->disallowMassProduction()
+        && equip->attr["Disallowmassproduction"] < 30) {
+        double x = equip->attr["Disallowmassproduction"];
+        double skillPointsAmplifier = 1.0
+                                      + 5.0 * (atan(pow(30.0 / x, 0.5))
+                                               - atan(1.0));
+        sonSkillPoints *= skillPointsAmplifier;
+    }
+    return sonSkillPoints;
+}
+
 void Server::newEquipHasMother(const CSteamID &uid, int equipId) {
     if(!equipRegistry.contains(equipId))
         return;
@@ -1116,7 +1140,7 @@ void Server::newEquipHasMother(const CSteamID &uid, int equipId) {
     if(!equipRegistry.contains(equip->attr["Mother"]))
         return;
     Equipment *mother = equipRegistry.value(equip->attr["Mother"]);
-    uint64 sonSkillPoints = equip->skillPointsStd() * pow(equip->getTech(), 0.5);
+    uint64 sonSkillPoints = newEquipHasMotherCal(equipId);
     User::addSkillPoints(uid, equip->attr["Mother"], -sonSkillPoints);
 }
 
@@ -1524,53 +1548,7 @@ void Server::sendTestMessages() {
     if(!listening)
         return;
     else {
-        Receiver r;
-
-        QString prependerString = QStringLiteral("\x01")
-                                  + QString::number(1)
-                                  + QStringLiteral("\x09")
-                                  + QString::number(0)
-                                  + QStringLiteral("\x09")
-                                  + QUuid::createUuid().toString(QUuid::WithoutBraces)
-                                  + QStringLiteral("\x09");
-        QByteArray prepender = prependerString.toLatin1();
-        QByteArray appender("\x7f");
-        prepender += KP::clientDemandEquipInfo();
-        prepender += appender;
-        r.processDgram(prepender);
-
-        QList<QString> orgasm;
-        for(int i=0; i<1024; ++i) {
-            orgasm.append("orgasm");
-        }
-        QString orgasmlist = orgasm.join(" ");
-        QByteArray msg2 = orgasmlist.toLatin1();
-        r.processDgram(msg2);
-        /*
-        for(auto connection: std::as_const(connectedPeers)) {
-            QByteArray msg = KP::clientDemandEquipInfo();
-
-            senderM.sendMessage(connection, msg);
-
-            QList<QString> orgasm;
-            for(int i=0; i<1024; ++i) {
-                orgasm.append("orgasm");
-            }
-            QString orgasmlist = orgasm.join(" ");
-            QByteArray msg2 = orgasmlist.toLatin1();
-
-            senderM.sendMessage(connection, msg2);
-
-            QList<QString> cock;
-            for(int i=0; i<1024; ++i) {
-                cock.append("cock");
-            }
-            QString cocklist = cock.join(" ");
-            QByteArray msg3 = cocklist.toLatin1();
-
-            senderM.sendMessage(connection, msg3);
-        }
-*/
+        qWarning() << newEquipHasMotherCal(52);
     }
 }
 
