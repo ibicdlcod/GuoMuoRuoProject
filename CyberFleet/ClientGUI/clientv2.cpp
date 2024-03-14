@@ -864,7 +864,10 @@ void Clientv2::receivedInfo(const QJsonObject &djson) {
     case KP::InfoType::SkillPointInfo:
         emit receivedSkillPointInfo(djson);
         break;
-    default: throw std::domain_error("auth type not supported"); break;
+    case KP::InfoType::ResourceInfo:
+        emit receivedResourceInfo(djson);
+        break;
+    default: throw std::domain_error("info type not supported"); break;
     }
 }
 
@@ -1031,6 +1034,10 @@ void Clientv2::receivedMsg(const QJsonObject &djson) {
         qInfo() << qtTrId("client-start");
         displayPrompt();
         SteamAPI_RunCallbacks();
+        {
+            QByteArray msg = KP::clientDemandResourceUpdate();
+            sender->enqueue(msg);
+        }
         break;
     case KP::AllowClientFinish:
         gameState = KP::Offline;

@@ -585,6 +585,15 @@ void Server::offerEquipInfo(QSslSocket *connection, int index = 0) {
     connection->flush();
 }
 
+void Server::offerResourceInfo(QSslSocket *connection,
+                               const CSteamID &uid) {
+    ResOrd ordinary = User::getCurrentResources(uid);
+    QByteArray msg = KP::serverResourceUpdate(ordinary);
+    connection->flush();
+    senderM.sendMessage(connection, msg);
+    connection->flush();
+}
+
 void Server::offerSPInfo(QSslSocket *connection,
                          const CSteamID &uid, int equipId) {
     connection->flush();
@@ -759,7 +768,7 @@ void Server::doDevelop(CSteamID &uid, int equipid,
                 senderM.sendMessage(connection, msg);
             });
         }
-        else{
+        else {
             qint64 startTime = QDateTime::currentSecsSinceEpoch();
             qint64 successTime = startTime + equip->devTimeInSec();
 
@@ -783,11 +792,11 @@ void Server::doDevelop(CSteamID &uid, int equipid,
             query.bindValue(":fid", factoryid);
             if(query.exec()) {
                 qDebug() << "GOOD";
-                currentRes -= resRequired;
                 User::setResources(uid, currentRes);
                 QByteArray msg =
                     KP::serverDevelopStart();
                 senderM.sendMessage(connection, msg);
+                offerResourceInfo(connection, uid);
             }
             else {
                 //% "Database failed when developing."
@@ -1547,7 +1556,7 @@ void Server::receivedReq(const QJsonObject &djson,
     case KP::CommandType::DemandGlobalTech: {
         QTimer::singleShot(100,
                            this,
-                           [=, this]
+                           [connection, uid, djson, this]
                            {offerTechInfo(
                                  connection,
                                  uid,
@@ -1557,11 +1566,20 @@ void Server::receivedReq(const QJsonObject &djson,
     case KP::CommandType::DemandSkillPoints: {
         QTimer::singleShot(100,
                            this,
-                           [=, this]
+                           [connection, uid, djson, this]
                            {offerSPInfo(
                                  connection,
                                  uid,
                                  djson["equipid"].toInt());});
+    }
+    break;
+    case KP::CommandType::DemandResourceUpdate: {
+        QTimer::singleShot(100,
+                           this,
+                           [connection, uid, this]
+                           {offerResourceInfo(
+                                 connection,
+                                 uid);});
     }
     break;
     default:

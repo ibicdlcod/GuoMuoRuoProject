@@ -131,6 +131,7 @@ signals:
     void receivedGlobalTechInfo2(const QJsonObject &);
     void receivedLocalTechInfo(const QJsonObject &);
     void receivedLocalTechInfo2(const QJsonObject &);
+    void receivedResourceInfo(const QJsonObject &);
     void receivedSkillPointInfo(const QJsonObject &);
 
 private slots:

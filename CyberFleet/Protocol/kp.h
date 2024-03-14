@@ -13,6 +13,8 @@
 #include <QCborValue>
 #include "steam/steamtypes.h"
 
+class ResOrd;
+
 /* OS Specific */
 #if defined (Q_OS_WIN)
 #include <windows.h>
@@ -105,7 +107,8 @@ enum CommandType{
     AdminAddEquip,
     DemandEquipInfo,
     DemandGlobalTech,
-    DemandSkillPoints
+    DemandSkillPoints,
+    DemandResourceUpdate
 };
 Q_ENUM_NS(CommandType)
 
@@ -130,7 +133,8 @@ enum InfoType{
     EquipInfo,
     GlobalTechInfo,
     LocalTechInfo,
-    SkillPointInfo
+    SkillPointInfo,
+    ResourceInfo
 };
 Q_ENUM_NS(InfoType)
 
@@ -154,6 +158,7 @@ QByteArray catbomb();
 QByteArray clientAddEquip(int);
 QByteArray clientDemandEquipInfo();
 QByteArray clientDemandGlobalTech(int local = 0);
+QByteArray clientDemandResourceUpdate();
 QByteArray clientDemandSkillPoints(int);
 QByteArray clientDevelop(int, bool convert = false, int factoryID = -1);
 QByteArray clientFactoryRefresh();
@@ -162,6 +167,7 @@ QByteArray clientHello();
 QByteArray clientStateChange(GameState);
 QByteArray clientSteamAuth(uint8 [], uint32);
 QByteArray clientSteamLogout();
+
 QByteArray serverDevelopFailed(GameError);
 QByteArray serverDevelopStart();
 QByteArray serverEquipLackFather(GameError, int);
@@ -180,6 +186,7 @@ QByteArray serverNewEquip(int, int);
 QByteArray serverParseError(MsgType, const QString &,
                             const QString &);
 QByteArray serverPenguin();
+QByteArray serverResourceUpdate(ResOrd);
 QByteArray serverSkillPoints(int, uint64, uint64);
 QByteArray serverVerifyComplete();
 QByteArray weighAnchor();

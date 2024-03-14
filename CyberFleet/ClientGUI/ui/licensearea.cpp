@@ -61,5 +61,10 @@ LicenseArea::~LicenseArea()
 }
 
 void LicenseArea::complete() {
-    emit showLicenseComplete();
+    if(!completeOff)
+        emit showLicenseComplete();
+}
+
+void LicenseArea::neverComplete() {
+    completeOff = true;
 }

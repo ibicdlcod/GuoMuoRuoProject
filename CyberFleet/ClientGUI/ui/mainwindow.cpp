@@ -6,6 +6,7 @@
 #include <QResizeEvent>
 #include <QScreen>
 #include "keyenterreceiver.h"
+#include "../clientv2.h"
 
 extern std::unique_ptr<QSettings> settings;
 
@@ -79,6 +80,8 @@ MainWindow::MainWindow(QWidget *parent, int argc, char ** argv)
                      &engine, &Clientv2::parseDisconnectReq);
     QObject::connect(ui->actionExit, &QAction::triggered,
                      &engine, &Clientv2::parseQuit);
+    QObject::connect(&engine, &Clientv2::receivedResourceInfo,
+                     this, &MainWindow::updateResources);
 
     portArea = new PortArea(ui->PortArea);
     licenseArea = new LicenseArea(ui->License);
@@ -89,8 +92,6 @@ MainWindow::MainWindow(QWidget *parent, int argc, char ** argv)
                        [this]
                        {adjustArea(licenseArea,
                                     ui->License->frameSize());});
-    QObject::connect(licenseArea, &LicenseArea::showLicenseComplete,
-                     ui->LoginScreen, &QWidget::show);
     QObject::connect(licenseArea, &LicenseArea::showLicenseComplete,
                      ui->License, &QWidget::hide);
     QObject::connect(licenseArea, &LicenseArea::showLicenseComplete,
@@ -133,6 +134,7 @@ void MainWindow::gamestateChanged(KP::GameState state) {
     state == KP::Offline ? ui->ResourcesBar->hide()
                          : ui->ResourcesBar->show();
     state == KP::Port ? (
+        licenseArea->neverComplete(),
         ui->PortArea->show(),
         QTimer::singleShot(1, this,
                            [this]
@@ -185,6 +187,16 @@ void MainWindow::switchToDevelop() {
     }
     factoryArea->setDevelop(true);
     factoryArea->switchToDevelop();
+}
+
+void MainWindow::updateResources(const QJsonObject &djson) {
+    ui->OilCount->setText(QString::number(djson["oil"].toInt()));
+    ui->ExploCount->setText(QString::number(djson["explo"].toInt()));
+    ui->SteelCount->setText(QString::number(djson["steel"].toInt()));
+    ui->RubberCount->setText(QString::number(djson["rubber"].toInt()));
+    ui->AluminumCount->setText(QString::number(djson["al"].toInt()));
+    ui->TungstenCount->setText(QString::number(djson["w"].toInt()));
+    ui->ChromiumCount->setText(QString::number(djson["cr"].toInt()));
 }
 
 /* reimplement */

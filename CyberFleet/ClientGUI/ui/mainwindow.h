@@ -2,7 +2,6 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
-#include "../clientv2.h"
 #include "../../FactorySlot/factoryslot.h"
 #include "portarea.h"
 #include "licensearea.h"
@@ -40,6 +39,7 @@ private slots:
     void factoryRefresh();
     void switchToConstruct();
     void switchToDevelop();
+    void updateResources(const QJsonObject &);
 
 private:
     Ui::MainWindow *ui;

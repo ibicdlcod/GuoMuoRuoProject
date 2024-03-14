@@ -20,9 +20,11 @@ signals:
 
 public slots:
     void complete();
+    void neverComplete();
 
 private:
     Ui::LicenseArea *ui;
+    bool completeOff = false;
 };
 
 #endif // LICENSEAREA_H

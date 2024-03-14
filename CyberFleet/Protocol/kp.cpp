@@ -2,6 +2,7 @@
 #include <QFile>
 #include <QJsonArray>
 #include <QSettings>
+#include "resord.h"
 
 extern QFile *logFile;
 extern std::unique_ptr<QSettings> settings;
@@ -77,7 +78,13 @@ QByteArray KP::clientDemandGlobalTech(int local) {
     result["command"] = CommandType::DemandGlobalTech;
     result["local"] = local;
     return QCborValue::fromJsonValue(result).toCbor();
+}
 
+QByteArray KP::clientDemandResourceUpdate() {
+    QJsonObject result;
+    result["type"] = DgramType::Request;
+    result["command"] = CommandType::DemandResourceUpdate;
+    return QCborValue::fromJsonValue(result).toCbor();
 }
 
 QByteArray KP::clientDemandSkillPoints(int equipId) {
@@ -296,6 +303,20 @@ QByteArray KP::serverPenguin() {
     QJsonObject result;
     result["type"] = DgramType::Message;
     result["msgtype"] = MsgType::Penguin;
+    return QCborValue::fromJsonValue(result).toCbor();
+}
+
+QByteArray KP::serverResourceUpdate(ResOrd ordinary) {
+    QJsonObject result;
+    result["type"] = DgramType::Info;
+    result["infotype"] = InfoType::ResourceInfo;
+    result["oil"] = ordinary.o;
+    result["explo"] = ordinary.e;
+    result["steel"] = ordinary.s;
+    result["rubber"] = ordinary.r;
+    result["al"] = ordinary.a;
+    result["w"] = ordinary.w;
+    result["cr"] = ordinary.c;
     return QCborValue::fromJsonValue(result).toCbor();
 }
 
