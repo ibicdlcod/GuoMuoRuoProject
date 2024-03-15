@@ -4,12 +4,12 @@
 #include "../Protocol/equiptype.h"
 #include <QIcon>
 
-namespace EquipIcon
+namespace Icute
 {
 /* this function is deliberately not placed in Protocol,
  * otherwith both Protocol and Server must depend on Qt::Gui
  */
-QIcon equipIcon(EquipType);
+QIcon equipIcon(EquipType, bool);
 };
 
 #endif // EQUIPICON_H

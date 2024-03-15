@@ -2,6 +2,7 @@
 #include "ui_techview.h"
 #include "../clientv2.h"
 #include "../networkerror.h"
+#include "../equipicon.h"
 
 extern std::unique_ptr<QSettings> settings;
 
@@ -172,6 +173,7 @@ void TechView::updateGlobalTechViewTable(const QJsonObject &djson) {
             newItem2 = new QTableWidgetItem(
                 thisEquip->toString(settings->value("language", "ja_JP").toString()));
         }
+        newItem2->setIcon(Icute::equipIcon(thisEquip->type, false));
         newItem2->setFlags(newItem->flags() & ~Qt::ItemIsEditable);
         ui->globalViewTable->setItem(currentRowCount + i, 1, newItem2);
         QTableWidgetItem *newItem3 = new TableWidgetItemNumber(
