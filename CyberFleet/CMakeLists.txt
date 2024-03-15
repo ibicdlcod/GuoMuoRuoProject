@@ -53,6 +53,8 @@ set(CLIENT_SOURCES
     ClientGUI/ui/techview.h
     ClientGUI/ui/techview.cpp
     ClientGUI/ui/techview.ui
+    ClientGUI/equipicon.h
+    ClientGUI/equipicon.cpp
     ${TS_FILES}
 )
 set(SERVER_SOURCES

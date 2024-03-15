@@ -28,19 +28,19 @@ MainWindow::MainWindow(QWidget *parent, int argc, char ** argv)
 
     ui->ResourcesBar->hide();
     ui->OilLabel->setPixmap(QPixmap(QStringLiteral(
-        ":/resources/smallimages/oil.png")));
+        ":/resources/resord/oil.png")));
     ui->ExploLabel->setPixmap(QPixmap(QStringLiteral(
-        ":/resources/smallimages/explosive.png")));
+        ":/resources/resord/explosive.png")));
     ui->SteelLabel->setPixmap(QPixmap(QStringLiteral(
-        ":/resources/smallimages/steel.png")));
+        ":/resources/resord/steel.png")));
     ui->RubberLabel->setPixmap(QPixmap(QStringLiteral(
-        ":/resources/smallimages/rubber.png")));
+        ":/resources/resord/rubber.png")));
     ui->AluminumLabel->setPixmap(QPixmap(QStringLiteral(
-        ":/resources/smallimages/aluminum.png")));
+        ":/resources/resord/aluminum.png")));
     ui->TungstenLabel->setPixmap(QPixmap(QStringLiteral(
-        ":/resources/smallimages/tungsten.png")));
+        ":/resources/resord/tungsten.png")));
     ui->ChromiumLabel->setPixmap(QPixmap(QStringLiteral(
-        ":/resources/smallimages/chromium.png")));
+        ":/resources/resord/chromium.png")));
     ui->OilCount->setText(QStringLiteral("0"));
     ui->ExploCount->setText(QStringLiteral("0"));
     ui->SteelCount->setText(QStringLiteral("0"));

@@ -163,7 +163,7 @@ void TechView::updateGlobalTechViewTable(const QJsonObject &djson) {
         ui->globalViewTable->setItem(currentRowCount + i, 0, newItem);
 
         QTableWidgetItem *newItem2;
-        Equipment * thisEquip = engine.getEquipmentReg(item["def"].toInt());
+        Equipment *thisEquip = engine.getEquipmentReg(item["def"].toInt());
         if(thisEquip->isInvalid()) {
             newItem2 = new QTableWidgetItem(
                 QString::number(item["def"].toInt()));

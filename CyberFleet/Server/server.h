@@ -55,9 +55,7 @@
 #include <QSqlRecord>
 #include <QSslConfiguration>
 #include <QtNetwork>
-#include <memory>
 #include <random>
-#include <vector>
 
 #include "../Protocol/commandline.h"
 #include "../Protocol/equipment.h"

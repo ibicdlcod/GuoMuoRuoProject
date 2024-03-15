@@ -50,12 +50,10 @@
 #include <QBuffer>
 #include <QFile>
 #include <QThread>
-#include <algorithm>
 #include "../steam/steamencryptedappticket.h"
 #include "../Protocol/equiptype.h"
 #include "../Protocol/kp.h"
 #include "../Protocol/tech.h"
-#include "../Protocol/receiver.h"
 #include "../Protocol/peerinfo.h"
 #include "kerrors.h"
 #include "sslserver.h"
@@ -1618,6 +1616,9 @@ void Server::sendTestMessages() {
     }
     else {
         qInfo() << "test";
+        for(const auto equip: equipRegistry) {
+            qInfo() << equip->type.iconGroup();
+        }
         //generateTestEquip(CSteamID((uint64)??));
     }
 }

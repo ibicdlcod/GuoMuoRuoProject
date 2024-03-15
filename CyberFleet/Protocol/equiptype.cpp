@@ -26,16 +26,20 @@ int EquipType::toInt() const {
     return iRep;
 }
 
+int EquipType::iconGroup() const {
+    return groupToIcon.value(toString(), 0);
+}
+
 QSet<QString> EquipType::getDisplayGroups() {
     QSet<QString> result;
-    for(auto &value: displaygroup) {
+    for(auto &value: displayGroup) {
         result.insert(value);
     }
     return result;
 }
 
 QString EquipType::getTypeGroup() {
-    return displaygroup.value(intToStrRep(iRep));
+    return displayGroup.value(intToStrRep(iRep));
 }
 
 const QString EquipType::intToStrRep(int input) {
