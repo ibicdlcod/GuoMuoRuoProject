@@ -194,9 +194,9 @@ private:
 
 #pragma message(NOT_M_CONST)
     const QByteArray defaultSalt =
-            QByteArrayLiteral("\xe8\xbf\x99\xe6\x98\xaf\xe4\xb8"
-                              "\x80\xe6\x9d\xa1\xe5\x92\xb8\xe9"
-                              "\xb1\xbc");
+        QByteArrayLiteral("\xe8\xbf\x99\xe6\x98\xaf\xe4\xb8"
+                          "\x80\xe6\x9d\xa1\xe5\x92\xb8\xe9"
+                          "\xb1\xbc");
 
     SteamAuth sauth;
     QByteArray authCache;

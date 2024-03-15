@@ -148,12 +148,15 @@ endif()
 message("add translations")
 qt_add_translations(CFClient
     TS_FILES ${TS_FILES}
-    INCLUDE_DIRECTORIES {root_SOURCE_DIR}
+    INCLUDE_DIRECTORIES ${CMAKE_CURRENT_SOURCE_DIR}
     LRELEASE_OPTIONS -idbased)
 qt_add_translations(CFServer
     TS_FILES ${TS_FILES}
-    INCLUDE_DIRECTORIES {root_SOURCE_DIR}
+    INCLUDE_DIRECTORIES ${CMAKE_CURRENT_SOURCE_DIR}
     LRELEASE_OPTIONS -idbased)
+
+#add_dependencies(CFClient CFClient_lupdate)
+#add_dependencies(CFServer CFServer_lupdate)
 
 target_link_libraries(CFProtocol PRIVATE Qt${QT_VERSION_MAJOR}::Core)
 target_link_libraries(CFProtocol PRIVATE Qt${QT_VERSION_MAJOR}::Sql)

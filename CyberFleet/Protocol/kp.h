@@ -13,6 +13,11 @@
 #include <QCborValue>
 #include "steam/steamtypes.h"
 
+#pragma message(NOT_M_CONST)
+static const int steamRateLimit = 60; // see ClientGUI/steamauth.cpp
+
+using TechEntry = std::tuple<QUuid, int, double>;
+
 class ResOrd;
 
 /* OS Specific */
@@ -171,23 +176,22 @@ QByteArray clientSteamLogout();
 QByteArray serverDevelopFailed(GameError);
 QByteArray serverDevelopStart();
 QByteArray serverEquipLackFather(GameError, int);
-QByteArray serverEquipLackMother(GameError, int, uint64);
+QByteArray serverEquipLackMother(GameError, int, int64);
 QByteArray serverEquipInfo(QJsonArray &, bool);
 QByteArray serverFairyBusy(int);
 QByteArray serverGlobalTech(double, bool);
-QByteArray serverGlobalTech(const QList<std::tuple<
-                                int, int, double>> &, bool, bool, bool);
+QByteArray serverGlobalTech(const QList<TechEntry> &, bool, bool, bool);
 QByteArray serverHello();
 QByteArray serverLackPrivate();
 QByteArray serverLogFail(AuthFailType);
 QByteArray serverLogSuccess(bool);
 QByteArray serverLogout(LogoutType);
-QByteArray serverNewEquip(int, int);
+QByteArray serverNewEquip(QUuid, int);
 QByteArray serverParseError(MsgType, const QString &,
                             const QString &);
 QByteArray serverPenguin();
 QByteArray serverResourceUpdate(ResOrd);
-QByteArray serverSkillPoints(int, uint64, uint64);
+QByteArray serverSkillPoints(int, int64, int64);
 QByteArray serverVerifyComplete();
 QByteArray weighAnchor();
 };

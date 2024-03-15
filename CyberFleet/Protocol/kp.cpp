@@ -173,7 +173,7 @@ QByteArray KP::serverEquipLackFather(GameError error, int father) {
     return QCborValue::fromJsonValue(result).toCbor();
 }
 
-QByteArray KP::serverEquipLackMother(GameError error, int mother, uint64 sp) {
+QByteArray KP::serverEquipLackMother(GameError error, int mother, int64 sp) {
     QJsonObject result;
     result["type"] = DgramType::Message;
     result["msgtype"] = MsgType::DevelopFailed;
@@ -217,8 +217,7 @@ QByteArray KP::serverGlobalTech(double tech, bool global) {
     return QCborValue::fromJsonValue(result).toCbor();
 }
 
-QByteArray KP::serverGlobalTech(const QList<std::tuple<
-                                    int, int, double>> &content,
+QByteArray KP::serverGlobalTech(const QList<TechEntry> &content,
                                 bool initial, bool final, bool global) {
     QJsonObject result;
     result["type"] = DgramType::Info;
@@ -230,7 +229,7 @@ QByteArray KP::serverGlobalTech(const QList<std::tuple<
     QJsonArray contentJSON;
     for(auto &contentPart: content) {
         QJsonObject part;
-        part["serial"] = std::get<0>(contentPart);
+        part["serial"] = std::get<0>(contentPart).toString();
         part["def"] = std::get<1>(contentPart);
         part["weight"] = std::get<2>(contentPart);
         contentJSON.append(part);
@@ -280,11 +279,11 @@ QByteArray KP::serverLogout(KP::LogoutType reason) {
     return QCborValue::fromJsonValue(result).toCbor();
 }
 
-QByteArray KP::serverNewEquip(int serial, int equipDid) {
+QByteArray KP::serverNewEquip(QUuid serial, int equipDid) {
     QJsonObject result;
     result["type"] = DgramType::Message;
     result["msgtype"] = MsgType::NewEquip;
-    result["serial"] = serial;
+    result["serial"] = serial.toString();
     result["equipdef"] = equipDid;
     return QCborValue::fromJsonValue(result).toCbor();
 }
@@ -321,7 +320,7 @@ QByteArray KP::serverResourceUpdate(ResOrd ordinary) {
 }
 
 QByteArray KP::serverSkillPoints(int equipId,
-                                 uint64 currentSP, uint64 standardSP) {
+                                 int64 currentSP, int64 standardSP) {
     QJsonObject result;
     result["type"] = DgramType::Info;
     result["infotype"] = InfoType::SkillPointInfo;

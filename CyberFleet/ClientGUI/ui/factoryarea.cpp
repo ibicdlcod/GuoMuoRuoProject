@@ -10,7 +10,7 @@ FactoryArea::FactoryArea(QWidget *parent) :
     ui->setupUi(this);
 
     Clientv2 &engine = Clientv2::getInstance();
-    QObject::connect(&engine, &Clientv2::receivedFactoryRefresh,
+    connect(&engine, &Clientv2::receivedFactoryRefresh,
                      this, &FactoryArea::doFactoryRefresh);
     slotfs.append(ui->Factory_Slot_0);
     slotfs.append(ui->Factory_Slot_1);
@@ -37,7 +37,7 @@ FactoryArea::FactoryArea(QWidget *parent) :
     slotfs.append(ui->Factory_Slot_22);
     slotfs.append(ui->Factory_Slot_23);
     for(auto iter = slotfs.begin(); iter < slotfs.end(); ++iter) {
-        QObject::connect((*iter), &FactorySlot::clickedSpec,
+        connect((*iter), &FactorySlot::clickedSpec,
                          this, &FactoryArea::developClicked);
         (*iter)->setSlotnum(iter - slotfs.begin());
         (*iter)->setStatus();

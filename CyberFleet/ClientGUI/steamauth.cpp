@@ -1,9 +1,9 @@
 #include "steamauth.h"
-#include "clientv2.h"
 #include <QtLogging>
 #include <QtTranslation>
 #include <QString>
 #include <QTextStream>
+#include "clientv2.h"
 
 extern std::unique_ptr<QSettings> settings;
 
@@ -11,7 +11,6 @@ extern std::unique_ptr<QSettings> settings;
 void SteamAuth::RetrieveEncryptedAppTicket() {
 #pragma message(NOT_M_CONST)
     uint32 k_unSecretData = 0x5444;
-    int steamRateLimit = 60;
 
     if(settings->contains("networkclient/requestEATCall")
         && settings->value("networkclient/requestEATCall").toDateTime()
@@ -33,8 +32,8 @@ void SteamAuth::OnEncryptedAppTicketResponse(
     EncryptedAppTicketResponse_t *pEncryptedAppTicketResponse,
     bool bIOFailure) {
     if(bIOFailure) {
-        qWarning() << qtTrId("There has been an IO Failure when requesting the "
-                             "Encrypted App Ticket.\n").toUtf8();
+        //% "There has been an IO Failure when requesting the Encrypted App Ticket.\n"
+        qWarning() << qtTrId("steam-bIOFailure").toUtf8();
         return;
     }
 
@@ -48,30 +47,32 @@ void SteamAuth::OnEncryptedAppTicketResponse(
         uint32 cubTicket;
 
         if(SteamUser()->GetEncryptedAppTicket(rgubTicket, sizeof(rgubTicket), &cubTicket)) {
-            qDebug() << "GetEncryptedAppTicket success!";
+            //% "GetEncryptedAppTicket success!"
+            qDebug() << qtTrId("appticket-success");
             Clientv2::getInstance().sendEncryptedAppTicket(rgubTicket, cubTicket);
         }
         else {
-            qWarning() << qtTrId("GetEncryptedAppTicket failed.\n").toUtf8();
+            //% "GetEncryptedAppTicket failed!"
+            qWarning() << qtTrId("appticket-failure");
         }
     }
     break;
     case k_EResultNoConnection:
-        qWarning() << qtTrId("Calling RequestEncryptedAppTicket while not "
-                             "connected to steam results in this error.\n").toUtf8();
+        //% "Calling RequestEncryptedAppTicket while not connected to steam results in this error."
+        qWarning() << qtTrId("k_EResultNoConnection");
         break;
     case k_EResultDuplicateRequest:
-        qWarning() << qtTrId("Calling RequestEncryptedAppTicket while there is "
-                             "already a pending request results in this error.\n").toUtf8();
+        //% "Calling RequestEncryptedAppTicket while there is already a pending request results in this error."
+        qWarning() << qtTrId("k_EResultDuplicateRequest");
         break;
     case k_EResultLimitExceeded:
-        qWarning() << qtTrId("Calling RequestEncryptedAppTicket more than once per "
-                             "minute returns this error.\n").toUtf8();
+        //% "Calling RequestEncryptedAppTicket more than once per minute returns this error."
+        qWarning() << qtTrId("k_EResultLimitExceeded");
         break;
     default:
-        qWarning() << qtTrId("Calling RequestEncryptedAppTicket encountered "
-                             "unknown error %1.\n")
-                          .arg(pEncryptedAppTicketResponse->m_eResult).toUtf8();
+        //% "Calling RequestEncryptedAppTicket encountered unknown error %1."
+        qWarning() << qtTrId("request-app-ticket-fail-unknown")
+                          .arg(pEncryptedAppTicketResponse->m_eResult);
         break;
     }
 }

@@ -111,7 +111,7 @@ uint8 charToInt(char data) {
 
 /* User registery */
 Q_GLOBAL_STATIC(QString,
-                userT,
+                userTable,
                 QStringLiteral(
                     "CREATE TABLE NewUsers ( "
                     "UserID BLOB PRIMARY KEY, "
@@ -121,7 +121,7 @@ Q_GLOBAL_STATIC(QString,
 
 /* User-bound attributes */
 Q_GLOBAL_STATIC(QString,
-                userA,
+                userAttr,
                 QStringLiteral(
                     "CREATE TABLE UserAttr ( "
                     "UserID BLOB NOT NULL, "
@@ -158,7 +158,7 @@ Q_GLOBAL_STATIC(QString,
 
 /* Factory slots of users */
 Q_GLOBAL_STATIC(QString,
-                userF,
+                userFactory,
                 QStringLiteral(
                     "CREATE TABLE Factories ("
                     "UserID BLOB NOT NULL,"
@@ -175,23 +175,22 @@ Q_GLOBAL_STATIC(QString,
 
 /* Equipment of users */
 Q_GLOBAL_STATIC(QString,
-                userE,
+                userEquip,
                 QStringLiteral(
                     "CREATE TABLE UserEquip ("
                     "User BLOB NOT NULL, "
-                    "EquipSerial INTEGER NOT NULL, "
+                    "EquipUuid TEXT PRIMARY KEY, "
                     "EquipDef INTEGER NOT NULL, "
                     "Star INTEGER DEFAULT 0, "
                     "FOREIGN KEY(User) REFERENCES NewUsers(UserID),"
                     "FOREIGN KEY(EquipDef) REFERENCES EquipName(EquipID),"
-                    "CONSTRAINT noduplicate UNIQUE(User, EquipSerial), "
                     "CONSTRAINT Star_Valid CHECK (Star >= 0 AND Star < 11)"
                     ");"
                     ));
 
 /* Equipment skill points */
 Q_GLOBAL_STATIC(QString,
-                userSP,
+                userEquipSkillPoints,
                 QStringLiteral(
                     "CREATE TABLE UserEquipSP ("
                     "User BLOB NOT NULL, "
@@ -204,7 +203,8 @@ Q_GLOBAL_STATIC(QString,
                     ");"
                     ));
 
-const int elapsedMaxTolerence = 60;
+/* Not customized, since set this lesser than 60 creates problems */
+static const int elapsedMaxTolerence = steamRateLimit;
 }
 
 Server::Server(int argc, char ** argv) : CommandLine(argc, argv) {
@@ -338,8 +338,8 @@ bool Server::listen(const QHostAddress &address, quint16 port) {
         listening = true;
     }
     if(listening) {
-        QObject::connect(&sslServer, &QTcpServer::newConnection,
-                         this, &Server::handleNewConnection);
+        connect(&sslServer, &QTcpServer::newConnection,
+                this, &Server::handleNewConnection);
     }
     return listening;
 }
@@ -466,18 +466,18 @@ void Server::handleNewConnection(){
 
 // jobid=0: std::pair(Globaltech, QList(equipserial, equipid, weight))
 // jobid!=0: std::pair(Localtech, QList(equipserial, equipid, weight))
-std::pair<double, QList<std::tuple<int, int, double>>>
+std::pair<double, QList<TechEntry>>
 Server::calculateTech(const CSteamID &uid, int jobID) {
-    QMap<int, Equipment *> equips;
+    QMap<QUuid, Equipment *> equips;
     QList<int> childIDs = QList<int>();
     if(jobID != 0 && jobID < KP::equipIdMax) {
         childIDs = equipChildTree.values(jobID);
     }
-    QList<std::tuple<int, int, double>> result;
+    QList<TechEntry> result;
     try{
         QSqlDatabase db = QSqlDatabase::database();
         QSqlQuery query;
-        query.prepare("SELECT EquipDef, EquipSerial"
+        query.prepare("SELECT EquipDef, EquipUuid"
                       " FROM UserEquip WHERE User = :id;");
         query.bindValue(":id", uid.ConvertToUint64());
         if(!query.exec() || !query.isSelect()) {
@@ -488,7 +488,7 @@ Server::calculateTech(const CSteamID &uid, int jobID) {
         else { // query.first yet to be called
             QList<std::pair<double, double>> source;
             while(query.next()) {
-                int serial = query.value(1).toInt();
+                QUuid serial = query.value(1).toUuid();
                 int def = query.value(0).toInt();
                 double weight
                     = 1.0 + getSkillPointsEffect(uid, def)
@@ -521,7 +521,8 @@ Server::calculateTech(const CSteamID &uid, int jobID) {
                                   ("rule/skillpointweightcontrib", 9.0)
                                       .toDouble();
                 if(equipRegistry.value(jobID)->disallowMassProduction()){
-                    result.append({0, jobID, weight});
+                    /* better hide this */
+                    //result.append({QUuid(), jobID, weight});
                     source.append({equipRegistry.value(jobID)->getTech(),
                                    weight});
                 }
@@ -617,8 +618,7 @@ void Server::offerTechInfo(QSslSocket *connection, const CSteamID &uid,
 }
 
 void Server::offerTechInfoComponents(
-    QSslSocket *connection, const QList<std::tuple<
-        int, int, double>> &content,
+    QSslSocket *connection, const QList<TechEntry> &content,
     bool initial, bool global) {
 
     /* see e337bb37ef2ee656321dc9688679a6c6f118cc16 for previous version
@@ -745,7 +745,7 @@ void Server::doDevelop(CSteamID &uid, int equipid,
             return;
         }
         /* mother skillpoint requirements */
-        uint64 sonSkillPointReq = newEquipHasMotherCal(equipid);
+        int64 sonSkillPointReq = newEquipHasMotherCal(equipid);
         auto motherResult = User::haveMotherSP(uid, equipid, equipRegistry,
                                                sonSkillPointReq);
         if(!std::get<0>(motherResult)) {
@@ -846,7 +846,7 @@ void Server::doFetch(CSteamID &uid, int factoryid, QSslSocket *connection) {
                 if(jobID < KP::equipIdMax &&
                     equipRegistry.value(jobID)->disallowMassProduction()) {
                     /* get skill points (non-massproduced only)*/
-                    uint64 stdSkillPoints = equipRegistry.value(jobID)
+                    int64 stdSkillPoints = equipRegistry.value(jobID)
                                                 ->skillPointsStd();
                     /* 10*(thisEquipTech - globalTech)^2,
                      * cannot be lower than 1.0 */
@@ -1006,6 +1006,27 @@ QSet<int> Server::generateEquipChilds(int ancestor) {
     return result;
 }
 
+void Server::generateTestEquip(const CSteamID &uid) {
+    static const double difficulty = 2.0; // higher the value is easier
+    std::uniform_real_distribution dist{0.0, 1.0};
+    for(auto equip: equipRegistry.values()) {
+        if(equip->type.isVirtual()) {
+            continue;
+        }
+        else {
+            for(int i = 0; i < equip->attr["Disallowmassproduction"]; ++i) {
+                double chance = 1.0 - atan(equip->getTech()/difficulty)
+                                          / acos(0);
+                double random_double = dist(mt);
+                if(random_double < chance){
+                    qInfo() << "SUCCESS" << "\t" << equip->toString("ja_JP");
+                    newEquip(uid, equip->getId());
+                }
+            }
+        }
+    }
+}
+
 const QStringList Server::getCommandsSpec() const {
     QStringList result = QStringList();
     result.append(getCommands());
@@ -1099,7 +1120,7 @@ bool Server::importEquipFromCSV() {
                         }
                     }
 #pragma message(M_CONST)
-                    else if(i > 4){
+                    else if(i >= 4){
                         QSqlQuery query;
                         query.prepare("REPLACE INTO EquipReg "
                                       "(EquipID, Attribute, Intvalue) "
@@ -1131,12 +1152,12 @@ bool Server::importEquipFromCSV() {
     return true;
 }
 
-int Server::newEquip(const CSteamID &uid, int equipId) {
+QUuid Server::newEquip(const CSteamID &uid, int equipId) {
     newEquipHasMother(uid, equipId);
     return User::newEquip(uid, equipId);
 }
 
-uint64 Server::newEquipHasMotherCal(int equipId) {
+int64 Server::newEquipHasMotherCal(int equipId) {
     if(!equipRegistry.contains(equipId))
         return 0;
     Equipment *equip = equipRegistry.value(equipId);
@@ -1169,8 +1190,9 @@ void Server::newEquipHasMother(const CSteamID &uid, int equipId) {
     if(!equipRegistry.contains(equip->attr["Mother"]))
         return;
     Equipment *mother = equipRegistry.value(equip->attr["Mother"]);
-    uint64 sonSkillPoints = newEquipHasMotherCal(equipId);
+    int64 sonSkillPoints = newEquipHasMotherCal(equipId);
     User::addSkillPoints(uid, equip->attr["Mother"], -sonSkillPoints);
+    qDebug() << sonSkillPoints;
 }
 
 void Server::parseListen(const QStringList &cmdParts) {
@@ -1370,7 +1392,7 @@ void Server::receivedAuth(const QJsonObject &djson,
             }
             else {
                 /* We are logged in here */
-                qulonglong idnum = steamID.ConvertToUint64();
+                uint64 idnum = steamID.ConvertToUint64();
                 qInfo() << QString("User login: %1").arg(idnum).toUtf8();
                 if(connectedPeers.contains(steamID)) {
                     receivedForceLogout(steamID);
@@ -1591,8 +1613,9 @@ void Server::receivedReq(const QJsonObject &djson,
 }
 
 void Server::sendTestMessages() {
-    if(!listening)
-        return;
+    if(!listening) {
+        qWarning() << "Server isn't listening, abort.";
+    }
     else {
         qInfo() << "test";
     }
@@ -1737,7 +1760,7 @@ void Server::sqlinit() {
     /* Use SQLite for current testing */
     db.setHostName(settings->value("sql/hostname",
                                    "SpearofTanaka").toString());
-    db.setDatabaseName(settings->value("sql/dbname", "ocean").toString());
+    db.setDatabaseName(settings->value("sql/dbname", "ocean.db").toString());
     db.setUserName(settings->value("sql/adminname", "admin").toString());
     /* obviously, a different password in settings is recommended */
     db.setPassword(settings->value("sql/adminpw", "10000826").toString());
@@ -1802,7 +1825,7 @@ void Server::sqlinitEquipName() {
 void Server::sqlinitEquipSP() {
     qWarning() << qtTrId("equip-db-user-sp-lack");
     QSqlQuery query;
-    query.prepare(*userSP);
+    query.prepare(*userEquipSkillPoints);
     if(!query.exec()) {
         throw DBError(qtTrId("equip-db-user-sp-gen-failure"),
                       query.lastError());
@@ -1813,7 +1836,7 @@ void Server::sqlinitEquipU() {
     //% "Equipment database for user does not exist, creating..."
     qWarning() << qtTrId("equip-db-user-lack");
     QSqlQuery query;
-    query.prepare(*userE);
+    query.prepare(*userEquip);
     if(!query.exec()) {
         //% "Create Equipment database for user failed."
         throw DBError(qtTrId("equip-db-user-gen-failure"),
@@ -1825,7 +1848,7 @@ void Server::sqlinitFacto() {
     //% "Factory database does not exist, creating..."
     qWarning() << qtTrId("facto-db-lack");
     QSqlQuery query;
-    query.prepare(*userF);
+    query.prepare(*userFactory);
     if(!query.exec()) {
         //% "Create Factory database failed."
         throw DBError(qtTrId("facto-db-gen-failure"),
@@ -1837,7 +1860,7 @@ void Server::sqlinitUserA() const {
     //% "User database does not exist, creating..."
     qWarning() << qtTrId("user-db-lack");
     QSqlQuery query;
-    query.prepare(*userA);
+    query.prepare(*userAttr);
     if(!query.exec()) {
         //% "Create User database failed."
         throw DBError(qtTrId("user-db-gen-failure"),
@@ -1849,7 +1872,7 @@ void Server::sqlinitNewUsers() const {
     //% "User database does not exist, creating..."
     qWarning() << qtTrId("user-db-lack");
     QSqlQuery query;
-    query.prepare(*userT);
+    query.prepare(*userTable);
     if(!query.exec()) {
         //% "Create User database failed."
         throw DBError(qtTrId("user-db-gen-failure"),

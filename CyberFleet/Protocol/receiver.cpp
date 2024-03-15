@@ -116,7 +116,7 @@ void Receiver::processGoodMsg(qint64 totalParts,
         else {
             qCritical() << qtTrId("msg-convert-to-json-failed") << msgId;
             if(sslsockets.contains(msgId) && peerInfos.contains(msgId)) {
-                //% PeerInfo: %1
+                //% "PeerInfo: %1"
                 qCritical() << qtTrId("peerinfo-handler")
                                    .arg(peerInfos[msgId].toString());
                 sslsockets.remove(msgId);

@@ -10,9 +10,9 @@
 #undef max
 #endif
 
-void User::addSkillPoints(const CSteamID &uid, int equipId, uint64 skillPoints) {
+void User::addSkillPoints(const CSteamID &uid, int equipId, int64 skillPoints) {
     QSqlDatabase db = QSqlDatabase::database();
-    uint64 existingSP = getSkillPoints(uid, equipId);
+    int64 existingSP = getSkillPoints(uid, equipId);
 
     QSqlQuery query2;
     query2.prepare("REPLACE INTO UserEquipSP (User, EquipDef, Intvalue) "
@@ -26,7 +26,7 @@ void User::addSkillPoints(const CSteamID &uid, int equipId, uint64 skillPoints) 
                       query2.lastError());
     }
     else {
-        //% User %1: add skillpoint of equipment %2 success, result: %3
+        //% "User %1: add skillpoint of equipment %2 success, result: %3"
         qDebug() << qtTrId("user-add-skillpoint-success")
                         .arg(uid.ConvertToUint64()).arg(equipId)
                         .arg(skillPoints + existingSP);
@@ -120,7 +120,7 @@ int User::getEquipAmount(const CSteamID &uid, int equipId) {
     }
 }
 
-uint64 User::getSkillPoints(const CSteamID &uid, int equipId) {
+int64 User::getSkillPoints(const CSteamID &uid, int equipId) {
     QSqlDatabase db = QSqlDatabase::database();
     QSqlQuery query;
 
@@ -183,10 +183,10 @@ std::pair<bool, int> User::haveFather(const CSteamID &uid, int sonEquipId,
     }
 }
 
-std::tuple<bool, int, uint64> User::haveMotherSP(
+std::tuple<bool, int, int64> User::haveMotherSP(
     const CSteamID &uid, int sonEquipId,
     QMap<int, Equipment *> &equipReg,
-    uint64 sonSkillPointReq) {
+    int64 sonSkillPointReq) {
     if(!equipReg.contains(sonEquipId))
         return {false, 0, 0};
     else {
@@ -364,39 +364,34 @@ void User::naturalRegen(const CSteamID &uid) {
     }
 }
 
-int User::newEquip(const CSteamID &uid, int equipDid) {
+QUuid User::newEquip(const CSteamID &uid, int equipDid) {
     QSqlDatabase db = QSqlDatabase::database();
-    QSqlQuery query;
-    query.prepare("SELECT MAX(EquipSerial) FROM UserEquip "
-                  "WHERE User = :id");
-    query.bindValue(":id", uid.ConvertToUint64());
-    query.exec();
-    query.isSelect();
-    int serial;
-    if(Q_UNLIKELY(!query.first()) || query.value(0).isNull()) {
-        serial = 1;
-    }
-    else {
-        serial = query.value(0).toInt() + 1;
-    }
+    QString uniqueStr = QString::number(uid.ConvertToUint64())
+                        + "@"
+                        + QString::number(QDateTime::currentMSecsSinceEpoch());
+    /* https://stackoverflow.com/a/28776880 */
+    static const QUuid base = QUuid::createUuidV5(
+        QUuid("{6ba7b811-9dad-11d1-80b4-00c04fd430c8}"),
+        QStringLiteral("harusoft.xyz"));
+    QUuid serial = QUuid::createUuidV5(base, uniqueStr);
     QSqlQuery query2;
-    query2.prepare("INSERT INTO UserEquip (User, EquipSerial, EquipDef, Star)"
-                   "VALUES (:id, :serial, :def, :star);");
+    query2.prepare("INSERT INTO UserEquip (User, EquipUuid, EquipDef, Star)"
+                   "VALUES (:id, :uuid, :def, :star);");
     query2.bindValue(":id", uid.ConvertToUint64());
-    query2.bindValue(":serial", serial);
+    query2.bindValue(":uuid", serial);
     query2.bindValue(":def", equipDid);
     query2.bindValue(":star", 0);
     if(Q_UNLIKELY(!query2.exec())) {
         //% "User id %1: new equipment failed!"
         throw DBError(qtTrId("new-equip-failed")
                           .arg(uid.ConvertToUint64()),
-                      query.lastError());
-        return 0;
+                      query2.lastError());
+        return QUuid();
     }
     else {
         //% "User id %1: new equipment %2 definition %3"
         qDebug() << qtTrId("new-equip").arg(uid.ConvertToUint64())
-                        .arg(serial).arg(equipDid);
+                        .arg(serial.toString()).arg(equipDid);
         return serial;
     }
 }

@@ -51,7 +51,7 @@ LicenseArea::LicenseArea(QWidget *parent) :
     ui->Naganami->setTextCursor(textCursor);
     //% "Continue"
     ui->ContinueButton->setText(qtTrId("license-continue"));
-    QObject::connect(ui->ContinueButton, &QPushButton::clicked,
+    connect(ui->ContinueButton, &QPushButton::clicked,
                      this, &LicenseArea::complete);
 }
 

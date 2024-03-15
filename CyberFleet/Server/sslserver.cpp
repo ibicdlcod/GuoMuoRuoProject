@@ -39,7 +39,7 @@ void SslServer::incomingConnection(qintptr socketDesc) {
 
     this->addPendingConnection(sslSocket);
 
-    QObject::connect(sslSocket, &QSslSocket::readyRead,
+    connect(sslSocket, &QSslSocket::readyRead,
                      this, &SslServer::readyRead);
 }
 

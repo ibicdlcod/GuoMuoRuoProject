@@ -65,15 +65,15 @@ Clientv2::Clientv2(QObject *parent)
     attemptMode(false),
     logoutPending(false),
     gameState(KP::Offline) {
-    QObject::connect(&socket, &QSslSocket::preSharedKeyAuthenticationRequired,
-                     this, &Clientv2::pskRequired);
-    QObject::connect(&socket, &QSslSocket::encrypted,
-                     this, &Clientv2::encrypted);
+    connect(&socket, &QSslSocket::preSharedKeyAuthenticationRequired,
+            this, &Clientv2::pskRequired);
+    connect(&socket, &QSslSocket::encrypted,
+            this, &Clientv2::encrypted);
 
-    QObject::connect(&recv, &Receiver::jsonReceived,
-                     this, &Clientv2::serverResponseStd);
-    QObject::connect(&recv, &Receiver::nonStandardReceived,
-                     this, &Clientv2::serverResponseNonStd);
+    connect(&recv, &Receiver::jsonReceived,
+            this, &Clientv2::serverResponseStd);
+    connect(&recv, &Receiver::nonStandardReceived,
+            this, &Clientv2::serverResponseNonStd);
 
     // May cause issues?
     timer = new QTimer(this);
@@ -98,8 +98,8 @@ bool Clientv2::loggedIn() const {
 void Clientv2::sendEncryptedAppTicket(uint8 rgubTicket [], uint32 cubTicket) {
     try {
         authCache = KP::clientSteamAuth(rgubTicket, cubTicket);
-        QObject::connect(&socket, &QSslSocket::encrypted,
-                         this, &Clientv2::sendEATActual);
+        connect(&socket, &QSslSocket::encrypted,
+                this, &Clientv2::sendEATActual);
     }  catch (NetworkError &e) {
         qCritical("Network error when sending Encrypted Ticket");
         qCritical() << e.what();
@@ -110,15 +110,15 @@ void Clientv2::sendEncryptedAppTicket(uint8 rgubTicket [], uint32 cubTicket) {
 /* public slots */
 /* Make actual connections */
 void Clientv2::autoPassword() {
-    QObject::connect(&socket, &QSslSocket::handshakeInterruptedOnError,
-                     this, &Clientv2::handshakeInterrupted);
-    QObject::connect(&socket,
-                     &QSslSocket::preSharedKeyAuthenticationRequired,
-                     this, &Clientv2::pskRequired);
-    QObject::connect(&socket, &QAbstractSocket::disconnected,
-                     this, &Clientv2::catbomb);
-    QObject::connect(&socket, &QAbstractSocket::errorOccurred,
-                     this, &Clientv2::errorOccurred);
+    connect(&socket, &QSslSocket::handshakeInterruptedOnError,
+            this, &Clientv2::handshakeInterrupted);
+    connect(&socket,
+            &QSslSocket::preSharedKeyAuthenticationRequired,
+            this, &Clientv2::pskRequired);
+    connect(&socket, &QAbstractSocket::disconnected,
+            this, &Clientv2::catbomb);
+    connect(&socket, &QAbstractSocket::errorOccurred,
+            this, &Clientv2::errorOccurred);
     socket.setProtocol(QSsl::TlsV1_3);
     socket.connectToHostEncrypted(address.toString(), port);
     if(!socket.waitForConnected(
@@ -130,8 +130,8 @@ void Clientv2::autoPassword() {
         attemptMode = false;
         return;
     }
-    QObject::connect(&socket, &QSslSocket::readyRead,
-                     this, &Clientv2::readyRead);
+    connect(&socket, &QSslSocket::readyRead,
+            this, &Clientv2::readyRead);
 
     SteamAPI_RunCallbacks();
 }
@@ -1223,7 +1223,8 @@ void Clientv2::updateEquipCache(const QJsonObject &input) {
         equipRegistryCache[eid] = new Equipment(equipDValue);
     }
 
-    qDebug() << qtTrId("Equipment cache length: %1")
+    //% "Equipment cache length: %1"
+    qDebug() << qtTrId("equipment-cache-length")
                     .arg(Clientv2::getInstance()
                              .equipRegistryCache.size());
     if(input["final"].toBool()) {

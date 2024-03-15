@@ -9,22 +9,22 @@
 
 namespace User {
 
-void addSkillPoints(const CSteamID &, int, uint64);
+void addSkillPoints(const CSteamID &, int, int64);
 int getCurrentFactoryParallel(const CSteamID &, int);
 ResOrd getCurrentResources(const CSteamID &);
 int getEquipAmount(const CSteamID &, int);
-uint64 getSkillPoints(const CSteamID &, int);
+int64 getSkillPoints(const CSteamID &, int);
 std::pair<bool, int> haveFather(const CSteamID &,
                                 int, QMap<int, Equipment *> &);
-std::tuple<bool, int, uint64> haveMotherSP(const CSteamID &,
+std::tuple<bool, int, int64> haveMotherSP(const CSteamID &,
                                            int, QMap<int, Equipment *> &,
-                                           uint64);
+                                           int64);
 void init(const CSteamID &);
 bool isFactoryBusy(const CSteamID &, int);
 std::tuple<bool, int> isFactoryFinished(const CSteamID &, int);
 bool isSuperUser(const CSteamID &);
 void naturalRegen(const CSteamID &);
-int newEquip(const CSteamID &, int);
+QUuid newEquip(const CSteamID &, int);
 void refreshFactory(const CSteamID &);
 void refreshPort(const CSteamID &);
 void setResources(const CSteamID &, ResOrd);

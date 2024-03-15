@@ -54,33 +54,33 @@ MainWindow::MainWindow(QWidget *parent, int argc, char ** argv)
 
     Clientv2 &engine = Clientv2::getInstance();
 
-    QObject::connect(this, &MainWindow::cmdMessage,
+    connect(this, &MainWindow::cmdMessage,
                      &engine, &Clientv2::parse);
-    QObject::connect(&engine, &Clientv2::qout,
+    connect(&engine, &Clientv2::qout,
                      this, &MainWindow::printMessage);
-    QObject::connect(&engine, &Clientv2::aboutToQuit,
+    connect(&engine, &Clientv2::aboutToQuit,
                      this, &MainWindow::close);
-    QObject::connect(key, &KeyEnterReceiver::enterPressed,
+    connect(key, &KeyEnterReceiver::enterPressed,
                      this, &MainWindow::processCmd);
-    QObject::connect(&engine, &Clientv2::gamestateChanged,
+    connect(&engine, &Clientv2::gamestateChanged,
                      this, &MainWindow::gamestateChanged);
-    QObject::connect(ui->actionBack_to_naval_base, &QAction::triggered,
+    connect(ui->actionBack_to_naval_base, &QAction::triggered,
                      &engine, &Clientv2::backToNavalBase);
-    QObject::connect(ui->actionView_Tech, &QAction::triggered,
+    connect(ui->actionView_Tech, &QAction::triggered,
                      &engine, &Clientv2::switchToTech);
-    QObject::connect(ui->actionDevelop_Equipment, &QAction::triggered,
+    connect(ui->actionDevelop_Equipment, &QAction::triggered,
                      &engine, &Clientv2::switchToFactory);
-    QObject::connect(ui->actionDevelop_Equipment, &QAction::triggered,
+    connect(ui->actionDevelop_Equipment, &QAction::triggered,
                      this, &MainWindow::switchToDevelop);
-    QObject::connect(ui->actionConstruct_Ships, &QAction::triggered,
+    connect(ui->actionConstruct_Ships, &QAction::triggered,
                      &engine, &Clientv2::switchToFactory);
-    QObject::connect(ui->actionConstruct_Ships, &QAction::triggered,
+    connect(ui->actionConstruct_Ships, &QAction::triggered,
                      this, &MainWindow::switchToConstruct);
-    QObject::connect(ui->actionLogout, &QAction::triggered,
+    connect(ui->actionLogout, &QAction::triggered,
                      &engine, &Clientv2::parseDisconnectReq);
-    QObject::connect(ui->actionExit, &QAction::triggered,
+    connect(ui->actionExit, &QAction::triggered,
                      &engine, &Clientv2::parseQuit);
-    QObject::connect(&engine, &Clientv2::receivedResourceInfo,
+    connect(&engine, &Clientv2::receivedResourceInfo,
                      this, &MainWindow::updateResources);
 
     portArea = new PortArea(ui->PortArea);
@@ -92,13 +92,13 @@ MainWindow::MainWindow(QWidget *parent, int argc, char ** argv)
                        [this]
                        {adjustArea(licenseArea,
                                     ui->License->frameSize());});
-    QObject::connect(licenseArea, &LicenseArea::showLicenseComplete,
+    connect(licenseArea, &LicenseArea::showLicenseComplete,
                      ui->License, &QWidget::hide);
-    QObject::connect(licenseArea, &LicenseArea::showLicenseComplete,
+    connect(licenseArea, &LicenseArea::showLicenseComplete,
                      this, &MainWindow::gamestateInit);
-    QObject::connect(licenseArea, &LicenseArea::showLicenseComplete,
+    connect(licenseArea, &LicenseArea::showLicenseComplete,
                      newLoginScreen, &QWidget::show);
-    QTimer::singleShot(settings->value("client/license_area_persist",
+    QTimer::singleShot(settings->value("client/licenseareapersist",
                                        5000).toInt(), this,
                        [this]{
                            this->licenseArea->complete();

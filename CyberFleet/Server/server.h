@@ -87,15 +87,13 @@ public slots:
 private slots:
     void alertReceived(QSslSocket *socket, QSsl::AlertLevel level,
                        QSsl::AlertType type, const QString &description);
-    std::pair<double, QList<std::tuple<int, int, double>>>
+    std::pair<double, QList<TechEntry>>
     calculateTech(const CSteamID &, int jobID = 0);
     void handleNewConnection();
     double getSkillPointsEffect(const CSteamID &, int);
     void offerEquipInfo(QSslSocket *, int);
     void offerTechInfo(QSslSocket *, const CSteamID &, int jobID = 0);
-    void offerTechInfoComponents(QSslSocket *,
-                                   const QList<std::tuple<
-                                       int, int, double>> &,
+    void offerTechInfoComponents(QSslSocket *, const QList<TechEntry> &,
                                    bool, bool);
     void offerResourceInfo(QSslSocket *, const CSteamID &);
     void offerSPInfo(QSslSocket *, const CSteamID &, int);
@@ -113,11 +111,12 @@ private:
     void exitGraceSpec() override;
     bool exportEquipToCSV() const;
     QSet<int> generateEquipChilds(int);
+    void generateTestEquip(const CSteamID &);
     const QStringList getCommandsSpec() const override;
     const QStringList getValidCommands() const override;
     bool importEquipFromCSV();
-    int newEquip(const CSteamID &, int);
-    uint64 newEquipHasMotherCal(int);
+    QUuid newEquip(const CSteamID &, int);
+    int64 newEquipHasMotherCal(int);
     void newEquipHasMother(const CSteamID &, int);
     void parseListen(const QStringList &);
     void parseUnlisten();

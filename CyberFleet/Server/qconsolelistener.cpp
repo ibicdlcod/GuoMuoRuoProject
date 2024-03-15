@@ -26,7 +26,7 @@ SOFTWARE.
 QConsoleListener::QConsoleListener(bool consolemode)
     : consolemode(consolemode)
 {
-    QObject::connect(
+    connect(
                 this, &QConsoleListener::finishedGetLine,
                 this, &QConsoleListener::on_finishedGetLine,
                 Qt::QueuedConnection
@@ -39,14 +39,14 @@ QConsoleListener::QConsoleListener(bool consolemode)
     // NOTE : move to thread because std::getline blocks,
     //        then we sync with main thread using a QueuedConnection with finishedGetLine
     m_notifier->moveToThread(&m_thread);
-    QObject::connect(
+    connect(
                 &m_thread , &QThread::finished,
                 m_notifier, &QObject::deleteLater
                 );
 #if defined (Q_OS_WIN)
-    QObject::connect(m_notifier, &QWinEventNotifier::activated,
+    connect(m_notifier, &QWinEventNotifier::activated,
 #else
-    QObject::connect(m_notifier, &QSocketNotifier::activated,
+    connect(m_notifier, &QSocketNotifier::activated,
 #endif
                      [this]() {
         /* the following is different from the original at https://github.com/juangburgos/QConsoleListener/blob/master/src/qconsolelistener.cpp

@@ -12,21 +12,21 @@ TechView::TechView(QWidget *parent) :
     ui->setupUi(this);
 
     Clientv2 &engine = Clientv2::getInstance();
-    QObject::connect(&engine, &Clientv2::receivedGlobalTechInfo,
+    connect(&engine, &Clientv2::receivedGlobalTechInfo,
                      this, &TechView::updateGlobalTech);
-    QObject::connect(&engine, &Clientv2::receivedGlobalTechInfo2,
+    connect(&engine, &Clientv2::receivedGlobalTechInfo2,
                      this, &TechView::updateGlobalTechViewTable);
-    QObject::connect(&engine, &Clientv2::receivedLocalTechInfo,
+    connect(&engine, &Clientv2::receivedLocalTechInfo,
                      this, &TechView::updateLocalTech);
-    QObject::connect(&engine, &Clientv2::receivedLocalTechInfo2,
+    connect(&engine, &Clientv2::receivedLocalTechInfo2,
                      this, &TechView::updateLocalTechViewTable);
-    QObject::connect(&engine, &Clientv2::equipRegistryComplete,
+    connect(&engine, &Clientv2::equipRegistryComplete,
                      this->ui->waitText, &QLabel::hide);
-    QObject::connect(&engine, &Clientv2::equipRegistryComplete,
+    connect(&engine, &Clientv2::equipRegistryComplete,
                      this, &TechView::resetLocalListName);
-    QObject::connect(this->ui->updateGlobalButton, &QPushButton::clicked,
+    connect(this->ui->updateGlobalButton, &QPushButton::clicked,
                      this, &TechView::demandGlobalTech);
-    QObject::connect(&engine, &Clientv2::receivedSkillPointInfo,
+    connect(&engine, &Clientv2::receivedSkillPointInfo,
                      this, &TechView::updateSkillPoints);
     ui->globalViewTable->hide();
     ui->waitText->show();
@@ -139,6 +139,7 @@ void TechView::updateGlobalTechViewTable(const QJsonObject &djson) {
         return;
     }
     else {
+        ui->globalViewTable->clear();
         ui->globalViewTable->show();
         ui->waitText->hide();
     }
@@ -157,7 +158,7 @@ void TechView::updateGlobalTechViewTable(const QJsonObject &djson) {
     for(auto content: contents) {
         QJsonObject item = content.toObject();
         QTableWidgetItem *newItem = new QTableWidgetItem(
-            QString::number(item["serial"].toInt()));
+            item["serial"].toString().first(9).last(8));
         ui->globalViewTable->setItem(currentRowCount + i, 0, newItem);
 
         QTableWidgetItem *newItem2;
@@ -201,6 +202,7 @@ void TechView::updateLocalTechViewTable(const QJsonObject &djson) {
         return;
     }
     else {
+        ui->localViewTable->clear();
         ui->localViewTable->show();
     }
     ui->localViewTable->setHorizontalHeaderLabels(
@@ -221,7 +223,7 @@ void TechView::updateLocalTechViewTable(const QJsonObject &djson) {
     for(auto content: contents) {
         QJsonObject item = content.toObject();
         QTableWidgetItem *newItem = new QTableWidgetItem(
-            QString::number(item["serial"].toInt()));
+            item["serial"].toString().first(9).last(8));
         ui->localViewTable->setItem(currentRowCount + i, 0, newItem);
 
         QTableWidgetItem *newItem2;
