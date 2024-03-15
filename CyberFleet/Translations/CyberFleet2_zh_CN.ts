@@ -69,6 +69,11 @@
         <source>Use &apos;disconnect&apos; for logout.</source>
         <translation type="unfinished"></translation>
     </message>
+    <message id="goodbye-gui">
+        <location filename="../ClientGUI/clientv2.cpp" line="609"/>
+        <source>Goodbye.</source>
+        <translation type="unfinished"></translation>
+    </message>
     <message id="disconnect-when-offline">
         <location filename="../ClientGUI/clientv2.cpp" line="718"/>
         <source>You are not online.</source>
@@ -289,6 +294,46 @@
         <source>Do not attempt duplicate connections!</source>
         <translation type="unfinished">不要重复尝试连接！</translation>
     </message>
+    <message id="already-listening">
+        <location filename="../Server/server.cpp" line="324"/>
+        <location filename="../Server/server.cpp" line="1205"/>
+        <source></source>
+        <translation type="unfinished">装备开发</translation>
+    </message>
+    <message id="read-dgram-failed">
+        <location filename="../ClientGUI/clientv2.cpp" line="443"/>
+        <location filename="../Server/server.cpp" line="413"/>
+        <source>Read datagram failed due to: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="user-check-resource-failed">
+        <location filename="../Server/server.cpp" line="484"/>
+        <location filename="../Server/user.cpp" line="75"/>
+        <source></source>
+        <translation type="unfinished">装备开发</translation>
+    </message>
+    <message id="local-tech-bad-equipdef">
+        <location filename="../Server/server.cpp" line="503"/>
+        <source></source>
+        <translation type="unfinished">装备开发</translation>
+    </message>
+    <message id="equipid-invalid-skill-points-effect">
+        <location filename="../Server/server.cpp" line="547"/>
+        <source></source>
+        <translation type="unfinished">装备开发</translation>
+    </message>
+    <message id="ip-invalid">
+        <location filename="../ClientGUI/clientv2.cpp" line="691"/>
+        <location filename="../Server/server.cpp" line="1210"/>
+        <source>IP isn&apos;t valid.</source>
+        <translation type="unfinished">IP格式不正确。</translation>
+    </message>
+    <message id="port-invalid">
+        <location filename="../ClientGUI/clientv2.cpp" line="697"/>
+        <location filename="../Server/server.cpp" line="1215"/>
+        <source>Port isn&apos;t valid, it must fall between 1024 and 49151</source>
+        <translation type="unfinished">端口格式不正确，注意1024以下和49151以上的端口是不能任意使用的</translation>
+    </message>
     <message id="dtls-1.2">
         <location filename="../Server/server.cpp" line="78"/>
         <source>DTLS 1.2.</source>
@@ -309,18 +354,6 @@
         <source>Session cipher: %1; session protocol: %2.</source>
         <translation type="unfinished"></translation>
     </message>
-    <message id="already-listening">
-        <location filename="../Server/server.cpp" line="324"/>
-        <location filename="../Server/server.cpp" line="1205"/>
-        <source></source>
-        <translation type="unfinished">装备开发</translation>
-    </message>
-    <message id="read-dgram-failed">
-        <location filename="../ClientGUI/clientv2.cpp" line="443"/>
-        <location filename="../Server/server.cpp" line="413"/>
-        <source>Read datagram failed due to: %1</source>
-        <translation type="unfinished"></translation>
-    </message>
     <message id="read-peerinfo-failed">
         <location filename="../Server/server.cpp" line="420"/>
         <source>Failed to extract peer info (address, port).</source>
@@ -330,22 +363,6 @@
         <location filename="../Server/server.cpp" line="434"/>
         <source>%1: disconnected abruptly.</source>
         <translation type="unfinished"></translation>
-    </message>
-    <message id="user-check-resource-failed">
-        <location filename="../Server/server.cpp" line="484"/>
-        <location filename="../Server/user.cpp" line="75"/>
-        <source></source>
-        <translation type="unfinished">装备开发</translation>
-    </message>
-    <message id="local-tech-bad-equipdef">
-        <location filename="../Server/server.cpp" line="503"/>
-        <source></source>
-        <translation type="unfinished">装备开发</translation>
-    </message>
-    <message id="equipid-invalid-skill-points-effect">
-        <location filename="../Server/server.cpp" line="547"/>
-        <source></source>
-        <translation type="unfinished">装备开发</translation>
     </message>
     <message id="client-id-received">
         <location filename="../Server/server.cpp" line="638"/>
@@ -390,6 +407,11 @@
         <source>Load equipment table failed!</source>
         <translation type="unfinished"></translation>
     </message>
+    <message id="equip-load-good">
+        <location filename="../Server/server.cpp" line="919"/>
+        <source>Load equipment registry success!</source>
+        <translation type="unfinished"></translation>
+    </message>
     <message id="equip-child-load-good">
         <location filename="../Server/server.cpp" line="930"/>
         <source>Load equipment child list success!</source>
@@ -427,18 +449,6 @@
         <location filename="../Server/server.cpp" line="1201"/>
         <source>Usage: listen [ip] [port]</source>
         <translation type="unfinished"></translation>
-    </message>
-    <message id="ip-invalid">
-        <location filename="../ClientGUI/clientv2.cpp" line="691"/>
-        <location filename="../Server/server.cpp" line="1210"/>
-        <source>IP isn&apos;t valid.</source>
-        <translation type="unfinished">IP格式不正确。</translation>
-    </message>
-    <message id="port-invalid">
-        <location filename="../ClientGUI/clientv2.cpp" line="697"/>
-        <location filename="../Server/server.cpp" line="1215"/>
-        <source>Port isn&apos;t valid, it must fall between 1024 and 49151</source>
-        <translation type="unfinished">端口格式不正确，注意1024以下和49151以上的端口是不能任意使用的</translation>
     </message>
     <message id="no-cert">
         <location filename="../Server/server.cpp" line="1227"/>
@@ -480,16 +490,6 @@
         <source>Server lack the steam app secret key.</source>
         <translation type="unfinished"></translation>
     </message>
-    <message id="add-user-fail">
-        <location filename="../Server/server.cpp" line="1482"/>
-        <source>%1: Add user failure!</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message id="equip-load-good">
-        <location filename="../Server/server.cpp" line="919"/>
-        <source>Load equipment registry success!</source>
-        <translation type="unfinished"></translation>
-    </message>
     <message id="%1: Ticket failed to decrypt">
         <location filename="../Server/server.cpp" line="1344"/>
         <source></source>
@@ -514,6 +514,11 @@
         <location filename="../Server/server.cpp" line="1386"/>
         <source></source>
         <translation type="unfinished">装备开发</translation>
+    </message>
+    <message id="add-user-fail">
+        <location filename="../Server/server.cpp" line="1482"/>
+        <source>%1: Add user failure!</source>
+        <translation type="unfinished"></translation>
     </message>
     <message id="Connection-not-properly-online">
         <location filename="../Server/server.cpp" line="1522"/>
@@ -688,11 +693,6 @@ Great at battle and bad at politics--so cool!</source>
         <source>All commands:</source>
         <translation type="unfinished">全部命令：</translation>
     </message>
-    <message id="goodbye-gui">
-        <location filename="../ClientGUI/clientv2.cpp" line="609"/>
-        <source>Goodbye.</source>
-        <translation type="unfinished"></translation>
-    </message>
     <message id="help-msg">
         <location filename="../ClientGUI/clientv2.cpp" line="322"/>
         <location filename="../Protocol/commandline.cpp" line="233"/>
@@ -725,47 +725,6 @@ Great at battle and bad at politics--so cool!</source>
         <location filename="../FactorySlot/factoryslot.cpp" line="73"/>
         <source>Factory %1</source>
         <translation type="unfinished">工厂槽 %1</translation>
-    </message>
-    <message id="steam-60-sec">
-        <location filename="../ClientGUI/steamauth.cpp" line="20"/>
-        <source>Steam API &apos;RequestEncryptedAppTicket&apos; is subject to a 60 second rate limit.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message id="steam-bIOFailure">
-        <location filename="../ClientGUI/steamauth.cpp" line="36"/>
-        <source>There has been an IO Failure when requesting the Encrypted App Ticket.
-</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message id="appticket-success">
-        <location filename="../ClientGUI/steamauth.cpp" line="51"/>
-        <source>GetEncryptedAppTicket success!</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message id="appticket-failure">
-        <location filename="../ClientGUI/steamauth.cpp" line="56"/>
-        <source>GetEncryptedAppTicket failed!</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message id="k_EResultNoConnection">
-        <location filename="../ClientGUI/steamauth.cpp" line="62"/>
-        <source>Calling RequestEncryptedAppTicket while not connected to steam results in this error.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message id="k_EResultDuplicateRequest">
-        <location filename="../ClientGUI/steamauth.cpp" line="66"/>
-        <source>Calling RequestEncryptedAppTicket while there is already a pending request results in this error.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message id="k_EResultLimitExceeded">
-        <location filename="../ClientGUI/steamauth.cpp" line="70"/>
-        <source>Calling RequestEncryptedAppTicket more than once per minute returns this error.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message id="request-app-ticket-fail-unknown">
-        <location filename="../ClientGUI/steamauth.cpp" line="74"/>
-        <source>Calling RequestEncryptedAppTicket encountered unknown error %1.</source>
-        <translation type="unfinished"></translation>
     </message>
     <message id="There has been an IO Failure when requesting the Encrypted App Ticket. ">
         <source></source>
@@ -1025,11 +984,6 @@ Great at battle and bad at politics--so cool!</source>
         <source></source>
         <translation type="unfinished">装备开发</translation>
     </message>
-    <message id="terminial-required">
-        <location filename="../Protocol/kp.cpp" line="36"/>
-        <source>This program must be run in the terminal.</source>
-        <translation type="unfinished"></translation>
-    </message>
     <message id="receive-msg-timeout">
         <location filename="../Protocol/receiver.cpp" line="79"/>
         <source>Message %1 timeouted when receiving!</source>
@@ -1094,16 +1048,6 @@ Great at battle and bad at politics--so cool!</source>
         <location filename="../Protocol/tech.cpp" line="70"/>
         <source></source>
         <translation type="unfinished">装备开发</translation>
-    </message>
-    <message id="db-error">
-        <location filename="../Server/kerrors.cpp" line="8"/>
-        <source>Database Error: %1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message id="sender-error">
-        <location filename="../Server/servermastersender.cpp" line="32"/>
-        <source>Address %1 Port %2 Errror: %3</source>
-        <translation type="unfinished"></translation>
     </message>
     <message id="user-add-skillpoint-failed">
         <location filename="../Server/user.cpp" line="24"/>
@@ -1180,6 +1124,62 @@ Great at battle and bad at politics--so cool!</source>
     <message id="set-resources">
         <location filename="../Server/user.cpp" line="455"/>
         <source>User id %1: set resources</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="steam-60-sec">
+        <location filename="../ClientGUI/steamauth.cpp" line="20"/>
+        <source>Steam API &apos;RequestEncryptedAppTicket&apos; is subject to a 60 second rate limit.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="steam-bIOFailure">
+        <location filename="../ClientGUI/steamauth.cpp" line="36"/>
+        <source>There has been an IO Failure when requesting the Encrypted App Ticket.
+</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="appticket-success">
+        <location filename="../ClientGUI/steamauth.cpp" line="51"/>
+        <source>GetEncryptedAppTicket success!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="appticket-failure">
+        <location filename="../ClientGUI/steamauth.cpp" line="56"/>
+        <source>GetEncryptedAppTicket failed!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="k_EResultNoConnection">
+        <location filename="../ClientGUI/steamauth.cpp" line="62"/>
+        <source>Calling RequestEncryptedAppTicket while not connected to steam results in this error.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="k_EResultDuplicateRequest">
+        <location filename="../ClientGUI/steamauth.cpp" line="66"/>
+        <source>Calling RequestEncryptedAppTicket while there is already a pending request results in this error.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="k_EResultLimitExceeded">
+        <location filename="../ClientGUI/steamauth.cpp" line="70"/>
+        <source>Calling RequestEncryptedAppTicket more than once per minute returns this error.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="request-app-ticket-fail-unknown">
+        <location filename="../ClientGUI/steamauth.cpp" line="74"/>
+        <source>Calling RequestEncryptedAppTicket encountered unknown error %1.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="terminial-required">
+        <location filename="../Protocol/kp.cpp" line="36"/>
+        <source>This program must be run in the terminal.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="db-error">
+        <location filename="../Server/kerrors.cpp" line="8"/>
+        <source>Database Error: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="sender-error">
+        <location filename="../Server/servermastersender.cpp" line="32"/>
+        <source>Address %1 Port %2 Errror: %3</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1356,6 +1356,11 @@ Great at battle and bad at politics--so cool!</source>
 <context>
     <name>MainWindow</name>
     <message>
+        <source>Continue</source>
+        <extracomment>License Continue</extracomment>
+        <translation type="obsolete">继续</translation>
+    </message>
+    <message>
         <location filename="../ClientGUI/ui/mainwindow.ui" line="14"/>
         <source>CyberFleet GUI</source>
         <translation type="unfinished"></translation>
@@ -1409,6 +1414,11 @@ Great at battle and bad at politics--so cool!</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <location filename="../ClientGUI/ui/mainwindow.ui" line="379"/>
+        <source>Naval Base</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <location filename="../ClientGUI/ui/mainwindow.ui" line="387"/>
         <source>Tech</source>
         <translation type="unfinished"></translation>
@@ -1441,16 +1451,6 @@ Great at battle and bad at politics--so cool!</source>
     <message>
         <location filename="../ClientGUI/ui/mainwindow.ui" line="428"/>
         <source>Construct Ships</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Continue</source>
-        <extracomment>License Continue</extracomment>
-        <translation type="obsolete">继续</translation>
-    </message>
-    <message>
-        <location filename="../ClientGUI/ui/mainwindow.ui" line="379"/>
-        <source>Naval Base</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

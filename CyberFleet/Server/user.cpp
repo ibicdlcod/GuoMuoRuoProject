@@ -3,6 +3,7 @@
 #include <QSqlError>
 #include <QSqlQuery>
 #include <QTimeZone>
+#include <algorithm>
 #include "../Protocol/resord.h"
 #include "kerrors.h"
 
@@ -13,13 +14,15 @@
 void User::addSkillPoints(const CSteamID &uid, int equipId, int64 skillPoints) {
     QSqlDatabase db = QSqlDatabase::database();
     int64 existingSP = getSkillPoints(uid, equipId);
+    /* disallow skillpoint lower than 0, may change in future */
+    int64 newSP = std::max((int64)0, skillPoints + existingSP);
 
     QSqlQuery query2;
     query2.prepare("REPLACE INTO UserEquipSP (User, EquipDef, Intvalue) "
                    "VALUES (:id, :eid, :sp)");
     query2.bindValue(":id", uid.ConvertToUint64());
     query2.bindValue(":eid", equipId);
-    query2.bindValue(":sp", skillPoints + existingSP);
+    query2.bindValue(":sp", newSP);
     if(Q_UNLIKELY(!query2.exec())) {
         throw DBError(qtTrId("user-add-skillpoint-failed")
                           .arg(uid.ConvertToUint64()).arg(equipId),
@@ -29,7 +32,7 @@ void User::addSkillPoints(const CSteamID &uid, int equipId, int64 skillPoints) {
         //% "User %1: add skillpoint of equipment %2 success, result: %3"
         qDebug() << qtTrId("user-add-skillpoint-success")
                         .arg(uid.ConvertToUint64()).arg(equipId)
-                        .arg(skillPoints + existingSP);
+                        .arg(newSP);
     }
 }
 

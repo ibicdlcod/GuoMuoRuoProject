@@ -13,21 +13,21 @@ TechView::TechView(QWidget *parent) :
 
     Clientv2 &engine = Clientv2::getInstance();
     connect(&engine, &Clientv2::receivedGlobalTechInfo,
-                     this, &TechView::updateGlobalTech);
+            this, &TechView::updateGlobalTech);
     connect(&engine, &Clientv2::receivedGlobalTechInfo2,
-                     this, &TechView::updateGlobalTechViewTable);
+            this, &TechView::updateGlobalTechViewTable);
     connect(&engine, &Clientv2::receivedLocalTechInfo,
-                     this, &TechView::updateLocalTech);
+            this, &TechView::updateLocalTech);
     connect(&engine, &Clientv2::receivedLocalTechInfo2,
-                     this, &TechView::updateLocalTechViewTable);
+            this, &TechView::updateLocalTechViewTable);
     connect(&engine, &Clientv2::equipRegistryComplete,
-                     this->ui->waitText, &QLabel::hide);
+            this->ui->waitText, &QLabel::hide);
     connect(&engine, &Clientv2::equipRegistryComplete,
-                     this, &TechView::resetLocalListName);
+            this, &TechView::resetLocalListName);
     connect(this->ui->updateGlobalButton, &QPushButton::clicked,
-                     this, &TechView::demandGlobalTech);
+            this, &TechView::demandGlobalTech);
     connect(&engine, &Clientv2::receivedSkillPointInfo,
-                     this, &TechView::updateSkillPoints);
+            this, &TechView::updateSkillPoints);
     ui->globalViewTable->hide();
     ui->waitText->show();
     ui->waitText->setWordWrap(true);
@@ -159,6 +159,7 @@ void TechView::updateGlobalTechViewTable(const QJsonObject &djson) {
         QJsonObject item = content.toObject();
         QTableWidgetItem *newItem = new QTableWidgetItem(
             item["serial"].toString().first(9).last(8));
+        newItem->setFlags(newItem->flags() & ~Qt::ItemIsEditable);
         ui->globalViewTable->setItem(currentRowCount + i, 0, newItem);
 
         QTableWidgetItem *newItem2;
@@ -171,12 +172,15 @@ void TechView::updateGlobalTechViewTable(const QJsonObject &djson) {
             newItem2 = new QTableWidgetItem(
                 thisEquip->toString(settings->value("language", "ja_JP").toString()));
         }
+        newItem2->setFlags(newItem->flags() & ~Qt::ItemIsEditable);
         ui->globalViewTable->setItem(currentRowCount + i, 1, newItem2);
         QTableWidgetItem *newItem3 = new TableWidgetItemNumber(
             thisEquip->getTech());
+        newItem3->setFlags(newItem->flags() & ~Qt::ItemIsEditable);
         ui->globalViewTable->setItem(currentRowCount + i, 2, newItem3);
         QTableWidgetItem *newItem4 = new TableWidgetItemNumber(
             item["weight"].toDouble());
+        newItem4->setFlags(newItem->flags() & ~Qt::ItemIsEditable);
         ui->globalViewTable->setItem(currentRowCount + i, 3, newItem4);
         ++i;
     }
@@ -186,7 +190,9 @@ void TechView::updateGlobalTechViewTable(const QJsonObject &djson) {
              qtTrId("Equip-tech-level"), qtTrId("Weight")});
         ui->globalViewTable->sortByColumn(3, Qt::DescendingOrder);
         ui->globalViewTable->sortByColumn(2, Qt::DescendingOrder);
-        resizeColumns(true);
+        /* not customized, shorter time will lead to problems */
+#pragma message(NOT_M_CONST)
+        QTimer::singleShot(100, this, [this](){resizeColumns(true);});
     }
 }
 
@@ -224,6 +230,7 @@ void TechView::updateLocalTechViewTable(const QJsonObject &djson) {
         QJsonObject item = content.toObject();
         QTableWidgetItem *newItem = new QTableWidgetItem(
             item["serial"].toString().first(9).last(8));
+        newItem->setFlags(newItem->flags() & ~Qt::ItemIsEditable);
         ui->localViewTable->setItem(currentRowCount + i, 0, newItem);
 
         QTableWidgetItem *newItem2;
@@ -236,12 +243,15 @@ void TechView::updateLocalTechViewTable(const QJsonObject &djson) {
             newItem2 = new QTableWidgetItem(
                 thisEquip->toString(settings->value("language", "ja_JP").toString()));
         }
+        newItem2->setFlags(newItem->flags() & ~Qt::ItemIsEditable);
         ui->localViewTable->setItem(currentRowCount + i, 1, newItem2);
         QTableWidgetItem *newItem3 = new TableWidgetItemNumber(
             thisEquip->getTech());
+        newItem3->setFlags(newItem->flags() & ~Qt::ItemIsEditable);
         ui->localViewTable->setItem(currentRowCount + i, 2, newItem3);
         QTableWidgetItem *newItem4 = new TableWidgetItemNumber(
             item["weight"].toDouble());
+        newItem4->setFlags(newItem->flags() & ~Qt::ItemIsEditable);
         ui->localViewTable->setItem(currentRowCount + i, 3, newItem4);
         ++i;
     }
@@ -251,7 +261,9 @@ void TechView::updateLocalTechViewTable(const QJsonObject &djson) {
              qtTrId("Equip-tech-level"), qtTrId("Weight")});
         ui->localViewTable->sortByColumn(3, Qt::DescendingOrder);
         ui->localViewTable->sortByColumn(2, Qt::DescendingOrder);
-        resizeColumns(false);
+        /* not customized, shorter time will lead to problems */
+#pragma message(NOT_M_CONST)
+        QTimer::singleShot(100, this, [this](){resizeColumns(false);});
     }
 }
 
@@ -263,7 +275,7 @@ void TechView::updateSkillPoints(const QJsonObject &djson) {
 
 void TechView::resizeColumns(bool global) {
     QHeaderView *hH = global ? ui->globalViewTable->horizontalHeader()
-                              : ui->localViewTable->horizontalHeader();
+                             : ui->localViewTable->horizontalHeader();
     hH->setSectionResizeMode(QHeaderView::ResizeToContents);
     int outerTableWidth = hH->size().width();
     int innerTableWidth = 0;

@@ -31,6 +31,11 @@ Great at battle and bad at politics--so cool!</source>
         <source>Read datagram failed due to: %1</source>
         <translation type="unfinished"></translation>
     </message>
+    <message id="wait-for-connect-failure">
+        <location filename="../ClientGUI/clientv2.cpp" line="128"/>
+        <source>Failed to connect to server at %1:%2</source>
+        <translation type="unfinished"></translation>
+    </message>
     <message id="catbomb">
         <location filename="../ClientGUI/clientv2.cpp" line="153"/>
         <source>You have been bombarded by a cute cat.</source>
@@ -39,6 +44,20 @@ Great at battle and bad at politics--so cool!</source>
     <message id="connection-failed-warning">
         <location filename="../ClientGUI/clientv2.cpp" line="162"/>
         <source>Failed to establish connection, check your username, password and server status.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="help-msg">
+        <location filename="../ClientGUI/clientv2.cpp" line="322"/>
+        <location filename="../Protocol/commandline.cpp" line="233"/>
+        <source>Use &apos;exit&apos; to quit, &apos;help&apos; to show help, &apos;commands&apos; to show available commands.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="access-denied-login-first">
+        <location filename="../ClientGUI/clientv2.cpp" line="332"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="349"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="916"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="1192"/>
+        <source>You have insufficient privileges (typically you need to login).</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="network-error">
@@ -58,15 +77,20 @@ Great at battle and bad at politics--so cool!</source>
         <source>%1: max restransmit time exceeded!</source>
         <translation type="unfinished"></translation>
     </message>
-    <message id="develop-usage">
-        <location filename="../ClientGUI/clientv2.cpp" line="518"/>
-        <source>Usage: develop [equipid] [FactorySlot]</source>
+    <message id="addequip-usage">
+        <location filename="../ClientGUI/clientv2.cpp" line="495"/>
+        <source>Usage: addequip [equipid]</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="develop-invalid-id">
         <location filename="../ClientGUI/clientv2.cpp" line="502"/>
         <location filename="../ClientGUI/clientv2.cpp" line="525"/>
         <source>Equipment id invalid.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="develop-usage">
+        <location filename="../ClientGUI/clientv2.cpp" line="518"/>
+        <source>Usage: develop [equipid] [FactorySlot]</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="fetch-usage">
@@ -89,6 +113,11 @@ Great at battle and bad at politics--so cool!</source>
         <source>Use &apos;disconnect&apos; for logout.</source>
         <translation type="unfinished"></translation>
     </message>
+    <message id="goodbye-gui">
+        <location filename="../ClientGUI/clientv2.cpp" line="609"/>
+        <source>Goodbye.</source>
+        <translation type="unfinished"></translation>
+    </message>
     <message id="connected-already">
         <location filename="../ClientGUI/clientv2.cpp" line="672"/>
         <source>Already connected, disconnect first.</source>
@@ -102,7 +131,6 @@ Great at battle and bad at politics--so cool!</source>
     <message id="connect-usage">
         <location filename="../ClientGUI/clientv2.cpp" line="683"/>
         <source>Usage: connect [ip] [port]</source>
-        <oldsource>Usage: connect [ip] [port] [username]</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message id="ip-invalid">
@@ -127,24 +155,9 @@ Great at battle and bad at politics--so cool!</source>
         <source>Attempting to disconnect...</source>
         <translation type="unfinished"></translation>
     </message>
-    <message id="wait-for-connect-failure">
-        <location filename="../ClientGUI/clientv2.cpp" line="128"/>
-        <source>Failed to connect to server at %1:%2</source>
-        <translation type="unfinished"></translation>
-    </message>
     <message id="remote-disconnect">
         <location filename="../ClientGUI/clientv2.cpp" line="819"/>
         <source>Remote disconnected.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message id="login-success">
-        <location filename="../ClientGUI/clientv2.cpp" line="1059"/>
-        <source>%1: login success</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message id="login-failed">
-        <location filename="../ClientGUI/clientv2.cpp" line="1076"/>
-        <source>%1: login failure, reason: %2</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="logout-success">
@@ -172,28 +185,19 @@ Great at battle and bad at politics--so cool!</source>
         <source>Client sent an unsupported JSON.</source>
         <translation type="unfinished"></translation>
     </message>
-    <message id="access-denied-login-first">
-        <location filename="../ClientGUI/clientv2.cpp" line="332"/>
-        <location filename="../ClientGUI/clientv2.cpp" line="349"/>
-        <location filename="../ClientGUI/clientv2.cpp" line="916"/>
-        <location filename="../ClientGUI/clientv2.cpp" line="1192"/>
-        <source>You have insufficient privileges (typically you need to login).</source>
-        <oldsource>You must be logged in in order to perform this operation.</oldsource>
-        <translation type="unfinished"></translation>
-    </message>
-    <message id="addequip-usage">
-        <location filename="../ClientGUI/clientv2.cpp" line="495"/>
-        <source>Usage: addequip [equipid]</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message id="goodbye-gui">
-        <location filename="../ClientGUI/clientv2.cpp" line="609"/>
-        <source>Goodbye.</source>
-        <translation type="unfinished"></translation>
-    </message>
     <message id="equip-not-exist">
         <location filename="../ClientGUI/clientv2.cpp" line="921"/>
         <source>This equipment does not exist.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="equip-not-developable-father">
+        <location filename="../ClientGUI/clientv2.cpp" line="929"/>
+        <source>This equipment requires you to possess %1 (id: %2) in order to develop.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="equip-not-developable-mother">
+        <location filename="../ClientGUI/clientv2.cpp" line="939"/>
+        <source>This equipment requires you to possess %3 skillpoints of %1 (id: %2) in order to develop.</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="factory-busy">
@@ -204,6 +208,16 @@ Great at battle and bad at politics--so cool!</source>
     <message id="resource-lack">
         <location filename="../ClientGUI/clientv2.cpp" line="953"/>
         <source>You do not have sufficient resources.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="massproduction-disallowed">
+        <location filename="../ClientGUI/clientv2.cpp" line="956"/>
+        <source></source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="production-disallowed">
+        <location filename="../ClientGUI/clientv2.cpp" line="959"/>
+        <source></source>
         <translation type="unfinished"></translation>
     </message>
     <message id="equip-develop-failed">
@@ -239,7 +253,6 @@ Great at battle and bad at politics--so cool!</source>
     <message id="develop-success">
         <location filename="../ClientGUI/clientv2.cpp" line="1005"/>
         <source>You get new equipment &apos;%1&apos;, serial number %2</source>
-        <oldsource>You get new equipment %1, serial number %2</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message id="develop-success-id">
@@ -252,53 +265,6 @@ Great at battle and bad at politics--so cool!</source>
         <source>Server is alive and responding.</source>
         <translation type="unfinished"></translation>
     </message>
-    <message id="server-equip-cache-fail">
-        <location filename="../ClientGUI/clientv2.cpp" line="1216"/>
-        <source></source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message id="equipment-cache-length">
-        <location filename="../ClientGUI/clientv2.cpp" line="1227"/>
-        <source>Equipment cache length: %1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message id="naganami">
-        <location filename="../Protocol/commandline.cpp" line="153"/>
-        <source>What? Admiral Tanaka? He&apos;s the real deal, isn&apos;t he?
-Great at battle and bad at politics--so cool!</source>
-        <translation type="unfinished">What? Admiral Tanaka? He&apos;s the real deal, isn&apos;t he?\nGreat at battle and bad at politics--so cool!</translation>
-    </message>
-    <message id="goodbye">
-        <location filename="../Protocol/commandline.cpp" line="390"/>
-        <source>Goodbye, press ENTER to quit.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message id="help-msg">
-        <location filename="../ClientGUI/clientv2.cpp" line="322"/>
-        <location filename="../Protocol/commandline.cpp" line="233"/>
-        <source>Use &apos;exit&apos; to quit, &apos;help&apos; to show help, &apos;commands&apos; to show available commands.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message id="equip-not-developable-father">
-        <location filename="../ClientGUI/clientv2.cpp" line="929"/>
-        <source>This equipment requires you to possess %1 (id: %2) in order to develop.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message id="equip-not-developable-mother">
-        <location filename="../ClientGUI/clientv2.cpp" line="939"/>
-        <source>This equipment requires you to possess %3 skillpoints of %1 (id: %2) in order to develop.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message id="massproduction-disallowed">
-        <location filename="../ClientGUI/clientv2.cpp" line="956"/>
-        <source></source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message id="production-disallowed">
-        <location filename="../ClientGUI/clientv2.cpp" line="959"/>
-        <source></source>
-        <translation type="unfinished"></translation>
-    </message>
     <message id="client-start">
         <location filename="../ClientGUI/clientv2.cpp" line="1034"/>
         <source>You can now play the game.</source>
@@ -307,6 +273,11 @@ Great at battle and bad at politics--so cool!</source>
     <message id="client-finish">
         <location filename="../ClientGUI/clientv2.cpp" line="1047"/>
         <source></source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="login-success">
+        <location filename="../ClientGUI/clientv2.cpp" line="1059"/>
+        <source>%1: login success</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="ticket-decrypt-fail">
@@ -334,6 +305,11 @@ Great at battle and bad at politics--so cool!</source>
         <source></source>
         <translation type="unfinished"></translation>
     </message>
+    <message id="login-failed">
+        <location filename="../ClientGUI/clientv2.cpp" line="1076"/>
+        <source>%1: login failure, reason: %2</source>
+        <translation type="unfinished"></translation>
+    </message>
     <message id="invalid-command">
         <location filename="../ClientGUI/clientv2.cpp" line="1186"/>
         <location filename="../Protocol/commandline.cpp" line="247"/>
@@ -358,14 +334,25 @@ Great at battle and bad at politics--so cool!</source>
         <source>All commands:</source>
         <translation type="unfinished"></translation>
     </message>
-    <message id="develop-equipment">
-        <location filename="../ClientGUI/ui/factoryarea.cpp" line="115"/>
+    <message id="server-equip-cache-fail">
+        <location filename="../ClientGUI/clientv2.cpp" line="1216"/>
         <source></source>
         <translation type="unfinished"></translation>
     </message>
-    <message id="construct-ships">
-        <location filename="../ClientGUI/ui/factoryarea.cpp" line="117"/>
-        <source></source>
+    <message id="equipment-cache-length">
+        <location filename="../ClientGUI/clientv2.cpp" line="1227"/>
+        <source>Equipment cache length: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="naganami">
+        <location filename="../Protocol/commandline.cpp" line="153"/>
+        <source>What? Admiral Tanaka? He&apos;s the real deal, isn&apos;t he?
+Great at battle and bad at politics--so cool!</source>
+        <translation type="unfinished">What? Admiral Tanaka? He&apos;s the real deal, isn&apos;t he?\nGreat at battle and bad at politics--so cool!</translation>
+    </message>
+    <message id="goodbye">
+        <location filename="../Protocol/commandline.cpp" line="390"/>
+        <source>Goodbye, press ENTER to quit.</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="steam-60-sec">
@@ -407,6 +394,16 @@ Great at battle and bad at politics--so cool!</source>
     <message id="request-app-ticket-fail-unknown">
         <location filename="../ClientGUI/steamauth.cpp" line="74"/>
         <source>Calling RequestEncryptedAppTicket encountered unknown error %1.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="develop-equipment">
+        <location filename="../ClientGUI/ui/factoryarea.cpp" line="115"/>
+        <source></source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="construct-ships">
+        <location filename="../ClientGUI/ui/factoryarea.cpp" line="117"/>
+        <source></source>
         <translation type="unfinished"></translation>
     </message>
     <message id="Serial-num">

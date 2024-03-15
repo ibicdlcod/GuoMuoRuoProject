@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1024</width>
-    <height>640</height>
+    <width>1366</width>
+    <height>768</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -245,38 +245,34 @@
          <property name="styleSheet">
           <string notr="true"/>
          </property>
-         <layout class="QHBoxLayout" name="horizontalLayout_4"/>
+         <layout class="QHBoxLayout" name="horizontalLayout_4">
+          <item>
+           <widget class="QWidget" name="FactoryArea" native="true">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+              <horstretch>1</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="minimumSize">
+             <size>
+              <width>1</width>
+              <height>0</height>
+             </size>
+            </property>
+            <property name="styleSheet">
+             <string notr="true"/>
+            </property>
+            <layout class="QGridLayout" name="gridLayout_3"/>
+           </widget>
+          </item>
+         </layout>
         </widget>
        </item>
        <item>
         <widget class="QWidget" name="TechArea" native="true"/>
        </item>
-       <item>
-        <widget class="QWidget" name="FactoryArea" native="true">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
-           <horstretch>1</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="minimumSize">
-          <size>
-           <width>1</width>
-           <height>0</height>
-          </size>
-         </property>
-         <property name="styleSheet">
-          <string notr="true"/>
-         </property>
-         <layout class="QGridLayout" name="gridLayout_3"/>
-        </widget>
-       </item>
       </layout>
-      <zorder>FactoryArea</zorder>
-      <zorder>License</zorder>
-      <zorder>LoginScreen</zorder>
-      <zorder>PortArea</zorder>
-      <zorder>TechArea</zorder>
      </widget>
     </item>
     <item>
@@ -330,7 +326,7 @@ border-style: none;</string>
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1024</width>
+     <width>1366</width>
      <height>21</height>
     </rect>
    </property>

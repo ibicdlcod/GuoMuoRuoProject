@@ -1007,9 +1007,9 @@ QSet<int> Server::generateEquipChilds(int ancestor) {
 }
 
 void Server::generateTestEquip(const CSteamID &uid) {
-    static const double difficulty = 2.0; // higher the value is easier
+    static const double difficulty = 1.0; // higher the value is easier
     std::uniform_real_distribution dist{0.0, 1.0};
-    for(auto equip: equipRegistry.values()) {
+    for(const auto equip: equipRegistry) {
         if(equip->type.isVirtual()) {
             continue;
         }
@@ -1189,7 +1189,7 @@ void Server::newEquipHasMother(const CSteamID &uid, int equipId) {
     Equipment *equip = equipRegistry.value(equipId);
     if(!equipRegistry.contains(equip->attr["Mother"]))
         return;
-    Equipment *mother = equipRegistry.value(equip->attr["Mother"]);
+    //Equipment *mother = equipRegistry.value(equip->attr["Mother"]);
     int64 sonSkillPoints = newEquipHasMotherCal(equipId);
     User::addSkillPoints(uid, equip->attr["Mother"], -sonSkillPoints);
     qDebug() << sonSkillPoints;
@@ -1618,6 +1618,7 @@ void Server::sendTestMessages() {
     }
     else {
         qInfo() << "test";
+        //generateTestEquip(CSteamID((uint64)??));
     }
 }
 

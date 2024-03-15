@@ -3,6 +3,12 @@
 <TS version="2.1" language="ja_JP">
 <context>
     <name></name>
+    <message id="read-dgram-failed">
+        <location filename="../ClientGUI/clientv2.cpp" line="443"/>
+        <location filename="../Server/server.cpp" line="413"/>
+        <source>Read datagram failed due to: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
     <message id="wait-for-connect-failure">
         <location filename="../ClientGUI/clientv2.cpp" line="128"/>
         <source>Failed to connect to server at %1:%2</source>
@@ -52,12 +58,6 @@
     <message id="retransmit-toomuch">
         <location filename="../ClientGUI/clientv2.cpp" line="418"/>
         <source>%1: max restransmit time exceeded!</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message id="read-dgram-failed">
-        <location filename="../ClientGUI/clientv2.cpp" line="443"/>
-        <location filename="../Server/server.cpp" line="413"/>
-        <source>Read datagram failed due to: %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="addequip-usage">
@@ -327,33 +327,6 @@
         <source>Equipment cache length: %1</source>
         <translation type="unfinished"></translation>
     </message>
-    <message id="develop-equipment">
-        <location filename="../ClientGUI/ui/factoryarea.cpp" line="115"/>
-        <source></source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message id="construct-ships">
-        <location filename="../ClientGUI/ui/factoryarea.cpp" line="117"/>
-        <source></source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message id="licence-not-found">
-        <location filename="../ClientGUI/ui/licensearea.cpp" line="30"/>
-        <location filename="../Protocol/commandline.cpp" line="141"/>
-        <source>Can&apos;t find license file, exiting.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message id="naganami-words">
-        <location filename="../ClientGUI/ui/licensearea.cpp" line="45"/>
-        <source>What? Admiral Tanaka? He&apos;s the real deal, isn&apos;t he?
-Great at battle and bad at politics--so cool!</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message id="license-continue">
-        <location filename="../ClientGUI/ui/licensearea.cpp" line="53"/>
-        <source>Continue</source>
-        <translation type="unfinished"></translation>
-    </message>
     <message id="steam-60-sec">
         <location filename="../ClientGUI/steamauth.cpp" line="20"/>
         <source>Steam API &apos;RequestEncryptedAppTicket&apos; is subject to a 60 second rate limit.</source>
@@ -393,6 +366,33 @@ Great at battle and bad at politics--so cool!</source>
     <message id="request-app-ticket-fail-unknown">
         <location filename="../ClientGUI/steamauth.cpp" line="74"/>
         <source>Calling RequestEncryptedAppTicket encountered unknown error %1.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="develop-equipment">
+        <location filename="../ClientGUI/ui/factoryarea.cpp" line="115"/>
+        <source></source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="construct-ships">
+        <location filename="../ClientGUI/ui/factoryarea.cpp" line="117"/>
+        <source></source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="licence-not-found">
+        <location filename="../ClientGUI/ui/licensearea.cpp" line="30"/>
+        <location filename="../Protocol/commandline.cpp" line="141"/>
+        <source>Can&apos;t find license file, exiting.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="naganami-words">
+        <location filename="../ClientGUI/ui/licensearea.cpp" line="45"/>
+        <source>What? Admiral Tanaka? He&apos;s the real deal, isn&apos;t he?
+Great at battle and bad at politics--so cool!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="license-continue">
+        <location filename="../ClientGUI/ui/licensearea.cpp" line="53"/>
+        <source>Continue</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="Serial-num">
