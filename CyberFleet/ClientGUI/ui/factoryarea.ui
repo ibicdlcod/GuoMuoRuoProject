@@ -237,21 +237,26 @@
    <item>
     <widget class="QFrame" name="ArsenalArea">
      <property name="sizePolicy">
-      <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
-       <horstretch>0</horstretch>
+      <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+       <horstretch>255</horstretch>
        <verstretch>255</verstretch>
       </sizepolicy>
      </property>
-     <property name="frameShape">
-      <enum>QFrame::StyledPanel</enum>
+     <property name="baseSize">
+      <size>
+       <width>0</width>
+       <height>0</height>
+      </size>
      </property>
-     <property name="frameShadow">
-      <enum>QFrame::Raised</enum>
+     <property name="styleSheet">
+      <string notr="true"/>
      </property>
-     <layout class="QVBoxLayout" name="verticalLayout_3"/>
     </widget>
    </item>
   </layout>
+  <zorder>ArsenalArea</zorder>
+  <zorder>FactoryLabel</zorder>
+  <zorder>Slots</zorder>
  </widget>
  <customwidgets>
   <customwidget>

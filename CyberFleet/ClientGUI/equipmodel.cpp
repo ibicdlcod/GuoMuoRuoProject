@@ -31,7 +31,8 @@ void EquipModel::setPageNumHint(int input) {
     pageNum = input;
     int newRowCount = rowCount();
     if(oldRowCount < newRowCount) {
-        beginInsertRows(QModelIndex(), 0, newRowCount - 1);
+        beginInsertRows(QModelIndex(), 0,
+                        newRowCount - oldRowCount - 1);
         endInsertRows();
     }
     else if(oldRowCount > newRowCount) {
@@ -48,7 +49,8 @@ void EquipModel::setRowsPerPageHint(int input) {
     rowsPerPage = input;
     int newRowCount = rowCount();
     if(oldRowCount < newRowCount) {
-        beginInsertRows(QModelIndex(), 0, newRowCount - 1);
+        beginInsertRows(QModelIndex(), 0,
+                        newRowCount - oldRowCount - 1);
         endInsertRows();
     }
     else if(oldRowCount > newRowCount) {
@@ -101,6 +103,7 @@ QVariant EquipModel::data(const QModelIndex &index, int role) const {
 }
 
 void EquipModel::updateEquipmentList(const QJsonObject &input) {
+    int oldRowCount = rowCount();
     static QMetaObject::Connection connection;
     Clientv2 &engine = Clientv2::getInstance();
     if(engine.isEquipRegistryCacheGood()) {
@@ -116,15 +119,17 @@ void EquipModel::updateEquipmentList(const QJsonObject &input) {
             clientEquipStars[uid] = star;
         }
         int newRowCount = rowCount();
-        beginInsertRows(QModelIndex(), 0, newRowCount - 1);
+        beginInsertRows(QModelIndex(), 0,
+                        newRowCount - oldRowCount - 1);
         endInsertRows();
         wholeTableChanged();
+        emit needReCalculateRows();
     }
-    else {/*
+    else {  /*
         connection = connect(&engine, &Clientv2::equipRegistryComplete,
                              this, [this, &input](){
             QTimer::singleShot(100, [=, this](){updateEquipmentList(input);});});
-*/
+            */
     }
     return;
 }

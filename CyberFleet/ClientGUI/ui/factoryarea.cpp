@@ -9,7 +9,14 @@ FactoryArea::FactoryArea(QWidget *parent) :
     ui(new Ui::FactoryArea)
 {
     ui->setupUi(this);
+    ui->ArsenalArea->setObjectName("arsenalarea");
+    ui->ArsenalArea->setStyleSheet("QFrame#arsenalarea { border-style: none }");
     arsenalView = new QTableView(ui->ArsenalArea);
+    arsenalView->setObjectName("arsenalview");
+    arsenalView->setStyleSheet("QTableView#arsenalview { border-style: none }");
+    QHBoxLayout *layout = new QHBoxLayout;
+    layout->addWidget(arsenalView);
+    ui->ArsenalArea->setLayout(layout);
 
     Clientv2 &engine = Clientv2::getInstance();
     connect(&engine, &Clientv2::receivedFactoryRefresh,
@@ -133,10 +140,22 @@ void FactoryArea::switchToDevelop() {
         Clientv2 &engine = Clientv2::getInstance();
         engine.equipModel.setIsInArsenal(true);
         arsenalView->setModel(&(engine.equipModel));
+        connect(&(engine.equipModel), &EquipModel::needReCalculateRows,
+                this, &FactoryArea::recalculateArsenalRows);
+        connect(this, &FactoryArea::rowCountHint,
+                &(engine.equipModel), &EquipModel::setRowsPerPageHint);
         engine.doRefreshFactoryArsenal();
-        arsenalView->show();
-        arsenalView->setGeometry(ui->ArsenalArea->rect());
-        qCritical() << arsenalView->verticalHeader()->sectionSize(0);
+        arsenalView->hide();
+        //arsenalView->setGeometry(ui->ArsenalArea->rect());
         break;
     }
+}
+
+void FactoryArea::recalculateArsenalRows() {
+    int rowSize = arsenalView->verticalHeader()->sectionSize(0);
+    int rowSizeAvailable = ui->ArsenalArea->size().height()
+                           - arsenalView->horizontalHeader()->size().height();
+    emit rowCountHint(std::max(rowSizeAvailable / rowSize - 1, 1));
+    arsenalView->setGeometry(ui->ArsenalArea->rect());
+    arsenalView->show();
 }

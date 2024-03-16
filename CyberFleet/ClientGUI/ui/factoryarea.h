@@ -21,6 +21,12 @@ public:
     void setDevelop(KP::FactoryState);
     void switchToDevelop();
 
+signals:
+    void rowCountHint(int);
+
+public slots:
+    void recalculateArsenalRows();
+
 private slots:
     void developClicked(bool checked = false, int slotnum = 0);
     void doFactoryRefresh(const QJsonObject &);

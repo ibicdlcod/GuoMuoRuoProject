@@ -12,6 +12,9 @@ class EquipModel : public QAbstractTableModel
 public:
     explicit EquipModel(QObject *parent = nullptr, bool isInArsenal = true);
 
+signals:
+    void needReCalculateRows();
+
 public slots:
     void destructEquipment(const QList<QUuid> &);
     void updateEquipmentList(const QJsonObject &);
