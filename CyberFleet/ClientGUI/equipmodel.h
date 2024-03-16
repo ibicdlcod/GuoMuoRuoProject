@@ -14,17 +14,27 @@ public:
 
 public slots:
     void destructEquipment(const QList<QUuid> &);
-    //void getEquipmentList();
+    void updateEquipmentList(const QJsonObject &);
     void setPageNumHint(int);
     void setRowsPerPageHint(int);
 
+public:
+    virtual int rowCount(const QModelIndex &parent
+                         = QModelIndex()) const override;
+    virtual int columnCount(const QModelIndex &parent
+                         = QModelIndex()) const override;
+    virtual QVariant data(const QModelIndex &index,
+                          int role = Qt::DisplayRole) const override;
+
 private:
     int numberOfColumns() const;
+    int numberOfEquip() const;
 
     QHash<QUuid, Equipment *> clientEquips;
+    QHash<QUuid, int> clientEquipStars;
     QList<QUuid> sortedEquipIds; // not sort by uuid but equiptype
     int rowsPerPage = 1;
-    int pageNum = 1;
+    int pageNum = 0;
     bool isInArsenal;
 };
 

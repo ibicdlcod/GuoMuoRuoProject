@@ -19,6 +19,12 @@
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
     <widget class="QLabel" name="FactoryLabel">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Preferred" vsizetype="MinimumExpanding">
+       <horstretch>0</horstretch>
+       <verstretch>40</verstretch>
+      </sizepolicy>
+     </property>
      <property name="font">
       <font>
        <pointsize>30</pointsize>
@@ -34,6 +40,18 @@
    </item>
    <item>
     <widget class="QFrame" name="Slots">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+       <horstretch>0</horstretch>
+       <verstretch>111</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>0</height>
+      </size>
+     </property>
      <property name="frameShape">
       <enum>QFrame::StyledPanel</enum>
      </property>
@@ -218,6 +236,12 @@
    </item>
    <item>
     <widget class="QFrame" name="ArsenalArea">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+       <horstretch>0</horstretch>
+       <verstretch>255</verstretch>
+      </sizepolicy>
+     </property>
      <property name="frameShape">
       <enum>QFrame::StyledPanel</enum>
      </property>
@@ -226,7 +250,7 @@
      </property>
      <layout class="QVBoxLayout" name="verticalLayout_3">
       <item alignment="Qt::AlignHCenter|Qt::AlignVCenter">
-       <widget class="QLabel" name="label">
+       <widget class="QLabel" name="FuckLabel">
         <property name="text">
          <string>Fuck</string>
         </property>

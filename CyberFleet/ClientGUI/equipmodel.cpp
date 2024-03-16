@@ -42,3 +42,32 @@ int EquipModel::numberOfColumns() const {
     else
         return 2; // equip/star
 }
+
+int EquipModel::numberOfEquip() const {
+    return clientEquips.size();
+}
+
+int EquipModel::rowCount(const QModelIndex &parent) const {
+    if(parent.isValid())
+        return 0;
+    else {
+        return std::min(numberOfEquip() - rowsPerPage * pageNum,
+                        rowsPerPage);
+    }
+}
+
+int EquipModel::columnCount(const QModelIndex &parent) const {
+    if(parent.isValid())
+        return 0;
+    else
+        return numberOfColumns();
+}
+
+QVariant EquipModel::data(const QModelIndex &index, int role) const {
+    return "";
+}
+
+void EquipModel::updateEquipmentList(const QJsonObject &input) {
+    qWarning() << input;
+    return;
+}

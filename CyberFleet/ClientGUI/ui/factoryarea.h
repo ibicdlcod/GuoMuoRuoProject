@@ -23,6 +23,7 @@ public:
 private slots:
     void developClicked(bool checked = false, int slotnum = 0);
     void doFactoryRefresh(const QJsonObject &);
+    void updateArsenalEquip(const QJsonObject &);
 
 private:
     Ui::FactoryArea *ui;

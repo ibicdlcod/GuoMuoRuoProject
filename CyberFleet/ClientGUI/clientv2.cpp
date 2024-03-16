@@ -75,6 +75,8 @@ Clientv2::Clientv2(QObject *parent)
     connect(&recv, &Receiver::nonStandardReceived,
             this, &Clientv2::serverResponseNonStd);
 
+    connect(this, &Clientv2::receivedArsenalEquip,
+            &equipModel, &EquipModel::updateEquipmentList);
     // May cause issues?
     timer = new QTimer(this);
     connect(timer, &QTimer::timeout, this, &Clientv2::uiRefresh);
@@ -594,7 +596,6 @@ void Clientv2::doRefreshFactory() {
 }
 
 void Clientv2::doRefreshFactoryArsenal() {
-    qCritical("GOOD");
     QByteArray msg = KP::clientDemandEquipInfoUser();
     sender->enqueue(msg);
     socket.flush();
@@ -854,6 +855,7 @@ void Clientv2::receivedInfo(const QJsonObject &djson) {
     switch(djson["infotype"].toInt()) {
     case KP::InfoType::FactoryInfo: emit receivedFactoryRefresh(djson); break;
     case KP::InfoType::EquipInfo: updateEquipCache(djson); break;
+    case KP::InfoType::EquipInfoUser: emit receivedArsenalEquip(djson); break;
     case KP::InfoType::GlobalTechInfo:
         if(djson.contains("value"))
             emit receivedGlobalTechInfo(djson);

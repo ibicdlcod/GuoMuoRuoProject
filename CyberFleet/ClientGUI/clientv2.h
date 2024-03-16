@@ -58,6 +58,7 @@
 #include "steamauth.h"
 #include "ui/developwindow.h"
 #include "ui/techview.h"
+#include "equipmodel.h"
 
 void customMessageHandler(QtMsgType,
                           const QMessageLogContext &,
@@ -95,6 +96,7 @@ public:
     int equipBigTypeIndex = 0;
     int equipIndex = 0;
     bool equipRegistryCacheGood = false;
+    EquipModel equipModel;
 
 public slots:
     void autoPassword();
@@ -127,6 +129,7 @@ signals:
     void gamestateChanged(KP::GameState);
     void qout(QString, QColor background = QColor("white"),
               QColor foreground = QColor("black"));
+    void receivedArsenalEquip(const QJsonObject &);
     void receivedFactoryRefresh(const QJsonObject &);
     void receivedGlobalTechInfo(const QJsonObject &);
     void receivedGlobalTechInfo2(const QJsonObject &);

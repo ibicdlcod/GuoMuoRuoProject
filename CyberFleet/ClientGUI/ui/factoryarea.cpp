@@ -11,7 +11,9 @@ FactoryArea::FactoryArea(QWidget *parent) :
 
     Clientv2 &engine = Clientv2::getInstance();
     connect(&engine, &Clientv2::receivedFactoryRefresh,
-                     this, &FactoryArea::doFactoryRefresh);
+            this, &FactoryArea::doFactoryRefresh);
+    connect(&engine, &Clientv2::receivedArsenalEquip,
+            this, &FactoryArea::updateArsenalEquip);
     slotfs.append(ui->Factory_Slot_0);
     slotfs.append(ui->Factory_Slot_1);
     slotfs.append(ui->Factory_Slot_2);
@@ -38,7 +40,7 @@ FactoryArea::FactoryArea(QWidget *parent) :
     slotfs.append(ui->Factory_Slot_23);
     for(auto iter = slotfs.begin(); iter < slotfs.end(); ++iter) {
         connect((*iter), &FactorySlot::clickedSpec,
-                         this, &FactoryArea::developClicked);
+                this, &FactoryArea::developClicked);
         (*iter)->setSlotnum(iter - slotfs.begin());
         (*iter)->setStatus();
     }
@@ -101,6 +103,9 @@ void FactoryArea::doFactoryRefresh(const QJsonObject &input) {
         }
         slotfs[i]->setStatus();
     }
+}
+
+void FactoryArea::updateArsenalEquip(const QJsonObject &input) {
 }
 
 void FactoryArea::setDevelop(KP::FactoryState state) {
