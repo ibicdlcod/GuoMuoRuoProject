@@ -71,7 +71,7 @@ TechView::~TechView()
 
 void TechView::demandGlobalTech() {
     Clientv2 &engine = Clientv2::getInstance();
-    if(!engine.equipRegistryCacheGood)
+    if(!engine.isEquipRegistryCacheGood())
         return;
     else {
         engine.switchToTech2();

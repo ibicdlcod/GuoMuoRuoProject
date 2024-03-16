@@ -92,10 +92,10 @@ public:
     friend void TechView::demandLocalTech(int);
     friend void TechView::demandSkillPoints(int);
     friend void TechView::resetLocalListName();
+    friend void EquipModel::updateEquipmentList(const QJsonObject &);
 
     int equipBigTypeIndex = 0;
     int equipIndex = 0;
-    bool equipRegistryCacheGood = false;
     EquipModel equipModel;
 
 public slots:
@@ -196,6 +196,7 @@ private:
 
     KP::GameState gameState;
     QMap<int, Equipment *> equipRegistryCache;
+    bool equipRegistryCacheGood = false;
 
 #pragma message(NOT_M_CONST)
     const QByteArray defaultSalt =

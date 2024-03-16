@@ -1,5 +1,7 @@
 #include "equipmodel.h"
+#include <QJsonArray>
 #include <algorithm>
+#include "clientv2.h"
 
 #ifdef max
 #undef max
@@ -15,6 +17,10 @@ void EquipModel::destructEquipment(const QList<QUuid> &destructed) {
                           {
                               return destructed.contains(i.key());
                           });
+    clientEquipStars.removeIf([&destructed](QHash<QUuid, int>::iterator i)
+                              {
+                                  return destructed.contains(i.key());
+                              });
     QModelIndex topleft = this->index(0, 0);
     QModelIndex bottomright = this->index(rowsPerPage - 1, numberOfColumns());
     emit dataChanged(topleft, bottomright, QList<int>());
@@ -68,6 +74,24 @@ QVariant EquipModel::data(const QModelIndex &index, int role) const {
 }
 
 void EquipModel::updateEquipmentList(const QJsonObject &input) {
-    qWarning() << input;
+    static QMetaObject::Connection connection;
+    Clientv2 &engine = Clientv2::getInstance();
+    if(engine.isEquipRegistryCacheGood()) {
+        if(connection)
+            disconnect(connection);
+        QJsonArray inputArray = input["content"].toArray();
+        for(const QJsonValueRef item: inputArray) {
+            QJsonObject itemObject = item.toObject();
+            QUuid uid = QUuid(itemObject["serial"].toString());
+            Equipment *equip = engine.equipRegistryCache[itemObject["def"].toInt()];
+            int star = itemObject["star"].toInt();
+            clientEquips[uid] = equip;
+            clientEquipStars[uid] = star;
+        }
+    }
+    else {
+        connection = connect(&engine, &Clientv2::equipRegistryComplete,
+                this, [this, &input](){updateEquipmentList(input);});
+    }
     return;
 }
