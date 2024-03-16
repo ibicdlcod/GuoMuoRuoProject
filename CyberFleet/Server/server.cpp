@@ -479,7 +479,7 @@ Server::calculateTech(const CSteamID &uid, int jobID) {
                       " FROM UserEquip WHERE User = :id;");
         query.bindValue(":id", uid.ConvertToUint64());
         if(!query.exec() || !query.isSelect()) {
-            throw DBError(qtTrId("user-check-resource-failed")
+            throw DBError(qtTrId("user-calculate-tech-failed")
                               .arg(uid.ConvertToUint64()),
                           query.lastError());
         }
@@ -551,6 +551,7 @@ double Server::getSkillPointsEffect(const CSteamID &uid, int equipId) {
 }
 
 void Server::offerEquipInfo(QSslSocket *connection, int index = 0) {
+    Q_UNUSED(index)
     QJsonArray equipInfos;
     int i = 0;
     for(auto equipIdIter = equipRegistry.keyBegin();
@@ -582,6 +583,34 @@ void Server::offerEquipInfo(QSslSocket *connection, int index = 0) {
         KP::serverEquipInfo(equipInfos, true);
     senderM.sendMessage(connection, msg);
     connection->flush();
+}
+
+void Server::offerEquipInfoUser(const CSteamID &uid,
+                                QSslSocket *connection) {
+    QMap<QUuid, Equipment *> equips;
+    QJsonArray UserEquipInfos;
+    try{
+        QSqlDatabase db = QSqlDatabase::database();
+        QSqlQuery query;
+        query.prepare("SELECT EquipDef, EquipUuid, Star"
+                      " FROM UserEquip WHERE User = :id;");
+        query.bindValue(":id", uid.ConvertToUint64());
+        if(!query.exec() || !query.isSelect()) {
+            throw DBError(qtTrId("user-get-equip-list-failed")
+                              .arg(uid.ConvertToUint64()),
+                          query.lastError());
+        }
+        else {
+            qCritical("GOOD");
+        }
+    } catch (DBError &e) {
+        for(QString &i : e.whats()) {
+            qCritical() << i;
+        }
+    } catch (std::exception &e) {
+        qCritical() << e.what();
+
+    }
 }
 
 void Server::offerResourceInfo(QSslSocket *connection,
@@ -618,7 +647,6 @@ void Server::offerTechInfo(QSslSocket *connection, const CSteamID &uid,
 void Server::offerTechInfoComponents(
     QSslSocket *connection, const QList<TechEntry> &content,
     bool initial, bool global) {
-
     /* see e337bb37ef2ee656321dc9688679a6c6f118cc16 for previous version
      * if this stopped working */
     connection->flush();
@@ -845,7 +873,7 @@ void Server::doFetch(CSteamID &uid, int factoryid, QSslSocket *connection) {
                     equipRegistry.value(jobID)->disallowMassProduction()) {
                     /* get skill points (non-massproduced only)*/
                     int64 stdSkillPoints = equipRegistry.value(jobID)
-                                                ->skillPointsStd();
+                                               ->skillPointsStd();
                     /* 10*(thisEquipTech - globalTech)^2,
                      * cannot be lower than 1.0 */
                     double difficultyFactor
@@ -1573,14 +1601,21 @@ void Server::receivedReq(const QJsonObject &djson,
                            [connection, this]{offerEquipInfo(connection);});
     }
     break;
+    case KP::CommandType::DemandEquipInfoUser: {
+        QTimer::singleShot(100,
+                           this,
+                           [connection, uid, this]
+                           {offerEquipInfoUser(uid, connection);});
+    }
+    break;
     case KP::CommandType::DemandGlobalTech: {
         QTimer::singleShot(100,
                            this,
                            [connection, uid, djson, this]
                            {offerTechInfo(
-                                 connection,
-                                 uid,
-                                 djson["local"].toInt());});
+                  connection,
+                  uid,
+                  djson["local"].toInt());});
     }
     break;
     case KP::CommandType::DemandSkillPoints: {
@@ -1588,9 +1623,9 @@ void Server::receivedReq(const QJsonObject &djson,
                            this,
                            [connection, uid, djson, this]
                            {offerSPInfo(
-                                 connection,
-                                 uid,
-                                 djson["equipid"].toInt());});
+                  connection,
+                  uid,
+                  djson["equipid"].toInt());});
     }
     break;
     case KP::CommandType::DemandResourceUpdate: {
@@ -1598,8 +1633,8 @@ void Server::receivedReq(const QJsonObject &djson,
                            this,
                            [connection, uid, this]
                            {offerResourceInfo(
-                                 connection,
-                                 uid);});
+                  connection,
+                  uid);});
     }
     break;
     default:

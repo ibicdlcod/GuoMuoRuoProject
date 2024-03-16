@@ -81,11 +81,19 @@ Equipment::Equipment(const QJsonObject &input) {
 }
 
 bool Equipment::operator<(const Equipment &other) const {
-    return equipRegId < other.equipRegId;
+    if(this->type.getTypeSort() != other.type.getTypeSort())
+        return this->type.getTypeSort() < other.type.getTypeSort();
+    else
+        return equipRegId < other.equipRegId;
 }
 
 QString Equipment::toString(QString lang) const {
     return localNames[lang];
+}
+
+void Equipment::addStar() {
+    if(star < 0xf)
+        star++;
 }
 
 const ResOrd Equipment::devRes() const {
@@ -114,6 +122,12 @@ bool Equipment::disallowProduction() const {
 
 int Equipment::getId() const {
     return equipRegId;
+}
+
+unsigned int Equipment::getStar() const {
+    if(star > 0xf)
+        return 0xf;
+    return star;
 }
 
 double Equipment::getTech() const {

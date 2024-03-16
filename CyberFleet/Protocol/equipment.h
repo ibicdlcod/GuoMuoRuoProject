@@ -1,4 +1,4 @@
-#ifndef EQUIPMENT_H
+﻿#ifndef EQUIPMENT_H
 #define EQUIPMENT_H
 
 #include <QList>
@@ -7,7 +7,7 @@
 #include <QString>
 #include "resord.h"
 #include "equiptype.h"
-#include "steam/steamclientpublic.h"
+//#include "steam/steamclientpublic.h"
 
 class Equipment: public QObject {
     Q_OBJECT
@@ -19,12 +19,14 @@ public:
     bool operator<(const Equipment &) const;
     QString toString(QString) const;
 
-    bool canDevelop(CSteamID userid = k_steamIDNil) const;
+    void addStar();
+    //bool canDevelop(const CSteamID &userid = k_steamIDNil) const;
     const ResOrd devRes() const;
     const int devTimeInSec() const;
     bool disallowMassProduction() const;
     bool disallowProduction() const;
     int getId() const;
+    unsigned int getStar() const;
     double getTech() const;
     bool isInvalid() const;
     int skillPointsStd() const;
@@ -36,6 +38,7 @@ public:
 
 private:
     int equipRegId;
+    unsigned int star = 0;
 };
 
 #endif // EQUIPMENT_H

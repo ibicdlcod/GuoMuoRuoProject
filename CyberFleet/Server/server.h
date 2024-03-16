@@ -56,6 +56,7 @@
 #include <QSslConfiguration>
 #include <QtNetwork>
 #include <random>
+#include "steam/steamclientpublic.h"
 
 #include "../Protocol/commandline.h"
 #include "../Protocol/equipment.h"
@@ -90,6 +91,7 @@ private slots:
     void handleNewConnection();
     double getSkillPointsEffect(const CSteamID &, int);
     void offerEquipInfo(QSslSocket *, int);
+    void offerEquipInfoUser(const CSteamID &, QSslSocket *);
     void offerTechInfo(QSslSocket *, const CSteamID &, int jobID = 0);
     void offerTechInfoComponents(QSslSocket *, const QList<TechEntry> &,
                                    bool, bool);

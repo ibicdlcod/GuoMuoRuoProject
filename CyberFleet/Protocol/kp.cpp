@@ -72,6 +72,13 @@ QByteArray KP::clientDemandEquipInfo() {
     return QCborValue::fromJsonValue(result).toCbor();
 }
 
+QByteArray KP::clientDemandEquipInfoUser() {
+    QJsonObject result;
+    result["type"] = DgramType::Request;
+    result["command"] = CommandType::DemandEquipInfoUser;
+    return QCborValue::fromJsonValue(result).toCbor();
+}
+
 QByteArray KP::clientDemandGlobalTech(int local) {
     QJsonObject result;
     result["type"] = DgramType::Request;
@@ -190,10 +197,13 @@ QByteArray KP::serverDevelopStart() {
     return QCborValue::fromJsonValue(result).toCbor();
 }
 
-QByteArray KP::serverEquipInfo(QJsonArray &input, bool final) {
+QByteArray KP::serverEquipInfo(QJsonArray &input, bool final, bool user) {
     QJsonObject result;
     result["type"] = DgramType::Info;
-    result["infotype"] = InfoType::EquipInfo;
+    if(user)
+        result["infotype"] = InfoType::EquipInfoUser;
+    else
+        result["infotype"] = InfoType::EquipInfo;
     result["content"] = input;
     result["final"] = final;
     return QCborValue::fromJsonValue(result).toCbor();

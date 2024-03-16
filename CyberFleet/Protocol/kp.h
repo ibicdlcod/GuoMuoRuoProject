@@ -111,6 +111,7 @@ enum CommandType{
     CHello,
     AdminAddEquip,
     DemandEquipInfo,
+    DemandEquipInfoUser,
     DemandGlobalTech,
     DemandSkillPoints,
     DemandResourceUpdate
@@ -136,6 +137,7 @@ Q_ENUM_NS(FactoryState)
 enum InfoType{
     FactoryInfo,
     EquipInfo,
+    EquipInfoUser,
     GlobalTechInfo,
     LocalTechInfo,
     SkillPointInfo,
@@ -162,6 +164,7 @@ QByteArray accessDenied();
 QByteArray catbomb();
 QByteArray clientAddEquip(int);
 QByteArray clientDemandEquipInfo();
+QByteArray clientDemandEquipInfoUser();
 QByteArray clientDemandGlobalTech(int local = 0);
 QByteArray clientDemandResourceUpdate();
 QByteArray clientDemandSkillPoints(int);
@@ -177,7 +180,7 @@ QByteArray serverDevelopFailed(GameError);
 QByteArray serverDevelopStart();
 QByteArray serverEquipLackFather(GameError, int);
 QByteArray serverEquipLackMother(GameError, int, int64);
-QByteArray serverEquipInfo(QJsonArray &, bool);
+QByteArray serverEquipInfo(QJsonArray &, bool, bool user = false);
 QByteArray serverFairyBusy(int);
 QByteArray serverGlobalTech(double, bool);
 QByteArray serverGlobalTech(const QList<TechEntry> &, bool, bool, bool);

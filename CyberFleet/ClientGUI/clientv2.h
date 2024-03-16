@@ -191,6 +191,7 @@ private:
     bool logoutPending;
 
     KP::GameState gameState;
+    QMap<int, Equipment *> equipRegistryCache;
 
 #pragma message(NOT_M_CONST)
     const QByteArray defaultSalt =
@@ -202,11 +203,9 @@ private:
     QByteArray authCache;
     bool authSent = false;
 
-    QMap<int, Equipment *> equipRegistryCache;
-
     QTimer *timer;
 
-    Q_DISABLE_COPY(Clientv2)
+    Q_DISABLE_COPY_MOVE(Clientv2)
 };
 
 #endif // CLIENTV2_H

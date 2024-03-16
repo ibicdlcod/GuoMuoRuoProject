@@ -30,6 +30,10 @@ int EquipType::iconGroup() const {
     return groupToIcon.value(toString(), 0);
 }
 
+int EquipType::getTypeSort() const {
+    return displaySort.value(toString(), 0);
+}
+
 QSet<QString> EquipType::getDisplayGroups() {
     QSet<QString> result;
     for(auto &value: displayGroup) {
