@@ -593,6 +593,13 @@ void Clientv2::doRefreshFactory() {
     socket.flush();
 }
 
+void Clientv2::doRefreshFactoryArsenal() {
+    qCritical("GOOD");
+    QByteArray msg = KP::clientDemandEquipInfoUser();
+    sender->enqueue(msg);
+    socket.flush();
+}
+
 Equipment * Clientv2::getEquipmentReg(int equipid) {
     if(!equipRegistryCache.contains(equipid))
         return new Equipment(0);

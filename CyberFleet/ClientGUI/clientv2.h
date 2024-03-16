@@ -103,6 +103,7 @@ public slots:
     void demandEquipCache();
     void displayPrompt();
     void doRefreshFactory();
+    void doRefreshFactoryArsenal();
     Equipment * getEquipmentReg(int);
     bool parse(const QString &);
     void parseDisconnectReq();

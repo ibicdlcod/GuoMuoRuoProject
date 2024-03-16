@@ -79,7 +79,7 @@ MainWindow::MainWindow(QWidget *parent, int argc, char ** argv)
     connect(ui->actionArsenal, &QAction::triggered,
             &engine, &Clientv2::switchToFactory);
     connect(ui->actionArsenal, &QAction::triggered,
-            this, &MainWindow::switchToConstruct);
+            this, &MainWindow::switchToArsenal);
     connect(ui->actionLogout, &QAction::triggered,
             &engine, &Clientv2::parseDisconnectReq);
     connect(ui->actionExit, &QAction::triggered,
@@ -173,6 +173,15 @@ void MainWindow::factoryRefresh() {
     QString cmd1 = QStringLiteral("refresh Factory");
     Clientv2 &engine = Clientv2::getInstance();
     engine.parse(cmd1);
+}
+
+void MainWindow::switchToArsenal() {
+    Clientv2 &engine = Clientv2::getInstance();
+    if(!engine.loggedIn()) {
+        return;
+    }
+    factoryArea->setDevelop(KP::Arsenal);
+    factoryArea->switchToDevelop();
 }
 
 void MainWindow::switchToConstruct() {

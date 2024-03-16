@@ -604,7 +604,6 @@ void Server::offerEquipInfoUser(const CSteamID &uid,
                           query.lastError());
         }
         else {
-            qCritical("GOOD");
             QUuid serial;
             int def;
             int star;
@@ -618,7 +617,6 @@ void Server::offerEquipInfoUser(const CSteamID &uid,
                 output["star"] = star;
                 userEquipInfos.append(output);
             }
-            qDebug() << userEquipInfos;
             connection->flush();
             QByteArray msg =
                 KP::serverEquipInfo(userEquipInfos, true, true);

@@ -37,6 +37,7 @@ private slots:
                       QColor foreground = QColor("black"));
     void processCmd();
     void factoryRefresh();
+    void switchToArsenal();
     void switchToConstruct();
     void switchToDevelop();
     void updateResources(const QJsonObject &);

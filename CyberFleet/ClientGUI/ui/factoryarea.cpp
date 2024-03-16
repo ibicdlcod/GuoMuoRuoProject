@@ -111,13 +111,20 @@ void FactoryArea::switchToDevelop() {
     switch(factoryState) {
     case KP::Development:
         ui->FactoryLabel->setText(qtTrId("develop-equipment"));
+        ui->Slots->show();
+        ui->ArsenalArea->hide();
         break;
     case KP::Construction:
         ui->FactoryLabel->setText(qtTrId("construct-ships"));
+        ui->Slots->show();
+        ui->ArsenalArea->hide();
         break;
     case KP::Arsenal:
         ui->FactoryLabel->setText(qtTrId("arsenal"));
+        ui->Slots->hide();
+        ui->ArsenalArea->show();
+        Clientv2 &engine = Clientv2::getInstance();
+        engine.doRefreshFactoryArsenal();
         break;
     }
-
 }
