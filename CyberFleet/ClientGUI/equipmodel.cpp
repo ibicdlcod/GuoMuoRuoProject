@@ -27,15 +27,33 @@ void EquipModel::destructEquipment(const QList<QUuid> &destructed) {
 }
 
 void EquipModel::setPageNumHint(int input) {
+    int oldRowCount = rowCount();
     pageNum = input;
+    int newRowCount = rowCount();
+    if(oldRowCount < newRowCount) {
+        beginInsertRows(QModelIndex(), 0, newRowCount - 1);
+        endInsertRows();
+    }
+    else if(oldRowCount > newRowCount) {
+        removeRows(newRowCount, oldRowCount - newRowCount);
+    }
     wholeTableChanged();
 }
 
 void EquipModel::setRowsPerPageHint(int input) {
+    int oldRowCount = rowCount();
     QModelIndex topleft = this->index(0, 0);
     QModelIndex bottomright = this->index(
         std::max(rowsPerPage-1, input-1), numberOfColumns());
     rowsPerPage = input;
+    int newRowCount = rowCount();
+    if(oldRowCount < newRowCount) {
+        beginInsertRows(QModelIndex(), 0, newRowCount - 1);
+        endInsertRows();
+    }
+    else if(oldRowCount > newRowCount) {
+        removeRows(newRowCount, oldRowCount - newRowCount);
+    }
     emit dataChanged(topleft, bottomright, QList<int>());
 }
 

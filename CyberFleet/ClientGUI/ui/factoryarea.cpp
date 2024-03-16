@@ -2,6 +2,7 @@
 #include "ui_factoryarea.h"
 #include "../clientv2.h"
 #include "developwindow.h"
+#include <QHeaderView>
 
 FactoryArea::FactoryArea(QWidget *parent) :
     QFrame(parent),
@@ -135,6 +136,7 @@ void FactoryArea::switchToDevelop() {
         engine.doRefreshFactoryArsenal();
         arsenalView->show();
         arsenalView->setGeometry(ui->ArsenalArea->rect());
+        qCritical() << arsenalView->verticalHeader()->sectionSize(0);
         break;
     }
 }
