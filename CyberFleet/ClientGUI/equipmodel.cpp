@@ -56,9 +56,11 @@ int EquipModel::numberOfEquip() const {
 }
 
 int EquipModel::rowCount(const QModelIndex &parent) const {
-    //return std::min(numberOfEquip() - rowsPerPage * pageNum,
-    //                       rowsPerPage);
-    return 1;
+    if(parent.isValid())
+        return 0;
+    else
+        return std::min(numberOfEquip() - rowsPerPage * pageNum,
+                        rowsPerPage);
 }
 
 int EquipModel::columnCount(const QModelIndex &parent) const {
@@ -95,6 +97,9 @@ void EquipModel::updateEquipmentList(const QJsonObject &input) {
             clientEquips[uid] = equip;
             clientEquipStars[uid] = star;
         }
+        int newRowCount = rowCount();
+        beginInsertRows(QModelIndex(), 0, newRowCount - 1);
+        endInsertRows();
         wholeTableChanged();
     }
     else {/*
@@ -108,9 +113,6 @@ void EquipModel::updateEquipmentList(const QJsonObject &input) {
 
 void EquipModel::wholeTableChanged() {
     QModelIndex topleft = this->index(0, 0);
-    QModelIndex bottomright = this->index(rowsPerPage - 1, numberOfColumns() - 1);
-    qWarning() << topleft.row() << "/" << topleft.column();
-    qWarning() << bottomright.row() << "/" << bottomright.column();
+    QModelIndex bottomright = this->index(rowCount() - 1, columnCount() - 1);
     emit dataChanged(topleft, bottomright, QList<int>());
-    qWarning() << "RC" << rowCount(this->index(0,0));
 }
