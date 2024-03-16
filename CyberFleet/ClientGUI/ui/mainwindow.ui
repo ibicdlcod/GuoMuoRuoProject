@@ -245,34 +245,38 @@
          <property name="styleSheet">
           <string notr="true"/>
          </property>
-         <layout class="QHBoxLayout" name="horizontalLayout_4">
-          <item>
-           <widget class="QWidget" name="FactoryArea" native="true">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
-              <horstretch>1</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
-            <property name="minimumSize">
-             <size>
-              <width>1</width>
-              <height>0</height>
-             </size>
-            </property>
-            <property name="styleSheet">
-             <string notr="true"/>
-            </property>
-            <layout class="QGridLayout" name="gridLayout_3"/>
-           </widget>
-          </item>
-         </layout>
+         <layout class="QHBoxLayout" name="horizontalLayout_4"/>
         </widget>
        </item>
        <item>
         <widget class="QWidget" name="TechArea" native="true"/>
        </item>
+       <item>
+        <widget class="QWidget" name="FactoryArea" native="true">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+           <horstretch>1</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>1</width>
+           <height>0</height>
+          </size>
+         </property>
+         <property name="styleSheet">
+          <string notr="true"/>
+         </property>
+         <layout class="QGridLayout" name="gridLayout_3"/>
+        </widget>
+       </item>
       </layout>
+      <zorder>FactoryArea</zorder>
+      <zorder>License</zorder>
+      <zorder>LoginScreen</zorder>
+      <zorder>PortArea</zorder>
+      <zorder>TechArea</zorder>
      </widget>
     </item>
     <item>
@@ -369,7 +373,6 @@ border-style: none;</string>
     </property>
     <addaction name="actionDevelop_Equipment"/>
     <addaction name="actionConstruct_Ships"/>
-    <addaction name="separator"/>
     <addaction name="actionArsenal"/>
    </widget>
    <widget class="QMenu" name="menuNaval_Base">
