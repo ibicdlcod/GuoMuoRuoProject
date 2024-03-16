@@ -20,8 +20,9 @@ void ServerMasterSender::removeSender(QAbstractSocket *connection) {
 
 void ServerMasterSender::sendMessage(QAbstractSocket *connection,
                                      const QByteArray &contents) {
-    if(agents.contains(connection))
+    if(agents.contains(connection)) {
         agents[connection]->enqueue(contents);
+    }
     else
         connection->write(contents);
 }

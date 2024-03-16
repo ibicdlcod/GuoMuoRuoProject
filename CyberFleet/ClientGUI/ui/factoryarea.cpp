@@ -8,6 +8,7 @@ FactoryArea::FactoryArea(QWidget *parent) :
     ui(new Ui::FactoryArea)
 {
     ui->setupUi(this);
+    arsenalView = new QTableView(ui->ArsenalArea);
 
     Clientv2 &engine = Clientv2::getInstance();
     connect(&engine, &Clientv2::receivedFactoryRefresh,
@@ -129,7 +130,11 @@ void FactoryArea::switchToDevelop() {
         ui->Slots->hide();
         ui->ArsenalArea->show();
         Clientv2 &engine = Clientv2::getInstance();
+        engine.equipModel.setIsInArsenal(true);
+        arsenalView->setModel(&(engine.equipModel));
         engine.doRefreshFactoryArsenal();
+        arsenalView->show();
+        arsenalView->setGeometry(ui->ArsenalArea->rect());
         break;
     }
 }

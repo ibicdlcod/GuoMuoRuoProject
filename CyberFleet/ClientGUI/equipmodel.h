@@ -17,6 +17,8 @@ public slots:
     void updateEquipmentList(const QJsonObject &);
     void setPageNumHint(int);
     void setRowsPerPageHint(int);
+    void setIsInArsenal(bool);
+    void wholeTableChanged();
 
 public:
     virtual int rowCount(const QModelIndex &parent
@@ -29,13 +31,13 @@ public:
 private:
     int numberOfColumns() const;
     int numberOfEquip() const;
+    bool isInArsenal;
 
     QHash<QUuid, Equipment *> clientEquips;
     QHash<QUuid, int> clientEquipStars;
     QList<QUuid> sortedEquipIds; // not sort by uuid but equiptype
     int rowsPerPage = 1;
     int pageNum = 0;
-    bool isInArsenal;
 };
 
 #endif // EQUIPMODEL_H

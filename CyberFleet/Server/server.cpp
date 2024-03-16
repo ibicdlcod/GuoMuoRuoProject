@@ -620,7 +620,8 @@ void Server::offerEquipInfoUser(const CSteamID &uid,
             connection->flush();
             QByteArray msg =
                 KP::serverEquipInfo(userEquipInfos, true, true);
-            senderM.sendMessage(connection, msg);
+            QTimer::singleShot(500, this,
+                               [=, this](){senderM.sendMessage(connection, msg);});
             connection->flush();
         }
     } catch (DBError &e) {

@@ -248,15 +248,7 @@
      <property name="frameShadow">
       <enum>QFrame::Raised</enum>
      </property>
-     <layout class="QVBoxLayout" name="verticalLayout_3">
-      <item alignment="Qt::AlignHCenter|Qt::AlignVCenter">
-       <widget class="QLabel" name="FuckLabel">
-        <property name="text">
-         <string>Fuck</string>
-        </property>
-       </widget>
-      </item>
-     </layout>
+     <layout class="QVBoxLayout" name="verticalLayout_3"/>
     </widget>
    </item>
   </layout>

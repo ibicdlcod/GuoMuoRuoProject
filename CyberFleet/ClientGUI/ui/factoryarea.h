@@ -2,6 +2,7 @@
 #define FACTORYAREA_H
 
 #include <QFrame>
+#include <QTableView>
 #include "FactorySlot/factoryslot.h"
 #include "../../Protocol/kp.h"
 
@@ -27,6 +28,7 @@ private slots:
 
 private:
     Ui::FactoryArea *ui;
+    QTableView *arsenalView;
 
     KP::FactoryState factoryState = KP::Development;
     QList<FactorySlot *> slotfs;

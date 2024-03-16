@@ -10,7 +10,9 @@
 EquipModel::EquipModel(QObject *parent, bool isInArsenal)
     : QAbstractTableModel{parent},
     isInArsenal(isInArsenal)
-{}
+{
+
+}
 
 void EquipModel::destructEquipment(const QList<QUuid> &destructed) {
     clientEquips.removeIf([&destructed](QHash<QUuid, Equipment *>::iterator i)
@@ -21,16 +23,12 @@ void EquipModel::destructEquipment(const QList<QUuid> &destructed) {
                               {
                                   return destructed.contains(i.key());
                               });
-    QModelIndex topleft = this->index(0, 0);
-    QModelIndex bottomright = this->index(rowsPerPage - 1, numberOfColumns());
-    emit dataChanged(topleft, bottomright, QList<int>());
+    wholeTableChanged();
 }
 
 void EquipModel::setPageNumHint(int input) {
-    QModelIndex topleft = this->index(0, 0);
-    QModelIndex bottomright = this->index(rowsPerPage - 1, numberOfColumns());
     pageNum = input;
-    emit dataChanged(topleft, bottomright, QList<int>());
+    wholeTableChanged();
 }
 
 void EquipModel::setRowsPerPageHint(int input) {
@@ -39,6 +37,10 @@ void EquipModel::setRowsPerPageHint(int input) {
         std::max(rowsPerPage-1, input-1), numberOfColumns());
     rowsPerPage = input;
     emit dataChanged(topleft, bottomright, QList<int>());
+}
+
+void EquipModel::setIsInArsenal(bool input) {
+    isInArsenal = input;
 }
 
 int EquipModel::numberOfColumns() const {
@@ -54,12 +56,9 @@ int EquipModel::numberOfEquip() const {
 }
 
 int EquipModel::rowCount(const QModelIndex &parent) const {
-    if(parent.isValid())
-        return 0;
-    else {
-        return std::min(numberOfEquip() - rowsPerPage * pageNum,
-                        rowsPerPage);
-    }
+    //return std::min(numberOfEquip() - rowsPerPage * pageNum,
+    //                       rowsPerPage);
+    return 1;
 }
 
 int EquipModel::columnCount(const QModelIndex &parent) const {
@@ -70,7 +69,15 @@ int EquipModel::columnCount(const QModelIndex &parent) const {
 }
 
 QVariant EquipModel::data(const QModelIndex &index, int role) const {
-    return "";
+    if(role != Qt::DisplayRole)
+        return QVariant();
+    Clientv2 &engine = Clientv2::getInstance();
+    if(engine.isEquipRegistryCacheGood()) {
+        return "FB";
+    }
+    else {
+        return "FA";
+    }
 }
 
 void EquipModel::updateEquipmentList(const QJsonObject &input) {
@@ -88,10 +95,22 @@ void EquipModel::updateEquipmentList(const QJsonObject &input) {
             clientEquips[uid] = equip;
             clientEquipStars[uid] = star;
         }
+        wholeTableChanged();
     }
-    else {
+    else {/*
         connection = connect(&engine, &Clientv2::equipRegistryComplete,
-                this, [this, &input](){updateEquipmentList(input);});
+                             this, [this, &input](){
+            QTimer::singleShot(100, [=, this](){updateEquipmentList(input);});});
+*/
     }
     return;
+}
+
+void EquipModel::wholeTableChanged() {
+    QModelIndex topleft = this->index(0, 0);
+    QModelIndex bottomright = this->index(rowsPerPage - 1, numberOfColumns() - 1);
+    qWarning() << topleft.row() << "/" << topleft.column();
+    qWarning() << bottomright.row() << "/" << bottomright.column();
+    emit dataChanged(topleft, bottomright, QList<int>());
+    qWarning() << "RC" << rowCount(this->index(0,0));
 }
