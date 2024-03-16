@@ -17,7 +17,7 @@ public:
     explicit FactoryArea(QWidget *parent = nullptr);
     ~FactoryArea();
 
-    void setDevelop(bool);
+    void setDevelop(KP::FactoryState);
     void switchToDevelop();
 
 private slots:

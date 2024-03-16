@@ -485,17 +485,21 @@ Server::calculateTech(const CSteamID &uid, int jobID) {
         }
         else { // query.first yet to be called
             QList<std::pair<double, double>> source;
+            QUuid serial;
+            int def;
+            double weight;
+            bool pass;
             while(query.next()) {
-                QUuid serial = query.value(1).toUuid();
-                int def = query.value(0).toInt();
-                double weight
+                serial = query.value(1).toUuid();
+                def = query.value(0).toInt();
+                weight
                     = 1.0 + getSkillPointsEffect(uid, def)
                                 * settings->value
                                   ("rule/skillpointweightcontrib", 9.0)
                                       .toDouble();
                 equips[serial] =
                     equipRegistry.value(def);
-                bool pass = jobID == 0;
+                pass = jobID == 0;
                 if(jobID != 0 && jobID < KP::equipIdMax) {
                     if(!equipRegistry.contains(jobID)) {
                         qCritical() << qtTrId("local-tech-bad-equipdef");
@@ -587,8 +591,7 @@ void Server::offerEquipInfo(QSslSocket *connection, int index = 0) {
 
 void Server::offerEquipInfoUser(const CSteamID &uid,
                                 QSslSocket *connection) {
-    QMap<QUuid, Equipment *> equips;
-    QJsonArray UserEquipInfos;
+    QJsonArray userEquipInfos;
     try{
         QSqlDatabase db = QSqlDatabase::database();
         QSqlQuery query;
@@ -602,6 +605,25 @@ void Server::offerEquipInfoUser(const CSteamID &uid,
         }
         else {
             qCritical("GOOD");
+            QUuid serial;
+            int def;
+            int star;
+            while(query.next()) {
+                QJsonObject output;
+                def = query.value(0).toInt();
+                serial = query.value(1).toUuid();
+                star = query.value(2).toInt();
+                output["def"] = def;
+                output["serial"] = serial.toString();
+                output["star"] = star;
+                userEquipInfos.append(output);
+            }
+            qDebug() << userEquipInfos;
+            connection->flush();
+            QByteArray msg =
+                KP::serverEquipInfo(userEquipInfos, true, true);
+            senderM.sendMessage(connection, msg);
+            connection->flush();
         }
     } catch (DBError &e) {
         for(QString &i : e.whats()) {

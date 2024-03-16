@@ -55,33 +55,35 @@ MainWindow::MainWindow(QWidget *parent, int argc, char ** argv)
     Clientv2 &engine = Clientv2::getInstance();
 
     connect(this, &MainWindow::cmdMessage,
-                     &engine, &Clientv2::parse);
+            &engine, &Clientv2::parse);
     connect(&engine, &Clientv2::qout,
-                     this, &MainWindow::printMessage);
+            this, &MainWindow::printMessage);
     connect(&engine, &Clientv2::aboutToQuit,
-                     this, &MainWindow::close);
+            this, &MainWindow::close);
     connect(key, &KeyEnterReceiver::enterPressed,
-                     this, &MainWindow::processCmd);
+            this, &MainWindow::processCmd);
     connect(&engine, &Clientv2::gamestateChanged,
-                     this, &MainWindow::gamestateChanged);
+            this, &MainWindow::gamestateChanged);
     connect(ui->actionBack_to_naval_base, &QAction::triggered,
-                     &engine, &Clientv2::backToNavalBase);
+            &engine, &Clientv2::backToNavalBase);
     connect(ui->actionView_Tech, &QAction::triggered,
-                     &engine, &Clientv2::switchToTech);
+            &engine, &Clientv2::switchToTech);
     connect(ui->actionDevelop_Equipment, &QAction::triggered,
-                     &engine, &Clientv2::switchToFactory);
+            &engine, &Clientv2::switchToFactory);
     connect(ui->actionDevelop_Equipment, &QAction::triggered,
-                     this, &MainWindow::switchToDevelop);
+            this, &MainWindow::switchToDevelop);
     connect(ui->actionConstruct_Ships, &QAction::triggered,
-                     &engine, &Clientv2::switchToFactory);
+            &engine, &Clientv2::switchToFactory);
     connect(ui->actionConstruct_Ships, &QAction::triggered,
-                     this, &MainWindow::switchToConstruct);
+            this, &MainWindow::switchToConstruct);
+    connect(ui->actionArsenal, &QAction::triggered,
+            &engine, &Clientv2::switchToFactory);
     connect(ui->actionLogout, &QAction::triggered,
-                     &engine, &Clientv2::parseDisconnectReq);
+            &engine, &Clientv2::parseDisconnectReq);
     connect(ui->actionExit, &QAction::triggered,
-                     &engine, &Clientv2::parseQuit);
+            &engine, &Clientv2::parseQuit);
     connect(&engine, &Clientv2::receivedResourceInfo,
-                     this, &MainWindow::updateResources);
+            this, &MainWindow::updateResources);
 
     portArea = new PortArea(ui->PortArea);
     licenseArea = new LicenseArea(ui->License);
@@ -93,11 +95,11 @@ MainWindow::MainWindow(QWidget *parent, int argc, char ** argv)
                        {adjustArea(licenseArea,
                                     ui->License->frameSize());});
     connect(licenseArea, &LicenseArea::showLicenseComplete,
-                     ui->License, &QWidget::hide);
+            ui->License, &QWidget::hide);
     connect(licenseArea, &LicenseArea::showLicenseComplete,
-                     this, &MainWindow::gamestateInit);
+            this, &MainWindow::gamestateInit);
     connect(licenseArea, &LicenseArea::showLicenseComplete,
-                     newLoginScreen, &QWidget::show);
+            newLoginScreen, &QWidget::show);
     QTimer::singleShot(settings->value("client/licenseareapersist",
                                        5000).toInt(), this,
                        [this]{
@@ -176,7 +178,7 @@ void MainWindow::switchToConstruct() {
     if(!engine.loggedIn()) {
         return;
     }
-    factoryArea->setDevelop(false);
+    factoryArea->setDevelop(KP::Construction);
     factoryArea->switchToDevelop();
 }
 
@@ -185,7 +187,7 @@ void MainWindow::switchToDevelop() {
     if(!engine.loggedIn()) {
         return;
     }
-    factoryArea->setDevelop(true);
+    factoryArea->setDevelop(KP::Development);
     factoryArea->switchToDevelop();
 }
 

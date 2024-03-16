@@ -369,6 +369,8 @@ border-style: none;</string>
     </property>
     <addaction name="actionDevelop_Equipment"/>
     <addaction name="actionConstruct_Ships"/>
+    <addaction name="separator"/>
+    <addaction name="actionArsenal"/>
    </widget>
    <widget class="QMenu" name="menuNaval_Base">
     <property name="title">
@@ -422,6 +424,11 @@ border-style: none;</string>
   <action name="actionConstruct_Ships">
    <property name="text">
     <string>Construct Ships</string>
+   </property>
+  </action>
+  <action name="actionArsenal">
+   <property name="text">
+    <string>Arsenal</string>
    </property>
   </action>
  </widget>

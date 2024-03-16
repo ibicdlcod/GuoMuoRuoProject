@@ -103,11 +103,8 @@ void FactoryArea::doFactoryRefresh(const QJsonObject &input) {
     }
 }
 
-void FactoryArea::setDevelop(bool isDevelop) {
-    if(isDevelop)
-        factoryState = KP::Development;
-    else
-        factoryState = KP::Construction;
+void FactoryArea::setDevelop(KP::FactoryState state) {
+    factoryState = state;
 }
 
 void FactoryArea::switchToDevelop() {
