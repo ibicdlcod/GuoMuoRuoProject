@@ -108,8 +108,16 @@ void FactoryArea::setDevelop(KP::FactoryState state) {
 }
 
 void FactoryArea::switchToDevelop() {
-    if(factoryState == KP::Development)
+    switch(factoryState) {
+    case KP::Development:
         ui->FactoryLabel->setText(qtTrId("develop-equipment"));
-    else
+        break;
+    case KP::Construction:
         ui->FactoryLabel->setText(qtTrId("construct-ships"));
+        break;
+    case KP::Arsenal:
+        ui->FactoryLabel->setText(qtTrId("arsenal"));
+        break;
+    }
+
 }

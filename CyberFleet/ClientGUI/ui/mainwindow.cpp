@@ -78,6 +78,8 @@ MainWindow::MainWindow(QWidget *parent, int argc, char ** argv)
             this, &MainWindow::switchToConstruct);
     connect(ui->actionArsenal, &QAction::triggered,
             &engine, &Clientv2::switchToFactory);
+    connect(ui->actionArsenal, &QAction::triggered,
+            this, &MainWindow::switchToConstruct);
     connect(ui->actionLogout, &QAction::triggered,
             &engine, &Clientv2::parseDisconnectReq);
     connect(ui->actionExit, &QAction::triggered,

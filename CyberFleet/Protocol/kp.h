@@ -130,7 +130,8 @@ Q_ENUM_NS(GameError)
 
 enum FactoryState{
     Development,
-    Construction
+    Construction,
+    Arsenal
 };
 Q_ENUM_NS(FactoryState)
 
