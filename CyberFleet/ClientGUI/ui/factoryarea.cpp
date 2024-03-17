@@ -11,17 +11,14 @@ FactoryArea::FactoryArea(QWidget *parent) :
     ui->setupUi(this);
     ui->ArsenalArea->setObjectName("arsenalarea");
     ui->ArsenalArea->setStyleSheet(
-        "QFrame#arsenalarea { border-style: none }");
+        "QFrame#arsenalarea { border-style: none; }");
     arsenalView = new QTableView(ui->ArsenalArea);
     ui->ArsenalAreaControl->setObjectName("arsenalareactl");
     ui->ArsenalAreaControl->setStyleSheet(
-        "QFrame#arsenalareactl { border-style: none }");
+        "QFrame#arsenalareactl { border-style: none; }");
     arsenalView->setObjectName("arsenalview");
     arsenalView->setStyleSheet(
-        "QTableView#arsenalview { border-style: none }");
-    QHBoxLayout *layout = new QHBoxLayout;
-    layout->addWidget(arsenalView);
-    ui->ArsenalArea->setLayout(layout);
+        "QTableView#arsenalview { border-style: none; }");
 
     Clientv2 &engine = Clientv2::getInstance();
     connect(&engine, &Clientv2::receivedFactoryRefresh,
