@@ -10,10 +10,15 @@ FactoryArea::FactoryArea(QWidget *parent) :
 {
     ui->setupUi(this);
     ui->ArsenalArea->setObjectName("arsenalarea");
-    ui->ArsenalArea->setStyleSheet("QFrame#arsenalarea { border-style: none }");
+    ui->ArsenalArea->setStyleSheet(
+        "QFrame#arsenalarea { border-style: none }");
     arsenalView = new QTableView(ui->ArsenalArea);
+    ui->ArsenalAreaControl->setObjectName("arsenalareactl");
+    ui->ArsenalAreaControl->setStyleSheet(
+        "QFrame#arsenalareactl { border-style: none }");
     arsenalView->setObjectName("arsenalview");
-    arsenalView->setStyleSheet("QTableView#arsenalview { border-style: none }");
+    arsenalView->setStyleSheet(
+        "QTableView#arsenalview { border-style: none }");
     QHBoxLayout *layout = new QHBoxLayout;
     layout->addWidget(arsenalView);
     ui->ArsenalArea->setLayout(layout);
@@ -146,7 +151,6 @@ void FactoryArea::switchToDevelop() {
                 &(engine.equipModel), &EquipModel::setRowsPerPageHint);
         engine.doRefreshFactoryArsenal();
         arsenalView->hide();
-        //arsenalView->setGeometry(ui->ArsenalArea->rect());
         break;
     }
 }
@@ -158,4 +162,8 @@ void FactoryArea::recalculateArsenalRows() {
     emit rowCountHint(std::max(rowSizeAvailable / rowSize - 1, 1));
     arsenalView->setGeometry(ui->ArsenalArea->rect());
     arsenalView->show();
+    Clientv2 &engine = Clientv2::getInstance();
+    arsenalView->sortByColumn(
+        engine.equipModel.hiddenSortColumn(), Qt::AscendingOrder);
+    //arsenalView->setColumnHidden(engine.equipModel.hiddenSortColumn(), true);
 }

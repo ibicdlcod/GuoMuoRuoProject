@@ -30,6 +30,15 @@ public:
                          = QModelIndex()) const override;
     virtual QVariant data(const QModelIndex &index,
                           int role = Qt::DisplayRole) const override;
+    virtual QVariant headerData(int section, Qt::Orientation orientation,
+                          int role = Qt::DisplayRole) const override;
+    static const int uidCol = 0;
+    static const int equipCol = 1;
+    static const int starCol = 2;
+    static const int attrCol = 3;
+    int destructColumn() const;
+    int addStarColumn() const;
+    int hiddenSortColumn() const;
 
 private:
     int numberOfColumns() const;

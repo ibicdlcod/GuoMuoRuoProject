@@ -16,7 +16,8 @@ public:
     Equipment(int);
     Equipment(const QJsonObject &);
 
-    bool operator<(const Equipment &) const;
+    int operator<=>(const Equipment &) const;
+    bool isNotEqual(const Equipment &) const;
     QString toString(QString) const;
 
     void addStar();
@@ -39,6 +40,8 @@ public:
 private:
     int equipRegId;
     unsigned int star = 0;
+
+    Q_DISABLE_COPY_MOVE(Equipment)
 };
 
 #endif // EQUIPMENT_H
