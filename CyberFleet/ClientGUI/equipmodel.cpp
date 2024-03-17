@@ -37,34 +37,14 @@ void EquipModel::setPageNumHint(int input) {
     int oldRowCount = rowCount();
     pageNum = input;
     int newRowCount = rowCount();
-    if(oldRowCount < newRowCount) {
-        beginInsertRows(QModelIndex(), 0,
-                        newRowCount - oldRowCount - 1);
-        endInsertRows();
-    }
-    else if(oldRowCount > newRowCount) {
-        beginRemoveRows(QModelIndex(),
-                        newRowCount,
-                        oldRowCount - 1);
-        endRemoveRows();
-    }
-    wholeTableChanged();
+    adjustRowCount(oldRowCount, newRowCount);
 }
 
 void EquipModel::setRowsPerPageHint(int input) {
     int oldRowCount = rowCount();
     rowsPerPage = input;
     int newRowCount = rowCount();
-    if(oldRowCount < newRowCount) {
-        beginInsertRows(QModelIndex(), 0,
-                        newRowCount - oldRowCount - 1);
-        endInsertRows();
-    }
-    else if(oldRowCount > newRowCount) {
-        beginRemoveRows(QModelIndex(), 0,
-                        oldRowCount - newRowCount - 1);
-        endRemoveRows();
-    }
+    adjustRowCount(oldRowCount, newRowCount);
 }
 
 void EquipModel::setIsInArsenal(bool input) {
@@ -355,18 +335,7 @@ void EquipModel::updateEquipmentList(const QJsonObject &input) {
                           return a < b;
                   });
         int newRowCount = rowCount();
-        if(oldRowCount < newRowCount) {
-            beginInsertRows(QModelIndex(), 0,
-                            newRowCount - oldRowCount - 1);
-            endInsertRows();
-        }
-        else if(oldRowCount > newRowCount) {
-            beginRemoveRows(QModelIndex(),
-                            newRowCount,
-                            oldRowCount - 1);
-            endRemoveRows();
-        }
-        wholeTableChanged();
+        adjustRowCount(oldRowCount, newRowCount);
         emit needReCalculateRows();
     }
     else {  /*
