@@ -13,6 +13,8 @@ class FactoryArea;
 }
 
 namespace {
+/* source: https://stackoverflow.com/questions/8766633/
+ * how-to-determine-the-correct-size-of-a-qtablewidget */
 static QSize tableSizeWhole(QTableView *view, EquipModel *model) {
     int w = view->verticalHeader()->width() + 4; // +4 seems to be needed
     for (int i = 0; i < model->columnCount(); i++)

@@ -14,7 +14,9 @@
 QFile *logFile;
 std::unique_ptr<QSettings> settings;
 
-static const int STEAM_ERROR = 1;
+namespace {
+const int STEAM_ERROR = 1;
+}
 
 int main(int argc, char *argv[]) {
 

@@ -11,7 +11,9 @@
 
 // Do not modify
 #pragma message(NOT_M_CONST)
-static const int maxNumberOfParts = 1024;
+namespace {
+const int maxNumberOfParts = 1024;
+}
 
 class Receiver : public QObject
 {

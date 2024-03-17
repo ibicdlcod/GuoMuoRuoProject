@@ -46,6 +46,7 @@
 **
 ****************************************************************************/
 
+#define NOMINMAX // apparently some stupid win header <minwindef.h> interferes with std::max
 #include "server.h"
 #include <QBuffer>
 #include <QFile>
@@ -58,10 +59,6 @@
 #include "kerrors.h"
 #include "sslserver.h"
 #include "user.h"
-
-#ifdef max
-#undef max // apparently some stupid win header interferes with std::max
-#endif
 
 QT_BEGIN_NAMESPACE
 

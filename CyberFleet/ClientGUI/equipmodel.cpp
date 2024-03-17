@@ -1,12 +1,9 @@
+#define NOMINMAX
 #include "equipmodel.h"
 #include <QJsonArray>
 #include <algorithm>
 #include "clientv2.h"
 #include "equipicon.h"
-
-#ifdef max
-#undef max
-#endif
 
 extern std::unique_ptr<QSettings> settings;
 

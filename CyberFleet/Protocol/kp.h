@@ -14,8 +14,9 @@
 #include "steam/steamtypes.h"
 
 #pragma message(NOT_M_CONST)
-static const int steamRateLimit = 60; // see ClientGUI/steamauth.cpp
-
+namespace {
+const int steamRateLimit = 60; // see ClientGUI/steamauth.cpp
+}
 using TechEntry = std::tuple<QUuid, int, double>;
 
 class ResOrd;
@@ -38,7 +39,9 @@ Q_NAMESPACE
 static constexpr int initDock = 4;
 static constexpr int initFactory = 4;
 static constexpr qint64 secsinMin = 60;
+#pragma message(M_CONST)
 static constexpr float baseDevRarity = 8.0;
+#pragma message(NOT_M_CONST)
 static constexpr int equipIdMax = 0x10000;
 
 enum DgramType{

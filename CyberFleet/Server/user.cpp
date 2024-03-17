@@ -1,3 +1,4 @@
+#define NOMINMAX
 #include "user.h"
 #include <QSqlDatabase>
 #include <QSqlError>
@@ -6,10 +7,6 @@
 #include <algorithm>
 #include "../Protocol/resord.h"
 #include "kerrors.h"
-
-#ifdef max
-#undef max
-#endif
 
 void User::addSkillPoints(const CSteamID &uid, int equipId, int64 skillPoints) {
     QSqlDatabase db = QSqlDatabase::database();
