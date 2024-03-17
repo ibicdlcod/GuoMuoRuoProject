@@ -163,7 +163,7 @@ void FactoryArea::recalculateArsenalRows() {
     arsenalView->setGeometry(ui->ArsenalArea->rect());
     arsenalView->show();
     Clientv2 &engine = Clientv2::getInstance();
-    //arsenalView->sortByColumn(
-    //    engine.equipModel.hiddenSortColumn(), Qt::AscendingOrder);
+    arsenalView->sortByColumn(
+        engine.equipModel.hiddenSortColumn(), Qt::AscendingOrder);
     //arsenalView->setColumnHidden(engine.equipModel.hiddenSortColumn(), true);
 }
