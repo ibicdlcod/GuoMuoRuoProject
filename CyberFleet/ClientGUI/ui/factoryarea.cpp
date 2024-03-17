@@ -9,27 +9,18 @@ FactoryArea::FactoryArea(QWidget *parent) :
     ui(new Ui::FactoryArea)
 {
     ui->setupUi(this);
-    ui->ArsenalArea->setObjectName("arsenalarea");
-    ui->ArsenalArea->setStyleSheet(
-        "QFrame#arsenalarea { border-style: none; }");
     arsenalView = new QTableView(this);
-    ui->ArsenalAreaControl->setObjectName("arsenalareactl");
-    ui->ArsenalAreaControl->setStyleSheet(
-        "QFrame#arsenalareactl { border-style: none; }");
     arsenalView->setObjectName("arsenalview");
     arsenalView->setStyleSheet(
         "QTableView#arsenalview { border-style: none; }");
 
-    //    QWidget * widget = new QWidget;
     QGridLayout * layout = new QGridLayout;
-
     layout->addWidget(arsenalView);
     layout->setAlignment(arsenalView, Qt::AlignCenter);
     arsenalView->setMinimumSize(QSize(800,800));
 
     ui->ArsenalControl->setLayout(layout);
     ui->ArsenalControl->show();
-    ui->ArsenalAreaControl->hide();
 
     Clientv2 &engine = Clientv2::getInstance();
     connect(&engine, &Clientv2::receivedFactoryRefresh,
@@ -140,17 +131,17 @@ void FactoryArea::switchToDevelop() {
     case KP::Development:
         ui->FactoryLabel->setText(qtTrId("develop-equipment"));
         ui->Slots->show();
-        ui->ArsenalArea->hide();
+        ui->ArsenalControl->hide();
         break;
     case KP::Construction:
         ui->FactoryLabel->setText(qtTrId("construct-ships"));
         ui->Slots->show();
-        ui->ArsenalArea->hide();
+        ui->ArsenalControl->hide();
         break;
     case KP::Arsenal:
         ui->FactoryLabel->setText(qtTrId("arsenal"));
         ui->Slots->hide();
-        ui->ArsenalArea->show();
+        ui->ArsenalControl->show();
         Clientv2 &engine = Clientv2::getInstance();
         engine.equipModel.setIsInArsenal(true);
         arsenalView->setModel(&(engine.equipModel));
@@ -171,8 +162,6 @@ void FactoryArea::recalculateArsenalRows() {
                            - arsenalView->horizontalHeader()->size().height();
     if(rowSize > 0)
         emit rowCountHint(std::max(rowSizeAvailable / rowSize - 1, 1));
-    //arsenalView->setGeometry(ui->ArsenalArea->rect());
-    qCritical() << tableSizeWhole(arsenalView, &engine.equipModel).width();
     arsenalView
         ->setMinimumSize(QSize(tableSizeWhole(arsenalView,
                                               &engine.equipModel).width(),
