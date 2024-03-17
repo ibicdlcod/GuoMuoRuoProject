@@ -1,8 +1,8 @@
 #include "factoryarea.h"
 #include "ui_factoryarea.h"
+#include <QHeaderView>
 #include "../clientv2.h"
 #include "developwindow.h"
-#include <QHeaderView>
 
 FactoryArea::FactoryArea(QWidget *parent) :
     QFrame(parent),
@@ -12,13 +12,24 @@ FactoryArea::FactoryArea(QWidget *parent) :
     ui->ArsenalArea->setObjectName("arsenalarea");
     ui->ArsenalArea->setStyleSheet(
         "QFrame#arsenalarea { border-style: none; }");
-    arsenalView = new QTableView(ui->ArsenalArea);
+    arsenalView = new QTableView(this);
     ui->ArsenalAreaControl->setObjectName("arsenalareactl");
     ui->ArsenalAreaControl->setStyleSheet(
         "QFrame#arsenalareactl { border-style: none; }");
     arsenalView->setObjectName("arsenalview");
     arsenalView->setStyleSheet(
         "QTableView#arsenalview { border-style: none; }");
+
+    //    QWidget * widget = new QWidget;
+    QGridLayout * layout = new QGridLayout;
+
+    layout->addWidget(arsenalView);
+    layout->setAlignment(arsenalView, Qt::AlignCenter);
+    arsenalView->setMinimumSize(QSize(800,800));
+
+    ui->ArsenalControl->setLayout(layout);
+    ui->ArsenalControl->show();
+    ui->ArsenalAreaControl->hide();
 
     Clientv2 &engine = Clientv2::getInstance();
     connect(&engine, &Clientv2::receivedFactoryRefresh,
@@ -154,14 +165,19 @@ void FactoryArea::switchToDevelop() {
 }
 
 void FactoryArea::recalculateArsenalRows() {
+    Clientv2 &engine = Clientv2::getInstance();
     int rowSize = arsenalView->verticalHeader()->sectionSize(0);
-    int rowSizeAvailable = ui->ArsenalArea->size().height()
+    int rowSizeAvailable = ui->ArsenalControl->size().height()
                            - arsenalView->horizontalHeader()->size().height();
     if(rowSize > 0)
         emit rowCountHint(std::max(rowSizeAvailable / rowSize - 1, 1));
-    arsenalView->setGeometry(ui->ArsenalArea->rect());
+    //arsenalView->setGeometry(ui->ArsenalArea->rect());
+    qCritical() << tableSizeWhole(arsenalView, &engine.equipModel).width();
+    arsenalView
+        ->setMinimumSize(QSize(tableSizeWhole(arsenalView,
+                                              &engine.equipModel).width(),
+                               ui->ArsenalControl->size().height()));
     arsenalView->show();
-    Clientv2 &engine = Clientv2::getInstance();
     arsenalView->sortByColumn(
         engine.equipModel.hiddenSortColumn(), Qt::AscendingOrder);
     arsenalView->setColumnHidden(engine.equipModel.hiddenSortColumn(), true);

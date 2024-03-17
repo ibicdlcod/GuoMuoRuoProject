@@ -3,11 +3,25 @@
 
 #include <QFrame>
 #include <QTableView>
+#include <QHeaderView>
 #include "FactorySlot/factoryslot.h"
+#include "../equipmodel.h"
 #include "../../Protocol/kp.h"
 
 namespace Ui {
 class FactoryArea;
+}
+
+namespace {
+static QSize tableSizeWhole(QTableView *view, EquipModel *model) {
+    int w = view->verticalHeader()->width() + 4; // +4 seems to be needed
+    for (int i = 0; i < model->columnCount(); i++)
+        w += view->columnWidth(i); // seems to include gridline (on my machine)
+    int h = view->horizontalHeader()->height() + 4;
+    for (int i = 0; i < model->rowCount(); i++)
+        h += view->rowHeight(i);
+    return QSize(w, h);
+}
 }
 
 class FactoryArea : public QFrame
