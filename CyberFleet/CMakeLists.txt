@@ -25,11 +25,17 @@ set(TS_FILES
 set(CLIENT_SOURCES
     ClientGUI/clientv2.cpp
     ClientGUI/clientv2.h
+    ClientGUI/equipicon.h
+    ClientGUI/equipicon.cpp
+    ClientGUI/equipmodel.h
+    ClientGUI/equipmodel.cpp
     ClientGUI/main.cpp
     ClientGUI/networkerror.cpp
     ClientGUI/networkerror.h
     ClientGUI/steamauth.cpp
     ClientGUI/steamauth.h
+    ClientGUI/ui/boxcenterfusionstyle.h
+
     ClientGUI/ui/developwindow.cpp
     ClientGUI/ui/developwindow.h
     ClientGUI/ui/developwindow.ui
@@ -53,8 +59,6 @@ set(CLIENT_SOURCES
     ClientGUI/ui/techview.h
     ClientGUI/ui/techview.cpp
     ClientGUI/ui/techview.ui
-    ClientGUI/equipicon.h
-    ClientGUI/equipicon.cpp
     ${TS_FILES}
 )
 set(SERVER_SOURCES
@@ -115,7 +119,6 @@ qt_add_executable(CFClient
     ${CLIENT_SOURCES}
     common.qrc
     ${app_icon_resource_windows}
-    ClientGUI/equipmodel.h ClientGUI/equipmodel.cpp
 )
 qt_add_executable(CFServer
     MANUAL_FINALIZATION

@@ -9,6 +9,7 @@
 
 #include "clientv2.h"
 #include "../Protocol/kp.h"
+#include "ui/boxcenterfusionstyle.h"
 
 QFile *logFile;
 std::unique_ptr<QSettings> settings;
@@ -42,7 +43,9 @@ int main(int argc, char *argv[]) {
 
     settings = std::make_unique<QSettings>(new QSettings);
 
-    QApplication::setStyle(QStyleFactory::create("Fusion"));
+    BoxCenterFusionStyle *style = new BoxCenterFusionStyle();
+    style->setBaseStyle(QStyleFactory::create("Fusion"));
+    QApplication::setStyle(style);
 
     /* Multilingual Support */
 #if defined(Q_OS_UNIX)

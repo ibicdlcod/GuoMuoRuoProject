@@ -28,6 +28,7 @@ FactoryArea::FactoryArea(QWidget *parent) :
             this, &FactoryArea::doFactoryRefresh);
     connect(&engine, &Clientv2::receivedArsenalEquip,
             this, &FactoryArea::updateArsenalEquip);
+
     slotfs.append(ui->Factory_Slot_0);
     slotfs.append(ui->Factory_Slot_1);
     slotfs.append(ui->Factory_Slot_2);
@@ -167,3 +168,9 @@ void FactoryArea::recalculateArsenalRows() {
         engine.equipModel.hiddenSortColumn(), Qt::AscendingOrder);
     arsenalView->setColumnHidden(engine.equipModel.hiddenSortColumn(), true);
 }
+
+void FactoryArea::resizeEvent(QResizeEvent *event) {
+    //recalculateArsenalRows();
+    QWidget::resizeEvent(event);
+}
+

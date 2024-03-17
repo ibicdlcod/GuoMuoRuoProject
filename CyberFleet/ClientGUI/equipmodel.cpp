@@ -10,6 +10,10 @@
 
 extern std::unique_ptr<QSettings> settings;
 
+enum {
+    CheckAlignmentRole = Qt::UserRole + Qt::CheckStateRole + Qt::TextAlignmentRole
+};
+
 EquipModel::EquipModel(QObject *parent, bool isInArsenal)
     : QAbstractTableModel{parent},
     isInArsenal(isInArsenal)
@@ -124,7 +128,12 @@ QVariant EquipModel::data(const QModelIndex &index, int role) const {
             return QVariant();
         }
         else if(index.column() == starCol) {
-            return QString::number(starToDisplay);
+            if(starToDisplay == 0)
+                return QVariant();
+            else if(starToDisplay < 15)
+                return "★+" + QString::number(starToDisplay);
+            else
+                return "★max";
         }
         else {
             return "FB";
@@ -171,8 +180,18 @@ QVariant EquipModel::data(const QModelIndex &index, int role) const {
     }
     break;
     case Qt::BackgroundRole:
-    case Qt::ForegroundRole:
-        return QVariant(); break;
+        return QVariant();
+    case Qt::ForegroundRole: {
+        if(index.column() == starCol) {
+            QColor color = QColor();
+            color.setHsv(starToDisplay * 20, 128, 255);
+            QBrush brush = QBrush(color);
+            return brush;
+        }
+        else
+            return QVariant();
+    }
+    break;
     case Qt::CheckStateRole: {
         if(index.column() == destructColumn()
             || index.column() == addStarColumn()) {
@@ -185,6 +204,14 @@ QVariant EquipModel::data(const QModelIndex &index, int role) const {
     case Qt::InitialSortOrderRole: {
         if(index.column() == hiddenSortColumn())
             return Qt::AscendingOrder;
+        else
+            return QVariant();
+    }
+    break;
+    case CheckAlignmentRole: {
+        if(index.column() == destructColumn()
+            || index.column() == addStarColumn())
+            return Qt::AlignCenter;
         else
             return QVariant();
     }

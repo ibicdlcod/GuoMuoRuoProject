@@ -83,7 +83,7 @@ namespace {
         //% "Unknown protocol."
         prot += qtTrId("protocol-unknown");
     }
-
+    
     //% "Session cipher: %1; session protocol: %2."
     QString info = qtTrId("connection-info-serverside")
                        .arg(connection->sessionCipher().name(),
@@ -182,7 +182,7 @@ Q_GLOBAL_STATIC(QString,
                     "Star INTEGER DEFAULT 0, "
                     "FOREIGN KEY(User) REFERENCES NewUsers(UserID),"
                     "FOREIGN KEY(EquipDef) REFERENCES EquipName(EquipID),"
-                    "CONSTRAINT Star_Valid CHECK (Star >= 0 AND Star < 11)"
+                    "CONSTRAINT Star_Valid CHECK (Star >= 0 AND Star < 16)"
                     ");"
                     ));
 
@@ -208,7 +208,7 @@ static const int elapsedMaxTolerence = steamRateLimit;
 Server::Server(int argc, char ** argv) : CommandLine(argc, argv) {
     /* no *settings could be used here */
     mt = std::mt19937(random());
-
+    
     connect(&receiverM, &Receiver::jsonReceivedWithInfo,
             this, &Server::datagramReceivedStd);
     connect(&receiverM, &Receiver::nonStandardReceivedWithInfo,
@@ -357,7 +357,7 @@ bool Server::parseSpec(const QStringList &cmdParts) {
     try {
         if(cmdParts.length() > 0) {
             QString primary = cmdParts[0];
-
+            
             if(primary.compare("listen", Qt::CaseInsensitive) == 0) {
                 parseListen(cmdParts);
                 return true;
@@ -418,7 +418,7 @@ void Server::readyRead(QSslSocket *currentsocket) {
         qWarning() << qtTrId("read-peerinfo-failed");
         return;
     }
-
+    
     decryptDatagram(currentsocket, dgram);
     if (currentsocket->error()
         == QAbstractSocket::RemoteHostClosedError) {
@@ -630,7 +630,6 @@ void Server::offerEquipInfoUser(const CSteamID &uid,
         }
     } catch (std::exception &e) {
         qCritical() << e.what();
-
     }
 }
 
@@ -699,7 +698,7 @@ void Server::shutdown() {
          connection != nullptr;) {
         connection->disconnectFromHost();
     }
-
+    
     if(sslServer.hasPendingConnections()) {
         for (const auto &connection = sslServer.nextPendingConnection();
              connection != nullptr;) {
@@ -735,10 +734,67 @@ void Server::sslErrors(QSslSocket *socket, const QList<QSslError> &errors) {
 }
 
 /* private */
+bool Server::addEquipStar(const QUuid &equipUid, int amount = 1) {
+    if(amount == 0)
+        return true;
+    try{
+        QSqlDatabase db = QSqlDatabase::database();
+        QSqlQuery query;
+        query.prepare("SELECT EquipDef, EquipUuid, Star"
+                      " FROM UserEquip WHERE EquipUuid = :id;");
+        query.bindValue(":id", equipUid.toString());
+        if(!query.exec() || !query.isSelect() || !query.next()) {
+            throw DBError(qtTrId("user-get-equip-list-failed-eidbased")
+                              .arg(equipUid.toString()),
+                          query.lastError());
+            return false;
+        }
+        else {
+            int star = query.value(2).toInt();
+            if(star + amount > 15) {
+                //% "Equip id %1: not allowed to improve beyond 15 stars."
+                qDebug() << qtTrId("improve-beyond-possible")
+                                .arg(equipUid.toString());
+                return false;
+            }
+            else {
+                QSqlQuery query2;
+                query2.prepare("UPDATE UserEquip SET Star = :star"
+                               " WHERE EquipUuid = :id");
+                query2.bindValue(":id", equipUid.toString());
+                query2.bindValue(":star", star + amount);
+                if(!query2.exec()) {
+                    throw DBError(qtTrId("user-add-equip-star-failed-eidbased")
+                                      .arg(equipUid.toString()),
+                                  query.lastError());
+                    return false;
+                }
+                else {
+                    //% "Equip id %1: improved to %2 stars."
+                    qDebug() << qtTrId("improve-success")
+                                    .arg(equipUid.toString())
+                                    .arg(star + amount);
+                    return true;
+                }
+            }
+            return false;
+        }
+    } catch (DBError &e) {
+        for(QString &i : e.whats()) {
+            qCritical() << i;
+            return false;
+        }
+    } catch (std::exception &e) {
+        qCritical() << e.what();
+        return false;
+    }
+    return false;
+}
+
 void Server::decryptDatagram(QSslSocket *connection,
                              const QByteArray &clientMessage) {
     Q_ASSERT(connection->isEncrypted());
-
+    
     const PeerInfo peerInfo = PeerInfo(connection->peerAddress(),
                                        connection->peerPort());
     const QByteArray dgram = clientMessage;
@@ -750,6 +806,25 @@ void Server::decryptDatagram(QSslSocket *connection,
     } else {
         qWarning() << peerInfo.toString()
                    << ":" << connection->errorString();
+    }
+}
+
+void Server::deleteTestEquip(const CSteamID &uid) {
+    /* Warning: ALL Equipment will be deleted under this uid! */
+    QSqlDatabase db = QSqlDatabase::database();
+    QSqlQuery query;
+    query.prepare("DELETE FROM UserEquip WHERE"
+                  " User = :id;");
+    query.bindValue(":id", uid.ConvertToUint64());
+    if(Q_UNLIKELY(!query.exec())) {
+        //% "User id %1: delete all equipment failed!"
+        throw DBError(qtTrId("delete-all-equip-failed")
+                          .arg(uid.ConvertToUint64()),
+                      query.lastError());
+    }
+    else {
+        //% "User id %1: all equipment deleted"
+        qDebug() << qtTrId("delete-all-equip").arg(uid.ConvertToUint64());
     }
 }
 
@@ -818,7 +893,7 @@ void Server::doDevelop(CSteamID &uid, int equipid,
         else {
             qint64 startTime = QDateTime::currentSecsSinceEpoch();
             qint64 successTime = startTime + equip->devTimeInSec();
-
+            
             QSqlDatabase db = QSqlDatabase::database();
             QSqlQuery query;
             query.prepare("UPDATE Factories "
@@ -993,7 +1068,7 @@ bool Server::exportEquipToCSV() const {
         return false;
     }
     QTextStream textStream(csvFile);
-
+    
     QSqlDatabase db = QSqlDatabase::database();
     if(!db.isValid()) {
         throw DBError(qtTrId("database-uninit"));
@@ -1054,9 +1129,11 @@ QSet<int> Server::generateEquipChilds(int ancestor) {
 }
 
 void Server::generateTestEquip(const CSteamID &uid) {
+    deleteTestEquip(uid);
     static const double difficulty = 1.0; // higher the value is easier
     std::uniform_real_distribution dist{0.0, 1.0};
-    for(const auto equip: equipRegistry) {
+    std::uniform_int_distribution dist2{0, 15};
+    for(auto equip: std::as_const(equipRegistry)) {
         if(equip->type.isVirtual()) {
             continue;
         }
@@ -1065,9 +1142,11 @@ void Server::generateTestEquip(const CSteamID &uid) {
                 double chance = 1.0 - atan(equip->getTech()/difficulty)
                                           / acos(0);
                 double random_double = dist(mt);
+
                 if(random_double < chance){
                     qInfo() << "SUCCESS" << "\t" << equip->toString("ja_JP");
-                    newEquip(uid, equip->getId());
+                    QUuid newId = newEquip(uid, equip->getId());
+                    addEquipStar(newId, dist2(mt));
                 }
             }
         }
@@ -1099,7 +1178,7 @@ bool Server::importEquipFromCSV() {
         throw DBError(qtTrId("database-uninit"));
         return false;
     }
-
+    
     QString csvFileName = settings->value("server/equip_reg_csv", "Equip.csv").toString();
     QFile *csvFile = new QFile(csvFileName);
     if(Q_UNLIKELY(!csvFile) || !csvFile->open(QIODevice::ReadOnly)) {
@@ -1107,7 +1186,7 @@ bool Server::importEquipFromCSV() {
         qCritical() << qtTrId("bad-csv").arg(csvFileName);
         return false;
     }
-
+    
     QTextStream textStream(csvFile);
     QString title = textStream.readLine();
     QStringList titleParts = title.split(",");
@@ -1132,7 +1211,7 @@ bool Server::importEquipFromCSV() {
                     if(i == 1) {
                         QString lang = titleParts[i];
                         QString content = lineParts[i];
-
+                        
                         QSqlQuery query;
                         query.prepare(
                             "REPLACE INTO EquipName "
@@ -1195,7 +1274,7 @@ bool Server::importEquipFromCSV() {
     //% "Import equipment registry success!"
     qInfo() << qtTrId("equip-import-good");
     equipmentRefresh();
-
+    
     return true;
 }
 
@@ -1352,7 +1431,7 @@ void Server::receivedAuth(const QJsonObject &djson,
 #pragma message(NOT_M_CONST)
         uint8 rgubDecrypted[1024];
         uint32 cubDecrypted = sizeof(rgubDecrypted);
-
+        
         /* Of course, app secret key is not shipped with the project. */
         QFile appSecretKeyFile("AppSecretKey");
         if(!appSecretKeyFile.open(QIODevice::ReadOnly)) {
@@ -1361,7 +1440,7 @@ void Server::receivedAuth(const QJsonObject &djson,
                               .arg(peerInfo.address.toString())
                               .arg(peerInfo.port);
             qCritical() << msg;
-
+            
             QByteArray msg2 = KP::serverLackPrivate();
             senderM.sendMessage(connection, msg2);
             delete [] rgubTicket;
@@ -1506,7 +1585,7 @@ void Server::receivedLogin(CSteamID &uid,
                            const PeerInfo &peerInfo,
                            QSslSocket *connection) {
     uint64 uidInt = uid.ConvertToUint64();
-
+    
     Q_UNUSED(peerInfo)
     QSqlDatabase db = QSqlDatabase::database();
     QSqlQuery query;
@@ -1539,7 +1618,7 @@ void Server::receivedLogin(CSteamID &uid,
     else {
         /* existing user */
     }
-
+    
     connectedPeers[uid] = connection;
     connectedUsers[connection] = uid;
     senderM.addSender(connection);
@@ -1634,9 +1713,9 @@ void Server::receivedReq(const QJsonObject &djson,
                            this,
                            [connection, uid, djson, this]
                            {offerTechInfo(
-                  connection,
-                  uid,
-                  djson["local"].toInt());});
+                                 connection,
+                                 uid,
+                                 djson["local"].toInt());});
     }
     break;
     case KP::CommandType::DemandSkillPoints: {
@@ -1644,9 +1723,9 @@ void Server::receivedReq(const QJsonObject &djson,
                            this,
                            [connection, uid, djson, this]
                            {offerSPInfo(
-                  connection,
-                  uid,
-                  djson["equipid"].toInt());});
+                                 connection,
+                                 uid,
+                                 djson["equipid"].toInt());});
     }
     break;
     case KP::CommandType::DemandResourceUpdate: {
@@ -1654,8 +1733,8 @@ void Server::receivedReq(const QJsonObject &djson,
                            this,
                            [connection, uid, this]
                            {offerResourceInfo(
-                  connection,
-                  uid);});
+                                 connection,
+                                 uid);});
     }
     break;
     default:
@@ -1671,11 +1750,11 @@ void Server::sendTestMessages() {
         qWarning() << "Server isn't listening, abort.";
     }
     else {
-        qInfo() << "test";
-        for(const auto equip: equipRegistry) {
+        qInfo() << "test";/*
+        for(auto equip: std::as_const(equipRegistry)) {
             qInfo() << equip->type.iconGroup();
-        }
-        //generateTestEquip(CSteamID((uint64)??));
+        }*/
+        generateTestEquip(CSteamID((uint64)76561198194251051));
     }
 }
 

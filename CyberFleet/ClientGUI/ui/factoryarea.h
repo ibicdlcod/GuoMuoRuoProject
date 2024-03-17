@@ -27,6 +27,9 @@ signals:
 public slots:
     void recalculateArsenalRows();
 
+protected:
+    void resizeEvent(QResizeEvent *event) override;
+
 private slots:
     void developClicked(bool checked = false, int slotnum = 0);
     void doFactoryRefresh(const QJsonObject &);

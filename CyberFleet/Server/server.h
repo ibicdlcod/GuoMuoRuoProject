@@ -103,7 +103,9 @@ private slots:
     void sslErrors(QSslSocket *, const QList<QSslError> &);
 
 private:
+    bool addEquipStar(const QUuid &, int);
     void decryptDatagram(QSslSocket *, const QByteArray &);
+    void deleteTestEquip(const CSteamID &);
     void doDevelop(CSteamID &, int, int, QSslSocket *);
     void doFetch(CSteamID &, int, QSslSocket *);
     void doHandshake(QSslSocket *, const QByteArray &);
