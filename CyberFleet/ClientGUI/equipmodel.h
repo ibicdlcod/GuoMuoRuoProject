@@ -32,6 +32,7 @@ public:
                           int role = Qt::DisplayRole) const override;
     virtual QVariant headerData(int section, Qt::Orientation orientation,
                           int role = Qt::DisplayRole) const override;
+    //virtual Qt::ItemFlags flags(const QModelIndex &index) const override;
     static const int uidCol = 0;
     static const int equipCol = 1;
     static const int starCol = 2;

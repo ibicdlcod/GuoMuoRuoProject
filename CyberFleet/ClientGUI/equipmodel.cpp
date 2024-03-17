@@ -102,6 +102,12 @@ QVariant EquipModel::data(const QModelIndex &index, int role) const {
     if(!ready)
         return QVariant();
     switch (role) {
+    case Qt::ToolTipRole:
+        [[fallthrough]];
+    case Qt::StatusTipRole:
+        [[fallthrough]];
+    case Qt::AccessibleTextRole:
+        [[fallthrough]];
     case Qt::DisplayRole: {
         if(index.column() == uidCol) {
             return uidToDisplay.toString();
@@ -112,6 +118,10 @@ QVariant EquipModel::data(const QModelIndex &index, int role) const {
         }
         else if(index.column() == hiddenSortColumn()) {
             return QString::number(equipToDisplay->type.getTypeSort());
+        }
+        else if(index.column() == destructColumn()
+                   || index.column() == addStarColumn()) {
+            return QVariant();
         }
         else {
             return "FB";
@@ -127,16 +137,48 @@ QVariant EquipModel::data(const QModelIndex &index, int role) const {
     }
     break;
     case Qt::EditRole:
-    case Qt::ToolTipRole:
-    case Qt::StatusTipRole:
-    case Qt::WhatsThisRole:
+        return QVariant(); break;
+    case Qt::AccessibleDescriptionRole:
+        [[fallthrough]];
+    case Qt::WhatsThisRole: {
+        if(index.column() == uidCol)
+            return qtTrId("equip-uuid");
+        else if(index.column() == equipCol)
+            return qtTrId("equip-name");
+        else if(index.column() == starCol)
+            return qtTrId("equip-star");
+        else if(index.column() == attrCol)
+            return qtTrId("equip-attr");
+        else if(index.column() == destructColumn())
+            return qtTrId("destruct");
+        else if(index.column() == addStarColumn())
+            return qtTrId("equip-improve");
+        else
+            return QVariant();
+    }
+    break;
     case Qt::SizeHintRole:
     case Qt::FontRole:
-    case Qt::TextAlignmentRole:
+        return QVariant(); break;
+    case Qt::TextAlignmentRole: {
+        if(index.column() == equipCol || index.column() == uidCol)
+            return Qt::AlignHCenter;
+        else
+            return Qt::AlignCenter;
+    }
+    break;
     case Qt::BackgroundRole:
     case Qt::ForegroundRole:
-    case Qt::CheckStateRole:
         return QVariant(); break;
+    case Qt::CheckStateRole: {
+        if(index.column() == destructColumn()
+            || index.column() == addStarColumn()) {
+            return Qt::Unchecked;
+        }
+        else
+            return QVariant();
+    }
+    break;
     case Qt::InitialSortOrderRole: {
         if(index.column() == hiddenSortColumn())
             return Qt::AscendingOrder;
@@ -144,14 +186,12 @@ QVariant EquipModel::data(const QModelIndex &index, int role) const {
             return QVariant();
     }
     break;
-    case Qt::AccessibleTextRole:
-    case Qt::AccessibleDescriptionRole:
     default: return QVariant(); break;
     }
 }
 
 QVariant EquipModel::headerData(int section, Qt::Orientation orientation,
-                            int role) const {
+                                int role) const {
     switch (role) {
     case Qt::DisplayRole: {
         if(orientation == Qt::Vertical) {
@@ -192,6 +232,16 @@ QVariant EquipModel::headerData(int section, Qt::Orientation orientation,
     case Qt::AccessibleDescriptionRole:
     default: return QVariant(); break;
     }
+}
+
+Qt::ItemFlags EquipModel::flags(const QModelIndex &index) const {
+    if(index.column() == destructColumn()
+        || index.column() == addStarColumn()) {
+        return QAbstractTableModel::flags(index)
+               | Qt::ItemIsUserCheckable;
+    }
+    else
+        return QAbstractTableModel::flags(index);
 }
 
 int EquipModel::destructColumn() const {
