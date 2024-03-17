@@ -165,5 +165,5 @@ void FactoryArea::recalculateArsenalRows() {
     Clientv2 &engine = Clientv2::getInstance();
     arsenalView->sortByColumn(
         engine.equipModel.hiddenSortColumn(), Qt::AscendingOrder);
-    //arsenalView->setColumnHidden(engine.equipModel.hiddenSortColumn(), true);
+    arsenalView->setColumnHidden(engine.equipModel.hiddenSortColumn(), true);
 }
