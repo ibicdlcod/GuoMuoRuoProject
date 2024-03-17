@@ -160,7 +160,8 @@ void FactoryArea::recalculateArsenalRows() {
     int rowSize = arsenalView->verticalHeader()->sectionSize(0);
     int rowSizeAvailable = ui->ArsenalArea->size().height()
                            - arsenalView->horizontalHeader()->size().height();
-    emit rowCountHint(std::max(rowSizeAvailable / rowSize - 1, 1));
+    if(rowSize > 0)
+        emit rowCountHint(std::max(rowSizeAvailable / rowSize - 1, 1));
     arsenalView->setGeometry(ui->ArsenalArea->rect());
     arsenalView->show();
     Clientv2 &engine = Clientv2::getInstance();
@@ -170,7 +171,7 @@ void FactoryArea::recalculateArsenalRows() {
 }
 
 void FactoryArea::resizeEvent(QResizeEvent *event) {
-    //recalculateArsenalRows();
+    recalculateArsenalRows();
     QWidget::resizeEvent(event);
 }
 

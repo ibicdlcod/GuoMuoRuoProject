@@ -45,6 +45,7 @@ public:
     int hiddenSortColumn() const;
 
 private:
+    void adjustRowCount(int oldRowCount, int newRowCount);
     int numberOfColumns() const;
     int numberOfEquip() const;
     bool isInArsenal;

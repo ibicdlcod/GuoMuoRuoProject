@@ -43,7 +43,10 @@ void EquipModel::setPageNumHint(int input) {
         endInsertRows();
     }
     else if(oldRowCount > newRowCount) {
-        removeRows(newRowCount, oldRowCount - newRowCount);
+        beginRemoveRows(QModelIndex(),
+                        newRowCount,
+                        oldRowCount - 1);
+        endRemoveRows();
     }
     wholeTableChanged();
 }
@@ -58,13 +61,28 @@ void EquipModel::setRowsPerPageHint(int input) {
         endInsertRows();
     }
     else if(oldRowCount > newRowCount) {
-        removeRows(newRowCount, oldRowCount - newRowCount);
+        beginRemoveRows(QModelIndex(), 0,
+                        oldRowCount - newRowCount - 1);
+        endRemoveRows();
     }
-    wholeTableChanged();
 }
 
 void EquipModel::setIsInArsenal(bool input) {
     isInArsenal = input;
+}
+
+void EquipModel::adjustRowCount(int oldRowCount, int newRowCount) {
+    if(oldRowCount < newRowCount) {
+        beginInsertRows(QModelIndex(), 0,
+                        newRowCount - oldRowCount - 1);
+        endInsertRows();
+    }
+    else if(oldRowCount > newRowCount) {
+        beginRemoveRows(QModelIndex(), 0,
+                        oldRowCount - newRowCount - 1);
+        endRemoveRows();
+    }
+    wholeTableChanged();
 }
 
 int EquipModel::numberOfColumns() const {
@@ -95,6 +113,8 @@ int EquipModel::columnCount(const QModelIndex &parent) const {
 }
 
 QVariant EquipModel::data(const QModelIndex &index, int role) const {
+    if(index.row() >= rowCount() || index.column() >= columnCount())
+        return QVariant();
     int realRowIndex = index.row() + rowsPerPage * pageNum;
     Q_ASSERT(sortedEquipIds.length() > realRowIndex);
     QUuid uidToDisplay = sortedEquipIds[realRowIndex];
@@ -222,6 +242,10 @@ QVariant EquipModel::data(const QModelIndex &index, int role) const {
 
 QVariant EquipModel::headerData(int section, Qt::Orientation orientation,
                                 int role) const {
+    if(section >= rowCount() && orientation == Qt::Vertical)
+        return QVariant();
+    if(section >= columnCount() && orientation == Qt::Horizontal)
+        return QVariant();
     switch (role) {
     case Qt::DisplayRole: {
         if(orientation == Qt::Vertical) {
@@ -337,7 +361,10 @@ void EquipModel::updateEquipmentList(const QJsonObject &input) {
             endInsertRows();
         }
         else if(oldRowCount > newRowCount) {
-            removeRows(newRowCount, oldRowCount - newRowCount);
+            beginRemoveRows(QModelIndex(),
+                            newRowCount,
+                            oldRowCount - 1);
+            endRemoveRows();
         }
         wholeTableChanged();
         emit needReCalculateRows();
