@@ -936,6 +936,7 @@ void Server::doDevelop(CSteamID &uid, int equipid,
 }
 
 void Server::doFetch(CSteamID &uid, int factoryid, QSslSocket *connection) {
+    naturalRegen(uid);
     User::refreshFactory(uid);
     QSqlDatabase db = QSqlDatabase::database();
     QSqlQuery query;
@@ -1275,6 +1276,74 @@ bool Server::importEquipFromCSV() {
     return true;
 }
 
+void Server::naturalRegen(const CSteamID &uid) {
+    try{
+        QSqlDatabase db = QSqlDatabase::database();
+        QSqlQuery query;
+        double globalTechLevel = std::get<0>(calculateTech(uid, 0));
+        query.prepare("SELECT Intvalue"
+                      " FROM UserAttr WHERE UserID = :id"
+                      " AND Attribute = 'RecoverTime'");
+        query.bindValue(":id", uid.ConvertToUint64());
+        query.exec();
+        query.isSelect();
+        if(Q_UNLIKELY(!query.first())) {
+            throw DBError(qtTrId("user-query-regen-time-fail")
+                              .arg(uid.ConvertToUint64()), query.lastError());
+            return;
+        }
+        else {
+            qint64 priorRecoverTime = query.value(0).toInt() / KP::secsinMin;
+            qint64 currentTimeInt =
+                QDateTime::currentDateTime(QTimeZone::UTC).toSecsSinceEpoch();
+            qint64 currentTimeInMinute = currentTimeInt / KP::secsinMin;
+            qint64 regenMins = currentTimeInMinute - priorRecoverTime;
+            regenMins = std::max(Q_INT64_C(0), regenMins); //stop timezone trap
+            int regenPower = globalTechLevel / 4.0; // not yet implemented
+#pragma message(NOT_M_CONST)
+            ResOrd regenAmount = ResOrd(10 + regenPower,
+                                        10 + regenPower,
+                                        10 + regenPower,
+                                        2 + regenPower,
+                                        5 + regenPower,
+                                        2 + regenPower,
+                                        2 + regenPower);
+            if(regenMins > 0)
+                qDebug() << regenMins << " minute(s) passed"
+                                         "for regeneration purposes.";
+            regenAmount *= (qint64)regenMins;
+            ResOrd regenCap = ResOrd(2500, 2500, 2500, 1500, 2000, 1500, 1500);
+            regenCap *= (qint64)(std::round(globalTechLevel * 8.0) + 24);
+            ResOrd currentRes = User::getCurrentResources(uid);
+            currentRes.addResources(regenAmount, regenCap);
+            User::setResources(uid, currentRes);
+            QSqlQuery query;
+            query.prepare("UPDATE UserAttr SET Intvalue"
+                          " = :now "
+                          "WHERE UserID = :id AND Attribute = 'RecoverTime'");
+            query.bindValue(":id", uid.ConvertToUint64());
+            query.bindValue(":now", currentTimeInt);
+            if(Q_UNLIKELY(!query.exec())) {
+                //% "User ID %1: natural regeneration failed!"
+                throw DBError(qtTrId("natural-regen-failed")
+                                  .arg(uid.ConvertToUint64()), query.lastError());
+                return;
+            }
+            else {
+                //% "User ID %1: natural regeneration"
+                qDebug() << qtTrId("natural-regen")
+                                .arg(uid.ConvertToUint64());
+            }
+        }
+    } catch (DBError &e) {
+        for(auto &what: e.whats()) {
+            qCritical() << what;
+        }
+    } catch (std::exception &e) {
+        qCritical() << e.what();
+    }
+}
+
 QUuid Server::newEquip(const CSteamID &uid, int equipId) {
     newEquipHasMother(uid, equipId);
     return User::newEquip(uid, equipId);
@@ -1552,6 +1621,7 @@ void Server::receivedAuth(const QJsonObject &djson,
             QByteArray msg = KP::weighAnchor();
             senderM.sendMessage(connection, msg);
             CSteamID uid = connectedUsers[connection];
+            naturalRegen(uid);
             User::refreshPort(uid);
             User::refreshFactory(uid);
         }
@@ -1655,9 +1725,17 @@ void Server::receivedReq(const QJsonObject &djson,
     case KP::CommandType::ChangeState:
         switch(djson["state"].toInt()) {
         /* TODO: Should update to client as well? */
-        case KP::GameState::Port: User::refreshPort(uid); break;
-        case KP::GameState::Factory: User::refreshFactory(uid);
-            refreshClientFactory(uid, connection); break;
+        case KP::GameState::Port: {
+            naturalRegen(uid);
+            User::refreshPort(uid);
+        }
+        break;
+        case KP::GameState::Factory: {
+            naturalRegen(uid);
+            User::refreshFactory(uid);
+            refreshClientFactory(uid, connection);
+        }
+        break;
         default:
             throw std::domain_error("command type not supported");
             break;

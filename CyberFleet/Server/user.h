@@ -23,7 +23,6 @@ void init(const CSteamID &);
 bool isFactoryBusy(const CSteamID &, int);
 std::tuple<bool, int> isFactoryFinished(const CSteamID &, int);
 bool isSuperUser(const CSteamID &);
-void naturalRegen(const CSteamID &);
 QUuid newEquip(const CSteamID &, int);
 void refreshFactory(const CSteamID &);
 void refreshPort(const CSteamID &);

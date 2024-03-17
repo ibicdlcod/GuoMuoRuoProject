@@ -117,6 +117,7 @@ private:
     const QStringList getCommandsSpec() const override;
     const QStringList getValidCommands() const override;
     bool importEquipFromCSV();
+    void naturalRegen(const CSteamID &);
     QUuid newEquip(const CSteamID &, int);
     int64 newEquipHasMotherCal(int);
     void newEquipHasMother(const CSteamID &, int);
