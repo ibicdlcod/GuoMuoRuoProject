@@ -102,6 +102,10 @@ QVariant EquipModel::data(const QModelIndex &index, int role) const {
     if(!ready)
         return QVariant();
     switch (role) {
+    case Qt::ToolTipRole:
+        [[fallthrough]];
+    case Qt::StatusTipRole:
+        [[fallthrough]];
     case Qt::AccessibleTextRole:
         [[fallthrough]];
     case Qt::DisplayRole: {
@@ -119,6 +123,9 @@ QVariant EquipModel::data(const QModelIndex &index, int role) const {
                  || index.column() == addStarColumn()) {
             return QVariant();
         }
+        else if(index.column() == starCol) {
+            return QString::number(starToDisplay);
+        }
         else {
             return "FB";
         }
@@ -133,8 +140,7 @@ QVariant EquipModel::data(const QModelIndex &index, int role) const {
     }
     break;
     case Qt::EditRole:
-    case Qt::ToolTipRole:
-    case Qt::StatusTipRole:
+        return QVariant(); break;
     case Qt::AccessibleDescriptionRole:
         [[fallthrough]];
     case Qt::WhatsThisRole: {
@@ -247,7 +253,7 @@ bool EquipModel::setData(const QModelIndex &index,
     if(role == Qt::CheckStateRole) {
         if(value.toInt() == Qt::Checked) {
             qCritical() << "FUCK";
-            dataChanged(index, index, {Qt::Checked});
+            emit dataChanged(index, index, {Qt::Checked});
             return true;
         }
     }
@@ -292,6 +298,8 @@ void EquipModel::updateEquipmentList(const QJsonObject &input) {
                   {
                       if((*clientEquips[a]).isNotEqual(*clientEquips[b]))
                           return (*clientEquips[a]) < (*clientEquips[b]);
+                      else if(clientEquipStars[a] != clientEquipStars[b])
+                          return clientEquipStars[a] > clientEquipStars[b];
                       else
                           return a < b;
                   });
