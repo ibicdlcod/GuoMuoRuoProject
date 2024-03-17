@@ -58,6 +58,8 @@ void EquipModel::adjustRowCount(int oldRowCount, int newRowCount) {
         endInsertRows();
     }
     else if(oldRowCount > newRowCount) {
+        /* make index [newRowCount, oldRowCount-1]
+         * will crash for whatever reason */
         beginRemoveRows(QModelIndex(), 0,
                         oldRowCount - newRowCount - 1);
         endRemoveRows();
@@ -257,7 +259,9 @@ QVariant EquipModel::headerData(int section, Qt::Orientation orientation,
     case Qt::WhatsThisRole:
     case Qt::SizeHintRole:
     case Qt::FontRole:
+        return QVariant(); break;
     case Qt::TextAlignmentRole:
+        return Qt::AlignCenter; break;
     case Qt::BackgroundRole:
     case Qt::ForegroundRole:
     case Qt::CheckStateRole:

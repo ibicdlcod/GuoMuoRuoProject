@@ -14,8 +14,10 @@
 void User::addSkillPoints(const CSteamID &uid, int equipId, int64 skillPoints) {
     QSqlDatabase db = QSqlDatabase::database();
     int64 existingSP = getSkillPoints(uid, equipId);
-    /* disallow skillpoint lower than 0, may change in future */
-    int64 newSP = std::max((int64)0, skillPoints + existingSP);
+    /* disallow skillpoint lower than 0 */
+    //int64 newSP = std::max((int64)0, skillPoints + existingSP);
+    /* allow skillpoint lower than 0 */
+    int64 newSP = skillPoints + existingSP;
 
     QSqlQuery query2;
     query2.prepare("REPLACE INTO UserEquipSP (User, EquipDef, Intvalue) "
