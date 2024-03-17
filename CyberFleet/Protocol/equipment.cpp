@@ -80,11 +80,17 @@ Equipment::Equipment(const QJsonObject &input) {
     }
 }
 
-bool Equipment::operator<(const Equipment &other) const {
-    if(this->type.getTypeSort() != other.type.getTypeSort())
-        return this->type.getTypeSort() < other.type.getTypeSort();
+int Equipment::operator<=>(const Equipment &other) const {
+    int typeResult = this->type.getTypeSort() - other.type.getTypeSort();
+    if(typeResult == 0)
+        return equipRegId - other.equipRegId;
     else
-        return equipRegId < other.equipRegId;
+        return typeResult;
+}
+
+/* not operator!= because QObject don't have == */
+bool Equipment::isNotEqual(const Equipment &other) const {
+    return operator<=>(other) != 0;
 }
 
 QString Equipment::toString(QString lang) const {
