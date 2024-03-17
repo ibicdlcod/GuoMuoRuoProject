@@ -120,8 +120,10 @@ QVariant EquipModel::data(const QModelIndex &index, int role) const {
     break;
     case Qt::DecorationRole: {
         if(index.column() == equipCol) {
-            //return Icute::equipIcon(equipToDisplay->type, false);
+            return Icute::equipIcon(equipToDisplay->type, false);
         }
+        else
+            return QVariant();
     }
     break;
     case Qt::EditRole:
@@ -134,6 +136,7 @@ QVariant EquipModel::data(const QModelIndex &index, int role) const {
     case Qt::BackgroundRole:
     case Qt::ForegroundRole:
     case Qt::CheckStateRole:
+        return QVariant(); break;
     case Qt::InitialSortOrderRole: {
         if(index.column() == hiddenSortColumn())
             return Qt::AscendingOrder;
