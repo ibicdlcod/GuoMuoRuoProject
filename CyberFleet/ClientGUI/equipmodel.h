@@ -51,6 +51,7 @@ public:
     int hiddenSortColumn() const;
     int currentPageNum() const;
     int maximumPageNum() const;
+    bool isReady() const;
 
 private slots:
     void updateIllegalPage();
@@ -66,6 +67,7 @@ private:
     QList<QUuid> sortedEquipIds; // not sort by uuid but equiptype
     int rowsPerPage = 1;
     int pageNum = 0;
+    bool ready = false;
 };
 
 #endif // EQUIPMODEL_H

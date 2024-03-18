@@ -351,6 +351,10 @@ int EquipModel::maximumPageNum() const {
     return (numberOfEquip() - 1) / rowsPerPage + 1;
 }
 
+bool EquipModel::isReady() const {
+    return ready;
+}
+
 void EquipModel::updateIllegalPage() {
     if(pageNum >= maximumPageNum())
         pageNum = maximumPageNum() - 1;
@@ -392,6 +396,7 @@ void EquipModel::updateEquipmentList(const QJsonObject &input) {
         adjustRowCount(oldRowCount, newRowCount);
         emit needReCalculateRows();
         emit needReCalculatePages();
+        ready = true;
     }
     else {  /*
             connection = connect(&engine, &Clientv2::equipRegistryComplete,

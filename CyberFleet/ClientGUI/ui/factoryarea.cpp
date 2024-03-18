@@ -217,9 +217,14 @@ void FactoryArea::switchToDevelop() {
                 this, &FactoryArea::recalculateArsenalRows);
         connect(this, &FactoryArea::rowCountHint,
                 getEquipModel(), &EquipModel::setRowsPerPageHint);
-        Clientv2 &engine = Clientv2::getInstance();
-        engine.doRefreshFactoryArsenal();
-        arsenalView->hide();
+        if(!getEquipModel()->isReady()) {
+            Clientv2 &engine = Clientv2::getInstance();
+            engine.doRefreshFactoryArsenal();
+            arsenalView->hide();
+        }
+        else {
+            arsenalView->show();
+        }
         break;
     }
 }
