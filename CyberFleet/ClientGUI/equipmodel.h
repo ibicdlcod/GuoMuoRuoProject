@@ -15,6 +15,7 @@ public:
 signals:
     void needReCalculateRows();
     void needReCalculatePages();
+    void pageNumChanged(int currentPageNum, int totalPageNum);
 
 public slots:
     void firstPage();

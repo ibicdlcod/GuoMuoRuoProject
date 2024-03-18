@@ -25,6 +25,9 @@ FactoryArea::FactoryArea(QWidget *parent) :
     ui->ArsenalControl->setLayout(layout);
     ui->ArsenalControl->show();
     addNavigator(ui->Navigator);
+
+    arsenalView->verticalHeader()->setSectionResizeMode(QHeaderView::Fixed);
+
     connect(dynamic_cast<QAbstractButton *>(ui->Navigator->itemAt(0)->widget()),
             &QAbstractButton::clicked,
             this, &FactoryArea::arsenalFirst);
@@ -37,13 +40,16 @@ FactoryArea::FactoryArea(QWidget *parent) :
     connect(dynamic_cast<QAbstractButton *>(ui->Navigator->itemAt(3)->widget()),
             &QAbstractButton::clicked,
             this, &FactoryArea::arsenalLast);
-    //ui->Navigator->itemAt(0)->widget()->setEnabled(false);
+    connect(getEquipModel(), &EquipModel::pageNumChanged,
+            this, &FactoryArea::enactPageNumChange);
+    connect(arsenalView->horizontalHeader(), &QHeaderView::sectionResized,
+            this, &FactoryArea::columnResized);
 
     Clientv2 &engine = Clientv2::getInstance();
     connect(&engine, &Clientv2::receivedFactoryRefresh,
             this, &FactoryArea::doFactoryRefresh);
-    connect(&engine, &Clientv2::receivedArsenalEquip,
-            this, &FactoryArea::updateArsenalEquip);
+    //connect(&engine, &Clientv2::receivedArsenalEquip,
+    //        this, &FactoryArea::updateArsenalEquip);
 
     slotfs.append(ui->Factory_Slot_0);
     slotfs.append(ui->Factory_Slot_1);
@@ -93,6 +99,18 @@ void FactoryArea::arsenalNext(bool checked) {
 }
 void FactoryArea::arsenalLast(bool checked) {
     getEquipModel()->lastPage();
+}
+
+void FactoryArea::columnResized(int logicalIndex, int oldSize, int newSize) {
+    Q_UNUSED(logicalIndex)
+    Q_UNUSED(oldSize)
+    Q_UNUSED(newSize)
+    arsenalView
+        ->setMinimumSize(QSize(tableSizeWhole(arsenalView,
+                                              getEquipModel()).width(),
+                               ui->ArsenalControl->size().height()));
+    arsenalView->hide();
+    arsenalView->show();
 }
 
 void FactoryArea::developClicked(bool checked, int slotnum) {
@@ -149,7 +167,23 @@ void FactoryArea::doFactoryRefresh(const QJsonObject &input) {
     }
 }
 
-void FactoryArea::updateArsenalEquip(const QJsonObject &input) {
+void FactoryArea::enactPageNumChange(int currentPageNum, int totalPageNum) {
+    if(currentPageNum == 0) {
+        ui->Navigator->itemAt(0)->widget()->setEnabled(false);
+        ui->Navigator->itemAt(1)->widget()->setEnabled(false);
+    }
+    else {
+        ui->Navigator->itemAt(0)->widget()->setEnabled(true);
+        ui->Navigator->itemAt(1)->widget()->setEnabled(true);
+    }
+    if(currentPageNum == totalPageNum - 1) {
+        ui->Navigator->itemAt(2)->widget()->setEnabled(false);
+        ui->Navigator->itemAt(3)->widget()->setEnabled(false);
+    }
+    else {
+        ui->Navigator->itemAt(2)->widget()->setEnabled(true);
+        ui->Navigator->itemAt(3)->widget()->setEnabled(true);
+    }
 }
 
 EquipModel * FactoryArea::getEquipModel() {
@@ -177,13 +211,13 @@ void FactoryArea::switchToDevelop() {
         ui->FactoryLabel->setText(qtTrId("arsenal"));
         ui->Slots->hide();
         ui->ArsenalControl->show();
-        Clientv2 &engine = Clientv2::getInstance();
-        engine.equipModel.setIsInArsenal(true);
-        arsenalView->setModel(&(engine.equipModel));
-        connect(&(engine.equipModel), &EquipModel::needReCalculateRows,
+        getEquipModel()->setIsInArsenal(true);
+        arsenalView->setModel(getEquipModel());
+        connect(getEquipModel(), &EquipModel::needReCalculateRows,
                 this, &FactoryArea::recalculateArsenalRows);
         connect(this, &FactoryArea::rowCountHint,
-                &(engine.equipModel), &EquipModel::setRowsPerPageHint);
+                getEquipModel(), &EquipModel::setRowsPerPageHint);
+        Clientv2 &engine = Clientv2::getInstance();
         engine.doRefreshFactoryArsenal();
         arsenalView->hide();
         break;
@@ -199,12 +233,11 @@ void FactoryArea::recalculateArsenalRows() {
         emit rowCountHint(std::max(rowSizeAvailable / rowSize - 1, 1));
     arsenalView
         ->setMinimumSize(QSize(tableSizeWhole(arsenalView,
-                                              &engine.equipModel).width(),
+                                              getEquipModel()).width(),
                                ui->ArsenalControl->size().height()));
     arsenalView->show();
-    arsenalView->sortByColumn(
-        engine.equipModel.hiddenSortColumn(), Qt::AscendingOrder);
-    arsenalView->setColumnHidden(engine.equipModel.hiddenSortColumn(), true);
+    arsenalView->sortByColumn(getEquipModel()->hiddenSortColumn(), Qt::AscendingOrder);
+    arsenalView->setColumnHidden(getEquipModel()->hiddenSortColumn(), true);
 }
 
 void FactoryArea::resizeEvent(QResizeEvent *event) {

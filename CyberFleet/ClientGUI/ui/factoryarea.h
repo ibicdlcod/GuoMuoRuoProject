@@ -51,9 +51,10 @@ private slots:
     void arsenalPrev(bool checked = false);
     void arsenalNext(bool checked = false);
     void arsenalLast(bool checked = false);
+    void columnResized(int logicalIndex, int oldSize, int newSize);
     void developClicked(bool checked = false, int slotnum = 0);
     void doFactoryRefresh(const QJsonObject &);
-    void updateArsenalEquip(const QJsonObject &);
+    void enactPageNumChange(int currentPageNum, int totalPageNum);
 
 private:
     EquipModel * getEquipModel();

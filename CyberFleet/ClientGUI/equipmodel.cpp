@@ -25,6 +25,7 @@ void EquipModel::firstPage() {
     int newRowCount = rowCount();
     adjustRowCount(oldRowCount, newRowCount);
     wholeTableChanged();
+    emit pageNumChanged(pageNum, maximumPageNum());
 }
 void EquipModel::prevPage() {
     int oldRowCount = rowCount();
@@ -33,6 +34,7 @@ void EquipModel::prevPage() {
     int newRowCount = rowCount();
     adjustRowCount(oldRowCount, newRowCount);
     wholeTableChanged();
+    emit pageNumChanged(pageNum, maximumPageNum());
 }
 void EquipModel::nextPage() {
     int oldRowCount = rowCount();
@@ -41,6 +43,7 @@ void EquipModel::nextPage() {
     int newRowCount = rowCount();
     adjustRowCount(oldRowCount, newRowCount);
     wholeTableChanged();
+    emit pageNumChanged(pageNum, maximumPageNum());
 }
 void EquipModel::lastPage() {
     int oldRowCount = rowCount();
@@ -48,6 +51,7 @@ void EquipModel::lastPage() {
     int newRowCount = rowCount();
     adjustRowCount(oldRowCount, newRowCount);
     wholeTableChanged();
+    emit pageNumChanged(pageNum, maximumPageNum());
 }
 
 void EquipModel::destructEquipment(const QList<QUuid> &destructed) {
@@ -67,6 +71,7 @@ void EquipModel::setPageNumHint(int input) {
     pageNum = input;
     int newRowCount = rowCount();
     adjustRowCount(oldRowCount, newRowCount);
+    emit pageNumChanged(pageNum, maximumPageNum());
 }
 
 void EquipModel::setRowsPerPageHint(int input) {
@@ -349,6 +354,7 @@ int EquipModel::maximumPageNum() const {
 void EquipModel::updateIllegalPage() {
     if(pageNum >= maximumPageNum())
         pageNum = maximumPageNum() - 1;
+    emit pageNumChanged(pageNum, maximumPageNum());
 }
 
 void EquipModel::updateEquipmentList(const QJsonObject &input) {
@@ -400,4 +406,5 @@ void EquipModel::wholeTableChanged() {
     QModelIndex topleft = this->index(0, 0);
     QModelIndex bottomright = this->index(rowCount() - 1, columnCount() - 1);
     emit dataChanged(topleft, bottomright, QList<int>());
+    emit headerDataChanged(Qt::Horizontal, 0, rowCount() - 1);
 }
