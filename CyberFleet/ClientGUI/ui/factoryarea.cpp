@@ -1,8 +1,11 @@
 #include "factoryarea.h"
 #include "ui_factoryarea.h"
 #include <QHeaderView>
+#include <QSvgWidget>
+#include <QToolButton>
 #include "../clientv2.h"
 #include "developwindow.h"
+#include "navigator.h"
 
 FactoryArea::FactoryArea(QWidget *parent) :
     QFrame(parent),
@@ -21,6 +24,20 @@ FactoryArea::FactoryArea(QWidget *parent) :
 
     ui->ArsenalControl->setLayout(layout);
     ui->ArsenalControl->show();
+    addNavigator(ui->Navigator);
+    connect(dynamic_cast<QAbstractButton *>(ui->Navigator->itemAt(0)->widget()),
+            &QAbstractButton::clicked,
+            this, &FactoryArea::arsenalFirst);
+    connect(dynamic_cast<QAbstractButton *>(ui->Navigator->itemAt(1)->widget()),
+            &QAbstractButton::clicked,
+            this, &FactoryArea::arsenalPrev);
+    connect(dynamic_cast<QAbstractButton *>(ui->Navigator->itemAt(2)->widget()),
+            &QAbstractButton::clicked,
+            this, &FactoryArea::arsenalNext);
+    connect(dynamic_cast<QAbstractButton *>(ui->Navigator->itemAt(3)->widget()),
+            &QAbstractButton::clicked,
+            this, &FactoryArea::arsenalLast);
+    ui->Navigator->itemAt(0)->widget()->setEnabled(false);
 
     Clientv2 &engine = Clientv2::getInstance();
     connect(&engine, &Clientv2::receivedFactoryRefresh,
@@ -63,6 +80,19 @@ FactoryArea::FactoryArea(QWidget *parent) :
 FactoryArea::~FactoryArea()
 {
     delete ui;
+}
+
+void FactoryArea::arsenalFirst(bool checked) {
+    qCritical() << "FUCK";
+}
+void FactoryArea::arsenalPrev(bool checked) {
+    qCritical() << "FUCK2";
+}
+void FactoryArea::arsenalNext(bool checked) {
+    qCritical() << "FUCK3";
+}
+void FactoryArea::arsenalLast(bool checked) {
+    qCritical() << "FUCK4";
 }
 
 void FactoryArea::developClicked(bool checked, int slotnum) {

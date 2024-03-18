@@ -43,7 +43,7 @@
      <property name="sizePolicy">
       <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
        <horstretch>0</horstretch>
-       <verstretch>10</verstretch>
+       <verstretch>1</verstretch>
       </sizepolicy>
      </property>
      <property name="minimumSize">
@@ -243,6 +243,9 @@
       </sizepolicy>
      </property>
     </widget>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="Navigator"/>
    </item>
   </layout>
  </widget>

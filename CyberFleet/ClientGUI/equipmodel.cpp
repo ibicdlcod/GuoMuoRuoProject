@@ -40,6 +40,7 @@ void EquipModel::setPageNumHint(int input) {
 void EquipModel::setRowsPerPageHint(int input) {
     int oldRowCount = rowCount();
     rowsPerPage = input;
+    emit needReCalculatePages();
     int newRowCount = rowCount();
     adjustRowCount(oldRowCount, newRowCount);
 }
@@ -304,6 +305,10 @@ int EquipModel::hiddenSortColumn() const {
     return isInArsenal ? 6 : 4;
 }
 
+int EquipModel::maximumPageNum() const {
+    return (numberOfEquip() - 1) / rowsPerPage + 1;
+}
+
 void EquipModel::updateEquipmentList(const QJsonObject &input) {
     clientEquips.clear();
     clientEquipStars.clear();
@@ -338,6 +343,7 @@ void EquipModel::updateEquipmentList(const QJsonObject &input) {
         int newRowCount = rowCount();
         adjustRowCount(oldRowCount, newRowCount);
         emit needReCalculateRows();
+        emit needReCalculatePages();
     }
     else {  /*
             connection = connect(&engine, &Clientv2::equipRegistryComplete,

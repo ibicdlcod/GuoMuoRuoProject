@@ -12,7 +12,8 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Core Gui Widgets)
-find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS UiPlugin LinguistTools Sql Network)
+find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS
+    UiPlugin LinguistTools Sql SvgWidgets Network)
 
 include_directories(${root_SOURCE_DIR}/FactorySlot)
 add_subdirectory(FactorySlot)
@@ -35,7 +36,6 @@ set(CLIENT_SOURCES
     ClientGUI/steamauth.cpp
     ClientGUI/steamauth.h
     ClientGUI/ui/boxcenterfusionstyle.h
-
     ClientGUI/ui/developwindow.cpp
     ClientGUI/ui/developwindow.h
     ClientGUI/ui/developwindow.ui
@@ -50,6 +50,7 @@ set(CLIENT_SOURCES
     ClientGUI/ui/mainwindow.cpp
     ClientGUI/ui/mainwindow.h
     ClientGUI/ui/mainwindow.ui
+    ClientGUI/ui/navigator.h
     ClientGUI/ui/newlogins.cpp
     ClientGUI/ui/newlogins.h
     ClientGUI/ui/newlogins.ui
@@ -167,6 +168,7 @@ qt_add_translations(CFServer
 target_link_libraries(CFProtocol PRIVATE Qt${QT_VERSION_MAJOR}::Core)
 target_link_libraries(CFProtocol PRIVATE Qt${QT_VERSION_MAJOR}::Sql)
 target_link_libraries(CFProtocol PRIVATE Qt${QT_VERSION_MAJOR}::Network)
+target_link_libraries(CFClient PRIVATE Qt${QT_VERSION_MAJOR}::SvgWidgets)
 target_link_libraries(CFClient PRIVATE Qt${QT_VERSION_MAJOR}::Widgets)
 target_link_libraries(CFClient PRIVATE Qt${QT_VERSION_MAJOR}::Network)
 target_link_libraries(CFClient PRIVATE CFProtocol)

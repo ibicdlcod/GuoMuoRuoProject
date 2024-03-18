@@ -47,6 +47,10 @@ protected:
     void resizeEvent(QResizeEvent *event) override;
 
 private slots:
+    void arsenalFirst(bool checked = false);
+    void arsenalPrev(bool checked = false);
+    void arsenalNext(bool checked = false);
+    void arsenalLast(bool checked = false);
     void developClicked(bool checked = false, int slotnum = 0);
     void doFactoryRefresh(const QJsonObject &);
     void updateArsenalEquip(const QJsonObject &);

@@ -14,6 +14,7 @@ public:
 
 signals:
     void needReCalculateRows();
+    void needReCalculatePages();
 
 public slots:
     void destructEquipment(const QList<QUuid> &);
@@ -43,6 +44,7 @@ public:
     int destructColumn() const;
     int addStarColumn() const;
     int hiddenSortColumn() const;
+    int maximumPageNum() const;
 
 private:
     void adjustRowCount(int oldRowCount, int newRowCount);
