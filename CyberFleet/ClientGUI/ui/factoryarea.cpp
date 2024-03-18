@@ -37,7 +37,7 @@ FactoryArea::FactoryArea(QWidget *parent) :
     connect(dynamic_cast<QAbstractButton *>(ui->Navigator->itemAt(3)->widget()),
             &QAbstractButton::clicked,
             this, &FactoryArea::arsenalLast);
-    ui->Navigator->itemAt(0)->widget()->setEnabled(false);
+    //ui->Navigator->itemAt(0)->widget()->setEnabled(false);
 
     Clientv2 &engine = Clientv2::getInstance();
     connect(&engine, &Clientv2::receivedFactoryRefresh,
@@ -83,16 +83,16 @@ FactoryArea::~FactoryArea()
 }
 
 void FactoryArea::arsenalFirst(bool checked) {
-    qCritical() << "FUCK";
+    getEquipModel()->firstPage();
 }
 void FactoryArea::arsenalPrev(bool checked) {
-    qCritical() << "FUCK2";
+    getEquipModel()->prevPage();
 }
 void FactoryArea::arsenalNext(bool checked) {
-    qCritical() << "FUCK3";
+    getEquipModel()->nextPage();
 }
 void FactoryArea::arsenalLast(bool checked) {
-    qCritical() << "FUCK4";
+    getEquipModel()->lastPage();
 }
 
 void FactoryArea::developClicked(bool checked, int slotnum) {
@@ -150,6 +150,11 @@ void FactoryArea::doFactoryRefresh(const QJsonObject &input) {
 }
 
 void FactoryArea::updateArsenalEquip(const QJsonObject &input) {
+}
+
+EquipModel * FactoryArea::getEquipModel() {
+    Clientv2 &engine = Clientv2::getInstance();
+    return &engine.equipModel;
 }
 
 void FactoryArea::setDevelop(KP::FactoryState state) {

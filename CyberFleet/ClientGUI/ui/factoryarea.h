@@ -56,6 +56,8 @@ private slots:
     void updateArsenalEquip(const QJsonObject &);
 
 private:
+    EquipModel * getEquipModel();
+
     Ui::FactoryArea *ui;
     QTableView *arsenalView;
 

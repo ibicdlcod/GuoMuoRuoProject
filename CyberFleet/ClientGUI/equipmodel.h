@@ -17,6 +17,10 @@ signals:
     void needReCalculatePages();
 
 public slots:
+    void firstPage();
+    void prevPage();
+    void nextPage();
+    void lastPage();
     void destructEquipment(const QList<QUuid> &);
     void updateEquipmentList(const QJsonObject &);
     void setPageNumHint(int);
@@ -44,7 +48,11 @@ public:
     int destructColumn() const;
     int addStarColumn() const;
     int hiddenSortColumn() const;
+    int currentPageNum() const;
     int maximumPageNum() const;
+
+private slots:
+    void updateIllegalPage();
 
 private:
     void adjustRowCount(int oldRowCount, int newRowCount);

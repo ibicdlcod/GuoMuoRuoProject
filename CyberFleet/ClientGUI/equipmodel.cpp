@@ -15,7 +15,39 @@ EquipModel::EquipModel(QObject *parent, bool isInArsenal)
     : QAbstractTableModel{parent},
     isInArsenal(isInArsenal)
 {
+    connect(this, &EquipModel::needReCalculatePages,
+            this, &EquipModel::updateIllegalPage);
+}
 
+void EquipModel::firstPage() {
+    int oldRowCount = rowCount();
+    pageNum = 0;
+    int newRowCount = rowCount();
+    adjustRowCount(oldRowCount, newRowCount);
+    wholeTableChanged();
+}
+void EquipModel::prevPage() {
+    int oldRowCount = rowCount();
+    if(pageNum > 0)
+        pageNum--;
+    int newRowCount = rowCount();
+    adjustRowCount(oldRowCount, newRowCount);
+    wholeTableChanged();
+}
+void EquipModel::nextPage() {
+    int oldRowCount = rowCount();
+    if(pageNum < maximumPageNum() - 1)
+        pageNum++;
+    int newRowCount = rowCount();
+    adjustRowCount(oldRowCount, newRowCount);
+    wholeTableChanged();
+}
+void EquipModel::lastPage() {
+    int oldRowCount = rowCount();
+    pageNum = maximumPageNum() - 1;
+    int newRowCount = rowCount();
+    adjustRowCount(oldRowCount, newRowCount);
+    wholeTableChanged();
 }
 
 void EquipModel::destructEquipment(const QList<QUuid> &destructed) {
@@ -64,6 +96,7 @@ void EquipModel::adjustRowCount(int oldRowCount, int newRowCount) {
     }
     wholeTableChanged();
 }
+
 
 int EquipModel::numberOfColumns() const {
     if(isInArsenal) {
@@ -305,8 +338,17 @@ int EquipModel::hiddenSortColumn() const {
     return isInArsenal ? 6 : 4;
 }
 
+int EquipModel::currentPageNum() const {
+    return pageNum;
+}
+
 int EquipModel::maximumPageNum() const {
     return (numberOfEquip() - 1) / rowsPerPage + 1;
+}
+
+void EquipModel::updateIllegalPage() {
+    if(pageNum >= maximumPageNum())
+        pageNum = maximumPageNum() - 1;
 }
 
 void EquipModel::updateEquipmentList(const QJsonObject &input) {
