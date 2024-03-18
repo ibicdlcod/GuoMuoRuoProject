@@ -50,6 +50,7 @@ set(CLIENT_SOURCES
     ClientGUI/ui/mainwindow.cpp
     ClientGUI/ui/mainwindow.h
     ClientGUI/ui/mainwindow.ui
+    ClientGUI/ui/navigator.cpp
     ClientGUI/ui/navigator.h
     ClientGUI/ui/newlogins.cpp
     ClientGUI/ui/newlogins.h

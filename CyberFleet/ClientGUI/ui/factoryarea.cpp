@@ -24,32 +24,33 @@ FactoryArea::FactoryArea(QWidget *parent) :
 
     ui->ArsenalControl->setLayout(layout);
     ui->ArsenalControl->show();
-    addNavigator(ui->Navigator);
+    navigator = new Navi(ui->Navigator, getEquipModel());
 
     arsenalView->verticalHeader()->setSectionResizeMode(QHeaderView::Fixed);
 
-    connect(dynamic_cast<QAbstractButton *>(ui->Navigator->itemAt(0)->widget()),
-            &QAbstractButton::clicked,
-            this, &FactoryArea::arsenalFirst);
-    connect(dynamic_cast<QAbstractButton *>(ui->Navigator->itemAt(1)->widget()),
-            &QAbstractButton::clicked,
-            this, &FactoryArea::arsenalPrev);
-    connect(dynamic_cast<QAbstractButton *>(ui->Navigator->itemAt(2)->widget()),
-            &QAbstractButton::clicked,
-            this, &FactoryArea::arsenalNext);
-    connect(dynamic_cast<QAbstractButton *>(ui->Navigator->itemAt(3)->widget()),
-            &QAbstractButton::clicked,
-            this, &FactoryArea::arsenalLast);
+    // connect(dynamic_cast<QAbstractButton *>(ui->Navigator->itemAt(0)->widget()),
+    //         &QAbstractButton::clicked,
+    //         this, &FactoryArea::arsenalFirst);
+    // connect(dynamic_cast<QAbstractButton *>(ui->Navigator->itemAt(1)->widget()),
+    //         &QAbstractButton::clicked,
+    //         this, &FactoryArea::arsenalPrev);
+    // connect(dynamic_cast<QAbstractButton *>(ui->Navigator->itemAt(2)->widget()),
+    //         &QAbstractButton::clicked,
+    //         this, &FactoryArea::arsenalNext);
+    // connect(dynamic_cast<QAbstractButton *>(ui->Navigator->itemAt(3)->widget()),
+    //         &QAbstractButton::clicked,
+    //         this, &FactoryArea::arsenalLast);
+    /*
     connect(getEquipModel(), &EquipModel::pageNumChanged,
-            this, &FactoryArea::enactPageNumChange);
+            this, &FactoryArea::enactPageNumChange);*/
     connect(arsenalView->horizontalHeader(), &QHeaderView::sectionResized,
             this, &FactoryArea::columnResized);
+    connect(getEquipModel(), &EquipModel::pageNumChanged,
+            this, [this](int, int){columnResized(0, 0, 0);});
 
     Clientv2 &engine = Clientv2::getInstance();
     connect(&engine, &Clientv2::receivedFactoryRefresh,
             this, &FactoryArea::doFactoryRefresh);
-    //connect(&engine, &Clientv2::receivedArsenalEquip,
-    //        this, &FactoryArea::updateArsenalEquip);
 
     slotfs.append(ui->Factory_Slot_0);
     slotfs.append(ui->Factory_Slot_1);
@@ -86,19 +87,6 @@ FactoryArea::FactoryArea(QWidget *parent) :
 FactoryArea::~FactoryArea()
 {
     delete ui;
-}
-
-void FactoryArea::arsenalFirst(bool checked) {
-    getEquipModel()->firstPage();
-}
-void FactoryArea::arsenalPrev(bool checked) {
-    getEquipModel()->prevPage();
-}
-void FactoryArea::arsenalNext(bool checked) {
-    getEquipModel()->nextPage();
-}
-void FactoryArea::arsenalLast(bool checked) {
-    getEquipModel()->lastPage();
 }
 
 void FactoryArea::columnResized(int logicalIndex, int oldSize, int newSize) {
@@ -164,25 +152,6 @@ void FactoryArea::doFactoryRefresh(const QJsonObject &input) {
             slotfs[i]->setComplete(true);
         }
         slotfs[i]->setStatus();
-    }
-}
-
-void FactoryArea::enactPageNumChange(int currentPageNum, int totalPageNum) {
-    if(currentPageNum == 0) {
-        ui->Navigator->itemAt(0)->widget()->setEnabled(false);
-        ui->Navigator->itemAt(1)->widget()->setEnabled(false);
-    }
-    else {
-        ui->Navigator->itemAt(0)->widget()->setEnabled(true);
-        ui->Navigator->itemAt(1)->widget()->setEnabled(true);
-    }
-    if(currentPageNum == totalPageNum - 1) {
-        ui->Navigator->itemAt(2)->widget()->setEnabled(false);
-        ui->Navigator->itemAt(3)->widget()->setEnabled(false);
-    }
-    else {
-        ui->Navigator->itemAt(2)->widget()->setEnabled(true);
-        ui->Navigator->itemAt(3)->widget()->setEnabled(true);
     }
 }
 

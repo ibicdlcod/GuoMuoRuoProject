@@ -1,33 +1,26 @@
 #ifndef NAVIGATOR_H
 #define NAVIGATOR_H
 
-#include <QIcon>
-#include <QToolButton>
 #include <QHBoxLayout>
+#include <QIcon>
+#include <QLabel>
+#include <QToolButton>
+#include "../equipmodel.h"
 
-namespace {
-void addNavigator(QHBoxLayout *layout) {
-    QIcon first = QIcon(":/resources/navigation/first.svg");
-    QIcon last = QIcon(":/resources/navigation/last.svg");
-    QIcon prev = QIcon(":/resources/navigation/prev.svg");
-    QIcon next = QIcon(":/resources/navigation/next.svg");
+class Navi : public QObject {
+    Q_OBJECT
 
-    QToolButton *firstbutton = new QToolButton();
-    QToolButton *lastbutton = new QToolButton();
-    QToolButton *prevbutton = new QToolButton();
-    QToolButton *nextbutton = new QToolButton();
+public:
+    explicit Navi(QHBoxLayout *layout, EquipModel *model);
 
-    firstbutton->setIcon(first);
-    lastbutton->setIcon(last);
-    prevbutton->setIcon(prev);
-    nextbutton->setIcon(next);
+    void enactPageNumChange(int currentPageNum, int totalPageNum);
 
-    layout->addWidget(firstbutton);
-    layout->addWidget(prevbutton);
-    layout->addWidget(nextbutton);
-    layout->addWidget(lastbutton);
-
-}
-
-}
+private:
+    QToolButton *firstbutton;
+    QToolButton *prevbutton;
+    QLabel *pageLabel;
+    QToolButton *nextbutton;
+    QToolButton *lastbutton;
+    EquipModel *model;
+};
 #endif // NAVIGATOR_H

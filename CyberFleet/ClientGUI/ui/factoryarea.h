@@ -4,6 +4,7 @@
 #include <QFrame>
 #include <QTableView>
 #include <QHeaderView>
+#include "navigator.h"
 #include "FactorySlot/factoryslot.h"
 #include "../equipmodel.h"
 #include "../../Protocol/kp.h"
@@ -47,17 +48,13 @@ protected:
     void resizeEvent(QResizeEvent *event) override;
 
 private slots:
-    void arsenalFirst(bool checked = false);
-    void arsenalPrev(bool checked = false);
-    void arsenalNext(bool checked = false);
-    void arsenalLast(bool checked = false);
     void columnResized(int logicalIndex, int oldSize, int newSize);
     void developClicked(bool checked = false, int slotnum = 0);
     void doFactoryRefresh(const QJsonObject &);
-    void enactPageNumChange(int currentPageNum, int totalPageNum);
 
 private:
     EquipModel * getEquipModel();
+    Navi * navigator;
 
     Ui::FactoryArea *ui;
     QTableView *arsenalView;
