@@ -56,6 +56,7 @@ public:
     bool isReady() const;
 
 private slots:
+    void clearCheckBoxes();
     void updateIllegalPage();
 
 private:
@@ -68,6 +69,7 @@ private:
     QHash<QUuid, Equipment *> clientEquips;
     QHash<QUuid, int> clientEquipStars;
     QList<QUuid> sortedEquipIds; // not sort by uuid but equiptype
+    QHash<QUuid, bool> isChecked;
     int rowsPerPage = 1;
     int pageNum = 0;
     bool ready = false;

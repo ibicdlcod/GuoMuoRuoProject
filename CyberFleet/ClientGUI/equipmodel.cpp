@@ -17,6 +17,8 @@ EquipModel::EquipModel(QObject *parent, bool isInArsenal)
 {
     connect(this, &EquipModel::needReCalculatePages,
             this, &EquipModel::updateIllegalPage);
+    connect(this, &EquipModel::pageNumChanged,
+            this, [this](int, int){clearCheckBoxes();});
 }
 
 void EquipModel::switchDisplayType(int index) {
@@ -144,7 +146,7 @@ void EquipModel::adjustRowCount(int oldRowCount, int newRowCount) {
          * will crash for whatever reason */
         beginRemoveRows(QModelIndex(), 0,
                         0);
-                        //oldRowCount - newRowCount - 1);
+        //oldRowCount - newRowCount - 1);
         endRemoveRows();
     }
     wholeTableChanged();
@@ -292,10 +294,15 @@ QVariant EquipModel::data(const QModelIndex &index, int role) const {
     }
     break;
     case Qt::CheckStateRole: {
-        if(index.column() == destructColumn()
-            || index.column() == addStarColumn()) {
-            return Qt::Unchecked;
+        if(index.column() == destructColumn()) {
+            if(isChecked.value(sortedEquipIds.value(realRowIndex),
+                                false))
+                return Qt::Checked;
+            else
+                return Qt::Unchecked;
         }
+        else if(index.column() == addStarColumn())
+            return Qt::Unchecked;
         else
             return QVariant();
     }
@@ -382,10 +389,16 @@ Qt::ItemFlags EquipModel::flags(const QModelIndex &index) const {
 bool EquipModel::setData(const QModelIndex &index,
                          const QVariant &value,
                          int role) {
+    int realRowIndex = index.row() + rowsPerPage * pageNum;
     if(role == Qt::CheckStateRole) {
         if(value.toInt() == Qt::Checked) {
-            qCritical() << "FUCK";
-            emit dataChanged(index, index, {Qt::Checked});
+            isChecked[sortedEquipIds.value(realRowIndex)] = true;
+            emit dataChanged(index, index, {Qt::CheckStateRole});
+            return true;
+        }
+        else if(value.toInt() == Qt::Unchecked) {
+            isChecked[sortedEquipIds.value(realRowIndex)] = false;
+            emit dataChanged(index, index, {Qt::CheckStateRole});
             return true;
         }
     }
@@ -416,6 +429,10 @@ int EquipModel::maximumPageNum() const {
 
 bool EquipModel::isReady() const {
     return ready;
+}
+
+void EquipModel::clearCheckBoxes() {
+    isChecked.clear();
 }
 
 void EquipModel::updateIllegalPage() {
@@ -468,6 +485,7 @@ void EquipModel::updateEquipmentList(const QJsonObject &input) {
 void EquipModel::wholeTableChanged() {
     QModelIndex topleft = this->index(0, 0);
     QModelIndex bottomright = this->index(rowCount() - 1, columnCount() - 1);
+    clearCheckBoxes();
     emit dataChanged(topleft, bottomright, QList<int>());
     emit headerDataChanged(Qt::Horizontal, 0, rowCount() - 1);
 }
