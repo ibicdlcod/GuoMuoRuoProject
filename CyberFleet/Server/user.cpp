@@ -103,7 +103,7 @@ int User::getEquipAmount(const CSteamID &uid, int equipId) {
     QSqlDatabase db = QSqlDatabase::database();
     QSqlQuery query;
 
-    query.prepare("SELECT EquipSerial "
+    query.prepare("SELECT EquipUuid "
                   "FROM UserEquip WHERE User = :id "
                   "AND EquipDef = :eid ");
     query.bindValue(":id", uid.ConvertToUint64());

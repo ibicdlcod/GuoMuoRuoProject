@@ -1008,20 +1008,22 @@ void Clientv2::receivedMsg(const QJsonObject &djson) {
         qDebug() << djson;
         qDebug() << equipRegistryCache.value(1);
         int equipDefInt = djson["equipdef"].toInt();
+        QUuid serial = QUuid(djson["serial"].toString());
         if(equipRegistryCache.contains(equipDefInt)) {
-            //% "You get new equipment '%1', serial number %2"
+            //% "You got new equipment %1, serial number %2"
             qInfo() <<
                 qtTrId("develop-success")
                     .arg(equipRegistryCache.value(equipDefInt)->toString(
-                        settings->value("language", "ja_JP").toString()))
-                    .arg(djson["serial"].toInt());
+                             settings->value("language", "ja_JP").toString()),
+                         djson["serial"].toString());
+            equipModel.addEquipment(serial, equipDefInt);
         }
         else {
             //% "You get new equipment with id %1, serial number %2"
             qInfo() <<
                 qtTrId("develop-success-id")
                     .arg(djson["equipdef"].toInt())
-                    .arg(djson["serial"].toInt());
+                    .arg(djson["serial"].toString());
         }
         doRefreshFactory();
     }

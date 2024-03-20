@@ -16,6 +16,9 @@ FactoryArea::FactoryArea(QWidget *parent) :
     arsenalView->setObjectName("arsenalview");
     arsenalView->setStyleSheet(
         "QTableView#arsenalview { border-style: none; }");
+    ui->Slots->setObjectName("slotcontrol");
+    ui->Slots->setStyleSheet(
+        "QFrame#slotcontrol { border-style: none; }");
 
     QGridLayout * layout = new QGridLayout;
     layout->addWidget(arsenalView);
@@ -156,18 +159,22 @@ void FactoryArea::switchToDevelop() {
         ui->FactoryLabel->setText(qtTrId("develop-equipment"));
         ui->Slots->show();
         ui->ArsenalControl->hide();
+        ui->NavigatorContol->hide();
         break;
     case KP::Construction:
         ui->FactoryLabel->setText(qtTrId("construct-ships"));
         ui->Slots->show();
         ui->ArsenalControl->hide();
+        ui->NavigatorContol->hide();
         break;
     case KP::Arsenal:
         ui->FactoryLabel->setText(qtTrId("arsenal"));
         ui->Slots->hide();
         ui->ArsenalControl->show();
+        ui->NavigatorContol->show();
         getEquipModel()->setIsInArsenal(true);
         arsenalView->setModel(getEquipModel());
+        recalculateArsenalRows();
         connect(getEquipModel(), SIGNAL(needReCalculateRows()),
                 this, SLOT(recalculateArsenalRows()),
                 Qt::UniqueConnection);

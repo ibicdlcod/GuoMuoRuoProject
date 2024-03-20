@@ -1883,7 +1883,7 @@ void Server::sqlcheckEquipU() {
     QSqlRecord columns = db.record("UserEquip");
     QStringList desiredColumns = {
         "User",
-        "EquipSerial",
+        "EquipUuid",
         "EquipDef",
         "Star"
     };
