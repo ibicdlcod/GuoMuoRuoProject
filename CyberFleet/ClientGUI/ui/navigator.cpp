@@ -30,8 +30,8 @@ Navi::Navi(QHBoxLayout *layout, EquipModel *model)
     layout->addWidget(lastbutton);
 
     typebox->setSizePolicy(QSizePolicy(QSizePolicy::Maximum,
-                                         QSizePolicy::Preferred,
-                                         QSizePolicy::ComboBox));
+                                       QSizePolicy::Preferred,
+                                       QSizePolicy::ComboBox));
     typebox->resize(QSize(100, pageLabel->size().height()));
     typebox->addItem(qtTrId("all-equipments"));
     typebox->addItems(EquipType::getDisplayGroupsSorted());
@@ -71,6 +71,11 @@ void Navi::enactPageNumChange(int currentPageNum, int totalPageNum) {
     else {
         nextbutton->setEnabled(true);
         lastbutton->setEnabled(true);
+    }
+    if(totalPageNum == 0) {
+        //% "No suitable Equipment"
+        pageLabel->setText(qtTrId("no-equip"));
+        return;
     }
     pageLabel->setText(QString::number(currentPageNum + 1)
                        + " / "

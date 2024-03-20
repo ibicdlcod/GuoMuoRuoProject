@@ -70,6 +70,8 @@ void EquipModel::nextPage() {
     emit pageNumChanged(pageNum, maximumPageNum());
 }
 void EquipModel::lastPage() {
+    if(maximumPageNum() == 0)
+        emit pageNumChanged(0, 0);
     int oldRowCount = rowCount();
     pageNum = maximumPageNum() - 1;
     int newRowCount = rowCount();
@@ -137,8 +139,8 @@ void EquipModel::adjustRowCount(int oldRowCount, int newRowCount) {
                         newRowCount - oldRowCount - 1);
         endInsertRows();
     }
-    else if(oldRowCount > newRowCount) {
-        /* make index [newRowCount, oldRowCount-1]
+    else if(oldRowCount > newRowCount && newRowCount > 0) {
+        /* make index [newRowCount, oldRowCount-1] or when newRowCount == 0
          * will crash for whatever reason */
         beginRemoveRows(QModelIndex(), 0,
                         0);
@@ -407,6 +409,8 @@ int EquipModel::currentPageNum() const {
 }
 
 int EquipModel::maximumPageNum() const {
+    if(numberOfEquip() == 0)
+        return 0;
     return (numberOfEquip() - 1) / rowsPerPage + 1;
 }
 
@@ -415,6 +419,11 @@ bool EquipModel::isReady() const {
 }
 
 void EquipModel::updateIllegalPage() {
+    if(maximumPageNum() == 0) {
+        pageNum = 0;
+        emit pageNumChanged(0, 0);
+        return;
+    }
     if(pageNum >= maximumPageNum())
         pageNum = maximumPageNum() - 1;
     emit pageNumChanged(pageNum, maximumPageNum());
