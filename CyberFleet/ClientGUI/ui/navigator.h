@@ -1,6 +1,7 @@
 #ifndef NAVIGATOR_H
 #define NAVIGATOR_H
 
+#include <QComboBox>
 #include <QHBoxLayout>
 #include <QIcon>
 #include <QLabel>
@@ -16,6 +17,7 @@ public:
     void enactPageNumChange(int currentPageNum, int totalPageNum);
 
 private:
+    QComboBox *typebox;
     QToolButton *firstbutton;
     QToolButton *prevbutton;
     QLabel *pageLabel;

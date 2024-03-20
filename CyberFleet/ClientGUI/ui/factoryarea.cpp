@@ -27,26 +27,12 @@ FactoryArea::FactoryArea(QWidget *parent) :
     navigator = new Navi(ui->Navigator, getEquipModel());
 
     arsenalView->verticalHeader()->setSectionResizeMode(QHeaderView::Fixed);
-
-    // connect(dynamic_cast<QAbstractButton *>(ui->Navigator->itemAt(0)->widget()),
-    //         &QAbstractButton::clicked,
-    //         this, &FactoryArea::arsenalFirst);
-    // connect(dynamic_cast<QAbstractButton *>(ui->Navigator->itemAt(1)->widget()),
-    //         &QAbstractButton::clicked,
-    //         this, &FactoryArea::arsenalPrev);
-    // connect(dynamic_cast<QAbstractButton *>(ui->Navigator->itemAt(2)->widget()),
-    //         &QAbstractButton::clicked,
-    //         this, &FactoryArea::arsenalNext);
-    // connect(dynamic_cast<QAbstractButton *>(ui->Navigator->itemAt(3)->widget()),
-    //         &QAbstractButton::clicked,
-    //         this, &FactoryArea::arsenalLast);
-    /*
-    connect(getEquipModel(), &EquipModel::pageNumChanged,
-            this, &FactoryArea::enactPageNumChange);*/
     connect(arsenalView->horizontalHeader(), &QHeaderView::sectionResized,
             this, &FactoryArea::columnResized);
     connect(getEquipModel(), &EquipModel::pageNumChanged,
-            this, [this](int, int){columnResized(0, 0, 0);});
+            this, [this](int, int){
+                QTimer::singleShot(10, this,
+                                   [this](){columnResized(0, 0, 0);});});
 
     Clientv2 &engine = Clientv2::getInstance();
     connect(&engine, &Clientv2::receivedFactoryRefresh,
@@ -182,10 +168,12 @@ void FactoryArea::switchToDevelop() {
         ui->ArsenalControl->show();
         getEquipModel()->setIsInArsenal(true);
         arsenalView->setModel(getEquipModel());
-        connect(getEquipModel(), &EquipModel::needReCalculateRows,
-                this, &FactoryArea::recalculateArsenalRows);
-        connect(this, &FactoryArea::rowCountHint,
-                getEquipModel(), &EquipModel::setRowsPerPageHint);
+        connect(getEquipModel(), SIGNAL(needReCalculateRows()),
+                this, SLOT(recalculateArsenalRows()),
+                Qt::UniqueConnection);
+        connect(this, SIGNAL(rowCountHint(int)),
+                getEquipModel(), SLOT(setRowsPerPageHint(int)),
+                Qt::UniqueConnection);
         if(!getEquipModel()->isReady()) {
             Clientv2 &engine = Clientv2::getInstance();
             engine.doRefreshFactoryArsenal();

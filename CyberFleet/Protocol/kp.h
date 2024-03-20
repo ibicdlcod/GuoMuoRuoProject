@@ -40,7 +40,7 @@ static constexpr int initDock = 4;
 static constexpr int initFactory = 4;
 static constexpr qint64 secsinMin = 60;
 #pragma message(M_CONST)
-static constexpr float baseDevRarity = 8.0;
+//static constexpr float baseDevRarity = 8.0;
 #pragma message(NOT_M_CONST)
 static constexpr int equipIdMax = 0x10000;
 

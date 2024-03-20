@@ -19,6 +19,30 @@ EquipModel::EquipModel(QObject *parent, bool isInArsenal)
             this, &EquipModel::updateIllegalPage);
 }
 
+void EquipModel::switchDisplayType(int index) {
+    int oldRowCount = rowCount();
+    sortedEquipIds.clear();
+    if(index == 0) {
+        sortedEquipIds.append(clientEquips.keys());
+    }
+    else {
+        for(auto iter = clientEquips.keyValueBegin();
+             iter != clientEquips.keyValueEnd();
+             ++iter) {
+            if(iter->second->type.getDisplayGroup()
+                    .localeAwareCompare(
+                        EquipType::getDisplayGroupsSorted().at(index - 1))
+                == 0)
+                sortedEquipIds.append(iter->first);
+        }
+    }
+    customSort();
+    int newRowCount = rowCount();
+    emit needReCalculatePages();
+    adjustRowCount(oldRowCount, newRowCount);
+    wholeTableChanged();
+}
+
 void EquipModel::firstPage() {
     int oldRowCount = rowCount();
     pageNum = 0;
@@ -54,7 +78,21 @@ void EquipModel::lastPage() {
     emit pageNumChanged(pageNum, maximumPageNum());
 }
 
+void EquipModel::addEquipment(QUuid uid, int def) {
+    int oldRowCount = rowCount();
+    Clientv2 &engine = Clientv2::getInstance();
+    clientEquips[uid] = engine.getEquipmentReg(def);
+    clientEquipStars[uid] = 0;
+    sortedEquipIds.append(uid);
+    customSort();
+    int newRowCount = rowCount();
+    emit needReCalculatePages();
+    adjustRowCount(oldRowCount, newRowCount);
+    wholeTableChanged();
+}
+
 void EquipModel::destructEquipment(const QList<QUuid> &destructed) {
+    int oldRowCount = rowCount();
     clientEquips.removeIf([&destructed](QHash<QUuid, Equipment *>::iterator i)
                           {
                               return destructed.contains(i.key());
@@ -63,6 +101,13 @@ void EquipModel::destructEquipment(const QList<QUuid> &destructed) {
                               {
                                   return destructed.contains(i.key());
                               });
+    sortedEquipIds.removeIf([&destructed](const QUuid &uid)
+                            {
+                                return destructed.contains(uid);
+                            });
+    int newRowCount = rowCount();
+    emit needReCalculatePages();
+    adjustRowCount(oldRowCount, newRowCount);
     wholeTableChanged();
 }
 
@@ -96,12 +141,26 @@ void EquipModel::adjustRowCount(int oldRowCount, int newRowCount) {
         /* make index [newRowCount, oldRowCount-1]
          * will crash for whatever reason */
         beginRemoveRows(QModelIndex(), 0,
-                        oldRowCount - newRowCount - 1);
+                        0);
+                        //oldRowCount - newRowCount - 1);
         endRemoveRows();
     }
     wholeTableChanged();
 }
 
+void EquipModel::customSort() {
+    std::sort(sortedEquipIds.begin(),
+              sortedEquipIds.end(),
+              [this](QUuid a, QUuid b)
+              {
+                  if((*clientEquips[a]).isNotEqual(*clientEquips[b]))
+                      return (*clientEquips[a]) < (*clientEquips[b]);
+                  else if(clientEquipStars[a] != clientEquipStars[b])
+                      return clientEquipStars[a] > clientEquipStars[b];
+                  else
+                      return a < b;
+              });
+}
 
 int EquipModel::numberOfColumns() const {
     if(isInArsenal) {
@@ -112,7 +171,7 @@ int EquipModel::numberOfColumns() const {
 }
 
 int EquipModel::numberOfEquip() const {
-    return clientEquips.size();
+    return sortedEquipIds.size();
 }
 
 int EquipModel::rowCount(const QModelIndex &parent) const {
@@ -381,17 +440,7 @@ void EquipModel::updateEquipmentList(const QJsonObject &input) {
             clientEquipStars[uid] = star;
             sortedEquipIds.append(uid);
         }
-        std::sort(sortedEquipIds.begin(),
-                  sortedEquipIds.end(),
-                  [this](QUuid a, QUuid b)
-                  {
-                      if((*clientEquips[a]).isNotEqual(*clientEquips[b]))
-                          return (*clientEquips[a]) < (*clientEquips[b]);
-                      else if(clientEquipStars[a] != clientEquipStars[b])
-                          return clientEquipStars[a] > clientEquipStars[b];
-                      else
-                          return a < b;
-                  });
+        customSort();
         int newRowCount = rowCount();
         adjustRowCount(oldRowCount, newRowCount);
         emit needReCalculateRows();

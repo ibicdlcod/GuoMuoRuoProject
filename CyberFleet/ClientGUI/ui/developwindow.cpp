@@ -70,10 +70,10 @@ void DevelopWindow::resetListName(int equiptypeInt) {
          Clientv2::getInstance().equipRegistryCache) {
         if(
             (ui->listType->currentText().compare("All equipments") == 0
-                 && equipReg->type.getTypeGroup()
+             && equipReg->type.getDisplayGroup()
                         .compare("VIRTUAL", Qt::CaseInsensitive) != 0
                  && !equipReg->localNames.value("ja_JP").isEmpty())
-            || equipReg->type.getTypeGroup()
+            || equipReg->type.getDisplayGroup()
                        .compare(ui->listType->currentText(),
                                 Qt::CaseInsensitive) == 0) {
             QString equipName = equipReg->toString(

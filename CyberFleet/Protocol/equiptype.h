@@ -16,8 +16,9 @@ public:
     bool operator==(const EquipType &) const;
 
     const ResOrd devResBase() const;
-    static QSet<QString> getDisplayGroups();
-    QString getTypeGroup();
+    static const QSet<QString> getDisplayGroups();
+    static const QList<QString> getDisplayGroupsSorted();
+    QString getDisplayGroup();
     static const QString intToStrRep(int);
     static int strToIntRep(QString);
     QString toString() const;
@@ -203,16 +204,17 @@ private:
         std::pair("Landing-craft",          qtTrId("LAND")),
         std::pair("Landing-tank",           qtTrId("LAND")),
         std::pair("Land-corps",             qtTrId("LAND")),
+        std::pair("AL-rocket",              qtTrId("LAND")),
+        std::pair("AL-shell",               qtTrId("LAND")),
         std::pair("Mid-gun-flat",           qtTrId("MIDGUN")),
         std::pair("Mid-gun-flak",           qtTrId("MIDGUN")),
         std::pair("Mid-gun-flat-ca",        qtTrId("MIDGUN")),
-        std::pair("AL-rocket",              qtTrId("OTHER")),
+        std::pair("AP-shell",               qtTrId("OTHER")),
         std::pair("Ballon",                 qtTrId("OTHER")),
         std::pair("Command-fac",            qtTrId("OTHER")),
         std::pair("Drum",                   qtTrId("OTHER")),
         std::pair("Engine-boiler",          qtTrId("OTHER")),
         std::pair("Engine-turbine",         qtTrId("OTHER")),
-        std::pair("Flyingboat",             qtTrId("RECON")),
         std::pair("Food",                   qtTrId("OTHER")),
         std::pair("Repair-fac",             qtTrId("OTHER")),
         std::pair("Repair-item",            qtTrId("OTHER")),
@@ -239,6 +241,7 @@ private:
         std::pair("Sp-recon-small",         qtTrId("RECON")),
         std::pair("Sp-recon",               qtTrId("RECON")),
         std::pair("Sp-recon-night",         qtTrId("RECON")),
+        std::pair("Flyingboat",             qtTrId("RECON")),
         std::pair("Sp-bomb-small",          qtTrId("SEAPLANEBF")),
         std::pair("Sp-bomb",                qtTrId("SEAPLANEBF")),
         std::pair("Sp-bomb-night",          qtTrId("SEAPLANEBF")),
@@ -246,8 +249,6 @@ private:
         std::pair("Second-gun-flat",        qtTrId("SECGUN")),
         std::pair("Second-gun-flak",        qtTrId("SECGUN")),
         std::pair("Second-gun-flak-big",    qtTrId("SECGUN")),
-        std::pair("AP-shell",               qtTrId("SHELL")),
-        std::pair("AL-shell",               qtTrId("SHELL")),
         std::pair("Small-gun-flat",         qtTrId("SMALLGUNFLAT")),
         std::pair("Small-gun-flak",         qtTrId("SMALLGUNFLAK")),
         std::pair("Superbig-gun",           qtTrId("SUPERBIGGUN")),

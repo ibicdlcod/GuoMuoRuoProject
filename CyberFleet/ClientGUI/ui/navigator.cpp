@@ -8,6 +8,7 @@ Navi::Navi(QHBoxLayout *layout, EquipModel *model)
     QIcon prev = QIcon(":/resources/navigation/prev.svg");
     QIcon next = QIcon(":/resources/navigation/next.svg");
 
+    typebox = new QComboBox();
     firstbutton = new QToolButton();
     prevbutton = new QToolButton();
     pageLabel = new QLabel();
@@ -21,19 +22,27 @@ Navi::Navi(QHBoxLayout *layout, EquipModel *model)
     nextbutton->setIcon(next);
     lastbutton->setIcon(last);
 
+    layout->addWidget(typebox);
     layout->addWidget(firstbutton);
     layout->addWidget(prevbutton);
     layout->addWidget(pageLabel);
     layout->addWidget(nextbutton);
     layout->addWidget(lastbutton);
 
+    typebox->setSizePolicy(QSizePolicy(QSizePolicy::Maximum,
+                                         QSizePolicy::Preferred,
+                                         QSizePolicy::ComboBox));
+    typebox->resize(QSize(100, pageLabel->size().height()));
+    typebox->addItem(qtTrId("all-equipments"));
+    typebox->addItems(EquipType::getDisplayGroupsSorted());
     pageLabel->setAlignment(Qt::AlignCenter);
     pageLabel->setSizePolicy(QSizePolicy(QSizePolicy::Maximum,
                                          QSizePolicy::Preferred,
                                          QSizePolicy::Label));
     pageLabel->resize(QSize(100, pageLabel->size().height()));
 
-
+    connect(typebox, &QComboBox::activated,
+            model, &EquipModel::switchDisplayType);
     connect(firstbutton, &QAbstractButton::clicked,
             model, &EquipModel::firstPage);
     connect(prevbutton, &QAbstractButton::clicked,

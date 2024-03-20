@@ -18,10 +18,12 @@ signals:
     void pageNumChanged(int currentPageNum, int totalPageNum);
 
 public slots:
+    void switchDisplayType(int);
     void firstPage();
     void prevPage();
     void nextPage();
     void lastPage();
+    void addEquipment(QUuid, int);
     void destructEquipment(const QList<QUuid> &);
     void updateEquipmentList(const QJsonObject &);
     void setPageNumHint(int);
@@ -58,6 +60,7 @@ private slots:
 
 private:
     void adjustRowCount(int oldRowCount, int newRowCount);
+    void customSort();
     int numberOfColumns() const;
     int numberOfEquip() const;
     bool isInArsenal;

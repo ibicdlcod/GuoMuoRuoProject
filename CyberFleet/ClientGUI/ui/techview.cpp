@@ -54,7 +54,8 @@ TechView::TechView(QWidget *parent) :
             continue;
         ui->localListType->addItem(equipType);
     }
-    ui->localListType->addItem("All equipments");
+    //% "All equipments"
+    ui->localListType->addItem(qtTrId("all-equipments"));
     ui->localListType->setCurrentIndex(0);
     connect(ui->localListType, &QComboBox::activated,
             this, &TechView::resetLocalListName);
@@ -313,10 +314,10 @@ void TechView::resetLocalListName() {
          Clientv2::getInstance().equipRegistryCache) {
         if(
             (ui->localListType->currentText().compare("All equipments") == 0
-             && equipReg->type.getTypeGroup()
+             && equipReg->type.getDisplayGroup()
                         .compare("VIRTUAL", Qt::CaseInsensitive) != 0
              && !equipReg->localNames.value("ja_JP").isEmpty())
-            || equipReg->type.getTypeGroup()
+            || equipReg->type.getDisplayGroup()
                        .compare(ui->localListType->currentText(),
                                 Qt::CaseInsensitive) == 0) {
             QString equipName = equipReg->toString(

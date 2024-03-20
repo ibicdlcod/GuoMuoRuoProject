@@ -34,7 +34,7 @@ int EquipType::getTypeSort() const {
     return displaySort.value(toString(), 0);
 }
 
-QSet<QString> EquipType::getDisplayGroups() {
+const QSet<QString> EquipType::getDisplayGroups() {
     QSet<QString> result;
     for(auto &value: displayGroup) {
         result.insert(value);
@@ -42,7 +42,33 @@ QSet<QString> EquipType::getDisplayGroups() {
     return result;
 }
 
-QString EquipType::getTypeGroup() {
+const QList<QString> EquipType::getDisplayGroupsSorted() {
+    return {
+        qtTrId("SMALLGUNFLAT"),
+        qtTrId("SMALLGUNFLAK"),
+        qtTrId("MIDGUN"),
+        qtTrId("BIGGUN"),
+        qtTrId("SUPERBIGGUN"),
+        qtTrId("SECGUN"),
+        qtTrId("FIGHTER"),
+        qtTrId("BOMBDIVE"),
+        qtTrId("BOMBTORP"),
+        qtTrId("RECON"),
+        qtTrId("SEAPLANEBF"),
+        qtTrId("TORP"),
+        qtTrId("AA"),
+        qtTrId("ASW"),
+        qtTrId("RADAR"),
+        qtTrId("LAND"),
+        qtTrId("ATTACKLB"),
+        qtTrId("FIGHTERLB"),
+        qtTrId("BULGE"),
+        qtTrId("PERS"),
+        qtTrId("OTHER"),
+    };
+}
+
+QString EquipType::getDisplayGroup() {
     return displayGroup.value(intToStrRep(iRep));
 }
 

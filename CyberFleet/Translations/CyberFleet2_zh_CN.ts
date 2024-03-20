@@ -142,12 +142,12 @@
     <message id="massproduction-disallowed">
         <location filename="../ClientGUI/clientv2.cpp" line="965"/>
         <source></source>
-        <translation type="unfinished">装备开发</translation>
+        <translation>你持有此装备数量已达上限。</translation>
     </message>
     <message id="production-disallowed">
         <location filename="../ClientGUI/clientv2.cpp" line="968"/>
         <source></source>
-        <translation type="unfinished">装备开发</translation>
+        <translation>你不能开发此装备。</translation>
     </message>
     <message id="equip-develop-failed">
         <location filename="../ClientGUI/clientv2.cpp" line="972"/>
@@ -202,7 +202,7 @@
     <message id="client-finish">
         <location filename="../ClientGUI/clientv2.cpp" line="1056"/>
         <source></source>
-        <translation type="unfinished">装备开发</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message id="login-success">
         <location filename="../ClientGUI/clientv2.cpp" line="1068"/>
@@ -213,27 +213,27 @@
     <message id="ticket-decrypt-fail">
         <location filename="../ClientGUI/clientv2.cpp" line="1077"/>
         <source></source>
-        <translation type="unfinished">装备开发</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message id="ticket-incorrect-appid">
         <location filename="../ClientGUI/clientv2.cpp" line="1078"/>
         <source></source>
-        <translation type="unfinished">装备开发</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message id="ticket-timeout">
         <location filename="../ClientGUI/clientv2.cpp" line="1079"/>
         <source></source>
-        <translation type="unfinished">装备开发</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message id="steam-id-invalid">
         <location filename="../ClientGUI/clientv2.cpp" line="1080"/>
         <source></source>
-        <translation type="unfinished">装备开发</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message id="steam-auth-fail">
         <location filename="../ClientGUI/clientv2.cpp" line="1081"/>
         <source></source>
-        <translation type="unfinished">装备开发</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message id="login-failed">
         <location filename="../ClientGUI/clientv2.cpp" line="1085"/>
@@ -243,7 +243,7 @@
     <message id="server-equip-cache-fail">
         <location filename="../ClientGUI/clientv2.cpp" line="1225"/>
         <source></source>
-        <translation type="unfinished">装备开发</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message id="equipment-cache-length">
         <location filename="../ClientGUI/clientv2.cpp" line="1236"/>
@@ -298,7 +298,7 @@
         <location filename="../Server/server.cpp" line="322"/>
         <location filename="../Server/server.cpp" line="1331"/>
         <source></source>
-        <translation type="unfinished">装备开发</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message id="read-dgram-failed">
         <location filename="../ClientGUI/clientv2.cpp" line="445"/>
@@ -309,17 +309,17 @@
     <message id="user-check-resource-failed">
         <location filename="../Server/user.cpp" line="78"/>
         <source></source>
-        <translation type="unfinished">装备开发</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message id="local-tech-bad-equipdef">
         <location filename="../Server/server.cpp" line="505"/>
         <source></source>
-        <translation type="unfinished">装备开发</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message id="equipid-invalid-skill-points-effect">
         <location filename="../Server/server.cpp" line="549"/>
         <source></source>
-        <translation type="unfinished">装备开发</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message id="ip-invalid">
         <location filename="../ClientGUI/clientv2.cpp" line="699"/>
@@ -366,12 +366,12 @@
     <message id="user-calculate-tech-failed">
         <location filename="../Server/server.cpp" line="482"/>
         <source></source>
-        <translation type="unfinished">装备开发</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message id="user-get-equip-list-failed">
         <location filename="../Server/server.cpp" line="602"/>
         <source></source>
-        <translation type="unfinished">装备开发</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message id="client-id-received">
         <location filename="../Server/server.cpp" line="684"/>
@@ -391,7 +391,7 @@
     <message id="user-get-equip-list-failed-eidbased">
         <location filename="../Server/server.cpp" line="747"/>
         <source></source>
-        <translation type="unfinished">装备开发</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message id="improve-beyond-possible">
         <location filename="../Server/server.cpp" line="756"/>
@@ -401,7 +401,7 @@
     <message id="user-add-equip-star-failed-eidbased">
         <location filename="../Server/server.cpp" line="767"/>
         <source></source>
-        <translation type="unfinished">装备开发</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message id="improve-success">
         <location filename="../Server/server.cpp" line="774"/>
@@ -657,7 +657,7 @@
         <location filename="../Server/server.cpp" line="2010"/>
         <source>User database does not exist, creating...</source>
         <oldsource>Can&apos;t find license file, exiting.</oldsource>
-        <translation type="unfinished">找不到许可证文件，退出。</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message id="user-db-gen-failure">
         <location filename="../Server/server.cpp" line="2003"/>
@@ -1491,7 +1491,7 @@ Great at battle and bad at politics--so cool!</source>
     <message>
         <location filename="../ClientGUI/ui/mainwindow.ui" line="372"/>
         <source>Factory</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">工厂</translation>
     </message>
     <message>
         <location filename="../ClientGUI/ui/mainwindow.ui" line="380"/>
@@ -1501,7 +1501,7 @@ Great at battle and bad at politics--so cool!</source>
     <message>
         <location filename="../ClientGUI/ui/mainwindow.ui" line="388"/>
         <source>Tech</source>
-        <translation type="unfinished">装备开发</translation>
+        <translation>装备开发</translation>
     </message>
     <message>
         <location filename="../ClientGUI/ui/mainwindow.ui" line="404"/>
@@ -1536,7 +1536,7 @@ Great at battle and bad at politics--so cool!</source>
     <message>
         <location filename="../ClientGUI/ui/mainwindow.ui" line="434"/>
         <source>Arsenal</source>
-        <translation type="unfinished"></translation>
+        <translation>军械库</translation>
     </message>
 </context>
 <context>
