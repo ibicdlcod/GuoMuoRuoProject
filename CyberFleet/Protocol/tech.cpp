@@ -67,7 +67,7 @@ double Tech::calLevel(QList<std::pair<double, double>> &source,
         }
         double weight = iter->second;
         if(weight < 0.0) {
-            qCritical() << qtTrId("tech-weight-less-than-0");
+            //qCritical() << qtTrId("tech-weight-less-than-0");
             return 0.0;
         }
         weightSum += weight;

@@ -1812,6 +1812,17 @@ void Server::receivedReq(const QJsonObject &djson,
                                  uid);});
     }
     break;
+    case KP::CommandType::DestructEquip: {
+        QList<QUuid> trash;
+        QJsonArray array = djson["equipids"].toArray();
+        for(auto trashItem: array) {
+            trash.append(QUuid(trashItem.toString()));
+        }
+        QList<QUuid> destructed = User::retireEquip(uid, trash);
+        QByteArray msg = KP::serverEquipRetired(destructed);
+        senderM.sendMessage(connection, msg);
+    }
+    break;
     default:
         throw std::domain_error("command type not supported"); break;
     }

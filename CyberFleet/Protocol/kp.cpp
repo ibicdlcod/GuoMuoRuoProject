@@ -68,7 +68,7 @@ QByteArray KP::clientAddEquip(int equipid) {
 QByteArray KP::clientDemandDestructEquip(const QList<QUuid> &trash) {
     QJsonObject result;
     result["type"] = DgramType::Request;
-    result["command"] = CommandType::DemandDestructEquip;
+    result["command"] = CommandType::DestructEquip;
     QJsonArray trashList;
     for(auto trashItem: trash) {
         trashList.append(QJsonValue(trashItem.toString()));
@@ -183,6 +183,13 @@ QByteArray KP::serverDevelopFailed(GameError error) {
     return QCborValue::fromJsonValue(result).toCbor();
 }
 
+QByteArray KP::serverDevelopStart() {
+    QJsonObject result;
+    result["type"] = DgramType::Message;
+    result["msgtype"] = MsgType::DevelopStart;
+    return QCborValue::fromJsonValue(result).toCbor();
+}
+
 QByteArray KP::serverEquipLackFather(GameError error, int father) {
     QJsonObject result;
     result["type"] = DgramType::Message;
@@ -202,10 +209,15 @@ QByteArray KP::serverEquipLackMother(GameError error, int mother, int64 sp) {
     return QCborValue::fromJsonValue(result).toCbor();
 }
 
-QByteArray KP::serverDevelopStart() {
+QByteArray KP::serverEquipRetired(const QList<QUuid> &trash) {
     QJsonObject result;
     result["type"] = DgramType::Message;
-    result["msgtype"] = MsgType::DevelopStart;
+    result["msgtype"] = MsgType::EquipRetired;
+    QJsonArray trashList;
+    for(auto trashItem: trash) {
+        trashList.append(QJsonValue(trashItem.toString()));
+    }
+    result["equipids"] = trashList;
     return QCborValue::fromJsonValue(result).toCbor();
 }
 

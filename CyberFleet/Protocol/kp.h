@@ -81,7 +81,8 @@ enum MsgType{
     LackPrivate,
     AllowClientStart,
     AllowClientFinish,
-    VerifyComplete
+    VerifyComplete,
+    EquipRetired
 };
 Q_ENUM_NS(MsgType)
 
@@ -118,7 +119,7 @@ enum CommandType{
     DemandGlobalTech,
     DemandSkillPoints,
     DemandResourceUpdate,
-    DemandDestructEquip
+    DestructEquip
 };
 Q_ENUM_NS(CommandType)
 
@@ -186,6 +187,7 @@ QByteArray serverDevelopFailed(GameError);
 QByteArray serverDevelopStart();
 QByteArray serverEquipLackFather(GameError, int);
 QByteArray serverEquipLackMother(GameError, int, int64);
+QByteArray serverEquipRetired(const QList<QUuid> &);
 QByteArray serverEquipInfo(const QJsonArray &, bool, bool user = false);
 QByteArray serverFairyBusy(int);
 QByteArray serverGlobalTech(double, bool);

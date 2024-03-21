@@ -4,7 +4,6 @@
 #include <QSqlError>
 #include <QSqlQuery>
 #include <QTimeZone>
-#include <algorithm>
 #include "../Protocol/resord.h"
 #include "kerrors.h"
 
@@ -346,6 +345,33 @@ void User::refreshFactory(const CSteamID &uid) {
 
 void User::refreshPort(const CSteamID &uid) {
     //naturalRegen(uid);
+}
+
+QList<QUuid> User::retireEquip(const CSteamID &uid, const QList<QUuid> &trash) {
+    QList<QUuid> result;
+    QSqlDatabase db = QSqlDatabase::database();
+    for(auto trashItem: trash) {
+        QSqlQuery query;
+        query.prepare("DELETE FROM UserEquip "
+                      "WHERE User = :uid AND EquipUuid = :eid;");
+        query.bindValue(":uid", uid.ConvertToUint64());
+        query.bindValue(":eid", trashItem.toString());
+
+        if(Q_UNLIKELY(!query.exec())) {
+            //% "User id %1: delete equipment failed!"
+            throw DBError(qtTrId("delete-equip-failed")
+                              .arg(uid.ConvertToUint64()),
+                          query.lastError());
+            break;
+        }
+        else {
+            //% "User id %1: deleted equipment %2"
+            qDebug() << qtTrId("delete-equip").arg(uid.ConvertToUint64())
+                            .arg(trashItem.toString());
+            result.append(trashItem);
+        }
+    }
+    return result;
 }
 
 void User::setResources(const CSteamID &uid, ResOrd goal) {

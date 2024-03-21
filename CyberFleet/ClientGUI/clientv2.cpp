@@ -1016,8 +1016,6 @@ void Clientv2::receivedMsg(const QJsonObject &djson) {
         doRefreshFactory();
         break;
     case KP::NewEquip: {
-        qDebug() << djson;
-        qDebug() << equipRegistryCache.value(1);
         int equipDefInt = djson["equipdef"].toInt();
         QUuid serial = QUuid(djson["serial"].toString());
         if(equipRegistryCache.contains(equipDefInt)) {
@@ -1070,6 +1068,19 @@ void Clientv2::receivedMsg(const QJsonObject &djson) {
         shutdown();
         displayPrompt();
         break;
+    case KP::EquipRetired: {
+        QJsonArray array = djson["equipids"].toArray();
+        QList<QUuid> trash;
+        QStringList trashString;
+        for(auto item: array) {
+            trash.append(QUuid(item.toString()));
+            trashString.append(item.toString());
+        }
+        //% "The following equipment are destructed: %1"
+        qInfo() << qtTrId("destruct-equip-list").arg(trashString.join(","));
+        equipModel.destructEquipment(trash);
+    }
+    break;
     default: throw std::domain_error("message not implemented"); break;
     }
 }
