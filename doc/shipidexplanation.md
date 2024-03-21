@@ -51,4 +51,5 @@
 |  0xA0000   |                   Amphibious assualt ships                   |
 |  0XB0000   |                         Repair ships                         |
 |   0x?00    |                          Ship class                          |
+|    0x?0    |                       Ship subclasses                        |
 |    0x??    |                           Ship id                            |

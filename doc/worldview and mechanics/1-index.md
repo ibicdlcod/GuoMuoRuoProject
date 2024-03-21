@@ -1,19 +1,20 @@
 # Index
 
 - [Technology](2-technology.md)
-- Resources
-  - Ore Purifier (DLC)
-- Equipment
-  - Factory slot
-  - Attributes
-  - Develop, normal precondition(father)
-  - Develop, special precondition(mother)
+- [Resources](3-resources.md)
+  - [Ore Purifier (DLC)](3.1-orepurifier.md)
+- [Equipment](4-equipment.md)
+  - [Factory slot](4.1-factoryslot.md)
+  - [Attributes](4.2-attributes.md)
+  - Developing
+  - Normal(father) and special(mother) preconditions
   - Virtual precondition
   - Equipment skill points
+  - Destruct
   - Improvement
   - Industrial plant
 - Ships
-  - Attributes
+  - Attributes (see equipment above)
   - Equip slots (including extra)
   - Visible bonuses
   - Ship blueprint

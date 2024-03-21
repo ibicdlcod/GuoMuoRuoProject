@@ -408,9 +408,10 @@ const ResOrd EquipType::devResBase() const {
             basic[W] += 10;
             break;
         case 22: // Repair facility
-            basic[S] += 10;
-            basic[W] += 2;
-            basic[C] += 2;
+            basic[O] += 10;
+            basic[S] += 50;
+            basic[W] += 10;
+            basic[C] += 10;
             break;
         case 25: // AA-gun
             basic[E] += 10;
@@ -444,7 +445,27 @@ const ResOrd EquipType::devResBase() const {
             basic[R] += 20;
             basic[W] += 20;
             break;
-        default: // 12, 17, 19, 20, 21, 22, 23
+        case 21: // Aircraft-personnel
+            basic[O] += 1;
+            basic[E] += 1;
+            basic[S] += 1;
+            basic[R] += 10;
+            basic[A] += 50;
+            basic[C] += 1;
+        case 23: // Surface-personnel
+            basic[O] += 1;
+            basic[E] += 1;
+            basic[S] += 1;
+            basic[R] += 1;
+            basic[A] += 1;
+            basic[W] += 1;
+            basic[C] += 1;
+        default:
+            /* Development disabled
+             * 12 = TP-material,
+             * 17 = Repair-item,
+             * 19 = Food,
+             * 20 = Command-fac, */
             /* zero */
             break;
         }
