@@ -4,8 +4,9 @@
 #include <QFrame>
 #include <QTableView>
 #include <QHeaderView>
-#include "navigator.h"
 #include "FactorySlot/factoryslot.h"
+#include "equipview.h"
+#include "navigator.h"
 #include "../equipmodel.h"
 #include "../../Protocol/kp.h"
 
@@ -16,7 +17,7 @@ class FactoryArea;
 namespace {
 /* source: https://stackoverflow.com/questions/8766633/
  * how-to-determine-the-correct-size-of-a-qtablewidget */
-static QSize tableSizeWhole(QTableView *view, EquipModel *model) {
+static QSize tableSizeWhole2(QTableView *view, EquipModel *model) {
     int w = view->verticalHeader()->width() + 4; // +4 seems to be needed
     for (int i = 0; i < model->columnCount(); i++)
         w += view->columnWidth(i); // seems to include gridline (on my machine)
@@ -58,6 +59,7 @@ private:
 
     Ui::FactoryArea *ui;
     QTableView *arsenalView;
+    EquipView *equipview;
 
     KP::FactoryState factoryState = KP::Development;
     QList<FactorySlot *> slotfs;

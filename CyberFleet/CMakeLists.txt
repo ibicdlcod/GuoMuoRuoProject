@@ -39,6 +39,9 @@ set(CLIENT_SOURCES
     ClientGUI/ui/developwindow.cpp
     ClientGUI/ui/developwindow.h
     ClientGUI/ui/developwindow.ui
+    ClientGUI/ui/equipview.h
+    ClientGUI/ui/equipview.cpp
+    ClientGUI/ui/equipview.ui
     ClientGUI/ui/factoryarea.cpp
     ClientGUI/ui/factoryarea.h
     ClientGUI/ui/factoryarea.ui

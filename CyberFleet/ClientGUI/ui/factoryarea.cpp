@@ -6,12 +6,14 @@
 #include "../clientv2.h"
 #include "developwindow.h"
 #include "navigator.h"
+#include "equipview.h"
 
 FactoryArea::FactoryArea(QWidget *parent) :
     QFrame(parent),
     ui(new Ui::FactoryArea)
 {
     ui->setupUi(this);
+    equipview = new EquipView(ui->ArsenalArea);
     arsenalView = new QTableView(this);
     arsenalView->setObjectName("arsenalview");
     arsenalView->setStyleSheet(
@@ -160,16 +162,21 @@ void FactoryArea::switchToDevelop() {
         ui->Slots->show();
         ui->ArsenalControl->hide();
         ui->NavigatorContol->hide();
+        ui->ArsenalArea->hide();
         break;
     case KP::Construction:
         ui->FactoryLabel->setText(qtTrId("construct-ships"));
         ui->Slots->show();
         ui->ArsenalControl->hide();
         ui->NavigatorContol->hide();
+        ui->ArsenalArea->hide();
         break;
     case KP::Arsenal:
         ui->FactoryLabel->setText(qtTrId("arsenal"));
         ui->Slots->hide();
+        ui->ArsenalControl->hide();
+        ui->NavigatorContol->hide();
+        /*
         ui->ArsenalControl->show();
         ui->NavigatorContol->show();
         getEquipModel()->setIsInArsenal(true);
@@ -189,6 +196,12 @@ void FactoryArea::switchToDevelop() {
         else {
             arsenalView->show();
         }
+*/
+        ui->ArsenalArea->show();
+        QTimer::singleShot(10, this, [this](){
+            equipview->setGeometry(ui->ArsenalArea->rect());
+        });
+        equipview->activate(true);
         break;
     }
 }

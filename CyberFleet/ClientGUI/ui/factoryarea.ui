@@ -262,11 +262,24 @@
     </widget>
    </item>
    <item>
+    <widget class="QWidget" name="ArsenalArea" native="true">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+       <horstretch>255</horstretch>
+       <verstretch>255</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="styleSheet">
+      <string notr="true"/>
+     </property>
+    </widget>
+   </item>
+   <item>
     <widget class="QWidget" name="ArsenalControl" native="true">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
        <horstretch>0</horstretch>
-       <verstretch>255</verstretch>
+       <verstretch>1</verstretch>
       </sizepolicy>
      </property>
      <property name="styleSheet">
@@ -279,6 +292,9 @@
      <layout class="QHBoxLayout" name="horizontalLayout">
       <property name="spacing">
        <number>10</number>
+      </property>
+      <property name="leftMargin">
+       <number>0</number>
       </property>
       <property name="topMargin">
        <number>0</number>
