@@ -165,3 +165,8 @@ void EquipView::recalculateArsenalRows() {
     arsenalView->sortByColumn(model->hiddenSortColumn(), Qt::AscendingOrder);
     arsenalView->setColumnHidden(model->hiddenSortColumn(), true);
 }
+
+void EquipView::resizeEvent(QResizeEvent *event) {
+    recalculateArsenalRows();
+    QWidget::resizeEvent(event);
+}

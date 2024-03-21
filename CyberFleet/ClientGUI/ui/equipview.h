@@ -37,12 +37,17 @@ public:
     void activate(bool arsenal = true);
     void enactPageNumChange(int currentPageNum, int totalPageNum);
 
+public slots:
+    void recalculateArsenalRows();
+
 signals:
     void rowCountHint(int);
 
+protected:
+    void resizeEvent(QResizeEvent *event) override;
+
 private slots:
     void columnResized(int logicalIndex, int oldSize, int newSize);
-    void recalculateArsenalRows();
 
 private:
     Ui::EquipView *ui;

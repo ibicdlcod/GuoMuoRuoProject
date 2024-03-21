@@ -5,7 +5,6 @@
 #include <QToolButton>
 #include "../clientv2.h"
 #include "developwindow.h"
-#include "navigator.h"
 #include "equipview.h"
 
 FactoryArea::FactoryArea(QWidget *parent) :
@@ -14,30 +13,14 @@ FactoryArea::FactoryArea(QWidget *parent) :
 {
     ui->setupUi(this);
     equipview = new EquipView(ui->ArsenalArea);
-    arsenalView = new QTableView(this);
-    arsenalView->setObjectName("arsenalview");
-    arsenalView->setStyleSheet(
-        "QTableView#arsenalview { border-style: none; }");
     ui->Slots->setObjectName("slotcontrol");
     ui->Slots->setStyleSheet(
         "QFrame#slotcontrol { border-style: none; }");
 
-    QGridLayout * layout = new QGridLayout;
-    layout->addWidget(arsenalView);
-    layout->setAlignment(arsenalView, Qt::AlignCenter);
-    arsenalView->setMinimumSize(QSize(800,800));
-
-    ui->ArsenalControl->setLayout(layout);
-    ui->ArsenalControl->show();
-    navigator = new Navi(ui->Navigator, getEquipModel());
-
-    arsenalView->verticalHeader()->setSectionResizeMode(QHeaderView::Fixed);
-    connect(arsenalView->horizontalHeader(), &QHeaderView::sectionResized,
-            this, &FactoryArea::columnResized);
-    connect(getEquipModel(), &EquipModel::pageNumChanged,
-            this, [this](int, int){
-                QTimer::singleShot(10, this,
-                                   [this](){columnResized(0, 0, 0);});});
+    QVBoxLayout *layout = new QVBoxLayout();
+    ui->ArsenalArea->setLayout(layout);
+    layout->addWidget(equipview);
+    layout->setContentsMargins(0,0,0,0);
 
     Clientv2 &engine = Clientv2::getInstance();
     connect(&engine, &Clientv2::receivedFactoryRefresh,
@@ -78,18 +61,6 @@ FactoryArea::FactoryArea(QWidget *parent) :
 FactoryArea::~FactoryArea()
 {
     delete ui;
-}
-
-void FactoryArea::columnResized(int logicalIndex, int oldSize, int newSize) {
-    Q_UNUSED(logicalIndex)
-    Q_UNUSED(oldSize)
-    Q_UNUSED(newSize)
-    arsenalView
-        ->setMinimumSize(QSize(tableSizeWhole(arsenalView,
-                                              getEquipModel()).width(),
-                               ui->ArsenalControl->size().height()));
-    arsenalView->hide();
-    arsenalView->show();
 }
 
 void FactoryArea::developClicked(bool checked, int slotnum) {
@@ -146,11 +117,6 @@ void FactoryArea::doFactoryRefresh(const QJsonObject &input) {
     }
 }
 
-EquipModel * FactoryArea::getEquipModel() {
-    Clientv2 &engine = Clientv2::getInstance();
-    return &engine.equipModel;
-}
-
 void FactoryArea::setDevelop(KP::FactoryState state) {
     factoryState = state;
 }
@@ -160,43 +126,16 @@ void FactoryArea::switchToDevelop() {
     case KP::Development:
         ui->FactoryLabel->setText(qtTrId("develop-equipment"));
         ui->Slots->show();
-        ui->ArsenalControl->hide();
-        ui->NavigatorContol->hide();
         ui->ArsenalArea->hide();
         break;
     case KP::Construction:
         ui->FactoryLabel->setText(qtTrId("construct-ships"));
         ui->Slots->show();
-        ui->ArsenalControl->hide();
-        ui->NavigatorContol->hide();
         ui->ArsenalArea->hide();
         break;
     case KP::Arsenal:
         ui->FactoryLabel->setText(qtTrId("arsenal"));
         ui->Slots->hide();
-        ui->ArsenalControl->hide();
-        ui->NavigatorContol->hide();
-        /*
-        ui->ArsenalControl->show();
-        ui->NavigatorContol->show();
-        getEquipModel()->setIsInArsenal(true);
-        arsenalView->setModel(getEquipModel());
-        recalculateArsenalRows();
-        connect(getEquipModel(), SIGNAL(needReCalculateRows()),
-                this, SLOT(recalculateArsenalRows()),
-                Qt::UniqueConnection);
-        connect(this, SIGNAL(rowCountHint(int)),
-                getEquipModel(), SLOT(setRowsPerPageHint(int)),
-                Qt::UniqueConnection);
-        if(!getEquipModel()->isReady()) {
-            Clientv2 &engine = Clientv2::getInstance();
-            engine.doRefreshFactoryArsenal();
-            arsenalView->hide();
-        }
-        else {
-            arsenalView->show();
-        }
-*/
         ui->ArsenalArea->show();
         QTimer::singleShot(10, this, [this](){
             equipview->setGeometry(ui->ArsenalArea->rect());
@@ -206,24 +145,7 @@ void FactoryArea::switchToDevelop() {
     }
 }
 
-void FactoryArea::recalculateArsenalRows() {
-    Clientv2 &engine = Clientv2::getInstance();
-    int rowSize = arsenalView->verticalHeader()->sectionSize(0);
-    int rowSizeAvailable = ui->ArsenalControl->size().height()
-                           - arsenalView->horizontalHeader()->size().height();
-    if(rowSize > 0)
-        emit rowCountHint(std::max(rowSizeAvailable / rowSize - 1, 1));
-    arsenalView
-        ->setMinimumSize(QSize(tableSizeWhole(arsenalView,
-                                              getEquipModel()).width(),
-                               ui->ArsenalControl->size().height()));
-    arsenalView->show();
-    arsenalView->sortByColumn(getEquipModel()->hiddenSortColumn(), Qt::AscendingOrder);
-    arsenalView->setColumnHidden(getEquipModel()->hiddenSortColumn(), true);
-}
-
 void FactoryArea::resizeEvent(QResizeEvent *event) {
-    recalculateArsenalRows();
+    equipview->recalculateArsenalRows();
     QWidget::resizeEvent(event);
 }
-

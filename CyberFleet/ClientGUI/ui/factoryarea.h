@@ -39,26 +39,15 @@ public:
     void setDevelop(KP::FactoryState);
     void switchToDevelop();
 
-signals:
-    void rowCountHint(int);
-
-public slots:
-    void recalculateArsenalRows();
-
 protected:
     void resizeEvent(QResizeEvent *event) override;
 
 private slots:
-    void columnResized(int logicalIndex, int oldSize, int newSize);
     void developClicked(bool checked = false, int slotnum = 0);
     void doFactoryRefresh(const QJsonObject &);
 
 private:
-    EquipModel * getEquipModel();
-    Navi * navigator;
-
     Ui::FactoryArea *ui;
-    QTableView *arsenalView;
     EquipView *equipview;
 
     KP::FactoryState factoryState = KP::Development;
