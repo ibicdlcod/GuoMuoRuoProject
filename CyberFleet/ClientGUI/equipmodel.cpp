@@ -95,6 +95,18 @@ void EquipModel::addEquipment(QUuid uid, int def) {
     wholeTableChanged();
 }
 
+void EquipModel::enactDestruct() {
+    QList<QUuid> trash;
+    for(auto iter = isDestructChecked.keyValueBegin();
+         iter != isDestructChecked.keyValueEnd();
+         ++iter) {
+        if(iter->second) {
+            trash.append(iter->first);
+        }
+    }
+    emit destructRequest(trash);
+}
+
 void EquipModel::destructEquipment(const QList<QUuid> &destructed) {
     int oldRowCount = rowCount();
     clientEquips.removeIf([&destructed](QHash<QUuid, Equipment *>::iterator i)
@@ -295,7 +307,7 @@ QVariant EquipModel::data(const QModelIndex &index, int role) const {
     break;
     case Qt::CheckStateRole: {
         if(index.column() == destructColumn()) {
-            if(isChecked.value(sortedEquipIds.value(realRowIndex),
+            if(isDestructChecked.value(sortedEquipIds.value(realRowIndex),
                                 false))
                 return Qt::Checked;
             else
@@ -392,12 +404,12 @@ bool EquipModel::setData(const QModelIndex &index,
     int realRowIndex = index.row() + rowsPerPage * pageNum;
     if(role == Qt::CheckStateRole) {
         if(value.toInt() == Qt::Checked) {
-            isChecked[sortedEquipIds.value(realRowIndex)] = true;
+            isDestructChecked[sortedEquipIds.value(realRowIndex)] = true;
             emit dataChanged(index, index, {Qt::CheckStateRole});
             return true;
         }
         else if(value.toInt() == Qt::Unchecked) {
-            isChecked[sortedEquipIds.value(realRowIndex)] = false;
+            isDestructChecked[sortedEquipIds.value(realRowIndex)] = false;
             emit dataChanged(index, index, {Qt::CheckStateRole});
             return true;
         }
@@ -432,7 +444,7 @@ bool EquipModel::isReady() const {
 }
 
 void EquipModel::clearCheckBoxes() {
-    isChecked.clear();
+    isDestructChecked.clear();
 }
 
 void EquipModel::updateIllegalPage() {

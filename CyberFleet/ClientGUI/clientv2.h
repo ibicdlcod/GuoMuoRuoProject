@@ -87,6 +87,7 @@ public:
     bool loggedIn() const;
     void doFetch(const QStringList &);
 
+    /* ususally accesses equipregistryCache */
     friend int DevelopWindow::equipIdDesired();
     friend void DevelopWindow::resetListName(int);
     friend void TechView::demandLocalTech(int);
@@ -104,6 +105,7 @@ public slots:
     void catbomb();
     void demandEquipCache();
     void displayPrompt();
+    void doDestructEquip(const QList<QUuid> &);
     void doRefreshFactory();
     void doRefreshFactoryArsenal();
     Equipment * getEquipmentReg(int);

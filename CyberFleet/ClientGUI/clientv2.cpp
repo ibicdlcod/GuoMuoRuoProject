@@ -77,6 +77,8 @@ Clientv2::Clientv2(QObject *parent)
 
     connect(this, &Clientv2::receivedArsenalEquip,
             &equipModel, &EquipModel::updateEquipmentList);
+    connect(&equipModel, &EquipModel::destructRequest,
+            this, &Clientv2::doDestructEquip);
     // May cause issues?
     timer = new QTimer(this);
     connect(timer, &QTimer::timeout, this, &Clientv2::uiRefresh);
@@ -585,6 +587,15 @@ void Clientv2::doSwitch(const QStringList &cmdParts) {
             sender->enqueue(msg);
         }
         return;
+    }
+}
+
+void Clientv2::doDestructEquip(const QList<QUuid> &trash) {
+    if(trash.empty())
+        return;
+    else {
+        QByteArray msg = KP::clientDemandDestructEquip(trash);
+        sender->enqueue(msg);
     }
 }
 

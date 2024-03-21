@@ -6,27 +6,12 @@
 #include <QHeaderView>
 #include "FactorySlot/factoryslot.h"
 #include "equipview.h"
-#include "navigator.h"
-#include "../equipmodel.h"
 #include "../../Protocol/kp.h"
 
 namespace Ui {
 class FactoryArea;
 }
 
-namespace {
-/* source: https://stackoverflow.com/questions/8766633/
- * how-to-determine-the-correct-size-of-a-qtablewidget */
-static QSize tableSizeWhole2(QTableView *view, EquipModel *model) {
-    int w = view->verticalHeader()->width() + 4; // +4 seems to be needed
-    for (int i = 0; i < model->columnCount(); i++)
-        w += view->columnWidth(i); // seems to include gridline (on my machine)
-    int h = view->horizontalHeader()->height() + 4;
-    for (int i = 0; i < model->rowCount(); i++)
-        h += view->rowHeight(i);
-    return QSize(w, h);
-}
-}
 
 class FactoryArea : public QFrame
 {

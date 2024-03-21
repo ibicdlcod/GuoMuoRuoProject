@@ -4,6 +4,7 @@
 #include <QComboBox>
 #include <QHeaderView>
 #include <QLabel>
+#include <QPushButton>
 #include <QTableView>
 #include <QWidget>
 #include "../equipmodel.h"
@@ -56,11 +57,13 @@ private:
     QTableView *arsenalView;
 
     QComboBox *typebox;
-    QToolButton *firstbutton;
-    QToolButton *prevbutton;
+    QToolButton *firstButton;
+    QToolButton *prevButton;
     QLabel *pageLabel;
-    QToolButton *nextbutton;
-    QToolButton *lastbutton;
+    QToolButton *nextButton;
+    QToolButton *lastButton;
+    QPushButton *destructButton;
+    QPushButton *addStarButton;
 };
 
 #endif // EQUIPVIEW_H

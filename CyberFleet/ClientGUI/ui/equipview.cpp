@@ -39,31 +39,40 @@ EquipView::EquipView(QWidget *parent)
     QIcon next = QIcon(":/resources/navigation/next.svg");
 
     typebox = new QComboBox();
-    firstbutton = new QToolButton();
-    prevbutton = new QToolButton();
+    firstButton = new QToolButton();
+    prevButton = new QToolButton();
     pageLabel = new QLabel();
     //% "Retrieving data, please wait..."
     pageLabel->setText(qtTrId("retrieving-please-wait"));
-    nextbutton = new QToolButton();
-    lastbutton = new QToolButton();
+    nextButton = new QToolButton();
+    lastButton = new QToolButton();
+    destructButton = new QPushButton();
+    addStarButton = new QPushButton();
 
-    firstbutton->setIcon(first);
-    prevbutton->setIcon(prev);
-    nextbutton->setIcon(next);
-    lastbutton->setIcon(last);
+    firstButton->setIcon(first);
+    prevButton->setIcon(prev);
+    nextButton->setIcon(next);
+    lastButton->setIcon(last);
+    //% "Destruct"
+    destructButton->setText(qtTrId("destruct-button"));
+    //% "Improve"
+    addStarButton->setText(qtTrId("add-star-button"));
 
     QHBoxLayout *layout = ui->Navigator;
     layout->addWidget(typebox);
-    layout->addWidget(firstbutton);
-    layout->addWidget(prevbutton);
+    layout->addWidget(firstButton);
+    layout->addWidget(prevButton);
     layout->addWidget(pageLabel);
-    layout->addWidget(nextbutton);
-    layout->addWidget(lastbutton);
+    layout->addWidget(nextButton);
+    layout->addWidget(lastButton);
+    layout->addWidget(destructButton);
+    layout->addWidget(addStarButton);
 
     typebox->setSizePolicy(QSizePolicy(QSizePolicy::Maximum,
                                        QSizePolicy::Preferred,
                                        QSizePolicy::ComboBox));
     typebox->resize(QSize(100, pageLabel->size().height()));
+    //% "All equipments"
     typebox->addItem(qtTrId("all-equipments"));
     typebox->addItems(EquipType::getDisplayGroupsSorted());
     pageLabel->setAlignment(Qt::AlignCenter);
@@ -71,17 +80,27 @@ EquipView::EquipView(QWidget *parent)
                                          QSizePolicy::Preferred,
                                          QSizePolicy::Label));
     pageLabel->resize(QSize(100, pageLabel->size().height()));
+    destructButton->setSizePolicy(QSizePolicy(QSizePolicy::Maximum,
+                                              QSizePolicy::Preferred,
+                                              QSizePolicy::PushButton));
+    destructButton->resize(QSize(100, pageLabel->size().height()));
+    addStarButton->setSizePolicy(QSizePolicy(QSizePolicy::Maximum,
+                                             QSizePolicy::Preferred,
+                                             QSizePolicy::PushButton));
+    addStarButton->resize(QSize(100, pageLabel->size().height()));
 
     connect(typebox, &QComboBox::activated,
             model, &EquipModel::switchDisplayType);
-    connect(firstbutton, &QAbstractButton::clicked,
+    connect(firstButton, &QAbstractButton::clicked,
             model, &EquipModel::firstPage);
-    connect(prevbutton, &QAbstractButton::clicked,
+    connect(prevButton, &QAbstractButton::clicked,
             model, &EquipModel::prevPage);
-    connect(nextbutton, &QAbstractButton::clicked,
+    connect(nextButton, &QAbstractButton::clicked,
             model, &EquipModel::nextPage);
-    connect(lastbutton, &QAbstractButton::clicked,
+    connect(lastButton, &QAbstractButton::clicked,
             model, &EquipModel::lastPage);
+    connect(destructButton, &QAbstractButton::clicked,
+            model, &EquipModel::enactDestruct);
     connect(model, &EquipModel::pageNumChanged,
             this, &EquipView::enactPageNumChange);
 }
@@ -93,20 +112,20 @@ EquipView::~EquipView()
 
 void EquipView::enactPageNumChange(int currentPageNum, int totalPageNum) {
     if(currentPageNum == 0) {
-        firstbutton->setEnabled(false);
-        prevbutton->setEnabled(false);
+        firstButton->setEnabled(false);
+        prevButton->setEnabled(false);
     }
     else {
-        firstbutton->setEnabled(true);
-        prevbutton->setEnabled(true);
+        firstButton->setEnabled(true);
+        prevButton->setEnabled(true);
     }
     if(currentPageNum == totalPageNum - 1) {
-        nextbutton->setEnabled(false);
-        lastbutton->setEnabled(false);
+        nextButton->setEnabled(false);
+        lastButton->setEnabled(false);
     }
     else {
-        nextbutton->setEnabled(true);
-        lastbutton->setEnabled(true);
+        nextButton->setEnabled(true);
+        lastButton->setEnabled(true);
     }
     if(totalPageNum == 0) {
         //% "No suitable Equipment"
@@ -148,6 +167,13 @@ void EquipView::activate(bool arsenal) {
         else {
             arsenalView->show();
         }
+        destructButton->show();
+        addStarButton->show();
+    }
+    else {
+        model->setIsInArsenal(false);
+        destructButton->hide();
+        addStarButton->hide();
     }
 }
 

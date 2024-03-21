@@ -13,6 +13,7 @@ public:
     explicit EquipModel(QObject *parent = nullptr, bool isInArsenal = true);
 
 signals:
+    void destructRequest(const QList<QUuid> &);
     void needReCalculateRows();
     void needReCalculatePages();
     void pageNumChanged(int currentPageNum, int totalPageNum);
@@ -24,6 +25,7 @@ public slots:
     void nextPage();
     void lastPage();
     void addEquipment(QUuid, int);
+    void enactDestruct();
     void destructEquipment(const QList<QUuid> &);
     void updateEquipmentList(const QJsonObject &);
     void setPageNumHint(int);
@@ -69,7 +71,7 @@ private:
     QHash<QUuid, Equipment *> clientEquips;
     QHash<QUuid, int> clientEquipStars;
     QList<QUuid> sortedEquipIds; // not sort by uuid but equiptype
-    QHash<QUuid, bool> isChecked;
+    QHash<QUuid, bool> isDestructChecked;
     int rowsPerPage = 1;
     int pageNum = 0;
     bool ready = false;

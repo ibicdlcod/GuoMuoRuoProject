@@ -65,6 +65,18 @@ QByteArray KP::clientAddEquip(int equipid) {
     return QCborValue::fromJsonValue(result).toCbor();
 }
 
+QByteArray KP::clientDemandDestructEquip(const QList<QUuid> &trash) {
+    QJsonObject result;
+    result["type"] = DgramType::Request;
+    result["command"] = CommandType::DemandDestructEquip;
+    QJsonArray trashList;
+    for(auto trashItem: trash) {
+        trashList.append(QJsonValue(trashItem.toString()));
+    }
+    result["equipids"] = trashList;
+    return QCborValue::fromJsonValue(result).toCbor();
+}
+
 QByteArray KP::clientDemandEquipInfo() {
     QJsonObject result;
     result["type"] = DgramType::Request;
@@ -197,7 +209,7 @@ QByteArray KP::serverDevelopStart() {
     return QCborValue::fromJsonValue(result).toCbor();
 }
 
-QByteArray KP::serverEquipInfo(QJsonArray &input, bool final, bool user) {
+QByteArray KP::serverEquipInfo(const QJsonArray &input, bool final, bool user) {
     QJsonObject result;
     result["type"] = DgramType::Info;
     if(user)

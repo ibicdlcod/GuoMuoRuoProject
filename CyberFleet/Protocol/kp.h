@@ -117,7 +117,8 @@ enum CommandType{
     DemandEquipInfoUser,
     DemandGlobalTech,
     DemandSkillPoints,
-    DemandResourceUpdate
+    DemandResourceUpdate,
+    DemandDestructEquip
 };
 Q_ENUM_NS(CommandType)
 
@@ -167,6 +168,7 @@ void winConsoleCheck();
 QByteArray accessDenied();
 QByteArray catbomb();
 QByteArray clientAddEquip(int);
+QByteArray clientDemandDestructEquip(const QList<QUuid> &);
 QByteArray clientDemandEquipInfo();
 QByteArray clientDemandEquipInfoUser();
 QByteArray clientDemandGlobalTech(int local = 0);
@@ -184,7 +186,7 @@ QByteArray serverDevelopFailed(GameError);
 QByteArray serverDevelopStart();
 QByteArray serverEquipLackFather(GameError, int);
 QByteArray serverEquipLackMother(GameError, int, int64);
-QByteArray serverEquipInfo(QJsonArray &, bool, bool user = false);
+QByteArray serverEquipInfo(const QJsonArray &, bool, bool user = false);
 QByteArray serverFairyBusy(int);
 QByteArray serverGlobalTech(double, bool);
 QByteArray serverGlobalTech(const QList<TechEntry> &, bool, bool, bool);
