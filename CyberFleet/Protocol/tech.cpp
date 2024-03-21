@@ -12,7 +12,7 @@ Tech::Tech()
 double Tech::calCapable(double globalTech, double localTech,
                         double wantedTech) {
     double maxDeterimental =
-        settings->value("rule/maxtechdifficulty", 3.0).toDouble();
+        settings->value("rule/techcombinedeffects", 3.0).toDouble();
     double min = std::min(globalTech, localTech);
     double max = std::max(globalTech, localTech);
     double detrimentalEffect = 0.0;
@@ -68,7 +68,7 @@ double Tech::calLevel(QList<std::pair<double, double>> &source,
         double weight = iter->second;
         if(weight < 0.0) {
             //qCritical() << qtTrId("tech-weight-less-than-0");
-            return 0.0;
+            weight = 0.0;
         }
         weightSum += weight;
         result += (iter->first) * (pow(scopeConstant, weight) - 1.0)

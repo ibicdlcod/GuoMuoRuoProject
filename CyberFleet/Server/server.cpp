@@ -494,6 +494,8 @@ Server::calculateTech(const CSteamID &uid, int jobID) {
                                 * settings->value
                                   ("rule/skillpointweightcontrib", 9.0)
                                       .toDouble();
+                if(weight < 0.0)
+                    weight = 0.0;
                 equips[serial] =
                     equipRegistry.value(def);
                 pass = jobID == 0;
@@ -519,6 +521,8 @@ Server::calculateTech(const CSteamID &uid, int jobID) {
                                 * settings->value
                                   ("rule/skillpointweightcontrib", 9.0)
                                       .toDouble();
+                if(weight < 0.0)
+                    weight = 0.0;
                 if(equipRegistry.value(jobID)->disallowMassProduction()){
                     /* better hide this */
                     //result.append({QUuid(), jobID, weight});
@@ -1299,15 +1303,18 @@ void Server::naturalRegen(const CSteamID &uid) {
             qint64 currentTimeInMinute = currentTimeInt / KP::secsinMin;
             qint64 regenMins = currentTimeInMinute - priorRecoverTime;
             regenMins = std::max(Q_INT64_C(0), regenMins); //stop timezone trap
-            int regenPower = globalTechLevel / 4.0; // not yet implemented
-#pragma message(NOT_M_CONST)
-            ResOrd regenAmount = ResOrd(10 + regenPower,
-                                        10 + regenPower,
-                                        10 + regenPower,
-                                        2 + regenPower,
-                                        5 + regenPower,
-                                        2 + regenPower,
-                                        2 + regenPower);
+            int regenPower = globalTechLevel /
+                             settings->value("rule/antiregenpower", 4.0).toDouble();
+            int normal = settings->value("rule/baseregennormal", 10).toInt();
+            int al = settings->value("rule/baseregenalumiuum", 5).toInt();
+            int rare = settings->value("rule/baseregenrare", 2).toInt();
+            ResOrd regenAmount = ResOrd(normal + regenPower,
+                                        normal + regenPower,
+                                        normal + regenPower,
+                                        rare + regenPower,
+                                        al + regenPower,
+                                        rare + regenPower,
+                                        rare + regenPower);
             if(regenMins > 0)
                 qDebug() << regenMins << " minute(s) passed"
                                          "for regeneration purposes.";
@@ -1874,7 +1881,6 @@ void Server::refreshClientFactory(CSteamID &uid, QSslSocket *connection) {
     result["infotype"] = KP::InfoType::FactoryInfo;
     result["content"] = itemArray;
     QByteArray msg = QCborValue::fromJsonValue(result).toCbor();
-    //qCritical() << msg;
     senderM.sendMessage(connection, msg);
 }
 

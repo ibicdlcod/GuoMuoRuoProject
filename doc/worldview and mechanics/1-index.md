@@ -1,0 +1,57 @@
+# Index
+
+- [Technology](2-technology.md)
+- Resources
+  - Ore Purifier (DLC)
+- Equipment
+  - Factory slot
+  - Attributes
+  - Develop, normal precondition(father)
+  - Develop, special precondition(mother)
+  - Virtual precondition
+  - Equipment skill points
+  - Improvement
+  - Industrial plant
+- Ships
+  - Attributes
+  - Equip slots (including extra)
+  - Visible bonuses
+  - Ship blueprint
+  - Construction
+  - Experience
+  - Improvement
+  - Remodel
+  - Cloning Vats
+  - Labor condition
+  - Food
+  - Emergency repair
+  - Enemies (Amnesiac Fleet)
+- Sortie Map
+  - Normal map
+  - Naval Supremacy
+  - Historical Mode (DLC)
+  - Achievements
+- Expedition
+  - Normal Expedition
+  - Command Expedition
+  - Supporting Expedition
+- Drill
+  - vs AI
+  - vs Player
+- Maintenance
+  - Supply
+  - Repair
+- Battle mechanic
+  - Tactical Goal
+  - Los
+  - Air battle
+  - Air superiority coefficient
+  - Guided strikes (触接)
+  - Formation coefficient
+  - Approaching phase
+  - Battle phase
+  - Disengaging phase
+  - Night battle
+  - Commander's abilities
+  - LBAS
+- Quests

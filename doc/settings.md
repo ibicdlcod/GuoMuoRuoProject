@@ -20,7 +20,7 @@
 |           rule/devtimebase           |       6        |                                                           |
 |        rule/skillpointfactor         |      1.25      |                                                           |
 |         rule/skillpointbase          |    10000.0     |                                                           |
-|        rule/maxtechdifficulty        |      3.0       |                                                           |
+|       rule/techcombinedeffects       |      3.0       |                                                           |
 |         rule/techglobalscope         |      1.02      |                                                           |
 |         rule/techlocalscope          |      1.1       |                                                           |
 |       rule/shiplevelperweight        |      10.0      |                                                           |
@@ -28,6 +28,10 @@
 |  rule/penguinskillpointsdifficulty   |      10.0      |                                                           |
 |     rule/maxskillpointsamplifier     |      5.0       |                                                           |
 |    rule/normalproductionstockpile    |      30.0      |                                                           |
+|         rule/antiregenpower          |      4.0       |                                                           |
+|         rule/baseregennormal         |       10       |                                                           |
+|        rule/baseregenaluminum        |       5        |                                                           |
+|          rule/baseregenrare          |       2        |                                                           |
 |            server/logfile            | ServerLog.log  |                                                           |
 |           server/language            |     en_US      |                                                           |
 |      server/displaypromptdelay       |      100       |                                                           |
