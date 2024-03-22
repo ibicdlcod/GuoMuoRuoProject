@@ -107,6 +107,8 @@ MainWindow::MainWindow(QWidget *parent, int argc, char ** argv)
                        [this]{
                            this->licenseArea->complete();
                        });
+    connect(&engine, &Clientv2::equipRegistryComplete,
+            portArea, &PortArea::equipRegistryComplete);
 }
 
 MainWindow::~MainWindow()

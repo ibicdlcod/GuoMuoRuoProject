@@ -16,7 +16,6 @@ public:
     bool operator==(const EquipType &) const;
 
     const ResOrd devResBase() const;
-    static const QSet<QString> getDisplayGroups();
     static const QList<QString> getDisplayGroupsSorted();
     QString getDisplayGroup();
     static const QString intToStrRep(int);

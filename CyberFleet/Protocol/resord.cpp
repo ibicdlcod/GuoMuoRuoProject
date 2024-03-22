@@ -1,5 +1,8 @@
 #include "resord.h"
+#include <QSettings>
 #include "kp.h"
+
+extern std::unique_ptr<QSettings> settings;
 
 ResOrd::ResOrd(ResTuple input) {
     o = e = s = r = a = w = c = 0;
@@ -32,14 +35,16 @@ QString ResOrd::toString() const {
 }
 
 bool ResOrd::addResources(const ResOrd &amount) {
+    int maxRes = settings->value("rule/maxresources", 3600000).toInt();
     operator+=(amount);
-    if(!sufficient()){
-        operator-=(amount);
-        return false;
-    }
-    else {
-        return true;
-    }
+    cap(ResOrd(maxRes,
+               maxRes,
+               maxRes,
+               maxRes,
+               maxRes,
+               maxRes,
+               maxRes));
+    return true;
 }
 
 bool ResOrd::addResources(const ResOrd &amount,
@@ -51,6 +56,17 @@ bool ResOrd::addResources(const ResOrd &amount,
     }
     else {
         cap(maximum);
+        return true;
+    }
+}
+
+bool ResOrd::spendResources(const ResOrd &amount) {
+    operator-=(amount);
+    if(!sufficient()){
+        operator+=(amount);
+        return false;
+    }
+    else {
         return true;
     }
 }

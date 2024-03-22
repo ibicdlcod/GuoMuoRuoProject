@@ -49,7 +49,8 @@
 |  0x82000   |     Seaplane carriers with advanced torpedo capabilites      |
 |  0x90000   |                         Supply ships                         |
 |  0xA0000   |                   Amphibious assualt ships                   |
-|  0XB0000   |                         Repair ships                         |
+|  0xB0000   |                         Repair ships                         |
+|  0xC0000   |                        Land Structure                      |
 |   0x?00    |                          Ship class                          |
 |    0x?0    |                       Ship subclasses                        |
 |    0x??    |                           Ship id                            |

@@ -80,6 +80,8 @@ set(SERVER_SOURCES
     Server/sslserver.h
     Server/user.cpp
     Server/user.h
+    Server/erfinv.h
+    Server/rnjesus.h
     ${TS_FILES}
 )
 set(PROTOCOL_SOURCES
@@ -103,6 +105,10 @@ set(PROTOCOL_SOURCES
     Protocol/resord.h
     Protocol/sender.cpp
     Protocol/sender.h
+    Protocol/ship.cpp
+    Protocol/ship.h
+    Protocol/shiptype.cpp
+    Protocol/shiptype.h
     Protocol/tech.cpp
     Protocol/tech.h
     Protocol/wcwidth.c

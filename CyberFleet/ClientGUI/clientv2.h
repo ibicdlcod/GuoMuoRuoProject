@@ -93,7 +93,6 @@ public:
     friend void TechView::demandLocalTech(int);
     friend void TechView::demandSkillPoints(int);
     friend void TechView::resetLocalListName();
-    friend void EquipModel::updateEquipmentList(const QJsonObject &);
 
     int equipBigTypeIndex = 0;
     int equipIndex = 0;

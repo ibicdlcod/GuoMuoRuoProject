@@ -30,7 +30,7 @@ where y is [actual skill points], x is [required skill points].
 
 We will deal with skill points later.
 
-## Bonuses and penalties 
+## Success rate
 
 When developing/constructing the success rate would be:
 $$

@@ -26,8 +26,8 @@ bool isSuperUser(const CSteamID &);
 QUuid newEquip(const CSteamID &, int);
 void refreshFactory(const CSteamID &);
 void refreshPort(const CSteamID &);
-QList<QUuid> retireEquip(const CSteamID &, const QList<QUuid> &);
 void setResources(const CSteamID &, ResOrd);
+
 };
 
 #endif // USER_H

@@ -27,7 +27,7 @@
   </property>
   <layout class="QHBoxLayout" name="horizontalLayout">
    <item>
-    <widget class="QLabel" name="label">
+    <widget class="QLabel" name="CentralMessage">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Maximum" vsizetype="Maximum">
        <horstretch>100</horstretch>

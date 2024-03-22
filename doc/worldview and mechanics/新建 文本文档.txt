@@ -1,5 +1,5 @@
 伤害
-cdf = e^(-ln(x*armor/armorpenetration)^2)
+pdf = e^(-ln(x*armor/armorpenetration)^2)
 值为火力*x
 
 过穿率

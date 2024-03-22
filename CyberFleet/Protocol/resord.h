@@ -46,12 +46,23 @@ struct ResOrd
         return ResOrd(
             o * amount,
             e * amount,
-                    s * amount,
-                    r * amount,
-                    a * amount,
-                    w * amount,
-                    c * amount
-                    );
+            s * amount,
+            r * amount,
+            a * amount,
+            w * amount,
+            c * amount
+            );
+    }
+    const ResOrd operator*(double amount) const {
+        return ResOrd(
+            std::round(o * amount),
+            std::round(e * amount),
+            std::round(s * amount),
+            std::round(r * amount),
+            std::round(a * amount),
+            std::round(w * amount),
+            std::round(c * amount)
+            );
     }
     constexpr ResOrd& operator*=(qint64 amount) {
         o *= amount;
@@ -63,8 +74,9 @@ struct ResOrd
         c *= amount;
         return *this;
     }
-    bool addResources(const ResOrd&);
-    bool addResources(const ResOrd&, const ResOrd &);
+    bool addResources(const ResOrd &);
+    bool addResources(const ResOrd &, const ResOrd &);
+    bool spendResources(const ResOrd &);
     void cap(const ResOrd&);
     QByteArray resourceDesired() const;
     bool sufficient();

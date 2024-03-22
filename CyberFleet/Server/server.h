@@ -129,6 +129,7 @@ private:
     void receivedLogout(CSteamID &, const PeerInfo &, QSslSocket *);
     void receivedReq(const QJsonObject &, const PeerInfo &, QSslSocket *);
     void refreshClientFactory(CSteamID &, QSslSocket *);
+    QList<QUuid> retireEquip(const CSteamID &, const QList<QUuid> &);
     void sendTestMessages();
     void sqlcheckEquip();
     void sqlcheckEquipU();

@@ -59,6 +59,7 @@
 #include "kerrors.h"
 #include "sslserver.h"
 #include "user.h"
+#include "rnjesus.h"
 
 QT_BEGIN_NAMESPACE
 
@@ -199,7 +200,8 @@ Q_GLOBAL_STATIC(QString,
                     ));
 
 /* Not customized, since set this lesser than 60 creates problems */
-static const int elapsedMaxTolerence = steamRateLimit;
+const int elapsedMaxTolerence = steamRateLimit;
+
 }
 
 Server::Server(int argc, char ** argv) : CommandLine(argc, argv) {
@@ -883,7 +885,7 @@ void Server::doDevelop(CSteamID &uid, int equipid,
         QByteArray msg = resRequired.resourceDesired();
         senderM.sendMessage(connection, msg);
         ResOrd currentRes = User::getCurrentResources(uid);
-        if(!currentRes.addResources(resRequired * -1)){
+        if(!currentRes.spendResources(resRequired)){
             connection->flush();
             QTimer::singleShot(100, this, [this, connection]{
                 QByteArray msg =
@@ -1363,8 +1365,11 @@ int64 Server::newEquipHasMotherCal(int equipId) {
     if(!equipRegistry.contains(equip->attr["Mother"]))
         return 0;
     Equipment *mother = equipRegistry.value(equip->attr["Mother"]);
-    uint64 sonSkillPoints = equip->skillPointsStd()
-                            * pow(equip->getTech(), 0.2);
+    uint64 sonSkillPoints
+        = equip->skillPointsStd()
+          * pow(equip->getTech(),
+                settings
+                    ->value("rule/motherspscle", 0.2).toDouble());
     if(equip->disallowMassProduction()
         && equip->attr["Disallowmassproduction"] < 30) {
         double x = equip->attr["Disallowmassproduction"];
@@ -1391,7 +1396,6 @@ void Server::newEquipHasMother(const CSteamID &uid, int equipId) {
     //Equipment *mother = equipRegistry.value(equip->attr["Mother"]);
     int64 sonSkillPoints = newEquipHasMotherCal(equipId);
     User::addSkillPoints(uid, equip->attr["Mother"], -sonSkillPoints);
-    qDebug() << sonSkillPoints;
 }
 
 void Server::parseListen(const QStringList &cmdParts) {
@@ -1825,7 +1829,7 @@ void Server::receivedReq(const QJsonObject &djson,
         for(auto trashItem: array) {
             trash.append(QUuid(trashItem.toString()));
         }
-        QList<QUuid> destructed = User::retireEquip(uid, trash);
+        QList<QUuid> destructed = retireEquip(uid, trash);
         QByteArray msg = KP::serverEquipRetired(destructed);
         senderM.sendMessage(connection, msg);
     }
@@ -1847,7 +1851,7 @@ void Server::sendTestMessages() {
         for(auto equip: std::as_const(equipRegistry)) {
             qInfo() << equip->type.iconGroup();
         }*/
-        generateTestEquip(CSteamID((uint64)76561198194251051));
+        //generateTestEquip(CSteamID((uint64)76561198194251051));
     }
 }
 
@@ -1882,6 +1886,56 @@ void Server::refreshClientFactory(CSteamID &uid, QSslSocket *connection) {
     result["content"] = itemArray;
     QByteArray msg = QCborValue::fromJsonValue(result).toCbor();
     senderM.sendMessage(connection, msg);
+}
+
+QList<QUuid> Server::retireEquip(const CSteamID &uid, const QList<QUuid> &trash) {
+    QList<QUuid> result;
+    QSqlDatabase db = QSqlDatabase::database();
+    for(auto trashItem: trash) {
+        QSqlQuery query2;
+        query2.prepare("SELECT EquipDef FROM UserEquip "
+                       "WHERE User = :uid AND EquipUuid = :eid;");
+        query2.bindValue(":uid", uid.ConvertToUint64());
+        query2.bindValue(":eid", trashItem.toString());
+
+        query2.exec();
+        query2.isSelect();
+        if(Q_UNLIKELY(!query2.first())) {
+            //% "User id %1: equipment %2 does not exist!"
+            qWarning() << qtTrId("delete-equip-nonexistent")
+                              .arg(uid.ConvertToUint64())
+                              .arg(trashItem.toString());
+            break;
+        }
+        else {
+            int equipDef = query2.value(0).toInt();
+            ResOrd refundRes = equipRegistry[equipDef]->devRes() * 0.5;
+            ResOrd currentRes = User::getCurrentResources(uid);
+            currentRes.addResources(refundRes);
+            User::setResources(uid, currentRes);
+        }
+
+        QSqlQuery query;
+        query.prepare("DELETE FROM UserEquip "
+                      "WHERE User = :uid AND EquipUuid = :eid;");
+        query.bindValue(":uid", uid.ConvertToUint64());
+        query.bindValue(":eid", trashItem.toString());
+
+        if(Q_UNLIKELY(!query.exec())) {
+            //% "User id %1: delete equipment failed!"
+            throw DBError(qtTrId("delete-equip-failed")
+                              .arg(uid.ConvertToUint64()),
+                          query.lastError());
+            break;
+        }
+        else {
+            //% "User id %1: deleted equipment %2"
+            qDebug() << qtTrId("delete-equip").arg(uid.ConvertToUint64())
+                            .arg(trashItem.toString());
+            result.append(trashItem);
+        }
+    }
+    return result;
 }
 
 void Server::sqlcheckEquip() {/*

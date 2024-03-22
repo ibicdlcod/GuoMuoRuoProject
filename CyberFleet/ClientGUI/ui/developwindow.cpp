@@ -10,15 +10,7 @@ DevelopWindow::DevelopWindow(QWidget *parent)
     ui(new Ui::DevelopWindow) {
     ui->setupUi(this);
 
-    QSet<QString> equipGroups = EquipType::getDisplayGroups();
-    QList<QString> sortedGroups;
-    for(auto &equip: equipGroups) {
-        sortedGroups.append(equip);
-    }
-    std::sort(sortedGroups.begin(), sortedGroups.end(),
-              [](const QString &a, const QString &b){
-                  return a.localeAwareCompare(b) < 0;
-              });
+    QList<QString> sortedGroups = EquipType::getDisplayGroupsSorted();
 
     for(auto &equipType: sortedGroups) {
         if(equipType.compare("VIRTUAL", Qt::CaseInsensitive) == 0)

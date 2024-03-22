@@ -32,6 +32,8 @@
 |         rule/baseregennormal         |       10       |                                                           |
 |        rule/baseregenaluminum        |       5        |                                                           |
 |          rule/baseregenrare          |       2        |                                                           |
+|          rule/motherspscale          |      0.2       |                                                           |
+|          rule/maxresources           |    3600000     |                                                           |
 |            server/logfile            | ServerLog.log  |                                                           |
 |           server/language            |     en_US      |                                                           |
 |      server/displaypromptdelay       |      100       |                                                           |

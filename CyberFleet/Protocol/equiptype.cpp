@@ -34,14 +34,6 @@ int EquipType::getTypeSort() const {
     return displaySort.value(toString(), 0);
 }
 
-const QSet<QString> EquipType::getDisplayGroups() {
-    QSet<QString> result;
-    for(auto &value: displayGroup) {
-        result.insert(value);
-    }
-    return result;
-}
-
 const QList<QString> EquipType::getDisplayGroupsSorted() {
     return {
         qtTrId("SMALLGUNFLAT"),

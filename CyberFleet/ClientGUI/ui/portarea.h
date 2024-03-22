@@ -15,6 +15,12 @@ public:
     explicit PortArea(QWidget *parent = nullptr);
     ~PortArea();
 
+public slots:
+    void equipRegistryComplete();
+
+protected:
+    void resizeEvent(QResizeEvent *event) override;
+
 private:
     Ui::PortArea *ui;
 };

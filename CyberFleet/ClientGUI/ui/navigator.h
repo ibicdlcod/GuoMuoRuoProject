@@ -12,7 +12,7 @@ class Navi : public QObject {
     Q_OBJECT
 
 public:
-    explicit Navi(QHBoxLayout *layout, EquipModel *model);
+    Q_DECL_DEPRECATED explicit Navi(QHBoxLayout *layout, EquipModel *model);
 
     void enactPageNumChange(int currentPageNum, int totalPageNum);
 
@@ -25,4 +25,5 @@ private:
     QToolButton *lastbutton;
     EquipModel *model;
 };
+
 #endif // NAVIGATOR_H

@@ -342,8 +342,7 @@ void Clientv2::switchToFactory() {
         gameState = KP::Factory;
         emit gamestateChanged(KP::Factory);
         if(!equipRegistryCacheGood) {
-            QByteArray msg = KP::clientDemandEquipInfo();
-            sender->enqueue(msg);
+            demandEquipCache();
         }
     }
 }
@@ -1058,6 +1057,7 @@ void Clientv2::receivedMsg(const QJsonObject &djson) {
             QByteArray msg = KP::clientDemandResourceUpdate();
             sender->enqueue(msg);
         }
+        demandEquipCache();
         break;
     case KP::AllowClientFinish:
         gameState = KP::Offline;
