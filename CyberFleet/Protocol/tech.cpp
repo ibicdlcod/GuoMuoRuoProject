@@ -4,11 +4,6 @@
 
 extern std::unique_ptr<QSettings> settings;
 
-Tech::Tech()
-{
-
-}
-
 double Tech::calCapable(double globalTech, double localTech,
                         double wantedTech) {
     double maxDeterimental =

@@ -8,17 +8,15 @@
 class ShipType
 {
 public:
-    ShipType();
-    ShipType(int);
+    ShipType(int shipId);
 
     bool operator==(const ShipType &) const;
 
     const ResOrd consResBase() const;
-    static const QString intToStrRep(int);
-    static int strToIntRep(QString);
+    int consTimeBase() const;
     QString toString() const;
     int toInt() const;
-    int iconGroup() const;
+    QString iconGroup() const;
     int getTypeSort() const;
 
 private:

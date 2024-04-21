@@ -141,8 +141,10 @@ private:
     void sqlinitEquipSP();
     void sqlinitEquipU();
     void sqlinitFacto();
+    void sqlinitShip();
+    void sqlinitShipName();
+    void sqlinitUsers() const;
     void sqlinitUserA() const;
-    void sqlinitNewUsers() const;
     void userInit(CSteamID &);
 
     bool listening = false;

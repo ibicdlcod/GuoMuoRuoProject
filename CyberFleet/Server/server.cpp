@@ -46,6 +46,7 @@
 **
 ****************************************************************************/
 
+#include "Protocol/shiptype.h"
 #define NOMINMAX // apparently some stupid win header <minwindef.h> interferes with std::max
 #include "server.h"
 #include <QBuffer>
@@ -59,7 +60,6 @@
 #include "kerrors.h"
 #include "sslserver.h"
 #include "user.h"
-#include "rnjesus.h"
 
 QT_BEGIN_NAMESPACE
 
@@ -146,6 +146,30 @@ Q_GLOBAL_STATIC(QString,
                 QStringLiteral(
                     "CREATE TABLE EquipName ( "
                     "EquipID INTEGER PRIMARY KEY, "
+                    "ja_JP TEXT, "
+                    "zh_CN TEXT, "
+                    "en_US TEXT"
+                    ");"
+                    ));
+
+/* Ship registry */
+Q_GLOBAL_STATIC(QString,
+                shipReg,
+                QStringLiteral(
+                    "CREATE TABLE ShipReg ( "
+                    "ShipID INTEGER NOT NULL, "
+                    "Attribute TEXT NOT NULL, "
+                    "Intvalue INTEGER DEFAULT 0,"
+                    "CONSTRAINT noduplicate UNIQUE(ShipID, Attribute)"
+                    ");"
+                    ));
+
+/* Ship name table */
+Q_GLOBAL_STATIC(QString,
+                shipName,
+                QStringLiteral(
+                    "CREATE TABLE ShipName ( "
+                    "ShipID INTEGER PRIMARY KEY, "
                     "ja_JP TEXT, "
                     "zh_CN TEXT, "
                     "en_US TEXT"
@@ -1847,11 +1871,9 @@ void Server::sendTestMessages() {
         qWarning() << "Server isn't listening, abort.";
     }
     else {
-        qInfo() << "test";/*
-        for(auto equip: std::as_const(equipRegistry)) {
-            qInfo() << equip->type.iconGroup();
-        }*/
-        //generateTestEquip(CSteamID((uint64)76561198194251051));
+        qInfo() << "test";
+        ShipType a = ShipType(0x10120101);
+        qInfo() << a.toString();
     }
 }
 
@@ -2058,7 +2080,7 @@ void Server::sqlinit() {
         /* Database integrity check, the structure is defined here */
         QStringList tables = db.tables(QSql::Tables);
         if(!tables.contains("NewUsers")) {
-            sqlinitNewUsers();
+            sqlinitUsers();
         }
         if(!tables.contains("UserAttr")) {
             sqlinitUserA();
@@ -2068,6 +2090,12 @@ void Server::sqlinit() {
         }
         if(!tables.contains("EquipName")) {
             sqlinitEquipName();
+        }
+        if(!tables.contains("ShipReg")) {
+            sqlinitShip();
+        }
+        if(!tables.contains("ShipName")) {
+            sqlinitShipName();
         }
         if(!tables.contains("Factories")) {
             sqlinitFacto();
@@ -2139,23 +2167,46 @@ void Server::sqlinitFacto() {
     }
 }
 
-void Server::sqlinitUserA() const {
+void Server::sqlinitShip() {
+    //% "Ship database does not exist, creating..."
+    qWarning() << qtTrId("equip-db-lack");
+    QSqlQuery query;
+    query.prepare(*shipReg);
+    if(!query.exec()) {
+        //% "Create Ship database failed."
+        throw DBError(qtTrId("equip-db-gen-failure"),
+                      query.lastError());
+    }
+}
+
+void Server::sqlinitShipName() {
+    //% "Ship name database does not exist, creating..."
+    qWarning() << qtTrId("equip-name-db-lack");
+    QSqlQuery query;
+    query.prepare(*shipName);
+    if(!query.exec()) {
+        //% "Create Ship database failed."
+        throw DBError(qtTrId("equip-db-gen-failure"),
+                      query.lastError());
+    }
+}
+
+void Server::sqlinitUsers() const {
     //% "User database does not exist, creating..."
     qWarning() << qtTrId("user-db-lack");
     QSqlQuery query;
-    query.prepare(*userAttr);
+    query.prepare(*userTable);
     if(!query.exec()) {
         //% "Create User database failed."
         throw DBError(qtTrId("user-db-gen-failure"),
                       query.lastError());
     }
 }
-
-void Server::sqlinitNewUsers() const {
+void Server::sqlinitUserA() const {
     //% "User database does not exist, creating..."
     qWarning() << qtTrId("user-db-lack");
     QSqlQuery query;
-    query.prepare(*userTable);
+    query.prepare(*userAttr);
     if(!query.exec()) {
         //% "Create User database failed."
         throw DBError(qtTrId("user-db-gen-failure"),

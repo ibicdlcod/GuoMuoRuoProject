@@ -4,21 +4,18 @@
 #include <QList>
 #include <random>
 
-class Tech
+namespace Tech
 {
-public:
-    Tech();
-
-    static double calCapable(double, double, double);
-    static bool calExperiment(double, double, double, std::mt19937 &);
-    static bool calExperiment2(double, double, double, double,
-                               std::mt19937 &);
-    static double calLevel(QList<std::pair<double, double>> &, const double);
-    static double calLevelGlobal(QList<std::pair<double, double>> &);
-    static double calLevelLocal(QList<std::pair<double, double>> &);
-    static double calWeightEquip(double, double);
-    static double calWeightShip(int);
-    static double techYearToCompact(int);
+    double calCapable(double, double, double);
+    bool calExperiment(double, double, double, std::mt19937 &);
+    bool calExperiment2(double, double, double, double,
+                        std::mt19937 &);
+    double calLevel(QList<std::pair<double, double>> &, const double);
+    double calLevelGlobal(QList<std::pair<double, double>> &);
+    double calLevelLocal(QList<std::pair<double, double>> &);
+    double calWeightEquip(double, double);
+    double calWeightShip(int);
+    double techYearToCompact(int);
 };
 
 #endif // TECH_H

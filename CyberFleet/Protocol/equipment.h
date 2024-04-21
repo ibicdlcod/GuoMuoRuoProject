@@ -20,14 +20,12 @@ public:
     bool isNotEqual(const Equipment &) const;
     QString toString(QString) const;
 
-    void addStar();
     //bool canDevelop(const CSteamID &userid = k_steamIDNil) const;
     const ResOrd devRes() const;
     const int devTimeInSec() const;
     bool disallowMassProduction() const;
     bool disallowProduction() const;
     int getId() const;
-    unsigned int getStar() const;
     double getTech() const;
     bool isInvalid() const;
     int skillPointsStd() const;
@@ -39,7 +37,6 @@ public:
 
 private:
     int equipRegId;
-    unsigned int star = 0;
 
     Q_DISABLE_COPY_MOVE(Equipment)
 };

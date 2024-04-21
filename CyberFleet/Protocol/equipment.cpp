@@ -97,11 +97,6 @@ QString Equipment::toString(QString lang) const {
     return localNames[lang];
 }
 
-void Equipment::addStar() {
-    if(star < 0xf)
-        star++;
-}
-
 const ResOrd Equipment::devRes() const {
     qint64 devResScale = settings->value("rule/devresscale", 10).toLongLong();
     return type.devResBase() * (qint64)std::round((getTech() + 1.0)
@@ -128,12 +123,6 @@ bool Equipment::disallowProduction() const {
 
 int Equipment::getId() const {
     return equipRegId;
-}
-
-unsigned int Equipment::getStar() const {
-    if(star > 0xf)
-        return 0xf;
-    return star;
 }
 
 double Equipment::getTech() const {

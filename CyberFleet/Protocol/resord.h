@@ -10,12 +10,6 @@
 
 typedef QMap<KP::ResourceType, int> ResTuple;
 
-class ResOrd;
-
-namespace User {
-void setResources(int uid, ResOrd goal);
-}
-
 struct ResOrd
 {
     ResOrd(ResTuple);

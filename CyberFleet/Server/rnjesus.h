@@ -16,7 +16,7 @@ namespace RNJesus {
 double calDamage(double firepower, double armor, double armorPenetration,
                  std::mt19937 &engine) {
     double effectivePene = armorPenetration / armor;
-    static std::lognormal_distribution<> dist(2.0 * effectivePene - 2.0, effectivePene);
+    static std::lognormal_distribution<> dist(0.5 * effectivePene - 1.0, effectivePene);
     return dist(engine) * firepower;
 }
 
