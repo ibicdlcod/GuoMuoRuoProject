@@ -1,4 +1,4 @@
-|                Field                 |    Default     |                          Meaning                          |
+|                Field                 |    Default     |                           Note                            |
 | :----------------------------------: | :------------: | :-------------------------------------------------------: |
 |               alias/*                |                |                                                           |
 |           client/language            |     ja_JP      |                default value is temporary                 |

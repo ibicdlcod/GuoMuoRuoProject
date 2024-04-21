@@ -81,7 +81,7 @@ set(SERVER_SOURCES
     Server/user.cpp
     Server/user.h
     Server/erfinv.h
-    Server/rnjesus.h
+    Server/rngesus.h
     ${TS_FILES}
 )
 set(PROTOCOL_SOURCES

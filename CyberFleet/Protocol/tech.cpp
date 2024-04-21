@@ -13,8 +13,7 @@ double Tech::calCapable(double globalTech, double localTech,
     double detrimentalEffect = 0.0;
     if(min < wantedTech) {
         double lag = wantedTech - min;
-        /* 0.5 is not a magic const because how this function behaves */
-        detrimentalEffect = maxDeterimental * lag / pow((1 + lag * lag), 0.5);
+        detrimentalEffect = maxDeterimental * lag / std::hypot(1.0, lag);
     }
     return std::max(min, max - detrimentalEffect);
 }
@@ -45,8 +44,8 @@ double Tech::calLevel(QList<std::pair<double, double>> &source,
     /* sort by key desc */
     std::sort(source.begin(), source.end(),
               [](std::pair<double, double> a, std::pair<double, double> b){
-        return a.first > b.first;
-    });
+                  return a.first > b.first;
+              });
     if(scopeConstant <= 1.0) {
         qCritical() << qtTrId("scope-constant-less-than-1");
         return 0.0;
@@ -94,9 +93,8 @@ double calWeightEquip(double requiredSP, double actualSP) {
     double skillPointWeightContrib =
         settings->value("rule/skillpointweightcontrib", 9.0).toDouble();
     /* 0.5 is not a magic const because how this function behaves */
-    return (skillPointWeightContrib * actualSP)
-               / pow((requiredSP * requiredSP + actualSP * actualSP), 0.5)
-           + 1.0;
+    return (skillPointWeightContrib * actualSP) / std::hypot(requiredSP, actualSP);
+    + 1.0;
 }
 
 double Tech::techYearToCompact(int year) {

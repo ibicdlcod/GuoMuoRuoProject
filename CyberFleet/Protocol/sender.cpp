@@ -7,7 +7,9 @@
 extern std::unique_ptr<QSettings> settings;
 /* this is deliberately not customized */
 #pragma message(NOT_M_CONST)
-static int practicalBufferSize = 1024;
+namespace {
+const int practicalBufferSize = 1024;
+}
 
 Sender::Sender(QAbstractSocket *destination,
                QObject *parent) :

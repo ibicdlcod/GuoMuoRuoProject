@@ -60,8 +60,9 @@
 
 #include "../Protocol/commandline.h"
 #include "../Protocol/equipment.h"
-#include "../Protocol/receiver.h"
 #include "../Protocol/peerinfo.h"
+#include "../Protocol/receiver.h"
+#include "../Protocol/ship.h"
 #include "servermastersender.h"
 #include "sslserver.h"
 
@@ -109,7 +110,7 @@ private:
     void doDevelop(CSteamID &, int, int, QSslSocket *);
     void doFetch(CSteamID &, int, QSslSocket *);
     void doHandshake(QSslSocket *, const QByteArray &);
-    bool equipmentRefresh();
+    [[nodiscard]] bool equipmentRefresh();
     void exitGraceSpec() override;
     bool exportEquipToCSV() const;
     void generateEquipChilds(int, int);
@@ -132,10 +133,11 @@ private:
     void refreshClientFactory(CSteamID &, QSslSocket *);
     QList<QUuid> retireEquip(const CSteamID &, const QList<QUuid> &);
     void sendTestMessages();
-    void sqlcheckEquip();
-    void sqlcheckEquipU();
-    void sqlcheckFacto();
-    void sqlcheckUsers();
+    [[nodiscard]] bool shipRefresh();
+    Q_DECL_DEPRECATED void sqlcheckEquip();
+    Q_DECL_DEPRECATED void sqlcheckEquipU();
+    Q_DECL_DEPRECATED void sqlcheckFacto();
+    Q_DECL_DEPRECATED void sqlcheckUsers();
     void sqlinit();
     void sqlinitEquip();
     void sqlinitEquipName();
@@ -159,15 +161,17 @@ private:
     QMap<int, Equipment *> equipRegistry;
     QMultiMap<int, int> equipChildTree;
 
+    QSet<int> openShips;
+    QMap<int, Ship *> shipRegistry;
+
     std::random_device random;
     std::mt19937 mt;
-    static constexpr float dOF = 1.0; // degree of freedom
-    std::chi_squared_distribution<float> chi2Dist{dOF};
 
     const QByteArray defaultSalt =
             QByteArrayLiteral("\xe8\xbf\x99\xe6\x98\xaf\xe4\xb8"
                               "\x80\xe6\x9d\xa1\xe5\x92\xb8\xe9"
                               "\xb1\xbc");
+
     Q_DISABLE_COPY(Server)
 };
 

@@ -1,5 +1,5 @@
-#ifndef RNJESUS_H
-#define RNJESUS_H
+#ifndef RNGESUS_H
+#define RNGESUS_H
 
 #include <numeric>
 #include <random>
@@ -10,14 +10,22 @@ struct ShipDropInfo
     double weight;
 };
 
-namespace RNJesus {
+namespace RNGesus {
 
 /* TBD: capital ships can nullify small damages */
 double calDamage(double firepower, double armor, double armorPenetration,
-                 std::mt19937 &engine) {
-    double effectivePene = armorPenetration / armor;
-    static std::lognormal_distribution<> dist(0.5 * effectivePene - 1.0, effectivePene);
-    return dist(engine) * firepower;
+                 std::mt19937 &engine,
+                 bool overPenetrationEnabled = true) {
+    double effectivePene = atan2(armorPenetration, armor);
+
+    std::lognormal_distribution<> dist(effectivePene - atan(1),
+                                       atan(1));
+    double overPene = exp(3.0 * effectivePene - 4.0 * atan(1));
+    double result = dist(engine);
+    if(overPenetrationEnabled && result < overPene)
+        return firepower * exp(-4.0 * atan(1));
+    else
+        return firepower * result;
 }
 
 int calDropCommon(const std::vector<ShipDropInfo> &shipInfo,
@@ -40,9 +48,10 @@ int calDropRare(const std::vector<ShipDropInfo> &shipInfo,
     for(auto shipItem : shipInfo) {
         shipWeights.push_back(shipItem.weight);
     }
-    double weightSum = 1.0 - std::accumulate(shipWeights.begin(),
-                                             shipWeights.end(),
-                                             0.0);
+    double weightSum = std::accumulate(shipWeights.begin(),
+                                       shipWeights.end(),
+                                       1.0,
+                                       std::minus<double>());
     if(weightSum < 0.0)
         weightSum = 0.0;
     shipWeights.push_back(weightSum);
@@ -54,4 +63,4 @@ int calDropRare(const std::vector<ShipDropInfo> &shipInfo,
 }
 
 }
-#endif // RNJESUS_H
+#endif // RNGESUS_H

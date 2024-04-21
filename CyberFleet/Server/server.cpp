@@ -46,7 +46,6 @@
 **
 ****************************************************************************/
 
-#include "Protocol/shiptype.h"
 #define NOMINMAX // apparently some stupid win header <minwindef.h> interferes with std::max
 #include "server.h"
 #include <QBuffer>
@@ -60,6 +59,7 @@
 #include "kerrors.h"
 #include "sslserver.h"
 #include "user.h"
+#include "rngesus.h"
 
 QT_BEGIN_NAMESPACE
 
@@ -353,7 +353,10 @@ bool Server::listen(const QHostAddress &address, quint16 port) {
             qCritical () << sslServer.errorString();
         else {
             sqlinit();
-            equipmentRefresh();
+            if(!equipmentRefresh()) {
+                //% "Equipment init failed!"
+                qCritical() << qtTrId("equip-init-failure");
+            }
         }
     } else {
         listening = true;
@@ -583,8 +586,7 @@ double Server::getSkillPointsEffect(const CSteamID &uid, int equipId) {
     }
     double x = User::getSkillPoints(uid, equipId);
     double y = equipRegistry.value(equipId)->skillPointsStd();
-    /* 0.5 is not a magic const because how this function behaves */
-    return x * std::pow(y * y + x * x, -0.5);
+    return x / std::hypot(y, x);
 }
 
 void Server::offerEquipInfo(QSslSocket *connection, int index = 0) {
@@ -1304,9 +1306,7 @@ bool Server::importEquipFromCSV() {
     csvFile->close();
     //% "Import equipment registry success!"
     qInfo() << qtTrId("equip-import-good");
-    equipmentRefresh();
-    
-    return true;
+    return equipmentRefresh();
 }
 
 bool Server::importShipFromCSV() {
@@ -1480,6 +1480,7 @@ int64 Server::newEquipHasMotherCal(int equipId) {
     if(!equipRegistry.contains(equip->attr["Mother"]))
         return 0;
     Equipment *mother = equipRegistry.value(equip->attr["Mother"]);
+    Q_UNUSED(mother);
     uint64 sonSkillPoints
         = equip->skillPointsStd()
           * pow(equip->getTech(),
@@ -1962,9 +1963,12 @@ void Server::sendTestMessages() {
         qWarning() << "Server isn't listening, abort.";
     }
     else {
-        qInfo() << "test";
-        ShipType a = ShipType(0x10120101);
-        qInfo() << a.toString();
+        std::vector<double> shipWeights = {0.1, 0.2};
+        double weightSum = std::accumulate(shipWeights.begin(),
+                                           shipWeights.end(),
+                                           1.0,
+                                           std::minus<double>());
+        qInfo() << weightSum;
     }
 }
 
