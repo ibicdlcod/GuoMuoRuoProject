@@ -1076,11 +1076,7 @@ bool Server::equipmentRefresh()
     for(auto iter = equipRegistry.constKeyValueBegin();
          iter != equipRegistry.constKeyValueEnd();
          ++iter) {
-        QSet<int> childSet = generateEquipChilds(iter->first);
-        QSetIterator<int> childs(childSet);
-        while(childs.hasNext()) {
-            equipChildTree.insert(iter->first, childs.next());
-        }
+        generateEquipChilds(iter->first, iter->first);
     }
     //% "Load equipment child list success!"
     qInfo() << qtTrId("equip-child-load-good");
@@ -1142,24 +1138,18 @@ bool Server::exportEquipToCSV() const {
     return true;
 }
 
-QSet<int> Server::generateEquipChilds(int ancestor) {
-    QSet<int> result;
-    for(auto iter = equipRegistry.constKeyValueBegin();
-         iter != equipRegistry.constKeyValueEnd();
-         ++iter) {
-        int fatherEquip = iter->second->attr["Father"];
-        int childEquip = iter->first;
-        if(fatherEquip == ancestor) {
-            QSet subset = generateEquipChilds(childEquip);
-            for (auto i = subset.cbegin(),
-                 end = subset.cend();
-                 i != end; ++i)
-                result.insert(*i);
-            //result.insert(generateEquipChilds(childEquip));
-            result.insert(childEquip);
-        }
+void Server::generateEquipChilds(int originalChild, int thisEquip) {
+    int fatherEquip = equipRegistry[thisEquip]->attr["Father"];
+    int fatherEquip2 = equipRegistry[thisEquip]->attr["Father2"];
+    int childEquip = originalChild;
+    if(fatherEquip != 0) {
+        equipChildTree.insert(fatherEquip, childEquip);
+        generateEquipChilds(childEquip, fatherEquip);
     }
-    return result;
+    if(fatherEquip2 != 0) {
+        equipChildTree.insert(fatherEquip2, childEquip);
+        generateEquipChilds(childEquip, fatherEquip2);
+    }
 }
 
 void Server::generateTestEquip(const CSteamID &uid) {
@@ -1266,8 +1256,8 @@ bool Server::importEquipFromCSV() {
                         }
                     }
                     else if(indicatorParts[i].compare("type",
-                                                         Qt::CaseInsensitive)
-                               == 0) {
+                                                       Qt::CaseInsensitive)
+                             == 0) {
                         QSqlQuery query;
                         query.prepare(
                             "   REPLACE INTO EquipReg "
@@ -1374,8 +1364,8 @@ bool Server::importShipFromCSV() {
                         }
                     }
                     else if(indicatorParts[i].compare("attr",
-                                                         Qt::CaseInsensitive)
-                               == 0 ){
+                                                       Qt::CaseInsensitive)
+                             == 0 ){
                         QSqlQuery query;
                         query.prepare("REPLACE INTO ShipReg "
                                       "(ShipID, Attribute, Intvalue) "
@@ -1924,9 +1914,9 @@ void Server::receivedReq(const QJsonObject &djson,
                            this,
                            [connection, uid, djson, this]
                            {offerTechInfo(
-                  connection,
-                  uid,
-                  djson["local"].toInt());});
+                                 connection,
+                                 uid,
+                                 djson["local"].toInt());});
     }
     break;
     case KP::CommandType::DemandSkillPoints: {
@@ -1934,9 +1924,9 @@ void Server::receivedReq(const QJsonObject &djson,
                            this,
                            [connection, uid, djson, this]
                            {offerSPInfo(
-                  connection,
-                  uid,
-                  djson["equipid"].toInt());});
+                                 connection,
+                                 uid,
+                                 djson["equipid"].toInt());});
     }
     break;
     case KP::CommandType::DemandResourceUpdate: {
@@ -1944,8 +1934,8 @@ void Server::receivedReq(const QJsonObject &djson,
                            this,
                            [connection, uid, this]
                            {offerResourceInfo(
-                  connection,
-                  uid);});
+                                 connection,
+                                 uid);});
     }
     break;
     case KP::CommandType::DestructEquip: {

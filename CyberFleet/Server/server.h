@@ -112,7 +112,7 @@ private:
     bool equipmentRefresh();
     void exitGraceSpec() override;
     bool exportEquipToCSV() const;
-    QSet<int> generateEquipChilds(int);
+    void generateEquipChilds(int, int);
     void generateTestEquip(const CSteamID &);
     const QStringList getCommandsSpec() const override;
     const QStringList getValidCommands() const override;
