@@ -403,6 +403,12 @@ bool Server::parseSpec(const QStringList &cmdParts) {
                            "equip", Qt::CaseInsensitive) == 0) {
                     importEquipFromCSV();
                     return true;
+                }
+                else if(cmdParts.length() > 1
+                         && cmdParts[1].compare(
+                                "ship", Qt::CaseInsensitive) == 0) {
+                    importShipFromCSV();
+                    return true;
                 } // else return false
             }
             else if(primary.compare("test", Qt::CaseInsensitive) == 0) {
@@ -1207,7 +1213,8 @@ bool Server::importEquipFromCSV() {
         return false;
     }
     
-    QString csvFileName = settings->value("server/equip_reg_csv", "Equip.csv").toString();
+    QString csvFileName =
+        settings->value("server/equip_reg_csv", "Equip.csv").toString();
     QFile *csvFile = new QFile(csvFileName);
     if(Q_UNLIKELY(!csvFile) || !csvFile->open(QIODevice::ReadOnly)) {
         //% "%1: CSV file cannot be opened"
@@ -1216,8 +1223,11 @@ bool Server::importEquipFromCSV() {
     }
     
     QTextStream textStream(csvFile);
+    QString titleIndicator = textStream.readLine();
+    QStringList indicatorParts = titleIndicator.split(",");
     QString title = textStream.readLine();
     QStringList titleParts = title.split(",");
+
     int importedEquips = 0;
     while(!textStream.atEnd()) {
         QString text = textStream.readLine();
@@ -1225,7 +1235,7 @@ bool Server::importEquipFromCSV() {
             continue;
         else {
             QStringList lineParts = text.split(",");
-            int equipid = lineParts[0].toInt();
+            int equipid = lineParts[indicatorParts.indexOf("id")].toInt();
             if(lineParts.size() < 7)
                 qCritical("incomplete equip type definition");
             else {
@@ -1235,8 +1245,8 @@ bool Server::importEquipFromCSV() {
                                << "\tUnsupported type: " << lineParts[3];
                 }
                 for(int i = 0; i < titleParts.length(); ++i) {
-#pragma message(M_CONST)
-                    if(i == 1) {
+                    if(indicatorParts[i].compare("name", Qt::CaseInsensitive)
+                        == 0) {
                         QString lang = titleParts[i];
                         QString content = lineParts[i];
                         
@@ -1255,7 +1265,9 @@ bool Server::importEquipFromCSV() {
                             return false;
                         }
                     }
-                    else if(titleParts[i] == "equiptype") {
+                    else if(indicatorParts[i].compare("type",
+                                                         Qt::CaseInsensitive)
+                               == 0) {
                         QSqlQuery query;
                         query.prepare(
                             "   REPLACE INTO EquipReg "
@@ -1273,8 +1285,9 @@ bool Server::importEquipFromCSV() {
                             return false;
                         }
                     }
-#pragma message(M_CONST)
-                    else if(i >= 4){
+                    else if(indicatorParts[i].compare("attr",
+                                                       Qt::CaseInsensitive)
+                             == 0){
                         QSqlQuery query;
                         query.prepare("REPLACE INTO EquipReg "
                                       "(EquipID, Attribute, Intvalue) "
@@ -1303,6 +1316,94 @@ bool Server::importEquipFromCSV() {
     qInfo() << qtTrId("equip-import-good");
     equipmentRefresh();
     
+    return true;
+}
+
+bool Server::importShipFromCSV() {
+    QSqlDatabase db = QSqlDatabase::database();
+    if(!db.isValid()) {
+        throw DBError(qtTrId("database-uninit"));
+        return false;
+    }
+
+    QString csvFileName =
+        settings->value("server/ship_reg_csv", "Ship.csv").toString();
+    QFile *csvFile = new QFile(csvFileName);
+    if(Q_UNLIKELY(!csvFile) || !csvFile->open(QIODevice::ReadOnly)) {
+        //% "%1: CSV file cannot be opened"
+        qCritical() << qtTrId("bad-csv").arg(csvFileName);
+        return false;
+    }
+
+    QTextStream textStream(csvFile);
+    QString titleIndicator = textStream.readLine();
+    QStringList indicatorParts = titleIndicator.split(",");
+    QString title = textStream.readLine();
+    QStringList titleParts = title.split(",");
+
+    int importedShips = 0;
+    while(!textStream.atEnd()) {
+        QString text = textStream.readLine();
+        if(text.startsWith(","))
+            continue;
+        else {
+            QStringList lineParts = text.split(",");
+            int shipid = lineParts[indicatorParts.indexOf("id")].toInt();
+            if(lineParts.size() < 7)
+                qCritical("incomplete ship type definition");
+            else {
+                for(int i = 0; i < titleParts.length(); ++i) {
+                    if(indicatorParts[i].compare("name", Qt::CaseInsensitive)
+                        == 0) {
+                        QString lang = titleParts[i];
+                        QString content = lineParts[i];
+
+                        QSqlQuery query;
+                        query.prepare(
+                            "REPLACE INTO ShipName "
+                            "(ShipID, "+lang+") "
+                                     "VALUES (:id, :value);");
+                        query.bindValue(":id", shipid);
+                        query.bindValue(":value", content);
+                        if(!query.exec()) {
+                            //% "Import ship database failed!"
+                            throw DBError(qtTrId("ship-import-failed"),
+                                          query.lastError());
+                            qCritical() << query.lastError();
+                            return false;
+                        }
+                    }
+                    else if(indicatorParts[i].compare("attr",
+                                                         Qt::CaseInsensitive)
+                               == 0 ){
+                        QSqlQuery query;
+                        query.prepare("REPLACE INTO ShipReg "
+                                      "(ShipID, Attribute, Intvalue) "
+                                      "VALUES (:id, :attr, :value);");
+                        query.bindValue(":id", shipid);
+                        query.bindValue(":attr", titleParts[i]);
+                        query.bindValue(":value", lineParts[i].toInt());
+                        if(!query.exec()) {
+                            //% "Import ship database failed!"
+                            throw DBError(qtTrId("ship-import-failed"),
+                                          query.lastError());
+                            qCritical() << query.lastError();
+                            return false;
+                        }
+                    }
+                }
+            }
+            importedShips++;
+            if(importedShips % 10 == 0)
+                qDebug() << QString("Imported %1 ship(s)")
+                                .arg(importedShips);
+        }
+    }
+    csvFile->close();
+    //% "Import ship registry success!"
+    qInfo() << qtTrId("ship-import-good");
+    //equipmentRefresh();
+
     return true;
 }
 
@@ -1823,9 +1924,9 @@ void Server::receivedReq(const QJsonObject &djson,
                            this,
                            [connection, uid, djson, this]
                            {offerTechInfo(
-                                 connection,
-                                 uid,
-                                 djson["local"].toInt());});
+                  connection,
+                  uid,
+                  djson["local"].toInt());});
     }
     break;
     case KP::CommandType::DemandSkillPoints: {
@@ -1833,9 +1934,9 @@ void Server::receivedReq(const QJsonObject &djson,
                            this,
                            [connection, uid, djson, this]
                            {offerSPInfo(
-                                 connection,
-                                 uid,
-                                 djson["equipid"].toInt());});
+                  connection,
+                  uid,
+                  djson["equipid"].toInt());});
     }
     break;
     case KP::CommandType::DemandResourceUpdate: {
@@ -1843,8 +1944,8 @@ void Server::receivedReq(const QJsonObject &djson,
                            this,
                            [connection, uid, this]
                            {offerResourceInfo(
-                                 connection,
-                                 uid);});
+                  connection,
+                  uid);});
     }
     break;
     case KP::CommandType::DestructEquip: {

@@ -1,4 +1,5 @@
-﻿No.,ja_JP,種別,equiptype,Tech,Father,Father2,Mother,Disallowmassproduction,Hitpoints,Firepower,Armor,Armorpenetration,Accuracy,Torpedoaccuracy,Evasion,Los,Concealment,Firingrange,Firingspeed,Speed,Torpedo,Airtorpedo,Bombing,Antiair,Asw,Interception,Antibomber,Antiland,Transport,Flightrange
+﻿id,name,,type,attr,attr,attr,attr,attr,attr,attr,attr,attr,attr,attr,attr,attr,attr,attr,attr,attr,attr,attr,attr,attr,attr,attr,attr,attr,attr,attr
+No.,ja_JP,種別,equiptype,Tech,Father,Father2,Mother,Disallowmassproduction,Hitpoints,Firepower,Armor,Armorpenetration,Accuracy,Torpedoaccuracy,Evasion,Los,Concealment,Firingrange,Firingspeed,Speed,Torpedo,Airtorpedo,Bombing,Antiair,Asw,Interception,Antibomber,Antiland,Transport,Flightrange
 1,12cm単装砲,小口径主砲,Small-gun-flat,1914,0,,,30,,15,,5,,,,,,16,50,,,,,5,,,,,,
 2,12.7cm連装砲B型,小口径主砲,Small-gun-flat,1930,297,,,30,,22,,6,3,,,,,18,100,,,,,10,,,,,,
 3,10cm連装高角砲,小口径主砲,Small-gun-flak,1938,0,,,30,,30,,7,5,,,,,20,150,,,,,70,,,,,,

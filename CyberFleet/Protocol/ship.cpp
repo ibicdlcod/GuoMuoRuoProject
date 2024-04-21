@@ -38,6 +38,10 @@ const int Ship::consTimeInSec() const {
     return devTimebase * (qint64)std::round((getTech() + 1.0) * devResScale);
 }
 
+int Ship::getId() const {
+    return shipRegId;
+}
+
 double Ship::getTech() const {
     return Tech::techYearToCompact(attr["Tech"]);
 }

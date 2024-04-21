@@ -18,6 +18,7 @@ public:
 
     const ResOrd consRes() const;
     const int consTimeInSec() const;
+    int getId() const;
     double getTech() const;
     ShipType getType() const;
 
@@ -27,6 +28,8 @@ public:
 
 private:
     int shipRegId;
+
+    Q_DISABLE_COPY_MOVE(Ship)
 };
 
 #endif // SHIP_H

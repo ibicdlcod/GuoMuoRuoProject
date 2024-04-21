@@ -42,7 +42,7 @@ QString ShipType::toString() const {
         //% "Battleship (Advanced Aviation)"
     case 0x54: return qtTrId("aviation-battleship");
     default:
-        switch(iRep & 0xf0 >> 4) {
+        switch((iRep & 0xf0) >> 4) {
         case 1:
             //% "Escort (uncategorized)"
             return qtTrId("escort-unknown-special");
@@ -136,7 +136,7 @@ const ResOrd ShipType::consResBase() const {
         std::pair(A, 0),
         std::pair(W, 0),
         std::pair(C, 0),};
-    switch(iRep & 0xf0 >> 4) {
+    switch((iRep & 0xf0) >> 4) {
     case 1:
         basic[S] += (100 + (iRep & 0x1 ? 50 : 0));
         basic[C] += 5;
@@ -195,7 +195,7 @@ const ResOrd ShipType::consResBase() const {
 int ShipType::consTimeBase() const {
     /* in principle all this should belong in settings,
      * but too cumbersome */
-    switch(iRep & 0xf0 >> 4) {
+    switch((iRep & 0xf0) >> 4) {
     case 1: return 100;
     case 2: return 200;
     case 3: return 300;
@@ -216,7 +216,7 @@ int ShipType::consTimeBase() const {
 }
 
 QString ShipType::iconGroup() const {
-    switch(iRep & 0xf0 >> 4) {
+    switch((iRep & 0xf0) >> 4) {
     case 1:
         return "DE";
     case 2:
