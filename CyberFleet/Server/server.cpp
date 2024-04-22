@@ -1554,8 +1554,7 @@ void Server::parseListen(const QStringList &cmdParts) {
                                   "serverprivate.key").toString());
     if(!keyFile.open(QIODevice::ReadOnly)) {
         //% "Server lack a private key."
-        QString msg = qtTrId("no-private-key")
-                          .arg(address.toString()).arg(port);
+        QString msg = qtTrId("no-private-key");
         qCritical() << msg;
         return;
     }
@@ -1563,8 +1562,7 @@ void Server::parseListen(const QStringList &cmdParts) {
                              QSsl::Pem, QSsl::PrivateKey, QByteArray());
     if(key.isNull()) {
         //% "Server private key can't be read."
-        QString msg = qtTrId("corrupt-private-key")
-                          .arg(address.toString()).arg(port);
+        QString msg = qtTrId("corrupt-private-key");
         qInfo() << msg;
         return;
     }
@@ -1668,9 +1666,9 @@ void Server::receivedAuth(const QJsonObject &djson,
                 return;
             }
             qDebug("Ticket decrypt success");
+#pragma message(NOT_M_CONST)
             if(!SteamEncryptedAppTicket_BIsTicketForApp(
                     rgubDecrypted,
-#pragma message(NOT_M_CONST)
                     cubDecrypted, 2632870)) {
                 qCritical() << qtTrId("%1: Ticket is not from correct App ID")
                                    .arg(peerInfo.toString()).toUtf8();
@@ -1963,12 +1961,9 @@ void Server::sendTestMessages() {
         qWarning() << "Server isn't listening, abort.";
     }
     else {
-        std::vector<double> shipWeights = {0.1, 0.2};
-        double weightSum = std::accumulate(shipWeights.begin(),
-                                           shipWeights.end(),
-                                           1.0,
-                                           std::minus<double>());
-        qInfo() << weightSum;
+        for(auto equip: std::as_const(equipRegistry)) {
+            qInfo() << equip->toString("ja_JP");
+        }
     }
 }
 

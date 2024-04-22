@@ -6,6 +6,7 @@
 #include <QLabel>
 #include <QPushButton>
 #include <QTableView>
+#include <QToolButton>
 #include <QWidget>
 #include "../equipmodel.h"
 
