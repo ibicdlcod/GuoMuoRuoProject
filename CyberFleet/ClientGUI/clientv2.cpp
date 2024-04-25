@@ -241,6 +241,10 @@ bool Clientv2::parseSpec(const QStringList &cmdParts) {
                 parseDisconnectReq();
                 return true;
             }
+            else if(primary.compare("cert", Qt::CaseInsensitive) == 0) {
+                switchCert(cmdParts);
+                return true;
+            }
             else if(!loggedIn()) {
                 return false;
             }
@@ -1243,6 +1247,24 @@ void Clientv2::showCommands(bool validOnly){
         emit qout(qtTrId("all-command"), QColor("black"), QColor("yellow"));
         qls(getCommandsSpec());
     }
+}
+
+void Clientv2::switchCert(const QStringList &input) {
+    if(loggedIn()) {
+        //% "Switch certificate when connected have no effect."
+        qWarning() << qtTrId("switch-cert-when-connecting");
+        return;
+    }
+    if(input.length() > 1) {
+        if(input.at(1).compare("default", Qt::CaseInsensitive) == 0) {
+            settings->remove("networkclient/pem");
+        }
+        else
+            settings->setValue("networkclient/pem", input.at(1));
+    }
+    //% "Client PEM is now %1."
+    qInfo() << qtTrId("client-pem")
+                   .arg(settings->value("networkclient/pem", "Default").toString());
 }
 
 void Clientv2::updateEquipCache(const QJsonObject &input) {

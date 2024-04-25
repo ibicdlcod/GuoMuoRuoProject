@@ -174,6 +174,7 @@ private:
     void receivedMsg(const QJsonObject &);
     void receivedNewLogin(const QJsonObject &);
     void showCommands(bool);
+    void switchCert(const QStringList &);
     void updateEquipCache(const QJsonObject &);
 
     explicit Clientv2(QObject * parent = nullptr);
