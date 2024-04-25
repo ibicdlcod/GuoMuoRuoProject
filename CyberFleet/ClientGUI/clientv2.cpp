@@ -123,7 +123,8 @@ void Clientv2::autoPassword() {
             this, &Clientv2::catbomb);
     connect(&socket, &QAbstractSocket::errorOccurred,
             this, &Clientv2::errorOccurred);
-    socket.setProtocol(QSsl::TlsV1_3);
+    /* FUCK, aliyun server don't offer TlsV1_3 */
+    socket.setProtocol(QSsl::TlsV1_2OrLater);
     socket.connectToHostEncrypted(address.toString(), port);
     if(!socket.waitForConnected(
             settings->value("networkclient/connectwaittimemsec", 8000)

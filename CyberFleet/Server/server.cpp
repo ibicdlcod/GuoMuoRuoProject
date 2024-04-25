@@ -1569,7 +1569,8 @@ void Server::parseListen(const QStringList &cmdParts) {
         return;
     }
     conf.setPrivateKey(key);
-    conf.setProtocol(QSsl::TlsV1_3);
+    /* FUCK, aliyun server don't offer TlsV1_3 */
+    conf.setProtocol(QSsl::TlsV1_2OrLater);
     conf.setPreSharedKeyIdentityHint(
         settings->value(
                     "server/servername",
