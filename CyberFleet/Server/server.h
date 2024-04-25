@@ -148,6 +148,7 @@ private:
     void sqlinitShipName();
     void sqlinitUsers() const;
     void sqlinitUserA() const;
+    void switchCert(const QStringList &);
     void userInit(CSteamID &);
 
     bool listening = false;

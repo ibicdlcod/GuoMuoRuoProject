@@ -414,6 +414,10 @@ bool Server::parseSpec(const QStringList &cmdParts) {
                     return true;
                 } // else return false
             }
+            else if(primary.compare("cert", Qt::CaseInsensitive) == 0) {
+                switchCert(cmdParts);
+                return true;
+            }
             else if(primary.compare("test", Qt::CaseInsensitive) == 0) {
                 sendTestMessages();
                 return true;
@@ -1538,19 +1542,18 @@ void Server::parseListen(const QStringList &cmdParts) {
     QSslConfiguration conf;
     const auto certs
         = QSslCertificate::fromPath(
-            settings->value("cert/serverpem",
+            settings->value("networkserver/pem",
                             ":/harusoft.pem").toString(),
             QSsl::Pem, QSslCertificate::PatternSyntax::FixedString);
     if(certs.isEmpty()) {
         //% "Server lack a certificate."
-        QString msg = qtTrId("no-cert")
-                          .arg(address.toString()).arg(port);
+        QString msg = qtTrId("no-cert");
         qCritical() << msg;
         return;
     }
     conf.setLocalCertificate(certs.at(0));
     /* Of course, private key is not shipped with the project. */
-    QFile keyFile(settings->value("cert/serverkey",
+    QFile keyFile(settings->value("networkserver/key",
                                   "serverprivate.key").toString());
     if(!keyFile.open(QIODevice::ReadOnly)) {
         //% "Server lack a private key."
@@ -2308,6 +2311,24 @@ void Server::sqlinitUserA() const {
         throw DBError(qtTrId("user-db-gen-failure"),
                       query.lastError());
     }
+}
+
+void Server::switchCert(const QStringList &input) {
+    if(listening) {
+        //% "Switch certificate when connected have no effect."
+        qWarning() << qtTrId("switch-cert-when-connecting");
+        return;
+    }
+    if(input.length() > 1) {
+        if(input.at(1).compare("default", Qt::CaseInsensitive) == 0) {
+            settings->remove("networkserver/pem");
+        }
+        else
+            settings->setValue("networkserver/pem", input.at(1));
+    }
+    //% "Server PEM is now %1."
+    qInfo() << qtTrId("server-pem")
+                   .arg(settings->value("networkserver/pem", "Default").toString());
 }
 
 void Server::userInit(CSteamID &uid) {
