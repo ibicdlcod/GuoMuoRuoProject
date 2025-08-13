@@ -21,6 +21,7 @@ void User::addSkillPoints(const CSteamID &uid, int equipId, int64 skillPoints) {
     query2.bindValue(":eid", equipId);
     query2.bindValue(":sp", newSP);
     if(Q_UNLIKELY(!query2.exec())) {
+        //% "User %1: add skill point to equipment id %2 failed!"
         throw DBError(qtTrId("user-add-skillpoint-failed")
                           .arg(uid.ConvertToUint64()).arg(equipId),
                       query2.lastError());
@@ -43,6 +44,7 @@ int User::getCurrentFactoryParallel(const CSteamID &uid, int equipId) {
     query.bindValue(":id", uid.ConvertToUint64());
     query.bindValue(":eid", equipId);
     if(Q_UNLIKELY(!query.exec() || !query.isSelect())) {
+        //% "User %1: get num of factory currently developing equipment %2 failed!"
         throw DBError(qtTrId("user-get-factory-developing-failed")
                           .arg(uid.ConvertToUint64()).arg(equipId),
                       query.lastError());
@@ -72,6 +74,7 @@ ResOrd User::getCurrentResources(const CSteamID &uid) {
     query.exec();
     query.isSelect();
     if(Q_UNLIKELY(!query.first())) {
+        //% "User %1: check resources failed!"
         qWarning() << qtTrId("user-check-resource-failed")
                           .arg(uid.ConvertToUint64());
         return ResOrd(ResTuple());
@@ -107,6 +110,7 @@ int User::getEquipAmount(const CSteamID &uid, int equipId) {
     query.bindValue(":id", uid.ConvertToUint64());
     query.bindValue(":eid", equipId);
     if(Q_UNLIKELY(!query.exec() || !query.isSelect())) {
+        //% "User %1: get equipment amount of %2 failed!"
         throw DBError(qtTrId("user-get-equip-amount-failed")
                           .arg(uid.ConvertToUint64()).arg(equipId),
                       query.lastError());
@@ -130,6 +134,7 @@ int64 User::getSkillPoints(const CSteamID &uid, int equipId) {
     query.bindValue(":id", uid.ConvertToUint64());
     query.bindValue(":eid", equipId);
     if(Q_UNLIKELY(!query.exec() || !query.isSelect())) {
+        //% "User %1: get skill point of equipment %2 failed!"
         throw DBError(qtTrId("user-get-skillpoint-failed")
                           .arg(uid.ConvertToUint64()).arg(equipId),
                       query.lastError());
@@ -245,6 +250,7 @@ bool User::isFactoryBusy(const CSteamID &uid, int factoryID) {
     query.exec();
     query.isSelect();
     if(Q_UNLIKELY(!query.first())) {
+        //% "User ID %1 does not exist!"
         qWarning() << qtTrId("user-nonexistent-uid")
                           .arg(uid.ConvertToUint64());
         return true;

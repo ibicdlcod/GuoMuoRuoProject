@@ -86,8 +86,10 @@ void Receiver::processGoodMsg(qint64 totalParts,
         timers[msgId]->start(settings->value("networkshared/maxmsgdelayinms",
                                              1000).toInt() * totalParts);
     }
-    else if(totalPartsMap[msgId] != totalParts)
+    else if(totalPartsMap[msgId] != totalParts) {
+        //% "Message total parts is inconsistent!"
         qCritical() << qtTrId("same-msg-uid-have-inconsistent-total-parts");
+    }
 
     Q_ASSERT(receivedPartsMap.contains(msgId));
     receivedPartsMap[msgId].set(currentPart, true);
@@ -114,6 +116,7 @@ void Receiver::processGoodMsg(qint64 totalParts,
             }
         }
         else {
+            //% "Message convert to JSON failed!"
             qCritical() << qtTrId("msg-convert-to-json-failed") << msgId;
             if(sslsockets.contains(msgId) && peerInfos.contains(msgId)) {
                 //% "PeerInfo: %1"

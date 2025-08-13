@@ -168,6 +168,7 @@ private:
     std::random_device random;
     std::mt19937 mt;
 
+#pragma message(SALT_FISH)
     const QByteArray defaultSalt =
             QByteArrayLiteral("\xe8\xbf\x99\xe6\x98\xaf\xe4\xb8"
                               "\x80\xe6\x9d\xa1\xe5\x92\xb8\xe9"

@@ -242,6 +242,8 @@ bool Clientv2::parseSpec(const QStringList &cmdParts) {
                 return true;
             }
             else if(!loggedIn()) {
+                //% "You are not online, command is invalid."
+                qWarning() << qtTrId("command-when-loggedout");
                 return false;
             }
             else {
@@ -675,7 +677,7 @@ const QStringList Clientv2::getValidCommands() const {
         }
     }
     else if(!attemptMode)
-        result.append({"connect", "register", "switch"});
+        result.append({"connect", "register"});
     result.sort(Qt::CaseInsensitive);
     return result;
 }
@@ -973,9 +975,11 @@ void Clientv2::receivedMsg(const QJsonObject &djson) {
             qInfo() << qtTrId("resource-lack");
             break;
         case KP::MassProductionDisallowed:
+            //% "You have reached possessing limit for this equipment!"
             qWarning() << qtTrId("massproduction-disallowed");
             break;
         case KP::ProductionDisallowed:
+            //% "This equipment does not allow mass production!"
             qWarning() << qtTrId("production-disallowed");
             break;
         default:
@@ -1065,6 +1069,7 @@ void Clientv2::receivedMsg(const QJsonObject &djson) {
         delete sender;
         authSent = false;
         emit gamestateChanged(KP::Offline);
+        //% "The client can now exit normally."
         qInfo() << qtTrId("client-finish");
         shutdown();
         displayPrompt();
@@ -1099,10 +1104,15 @@ void Clientv2::receivedNewLogin(const QJsonObject &djson) {
     else {
         QString reas;
         switch(djson["reason"].toInt()) {
+            //% "Login failed: cannot decrypt ticket."
         case KP::TicketFailedToDecrypt: reas = qtTrId("ticket-decrypt-fail"); break;
+            //% "Login failed: ticket is from incorrect app id."
         case KP::TicketIsntFromCorrectAppID: reas = qtTrId("ticket-incorrect-appid"); break;
+            //% "Login failed: ticket timeouted."
         case KP::RequestTimeout: reas = qtTrId("ticket-timeout"); break;
+            //% "Login failed: steam id is invalid."
         case KP::SteamIdInvalid: reas = qtTrId("steam-id-invalid"); break;
+            //% "Login failed: steam authentication failed."
         case KP::SteamAuthFail: reas = qtTrId("steam-auth-fail"); break;
         default: throw std::domain_error("message not implemented"); break;
         }
@@ -1174,7 +1184,7 @@ void customMessageHandler(QtMsgType type,
     switch(type) {
     case QtDebugMsg:
         background = QColor("green");
-        foreground = QColor("black");
+        foreground = QColor("white");
         break;
     case QtInfoMsg:
         background = QColor("blue");
@@ -1190,6 +1200,7 @@ void customMessageHandler(QtMsgType type,
         break;
     case QtFatalMsg:
         background = QColor("purple");
+        foreground = QColor("white");
         break;
     }
 
@@ -1235,7 +1246,7 @@ void Clientv2::showCommands(bool validOnly){
     emit qout(qtTrId("exit-helper"));
     if(validOnly) {
         //% "Available commands:"
-        emit qout(qtTrId("good-command"), QColor("black"), QColor("green"));
+        emit qout(qtTrId("good-command"), QColor("black"), QColor("lightgreen"));
         qls(getValidCommands());
     }
     else {
@@ -1247,6 +1258,7 @@ void Clientv2::showCommands(bool validOnly){
 
 void Clientv2::updateEquipCache(const QJsonObject &input) {
     if(!input.contains("content")) {
+        //% "Server fetch equipment cache failed!"
         qWarning() << qtTrId("server-equip-cache-fail");
         return;
     }

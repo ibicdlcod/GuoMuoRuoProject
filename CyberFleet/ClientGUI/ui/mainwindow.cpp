@@ -16,6 +16,8 @@ MainWindow::MainWindow(QWidget *parent, int argc, char ** argv)
 {
     ui->setupUi(this);
 
+    setStyleSheet("QMenuBar { background-color: lightgray; }");
+
     /* this is done instead of in *.ui for it does not cascade */
     ui->MainArea->setObjectName("mainArea");
     ui->MainArea->setStyleSheet("QWidget#mainArea { border-style: none }");
@@ -92,10 +94,13 @@ MainWindow::MainWindow(QWidget *parent, int argc, char ** argv)
     newLoginScreen = new NewLoginS(ui->LoginScreen);
     factoryArea = new FactoryArea(ui->FactoryArea);
     techArea = new TechView(ui->TechArea);
-    QTimer::singleShot(1, this,
+    licenseArea->hide();
+    QTimer::singleShot(100, this,
                        [this]
-                       {adjustArea(licenseArea,
-                                    ui->License->frameSize());});
+                       {
+                           licenseArea->show();
+                           adjustArea(licenseArea,
+                                    ui->License->size());});
     connect(licenseArea, &LicenseArea::showLicenseComplete,
             ui->License, &QWidget::hide);
     connect(licenseArea, &LicenseArea::showLicenseComplete,

@@ -40,6 +40,8 @@ static constexpr int initFactory = 4;
 #pragma message(NOT_M_CONST)
 static constexpr qint64 secsinMin = 60;
 static constexpr int equipIdMax = 0x10000;
+#pragma message(NOT_M_CONST)
+const int steamAppId = 2632870; // Go request your own steam appid if modding!
 
 enum DgramType{
     Auth,

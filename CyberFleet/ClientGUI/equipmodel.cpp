@@ -265,18 +265,30 @@ QVariant EquipModel::data(const QModelIndex &index, int role) const {
     case Qt::AccessibleDescriptionRole:
         [[fallthrough]];
     case Qt::WhatsThisRole: {
-        if(index.column() == uidCol)
+        if(index.column() == uidCol) {
+            //% "Equipment UUID"
             return qtTrId("equip-uuid");
-        else if(index.column() == equipCol)
+        }
+        else if(index.column() == equipCol) {
+            //% "Equipment name"
             return qtTrId("equip-name");
-        else if(index.column() == starCol)
+        }
+        else if(index.column() == starCol) {
+            //% "Equipment improvement level"
             return qtTrId("equip-star");
-        else if(index.column() == attrCol)
+        }
+        else if(index.column() == attrCol) {
+            //% "Equipment attributes"
             return qtTrId("equip-attr");
-        else if(index.column() == destructColumn())
+        }
+        else if(index.column() == destructColumn()) {
+            //% "Destruct this equipment"
             return qtTrId("destruct");
-        else if(index.column() == addStarColumn())
+        }
+        else if(index.column() == addStarColumn()) {
+            //% "Improve this equipment"
             return qtTrId("equip-improve");
+        }
         else
             return QVariant();
     }

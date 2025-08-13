@@ -340,6 +340,7 @@ void Server::datagramReceivedStd(const QJsonObject &djson,
 
 bool Server::listen(const QHostAddress &address, quint16 port) {
     if(listening) {
+        //% "Server is already listening."
         qWarning() << qtTrId("already-listening");
         return true;
     }
@@ -381,7 +382,12 @@ bool Server::parseSpec(const QStringList &cmdParts) {
     try {
         if(cmdParts.length() > 0) {
             QString primary = cmdParts[0];
-            
+
+            if(primary.compare("ll", Qt::CaseInsensitive) == 0) {
+                // TODO: this is not IPv6 compliant
+                parseListen({"listen", "0.0.0.0", "1826"});
+                return true;
+            }
             if(primary.compare("listen", Qt::CaseInsensitive) == 0) {
                 parseListen(cmdParts);
                 return true;
@@ -517,6 +523,7 @@ Server::calculateTech(const CSteamID &uid, int jobID) {
                       " FROM UserEquip WHERE User = :id;");
         query.bindValue(":id", uid.ConvertToUint64());
         if(!query.exec() || !query.isSelect()) {
+            //% "Calculate technology for user %1 failed!"
             throw DBError(qtTrId("user-calculate-tech-failed")
                               .arg(uid.ConvertToUint64()),
                           query.lastError());
@@ -543,6 +550,7 @@ Server::calculateTech(const CSteamID &uid, int jobID) {
                     equipRegistry.value(def);
                 if(isEquip) {
                     if(!equipRegistry.contains(jobID)) {
+                        //% "Local technology computation failed due to bad equipment ID!"
                         qCritical() << qtTrId("local-tech-bad-equipdef");
                         pass = false;
                     }
@@ -590,6 +598,7 @@ Server::calculateTech(const CSteamID &uid, int jobID) {
 
 double Server::getSkillPointsEffect(const CSteamID &uid, int equipId) {
     if(!equipRegistry.contains(equipId)) {
+        //% "Skill points effect calculation failed due to invalid equipment ID!"
         qWarning() << qtTrId("equipid-invalid-skill-points-effect");
     }
     double x = User::getSkillPoints(uid, equipId);
@@ -642,6 +651,7 @@ void Server::offerEquipInfoUser(const CSteamID &uid,
                       " FROM UserEquip WHERE User = :id;");
         query.bindValue(":id", uid.ConvertToUint64());
         if(!query.exec() || !query.isSelect()) {
+            //% "Get user %1's equipment list failed!"
             throw DBError(qtTrId("user-get-equip-list-failed")
                               .arg(uid.ConvertToUint64()),
                           query.lastError());
@@ -787,6 +797,7 @@ bool Server::addEquipStar(const QUuid &equipUid, int amount = 1) {
                       " FROM UserEquip WHERE EquipUuid = :id;");
         query.bindValue(":id", equipUid.toString());
         if(!query.exec() || !query.isSelect() || !query.next()) {
+            //% "Get user's equipment list by uuid %1 failed!"
             throw DBError(qtTrId("user-get-equip-list-failed-eidbased")
                               .arg(equipUid.toString()),
                           query.lastError());
@@ -807,6 +818,7 @@ bool Server::addEquipStar(const QUuid &equipUid, int amount = 1) {
                 query2.bindValue(":id", equipUid.toString());
                 query2.bindValue(":star", star + amount);
                 if(!query2.exec()) {
+                    //% "Improve equipment failed due to bad equipment uuid!"
                     throw DBError(qtTrId("user-add-equip-star-failed-eidbased")
                                       .arg(equipUid.toString()),
                                   query.lastError());
@@ -1420,6 +1432,7 @@ void Server::naturalRegen(const CSteamID &uid) {
         query.exec();
         query.isSelect();
         if(Q_UNLIKELY(!query.first())) {
+            //% "Query last regeneration time for user %1 failed!"
             throw DBError(qtTrId("user-query-regen-time-fail")
                               .arg(uid.ConvertToUint64()), query.lastError());
             return;
@@ -1565,7 +1578,7 @@ void Server::parseListen(const QStringList &cmdParts) {
         return;
     }
     conf.setLocalCertificate(certs.at(0));
-    /* Of course, private key is not shipped with the project. */
+    /* Of course, private key is not shipped with the project. Go make your own steam appid and private key. */
     QFile keyFile(settings->value("networkserver/key",
                                   "serverprivate.key").toString());
     if(!keyFile.open(QIODevice::ReadOnly)) {
@@ -1675,7 +1688,8 @@ void Server::receivedAuth(const QJsonObject &djson,
             if(!SteamEncryptedAppTicket_BDecryptTicket(
                     rgubTicket, cubTicket, rgubDecrypted, &cubDecrypted,
                     rgubKey, sizeof(rgubKey))) {
-                qCritical() << qtTrId("%1: Ticket failed to decrypt")
+                //% "%1: Ticket failed to decrypt"
+                qCritical() << qtTrId("ticket-decrypt-failed")
                                    .arg(peerInfo.toString()).toUtf8();
                 QByteArray msg = KP::serverLogFail(KP::TicketFailedToDecrypt);
                 senderM.sendMessage(connection, msg);
@@ -1684,18 +1698,19 @@ void Server::receivedAuth(const QJsonObject &djson,
             }
             qDebug("Ticket decrypt success");
 #pragma message(NOT_M_CONST)
-            static constexpr int steamAppId = 2632870;
             if(!SteamEncryptedAppTicket_BIsTicketForApp(
                     rgubDecrypted,
-                    cubDecrypted, steamAppId)) {
-                qCritical() << qtTrId("%1: Ticket is not from correct App ID")
+                    cubDecrypted, KP::steamAppId)) {
+                //% "%1: Ticket is not from correct App ID"
+                qCritical() << qtTrId("ticket-appid-wrong")
                                    .arg(peerInfo.toString()).toUtf8();
                 QByteArray msg = KP::serverLogFail(KP::TicketIsntFromCorrectAppID);
                 senderM.sendMessage(connection, msg);
                 delete [] rgubTicket;
                 return;
             }
-            qDebug("Ticket decrypt from correct App ID");
+            //% "Ticket decrypt from correct App ID"
+            qDebug() << qtTrId("ticket-appid-right");
             QDateTime now = QDateTime::currentDateTime();
             QDateTime requestThen = QDateTime();
             requestThen.setSecsSinceEpoch(
@@ -1703,9 +1718,11 @@ void Server::receivedAuth(const QJsonObject &djson,
                     rgubDecrypted,
                     cubDecrypted));
             qint64 elapsed = requestThen.secsTo(now);
-            qDebug() << qtTrId("Elapsed: %1 second(s)").arg(elapsed).toUtf8();
+            //% "Elapsed: %1 second(s)"
+            qDebug() << qtTrId("time-gone").arg(elapsed).toUtf8();
             if(elapsed > elapsedMaxTolerence) {
-                qCritical() << qtTrId("%1: Request timeout")
+                //% "%1: Request timeout"
+                qCritical() << qtTrId("request-timeout")
                                    .arg(peerInfo.toString()).toUtf8();
                 QByteArray msg = KP::serverLogFail(KP::RequestTimeout);
                 senderM.sendMessage(connection, msg);
@@ -1718,7 +1735,8 @@ void Server::receivedAuth(const QJsonObject &djson,
                 cubDecrypted,
                 &steamID);
             if(steamID == k_steamIDNil) {
-                qCritical() << qtTrId("%1: Steam ID invalid")
+                //% "%1: Steam ID invalid"
+                qCritical() << qtTrId("steam-id-wrong")
                                    .arg(peerInfo.toString()).toUtf8();
                 QByteArray msg = KP::serverLogFail(KP::SteamIdInvalid);
                 senderM.sendMessage(connection, msg);
@@ -1728,13 +1746,15 @@ void Server::receivedAuth(const QJsonObject &djson,
             else {
                 /* We are logged in here */
                 uint64 idnum = steamID.ConvertToUint64();
-                qInfo() << QString("User login: %1").arg(idnum).toUtf8();
+                //% "User login: %1"
+                qInfo() << qtTrId("user-login").arg(idnum).toUtf8();
                 if(connectedPeers.contains(steamID)) {
                     receivedForceLogout(steamID);
                 }
                 receivedLogin(steamID, peerInfo, connection);
                 if(User::isSuperUser(steamID)) {
-                    qWarning() << QString("Superuser login: %1").
+                    //% "Superuser login: %1"
+                    qWarning() << qtTrId("superuser-login").
                                   arg(idnum).toUtf8();
                     /*
                     for(auto &equip: equipRegistry) {
@@ -1855,12 +1875,14 @@ void Server::receivedReq(const QJsonObject &djson,
                          const PeerInfo &peerInfo,
                          QSslSocket *connection) {
     if(!connectedUsers.contains(connection)) {
+        //% "User is not properly online!"
         qWarning() << qtTrId("Connection-not-properly-online");
         return;
     }
     CSteamID uid = connectedUsers[connection];
     if(!uid.IsValid()) {
-        qWarning() << qtTrId("Invalid-uid: %1")
+        //% "Invalid-uid: %1"
+        qWarning() << qtTrId("invalid-uid")
                           .arg(uid.ConvertToUint64());
         return;
     }
@@ -1997,7 +2019,8 @@ void Server::refreshClientFactory(CSteamID &uid, QSslSocket *connection) {
                   "WHERE UserID = :id");
     query.bindValue(":id", uid.ConvertToUint64());
     if(!query.exec() || !query.isSelect()) {
-        throw DBError(qtTrId("factory-state-error"), query.lastError());
+        //% "Open user %1's factory failed!"
+        throw DBError(qtTrId("factory-state-error").arg(uid.ConvertToUint64()), query.lastError());
         return;
     }
     QJsonObject result;
@@ -2235,17 +2258,17 @@ void Server::sqlinitEquipName() {
     QSqlQuery query;
     query.prepare(*equipName);
     if(!query.exec()) {
-        //% "Create Equipment database failed."
-        throw DBError(qtTrId("equip-db-gen-failure"),
+        //% "Create Equipment name failed."
+        throw DBError(qtTrId("equip-name-gen-failure"),
                       query.lastError());
     }
 }
 
 void Server::sqlinitEquipSP() {
-    qWarning() << qtTrId("equip-db-user-sp-lack");
     QSqlQuery query;
     query.prepare(*userEquipSkillPoints);
     if(!query.exec()) {
+        //% "User equipment skillpoints fetch failure!"
         throw DBError(qtTrId("equip-db-user-sp-gen-failure"),
                       query.lastError());
     }
@@ -2277,24 +2300,24 @@ void Server::sqlinitFacto() {
 
 void Server::sqlinitShip() {
     //% "Ship database does not exist, creating..."
-    qWarning() << qtTrId("equip-db-lack");
+    qWarning() << qtTrId("ship-db-lack");
     QSqlQuery query;
     query.prepare(*shipReg);
     if(!query.exec()) {
         //% "Create Ship database failed."
-        throw DBError(qtTrId("equip-db-gen-failure"),
+        throw DBError(qtTrId("equip-ship-db-gen-failure"),
                       query.lastError());
     }
 }
 
 void Server::sqlinitShipName() {
     //% "Ship name database does not exist, creating..."
-    qWarning() << qtTrId("equip-name-db-lack");
+    qWarning() << qtTrId("ship-name-db-lack");
     QSqlQuery query;
     query.prepare(*shipName);
     if(!query.exec()) {
-        //% "Create Ship database failed."
-        throw DBError(qtTrId("equip-db-gen-failure"),
+        //% "Create Ship name failed."
+        throw DBError(qtTrId("equip-ship-name-gen-failure"),
                       query.lastError());
     }
 }
@@ -2403,6 +2426,7 @@ void Server::userInit(CSteamID &uid) {
         factoryNew.bindValue(":uid", uid.ConvertToUint64());
         factoryNew.bindValue(":facto", i);
         if(!factoryNew.exec()) {
+            //% "Init 4 factory slots for user %1 failed!"
             throw DBError(qtTrId("user-factory-init-fail").
                           arg(uid.ConvertToUint64()),
                           factoryNew.lastError());

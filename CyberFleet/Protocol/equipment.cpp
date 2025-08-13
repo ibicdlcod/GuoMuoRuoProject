@@ -23,7 +23,8 @@ Equipment::Equipment(int equipId)
                                "WHERE EquipID = :id;");
         query.bindValue(":id", equipId);
         if(!query.exec() || !query.isSelect()) {
-            throw DBError(qtTrId("equip-local-name-lack"),
+            //% "Local language (%1) for equipment name not found!"
+            throw DBError(qtTrId("equip-local-name-lack").arg(lang),
                           query.lastError());
             qCritical() << query.lastError();
         }
@@ -38,6 +39,7 @@ Equipment::Equipment(int equipId)
         "WHERE EquipID = :id AND Attribute = 'equiptype'");
     query.bindValue(":id", equipId);
     if(!query.exec() || !query.isSelect()) {
+        //% "Fetch equipment type failure!"
         throw DBError(qtTrId("equip-type-lack"),
                       query.lastError());
         qCritical() << query.lastError();
@@ -51,6 +53,7 @@ Equipment::Equipment(int equipId)
         "WHERE EquipID = :id AND Attribute != 'equiptype'");
     query2.bindValue(":id", equipId);
     if(!query2.exec() || !query2.isSelect()) {
+        //% "Fetch equipment attributes failure!"
         throw DBError(qtTrId("equip-attr-lack"),
                       query2.lastError());
         qCritical() << query2.lastError();

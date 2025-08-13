@@ -26,6 +26,6 @@ void PortArea::resizeEvent(QResizeEvent *event) {
 }
 
 void PortArea::equipRegistryComplete() {
-    //% ”Hello!"
+    //% "Hello!"
     ui->CentralMessage->setText(qtTrId("hello"));
 }

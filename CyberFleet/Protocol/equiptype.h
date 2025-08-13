@@ -255,7 +255,8 @@ private:
         std::pair("Torp",                   qtTrId("TORP")),
         std::pair("Torp-sub",               qtTrId("TORP")),
         std::pair("Midget-sub",             qtTrId("TORP")),
-        std::pair("Virtual-precondition",   qtTrId("VIRTUAL")),
+        /* will not translate, as it won't be displayed */
+        std::pair("Virtual-precondition",   "VIRTUAL"),
     };
 
     inline static const QHash<QString, int> groupToIcon = {

@@ -47,11 +47,14 @@ QString ShipType::toString() const {
             //% "Escort (uncategorized)"
             return qtTrId("escort-unknown-special");
         case 2:
-            return (iRep & 0xf) >= 8 ?
-                       //% "Lead Destroyer"
-                       qtTrId("lead-destroyer")
-                                     //% "Destroyer"
-                                     : qtTrId("destroyer");
+            if((iRep & 0xf) >= 8) {
+                //% "Lead Destroyer"
+                return qtTrId("lead-destroyer");
+            }
+            else {
+                //% "Destroyer"
+                return qtTrId("destroyer");
+            }
         case 3:
             //% "Light Cruiser (uncategorized)"
             return qtTrId("light-cruiser-unknown-special");
@@ -60,7 +63,7 @@ QString ShipType::toString() const {
             return qtTrId("heavy-cruiser-unknown-special");
         case 5:
             //% "BattleShip (uncategorized)"
-            return qtTrId("heavy-cruiser-unknown-special");
+            return qtTrId("battleship-unknown-special");
         case 6:
         {
             //% "Carrier"
@@ -200,7 +203,7 @@ int ShipType::consTimeBase() const {
     case 2: return 200;
     case 3: return 300;
     case 4: return 500;
-        case 5: return (2000 - (iRep & 0x1 ? 750 : 0));
+    case 5: return (2000 - (iRep & 0x1 ? 750 : 0));
     case 6: return (1500 - (iRep & 0x1 ? 750 : 0));
     case 7: return 150;
     case 8: return 400 + (iRep & 0x2 ? 150 : 0);

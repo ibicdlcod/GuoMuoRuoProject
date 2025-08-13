@@ -16,7 +16,7 @@ const int STEAM_ERROR = 1;
 
 int main(int argc, char *argv[]) {
 
-    if(SteamAPI_RestartAppIfNecessary(2632870)) { // keep steam_appid.txt
+    if(SteamAPI_RestartAppIfNecessary(KP::steamAppId)) { // keep steam_appid.txt
         return STEAM_ERROR;
     }
     if(!SteamAPI_Init()) {

@@ -30,8 +30,22 @@ ResOrd::ResOrd(int oil, int explo, int steel, int rub,
 }
 
 QString ResOrd::toString() const {
-    return qtTrId("Oil %1 Explo %2 Steel %3 Rub %4 Al %5 W %6 Cr %7")
-        .arg(o).arg(e).arg(s).arg(r).arg(a).arg(w).arg(c);
+    //% "%1 Oil"
+    QString oil = o != 0 ? (qtTrId("%1 Oil").arg(o)) : "";
+    //% "%1 Ammo "
+    QString explo = e != 0 ? (qtTrId("%1 Ammo").arg(e)) : "";
+    //% "%1 Steel "
+    QString steel = s != 0 ? (qtTrId("%1 Steel").arg(s)) : "";
+    //% "%1 Rubber "
+    QString rubber = r != 0 ? (qtTrId("%1 Rubber").arg(r)) : "";
+    //% "%1 Aluminum "
+    QString al = a != 0 ? (qtTrId("%1 Al").arg(a)) : "";
+    //% "%1 Tungsten "
+    QString ww = w != 0 ? (qtTrId("%1 W").arg(w)) : "";
+    //% "%1 Chromium "
+    QString cr = c != 0 ? (qtTrId("%1 Cr").arg(c)) : "";
+
+    return oil+explo+steel+rubber+al+ww+cr;
 }
 
 bool ResOrd::addResources(const ResOrd &amount) {

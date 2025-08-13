@@ -52,6 +52,7 @@ double Tech::calLevel(QList<std::pair<double, double>> &source,
                   return a.first > b.first;
               });
     if(scopeConstant <= 1.0) {
+        //% "Scope constant less or equal to 1 is against design doctrine!"
         qCritical() << qtTrId("scope-constant-less-than-1");
         return 0.0;
     }
@@ -61,6 +62,7 @@ double Tech::calLevel(QList<std::pair<double, double>> &source,
          iter != source.end();
          iter++) {
         if(iter->first < 0.0) {
+            //% "Tech level less than 0 is against design doctrine!"
             qCritical() << qtTrId("tech-level-less-than-0");
             return 0.0;
         }
