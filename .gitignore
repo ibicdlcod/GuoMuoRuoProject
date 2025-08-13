@@ -85,9 +85,12 @@ gcc/
 msvc/
 .qmake.stash
 static_build/
-
 # Custom
 *.log
 *.ods
 */.qtc_clangd/
 *.user
+!CyberFleet/redistributable_bin/*.dll
+!CyberFleet/redistributable_bin/*.so
+!CyberFleet/steam/*.dll
+!CyberFleet/steam/*.so
