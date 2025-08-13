@@ -120,7 +120,8 @@ enum CommandType{
     DemandGlobalTech,
     DemandSkillPoints,
     DemandResourceUpdate,
-    DestructEquip
+    DestructEquip,
+    Switch
 };
 Q_ENUM_NS(CommandType)
 
@@ -160,6 +161,16 @@ enum AuthFailType{
     SteamAuthFail
 };
 Q_ENUM_NS(AuthFailType)
+
+enum ConsoleCommandType{
+    Help,
+    Exit,
+    Commands,
+    Allcommands,
+    Connect,
+    Disconnect
+};
+Q_ENUM_NS(ConsoleCommandType)
 
 void initLog(bool server = false);
 #if defined (Q_OS_WIN)
@@ -206,6 +217,7 @@ QByteArray serverResourceUpdate(ResOrd);
 QByteArray serverSkillPoints(int, int64, int64);
 QByteArray serverVerifyComplete();
 QByteArray weighAnchor();
+
 };
 
 #endif // KP_H

@@ -112,6 +112,8 @@ set(PROTOCOL_SOURCES
     Protocol/shiptype.h
     Protocol/tech.cpp
     Protocol/tech.h
+    Protocol/utility.cpp
+    Protocol/utility.h
     Protocol/wcwidth.c
     Protocol/wcwidth.h
 )
