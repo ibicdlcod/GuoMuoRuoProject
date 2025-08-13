@@ -71,6 +71,7 @@ bool ResOrd::spendResources(const ResOrd &amount) {
     }
 }
 
+/* 3-Resources.md#Stockpile cap */
 void ResOrd::cap(const ResOrd &cap) {
     using std::min;
     o = min(o, cap.o);
@@ -82,6 +83,7 @@ void ResOrd::cap(const ResOrd &cap) {
     c = min(c, cap.c);
 }
 
+/* convert to Server message */
 QByteArray ResOrd::resourceDesired() const {
     QJsonObject result;
     result["type"] = KP::DgramType::Message;

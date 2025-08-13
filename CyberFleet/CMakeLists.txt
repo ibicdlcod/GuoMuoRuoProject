@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 3.16)
 
 project(CyberFleet VERSION 0.1 LANGUAGES C CXX)
 
+set(CMAKE_VERBOSE_MAKEFILE ON)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 set(CMAKE_AUTOUIC ON)
@@ -172,8 +173,8 @@ qt_add_translations(CFServer
     INCLUDE_DIRECTORIES ${CMAKE_CURRENT_SOURCE_DIR}
     LRELEASE_OPTIONS -idbased)
 
-#add_dependencies(CFClient CFClient_lupdate)
-#add_dependencies(CFServer CFServer_lupdate)
+add_dependencies(CFClient update_translations)
+add_dependencies(CFServer update_translations)
 
 target_link_libraries(CFProtocol PRIVATE Qt${QT_VERSION_MAJOR}::Core)
 target_link_libraries(CFProtocol PRIVATE Qt${QT_VERSION_MAJOR}::Sql)

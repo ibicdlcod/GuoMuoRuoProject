@@ -1,4 +1,3 @@
-#define NOMINMAX
 #include "equipmodel.h"
 #include <QJsonArray>
 #include <algorithm>

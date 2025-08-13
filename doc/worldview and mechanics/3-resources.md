@@ -4,23 +4,32 @@ It's been said the core of KC is resource management, and this game inevitably i
 
 Base resource type is 7 compared to 4 in KC. However other resource types are simplified. For example, you just pay double resources plus a fixed percentage of the ship's construction costs to instantly repair a ship instead of spending a bucket. [NOTYETIMPLEMENTED]
 
+### Base types
+
+[Implemented in KP::ResourceType] 
+
 Base resource type is Oil, Explosives, Steel, Rubber, Aluminum, Tungsten, and Chromium. They function similarly to Hearts of Iron IV. Beware that you should perceive 1 ordinary resource in KC as 10 resources in this game!
 
-All ordinary resources are capped absolutely at 3600000.
+### Stockpile cap
+
+[Implemented in ResOrd::cap]
+
+All ordinary resources are capped absolutely at [rule/maxresources](settings.md).
 
 ## You gain resources by:
 
 ### Natural regeneration
 
+[Implemented in Server::naturalRegen]
+
 Natural regeneration speed is the following per minute:
 
-10 + power for Oil, Explosives, Aluminum (capped at 2500 * (globaltechlevel * 8 + 24));
-
-5 + power for Aluminum (capped at 2000 * (globaltechlevel * 8 + 24));
-
-###### 2 + power for Rubber, Tungsten and Chromium (capped at 1500 * (globaltechlevel * 8 + 24));
-
-Power is your global tech level divided by 4.0.
++ [rule/baseregennormal](settings.md) + power for Oil, Explosives, Steel (capped at [rule/regencapnormal](settings.md) * (globaltechlevel * a + b));
++ [rule/baseregenaluminum](settings.md) + power for Aluminum (capped at [rule/regencapaluminum](settings.md) * (globaltechlevel * a + b));
++ [rule/baseregenrare](settings.md) + power for Rubber, Tungsten and Chromium (capped at [rule/regencaprare](settings.md) * (globaltechlevel * a + b)).[MAGICNUMBERSTOBEELIMINATED]
++ Power is your global tech level divided by [rule/antiregenpower](settings.md).
++ a is [rule/regenpertech](settings.md)
++ b is [rule/regenattech0](settings.md)
 
 ### Naval Supremacy [NOTYETIMPLEMENTED]
 

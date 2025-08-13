@@ -1,4 +1,3 @@
-#define NOMINMAX
 #include "user.h"
 #include <QSqlDatabase>
 #include <QSqlError>
@@ -143,6 +142,7 @@ int64 User::getSkillPoints(const CSteamID &uid, int equipId) {
         return 0;
 }
 
+/* returns {fatherexists, missingfatherid} */
 std::pair<bool, int> User::haveFather(const CSteamID &uid, int sonEquipId,
                                       QMap<int, Equipment *> &equipReg) {
     if(!equipReg.contains(sonEquipId))
@@ -184,6 +184,7 @@ std::pair<bool, int> User::haveFather(const CSteamID &uid, int sonEquipId,
     }
 }
 
+/* returns {motherSPSufficient, motherEquipId, skillPointsRemaining} */
 std::tuple<bool, int, int64> User::haveMotherSP(
     const CSteamID &uid, int sonEquipId,
     QMap<int, Equipment *> &equipReg,
@@ -204,14 +205,14 @@ std::tuple<bool, int, int64> User::haveMotherSP(
         query.exec();
         query.isSelect();
         if(!query.first()) {
-            return {false, motherEquipId, 0};
+            return {false, motherEquipId, sonSkillPointReq};
         }
         else {
             uint64 motherSkillPoint = getSkillPoints(uid, motherEquipId);
             if(motherSkillPoint >= sonSkillPointReq)
-                return {true, motherEquipId, sonSkillPointReq};
+                return {true, motherEquipId, 0};
             else
-                return {false, motherEquipId, sonSkillPointReq};
+                return {false, motherEquipId, sonSkillPointReq - motherSkillPoint};
         }
     }
 }
@@ -349,6 +350,8 @@ void User::refreshPort(const CSteamID &uid) {
 
 void User::setResources(const CSteamID &uid, ResOrd goal) {
     assert(goal.sufficient());
+    //int maxRes = settings->value("rule/maxresources", 3600000).toInt();
+#pragma message(M_CONST)
     goal.cap(ResOrd(3600000,
                     3600000,
                     3600000,

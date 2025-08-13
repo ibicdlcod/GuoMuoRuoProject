@@ -954,7 +954,7 @@ void Clientv2::receivedMsg(const QJsonObject &djson) {
             Equipment *mother = equipRegistryCache
                                     .value(djson["mother"].toInt());
             if(mother != nullptr) {
-                //% "This equipment requires you to possess %3 skillpoints of %1 (id: %2) in order to develop."
+                //% "This equipment requires you to possess extra %3 skillpoints of %1 (id: %2) in order to develop."
                 qInfo() <<
                     qtTrId("equip-not-developable-mother")
                         .arg(mother->toString(
