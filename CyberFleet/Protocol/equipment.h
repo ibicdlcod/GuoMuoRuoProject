@@ -7,7 +7,6 @@
 #include <QString>
 #include "resord.h"
 #include "equiptype.h"
-//#include "steam/steamclientpublic.h"
 
 class Equipment: public QObject {
     Q_OBJECT
@@ -20,7 +19,6 @@ public:
     bool isNotEqual(const Equipment &) const;
     QString toString(QString) const;
 
-    //bool canDevelop(const CSteamID &userid = k_steamIDNil) const;
     const ResOrd devRes() const;
     const int devTimeInSec() const;
     bool disallowMassProduction() const;
@@ -30,6 +28,7 @@ public:
     bool isInvalid() const;
     int skillPointsStd() const;
 
+    /* 4.2-Attributes.md */
     QMap<QString, QString> localNames;
     EquipType type;
     QMap<QString, int> attr;

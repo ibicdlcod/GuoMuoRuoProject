@@ -224,7 +224,7 @@ std::tuple<bool, int, int64> User::haveMotherSP(
 
 void User::init(const CSteamID &uid) {
     QSqlDatabase db = QSqlDatabase::database();
-    /* factory */
+    /* 4.1-Factoryslot.md */
     for(int i = 0; i < KP::initFactory; ++i) {
         QSqlQuery query;
         query.prepare("INSERT INTO Factories (User,FactoryID)"

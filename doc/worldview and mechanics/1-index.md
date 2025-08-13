@@ -10,8 +10,8 @@
   * [Factory slot](4.1-factoryslot.md)\[PARTIAL]
   * [Attributes](4.2-attributes.md)\[PARTIAL]
   * [Development](4.3-development.md)
-  * [Normal/Special/Virtual preconditions](4.4-precondition.md)
-  * [Equipment skill points](4.5-skillpoints.md)
+  * [Normal/Special/Virtual preconditions](4.4-precondition.md)[PARTIAL]
+  * [Equipment skill points](4.5-skillpoints.md)[PARTIAL]
   * [Destruct](4.6-destruct.md)
   * [Improvement](4.7-improve.md)\[NOTYETIMPLEMENTED]
   * [Industrial plant](4.8-industrial.md)\[NOTYETIMPLEMENTED]

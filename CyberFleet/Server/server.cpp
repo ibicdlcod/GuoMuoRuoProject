@@ -566,7 +566,9 @@ Server::calculateTech(const CSteamID &uid, int jobID) {
                     source.append({equips.value(serial)->getTech(), weight});
                 }
             }
-            virtual_skill_point_effect:
+
+        /* 2-Technology.md#Local technology */
+        virtual_skill_point_effect:
             if(isEquip) {
                 double weight = getSkillPointsEffect(uid, jobID)
                                 * settings->value
@@ -581,6 +583,7 @@ Server::calculateTech(const CSteamID &uid, int jobID) {
                                    weight});
                 }
             }
+
             return {jobID == 0 ? Tech::calLevelGlobal(source)
                                : Tech::calLevelLocal(source), result};
         }
@@ -899,6 +902,9 @@ void Server::doDevelop(CSteamID &uid, int equipid,
             senderM.sendMessage(connection, msg);
             return;
         }
+
+    /* 4.3-Development.md#Possess limit */
+    possess_limit:
         if(equip->disallowMassProduction() && (
                 User::getEquipAmount(uid, equipid)
                     + User::getCurrentFactoryParallel(uid, equipid)
@@ -908,6 +914,9 @@ void Server::doDevelop(CSteamID &uid, int equipid,
             senderM.sendMessage(connection, msg);
             return;
         }
+
+    /* 4.4-Precondition.md#Normal preconditions (father) */
+    father_required:
         auto [fatherExists, missingFatherId] = User::haveFather(uid, equipid, equipRegistry);
         if(!fatherExists) {
             QByteArray msg =
@@ -916,23 +925,28 @@ void Server::doDevelop(CSteamID &uid, int equipid,
             senderM.sendMessage(connection, msg);
             return;
         }
+
         if(User::isFactoryBusy(uid, factoryid)) {
             QByteArray msg = KP::serverDevelopFailed(KP::FactoryBusy);
             senderM.sendMessage(connection, msg);
             return;
         }
-        /* mother skillpoint requirements */
+
+    /* 4.4-Precondition.md#Special preconditions (mother) */
+    mother_required:
         int64 sonSkillPointReq = newEquipHasMotherCal(equipid);
-        auto motherResult = User::haveMotherSP(uid, equipid, equipRegistry,
-                                               sonSkillPointReq);
-        if(!std::get<0>(motherResult)) {
+        auto [motherSPSufficient, motherEquipId, skillPointsRemaining]
+            = User::haveMotherSP(uid, equipid, equipRegistry,
+                                 sonSkillPointReq);
+        if(!motherSPSufficient) {
             QByteArray msg =
                 KP::serverEquipLackMother(KP::DevelopNotOption,
-                                          std::get<1>(motherResult),
-                                          std::get<2>(motherResult));
+                                          motherEquipId,
+                                          skillPointsRemaining);
             senderM.sendMessage(connection, msg);
             return;
         }
+
         ResOrd resRequired = equip->devRes();
         QByteArray msg = resRequired.resourceDesired();
         senderM.sendMessage(connection, msg);
@@ -960,8 +974,10 @@ void Server::doDevelop(CSteamID &uid, int equipid,
             query.bindValue(":succ", successTime);
             query.bindValue(":good", Tech::calExperiment2(
                                          equip->getTech(),
-                                         calculateTech(uid).first, // global
-                                         calculateTech(uid, equipid).first, // local
+                                         /* global tech */
+                                         calculateTech(uid).first,
+                                         /* local tech */
+                                         calculateTech(uid, equipid).first,
                                          settings->value(
                                                      "rule/sigmaconstant",
                                                      1.0).toDouble(),
@@ -970,7 +986,9 @@ void Server::doDevelop(CSteamID &uid, int equipid,
             query.bindValue(":id", uid.ConvertToUint64());
             query.bindValue(":fid", factoryid);
             if(query.exec()) {
-                qDebug() << "EQUIP DEV GOOD";
+                qDebug() << "EQUIP DEV START";
+                /* only spend resources if database successfully register
+                 * the operation */
                 User::setResources(uid, currentRes);
                 QByteArray msg =
                     KP::serverDevelopStart();
@@ -1013,6 +1031,7 @@ void Server::doFetch(CSteamID &uid, int factoryid, QSslSocket *connection) {
     }
     else {
         int jobID = query.value(0).toInt();
+        bool isEquip = jobID < KP::equipIdMax;
         bool done = query.value(1).toBool();
         if(!done) {
             QByteArray msg = KP::serverFairyBusy(jobID);
@@ -1021,9 +1040,12 @@ void Server::doFetch(CSteamID &uid, int factoryid, QSslSocket *connection) {
         else {
             bool success = query.value(2).toBool();
             if(!success) {
+
+            /* 4.5-Skillpoints.md#Development fail */
+            consolation_skill_point:
                 QByteArray msg = KP::serverPenguin();
                 senderM.sendMessage(connection, msg);
-                if(jobID < KP::equipIdMax &&
+                if(isEquip &&
                     equipRegistry.value(jobID)->disallowMassProduction()) {
                     /* get skill points (non-massproduced only)*/
                     int64 stdSkillPoints = equipRegistry.value(jobID)
@@ -1033,17 +1055,15 @@ void Server::doFetch(CSteamID &uid, int factoryid, QSslSocket *connection) {
                     double difficultyFactor
                         = settings->value(
                                       "rule/penguinskillpointsdifficulty",
-                                      10.0).toDouble() *
-                          std::pow(
-                              std::max(
-                                  1.0,
-                                  equipRegistry.value(jobID)->getTech()
-                                      - calculateTech(uid, 0).first), 2.0);
+                                      10.0).toDouble();
+                    double techFactor = atan2(calculateTech(uid, 0).first + 1,
+                                              equipRegistry.value(jobID)->getTech() + 1);
                     User::addSkillPoints(uid, jobID,
-                                         stdSkillPoints / difficultyFactor);
+                                         (stdSkillPoints * techFactor) / difficultyFactor);
                 }
+
             }
-            else if(jobID < KP::equipIdMax) {
+            else if(isEquip) {
                 QByteArray msg = KP::serverNewEquip(
                     newEquip(uid, jobID), jobID);
                 senderM.sendMessage(connection, msg);
@@ -1502,6 +1522,18 @@ QUuid Server::newEquip(const CSteamID &uid, int equipId) {
     return User::newEquip(uid, equipId);
 }
 
+/* 4.4-Precondition.md#Special preconditions (mother) */
+void Server::newEquipHasMother(const CSteamID &uid, int equipId) {
+    if(!equipRegistry.contains(equipId))
+        return;
+    Equipment *equip = equipRegistry.value(equipId);
+    if(!equipRegistry.contains(equip->attr["Mother"]))
+        return;
+    int64 sonSkillPoints = newEquipHasMotherCal(equipId);
+    User::addSkillPoints(uid, equip->attr["Mother"], -sonSkillPoints);
+}
+
+/* 4.4-Precodition.md#Required skill points */
 int64 Server::newEquipHasMotherCal(int equipId) {
     if(!equipRegistry.contains(equipId))
         return 0;
@@ -1515,7 +1547,7 @@ int64 Server::newEquipHasMotherCal(int equipId) {
         = equip->skillPointsStd()
           * pow(equip->getTech(),
                 settings
-                    ->value("rule/motherspscle", 0.2).toDouble());
+                    ->value("rule/motherspscale", 0.2).toDouble());
     if(equip->disallowMassProduction()
         && equip->attr["Disallowmassproduction"] < 30) {
         double x = equip->attr["Disallowmassproduction"];
@@ -1531,17 +1563,6 @@ int64 Server::newEquipHasMotherCal(int equipId) {
         sonSkillPoints *= skillPointsAmplifier;
     }
     return sonSkillPoints;
-}
-
-void Server::newEquipHasMother(const CSteamID &uid, int equipId) {
-    if(!equipRegistry.contains(equipId))
-        return;
-    Equipment *equip = equipRegistry.value(equipId);
-    if(!equipRegistry.contains(equip->attr["Mother"]))
-        return;
-    //Equipment *mother = equipRegistry.value(equip->attr["Mother"]);
-    int64 sonSkillPoints = newEquipHasMotherCal(equipId);
-    User::addSkillPoints(uid, equip->attr["Mother"], -sonSkillPoints);
 }
 
 void Server::parseListen(const QStringList &cmdParts) {
@@ -1578,7 +1599,7 @@ void Server::parseListen(const QStringList &cmdParts) {
         return;
     }
     conf.setLocalCertificate(certs.at(0));
-    /* Of course, private key is not shipped with the project. Go make your own steam appid and private key. */
+#pragma message(SECRET)
     QFile keyFile(settings->value("networkserver/key",
                                   "serverprivate.key").toString());
     if(!keyFile.open(QIODevice::ReadOnly)) {
@@ -1652,8 +1673,8 @@ void Server::receivedAuth(const QJsonObject &djson,
 #pragma message(NOT_M_CONST)
         uint8 rgubDecrypted[1024];
         uint32 cubDecrypted = sizeof(rgubDecrypted);
-        
-        /* Of course, app secret key is not shipped with the project. */
+
+#pragma message(SECRET)
         QFile appSecretKeyFile("AppSecretKey");
         if(!appSecretKeyFile.open(QIODevice::ReadOnly)) {
             //% "Server lack the steam app secret key."
@@ -1669,8 +1690,6 @@ void Server::receivedAuth(const QJsonObject &djson,
         }
         else {
             char *data = new char[2];
-            /* Must be modified in steam release,
-             * you can't put AppSecretKey file in it */
             uint8 rgubKey[k_nSteamEncryptedAppTicketSymmetricKeyLen]
                 = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
                     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -1992,6 +2011,7 @@ void Server::receivedReq(const QJsonObject &djson,
         throw std::domain_error("command type not supported"); break;
     }
     return;
+    Q_UNREACHABLE();
     QByteArray msg2 = KP::accessDenied();
     senderM.sendMessage(connection, msg2);
 }
@@ -2041,6 +2061,7 @@ void Server::refreshClientFactory(CSteamID &uid, QSslSocket *connection) {
     senderM.sendMessage(connection, msg);
 }
 
+/* 4.6-Destruct.md */
 QList<QUuid> Server::retireEquip(const CSteamID &uid, const QList<QUuid> &trash) {
     QList<QUuid> result;
     QSqlDatabase db = QSqlDatabase::database();

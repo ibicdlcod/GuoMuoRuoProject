@@ -271,6 +271,7 @@ QList<QString> EquipType::allEquipTypes() {
     return result.keys();
 }
 
+/* 4.3-Development.md#Resource cost */
 const ResOrd EquipType::devResBase() const {
     using namespace KP;
 

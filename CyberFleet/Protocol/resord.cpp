@@ -74,6 +74,7 @@ bool ResOrd::addResources(const ResOrd &amount,
     }
 }
 
+/* attempt to spend resources, will not change if failed */
 bool ResOrd::spendResources(const ResOrd &amount) {
     operator-=(amount);
     if(!sufficient()){

@@ -154,6 +154,7 @@ void Clientv2::backToNavalBase() {
 /* Connection is lost */
 void Clientv2::catbomb() {
     if(loggedIn()) {
+        /* should make a cat GUI */
         //% "You have been bombarded by a cute cat."
         qCritical() << qtTrId("catbomb");
         gameState = KP::Offline;
@@ -165,8 +166,8 @@ void Clientv2::catbomb() {
         //% "Failed to establish connection, check your username, "
         //% "password and server status."
         qWarning() << qtTrId("connection-failed-warning");
+        attemptMode = false;
     }
-    attemptMode = false;
     shutdown();
     displayPrompt();
 }

@@ -121,8 +121,8 @@ private:
     bool importShipFromCSV();
     void naturalRegen(const CSteamID &);
     QUuid newEquip(const CSteamID &, int);
-    int64 newEquipHasMotherCal(int);
     void newEquipHasMother(const CSteamID &, int);
+    int64 newEquipHasMotherCal(int);
     void parseListen(const QStringList &);
     void parseUnlisten();
     void receivedAuth(const QJsonObject &, const PeerInfo &, QSslSocket *);
