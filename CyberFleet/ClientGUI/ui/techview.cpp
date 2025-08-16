@@ -55,6 +55,9 @@ TechView::TechView(QWidget *parent) :
             this, &TechView::demandLocalTech);
     connect(ui->localListValue, &QComboBox::activated,
             this, &TechView::demandSkillPoints);
+
+    ui->globalViewTable->setSortingEnabled(true);
+    ui->localViewTable->setSortingEnabled(true);
 }
 
 TechView::~TechView()

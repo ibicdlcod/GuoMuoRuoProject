@@ -23,6 +23,14 @@ set(TS_FILES
     Translations/CyberFleet2_en_US.ts
     Translations/CyberFleet2_ja_JP.ts
     Translations/CyberFleet2_zh_CN.ts)
+set(TS_FILES_S
+    Translations/CyberFleet2_server_en_US.ts
+    Translations/CyberFleet2_server_ja_JP.ts
+    Translations/CyberFleet2_server_zh_CN.ts)
+set(TS_FILES_P
+    Translations/CyberFleet2_protocol_en_US.ts
+    Translations/CyberFleet2_protocol_ja_JP.ts
+    Translations/CyberFleet2_protocol_zh_CN.ts)
 
 set(CLIENT_SOURCES
     ClientGUI/clientv2.cpp
@@ -83,7 +91,7 @@ set(SERVER_SOURCES
     Server/user.h
     Server/erfinv.h
     Server/rngesus.h
-    ${TS_FILES}
+    ${TS_FILES_S}
 )
 set(PROTOCOL_SOURCES
     Protocol/commandline.cpp
@@ -116,6 +124,7 @@ set(PROTOCOL_SOURCES
     Protocol/utility.h
     Protocol/wcwidth.c
     Protocol/wcwidth.h
+    ${TS_FILES_P}
 )
 
 if (${CMAKE_SYSTEM_NAME} MATCHES "Windows")
@@ -170,18 +179,18 @@ qt_add_translations(CFClient
     INCLUDE_DIRECTORIES ${CMAKE_CURRENT_SOURCE_DIR}
     LRELEASE_OPTIONS -idbased)
 qt_add_translations(CFProtocol
-    TS_FILES ${TS_FILES}
+    TS_FILES ${TS_FILES_P}
     INCLUDE_DIRECTORIES ${CMAKE_CURRENT_SOURCE_DIR}
     LRELEASE_OPTIONS -idbased)
 qt_add_translations(CFServer
-    TS_FILES ${TS_FILES}
+    TS_FILES ${TS_FILES_S}
     INCLUDE_DIRECTORIES ${CMAKE_CURRENT_SOURCE_DIR}
     LRELEASE_OPTIONS -idbased)
 
 # frequently error but not always
-#add_dependencies(CFProtocol update_translations)
-#add_dependencies(CFClient update_translations)
-#add_dependencies(CFServer update_translations)
+add_dependencies(CFProtocol update_translations)
+add_dependencies(CFClient update_translations)
+add_dependencies(CFServer update_translations)
 
 target_link_libraries(CFProtocol PRIVATE Qt${QT_VERSION_MAJOR}::Core)
 target_link_libraries(CFProtocol PRIVATE Qt${QT_VERSION_MAJOR}::Sql)
