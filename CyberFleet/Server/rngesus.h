@@ -40,6 +40,7 @@ int calDropCommon(const std::vector<ShipDropInfo> &shipInfo,
     return shipInfo[dist(engine)].shipDef;
 }
 
+/* Different from above is total weights may be < 100% and no drop as a result */
 int calDropRare(const std::vector<ShipDropInfo> &shipInfo,
                 std::mt19937 &engine) {
     if(shipInfo.empty())

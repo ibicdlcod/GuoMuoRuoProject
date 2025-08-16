@@ -21,7 +21,7 @@ const int STEAM_ERROR = 1;
 int main(int argc, char *argv[]) {
 
     /* Steam initialization */
-    if(SteamAPI_RestartAppIfNecessary(2632870)) {
+    if(SteamAPI_RestartAppIfNecessary(KP::steamAppId)) {
         return STEAM_ERROR;
     }
     if(!SteamAPI_Init()) {
@@ -45,8 +45,16 @@ int main(int argc, char *argv[]) {
 
     settings = std::make_unique<QSettings>(new QSettings);
 
+    /* Display style */
     BoxCenterFusionStyle *style = new BoxCenterFusionStyle();
     style->setBaseStyle(QStyleFactory::create("Fusion"));
+    QPalette pal = QGuiApplication::palette();
+    /* https://www.w3.org/TR/SVG11/types.html#ColorKeywords */
+    pal.setColor(QPalette::Window, QColor::fromString("midnightblue"));
+    pal.setColor(QPalette::Base, QColor::fromString("midnightblue"));
+    pal.setColor(QPalette::WindowText, QColor::fromString("white"));
+    pal.setColor(QPalette::Text, QColor::fromString("white"));
+    QApplication::setPalette(pal);
     QApplication::setStyle(style);
 
     /* Multilingual Support */

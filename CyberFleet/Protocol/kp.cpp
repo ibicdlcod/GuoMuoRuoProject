@@ -60,7 +60,7 @@ QByteArray KP::catbomb() {
 QByteArray KP::clientAddEquip(int equipid) {
     QJsonObject result;
     result["type"] = DgramType::Request;
-    result["command"] = CommandType::AdminAddEquip;
+    result["command"] = CommandType::Adminaddequip;
     result["equipid"] = equipid;
     return QCborValue::fromJsonValue(result).toCbor();
 }

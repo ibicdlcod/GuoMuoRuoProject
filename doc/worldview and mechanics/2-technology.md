@@ -8,62 +8,81 @@ Constructing ships and Developing equipment which is precisely on your current t
 
 ## How a combined level is calculated from its components
 
+[Implemented in: Tech::calLevel]
 $$
-level=\sum_{i=1}^{\infty}v_i(a^{w_i}-1)a^{-\sum_{j=1}^iw_j}
+\text{Level}=\sum_{i=1}^{\infty}v_i(a^{w_i}-1)a^{-\sum_{j=1}^iw_j}
 $$
 
-v_i is each component's own characteristic tech level, in descending order. w_i is the weight of v_i.
+$v_i$ is each component's own characteristic tech level, in descending order. $w_i$ is the weight of $v_i$ (for example, more experience on an equipment have more weight).
 
 Note the level never drops unless you remove some of the components(e.g. destruct an equipment)
 
-a: 1.02 when calculating global tech, 1.1 when calculating local tech
+### Constants
+
+$a$: [settings: rule/techglobalscope](settings.md) when calculating global tech, [settings: rule/techlocalscope](settings.md) when calculating local tech.
 
 ## Weight of components
 
-A Kanmusu's weight when calculating its technology is its [level]/10. [NOTYETIMPLEMENTED]
+### Weight of ships
 
-An equipment's weight when calculating its technology is
+[Implemented in Tech::calWeightShip] A Kanmusu's weight when calculating its technology is its [level]/[settings: rule/shiplevelperweight](settings.md).
+
+### Weight of equipment, taking skill points into account 
+
+[Implemented in Tech::calWeightEquip] An equipment's weight when calculating its technology is
 $$
-\frac{9y}{\sqrt{x^2+y^2}}+1
+\frac{by}{\sqrt{x^2+y^2}}+1
 $$
-where y is [actual skill points], x is [required skill points].
+where $y$ is [actual skill points], $x$ is [required skill points], $b$ is [settings: rule/skillpointweightcontrib](settings.md).
 
 We will deal with skill points later.
 
 ## Success rate
 
+[Implemented in Tech::calExperiment]
+
 When developing/constructing the success rate would be:
 $$
-successrate=\int_{t_{wanted}-t_{current}}^{\infty}\frac{1}{\sigma\sqrt{2\pi}}e^{-\frac{1}{2}(\frac{x}{\sigma})^2}dx
+\text{Successrate}=\int_{t_{wanted}-t_{current}}^{\infty}\frac{1}{\sigma\sqrt{2\pi}}e^{-\frac{1}{2}(\frac{x}{\sigma})^2}dx
 $$
 
-σ: 1.0
+$σ$: [rule/sigmaconstant](settings.md)
 
-t_wanted: the tech of the equipment/ship you want
+$t_{wanted}$: the tech of the equipment/ship you want.
 
-t_current: the highest among your global tech and your local tech for this equipment/ship, minus detrimental effects
+$t_{current}$: the highest among your global tech and your local tech for this equipment/ship, minus [combined effects] (see below).
 
 ## Global technology
+
+[Implemented in Server::calculateTech]
 
 All Kanmusu and equipment will count toward the calculation.
 
 ## Local technology
 
-For ships: All ships of the same class and all equipment she can handle will count toward the calculation.
+[Implemented in Server::calculateTech]
 
-For equipment: All equipment of this exact type and (when this equipment could not be infinitely produced) a virtual equipment of this exact type (without base weight of 1.0, meaning only skill point effect will count) and [its "father" and all paternal children on the technology tree], and [all Kanmusu who have visible bonuses related to this equipment] [NOTYETIMPLEMENTED] will count toward the calculation. The two concepts will be dealt later.
+For ships: All ships of the same class and all equipment she can handle will count toward the calculation. [NOTYETIMPLEMENTED]
+
+For equipment: All equipment of this exact type and a virtual equipment of this exact type (without base weight of 1.0, meaning only skill point effect will count [Implemented in Server::calculateTech#virtual_skill_point_effect]) and [its "father" and all paternal children on the technology tree], and [all Kanmusu who have visible bonuses related to this equipment] [NOTYETIMPLEMENTED] will count toward the calculation. The two concepts will be dealt later.
 
 An equipment that does not have a predecessor will have it's local technology not counted when developing.
 
-## Combined Effects
+## Combined effects 
+
+[Implemented in Tech::calCapable]
 
 The highest among global and local would be in effect. However local technology x level behind will cause a detrimental effect of
 $$
--\frac{3x}{\sqrt{1+x^2}}
+-\frac{cx}{\sqrt{1+x^2}}
 $$
-be applied on global technology (the reverse is also true)
+be applied on global technology (the reverse is also true). The resulting technology will NOT be lower than the lowest among global and local technology.
+
+$c$: [rule/techcombinedeffects](settings.md)
 
 ## How characteristic tech level are determined
+
+[Implemented in Tech::techYearToCompact]
 
 Generally (variations may exist):
 

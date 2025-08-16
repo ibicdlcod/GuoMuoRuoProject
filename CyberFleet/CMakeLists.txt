@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 3.16)
 
 project(CyberFleet VERSION 0.1 LANGUAGES C CXX)
 
+set(CMAKE_VERBOSE_MAKEFILE ON)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 set(CMAKE_AUTOUIC ON)
@@ -111,6 +112,8 @@ set(PROTOCOL_SOURCES
     Protocol/shiptype.h
     Protocol/tech.cpp
     Protocol/tech.h
+    Protocol/utility.cpp
+    Protocol/utility.h
     Protocol/wcwidth.c
     Protocol/wcwidth.h
 )
@@ -162,8 +165,11 @@ endif()
 
 #qt_create_translation(QM_FILES ${CMAKE_SOURCE_DIR} ${TS_FILES})
 
-message("add translations")
 qt_add_translations(CFClient
+    TS_FILES ${TS_FILES}
+    INCLUDE_DIRECTORIES ${CMAKE_CURRENT_SOURCE_DIR}
+    LRELEASE_OPTIONS -idbased)
+qt_add_translations(CFProtocol
     TS_FILES ${TS_FILES}
     INCLUDE_DIRECTORIES ${CMAKE_CURRENT_SOURCE_DIR}
     LRELEASE_OPTIONS -idbased)
@@ -172,8 +178,10 @@ qt_add_translations(CFServer
     INCLUDE_DIRECTORIES ${CMAKE_CURRENT_SOURCE_DIR}
     LRELEASE_OPTIONS -idbased)
 
-#add_dependencies(CFClient CFClient_lupdate)
-#add_dependencies(CFServer CFServer_lupdate)
+# frequently error but not always
+#add_dependencies(CFProtocol update_translations)
+#add_dependencies(CFClient update_translations)
+#add_dependencies(CFServer update_translations)
 
 target_link_libraries(CFProtocol PRIVATE Qt${QT_VERSION_MAJOR}::Core)
 target_link_libraries(CFProtocol PRIVATE Qt${QT_VERSION_MAJOR}::Sql)

@@ -1,12 +1,11 @@
 #ifndef KP_H
 #define KP_H
 
-#define STRING2(x) #x
-#define STRING(x) STRING2(x)
-#define M_CONST __FILE__ STRING(:__LINE__: MAGICCONSTANT UNDESIREABLE NO 1)
-#define NOT_M_CONST __FILE__ STRING(:__LINE__: This is considered an integral part of the program rather than magic constants.)
-#define SALT_FISH __FILE__ STRING(:__LINE__: This is a salt fish.)
-#define USED_CXX17 __FILE__ STRING(:__LINE__: This part uses C++ 17 features. Use macro "__cplusplus" to check whether your compiler supports it.)
+#define M_CONST __FILE__ QT_STRINGIFY(:__LINE__: MAGICCONSTANT UNDESIREABLE NO 1)
+#define NOT_M_CONST __FILE__ QT_STRINGIFY(:__LINE__: This is considered an integral part of the program rather than magic constants.)
+#define SALT_FISH __FILE__ QT_STRINGIFY(:__LINE__: This is a salt fish.)
+#define SECRET __FILE__ QT_STRINGIFY(:__LINE__: Go make your own steam app if modding!)
+#define USED_CXX17 __FILE__ QT_STRINGIFY(:__LINE__: This part uses C++ 17 features. Use macro "__cplusplus" to check whether your compiler supports it.)
 
 #include <QObject>
 #include <QJsonObject>
@@ -23,6 +22,7 @@ class ResOrd;
 
 /* OS Specific */
 #if defined (Q_OS_WIN)
+#define NOMINMAX // apparently some stupid win header <minwindef.h> interferes with std::max
 #include <windows.h>
 #ifndef ENABLE_VIRTUAL_TERMINAL_PROCESSING
 #define ENABLE_VIRTUAL_TERMINAL_PROCESSING 0x0004
@@ -38,11 +38,11 @@ Q_NAMESPACE
 #pragma message(NOT_M_CONST)
 static constexpr int initDock = 4;
 static constexpr int initFactory = 4;
-static constexpr qint64 secsinMin = 60;
-#pragma message(M_CONST)
-//static constexpr float baseDevRarity = 8.0;
 #pragma message(NOT_M_CONST)
+static constexpr qint64 secsinMin = 60;
 static constexpr int equipIdMax = 0x10000;
+#pragma message(NOT_M_CONST)
+const int steamAppId = 2632870; // Go request your own steam appid if modding!
 
 enum DgramType{
     Auth,
@@ -94,6 +94,7 @@ enum GameState{
 };
 Q_ENUM_NS(GameState)
 
+/* 3-resources.md#Base types */
 enum ResourceType{
     O, // oil
     E, // Explosives
@@ -113,13 +114,14 @@ enum CommandType{
     SteamAuth,
     SteamLogout,
     CHello,
-    AdminAddEquip,
+    Adminaddequip,
     DemandEquipInfo,
     DemandEquipInfoUser,
     DemandGlobalTech,
     DemandSkillPoints,
     DemandResourceUpdate,
-    DestructEquip
+    DestructEquip,
+    Switch
 };
 Q_ENUM_NS(CommandType)
 
@@ -159,6 +161,17 @@ enum AuthFailType{
     SteamAuthFail
 };
 Q_ENUM_NS(AuthFailType)
+
+enum ConsoleCommandType{
+    Help,
+    Exit,
+    Commands,
+    Allcommands,
+    Connect,
+    Disconnect,
+    Switchcert
+};
+Q_ENUM_NS(ConsoleCommandType)
 
 void initLog(bool server = false);
 #if defined (Q_OS_WIN)
@@ -205,6 +218,7 @@ QByteArray serverResourceUpdate(ResOrd);
 QByteArray serverSkillPoints(int, int64, int64);
 QByteArray serverVerifyComplete();
 QByteArray weighAnchor();
+
 };
 
 #endif // KP_H

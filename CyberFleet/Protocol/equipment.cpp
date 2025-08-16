@@ -23,7 +23,8 @@ Equipment::Equipment(int equipId)
                                "WHERE EquipID = :id;");
         query.bindValue(":id", equipId);
         if(!query.exec() || !query.isSelect()) {
-            throw DBError(qtTrId("equip-local-name-lack"),
+            //% "Local language (%1) for equipment name not found!"
+            throw DBError(qtTrId("equip-local-name-lack").arg(lang),
                           query.lastError());
             qCritical() << query.lastError();
         }
@@ -38,6 +39,7 @@ Equipment::Equipment(int equipId)
         "WHERE EquipID = :id AND Attribute = 'equiptype'");
     query.bindValue(":id", equipId);
     if(!query.exec() || !query.isSelect()) {
+        //% "Fetch equipment type failure!"
         throw DBError(qtTrId("equip-type-lack"),
                       query.lastError());
         qCritical() << query.lastError();
@@ -51,6 +53,7 @@ Equipment::Equipment(int equipId)
         "WHERE EquipID = :id AND Attribute != 'equiptype'");
     query2.bindValue(":id", equipId);
     if(!query2.exec() || !query2.isSelect()) {
+        //% "Fetch equipment attributes failure!"
         throw DBError(qtTrId("equip-attr-lack"),
                       query2.lastError());
         qCritical() << query2.lastError();
@@ -97,12 +100,14 @@ QString Equipment::toString(QString lang) const {
     return localNames[lang];
 }
 
+/* 4.3-Development.md#Resource cost */
 const ResOrd Equipment::devRes() const {
     qint64 devResScale = settings->value("rule/devresscale", 10).toLongLong();
     return type.devResBase() * (qint64)std::round((getTech() + 1.0)
                                                    * devResScale);
 }
 
+/* 4.3-Development.md#Development time */
 const int Equipment::devTimeInSec() const {
     qint64 devTimebase = settings->value("rule/devtimebase", 6).toLongLong();
     qint64 devResScale = settings->value("rule/devresscale", 10).toLongLong();
@@ -133,6 +138,7 @@ bool Equipment::isInvalid() const {
     return equipRegId == 0;
 };
 
+/* 4.5-Skillpoints.md#Standard skill points */
 int Equipment::skillPointsStd() const {
     double skillPointFactor = settings->value("rule/skillpointfactor",
                                               1.25).toDouble();

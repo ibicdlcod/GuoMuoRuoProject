@@ -4,12 +4,9 @@
 #include <QMap>
 #include "kp.h"
 
-#ifdef min
-#undef min
-#endif
-
 typedef QMap<KP::ResourceType, int> ResTuple;
 
+/* 3-Resources.md */
 struct ResOrd
 {
     ResOrd(ResTuple);
@@ -69,7 +66,7 @@ struct ResOrd
         return *this;
     }
     bool addResources(const ResOrd &);
-    bool addResources(const ResOrd &, const ResOrd &);
+    bool addResources(const ResOrd &amount, const ResOrd &maximum);
     bool spendResources(const ResOrd &);
     void cap(const ResOrd&);
     QByteArray resourceDesired() const;

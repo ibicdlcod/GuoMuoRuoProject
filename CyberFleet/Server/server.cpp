@@ -45,8 +45,7 @@
 ** $QT_END_LICENSE$
 **
 ****************************************************************************/
-
-#define NOMINMAX // apparently some stupid win header <minwindef.h> interferes with std::max
+#define NOMINMAX
 #include "server.h"
 #include <QBuffer>
 #include <QFile>
@@ -59,7 +58,6 @@
 #include "kerrors.h"
 #include "sslserver.h"
 #include "user.h"
-#include "rngesus.h"
 
 QT_BEGIN_NAMESPACE
 
@@ -342,6 +340,7 @@ void Server::datagramReceivedStd(const QJsonObject &djson,
 
 bool Server::listen(const QHostAddress &address, quint16 port) {
     if(listening) {
+        //% "Server is already listening."
         qWarning() << qtTrId("already-listening");
         return true;
     }
@@ -383,7 +382,12 @@ bool Server::parseSpec(const QStringList &cmdParts) {
     try {
         if(cmdParts.length() > 0) {
             QString primary = cmdParts[0];
-            
+
+            if(primary.compare("ll", Qt::CaseInsensitive) == 0) {
+                // TODO: this is not IPv6 compliant
+                parseListen({"listen", "0.0.0.0", "1826"});
+                return true;
+            }
             if(primary.compare("listen", Qt::CaseInsensitive) == 0) {
                 parseListen(cmdParts);
                 return true;
@@ -498,13 +502,17 @@ void Server::handleNewConnection(){
     currentsocket->write(msg);
 }
 
-// jobid=0: std::pair(Globaltech, QList(equipserial, equipid, weight))
-// jobid!=0: std::pair(Localtech, QList(equipserial, equipid, weight))
+/* 2-Technology.md#Global technology
+ * 2-Technology.md#Local technology
+ * jobid=0: Returns std::pair(Globaltech, QList(equipserial, equipid, weight))
+ * jobid!=0: Returns std::pair(Localtech, QList(equipserial, equipid, weight))
+ */
 std::pair<double, QList<TechEntry>>
 Server::calculateTech(const CSteamID &uid, int jobID) {
     QMap<QUuid, Equipment *> equips;
     QList<int> childIDs = QList<int>();
-    if(jobID != 0 && jobID < KP::equipIdMax) {
+    bool isEquip = (jobID != 0 && jobID < KP::equipIdMax);
+    if(isEquip) {
         childIDs = equipChildTree.values(jobID);
     }
     QList<TechEntry> result;
@@ -515,17 +523,20 @@ Server::calculateTech(const CSteamID &uid, int jobID) {
                       " FROM UserEquip WHERE User = :id;");
         query.bindValue(":id", uid.ConvertToUint64());
         if(!query.exec() || !query.isSelect()) {
+            //% "Calculate technology for user %1 failed!"
             throw DBError(qtTrId("user-calculate-tech-failed")
                               .arg(uid.ConvertToUint64()),
                           query.lastError());
         }
-        else { // query.first yet to be called
+        else {
+            /* dump equip tech data into equips */
             QList<std::pair<double, double>> source;
             QUuid serial;
             int def;
             double weight;
             bool pass;
             while(query.next()) {
+                pass = jobID == 0;
                 serial = query.value(1).toUuid();
                 def = query.value(0).toInt();
                 weight
@@ -537,9 +548,9 @@ Server::calculateTech(const CSteamID &uid, int jobID) {
                     weight = 0.0;
                 equips[serial] =
                     equipRegistry.value(def);
-                pass = jobID == 0;
-                if(jobID != 0 && jobID < KP::equipIdMax) {
+                if(isEquip) {
                     if(!equipRegistry.contains(jobID)) {
+                        //% "Local technology computation failed due to bad equipment ID!"
                         qCritical() << qtTrId("local-tech-bad-equipdef");
                         pass = false;
                     }
@@ -555,7 +566,10 @@ Server::calculateTech(const CSteamID &uid, int jobID) {
                     source.append({equips.value(serial)->getTech(), weight});
                 }
             }
-            if(jobID != 0 && jobID < KP::equipIdMax) {
+
+        /* 2-Technology.md#Local technology */
+        virtual_skill_point_effect:
+            if(isEquip) {
                 double weight = getSkillPointsEffect(uid, jobID)
                                 * settings->value
                                   ("rule/skillpointweightcontrib", 9.0)
@@ -569,6 +583,7 @@ Server::calculateTech(const CSteamID &uid, int jobID) {
                                    weight});
                 }
             }
+
             return {jobID == 0 ? Tech::calLevelGlobal(source)
                                : Tech::calLevelLocal(source), result};
         }
@@ -586,6 +601,7 @@ Server::calculateTech(const CSteamID &uid, int jobID) {
 
 double Server::getSkillPointsEffect(const CSteamID &uid, int equipId) {
     if(!equipRegistry.contains(equipId)) {
+        //% "Skill points effect calculation failed due to invalid equipment ID!"
         qWarning() << qtTrId("equipid-invalid-skill-points-effect");
     }
     double x = User::getSkillPoints(uid, equipId);
@@ -638,6 +654,7 @@ void Server::offerEquipInfoUser(const CSteamID &uid,
                       " FROM UserEquip WHERE User = :id;");
         query.bindValue(":id", uid.ConvertToUint64());
         if(!query.exec() || !query.isSelect()) {
+            //% "Get user %1's equipment list failed!"
             throw DBError(qtTrId("user-get-equip-list-failed")
                               .arg(uid.ConvertToUint64()),
                           query.lastError());
@@ -783,6 +800,7 @@ bool Server::addEquipStar(const QUuid &equipUid, int amount = 1) {
                       " FROM UserEquip WHERE EquipUuid = :id;");
         query.bindValue(":id", equipUid.toString());
         if(!query.exec() || !query.isSelect() || !query.next()) {
+            //% "Get user's equipment list by uuid %1 failed!"
             throw DBError(qtTrId("user-get-equip-list-failed-eidbased")
                               .arg(equipUid.toString()),
                           query.lastError());
@@ -803,6 +821,7 @@ bool Server::addEquipStar(const QUuid &equipUid, int amount = 1) {
                 query2.bindValue(":id", equipUid.toString());
                 query2.bindValue(":star", star + amount);
                 if(!query2.exec()) {
+                    //% "Improve equipment failed due to bad equipment uuid!"
                     throw DBError(qtTrId("user-add-equip-star-failed-eidbased")
                                       .arg(equipUid.toString()),
                                   query.lastError());
@@ -883,6 +902,9 @@ void Server::doDevelop(CSteamID &uid, int equipid,
             senderM.sendMessage(connection, msg);
             return;
         }
+
+    /* 4.3-Development.md#Possess limit */
+    possess_limit:
         if(equip->disallowMassProduction() && (
                 User::getEquipAmount(uid, equipid)
                     + User::getCurrentFactoryParallel(uid, equipid)
@@ -892,31 +914,39 @@ void Server::doDevelop(CSteamID &uid, int equipid,
             senderM.sendMessage(connection, msg);
             return;
         }
-        auto fatherResult = User::haveFather(uid, equipid, equipRegistry);
-        if(!fatherResult.first) {
+
+    /* 4.4-Precondition.md#Normal preconditions (father) */
+    father_required:
+        auto [fatherExists, missingFatherId] = User::haveFather(uid, equipid, equipRegistry);
+        if(!fatherExists) {
             QByteArray msg =
                 KP::serverEquipLackFather(KP::DevelopNotOption,
-                                          fatherResult.second);
+                                          missingFatherId);
             senderM.sendMessage(connection, msg);
             return;
         }
+
         if(User::isFactoryBusy(uid, factoryid)) {
             QByteArray msg = KP::serverDevelopFailed(KP::FactoryBusy);
             senderM.sendMessage(connection, msg);
             return;
         }
-        /* mother skillpoint requirements */
+
+    /* 4.4-Precondition.md#Special preconditions (mother) */
+    mother_required:
         int64 sonSkillPointReq = newEquipHasMotherCal(equipid);
-        auto motherResult = User::haveMotherSP(uid, equipid, equipRegistry,
-                                               sonSkillPointReq);
-        if(!std::get<0>(motherResult)) {
+        auto [motherSPSufficient, motherEquipId, skillPointsRemaining]
+            = User::haveMotherSP(uid, equipid, equipRegistry,
+                                 sonSkillPointReq);
+        if(!motherSPSufficient) {
             QByteArray msg =
                 KP::serverEquipLackMother(KP::DevelopNotOption,
-                                          std::get<1>(motherResult),
-                                          std::get<2>(motherResult));
+                                          motherEquipId,
+                                          skillPointsRemaining);
             senderM.sendMessage(connection, msg);
             return;
         }
+
         ResOrd resRequired = equip->devRes();
         QByteArray msg = resRequired.resourceDesired();
         senderM.sendMessage(connection, msg);
@@ -944,15 +974,21 @@ void Server::doDevelop(CSteamID &uid, int equipid,
             query.bindValue(":succ", successTime);
             query.bindValue(":good", Tech::calExperiment2(
                                          equip->getTech(),
+                                         /* global tech */
                                          calculateTech(uid).first,
-                                         calculateTech(uid, equipid).first, // not tested
-                                         1.0, // sigma constant
+                                         /* local tech */
+                                         calculateTech(uid, equipid).first,
+                                         settings->value(
+                                                     "rule/sigmaconstant",
+                                                     1.0).toDouble(),
                                          mt));
             query.bindValue(":eqid", equipid);
             query.bindValue(":id", uid.ConvertToUint64());
             query.bindValue(":fid", factoryid);
             if(query.exec()) {
-                qDebug() << "GOOD";
+                qDebug() << "EQUIP DEV START";
+                /* only spend resources if database successfully register
+                 * the operation */
                 User::setResources(uid, currentRes);
                 QByteArray msg =
                     KP::serverDevelopStart();
@@ -995,6 +1031,7 @@ void Server::doFetch(CSteamID &uid, int factoryid, QSslSocket *connection) {
     }
     else {
         int jobID = query.value(0).toInt();
+        bool isEquip = jobID < KP::equipIdMax;
         bool done = query.value(1).toBool();
         if(!done) {
             QByteArray msg = KP::serverFairyBusy(jobID);
@@ -1003,9 +1040,12 @@ void Server::doFetch(CSteamID &uid, int factoryid, QSslSocket *connection) {
         else {
             bool success = query.value(2).toBool();
             if(!success) {
+
+            /* 4.5-Skillpoints.md#Development fail */
+            consolation_skill_point:
                 QByteArray msg = KP::serverPenguin();
                 senderM.sendMessage(connection, msg);
-                if(jobID < KP::equipIdMax &&
+                if(isEquip &&
                     equipRegistry.value(jobID)->disallowMassProduction()) {
                     /* get skill points (non-massproduced only)*/
                     int64 stdSkillPoints = equipRegistry.value(jobID)
@@ -1015,17 +1055,15 @@ void Server::doFetch(CSteamID &uid, int factoryid, QSslSocket *connection) {
                     double difficultyFactor
                         = settings->value(
                                       "rule/penguinskillpointsdifficulty",
-                                      10.0).toDouble() *
-                          std::pow(
-                              std::max(
-                                  1.0,
-                                  equipRegistry.value(jobID)->getTech()
-                                      - calculateTech(uid, 0).first), 2.0);
+                                      10.0).toDouble();
+                    double techFactor = atan2(calculateTech(uid, 0).first + 1,
+                                              equipRegistry.value(jobID)->getTech() + 1);
                     User::addSkillPoints(uid, jobID,
-                                         stdSkillPoints / difficultyFactor);
+                                         (stdSkillPoints * techFactor) / difficultyFactor);
                 }
+
             }
-            else if(jobID < KP::equipIdMax) {
+            else if(isEquip) {
                 QByteArray msg = KP::serverNewEquip(
                     newEquip(uid, jobID), jobID);
                 senderM.sendMessage(connection, msg);
@@ -1401,6 +1439,7 @@ bool Server::importShipFromCSV() {
     return true;
 }
 
+/* 3-Resources.md#Natural regeneration */
 void Server::naturalRegen(const CSteamID &uid) {
     try{
         QSqlDatabase db = QSqlDatabase::database();
@@ -1413,6 +1452,7 @@ void Server::naturalRegen(const CSteamID &uid) {
         query.exec();
         query.isSelect();
         if(Q_UNLIKELY(!query.first())) {
+            //% "Query last regeneration time for user %1 failed!"
             throw DBError(qtTrId("user-query-regen-time-fail")
                               .arg(uid.ConvertToUint64()), query.lastError());
             return;
@@ -1427,7 +1467,7 @@ void Server::naturalRegen(const CSteamID &uid) {
             int regenPower = globalTechLevel /
                              settings->value("rule/antiregenpower", 4.0).toDouble();
             int normal = settings->value("rule/baseregennormal", 10).toInt();
-            int al = settings->value("rule/baseregenalumiuum", 5).toInt();
+            int al = settings->value("rule/baseregenaluminum", 5).toInt();
             int rare = settings->value("rule/baseregenrare", 2).toInt();
             ResOrd regenAmount = ResOrd(normal + regenPower,
                                         normal + regenPower,
@@ -1440,8 +1480,13 @@ void Server::naturalRegen(const CSteamID &uid) {
                 qDebug() << regenMins << " minute(s) passed"
                                          "for regeneration purposes.";
             regenAmount *= (qint64)regenMins;
-            ResOrd regenCap = ResOrd(2500, 2500, 2500, 1500, 2000, 1500, 1500);
-            regenCap *= (qint64)(std::round(globalTechLevel * 8.0) + 24);
+            int normalCap = settings->value("rule/regencapnormal", 2500).toInt();
+            int alCap = settings->value("rule/regencapaluminum", 2000).toInt();
+            int rareCap = settings->value("rule/regencaprare", 1500).toInt();
+            ResOrd regenCap = ResOrd(normalCap, normalCap, normalCap, rareCap, alCap, rareCap, rareCap);
+            double regenPerTech = settings->value("rule/regenpertech", 8.0).toDouble();
+            int regenInitFactor = settings->value("rule/regenattech0", 24).toInt();
+            regenCap *= (qint64)(std::round(globalTechLevel * regenPerTech) + regenInitFactor);
             ResOrd currentRes = User::getCurrentResources(uid);
             currentRes.addResources(regenAmount, regenCap);
             User::setResources(uid, currentRes);
@@ -1477,6 +1522,18 @@ QUuid Server::newEquip(const CSteamID &uid, int equipId) {
     return User::newEquip(uid, equipId);
 }
 
+/* 4.4-Precondition.md#Special preconditions (mother) */
+void Server::newEquipHasMother(const CSteamID &uid, int equipId) {
+    if(!equipRegistry.contains(equipId))
+        return;
+    Equipment *equip = equipRegistry.value(equipId);
+    if(!equipRegistry.contains(equip->attr["Mother"]))
+        return;
+    int64 sonSkillPoints = newEquipHasMotherCal(equipId);
+    User::addSkillPoints(uid, equip->attr["Mother"], -sonSkillPoints);
+}
+
+/* 4.4-Precodition.md#Required skill points */
 int64 Server::newEquipHasMotherCal(int equipId) {
     if(!equipRegistry.contains(equipId))
         return 0;
@@ -1484,12 +1541,13 @@ int64 Server::newEquipHasMotherCal(int equipId) {
     if(!equipRegistry.contains(equip->attr["Mother"]))
         return 0;
     Equipment *mother = equipRegistry.value(equip->attr["Mother"]);
-    Q_UNUSED(mother);
+    if(!mother || mother->isInvalid())
+        return 0;
     uint64 sonSkillPoints
         = equip->skillPointsStd()
           * pow(equip->getTech(),
                 settings
-                    ->value("rule/motherspscle", 0.2).toDouble());
+                    ->value("rule/motherspscale", 0.2).toDouble());
     if(equip->disallowMassProduction()
         && equip->attr["Disallowmassproduction"] < 30) {
         double x = equip->attr["Disallowmassproduction"];
@@ -1505,17 +1563,6 @@ int64 Server::newEquipHasMotherCal(int equipId) {
         sonSkillPoints *= skillPointsAmplifier;
     }
     return sonSkillPoints;
-}
-
-void Server::newEquipHasMother(const CSteamID &uid, int equipId) {
-    if(!equipRegistry.contains(equipId))
-        return;
-    Equipment *equip = equipRegistry.value(equipId);
-    if(!equipRegistry.contains(equip->attr["Mother"]))
-        return;
-    //Equipment *mother = equipRegistry.value(equip->attr["Mother"]);
-    int64 sonSkillPoints = newEquipHasMotherCal(equipId);
-    User::addSkillPoints(uid, equip->attr["Mother"], -sonSkillPoints);
 }
 
 void Server::parseListen(const QStringList &cmdParts) {
@@ -1552,7 +1599,7 @@ void Server::parseListen(const QStringList &cmdParts) {
         return;
     }
     conf.setLocalCertificate(certs.at(0));
-    /* Of course, private key is not shipped with the project. */
+#pragma message(SECRET)
     QFile keyFile(settings->value("networkserver/key",
                                   "serverprivate.key").toString());
     if(!keyFile.open(QIODevice::ReadOnly)) {
@@ -1626,8 +1673,8 @@ void Server::receivedAuth(const QJsonObject &djson,
 #pragma message(NOT_M_CONST)
         uint8 rgubDecrypted[1024];
         uint32 cubDecrypted = sizeof(rgubDecrypted);
-        
-        /* Of course, app secret key is not shipped with the project. */
+
+#pragma message(SECRET)
         QFile appSecretKeyFile("AppSecretKey");
         if(!appSecretKeyFile.open(QIODevice::ReadOnly)) {
             //% "Server lack the steam app secret key."
@@ -1643,8 +1690,6 @@ void Server::receivedAuth(const QJsonObject &djson,
         }
         else {
             char *data = new char[2];
-            /* Must be modified in steam release,
-             * you can't put AppSecretKey file in it */
             uint8 rgubKey[k_nSteamEncryptedAppTicketSymmetricKeyLen]
                 = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
                     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -1662,7 +1707,8 @@ void Server::receivedAuth(const QJsonObject &djson,
             if(!SteamEncryptedAppTicket_BDecryptTicket(
                     rgubTicket, cubTicket, rgubDecrypted, &cubDecrypted,
                     rgubKey, sizeof(rgubKey))) {
-                qCritical() << qtTrId("%1: Ticket failed to decrypt")
+                //% "%1: Ticket failed to decrypt"
+                qCritical() << qtTrId("ticket-decrypt-failed")
                                    .arg(peerInfo.toString()).toUtf8();
                 QByteArray msg = KP::serverLogFail(KP::TicketFailedToDecrypt);
                 senderM.sendMessage(connection, msg);
@@ -1673,15 +1719,17 @@ void Server::receivedAuth(const QJsonObject &djson,
 #pragma message(NOT_M_CONST)
             if(!SteamEncryptedAppTicket_BIsTicketForApp(
                     rgubDecrypted,
-                    cubDecrypted, 2632870)) {
-                qCritical() << qtTrId("%1: Ticket is not from correct App ID")
+                    cubDecrypted, KP::steamAppId)) {
+                //% "%1: Ticket is not from correct App ID"
+                qCritical() << qtTrId("ticket-appid-wrong")
                                    .arg(peerInfo.toString()).toUtf8();
                 QByteArray msg = KP::serverLogFail(KP::TicketIsntFromCorrectAppID);
                 senderM.sendMessage(connection, msg);
                 delete [] rgubTicket;
                 return;
             }
-            qDebug("Ticket decrypt from correct App ID");
+            //% "Ticket decrypt from correct App ID"
+            qDebug() << qtTrId("ticket-appid-right");
             QDateTime now = QDateTime::currentDateTime();
             QDateTime requestThen = QDateTime();
             requestThen.setSecsSinceEpoch(
@@ -1689,9 +1737,11 @@ void Server::receivedAuth(const QJsonObject &djson,
                     rgubDecrypted,
                     cubDecrypted));
             qint64 elapsed = requestThen.secsTo(now);
-            qDebug() << qtTrId("Elapsed: %1 second(s)").arg(elapsed).toUtf8();
+            //% "Elapsed: %1 second(s)"
+            qDebug() << qtTrId("time-gone").arg(elapsed).toUtf8();
             if(elapsed > elapsedMaxTolerence) {
-                qCritical() << qtTrId("%1: Request timeout")
+                //% "%1: Request timeout"
+                qCritical() << qtTrId("request-timeout")
                                    .arg(peerInfo.toString()).toUtf8();
                 QByteArray msg = KP::serverLogFail(KP::RequestTimeout);
                 senderM.sendMessage(connection, msg);
@@ -1704,7 +1754,8 @@ void Server::receivedAuth(const QJsonObject &djson,
                 cubDecrypted,
                 &steamID);
             if(steamID == k_steamIDNil) {
-                qCritical() << qtTrId("%1: Steam ID invalid")
+                //% "%1: Steam ID invalid"
+                qCritical() << qtTrId("steam-id-wrong")
                                    .arg(peerInfo.toString()).toUtf8();
                 QByteArray msg = KP::serverLogFail(KP::SteamIdInvalid);
                 senderM.sendMessage(connection, msg);
@@ -1714,13 +1765,15 @@ void Server::receivedAuth(const QJsonObject &djson,
             else {
                 /* We are logged in here */
                 uint64 idnum = steamID.ConvertToUint64();
-                qInfo() << QString("User login: %1").arg(idnum).toUtf8();
+                //% "User login: %1"
+                qInfo() << qtTrId("user-login").arg(idnum).toUtf8();
                 if(connectedPeers.contains(steamID)) {
                     receivedForceLogout(steamID);
                 }
                 receivedLogin(steamID, peerInfo, connection);
                 if(User::isSuperUser(steamID)) {
-                    qWarning() << QString("Superuser login: %1").
+                    //% "Superuser login: %1"
+                    qWarning() << qtTrId("superuser-login").
                                   arg(idnum).toUtf8();
                     /*
                     for(auto &equip: equipRegistry) {
@@ -1841,12 +1894,14 @@ void Server::receivedReq(const QJsonObject &djson,
                          const PeerInfo &peerInfo,
                          QSslSocket *connection) {
     if(!connectedUsers.contains(connection)) {
+        //% "User is not properly online!"
         qWarning() << qtTrId("Connection-not-properly-online");
         return;
     }
     CSteamID uid = connectedUsers[connection];
     if(!uid.IsValid()) {
-        qWarning() << qtTrId("Invalid-uid: %1")
+        //% "Invalid-uid: %1"
+        qWarning() << qtTrId("invalid-uid")
                           .arg(uid.ConvertToUint64());
         return;
     }
@@ -1870,7 +1925,7 @@ void Server::receivedReq(const QJsonObject &djson,
             break;
         }
         break;
-    case KP::CommandType::AdminAddEquip: {
+    case KP::CommandType::Adminaddequip: {
         int equipid = djson["equipid"].toInt();
         if(!User::isSuperUser(uid)) {
             QByteArray msg = KP::accessDenied();
@@ -1917,9 +1972,9 @@ void Server::receivedReq(const QJsonObject &djson,
                            this,
                            [connection, uid, djson, this]
                            {offerTechInfo(
-                                 connection,
-                                 uid,
-                                 djson["local"].toInt());});
+                  connection,
+                  uid,
+                  djson["local"].toInt());});
     }
     break;
     case KP::CommandType::DemandSkillPoints: {
@@ -1927,9 +1982,9 @@ void Server::receivedReq(const QJsonObject &djson,
                            this,
                            [connection, uid, djson, this]
                            {offerSPInfo(
-                                 connection,
-                                 uid,
-                                 djson["equipid"].toInt());});
+                  connection,
+                  uid,
+                  djson["equipid"].toInt());});
     }
     break;
     case KP::CommandType::DemandResourceUpdate: {
@@ -1937,8 +1992,8 @@ void Server::receivedReq(const QJsonObject &djson,
                            this,
                            [connection, uid, this]
                            {offerResourceInfo(
-                                 connection,
-                                 uid);});
+                  connection,
+                  uid);});
     }
     break;
     case KP::CommandType::DestructEquip: {
@@ -1956,6 +2011,7 @@ void Server::receivedReq(const QJsonObject &djson,
         throw std::domain_error("command type not supported"); break;
     }
     return;
+    Q_UNREACHABLE();
     QByteArray msg2 = KP::accessDenied();
     senderM.sendMessage(connection, msg2);
 }
@@ -1983,7 +2039,8 @@ void Server::refreshClientFactory(CSteamID &uid, QSslSocket *connection) {
                   "WHERE UserID = :id");
     query.bindValue(":id", uid.ConvertToUint64());
     if(!query.exec() || !query.isSelect()) {
-        throw DBError(qtTrId("factory-state-error"), query.lastError());
+        //% "Open user %1's factory failed!"
+        throw DBError(qtTrId("factory-state-error").arg(uid.ConvertToUint64()), query.lastError());
         return;
     }
     QJsonObject result;
@@ -2004,6 +2061,7 @@ void Server::refreshClientFactory(CSteamID &uid, QSslSocket *connection) {
     senderM.sendMessage(connection, msg);
 }
 
+/* 4.6-Destruct.md */
 QList<QUuid> Server::retireEquip(const CSteamID &uid, const QList<QUuid> &trash) {
     QList<QUuid> result;
     QSqlDatabase db = QSqlDatabase::database();
@@ -2221,17 +2279,17 @@ void Server::sqlinitEquipName() {
     QSqlQuery query;
     query.prepare(*equipName);
     if(!query.exec()) {
-        //% "Create Equipment database failed."
-        throw DBError(qtTrId("equip-db-gen-failure"),
+        //% "Create Equipment name failed."
+        throw DBError(qtTrId("equip-name-gen-failure"),
                       query.lastError());
     }
 }
 
 void Server::sqlinitEquipSP() {
-    qWarning() << qtTrId("equip-db-user-sp-lack");
     QSqlQuery query;
     query.prepare(*userEquipSkillPoints);
     if(!query.exec()) {
+        //% "User equipment skillpoints fetch failure!"
         throw DBError(qtTrId("equip-db-user-sp-gen-failure"),
                       query.lastError());
     }
@@ -2263,24 +2321,24 @@ void Server::sqlinitFacto() {
 
 void Server::sqlinitShip() {
     //% "Ship database does not exist, creating..."
-    qWarning() << qtTrId("equip-db-lack");
+    qWarning() << qtTrId("ship-db-lack");
     QSqlQuery query;
     query.prepare(*shipReg);
     if(!query.exec()) {
         //% "Create Ship database failed."
-        throw DBError(qtTrId("equip-db-gen-failure"),
+        throw DBError(qtTrId("equip-ship-db-gen-failure"),
                       query.lastError());
     }
 }
 
 void Server::sqlinitShipName() {
     //% "Ship name database does not exist, creating..."
-    qWarning() << qtTrId("equip-name-db-lack");
+    qWarning() << qtTrId("ship-name-db-lack");
     QSqlQuery query;
     query.prepare(*shipName);
     if(!query.exec()) {
-        //% "Create Ship database failed."
-        throw DBError(qtTrId("equip-db-gen-failure"),
+        //% "Create Ship name failed."
+        throw DBError(qtTrId("equip-ship-name-gen-failure"),
                       query.lastError());
     }
 }
@@ -2389,6 +2447,7 @@ void Server::userInit(CSteamID &uid) {
         factoryNew.bindValue(":uid", uid.ConvertToUint64());
         factoryNew.bindValue(":facto", i);
         if(!factoryNew.exec()) {
+            //% "Init 4 factory slots for user %1 failed!"
             throw DBError(qtTrId("user-factory-init-fail").
                           arg(uid.ConvertToUint64()),
                           factoryNew.lastError());

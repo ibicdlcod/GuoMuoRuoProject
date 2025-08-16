@@ -52,6 +52,7 @@
 #include "../steam/isteamfriends.h"
 #include "../Protocol/commandline.h"
 #include "../Protocol/kp.h"
+#include "../Protocol/utility.h"
 #include "networkerror.h"
 #include "steamauth.h"
 
@@ -154,6 +155,7 @@ void Clientv2::backToNavalBase() {
 /* Connection is lost */
 void Clientv2::catbomb() {
     if(loggedIn()) {
+        /* should make a cat GUI */
         //% "You have been bombarded by a cute cat."
         qCritical() << qtTrId("catbomb");
         gameState = KP::Offline;
@@ -165,8 +167,8 @@ void Clientv2::catbomb() {
         //% "Failed to establish connection, check your username, "
         //% "password and server status."
         qWarning() << qtTrId("connection-failed-warning");
+        attemptMode = false;
     }
-    attemptMode = false;
     shutdown();
     displayPrompt();
 }
@@ -190,30 +192,29 @@ bool Clientv2::parse(const QString &input) {
     static QRegularExpression re("\\s+");
     QStringList cmdParts = input.split(re, Qt::SkipEmptyParts);
     if(cmdParts.length() > 0) {
+        auto meta = QMetaEnum::fromType<KP::ConsoleCommandType>();
         QString primary = cmdParts[0];
+        Utility::titleCase(primary);
 
-        if(primary.compare("help", Qt::CaseInsensitive) == 0) {
+        switch(meta.keyToValue(primary.toUtf8())) {
+        case KP::Help:
             cmdParts.removeFirst();
             showHelp(cmdParts);
             displayPrompt();
             return true;
-        }
-        else if(primary.compare("exit", Qt::CaseInsensitive) == 0) {
+        case KP::Exit:
             exitGracefully();
             return true;
-        }
-        else if(primary.compare("commands", Qt::CaseInsensitive) == 0) {
+        case KP::Commands:
             showCommands(true);
             displayPrompt();
             return true;
-        }
-        else if(primary.compare("allcommands", Qt::CaseInsensitive) == 0) {
+        case KP::Allcommands:
             showCommands(false);
             displayPrompt();
             return true;
-        }
-        /* Not consistently present commands */
-        else {
+        default:
+            /* Not consistently present commands */
             bool success = parseSpec(cmdParts);
             if(!success) {
                 invalidCommand();
@@ -230,26 +231,31 @@ bool Clientv2::parse(const QString &input) {
 bool Clientv2::parseSpec(const QStringList &cmdParts) {
     try {
         if(cmdParts.length() > 0) {
-            QString primary = cmdParts[0];
 
-            bool loginMode = primary.compare("connect", Qt::CaseInsensitive) == 0;
-            if(loginMode) {
+            auto meta = QMetaEnum::fromType<KP::ConsoleCommandType>();
+            QString primary = cmdParts[0];
+            Utility::titleCase(primary);
+
+            switch(meta.keyToValue(primary.toUtf8())) {
+            case KP::Connect:
                 parseConnectReq(cmdParts);
                 return true;
-            }
-            else if(primary.compare("disconnect", Qt::CaseInsensitive) == 0) {
+            case KP::Disconnect:
                 parseDisconnectReq();
                 return true;
-            }
-            else if(primary.compare("cert", Qt::CaseInsensitive) == 0) {
+            case KP::Switchcert:
                 switchCert(cmdParts);
                 return true;
-            }
-            else if(!loggedIn()) {
-                return false;
-            }
-            else {
-                return parseGameCommands(primary, cmdParts);
+            default:
+                if(!loggedIn()) {
+                    //% "You are not online, command is invalid."
+                    qWarning() << qtTrId("command-when-loggedout");
+                    return false;
+                }
+                else {
+                    return parseGameCommands(primary, cmdParts);
+                }
+                break;
             }
         }
         return false;
@@ -679,7 +685,7 @@ const QStringList Clientv2::getValidCommands() const {
         }
     }
     else if(!attemptMode)
-        result.append({"connect", "register", "switch"});
+        result.append({"connect", "register"});
     result.sort(Qt::CaseInsensitive);
     return result;
 }
@@ -755,11 +761,16 @@ void Clientv2::parseDisconnectReq() {
 /* Parse CLI commands actually related to game */
 bool Clientv2::parseGameCommands(const QString &primary,
                                  const QStringList &cmdParts) {
-    if(primary.compare("switch", Qt::CaseInsensitive) == 0) {
+
+    auto meta = QMetaEnum::fromType<KP::CommandType>();
+    QString primaryNonConst = primary;
+    Utility::titleCase(primaryNonConst);
+
+    switch(meta.keyToValue(primaryNonConst.toUtf8())) {
+    case KP::Switch:
         doSwitch(cmdParts);
         return true;
-    }
-    else if(primary.compare("develop", Qt::CaseInsensitive) == 0) {
+    case KP::Develop:
         if(gameState != KP::Factory) {
             return false;
         }
@@ -767,8 +778,7 @@ bool Clientv2::parseGameCommands(const QString &primary,
             doDevelop(cmdParts);
             return true;
         }
-    }
-    else if(primary.compare("fetch", Qt::CaseInsensitive) == 0) {
+    case KP::Fetch:
         if(gameState != KP::Factory) {
             return false;
         }
@@ -776,12 +786,10 @@ bool Clientv2::parseGameCommands(const QString &primary,
             doFetch(cmdParts);
             return true;
         }
-    }
-    else if(primary.compare("addequip", Qt::CaseInsensitive) == 0) {
+    case KP::Adminaddequip:
         doAddEquip(cmdParts);
         return true;
-    }
-    else if(primary.compare("refresh", Qt::CaseInsensitive) == 0) {
+    case KP::Refresh:
         if(cmdParts.length() > 1
             && cmdParts[1].compare("Factory", Qt::CaseInsensitive) == 0) {
             doRefreshFactory();
@@ -789,8 +797,9 @@ bool Clientv2::parseGameCommands(const QString &primary,
         } else {
             return false;
         }
+    default:
+        return false;
     }
-    return false;
 }
 
 /* Parse quit */
@@ -959,7 +968,7 @@ void Clientv2::receivedMsg(const QJsonObject &djson) {
             Equipment *mother = equipRegistryCache
                                     .value(djson["mother"].toInt());
             if(mother != nullptr) {
-                //% "This equipment requires you to possess %3 skillpoints of %1 (id: %2) in order to develop."
+                //% "This equipment requires you to possess extra %3 skillpoints of %1 (id: %2) in order to develop."
                 qInfo() <<
                     qtTrId("equip-not-developable-mother")
                         .arg(mother->toString(
@@ -978,9 +987,11 @@ void Clientv2::receivedMsg(const QJsonObject &djson) {
             qInfo() << qtTrId("resource-lack");
             break;
         case KP::MassProductionDisallowed:
+            //% "You have reached possessing limit for this equipment!"
             qWarning() << qtTrId("massproduction-disallowed");
             break;
         case KP::ProductionDisallowed:
+            //% "This equipment does not allow mass production!"
             qWarning() << qtTrId("production-disallowed");
             break;
         default:
@@ -1070,6 +1081,7 @@ void Clientv2::receivedMsg(const QJsonObject &djson) {
         delete sender;
         authSent = false;
         emit gamestateChanged(KP::Offline);
+        //% "The client can now exit normally."
         qInfo() << qtTrId("client-finish");
         shutdown();
         displayPrompt();
@@ -1104,10 +1116,15 @@ void Clientv2::receivedNewLogin(const QJsonObject &djson) {
     else {
         QString reas;
         switch(djson["reason"].toInt()) {
+            //% "Login failed: cannot decrypt ticket."
         case KP::TicketFailedToDecrypt: reas = qtTrId("ticket-decrypt-fail"); break;
+            //% "Login failed: ticket is from incorrect app id."
         case KP::TicketIsntFromCorrectAppID: reas = qtTrId("ticket-incorrect-appid"); break;
+            //% "Login failed: ticket timeouted."
         case KP::RequestTimeout: reas = qtTrId("ticket-timeout"); break;
+            //% "Login failed: steam id is invalid."
         case KP::SteamIdInvalid: reas = qtTrId("steam-id-invalid"); break;
+            //% "Login failed: steam authentication failed."
         case KP::SteamAuthFail: reas = qtTrId("steam-auth-fail"); break;
         default: throw std::domain_error("message not implemented"); break;
         }
@@ -1179,7 +1196,7 @@ void customMessageHandler(QtMsgType type,
     switch(type) {
     case QtDebugMsg:
         background = QColor("green");
-        foreground = QColor("black");
+        foreground = QColor("white");
         break;
     case QtInfoMsg:
         background = QColor("blue");
@@ -1195,6 +1212,7 @@ void customMessageHandler(QtMsgType type,
         break;
     case QtFatalMsg:
         background = QColor("purple");
+        foreground = QColor("white");
         break;
     }
 
@@ -1240,7 +1258,7 @@ void Clientv2::showCommands(bool validOnly){
     emit qout(qtTrId("exit-helper"));
     if(validOnly) {
         //% "Available commands:"
-        emit qout(qtTrId("good-command"), QColor("black"), QColor("green"));
+        emit qout(qtTrId("good-command"), QColor("black"), QColor("lightgreen"));
         qls(getValidCommands());
     }
     else {
@@ -1270,6 +1288,7 @@ void Clientv2::switchCert(const QStringList &input) {
 
 void Clientv2::updateEquipCache(const QJsonObject &input) {
     if(!input.contains("content")) {
+        //% "Server fetch equipment cache failed!"
         qWarning() << qtTrId("server-equip-cache-fail");
         return;
     }

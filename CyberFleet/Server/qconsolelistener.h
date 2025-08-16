@@ -28,10 +28,10 @@ SOFTWARE.
 
 #include <QObject>
 #include <QThread>
-#include <iostream>
 
 #if defined (Q_OS_WIN)
 #include <QWinEventNotifier>
+#define NOMINMAX
 #include <windows.h>
 #else
 #include <QSocketNotifier>

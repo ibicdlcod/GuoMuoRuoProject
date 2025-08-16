@@ -1,9 +1,11 @@
 #include "tech.h"
 #include <QDebug>
 #include <QSettings>
+#include "kp.h"
 
 extern std::unique_ptr<QSettings> settings;
 
+/* 2-Technology.md#Combined effects */
 double Tech::calCapable(double globalTech, double localTech,
                         double wantedTech) {
     double maxDeterimental =
@@ -18,6 +20,7 @@ double Tech::calCapable(double globalTech, double localTech,
     return std::max(min, max - detrimentalEffect);
 }
 
+/* 2-Technology.md#Success rate */
 bool Tech::calExperiment(const double wantedTech,
                          const double currentTech,
                          const double sigmaConstant,
@@ -28,6 +31,7 @@ bool Tech::calExperiment(const double wantedTech,
     return random_double <= currentTech;
 }
 
+/* 2-Technology.md#Success rate */
 bool Tech::calExperiment2(const double wantedTech,
                           const double globalTech,
                           const double localTech,
@@ -39,6 +43,7 @@ bool Tech::calExperiment2(const double wantedTech,
                          generator);
 }
 
+/* 2-Technology.md#How a combined level is calculated from its components */
 double Tech::calLevel(QList<std::pair<double, double>> &source,
                       const double scopeConstant) {
     /* sort by key desc */
@@ -47,6 +52,7 @@ double Tech::calLevel(QList<std::pair<double, double>> &source,
                   return a.first > b.first;
               });
     if(scopeConstant <= 1.0) {
+        //% "Scope constant less or equal to 1 is against design doctrine!"
         qCritical() << qtTrId("scope-constant-less-than-1");
         return 0.0;
     }
@@ -56,12 +62,12 @@ double Tech::calLevel(QList<std::pair<double, double>> &source,
          iter != source.end();
          iter++) {
         if(iter->first < 0.0) {
+            //% "Tech level less than 0 is against design doctrine!"
             qCritical() << qtTrId("tech-level-less-than-0");
             return 0.0;
         }
         double weight = iter->second;
         if(weight < 0.0) {
-            //qCritical() << qtTrId("tech-weight-less-than-0");
             weight = 0.0;
         }
         weightSum += weight;
@@ -71,33 +77,38 @@ double Tech::calLevel(QList<std::pair<double, double>> &source,
     return result;
 }
 
+/* 2-Technology.md#Constants */
 double Tech::calLevelGlobal(QList<std::pair<double, double>> &source) {
     double globalScope =
         settings->value("rule/techglobalscope", 1.02).toDouble();
     return calLevel(source, globalScope);
 }
 
+/* 2-Technology.md#Constants */
 double Tech::calLevelLocal(QList<std::pair<double, double>> &source) {
     double localScope =
         settings->value("rule/techlocalscope", 1.1).toDouble();
     return calLevel(source, localScope);
 }
 
+/* 2-Technology.md#Weight of ships */
 double Tech::calWeightShip(int level) {
     double shipLevelPerWeight =
         settings->value("rule/shiplevelperweight", 10.0).toDouble();
     return level / shipLevelPerWeight;
 }
 
-double calWeightEquip(double requiredSP, double actualSP) {
+/* 2-Technology.md#Weight of equipment, taking skill points into account */
+double Tech::calWeightEquip(double requiredSP, double actualSP) {
     double skillPointWeightContrib =
         settings->value("rule/skillpointweightcontrib", 9.0).toDouble();
-    /* 0.5 is not a magic const because how this function behaves */
-    return (skillPointWeightContrib * actualSP) / std::hypot(requiredSP, actualSP);
+    return (skillPointWeightContrib * actualSP) / std::hypot(requiredSP, actualSP)
     + 1.0;
 }
 
+/* 2-Technology.md#How characteristic tech level are determined */
 double Tech::techYearToCompact(int year) {
+#pragma message(NOT_M_CONST)
     if(year <= 1924)
         return std::max(0.0, (year - 1908) / 16.0);
     else if(year <= 1933)

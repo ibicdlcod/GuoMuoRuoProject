@@ -39,6 +39,7 @@ void Sender::enqueue(const QByteArray &content) {
 
 void Sender::start() {
     if(input.isEmpty()) {
+        //% "Input buffer is empty."
         qWarning() << qtTrId("input-buffer-empty");
         return;
     }
@@ -75,6 +76,7 @@ void Sender::destinationBytesWritten(qint64 length) {
 }
 
 void Sender::destinationError() {
+    //% "Unable to send data."
     emit errorOccurred(qtTrId("unable-send-data"));
     qWarning() << m_destination->error();
 }
@@ -104,6 +106,7 @@ void Sender::send() {
     }
     qint64 read = m_source->read(m_buffer.data(), m_buffer.size());
     if (read == -1) {
+        //% "Error reading intended message."
         emit errorOccurred(qtTrId("error-reading-intended-message"));
         return;
     }
@@ -125,11 +128,13 @@ void Sender::send() {
     qint64 written = m_destination->write(writeContent.constData(),
                                           writeSize);
     if (written == -1) {
+        //% "Unable to send data, connection broke."
         emit errorOccurred(qtTrId("unable-send-data-connection-broke"));
         qWarning() << m_destination->error();
         return;
     }
     if (written != writeSize) {
+        //% "Write buffer failed to fill completely."
         emit errorOccurred(qtTrId("write-buffer-failed-to-fill"));
         qWarning() << m_destination->error();
         return;

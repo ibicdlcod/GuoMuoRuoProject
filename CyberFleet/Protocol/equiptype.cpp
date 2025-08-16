@@ -36,26 +36,47 @@ int EquipType::getTypeSort() const {
 
 const QList<QString> EquipType::getDisplayGroupsSorted() {
     return {
+        //% "小口径主炮（平射）"
         qtTrId("SMALLGUNFLAT"),
+        //% "小口径主炮（高角）"
         qtTrId("SMALLGUNFLAK"),
+        //% "中口径主炮"
         qtTrId("MIDGUN"),
+        //% "大口径主炮"
         qtTrId("BIGGUN"),
+        //% "超大口径主炮"
         qtTrId("SUPERBIGGUN"),
+        //% "副炮"
         qtTrId("SECGUN"),
+        //% "舰载战斗机"
         qtTrId("FIGHTER"),
+        //% "舰载爆击机"
         qtTrId("BOMBDIVE"),
+        //% "舰载雷击机"
         qtTrId("BOMBTORP"),
+        //% "侦察机"
         qtTrId("RECON"),
+        //% "水上爆击机/战斗机"
         qtTrId("SEAPLANEBF"),
+        //% "鱼雷"
         qtTrId("TORP"),
+        //% "防空装备"
         qtTrId("AA"),
+        //% "对潜装备"
         qtTrId("ASW"),
+        //% "雷达"
         qtTrId("RADAR"),
+        //% "对陆装备"
         qtTrId("LAND"),
+        //% "陆基攻击机"
         qtTrId("ATTACKLB"),
+        //% "陆基战斗机"
         qtTrId("FIGHTERLB"),
+        //% "增设装甲"
         qtTrId("BULGE"),
+        //% "人员"
         qtTrId("PERS"),
+        //% "其他"
         qtTrId("OTHER"),
     };
 }
@@ -250,6 +271,7 @@ QList<QString> EquipType::allEquipTypes() {
     return result.keys();
 }
 
+/* 4.3-Development.md#Resource cost */
 const ResOrd EquipType::devResBase() const {
     using namespace KP;
 
