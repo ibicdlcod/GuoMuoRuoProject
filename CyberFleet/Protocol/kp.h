@@ -114,7 +114,7 @@ enum CommandType{
     SteamAuth,
     SteamLogout,
     CHello,
-    AdminAddEquip,
+    Adminaddequip,
     DemandEquipInfo,
     DemandEquipInfoUser,
     DemandGlobalTech,

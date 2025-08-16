@@ -782,7 +782,7 @@ bool Clientv2::parseGameCommands(const QString &primary,
             doFetch(cmdParts);
             return true;
         }
-    case KP::AdminAddEquip:
+    case KP::Adminaddequip:
         doAddEquip(cmdParts);
         return true;
     case KP::Refresh:

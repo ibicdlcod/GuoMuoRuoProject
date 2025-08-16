@@ -1925,7 +1925,7 @@ void Server::receivedReq(const QJsonObject &djson,
             break;
         }
         break;
-    case KP::CommandType::AdminAddEquip: {
+    case KP::CommandType::Adminaddequip: {
         int equipid = djson["equipid"].toInt();
         if(!User::isSuperUser(uid)) {
             QByteArray msg = KP::accessDenied();
