@@ -34,6 +34,7 @@ void SteamAuth::OnEncryptedAppTicketResponse(
     if(bIOFailure) {
         //% "There has been an IO Failure when requesting the Encrypted App Ticket.\n"
         qWarning() << qtTrId("steam-bIOFailure").toUtf8();
+        emit eATFailed();
         return;
     }
 
@@ -54,25 +55,30 @@ void SteamAuth::OnEncryptedAppTicketResponse(
         else {
             //% "GetEncryptedAppTicket failed!"
             qWarning() << qtTrId("appticket-failure");
+            emit eATFailed();
         }
     }
     break;
     case k_EResultNoConnection:
         //% "Calling RequestEncryptedAppTicket while not connected to steam results in this error."
         qWarning() << qtTrId("k_EResultNoConnection");
+        emit eATFailed();
         break;
     case k_EResultDuplicateRequest:
         //% "Calling RequestEncryptedAppTicket while there is already a pending request results in this error."
         qWarning() << qtTrId("k_EResultDuplicateRequest");
+        emit eATFailed();
         break;
     case k_EResultLimitExceeded:
         //% "Calling RequestEncryptedAppTicket more than once per minute returns this error."
         qWarning() << qtTrId("k_EResultLimitExceeded");
+        emit eATFailed();
         break;
     default:
         //% "Calling RequestEncryptedAppTicket encountered unknown error %1."
         qWarning() << qtTrId("request-app-ticket-fail-unknown")
                           .arg(pEncryptedAppTicketResponse->m_eResult);
+        emit eATFailed();
         break;
     }
 }

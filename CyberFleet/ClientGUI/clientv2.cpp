@@ -722,6 +722,7 @@ void Clientv2::parseConnectReq(const QStringList &cmdParts) {
         }
         attemptMode = true;
 
+        QObject::connect(&sauth, &SteamAuth::eATFailed, this, &Clientv2::catbomb);
         sauth.RetrieveEncryptedAppTicket();
         SteamAPI_RunCallbacks();
 

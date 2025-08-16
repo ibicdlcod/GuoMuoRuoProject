@@ -2,10 +2,16 @@
 #define STEAMAUTH_H
 
 #include "../steam/isteamuser.h"
+#include <QObject>
 
-class SteamAuth {
+class SteamAuth : public QObject {
+    Q_OBJECT
+
 public:
     void RetrieveEncryptedAppTicket();
+
+signals:
+    void eATFailed();
 
 private:
     void OnEncryptedAppTicketResponse(
