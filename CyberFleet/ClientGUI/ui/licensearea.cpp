@@ -13,7 +13,7 @@ LicenseArea::LicenseArea(QWidget *parent) :
 
     /* this is done instead of in *.ui for it does not cascade */
     ui->LicenseText->setObjectName("licenseText");
-    ui->LicenseText->setStyleSheet("QTextBrowser#licenseText { border-style: none }");
+    ui->LicenseText->setStyleSheet("QTextBrowser#licenseText { border-style: none; }");
     ui->BelowLicense->setObjectName("belowLicense");
     ui->BelowLicense->setStyleSheet("QFrame#belowLicense { border-style: none }");
     ui->Naganami->setObjectName("naganami");
@@ -37,7 +37,6 @@ LicenseArea::LicenseArea(QWidget *parent) :
     ui->LicenseText->setText(notice);
     ui->LicenseText->selectAll();
     ui->LicenseText->setAlignment(Qt::AlignCenter);
-    ui->LicenseText->setTextColor(QColor("white"));
     auto textCursor = ui->LicenseText->textCursor();
     textCursor.clearSelection();
     ui->LicenseText->setTextCursor(textCursor);
@@ -45,7 +44,6 @@ LicenseArea::LicenseArea(QWidget *parent) :
     ui->Naganami->setText(qtTrId("naganami-words"));
     ui->Naganami->selectAll();
     ui->Naganami->setAlignment(Qt::AlignCenter);
-    ui->Naganami->setTextColor(QColor("white"));
     textCursor = ui->Naganami->textCursor();
     textCursor.clearSelection();
     ui->Naganami->setTextCursor(textCursor);

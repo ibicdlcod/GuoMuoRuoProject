@@ -5,6 +5,7 @@
 #include <QSettings>
 #include <QResizeEvent>
 #include <QScreen>
+#include <QStyleHints>
 #include "keyenterreceiver.h"
 #include "../clientv2.h"
 
@@ -16,7 +17,11 @@ MainWindow::MainWindow(QWidget *parent, int argc, char ** argv)
 {
     ui->setupUi(this);
 
-    setStyleSheet("QMenuBar { background-color: lightgray; }");
+    updateColorScheme(QApplication::styleHints()->colorScheme());
+    QObject::connect(QApplication::styleHints(),
+                     &QStyleHints::colorSchemeChanged,
+                     this, &MainWindow::updateColorScheme);
+
 
     /* this is done instead of in *.ui for it does not cascade */
     ui->MainArea->setObjectName("mainArea");
@@ -100,7 +105,7 @@ MainWindow::MainWindow(QWidget *parent, int argc, char ** argv)
                        {
                            licenseArea->show();
                            adjustArea(licenseArea,
-                                    ui->License->size());});
+                                      ui->License->size());});
     connect(licenseArea, &LicenseArea::showLicenseComplete,
             ui->License, &QWidget::hide);
     connect(licenseArea, &LicenseArea::showLicenseComplete,
@@ -129,6 +134,12 @@ MainWindow::~MainWindow()
 void MainWindow::adjustArea(QFrame *input, const QSize &size) {
     QTimer::singleShot(1, this,
                        [input, size]{input->resize(size);});
+}
+
+void MainWindow::factoryRefresh() {
+    QString cmd1 = QStringLiteral("refresh Factory");
+    Clientv2 &engine = Clientv2::getInstance();
+    engine.parse(cmd1);
 }
 
 void MainWindow::gamestateInit() {
@@ -176,12 +187,6 @@ void MainWindow::processCmd() {
     ui->CommandPrompt->clear();
 }
 
-void MainWindow::factoryRefresh() {
-    QString cmd1 = QStringLiteral("refresh Factory");
-    Clientv2 &engine = Clientv2::getInstance();
-    engine.parse(cmd1);
-}
-
 void MainWindow::switchToArsenal() {
     Clientv2 &engine = Clientv2::getInstance();
     if(!engine.loggedIn()) {
@@ -207,6 +212,30 @@ void MainWindow::switchToDevelop() {
     }
     factoryArea->setDevelop(KP::Development);
     factoryArea->switchToDevelop();
+}
+
+void MainWindow::updateColorScheme(Qt::ColorScheme colorscheme) {
+    QPalette pal = QGuiApplication::palette();
+    /* https://www.w3.org/TR/SVG11/types.html#ColorKeywords */
+    switch(colorscheme) {
+    case Qt::ColorScheme::Dark:
+        setStyleSheet("QMenuBar { background-color: dimgray; }");
+        pal.setColor(QPalette::Window, QColor::fromString("lightskyblue"));
+        pal.setColor(QPalette::Base, QColor::fromString("lightskyblue"));
+        pal.setColor(QPalette::WindowText, QColor::fromString("black"));
+        pal.setColor(QPalette::Text, QColor::fromString("black"));
+        break;
+    case Qt::ColorScheme::Light:
+        setStyleSheet("QMenuBar { background-color: lightgray; }");
+        pal.setColor(QPalette::Window, QColor::fromString("midnightblue"));
+        pal.setColor(QPalette::Base, QColor::fromString("midnightblue"));
+        pal.setColor(QPalette::WindowText, QColor::fromString("white"));
+        pal.setColor(QPalette::Text, QColor::fromString("white"));
+        break;
+    default:
+        break;
+    }
+    QApplication::setPalette(pal);
 }
 
 void MainWindow::updateResources(const QJsonObject &djson) {

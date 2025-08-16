@@ -1341,7 +1341,7 @@ bool Server::importEquipFromCSV() {
             }
             importedEquips++;
             if(importedEquips % 10 == 0)
-                qDebug() << QString("Imported %1 equipment(s)")
+                qInfo() << QString("Imported %1 equipment(s)")
                                 .arg(importedEquips);
         }
     }
@@ -1427,7 +1427,7 @@ bool Server::importShipFromCSV() {
             }
             importedShips++;
             if(importedShips % 10 == 0)
-                qDebug() << QString("Imported %1 ship(s)")
+                qInfo() << QString("Imported %1 ship(s)")
                                 .arg(importedShips);
         }
     }

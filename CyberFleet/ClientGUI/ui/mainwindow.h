@@ -31,15 +31,16 @@ protected:
 
 private slots:
     void adjustArea(QFrame *, const QSize &);
+    void factoryRefresh();
     void gamestateChanged(KP::GameState);
     void gamestateInit();
     void printMessage(QString, QColor background = QColor("white"),
                       QColor foreground = QColor("black"));
     void processCmd();
-    void factoryRefresh();
     void switchToArsenal();
     void switchToConstruct();
     void switchToDevelop();
+    void updateColorScheme(Qt::ColorScheme colorscheme);
     void updateResources(const QJsonObject &);
 
 private:

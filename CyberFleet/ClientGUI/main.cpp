@@ -38,7 +38,7 @@ int main(int argc, char *argv[]) {
 #pragma message(NOT_M_CONST)
     /* Metadata */
     client.setApplicationName("CyberFleet");
-    client.setApplicationVersion("0.58.1"); // temp
+    client.setApplicationVersion("0.60.1"); // temp
     client.setOrganizationName("Harusame Software");
     client.setOrganizationDomain("harusoft.xyz"); // temp
     /* End Metadata */
@@ -48,13 +48,6 @@ int main(int argc, char *argv[]) {
     /* Display style */
     BoxCenterFusionStyle *style = new BoxCenterFusionStyle();
     style->setBaseStyle(QStyleFactory::create("Fusion"));
-    QPalette pal = QGuiApplication::palette();
-    /* https://www.w3.org/TR/SVG11/types.html#ColorKeywords */
-    pal.setColor(QPalette::Window, QColor::fromString("midnightblue"));
-    pal.setColor(QPalette::Base, QColor::fromString("midnightblue"));
-    pal.setColor(QPalette::WindowText, QColor::fromString("white"));
-    pal.setColor(QPalette::Text, QColor::fromString("white"));
-    QApplication::setPalette(pal);
     QApplication::setStyle(style);
 
     /* Multilingual Support */
