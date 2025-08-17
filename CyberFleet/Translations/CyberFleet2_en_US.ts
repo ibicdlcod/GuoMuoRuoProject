@@ -215,13 +215,13 @@
         <location filename="../ClientGUI/ui/licensearea.cpp" line="44"/>
         <source>What? Admiral Tanaka? He&apos;s the real deal, isn&apos;t he?
 Great at battle and bad at politics--so cool!</source>
-        <translation type="unfinished">What? Admiral Tanaka? He&apos;s the real deal, isn&apos;t he?
+        <translation>What? Admiral Tanaka? He&apos;s the real deal, isn&apos;t he?
 Great at battle and bad at politics--so cool!</translation>
     </message>
     <message id="license-continue">
         <location filename="../ClientGUI/ui/licensearea.cpp" line="51"/>
         <source>Continue</source>
-        <translation type="unfinished"></translation>
+        <translation>Continue</translation>
     </message>
     <message id="naganami">
         <location filename="../Protocol/commandline.cpp" line="153"/>
