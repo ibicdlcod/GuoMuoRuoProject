@@ -233,6 +233,11 @@ void MainWindow::updateColorScheme(Qt::ColorScheme colorscheme) {
         pal.setColor(QPalette::Text, QColor::fromString("white"));
         break;
     default:
+        setStyleSheet("QMenuBar { background-color: lightgray; }");
+        pal.setColor(QPalette::Window, QColor::fromString("midnightblue"));
+        pal.setColor(QPalette::Base, QColor::fromString("midnightblue"));
+        pal.setColor(QPalette::WindowText, QColor::fromString("white"));
+        pal.setColor(QPalette::Text, QColor::fromString("white"));
         break;
     }
     QApplication::setPalette(pal);
