@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ui version="4.0">
+<ui version="4.0" idbasedtr="true">
  <class>DevelopWindow</class>
  <widget class="QDialog" name="DevelopWindow">
   <property name="geometry">
@@ -47,7 +47,7 @@
         </size>
        </property>
        <property name="text">
-        <string>Select Equipment Name:</string>
+        <string id="select-equipment-name">Select Equipment Name:</string>
        </property>
       </widget>
      </item>
@@ -66,7 +66,7 @@
         </size>
        </property>
        <property name="text">
-        <string>Select Equipment Type:</string>
+        <string id="select-equipment-type">Select Equipment Type:</string>
        </property>
       </widget>
      </item>
@@ -85,7 +85,7 @@
         </size>
        </property>
        <property name="text">
-        <string>Or Enter Equipment ID:</string>
+        <string id="or-enter-equipment-id">Or Enter Equipment ID:</string>
        </property>
       </widget>
      </item>

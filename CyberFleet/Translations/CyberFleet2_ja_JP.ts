@@ -1582,17 +1582,17 @@ Great at battle and bad at politics--so cool!</source>
         <source>Develop Equipment</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
+    <message id="select-equipment-name">
         <location filename="../ClientGUI/ui/developwindow.ui" line="50"/>
         <source>Select Equipment Name:</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
+    <message id="select-equipment-type">
         <location filename="../ClientGUI/ui/developwindow.ui" line="69"/>
         <source>Select Equipment Type:</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
+    <message id="or-enter-equipment-id">
         <location filename="../ClientGUI/ui/developwindow.ui" line="88"/>
         <source>Or Enter Equipment ID:</source>
         <translation type="unfinished"></translation>
@@ -1778,77 +1778,77 @@ Great at battle and bad at politics--so cool!</source>
         <source>TextLabel</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
+    <message id="menu-sortie">
         <location filename="../ClientGUI/ui/mainwindow.ui" line="347"/>
         <source>Sortie</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
+    <message id="menu-fleet">
         <location filename="../ClientGUI/ui/mainwindow.ui" line="352"/>
         <source>Fleet</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
+    <message id="menu-supply">
         <location filename="../ClientGUI/ui/mainwindow.ui" line="357"/>
         <source>Supply</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
+    <message id="menu-refit">
         <location filename="../ClientGUI/ui/mainwindow.ui" line="362"/>
         <source>Refit</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
+    <message id="menu-dock">
         <location filename="../ClientGUI/ui/mainwindow.ui" line="367"/>
         <source>Dock</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
+    <message id="menu-factory">
         <location filename="../ClientGUI/ui/mainwindow.ui" line="372"/>
         <source>Factory</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
+    <message id="menu-naval-base">
         <location filename="../ClientGUI/ui/mainwindow.ui" line="380"/>
         <source>Naval Base</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
+    <message id="menu-tech">
         <location filename="../ClientGUI/ui/mainwindow.ui" line="388"/>
         <source>Tech</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
+    <message id="menu-develop">
         <location filename="../ClientGUI/ui/mainwindow.ui" line="404"/>
         <source>Develop Equipment</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
+    <message id="menu-back-to-naval-base">
         <location filename="../ClientGUI/ui/mainwindow.ui" line="409"/>
         <source>Back to naval base</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
+    <message id="menu-logout">
         <location filename="../ClientGUI/ui/mainwindow.ui" line="414"/>
         <source>Logout</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
+    <message id="menu-exit">
         <location filename="../ClientGUI/ui/mainwindow.ui" line="419"/>
         <source>Exit program</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
+    <message id="menu-view-tech">
         <location filename="../ClientGUI/ui/mainwindow.ui" line="424"/>
         <source>View Tech</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
+    <message id="menu-construct">
         <location filename="../ClientGUI/ui/mainwindow.ui" line="429"/>
         <source>Construct Ships</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
+    <message id="menu-arsenal">
         <location filename="../ClientGUI/ui/mainwindow.ui" line="434"/>
         <source>Arsenal</source>
         <translation type="unfinished"></translation>
@@ -1861,18 +1861,18 @@ Great at battle and bad at politics--so cool!</source>
         <source>Frame</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
-        <location filename="../ClientGUI/ui/newlogins.ui" line="52"/>
+    <message id="login-options-server">
+        <location filename="../ClientGUI/ui/newlogins.ui" line="58"/>
         <source>Server:</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
-        <location filename="../ClientGUI/ui/newlogins.ui" line="78"/>
+    <message id="login-options-port">
+        <location filename="../ClientGUI/ui/newlogins.ui" line="84"/>
         <source>Port:</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
-        <location filename="../ClientGUI/ui/newlogins.ui" line="98"/>
+    <message id="login-options-connect">
+        <location filename="../ClientGUI/ui/newlogins.ui" line="104"/>
         <source>Connect</source>
         <translation type="unfinished"></translation>
     </message>

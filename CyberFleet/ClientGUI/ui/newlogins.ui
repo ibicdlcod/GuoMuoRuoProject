@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ui version="4.0">
+<ui version="4.0" idbasedtr="true">
  <class>NewLoginS</class>
  <widget class="QFrame" name="NewLoginS">
   <property name="geometry">
@@ -45,11 +45,17 @@
       <layout class="QGridLayout" name="gridLayout">
        <item row="1" column="0">
         <widget class="QLabel" name="ServerLabel">
+         <property name="enabled">
+          <bool>true</bool>
+         </property>
          <property name="styleSheet">
           <string notr="true"/>
          </property>
+         <property name="locale">
+          <locale language="English" country="UnitedStates"/>
+         </property>
          <property name="text">
-          <string>Server:</string>
+          <string id="login-options-server">Server:</string>
          </property>
         </widget>
        </item>
@@ -75,7 +81,7 @@ color: rgb(0, 0, 0);</string>
           <string notr="true"/>
          </property>
          <property name="text">
-          <string>Port:</string>
+          <string id="login-options-port">Port:</string>
          </property>
         </widget>
        </item>
@@ -95,7 +101,7 @@ color: rgb(0, 0, 0);</string>
           <string notr="true"/>
          </property>
          <property name="text">
-          <string>Connect</string>
+          <string id="login-options-connect">Connect</string>
          </property>
         </widget>
        </item>

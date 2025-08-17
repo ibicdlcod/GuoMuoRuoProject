@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ui version="4.0">
+<ui version="4.0" idbasedtr="true">
  <class>FactoryArea</class>
  <widget class="QFrame" name="FactoryArea">
   <property name="geometry">

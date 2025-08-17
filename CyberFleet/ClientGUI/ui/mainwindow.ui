@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ui version="4.0">
+<ui version="4.0" idbasedtr="true">
  <class>MainWindow</class>
  <widget class="QMainWindow" name="MainWindow">
   <property name="geometry">
@@ -331,7 +331,7 @@ border-style: none;</string>
      <x>0</x>
      <y>0</y>
      <width>1366</width>
-     <height>25</height>
+     <height>21</height>
     </rect>
    </property>
    <property name="font">
@@ -344,32 +344,32 @@ border-style: none;</string>
    </property>
    <widget class="QMenu" name="menuSortie">
     <property name="title">
-     <string>Sortie</string>
+     <string id="menu-sortie">Sortie</string>
     </property>
    </widget>
    <widget class="QMenu" name="menuFleet">
     <property name="title">
-     <string>Fleet</string>
+     <string id="menu-fleet">Fleet</string>
     </property>
    </widget>
    <widget class="QMenu" name="menuSupply">
     <property name="title">
-     <string>Supply</string>
+     <string id="menu-supply">Supply</string>
     </property>
    </widget>
    <widget class="QMenu" name="menuRefit">
     <property name="title">
-     <string>Refit</string>
+     <string id="menu-refit">Refit</string>
     </property>
    </widget>
    <widget class="QMenu" name="menuDock">
     <property name="title">
-     <string>Dock</string>
+     <string id="menu-dock">Dock</string>
     </property>
    </widget>
    <widget class="QMenu" name="menuFactory">
     <property name="title">
-     <string>Factory</string>
+     <string id="menu-factory">Factory</string>
     </property>
     <addaction name="actionDevelop_Equipment"/>
     <addaction name="actionConstruct_Ships"/>
@@ -377,7 +377,7 @@ border-style: none;</string>
    </widget>
    <widget class="QMenu" name="menuNaval_Base">
     <property name="title">
-     <string>Naval Base</string>
+     <string id="menu-naval-base">Naval Base</string>
     </property>
     <addaction name="actionBack_to_naval_base"/>
     <addaction name="actionLogout"/>
@@ -385,7 +385,7 @@ border-style: none;</string>
    </widget>
    <widget class="QMenu" name="menuTech">
     <property name="title">
-     <string>Tech</string>
+     <string id="menu-tech">Tech</string>
     </property>
     <addaction name="actionView_Tech"/>
    </widget>
@@ -401,37 +401,37 @@ border-style: none;</string>
   <widget class="QStatusBar" name="statusbar"/>
   <action name="actionDevelop_Equipment">
    <property name="text">
-    <string>Develop Equipment</string>
+    <string id="menu-develop">Develop Equipment</string>
    </property>
   </action>
   <action name="actionBack_to_naval_base">
    <property name="text">
-    <string>Back to naval base</string>
+    <string id="menu-back-to-naval-base">Back to naval base</string>
    </property>
   </action>
   <action name="actionLogout">
    <property name="text">
-    <string>Logout</string>
+    <string id="menu-logout">Logout</string>
    </property>
   </action>
   <action name="actionExit">
    <property name="text">
-    <string>Exit program</string>
+    <string id="menu-exit">Exit program</string>
    </property>
   </action>
   <action name="actionView_Tech">
    <property name="text">
-    <string>View Tech</string>
+    <string id="menu-view-tech">View Tech</string>
    </property>
   </action>
   <action name="actionConstruct_Ships">
    <property name="text">
-    <string>Construct Ships</string>
+    <string id="menu-construct">Construct Ships</string>
    </property>
   </action>
   <action name="actionArsenal">
    <property name="text">
-    <string>Arsenal</string>
+    <string id="menu-arsenal">Arsenal</string>
    </property>
   </action>
  </widget>
