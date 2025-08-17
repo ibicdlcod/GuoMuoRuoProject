@@ -1,6 +1,8 @@
 #include "equipmodel.h"
 #include <QJsonArray>
 #include <algorithm>
+#include <QApplication>
+#include <QStyleHints>
 #include "clientv2.h"
 #include "equipicon.h"
 
@@ -229,8 +231,12 @@ QVariant EquipModel::data(const QModelIndex &index, int role) const {
             return uidToDisplay.toString();
         }
         else if(index.column() == equipCol) {
-            return equipToDisplay->toString(
+            QString localName = equipToDisplay->toString(
                 settings->value("client/language", "ja_JP").toString());
+            if(localName.size() == 0)
+                return equipToDisplay->toString("ja_JP");
+            else
+                return localName;
         }
         else if(index.column() == hiddenSortColumn()) {
             return QString::number(equipToDisplay->type.getTypeSort());
@@ -308,7 +314,16 @@ QVariant EquipModel::data(const QModelIndex &index, int role) const {
     case Qt::ForegroundRole: {
         if(index.column() == starCol) {
             QColor color = QColor();
-            color.setHsv(starToDisplay * 20, 128, 255);
+            switch(QApplication::styleHints()->colorScheme()) {
+            case Qt::ColorScheme::Dark:
+                color.setHsv(starToDisplay * 20, 255, 128);
+                break;
+            case Qt::ColorScheme::Light: [[fallthrough]];
+            default:
+                color.setHsv(starToDisplay * 20, 128, 255);
+                break;
+            }
+
             QBrush brush = QBrush(color);
             return brush;
         }

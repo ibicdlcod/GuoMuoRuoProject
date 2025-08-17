@@ -1,6 +1,7 @@
 #include "equipview.h"
 #include "ui_equipview.h"
 #include <QToolButton>
+#include <QStyleHints>
 #include "../clientv2.h"
 
 EquipView::EquipView(QWidget *parent)
@@ -24,6 +25,7 @@ EquipView::EquipView(QWidget *parent)
     arsenalView->setMinimumSize(QSize(800,800));
 
     arsenalView->verticalHeader()->setSectionResizeMode(QHeaderView::Fixed);
+    arsenalView->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
     connect(arsenalView->horizontalHeader(), &QHeaderView::sectionResized,
             this, &EquipView::columnResized);
     connect(model, &EquipModel::pageNumChanged,
@@ -37,8 +39,23 @@ EquipView::EquipView(QWidget *parent)
     QIcon last = QIcon(":/resources/navigation/last.svg");
     QIcon prev = QIcon(":/resources/navigation/prev.svg");
     QIcon next = QIcon(":/resources/navigation/next.svg");
+    switch(QApplication::styleHints()->colorScheme()) {
+    case Qt::ColorScheme::Dark:
+        break;
+    case Qt::ColorScheme::Light: [[fallthrough]];
+    default:
+        first = QIcon(":/resources/navigation/first_dark.svg");
+        last = QIcon(":/resources/navigation/last_dark.svg");
+        prev = QIcon(":/resources/navigation/prev_dark.svg");
+        next = QIcon(":/resources/navigation/next_dark.svg");
+        break;
+    }
+
 
     typebox = new QComboBox();
+    typebox->setObjectName("typeselect");
+    typebox->setStyleSheet(
+        "QComboBox#typeselect { color: palette(base); }");
     firstButton = new QToolButton();
     prevButton = new QToolButton();
     pageLabel = new QLabel();

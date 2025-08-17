@@ -121,5 +121,9 @@
         <file>resources/navigation/last.svg</file>
         <file>resources/navigation/next.svg</file>
         <file>resources/navigation/prev.svg</file>
+        <file>resources/navigation/first_dark.svg</file>
+        <file>resources/navigation/last_dark.svg</file>
+        <file>resources/navigation/next_dark.svg</file>
+        <file>resources/navigation/prev_dark.svg</file>
     </qresource>
 </RCC>
