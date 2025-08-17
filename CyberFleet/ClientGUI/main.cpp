@@ -69,7 +69,7 @@ int main(int argc, char *argv[]) {
         qWarning() << "Language not natively supported";
     }
 #else
-    settings->setValue("client/language", "ja_JP");
+    settings->setValue("client/language", "en_US");
 #endif
 
     QStringList uiLanguages = QLocale::system().uiLanguages();

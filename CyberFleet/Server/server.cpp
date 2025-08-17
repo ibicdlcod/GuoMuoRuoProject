@@ -1577,11 +1577,13 @@ void Server::parseListen(const QStringList &cmdParts) {
     }
     QHostAddress address = QHostAddress(cmdParts[1]);
     if(address.isNull()) {
+        //% "IP isn't valid."
         qWarning() << qtTrId("ip-invalid");
         return;
     }
     quint16 port = QString(cmdParts[2]).toInt();
     if(port < 1024 || port > 49151) {
+        //% "Port isn't valid, it must fall between 1024 and 49151"
         qWarning() << qtTrId("port-invalid");
         return;
     }
