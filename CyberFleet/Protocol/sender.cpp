@@ -83,7 +83,7 @@ void Sender::destinationError() {
 
 void Sender::send() {
     m_readySend = false;
-    if (signalDone()) {
+    if (signalDone() || ((m_partnum >= m_partnumtotal) && (m_partnum > 0))) {
         disconnect(m_destination, &QAbstractSocket::bytesWritten,
                    this, &Sender::destinationBytesWritten);
         disconnect(m_destination, &QAbstractSocket::errorOccurred,

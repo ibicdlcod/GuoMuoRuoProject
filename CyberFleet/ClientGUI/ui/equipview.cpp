@@ -136,7 +136,7 @@ void EquipView::enactPageNumChange(int currentPageNum, int totalPageNum) {
         firstButton->setEnabled(true);
         prevButton->setEnabled(true);
     }
-    if(currentPageNum == totalPageNum - 1) {
+    if(currentPageNum == totalPageNum - 1 || totalPageNum == 0) {
         nextButton->setEnabled(false);
         lastButton->setEnabled(false);
     }
