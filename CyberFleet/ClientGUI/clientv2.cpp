@@ -80,6 +80,8 @@ Clientv2::Clientv2(QObject *parent)
             &equipModel, &EquipModel::updateEquipmentList);
     connect(&equipModel, &EquipModel::destructRequest,
             this, &Clientv2::doDestructEquip);
+    connect(this, &Clientv2::gamestateChanged,
+            this, &Clientv2::changeGameState);
     // May cause issues?
     timer = new QTimer(this);
     connect(timer, &QTimer::timeout, this, &Clientv2::uiRefresh);
@@ -402,6 +404,23 @@ void Clientv2::update() {
 }
 
 /* private slots */
+void Clientv2::changeGameState(KP::GameState state)
+{
+    QByteArray msg = KP::clientStateChange(state);
+    switch(socket.state()) {
+    case QAbstractSocket::UnconnectedState: [[fallthrough]];
+    case QAbstractSocket::HostLookupState: [[fallthrough]];
+    case QAbstractSocket::ConnectingState:
+        //% "You cannot change game state while offline."
+        qInfo() << qtTrId("change-gamestate-offline"); break;
+    case QAbstractSocket::ConnectedState:
+        sender->enqueue(msg);
+        break;
+    default:
+        break;
+    }
+}
+
 /* Called when encrypted() signal is emitted */
 void Clientv2::encrypted() {
     retransmitTimes = 0;
@@ -593,8 +612,6 @@ void Clientv2::doSwitch(const QStringList &cmdParts) {
         else {
             gameState = (KP::GameState)statevalue;
             emit gamestateChanged(gameState);
-            QByteArray msg = KP::clientStateChange(gameState);
-            sender->enqueue(msg);
         }
         return;
     }
@@ -1059,7 +1076,6 @@ void Clientv2::receivedMsg(const QJsonObject &djson) {
         break;
     case KP::AllowClientStart:
         gameState = KP::Port;
-        emit gamestateChanged(KP::Port);
         // this might not be platform dependent
         delete sender;
         sender = new Sender(&socket);
@@ -1068,6 +1084,7 @@ void Clientv2::receivedMsg(const QJsonObject &djson) {
                 this, &Clientv2::errorOccurredStr);
         //% "You can now play the game."
         qInfo() << qtTrId("client-start");
+        emit gamestateChanged(KP::Port);
         displayPrompt();
         SteamAPI_RunCallbacks();
         {

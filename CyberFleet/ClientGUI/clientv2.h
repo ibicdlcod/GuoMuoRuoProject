@@ -140,6 +140,7 @@ signals:
     void receivedSkillPointInfo(const QJsonObject &);
 
 private slots:
+    void changeGameState(KP::GameState);
     void encrypted();
     void errorOccurred(QAbstractSocket::SocketError);
     void errorOccurredStr(const QString &);
