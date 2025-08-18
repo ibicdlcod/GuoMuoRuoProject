@@ -1939,6 +1939,7 @@ void Server::receivedReq(const QJsonObject &djson,
             senderM.sendMessage(connection, msg);
         }
     }
+        break;
     case KP::CommandType::Develop: {
         int equipid = djson["equipid"].toInt();
         doDevelop(uid, equipid, djson["factory"].toInt(), connection);
