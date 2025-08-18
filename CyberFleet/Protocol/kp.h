@@ -115,6 +115,7 @@ enum CommandType{
     SteamLogout,
     CHello,
     Adminaddequip,
+    Admingenerateequips,
     DemandEquipInfo,
     DemandEquipInfoUser,
     DemandGlobalTech,
@@ -182,6 +183,7 @@ void winConsoleCheck();
 QByteArray accessDenied();
 QByteArray catbomb();
 QByteArray clientAddEquip(int);
+QByteArray clientAdminTestEquip();
 QByteArray clientDemandDestructEquip(const QList<QUuid> &);
 QByteArray clientDemandEquipInfo();
 QByteArray clientDemandEquipInfoUser();

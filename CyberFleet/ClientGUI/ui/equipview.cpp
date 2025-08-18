@@ -54,8 +54,10 @@ EquipView::EquipView(QWidget *parent)
 
     typebox = new QComboBox();
     typebox->setObjectName("typeselect");
+    /*
     typebox->setStyleSheet(
         "QComboBox#typeselect { color: palette(base); }");
+*/
     firstButton = new QToolButton();
     prevButton = new QToolButton();
     pageLabel = new QLabel();

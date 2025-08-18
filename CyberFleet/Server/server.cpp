@@ -1342,7 +1342,7 @@ bool Server::importEquipFromCSV() {
             importedEquips++;
             if(importedEquips % 10 == 0)
                 qInfo() << QString("Imported %1 equipment(s)")
-                                .arg(importedEquips);
+                               .arg(importedEquips);
         }
     }
     csvFile->close();
@@ -1428,7 +1428,7 @@ bool Server::importShipFromCSV() {
             importedShips++;
             if(importedShips % 10 == 0)
                 qInfo() << QString("Imported %1 ship(s)")
-                                .arg(importedShips);
+                               .arg(importedShips);
         }
     }
     csvFile->close();
@@ -1939,7 +1939,18 @@ void Server::receivedReq(const QJsonObject &djson,
             senderM.sendMessage(connection, msg);
         }
     }
-        break;
+    break;
+    case KP::CommandType::Admingenerateequips: {
+        if(!User::isSuperUser(uid)) {
+            QByteArray msg = KP::accessDenied();
+            senderM.sendMessage(connection, msg);
+        }
+        else {
+            generateTestEquip(uid);
+        }
+        /* TODO: send to client */
+    }
+    break;
     case KP::CommandType::Develop: {
         int equipid = djson["equipid"].toInt();
         doDevelop(uid, equipid, djson["factory"].toInt(), connection);
@@ -1975,9 +1986,9 @@ void Server::receivedReq(const QJsonObject &djson,
                            this,
                            [connection, uid, djson, this]
                            {offerTechInfo(
-                  connection,
-                  uid,
-                  djson["local"].toInt());});
+                                 connection,
+                                 uid,
+                                 djson["local"].toInt());});
     }
     break;
     case KP::CommandType::DemandSkillPoints: {
@@ -1985,9 +1996,9 @@ void Server::receivedReq(const QJsonObject &djson,
                            this,
                            [connection, uid, djson, this]
                            {offerSPInfo(
-                  connection,
-                  uid,
-                  djson["equipid"].toInt());});
+                                 connection,
+                                 uid,
+                                 djson["equipid"].toInt());});
     }
     break;
     case KP::CommandType::DemandResourceUpdate: {
@@ -1995,8 +2006,8 @@ void Server::receivedReq(const QJsonObject &djson,
                            this,
                            [connection, uid, this]
                            {offerResourceInfo(
-                  connection,
-                  uid);});
+                                 connection,
+                                 uid);});
     }
     break;
     case KP::CommandType::DestructEquip: {

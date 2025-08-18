@@ -162,8 +162,6 @@ void Clientv2::catbomb() {
         qCritical() << qtTrId("catbomb");
         gameState = KP::Offline;
         delete sender;
-        disconnect(sender, &Sender::errorOccurred,
-                   this, &Clientv2::errorOccurredStr);
         authSent = false;
         emit gamestateChanged(KP::Offline);
     }
@@ -538,11 +536,7 @@ void Clientv2::doAddEquip(const QStringList &cmdParts) {
             return;
         }
         QByteArray msg = KP::clientAddEquip(equipid);
-        sender->enqueue(msg);/*
-        const qint64 written = socket.write(msg);
-        if (written <= 0) {
-            throw NetworkError(socket.errorString());
-        }*/
+        sender->enqueue(msg);
         return;
     }
 }
@@ -562,13 +556,15 @@ void Clientv2::doDevelop(const QStringList &cmdParts) {
         }
         int factoSlot = cmdParts[2].toInt();
         QByteArray msg = KP::clientDevelop(equipid, false, factoSlot);
-        sender->enqueue(msg);/*
-        const qint64 written = socket.write(msg);
-        if (written <= 0) {
-            throw NetworkError(socket.errorString());
-        }*/
+        sender->enqueue(msg);
         return;
     }
+}
+
+/* Admin generate a bunch of test equips */
+void Clientv2::doGenerateTestEquip() {
+    QByteArray msg = KP::clientAdminTestEquip();
+    sender->enqueue(msg);
 }
 
 /* Get developed equipment */
@@ -581,11 +577,7 @@ void Clientv2::doFetch(const QStringList &cmdParts) {
     else {
         int factoSlot = cmdParts[1].toInt();
         QByteArray msg = KP::clientFetch(factoSlot);
-        sender->enqueue(msg);/*
-        const qint64 written = socket.write(msg);
-        if (written <= 0) {
-            throw NetworkError(socket.errorString());
-        }*/
+        sender->enqueue(msg);
         return;
     }
 }
@@ -808,6 +800,9 @@ bool Clientv2::parseGameCommands(const QString &primary,
     case KP::Adminaddequip:
         doAddEquip(cmdParts);
         return true;
+    case KP::Admingenerateequips:
+        doGenerateTestEquip();
+        return true;
     case KP::Refresh:
         if(cmdParts.length() > 1
             && cmdParts[1].compare("Factory", Qt::CaseInsensitive) == 0) {
@@ -944,8 +939,6 @@ void Clientv2::receivedLogout(const QJsonObject &djson) {
             throw std::domain_error("message not implemented");
 
         gameState = KP::Offline;
-        disconnect(sender, &Sender::errorOccurred,
-                   this, &Clientv2::errorOccurredStr);
         delete sender;
         authSent = false;
         emit gamestateChanged(KP::Offline);
@@ -1082,8 +1075,6 @@ void Clientv2::receivedMsg(const QJsonObject &djson) {
     case KP::AllowClientStart:
         gameState = KP::Port;
         // this might not be platform dependent
-        disconnect(sender, &Sender::errorOccurred,
-                   this, &Clientv2::errorOccurredStr);
         delete sender;
         sender = new Sender(&socket);
         // disconnect when sender destoryed
@@ -1102,8 +1093,6 @@ void Clientv2::receivedMsg(const QJsonObject &djson) {
         break;
     case KP::AllowClientFinish:
         gameState = KP::Offline;
-        disconnect(sender, &Sender::errorOccurred,
-                   this, &Clientv2::errorOccurredStr);
         delete sender;
         authSent = false;
         emit gamestateChanged(KP::Offline);

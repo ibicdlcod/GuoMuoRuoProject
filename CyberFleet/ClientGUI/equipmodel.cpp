@@ -253,8 +253,13 @@ QVariant EquipModel::data(const QModelIndex &index, int role) const {
             else
                 return "★max";
         }
-        else {
+        else if(index.column() == attrCol){ // attributes
+            /* TODO: display primary attr, other attr will be in Tooltip role */
             return "FB";
+        }
+        else {
+            Q_UNREACHABLE();
+            return "";
         }
     }
     break;

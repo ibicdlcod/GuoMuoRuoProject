@@ -65,6 +65,13 @@ QByteArray KP::clientAddEquip(int equipid) {
     return QCborValue::fromJsonValue(result).toCbor();
 }
 
+QByteArray KP::clientAdminTestEquip() {
+    QJsonObject result;
+    result["type"] = DgramType::Request;
+    result["command"] = CommandType::Admingenerateequips;
+    return QCborValue::fromJsonValue(result).toCbor();
+}
+
 QByteArray KP::clientDemandDestructEquip(const QList<QUuid> &trash) {
     QJsonObject result;
     result["type"] = DgramType::Request;
