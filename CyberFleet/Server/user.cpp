@@ -3,8 +3,11 @@
 #include <QSqlError>
 #include <QSqlQuery>
 #include <QTimeZone>
+#include <QSettings>
 #include "../Protocol/resord.h"
 #include "kerrors.h"
+
+extern std::unique_ptr<QSettings> settings;
 
 void User::addSkillPoints(const CSteamID &uid, int equipId, int64 skillPoints) {
     QSqlDatabase db = QSqlDatabase::database();
@@ -356,15 +359,15 @@ void User::refreshPort(const CSteamID &uid) {
 
 void User::setResources(const CSteamID &uid, ResOrd goal) {
     assert(goal.sufficient());
-    //int maxRes = settings->value("rule/maxresources", 3600000).toInt();
+    int maxRes = settings->value("rule/maxresources", 3600000).toInt();
 #pragma message(M_CONST)
-    goal.cap(ResOrd(3600000,
-                    3600000,
-                    3600000,
-                    3600000,
-                    3600000,
-                    3600000,
-                    3600000));
+    goal.cap(ResOrd(maxRes,
+                    maxRes,
+                    maxRes,
+                    maxRes,
+                    maxRes,
+                    maxRes,
+                    maxRes));
     QMap<QString, int> map = {
         std::pair("O", goal.o),
         std::pair("E", goal.e),

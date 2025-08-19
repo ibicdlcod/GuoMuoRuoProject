@@ -221,14 +221,22 @@ QVariant EquipModel::data(const QModelIndex &index, int role) const {
         return QVariant();
     switch (role) {
     case Qt::ToolTipRole:
-        [[fallthrough]];
+        if(index.column() == uidCol) {
+            return uidToDisplay.toString();
+        }
+        else if(index.column() == attrCol){ // attributes
+            return equipToDisplay->attrStr();
+        }
+        else {
+            [[fallthrough]];
+        }
     case Qt::StatusTipRole:
         [[fallthrough]];
     case Qt::AccessibleTextRole:
         [[fallthrough]];
     case Qt::DisplayRole: {
         if(index.column() == uidCol) {
-            return uidToDisplay.toString();
+            return uidToDisplay.toString().first(9).last(8);
         }
         else if(index.column() == equipCol) {
             QString localName = equipToDisplay->toString(
@@ -254,8 +262,7 @@ QVariant EquipModel::data(const QModelIndex &index, int role) const {
                 return "★max";
         }
         else if(index.column() == attrCol){ // attributes
-            /* TODO: display primary attr, other attr will be in Tooltip role */
-            return "FB";
+            return equipToDisplay->attrPrimaryStr();
         }
         else {
             Q_UNREACHABLE();
@@ -308,7 +315,7 @@ QVariant EquipModel::data(const QModelIndex &index, int role) const {
     case Qt::FontRole:
         return QVariant(); break;
     case Qt::TextAlignmentRole: {
-        if(index.column() == equipCol || index.column() == uidCol)
+        if(index.column() == equipCol)
             return Qt::AlignVCenter;
         else
             return Qt::AlignCenter;
@@ -339,7 +346,7 @@ QVariant EquipModel::data(const QModelIndex &index, int role) const {
     case Qt::CheckStateRole: {
         if(index.column() == destructColumn()) {
             if(isDestructChecked.value(sortedEquipIds.value(realRowIndex),
-                                false))
+                                        false))
                 return Qt::Checked;
             else
                 return Qt::Unchecked;

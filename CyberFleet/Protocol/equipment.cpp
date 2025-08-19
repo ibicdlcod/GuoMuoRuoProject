@@ -100,6 +100,54 @@ QString Equipment::toString(QString lang) const {
     return localNames[lang];
 }
 
+const QString Equipment::attrStr() const {
+    QString result;
+    for(auto iter = attr.constKeyValueBegin();
+         iter != attr.constKeyValueEnd();
+         ++iter) {
+        auto attrName = iter->first;
+        auto attrValue = iter->second;
+        if(attrName.localeAwareCompare("Tech") == 0
+            || attrName.contains("Father")
+            || attrName.contains("Mother")
+            || attrName.localeAwareCompare("Disallowmassproduction") == 0) {
+            continue;
+        }
+        else if(attrValue != 0) {
+            QString toTranslate = QString("equip-attr-")
+                                  + attrName.toLower();
+            result = result + qtTrId(toTranslate.toUtf8())
+                     + " "
+                     + (attrValue > 0 ? "+" : "")
+                     + QString::number(attrValue) + " ";
+        }
+    }
+    if(result.endsWith("")) {
+        result.erase(result.constEnd() - 1, result.constEnd());
+    }
+    return result;
+}
+
+const QString Equipment::attrPrimaryStr() const {
+    QString result;
+    auto attrName = type.getPrimaryAttr();
+    if(attrName.localeAwareCompare("Tech") == 0
+        || attrName.contains("Father")
+        || attrName.contains("Mother")
+        || attrName.localeAwareCompare("Disallowmassproduction") == 0) {
+        return "";
+    }
+    auto attrValue = attr[attrName];
+    QString toTranslate = QString("equip-attr-")
+                          + attrName.toLower();
+    result = result + qtTrId(toTranslate.toUtf8())
+             + " "
+             + (attrValue > 0 ? "+" : "")
+             + QString::number(attrValue);
+
+    return result;
+}
+
 /* 4.3-Development.md#Resource cost */
 const ResOrd Equipment::devRes() const {
     qint64 devResScale = settings->value("rule/devresscale", 10).toLongLong();

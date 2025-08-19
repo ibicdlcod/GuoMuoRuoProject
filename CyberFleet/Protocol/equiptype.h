@@ -18,12 +18,13 @@ public:
     const ResOrd devResBase() const;
     static const QList<QString> getDisplayGroupsSorted();
     QString getDisplayGroup();
+    int getTypeSort() const;
+    QString getPrimaryAttr() const;
+    int iconGroup() const;
     static const QString intToStrRep(int);
     static int strToIntRep(QString);
     QString toString() const;
     int toInt() const;
-    int iconGroup() const;
-    int getTypeSort() const;
 
     static int getSize(const int);
     static bool isMainGun(const int);
@@ -256,6 +257,99 @@ private:
         std::pair("Torp-sub",               5),
         std::pair("Midget-sub",             5),
         std::pair("Virtual-precondition",   0),
+    };
+
+    inline static const QHash<QString, QString> primaryAttr = {
+        std::pair("Small-gun-flat",         "Firepower"),
+        std::pair("Small-gun-flak",         "Firepower"),
+        std::pair("Mid-gun-flat",           "Firepower"),
+        std::pair("Mid-gun-flat-ca",        "Firepower"),
+        std::pair("Mid-gun-flak",           "Firepower"),
+        std::pair("Big-gun",                "Firepower"),
+        std::pair("Superbig-gun",           "Firepower"),
+        std::pair("Supremebig-gun",         "Firepower"),
+        std::pair("Second-gun-flat",        "Accuracy"),
+        std::pair("Second-gun-flak",        "Antiair"),
+        std::pair("Second-gun-flak-big",    "Antiair"),
+        std::pair("Torp",                   "Torpedo"),
+        std::pair("Torp-sub",               "Torpedo"),
+        std::pair("Midget-sub",             "Torpedo"),
+        std::pair("Fighter",                "Antiair"),
+        std::pair("Fighter-night",          "Antiair"),
+        std::pair("Bomb-dive",              "Bombing"),
+        std::pair("Bomb-dive-fight",        "Bombing"),
+        std::pair("Bomb-dive-fight-n2",     "Bombing"),
+        std::pair("Bomb-dive-n2",           "Bombing"),
+        std::pair("Bomb-dive-torp-fight",   "Bombing"),
+        std::pair("Bomb-dive-fight-jet",    "Bombing"),
+        std::pair("Bomb-torp",              "Airtorpedo"),
+        std::pair("Bomb-torp-fight",        "Airtorpedo"),
+        std::pair("Bomb-torp-dive",         "Airtorpedo"),
+        std::pair("Bomb-torp-n2",           "Airtorpedo"),
+        std::pair("Bomb-torp-night",        "Airtorpedo"),
+        std::pair("Recon",                  "Los"),
+        std::pair("Recon-fight",            "Los"),
+        std::pair("Recon-jet",              "Los"),
+        std::pair("Fighter-lb",             "Antiair"),
+        std::pair("Fighter-lb-interc",      "Antiair"),
+        std::pair("Attack-lb",              "Bombing"),
+        std::pair("Attack-lb-fight",        "Bombing"),
+        std::pair("Attack-lb-big",          "Bombing"),
+        std::pair("Recon-lb",               "LOS"),
+        std::pair("Sp-recon-small",         "Los"),
+        std::pair("Sp-recon",               "Los"),
+        std::pair("Sp-recon-night",         "Los"),
+        std::pair("Sp-bomb-small",          "Bombing"),
+        std::pair("Sp-bomb",                "Bombing"),
+        std::pair("Sp-bomb-night",          "Bombing"),
+        std::pair("Sp-fight",               "Antiair"),
+        std::pair("Radar-small-flak",       "Los"),
+        std::pair("Radar-small-flat",       "Los"),
+        std::pair("Radar-small-dual",       "Los"),
+        std::pair("Radar-big-flak",         "Los"),
+        std::pair("Radar-big-flat",         "Los"),
+        std::pair("Radar-big-dual",         "Los"),
+        std::pair("Radar-superbig-dual",    "Los"),
+        std::pair("Radar-sub",              "Evasion"),
+        std::pair("AL-shell",               "Antiland"),
+        std::pair("AP-shell",               "Armorpenetration"),
+        std::pair("Repair-item",            "Tech"),
+        std::pair("AA-gun",                 "Antiair"),
+        std::pair("AA-cannon",              "Antiair"),
+        std::pair("AA-control-device",      "Antiair"),
+        std::pair("Sonar-passive-big",      "Asw"),
+        std::pair("Sonar-passive",          "Asw"),
+        std::pair("Sonar-active",           "Asw"),
+        std::pair("Depthc-projector",       "Asw"),
+        std::pair("Depthc-racks",           "Asw"),
+        std::pair("Engine-boiler",          "Speed"),
+        std::pair("Engine-turbine",         "Speed"),
+        std::pair("Landing-craft",          "Antiland"),
+        std::pair("Landing-tank",           "Antiland"),
+        std::pair("Land-corps",             "Antiland"),
+        std::pair("Patrol-autogyro",        "Asw"),
+        std::pair("Patrol-liaison",         "Asw"),
+        std::pair("Patrol-liaison-f",       "Asw"),
+        std::pair("Patrol-lb",              "Asw"),
+        std::pair("Bulge-small",            "Armor"),
+        std::pair("Bulge-medium",           "Armor"),
+        std::pair("Bulge-large",            "Armor"),
+        std::pair("Searchlight",            "Los"),
+        std::pair("Searchlight-big",        "Los"),
+        std::pair("Drum",                   "Transport"),
+        std::pair("Repair-fac",             "Tech"),
+        std::pair("Starshell",              "Tech"),
+        std::pair("Command-fac",            "Los"),
+        std::pair("Aircraft-personnel",     "Firingrange"),
+        std::pair("AL-rocket",              "Antiland"),
+        std::pair("Surface-personnel",      "Los"),
+        std::pair("Flyingboat",             "Los"),
+        std::pair("Food",                   "Tech"),
+        std::pair("Underway-replenish",     "Tech"),
+        std::pair("Tp-material",            "Transport"),
+        std::pair("Smoke",                  "Concealment"),
+        std::pair("Ballon",                 "Evasion"),
+        std::pair("Virtual-precondition",   "Tech"),
     };
 
     inline static const QHash<QString, int> displaySort = {

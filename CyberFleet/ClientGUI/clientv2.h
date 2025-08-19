@@ -153,6 +153,7 @@ private slots:
 private:
     void doAddEquip(const QStringList &);
     void doDevelop(const QStringList &);
+    void doDeleteTestEquip();
     void doGenerateTestEquip();
     void doSwitch(const QStringList &);
     void exitGracefully();

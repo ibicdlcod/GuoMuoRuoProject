@@ -561,6 +561,12 @@ void Clientv2::doDevelop(const QStringList &cmdParts) {
     }
 }
 
+/* Admin delete all of test equips */
+void Clientv2::doDeleteTestEquip() {
+    QByteArray msg = KP::clientAdminTestEquipRemove();
+    sender->enqueue(msg);
+}
+
 /* Admin generate a bunch of test equips */
 void Clientv2::doGenerateTestEquip() {
     QByteArray msg = KP::clientAdminTestEquip();
@@ -803,6 +809,9 @@ bool Clientv2::parseGameCommands(const QString &primary,
     case KP::Admingenerateequips:
         doGenerateTestEquip();
         return true;
+    case KP::Adminremoveequips:
+        doDeleteTestEquip();
+        return true;
     case KP::Refresh:
         if(cmdParts.length() > 1
             && cmdParts[1].compare("Factory", Qt::CaseInsensitive) == 0) {
@@ -955,8 +964,9 @@ void Clientv2::receivedLogout(const QJsonObject &djson) {
 /* Part of parser */
 void Clientv2::receivedMsg(const QJsonObject &djson) {
     switch(djson["msgtype"].toInt()) {
-    //% "Client sent a bad JSON."
-    case KP::JsonError: qWarning() << qtTrId("client-bad-json"); break;
+    case KP::JsonError:
+        //% "Client sent a bad JSON."
+        qWarning() << qtTrId("client-bad-json"); break;
     case KP::Unsupported:
         //% "Client sent an unsupported JSON."
         qWarning() << qtTrId("client-unsupported-json"); break;
@@ -1112,6 +1122,11 @@ void Clientv2::receivedMsg(const QJsonObject &djson) {
         //% "The following equipment are destructed: %1"
         qInfo() << qtTrId("destruct-equip-list").arg(trashString.join(","));
         equipModel.destructEquipment(trash);
+    }
+    break;
+    case KP::Success: {
+        //% "Operation success!"
+        qInfo() << qtTrId("operation-success");
     }
     break;
     default: throw std::domain_error("message not implemented"); break;

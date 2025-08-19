@@ -26,13 +26,6 @@ int EquipType::toInt() const {
     return iRep;
 }
 
-int EquipType::iconGroup() const {
-    return groupToIcon.value(toString(), 0);
-}
-
-int EquipType::getTypeSort() const {
-    return displaySort.value(toString(), 0);
-}
 
 const QList<QString> EquipType::getDisplayGroupsSorted() {
     return {
@@ -83,7 +76,7 @@ const QList<QString> EquipType::getDisplayGroupsSorted() {
 
 QString EquipType::getDisplayGroup() {
     /* TODO: change to switch */
-    QMap<QString, QString> displayGroup = {
+    static QMap<QString, QString> displayGroup = {
         std::pair("AA-gun",                 qtTrId("AA")),
         std::pair("AA-cannon",              qtTrId("AA")),
         std::pair("AA-control-device",      qtTrId("AA")),
@@ -178,6 +171,18 @@ QString EquipType::getDisplayGroup() {
     };
 
     return displayGroup.value(intToStrRep(iRep));
+}
+
+int EquipType::getTypeSort() const {
+    return displaySort.value(toString(), 0);
+}
+
+QString EquipType::getPrimaryAttr() const {
+    return primaryAttr.value(toString(), "Tech");
+}
+
+int EquipType::iconGroup() const {
+    return groupToIcon.value(toString(), 0);
 }
 
 const QString EquipType::intToStrRep(int input) {

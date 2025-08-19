@@ -82,7 +82,8 @@ enum MsgType{
     AllowClientStart,
     AllowClientFinish,
     VerifyComplete,
-    EquipRetired
+    EquipRetired,
+    Success
 };
 Q_ENUM_NS(MsgType)
 
@@ -116,6 +117,7 @@ enum CommandType{
     CHello,
     Adminaddequip,
     Admingenerateequips,
+    Adminremoveequips,
     DemandEquipInfo,
     DemandEquipInfoUser,
     DemandGlobalTech,
@@ -184,6 +186,7 @@ QByteArray accessDenied();
 QByteArray catbomb();
 QByteArray clientAddEquip(int);
 QByteArray clientAdminTestEquip();
+QByteArray clientAdminTestEquipRemove();
 QByteArray clientDemandDestructEquip(const QList<QUuid> &);
 QByteArray clientDemandEquipInfo();
 QByteArray clientDemandEquipInfoUser();
@@ -218,6 +221,7 @@ QByteArray serverParseError(MsgType, const QString &,
 QByteArray serverPenguin();
 QByteArray serverResourceUpdate(ResOrd);
 QByteArray serverSkillPoints(int, int64, int64);
+QByteArray serverSuccess();
 QByteArray serverVerifyComplete();
 QByteArray weighAnchor();
 

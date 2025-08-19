@@ -1069,7 +1069,7 @@ void Server::doFetch(CSteamID &uid, int factoryid, QSslSocket *connection) {
                 senderM.sendMessage(connection, msg);
             }
             else {
-                // TODO:is ship part
+                // TODO: is ship part
             }
             QSqlDatabase db = QSqlDatabase::database();
             QSqlQuery query;
@@ -1587,7 +1587,6 @@ void Server::parseListen(const QStringList &cmdParts) {
         qWarning() << qtTrId("port-invalid");
         return;
     }
-    // TODO: This should be configureable
     QSslConfiguration conf;
     const auto certs
         = QSslCertificate::fromPath(
@@ -1908,9 +1907,9 @@ void Server::receivedReq(const QJsonObject &djson,
         return;
     }
     switch(djson["command"].toInt()) {
-    case KP::CommandType::ChangeState:
-        switch(djson["state"].toInt()) {
-        /* TODO: Should update to client as well? */
+    case KP::CommandType::ChangeState: {
+        auto state = djson["state"].toInt();
+        switch(state) {
         case KP::GameState::Port: {
             naturalRegen(uid);
             User::refreshPort(uid);
@@ -1922,11 +1921,19 @@ void Server::receivedReq(const QJsonObject &djson,
             refreshClientFactory(uid, connection);
         }
         break;
-        default:
-            throw std::domain_error("command type not supported");
-            break;
+        case KP::GameState::TechView: {
+            ;
         }
         break;
+        default:
+            auto meta = QMetaEnum::fromType<KP::GameState>();
+            //% "Game state %1 not supported!"
+            throw std::domain_error(qtTrId("gamestate-invalid")
+                                        .arg(meta.valueToKey(state)).toUtf8());
+            break;
+        }
+    }
+    break;
     case KP::CommandType::Adminaddequip: {
         int equipid = djson["equipid"].toInt();
         if(!User::isSuperUser(uid)) {
@@ -1938,17 +1945,25 @@ void Server::receivedReq(const QJsonObject &djson,
                 newEquip(uid, equipid), equipid);
             senderM.sendMessage(connection, msg);
         }
+
     }
     break;
     case KP::CommandType::Admingenerateequips: {
         if(!User::isSuperUser(uid)) {
             QByteArray msg = KP::accessDenied();
             senderM.sendMessage(connection, msg);
+        } else {
+            if(!djson["remove"].toBool()) {
+                generateTestEquip(uid);
+                QByteArray msg = KP::serverSuccess();
+                senderM.sendMessage(connection, msg);
+            } else {
+                deleteTestEquip(uid);
+                QByteArray msg = KP::serverSuccess();
+                senderM.sendMessage(connection, msg);
+            }
+            offerEquipInfoUser(uid, connection);
         }
-        else {
-            generateTestEquip(uid);
-        }
-        /* TODO: send to client */
     }
     break;
     case KP::CommandType::Develop: {
@@ -1986,9 +2001,9 @@ void Server::receivedReq(const QJsonObject &djson,
                            this,
                            [connection, uid, djson, this]
                            {offerTechInfo(
-                                 connection,
-                                 uid,
-                                 djson["local"].toInt());});
+                  connection,
+                  uid,
+                  djson["local"].toInt());});
     }
     break;
     case KP::CommandType::DemandSkillPoints: {
@@ -1996,9 +2011,9 @@ void Server::receivedReq(const QJsonObject &djson,
                            this,
                            [connection, uid, djson, this]
                            {offerSPInfo(
-                                 connection,
-                                 uid,
-                                 djson["equipid"].toInt());});
+                  connection,
+                  uid,
+                  djson["equipid"].toInt());});
     }
     break;
     case KP::CommandType::DemandResourceUpdate: {
@@ -2006,8 +2021,8 @@ void Server::receivedReq(const QJsonObject &djson,
                            this,
                            [connection, uid, this]
                            {offerResourceInfo(
-                                 connection,
-                                 uid);});
+                  connection,
+                  uid);});
     }
     break;
     case KP::CommandType::DestructEquip: {
@@ -2036,7 +2051,7 @@ void Server::sendTestMessages() {
     }
     else {
         for(auto equip: std::as_const(equipRegistry)) {
-            qInfo() << equip->toString("ja_JP");
+            qInfo() << equip->localNames["ja_JP"];
         }
     }
 }

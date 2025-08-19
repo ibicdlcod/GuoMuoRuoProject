@@ -69,6 +69,15 @@ QByteArray KP::clientAdminTestEquip() {
     QJsonObject result;
     result["type"] = DgramType::Request;
     result["command"] = CommandType::Admingenerateequips;
+    result["remove"] = false;
+    return QCborValue::fromJsonValue(result).toCbor();
+}
+
+QByteArray KP::clientAdminTestEquipRemove() {
+    QJsonObject result;
+    result["type"] = DgramType::Request;
+    result["command"] = CommandType::Admingenerateequips;
+    result["remove"] = true;
     return QCborValue::fromJsonValue(result).toCbor();
 }
 
@@ -368,6 +377,13 @@ QByteArray KP::serverSkillPoints(int equipId,
     result["equipid"] = equipId;
     result["actualSP"] = (qint64)currentSP;
     result["desiredSP"] = (qint64)standardSP;
+    return QCborValue::fromJsonValue(result).toCbor();
+}
+
+QByteArray KP::serverSuccess() {
+    QJsonObject result;
+    result["type"] = DgramType::Message;
+    result["msgtype"] = MsgType::Success;
     return QCborValue::fromJsonValue(result).toCbor();
 }
 
