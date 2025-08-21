@@ -29,7 +29,7 @@ void ServerMasterSender::sendMessage(QAbstractSocket *connection,
 
 void ServerMasterSender::errorHandle(const QString &error) {
     Sender *individual = qobject_cast<Sender *>(QObject::sender());
-    //% "Address %1 Port %2 Errror: %3"
+    //% "Address %1 Port %2 Error: %3"
     emit errorMessage(qtTrId("sender-error")
                            .arg(individual->peerAddress().toString())
                            .arg(individual->peerPort())

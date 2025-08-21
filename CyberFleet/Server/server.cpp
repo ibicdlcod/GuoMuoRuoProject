@@ -201,8 +201,7 @@ Q_GLOBAL_STATIC(QString,
                     "EquipDef INTEGER NOT NULL, "
                     "Star INTEGER DEFAULT 0, "
                     "FOREIGN KEY(User) REFERENCES NewUsers(UserID),"
-                    "FOREIGN KEY(EquipDef) REFERENCES EquipName(EquipID),"
-                    "CONSTRAINT Star_Valid CHECK (Star >= 0 AND Star < 16)"
+                    "FOREIGN KEY(EquipDef) REFERENCES EquipName(EquipID)"
                     ");"
                     ));
 
@@ -808,7 +807,7 @@ bool Server::addEquipStar(const QUuid &equipUid, int amount = 1) {
         }
         else {
             int star = query.value(2).toInt();
-            if(star + amount > 15) {
+            if(star + amount > INT_MAX) {
                 //% "Equip id %1: not allowed to improve beyond 15 stars."
                 qDebug() << qtTrId("improve-beyond-possible")
                                 .arg(equipUid.toString());
@@ -847,6 +846,17 @@ bool Server::addEquipStar(const QUuid &equipUid, int amount = 1) {
         return false;
     }
     return false;
+}
+
+void Server::clearNegativeSkillPoints(const CSteamID &uid) {
+    /*
+     * UPDATE UserEquipSP
+SET Intvalue = CASE
+    WHEN Intvalue < 0 THEN 0 -- Change to 0 if less than 0
+    ELSE Intvalue  -- Keep original value otherwise
+END
+WHERE User = '76561198194251051' AND Intvalue < 0;
+*/
 }
 
 void Server::decryptDatagram(QSslSocket *connection,

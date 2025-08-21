@@ -105,6 +105,7 @@ private slots:
 
 private:
     bool addEquipStar(const QUuid &, int);
+    void clearNegativeSkillPoints(const CSteamID &);
     void decryptDatagram(QSslSocket *, const QByteArray &);
     void deleteTestEquip(const CSteamID &);
     void doDevelop(CSteamID &, int, int, QSslSocket *);
