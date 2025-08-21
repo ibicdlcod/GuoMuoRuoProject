@@ -1056,8 +1056,9 @@ void Server::doFetch(CSteamID &uid, int factoryid, QSslSocket *connection) {
                         = settings->value(
                                       "rule/penguinskillpointsdifficulty",
                                       10.0).toDouble();
-                    double techFactor = atan2(calculateTech(uid, 0).first + 1,
-                                              equipRegistry.value(jobID)->getTech() + 1);
+                    double tEquipP1 = equipRegistry.value(jobID)->getTech() + 1;
+                    double tCurrentP1 = calculateTech(uid, 0).first + 1;
+                    double techFactor = tCurrentP1 / std::hypot(tCurrentP1, tEquipP1);
                     User::addSkillPoints(uid, jobID,
                                          (stdSkillPoints * techFactor) / difficultyFactor);
                 }
