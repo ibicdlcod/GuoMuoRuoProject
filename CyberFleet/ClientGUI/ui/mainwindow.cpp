@@ -220,22 +220,14 @@ void MainWindow::updateColorScheme(Qt::ColorScheme colorscheme) {
     switch(colorscheme) {
     case Qt::ColorScheme::Dark:
         setStyleSheet("QMenuBar { background-color: dimgray; }");
-        pal.setColor(QPalette::Window, QColor::fromString("lightskyblue"));
-        pal.setColor(QPalette::Base, QColor::fromString("lightskyblue"));
-        pal.setColor(QPalette::Disabled, QPalette::Window, QColor::fromString("grey"));
-        pal.setColor(QPalette::WindowText, QColor::fromString("black"));
-        pal.setColor(QPalette::Text, QColor::fromString("black"));
-        pal.setColor(QPalette::BrightText, QColor::fromString("white"));
+        pal.setColor(QPalette::Window, QColor::fromString("midnightblue"));
+        pal.setColor(QPalette::Base, QColor::fromString("midnightblue"));
         break;
     case Qt::ColorScheme::Light: [[fallthrough]];
     default:
         setStyleSheet("QMenuBar { background-color: lightgray; }");
-        pal.setColor(QPalette::Window, QColor::fromString("midnightblue"));
-        pal.setColor(QPalette::Base, QColor::fromString("midnightblue"));
-        pal.setColor(QPalette::Disabled, QPalette::Window, QColor::fromString("grey"));
-        pal.setColor(QPalette::WindowText, QColor::fromString("white"));
-        pal.setColor(QPalette::Text, QColor::fromString("white"));
-        pal.setColor(QPalette::BrightText, QColor::fromString("black"));
+        pal.setColor(QPalette::Window, QColor::fromString("lightskyblue"));
+        pal.setColor(QPalette::Base, QColor::fromString("lightskyblue"));
         break;
     }
     QApplication::setPalette(pal);

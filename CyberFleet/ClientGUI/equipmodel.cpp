@@ -328,11 +328,11 @@ QVariant EquipModel::data(const QModelIndex &index, int role) const {
             QColor color = QColor();
             switch(QApplication::styleHints()->colorScheme()) {
             case Qt::ColorScheme::Dark:
-                color.setHsv(starToDisplay * 20, 255, 128);
+                color.setHsv(starToDisplay * 20, 128, 255);
                 break;
             case Qt::ColorScheme::Light: [[fallthrough]];
             default:
-                color.setHsv(starToDisplay * 20, 128, 255);
+                color.setHsv(starToDisplay * 20, 255, 128);
                 break;
             }
 

@@ -10,7 +10,7 @@
 |    networkclient/autopasswordtime    |                1000                 |                                                              |
 |     networkclient/requestEATCall     | datetime at last successful attempt |                                                              |
 |    networkshared/maxmsgdelayinms     |                1000                 |                                                              |
-| networkshared/mintimebetweenmsgsinms |                 100                 |                                                              |
+| networkshared/mintimebetweenmsgsinms |                  0                  |                                                              |
 |          networkserver/pem           |           :/harusoft.pem            |                                                              |
 |          networkserver/key           |          serverprivate.key          |                                                              |
 |          msg_disabled/debug          |                false                |                    ignored in releasemode                    |

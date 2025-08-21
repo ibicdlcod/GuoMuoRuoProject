@@ -248,14 +248,12 @@ bool Clientv2::parseSpec(const QStringList &cmdParts) {
             case KP::Switchcert:
                 switchCert(cmdParts);
                 return true;
-#ifdef QT_DEBUG
             case KP::Messagetest:
                 if(!loginCheck()) {
                     return false;
                 }
                 sendTestMessages();
                 return true;
-#endif
             default:
                 if(!loggedIn()) {
                     //% "You are not online, command is invalid."
@@ -1288,7 +1286,7 @@ inline void Clientv2::invalidCommand() {
 /* Guard against unauthorized entry */
 bool Clientv2::loginCheck() {
     if(!loggedIn()) {
-        emit qout(qtTrId("access-denied-login-first"));
+        qCritical() << qtTrId("access-denied-login-first");
         return false;
     }
     return true;
