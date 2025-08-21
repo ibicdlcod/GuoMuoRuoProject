@@ -95,7 +95,7 @@ void Sender::send() {
         m_partnumtotal = 0;
         QTimer::singleShot(settings->value(
                                        "networkshared/mintimebetweenmsgsinms",
-                                       100).toInt(),
+                                       0).toInt(),
                            this, &Sender::switchtoReady);
         return;
     }

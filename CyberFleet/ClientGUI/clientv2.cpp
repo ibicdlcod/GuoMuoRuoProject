@@ -248,6 +248,14 @@ bool Clientv2::parseSpec(const QStringList &cmdParts) {
             case KP::Switchcert:
                 switchCert(cmdParts);
                 return true;
+#ifdef QT_DEBUG
+            case KP::Messagetest:
+                if(!loginCheck()) {
+                    return false;
+                }
+                sendTestMessages();
+                return true;
+#endif
             default:
                 if(!loggedIn()) {
                     //% "You are not online, command is invalid."
@@ -1129,6 +1137,10 @@ void Clientv2::receivedMsg(const QJsonObject &djson) {
         qInfo() << qtTrId("operation-success");
     }
     break;
+    case KP::MessageTestServer: {
+        qInfo() << "Received test message, id: " + djson["id"].toString();
+    }
+    break;
     default: throw std::domain_error("message not implemented"); break;
     }
 }
@@ -1282,8 +1294,17 @@ bool Clientv2::loginCheck() {
     return true;
 }
 
+void Clientv2::sendTestMessages() {
+#pragma message(NOT_M_CONST)
+    constexpr int size = 20;
+    for(int i = 0; i < size; ++i) {
+        QByteArray msg = KP::clientTestMessages(i);
+        sender->enqueue(msg);
+    }
+}
+
 /* CLI */
-void Clientv2::showCommands(bool validOnly){
+void Clientv2::showCommands(bool validOnly) {
     //% "Use 'exit' to quit."
     emit qout(qtTrId("exit-helper"));
     if(validOnly) {

@@ -191,6 +191,14 @@ QByteArray KP::clientSteamLogout() {
     return QCborValue::fromJsonValue(result).toCbor();
 }
 
+QByteArray KP::clientTestMessages(int index) {
+    QJsonObject result;
+    result["type"] = DgramType::Request;
+    result["command"] = CommandType::MessageTest;
+    result["id"] = index;
+    return QCborValue::fromJsonValue(result).toCbor();
+}
+
 QByteArray KP::serverDevelopFailed(GameError error) {
     QJsonObject result;
     result["type"] = DgramType::Message;
@@ -384,6 +392,14 @@ QByteArray KP::serverSuccess() {
     QJsonObject result;
     result["type"] = DgramType::Message;
     result["msgtype"] = MsgType::Success;
+    return QCborValue::fromJsonValue(result).toCbor();
+}
+
+QByteArray KP::serverTestMessages(int index) {
+    QJsonObject result;
+    result["type"] = DgramType::Message;
+    result["msgtype"] = MsgType::MessageTestServer;
+    result["id"] = index;
     return QCborValue::fromJsonValue(result).toCbor();
 }
 

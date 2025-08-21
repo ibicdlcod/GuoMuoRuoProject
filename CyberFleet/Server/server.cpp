@@ -1979,7 +1979,8 @@ void Server::receivedReq(const QJsonObject &djson,
         case KP::GameState::Factory: refreshClientFactory
                 (uid, connection); break;
         default:
-            throw std::domain_error("command type not supported");
+            throw std::domain_error(QString("User %1: command type not supported")
+                                        .arg(uid.ConvertToUint64()).toUtf8());
             break;
         }
         break;
@@ -2036,8 +2037,16 @@ void Server::receivedReq(const QJsonObject &djson,
         senderM.sendMessage(connection, msg);
     }
     break;
+    case KP::CommandType::MessageTest: {
+        int id = djson["id"].toInt();
+        QByteArray msg = KP::serverTestMessages(id);
+        senderM.sendMessage(connection, msg);
+    }
+    break;
     default:
-        throw std::domain_error("command type not supported"); break;
+        throw std::domain_error(QString("User %1: command type not supported")
+                                    .arg(uid.ConvertToUint64()).toUtf8());
+        break;
     }
     return;
     Q_UNREACHABLE();

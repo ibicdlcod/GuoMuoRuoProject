@@ -83,7 +83,8 @@ enum MsgType{
     AllowClientFinish,
     VerifyComplete,
     EquipRetired,
-    Success
+    Success,
+    MessageTestServer,
 };
 Q_ENUM_NS(MsgType)
 
@@ -124,7 +125,8 @@ enum CommandType{
     DemandSkillPoints,
     DemandResourceUpdate,
     DestructEquip,
-    Switch
+    Switch,
+    MessageTest
 };
 Q_ENUM_NS(CommandType)
 
@@ -172,7 +174,8 @@ enum ConsoleCommandType{
     Allcommands,
     Connect,
     Disconnect,
-    Switchcert
+    Switchcert,
+    Messagetest
 };
 Q_ENUM_NS(ConsoleCommandType)
 
@@ -200,6 +203,7 @@ QByteArray clientHello();
 QByteArray clientStateChange(GameState);
 QByteArray clientSteamAuth(uint8 [], uint32);
 QByteArray clientSteamLogout();
+QByteArray clientTestMessages(int);
 
 QByteArray serverDevelopFailed(GameError);
 QByteArray serverDevelopStart();
@@ -222,6 +226,7 @@ QByteArray serverPenguin();
 QByteArray serverResourceUpdate(ResOrd);
 QByteArray serverSkillPoints(int, int64, int64);
 QByteArray serverSuccess();
+QByteArray serverTestMessages(int);
 QByteArray serverVerifyComplete();
 QByteArray weighAnchor();
 

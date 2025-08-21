@@ -176,6 +176,7 @@ private:
     void receivedLogout(const QJsonObject &);
     void receivedMsg(const QJsonObject &);
     void receivedNewLogin(const QJsonObject &);
+    void sendTestMessages();
     void showCommands(bool);
     void switchCert(const QStringList &);
     void updateEquipCache(const QJsonObject &);
