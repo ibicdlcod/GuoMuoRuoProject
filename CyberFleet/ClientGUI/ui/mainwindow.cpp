@@ -22,6 +22,9 @@ MainWindow::MainWindow(QWidget *parent, int argc, char ** argv)
                      &QStyleHints::colorSchemeChanged,
                      this, &MainWindow::updateColorScheme);
 
+    auto menubarFont = ui->menubar->font();
+    menubarFont.setPointSize(12);
+    ui->menubar->setFont(menubarFont);
 
     /* this is done instead of in *.ui for it does not cascade */
     ui->MainArea->setObjectName("mainArea");
@@ -216,16 +219,15 @@ void MainWindow::switchToDevelop() {
 
 void MainWindow::updateColorScheme(Qt::ColorScheme colorscheme) {
     QPalette pal = QGuiApplication::palette();
+    setStyleSheet("QMenuBar { background-color: palette(button)}");
     /* https://www.w3.org/TR/SVG11/types.html#ColorKeywords */
     switch(colorscheme) {
     case Qt::ColorScheme::Dark:
-        setStyleSheet("QMenuBar { background-color: dimgray; }");
         pal.setColor(QPalette::Window, QColor::fromString("midnightblue"));
         pal.setColor(QPalette::Base, QColor::fromString("midnightblue"));
         break;
     case Qt::ColorScheme::Light: [[fallthrough]];
     default:
-        setStyleSheet("QMenuBar { background-color: lightgray; }");
         pal.setColor(QPalette::Window, QColor::fromString("lightskyblue"));
         pal.setColor(QPalette::Base, QColor::fromString("lightskyblue"));
         break;

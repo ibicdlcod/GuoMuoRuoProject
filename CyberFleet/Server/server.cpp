@@ -849,14 +849,21 @@ bool Server::addEquipStar(const QUuid &equipUid, int amount = 1) {
 }
 
 void Server::clearNegativeSkillPoints(const CSteamID &uid) {
-    /*
-     * UPDATE UserEquipSP
-SET Intvalue = CASE
-    WHEN Intvalue < 0 THEN 0 -- Change to 0 if less than 0
-    ELSE Intvalue  -- Keep original value otherwise
-END
-WHERE User = '76561198194251051' AND Intvalue < 0;
-*/
+    QSqlDatabase db = QSqlDatabase::database();
+    QSqlQuery query;
+    query.prepare("UPDATE UserEquipSP "
+                  "SET Intvalue = CASE "
+                  "WHEN Intvalue < 0 THEN 0 "
+                  "ELSE Intvalue "
+                  "END "
+                  "WHERE User = :uid AND Intvalue < 0;");
+    query.bindValue(":uid", QString::number(uid.ConvertToUint64()));
+    if(Q_UNLIKELY(!query.exec())) {
+        //% "User %1: clear negative skill points failed!"
+        throw DBError(qtTrId("clear-negative-skillpoints-failed")
+                          .arg(uid.ConvertToUint64()),
+                      query.lastError());
+    }
 }
 
 void Server::decryptDatagram(QSslSocket *connection,
@@ -1967,7 +1974,9 @@ void Server::receivedReq(const QJsonObject &djson,
             senderM.sendMessage(connection, msg);
         } else {
             if(!djson["remove"].toBool()) {
+                deleteTestEquip(uid);
                 generateTestEquip(uid);
+                clearNegativeSkillPoints(uid);
                 QByteArray msg = KP::serverSuccess();
                 senderM.sendMessage(connection, msg);
             } else {
@@ -2015,9 +2024,9 @@ void Server::receivedReq(const QJsonObject &djson,
                            this,
                            [connection, uid, djson, this]
                            {offerTechInfo(
-                  connection,
-                  uid,
-                  djson["local"].toInt());});
+                                 connection,
+                                 uid,
+                                 djson["local"].toInt());});
     }
     break;
     case KP::CommandType::DemandSkillPoints: {
@@ -2025,9 +2034,9 @@ void Server::receivedReq(const QJsonObject &djson,
                            this,
                            [connection, uid, djson, this]
                            {offerSPInfo(
-                  connection,
-                  uid,
-                  djson["equipid"].toInt());});
+                                 connection,
+                                 uid,
+                                 djson["equipid"].toInt());});
     }
     break;
     case KP::CommandType::DemandResourceUpdate: {
@@ -2035,8 +2044,8 @@ void Server::receivedReq(const QJsonObject &djson,
                            this,
                            [connection, uid, this]
                            {offerResourceInfo(
-                  connection,
-                  uid);});
+                                 connection,
+                                 uid);});
     }
     break;
     case KP::CommandType::DestructEquip: {
@@ -2072,9 +2081,10 @@ void Server::sendTestMessages() {
         qWarning() << "Server isn't listening, abort.";
     }
     else {
+        /*
         for(auto equip: std::as_const(equipRegistry)) {
             qInfo() << equip->localNames["ja_JP"];
-        }
+        }*/
     }
 }
 

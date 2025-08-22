@@ -1,7 +1,6 @@
 #include <QCoreApplication>
 #include <QLocale>
 #include <QTranslator>
-#include "../steam/steam_api.h"
 #include "../steam/steam_gameserver.h"
 
 #include "../Protocol/kp.h"
@@ -21,7 +20,13 @@ int main(int argc, char *argv[]) {
         return STEAM_ERROR;
     }
     if(!SteamAPI_Init()) {
-        /* ignore it, since servers need not to have steam client running */
+        /* ignore it */
+    }
+    if(!SteamGameServer_Init(INADDR_ANY, 1826, 1424, eServerModeNoAuthentication, "0.60.0")) {
+        qFatal() <<
+            "Fatal Error - "
+            "SteamGameServer_Init() failed.\n";
+        return STEAM_ERROR;
     }
 
     QT_USE_NAMESPACE
