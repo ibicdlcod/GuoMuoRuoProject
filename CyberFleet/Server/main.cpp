@@ -15,17 +15,14 @@ const int STEAM_ERROR = 1;
 }
 
 int main(int argc, char *argv[]) {
-
-    if(SteamAPI_RestartAppIfNecessary(KP::steamAppId)) { // keep steam_appid.txt
-        return STEAM_ERROR;
-    }
-    if(!SteamAPI_Init()) {
-        /* ignore it */
-    }
-    if(!SteamGameServer_Init(INADDR_ANY, 1826, 1424, eServerModeNoAuthentication, "0.60.0")) {
+    SteamErrMsg err;
+    if(!SteamGameServer_InitEx(
+            INADDR_ANY, 1826, 1424,
+            eServerModeAuthenticationAndSecure, "0.60.0", &err)) {
+        qCritical() << err;
         qFatal() <<
             "Fatal Error - "
-            "SteamGameServer_Init() failed.\n";
+            "SteamGameServer_Init() failed.";
         return STEAM_ERROR;
     }
 
@@ -49,7 +46,7 @@ int main(int argc, char *argv[]) {
 
     QTranslator translator;
 #ifdef QT_NO_DEBUG
-    QString steamLanguage = SteamUtils()->GetSteamUILanguage();
+    QString steamLanguage = SteamGameServerUtils()->GetSteamUILanguage();
     QMap<QString, QString> LanguageView;
     LanguageView["english"] = QStringLiteral("en_US");
     LanguageView["schinese"] = QStringLiteral("zh_CN");
@@ -87,5 +84,12 @@ int main(int argc, char *argv[]) {
     QTimer::singleShot(0, &server, &Server::openingwords);
     QTimer::singleShot(settings->value("server/displaypromptdelay", 100).toInt(),
                        &server, &Server::displayPrompt);
-    return server.exec();
+
+    // ↓ Start event loop
+    int execvalue = server.exec();
+
+    // ↓ Steam shutdown
+    SteamGameServer_Shutdown();
+
+    return execvalue;
 }

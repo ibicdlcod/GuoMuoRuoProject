@@ -1997,27 +1997,27 @@ Great at battle and bad at politics--so cool!</translation>
         <translation>Back to naval base</translation>
     </message>
     <message id="menu-logout">
-        <location filename="../ClientGUI/ui/mainwindow.ui" line="419"/>
+        <location filename="../ClientGUI/ui/mainwindow.ui" line="414"/>
         <source>Logout</source>
         <translation>Logout</translation>
     </message>
     <message id="menu-exit">
-        <location filename="../ClientGUI/ui/mainwindow.ui" line="424"/>
+        <location filename="../ClientGUI/ui/mainwindow.ui" line="419"/>
         <source>Exit program</source>
         <translation>Exit program</translation>
     </message>
     <message id="menu-view-tech">
-        <location filename="../ClientGUI/ui/mainwindow.ui" line="429"/>
+        <location filename="../ClientGUI/ui/mainwindow.ui" line="424"/>
         <source>View Tech</source>
         <translation>View Tech</translation>
     </message>
     <message id="menu-construct">
-        <location filename="../ClientGUI/ui/mainwindow.ui" line="434"/>
+        <location filename="../ClientGUI/ui/mainwindow.ui" line="429"/>
         <source>Construct Ships</source>
         <translation>Construct Ships</translation>
     </message>
     <message id="menu-arsenal">
-        <location filename="../ClientGUI/ui/mainwindow.ui" line="439"/>
+        <location filename="../ClientGUI/ui/mainwindow.ui" line="434"/>
         <source>Arsenal</source>
         <translation>Arsenal</translation>
     </message>
