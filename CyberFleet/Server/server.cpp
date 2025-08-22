@@ -1728,14 +1728,16 @@ void Server::receivedAuth(const QJsonObject &djson,
                 return;
             }
             qDebug("Ticket decrypt success");
-#pragma message(NOT_M_CONST)
+            /* TODO: Use SteamEncryptedAppTicket_BUserOwnsAppInTicket
+             * to check DLC */
             if(!SteamEncryptedAppTicket_BIsTicketForApp(
                     rgubDecrypted,
                     cubDecrypted, KP::steamAppId)) {
                 //% "%1: Ticket is not from correct App ID"
                 qCritical() << qtTrId("ticket-appid-wrong")
                                    .arg(peerInfo.toString()).toUtf8();
-                QByteArray msg = KP::serverLogFail(KP::TicketIsntFromCorrectAppID);
+                QByteArray msg = KP::serverLogFail
+                    (KP::TicketIsntFromCorrectAppID);
                 senderM.sendMessage(connection, msg);
                 delete [] rgubTicket;
                 return;

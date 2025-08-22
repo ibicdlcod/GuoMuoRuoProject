@@ -2,6 +2,7 @@
 #include <QLocale>
 #include <QTranslator>
 #include "../steam/steam_api.h"
+#include "../steam/steam_gameserver.h"
 
 #include "../Protocol/kp.h"
 #include "qconsolelistener.h"
@@ -20,8 +21,7 @@ int main(int argc, char *argv[]) {
         return STEAM_ERROR;
     }
     if(!SteamAPI_Init()) {
-        qFatal("Fatal Error - Steam must be running to play this game (SteamAPI_Init() failed).\n");
-        return STEAM_ERROR;
+        /* ignore it, since servers need not to have steam client running */
     }
 
     QT_USE_NAMESPACE
