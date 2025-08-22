@@ -16,9 +16,10 @@ const int STEAM_ERROR = 1;
 
 int main(int argc, char *argv[]) {
     SteamErrMsg err;
-    if(!SteamGameServer_InitEx(
+    if(SteamGameServer_InitEx(
             INADDR_ANY, 1826, 1424,
-            eServerModeAuthenticationAndSecure, "0.60.0", &err)) {
+            eServerModeAuthenticationAndSecure, "0.60.0", &err)
+        != k_ESteamAPIInitResult_OK) {
         qCritical() << err;
         qFatal() <<
             "Fatal Error - "

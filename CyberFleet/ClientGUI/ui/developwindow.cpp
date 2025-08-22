@@ -1,6 +1,7 @@
 #include "developwindow.h"
 #include "ui_developwindow.h"
 #include "Protocol/equiptype.h"
+#include "Protocol/tech.h"
 #include "ClientGUI/clientv2.h"
 
 extern std::unique_ptr<QSettings> settings;
@@ -28,6 +29,13 @@ DevelopWindow::DevelopWindow(QWidget *parent)
             this, &DevelopWindow::resetListName);
     connect(ui->listName, &QComboBox::currentIndexChanged,
             this, &DevelopWindow::resetEquipName);
+    connect(ui->listType, &QComboBox::currentIndexChanged,
+            this, &DevelopWindow::displaySuccessRate);
+    connect(ui->listName, &QComboBox::currentIndexChanged,
+            this, &DevelopWindow::displaySuccessRate);
+    connect(ui->idText, &QTextEdit::textChanged,
+            this, &DevelopWindow::displaySuccessRate2);
+    displaySuccessRate2();
 }
 
 DevelopWindow::~DevelopWindow() {
@@ -80,4 +88,29 @@ void DevelopWindow::resetListName(int equiptypeInt) {
 
 void DevelopWindow::resetEquipName(int equipInt) {
     Clientv2::getInstance().equipIndex = equipInt;
+}
+
+void DevelopWindow::displaySuccessRate(int index) {
+    Q_UNUSED(index);
+    displaySuccessRate2();
+}
+
+void DevelopWindow::displaySuccessRate2() {
+    Clientv2 &engine = Clientv2::getInstance();
+    auto cache = engine.techCache;
+    auto equipId = equipIdDesired();
+    if(cache.contains(0) && cache.contains(equipId)) {
+        ui->rateNumber->setText(QString::number(Tech::calExperimentRate(
+            engine.equipRegistryCache[equipId]->getTech(),
+            cache[0],
+            cache[equipId],
+            settings->value(
+                        "rule/sigmaconstant",
+                        1.0).toDouble()
+            )*100) + "%");
+    }
+    else {
+        //% "Unknown"
+        ui->rateNumber->setText(qtTrId("develop-success-rate-unknown"));
+    }
 }

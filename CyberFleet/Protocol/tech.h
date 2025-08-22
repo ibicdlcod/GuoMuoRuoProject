@@ -10,6 +10,7 @@ namespace Tech
     bool calExperiment(double, double, double, std::mt19937 &);
     bool calExperiment2(double, double, double, double,
                         std::mt19937 &);
+    double calExperimentRate(double, double, double, double);
     double calLevel(QList<std::pair<double, double>> &, const double);
     double calLevelGlobal(QList<std::pair<double, double>> &);
     double calLevelLocal(QList<std::pair<double, double>> &);

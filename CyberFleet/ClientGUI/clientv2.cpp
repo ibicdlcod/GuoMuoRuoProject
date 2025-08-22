@@ -378,7 +378,7 @@ void Clientv2::switchToTech() {
         emit gamestateChanged(KP::TechView);
         if(equipRegistryCacheGood) {
             socket.flush();
-            QByteArray msg = KP::clientDemandGlobalTech(0);
+            QByteArray msg = KP::clientDemandTech(0);
             sender->enqueue(msg);
             socket.flush();
         }
@@ -392,7 +392,7 @@ void Clientv2::switchToTech() {
 
 void Clientv2::switchToTech2() {
     socket.flush();
-    QByteArray msg = KP::clientDemandGlobalTech(0);
+    QByteArray msg = KP::clientDemandTech(0);
     sender->enqueue(msg);
     socket.flush();
 }

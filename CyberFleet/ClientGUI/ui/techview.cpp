@@ -107,7 +107,7 @@ void TechView::demandSkillPoints(int index) {
             if(name.compare(ui->localListValue->currentText(),
                              Qt::CaseInsensitive) == 0) {
                 engine.socket.flush();
-                QByteArray msg = KP::clientDemandGlobalTech(equipReg->getId());
+                QByteArray msg = KP::clientDemandTech(equipReg->getId());
                 const qint64 written = engine.socket.write(msg);
                 if (written <= 0) {
                     throw NetworkError(engine.socket.errorString());
@@ -121,6 +121,8 @@ void TechView::demandSkillPoints(int index) {
 void TechView::updateGlobalTech(const QJsonObject &djson) {
     ui->globalTechValue->setText(
         QString::number(djson.value("value").toDouble()));
+    Clientv2 &engine = Clientv2::getInstance();
+    engine.techCache[0] = djson.value("value").toDouble();
 }
 
 void TechView::updateGlobalTechViewTable(const QJsonObject &djson) {
@@ -136,7 +138,7 @@ void TechView::updateGlobalTechViewTable(const QJsonObject &djson) {
         return;
     }
     else {
-        ui->globalViewTable->clear();
+        ui->globalViewTable->setSortingEnabled(false);
         ui->globalViewTable->show();
         ui->waitText->hide();
     }
@@ -198,6 +200,7 @@ void TechView::updateGlobalTechViewTable(const QJsonObject &djson) {
              //% "Weight"
              qtTrId("Weight")
             });
+        ui->globalViewTable->setSortingEnabled(true);
         ui->globalViewTable->sortByColumn(4, Qt::DescendingOrder);
         ui->globalViewTable->sortByColumn(2, Qt::DescendingOrder);
         ui->globalViewTable->hideColumn(4);
@@ -210,6 +213,9 @@ void TechView::updateGlobalTechViewTable(const QJsonObject &djson) {
 void TechView::updateLocalTech(const QJsonObject &djson) {
     ui->localTechValue->setText(
         QString::number(djson.value("value").toDouble()));
+    Clientv2 &engine = Clientv2::getInstance();
+    engine.techCache[djson["jobid"].toInt()]
+        = djson.value("value").toDouble();
 }
 
 void TechView::updateLocalTechViewTable(const QJsonObject &djson) {
@@ -219,7 +225,7 @@ void TechView::updateLocalTechViewTable(const QJsonObject &djson) {
         return;
     }
     else {
-        ui->localViewTable->clear();
+        ui->localViewTable->setSortingEnabled(false);
         ui->localViewTable->show();
     }
     ui->localViewTable->setHorizontalHeaderLabels(
@@ -256,14 +262,18 @@ void TechView::updateLocalTechViewTable(const QJsonObject &djson) {
         }
         newItem2->setFlags(newItem->flags() & ~Qt::ItemIsEditable);
         ui->localViewTable->setItem(currentRowCount + i, 1, newItem2);
+
         QTableWidgetItem *newItem3 = new TableWidgetItemNumber(
             thisEquip->getTech());
         newItem3->setFlags(newItem->flags() & ~Qt::ItemIsEditable);
         ui->localViewTable->setItem(currentRowCount + i, 2, newItem3);
+
+        /* item["weight"].toDouble() */
         QTableWidgetItem *newItem4 = new TableWidgetItemNumber(
-            item["weight"].toDouble());
+            item["weight"].toDouble(-1));
         newItem4->setFlags(newItem->flags() & ~Qt::ItemIsEditable);
         ui->localViewTable->setItem(currentRowCount + i, 3, newItem4);
+
         QTableWidgetItem *newItem5 = new TableWidgetItemNumber(
             thisEquip->type.getTypeSort());
         newItem5->setFlags(newItem->flags() & ~Qt::ItemIsEditable);
@@ -274,6 +284,7 @@ void TechView::updateLocalTechViewTable(const QJsonObject &djson) {
         ui->localViewTable->setHorizontalHeaderLabels(
             {qtTrId("Serial-num"), qtTrId("Equip-name-def"),
              qtTrId("Equip-tech-level"), qtTrId("Weight")});
+        ui->localViewTable->setSortingEnabled(true);
         ui->localViewTable->sortByColumn(4, Qt::DescendingOrder);
         ui->localViewTable->sortByColumn(2, Qt::DescendingOrder);
         ui->localViewTable->hideColumn(4);

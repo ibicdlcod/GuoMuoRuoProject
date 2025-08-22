@@ -713,7 +713,7 @@ void Server::offerTechInfo(QSslSocket *connection, const CSteamID &uid,
     auto result = calculateTech(uid, jobID);
     double globalValue = result.first;
     connection->flush();
-    QByteArray msg = KP::serverGlobalTech(globalValue, jobID == 0);
+    QByteArray msg = KP::serverGlobalTech(globalValue, jobID);
     senderM.sendMessage(connection, msg);
     connection->flush();
     offerTechInfoComponents(connection, result.second, true, jobID == 0);
@@ -2081,6 +2081,7 @@ void Server::sendTestMessages() {
         qWarning() << "Server isn't listening, abort.";
     }
     else {
+        qInfo() << Tech::calExperimentRate(1, 2, 2, 1);
         /*
         for(auto equip: std::as_const(equipRegistry)) {
             qInfo() << equip->localNames["ja_JP"];

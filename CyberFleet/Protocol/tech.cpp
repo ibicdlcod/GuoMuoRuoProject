@@ -43,6 +43,16 @@ bool Tech::calExperiment2(const double wantedTech,
                          generator);
 }
 
+/* 2-Technology.md#Success rate */
+double Tech::calExperimentRate(const double wantedTech,
+                          const double globalTech,
+                          const double localTech,
+                          const double sigmaConstant) {
+    double techDiff = calCapable(globalTech, localTech, wantedTech) - wantedTech;
+    return std::erfc(-techDiff / (std::sqrt(2) * sigmaConstant) ) / 2;
+}
+
+
 /* 2-Technology.md#How a combined level is calculated from its components */
 double Tech::calLevel(QList<std::pair<double, double>> &source,
                       const double scopeConstant) {

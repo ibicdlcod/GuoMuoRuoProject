@@ -107,7 +107,7 @@ QByteArray KP::clientDemandEquipInfoUser() {
     return QCborValue::fromJsonValue(result).toCbor();
 }
 
-QByteArray KP::clientDemandGlobalTech(int local) {
+QByteArray KP::clientDemandTech(int local) {
     QJsonObject result;
     result["type"] = DgramType::Request;
     result["command"] = CommandType::DemandGlobalTech;
@@ -265,13 +265,14 @@ QByteArray KP::serverFairyBusy(int jobID) {
     return QCborValue::fromJsonValue(result).toCbor();
 }
 
-QByteArray KP::serverGlobalTech(double tech, bool global) {
+QByteArray KP::serverGlobalTech(double tech, int jobId) {
     QJsonObject result;
     result["type"] = DgramType::Info;
-    result["infotype"] = global
+    result["infotype"] = (jobId == 0)
                              ? InfoType::GlobalTechInfo
                              : InfoType::LocalTechInfo;
     result["value"] = tech;
+    result["jobid"] = jobId;
     return QCborValue::fromJsonValue(result).toCbor();
 }
 

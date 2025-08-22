@@ -16,12 +16,18 @@ public:
     ~DevelopWindow();
 
     int equipIdDesired();
+    void displaySuccessRate2();
 
 signals:
+    void devDemandGlobalTech();
+    void devDemandLocalTech(int);
 
 public slots:
     void resetListName(int);
     void resetEquipName(int);
+
+private slots:
+    void displaySuccessRate(int);
 
 private:
     Ui::DevelopWindow *ui;
