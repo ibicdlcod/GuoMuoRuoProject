@@ -4,7 +4,6 @@
 * [Resources](3-resources.md)\[PARTIAL]
 
   * [Ore Purifier (DLC)](3.1-orepurifier.md)\[NOTYETIMPLEMENTED]
-
 * [Equipment](4-equipment.md)
 
   * [Factory slot](4.1-factoryslot.md)\[PARTIAL]
@@ -15,14 +14,13 @@
   * [Destruct](4.6-destruct.md)
   * [Improvement](4.7-improve.md)\[NOTYETIMPLEMENTED]
   * [Industrial plant](4.8-industrial.md)\[NOTYETIMPLEMENTED]
-
 * Ships
 
-  * Attributes (see equipment above)
-  * Equip slots (including extra)
-  * Visible bonuses
+  * [Attributes](4.2-attributes.md)
   * Ship blueprint
   * Construction
+  * Equip slots (including extra)
+  * Visible bonuses
   * Experience
   * Improvement
   * Remodel
@@ -31,30 +29,25 @@
   * Food
   * Emergency repair
   * Enemies (Amnesiac Fleet)
-
 * Sortie Map
 
   * Normal map
   * Naval Supremacy
   * Historical Mode (DLC)
   * Achievements
-
 * Expedition
 
   * Normal Expedition
   * Command Expedition
   * Supporting Expedition
-
 * Drill
 
   * vs AI
   * vs Player
-
 * Maintenance
 
   * Supply
   * Repair
-
 * Battle mechanic
 
   * Tactical Goal
@@ -69,5 +62,4 @@
   * Night battle
   * Commander's abilities
   * LBAS
-
 * Quests

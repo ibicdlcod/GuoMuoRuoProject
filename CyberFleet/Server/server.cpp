@@ -1423,6 +1423,24 @@ bool Server::importShipFromCSV() {
                             return false;
                         }
                     }
+                    else if(titleParts[i].compare("remodel",
+                                                  Qt::CaseInsensitive)
+                             == 0 ){
+                        QSqlQuery query;
+                        query.prepare("REPLACE INTO ShipReg "
+                                      "(ShipID, Attribute, Intvalue) "
+                                      "VALUES (:id, :attr, :value);");
+                        query.bindValue(":id", shipid);
+                        query.bindValue(":attr", titleParts[i]);
+                        query.bindValue(":value", lineParts[i].toInt(nullptr, 16));
+                        if(!query.exec()) {
+                            //% "Import ship database failed!"
+                            throw DBError(qtTrId("ship-import-failed"),
+                                          query.lastError());
+                            qCritical() << query.lastError();
+                            return false;
+                        }
+                    }
                     else if(indicatorParts[i].compare("attr",
                                                        Qt::CaseInsensitive)
                              == 0 ){
@@ -1974,7 +1992,6 @@ void Server::receivedReq(const QJsonObject &djson,
             senderM.sendMessage(connection, msg);
         } else {
             if(!djson["remove"].toBool()) {
-                deleteTestEquip(uid);
                 generateTestEquip(uid);
                 clearNegativeSkillPoints(uid);
                 QByteArray msg = KP::serverSuccess();

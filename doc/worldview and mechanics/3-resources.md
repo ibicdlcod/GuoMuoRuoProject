@@ -31,11 +31,17 @@ Natural regeneration speed is the following per minute:
 + a is [rule/regenpertech](settings.md)
 + b is [rule/regenattech0](settings.md)
 
-### Naval Supremacy [NOTYETIMPLEMENTED]
+### Naval Supremacy and Expedition[NOTYETIMPLEMENTED]
 
-1000(ordinary)/750(aluminum)/500(rare) per naval area having supremacy every day at 05:00 server time. This amount is only affected by absolute caps, but you need to sortie to these areas every month to maintain it.
+You gain resources from world's land resource points via having naval supremacy at adjacent sea maps. ([Details](../map/resources.md))
 
-### Expedition [NOTYETIMPLEMENTED]
+This amount is only affected by absolute caps.
+
+You lost naval supremacy at each map by 0.02% per minute.
+
+You set the map's naval supremacy to 100/200/300% by successfully sortieing and defeating the boss of a map at C/B/A difficulty.
+
+You gain naval supremacy by 10/20/30% per successful expedition by defeating boss or sub-bosses (any fleet at map endpoint) at C/B/A difficulty (each expedition takes 15 minutes per battle which is 30-60 minutes), capped by 100/200/300%.
 
 ## You spend resources by:
 
