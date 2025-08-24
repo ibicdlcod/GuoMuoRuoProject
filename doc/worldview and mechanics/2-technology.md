@@ -2,7 +2,7 @@
 
 You control a fleet headquarters that mainly consists of Kanmusu(ship girl)s and their equipment.
 
-Technology level is the most important aspect of the game, defined by the weighted average of your eligible ships and equipment.
+Technology level is the most important aspect of the game progression, defined by the weighted average of your eligible ships and equipment.
 
 Constructing ships and Developing equipment which is precisely on your current technology level have a 50% success rate. For deprecated technology the rate is higher but always lesser than 100%. On the other hand, forcefully constructing or developing something far ahead than your current technology level give heavy penalties. You are better off trying something 1-3 level ahead to boost your overall/local level and avoid a hell-like success rate of less than 2%.
 

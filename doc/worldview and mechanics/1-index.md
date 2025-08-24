@@ -16,13 +16,14 @@
   * [Industrial plant](4.8-industrial.md)\[NOTYETIMPLEMENTED]
 * Ships
 
-  * [Attributes](4.2-attributes.md)
+  * [Attributes](4.2-attributes.md)[See above]
+  * [Capital-ness and fleet type](5.1-capitalness.md)[NOTYETIMPLEMENTED]
+  * Home port and initial ship
   * Ship blueprint
   * Construction
   * Equip slots (including extra)
   * Visible bonuses
-  * Experience
-  * Improvement
+  * Experience and modernization
   * Remodel
   * Cloning Vats
   * Labor condition
@@ -31,7 +32,7 @@
   * Enemies (Amnesiac Fleet)
 * Sortie Map
 
-  * Normal map
+  * Normal map and map relations
   * Naval Supremacy
   * Historical Mode (DLC)
   * Achievements

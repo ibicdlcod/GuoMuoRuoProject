@@ -17,11 +17,11 @@
 |  0XE00000  |                    Asian(excluding above)                    |
 |  0xF00000  |                        Fantasy ships                         |
 |  0x10000   |                           Escorts                            |
-|  0x11000   |            Escort Destoryers (have base torpedo)             |
-|  0x20000   |                          Destoryers                          |
-|  0x21000   |  Destoryers with Daihatsu capabilities (bitwise operation)   |
-|  0x22000   | Destoryers with Amphibious tank capabilites (bitwise operation) |
-|  0x24000   |    Destoryers with Bulge capabilities (bitwise operation)    |
+|  0x11000   |            Escort Destroyers (have base torpedo)             |
+|  0x20000   |                          Destroyers                          |
+|  0x21000   |  Destroyers with Daihatsu capabilities (bitwise operation)   |
+|  0x22000   | Destroyers with Amphibious tank capabilites (bitwise operation) |
+|  0x24000   |    Destroyers with Bulge capabilities (bitwise operation)    |
 |  0x28000   |       Leading destroyer(Tashkent) (bitwise operation)        |
 |  0x30000   |                        Light cruisers                        |
 |  0x31000   |                      Training cruisers                       |
@@ -44,11 +44,11 @@
 |  0x64000   |                       Armored Carriers                       |
 |  0x68000   | Carriers with night aviation capabilities (bitwise operation) |
 |  0x70000   |                          Submarines                          |
-|  0x74000   |             Submarine with aviation capabilites              |
+|  0x74000   |             Submarine with aviation capabilities             |
 |  0x80000   |                      Seaplane carriers                       |
-|  0x82000   |     Seaplane carriers with advanced torpedo capabilites      |
+|  0x82000   |     Seaplane carriers with advanced torpedo capabilities     |
 |  0x90000   |                         Supply ships                         |
-|  0xA0000   |                   Amphibious assualt ships                   |
+|  0xA0000   |                   Amphibious assault ships                   |
 |  0xB0000   |                         Repair ships                         |
 |  0xC0000   |                        Land Structure                        |
 |   0x?00    |                          Ship class                          |
