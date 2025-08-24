@@ -43,14 +43,14 @@ We will deal with skill points later.
 
 When developing/constructing the success rate would be:
 $$
-\text{Successrate}=\int_{t_{wanted}-t_{current}}^{\infty}\frac{1}{\sigma\sqrt{2\pi}}e^{-\frac{1}{2}(\frac{x}{\sigma})^2}dx
+\text{Successrate}=\int_{t_{\text{wanted}}-t_{\text{current}}}^{\infty}\frac{1}{\sigma\sqrt{2\pi}}e^{-\frac{1}{2}(\frac{x}{\sigma})^2}dx
 $$
 
 $σ$: [rule/sigmaconstant](settings.md)
 
-$t_{wanted}$: the tech of the equipment/ship you want.
+$t_{\text{wanted}}$: the tech of the equipment/ship you want.
 
-$t_{current}$: the highest among your global tech and your local tech for this equipment/ship, minus [combined effects] (see below).
+$t_{\text{current}}$: the highest among your global tech and your local tech for this equipment/ship, minus [combined effects] (see below).
 
 ## Global technology
 
