@@ -1,9 +1,9 @@
 #include "maprender.h"
 #include <QPainter>
+#include <QMouseEvent>
 
 MapRender::MapRender(QWidget *parent)
-    : QWidget{parent}
-{
+    : QWidget{parent} {
     antialiased = false;
     pixmap.load(":/resources/map/globe.png");
 
@@ -12,6 +12,26 @@ MapRender::MapRender(QWidget *parent)
 
     setBackgroundRole(QPalette::Base);
     setAutoFillBackground(true);
+}
+
+void MapRender::mousePressEvent(QMouseEvent *event)
+{
+    if (event->button() == Qt::LeftButton) {
+        mousePressedInside = true;
+    }
+    QWidget::mousePressEvent(event); // Call base class implementation
+}
+
+void MapRender::mouseReleaseEvent(QMouseEvent *event)
+{
+    if (event->button() == Qt::LeftButton && mousePressedInside) {
+        if (rect().contains(event->pos())) { // Check if release occurred within widget
+            qCritical() << event->pos();
+            update();
+        }
+    }
+    mousePressedInside = false;
+    QWidget::mouseReleaseEvent(event); // Call base class implementation
 }
 
 void MapRender::paintEvent(QPaintEvent * /* event */)
@@ -23,14 +43,14 @@ void MapRender::paintEvent(QPaintEvent * /* event */)
                                      Qt::SmoothTransformation
                                      )
                        );
-    painter.scale(this->width() / 5632.0, this->height() / 2048.0);
+    painter.scale(this->width() / (double)globeMapWidth,
+                  this->height() / (double)globeMapHeight);
     painter.setPen(Qt::NoPen);
     painter.setBrush(brush);
     if (antialiased)
         painter.setRenderHint(QPainter::Antialiasing, true);
 
     painter.drawEllipse(0, 0, 300, 300);
-    painter.restore();
 
     painter.setRenderHint(QPainter::Antialiasing, false);
     painter.setPen(palette().dark().color());

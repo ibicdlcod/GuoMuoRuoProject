@@ -13,8 +13,11 @@ Sortie::Sortie(QWidget *parent)
     ui->setupUi(this);
 
     renderer = new MapRender(this);
-#pragma message(NOT_M_CONST)
-    globeFrame = new MapViewWidget(renderer, 5632, 2048, ui->MapView);
+
+    globeFrame = new MapViewWidget(renderer,
+                                   MapRender::globeMapWidth,
+                                   MapRender::globeMapHeight,
+                                   ui->MapView);
 }
 
 Sortie::~Sortie()
@@ -38,14 +41,7 @@ void Sortie::switchToState() {
         ui->DiffChoice->addItem(qtTrId("diff-a"));
         ui->MapSelect->show();
         ui->BattleScreen->hide();
-        QTimer::singleShot(50, this,
-                           [this]{
-                               QResizeEvent *myResizeEvent
-                                   = new QResizeEvent(this->size(),
-                                                      this->size());
-                               resizeEvent(myResizeEvent);
-                           }
-                           );
+        update();
         break;
     default:
         break;
