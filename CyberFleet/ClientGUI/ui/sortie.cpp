@@ -4,16 +4,17 @@
 #include <QLabel>
 #include <QResizeEvent>
 #include <QPainter>
+#include "maprender.h"
 
 Sortie::Sortie(QWidget *parent)
     : QFrame(parent)
     , ui(new Ui::Sortie)
 {
     ui->setupUi(this);
-    globe = new QLabel(this);
+
+    renderer = new MapRender(this);
 #pragma message(NOT_M_CONST)
-    globeFrame = new MapViewWidget(globe, 5632, 2048, ui->MapView);
-    globeImg = new QPixmap(":/resources/map/globe.png");
+    globeFrame = new MapViewWidget(renderer, 5632, 2048, ui->MapView);
 }
 
 Sortie::~Sortie()
@@ -53,16 +54,6 @@ void Sortie::switchToState() {
 
 void Sortie::resizeEvent(QResizeEvent *event) {
     globeFrame->resize(ui->MapView->size());
-    QPixmap globeImgScaled =
-        globeImg->scaled(globe->size(),
-                         Qt::KeepAspectRatio,
-                         Qt::SmoothTransformation);
-    globe->setPixmap(globeImgScaled);
-    /*
-    QPainter painter(ui->BattleScreen);
-    painter.setPen(QPen(Qt::blue, 0));
-    painter.setBrush(QBrush(Qt::black));
-    painter.drawEllipse(0,0,300,300);
-*/
+
     QWidget::resizeEvent(event);
 }

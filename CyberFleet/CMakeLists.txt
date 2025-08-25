@@ -54,6 +54,8 @@ set(CLIENT_SOURCES
     ClientGUI/ui/mainwindow.cpp
     ClientGUI/ui/mainwindow.h
     ClientGUI/ui/mainwindow.ui
+    ClientGUI/ui/maprender.cpp
+    ClientGUI/ui/maprender.h
     ClientGUI/ui/mapviewwidget.cpp
     ClientGUI/ui/mapviewwidget.h
     ClientGUI/ui/navigator.cpp

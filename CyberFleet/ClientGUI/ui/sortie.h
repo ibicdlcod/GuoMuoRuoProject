@@ -4,6 +4,7 @@
 #include <QFrame>
 #include <QLabel>
 #include "../../Protocol/kp.h"
+#include "maprender.h"
 #include "mapviewwidget.h"
 
 namespace Ui {
@@ -26,9 +27,8 @@ protected:
 
 private:
     Ui::Sortie *ui;
-    QLabel *globe;
+    MapRender *renderer;
     MapViewWidget *globeFrame;
-    QPixmap *globeImg;
 
     KP::SortieState sortieState = KP::MapView;
 };

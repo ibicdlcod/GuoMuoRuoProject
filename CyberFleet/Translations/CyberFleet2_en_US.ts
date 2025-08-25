@@ -1733,17 +1733,17 @@ Great at battle and bad at politics--so cool!</translation>
         <translation type="unfinished">Unknown</translation>
     </message>
     <message id="diff-c">
-        <location filename="../ClientGUI/ui/sortie.cpp" line="33"/>
+        <location filename="../ClientGUI/ui/sortie.cpp" line="34"/>
         <source>Early</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="diff-b">
-        <location filename="../ClientGUI/ui/sortie.cpp" line="35"/>
+        <location filename="../ClientGUI/ui/sortie.cpp" line="36"/>
         <source>Medium</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="diff-a">
-        <location filename="../ClientGUI/ui/sortie.cpp" line="37"/>
+        <location filename="../ClientGUI/ui/sortie.cpp" line="38"/>
         <source>Late</source>
         <translation type="unfinished"></translation>
     </message>
