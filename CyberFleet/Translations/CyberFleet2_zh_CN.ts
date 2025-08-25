@@ -1592,12 +1592,12 @@ Great at battle and bad at politics--so cool!</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="set-resources-failed">
-        <location filename="../Server/user.cpp" line="393"/>
+        <location filename="../Server/user.cpp" line="392"/>
         <source>User id %1: set resources failed!</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="set-resources">
-        <location filename="../Server/user.cpp" line="399"/>
+        <location filename="../Server/user.cpp" line="398"/>
         <source>User id %1: set resources</source>
         <translation type="unfinished"></translation>
     </message>
