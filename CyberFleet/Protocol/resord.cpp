@@ -30,7 +30,7 @@ ResOrd::ResOrd(int oil, int explo, int steel, int rub,
 }
 
 QString ResOrd::toString() const {
-    //% "%1 Oil"
+    //% "%1 Oil "
     QString oil = o != 0 ? (qtTrId("%1 Oil").arg(o)) : "";
     //% "%1 Ammo "
     QString explo = e != 0 ? (qtTrId("%1 Ammo").arg(e)) : "";

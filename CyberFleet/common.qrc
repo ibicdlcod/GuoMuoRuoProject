@@ -125,5 +125,6 @@
         <file>resources/navigation/last_dark.svg</file>
         <file>resources/navigation/next_dark.svg</file>
         <file>resources/navigation/prev_dark.svg</file>
+        <file>resources/map/globe.png</file>
     </qresource>
 </RCC>

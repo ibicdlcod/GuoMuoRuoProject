@@ -21,8 +21,8 @@ public:
     explicit FactoryArea(QWidget *parent = nullptr);
     ~FactoryArea();
 
-    void setDevelop(KP::FactoryState);
-    void switchToDevelop();
+    void setState(KP::FactoryState);
+    void switchToState();
 
 protected:
     void resizeEvent(QResizeEvent *event) override;

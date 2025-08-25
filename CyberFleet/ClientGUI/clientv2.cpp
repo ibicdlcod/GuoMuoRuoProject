@@ -349,6 +349,19 @@ void Clientv2::showHelp(const QStringList &cmdParts) {
     }
 }
 
+void Clientv2::switchToBattleView() {
+    if(!loggedIn()) {
+        emit qout(qtTrId("access-denied-login-first"));
+        return;
+    }
+    if(gameState == KP::BattleView) {
+        return;
+    } else {
+        gameState = KP::BattleView;
+        emit gamestateChanged(KP::BattleView);
+    }
+}
+
 /* Not generalized because used as slots */
 void Clientv2::switchToFactory() {
     if(!loggedIn()) {

@@ -120,6 +120,7 @@ public slots:
     void serverResponseNonStd(const QByteArray &);
     void setTicketCache(uint8 [], uint32);
     void showHelp(const QStringList &);
+    void switchToBattleView();
     void switchToFactory();
     void switchToTech();
     void switchToTech2();

@@ -135,10 +135,6 @@ private:
     QList<QUuid> retireEquip(const CSteamID &, const QList<QUuid> &);
     void sendTestMessages();
     [[nodiscard]] bool shipRefresh();
-    Q_DECL_DEPRECATED void sqlcheckEquip();
-    Q_DECL_DEPRECATED void sqlcheckEquipU();
-    Q_DECL_DEPRECATED void sqlcheckFacto();
-    Q_DECL_DEPRECATED void sqlcheckUsers();
     void sqlinit();
     void sqlinitEquip();
     void sqlinitEquipName();

@@ -54,6 +54,8 @@ set(CLIENT_SOURCES
     ClientGUI/ui/mainwindow.cpp
     ClientGUI/ui/mainwindow.h
     ClientGUI/ui/mainwindow.ui
+    ClientGUI/ui/mapviewwidget.cpp
+    ClientGUI/ui/mapviewwidget.h
     ClientGUI/ui/navigator.cpp
     ClientGUI/ui/navigator.h
     ClientGUI/ui/newlogins.cpp
@@ -62,6 +64,9 @@ set(CLIENT_SOURCES
     ClientGUI/ui/portarea.cpp
     ClientGUI/ui/portarea.h
     ClientGUI/ui/portarea.ui
+    ClientGUI/ui/sortie.cpp
+    ClientGUI/ui/sortie.h
+    ClientGUI/ui/sortie.ui
     ClientGUI/ui/techview.h
     ClientGUI/ui/techview.cpp
     ClientGUI/ui/techview.ui
@@ -98,6 +103,10 @@ set(PROTOCOL_SOURCES
     Protocol/equiptype.h
     Protocol/kp.cpp
     Protocol/kp.h
+    Protocol/map.cpp
+    Protocol/map.h
+    Protocol/mapwithdiff.cpp
+    Protocol/mapwithdiff.h
     Protocol/peerinfo.cpp
     Protocol/peerinfo.h
     Protocol/receiver.cpp

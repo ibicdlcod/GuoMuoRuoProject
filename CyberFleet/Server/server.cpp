@@ -64,6 +64,7 @@ QT_BEGIN_NAMESPACE
 extern std::unique_ptr<QSettings> settings;
 
 namespace {
+
 [[maybe_unused]] QString connection_info(QSslSocket *connection) {
     QString prot;
     switch (connection->sessionProtocol()) {
@@ -1116,7 +1117,7 @@ bool Server::equipmentRefresh()
         return false;
     }
     QSqlQuery query;
-    query.prepare("SELECT * FROM EquipReg;");
+    query.prepare("SELECT EquipID FROM EquipReg;");
     if(!query.exec()) {
         //% "Load equipment table failed!"
         throw DBError(qtTrId("equip-refresh-failed"),
@@ -1963,6 +1964,10 @@ void Server::receivedReq(const QJsonObject &djson,
             ;
         }
         break;
+        case KP::GameState::BattleView: {
+            ;
+        }
+        break;
         default:
             auto meta = QMetaEnum::fromType<KP::GameState>();
             //% "Game state %1 not supported!"
@@ -2189,102 +2194,6 @@ QList<QUuid> Server::retireEquip(const CSteamID &uid, const QList<QUuid> &trash)
         }
     }
     return result;
-}
-
-void Server::sqlcheckEquip() {/*
-    if(equipmentRefresh()) {
-        //% "Equipment database is OK."
-        qInfo() << qtTrId("equip-db-good");
-    }
-    else {
-        //% "Equipment database is corrupted or incompatible."
-        throw DBError(qtTrId("equip-db-bad"));
-    }*/
-}
-
-void Server::sqlcheckEquipU() {
-    QSqlDatabase db = QSqlDatabase::database();
-    QSqlRecord columns = db.record("UserEquip");
-    QStringList desiredColumns = {
-        "User",
-        "EquipUuid",
-        "EquipDef",
-        "Star"
-    };
-    for(const QString &column : desiredColumns) {
-        if(!columns.contains(column)) {
-            //% "column %1 does not exist at table %2"
-            throw DBError(qtTrId("column-nonexist").arg(column, "UserEquip"));
-        }
-    }
-    //% "Equipment database for user is OK."
-    qInfo() << qtTrId("equip-user-db-good");
-}
-
-void Server::sqlcheckFacto() {
-    QSqlDatabase db = QSqlDatabase::database();
-    QSqlRecord columns = db.record("Factories");
-    QStringList desiredColumns = {
-        "User",
-        "FactoryID",
-        "CurrentJob",
-        "StartTime",
-        "FullTime",
-        "SuccessTime",
-        "Done",
-        "Success",
-    };
-    for(const QString &column : desiredColumns) {
-        if(!columns.contains(column)) {
-            //% "column %1 does not exist at table %2"
-            throw DBError(qtTrId("column-nonexist").arg(column, "Factories"));
-        }
-    }
-    //% "Factory database is OK."
-    qInfo() << qtTrId("factory-db-good");
-}
-
-void Server::sqlcheckUsers() {
-    QSqlDatabase db = QSqlDatabase::database();
-    QSqlRecord columns = db.record("Users");
-    QStringList desiredColumns = {
-        "UserID",
-        "Username",
-        "Shadow",
-        "Experience",
-        "Level",
-        "InduContrib",
-        "FleetSize",
-        "FactorySize",
-        "DockSize",
-        "Oil",
-        "Explo",
-        "Steel",
-        "Rub",
-        "Al",
-        "W",
-        "Cr",
-        "Limitbreak",
-        "Silver",
-        "Gold",
-        "Energizer",
-        "Giftbox",
-        "DecoratePt",
-        "JetEngine",
-        "LandCorps",
-        "Saury",
-        "Sardine",
-        "Hishimochi",
-        "EmergRepair"
-    };
-    for(const QString &column : desiredColumns) {
-        if(!columns.contains(column)) {
-            //% "column %1 does not exist at table %2"
-            throw DBError(qtTrId("column-nonexist").arg(column, "Users"));
-        }
-    }
-    //% "User database is OK."
-    qInfo() << qtTrId("user-db-good");
 }
 
 void Server::sqlinit() {
