@@ -415,7 +415,12 @@ bool Server::parseSpec(const QStringList &cmdParts) {
                                 "ship", Qt::CaseInsensitive) == 0) {
                     importShipFromCSV();
                     return true;
-                } // else return false
+                }
+                else {
+                    //% "Usage: importcsv [equip|ship]"
+                    qout << qtTrId("importcsv-usage") << Qt::endl;
+                    return true;
+                }
             }
             else if(primary.compare("cert", Qt::CaseInsensitive) == 0) {
                 switchCert(cmdParts);
@@ -432,7 +437,7 @@ bool Server::parseSpec(const QStringList &cmdParts) {
             qCritical() << i;
         }
         shutdown();
-        return true;
+        return true; // already printed error
     }
 }
 
@@ -1243,6 +1248,7 @@ const QStringList Server::getCommandsSpec() const {
     QStringList result = QStringList();
     result.append(getCommands());
     result.append({"listen", "unlisten"});
+    result.append("importcsv");
     result.sort(Qt::CaseInsensitive);
     return result;
 }
@@ -1250,6 +1256,7 @@ const QStringList Server::getCommandsSpec() const {
 const QStringList Server::getValidCommands() const {
     QStringList result = QStringList();
     result.append(getCommands());
+    result.append("importcsv");
     if(listening)
         result.append("unlisten");
     else
