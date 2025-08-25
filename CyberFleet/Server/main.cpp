@@ -7,6 +7,10 @@
 #include "qconsolelistener.h"
 #include "server.h"
 
+#if defined(Q_OS_UNIX)
+#include <netinet/in.h>
+#endif
+
 QFile *logFile;
 std::unique_ptr<QSettings> settings;
 
@@ -16,8 +20,12 @@ const int STEAM_ERROR = 1;
 
 int main(int argc, char *argv[]) {
     SteamErrMsg err;
+    /* doubt this will have actual effect */
+    constexpr int gamePort = 1826;
+    constexpr int queryPort = 1424;
+    /* if queryPort is not open, you are running duplicate instances. */
     if(SteamGameServer_InitEx(
-            INADDR_ANY, 1826, 1424,
+            INADDR_ANY, gamePort, queryPort,
             eServerModeAuthenticationAndSecure, "0.60.0", &err)
         != k_ESteamAPIInitResult_OK) {
         qCritical() << err;

@@ -4,6 +4,7 @@
 #include <QString>
 #include <QTextStream>
 #include "clientv2.h"
+#include "../steam/isteamfriends.h"
 
 extern std::unique_ptr<QSettings> settings;
 
@@ -62,6 +63,7 @@ void SteamAuth::OnEncryptedAppTicketResponse(
     case k_EResultNoConnection:
         //% "Calling RequestEncryptedAppTicket while not connected to steam results in this error."
         qWarning() << qtTrId("k_EResultNoConnection");
+        qInfo() << SteamFriends()->GetPersonaName();
         emit eATFailed();
         break;
     case k_EResultDuplicateRequest:

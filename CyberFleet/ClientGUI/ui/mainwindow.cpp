@@ -244,8 +244,8 @@ void MainWindow::updateColorScheme(Qt::ColorScheme colorscheme) {
     /* https://www.w3.org/TR/SVG11/types.html#ColorKeywords */
     switch(colorscheme) {
     case Qt::ColorScheme::Dark:
-        pal.setColor(QPalette::Window, QColor::fromString("midnightblue"));
-        pal.setColor(QPalette::Base, QColor::fromString("midnightblue"));
+        pal.setColor(QPalette::Window, QColor::fromString("mediumblue"));
+        pal.setColor(QPalette::Base, QColor::fromString("mediumblue"));
         break;
     case Qt::ColorScheme::Light: [[fallthrough]];
     default:

@@ -360,7 +360,6 @@ void User::refreshPort(const CSteamID &uid) {
 void User::setResources(const CSteamID &uid, ResOrd goal) {
     assert(goal.sufficient());
     int maxRes = settings->value("rule/maxresources", 3600000).toInt();
-#pragma message(M_CONST)
     goal.cap(ResOrd(maxRes,
                     maxRes,
                     maxRes,
