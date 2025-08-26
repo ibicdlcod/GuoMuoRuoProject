@@ -140,9 +140,8 @@ void FactoryArea::switchToState() {
         ui->FactoryLabel->setText(qtTrId("arsenal"));
         ui->Slots->hide();
         ui->ArsenalArea->show();
-        QTimer::singleShot(10, this, [this](){
-            equipview->setGeometry(ui->ArsenalArea->rect());
-        });
+        equipview->setGeometry(ui->ArsenalArea->rect());
+        update();
         equipview->activate(true);
         break;
     }

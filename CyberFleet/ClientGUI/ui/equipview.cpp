@@ -29,9 +29,9 @@ EquipView::EquipView(QWidget *parent)
     connect(arsenalView->horizontalHeader(), &QHeaderView::sectionResized,
             this, &EquipView::columnResized);
     connect(model, &EquipModel::pageNumChanged,
-            this, [this](int, int){
-                QTimer::singleShot(10, this,
-                                   [this](){columnResized(0, 0, 0);});});
+            this, [this](int, int){columnResized(0, 0, 0);
+        update();
+    });
 
     arsenalView->show();
     /* navigator part */
