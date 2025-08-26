@@ -217,7 +217,45 @@ Q_GLOBAL_STATIC(QString,
                     "FOREIGN KEY(User) REFERENCES NewUsers(UserID),"
                     "FOREIGN KEY(EquipDef) REFERENCES EquipName(EquipID),"
                     "CONSTRAINT noduplicate UNIQUE(User, EquipDef) "
-                    //"CONSTRAINT Skill_Valid CHECK (Intvalue >= 0)"
+                    ");"
+                    ));
+
+/* Map node table */
+Q_GLOBAL_STATIC(QString,
+                mapNode,
+                QStringLiteral(
+                    "CREATE TABLE MapNode ( "
+                    "MapID INTEGER PRIMARY KEY, "
+                    "ja_JP TEXT, "
+                    "zh_CN TEXT, "
+                    "en_US TEXT, "
+                    "x INTEGER, "
+                    "y INTERGER "
+                    ");"
+                    ));
+
+/* Map relation table */
+Q_GLOBAL_STATIC(QString,
+                mapRelation,
+                QStringLiteral(
+                    "CREATE TABLE MapRelation ( "
+                    "Type TEXT, "
+                    "Node1 INTEGER NOT NULL, "
+                    "Node2 INTEGER NOT NULL, "
+                    "FOREIGN KEY(Node1) REFERENCES MapNode(MapID),"
+                    "FOREIGN KEY(Node2) REFERENCES MapNode(MapID) "
+                    ");"
+                    ));
+
+/* Map resources table */
+Q_GLOBAL_STATIC(QString,
+                mapResource,
+                QStringLiteral(
+                    "CREATE TABLE MapResource ( "
+                    "MapID INTEGER, "
+                    "Attribute TEXT NOT NULL, "
+                    "Intvalue INTEGER, "
+                    "FOREIGN KEY(MapID) REFERENCES MapNode(MapID) "
                     ");"
                     ));
 
@@ -417,8 +455,14 @@ bool Server::parseSpec(const QStringList &cmdParts) {
                     importShipFromCSV();
                     return true;
                 }
+                else if(cmdParts.length() > 1
+                         && cmdParts[1].compare(
+                                "map", Qt::CaseInsensitive) == 0) {
+                    importMapFromCSV();
+                    return true;
+                }
                 else {
-                    //% "Usage: importcsv [equip|ship]"
+                    //% "Usage: importcsv [equip|ship|map]"
                     qout << qtTrId("importcsv-usage") << Qt::endl;
                     return true;
                 }
@@ -1296,8 +1340,10 @@ bool Server::importEquipFromCSV() {
         else {
             QStringList lineParts = text.split(",");
             int equipid = lineParts[indicatorParts.indexOf("id")].toInt();
-            if(lineParts.size() < 7)
-                qCritical("incomplete equip type definition");
+            if(lineParts.size() < 7) {
+                //% "incomplete equip type definition"
+                qCritical() << qtTrId("equip-def-incomplete");
+            }
             else {
                 int type = EquipType::strToIntRep(lineParts[3]);
                 if(type == 0 && !lineParts[1].isEmpty()) {
@@ -1338,7 +1384,6 @@ bool Server::importEquipFromCSV() {
                         query.bindValue(":value",
                                         EquipType::strToIntRep(lineParts[i]));
                         if(!query.exec()) {
-                            //% "Import equipment database failed!"
                             throw DBError(qtTrId("equip-import-failed"),
                                           query.lastError());
                             qCritical() << query.lastError();
@@ -1356,7 +1401,6 @@ bool Server::importEquipFromCSV() {
                         query.bindValue(":attr", titleParts[i]);
                         query.bindValue(":value", lineParts[i].toInt());
                         if(!query.exec()) {
-                            //% "Import equipment database failed!"
                             throw DBError(qtTrId("equip-import-failed"),
                                           query.lastError());
                             qCritical() << query.lastError();
@@ -1366,15 +1410,262 @@ bool Server::importEquipFromCSV() {
                 }
             }
             importedEquips++;
-            if(importedEquips % 10 == 0)
-                qInfo() << QString("Imported %1 equipment(s)")
+            if(importedEquips % 10 == 0) {
+                //% "Imported %1 equipment(s)"
+                qInfo() << qtTrId("num-of-equip-imports")
                                .arg(importedEquips);
+            }
         }
     }
     csvFile->close();
     //% "Import equipment registry success!"
     qInfo() << qtTrId("equip-import-good");
     return equipmentRefresh();
+}
+
+bool Server::importMapFromCSV() {
+    return importMapNodeFromCSV()
+           && importMapRelationFromCSV()
+           && importMapResourceFromCSV();
+}
+
+bool Server::importMapNodeFromCSV() {
+    QSqlDatabase db = QSqlDatabase::database();
+    if(!db.isValid()) {
+        throw DBError(qtTrId("database-uninit"));
+        return false;
+    }
+
+    QString csvFileName =
+        settings->value("server/map_node_reg_csv", "Map_nodes.csv").toString();
+    QFile *csvFile = new QFile(csvFileName);
+    if(Q_UNLIKELY(!csvFile) || !csvFile->open(QIODevice::ReadOnly)) {
+        //% "%1: CSV file cannot be opened"
+        qCritical() << qtTrId("bad-csv").arg(csvFileName);
+        return false;
+    }
+
+    QTextStream textStream(csvFile);
+    QString titleIndicator = textStream.readLine();
+    QStringList indicatorParts = titleIndicator.split(",");
+    QString title = textStream.readLine();
+    QStringList titleParts = title.split(",");
+
+    int importedMapNodes = 0;
+    while(!textStream.atEnd()) {
+        QString text = textStream.readLine();
+        if(text.startsWith(","))
+            continue;
+        else {
+            QStringList lineParts = text.split(",");
+            int mapNodeId = lineParts[indicatorParts.indexOf("id")].toInt();
+            QSqlQuery query;
+            query.prepare(
+                "REPLACE INTO MapNode "
+                "(MapID) "
+                "VALUES (:id);");
+            query.bindValue(":id", mapNodeId);
+            if(!query.exec()) {
+                qCritical() << query.lastQuery();
+                //% "Import map node database failed!"
+                throw DBError(qtTrId("map-node-import-failed"),
+                              query.lastError());
+                return false;
+            }
+
+            for(int i = 0; i < titleParts.length(); ++i) {
+                if(indicatorParts[i].compare("name", Qt::CaseInsensitive)
+                    == 0) {
+                    QString lang = titleParts[i];
+                    QString content = lineParts[i];
+
+                    QSqlQuery query;
+                    query.prepare(
+                        "UPDATE MapNode "
+                        "SET "+lang+" = :value "
+                                 "WHERE MapID = :id;");
+                    query.bindValue(":id", mapNodeId);
+                    query.bindValue(":value", content);
+                    if(!query.exec()) {
+                        qCritical() << query.lastQuery();
+                        //% "Import map node database failed!"
+                        throw DBError(qtTrId("map-node-import-failed"),
+                                      query.lastError());
+                        return false;
+                    }
+                }
+                else if(titleParts[i].compare("x", Qt::CaseInsensitive)
+                         == 0) {
+                    int content = lineParts[i].toInt();
+
+                    QSqlQuery query;
+                    query.prepare(
+                        "UPDATE MapNode "
+                        "SET x = :value "
+                        "WHERE MapID = :id;");
+                    query.bindValue(":id", mapNodeId);
+                    query.bindValue(":value", content);
+                    if(!query.exec()) {
+                        qCritical() << query.lastQuery();
+                        //% "Import map node database failed!"
+                        throw DBError(qtTrId("map-node-import-failed"),
+                                      query.lastError());
+                        return false;
+                    }
+                }
+                else if(titleParts[i].compare("y", Qt::CaseInsensitive)
+                         == 0) {
+                    int content = lineParts[i].toInt();
+
+                    QSqlQuery query;
+                    query.prepare(
+                        "UPDATE MapNode "
+                        "SET y = :value "
+                        "WHERE MapID = :id;");
+                    query.bindValue(":id", mapNodeId);
+                    query.bindValue(":value", content);
+                    if(!query.exec()) {
+                        qCritical() << query.lastQuery();
+                        //% "Import map node database failed!"
+                        throw DBError(qtTrId("map-node-import-failed"),
+                                      query.lastError());
+                        return false;
+                    }
+                }
+            }
+            importedMapNodes++;
+            if(importedMapNodes % 10 == 0)
+                qInfo() << QString("Imported %1 map node(s)")
+                               .arg(importedMapNodes);
+        }
+    }
+    csvFile->close();
+    //% "Import map node registry success!"
+    qInfo() << qtTrId("map-node-import-good");
+    return true;
+}
+bool Server::importMapRelationFromCSV() {
+    QSqlDatabase db = QSqlDatabase::database();
+    if(!db.isValid()) {
+        throw DBError(qtTrId("database-uninit"));
+        return false;
+    }
+
+    QString csvFileName =
+        settings->value("server/map_relation_reg_csv", "Map_relations.csv").toString();
+    QFile *csvFile = new QFile(csvFileName);
+    if(Q_UNLIKELY(!csvFile) || !csvFile->open(QIODevice::ReadOnly)) {
+        //% "%1: CSV file cannot be opened"
+        qCritical() << qtTrId("bad-csv").arg(csvFileName);
+        return false;
+    }
+
+    QTextStream textStream(csvFile);
+    QString title = textStream.readLine();
+    QStringList titleParts = title.split(",");
+
+    int importedMapRelations = 0;
+    while(!textStream.atEnd()) {
+        QString text = textStream.readLine();
+        if(text.startsWith(","))
+            continue;
+        else {
+            QStringList lineParts = text.split(",");
+            QString type = lineParts[0];
+            int node1 = lineParts[1].toInt();
+            int node2 = lineParts[2].toInt();
+            QSqlQuery query;
+            query.prepare(
+                "REPLACE INTO MapRelation "
+                "(Type, Node1, Node2) "
+                "VALUES (:type, :id1, :id2);");
+            query.bindValue(":type", type);
+            query.bindValue(":id1", node1);
+            query.bindValue(":id2", node2);
+            if(!query.exec()) {
+                qCritical() << query.lastQuery();
+                //% "Import map node database failed!"
+                throw DBError(qtTrId("map-node-import-failed"),
+                              query.lastError());
+                return false;
+            }
+
+            importedMapRelations++;
+            if(importedMapRelations % 10 == 0)
+                qInfo() << QString("Imported %1 map relation(s)")
+                               .arg(importedMapRelations);
+        }
+    }
+    csvFile->close();
+    //% "Import map relation registry success!"
+    qInfo() << qtTrId("map-relation-import-good");
+    return true;
+}
+
+bool Server::importMapResourceFromCSV() {
+    QSqlDatabase db = QSqlDatabase::database();
+    if(!db.isValid()) {
+        throw DBError(qtTrId("database-uninit"));
+        return false;
+    }
+
+    QString csvFileName =
+        settings->value("server/map_resource_reg_csv", "Map_resources.csv").toString();
+    QFile *csvFile = new QFile(csvFileName);
+    if(Q_UNLIKELY(!csvFile) || !csvFile->open(QIODevice::ReadOnly)) {
+        //% "%1: CSV file cannot be opened"
+        qCritical() << qtTrId("bad-csv").arg(csvFileName);
+        return false;
+    }
+
+    QTextStream textStream(csvFile);
+    QString title = textStream.readLine();
+    QStringList titleParts = title.split(",");
+
+    int importedMapRelations = 0;
+    while(!textStream.atEnd()) {
+        QString text = textStream.readLine();
+        if(text.startsWith(","))
+            continue;
+        else {
+            QStringList lineParts = text.split(",");
+            int mapId = lineParts[0].toInt();
+            for(auto iter = titleParts.constBegin();
+                 iter != titleParts.constEnd();
+                 ++iter) {
+                int i = iter - titleParts.constBegin();
+                if(i == 0) {  // id
+                    continue;
+                }
+
+                int content = lineParts[i].toInt();
+                QSqlQuery query;
+                query.prepare(
+                    "INSERT INTO MapResource "
+                    "(MapID, Attribute, Intvalue) "
+                    "VALUES (:id, :attr, :value);");
+                query.bindValue(":id", mapId);
+                query.bindValue(":attr", *iter);
+                query.bindValue(":value", content);
+                if(!query.exec()) {
+                    qCritical() << query.lastQuery();
+                    //% "Import map node database failed!"
+                    throw DBError(qtTrId("map-node-import-failed"),
+                                  query.lastError());
+                    return false;
+                }
+            }
+
+            importedMapRelations++;
+            if(importedMapRelations % 10 == 0)
+                qInfo() << QString("Imported %1 map relation(s)")
+                               .arg(importedMapRelations);
+        }
+    }
+    csvFile->close();
+    //% "Import map resource registry success!"
+    qInfo() << qtTrId("map-resource-import-good");
+    return true;
 }
 
 bool Server::importShipFromCSV() {
@@ -1432,7 +1723,7 @@ bool Server::importShipFromCSV() {
                         }
                     }
                     else if(titleParts[i].compare("remodel",
-                                                  Qt::CaseInsensitive)
+                                                   Qt::CaseInsensitive)
                              == 0 ){
                         QSqlQuery query;
                         query.prepare("REPLACE INTO ShipReg "
@@ -1442,7 +1733,6 @@ bool Server::importShipFromCSV() {
                         query.bindValue(":attr", titleParts[i]);
                         query.bindValue(":value", lineParts[i].toInt(nullptr, 16));
                         if(!query.exec()) {
-                            //% "Import ship database failed!"
                             throw DBError(qtTrId("ship-import-failed"),
                                           query.lastError());
                             qCritical() << query.lastError();
@@ -1460,7 +1750,6 @@ bool Server::importShipFromCSV() {
                         query.bindValue(":attr", titleParts[i]);
                         query.bindValue(":value", lineParts[i].toInt());
                         if(!query.exec()) {
-                            //% "Import ship database failed!"
                             throw DBError(qtTrId("ship-import-failed"),
                                           query.lastError());
                             qCritical() << query.lastError();
@@ -1478,7 +1767,6 @@ bool Server::importShipFromCSV() {
     csvFile->close();
     //% "Import ship registry success!"
     qInfo() << qtTrId("ship-import-good");
-    //equipmentRefresh();
 
     return true;
 }
@@ -2253,6 +2541,15 @@ void Server::sqlinit() {
         if(!tables.contains("UserEquipSP")) {
             sqlinitEquipSP();
         }
+        if(!tables.contains("MapNode")) {
+            sqlinitMapNode();
+        }
+        if(!tables.contains("MapRelation")) {
+            sqlinitMapRelation();
+        }
+        if(!tables.contains("MapResource")) {
+            sqlinitMapResource();
+        }
     }
 }
 
@@ -2310,6 +2607,42 @@ void Server::sqlinitFacto() {
     if(!query.exec()) {
         //% "Create Factory database failed."
         throw DBError(qtTrId("facto-db-gen-failure"),
+                      query.lastError());
+    }
+}
+
+void Server::sqlinitMapNode() {
+    //% "Map node database does not exist, creating..."
+    qWarning() << qtTrId("map-node-db-lack");
+    QSqlQuery query;
+    query.prepare(*mapNode);
+    if(!query.exec()) {
+        //% "Create Map node database failed."
+        throw DBError(qtTrId("map-node-db-gen-failure"),
+                      query.lastError());
+    }
+}
+
+void Server::sqlinitMapRelation() {
+    //% "Map relation database does not exist, creating..."
+    qWarning() << qtTrId("map-relation-db-lack");
+    QSqlQuery query;
+    query.prepare(*mapRelation);
+    if(!query.exec()) {
+        //% "Create Map relation database failed."
+        throw DBError(qtTrId("map-relation-db-gen-failure"),
+                      query.lastError());
+    }
+}
+
+void Server::sqlinitMapResource() {
+    //% "Map resource database does not exist, creating..."
+    qWarning() << qtTrId("map-resource-db-lack");
+    QSqlQuery query;
+    query.prepare(*mapResource);
+    if(!query.exec()) {
+        //% "Create Map resource database failed."
+        throw DBError(qtTrId("map-resource-db-gen-failure"),
                       query.lastError());
     }
 }

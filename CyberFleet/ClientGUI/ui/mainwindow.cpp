@@ -114,7 +114,8 @@ MainWindow::MainWindow(QWidget *parent, int argc, char ** argv)
                        {
                            licenseArea->show();
                            adjustArea(licenseArea,
-                                      ui->License->size());});
+                                      ui->License->size());
+                       });
     connect(licenseArea, &LicenseArea::showLicenseComplete,
             ui->License, &QWidget::hide);
     connect(licenseArea, &LicenseArea::showLicenseComplete,
@@ -141,8 +142,8 @@ MainWindow::~MainWindow()
 }
 
 void MainWindow::adjustArea(QFrame *input, const QSize &size) {
-    QTimer::singleShot(1, this,
-                       [input, size]{input->resize(size);});
+    input->resize(size);
+    update();
 }
 
 void MainWindow::factoryRefresh() {
@@ -153,10 +154,9 @@ void MainWindow::factoryRefresh() {
 
 void MainWindow::gamestateInit() {
     gamestateChanged(KP::Offline);
-    QTimer::singleShot(1, this,
-                       [this]
-                       {adjustArea(newLoginScreen,
-                                    ui->LoginScreen->frameSize());});
+    adjustArea(newLoginScreen,
+               ui->LoginScreen->frameSize());
+    update();
 }
 
 void MainWindow::gamestateChanged(KP::GameState state) {
@@ -170,7 +170,8 @@ void MainWindow::gamestateChanged(KP::GameState state) {
         QTimer::singleShot(1, this,
                            [this]
                            {adjustArea(portArea,
-                                        ui->PortArea->frameSize());}))
+                                       ui->PortArea->frameSize()
+                                      );}))
                       : ui->PortArea->hide();
     state == KP::Factory ? (ui->FactoryArea->show(), factoryRefresh(),
                             factoryArea->resize(ui->FactoryArea->size())) :

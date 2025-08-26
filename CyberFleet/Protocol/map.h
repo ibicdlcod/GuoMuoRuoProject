@@ -2,6 +2,7 @@
 #define MAP_H
 
 #include <QObject>
+#include <QHash>
 
 class Map: public QObject
 {
@@ -18,6 +19,7 @@ public:
     Q_ENUM(Difficulty)
 
     int id;
+    QHash<QString, QString> localNames;
     int x;
     int y;
 };

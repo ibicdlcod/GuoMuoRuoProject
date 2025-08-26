@@ -119,6 +119,10 @@ private:
     const QStringList getCommandsSpec() const override;
     const QStringList getValidCommands() const override;
     bool importEquipFromCSV();
+    bool importMapFromCSV();
+    bool importMapNodeFromCSV();
+    bool importMapRelationFromCSV();
+    bool importMapResourceFromCSV();
     bool importShipFromCSV();
     void naturalRegen(const CSteamID &);
     QUuid newEquip(const CSteamID &, int);
@@ -141,6 +145,9 @@ private:
     void sqlinitEquipSP();
     void sqlinitEquipU();
     void sqlinitFacto();
+    void sqlinitMapNode();
+    void sqlinitMapRelation();
+    void sqlinitMapResource();
     void sqlinitShip();
     void sqlinitShipName();
     void sqlinitUsers() const;

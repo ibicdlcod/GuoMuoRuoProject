@@ -1,3 +1,4 @@
+id,name,name,name,attr,attr
 ID,en_US,zh_CN,ja_JP,x,y
 1,Seto Inland sea,,,4894,869
 2,Tokyo bay,,,4986,836
@@ -86,3 +87,33 @@ ID,en_US,zh_CN,ja_JP,x,y
 85,Malvinas,,,1944,1955
 86,Brazilian Coast,,,2109,1595
 99,Fukushima No.1 Nuclear Plant,,,4996,770
+1025,China,,,0,0
+1026,Korea and Japan,,,0,0
+1027,Indochina,,,0,0
+1028,Indonesia and Phillippines,,,0,0
+1029,Australasia,,,0,0
+1030,India,,,0,0
+1031,Arabia,,,0,0
+1032,Turkey and Caucasus,,,0,0
+1033,Russia,,,0,0
+1034,Balkans,,,0,0
+1035,Eastern Europe,,,0,0
+1036,Central Europe,,,0,0
+1037,Italy,,,0,0
+1038,France and Benelux,,,0,0
+1039,British Isles,,,0,0
+1040,Nordic,,,0,0
+1041,North Africa,,,0,0
+1042,West Africa,,,0,0
+1043,Canada and Alaska,,,0,0
+1044,United States,,,0,0
+1045,Mexico and Central America,,,0,0
+1046,Grand Columbia,,,0,0
+1047,Brazil,,,0,0
+1048,Andes,,,0,0
+1049,La Plata,,,0,0
+1050,Siberia,,,0,0
+1051,Central Asia and Iran,,,0,0
+1052,Iberia,,,0,0
+1053,East Africa,,,0,0
+1054,Southern Africa,,,0,0
