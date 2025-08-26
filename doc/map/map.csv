@@ -1,3 +1,4 @@
+ID,name,x,y
 1,Seto Inland sea,4894,869
 2,Tokyo bay,4986,836
 3,Sea of Japan,4910,729
@@ -31,7 +32,7 @@
 31,Rabul,5152,1461
 32,Solomon,5286,1533
 33,Port Moresby,5067,1553
-34,de Gaulle's Fist,5399,1711
+34,De Gaulle's Fist,5399,1711
 35,Eastern Australia,5221,1818
 36,Fiji,5598,1716
 37,Samoa,153,1672
@@ -84,7 +85,4 @@
 84,St Helena,2723,1684
 85,Malvinas,1944,1955
 86,Brazilian Coast,2109,1595
-99,Fukushima,4996,770
-99,Fukushima,4996,770
-99,Fukushima,4996,770
-99,Fukushima,4996,770
+99,Fukushima No.1 Nuclear Plant,4996,770

@@ -271,12 +271,23 @@
          <layout class="QGridLayout" name="gridLayout_3"/>
         </widget>
        </item>
+       <item>
+        <widget class="QWidget" name="BattleArea" native="true">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+        </widget>
+       </item>
       </layout>
       <zorder>FactoryArea</zorder>
       <zorder>License</zorder>
       <zorder>LoginScreen</zorder>
       <zorder>PortArea</zorder>
       <zorder>TechArea</zorder>
+      <zorder>BattleArea</zorder>
      </widget>
     </item>
     <item>
@@ -346,6 +357,7 @@ border-style: none;</string>
     <property name="title">
      <string id="menu-sortie">Sortie</string>
     </property>
+    <addaction name="actionBattle"/>
    </widget>
    <widget class="QMenu" name="menuFleet">
     <property name="title">
@@ -432,6 +444,11 @@ border-style: none;</string>
   <action name="actionArsenal">
    <property name="text">
     <string id="menu-arsenal">Arsenal</string>
+   </property>
+  </action>
+  <action name="actionBattle">
+   <property name="text">
+    <string id="menu-battle">Battle Maps</string>
    </property>
   </action>
  </widget>

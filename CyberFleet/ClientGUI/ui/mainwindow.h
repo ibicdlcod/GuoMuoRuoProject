@@ -8,6 +8,7 @@
 #include "newlogins.h"
 #include "factoryarea.h"
 #include "techview.h"
+#include "sortie.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -40,6 +41,7 @@ private slots:
     void switchToArsenal();
     void switchToConstruct();
     void switchToDevelop();
+    void switchToSortie();
     void updateColorScheme(Qt::ColorScheme colorscheme);
     void updateResources(const QJsonObject &);
 
@@ -53,5 +55,6 @@ private:
     NewLoginS *newLoginScreen;
     PortArea *portArea;
     TechView *techArea;
+    Sortie *battleArea;
 };
 #endif // MAINWINDOW_H

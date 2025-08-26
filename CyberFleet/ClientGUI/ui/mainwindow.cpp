@@ -35,6 +35,7 @@ MainWindow::MainWindow(QWidget *parent, int argc, char ** argv)
     ui->FactoryArea->hide();
     ui->LoginScreen->hide();
     ui->TechArea->hide();
+    ui->BattleArea->hide();
 
     ui->ResourcesBar->hide();
     ui->OilLabel->setPixmap(QPixmap(QStringLiteral(
@@ -90,6 +91,10 @@ MainWindow::MainWindow(QWidget *parent, int argc, char ** argv)
             &engine, &Clientv2::switchToFactory);
     connect(ui->actionArsenal, &QAction::triggered,
             this, &MainWindow::switchToArsenal);
+    connect(ui->actionBattle, &QAction::triggered,
+            &engine, &Clientv2::switchToBattleView);
+    connect(ui->actionBattle, &QAction::triggered,
+            this, &MainWindow::switchToSortie);
     connect(ui->actionLogout, &QAction::triggered,
             &engine, &Clientv2::parseDisconnectReq);
     connect(ui->actionExit, &QAction::triggered,
@@ -102,6 +107,7 @@ MainWindow::MainWindow(QWidget *parent, int argc, char ** argv)
     newLoginScreen = new NewLoginS(ui->LoginScreen);
     factoryArea = new FactoryArea(ui->FactoryArea);
     techArea = new TechView(ui->TechArea);
+    battleArea = new Sortie(ui->BattleArea);
     licenseArea->hide();
     QTimer::singleShot(100, this,
                        [this]
@@ -176,6 +182,12 @@ void MainWindow::gamestateChanged(KP::GameState state) {
                            {adjustArea(techArea,
                                         ui->TechArea->frameSize());}))
                           : ui->TechArea->hide();
+    state == KP::BattleView ? (
+        ui->BattleArea->show(),
+        QTimer::singleShot(1, this,
+                           [this]
+                           {adjustArea(battleArea, ui->BattleArea->frameSize());}))
+                            : ui->BattleArea->hide();
 }
 
 void MainWindow::printMessage(QString text, QColor background,
@@ -195,8 +207,8 @@ void MainWindow::switchToArsenal() {
     if(!engine.loggedIn()) {
         return;
     }
-    factoryArea->setDevelop(KP::Arsenal);
-    factoryArea->switchToDevelop();
+    factoryArea->setState(KP::Arsenal);
+    factoryArea->switchToState();
 }
 
 void MainWindow::switchToConstruct() {
@@ -204,8 +216,8 @@ void MainWindow::switchToConstruct() {
     if(!engine.loggedIn()) {
         return;
     }
-    factoryArea->setDevelop(KP::Construction);
-    factoryArea->switchToDevelop();
+    factoryArea->setState(KP::Construction);
+    factoryArea->switchToState();
 }
 
 void MainWindow::switchToDevelop() {
@@ -213,8 +225,17 @@ void MainWindow::switchToDevelop() {
     if(!engine.loggedIn()) {
         return;
     }
-    factoryArea->setDevelop(KP::Development);
-    factoryArea->switchToDevelop();
+    factoryArea->setState(KP::Development);
+    factoryArea->switchToState();
+}
+
+void MainWindow::switchToSortie() {
+    Clientv2 &engine = Clientv2::getInstance();
+    if(!engine.loggedIn()) {
+        return;
+    }
+    battleArea->setState(KP::MapView);
+    battleArea->switchToState();
 }
 
 void MainWindow::updateColorScheme(Qt::ColorScheme colorscheme) {
@@ -223,8 +244,13 @@ void MainWindow::updateColorScheme(Qt::ColorScheme colorscheme) {
     /* https://www.w3.org/TR/SVG11/types.html#ColorKeywords */
     switch(colorscheme) {
     case Qt::ColorScheme::Dark:
+#if defined(Q_OS_WIN)
+        pal.setColor(QPalette::Window, QColor::fromString("midnightblue"));
+        pal.setColor(QPalette::Base, QColor::fromString("midnightblue"));
+#else
         pal.setColor(QPalette::Window, QColor::fromString("mediumblue"));
         pal.setColor(QPalette::Base, QColor::fromString("mediumblue"));
+#endif
         break;
     case Qt::ColorScheme::Light: [[fallthrough]];
     default:
@@ -261,6 +287,9 @@ void MainWindow::resizeEvent(QResizeEvent *event) {
     }
     if(!ui->TechArea->isHidden()) {
         adjustArea(techArea, ui->TechArea->size());
+    }
+    if(!ui->BattleArea->isHidden()) {
+        adjustArea(battleArea, ui->BattleArea->size());
     }
     QWidget::resizeEvent(event);
 }

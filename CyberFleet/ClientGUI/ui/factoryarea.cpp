@@ -117,11 +117,11 @@ void FactoryArea::doFactoryRefresh(const QJsonObject &input) {
     }
 }
 
-void FactoryArea::setDevelop(KP::FactoryState state) {
+void FactoryArea::setState(KP::FactoryState state) {
     factoryState = state;
 }
 
-void FactoryArea::switchToDevelop() {
+void FactoryArea::switchToState() {
     switch(factoryState) {
     case KP::Development:
         //% "Develop equipment"
@@ -149,6 +149,8 @@ void FactoryArea::switchToDevelop() {
 }
 
 void FactoryArea::resizeEvent(QResizeEvent *event) {
-    equipview->recalculateArsenalRows();
+    if(factoryState == KP::Arsenal) {
+        equipview->recalculateArsenalRows();
+    }
     QWidget::resizeEvent(event);
 }

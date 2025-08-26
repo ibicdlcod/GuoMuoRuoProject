@@ -92,7 +92,8 @@ enum GameState{
     Offline,
     Port,
     Factory,
-    TechView
+    TechView,
+    BattleView
 };
 Q_ENUM_NS(GameState)
 
@@ -146,6 +147,13 @@ enum FactoryState{
     Arsenal
 };
 Q_ENUM_NS(FactoryState)
+
+enum SortieState{
+    MapView,
+    DrillView,
+    BattleScreen
+};
+Q_ENUM_NS(SortieState)
 
 enum InfoType{
     FactoryInfo,
