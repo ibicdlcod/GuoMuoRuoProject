@@ -51,3 +51,6 @@
 |              sql/dbname              |                ocean                |                                                              |
 |            sql/adminname             |                admin                |                                                              |
 |             sql/adminpw              |              10000826               |  You must change this or your database would be vulnerable   |
+|       server/equipdbtimestamp        |               dynamic               |                                                              |
+|        server/shipdbtimestamp        |               dynamic               |                                                              |
+|        server/mapdbtimestamp         |               dynamic               |                                                              |

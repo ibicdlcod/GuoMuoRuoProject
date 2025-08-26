@@ -1420,6 +1420,7 @@ bool Server::importEquipFromCSV() {
     csvFile->close();
     //% "Import equipment registry success!"
     qInfo() << qtTrId("equip-import-good");
+    settings->setValue("server/equipdbtimestamp", QDateTime::currentDateTimeUtc());
     return equipmentRefresh();
 }
 
@@ -1542,6 +1543,7 @@ bool Server::importMapNodeFromCSV() {
     csvFile->close();
     //% "Import map node registry success!"
     qInfo() << qtTrId("map-node-import-good");
+    settings->setValue("server/mapdbtimestamp", QDateTime::currentDateTimeUtc());
     return true;
 }
 bool Server::importMapRelationFromCSV() {
@@ -1563,6 +1565,7 @@ bool Server::importMapRelationFromCSV() {
     QTextStream textStream(csvFile);
     QString title = textStream.readLine();
     QStringList titleParts = title.split(",");
+    Q_UNUSED(titleParts)
 
     int importedMapRelations = 0;
     while(!textStream.atEnd()) {
@@ -1599,6 +1602,7 @@ bool Server::importMapRelationFromCSV() {
     csvFile->close();
     //% "Import map relation registry success!"
     qInfo() << qtTrId("map-relation-import-good");
+    settings->setValue("server/mapdbtimestamp", QDateTime::currentDateTimeUtc());
     return true;
 }
 
@@ -1665,6 +1669,7 @@ bool Server::importMapResourceFromCSV() {
     csvFile->close();
     //% "Import map resource registry success!"
     qInfo() << qtTrId("map-resource-import-good");
+    settings->setValue("server/mapdbtimestamp", QDateTime::currentDateTimeUtc());
     return true;
 }
 
@@ -1767,7 +1772,7 @@ bool Server::importShipFromCSV() {
     csvFile->close();
     //% "Import ship registry success!"
     qInfo() << qtTrId("ship-import-good");
-
+    settings->setValue("server/shipdbtimestamp", QDateTime::currentDateTimeUtc());
     return true;
 }
 
@@ -2065,7 +2070,7 @@ void Server::receivedAuth(const QJsonObject &djson,
             }
             //% "Ticket decrypt from correct App ID"
             qDebug() << qtTrId("ticket-appid-right");
-            QDateTime now = QDateTime::currentDateTime();
+            QDateTime now = QDateTime::currentDateTimeUtc();
             QDateTime requestThen = QDateTime();
             requestThen.setSecsSinceEpoch(
                 SteamEncryptedAppTicket_GetTicketIssueTime(
