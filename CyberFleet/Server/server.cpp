@@ -258,7 +258,7 @@ Q_GLOBAL_STATIC(QString,
                     ));
 
 /* Not customized, since set this lesser than 60 creates problems */
-const int elapsedMaxTolerence = steamRateLimit;
+const int elapsedMaxTolerance = steamRateLimit;
 
 }
 
@@ -686,7 +686,12 @@ void Server::offerEquipInfo(QSslSocket *connection, int index = 0) {
     }
     connection->flush();
     QByteArray msg =
-        KP::serverEquipInfo(equipInfos);
+        KP::serverEquipInfo(equipInfos,
+                            false,
+                            settings->value("server/equipdbtimestamp",
+                                            QDateTime::currentDateTimeUtc()
+                                            ).toDateTime()
+                            );
     senderM.sendMessage(connection, msg);
     connection->flush();
 }
@@ -773,7 +778,7 @@ void Server::offerTechInfoComponents(
     /* see e337bb37ef2ee656321dc9688679a6c6f118cc16 for previous version
      * if this stopped working */
     connection->flush();
-    QByteArray msg = KP::serverGlobalTech(content, initial, true, global);
+    QByteArray msg = KP::serverGlobalTech(content, global);
     senderM.sendMessage(connection, msg);
     connection->flush();
 }
@@ -1992,7 +1997,7 @@ void Server::receivedAuth(const QJsonObject &djson,
             qint64 elapsed = requestThen.secsTo(now);
             //% "Elapsed: %1 second(s)"
             qDebug() << qtTrId("time-gone").arg(elapsed).toUtf8();
-            if(elapsed > elapsedMaxTolerence) {
+            if(elapsed > elapsedMaxTolerance) {
                 //% "%1: Request timeout"
                 qCritical() << qtTrId("request-timeout")
                                    .arg(peerInfo.toString()).toUtf8();
@@ -2242,9 +2247,27 @@ void Server::receivedReq(const QJsonObject &djson,
         }
         break;
     case KP::CommandType::DemandEquipInfo: {
-        QTimer::singleShot(100,
-                           this,
-                           [connection, this]{offerEquipInfo(connection);});
+        auto clientTime = QDateTime::fromString(djson["timestamp"].toString());
+        auto serverTime = settings->value("server/equipdbtimestamp").toDateTime();
+        qint64 diff = clientTime.msecsTo(serverTime);
+        if(diff > settings->value("server/cachetolerancemsec", 10000).toInt()) {
+            QTimer::singleShot(100,
+                               this,
+                               [connection, this]{offerEquipInfo(connection);});
+        }
+        else {
+            connection->flush();
+            QByteArray msg =
+                KP::serverEquipInfo(QJsonArray(),
+                                    false,
+                                    settings->value("server/equipdbtimestamp",
+                                                    QDateTime::currentDateTimeUtc()
+                                                    ).toDateTime(),
+                                    true
+                                    );
+            senderM.sendMessage(connection, msg);
+            connection->flush();
+        }
     }
     break;
     case KP::CommandType::DemandEquipInfoUser: {
@@ -2259,9 +2282,9 @@ void Server::receivedReq(const QJsonObject &djson,
                            this,
                            [connection, uid, djson, this]
                            {offerTechInfo(
-                                 connection,
-                                 uid,
-                                 djson["local"].toInt());});
+                  connection,
+                  uid,
+                  djson["local"].toInt());});
     }
     break;
     case KP::CommandType::DemandSkillPoints: {
@@ -2269,9 +2292,9 @@ void Server::receivedReq(const QJsonObject &djson,
                            this,
                            [connection, uid, djson, this]
                            {offerSPInfo(
-                                 connection,
-                                 uid,
-                                 djson["equipid"].toInt());});
+                  connection,
+                  uid,
+                  djson["equipid"].toInt());});
     }
     break;
     case KP::CommandType::DemandResourceUpdate: {
@@ -2279,8 +2302,8 @@ void Server::receivedReq(const QJsonObject &djson,
                            this,
                            [connection, uid, this]
                            {offerResourceInfo(
-                                 connection,
-                                 uid);});
+                  connection,
+                  uid);});
     }
     break;
     case KP::CommandType::DestructEquip: {
@@ -2316,7 +2339,7 @@ void Server::sendTestMessages() {
         qWarning() << "Server isn't listening, abort.";
     }
     else {
-        qInfo() << Tech::calExperimentRate(1, 2, 2, 1);
+        qCritical() << settings->value("server/equipdbtimestamp");
         /*
         for(auto equip: std::as_const(equipRegistry)) {
             qInfo() << equip->localNames["ja_JP"];

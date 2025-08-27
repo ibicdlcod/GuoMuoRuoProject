@@ -93,10 +93,11 @@ QByteArray KP::clientDemandDestructEquip(const QList<QUuid> &trash) {
     return QCborValue::fromJsonValue(result).toCbor();
 }
 
-QByteArray KP::clientDemandEquipInfo() {
+QByteArray KP::clientDemandEquipInfo(QDateTime timeUtc) {
     QJsonObject result;
     result["type"] = DgramType::Request;
     result["command"] = CommandType::DemandEquipInfo;
+    result["timestamp"] = timeUtc.toString();
     return QCborValue::fromJsonValue(result).toCbor();
 }
 
@@ -245,14 +246,19 @@ QByteArray KP::serverEquipRetired(const QList<QUuid> &trash) {
     return QCborValue::fromJsonValue(result).toCbor();
 }
 
-QByteArray KP::serverEquipInfo(const QJsonArray &input, bool user) {
+QByteArray KP::serverEquipInfo(const QJsonArray &input, bool user,
+                               QDateTime timeUtc, bool cacheHit) {
     QJsonObject result;
     result["type"] = DgramType::Info;
     if(user)
         result["infotype"] = InfoType::EquipInfoUser;
-    else
+    else {
         result["infotype"] = InfoType::EquipInfo;
-    result["content"] = input;
+        result["timestamp"] = timeUtc.toString();
+    }
+    if(!cacheHit) {
+        result["content"] = input;
+    }
     return QCborValue::fromJsonValue(result).toCbor();
 }
 
@@ -275,15 +281,12 @@ QByteArray KP::serverGlobalTech(double tech, int jobId) {
     return QCborValue::fromJsonValue(result).toCbor();
 }
 
-QByteArray KP::serverGlobalTech(const QList<TechEntry> &content,
-                                bool initial, bool final, bool global) {
+QByteArray KP::serverGlobalTech(const QList<TechEntry> &content, bool global) {
     QJsonObject result;
     result["type"] = DgramType::Info;
     result["infotype"] = global
                              ? InfoType::GlobalTechInfo
                              : InfoType::LocalTechInfo;
-    result["initial"] = initial; // a true result will refresh the client table
-    result["final"] = final; // a true result will trigger sorting in client
     QJsonArray contentJSON;
     for(auto &contentPart: content) {
         QJsonObject part;

@@ -134,7 +134,11 @@ void TechView::updateGlobalTechViewTable(const QJsonObject &djson) {
         ui->waitText->setWordWrap(true);
         ui->waitText->setText(
             QStringLiteral("updating equipment data, please wait..."));
-        engine.demandEquipCache();
+        engine.demandEquipCache(
+            settings->value("client/equipdbtimestamp",
+                            QDateTime(QDate(1970,01,01),
+                                      QTime(0, 0, 0))
+                            ).toDateTime());
         return;
     }
     else {
@@ -203,7 +207,7 @@ void TechView::updateGlobalTechViewTable(const QJsonObject &djson) {
     ui->globalViewTable->sortByColumn(4, Qt::DescendingOrder);
     ui->globalViewTable->sortByColumn(2, Qt::DescendingOrder);
     ui->globalViewTable->hideColumn(4);
-    resizeColumns(true);
+    QTimer::singleShot(1, this, [this]{resizeColumns(true);});
 }
 
 void TechView::updateLocalTech(const QJsonObject &djson) {
@@ -283,7 +287,7 @@ void TechView::updateLocalTechViewTable(const QJsonObject &djson) {
     ui->localViewTable->sortByColumn(4, Qt::DescendingOrder);
     ui->localViewTable->sortByColumn(2, Qt::DescendingOrder);
     ui->localViewTable->hideColumn(4);
-    resizeColumns(false);
+    QTimer::singleShot(1, this, [this]{resizeColumns(false);});
 }
 
 void TechView::updateSkillPoints(const QJsonObject &djson) {

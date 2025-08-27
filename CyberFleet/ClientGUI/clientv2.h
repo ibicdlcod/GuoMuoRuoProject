@@ -104,7 +104,7 @@ public slots:
     void autoPassword();
     void backToNavalBase();
     void catbomb();
-    void demandEquipCache();
+    void demandEquipCache(QDateTime localCacheTimeStamp);
     void displayPrompt();
     void doDestructEquip(const QList<QUuid> &);
     void doRefreshFactory();

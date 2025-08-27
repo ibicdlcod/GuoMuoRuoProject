@@ -10,6 +10,7 @@
 #include <QObject>
 #include <QJsonObject>
 #include <QCborValue>
+#include <QDateTime>
 #include "steam/steamtypes.h"
 
 #pragma message(NOT_M_CONST)
@@ -199,7 +200,9 @@ QByteArray clientAddEquip(int);
 QByteArray clientAdminTestEquip();
 QByteArray clientAdminTestEquipRemove();
 QByteArray clientDemandDestructEquip(const QList<QUuid> &);
-QByteArray clientDemandEquipInfo();
+QByteArray clientDemandEquipInfo(QDateTime timeUtc
+                                 = QDateTime(QDate(1970, 1, 1),
+                                             QTime(0, 0, 0)));
 QByteArray clientDemandEquipInfoUser();
 QByteArray clientDemandTech(int local = 0);
 QByteArray clientDemandResourceUpdate();
@@ -218,10 +221,12 @@ QByteArray serverDevelopStart();
 QByteArray serverEquipLackFather(GameError, int);
 QByteArray serverEquipLackMother(GameError, int, int64);
 QByteArray serverEquipRetired(const QList<QUuid> &);
-QByteArray serverEquipInfo(const QJsonArray &, bool user = false);
+QByteArray serverEquipInfo(const QJsonArray &, bool user = false,
+                           QDateTime timeUtc = QDateTime::currentDateTimeUtc(),
+                           bool cacheHit = false);
 QByteArray serverFairyBusy(int);
 QByteArray serverGlobalTech(double, int);
-QByteArray serverGlobalTech(const QList<TechEntry> &, bool, bool, bool);
+QByteArray serverGlobalTech(const QList<TechEntry> &, bool);
 QByteArray serverHello();
 QByteArray serverLackPrivate();
 QByteArray serverLogFail(AuthFailType);

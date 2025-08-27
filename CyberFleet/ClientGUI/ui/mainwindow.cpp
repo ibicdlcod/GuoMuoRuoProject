@@ -6,6 +6,7 @@
 #include <QResizeEvent>
 #include <QScreen>
 #include <QStyleHints>
+#include <QScrollBar>
 #include "keyenterreceiver.h"
 #include "../clientv2.h"
 
@@ -196,6 +197,8 @@ void MainWindow::printMessage(QString text, QColor background,
     ui->LogBrowser->setTextBackgroundColor(background);
     ui->LogBrowser->setTextColor(foreground);
     ui->LogBrowser->append(text);
+    ui->LogBrowser->verticalScrollBar()->setValue(
+        ui->LogBrowser->verticalScrollBar()->maximum());
 }
 
 void MainWindow::processCmd() {

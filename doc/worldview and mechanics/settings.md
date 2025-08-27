@@ -4,6 +4,10 @@
 |           client/language            |                ja_JP                |                  default value is temporary                  |
 |            client/logfile            |            ClientLog.log            |                                                              |
 |      client/licenseareapersist       |                5000                 |                                                              |
+|       client/equipdbtimestamp        |               dynamic               |                                                              |
+|         client/equipdbcache          |               dynamic               |                                                              |
+|        client/shipdbtimestamp        |               dynamic               |                                                              |
+|        client/mapdbtimestamp         |               dynamic               |                                                              |
 |     networkclient/retransmitmax      |                  2                  |                    Client retransmit time                    |
 |  networkclient/connectwaittimemsec   |                8000                 |                                                              |
 |          networkclient/pem           |           :/harusoft.pem            |                           Embedded                           |

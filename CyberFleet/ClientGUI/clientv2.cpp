@@ -175,8 +175,8 @@ void Clientv2::catbomb() {
     displayPrompt();
 }
 
-void Clientv2::demandEquipCache() {
-    QByteArray msg = KP::clientDemandEquipInfo();
+void Clientv2::demandEquipCache(QDateTime localCacheTimeStamp) {
+    QByteArray msg = KP::clientDemandEquipInfo(localCacheTimeStamp);
     sender->enqueue(msg);
 }
 
@@ -374,7 +374,10 @@ void Clientv2::switchToFactory() {
         gameState = KP::Factory;
         emit gamestateChanged(KP::Factory);
         if(!equipRegistryCacheGood) {
-            demandEquipCache();
+            demandEquipCache(settings->value("client/equipdbtimestamp",
+                                             QDateTime(QDate(1970,01,01),
+                                                       QTime(0, 0, 0))
+                                             ).toDateTime());
         }
     }
 }
@@ -396,7 +399,10 @@ void Clientv2::switchToTech() {
             socket.flush();
         }
         else {
-            demandEquipCache();
+            demandEquipCache(settings->value("client/equipdbtimestamp",
+                                             QDateTime(QDate(1970,01,01),
+                                                       QTime(0, 0, 0))
+                                             ).toDateTime());
             connect(this, &Clientv2::equipRegistryComplete,
                     this, &Clientv2::switchToTech2);
         }
@@ -1118,7 +1124,10 @@ void Clientv2::receivedMsg(const QJsonObject &djson) {
             QByteArray msg = KP::clientDemandResourceUpdate();
             sender->enqueue(msg);
         }
-        demandEquipCache();
+        demandEquipCache(settings->value("client/equipdbtimestamp",
+                                         QDateTime(QDate(1970,01,01),
+                                                   QTime(0, 0, 0))
+                                         ).toDateTime());
         break;
     case KP::AllowClientFinish:
         gameState = KP::Offline;
@@ -1349,12 +1358,20 @@ void Clientv2::switchCert(const QStringList &input) {
 }
 
 void Clientv2::updateEquipCache(const QJsonObject &input) {
+    QJsonObject cachedInput;
     if(!input.contains("content")) {
-        //% "Server fetch equipment cache failed!"
-        qWarning() << qtTrId("server-equip-cache-fail");
-        return;
+        cachedInput
+            = settings->value("client/equipdbcache").toJsonObject();
     }
-    QJsonArray equipDefs = input["content"].toArray();
+    else {
+        settings->setValue("client/equipdbtimestamp",
+                           QDateTime::fromString(
+                               input["timestamp"].toString()));
+        settings->setValue("client/equipdbcache",
+                           input);
+        cachedInput = input;
+    }
+    QJsonArray equipDefs = cachedInput["content"].toArray();
     for(auto equipDef: equipDefs) {
         QJsonObject equipDValue = equipDef.toObject();
         int eid = equipDValue.value("eid").toInt();
