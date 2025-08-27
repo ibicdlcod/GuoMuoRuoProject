@@ -10,7 +10,8 @@ class Ship : public QObject
 {
     Q_OBJECT
 public:
-    explicit Ship(QObject *parent = nullptr);
+    explicit Ship(int);
+    explicit Ship(const QJsonObject &);
 
     int operator<=>(const Ship &) const;
     bool isNotEqual(const Ship &) const;

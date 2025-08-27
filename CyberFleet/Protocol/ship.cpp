@@ -1,12 +1,69 @@
 #include "ship.h"
 #include <QSettings>
+#include <QSqlQuery>
 #include "tech.h"
+#include "../Server/kerrors.h"
 
 extern std::unique_ptr<QSettings> settings;
 
-Ship::Ship(QObject *parent)
-    : QObject{parent}
-{}
+Ship::Ship(int shipId)
+{
+    if(shipId == 0) {
+        return;
+    }
+    QStringList supportedLangs = {"ja_JP", "zh_CN", "en_US"};
+
+    for(auto &lang: supportedLangs) {
+        QSqlQuery query;
+        query.prepare(
+            "SELECT "+lang+" FROM ShipName "
+                               "WHERE ShipID = :id;");
+        query.bindValue(":id", shipId);
+        if(!query.exec() || !query.isSelect()) {
+            qCritical() << query.lastQuery();
+            //% "Local language (%1) for ship name not found!"
+            throw DBError(qtTrId("ship-local-name-lack").arg(lang),
+                          query.lastError());
+        }
+        else if(query.first()) {
+            localNames[lang] = query.value(0).toString();
+        }
+    }
+
+    QSqlQuery query2;
+    query2.prepare(
+        "SELECT Intvalue, Attribute FROM ShipReg "
+        "WHERE ShipID = :id ");
+    query2.bindValue(":id", shipId);
+    if(!query2.exec() || !query2.isSelect()) {
+        qCritical() << query2.lastQuery();
+        //% "Fetch ship attributes failure!"
+        throw DBError(qtTrId("ship-attr-lack"),
+                      query2.lastError());
+    }
+    else {
+        while(query2.next()) {
+            attr[query2.value(1).toString()]
+                = query2.value(0).toInt();
+        }
+    }
+}
+
+Ship::Ship(const QJsonObject &input) {
+    shipRegId = input["sid"].toInt();
+    if(shipRegId == 0)
+        return;
+    QJsonObject lNames = input["name"].toObject();
+    for(auto &lang: lNames.keys()) {
+        localNames[lang] =
+            lNames.value(lang).toString();
+    };
+    QJsonObject attrs = input["attr"].toObject();
+    for(auto &attrI: attrs.keys()) {
+        attr[attrI] =
+            attrs.value(attrI).toInt();
+    }
+}
 
 int Ship::operator<=>(const Ship &other) const {
     int typeResult = this->getType().getTypeSort()

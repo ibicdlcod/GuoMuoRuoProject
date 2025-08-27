@@ -392,6 +392,10 @@ bool Server::listen(const QHostAddress &address, quint16 port) {
                 //% "Equipment init failed!"
                 qCritical() << qtTrId("equip-init-failure");
             }
+            if(!shipRefresh()) {
+                //% "Ship init failed!"
+                qCritical() << qtTrId("ship-init-failure");
+            }
         }
     } else {
         listening = true;
@@ -1160,8 +1164,7 @@ void Server::doFetch(CSteamID &uid, int factoryid, QSslSocket *connection) {
     }
 }
 
-bool Server::equipmentRefresh()
-{
+bool Server::equipmentRefresh() {
     QSqlDatabase db = QSqlDatabase::database();
     if(!db.isValid()) {
         //% "Database uninitialized!"
@@ -1691,7 +1694,7 @@ bool Server::importShipFromCSV() {
     //% "Import ship registry success!"
     qInfo() << qtTrId("ship-import-good");
     settings->setValue("server/shipdbtimestamp", QDateTime::currentDateTimeUtc());
-    return true;
+    return shipRefresh();
 }
 
 /* 3-Resources.md#Natural regeneration */
@@ -2345,6 +2348,35 @@ void Server::sendTestMessages() {
             qInfo() << equip->localNames["ja_JP"];
         }*/
     }
+}
+
+bool Server::shipRefresh() {
+    QSqlDatabase db = QSqlDatabase::database();
+    if(!db.isValid()) {
+        //% "Database uninitialized!"
+        throw DBError(qtTrId("database-uninit"));
+        return false;
+    }
+    QSqlQuery query;
+    query.prepare("SELECT ShipID FROM ShipName;");
+    if(!query.exec()) {
+        //% "Load ship table failed!"
+        throw DBError(qtTrId("ship-refresh-failed"),
+                      query.lastError());
+        return false;
+    }
+    query.isSelect();
+    QSqlRecord rec = query.record();
+    int idCol = rec.indexOf("ShipID");
+    while(query.next()) {
+        openShips.insert(query.value(idCol).toInt());
+    }
+    shipRegistry.clear();
+    for(auto shipID : std::as_const(openShips)) {
+        shipRegistry[shipID] = new Ship(shipID);
+    }
+    //% "Load ship registry success!"
+    qInfo() << qtTrId("ship-load-good");
 }
 
 void Server::refreshClientFactory(CSteamID &uid, QSslSocket *connection) {

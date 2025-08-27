@@ -74,8 +74,8 @@ class Equipment: public QObject {
     Q_OBJECT
 
 public:
-    Equipment(int);
-    Equipment(const QJsonObject &);
+    explicit Equipment(int);
+    explicit Equipment(const QJsonObject &);
 
     int operator<=>(const Equipment &) const;
     bool isNotEqual(const Equipment &) const;
