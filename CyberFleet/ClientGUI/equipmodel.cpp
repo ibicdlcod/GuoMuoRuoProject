@@ -512,7 +512,6 @@ void EquipModel::updateEquipmentList(const QJsonObject &input) {
             QUuid uid = QUuid(itemObject["serial"].toString());
             Equipment *equip = engine.getEquipmentReg(
                 itemObject["def"].toInt());
-            //Equipment *equip = engine.equipRegistryCache[itemObject["def"].toInt()];
             int star = itemObject["star"].toInt();
             clientEquips[uid] = equip;
             clientEquipStars[uid] = star;

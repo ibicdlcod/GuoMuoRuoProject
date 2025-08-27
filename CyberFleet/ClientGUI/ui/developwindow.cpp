@@ -72,7 +72,7 @@ void DevelopWindow::resetListName(int equiptypeInt) {
             (ui->listType->currentText().compare("All equipments") == 0
              && equipReg->type.getDisplayGroup()
                         .compare("VIRTUAL", Qt::CaseInsensitive) != 0
-                 && !equipReg->localNames.value("ja_JP").isEmpty())
+             && !equipReg->localNames.value("ja_JP").isEmpty())
             || equipReg->type.getDisplayGroup()
                        .compare(ui->listType->currentText(),
                                 Qt::CaseInsensitive) == 0) {
@@ -100,14 +100,16 @@ void DevelopWindow::displaySuccessRate2() {
     auto cache = engine.techCache;
     auto equipId = equipIdDesired();
     if(cache.contains(0) && cache.contains(equipId)) {
-        ui->rateNumber->setText(QString::number(Tech::calExperimentRate(
-            engine.equipRegistryCache[equipId]->getTech(),
-            cache[0],
-            cache[equipId],
-            settings->value(
-                        "rule/sigmaconstant",
-                        1.0).toDouble()
-            )*100) + "%");
+        ui->rateNumber->setText(
+            QString::number(
+                Tech::calExperimentRate(
+                    engine.getEquipmentReg(equipId)->getTech(),
+                    cache[0],
+                    cache[equipId],
+                    settings->value(
+                                "rule/sigmaconstant",
+                                1.0).toDouble()
+                    )*100) + "%");
     }
     else {
         //% "Unknown"
