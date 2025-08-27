@@ -27,20 +27,16 @@
   * Remodel
   * Cloning Vats
   * Labor condition
-  * Food
-  * Emergency repair
   * Enemies (Amnesiac Fleet)
 * Sortie Map
 
   * Normal map and map relations
-  * Naval Supremacy
+  * Naval Supremacy and Normal expedition
+  * Emergency repair
   * Historical Mode (DLC)
-  * Achievements
-* Expedition
+  * Quests and Achievements
+  * Expedition quests
 
-  * Normal Expedition
-  * Command Expedition
-  * Supporting Expedition
 * Drill
 
   * vs AI
@@ -63,4 +59,3 @@
   * Night battle
   * Commander's abilities
   * LBAS
-* Quests
