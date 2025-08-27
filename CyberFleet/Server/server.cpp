@@ -228,9 +228,7 @@ Q_GLOBAL_STATIC(QString,
                     "MapID INTEGER PRIMARY KEY, "
                     "ja_JP TEXT, "
                     "zh_CN TEXT, "
-                    "en_US TEXT, "
-                    "x INTEGER, "
-                    "y INTERGER "
+                    "en_US TEXT "
                     ");"
                     ));
 
@@ -1426,8 +1424,7 @@ bool Server::importEquipFromCSV() {
 
 bool Server::importMapFromCSV() {
     return importMapNodeFromCSV()
-           && importMapRelationFromCSV()
-           && importMapResourceFromCSV();
+           && importMapRelationFromCSV();
 }
 
 bool Server::importMapNodeFromCSV() {
@@ -1495,35 +1492,18 @@ bool Server::importMapNodeFromCSV() {
                         return false;
                     }
                 }
-                else if(titleParts[i].compare("x", Qt::CaseInsensitive)
+                else if(indicatorParts[i].compare("attr", Qt::CaseInsensitive)
                          == 0) {
+                    QString attr = titleParts[i];
                     int content = lineParts[i].toInt();
 
                     QSqlQuery query;
                     query.prepare(
-                        "UPDATE MapNode "
-                        "SET x = :value "
-                        "WHERE MapID = :id;");
+                        "INSERT INTO MapResource "
+                        "(MapID, Attribute, Intvalue) "
+                        "VALUES (:id, :attr, :value);");
                     query.bindValue(":id", mapNodeId);
-                    query.bindValue(":value", content);
-                    if(!query.exec()) {
-                        qCritical() << query.lastQuery();
-                        //% "Import map node database failed!"
-                        throw DBError(qtTrId("map-node-import-failed"),
-                                      query.lastError());
-                        return false;
-                    }
-                }
-                else if(titleParts[i].compare("y", Qt::CaseInsensitive)
-                         == 0) {
-                    int content = lineParts[i].toInt();
-
-                    QSqlQuery query;
-                    query.prepare(
-                        "UPDATE MapNode "
-                        "SET y = :value "
-                        "WHERE MapID = :id;");
-                    query.bindValue(":id", mapNodeId);
+                    query.bindValue(":attr", attr);
                     query.bindValue(":value", content);
                     if(!query.exec()) {
                         qCritical() << query.lastQuery();
@@ -1602,73 +1582,6 @@ bool Server::importMapRelationFromCSV() {
     csvFile->close();
     //% "Import map relation registry success!"
     qInfo() << qtTrId("map-relation-import-good");
-    settings->setValue("server/mapdbtimestamp", QDateTime::currentDateTimeUtc());
-    return true;
-}
-
-bool Server::importMapResourceFromCSV() {
-    QSqlDatabase db = QSqlDatabase::database();
-    if(!db.isValid()) {
-        throw DBError(qtTrId("database-uninit"));
-        return false;
-    }
-
-    QString csvFileName =
-        settings->value("server/map_resource_reg_csv", "Map_resources.csv").toString();
-    QFile *csvFile = new QFile(csvFileName);
-    if(Q_UNLIKELY(!csvFile) || !csvFile->open(QIODevice::ReadOnly)) {
-        //% "%1: CSV file cannot be opened"
-        qCritical() << qtTrId("bad-csv").arg(csvFileName);
-        return false;
-    }
-
-    QTextStream textStream(csvFile);
-    QString title = textStream.readLine();
-    QStringList titleParts = title.split(",");
-
-    int importedMapRelations = 0;
-    while(!textStream.atEnd()) {
-        QString text = textStream.readLine();
-        if(text.startsWith(","))
-            continue;
-        else {
-            QStringList lineParts = text.split(",");
-            int mapId = lineParts[0].toInt();
-            for(auto iter = titleParts.constBegin();
-                 iter != titleParts.constEnd();
-                 ++iter) {
-                int i = iter - titleParts.constBegin();
-                if(i == 0) {  // id
-                    continue;
-                }
-
-                int content = lineParts[i].toInt();
-                QSqlQuery query;
-                query.prepare(
-                    "INSERT INTO MapResource "
-                    "(MapID, Attribute, Intvalue) "
-                    "VALUES (:id, :attr, :value);");
-                query.bindValue(":id", mapId);
-                query.bindValue(":attr", *iter);
-                query.bindValue(":value", content);
-                if(!query.exec()) {
-                    qCritical() << query.lastQuery();
-                    //% "Import map node database failed!"
-                    throw DBError(qtTrId("map-node-import-failed"),
-                                  query.lastError());
-                    return false;
-                }
-            }
-
-            importedMapRelations++;
-            if(importedMapRelations % 10 == 0)
-                qInfo() << QString("Imported %1 map relation(s)")
-                               .arg(importedMapRelations);
-        }
-    }
-    csvFile->close();
-    //% "Import map resource registry success!"
-    qInfo() << qtTrId("map-resource-import-good");
     settings->setValue("server/mapdbtimestamp", QDateTime::currentDateTimeUtc());
     return true;
 }
