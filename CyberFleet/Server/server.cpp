@@ -686,7 +686,7 @@ void Server::offerEquipInfo(QSslSocket *connection, int index = 0) {
     }
     connection->flush();
     QByteArray msg =
-        KP::serverEquipInfo(equipInfos, true);
+        KP::serverEquipInfo(equipInfos);
     senderM.sendMessage(connection, msg);
     connection->flush();
 }
@@ -722,7 +722,7 @@ void Server::offerEquipInfoUser(const CSteamID &uid,
             }
             connection->flush();
             QByteArray msg =
-                KP::serverEquipInfo(userEquipInfos, true, true);
+                KP::serverEquipInfo(userEquipInfos, true);
             QTimer::singleShot(500, this,
                                [=, this](){senderM.sendMessage(connection, msg);});
             connection->flush();

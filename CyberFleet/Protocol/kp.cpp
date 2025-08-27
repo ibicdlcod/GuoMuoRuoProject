@@ -245,7 +245,7 @@ QByteArray KP::serverEquipRetired(const QList<QUuid> &trash) {
     return QCborValue::fromJsonValue(result).toCbor();
 }
 
-QByteArray KP::serverEquipInfo(const QJsonArray &input, bool final, bool user) {
+QByteArray KP::serverEquipInfo(const QJsonArray &input, bool user) {
     QJsonObject result;
     result["type"] = DgramType::Info;
     if(user)
@@ -253,7 +253,6 @@ QByteArray KP::serverEquipInfo(const QJsonArray &input, bool final, bool user) {
     else
         result["infotype"] = InfoType::EquipInfo;
     result["content"] = input;
-    result["final"] = final;
     return QCborValue::fromJsonValue(result).toCbor();
 }
 

@@ -1365,9 +1365,7 @@ void Clientv2::updateEquipCache(const QJsonObject &input) {
     qDebug() << qtTrId("equipment-cache-length")
                     .arg(Clientv2::getInstance()
                              .equipRegistryCache.size());
-    if(input["final"].toBool()) {
-        // Server should be able to set it false again
-        equipRegistryCacheGood = true;
-        emit equipRegistryComplete();
-    }
+
+    equipRegistryCacheGood = true;
+    emit equipRegistryComplete();
 }

@@ -122,7 +122,6 @@ private:
     bool importMapFromCSV();
     bool importMapNodeFromCSV();
     bool importMapRelationFromCSV();
-    bool importMapResourceFromCSV();
     bool importShipFromCSV();
     void naturalRegen(const CSteamID &);
     QUuid newEquip(const CSteamID &, int);

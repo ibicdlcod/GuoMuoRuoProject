@@ -188,26 +188,22 @@ void TechView::updateGlobalTechViewTable(const QJsonObject &djson) {
         ui->globalViewTable->setItem(currentRowCount + i, 4, newItem5);
         ++i;
     }
-    if(djson["final"].toBool()) {
-        ui->globalViewTable->setHorizontalHeaderLabels(
-            {
-             //% "Serial Num"
-             qtTrId("Serial-num"),
-             //% "Name"
-             qtTrId("Equip-name-def"),
-             //% "Tech"
-             qtTrId("Equip-tech-level"),
-             //% "Weight"
-             qtTrId("Weight")
-            });
-        ui->globalViewTable->setSortingEnabled(true);
-        ui->globalViewTable->sortByColumn(4, Qt::DescendingOrder);
-        ui->globalViewTable->sortByColumn(2, Qt::DescendingOrder);
-        ui->globalViewTable->hideColumn(4);
-        /* not customized, shorter time will lead to problems */
-#pragma message(NOT_M_CONST)
-        QTimer::singleShot(100, this, [this](){resizeColumns(true);});
-    }
+    ui->globalViewTable->setHorizontalHeaderLabels(
+        {
+            //% "Serial Num"
+            qtTrId("Serial-num"),
+            //% "Name"
+            qtTrId("Equip-name-def"),
+            //% "Tech"
+            qtTrId("Equip-tech-level"),
+            //% "Weight"
+            qtTrId("Weight")
+        });
+    ui->globalViewTable->setSortingEnabled(true);
+    ui->globalViewTable->sortByColumn(4, Qt::DescendingOrder);
+    ui->globalViewTable->sortByColumn(2, Qt::DescendingOrder);
+    ui->globalViewTable->hideColumn(4);
+    resizeColumns(true);
 }
 
 void TechView::updateLocalTech(const QJsonObject &djson) {
@@ -280,18 +276,14 @@ void TechView::updateLocalTechViewTable(const QJsonObject &djson) {
         ui->localViewTable->setItem(currentRowCount + i, 4, newItem5);
         ++i;
     }
-    if(djson["final"].toBool()) {
-        ui->localViewTable->setHorizontalHeaderLabels(
-            {qtTrId("Serial-num"), qtTrId("Equip-name-def"),
-             qtTrId("Equip-tech-level"), qtTrId("Weight")});
-        ui->localViewTable->setSortingEnabled(true);
-        ui->localViewTable->sortByColumn(4, Qt::DescendingOrder);
-        ui->localViewTable->sortByColumn(2, Qt::DescendingOrder);
-        ui->localViewTable->hideColumn(4);
-        /* not customized, shorter time will lead to problems */
-#pragma message(NOT_M_CONST)
-        QTimer::singleShot(100, this, [this](){resizeColumns(false);});
-    }
+    ui->localViewTable->setHorizontalHeaderLabels(
+        {qtTrId("Serial-num"), qtTrId("Equip-name-def"),
+         qtTrId("Equip-tech-level"), qtTrId("Weight")});
+    ui->localViewTable->setSortingEnabled(true);
+    ui->localViewTable->sortByColumn(4, Qt::DescendingOrder);
+    ui->localViewTable->sortByColumn(2, Qt::DescendingOrder);
+    ui->localViewTable->hideColumn(4);
+    resizeColumns(false);
 }
 
 void TechView::updateSkillPoints(const QJsonObject &djson) {

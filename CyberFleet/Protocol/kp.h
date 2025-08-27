@@ -218,7 +218,7 @@ QByteArray serverDevelopStart();
 QByteArray serverEquipLackFather(GameError, int);
 QByteArray serverEquipLackMother(GameError, int, int64);
 QByteArray serverEquipRetired(const QList<QUuid> &);
-QByteArray serverEquipInfo(const QJsonArray &, bool, bool user = false);
+QByteArray serverEquipInfo(const QJsonArray &, bool user = false);
 QByteArray serverFairyBusy(int);
 QByteArray serverGlobalTech(double, int);
 QByteArray serverGlobalTech(const QList<TechEntry> &, bool, bool, bool);
