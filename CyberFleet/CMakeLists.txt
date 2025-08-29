@@ -14,7 +14,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Core Gui Widgets)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS
-    UiPlugin LinguistTools Sql SvgWidgets Network)
+    UiPlugin LinguistTools Sql SvgWidgets Network HttpServer)
 
 include_directories(${root_SOURCE_DIR}/FactorySlot)
 add_subdirectory(FactorySlot)
@@ -191,6 +191,7 @@ add_dependencies(CFServer update_translations)
 target_link_libraries(CFProtocol PRIVATE Qt${QT_VERSION_MAJOR}::Core)
 target_link_libraries(CFProtocol PRIVATE Qt${QT_VERSION_MAJOR}::Sql)
 target_link_libraries(CFProtocol PRIVATE Qt${QT_VERSION_MAJOR}::Network)
+target_link_libraries(CFClient PRIVATE Qt${QT_VERSION_MAJOR}::HttpServer)
 target_link_libraries(CFClient PRIVATE Qt${QT_VERSION_MAJOR}::SvgWidgets)
 target_link_libraries(CFClient PRIVATE Qt${QT_VERSION_MAJOR}::Widgets)
 target_link_libraries(CFClient PRIVATE Qt${QT_VERSION_MAJOR}::Network)
