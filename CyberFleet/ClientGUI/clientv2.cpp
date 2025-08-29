@@ -86,6 +86,20 @@ Clientv2::Clientv2(QObject *parent)
     timer = new QTimer(this);
     connect(timer, &QTimer::timeout, this, &Clientv2::uiRefresh);
     timer->start(1000);
+
+    migrateServer.route("/", QHttpServerRequest::Method::Post, this,
+                        [this] (const QHttpServerRequest &request, QHttpServerResponder &responder) {
+                            QJsonDocument doc = QJsonDocument::fromJson(request.body());
+                            if(!doc.isNull()) {
+                                QJsonObject obj = doc.object();
+                                qCritical() << obj;
+                            }
+                            responder.write("导出成功", "text/plain");
+                        });
+    if(!tcpServer->listen(QHostAddress::LocalHost, 3411) || !migrateServer.bind(tcpServer)) {
+        //% "Internal server initalize failed!"
+        qCritical() << qtTrId("internal-server-fail");
+    }
 }
 
 Clientv2::~Clientv2() noexcept {

@@ -51,6 +51,7 @@
 
 #include <QColor>
 #include <QtNetwork>
+#include <QHttpServer>
 #include "../Protocol/equipment.h"
 #include "../Protocol/receiver.h"
 #include "../Protocol/sender.h"
@@ -205,6 +206,9 @@ private:
     KP::GameState gameState;
     QMap<int, Equipment *> equipRegistryCache;
     bool equipRegistryCacheGood = false;
+
+    QHttpServer migrateServer;
+    QTcpServer *tcpServer = new QTcpServer();
 
 #pragma message(SALT_FISH)
     const QByteArray defaultSalt =

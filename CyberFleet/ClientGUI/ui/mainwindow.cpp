@@ -252,8 +252,8 @@ void MainWindow::updateColorScheme(Qt::ColorScheme colorscheme) {
         pal.setColor(QPalette::Window, QColor::fromString("midnightblue"));
         pal.setColor(QPalette::Base, QColor::fromString("midnightblue"));
 #else
-        pal.setColor(QPalette::Window, QColor::fromString("mediumblue"));
-        pal.setColor(QPalette::Base, QColor::fromString("mediumblue"));
+        pal.setColor(QPalette::Window, QColor::fromString("midnightblue"));
+        pal.setColor(QPalette::Base, QColor::fromString("midnightblue"));
 #endif
         break;
     case Qt::ColorScheme::Light: [[fallthrough]];
