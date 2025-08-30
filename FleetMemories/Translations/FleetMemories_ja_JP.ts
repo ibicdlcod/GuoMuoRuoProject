@@ -872,7 +872,7 @@ Great at battle and bad at politics--so cool!</source>
     </message>
     <message id="switch-cert-when-connecting">
         <location filename="../ClientGUI/clientv2.cpp" line="1359"/>
-        <location filename="../Server/server.cpp" line="2673"/>
+        <location filename="../Server/server.cpp" line="2674"/>
         <source>Switch certificate when connected have no effect.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1435,156 +1435,156 @@ Great at battle and bad at politics--so cool!</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="factory-state-error">
-        <location filename="../Server/server.cpp" line="2395"/>
+        <location filename="../Server/server.cpp" line="2396"/>
         <source>Open user %1&apos;s factory failed!</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="delete-equip-nonexistent">
-        <location filename="../Server/server.cpp" line="2431"/>
+        <location filename="../Server/server.cpp" line="2432"/>
         <source>User id %1: equipment %2 does not exist!</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="delete-equip-failed">
-        <location filename="../Server/server.cpp" line="2452"/>
+        <location filename="../Server/server.cpp" line="2453"/>
         <source>User id %1: delete equipment failed!</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="delete-equip">
-        <location filename="../Server/server.cpp" line="2459"/>
+        <location filename="../Server/server.cpp" line="2460"/>
         <source>User id %1: deleted equipment %2</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="open-db-failed">
-        <location filename="../Server/server.cpp" line="2483"/>
+        <location filename="../Server/server.cpp" line="2484"/>
         <source>Open database failed!</source>
         <oldsource>User id %1: deleted equipment %2</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message id="sql-connect-success">
-        <location filename="../Server/server.cpp" line="2487"/>
+        <location filename="../Server/server.cpp" line="2488"/>
         <source>SQL connection successful!</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="equip-db-lack">
-        <location filename="../Server/server.cpp" line="2531"/>
+        <location filename="../Server/server.cpp" line="2532"/>
         <source>Equipment database does not exist, creating...</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="equip-db-gen-failure">
-        <location filename="../Server/server.cpp" line="2536"/>
+        <location filename="../Server/server.cpp" line="2537"/>
         <source>Create Equipment database failed.</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="equip-name-db-lack">
-        <location filename="../Server/server.cpp" line="2543"/>
+        <location filename="../Server/server.cpp" line="2544"/>
         <source>Equipment name database does not exist, creating...</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="equip-name-gen-failure">
-        <location filename="../Server/server.cpp" line="2548"/>
+        <location filename="../Server/server.cpp" line="2549"/>
         <source>Create Equipment name failed.</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="equip-db-user-sp-gen-failure">
-        <location filename="../Server/server.cpp" line="2558"/>
+        <location filename="../Server/server.cpp" line="2559"/>
         <source>User equipment skillpoints fetch failure!</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="equip-db-user-lack">
-        <location filename="../Server/server.cpp" line="2565"/>
+        <location filename="../Server/server.cpp" line="2566"/>
         <source>Equipment database for user does not exist, creating...</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="equip-db-user-gen-failure">
-        <location filename="../Server/server.cpp" line="2570"/>
+        <location filename="../Server/server.cpp" line="2571"/>
         <source>Create Equipment database for user failed.</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="facto-db-lack">
-        <location filename="../Server/server.cpp" line="2577"/>
+        <location filename="../Server/server.cpp" line="2578"/>
         <source>Factory database does not exist, creating...</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="facto-db-gen-failure">
-        <location filename="../Server/server.cpp" line="2582"/>
+        <location filename="../Server/server.cpp" line="2583"/>
         <source>Create Factory database failed.</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="map-node-db-lack">
-        <location filename="../Server/server.cpp" line="2589"/>
+        <location filename="../Server/server.cpp" line="2590"/>
         <source>Map node database does not exist, creating...</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="map-node-db-gen-failure">
-        <location filename="../Server/server.cpp" line="2594"/>
+        <location filename="../Server/server.cpp" line="2595"/>
         <source>Create Map node database failed.</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="map-relation-db-lack">
-        <location filename="../Server/server.cpp" line="2601"/>
+        <location filename="../Server/server.cpp" line="2602"/>
         <source>Map relation database does not exist, creating...</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="map-relation-db-gen-failure">
-        <location filename="../Server/server.cpp" line="2606"/>
+        <location filename="../Server/server.cpp" line="2607"/>
         <source>Create Map relation database failed.</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="map-resource-db-lack">
-        <location filename="../Server/server.cpp" line="2613"/>
+        <location filename="../Server/server.cpp" line="2614"/>
         <source>Map resource database does not exist, creating...</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="map-resource-db-gen-failure">
-        <location filename="../Server/server.cpp" line="2618"/>
+        <location filename="../Server/server.cpp" line="2619"/>
         <source>Create Map resource database failed.</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="ship-db-lack">
-        <location filename="../Server/server.cpp" line="2625"/>
+        <location filename="../Server/server.cpp" line="2626"/>
         <source>Ship database does not exist, creating...</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="equip-ship-db-gen-failure">
-        <location filename="../Server/server.cpp" line="2630"/>
+        <location filename="../Server/server.cpp" line="2631"/>
         <source>Create Ship database failed.</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="ship-name-db-lack">
-        <location filename="../Server/server.cpp" line="2637"/>
+        <location filename="../Server/server.cpp" line="2638"/>
         <source>Ship name database does not exist, creating...</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="equip-ship-name-gen-failure">
-        <location filename="../Server/server.cpp" line="2642"/>
+        <location filename="../Server/server.cpp" line="2643"/>
         <source>Create Ship name failed.</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="user-db-lack">
-        <location filename="../Server/server.cpp" line="2649"/>
-        <location filename="../Server/server.cpp" line="2660"/>
+        <location filename="../Server/server.cpp" line="2650"/>
+        <location filename="../Server/server.cpp" line="2661"/>
         <source>User database does not exist, creating...</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="user-db-gen-failure">
-        <location filename="../Server/server.cpp" line="2654"/>
-        <location filename="../Server/server.cpp" line="2665"/>
+        <location filename="../Server/server.cpp" line="2655"/>
+        <location filename="../Server/server.cpp" line="2666"/>
         <source>Create User database failed.</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="server-pem">
-        <location filename="../Server/server.cpp" line="2684"/>
+        <location filename="../Server/server.cpp" line="2685"/>
         <source>Server PEM is now %1.</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="user-data-init-fail">
-        <location filename="../Server/server.cpp" line="2715"/>
-        <location filename="../Server/server.cpp" line="2735"/>
+        <location filename="../Server/server.cpp" line="2716"/>
+        <location filename="../Server/server.cpp" line="2736"/>
         <source>%1: User data init failure!</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="user-factory-init-fail">
-        <location filename="../Server/server.cpp" line="2752"/>
+        <location filename="../Server/server.cpp" line="2753"/>
         <source>Init 4 factory slots for user %1 failed!</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2020,9 +2020,9 @@ Great at battle and bad at politics--so cool!</source>
 </context>
 <context>
     <name>MainWindow</name>
-    <message>
+    <message id="mainwindow-title">
         <location filename="../ClientGUI/ui/mainwindow.ui" line="14"/>
-        <source>CyberFleet GUI</source>
+        <source>FleetMemories</source>
         <translation type="unfinished"></translation>
     </message>
     <message>

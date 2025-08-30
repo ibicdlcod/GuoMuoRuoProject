@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.16)
 
-project(CyberFleet VERSION 0.1 LANGUAGES C CXX)
+project(FleetMemories VERSION 0.1 LANGUAGES C CXX)
 
 set(CMAKE_VERBOSE_MAKEFILE ON)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
@@ -20,9 +20,9 @@ include_directories(${root_SOURCE_DIR}/FactorySlot)
 add_subdirectory(FactorySlot)
 
 set(TS_FILES
-    Translations/CyberFleet2_en_US.ts
-    Translations/CyberFleet2_ja_JP.ts
-    Translations/CyberFleet2_zh_CN.ts)
+    Translations/FleetMemories_en_US.ts
+    Translations/FleetMemories_ja_JP.ts
+    Translations/FleetMemories_zh_CN.ts)
 
 set(CLIENT_SOURCES
     ClientGUI/clientv2.cpp
@@ -171,7 +171,7 @@ if( ${STEAM_APPENCRYPT_LIBRARY} STREQUAL "STEAM_APPENCRYPT_LIBRARY-NOTFOUND")
 endif()
 
 # Define target properties for Android with Qt 6 as:
-#    set_property(TARGET CyberFleet2 APPEND PROPERTY QT_ANDROID_PACKAGE_SOURCE_DIR
+#    set_property(TARGET FleetMemories APPEND PROPERTY QT_ANDROID_PACKAGE_SOURCE_DIR
 #                 ${CMAKE_CURRENT_SOURCE_DIR}/android)
 # For more information, see https://doc.qt.io/qt-6/qt-add-executable.html#target-creation
 
@@ -211,7 +211,7 @@ target_link_libraries(CFServer PRIVATE ${STEAM_LIBRARY})
 target_link_libraries(CFServer PRIVATE ${STEAM_APPENCRYPT_LIBRARY})
 
 set_target_properties(CFClient PROPERTIES
-    MACOSX_BUNDLE_GUI_IDENTIFIER xyz.harusoft.cyberfleet
+    MACOSX_BUNDLE_GUI_IDENTIFIER moe.fleetmemories.fleetmemories
     MACOSX_BUNDLE_BUNDLE_VERSION ${PROJECT_VERSION}
     MACOSX_BUNDLE_SHORT_VERSION_STRING ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}
     MACOSX_BUNDLE TRUE

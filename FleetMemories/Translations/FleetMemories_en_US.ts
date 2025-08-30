@@ -1,81 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="zh_CN">
+<TS version="2.1" language="en_US">
 <context>
     <name></name>
-    <message id="licence-not-found">
-        <location filename="../Protocol/commandline.cpp" line="141"/>
-        <location filename="../ClientGUI/ui/licensearea.cpp" line="30"/>
-        <source>Can&apos;t find license file, exiting.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message id="naganami">
-        <location filename="../Protocol/commandline.cpp" line="153"/>
-        <source>What? Admiral Tanaka? He&apos;s the real deal, isn&apos;t he?
-Great at battle and bad at politics--so cool!</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message id="help-msg">
-        <location filename="../Protocol/commandline.cpp" line="233"/>
-        <location filename="../ClientGUI/clientv2.cpp" line="359"/>
-        <source>Use &apos;exit&apos; to quit, &apos;help&apos; to show help, &apos;commands&apos; to show available commands.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message id="invalid-command">
-        <location filename="../Protocol/commandline.cpp" line="247"/>
-        <location filename="../ClientGUI/clientv2.cpp" line="1319"/>
-        <source>Invalid Command, use &apos;commands&apos; for valid commands, &apos;help&apos; for help, &apos;exit&apos; to exit.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message id="exit-helper">
-        <location filename="../Protocol/commandline.cpp" line="252"/>
-        <location filename="../ClientGUI/clientv2.cpp" line="1343"/>
-        <source>Use &apos;exit&apos; to quit.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message id="good-command">
-        <location filename="../Protocol/commandline.cpp" line="255"/>
-        <location filename="../ClientGUI/clientv2.cpp" line="1346"/>
-        <source>Available commands:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message id="all-command">
-        <location filename="../Protocol/commandline.cpp" line="260"/>
-        <location filename="../ClientGUI/clientv2.cpp" line="1351"/>
-        <source>All commands:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message id="goodbye">
-        <location filename="../Protocol/commandline.cpp" line="390"/>
-        <source>Goodbye, press ENTER to quit.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message id="equip-local-name-lack">
-        <location filename="../Protocol/equipment.cpp" line="27"/>
-        <source>Local language (%1) for equipment name not found!</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message id="equip-type-lack">
-        <location filename="../Protocol/equipment.cpp" line="43"/>
-        <source>Fetch equipment type failure!</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message id="equip-attr-lack">
-        <location filename="../Protocol/equipment.cpp" line="57"/>
-        <source>Fetch equipment attributes failure!</source>
-        <translation type="unfinished"></translation>
-    </message>
     <message id="SMALLGUNFLAT">
         <location filename="../Protocol/equiptype.cpp" line="33"/>
         <location filename="../Protocol/equiptype.cpp" line="162"/>
         <source>小口径主炮（平射）</source>
-        <translation type="unfinished"></translation>
+        <translation>Small-caliber gun (flat)</translation>
     </message>
     <message id="SMALLGUNFLAK">
         <location filename="../Protocol/equiptype.cpp" line="35"/>
         <location filename="../Protocol/equiptype.cpp" line="163"/>
         <source>小口径主炮（高角）</source>
-        <translation type="unfinished"></translation>
+        <translation>Small-caliber gun (flak)</translation>
     </message>
     <message id="MIDGUN">
         <location filename="../Protocol/equiptype.cpp" line="37"/>
@@ -83,20 +21,20 @@ Great at battle and bad at politics--so cool!</source>
         <location filename="../Protocol/equiptype.cpp" line="120"/>
         <location filename="../Protocol/equiptype.cpp" line="121"/>
         <source>中口径主炮</source>
-        <translation type="unfinished"></translation>
+        <translation>Mid-caliber gun</translation>
     </message>
     <message id="BIGGUN">
         <location filename="../Protocol/equiptype.cpp" line="39"/>
         <location filename="../Protocol/equiptype.cpp" line="95"/>
         <source>大口径主炮</source>
-        <translation type="unfinished"></translation>
+        <translation>Big-caliber gun</translation>
     </message>
     <message id="SUPERBIGGUN">
         <location filename="../Protocol/equiptype.cpp" line="41"/>
         <location filename="../Protocol/equiptype.cpp" line="164"/>
         <location filename="../Protocol/equiptype.cpp" line="165"/>
         <source>超大口径主炮</source>
-        <translation type="unfinished"></translation>
+        <translation>Superbig-caliber gun</translation>
     </message>
     <message id="SECGUN">
         <location filename="../Protocol/equiptype.cpp" line="43"/>
@@ -104,14 +42,14 @@ Great at battle and bad at politics--so cool!</source>
         <location filename="../Protocol/equiptype.cpp" line="160"/>
         <location filename="../Protocol/equiptype.cpp" line="161"/>
         <source>副炮</source>
-        <translation type="unfinished"></translation>
+        <translation>Secondary gun</translation>
     </message>
     <message id="FIGHTER">
         <location filename="../Protocol/equiptype.cpp" line="45"/>
         <location filename="../Protocol/equiptype.cpp" line="110"/>
         <location filename="../Protocol/equiptype.cpp" line="111"/>
         <source>舰载战斗机</source>
-        <translation type="unfinished"></translation>
+        <translation>Carrier fighter</translation>
     </message>
     <message id="BOMBDIVE">
         <location filename="../Protocol/equiptype.cpp" line="47"/>
@@ -122,7 +60,7 @@ Great at battle and bad at politics--so cool!</source>
         <location filename="../Protocol/equiptype.cpp" line="100"/>
         <location filename="../Protocol/equiptype.cpp" line="101"/>
         <source>舰载爆击机</source>
-        <translation type="unfinished"></translation>
+        <translation>Carrier dive bomber</translation>
     </message>
     <message id="BOMBTORP">
         <location filename="../Protocol/equiptype.cpp" line="49"/>
@@ -132,7 +70,7 @@ Great at battle and bad at politics--so cool!</source>
         <location filename="../Protocol/equiptype.cpp" line="105"/>
         <location filename="../Protocol/equiptype.cpp" line="106"/>
         <source>舰载雷击机</source>
-        <translation type="unfinished"></translation>
+        <translation>Carrier torpedo bomber</translation>
     </message>
     <message id="RECON">
         <location filename="../Protocol/equiptype.cpp" line="51"/>
@@ -145,7 +83,7 @@ Great at battle and bad at politics--so cool!</source>
         <location filename="../Protocol/equiptype.cpp" line="153"/>
         <location filename="../Protocol/equiptype.cpp" line="154"/>
         <source>侦察机</source>
-        <translation type="unfinished"></translation>
+        <translation>Recon plane</translation>
     </message>
     <message id="SEAPLANEBF">
         <location filename="../Protocol/equiptype.cpp" line="53"/>
@@ -154,7 +92,7 @@ Great at battle and bad at politics--so cool!</source>
         <location filename="../Protocol/equiptype.cpp" line="157"/>
         <location filename="../Protocol/equiptype.cpp" line="158"/>
         <source>水上爆击机/战斗机</source>
-        <translation type="unfinished"></translation>
+        <translation>Seaplane bomber/attacker</translation>
     </message>
     <message id="TORP">
         <location filename="../Protocol/equiptype.cpp" line="55"/>
@@ -162,7 +100,7 @@ Great at battle and bad at politics--so cool!</source>
         <location filename="../Protocol/equiptype.cpp" line="167"/>
         <location filename="../Protocol/equiptype.cpp" line="168"/>
         <source>鱼雷</source>
-        <translation type="unfinished"></translation>
+        <translation>Torpedo</translation>
     </message>
     <message id="AA">
         <location filename="../Protocol/equiptype.cpp" line="57"/>
@@ -170,7 +108,7 @@ Great at battle and bad at politics--so cool!</source>
         <location filename="../Protocol/equiptype.cpp" line="81"/>
         <location filename="../Protocol/equiptype.cpp" line="82"/>
         <source>防空装备</source>
-        <translation type="unfinished"></translation>
+        <translation>Anti-air</translation>
     </message>
     <message id="ASW">
         <location filename="../Protocol/equiptype.cpp" line="59"/>
@@ -184,7 +122,7 @@ Great at battle and bad at politics--so cool!</source>
         <location filename="../Protocol/equiptype.cpp" line="90"/>
         <location filename="../Protocol/equiptype.cpp" line="91"/>
         <source>对潜装备</source>
-        <translation type="unfinished"></translation>
+        <translation>ASW</translation>
     </message>
     <message id="RADAR">
         <location filename="../Protocol/equiptype.cpp" line="61"/>
@@ -197,7 +135,7 @@ Great at battle and bad at politics--so cool!</source>
         <location filename="../Protocol/equiptype.cpp" line="145"/>
         <location filename="../Protocol/equiptype.cpp" line="146"/>
         <source>雷达</source>
-        <translation type="unfinished"></translation>
+        <translation>Radar</translation>
     </message>
     <message id="LAND">
         <location filename="../Protocol/equiptype.cpp" line="63"/>
@@ -207,7 +145,7 @@ Great at battle and bad at politics--so cool!</source>
         <location filename="../Protocol/equiptype.cpp" line="117"/>
         <location filename="../Protocol/equiptype.cpp" line="118"/>
         <source>对陆装备</source>
-        <translation type="unfinished"></translation>
+        <translation>Anti-land equipment</translation>
     </message>
     <message id="ATTACKLB">
         <location filename="../Protocol/equiptype.cpp" line="65"/>
@@ -215,14 +153,14 @@ Great at battle and bad at politics--so cool!</source>
         <location filename="../Protocol/equiptype.cpp" line="93"/>
         <location filename="../Protocol/equiptype.cpp" line="94"/>
         <source>陆基攻击机</source>
-        <translation type="unfinished"></translation>
+        <translation>Land-based attacker</translation>
     </message>
     <message id="FIGHTERLB">
         <location filename="../Protocol/equiptype.cpp" line="67"/>
         <location filename="../Protocol/equiptype.cpp" line="112"/>
         <location filename="../Protocol/equiptype.cpp" line="113"/>
         <source>陆基战斗机</source>
-        <translation type="unfinished"></translation>
+        <translation>Land-based fighter</translation>
     </message>
     <message id="BULGE">
         <location filename="../Protocol/equiptype.cpp" line="69"/>
@@ -230,14 +168,14 @@ Great at battle and bad at politics--so cool!</source>
         <location filename="../Protocol/equiptype.cpp" line="108"/>
         <location filename="../Protocol/equiptype.cpp" line="109"/>
         <source>增设装甲</source>
-        <translation type="unfinished"></translation>
+        <translation>Bulge</translation>
     </message>
     <message id="PERS">
         <location filename="../Protocol/equiptype.cpp" line="71"/>
         <location filename="../Protocol/equiptype.cpp" line="137"/>
         <location filename="../Protocol/equiptype.cpp" line="138"/>
         <source>人员</source>
-        <translation type="unfinished"></translation>
+        <translation>Personnel</translation>
     </message>
     <message id="OTHER">
         <location filename="../Protocol/equiptype.cpp" line="73"/>
@@ -257,293 +195,376 @@ Great at battle and bad at politics--so cool!</source>
         <location filename="../Protocol/equiptype.cpp" line="135"/>
         <location filename="../Protocol/equiptype.cpp" line="136"/>
         <source>其他</source>
-        <translation type="unfinished"></translation>
+        <translation>Others</translation>
+    </message>
+    <message>
+        <source>dtls-1.2+</source>
+        <translation type="vanished">dtls-1.2+</translation>
+    </message>
+    <message>
+        <source>dtls-1.2</source>
+        <translation type="vanished">dtls-1.2</translation>
+    </message>
+    <message id="licence-not-found">
+        <location filename="../Protocol/commandline.cpp" line="141"/>
+        <location filename="../ClientGUI/ui/licensearea.cpp" line="30"/>
+        <source>Can&apos;t find license file, exiting.</source>
+        <translation>Can&apos;t find license file, exiting.</translation>
+    </message>
+    <message id="naganami-words">
+        <location filename="../ClientGUI/ui/licensearea.cpp" line="44"/>
+        <source>What? Admiral Tanaka? He&apos;s the real deal, isn&apos;t he?
+Great at battle and bad at politics--so cool!</source>
+        <translation>What? Admiral Tanaka? He&apos;s the real deal, isn&apos;t he?
+Great at battle and bad at politics--so cool!</translation>
+    </message>
+    <message id="license-continue">
+        <location filename="../ClientGUI/ui/licensearea.cpp" line="51"/>
+        <source>Continue</source>
+        <translation>Continue</translation>
+    </message>
+    <message id="naganami">
+        <location filename="../Protocol/commandline.cpp" line="153"/>
+        <source>What? Admiral Tanaka? He&apos;s the real deal, isn&apos;t he?
+Great at battle and bad at politics--so cool!</source>
+        <translation>What? Admiral Tanaka? He&apos;s the real deal, isn&apos;t he?
+Great at battle and bad at politics--so cool!</translation>
+    </message>
+    <message id="help-msg">
+        <location filename="../Protocol/commandline.cpp" line="233"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="359"/>
+        <source>Use &apos;exit&apos; to quit, &apos;help&apos; to show help, &apos;commands&apos; to show available commands.</source>
+        <translation>Use &apos;exit&apos; to quit, &apos;help&apos; to show help, &apos;commands&apos; to show available commands.</translation>
+    </message>
+    <message id="invalid-command">
+        <location filename="../Protocol/commandline.cpp" line="247"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="1319"/>
+        <source>Invalid Command, use &apos;commands&apos; for valid commands, &apos;help&apos; for help, &apos;exit&apos; to exit.</source>
+        <translation>Invalid Command, use &apos;commands&apos; for valid commands, &apos;help&apos; for help, &apos;exit&apos; to exit.</translation>
+    </message>
+    <message id="exit-helper">
+        <location filename="../Protocol/commandline.cpp" line="252"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="1343"/>
+        <source>Use &apos;exit&apos; to quit.</source>
+        <translation>Use &apos;exit&apos; to quit.</translation>
+    </message>
+    <message id="good-command">
+        <location filename="../Protocol/commandline.cpp" line="255"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="1346"/>
+        <source>Available commands:</source>
+        <translation>Available commands:</translation>
+    </message>
+    <message id="all-command">
+        <location filename="../Protocol/commandline.cpp" line="260"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="1351"/>
+        <source>All commands:</source>
+        <translation>All commands:</translation>
+    </message>
+    <message id="goodbye">
+        <location filename="../Protocol/commandline.cpp" line="390"/>
+        <source>Goodbye, press ENTER to quit.</source>
+        <translation>Goodbye, press ENTER to quit.</translation>
+    </message>
+    <message id="equip-local-name-lack">
+        <location filename="../Protocol/equipment.cpp" line="27"/>
+        <source>Local language (%1) for equipment name not found!</source>
+        <translation>Local language (%1) for equipment name not found!</translation>
+    </message>
+    <message id="equip-type-lack">
+        <location filename="../Protocol/equipment.cpp" line="43"/>
+        <source>Fetch equipment type failure!</source>
+        <translation>Fetch equipment type failure!</translation>
+    </message>
+    <message id="equip-attr-lack">
+        <location filename="../Protocol/equipment.cpp" line="57"/>
+        <source>Fetch equipment attributes failure!</source>
+        <translation>Fetch equipment attributes failure!</translation>
     </message>
     <message id="terminial-required">
         <location filename="../Protocol/kp.cpp" line="36"/>
         <source>This program must be run in the terminal.</source>
-        <translation type="unfinished"></translation>
+        <translation>This program must be run in the terminal.</translation>
     </message>
     <message id="receive-msg-timeout">
         <location filename="../Protocol/receiver.cpp" line="79"/>
         <source>Message %1 timeouted when receiving!</source>
-        <translation type="unfinished"></translation>
+        <translation>Message %1 timeouted when receiving!</translation>
     </message>
     <message id="same-msg-uid-have-inconsistent-total-parts">
         <location filename="../Protocol/receiver.cpp" line="91"/>
         <source>Message total parts is inconsistent!</source>
-        <translation type="unfinished"></translation>
+        <translation>Message total parts is inconsistent!</translation>
     </message>
     <message id="msg-convert-to-json-failed">
         <location filename="../Protocol/receiver.cpp" line="120"/>
         <source>Message convert to JSON failed!</source>
-        <translation type="unfinished"></translation>
+        <translation>Message convert to JSON failed!</translation>
     </message>
     <message id="peerinfo-handler">
         <location filename="../Protocol/receiver.cpp" line="123"/>
         <source>PeerInfo: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>PeerInfo: %1</translation>
     </message>
     <message id="%1 Oil">
         <location filename="../Protocol/resord.cpp" line="34"/>
         <source>%1 Oil </source>
         <oldsource>%1 Oil</oldsource>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">%1 Oil</translation>
     </message>
     <message id="%1 Ammo">
         <location filename="../Protocol/resord.cpp" line="36"/>
         <source>%1 Ammo </source>
-        <translation type="unfinished"></translation>
+        <translation>%1 Ammo </translation>
     </message>
     <message id="%1 Steel">
         <location filename="../Protocol/resord.cpp" line="38"/>
         <source>%1 Steel </source>
-        <translation type="unfinished"></translation>
+        <translation>%1 Steel </translation>
     </message>
     <message id="%1 Rubber">
         <location filename="../Protocol/resord.cpp" line="40"/>
         <source>%1 Rubber </source>
-        <translation type="unfinished"></translation>
+        <translation>%1 Rubber </translation>
     </message>
     <message id="%1 Al">
         <location filename="../Protocol/resord.cpp" line="42"/>
         <source>%1 Aluminum </source>
-        <translation type="unfinished"></translation>
+        <translation>%1 Aluminum </translation>
     </message>
     <message id="%1 W">
         <location filename="../Protocol/resord.cpp" line="44"/>
         <source>%1 Tungsten </source>
-        <translation type="unfinished"></translation>
+        <translation>%1 Tungsten </translation>
     </message>
     <message id="%1 Cr">
         <location filename="../Protocol/resord.cpp" line="46"/>
         <source>%1 Chromium </source>
-        <translation type="unfinished"></translation>
+        <translation>%1 Chromium </translation>
     </message>
     <message id="input-buffer-empty">
         <location filename="../Protocol/sender.cpp" line="43"/>
         <source>Input buffer is empty.</source>
-        <translation type="unfinished"></translation>
+        <translation>Input buffer is empty.</translation>
     </message>
     <message id="unable-send-data">
         <location filename="../Protocol/sender.cpp" line="80"/>
         <source>Unable to send data.</source>
-        <translation type="unfinished"></translation>
+        <translation>Unable to send data.</translation>
     </message>
     <message id="error-reading-intended-message">
         <location filename="../Protocol/sender.cpp" line="110"/>
         <source>Error reading intended message.</source>
-        <translation type="unfinished"></translation>
+        <translation>Error reading intended message.</translation>
     </message>
     <message id="unable-send-data-connection-broke">
         <location filename="../Protocol/sender.cpp" line="132"/>
         <source>Unable to send data, connection broke.</source>
-        <translation type="unfinished"></translation>
+        <translation>Unable to send data, connection broke.</translation>
     </message>
     <message id="write-buffer-failed-to-fill">
         <location filename="../Protocol/sender.cpp" line="138"/>
         <source>Write buffer failed to fill completely.</source>
-        <translation type="unfinished"></translation>
+        <translation>Write buffer failed to fill completely.</translation>
     </message>
     <message id="escort">
         <location filename="../Protocol/shiptype.cpp" line="11"/>
         <source>Escort</source>
-        <translation type="unfinished"></translation>
+        <translation>Escort</translation>
     </message>
     <message id="escort-destoryer">
         <location filename="../Protocol/shiptype.cpp" line="13"/>
         <source>Escort Destroyer</source>
-        <translation type="unfinished"></translation>
+        <translation>Escort Destroyer</translation>
     </message>
     <message id="light-cruiser">
         <location filename="../Protocol/shiptype.cpp" line="15"/>
         <source>Light Cruiser</source>
-        <translation type="unfinished"></translation>
+        <translation>Light Cruiser</translation>
     </message>
     <message id="training-cruiser">
         <location filename="../Protocol/shiptype.cpp" line="17"/>
         <source>Training Cruiser</source>
-        <translation type="unfinished"></translation>
+        <translation>Training Cruiser</translation>
     </message>
     <message id="torpedo-cruiser">
         <location filename="../Protocol/shiptype.cpp" line="19"/>
         <source>Light Cruiser (Advanced Torpedos)</source>
-        <translation type="unfinished"></translation>
+        <translation>Light Cruiser (Advanced Torpedos)</translation>
     </message>
     <message id="light-aviation-cruiser">
         <location filename="../Protocol/shiptype.cpp" line="21"/>
         <source>Light Cruiser (Advanced Aviation)</source>
-        <translation type="unfinished"></translation>
+        <translation>Light Cruiser (Advanced Aviation)</translation>
     </message>
     <message id="submarine-tender">
         <location filename="../Protocol/shiptype.cpp" line="23"/>
         <source>Submarine Tender</source>
-        <translation type="unfinished"></translation>
+        <translation>Submarine Tender</translation>
     </message>
     <message id="light-cruiser-aa">
         <location filename="../Protocol/shiptype.cpp" line="25"/>
         <source>Light Cruiser (Advanced Anti-Air)</source>
-        <translation type="unfinished"></translation>
+        <translation>Light Cruiser (Advanced Anti-Air)</translation>
     </message>
     <message id="heavy-cruiser">
         <location filename="../Protocol/shiptype.cpp" line="27"/>
         <source>Heavy Cruiser</source>
-        <translation type="unfinished"></translation>
+        <translation>Heavy Cruiser</translation>
     </message>
     <message id="heavy-cruiser-torp">
         <location filename="../Protocol/shiptype.cpp" line="29"/>
         <source>Heavy Cruiser (Advanced Torpedos)</source>
-        <translation type="unfinished"></translation>
+        <translation>Heavy Cruiser (Advanced Torpedos)</translation>
     </message>
     <message id="aviation-cruiser">
         <location filename="../Protocol/shiptype.cpp" line="31"/>
         <source>Heavy Cruiser (Advanced Aviation)</source>
-        <translation type="unfinished"></translation>
+        <translation>Heavy Cruiser (Advanced Aviation)</translation>
     </message>
     <message id="aviation-cruiser-torp">
         <location filename="../Protocol/shiptype.cpp" line="33"/>
         <source>Heavy Cruiser (Advanced Aviation &amp; Torpedos)</source>
-        <translation type="unfinished"></translation>
+        <translation>Heavy Cruiser (Advanced Aviation &amp; Torpedos)</translation>
     </message>
     <message id="heavy-cruiser-aa">
         <location filename="../Protocol/shiptype.cpp" line="35"/>
         <source>Heavy Cruiser (Advanced Anti-Air)</source>
-        <translation type="unfinished"></translation>
+        <translation>Heavy Cruiser (Advanced Anti-Air)</translation>
     </message>
     <message id="battleship">
         <location filename="../Protocol/shiptype.cpp" line="37"/>
         <source>Battleship</source>
-        <translation type="unfinished"></translation>
+        <translation>Battleship</translation>
     </message>
     <message id="battlecruiser">
         <location filename="../Protocol/shiptype.cpp" line="39"/>
         <source>Battlecruiser</source>
-        <translation type="unfinished"></translation>
+        <translation>Battlecruiser</translation>
     </message>
     <message id="highspeed-battleship">
         <location filename="../Protocol/shiptype.cpp" line="41"/>
         <source>Battleship (High speed)</source>
-        <translation type="unfinished"></translation>
+        <translation>Battleship (High speed)</translation>
     </message>
     <message id="aviation-battleship">
         <location filename="../Protocol/shiptype.cpp" line="43"/>
         <source>Battleship (Advanced Aviation)</source>
-        <translation type="unfinished"></translation>
+        <translation>Battleship (Advanced Aviation)</translation>
     </message>
     <message id="escort-unknown-special">
         <location filename="../Protocol/shiptype.cpp" line="48"/>
         <source>Escort (uncategorized)</source>
-        <translation type="unfinished"></translation>
+        <translation>Escort (uncategorized)</translation>
     </message>
     <message id="lead-destroyer">
         <location filename="../Protocol/shiptype.cpp" line="52"/>
         <source>Lead Destroyer</source>
-        <translation type="unfinished"></translation>
+        <translation>Lead Destroyer</translation>
     </message>
     <message id="destroyer">
         <location filename="../Protocol/shiptype.cpp" line="56"/>
         <source>Destroyer</source>
-        <translation type="unfinished"></translation>
+        <translation>Destroyer</translation>
     </message>
     <message id="light-cruiser-unknown-special">
         <location filename="../Protocol/shiptype.cpp" line="60"/>
         <source>Light Cruiser (uncategorized)</source>
-        <translation type="unfinished"></translation>
+        <translation>Light Cruiser (uncategorized)</translation>
     </message>
     <message id="heavy-cruiser-unknown-special">
         <location filename="../Protocol/shiptype.cpp" line="63"/>
         <source>Heavy Cruiser (uncategorized)</source>
-        <translation type="unfinished"></translation>
+        <translation>Heavy Cruiser (uncategorized)</translation>
     </message>
     <message id="battleship-unknown-special">
         <location filename="../Protocol/shiptype.cpp" line="66"/>
         <source>BattleShip (uncategorized)</source>
-        <translation type="unfinished"></translation>
+        <translation>BattleShip (uncategorized)</translation>
     </message>
     <message id="type-cv">
         <location filename="../Protocol/shiptype.cpp" line="70"/>
         <source>Carrier</source>
-        <translation type="unfinished"></translation>
+        <translation>Carrier</translation>
     </message>
     <message id="light-carrier">
         <location filename="../Protocol/shiptype.cpp" line="74"/>
         <source>(Light)</source>
-        <translation type="unfinished"></translation>
+        <translation>(Light)</translation>
     </message>
     <message id="asw-carrier">
         <location filename="../Protocol/shiptype.cpp" line="77"/>
         <source>(Advanced Anti-Sub)</source>
-        <translation type="unfinished"></translation>
+        <translation>(Advanced Anti-Sub)</translation>
     </message>
     <message id="escort-carrier">
         <location filename="../Protocol/shiptype.cpp" line="80"/>
         <source>(Escort)</source>
-        <translation type="unfinished"></translation>
+        <translation>(Escort)</translation>
     </message>
     <message id="armored-carrier">
         <location filename="../Protocol/shiptype.cpp" line="84"/>
         <source>(Armored)</source>
-        <translation type="unfinished"></translation>
+        <translation>(Armored)</translation>
     </message>
     <message id="night-carrier">
         <location filename="../Protocol/shiptype.cpp" line="87"/>
         <source>(Night Aviation)</source>
-        <translation type="unfinished"></translation>
+        <translation>(Night Aviation)</translation>
     </message>
     <message id="type-ss">
         <location filename="../Protocol/shiptype.cpp" line="93"/>
         <source>Submarine</source>
-        <translation type="unfinished"></translation>
+        <translation>Submarine</translation>
     </message>
     <message id="aviation-submarine">
         <location filename="../Protocol/shiptype.cpp" line="96"/>
         <source>(Aviation)</source>
-        <translation type="unfinished"></translation>
+        <translation>(Aviation)</translation>
     </message>
     <message id="type-av">
         <location filename="../Protocol/shiptype.cpp" line="102"/>
         <source>Seaplane Carrier</source>
-        <translation type="unfinished"></translation>
+        <translation>Seaplane Carrier</translation>
     </message>
     <message id="type-av-torp">
         <location filename="../Protocol/shiptype.cpp" line="105"/>
         <source>(Advanced Torpedos)</source>
-        <translation type="unfinished"></translation>
+        <translation>(Advanced Torpedos)</translation>
     </message>
     <message id="supply-ship">
         <location filename="../Protocol/shiptype.cpp" line="110"/>
         <source>Supply ship</source>
-        <translation type="unfinished"></translation>
+        <translation>Supply ship</translation>
     </message>
     <message id="amphibious-assault">
         <location filename="../Protocol/shiptype.cpp" line="113"/>
         <source>Amphibious assault ship</source>
-        <translation type="unfinished"></translation>
+        <translation>Amphibious assault ship</translation>
     </message>
     <message id="repair">
         <location filename="../Protocol/shiptype.cpp" line="116"/>
         <source>Repair ship</source>
-        <translation type="unfinished"></translation>
+        <translation>Repair ship</translation>
     </message>
     <message id="type-land">
         <location filename="../Protocol/shiptype.cpp" line="119"/>
         <source>Land Structure</source>
-        <translation type="unfinished"></translation>
+        <translation>Land Structure</translation>
     </message>
     <message id="unknown-ship-type">
         <location filename="../Protocol/shiptype.cpp" line="122"/>
         <source>Unknown</source>
-        <translation type="unfinished"></translation>
+        <translation>Unknown</translation>
     </message>
     <message id="scope-constant-less-than-1">
         <location filename="../Protocol/tech.cpp" line="66"/>
         <source>Scope constant less or equal to 1 is against design doctrine!</source>
-        <translation type="unfinished"></translation>
+        <translation>Scope constant less or equal to 1 is against design doctrine!</translation>
     </message>
     <message id="tech-level-less-than-0">
         <location filename="../Protocol/tech.cpp" line="76"/>
         <source>Tech level less than 0 is against design doctrine!</source>
-        <translation type="unfinished"></translation>
+        <translation>Tech level less than 0 is against design doctrine!</translation>
     </message>
     <message id="closed-factoryslot">
         <location filename="../FactorySlot/factoryslot.cpp" line="55"/>
@@ -872,7 +893,7 @@ Great at battle and bad at politics--so cool!</source>
     </message>
     <message id="switch-cert-when-connecting">
         <location filename="../ClientGUI/clientv2.cpp" line="1359"/>
-        <location filename="../Server/server.cpp" line="2673"/>
+        <location filename="../Server/server.cpp" line="2674"/>
         <source>Switch certificate when connected have no effect.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1005,18 +1026,7 @@ Great at battle and bad at politics--so cool!</source>
     <message id="arsenal">
         <location filename="../ClientGUI/ui/factoryarea.cpp" line="140"/>
         <source>Arsenal</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message id="naganami-words">
-        <location filename="../ClientGUI/ui/licensearea.cpp" line="44"/>
-        <source>What? Admiral Tanaka? He&apos;s the real deal, isn&apos;t he?
-Great at battle and bad at politics--so cool!</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message id="license-continue">
-        <location filename="../ClientGUI/ui/licensearea.cpp" line="51"/>
-        <source>Continue</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Arsenal</translation>
     </message>
     <message id="load-equip">
         <location filename="../ClientGUI/ui/portarea.cpp" line="10"/>
@@ -1053,7 +1063,7 @@ Great at battle and bad at politics--so cool!</source>
         <location filename="../ClientGUI/ui/techview.cpp" line="344"/>
         <location filename="../ClientGUI/ui/techview.cpp" line="348"/>
         <source>Tech</source>
-        <translation type="unfinished"></translation>
+        <translation>Tech</translation>
     </message>
     <message id="Weight">
         <location filename="../ClientGUI/ui/techview.cpp" line="204"/>
@@ -1435,156 +1445,156 @@ Great at battle and bad at politics--so cool!</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="factory-state-error">
-        <location filename="../Server/server.cpp" line="2395"/>
+        <location filename="../Server/server.cpp" line="2396"/>
         <source>Open user %1&apos;s factory failed!</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="delete-equip-nonexistent">
-        <location filename="../Server/server.cpp" line="2431"/>
+        <location filename="../Server/server.cpp" line="2432"/>
         <source>User id %1: equipment %2 does not exist!</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="delete-equip-failed">
-        <location filename="../Server/server.cpp" line="2452"/>
+        <location filename="../Server/server.cpp" line="2453"/>
         <source>User id %1: delete equipment failed!</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="delete-equip">
-        <location filename="../Server/server.cpp" line="2459"/>
+        <location filename="../Server/server.cpp" line="2460"/>
         <source>User id %1: deleted equipment %2</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="open-db-failed">
-        <location filename="../Server/server.cpp" line="2483"/>
+        <location filename="../Server/server.cpp" line="2484"/>
         <source>Open database failed!</source>
         <oldsource>User id %1: deleted equipment %2</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message id="sql-connect-success">
-        <location filename="../Server/server.cpp" line="2487"/>
+        <location filename="../Server/server.cpp" line="2488"/>
         <source>SQL connection successful!</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="equip-db-lack">
-        <location filename="../Server/server.cpp" line="2531"/>
+        <location filename="../Server/server.cpp" line="2532"/>
         <source>Equipment database does not exist, creating...</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="equip-db-gen-failure">
-        <location filename="../Server/server.cpp" line="2536"/>
+        <location filename="../Server/server.cpp" line="2537"/>
         <source>Create Equipment database failed.</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="equip-name-db-lack">
-        <location filename="../Server/server.cpp" line="2543"/>
+        <location filename="../Server/server.cpp" line="2544"/>
         <source>Equipment name database does not exist, creating...</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="equip-name-gen-failure">
-        <location filename="../Server/server.cpp" line="2548"/>
+        <location filename="../Server/server.cpp" line="2549"/>
         <source>Create Equipment name failed.</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="equip-db-user-sp-gen-failure">
-        <location filename="../Server/server.cpp" line="2558"/>
+        <location filename="../Server/server.cpp" line="2559"/>
         <source>User equipment skillpoints fetch failure!</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="equip-db-user-lack">
-        <location filename="../Server/server.cpp" line="2565"/>
+        <location filename="../Server/server.cpp" line="2566"/>
         <source>Equipment database for user does not exist, creating...</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="equip-db-user-gen-failure">
-        <location filename="../Server/server.cpp" line="2570"/>
+        <location filename="../Server/server.cpp" line="2571"/>
         <source>Create Equipment database for user failed.</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="facto-db-lack">
-        <location filename="../Server/server.cpp" line="2577"/>
+        <location filename="../Server/server.cpp" line="2578"/>
         <source>Factory database does not exist, creating...</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="facto-db-gen-failure">
-        <location filename="../Server/server.cpp" line="2582"/>
+        <location filename="../Server/server.cpp" line="2583"/>
         <source>Create Factory database failed.</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="map-node-db-lack">
-        <location filename="../Server/server.cpp" line="2589"/>
+        <location filename="../Server/server.cpp" line="2590"/>
         <source>Map node database does not exist, creating...</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="map-node-db-gen-failure">
-        <location filename="../Server/server.cpp" line="2594"/>
+        <location filename="../Server/server.cpp" line="2595"/>
         <source>Create Map node database failed.</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="map-relation-db-lack">
-        <location filename="../Server/server.cpp" line="2601"/>
+        <location filename="../Server/server.cpp" line="2602"/>
         <source>Map relation database does not exist, creating...</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="map-relation-db-gen-failure">
-        <location filename="../Server/server.cpp" line="2606"/>
+        <location filename="../Server/server.cpp" line="2607"/>
         <source>Create Map relation database failed.</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="map-resource-db-lack">
-        <location filename="../Server/server.cpp" line="2613"/>
+        <location filename="../Server/server.cpp" line="2614"/>
         <source>Map resource database does not exist, creating...</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="map-resource-db-gen-failure">
-        <location filename="../Server/server.cpp" line="2618"/>
+        <location filename="../Server/server.cpp" line="2619"/>
         <source>Create Map resource database failed.</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="ship-db-lack">
-        <location filename="../Server/server.cpp" line="2625"/>
+        <location filename="../Server/server.cpp" line="2626"/>
         <source>Ship database does not exist, creating...</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="equip-ship-db-gen-failure">
-        <location filename="../Server/server.cpp" line="2630"/>
+        <location filename="../Server/server.cpp" line="2631"/>
         <source>Create Ship database failed.</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="ship-name-db-lack">
-        <location filename="../Server/server.cpp" line="2637"/>
+        <location filename="../Server/server.cpp" line="2638"/>
         <source>Ship name database does not exist, creating...</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="equip-ship-name-gen-failure">
-        <location filename="../Server/server.cpp" line="2642"/>
+        <location filename="../Server/server.cpp" line="2643"/>
         <source>Create Ship name failed.</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="user-db-lack">
-        <location filename="../Server/server.cpp" line="2649"/>
-        <location filename="../Server/server.cpp" line="2660"/>
+        <location filename="../Server/server.cpp" line="2650"/>
+        <location filename="../Server/server.cpp" line="2661"/>
         <source>User database does not exist, creating...</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="user-db-gen-failure">
-        <location filename="../Server/server.cpp" line="2654"/>
-        <location filename="../Server/server.cpp" line="2665"/>
+        <location filename="../Server/server.cpp" line="2655"/>
+        <location filename="../Server/server.cpp" line="2666"/>
         <source>Create User database failed.</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="server-pem">
-        <location filename="../Server/server.cpp" line="2684"/>
+        <location filename="../Server/server.cpp" line="2685"/>
         <source>Server PEM is now %1.</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="user-data-init-fail">
-        <location filename="../Server/server.cpp" line="2715"/>
-        <location filename="../Server/server.cpp" line="2735"/>
+        <location filename="../Server/server.cpp" line="2716"/>
+        <location filename="../Server/server.cpp" line="2736"/>
         <source>%1: User data init failure!</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="user-factory-init-fail">
-        <location filename="../Server/server.cpp" line="2752"/>
+        <location filename="../Server/server.cpp" line="2753"/>
         <source>Init 4 factory slots for user %1 failed!</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1664,145 +1674,148 @@ Great at battle and bad at politics--so cool!</source>
     <message id="equip-attr-tech">
         <location filename="../Protocol/equipment.h" line="16"/>
         <source>Tech</source>
-        <oldsource>Technology</oldsource>
-        <translation type="unfinished"></translation>
+        <translation>Technology</translation>
     </message>
     <message id="equip-attr-father">
         <location filename="../Protocol/equipment.h" line="18"/>
         <source>Precedent</source>
-        <translation type="unfinished"></translation>
+        <translation>Precedent</translation>
     </message>
     <message id="equip-attr-father2">
         <location filename="../Protocol/equipment.h" line="20"/>
         <source>Precedent 2</source>
-        <translation type="unfinished"></translation>
+        <translation>Precedent 2</translation>
     </message>
     <message id="equip-attr-mother">
         <location filename="../Protocol/equipment.h" line="22"/>
         <source>Skill points pool</source>
-        <translation type="unfinished"></translation>
+        <translation>Skill points pool</translation>
     </message>
     <message id="equip-attr-disallowmassproduction">
         <location filename="../Protocol/equipment.h" line="24"/>
         <source>Possessing limit</source>
-        <translation type="unfinished"></translation>
+        <translation>Possessing limit</translation>
     </message>
     <message id="equip-attr-hitpoints">
         <location filename="../Protocol/equipment.h" line="26"/>
         <source>Hitpoints</source>
-        <translation type="unfinished"></translation>
+        <translation>Hitpoints</translation>
     </message>
     <message id="equip-attr-firepower">
         <location filename="../Protocol/equipment.h" line="28"/>
         <source>Firepower</source>
-        <translation type="unfinished"></translation>
+        <translation>Firepower</translation>
     </message>
     <message id="equip-attr-armor">
         <location filename="../Protocol/equipment.h" line="30"/>
         <source>Armor</source>
-        <translation type="unfinished"></translation>
+        <translation>Armor</translation>
     </message>
     <message id="equip-attr-armorpenetration">
         <location filename="../Protocol/equipment.h" line="32"/>
         <source>AP</source>
-        <translation type="unfinished"></translation>
+        <translation>AP</translation>
     </message>
     <message id="equip-attr-accuracy">
         <location filename="../Protocol/equipment.h" line="34"/>
         <source>Accuracy</source>
-        <translation type="unfinished"></translation>
+        <translation>Accuracy</translation>
     </message>
     <message id="equip-attr-torpedoaccuracy">
         <location filename="../Protocol/equipment.h" line="36"/>
         <source>Accuracy(torp)</source>
-        <translation type="unfinished"></translation>
+        <translation>Accuracy(torp)</translation>
     </message>
     <message id="equip-attr-evasion">
         <location filename="../Protocol/equipment.h" line="38"/>
         <source>Evasion</source>
-        <translation type="unfinished"></translation>
+        <translation>Evasion</translation>
     </message>
     <message id="equip-attr-los">
         <location filename="../Protocol/equipment.h" line="40"/>
         <source>LOS</source>
-        <translation type="unfinished"></translation>
+        <translation>LOS</translation>
     </message>
     <message id="equip-attr-concealment">
         <location filename="../Protocol/equipment.h" line="42"/>
         <source>Concealment</source>
-        <translation type="unfinished"></translation>
+        <translation>Concealment</translation>
     </message>
     <message id="equip-attr-firingrange">
         <location filename="../Protocol/equipment.h" line="44"/>
         <source>Firing range</source>
-        <translation type="unfinished"></translation>
+        <translation>Firing range</translation>
     </message>
     <message id="equip-attr-firingspeed">
         <location filename="../Protocol/equipment.h" line="46"/>
         <source>Firing speed</source>
-        <translation type="unfinished"></translation>
+        <translation>Firing speed</translation>
     </message>
     <message id="equip-attr-speed">
         <location filename="../Protocol/equipment.h" line="48"/>
         <source>Ship speed</source>
-        <translation type="unfinished"></translation>
+        <translation>Ship speed</translation>
     </message>
     <message id="equip-attr-torpedo">
         <location filename="../Protocol/equipment.h" line="50"/>
         <source>Torpedo</source>
-        <translation type="unfinished"></translation>
+        <translation>Torpedo</translation>
     </message>
     <message id="equip-attr-airtorpedo">
         <location filename="../Protocol/equipment.h" line="52"/>
         <source>Torpedo(air)</source>
-        <translation type="unfinished"></translation>
+        <translation>Torpedo(air)</translation>
     </message>
     <message id="equip-attr-bombing">
         <location filename="../Protocol/equipment.h" line="54"/>
         <source>Bombing</source>
-        <translation type="unfinished"></translation>
+        <translation>Bombing</translation>
     </message>
     <message id="equip-attr-antiair">
         <location filename="../Protocol/equipment.h" line="56"/>
         <source>Anti-air</source>
-        <translation type="unfinished"></translation>
+        <translation>Anti-air</translation>
     </message>
     <message id="equip-attr-asw">
         <location filename="../Protocol/equipment.h" line="58"/>
         <source>ASW</source>
-        <translation type="unfinished"></translation>
+        <translation>ASW</translation>
     </message>
     <message id="equip-attr-interception">
         <location filename="../Protocol/equipment.h" line="60"/>
         <source>Interception</source>
-        <translation type="unfinished"></translation>
+        <translation>Interception</translation>
     </message>
     <message id="equip-attr-antibomber">
         <location filename="../Protocol/equipment.h" line="62"/>
         <source>Anti-bomber</source>
         <oldsource>Anti bomber</oldsource>
-        <translation type="unfinished"></translation>
+        <translation>Anti-bomber</translation>
     </message>
     <message id="equip-attr-antiland">
         <location filename="../Protocol/equipment.h" line="64"/>
         <source>Anti-land</source>
         <oldsource>Anti land</oldsource>
-        <translation type="unfinished"></translation>
+        <translation>Anti-land</translation>
     </message>
     <message id="equip-attr-transport">
         <location filename="../Protocol/equipment.h" line="66"/>
         <source>Transport</source>
-        <translation type="unfinished"></translation>
+        <translation>Transport</translation>
     </message>
     <message id="equip-attr-flightrange">
         <location filename="../Protocol/equipment.h" line="68"/>
         <source>Flight range</source>
-        <translation type="unfinished"></translation>
+        <translation>Flight range</translation>
+    </message>
+    <message id="develop-success-rate-calculating">
+        <source>Calculating...</source>
+        <translation type="obsolete">Calculating...</translation>
     </message>
     <message id="develop-success-rate-unknown">
         <location filename="../ClientGUI/ui/developwindow.cpp" line="116"/>
         <source>Unknown</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Unknown</translation>
     </message>
     <message id="diff-c">
         <location filename="../ClientGUI/ui/sortie.cpp" line="37"/>
@@ -1835,7 +1848,7 @@ Great at battle and bad at politics--so cool!</source>
     <message>
         <location filename="../ClientGUI/ui/developwindow.ui" line="14"/>
         <source>Develop Equipment</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Develop Equipment</translation>
     </message>
     <message id="select-equipment-name">
         <location filename="../ClientGUI/ui/developwindow.ui" line="50"/>
@@ -1860,7 +1873,7 @@ Great at battle and bad at politics--so cool!</source>
     <message id="dev-calculating">
         <location filename="../ClientGUI/ui/developwindow.ui" line="112"/>
         <source>Calculating...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Calculating...</translation>
     </message>
 </context>
 <context>
@@ -2015,14 +2028,18 @@ Great at battle and bad at politics--so cool!</source>
         <location filename="../ClientGUI/ui/licensearea.ui" line="115"/>
         <source>Continue</source>
         <extracomment>License Continue</extracomment>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Continue</translation>
     </message>
 </context>
 <context>
     <name>MainWindow</name>
     <message>
-        <location filename="../ClientGUI/ui/mainwindow.ui" line="14"/>
         <source>CyberFleet GUI</source>
+        <translation type="vanished">CyberFleet GUI</translation>
+    </message>
+    <message id="mainwindow-title">
+        <location filename="../ClientGUI/ui/mainwindow.ui" line="14"/>
+        <source>FleetMemories</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -2041,82 +2058,82 @@ Great at battle and bad at politics--so cool!</source>
         <location filename="../ClientGUI/ui/mainwindow.ui" line="156"/>
         <location filename="../ClientGUI/ui/mainwindow.ui" line="163"/>
         <source>TextLabel</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message id="menu-sortie">
         <location filename="../ClientGUI/ui/mainwindow.ui" line="358"/>
         <source>Sortie</source>
-        <translation type="unfinished"></translation>
+        <translation>Sortie</translation>
     </message>
     <message id="menu-fleet">
         <location filename="../ClientGUI/ui/mainwindow.ui" line="364"/>
         <source>Fleet</source>
-        <translation type="unfinished"></translation>
+        <translation>Fleet</translation>
     </message>
     <message id="menu-supply">
         <location filename="../ClientGUI/ui/mainwindow.ui" line="369"/>
         <source>Supply</source>
-        <translation type="unfinished"></translation>
+        <translation>Supply</translation>
     </message>
     <message id="menu-refit">
         <location filename="../ClientGUI/ui/mainwindow.ui" line="374"/>
         <source>Refit</source>
-        <translation type="unfinished"></translation>
+        <translation>Refit</translation>
     </message>
     <message id="menu-dock">
         <location filename="../ClientGUI/ui/mainwindow.ui" line="379"/>
         <source>Dock</source>
-        <translation type="unfinished"></translation>
+        <translation>Dock</translation>
     </message>
     <message id="menu-factory">
         <location filename="../ClientGUI/ui/mainwindow.ui" line="384"/>
         <source>Factory</source>
-        <translation type="unfinished"></translation>
+        <translation>Factory</translation>
     </message>
     <message id="menu-naval-base">
         <location filename="../ClientGUI/ui/mainwindow.ui" line="392"/>
         <source>Naval Base</source>
-        <translation type="unfinished"></translation>
+        <translation>Naval Base</translation>
     </message>
     <message id="menu-tech">
         <location filename="../ClientGUI/ui/mainwindow.ui" line="400"/>
         <source>Tech</source>
-        <translation type="unfinished"></translation>
+        <translation>Tech</translation>
     </message>
     <message id="menu-develop">
         <location filename="../ClientGUI/ui/mainwindow.ui" line="416"/>
         <source>Develop Equipment</source>
-        <translation type="unfinished"></translation>
+        <translation>Develop Equipment</translation>
     </message>
     <message id="menu-back-to-naval-base">
         <location filename="../ClientGUI/ui/mainwindow.ui" line="421"/>
         <source>Back to naval base</source>
-        <translation type="unfinished"></translation>
+        <translation>Back to naval base</translation>
     </message>
     <message id="menu-logout">
         <location filename="../ClientGUI/ui/mainwindow.ui" line="426"/>
         <source>Logout</source>
-        <translation type="unfinished"></translation>
+        <translation>Logout</translation>
     </message>
     <message id="menu-exit">
         <location filename="../ClientGUI/ui/mainwindow.ui" line="431"/>
         <source>Exit program</source>
-        <translation type="unfinished"></translation>
+        <translation>Exit program</translation>
     </message>
     <message id="menu-view-tech">
         <location filename="../ClientGUI/ui/mainwindow.ui" line="436"/>
         <source>View Tech</source>
-        <translation type="unfinished"></translation>
+        <translation>View Tech</translation>
     </message>
     <message id="menu-construct">
         <location filename="../ClientGUI/ui/mainwindow.ui" line="441"/>
         <source>Construct Ships</source>
-        <translation type="unfinished"></translation>
+        <translation>Construct Ships</translation>
     </message>
     <message id="menu-arsenal">
         <location filename="../ClientGUI/ui/mainwindow.ui" line="446"/>
         <source>Arsenal</source>
-        <translation type="unfinished"></translation>
+        <translation>Arsenal</translation>
     </message>
     <message id="menu-battle">
         <location filename="../ClientGUI/ui/mainwindow.ui" line="451"/>
@@ -2129,22 +2146,22 @@ Great at battle and bad at politics--so cool!</source>
     <message>
         <location filename="../ClientGUI/ui/newlogins.ui" line="14"/>
         <source>Frame</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message id="login-options-server">
         <location filename="../ClientGUI/ui/newlogins.ui" line="58"/>
         <source>Server:</source>
-        <translation type="unfinished"></translation>
+        <translation>Server:</translation>
     </message>
     <message id="login-options-port">
         <location filename="../ClientGUI/ui/newlogins.ui" line="84"/>
         <source>Port:</source>
-        <translation type="unfinished"></translation>
+        <translation>Port:</translation>
     </message>
     <message id="login-options-connect">
         <location filename="../ClientGUI/ui/newlogins.ui" line="104"/>
         <source>Connect</source>
-        <translation type="unfinished"></translation>
+        <translation>Connect</translation>
     </message>
 </context>
 <context>
@@ -2196,63 +2213,63 @@ Great at battle and bad at politics--so cool!</source>
     <message id="techview-globaltech">
         <location filename="../ClientGUI/ui/techview.ui" line="24"/>
         <source>GlobalTech:</source>
-        <translation type="unfinished"></translation>
+        <translation>GlobalTech:</translation>
     </message>
     <message id="techview-calculating">
         <location filename="../ClientGUI/ui/techview.ui" line="34"/>
         <source>Calculating...</source>
-        <translation type="unfinished"></translation>
+        <translation>Calculating...</translation>
     </message>
     <message>
         <location filename="../ClientGUI/ui/techview.ui" line="57"/>
         <source>TextLabel</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message id="techview-update">
         <location filename="../ClientGUI/ui/techview.ui" line="83"/>
         <source>Update</source>
-        <translation type="unfinished"></translation>
+        <translation>Update</translation>
     </message>
     <message id="techview-localtech">
         <location filename="../ClientGUI/ui/techview.ui" line="96"/>
         <source>LocalTech:</source>
-        <translation type="unfinished"></translation>
+        <translation>LocalTech:</translation>
     </message>
     <message id="techview-na">
         <location filename="../ClientGUI/ui/techview.ui" line="106"/>
         <location filename="../ClientGUI/ui/techview.ui" line="130"/>
         <source>N/A</source>
-        <translation type="unfinished"></translation>
+        <translation>N/A</translation>
     </message>
     <message id="techview-skillpoints">
         <location filename="../ClientGUI/ui/techview.ui" line="120"/>
         <source>Skill Points:</source>
-        <translation type="unfinished"></translation>
+        <translation>Skill Points:</translation>
     </message>
     <message id="techview-select">
         <location filename="../ClientGUI/ui/techview.ui" line="200"/>
         <source>Select:</source>
-        <translation type="unfinished"></translation>
+        <translation>Select:</translation>
     </message>
     <message id="techview-type">
         <location filename="../ClientGUI/ui/techview.ui" line="227"/>
         <source>Type:</source>
-        <translation type="unfinished"></translation>
+        <translation>Type:</translation>
     </message>
     <message id="techview-equip-ship">
         <location filename="../ClientGUI/ui/techview.ui" line="147"/>
         <source>Equip/Ship:</source>
-        <translation type="unfinished"></translation>
+        <translation>Equip/Ship:</translation>
     </message>
     <message id="techview-equip">
         <location filename="../ClientGUI/ui/techview.ui" line="193"/>
         <source>Equipment:</source>
-        <translation type="unfinished"></translation>
+        <translation>Equipment:</translation>
     </message>
     <message id="techview-ship">
         <location filename="../ClientGUI/ui/techview.ui" line="160"/>
         <source>Ship:</source>
-        <translation type="unfinished"></translation>
+        <translation>Ship:</translation>
     </message>
 </context>
 </TS>

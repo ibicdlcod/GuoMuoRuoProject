@@ -410,7 +410,7 @@ bool Server::listen(const QHostAddress &address, quint16 port) {
 /* public slots */
 void Server::displayPrompt() {
     if(!listening)
-        qout << "CyberFleet$ ";
+        qout << "FleetMemories$ ";
     else {
         qout << sslServer.preSharedKeyIdentityHint()
              << "@" << sslServer.serverAddress().toString()
@@ -2377,6 +2377,7 @@ bool Server::shipRefresh() {
     }
     //% "Load ship registry success!"
     qInfo() << qtTrId("ship-load-good");
+    return true;
 }
 
 void Server::refreshClientFactory(CSteamID &uid, QSslSocket *connection) {

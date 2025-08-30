@@ -37,10 +37,10 @@ int main(int argc, char *argv[]) {
 #endif
 #pragma message(NOT_M_CONST)
     /* Metadata */
-    client.setApplicationName("CyberFleet");
+    client.setApplicationName("FleetMemories");
     client.setApplicationVersion("0.60.1"); // temp
     client.setOrganizationName("Harusame Software");
-    client.setOrganizationDomain("harusoft.xyz"); // temp
+    client.setOrganizationDomain("fleetmemories.moe"); // temp
     /* End Metadata */
 
     settings = std::make_unique<QSettings>(new QSettings);
@@ -77,7 +77,7 @@ int main(int argc, char *argv[]) {
         uiLanguages.prepend(settings->value("client/language").toString());
     }
     for (const QString &locale : uiLanguages) {
-        const QString baseName = "CyberFleet2_" + QLocale(locale).name();
+        const QString baseName = "FleetMemories_" + QLocale(locale).name();
         if (translator.load(":/i18n/" + baseName)) {
             client.installTranslator(&translator);
             break;

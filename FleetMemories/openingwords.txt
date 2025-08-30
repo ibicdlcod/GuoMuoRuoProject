@@ -1,4 +1,4 @@
-CyberFleet: An experiment on ship games
+FleetMemories: An experiment on ship games
 Copyright (C) 2024 Harusame Software
 
 This program is free software: you can redistribute it and/or modify

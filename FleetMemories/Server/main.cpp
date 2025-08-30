@@ -43,10 +43,10 @@ int main(int argc, char *argv[]) {
     Server server(argc, argv);
 
 #pragma message(NOT_M_CONST)
-    server.setApplicationName("CyberFleet Server");
-    server.setApplicationVersion("0.58.1"); // temp
+    server.setApplicationName("FleetMemories Server");
+    server.setApplicationVersion("0.60.1"); // temp
     server.setOrganizationName("Harusame Software");
-    server.setOrganizationDomain("harusoft.xyz"); // temp
+    server.setOrganizationDomain("fleetmemories.moe"); // temp
     settings = std::make_unique<QSettings>(new QSettings);
 
 #if defined(Q_OS_UNIX)
@@ -75,7 +75,7 @@ int main(int argc, char *argv[]) {
         uiLanguages.prepend(settings->value("server/language").toString());
     }
     for (const QString &locale : uiLanguages) {
-        const QString baseName = "CyberFleet2_" + QLocale(locale).name();
+        const QString baseName = "FleetMemories_" + QLocale(locale).name();
         if (translator.load(":/i18n/" + baseName)) {
             server.installTranslator(&translator);
             break;
