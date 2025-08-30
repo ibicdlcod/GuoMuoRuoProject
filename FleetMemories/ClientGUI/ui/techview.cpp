@@ -58,6 +58,9 @@ TechView::TechView(QWidget *parent) :
 
     ui->globalViewTable->setSortingEnabled(true);
     ui->localViewTable->setSortingEnabled(true);
+    ui->shipChoice->hide();
+    connect(ui->equipOrShip, &QPushButton::clicked,
+            this, &TechView::equipOrShip);
 }
 
 TechView::~TechView()
@@ -118,6 +121,22 @@ void TechView::demandSkillPoints(int index) {
     }
 }
 
+void TechView::equipOrShip() {
+    if(isEquipChoice) {
+        isEquipChoice = false;
+        //% "Switch to Equip"
+        ui->equipOrShip->setText(qtTrId("techview-toequip"));
+        ui->equipChoice->hide();
+        ui->shipChoice->show();
+    }
+    else {
+        isEquipChoice = true;
+        ui->equipOrShip->setText(qtTrId("techview-toship"));
+        ui->equipChoice->show();
+        ui->shipChoice->hide();
+    }
+}
+
 void TechView::updateGlobalTech(const QJsonObject &djson) {
     ui->globalTechValue->setText(
         QString::number(djson.value("value").toDouble()));
@@ -142,7 +161,7 @@ void TechView::updateGlobalTechViewTable(const QJsonObject &djson) {
         ui->waitText->show();
         ui->waitText->setWordWrap(true);
         ui->waitText->setText(
-            QStringLiteral("updating equipment data, please wait..."));
+            QStringLiteral("updating ship data, please wait..."));
         engine.demandShipCache();
         return;
     }
@@ -168,33 +187,57 @@ void TechView::updateGlobalTechViewTable(const QJsonObject &djson) {
         QTableWidgetItem *newItem = new QTableWidgetItem(
             item["serial"].toString().first(9).last(8));
         newItem->setFlags(newItem->flags() & ~Qt::ItemIsEditable);
+        newItem->setToolTip(item["serial"].toString());
         ui->globalViewTable->setItem(currentRowCount + i, 0, newItem);
 
-        QTableWidgetItem *newItem2;
-        Equipment *thisEquip = engine.getEquipmentReg(item["def"].toInt());
-        if(thisEquip->isInvalid()) {
-            newItem2 = new QTableWidgetItem(
-                QString::number(item["def"].toInt()));
+        Equipment *thisEquip = nullptr;
+        Ship *thisShip = nullptr;
+        if(item["def"].toInt() < KP::equipIdMax) {
+            thisEquip = engine.getEquipmentReg(item["def"].toInt());
         }
         else {
+            thisShip = engine.getShipReg(item["def"].toInt());
+        }
+        if(thisEquip && !thisEquip->isInvalid()) {
+            QTableWidgetItem *newItem2;
             newItem2 = new QTableWidgetItem(
                 thisEquip->toString(settings->value("language", "ja_JP").toString()));
+            newItem2->setIcon(Icute::equipIcon(thisEquip->type, false));
+            newItem2->setFlags(newItem->flags() & ~Qt::ItemIsEditable);
+            ui->globalViewTable->setItem(currentRowCount + i, 1, newItem2);
+            QTableWidgetItem *newItem3 = new TableWidgetItemNumber(
+                    thisEquip->getTech());
+            newItem3->setFlags(newItem->flags() & ~Qt::ItemIsEditable);
+            ui->globalViewTable->setItem(currentRowCount + i, 2, newItem3);
+            QTableWidgetItem *newItem4 = new TableWidgetItemNumber(
+                item["weight"].toDouble());
+            newItem4->setFlags(newItem->flags() & ~Qt::ItemIsEditable);
+            ui->globalViewTable->setItem(currentRowCount + i, 3, newItem4);
+            QTableWidgetItem *newItem5 = new TableWidgetItemNumber(
+                thisEquip->type.getTypeSort());
+            newItem5->setFlags(newItem->flags() & ~Qt::ItemIsEditable);
+            ui->globalViewTable->setItem(currentRowCount + i, 4, newItem5);
         }
-        newItem2->setIcon(Icute::equipIcon(thisEquip->type, false));
-        newItem2->setFlags(newItem->flags() & ~Qt::ItemIsEditable);
-        ui->globalViewTable->setItem(currentRowCount + i, 1, newItem2);
-        QTableWidgetItem *newItem3 = new TableWidgetItemNumber(
-            thisEquip->getTech());
-        newItem3->setFlags(newItem->flags() & ~Qt::ItemIsEditable);
-        ui->globalViewTable->setItem(currentRowCount + i, 2, newItem3);
-        QTableWidgetItem *newItem4 = new TableWidgetItemNumber(
-            item["weight"].toDouble());
-        newItem4->setFlags(newItem->flags() & ~Qt::ItemIsEditable);
-        ui->globalViewTable->setItem(currentRowCount + i, 3, newItem4);
-        QTableWidgetItem *newItem5 = new TableWidgetItemNumber(
-            thisEquip->type.getTypeSort());
-        newItem5->setFlags(newItem->flags() & ~Qt::ItemIsEditable);
-        ui->globalViewTable->setItem(currentRowCount + i, 4, newItem5);
+        if(thisShip) {
+            QTableWidgetItem *newItem2;
+            newItem2 = new QTableWidgetItem(
+                thisShip->toString(settings->value("language", "ja_JP").toString()));
+            newItem2->setIcon(Icute::shipIcon(thisShip->getId(), false));
+            newItem2->setFlags(newItem->flags() & ~Qt::ItemIsEditable);
+            ui->globalViewTable->setItem(currentRowCount + i, 1, newItem2);
+            QTableWidgetItem *newItem3 = new TableWidgetItemNumber(
+                thisShip->getTech());
+            newItem3->setFlags(newItem->flags() & ~Qt::ItemIsEditable);
+            ui->globalViewTable->setItem(currentRowCount + i, 2, newItem3);
+            QTableWidgetItem *newItem4 = new TableWidgetItemNumber(
+                item["weight"].toDouble());
+            newItem4->setFlags(newItem->flags() & ~Qt::ItemIsEditable);
+            ui->globalViewTable->setItem(currentRowCount + i, 3, newItem4);
+            QTableWidgetItem *newItem5 = new TableWidgetItemNumber(
+                -(thisShip->getId()));
+            newItem5->setFlags(newItem->flags() & ~Qt::ItemIsEditable);
+            ui->globalViewTable->setItem(currentRowCount + i, 4, newItem5);
+        }
         ++i;
     }
     ui->globalViewTable->setHorizontalHeaderLabels(

@@ -10,6 +10,7 @@ namespace Icute
  * otherwith both Protocol and Server must depend on Qt::Gui
  */
 QIcon equipIcon(EquipType, bool);
+QIcon shipIcon(int, bool);
 };
 
 #endif // EQUIPICON_H

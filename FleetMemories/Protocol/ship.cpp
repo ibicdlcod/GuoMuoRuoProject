@@ -111,3 +111,8 @@ ShipType Ship::getType() const {
 bool Ship::isAmnesiac() const {
     return Utility::checkMask(shipRegId, 0xF0000000, 0x70000000);
 }
+
+int Ship::getLevel(int exp) {
+    /* inverse of y = x(x-1)/2 */
+    return std::floor((1.0 + pow(1.0 + 8.0 * (exp / 100.0), 0.5))/ 2.0);
+}

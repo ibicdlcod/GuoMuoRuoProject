@@ -24,6 +24,8 @@ public:
     ShipType getType() const;
     bool isAmnesiac() const;
 
+    static int getLevel(int);
+
     QMap<QString, QString> localNames;
     QMap<QString, int> attr;
     QStringList customflags; // unused for now

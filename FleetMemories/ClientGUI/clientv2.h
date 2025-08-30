@@ -113,6 +113,7 @@ public slots:
     void doRefreshFactory();
     void doRefreshFactoryArsenal();
     Equipment * getEquipmentReg(int);
+    Ship * getShipReg(int);
     bool parse(const QString &);
     void parseDisconnectReq();
     void parseQuit();

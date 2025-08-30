@@ -600,82 +600,136 @@ void Server::handleNewConnection(){
 std::pair<double, QList<TechEntry>>
 Server::calculateTech(const CSteamID &uid, int jobID) {
     QMap<QUuid, Equipment *> equips;
+    QMap<QUuid, Ship *> ships;
     QList<int> childIDs = QList<int>();
     bool isEquip = (jobID != 0 && jobID < KP::equipIdMax);
+    bool isShip = (jobID != 0 && jobID >= KP::equipIdMax);
     if(isEquip) {
         childIDs = equipChildTree.values(jobID);
     }
     QList<TechEntry> result;
+    QList<std::pair<double, double>> source;
     try{
         QSqlDatabase db = QSqlDatabase::database();
-        QSqlQuery query;
-        query.prepare("SELECT EquipDef, EquipUuid"
-                      " FROM UserEquip WHERE User = :id;");
-        query.bindValue(":id", uid.ConvertToUint64());
-        if(!query.exec() || !query.isSelect()) {
-            //% "Calculate technology for user %1 failed!"
-            throw DBError(qtTrId("user-calculate-tech-failed")
-                              .arg(uid.ConvertToUint64()),
-                          query.lastError());
-        }
-        else {
-            /* dump equip tech data into equips */
-            QList<std::pair<double, double>> source;
-            QUuid serial;
-            int def;
-            double weight;
-            bool pass;
-            while(query.next()) {
-                pass = jobID == 0;
-                serial = query.value(1).toUuid();
-                def = query.value(0).toInt();
-                weight
-                    = 1.0 + getSkillPointsEffect(uid, def)
-                                * settings->value
-                                  ("rule/skillpointweightcontrib", 9.0)
-                                      .toDouble();
-                if(weight < 0.0)
-                    weight = 0.0;
-                equips[serial] =
-                    equipRegistry.value(def);
-                if(isEquip) {
-                    if(!equipRegistry.contains(jobID)) {
-                        //% "Local technology computation failed due to bad equipment ID!"
-                        qCritical() << qtTrId("local-tech-bad-equipdef");
-                        pass = false;
+        if(isEquip || jobID == 0) {
+            QSqlQuery query;
+            query.prepare("SELECT EquipDef, EquipUuid"
+                          " FROM UserEquip WHERE User = :id;");
+            query.bindValue(":id", uid.ConvertToUint64());
+            if(!query.exec() || !query.isSelect()) {
+                qCritical() << query.lastQuery();
+                //% "Calculate technology for user %1 failed!"
+                throw DBError(qtTrId("user-calculate-tech-failed")
+                                  .arg(uid.ConvertToUint64()),
+                              query.lastError());
+            }
+            else {
+                /* dump equip tech data into equips */
+                QUuid serial;
+                int def;
+                double weight;
+                bool pass;
+                while(query.next()) {
+                    pass = jobID == 0;
+                    serial = query.value(1).toUuid();
+                    def = query.value(0).toInt();
+                    double x = User::getSkillPoints(uid, def);
+                    double y = equipRegistry.value(def)->skillPointsStd();
+                    weight = Tech::calWeightEquip(y, x);
+                    if(weight < 0.0)
+                        weight = 0.0;
+                    equips[serial] =
+                        equipRegistry.value(def);
+                    if(isEquip) {
+                        if(!equipRegistry.contains(jobID)) {
+                            //% "Local technology computation failed due to bad equipment ID!"
+                            qCritical() << qtTrId("local-tech-bad-equipdef");
+                            pass = false;
+                        }
+                        if(def == equipRegistry[jobID]->attr["Father"])
+                            pass = true;
+                        if(def == jobID)
+                            pass = true;
+                        if(childIDs.contains(def))
+                            pass = true;
                     }
-                    if(def == equipRegistry[jobID]->attr["Father"])
-                        pass = true;
-                    if(def == jobID)
-                        pass = true;
-                    if(childIDs.contains(def))
-                        pass = true;
+
+                    if(pass) {
+                        result.append({serial, def, weight});
+                        source.append({equips.value(serial)->getTech(),
+                                       weight});
+                    }
                 }
-                if(pass) {
-                    result.append({serial, def, weight});
-                    source.append({equips.value(serial)->getTech(), weight});
+
+            /* 2-Technology.md#Local technology */
+            virtual_skill_point_effect:
+                if(isEquip) {
+                    double weight = getSkillPointsEffect(uid, jobID)
+                                    * settings->value
+                                      ("rule/skillpointweightcontrib", 9.0)
+                                          .toDouble();
+                    if(weight < 0.0)
+                        weight = 0.0;
+                    if(equipRegistry.value(jobID)->disallowMassProduction()){
+                        /* better hide this */
+                        //result.append({QUuid(), jobID, weight});
+                        source.append({equipRegistry.value(jobID)->getTech(),
+                                       weight});
+                    }
+                }
+
+                if(jobID != 0) {
+                    return {Tech::calLevelLocal(source), result};
                 }
             }
-
-        /* 2-Technology.md#Local technology */
-        virtual_skill_point_effect:
-            if(isEquip) {
-                double weight = getSkillPointsEffect(uid, jobID)
-                                * settings->value
-                                  ("rule/skillpointweightcontrib", 9.0)
-                                      .toDouble();
-                if(weight < 0.0)
-                    weight = 0.0;
-                if(equipRegistry.value(jobID)->disallowMassProduction()){
-                    /* better hide this */
-                    //result.append({QUuid(), jobID, weight});
-                    source.append({equipRegistry.value(jobID)->getTech(),
-                                   weight});
+        }
+        if (isShip || jobID == 0) {
+            QSqlQuery query;
+            query.prepare("SELECT ShipDef, ShipUuid, Exp, ExpCap"
+                          " FROM UserShip WHERE User = :id;");
+            query.bindValue(":id", uid.ConvertToUint64());
+            if(!query.exec() || !query.isSelect()) {
+                qCritical() << query.lastQuery();
+                //% "Calculate technology for user %1 failed!"
+                throw DBError(qtTrId("user-calculate-tech-failed")
+                                  .arg(uid.ConvertToUint64()),
+                              query.lastError());
+            }
+            else {
+                /* dump ship tech data into ships */
+                QUuid serial;
+                int def;
+                double weight;
+                bool pass;
+                int exp;
+                int level;
+                while(query.next()) {
+                    pass = jobID == 0;
+                    serial = query.value(1).toUuid();
+                    def = query.value(0).toInt();
+                    exp = std::min(query.value(2).toInt(),
+                                   query.value(3).toInt());
+                    level = Ship::getLevel(exp);
+                    weight = Tech::calWeightShip(level);
+                    ships[serial] =
+                        shipRegistry.value(def);
+                    if(isShip) {
+                        if(def == jobID)
+                            pass = true;
+                    }
+                    if(pass) {
+                        result.append({serial, def, weight});
+                        source.append({ships.value(serial)->getTech(),
+                                       weight});
+                    }
+                }
+                if(jobID != 0) {
+                    return {Tech::calLevelLocal(source), result};
                 }
             }
-
-            return {jobID == 0 ? Tech::calLevelGlobal(source)
-                               : Tech::calLevelLocal(source), result};
+        }
+        if (jobID == 0) {
+            return {Tech::calLevelGlobal(source), result};
         }
     } catch (DBError &e) {
         for(QString &i : e.whats()) {
@@ -864,6 +918,7 @@ void Server::offerTechInfo(QSslSocket *connection, const CSteamID &uid,
 void Server::offerTechInfoComponents(
     QSslSocket *connection, const QList<TechEntry> &content,
     bool initial, bool global) {
+    Q_UNUSED(initial)
     /* see e337bb37ef2ee656321dc9688679a6c6f118cc16 for previous version
      * if this stopped working */
     connection->flush();
@@ -2475,7 +2530,7 @@ void Server::receivedReq(const QJsonObject &djson,
                            {offerShipInfoUser(uid, connection);});
     }
     break;
-    case KP::CommandType::DemandGlobalTech: {
+    case KP::CommandType::DemandTech: {
         QTimer::singleShot(100,
                            this,
                            [connection, uid, djson, this]
@@ -2537,6 +2592,10 @@ void Server::sendTestMessages() {
         qWarning() << "Server isn't listening, abort.";
     }
     else {
+        for(int i = 0; i < 496000; i = i + 100) {
+            ;
+        }
+        /*
         for(auto user: connectedUsers) {
             if(!User::isSuperUser(user)) {
                 continue;
@@ -2545,10 +2604,7 @@ void Server::sendTestMessages() {
                 generateTestShip(user);
             }
         }
-        /*
-        for(auto equip: std::as_const(equipRegistry)) {
-            qInfo() << equip->localNames["ja_JP"];
-        }*/
+*/
     }
 }
 

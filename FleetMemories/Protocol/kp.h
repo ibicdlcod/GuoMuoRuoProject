@@ -127,7 +127,7 @@ enum CommandType{
     DemandEquipInfoUser,
     DemandShipInfo,
     DemandShipInfoUser,
-    DemandGlobalTech,
+    DemandTech,
     DemandSkillPoints,
     DemandResourceUpdate,
     DestructEquip,

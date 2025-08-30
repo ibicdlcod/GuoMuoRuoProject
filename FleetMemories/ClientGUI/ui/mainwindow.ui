@@ -364,16 +364,6 @@ border-style: none;</string>
      <string id="menu-fleet">Fleet</string>
     </property>
    </widget>
-   <widget class="QMenu" name="menuSupply">
-    <property name="title">
-     <string id="menu-supply">Supply</string>
-    </property>
-   </widget>
-   <widget class="QMenu" name="menuRefit">
-    <property name="title">
-     <string id="menu-refit">Refit</string>
-    </property>
-   </widget>
    <widget class="QMenu" name="menuDock">
     <property name="title">
      <string id="menu-dock">Dock</string>
@@ -405,8 +395,6 @@ border-style: none;</string>
    <addaction name="menuTech"/>
    <addaction name="menuSortie"/>
    <addaction name="menuFleet"/>
-   <addaction name="menuSupply"/>
-   <addaction name="menuRefit"/>
    <addaction name="menuDock"/>
    <addaction name="menuFactory"/>
   </widget>

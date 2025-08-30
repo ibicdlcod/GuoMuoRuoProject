@@ -718,6 +718,13 @@ Equipment * Clientv2::getEquipmentReg(int equipid) {
         return equipRegistryCache.value(equipid);
 }
 
+Ship * Clientv2::getShipReg(int equipid) {
+    if(!shipRegistryCache.contains(equipid))
+        return new Ship(0);
+    else
+        return shipRegistryCache.value(equipid);
+}
+
 /* Exit */
 void Clientv2::exitGracefully() {
     exitGraceSpec();

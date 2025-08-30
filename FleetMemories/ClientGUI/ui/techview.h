@@ -27,6 +27,7 @@ protected:
     void showEvent(QShowEvent *event) override;
 
 private slots:
+    void equipOrShip();
     void updateGlobalTech(const QJsonObject &);
     void updateGlobalTechViewTable(const QJsonObject &);
     void updateLocalTech(const QJsonObject &);
@@ -37,6 +38,7 @@ private:
     void resizeColumns(bool);
 
     Ui::TechView *ui;
+    bool isEquipChoice = true;
 };
 
 class TableWidgetItemNumber: public QTableWidgetItem {

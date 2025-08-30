@@ -126,5 +126,13 @@
         <file>resources/navigation/next_dark.svg</file>
         <file>resources/navigation/prev_dark.svg</file>
         <file>resources/map/globe.png</file>
+        <file>resources/shiptype/BB.png</file>
+        <file>resources/shiptype/CA.png</file>
+        <file>resources/shiptype/CL.png</file>
+        <file>resources/shiptype/CV.png</file>
+        <file>resources/shiptype/DD.png</file>
+        <file>resources/shiptype/DE.png</file>
+        <file>resources/shiptype/OTH.png</file>
+        <file>resources/shiptype/SS.png</file>
     </qresource>
 </RCC>
