@@ -56,6 +56,7 @@
 #include "../Protocol/receiver.h"
 #include "../Protocol/sender.h"
 #include "../Protocol/kp.h"
+#include "../Protocol/ship.h"
 #include "steamauth.h"
 #include "ui/developwindow.h"
 #include "ui/techview.h"
@@ -160,7 +161,9 @@ private:
     void doAddEquip(const QStringList &);
     void doDevelop(const QStringList &);
     void doDeleteTestEquip();
+    void doDeleteTestShip();
     void doGenerateTestEquip();
+    void doGenerateTestShip();
     void doSwitch(const QStringList &);
     void exitGracefully();
     void exitGraceSpec();
@@ -186,6 +189,7 @@ private:
     void showCommands(bool);
     void switchCert(const QStringList &);
     void updateEquipCache(const QJsonObject &);
+    void updateShipCache(const QJsonObject &);
 
     explicit Clientv2(QObject * parent = nullptr);
 
@@ -210,7 +214,7 @@ private:
 
     QMap<int, Equipment *> equipRegistryCache;
     bool equipRegistryCacheGood = false;
-    QMap<int, Equipment *> shipRegistryCache;
+    QMap<int, Ship *> shipRegistryCache;
     bool shipRegistryCacheGood = false;
 
     QHttpServer migrateServer;

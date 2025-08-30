@@ -121,8 +121,12 @@ enum CommandType{
     Adminaddequip,
     Admingenerateequips,
     Adminremoveequips,
+    Admingenerateships,
+    Adminremoveships,
     DemandEquipInfo,
     DemandEquipInfoUser,
+    DemandShipInfo,
+    DemandShipInfoUser,
     DemandGlobalTech,
     DemandSkillPoints,
     DemandResourceUpdate,
@@ -163,7 +167,9 @@ enum InfoType{
     GlobalTechInfo,
     LocalTechInfo,
     SkillPointInfo,
-    ResourceInfo
+    ResourceInfo,
+    ShipInfo,
+    ShipInfoUser
 };
 Q_ENUM_NS(InfoType)
 
@@ -199,11 +205,17 @@ QByteArray catbomb();
 QByteArray clientAddEquip(int);
 QByteArray clientAdminTestEquip();
 QByteArray clientAdminTestEquipRemove();
+QByteArray clientAdminTestShip();
+QByteArray clientAdminTestShipRemove();
 QByteArray clientDemandDestructEquip(const QList<QUuid> &);
 QByteArray clientDemandEquipInfo(QDateTime timeUtc
                                  = QDateTime(QDate(1970, 1, 1),
                                              QTime(0, 0, 0)));
 QByteArray clientDemandEquipInfoUser();
+QByteArray clientDemandShipInfo(QDateTime timeUtc
+                                = QDateTime(QDate(1970, 1, 1),
+                                            QTime(0, 0, 0)));
+QByteArray clientDemandShipInfoUser();
 QByteArray clientDemandTech(int local = 0);
 QByteArray clientDemandResourceUpdate();
 QByteArray clientDemandSkillPoints(int);
@@ -237,6 +249,9 @@ QByteArray serverParseError(MsgType, const QString &,
                             const QString &);
 QByteArray serverPenguin();
 QByteArray serverResourceUpdate(ResOrd);
+QByteArray serverShipInfo(const QJsonArray &, bool user = false,
+                           QDateTime timeUtc = QDateTime::currentDateTimeUtc(),
+                           bool cacheHit = false);
 QByteArray serverSkillPoints(int, int64, int64);
 QByteArray serverSuccess();
 QByteArray serverTestMessages(int);

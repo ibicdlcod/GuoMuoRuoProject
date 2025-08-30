@@ -81,6 +81,22 @@ QByteArray KP::clientAdminTestEquipRemove() {
     return QCborValue::fromJsonValue(result).toCbor();
 }
 
+QByteArray KP::clientAdminTestShip() {
+    QJsonObject result;
+    result["type"] = DgramType::Request;
+    result["command"] = CommandType::Admingenerateships;
+    result["remove"] = false;
+    return QCborValue::fromJsonValue(result).toCbor();
+}
+
+QByteArray KP::clientAdminTestShipRemove() {
+    QJsonObject result;
+    result["type"] = DgramType::Request;
+    result["command"] = CommandType::Admingenerateships;
+    result["remove"] = true;
+    return QCborValue::fromJsonValue(result).toCbor();
+}
+
 QByteArray KP::clientDemandDestructEquip(const QList<QUuid> &trash) {
     QJsonObject result;
     result["type"] = DgramType::Request;
@@ -100,6 +116,15 @@ QByteArray KP::clientDemandEquipInfo(QDateTime timeUtc) {
     result["timestamp"] = timeUtc.toString();
     return QCborValue::fromJsonValue(result).toCbor();
 }
+
+QByteArray KP::clientDemandShipInfo(QDateTime timeUtc) {
+    QJsonObject result;
+    result["type"] = DgramType::Request;
+    result["command"] = CommandType::DemandShipInfo;
+    result["timestamp"] = timeUtc.toString();
+    return QCborValue::fromJsonValue(result).toCbor();
+}
+
 
 QByteArray KP::clientDemandEquipInfoUser() {
     QJsonObject result;
@@ -377,6 +402,22 @@ QByteArray KP::serverResourceUpdate(ResOrd ordinary) {
     result["al"] = ordinary.a;
     result["w"] = ordinary.w;
     result["cr"] = ordinary.c;
+    return QCborValue::fromJsonValue(result).toCbor();
+}
+
+QByteArray KP::serverShipInfo(const QJsonArray &input, bool user,
+                               QDateTime timeUtc, bool cacheHit) {
+    QJsonObject result;
+    result["type"] = DgramType::Info;
+    if(user)
+        result["infotype"] = InfoType::ShipInfoUser;
+    else {
+        result["infotype"] = InfoType::ShipInfo;
+        result["timestamp"] = timeUtc.toString();
+    }
+    if(!cacheHit) {
+        result["content"] = input;
+    }
     return QCborValue::fromJsonValue(result).toCbor();
 }
 

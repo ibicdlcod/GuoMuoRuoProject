@@ -207,10 +207,8 @@ void Clientv2::demandShipCache() {
                                                     QDateTime(QDate(1970,01,01),
                                                               QTime(0, 0, 0))
                                                     ).toDateTime();
-    shipRegistryCacheGood = true;
-    emit shipRegistryComplete();
-    //QByteArray msg = KP::clientDemandShipInfo(localCacheTimeStamp);
-    //sender->enqueue(msg);
+    QByteArray msg = KP::clientDemandShipInfo(localCacheTimeStamp);
+    sender->enqueue(msg);
 }
 
 /* Originally used in CLI */
@@ -623,15 +621,27 @@ void Clientv2::doDevelop(const QStringList &cmdParts) {
     }
 }
 
-/* Admin delete all of test equips */
+/* Admin delete all equips */
 void Clientv2::doDeleteTestEquip() {
     QByteArray msg = KP::clientAdminTestEquipRemove();
+    sender->enqueue(msg);
+}
+
+/* Admin delete all ships */
+void Clientv2::doDeleteTestShip() {
+    QByteArray msg = KP::clientAdminTestShipRemove();
     sender->enqueue(msg);
 }
 
 /* Admin generate a bunch of test equips */
 void Clientv2::doGenerateTestEquip() {
     QByteArray msg = KP::clientAdminTestEquip();
+    sender->enqueue(msg);
+}
+
+/* Admin generate a bunch of test ships */
+void Clientv2::doGenerateTestShip() {
+    QByteArray msg = KP::clientAdminTestShip();
     sender->enqueue(msg);
 }
 
@@ -874,6 +884,12 @@ bool Clientv2::parseGameCommands(const QString &primary,
     case KP::Adminremoveequips:
         doDeleteTestEquip();
         return true;
+    case KP::Admingenerateships:
+        doGenerateTestShip();
+        return true;
+    case KP::Adminremoveships:
+        doDeleteTestShip();
+        return true;
     case KP::Refresh:
         if(cmdParts.length() > 1
             && cmdParts[1].compare("Factory", Qt::CaseInsensitive) == 0) {
@@ -963,9 +979,15 @@ void Clientv2::receivedAuth(const QJsonObject &djson) {
 /* Part of parser */
 void Clientv2::receivedInfo(const QJsonObject &djson) {
     switch(djson["infotype"].toInt()) {
-    case KP::InfoType::FactoryInfo: emit receivedFactoryRefresh(djson); break;
-    case KP::InfoType::EquipInfo: updateEquipCache(djson); break;
-    case KP::InfoType::EquipInfoUser: emit receivedArsenalEquip(djson); break;
+    case KP::InfoType::FactoryInfo:
+        emit receivedFactoryRefresh(djson);
+        break;
+    case KP::InfoType::EquipInfo:
+        updateEquipCache(djson);
+        break;
+    case KP::InfoType::EquipInfoUser:
+        emit receivedArsenalEquip(djson);
+        break;
     case KP::InfoType::GlobalTechInfo:
         if(djson.contains("value"))
             emit receivedGlobalTechInfo(djson);
@@ -985,6 +1007,11 @@ void Clientv2::receivedInfo(const QJsonObject &djson) {
         break;
     case KP::InfoType::ResourceInfo:
         emit receivedResourceInfo(djson);
+        break;
+    case KP::InfoType::ShipInfo:
+        updateShipCache(djson);
+        break;
+    case KP::InfoType::ShipInfoUser:
         break;
     default: throw std::domain_error("info type not supported"); break;
     }
@@ -1421,4 +1448,34 @@ void Clientv2::updateEquipCache(const QJsonObject &input) {
 
     equipRegistryCacheGood = true;
     emit equipRegistryComplete();
+}
+
+void Clientv2::updateShipCache(const QJsonObject &input) {
+    QJsonObject cachedInput;
+    if(!input.contains("content")) {
+        cachedInput
+            = settings->value("client/shipdbcache").toJsonObject();
+    }
+    else {
+        settings->setValue("client/shipdbtimestamp",
+                           QDateTime::fromString(
+                               input["timestamp"].toString()));
+        settings->setValue("client/shipdbcache",
+                           input);
+        cachedInput = input;
+    }
+    QJsonArray shipDefs = cachedInput["content"].toArray();
+    for(auto shipDef: shipDefs) {
+        QJsonObject shipDValue = shipDef.toObject();
+        int sid = shipDValue.value("sid").toInt();
+        shipRegistryCache[sid] = new Ship(shipDValue);
+    }
+
+    //% "Ship cache length: %1"
+    qDebug() << qtTrId("shipment-cache-length")
+                    .arg(Clientv2::getInstance()
+                             .shipRegistryCache.size());
+
+    shipRegistryCacheGood = true;
+    emit shipRegistryComplete();
 }

@@ -97,6 +97,8 @@ private slots:
     void offerTechInfoComponents(QSslSocket *, const QList<TechEntry> &,
                                    bool, bool);
     void offerResourceInfo(QSslSocket *, const CSteamID &);
+    void offerShipInfo(QSslSocket *, int);
+    void offerShipInfoUser(const CSteamID &, QSslSocket *);
     void offerSPInfo(QSslSocket *, const CSteamID &, int);
     void pskRequired(QSslSocket *, QSslPreSharedKeyAuthenticator *);
     void senderMErrorMessage(const QString &);
@@ -138,17 +140,18 @@ private:
     QList<QUuid> retireEquip(const CSteamID &, const QList<QUuid> &);
     void sendTestMessages();
     [[nodiscard]] bool shipRefresh();
-    void sqlinit();
-    void sqlinitEquip();
-    void sqlinitEquipName();
-    void sqlinitEquipSP();
-    void sqlinitEquipU();
-    void sqlinitFacto();
-    void sqlinitMapNode();
-    void sqlinitMapRelation();
-    void sqlinitMapResource();
-    void sqlinitShip();
-    void sqlinitShipName();
+    void sqlinit() const;
+    void sqlinitEquip() const;
+    void sqlinitEquipName() const;
+    void sqlinitEquipSP() const;
+    void sqlinitEquipU() const;
+    void sqlinitFacto() const;
+    void sqlinitMapNode() const;
+    void sqlinitMapRelation() const;
+    void sqlinitMapResource() const;
+    void sqlinitShip() const;
+    void sqlinitShipName() const;
+    void sqlinitShipU() const;
     void sqlinitUsers() const;
     void sqlinitUserA() const;
     void switchCert(const QStringList &);

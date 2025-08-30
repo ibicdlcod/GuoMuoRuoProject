@@ -257,6 +257,45 @@ Q_GLOBAL_STATIC(QString,
                     ");"
                     ));
 
+/* Ship of users */
+Q_GLOBAL_STATIC(QString,
+                userShip,
+                QStringLiteral(
+                    "CREATE TABLE UserShip ("
+                    "User BLOB NOT NULL, "
+                    "ShipUuid TEXT PRIMARY KEY, "
+                    "ShipDef INTEGER NOT NULL, "
+                    "Star INTEGER DEFAULT 0, "
+                    "CurrentHP INTEGER DEFAULT 1, "
+                    "Condition INTEGER DEFAULT 480, "
+                    "CondRecovTime INTEGER, "
+                    "Exp INTEGER DEFAULT 0, "
+                    // does not prevent gaining of more Exp but only its effects
+                    "ExpCap INTEGER DEFAULT 0, "
+                    "Slot1 TEXT, "
+                    "Slot2 TEXT, "
+                    "Slot3 TEXT, "
+                    "Slot4 TEXT, "
+                    "Slot5 TEXT, "
+                    "SlotEX TEXT, "
+                    "Slot1Planes INTEGER DEFAULT 0, "
+                    "Slot2Planes INTEGER DEFAULT 0, "
+                    "Slot3Planes INTEGER DEFAULT 0, "
+                    "Slot4Planes INTEGER DEFAULT 0, "
+                    "Slot5Planes INTEGER DEFAULT 0, "
+                    "FleetIndex INTEGER DEFAULT 0, "
+                    "FleetPosIndex INTEGER DEFAULT 0, "
+                    "FOREIGN KEY(User) REFERENCES NewUsers(UserID),"
+                    "FOREIGN KEY(ShipDef) REFERENCES ShipName(ShipID)"
+                    "FOREIGN KEY(Slot1) REFERENCES UserEquip(EquipUuid)"
+                    "FOREIGN KEY(Slot2) REFERENCES UserEquip(EquipUuid)"
+                    "FOREIGN KEY(Slot3) REFERENCES UserEquip(EquipUuid)"
+                    "FOREIGN KEY(Slot4) REFERENCES UserEquip(EquipUuid)"
+                    "FOREIGN KEY(Slot5) REFERENCES UserEquip(EquipUuid)"
+                    "FOREIGN KEY(SlotEX) REFERENCES UserEquip(EquipUuid)"
+                    ");"
+                    ));
+
 /* Not customized, since set this lesser than 60 creates problems */
 const int elapsedMaxTolerance = steamRateLimit;
 
@@ -752,6 +791,50 @@ void Server::offerResourceInfo(QSslSocket *connection,
     connection->flush();
     senderM.sendMessage(connection, msg);
     connection->flush();
+}
+
+void Server::offerShipInfo(QSslSocket *connection, int index = 0) {
+    Q_UNUSED(index)
+    QJsonArray shipInfos;
+    int i = 0;
+    for(auto shipIdIter = shipRegistry.keyBegin();
+         shipIdIter != shipRegistry.keyEnd();
+         ++shipIdIter, ++i) {
+        auto shipid = *shipIdIter;
+        QJsonObject result;
+        result["sid"] = shipid;
+        Ship *e = shipRegistry.value(shipid);
+        QJsonObject ename;
+        for(auto lang = e->localNames.keyValueBegin();
+             lang != e->localNames.keyValueEnd();
+             ++lang) {
+            ename[lang->first] = lang->second;
+        }
+        result["name"] = ename;
+        QJsonObject attrs;
+        for(auto a = e->attr.keyValueBegin();
+             a != e->attr.keyValueEnd();
+             ++a) {
+            attrs[a->first] = a->second;
+        }
+        result["attr"] = attrs;
+        shipInfos.append(result);
+    }
+    connection->flush();
+    QByteArray msg =
+        KP::serverShipInfo(shipInfos,
+                           false,
+                           settings->value("server/shipdbtimestamp",
+                                           QDateTime::currentDateTimeUtc()
+                                           ).toDateTime()
+                           );
+    senderM.sendMessage(connection, msg);
+    connection->flush();
+}
+
+void Server::offerShipInfoUser(const CSteamID &uid,
+                               QSslSocket *connection) {
+
 }
 
 void Server::offerSPInfo(QSslSocket *connection,
@@ -2280,14 +2363,39 @@ void Server::receivedReq(const QJsonObject &djson,
                            {offerEquipInfoUser(uid, connection);});
     }
     break;
+    case KP::CommandType::DemandShipInfo: {
+        auto clientTime = QDateTime::fromString(djson["timestamp"].toString());
+        auto serverTime = settings->value("server/shipdbtimestamp").toDateTime();
+        qint64 diff = clientTime.msecsTo(serverTime);
+        if(diff > settings->value("server/cachetolerancemsec", 10000).toInt()) {
+            QTimer::singleShot(100,
+                               this,
+                               [connection, this]{offerShipInfo(connection);});
+
+        }
+        else {
+            connection->flush();
+            QByteArray msg =
+                KP::serverShipInfo(QJsonArray(),
+                                   false,
+                                   settings->value("server/shipdbtimestamp",
+                                                   QDateTime::currentDateTimeUtc()
+                                                   ).toDateTime(),
+                                   true
+                                   );
+            senderM.sendMessage(connection, msg);
+            connection->flush();
+        }
+    }
+    break;
     case KP::CommandType::DemandGlobalTech: {
         QTimer::singleShot(100,
                            this,
                            [connection, uid, djson, this]
                            {offerTechInfo(
-                                 connection,
-                                 uid,
-                                 djson["local"].toInt());});
+                  connection,
+                  uid,
+                  djson["local"].toInt());});
     }
     break;
     case KP::CommandType::DemandSkillPoints: {
@@ -2295,9 +2403,9 @@ void Server::receivedReq(const QJsonObject &djson,
                            this,
                            [connection, uid, djson, this]
                            {offerSPInfo(
-                                 connection,
-                                 uid,
-                                 djson["equipid"].toInt());});
+                  connection,
+                  uid,
+                  djson["equipid"].toInt());});
     }
     break;
     case KP::CommandType::DemandResourceUpdate: {
@@ -2305,8 +2413,8 @@ void Server::receivedReq(const QJsonObject &djson,
                            this,
                            [connection, uid, this]
                            {offerResourceInfo(
-                                 connection,
-                                 uid);});
+                  connection,
+                  uid);});
     }
     break;
     case KP::CommandType::DestructEquip: {
@@ -2465,7 +2573,7 @@ QList<QUuid> Server::retireEquip(const CSteamID &uid, const QList<QUuid> &trash)
     return result;
 }
 
-void Server::sqlinit() {
+void Server::sqlinit() const {
     /* User QSqlDatabase db = QSqlDatabase::database();
      * to access database in elsewhere */
     QSqlDatabase db =
@@ -2524,10 +2632,13 @@ void Server::sqlinit() {
         if(!tables.contains("MapResource")) {
             sqlinitMapResource();
         }
+        if(!tables.contains("UserShip")) {
+            sqlinitShipU();
+        }
     }
 }
 
-void Server::sqlinitEquip() {
+void Server::sqlinitEquip() const {
     //% "Equipment database does not exist, creating..."
     qWarning() << qtTrId("equip-db-lack");
     QSqlQuery query;
@@ -2539,7 +2650,7 @@ void Server::sqlinitEquip() {
     }
 }
 
-void Server::sqlinitEquipName() {
+void Server::sqlinitEquipName() const {
     //% "Equipment name database does not exist, creating..."
     qWarning() << qtTrId("equip-name-db-lack");
     QSqlQuery query;
@@ -2551,7 +2662,7 @@ void Server::sqlinitEquipName() {
     }
 }
 
-void Server::sqlinitEquipSP() {
+void Server::sqlinitEquipSP() const {
     QSqlQuery query;
     query.prepare(*userEquipSkillPoints);
     if(!query.exec()) {
@@ -2561,7 +2672,7 @@ void Server::sqlinitEquipSP() {
     }
 }
 
-void Server::sqlinitEquipU() {
+void Server::sqlinitEquipU() const {
     //% "Equipment database for user does not exist, creating..."
     qWarning() << qtTrId("equip-db-user-lack");
     QSqlQuery query;
@@ -2573,7 +2684,7 @@ void Server::sqlinitEquipU() {
     }
 }
 
-void Server::sqlinitFacto() {
+void Server::sqlinitFacto() const {
     //% "Factory database does not exist, creating..."
     qWarning() << qtTrId("facto-db-lack");
     QSqlQuery query;
@@ -2585,7 +2696,7 @@ void Server::sqlinitFacto() {
     }
 }
 
-void Server::sqlinitMapNode() {
+void Server::sqlinitMapNode() const {
     //% "Map node database does not exist, creating..."
     qWarning() << qtTrId("map-node-db-lack");
     QSqlQuery query;
@@ -2597,7 +2708,7 @@ void Server::sqlinitMapNode() {
     }
 }
 
-void Server::sqlinitMapRelation() {
+void Server::sqlinitMapRelation() const {
     //% "Map relation database does not exist, creating..."
     qWarning() << qtTrId("map-relation-db-lack");
     QSqlQuery query;
@@ -2609,7 +2720,7 @@ void Server::sqlinitMapRelation() {
     }
 }
 
-void Server::sqlinitMapResource() {
+void Server::sqlinitMapResource() const {
     //% "Map resource database does not exist, creating..."
     qWarning() << qtTrId("map-resource-db-lack");
     QSqlQuery query;
@@ -2621,7 +2732,7 @@ void Server::sqlinitMapResource() {
     }
 }
 
-void Server::sqlinitShip() {
+void Server::sqlinitShip() const {
     //% "Ship database does not exist, creating..."
     qWarning() << qtTrId("ship-db-lack");
     QSqlQuery query;
@@ -2633,7 +2744,7 @@ void Server::sqlinitShip() {
     }
 }
 
-void Server::sqlinitShipName() {
+void Server::sqlinitShipName() const {
     //% "Ship name database does not exist, creating..."
     qWarning() << qtTrId("ship-name-db-lack");
     QSqlQuery query;
@@ -2641,6 +2752,18 @@ void Server::sqlinitShipName() {
     if(!query.exec()) {
         //% "Create Ship name failed."
         throw DBError(qtTrId("equip-ship-name-gen-failure"),
+                      query.lastError());
+    }
+}
+
+void Server::sqlinitShipU() const {
+    //% "Ship database for user does not exist, creating..."
+    qWarning() << qtTrId("ship-db-user-lack");
+    QSqlQuery query;
+    query.prepare(*userShip);
+    if(!query.exec()) {
+        //% "Create Ship database for user failed."
+        throw DBError(qtTrId("ship-db-user-gen-failure"),
                       query.lastError());
     }
 }
