@@ -1370,8 +1370,33 @@ void Server::generateTestEquip(const CSteamID &uid) {
 
                 if(random_double < chance){
                     qInfo() << "SUCCESS" << "\t" << equip->toString("ja_JP");
-                    QUuid newId = newEquip(uid, equip->getId());
+                    QUuid newId = newEquip(uid, equip->getId(), true);
                     addEquipStar(newId, dist2(mt));
+                }
+            }
+        }
+    }
+}
+
+void Server::generateTestShip(const CSteamID &uid) {
+    //deleteTestShip(uid);
+    static const double difficulty = 4.0; // higher the value is easier
+    std::uniform_real_distribution dist{0.0, 1.0};
+    std::uniform_int_distribution dist2{0, 15};
+    for(auto ship: std::as_const(shipRegistry)) {
+        if(ship->isAmnesiac()) {
+            continue;
+        }
+        else {
+            for(int i = 0; i < 1; ++i) {
+                double chance = 1.0 - atan(ship->getTech()/difficulty)
+                                          / acos(0);
+                double random_double = dist(mt);
+
+                if(random_double < chance){
+                    qInfo() << "SUCCESS" << "\t" << ship->toString("ja_JP");
+                    QUuid newId = newShip(uid, ship->getId(), true);
+                    //addShipStar(newId, dist2(mt));
                 }
             }
         }
@@ -1858,8 +1883,10 @@ void Server::naturalRegen(const CSteamID &uid) {
     }
 }
 
-QUuid Server::newEquip(const CSteamID &uid, int equipId) {
-    newEquipHasMother(uid, equipId);
+QUuid Server::newEquip(const CSteamID &uid, int equipId, bool direct) {
+    if(!direct) {
+        newEquipHasMother(uid, equipId);
+    }
     return User::newEquip(uid, equipId);
 }
 
@@ -1904,6 +1931,20 @@ int64 Server::newEquipHasMotherCal(int equipId) {
         sonSkillPoints *= skillPointsAmplifier;
     }
     return sonSkillPoints;
+}
+
+QUuid Server::newShip(const CSteamID &uid, int shipId, bool direct) {
+    if(!direct) {
+        /* consume starting equip */
+    }
+    int startingHP;
+    if(shipRegistry[shipId]->attr.contains("Hitpoints")) {
+        startingHP = shipRegistry[shipId]->attr["Hitpoints"];
+    }
+    else {
+        startingHP = 1;
+    }
+    return User::newShip(uid, shipId, startingHP);
 }
 
 void Server::parseListen(const QStringList &cmdParts) {
@@ -2289,7 +2330,7 @@ void Server::receivedReq(const QJsonObject &djson,
         }
         else {
             QByteArray msg = KP::serverNewEquip(
-                newEquip(uid, equipid), equipid);
+                newEquip(uid, equipid, true), equipid);
             senderM.sendMessage(connection, msg);
         }
 
@@ -2393,9 +2434,9 @@ void Server::receivedReq(const QJsonObject &djson,
                            this,
                            [connection, uid, djson, this]
                            {offerTechInfo(
-                  connection,
-                  uid,
-                  djson["local"].toInt());});
+                                 connection,
+                                 uid,
+                                 djson["local"].toInt());});
     }
     break;
     case KP::CommandType::DemandSkillPoints: {
@@ -2403,9 +2444,9 @@ void Server::receivedReq(const QJsonObject &djson,
                            this,
                            [connection, uid, djson, this]
                            {offerSPInfo(
-                  connection,
-                  uid,
-                  djson["equipid"].toInt());});
+                                 connection,
+                                 uid,
+                                 djson["equipid"].toInt());});
     }
     break;
     case KP::CommandType::DemandResourceUpdate: {
@@ -2413,8 +2454,8 @@ void Server::receivedReq(const QJsonObject &djson,
                            this,
                            [connection, uid, this]
                            {offerResourceInfo(
-                  connection,
-                  uid);});
+                                 connection,
+                                 uid);});
     }
     break;
     case KP::CommandType::DestructEquip: {
@@ -2450,7 +2491,14 @@ void Server::sendTestMessages() {
         qWarning() << "Server isn't listening, abort.";
     }
     else {
-        qCritical() << settings->value("server/equipdbtimestamp");
+        for(auto user: connectedUsers) {
+            if(!User::isSuperUser(user)) {
+                continue;
+            }
+            else {
+                generateTestShip(user);
+            }
+        }
         /*
         for(auto equip: std::as_const(equipRegistry)) {
             qInfo() << equip->localNames["ja_JP"];

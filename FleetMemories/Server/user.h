@@ -24,6 +24,7 @@ bool isFactoryBusy(const CSteamID &, int);
 std::tuple<bool, int> isFactoryFinished(const CSteamID &, int);
 bool isSuperUser(const CSteamID &);
 QUuid newEquip(const CSteamID &, int);
+QUuid newShip(const CSteamID &, int, int);
 void refreshFactory(const CSteamID &);
 void refreshPort(const CSteamID &);
 void setResources(const CSteamID &, ResOrd);

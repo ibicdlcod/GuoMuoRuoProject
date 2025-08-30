@@ -22,6 +22,7 @@ public:
     int getId() const;
     double getTech() const;
     ShipType getType() const;
+    bool isAmnesiac() const;
 
     QMap<QString, QString> localNames;
     QMap<QString, int> attr;

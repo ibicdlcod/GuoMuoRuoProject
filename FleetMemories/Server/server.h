@@ -118,6 +118,7 @@ private:
     bool exportEquipToCSV() const;
     void generateEquipChilds(int, int);
     void generateTestEquip(const CSteamID &);
+    void generateTestShip(const CSteamID &);
     const QStringList getCommandsSpec() const override;
     const QStringList getValidCommands() const override;
     bool importEquipFromCSV();
@@ -126,9 +127,10 @@ private:
     bool importMapRelationFromCSV();
     bool importShipFromCSV();
     void naturalRegen(const CSteamID &);
-    QUuid newEquip(const CSteamID &, int);
+    QUuid newEquip(const CSteamID &, int, bool direct = false);
     void newEquipHasMother(const CSteamID &, int);
     int64 newEquipHasMotherCal(int);
+    QUuid newShip(const CSteamID &, int, bool direct = false);
     void parseListen(const QStringList &);
     void parseUnlisten();
     void receivedAuth(const QJsonObject &, const PeerInfo &, QSslSocket *);

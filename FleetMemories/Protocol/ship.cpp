@@ -3,11 +3,12 @@
 #include <QSqlQuery>
 #include "tech.h"
 #include "../Server/kerrors.h"
+#include "utility.h"
 
 extern std::unique_ptr<QSettings> settings;
 
 Ship::Ship(int shipId)
-{
+    : shipRegId(shipId){
     if(shipId == 0) {
         return;
     }
@@ -105,4 +106,8 @@ double Ship::getTech() const {
 
 ShipType Ship::getType() const {
     return ShipType(shipRegId);
+}
+
+bool Ship::isAmnesiac() const {
+    return Utility::checkMask(shipRegId, 0xF0000000, 0x70000000);
 }

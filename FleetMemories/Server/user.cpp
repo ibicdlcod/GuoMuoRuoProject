@@ -317,7 +317,7 @@ QUuid User::newEquip(const CSteamID &uid, int equipDid) {
         QStringLiteral("harusoft.xyz"));
     QUuid serial = QUuid::createUuidV5(base, uniqueStr);
     QSqlQuery query2;
-    query2.prepare("INSERT INTO UserEquip (User, EquipUuid, EquipDef, Star)"
+    query2.prepare("INSERT INTO UserEquip (User, EquipUuid, EquipDef, Star) "
                    "VALUES (:id, :uuid, :def, :star);");
     query2.bindValue(":id", uid.ConvertToUint64());
     query2.bindValue(":uuid", serial);
@@ -334,6 +334,43 @@ QUuid User::newEquip(const CSteamID &uid, int equipDid) {
         //% "User id %1: new equipment %2 definition %3"
         qDebug() << qtTrId("new-equip").arg(uid.ConvertToUint64())
                         .arg(serial.toString()).arg(equipDid);
+        return serial;
+    }
+}
+
+QUuid User::newShip(const CSteamID &uid, int shipDid, int startingHP) {
+    QSqlDatabase db = QSqlDatabase::database();
+    QString uniqueStr = QString::number(uid.ConvertToUint64())
+                        + "@"
+                        + QString::number(QDateTime::currentMSecsSinceEpoch());
+    /* https://stackoverflow.com/a/28776880 */
+    static const QUuid base = QUuid::createUuidV5(
+        QUuid("{6ba7b811-9dad-11d1-80b4-00c04fd430c8}"),
+        QStringLiteral("harusoft.xyz"));
+    QUuid serial = QUuid::createUuidV5(base, uniqueStr);
+    QSqlQuery query2;
+    query2.prepare("INSERT INTO UserShip (User, ShipUuid, ShipDef, "
+                   "CurrentHP, CondRecovTime, ExpCap) "
+                   "VALUES (:id, :uuid, :def, :hp, :rectime, :cap);");
+    query2.bindValue(":id", uid.ConvertToUint64());
+    query2.bindValue(":uuid", serial);
+    query2.bindValue(":def", shipDid);
+    query2.bindValue(":hp", startingHP);
+    query2.bindValue(":rectime", QDateTime::currentSecsSinceEpoch());
+    const int expCapAt100 = (100 + 9900) / 2 * (100 - 1);
+    query2.bindValue(":cap", expCapAt100);
+    if(Q_UNLIKELY(!query2.exec())) {
+        qCritical() << query2.lastQuery();
+        //% "User id %1: new ship failed!"
+        throw DBError(qtTrId("new-ship-failed")
+                          .arg(uid.ConvertToUint64()),
+                      query2.lastError());
+        return QUuid();
+    }
+    else {
+        //% "User id %1: new ship %2 definition %3"
+        qDebug() << qtTrId("new-ship").arg(uid.ConvertToUint64())
+                        .arg(serial.toString()).arg(shipDid);
         return serial;
     }
 }
