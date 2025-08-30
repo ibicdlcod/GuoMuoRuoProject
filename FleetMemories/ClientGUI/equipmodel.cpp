@@ -383,6 +383,9 @@ QVariant EquipModel::headerData(int section, Qt::Orientation orientation,
     if(section >= columnCount() && orientation == Qt::Horizontal)
         return QVariant();
     switch (role) {
+    case Qt::AccessibleTextRole: [[fallthrough]];
+    case Qt::AccessibleDescriptionRole: [[fallthrough]];
+    case Qt::ToolTipRole: [[fallthrough]];
     case Qt::DisplayRole: {
         if(orientation == Qt::Vertical) {
             int realRowIndex = section + rowsPerPage * pageNum;
@@ -408,7 +411,6 @@ QVariant EquipModel::headerData(int section, Qt::Orientation orientation,
     break;
     case Qt::DecorationRole:
     case Qt::EditRole:
-    case Qt::ToolTipRole:
     case Qt::StatusTipRole:
     case Qt::WhatsThisRole:
     case Qt::SizeHintRole:
@@ -420,8 +422,6 @@ QVariant EquipModel::headerData(int section, Qt::Orientation orientation,
     case Qt::ForegroundRole:
     case Qt::CheckStateRole:
     case Qt::InitialSortOrderRole:
-    case Qt::AccessibleTextRole:
-    case Qt::AccessibleDescriptionRole:
     default: return QVariant(); break;
     }
 }

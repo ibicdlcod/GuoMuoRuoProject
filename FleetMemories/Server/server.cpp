@@ -833,8 +833,10 @@ void Server::offerShipInfo(QSslSocket *connection, int index = 0) {
 }
 
 void Server::offerShipInfoUser(const CSteamID &uid,
-                               QSslSocket *connection) {
-
+                               QSslSocket *connection) {  
+    QByteArray msg = KP::serverSuccess();
+    senderM.sendMessage(connection, msg);
+    connection->flush();
 }
 
 void Server::offerSPInfo(QSslSocket *connection,
@@ -1040,6 +1042,25 @@ void Server::deleteTestEquip(const CSteamID &uid) {
     else {
         //% "User id %1: all equipment deleted"
         qDebug() << qtTrId("delete-all-equip").arg(uid.ConvertToUint64());
+    }
+}
+
+void Server::deleteTestShip(const CSteamID &uid) {
+    /* Warning: ALL Equipment will be deleted under this uid! */
+    QSqlDatabase db = QSqlDatabase::database();
+    QSqlQuery query;
+    query.prepare("DELETE FROM UserShip WHERE"
+                  " User = :id;");
+    query.bindValue(":id", uid.ConvertToUint64());
+    if(Q_UNLIKELY(!query.exec())) {
+        //% "User id %1: delete all ship failed!"
+        throw DBError(qtTrId("delete-all-ship-failed")
+                          .arg(uid.ConvertToUint64()),
+                      query.lastError());
+    }
+    else {
+        //% "User id %1: all ship deleted"
+        qDebug() << qtTrId("delete-all-ship").arg(uid.ConvertToUint64());
     }
 }
 
@@ -1939,7 +1960,7 @@ QUuid Server::newShip(const CSteamID &uid, int shipId, bool direct) {
     }
     int startingHP;
     if(shipRegistry[shipId]->attr.contains("Hitpoints")) {
-        startingHP = shipRegistry[shipId]->attr["Hitpoints"];
+        startingHP = std::max(1, shipRegistry[shipId]->attr["Hitpoints"]);
     }
     else {
         startingHP = 1;
@@ -2355,6 +2376,24 @@ void Server::receivedReq(const QJsonObject &djson,
         }
     }
     break;
+    case KP::CommandType::Admingenerateships: {
+        if(!User::isSuperUser(uid)) {
+            QByteArray msg = KP::accessDenied();
+            senderM.sendMessage(connection, msg);
+        } else {
+            if(!djson["remove"].toBool()) {
+                generateTestShip(uid);
+                QByteArray msg = KP::serverSuccess();
+                senderM.sendMessage(connection, msg);
+            } else {
+                deleteTestShip(uid);
+                QByteArray msg = KP::serverSuccess();
+                senderM.sendMessage(connection, msg);
+            }
+            offerShipInfoUser(uid, connection);
+        }
+    }
+    break;
     case KP::CommandType::Develop: {
         int equipid = djson["equipid"].toInt();
         doDevelop(uid, equipid, djson["factory"].toInt(), connection);
@@ -2427,6 +2466,13 @@ void Server::receivedReq(const QJsonObject &djson,
             senderM.sendMessage(connection, msg);
             connection->flush();
         }
+    }
+    break;
+    case KP::CommandType::DemandShipInfoUser: {
+        QTimer::singleShot(100,
+                           this,
+                           [connection, uid, this]
+                           {offerShipInfoUser(uid, connection);});
     }
     break;
     case KP::CommandType::DemandGlobalTech: {
