@@ -26,6 +26,11 @@ void PortArea::resizeEvent(QResizeEvent *event) {
 }
 
 void PortArea::equipRegistryComplete() {
+    //% "Loading Ship Registry..."
+    ui->CentralMessage->setText(qtTrId("load-ship"));
+}
+
+void PortArea::shipRegistryComplete() {
     //% "Hello!"
-    ui->CentralMessage->setText(qtTrId("hello"));
+    ui->CentralMessage->setText(qtTrId("client-hello"));
 }

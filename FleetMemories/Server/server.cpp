@@ -2285,9 +2285,9 @@ void Server::receivedReq(const QJsonObject &djson,
                            this,
                            [connection, uid, djson, this]
                            {offerTechInfo(
-                  connection,
-                  uid,
-                  djson["local"].toInt());});
+                                 connection,
+                                 uid,
+                                 djson["local"].toInt());});
     }
     break;
     case KP::CommandType::DemandSkillPoints: {
@@ -2295,9 +2295,9 @@ void Server::receivedReq(const QJsonObject &djson,
                            this,
                            [connection, uid, djson, this]
                            {offerSPInfo(
-                  connection,
-                  uid,
-                  djson["equipid"].toInt());});
+                                 connection,
+                                 uid,
+                                 djson["equipid"].toInt());});
     }
     break;
     case KP::CommandType::DemandResourceUpdate: {
@@ -2305,8 +2305,8 @@ void Server::receivedReq(const QJsonObject &djson,
                            this,
                            [connection, uid, this]
                            {offerResourceInfo(
-                  connection,
-                  uid);});
+                                 connection,
+                                 uid);});
     }
     break;
     case KP::CommandType::DestructEquip: {

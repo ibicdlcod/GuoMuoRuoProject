@@ -17,6 +17,7 @@ public:
 
 public slots:
     void equipRegistryComplete();
+    void shipRegistryComplete();
 
 protected:
     void resizeEvent(QResizeEvent *event) override;

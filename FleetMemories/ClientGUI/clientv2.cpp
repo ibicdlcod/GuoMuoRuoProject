@@ -111,6 +111,10 @@ bool Clientv2::isEquipRegistryCacheGood() const {
     return equipRegistryCacheGood;
 }
 
+bool Clientv2::isShipRegistryCacheGood() const {
+    return shipRegistryCacheGood;
+}
+
 bool Clientv2::loggedIn() const {
     return gameState != KP::Offline;
 }
@@ -189,9 +193,24 @@ void Clientv2::catbomb() {
     displayPrompt();
 }
 
-void Clientv2::demandEquipCache(QDateTime localCacheTimeStamp) {
+void Clientv2::demandEquipCache() {
+    QDateTime localCacheTimeStamp = settings->value("client/equipdbtimestamp",
+                                                    QDateTime(QDate(1970,01,01),
+                                                              QTime(0, 0, 0))
+                                                    ).toDateTime();
     QByteArray msg = KP::clientDemandEquipInfo(localCacheTimeStamp);
     sender->enqueue(msg);
+}
+
+void Clientv2::demandShipCache() {
+    QDateTime localCacheTimeStamp = settings->value("client/shipdbtimestamp",
+                                                    QDateTime(QDate(1970,01,01),
+                                                              QTime(0, 0, 0))
+                                                    ).toDateTime();
+    shipRegistryCacheGood = true;
+    emit shipRegistryComplete();
+    //QByteArray msg = KP::clientDemandShipInfo(localCacheTimeStamp);
+    //sender->enqueue(msg);
 }
 
 /* Originally used in CLI */
@@ -388,10 +407,10 @@ void Clientv2::switchToFactory() {
         gameState = KP::Factory;
         emit gamestateChanged(KP::Factory);
         if(!equipRegistryCacheGood) {
-            demandEquipCache(settings->value("client/equipdbtimestamp",
-                                             QDateTime(QDate(1970,01,01),
-                                                       QTime(0, 0, 0))
-                                             ).toDateTime());
+            demandEquipCache();
+        }
+        if(!shipRegistryCacheGood) {
+            demandShipCache();
         }
     }
 }
@@ -406,18 +425,22 @@ void Clientv2::switchToTech() {
     } else {
         gameState = KP::TechView;
         emit gamestateChanged(KP::TechView);
-        if(equipRegistryCacheGood) {
+        if(equipRegistryCacheGood && shipRegistryCacheGood) {
             socket.flush();
             QByteArray msg = KP::clientDemandTech(0);
             sender->enqueue(msg);
             socket.flush();
         }
-        else {
-            demandEquipCache(settings->value("client/equipdbtimestamp",
-                                             QDateTime(QDate(1970,01,01),
-                                                       QTime(0, 0, 0))
-                                             ).toDateTime());
+        else if(!equipRegistryCacheGood){
+            demandEquipCache();
             connect(this, &Clientv2::equipRegistryComplete,
+                    this, &Clientv2::demandShipCache);
+            connect(this, &Clientv2::shipRegistryComplete,
+                    this, &Clientv2::switchToTech2);
+        }
+        else{
+            demandShipCache();
+            connect(this, &Clientv2::shipRegistryComplete,
                     this, &Clientv2::switchToTech2);
         }
     }
@@ -1138,10 +1161,9 @@ void Clientv2::receivedMsg(const QJsonObject &djson) {
             QByteArray msg = KP::clientDemandResourceUpdate();
             sender->enqueue(msg);
         }
-        demandEquipCache(settings->value("client/equipdbtimestamp",
-                                         QDateTime(QDate(1970,01,01),
-                                                   QTime(0, 0, 0))
-                                         ).toDateTime());
+        demandEquipCache();
+        connect(this, &Clientv2::equipRegistryComplete,
+                this, &Clientv2::demandShipCache);
         break;
     case KP::AllowClientFinish:
         gameState = KP::Offline;

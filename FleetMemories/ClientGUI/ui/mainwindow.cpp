@@ -130,6 +130,8 @@ MainWindow::MainWindow(QWidget *parent, int argc, char ** argv)
                        });
     connect(&engine, &Clientv2::equipRegistryComplete,
             portArea, &PortArea::equipRegistryComplete);
+    connect(&engine, &Clientv2::shipRegistryComplete,
+            portArea, &PortArea::shipRegistryComplete);
 }
 
 MainWindow::~MainWindow()

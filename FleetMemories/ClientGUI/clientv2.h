@@ -85,6 +85,7 @@ public:
     };
     Q_ENUM(Password);
     bool isEquipRegistryCacheGood() const;
+    bool isShipRegistryCacheGood() const;
     bool loggedIn() const;
     void doFetch(const QStringList &);
 
@@ -104,7 +105,8 @@ public slots:
     void autoPassword();
     void backToNavalBase();
     void catbomb();
-    void demandEquipCache(QDateTime localCacheTimeStamp);
+    void demandEquipCache();
+    void demandShipCache();
     void displayPrompt();
     void doDestructEquip(const QList<QUuid> &);
     void doRefreshFactory();
@@ -130,6 +132,7 @@ public slots:
 signals:
     void aboutToQuit();
     void equipRegistryComplete();
+    void shipRegistryComplete();
     void gamestateChanged(KP::GameState);
     void qout(QString, QColor background = QColor("white"),
               QColor foreground = QColor("black"));
@@ -204,8 +207,11 @@ private:
     bool logoutPending;
 
     KP::GameState gameState;
+
     QMap<int, Equipment *> equipRegistryCache;
     bool equipRegistryCacheGood = false;
+    QMap<int, Equipment *> shipRegistryCache;
+    bool shipRegistryCacheGood = false;
 
     QHttpServer migrateServer;
     QTcpServer *tcpServer = new QTcpServer();

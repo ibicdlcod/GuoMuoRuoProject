@@ -134,11 +134,16 @@ void TechView::updateGlobalTechViewTable(const QJsonObject &djson) {
         ui->waitText->setWordWrap(true);
         ui->waitText->setText(
             QStringLiteral("updating equipment data, please wait..."));
-        engine.demandEquipCache(
-            settings->value("client/equipdbtimestamp",
-                            QDateTime(QDate(1970,01,01),
-                                      QTime(0, 0, 0))
-                            ).toDateTime());
+        engine.demandEquipCache();
+        return;
+    }
+    else if(!engine.isShipRegistryCacheGood()) {
+        ui->globalViewTable->hide();
+        ui->waitText->show();
+        ui->waitText->setWordWrap(true);
+        ui->waitText->setText(
+            QStringLiteral("updating equipment data, please wait..."));
+        engine.demandShipCache();
         return;
     }
     else {
