@@ -13,21 +13,22 @@ public:
     explicit EquipModel(QObject *parent = nullptr, bool isInArsenal = true);
 
 signals:
-    void destructRequest(const QList<QUuid> &);
+    virtual void destructRequest(const QList<QUuid> &) final;
     void needReCalculateRows();
     void needReCalculatePages();
     void pageNumChanged(int currentPageNum, int totalPageNum);
 
 public slots:
-    void switchDisplayType(int);
+    virtual void switchDisplayType(int) final;
+    virtual void switchDisplayType2(QString) final;
     void firstPage();
     void prevPage();
     void nextPage();
     void lastPage();
-    void addEquipment(QUuid, int);
-    void enactDestruct();
-    void destructEquipment(const QList<QUuid> &);
-    void updateEquipmentList(const QJsonObject &);
+    virtual void addEquipment(QUuid, int) final;
+    virtual void enactDestruct() final;
+    virtual void destructEquipment(const QList<QUuid> &) final;
+    virtual void updateEquipmentList(const QJsonObject &) final;
     void setPageNumHint(int);
     void setRowsPerPageHint(int);
     void setIsInArsenal(bool);
@@ -49,8 +50,7 @@ public:
     static const int uidCol = 0;
     static const int equipCol = 1;
     static const int starCol = 2;
-    static const int attrCol = 3;
-    int destructColumn() const;
+    virtual int destructColumn() const final;
     int addStarColumn() const;
     int hiddenSortColumn() const;
     int selectColumn() const;
@@ -68,12 +68,15 @@ protected:
     int pageNum = 0;
     bool ready = false;
 
+protected slots:
+    void updateIllegalPage();
+
 private slots:
     void clearCheckBoxes();
-    void updateIllegalPage();
 
 private:
     int numberOfEquip() const;
+    static const int attrCol = 3;
 
     QHash<QUuid, Equipment *> clientEquips;
     QHash<QUuid, int> clientEquipStars;

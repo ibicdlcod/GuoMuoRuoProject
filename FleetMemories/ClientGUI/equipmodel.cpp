@@ -47,6 +47,26 @@ void EquipModel::switchDisplayType(int index) {
     wholeTableChanged();
 }
 
+void EquipModel::switchDisplayType2(QString equipName) {
+    int oldRowCount = rowCount();
+    sortedEquipIds.clear();
+    for(auto iter = clientEquips.keyValueBegin();
+         iter != clientEquips.keyValueEnd();
+         ++iter) {
+        for(const auto &name:
+             std::as_const(iter->second->localNames)) {
+            if(name.localeAwareCompare(equipName) == 0)
+                sortedEquipIds.append(iter->first);
+        }
+    }
+    customSort();
+    int newRowCount = rowCount();
+    emit needReCalculatePages();
+    adjustRowCount(oldRowCount, newRowCount);
+    firstPage();
+    wholeTableChanged();
+}
+
 void EquipModel::firstPage() {
     int oldRowCount = rowCount();
     pageNum = 0;
@@ -543,11 +563,7 @@ void EquipModel::updateEquipmentList(const QJsonObject &input) {
         emit needReCalculatePages();
         ready = true;
     }
-    else {  /*
-            connection = connect(&engine, &Clientv2::equipRegistryComplete,
-                             this, [this, &input](){
-            QTimer::singleShot(100, [=, this](){updateEquipmentList(input);});});
-            */
+    else {
     }
     return;
 }

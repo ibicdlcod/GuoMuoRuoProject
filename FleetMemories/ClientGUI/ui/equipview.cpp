@@ -5,6 +5,8 @@
 #include <QStyledItemDelegate>
 #include "../clientv2.h"
 
+extern std::unique_ptr<QSettings> settings;
+
 EquipView::EquipView(QWidget *parent)
     : QWidget(parent)
     , ui(new Ui::EquipView)
@@ -31,8 +33,8 @@ EquipView::EquipView(QWidget *parent)
             this, &EquipView::columnResized);
     connect(model, &EquipModel::pageNumChanged,
             this, [this](int, int){columnResized(0, 0, 0);
-        update();
-    });
+                update();
+            });
 
     arsenalView->show();
     /* navigator part */
@@ -53,21 +55,24 @@ EquipView::EquipView(QWidget *parent)
     }
 
 
-    typebox = new QComboBox();
+    typebox = new QComboBox(this);
     typebox->setObjectName("typeselect");
     /*
     typebox->setStyleSheet(
         "QComboBox#typeselect { color: palette(base); }");
 */
-    firstButton = new QToolButton();
-    prevButton = new QToolButton();
-    pageLabel = new QLabel();
+    equipbox = new QComboBox(this);
+    equipbox->setObjectName("equipdef");
+
+    firstButton = new QToolButton(this);
+    prevButton = new QToolButton(this);
+    pageLabel = new QLabel(this);
     //% "Retrieving data, please wait..."
     pageLabel->setText(qtTrId("retrieving-please-wait"));
-    nextButton = new QToolButton();
-    lastButton = new QToolButton();
-    destructButton = new QPushButton();
-    addStarButton = new QPushButton();
+    nextButton = new QToolButton(this);
+    lastButton = new QToolButton(this);
+    destructButton = new QPushButton(this);
+    addStarButton = new QPushButton(this);
 
     firstButton->setIcon(first);
     prevButton->setIcon(prev);
@@ -80,6 +85,7 @@ EquipView::EquipView(QWidget *parent)
 
     QHBoxLayout *layout = ui->Navigator;
     layout->addWidget(typebox);
+    layout->addWidget(equipbox);
     layout->addWidget(firstButton);
     layout->addWidget(prevButton);
     layout->addWidget(pageLabel);
@@ -95,15 +101,25 @@ EquipView::EquipView(QWidget *parent)
     //% "All equipments"
     typebox->addItem(qtTrId("all-equipments"));
     typebox->addItems(EquipType::getDisplayGroupsSorted());
+
+    QSizePolicy equipBoxSize = QSizePolicy(QSizePolicy::Maximum,
+                                           QSizePolicy::Preferred,
+                                           QSizePolicy::ComboBox);
+    equipbox->setSizePolicy(equipBoxSize);
+    equipbox->resize(QSize(100, pageLabel->size().height()));
+    equipbox->setSizeAdjustPolicy(QComboBox::AdjustToContents);
+
     pageLabel->setAlignment(Qt::AlignCenter);
     pageLabel->setSizePolicy(QSizePolicy(QSizePolicy::Maximum,
                                          QSizePolicy::Preferred,
                                          QSizePolicy::Label));
     pageLabel->resize(QSize(100, pageLabel->size().height()));
+
     destructButton->setSizePolicy(QSizePolicy(QSizePolicy::Maximum,
                                               QSizePolicy::Preferred,
                                               QSizePolicy::PushButton));
     destructButton->resize(QSize(100, pageLabel->size().height()));
+
     addStarButton->setSizePolicy(QSizePolicy(QSizePolicy::Maximum,
                                              QSizePolicy::Preferred,
                                              QSizePolicy::PushButton));
@@ -111,6 +127,12 @@ EquipView::EquipView(QWidget *parent)
 
     connect(typebox, &QComboBox::activated,
             model, &EquipModel::switchDisplayType);
+    connect(equipbox, &QComboBox::activated,
+            model, [this]{
+                model->switchDisplayType2(equipbox->currentText());
+            });
+    connect(typebox, &QComboBox::activated,
+            this, &EquipView::reCalculateAvailableEquips);
     connect(firstButton, &QAbstractButton::clicked,
             model, &EquipModel::firstPage);
     connect(prevButton, &QAbstractButton::clicked,
@@ -174,6 +196,29 @@ void EquipView::columnResized(int logicalIndex, int oldSize, int newSize) {
 
 void EquipView::itemSelected(QUuid id) {
     qCritical() << id;
+}
+
+void EquipView::reCalculateAvailableEquips(int index) {
+    Q_UNUSED(index);
+    equipbox->clear();
+    for(auto &equipReg:
+         Clientv2::getInstance().equipRegistryCache) {
+        if(
+            (typebox->currentText().compare("All equipments") == 0
+             && equipReg->type.getDisplayGroup()
+                        .compare("VIRTUAL", Qt::CaseInsensitive) != 0
+             && !equipReg->localNames.value("ja_JP").isEmpty())
+            || equipReg->type.getDisplayGroup()
+                       .compare(typebox->currentText(),
+                                Qt::CaseInsensitive) == 0) {
+            QString equipName = equipReg->toString(
+                settings->value("language", "ja_JP").toString());
+            if(equipName.isEmpty()) {
+                equipName = equipReg->toString("ja_JP");
+            }
+            equipbox->addItem(equipName);
+        }
+    }
 }
 
 void EquipView::activate(bool arsenal) {

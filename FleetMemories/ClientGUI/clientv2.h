@@ -60,6 +60,7 @@
 #include "steamauth.h"
 #include "ui/developwindow.h"
 #include "ui/techview.h"
+#include "ui/equipview.h"
 #include "equipmodel.h"
 
 void customMessageHandler(QtMsgType,
@@ -97,6 +98,7 @@ public:
     friend void TechView::demandSkillPoints(int);
     friend void TechView::resetLocalListName();
     friend void TechView::equipOrShip();
+    friend void EquipView::reCalculateAvailableEquips(int);
 
     int equipBigTypeIndex = 0;
     int equipIndex = 0;

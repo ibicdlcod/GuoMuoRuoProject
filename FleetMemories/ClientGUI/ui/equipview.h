@@ -42,6 +42,7 @@ public:
 
 public slots:
     void recalculateArsenalRows();
+    void reCalculateAvailableEquips(int);
 
 signals:
     void rowCountHint(int);
@@ -61,6 +62,7 @@ private:
     SelectDelegate *delegate;
 
     QComboBox *typebox;
+    QComboBox *equipbox;
     QToolButton *firstButton;
     QToolButton *prevButton;
     QLabel *pageLabel;
