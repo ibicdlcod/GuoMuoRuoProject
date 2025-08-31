@@ -27,6 +27,8 @@ public:
     static int getLevel(int);
 
     QMap<QString, QString> localNames;
+    QMap<QString, QString> shipClassText;
+    QMap<QString, QString> shipOrderText;
     QMap<QString, int> attr;
     QStringList customflags; // unused for now
 

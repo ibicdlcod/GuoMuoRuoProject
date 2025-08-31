@@ -44,16 +44,16 @@ TechView::TechView(QWidget *parent) :
     for(auto &equipType: sortedGroups) {
         if(equipType.compare("VIRTUAL", Qt::CaseInsensitive) == 0)
             continue;
-        ui->localListType->addItem(equipType);
+        ui->localListType1->addItem(equipType);
     }
     //% "All equipments"
-    ui->localListType->addItem(qtTrId("all-equipments"));
-    ui->localListType->setCurrentIndex(0);
-    connect(ui->localListType, &QComboBox::activated,
+    ui->localListType1->addItem(qtTrId("all-equipments"));
+    ui->localListType1->setCurrentIndex(0);
+    connect(ui->localListType1, &QComboBox::activated,
             this, &TechView::resetLocalListName);
-    connect(ui->localListValue, &QComboBox::activated,
+    connect(ui->localListValue1, &QComboBox::activated,
             this, &TechView::demandLocalTech);
-    connect(ui->localListValue, &QComboBox::activated,
+    connect(ui->localListValue1, &QComboBox::activated,
             this, &TechView::demandSkillPoints);
 
     ui->globalViewTable->setSortingEnabled(true);
@@ -86,7 +86,7 @@ void TechView::demandLocalTech(int index) {
     for(auto &equipReg:
          engine.equipRegistryCache) {
         for(auto &name: equipReg->localNames) {
-            if(name.compare(ui->localListValue->currentText(),
+            if(name.compare(ui->localListValue1->currentText(),
                              Qt::CaseInsensitive) == 0) {
                 engine.socket.flush();
                 QByteArray msg = KP::clientDemandSkillPoints(equipReg->getId());
@@ -107,7 +107,7 @@ void TechView::demandSkillPoints(int index) {
     for(auto &equipReg:
          engine.equipRegistryCache) {
         for(auto &name: equipReg->localNames) {
-            if(name.compare(ui->localListValue->currentText(),
+            if(name.compare(ui->localListValue1->currentText(),
                              Qt::CaseInsensitive) == 0) {
                 engine.socket.flush();
                 QByteArray msg = KP::clientDemandTech(equipReg->getId());
@@ -359,23 +359,23 @@ void TechView::resizeColumns(bool global) {
 }
 
 void TechView::resetLocalListName() {
-    ui->localListValue->clear();
+    ui->localListValue1->clear();
     for(auto &equipReg:
          Clientv2::getInstance().equipRegistryCache) {
         if(
-            (ui->localListType->currentText().compare("All equipments") == 0
+            (ui->localListType1->currentText().compare("All equipments") == 0
              && equipReg->type.getDisplayGroup()
                         .compare("VIRTUAL", Qt::CaseInsensitive) != 0
              && !equipReg->localNames.value("ja_JP").isEmpty())
             || equipReg->type.getDisplayGroup()
-                       .compare(ui->localListType->currentText(),
+                       .compare(ui->localListType1->currentText(),
                                 Qt::CaseInsensitive) == 0) {
             QString equipName = equipReg->toString(
                 settings->value("language", "ja_JP").toString());
             if(equipName.isEmpty()) {
                 equipName = equipReg->toString("ja_JP");
             }
-            ui->localListValue->addItem(equipName);
+            ui->localListValue1->addItem(equipName);
         }
     }
 }

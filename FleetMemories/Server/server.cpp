@@ -168,10 +168,10 @@ Q_GLOBAL_STATIC(QString,
                 shipName,
                 QStringLiteral(
                     "CREATE TABLE ShipName ( "
-                    "ShipID INTEGER PRIMARY KEY, "
-                    "ja_JP TEXT, "
-                    "zh_CN TEXT, "
-                    "en_US TEXT"
+                    "ShipID INTEGER, "
+                    "lang TEXT, "
+                    "textattr TEXT, "
+                    "value TEXT "
                     ");"
                     ));
 
@@ -865,6 +865,20 @@ void Server::offerShipInfo(QSslSocket *connection, int index = 0) {
             ename[lang->first] = lang->second;
         }
         result["name"] = ename;
+        QJsonObject eclass;
+        for(auto lang = e->shipClassText.keyValueBegin();
+             lang != e->shipClassText.keyValueEnd();
+             ++lang) {
+            eclass[lang->first] = lang->second;
+        }
+        result["class"] = eclass;
+        QJsonObject eorder;
+        for(auto lang = e->shipOrderText.keyValueBegin();
+             lang != e->shipOrderText.keyValueEnd();
+             ++lang) {
+            eorder[lang->first] = lang->second;
+        }
+        result["shiporder"] = eorder;
         QJsonObject attrs;
         for(auto a = e->attr.keyValueBegin();
              a != e->attr.keyValueEnd();
@@ -1548,16 +1562,16 @@ bool Server::importEquipFromCSV() {
                         
                         QSqlQuery query;
                         query.prepare(
-                            "REPLACE INTO EquipName "
-                            "(EquipID, "+lang+") "
-                                     "VALUES (:id, :value);");
+                            "UPDATE EquipName "
+                            "SET "+lang+" = :value "
+                            "WHERE EquipID = :id;");
                         query.bindValue(":id", equipid);
                         query.bindValue(":value", content);
                         if(!query.exec()) {
+                            qCritical () << query.lastQuery();
                             //% "Import equipment database failed!"
                             throw DBError(qtTrId("equip-import-failed"),
                                           query.lastError());
-                            qCritical() << query.lastError();
                             return false;
                         }
                     }
@@ -1673,7 +1687,7 @@ bool Server::importMapNodeFromCSV() {
                     query.prepare(
                         "UPDATE MapNode "
                         "SET "+lang+" = :value "
-                                 "WHERE MapID = :id;");
+                        "WHERE MapID = :id;");
                     query.bindValue(":id", mapNodeId);
                     query.bindValue(":value", content);
                     if(!query.exec()) {
@@ -1691,7 +1705,7 @@ bool Server::importMapNodeFromCSV() {
 
                     QSqlQuery query;
                     query.prepare(
-                        "INSERT INTO MapResource "
+                        "REPLACE INTO MapResource "
                         "(MapID, Attribute, Intvalue) "
                         "VALUES (:id, :attr, :value);");
                     query.bindValue(":id", mapNodeId);
@@ -1812,27 +1826,7 @@ bool Server::importShipFromCSV() {
                 qCritical("incomplete ship type definition");
             else {
                 for(int i = 0; i < titleParts.length(); ++i) {
-                    if(indicatorParts[i].compare("name", Qt::CaseInsensitive)
-                        == 0) {
-                        QString lang = titleParts[i];
-                        QString content = lineParts[i];
-
-                        QSqlQuery query;
-                        query.prepare(
-                            "REPLACE INTO ShipName "
-                            "(ShipID, "+lang+") "
-                                     "VALUES (:id, :value);");
-                        query.bindValue(":id", shipid);
-                        query.bindValue(":value", content);
-                        if(!query.exec()) {
-                            //% "Import ship database failed!"
-                            throw DBError(qtTrId("ship-import-failed"),
-                                          query.lastError());
-                            qCritical() << query.lastError();
-                            return false;
-                        }
-                    }
-                    else if(titleParts[i].compare("remodel",
+                    if(titleParts[i].compare("remodel",
                                                    Qt::CaseInsensitive)
                              == 0 ){
                         QSqlQuery query;
@@ -1843,9 +1837,9 @@ bool Server::importShipFromCSV() {
                         query.bindValue(":attr", titleParts[i]);
                         query.bindValue(":value", lineParts[i].toInt(nullptr, 16));
                         if(!query.exec()) {
+                            qCritical() << query.lastQuery();
                             throw DBError(qtTrId("ship-import-failed"),
                                           query.lastError());
-                            qCritical() << query.lastError();
                             return false;
                         }
                     }
@@ -1860,9 +1854,32 @@ bool Server::importShipFromCSV() {
                         query.bindValue(":attr", titleParts[i]);
                         query.bindValue(":value", lineParts[i].toInt());
                         if(!query.exec()) {
+                            qCritical() << query.lastQuery();
                             throw DBError(qtTrId("ship-import-failed"),
                                           query.lastError());
-                            qCritical() << query.lastError();
+                            return false;
+                        }
+                    }
+                    else if(!indicatorParts[i].isEmpty()
+                               && indicatorParts[i].compare(
+                                      "id", Qt::CaseInsensitive) != 0){
+                        QString lang = titleParts[i];
+                        QString content = lineParts[i];
+                        QString textattr = indicatorParts[i];
+
+                        QSqlQuery query;
+                        query.prepare(
+                            "REPLACE INTO ShipName "
+                            "(ShipID, lang, textattr, value) "
+                            "VALUES (:id, :lang, :textattr, :value);");
+                        query.bindValue(":id", shipid);
+                        query.bindValue(":lang", lang);
+                        query.bindValue(":textattr", textattr);
+                        query.bindValue(":value", content);
+                        if(!query.exec()) {
+                            qCritical() << query.lastQuery();
+                            throw DBError(qtTrId("ship-import-failed"),
+                                          query.lastError());
                             return false;
                         }
                     }
@@ -2592,8 +2609,8 @@ void Server::sendTestMessages() {
         qWarning() << "Server isn't listening, abort.";
     }
     else {
-        for(int i = 0; i < 496000; i = i + 100) {
-            ;
+        for(auto ship: std::as_const(shipRegistry)) {
+            qInfo() << ship->shipClassText["ja_JP"] << "\t" << ship->shipOrderText["ja_JP"];
         }
         /*
         for(auto user: connectedUsers) {
@@ -2616,7 +2633,7 @@ bool Server::shipRefresh() {
         return false;
     }
     QSqlQuery query;
-    query.prepare("SELECT ShipID FROM ShipName;");
+    query.prepare("SELECT DISTINCT ShipID FROM ShipName;");
     if(!query.exec()) {
         //% "Load ship table failed!"
         throw DBError(qtTrId("ship-refresh-failed"),
@@ -2900,6 +2917,7 @@ void Server::sqlinitShipName() const {
     QSqlQuery query;
     query.prepare(*shipName);
     if(!query.exec()) {
+        qCritical() << query.lastQuery();
         //% "Create Ship name failed."
         throw DBError(qtTrId("equip-ship-name-gen-failure"),
                       query.lastError());

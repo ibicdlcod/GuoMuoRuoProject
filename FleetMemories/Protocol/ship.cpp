@@ -17,9 +17,10 @@ Ship::Ship(int shipId)
     for(auto &lang: supportedLangs) {
         QSqlQuery query;
         query.prepare(
-            "SELECT "+lang+" FROM ShipName "
-                               "WHERE ShipID = :id;");
+            "SELECT value FROM ShipName "
+            "WHERE ShipID = :id AND lang = :lang AND textattr = 'name'");
         query.bindValue(":id", shipId);
+        query.bindValue(":lang", lang);
         if(!query.exec() || !query.isSelect()) {
             qCritical() << query.lastQuery();
             //% "Local language (%1) for ship name not found!"
@@ -28,6 +29,40 @@ Ship::Ship(int shipId)
         }
         else if(query.first()) {
             localNames[lang] = query.value(0).toString();
+        }
+    }
+    for(auto &lang: supportedLangs) {
+        QSqlQuery query;
+        query.prepare(
+            "SELECT value FROM ShipName "
+            "WHERE ShipID = :id AND lang = :lang AND textattr = 'shipclasstext'");
+        query.bindValue(":id", shipId);
+        query.bindValue(":lang", lang);
+        if(!query.exec() || !query.isSelect()) {
+            qCritical() << query.lastQuery();
+            //% "Local language (%1) for ship name not found!"
+            throw DBError(qtTrId("ship-local-name-lack").arg(lang),
+                          query.lastError());
+        }
+        else if(query.first()) {
+            shipClassText[lang] = query.value(0).toString();
+        }
+    }
+    for(auto &lang: supportedLangs) {
+        QSqlQuery query;
+        query.prepare(
+            "SELECT value FROM ShipName "
+            "WHERE ShipID = :id AND lang = :lang AND textattr = 'shipordertext'");
+        query.bindValue(":id", shipId);
+        query.bindValue(":lang", lang);
+        if(!query.exec() || !query.isSelect()) {
+            qCritical() << query.lastQuery();
+            //% "Local language (%1) for ship name not found!"
+            throw DBError(qtTrId("ship-local-name-lack").arg(lang),
+                          query.lastError());
+        }
+        else if(query.first()) {
+            shipOrderText[lang] = query.value(0).toString();
         }
     }
 
@@ -58,6 +93,16 @@ Ship::Ship(const QJsonObject &input) {
     for(auto &lang: lNames.keys()) {
         localNames[lang] =
             lNames.value(lang).toString();
+    };
+    QJsonObject lClassTexts = input["class"].toObject();
+    for(auto &lang: lClassTexts.keys()) {
+        shipClassText[lang] =
+            lClassTexts.value(lang).toString();
+    };
+    QJsonObject lOrderTexts = input["shiporder"].toObject();
+    for(auto &lang: lOrderTexts.keys()) {
+        shipOrderText[lang] =
+            lOrderTexts.value(lang).toString();
     };
     QJsonObject attrs = input["attr"].toObject();
     for(auto &attrI: attrs.keys()) {

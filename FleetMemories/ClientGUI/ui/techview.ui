@@ -168,7 +168,7 @@
              </widget>
             </item>
             <item row="1" column="0">
-             <widget class="QComboBox" name="localListType">
+             <widget class="QComboBox" name="localListType1">
               <property name="sizePolicy">
                <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
                 <horstretch>2</horstretch>
@@ -178,7 +178,7 @@
              </widget>
             </item>
             <item row="1" column="1">
-             <widget class="QComboBox" name="localListValue">
+             <widget class="QComboBox" name="localListValue1">
               <property name="sizePolicy">
                <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
                 <horstretch>2</horstretch>
@@ -220,7 +220,7 @@
              </widget>
             </item>
             <item row="1" column="0">
-             <widget class="QComboBox" name="comboBox_4">
+             <widget class="QComboBox" name="localListNation">
               <property name="sizePolicy">
                <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
                 <horstretch>2</horstretch>
@@ -230,7 +230,7 @@
              </widget>
             </item>
             <item row="1" column="1">
-             <widget class="QComboBox" name="comboBox_3">
+             <widget class="QComboBox" name="localListType2">
               <property name="sizePolicy">
                <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
                 <horstretch>2</horstretch>
@@ -266,7 +266,7 @@
              </widget>
             </item>
             <item row="3" column="0">
-             <widget class="QComboBox" name="comboBox_6">
+             <widget class="QComboBox" name="localListClass">
               <property name="sizePolicy">
                <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
                 <horstretch>2</horstretch>
@@ -276,7 +276,7 @@
              </widget>
             </item>
             <item row="3" column="1">
-             <widget class="QComboBox" name="comboBox_5">
+             <widget class="QComboBox" name="localListShip">
               <property name="sizePolicy">
                <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
                 <horstretch>2</horstretch>
@@ -295,9 +295,6 @@
     </layout>
    </item>
   </layout>
-  <zorder>shipChoice</zorder>
-  <zorder>equipOrShip</zorder>
-  <zorder>equipChoice</zorder>
  </widget>
  <resources/>
  <connections/>
