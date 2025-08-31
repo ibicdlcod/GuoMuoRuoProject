@@ -66,6 +66,8 @@ set(CLIENT_SOURCES
     ClientGUI/ui/portarea.cpp
     ClientGUI/ui/portarea.h
     ClientGUI/ui/portarea.ui
+    ClientGUI/ui/selectdelegate.cpp
+    ClientGUI/ui/selectdelegate.h
     ClientGUI/ui/sortie.cpp
     ClientGUI/ui/sortie.h
     ClientGUI/ui/sortie.ui

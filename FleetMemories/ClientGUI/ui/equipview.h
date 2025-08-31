@@ -9,6 +9,7 @@
 #include <QToolButton>
 #include <QWidget>
 #include "../equipmodel.h"
+#include "selectdelegate.h"
 
 namespace Ui {
 class EquipView;
@@ -50,12 +51,14 @@ protected:
 
 private slots:
     void columnResized(int logicalIndex, int oldSize, int newSize);
+    void itemSelected(QUuid id);
 
 private:
     Ui::EquipView *ui;
 
     EquipModel *model;
     QTableView *arsenalView;
+    SelectDelegate *delegate;
 
     QComboBox *typebox;
     QToolButton *firstButton;

@@ -147,6 +147,10 @@ void EquipModel::setRowsPerPageHint(int input) {
 
 void EquipModel::setIsInArsenal(bool input) {
     isInArsenal = input;
+    wholeTableChanged();
+    if(!input) {
+        isDestructChecked.clear();
+    }
 }
 
 void EquipModel::adjustRowCount(int oldRowCount, int newRowCount) {
@@ -185,7 +189,7 @@ int EquipModel::numberOfColumns() const {
         return 7; // uid/equip/star/attr/destruct/addstar/hiddensort
     }
     else
-        return 5; // uid/equip/star/attr/hiddensort
+        return 6; // uid/equip/star/attr/select/hiddensort
 }
 
 int EquipModel::numberOfEquip() const {
@@ -254,6 +258,9 @@ QVariant EquipModel::data(const QModelIndex &index, int role) const {
                  || index.column() == addStarColumn()) {
             return QVariant();
         }
+        else if(index.column() == selectColumn()) {
+            return QVariant();
+        }
         else if(index.column() == starCol) {
             if(starToDisplay == 0)
                 return QVariant();
@@ -307,6 +314,10 @@ QVariant EquipModel::data(const QModelIndex &index, int role) const {
         else if(index.column() == addStarColumn()) {
             //% "Improve this equipment"
             return qtTrId("equip-improve");
+        }
+        else if(index.column() == selectColumn()) {
+            //% "Select this equipment"
+            return qtTrId("equip-select");
         }
         else
             return QVariant();
@@ -405,6 +416,9 @@ QVariant EquipModel::headerData(int section, Qt::Orientation orientation,
                 return qtTrId("destruct");
             else if(section == addStarColumn())
                 return qtTrId("equip-improve");
+            else if(section == selectColumn()) {
+                return qtTrId("equip-select");
+            }
             else
                 return QVariant();
         }
@@ -465,7 +479,11 @@ int EquipModel::addStarColumn() const {
 }
 
 int EquipModel::hiddenSortColumn() const {
-    return isInArsenal ? 6 : 4;
+    return isInArsenal ? 6 : 5;
+}
+
+int EquipModel::selectColumn() const {
+    return isInArsenal ? -1 : 4;
 }
 
 int EquipModel::currentPageNum() const {
@@ -538,6 +556,8 @@ void EquipModel::wholeTableChanged() {
     QModelIndex topleft = this->index(0, 0);
     QModelIndex bottomright = this->index(rowCount() - 1, columnCount() - 1);
     clearCheckBoxes();
-    emit dataChanged(topleft, bottomright, QList<int>());
+    if(rowCount() > 0 && columnCount() > 0) {
+        emit dataChanged(topleft, bottomright, QList<int>());
+    }
     emit headerDataChanged(Qt::Horizontal, 0, rowCount() - 1);
 }

@@ -53,28 +53,32 @@ public:
     int destructColumn() const;
     int addStarColumn() const;
     int hiddenSortColumn() const;
+    int selectColumn() const;
     int currentPageNum() const;
     int maximumPageNum() const;
     bool isReady() const;
+
+protected:
+    void adjustRowCount(int oldRowCount, int newRowCount);
+    void customSort();
+    int numberOfColumns() const;
+    bool isInArsenal;
+
+    int rowsPerPage = 1;
+    int pageNum = 0;
+    bool ready = false;
 
 private slots:
     void clearCheckBoxes();
     void updateIllegalPage();
 
 private:
-    void adjustRowCount(int oldRowCount, int newRowCount);
-    void customSort();
-    int numberOfColumns() const;
     int numberOfEquip() const;
-    bool isInArsenal;
 
     QHash<QUuid, Equipment *> clientEquips;
     QHash<QUuid, int> clientEquipStars;
     QList<QUuid> sortedEquipIds; // not sort by uuid but equiptype
     QHash<QUuid, bool> isDestructChecked;
-    int rowsPerPage = 1;
-    int pageNum = 0;
-    bool ready = false;
 };
 
 #endif // EQUIPMODEL_H

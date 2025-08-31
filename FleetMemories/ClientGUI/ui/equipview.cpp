@@ -2,6 +2,7 @@
 #include "ui_equipview.h"
 #include <QToolButton>
 #include <QStyleHints>
+#include <QStyledItemDelegate>
 #include "../clientv2.h"
 
 EquipView::EquipView(QWidget *parent)
@@ -122,11 +123,14 @@ EquipView::EquipView(QWidget *parent)
             model, &EquipModel::enactDestruct);
     connect(model, &EquipModel::pageNumChanged,
             this, &EquipView::enactPageNumChange);
+
+    delegate = new SelectDelegate(arsenalView);
 }
 
 EquipView::~EquipView()
 {
     delete ui;
+    delete delegate;
 }
 
 void EquipView::enactPageNumChange(int currentPageNum, int totalPageNum) {
@@ -168,8 +172,13 @@ void EquipView::columnResized(int logicalIndex, int oldSize, int newSize) {
     arsenalView->show();
 }
 
+void EquipView::itemSelected(QUuid id) {
+    qCritical() << id;
+}
+
 void EquipView::activate(bool arsenal) {
     if(arsenal) {
+        arsenalView->setItemDelegate(new QStyledItemDelegate());
         model->setIsInArsenal(true);
         recalculateArsenalRows();
         connect(model, SIGNAL(needReCalculateRows()),
@@ -191,6 +200,25 @@ void EquipView::activate(bool arsenal) {
     }
     else {
         model->setIsInArsenal(false);
+        arsenalView->setItemDelegateForColumn(model->selectColumn(), delegate);
+        recalculateArsenalRows();
+        connect(delegate, &SelectDelegate::itemSelected,
+                this, &EquipView::itemSelected);
+        connect(model, SIGNAL(needReCalculateRows()),
+                this, SLOT(recalculateArsenalRows()),
+                Qt::UniqueConnection);
+        connect(this, SIGNAL(rowCountHint(int)),
+                model, SLOT(setRowsPerPageHint(int)),
+                Qt::UniqueConnection);
+
+        if(!model->isReady()) {
+            Clientv2 &engine = Clientv2::getInstance();
+            engine.doRefreshFactoryArsenal();
+            arsenalView->hide();
+        }
+        else {
+            arsenalView->show();
+        }
         destructButton->hide();
         addStarButton->hide();
     }
@@ -208,7 +236,9 @@ void EquipView::recalculateArsenalRows() {
                                ui->ArsenalControl->size().height()));
     arsenalView->show();
     arsenalView->sortByColumn(model->hiddenSortColumn(), Qt::AscendingOrder);
-    arsenalView->setColumnHidden(model->hiddenSortColumn(), true);
+    for(int i = 0; i < model->columnCount(); ++i) {
+        arsenalView->setColumnHidden(i, i == model->hiddenSortColumn());
+    }
 }
 
 void EquipView::resizeEvent(QResizeEvent *event) {

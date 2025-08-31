@@ -151,7 +151,7 @@ void FactoryArea::switchToState() {
         ui->ArsenalArea->show();
         equipview->setGeometry(ui->ArsenalArea->rect());
         update();
-        equipview->activate(true);
+        equipview->activate(false);
         break;
     }
 }
