@@ -20,8 +20,11 @@ public:
     const ResOrd consRes() const;
     const int consTimeInSec() const;
     int getId() const;
+    QList<int> getLaterModels(const QMap<int, Ship *> &) const;
+    QList<int> getStartingEquip() const;
     double getTech() const;
     ShipType getType() const;
+    QList<std::tuple<int, int>> getVisibleBonuses() const;
     bool isAmnesiac() const;
 
     static int getLevel(int);

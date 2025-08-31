@@ -1386,10 +1386,17 @@ bool Clientv2::loginCheck() {
 
 void Clientv2::sendTestMessages() {
 #pragma message(NOT_M_CONST)
+    /*
     constexpr int size = 20;
     for(int i = 0; i < size; ++i) {
         QByteArray msg = KP::clientTestMessages(i);
         sender->enqueue(msg);
+    }
+*/
+    for(auto ship: std::as_const(shipRegistryCache)) {
+        qCritical() << ship->localNames["ja_JP"]
+                    << "\t" << ship->shipClassText["ja_JP"]
+                    << "\t" << ship->shipOrderText["ja_JP"];
     }
 }
 

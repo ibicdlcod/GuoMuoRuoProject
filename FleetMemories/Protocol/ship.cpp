@@ -145,12 +145,57 @@ int Ship::getId() const {
     return shipRegId;
 }
 
+QList<int> Ship::getLaterModels(const QMap<int, Ship *> &registry) const {
+    QList<int> result;
+    int current = shipRegId;
+    int later = -1;
+    while(true) {
+        later = registry[current]->attr["remodel"];
+        if(later == 0) {
+            break;
+        }
+        if(!registry.contains(later)) {
+            //% "Remodel target %1 does not exist!"
+            qCritical() << qtTrId("remodel-nonexistent").arg(later);
+            break;
+        }
+        if(result.contains(later)) {
+            break;
+        }
+        else {
+            result.append(later);
+            current = later;
+        }
+    }
+    return result;
+}
+
+QList<int> Ship::getStartingEquip() const {
+    QList<int> result;
+    for(int i = 1; i <= 5; ++i) {
+        QString attrId = "Defaultequip" + QString::number(i);
+        if(attr.contains(attrId) && attr[attrId] != 0) {
+            result.append(attr[attrId]);
+        }
+    }
+    return result;
+}
+
 double Ship::getTech() const {
     return Tech::techYearToCompact(attr["Tech"]);
 }
 
 ShipType Ship::getType() const {
     return ShipType(shipRegId);
+}
+
+QList<std::tuple<int, int>> Ship::getVisibleBonuses() const {
+    /* TODO: this is temporary */
+    QList<std::tuple<int, int>> result;
+    for(const auto &defaultequip: getStartingEquip()) {
+        result.append({defaultequip, 1});
+    }
+    return result;
 }
 
 bool Ship::isAmnesiac() const {

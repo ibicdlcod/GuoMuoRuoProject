@@ -51,10 +51,12 @@ TechView::TechView(QWidget *parent) :
     ui->localListType1->setCurrentIndex(0);
     connect(ui->localListType1, &QComboBox::activated,
             this, &TechView::resetLocalListName);
-    connect(ui->localListValue1, &QComboBox::activated,
+    connect(ui->localListEquip, &QComboBox::activated,
             this, &TechView::demandLocalTech);
-    connect(ui->localListValue1, &QComboBox::activated,
+    connect(ui->localListEquip, &QComboBox::activated,
             this, &TechView::demandSkillPoints);
+    connect(ui->localListShip, &QComboBox::activated,
+            this, &TechView::demandLocalTech);
 
     ui->globalViewTable->setSortingEnabled(true);
     ui->localViewTable->setSortingEnabled(true);
@@ -81,20 +83,40 @@ void TechView::demandLocalTech(int index) {
     Q_UNUSED(index)
 
     ui->localViewTable->clear();
+    ui->skillPointsValue->setText(qtTrId("techview-na"));
 
     Clientv2 &engine = Clientv2::getInstance();
-    for(auto &equipReg:
-         engine.equipRegistryCache) {
-        for(auto &name: equipReg->localNames) {
-            if(name.compare(ui->localListValue1->currentText(),
-                             Qt::CaseInsensitive) == 0) {
-                engine.socket.flush();
-                QByteArray msg = KP::clientDemandSkillPoints(equipReg->getId());
-                const qint64 written = engine.socket.write(msg);
-                if (written <= 0) {
-                    throw NetworkError(engine.socket.errorString());
+    if(isEquipChoice) {
+        for(auto &equipReg:
+             engine.equipRegistryCache) {
+            for(auto &name: equipReg->localNames) {
+                if(name.localeAwareCompare(ui->localListEquip->currentText())
+                    == 0) {
+                    engine.socket.flush();
+                    QByteArray msg = KP::clientDemandTech(equipReg->getId());
+                    const qint64 written = engine.socket.write(msg);
+                    if (written <= 0) {
+                        throw NetworkError(engine.socket.errorString());
+                    }
+                    return;
                 }
-                return;
+            }
+        }
+    }
+    else {
+        for(auto &shipReg:
+             engine.shipRegistryCache) {
+            for(auto &name: shipReg->localNames) {
+                if(name.localeAwareCompare(ui->localListShip->currentText())
+                    == 0) {
+                    engine.socket.flush();
+                    QByteArray msg = KP::clientDemandTech(shipReg->getId());
+                    const qint64 written = engine.socket.write(msg);
+                    if (written <= 0) {
+                        throw NetworkError(engine.socket.errorString());
+                    }
+                    return;
+                }
             }
         }
     }
@@ -107,10 +129,10 @@ void TechView::demandSkillPoints(int index) {
     for(auto &equipReg:
          engine.equipRegistryCache) {
         for(auto &name: equipReg->localNames) {
-            if(name.compare(ui->localListValue1->currentText(),
+            if(name.compare(ui->localListEquip->currentText(),
                              Qt::CaseInsensitive) == 0) {
                 engine.socket.flush();
-                QByteArray msg = KP::clientDemandTech(equipReg->getId());
+                QByteArray msg = KP::clientDemandSkillPoints(equipReg->getId());
                 const qint64 written = engine.socket.write(msg);
                 if (written <= 0) {
                     throw NetworkError(engine.socket.errorString());
@@ -128,6 +150,20 @@ void TechView::equipOrShip() {
         ui->equipOrShip->setText(qtTrId("techview-toequip"));
         ui->equipChoice->hide();
         ui->shipChoice->show();
+
+
+        ui->localListShip->clear();
+        for(auto &shipReg:
+             Clientv2::getInstance().shipRegistryCache) {
+            if(true) {
+                QString shipName = shipReg->toString(
+                    settings->value("language", "ja_JP").toString());
+                if(shipName.isEmpty()) {
+                    shipName = shipReg->toString("ja_JP");
+                }
+                ui->localListShip->addItem(shipName);
+            }
+        }
     }
     else {
         isEquipChoice = true;
@@ -173,16 +209,11 @@ void TechView::updateGlobalTechViewTable(const QJsonObject &djson) {
     ui->globalViewTable->setColumnCount(5);
     QJsonArray contents = djson["content"].toArray();
     int currentRowCount = ui->globalViewTable->rowCount();
-    if(djson["initial"].toBool()) {
-        ui->globalViewTable->clear();
-        currentRowCount = 0;
-        ui->globalViewTable->setRowCount(contents.size());
-    }
-    else {
-        ui->globalViewTable->setRowCount(contents.size() + currentRowCount);
-    }
+    ui->globalViewTable->clear();
+    currentRowCount = 0;
+    ui->globalViewTable->setRowCount(contents.size());
     int i = 0;
-    for(auto content: contents) {
+    for(auto &content: std::as_const(contents)) {
         QJsonObject item = content.toObject();
         QTableWidgetItem *newItem = new QTableWidgetItem(
             item["serial"].toString().first(9).last(8));
@@ -206,7 +237,7 @@ void TechView::updateGlobalTechViewTable(const QJsonObject &djson) {
             newItem2->setFlags(newItem->flags() & ~Qt::ItemIsEditable);
             ui->globalViewTable->setItem(currentRowCount + i, 1, newItem2);
             QTableWidgetItem *newItem3 = new TableWidgetItemNumber(
-                    thisEquip->getTech());
+                thisEquip->getTech());
             newItem3->setFlags(newItem->flags() & ~Qt::ItemIsEditable);
             ui->globalViewTable->setItem(currentRowCount + i, 2, newItem3);
             QTableWidgetItem *newItem4 = new TableWidgetItemNumber(
@@ -269,7 +300,10 @@ void TechView::updateLocalTech(const QJsonObject &djson) {
 void TechView::updateLocalTechViewTable(const QJsonObject &djson) {
     Clientv2 &engine = Clientv2::getInstance();
 
-    if(!engine.isEquipRegistryCacheGood()) {
+    if(isEquipChoice && !engine.isEquipRegistryCacheGood()) {
+        return;
+    }
+    else if(!isEquipChoice && !engine.isShipRegistryCacheGood()) {
         return;
     }
     else {
@@ -282,16 +316,11 @@ void TechView::updateLocalTechViewTable(const QJsonObject &djson) {
     ui->localViewTable->setColumnCount(5);
     QJsonArray contents = djson["content"].toArray();
     int currentRowCount = ui->localViewTable->rowCount();
-    if(djson["initial"].toBool()) {
-        ui->localViewTable->clear();
-        currentRowCount = 0;
-        ui->localViewTable->setRowCount(contents.size());
-    }
-    else {
-        ui->localViewTable->setRowCount(contents.size() + currentRowCount);
-    }
+    ui->localViewTable->clear();
+    currentRowCount = 0;
+    ui->localViewTable->setRowCount(contents.size());
     int i = 0;
-    for(auto content: contents) {
+    for(auto &content: std::as_const(contents)) {
         QJsonObject item = content.toObject();
         QTableWidgetItem *newItem = new QTableWidgetItem(
             item["serial"].toString().first(9).last(8));
@@ -299,20 +328,38 @@ void TechView::updateLocalTechViewTable(const QJsonObject &djson) {
         ui->localViewTable->setItem(currentRowCount + i, 0, newItem);
 
         QTableWidgetItem *newItem2;
-        Equipment * thisEquip = engine.getEquipmentReg(item["def"].toInt());
-        if(thisEquip->isInvalid()) {
-            newItem2 = new QTableWidgetItem(
-                QString::number(item["def"].toInt()));
+        Equipment * thisEquip = nullptr;
+        Ship * thisShip = nullptr;
+        bool isEquip = item["def"].toInt() < KP::equipIdMax;
+        if(isEquip) {
+            thisEquip = engine.getEquipmentReg(item["def"].toInt());
+            if(thisEquip->isInvalid()) {
+                newItem2 = new QTableWidgetItem(
+                    QString::number(item["def"].toInt()));
+            }
+            else {
+                newItem2 = new QTableWidgetItem(
+                    thisEquip->toString(settings->value("language", "ja_JP").toString()));
+                newItem2->setIcon(Icute::equipIcon(thisEquip->type, false));
+            }
         }
         else {
-            newItem2 = new QTableWidgetItem(
-                thisEquip->toString(settings->value("language", "ja_JP").toString()));
+            thisShip = engine.getShipReg(item["def"].toInt());
+            if(thisShip->isAmnesiac()) {
+                newItem2 = new QTableWidgetItem(
+                    QString::number(item["def"].toInt()));
+            }
+            else {
+                newItem2 = new QTableWidgetItem(
+                    thisShip->toString(settings->value("language", "ja_JP").toString()));
+                newItem2->setIcon(Icute::shipIcon(thisShip->getId(), false));
+            }
         }
         newItem2->setFlags(newItem->flags() & ~Qt::ItemIsEditable);
         ui->localViewTable->setItem(currentRowCount + i, 1, newItem2);
 
         QTableWidgetItem *newItem3 = new TableWidgetItemNumber(
-            thisEquip->getTech());
+            isEquip ? thisEquip->getTech() : thisShip->getTech());
         newItem3->setFlags(newItem->flags() & ~Qt::ItemIsEditable);
         ui->localViewTable->setItem(currentRowCount + i, 2, newItem3);
 
@@ -323,7 +370,7 @@ void TechView::updateLocalTechViewTable(const QJsonObject &djson) {
         ui->localViewTable->setItem(currentRowCount + i, 3, newItem4);
 
         QTableWidgetItem *newItem5 = new TableWidgetItemNumber(
-            thisEquip->type.getTypeSort());
+            isEquip ? thisEquip->type.getTypeSort() : -(thisShip->getId()));
         newItem5->setFlags(newItem->flags() & ~Qt::ItemIsEditable);
         ui->localViewTable->setItem(currentRowCount + i, 4, newItem5);
         ++i;
@@ -359,7 +406,7 @@ void TechView::resizeColumns(bool global) {
 }
 
 void TechView::resetLocalListName() {
-    ui->localListValue1->clear();
+    ui->localListEquip->clear();
     for(auto &equipReg:
          Clientv2::getInstance().equipRegistryCache) {
         if(
@@ -375,7 +422,7 @@ void TechView::resetLocalListName() {
             if(equipName.isEmpty()) {
                 equipName = equipReg->toString("ja_JP");
             }
-            ui->localListValue1->addItem(equipName);
+            ui->localListEquip->addItem(equipName);
         }
     }
 }

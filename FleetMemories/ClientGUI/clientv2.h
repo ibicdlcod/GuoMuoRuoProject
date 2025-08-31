@@ -96,6 +96,7 @@ public:
     friend void TechView::demandLocalTech(int);
     friend void TechView::demandSkillPoints(int);
     friend void TechView::resetLocalListName();
+    friend void TechView::equipOrShip();
 
     int equipBigTypeIndex = 0;
     int equipIndex = 0;

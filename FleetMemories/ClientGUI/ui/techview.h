@@ -21,13 +21,13 @@ public slots:
     void demandGlobalTech();
     void demandLocalTech(int);
     void demandSkillPoints(int);
+    void equipOrShip();
 
 protected:
     void resizeEvent(QResizeEvent *event) override;
     void showEvent(QShowEvent *event) override;
 
 private slots:
-    void equipOrShip();
     void updateGlobalTech(const QJsonObject &);
     void updateGlobalTechViewTable(const QJsonObject &);
     void updateLocalTech(const QJsonObject &);

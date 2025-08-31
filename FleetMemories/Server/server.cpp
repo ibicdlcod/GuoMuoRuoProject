@@ -716,11 +716,40 @@ Server::calculateTech(const CSteamID &uid, int jobID) {
                     if(isShip) {
                         if(def == jobID)
                             pass = true;
+                        int shipClassMask = 0xFFFFFF00;
+                        if((def & shipClassMask)
+                            == (jobID & shipClassMask))
+                            pass = true;
+                        if(shipRegistry[def]
+                                ->getLaterModels(shipRegistry)
+                                .contains(jobID)) {
+                            pass = true;
+                        }
+                        if(shipRegistry[jobID]
+                                ->getLaterModels(shipRegistry)
+                                .contains(def)) {
+                            pass = true;
+                        }
                     }
                     if(pass) {
                         result.append({serial, def, weight});
                         source.append({ships.value(serial)->getTech(),
                                        weight});
+                    }
+                }
+                if(isShip) {
+                    for(const auto &visibleBouusEquip:
+                         shipRegistry[jobID]->getVisibleBonuses()) {
+                        auto subtech =
+                            calculateTech(uid,
+                                          std::get<0>(visibleBouusEquip));
+                        result.append(subtech.second);
+                        for(const auto &equipData: subtech.second) {
+                            Equipment *equipDef =
+                                equipRegistry[std::get<1>(equipData)];
+                            source.append({equipDef->getTech(),
+                                           std::get<2>(equipData)});
+                        }
                     }
                 }
                 if(jobID != 0) {
@@ -1564,7 +1593,7 @@ bool Server::importEquipFromCSV() {
                         query.prepare(
                             "UPDATE EquipName "
                             "SET "+lang+" = :value "
-                            "WHERE EquipID = :id;");
+                                     "WHERE EquipID = :id;");
                         query.bindValue(":id", equipid);
                         query.bindValue(":value", content);
                         if(!query.exec()) {
@@ -1687,7 +1716,7 @@ bool Server::importMapNodeFromCSV() {
                     query.prepare(
                         "UPDATE MapNode "
                         "SET "+lang+" = :value "
-                        "WHERE MapID = :id;");
+                                 "WHERE MapID = :id;");
                     query.bindValue(":id", mapNodeId);
                     query.bindValue(":value", content);
                     if(!query.exec()) {
@@ -1827,8 +1856,8 @@ bool Server::importShipFromCSV() {
             else {
                 for(int i = 0; i < titleParts.length(); ++i) {
                     if(titleParts[i].compare("remodel",
-                                                   Qt::CaseInsensitive)
-                             == 0 ){
+                                              Qt::CaseInsensitive)
+                        == 0 ){
                         QSqlQuery query;
                         query.prepare("REPLACE INTO ShipReg "
                                       "(ShipID, Attribute, Intvalue) "
@@ -1861,8 +1890,8 @@ bool Server::importShipFromCSV() {
                         }
                     }
                     else if(!indicatorParts[i].isEmpty()
-                               && indicatorParts[i].compare(
-                                      "id", Qt::CaseInsensitive) != 0){
+                             && indicatorParts[i].compare(
+                                    "id", Qt::CaseInsensitive) != 0){
                         QString lang = titleParts[i];
                         QString content = lineParts[i];
                         QString textattr = indicatorParts[i];
@@ -2610,7 +2639,9 @@ void Server::sendTestMessages() {
     }
     else {
         for(auto ship: std::as_const(shipRegistry)) {
-            qInfo() << ship->shipClassText["ja_JP"] << "\t" << ship->shipOrderText["ja_JP"];
+            for(auto later: ship->getLaterModels(shipRegistry)) {
+                qInfo() << ship->getId() << "\t" << later;
+            }
         }
         /*
         for(auto user: connectedUsers) {
