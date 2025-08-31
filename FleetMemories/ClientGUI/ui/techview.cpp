@@ -48,6 +48,18 @@ TechView::TechView(QWidget *parent) :
     }
     //% "All equipments"
     ui->localListType1->addItem(qtTrId("all-equipments"));
+
+    auto meta = QMetaEnum::fromType<KP::ShipNationality>();
+    for(int i = 0; i < meta.keyCount(); ++i) {
+        if(meta.value(i) == KP::ShipNationality::Unknown) {
+            //% "All nationalities"
+            ui->localListNation->addItem(qtTrId("all-nationality"));
+        }
+        else {
+            ui->localListNation->addItem(qtTrId(meta.key(i)));
+        }
+    }
+
     ui->localListType1->setCurrentIndex(0);
     connect(ui->localListType1, &QComboBox::activated,
             this, &TechView::resetLocalListName);
@@ -55,8 +67,18 @@ TechView::TechView(QWidget *parent) :
             this, &TechView::demandLocalTech);
     connect(ui->localListEquip, &QComboBox::activated,
             this, &TechView::demandSkillPoints);
+    connect(ui->localListNation, &QComboBox::activated,
+            this, &TechView::resetLocalListName);
+    connect(ui->localListType2, &QComboBox::activated,
+            this, &TechView::resetLocalListName);
+    connect(ui->localListClass, &QComboBox::activated,
+            this, &TechView::resetLocalListName);
     connect(ui->localListShip, &QComboBox::activated,
             this, &TechView::demandLocalTech);
+    connect(ui->updateLocal, &QPushButton::clicked,
+            this, &TechView::demandLocalTech);
+    connect(ui->updateLocal, &QPushButton::clicked,
+            this, &TechView::demandSkillPoints);
 
     ui->globalViewTable->setSortingEnabled(true);
     ui->localViewTable->setSortingEnabled(true);
@@ -125,19 +147,21 @@ void TechView::demandLocalTech(int index) {
 void TechView::demandSkillPoints(int index) {
     Q_UNUSED(index)
 
-    Clientv2 &engine = Clientv2::getInstance();
-    for(auto &equipReg:
-         engine.equipRegistryCache) {
-        for(auto &name: equipReg->localNames) {
-            if(name.compare(ui->localListEquip->currentText(),
-                             Qt::CaseInsensitive) == 0) {
-                engine.socket.flush();
-                QByteArray msg = KP::clientDemandSkillPoints(equipReg->getId());
-                const qint64 written = engine.socket.write(msg);
-                if (written <= 0) {
-                    throw NetworkError(engine.socket.errorString());
+    if(isEquipChoice) {
+        Clientv2 &engine = Clientv2::getInstance();
+        for(auto &equipReg:
+             engine.equipRegistryCache) {
+            for(auto &name: equipReg->localNames) {
+                if(name.compare(ui->localListEquip->currentText(),
+                                 Qt::CaseInsensitive) == 0) {
+                    engine.socket.flush();
+                    QByteArray msg = KP::clientDemandSkillPoints(equipReg->getId());
+                    const qint64 written = engine.socket.write(msg);
+                    if (written <= 0) {
+                        throw NetworkError(engine.socket.errorString());
+                    }
+                    return;
                 }
-                return;
             }
         }
     }
@@ -151,19 +175,7 @@ void TechView::equipOrShip() {
         ui->equipChoice->hide();
         ui->shipChoice->show();
 
-
-        ui->localListShip->clear();
-        for(auto &shipReg:
-             Clientv2::getInstance().shipRegistryCache) {
-            if(true) {
-                QString shipName = shipReg->toString(
-                    settings->value("language", "ja_JP").toString());
-                if(shipName.isEmpty()) {
-                    shipName = shipReg->toString("ja_JP");
-                }
-                ui->localListShip->addItem(shipName);
-            }
-        }
+        resetLocalListName();
     }
     else {
         isEquipChoice = true;
@@ -406,23 +418,96 @@ void TechView::resizeColumns(bool global) {
 }
 
 void TechView::resetLocalListName() {
-    ui->localListEquip->clear();
-    for(auto &equipReg:
-         Clientv2::getInstance().equipRegistryCache) {
-        if(
-            (ui->localListType1->currentText().compare("All equipments") == 0
-             && equipReg->type.getDisplayGroup()
-                        .compare("VIRTUAL", Qt::CaseInsensitive) != 0
-             && !equipReg->localNames.value("ja_JP").isEmpty())
-            || equipReg->type.getDisplayGroup()
-                       .compare(ui->localListType1->currentText(),
-                                Qt::CaseInsensitive) == 0) {
-            QString equipName = equipReg->toString(
-                settings->value("language", "ja_JP").toString());
-            if(equipName.isEmpty()) {
-                equipName = equipReg->toString("ja_JP");
+    if(isEquipChoice) {
+        ui->localListEquip->clear();
+        for(auto &equipReg:
+             Clientv2::getInstance().equipRegistryCache) {
+            if(
+                (ui->localListType1->currentText().compare("All equipments") == 0
+                 && equipReg->type.getDisplayGroup()
+                            .compare("VIRTUAL", Qt::CaseInsensitive) != 0
+                 && !equipReg->localNames.value("ja_JP").isEmpty())
+                || equipReg->type.getDisplayGroup()
+                           .compare(ui->localListType1->currentText(),
+                                    Qt::CaseInsensitive) == 0) {
+                QString equipName = equipReg->toString(
+                    settings->value("language", "ja_JP").toString());
+                if(equipName.isEmpty()) {
+                    equipName = equipReg->toString("ja_JP");
+                }
+                ui->localListEquip->addItem(equipName);
             }
-            ui->localListEquip->addItem(equipName);
+        }
+    }
+    else {
+        ui->localListShip->clear();
+        auto meta = QMetaEnum::fromType<KP::ShipNationality>();
+        bool pass;
+        auto sender = QObject::sender();
+        QString classText;
+        if(sender == ui->localListNation) {
+            ui->localListType2->clear();
+            ui->localListClass->clear();
+        }
+        if(sender == ui->localListType2) {
+            ui->localListClass->clear();
+        }
+        for(auto &shipReg:
+             Clientv2::getInstance().shipRegistryCache) {
+            if(shipReg->isAmnesiac()) {
+                continue;
+            }
+            pass = true;
+
+            if(ui->localListNation->currentText().localeAwareCompare(
+                    qtTrId("all-nationality")) != 0
+                && qtTrId(meta.key(shipReg->getNationality()))
+                           .localeAwareCompare(
+                               ui->localListNation->currentText()) != 0) {
+                pass = false;
+            }
+            if(sender != ui->localListType2
+                && sender != ui->localListClass) {
+                if(pass) {
+                    QString type = shipReg->getType().toString();
+                    if(ui->localListType2->findText(type) == -1) {
+                        ui->localListType2->addItem(type);
+                    }
+                }
+            }
+
+            if(shipReg->getType().toString().localeAwareCompare(
+                    ui->localListType2->currentText()) != 0) {
+                pass = false;
+            }
+            classText =
+                shipReg->shipClassText[
+                    settings->value("language", "ja_JP").toString()
+            ];
+            if(classText.isEmpty()) {
+                classText = shipReg->shipClassText["ja_JP"];
+            }
+            if(sender != ui->localListClass) {
+                if(pass) {
+                    if(ui->localListClass->findText(classText) == -1) {
+                        ui->localListClass->addItem(classText);
+                    }
+                }
+            }
+
+            if(classText.localeAwareCompare(
+                    ui->localListClass->currentText()) != 0) {
+                pass = false;
+            }
+
+            if(pass) {
+                QString shipName = shipReg->toString(
+                    settings->value("language", "ja_JP").toString());
+                if(shipName.isEmpty()) {
+                    shipName = shipReg->toString("ja_JP");
+                }
+                ui->localListShip->addItem(shipName);
+            }
         }
     }
 }

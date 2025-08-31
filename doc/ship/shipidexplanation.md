@@ -10,7 +10,7 @@
 |  0x700000  |                            Soviet                            |
 |  0x800000  |                Chinese(regardless of regime)                 |
 |  0x900000  |                           Benelux                            |
-|  0xA00000  |                         Scadinavian                          |
+|  0xA00000  |                         Scandinavian                         |
 |  0xB00000  |                   Australian/New Zelandian                   |
 |  0xC00000  |                  Iberian or Latin American                   |
 |  0XD00000  |             Eastern European(including Turkish)              |

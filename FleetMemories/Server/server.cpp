@@ -703,6 +703,11 @@ Server::calculateTech(const CSteamID &uid, int jobID) {
                 bool pass;
                 int exp;
                 int level;
+                QList<int> laterModels;
+                if(isShip) {
+                    laterModels = shipRegistry[jobID]
+                                      ->getLaterModels(shipRegistry);
+                }
                 while(query.next()) {
                     pass = jobID == 0;
                     serial = query.value(1).toUuid();
@@ -716,18 +721,16 @@ Server::calculateTech(const CSteamID &uid, int jobID) {
                     if(isShip) {
                         if(def == jobID)
                             pass = true;
-                        int shipClassMask = 0xFFFFFF00;
+                        int shipClassMask = 0xFFFF0F00;
                         if((def & shipClassMask)
                             == (jobID & shipClassMask))
                             pass = true;
                         if(shipRegistry[def]
-                                ->getLaterModels(shipRegistry)
-                                .contains(jobID)) {
+                                ->getLaterModels(shipRegistry).
+                            contains(jobID)) {
                             pass = true;
                         }
-                        if(shipRegistry[jobID]
-                                ->getLaterModels(shipRegistry)
-                                .contains(def)) {
+                        if(laterModels.contains(def)) {
                             pass = true;
                         }
                     }
@@ -2638,10 +2641,10 @@ void Server::sendTestMessages() {
         qWarning() << "Server isn't listening, abort.";
     }
     else {
+        auto meta = QMetaEnum::fromType<KP::ShipNationality>();
         for(auto ship: std::as_const(shipRegistry)) {
-            for(auto later: ship->getLaterModels(shipRegistry)) {
-                qInfo() << ship->getId() << "\t" << later;
-            }
+            qInfo() << meta.valueToKey(ship->getNationality());
+            //qInfo() << ship->getNationality();
         }
         /*
         for(auto user: connectedUsers) {

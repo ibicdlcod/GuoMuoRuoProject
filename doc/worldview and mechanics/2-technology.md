@@ -62,9 +62,9 @@ All Kanmusu and equipment will count toward the calculation.
 
 [Implemented in Server::calculateTech]
 
-For ships: All ships of the same class and all equipment she can handle will count toward the calculation. [NOTYETIMPLEMENTED]
+For ships: All ships of the same class, all ships of her earlier and later remodel, and all equipment she has visible bonus[TEMPORARYSOLUTION: all sub-technologies of default equipment] will count toward the calculation.
 
-For equipment: All equipment of this exact type and a virtual equipment of this exact type (without base weight of 1.0, meaning only skill point effect will count [Implemented in Server::calculateTech#virtual_skill_point_effect]) and [its "father" and all paternal children on the technology tree], and [all Kanmusu who have visible bonuses related to this equipment] [NOTYETIMPLEMENTED] will count toward the calculation. The two concepts will be dealt later.
+For equipment: All equipment of this exact type and a virtual equipment of this exact type (without base weight of 1.0, meaning only skill point effect will count [Implemented in Server::calculateTech#virtual_skill_point_effect]) and [its "father" and all paternal children on the technology tree] will count toward the calculation. The two concepts will be dealt later.
 
 An equipment that does not have a predecessor will have it's local technology not counted when developing.
 

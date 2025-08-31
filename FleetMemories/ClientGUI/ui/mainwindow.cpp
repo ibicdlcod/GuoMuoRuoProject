@@ -92,6 +92,10 @@ MainWindow::MainWindow(QWidget *parent, int argc, char ** argv)
             &engine, &Clientv2::switchToFactory);
     connect(ui->actionArsenal, &QAction::triggered,
             this, &MainWindow::switchToArsenal);
+    connect(ui->actionAnchorage, &QAction::triggered,
+            &engine, &Clientv2::switchToFactory);
+    connect(ui->actionAnchorage, &QAction::triggered,
+            this, &MainWindow::switchToAnchorage);
     connect(ui->actionBattle, &QAction::triggered,
             &engine, &Clientv2::switchToBattleView);
     connect(ui->actionBattle, &QAction::triggered,
@@ -206,6 +210,15 @@ void MainWindow::printMessage(QString text, QColor background,
 void MainWindow::processCmd() {
     emit cmdMessage(ui->CommandPrompt->toPlainText());
     ui->CommandPrompt->clear();
+}
+
+void MainWindow::switchToAnchorage() {
+    Clientv2 &engine = Clientv2::getInstance();
+    if(!engine.loggedIn()) {
+        return;
+    }
+    factoryArea->setState(KP::Anchorage);
+    factoryArea->switchToState();
 }
 
 void MainWindow::switchToArsenal() {

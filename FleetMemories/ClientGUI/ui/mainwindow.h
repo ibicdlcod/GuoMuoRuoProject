@@ -38,6 +38,7 @@ private slots:
     void printMessage(QString, QColor background = QColor("white"),
                       QColor foreground = QColor("black"));
     void processCmd();
+    void switchToAnchorage();
     void switchToArsenal();
     void switchToConstruct();
     void switchToDevelop();

@@ -15,13 +15,13 @@ class TechView : public QFrame
 public:
     explicit TechView(QWidget *parent = nullptr);
     ~TechView();
-    void resetLocalListName();
 
 public slots:
     void demandGlobalTech();
     void demandLocalTech(int);
     void demandSkillPoints(int);
     void equipOrShip();
+    void resetLocalListName();
 
 protected:
     void resizeEvent(QResizeEvent *event) override;

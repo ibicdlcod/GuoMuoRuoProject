@@ -149,7 +149,8 @@ Q_ENUM_NS(GameError)
 enum FactoryState{
     Development,
     Construction,
-    Arsenal
+    Arsenal,
+    Anchorage
 };
 Q_ENUM_NS(FactoryState)
 
@@ -193,6 +194,26 @@ enum ConsoleCommandType{
     Messagetest
 };
 Q_ENUM_NS(ConsoleCommandType)
+
+enum ShipNationality{
+    Unknown = 0,
+    Japanese = 1,
+    German = 2,
+    Italian = 3,
+    American = 4, // includes Canadian and Filipino
+    British = 5, // includes Indian and Irish
+    French = 6,
+    Soviet = 7, // includes any non-Baltic Soviet Republic
+    Chinese = 8,
+    Benelux = 9,
+    Scandinavian = 0xA,
+    Oceanian = 0xB,
+    Latin = 0xC, // Iberian or Latin American
+    EasternEuropean = 0xD,
+    MinorAsian = 0xE,
+    Fantasy = 0xF
+};
+Q_ENUM_NS(ShipNationality)
 
 void initLog(bool server = false);
 #if defined (Q_OS_WIN)

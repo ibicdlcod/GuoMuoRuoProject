@@ -79,30 +79,34 @@ QString ShipType::toString() const {
                 //% "(Escort)"
                 result.append(" ").append(qtTrId("escort-carrier")); break;
             }
-            if(iRep & 0x4)
+            if(iRep & 0x4) {
                 //% "(Armored)"
-                result.append(" ").append(qtTrId("armored-carrier")); break;
-            if(iRep & 0x8)
+                result.append(" ").append(qtTrId("armored-carrier"));
+            }
+            if(iRep & 0x8) {
                 //% "(Night Aviation)"
-                result.append(" ").append(qtTrId("night-carrier")); break;
+                result.append(" ").append(qtTrId("night-carrier"));
+            }
             return result;
         }
         case 7:
         {
             //% "Submarine"
             QString result = qtTrId("type-ss");
-            if(iRep & 0x4)
+            if(iRep & 0x4) {
                 //% "(Aviation)"
-                result.append(" ").append(qtTrId("aviation-submarine")); break;
+                result.append(" ").append(qtTrId("aviation-submarine"));
+            }
             return result;
         }
         case 8:
         {
             //% "Seaplane Carrier"
             QString result = qtTrId("type-av");
-            if(iRep & 0x2)
+            if(iRep & 0x2) {
                 //% "(Advanced Torpedos)"
-                result.append(" ").append(qtTrId("type-av-torp")); break;
+                result.append(" ").append(qtTrId("type-av-torp"));
+            }
             return result;
         }
         case 9:

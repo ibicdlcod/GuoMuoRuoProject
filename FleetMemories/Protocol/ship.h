@@ -21,6 +21,7 @@ public:
     const int consTimeInSec() const;
     int getId() const;
     QList<int> getLaterModels(const QMap<int, Ship *> &) const;
+    KP::ShipNationality getNationality() const;
     QList<int> getStartingEquip() const;
     double getTech() const;
     ShipType getType() const;

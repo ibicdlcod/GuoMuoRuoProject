@@ -144,6 +144,15 @@ void FactoryArea::switchToState() {
         update();
         equipview->activate(true);
         break;
+    case KP::Anchorage:
+        //% "Anchorage"
+        ui->FactoryLabel->setText(qtTrId("anchorage"));
+        ui->Slots->hide();
+        ui->ArsenalArea->show();
+        equipview->setGeometry(ui->ArsenalArea->rect());
+        update();
+        equipview->activate(true);
+        break;
     }
 }
 

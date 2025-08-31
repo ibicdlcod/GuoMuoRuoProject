@@ -486,52 +486,52 @@ Great at battle and bad at politics--so cool!</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="night-carrier">
-        <location filename="../Protocol/shiptype.cpp" line="87"/>
+        <location filename="../Protocol/shiptype.cpp" line="88"/>
         <source>(Night Aviation)</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="type-ss">
-        <location filename="../Protocol/shiptype.cpp" line="93"/>
+        <location filename="../Protocol/shiptype.cpp" line="95"/>
         <source>Submarine</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="aviation-submarine">
-        <location filename="../Protocol/shiptype.cpp" line="96"/>
+        <location filename="../Protocol/shiptype.cpp" line="98"/>
         <source>(Aviation)</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="type-av">
-        <location filename="../Protocol/shiptype.cpp" line="102"/>
+        <location filename="../Protocol/shiptype.cpp" line="105"/>
         <source>Seaplane Carrier</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="type-av-torp">
-        <location filename="../Protocol/shiptype.cpp" line="105"/>
+        <location filename="../Protocol/shiptype.cpp" line="108"/>
         <source>(Advanced Torpedos)</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="supply-ship">
-        <location filename="../Protocol/shiptype.cpp" line="110"/>
+        <location filename="../Protocol/shiptype.cpp" line="114"/>
         <source>Supply ship</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="amphibious-assault">
-        <location filename="../Protocol/shiptype.cpp" line="113"/>
+        <location filename="../Protocol/shiptype.cpp" line="117"/>
         <source>Amphibious assault ship</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="repair">
-        <location filename="../Protocol/shiptype.cpp" line="116"/>
+        <location filename="../Protocol/shiptype.cpp" line="120"/>
         <source>Repair ship</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="type-land">
-        <location filename="../Protocol/shiptype.cpp" line="119"/>
+        <location filename="../Protocol/shiptype.cpp" line="123"/>
         <source>Land Structure</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="unknown-ship-type">
-        <location filename="../Protocol/shiptype.cpp" line="122"/>
+        <location filename="../Protocol/shiptype.cpp" line="126"/>
         <source>Unknown</source>
         <translation type="unfinished"></translation>
     </message>
@@ -685,13 +685,13 @@ Great at battle and bad at politics--so cool!</source>
     </message>
     <message id="ip-invalid">
         <location filename="../ClientGUI/clientv2.cpp" line="816"/>
-        <location filename="../Server/server.cpp" line="2085"/>
+        <location filename="../Server/server.cpp" line="2088"/>
         <source>IP isn&apos;t valid.</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="port-invalid">
         <location filename="../ClientGUI/clientv2.cpp" line="822"/>
-        <location filename="../Server/server.cpp" line="2091"/>
+        <location filename="../Server/server.cpp" line="2094"/>
         <source>Port isn&apos;t valid, it must fall between 1024 and 49151</source>
         <translation type="unfinished"></translation>
     </message>
@@ -872,7 +872,7 @@ Great at battle and bad at politics--so cool!</source>
     </message>
     <message id="switch-cert-when-connecting">
         <location filename="../ClientGUI/clientv2.cpp" line="1422"/>
-        <location filename="../Server/server.cpp" line="2996"/>
+        <location filename="../Server/server.cpp" line="2999"/>
         <source>Switch certificate when connected have no effect.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1012,6 +1012,11 @@ Great at battle and bad at politics--so cool!</source>
         <source>Arsenal</source>
         <translation type="unfinished"></translation>
     </message>
+    <message id="anchorage">
+        <location filename="../ClientGUI/ui/factoryarea.cpp" line="149"/>
+        <source>Anchorage</source>
+        <translation type="unfinished"></translation>
+    </message>
     <message id="naganami-words">
         <location filename="../ClientGUI/ui/licensearea.cpp" line="44"/>
         <source>What? Admiral Tanaka? He&apos;s the real deal, isn&apos;t he?
@@ -1038,44 +1043,51 @@ Great at battle and bad at politics--so cool!</source>
         <source>Hello!</source>
         <translation type="unfinished"></translation>
     </message>
+    <message id="all-nationality">
+        <location filename="../ClientGUI/ui/techview.cpp" line="56"/>
+        <location filename="../ClientGUI/ui/techview.cpp" line="463"/>
+        <source>All nationalities</source>
+        <oldsource>All nationality</oldsource>
+        <translation type="unfinished"></translation>
+    </message>
     <message id="techview-toequip">
-        <location filename="../ClientGUI/ui/techview.cpp" line="150"/>
+        <location filename="../ClientGUI/ui/techview.cpp" line="174"/>
         <source>Switch to Equip</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="Serial-num">
-        <location filename="../ClientGUI/ui/techview.cpp" line="277"/>
-        <location filename="../ClientGUI/ui/techview.cpp" line="314"/>
-        <location filename="../ClientGUI/ui/techview.cpp" line="379"/>
-        <location filename="../ClientGUI/ui/techview.cpp" line="438"/>
-        <location filename="../ClientGUI/ui/techview.cpp" line="442"/>
+        <location filename="../ClientGUI/ui/techview.cpp" line="289"/>
+        <location filename="../ClientGUI/ui/techview.cpp" line="326"/>
+        <location filename="../ClientGUI/ui/techview.cpp" line="391"/>
+        <location filename="../ClientGUI/ui/techview.cpp" line="523"/>
+        <location filename="../ClientGUI/ui/techview.cpp" line="527"/>
         <source>Serial Num</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="Equip-name-def">
-        <location filename="../ClientGUI/ui/techview.cpp" line="279"/>
-        <location filename="../ClientGUI/ui/techview.cpp" line="314"/>
-        <location filename="../ClientGUI/ui/techview.cpp" line="379"/>
-        <location filename="../ClientGUI/ui/techview.cpp" line="438"/>
-        <location filename="../ClientGUI/ui/techview.cpp" line="442"/>
+        <location filename="../ClientGUI/ui/techview.cpp" line="291"/>
+        <location filename="../ClientGUI/ui/techview.cpp" line="326"/>
+        <location filename="../ClientGUI/ui/techview.cpp" line="391"/>
+        <location filename="../ClientGUI/ui/techview.cpp" line="523"/>
+        <location filename="../ClientGUI/ui/techview.cpp" line="527"/>
         <source>Name</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="Equip-tech-level">
-        <location filename="../ClientGUI/ui/techview.cpp" line="281"/>
-        <location filename="../ClientGUI/ui/techview.cpp" line="315"/>
-        <location filename="../ClientGUI/ui/techview.cpp" line="380"/>
-        <location filename="../ClientGUI/ui/techview.cpp" line="439"/>
-        <location filename="../ClientGUI/ui/techview.cpp" line="443"/>
+        <location filename="../ClientGUI/ui/techview.cpp" line="293"/>
+        <location filename="../ClientGUI/ui/techview.cpp" line="327"/>
+        <location filename="../ClientGUI/ui/techview.cpp" line="392"/>
+        <location filename="../ClientGUI/ui/techview.cpp" line="524"/>
+        <location filename="../ClientGUI/ui/techview.cpp" line="528"/>
         <source>Tech</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="Weight">
-        <location filename="../ClientGUI/ui/techview.cpp" line="283"/>
-        <location filename="../ClientGUI/ui/techview.cpp" line="315"/>
-        <location filename="../ClientGUI/ui/techview.cpp" line="380"/>
-        <location filename="../ClientGUI/ui/techview.cpp" line="439"/>
-        <location filename="../ClientGUI/ui/techview.cpp" line="443"/>
+        <location filename="../ClientGUI/ui/techview.cpp" line="295"/>
+        <location filename="../ClientGUI/ui/techview.cpp" line="327"/>
+        <location filename="../ClientGUI/ui/techview.cpp" line="392"/>
+        <location filename="../ClientGUI/ui/techview.cpp" line="524"/>
+        <location filename="../ClientGUI/ui/techview.cpp" line="528"/>
         <source>Weight</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1106,7 +1118,7 @@ Great at battle and bad at politics--so cool!</source>
     </message>
     <message id="already-listening">
         <location filename="../Server/server.cpp" line="419"/>
-        <location filename="../Server/server.cpp" line="2079"/>
+        <location filename="../Server/server.cpp" line="2082"/>
         <source>Server is already listening.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1148,480 +1160,480 @@ Great at battle and bad at politics--so cool!</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="equipid-invalid-skill-points-effect">
-        <location filename="../Server/server.cpp" line="778"/>
+        <location filename="../Server/server.cpp" line="781"/>
         <source>Skill points effect calculation failed due to invalid equipment ID!</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="user-get-equip-list-failed">
-        <location filename="../Server/server.cpp" line="836"/>
+        <location filename="../Server/server.cpp" line="839"/>
         <source>Get user %1&apos;s equipment list failed!</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="client-id-received">
-        <location filename="../Server/server.cpp" line="979"/>
+        <location filename="../Server/server.cpp" line="982"/>
         <source>PSK callback, received a client&apos;s identity: &apos;%1&apos;</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="wait-for-dc">
-        <location filename="../Server/server.cpp" line="1006"/>
+        <location filename="../Server/server.cpp" line="1009"/>
         <source>Disconnect success: %1 port %2</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="dc-failed">
-        <location filename="../Server/server.cpp" line="1011"/>
+        <location filename="../Server/server.cpp" line="1014"/>
         <source>Disconnect failed! %1 port %2</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="user-get-equip-list-failed-eidbased">
-        <location filename="../Server/server.cpp" line="1043"/>
+        <location filename="../Server/server.cpp" line="1046"/>
         <source>Get user&apos;s equipment list by uuid %1 failed!</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="improve-beyond-possible">
-        <location filename="../Server/server.cpp" line="1052"/>
+        <location filename="../Server/server.cpp" line="1055"/>
         <source>Equip id %1: not allowed to improve beyond 15 stars.</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="user-add-equip-star-failed-eidbased">
-        <location filename="../Server/server.cpp" line="1064"/>
+        <location filename="../Server/server.cpp" line="1067"/>
         <source>Improve equipment failed due to bad equipment uuid!</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="improve-success">
-        <location filename="../Server/server.cpp" line="1071"/>
+        <location filename="../Server/server.cpp" line="1074"/>
         <source>Equip id %1: improved to %2 stars.</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="clear-negative-skillpoints-failed">
-        <location filename="../Server/server.cpp" line="1103"/>
+        <location filename="../Server/server.cpp" line="1106"/>
         <source>User %1: clear negative skill points failed!</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="delete-all-equip-failed">
-        <location filename="../Server/server.cpp" line="1136"/>
+        <location filename="../Server/server.cpp" line="1139"/>
         <source>User id %1: delete all equipment failed!</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="delete-all-equip">
-        <location filename="../Server/server.cpp" line="1142"/>
+        <location filename="../Server/server.cpp" line="1145"/>
         <source>User id %1: all equipment deleted</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="delete-all-ship-failed">
-        <location filename="../Server/server.cpp" line="1155"/>
+        <location filename="../Server/server.cpp" line="1158"/>
         <source>User id %1: delete all ship failed!</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="delete-all-ship">
-        <location filename="../Server/server.cpp" line="1161"/>
+        <location filename="../Server/server.cpp" line="1164"/>
         <source>User id %1: all ship deleted</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="dbfail-developing">
-        <location filename="../Server/server.cpp" line="1276"/>
+        <location filename="../Server/server.cpp" line="1279"/>
         <source>Database failed when developing.</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="fetch-facto-failed">
-        <location filename="../Server/server.cpp" line="1306"/>
+        <location filename="../Server/server.cpp" line="1309"/>
         <source>Fetch factory product failed.</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="dbfail-fetching">
-        <location filename="../Server/server.cpp" line="1362"/>
+        <location filename="../Server/server.cpp" line="1365"/>
         <source>Database failed when fetching product.</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="database-uninit">
-        <location filename="../Server/server.cpp" line="1373"/>
-        <location filename="../Server/server.cpp" line="1424"/>
-        <location filename="../Server/server.cpp" line="1549"/>
-        <location filename="../Server/server.cpp" line="1668"/>
-        <location filename="../Server/server.cpp" line="1767"/>
-        <location filename="../Server/server.cpp" line="1827"/>
-        <location filename="../Server/server.cpp" line="2663"/>
+        <location filename="../Server/server.cpp" line="1376"/>
+        <location filename="../Server/server.cpp" line="1427"/>
+        <location filename="../Server/server.cpp" line="1552"/>
+        <location filename="../Server/server.cpp" line="1671"/>
+        <location filename="../Server/server.cpp" line="1770"/>
+        <location filename="../Server/server.cpp" line="1830"/>
+        <location filename="../Server/server.cpp" line="2666"/>
         <source>Database uninitialized!</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="equip-refresh-failed">
-        <location filename="../Server/server.cpp" line="1380"/>
-        <location filename="../Server/server.cpp" line="1431"/>
+        <location filename="../Server/server.cpp" line="1383"/>
+        <location filename="../Server/server.cpp" line="1434"/>
         <source>Load equipment table failed!</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="equip-load-good">
-        <location filename="../Server/server.cpp" line="1395"/>
+        <location filename="../Server/server.cpp" line="1398"/>
         <source>Load equipment registry success!</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="equip-child-load-good">
-        <location filename="../Server/server.cpp" line="1402"/>
+        <location filename="../Server/server.cpp" line="1405"/>
         <source>Load equipment child list success!</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="server-shutdown">
-        <location filename="../Server/server.cpp" line="1409"/>
+        <location filename="../Server/server.cpp" line="1412"/>
         <source>Server is shutting down</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="bad-csv">
-        <location filename="../Server/server.cpp" line="1417"/>
-        <location filename="../Server/server.cpp" line="1558"/>
-        <location filename="../Server/server.cpp" line="1677"/>
-        <location filename="../Server/server.cpp" line="1776"/>
-        <location filename="../Server/server.cpp" line="1836"/>
+        <location filename="../Server/server.cpp" line="1420"/>
+        <location filename="../Server/server.cpp" line="1561"/>
+        <location filename="../Server/server.cpp" line="1680"/>
+        <location filename="../Server/server.cpp" line="1779"/>
+        <location filename="../Server/server.cpp" line="1839"/>
         <source>%1: CSV file cannot be opened</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="equip-export-good">
-        <location filename="../Server/server.cpp" line="1457"/>
+        <location filename="../Server/server.cpp" line="1460"/>
         <source>Export equipment registry success!</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="equip-def-incomplete">
-        <location filename="../Server/server.cpp" line="1578"/>
+        <location filename="../Server/server.cpp" line="1581"/>
         <source>incomplete equip type definition</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="equip-import-failed">
-        <location filename="../Server/server.cpp" line="1602"/>
-        <location filename="../Server/server.cpp" line="1620"/>
-        <location filename="../Server/server.cpp" line="1637"/>
+        <location filename="../Server/server.cpp" line="1605"/>
+        <location filename="../Server/server.cpp" line="1623"/>
+        <location filename="../Server/server.cpp" line="1640"/>
         <source>Import equipment database failed!</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="num-of-equip-imports">
-        <location filename="../Server/server.cpp" line="1648"/>
+        <location filename="../Server/server.cpp" line="1651"/>
         <source>Imported %1 equipment(s)</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="equip-import-good">
-        <location filename="../Server/server.cpp" line="1655"/>
+        <location filename="../Server/server.cpp" line="1658"/>
         <source>Import equipment registry success!</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="map-node-import-failed">
-        <location filename="../Server/server.cpp" line="1704"/>
-        <location filename="../Server/server.cpp" line="1725"/>
-        <location filename="../Server/server.cpp" line="1746"/>
-        <location filename="../Server/server.cpp" line="1806"/>
+        <location filename="../Server/server.cpp" line="1707"/>
+        <location filename="../Server/server.cpp" line="1728"/>
+        <location filename="../Server/server.cpp" line="1749"/>
+        <location filename="../Server/server.cpp" line="1809"/>
         <source>Import map node database failed!</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="map-node-import-good">
-        <location filename="../Server/server.cpp" line="1760"/>
+        <location filename="../Server/server.cpp" line="1763"/>
         <source>Import map node registry success!</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="map-relation-import-good">
-        <location filename="../Server/server.cpp" line="1819"/>
+        <location filename="../Server/server.cpp" line="1822"/>
         <source>Import map relation registry success!</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="ship-import-failed">
-        <location filename="../Server/server.cpp" line="1870"/>
-        <location filename="../Server/server.cpp" line="1887"/>
-        <location filename="../Server/server.cpp" line="1910"/>
+        <location filename="../Server/server.cpp" line="1873"/>
+        <location filename="../Server/server.cpp" line="1890"/>
+        <location filename="../Server/server.cpp" line="1913"/>
         <source></source>
         <oldsource>Import ship database failed!</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message id="ship-import-good">
-        <location filename="../Server/server.cpp" line="1925"/>
+        <location filename="../Server/server.cpp" line="1928"/>
         <source>Import ship registry success!</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="user-query-regen-time-fail">
-        <location filename="../Server/server.cpp" line="1944"/>
+        <location filename="../Server/server.cpp" line="1947"/>
         <source>Query last regeneration time for user %1 failed!</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="natural-regen-failed">
-        <location filename="../Server/server.cpp" line="1989"/>
+        <location filename="../Server/server.cpp" line="1992"/>
         <source>User ID %1: natural regeneration failed!</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="natural-regen">
-        <location filename="../Server/server.cpp" line="1995"/>
+        <location filename="../Server/server.cpp" line="1998"/>
         <source>User ID %1: natural regeneration</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="listen-usage">
-        <location filename="../Server/server.cpp" line="2075"/>
+        <location filename="../Server/server.cpp" line="2078"/>
         <source>Usage: listen [ip] [port]</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="no-cert">
-        <location filename="../Server/server.cpp" line="2102"/>
+        <location filename="../Server/server.cpp" line="2105"/>
         <source>Server lack a certificate.</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="no-private-key">
-        <location filename="../Server/server.cpp" line="2112"/>
+        <location filename="../Server/server.cpp" line="2115"/>
         <source>Server lack a private key.</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="corrupt-private-key">
-        <location filename="../Server/server.cpp" line="2120"/>
+        <location filename="../Server/server.cpp" line="2123"/>
         <source>Server private key can&apos;t be read.</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="server-listen">
-        <location filename="../Server/server.cpp" line="2135"/>
+        <location filename="../Server/server.cpp" line="2138"/>
         <source>Server is listening on address %1 and port %2</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="server-listen-fail">
-        <location filename="../Server/server.cpp" line="2149"/>
+        <location filename="../Server/server.cpp" line="2152"/>
         <source>Server failed to listen on address %1 and port %2</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="server-stop">
-        <location filename="../Server/server.cpp" line="2159"/>
+        <location filename="../Server/server.cpp" line="2162"/>
         <source>Server stopped listening.</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="server-stopped-already">
-        <location filename="../Server/server.cpp" line="2163"/>
+        <location filename="../Server/server.cpp" line="2166"/>
         <source>Server isn&apos;t listening.</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="no-app-secret-key">
-        <location filename="../Server/server.cpp" line="2186"/>
+        <location filename="../Server/server.cpp" line="2189"/>
         <source>Server lack the steam app secret key.</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="ticket-decrypt-failed">
-        <location filename="../Server/server.cpp" line="2216"/>
+        <location filename="../Server/server.cpp" line="2219"/>
         <source>%1: Ticket failed to decrypt</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="ticket-appid-wrong">
-        <location filename="../Server/server.cpp" line="2230"/>
+        <location filename="../Server/server.cpp" line="2233"/>
         <source>%1: Ticket is not from correct App ID</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="ticket-appid-right">
-        <location filename="../Server/server.cpp" line="2239"/>
+        <location filename="../Server/server.cpp" line="2242"/>
         <source>Ticket decrypt from correct App ID</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="time-gone">
-        <location filename="../Server/server.cpp" line="2248"/>
+        <location filename="../Server/server.cpp" line="2251"/>
         <source>Elapsed: %1 second(s)</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="request-timeout">
-        <location filename="../Server/server.cpp" line="2251"/>
+        <location filename="../Server/server.cpp" line="2254"/>
         <source>%1: Request timeout</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="steam-id-wrong">
-        <location filename="../Server/server.cpp" line="2265"/>
+        <location filename="../Server/server.cpp" line="2268"/>
         <source>%1: Steam ID invalid</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="user-login">
-        <location filename="../Server/server.cpp" line="2276"/>
+        <location filename="../Server/server.cpp" line="2279"/>
         <source>User login: %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="superuser-login">
-        <location filename="../Server/server.cpp" line="2283"/>
+        <location filename="../Server/server.cpp" line="2286"/>
         <source>Superuser login: %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="add-user-fail">
-        <location filename="../Server/server.cpp" line="2364"/>
+        <location filename="../Server/server.cpp" line="2367"/>
         <source>%1: Add user failure!</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="Connection-not-properly-online">
-        <location filename="../Server/server.cpp" line="2405"/>
+        <location filename="../Server/server.cpp" line="2408"/>
         <source>User is not properly online!</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="invalid-uid">
-        <location filename="../Server/server.cpp" line="2411"/>
+        <location filename="../Server/server.cpp" line="2414"/>
         <source>Invalid-uid: %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="gamestate-invalid">
-        <location filename="../Server/server.cpp" line="2441"/>
+        <location filename="../Server/server.cpp" line="2444"/>
         <source>Game state %1 not supported!</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="ship-refresh-failed">
-        <location filename="../Server/server.cpp" line="2670"/>
+        <location filename="../Server/server.cpp" line="2673"/>
         <source>Load ship table failed!</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="ship-load-good">
-        <location filename="../Server/server.cpp" line="2685"/>
+        <location filename="../Server/server.cpp" line="2688"/>
         <source>Load ship registry success!</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="factory-state-error">
-        <location filename="../Server/server.cpp" line="2702"/>
+        <location filename="../Server/server.cpp" line="2705"/>
         <source>Open user %1&apos;s factory failed!</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="delete-equip-nonexistent">
-        <location filename="../Server/server.cpp" line="2738"/>
+        <location filename="../Server/server.cpp" line="2741"/>
         <source>User id %1: equipment %2 does not exist!</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="delete-equip-failed">
-        <location filename="../Server/server.cpp" line="2759"/>
+        <location filename="../Server/server.cpp" line="2762"/>
         <source>User id %1: delete equipment failed!</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="delete-equip">
-        <location filename="../Server/server.cpp" line="2766"/>
+        <location filename="../Server/server.cpp" line="2769"/>
         <source>User id %1: deleted equipment %2</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="open-db-failed">
-        <location filename="../Server/server.cpp" line="2790"/>
+        <location filename="../Server/server.cpp" line="2793"/>
         <source>Open database failed!</source>
         <oldsource>User id %1: deleted equipment %2</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message id="sql-connect-success">
-        <location filename="../Server/server.cpp" line="2794"/>
+        <location filename="../Server/server.cpp" line="2797"/>
         <source>SQL connection successful!</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="equip-db-lack">
-        <location filename="../Server/server.cpp" line="2841"/>
+        <location filename="../Server/server.cpp" line="2844"/>
         <source>Equipment database does not exist, creating...</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="equip-db-gen-failure">
-        <location filename="../Server/server.cpp" line="2846"/>
+        <location filename="../Server/server.cpp" line="2849"/>
         <source>Create Equipment database failed.</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="equip-name-db-lack">
-        <location filename="../Server/server.cpp" line="2853"/>
+        <location filename="../Server/server.cpp" line="2856"/>
         <source>Equipment name database does not exist, creating...</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="equip-name-gen-failure">
-        <location filename="../Server/server.cpp" line="2858"/>
+        <location filename="../Server/server.cpp" line="2861"/>
         <source>Create Equipment name failed.</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="equip-db-user-sp-gen-failure">
-        <location filename="../Server/server.cpp" line="2868"/>
+        <location filename="../Server/server.cpp" line="2871"/>
         <source>User equipment skillpoints fetch failure!</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="equip-db-user-lack">
-        <location filename="../Server/server.cpp" line="2875"/>
+        <location filename="../Server/server.cpp" line="2878"/>
         <source>Equipment database for user does not exist, creating...</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="equip-db-user-gen-failure">
-        <location filename="../Server/server.cpp" line="2880"/>
+        <location filename="../Server/server.cpp" line="2883"/>
         <source>Create Equipment database for user failed.</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="facto-db-lack">
-        <location filename="../Server/server.cpp" line="2887"/>
+        <location filename="../Server/server.cpp" line="2890"/>
         <source>Factory database does not exist, creating...</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="facto-db-gen-failure">
-        <location filename="../Server/server.cpp" line="2892"/>
+        <location filename="../Server/server.cpp" line="2895"/>
         <source>Create Factory database failed.</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="map-node-db-lack">
-        <location filename="../Server/server.cpp" line="2899"/>
+        <location filename="../Server/server.cpp" line="2902"/>
         <source>Map node database does not exist, creating...</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="map-node-db-gen-failure">
-        <location filename="../Server/server.cpp" line="2904"/>
+        <location filename="../Server/server.cpp" line="2907"/>
         <source>Create Map node database failed.</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="map-relation-db-lack">
-        <location filename="../Server/server.cpp" line="2911"/>
+        <location filename="../Server/server.cpp" line="2914"/>
         <source>Map relation database does not exist, creating...</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="map-relation-db-gen-failure">
-        <location filename="../Server/server.cpp" line="2916"/>
+        <location filename="../Server/server.cpp" line="2919"/>
         <source>Create Map relation database failed.</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="map-resource-db-lack">
-        <location filename="../Server/server.cpp" line="2923"/>
+        <location filename="../Server/server.cpp" line="2926"/>
         <source>Map resource database does not exist, creating...</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="map-resource-db-gen-failure">
-        <location filename="../Server/server.cpp" line="2928"/>
+        <location filename="../Server/server.cpp" line="2931"/>
         <source>Create Map resource database failed.</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="ship-db-lack">
-        <location filename="../Server/server.cpp" line="2935"/>
+        <location filename="../Server/server.cpp" line="2938"/>
         <source>Ship database does not exist, creating...</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="equip-ship-db-gen-failure">
-        <location filename="../Server/server.cpp" line="2940"/>
+        <location filename="../Server/server.cpp" line="2943"/>
         <source>Create Ship database failed.</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="ship-name-db-lack">
-        <location filename="../Server/server.cpp" line="2947"/>
+        <location filename="../Server/server.cpp" line="2950"/>
         <source>Ship name database does not exist, creating...</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="equip-ship-name-gen-failure">
-        <location filename="../Server/server.cpp" line="2953"/>
+        <location filename="../Server/server.cpp" line="2956"/>
         <source>Create Ship name failed.</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="ship-db-user-lack">
-        <location filename="../Server/server.cpp" line="2960"/>
+        <location filename="../Server/server.cpp" line="2963"/>
         <source>Ship database for user does not exist, creating...</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="ship-db-user-gen-failure">
-        <location filename="../Server/server.cpp" line="2965"/>
+        <location filename="../Server/server.cpp" line="2968"/>
         <source>Create Ship database for user failed.</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="user-db-lack">
-        <location filename="../Server/server.cpp" line="2972"/>
-        <location filename="../Server/server.cpp" line="2983"/>
+        <location filename="../Server/server.cpp" line="2975"/>
+        <location filename="../Server/server.cpp" line="2986"/>
         <source>User database does not exist, creating...</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="user-db-gen-failure">
-        <location filename="../Server/server.cpp" line="2977"/>
-        <location filename="../Server/server.cpp" line="2988"/>
+        <location filename="../Server/server.cpp" line="2980"/>
+        <location filename="../Server/server.cpp" line="2991"/>
         <source>Create User database failed.</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="server-pem">
-        <location filename="../Server/server.cpp" line="3007"/>
+        <location filename="../Server/server.cpp" line="3010"/>
         <source>Server PEM is now %1.</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="user-data-init-fail">
-        <location filename="../Server/server.cpp" line="3038"/>
-        <location filename="../Server/server.cpp" line="3058"/>
+        <location filename="../Server/server.cpp" line="3041"/>
+        <location filename="../Server/server.cpp" line="3061"/>
         <source>%1: User data init failure!</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="user-factory-init-fail">
-        <location filename="../Server/server.cpp" line="3075"/>
+        <location filename="../Server/server.cpp" line="3078"/>
         <source>Init 4 factory slots for user %1 failed!</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2118,53 +2130,58 @@ Great at battle and bad at politics--so cool!</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="menu-naval-base">
-        <location filename="../ClientGUI/ui/mainwindow.ui" line="382"/>
+        <location filename="../ClientGUI/ui/mainwindow.ui" line="383"/>
         <source>Naval Base</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="menu-tech">
-        <location filename="../ClientGUI/ui/mainwindow.ui" line="390"/>
+        <location filename="../ClientGUI/ui/mainwindow.ui" line="391"/>
         <source>Tech</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="menu-develop">
-        <location filename="../ClientGUI/ui/mainwindow.ui" line="404"/>
+        <location filename="../ClientGUI/ui/mainwindow.ui" line="405"/>
         <source>Develop Equipment</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="menu-back-to-naval-base">
-        <location filename="../ClientGUI/ui/mainwindow.ui" line="409"/>
+        <location filename="../ClientGUI/ui/mainwindow.ui" line="410"/>
         <source>Back to naval base</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="menu-logout">
-        <location filename="../ClientGUI/ui/mainwindow.ui" line="414"/>
+        <location filename="../ClientGUI/ui/mainwindow.ui" line="415"/>
         <source>Logout</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="menu-exit">
-        <location filename="../ClientGUI/ui/mainwindow.ui" line="419"/>
+        <location filename="../ClientGUI/ui/mainwindow.ui" line="420"/>
         <source>Exit program</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="menu-view-tech">
-        <location filename="../ClientGUI/ui/mainwindow.ui" line="424"/>
+        <location filename="../ClientGUI/ui/mainwindow.ui" line="425"/>
         <source>View Tech</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="menu-construct">
-        <location filename="../ClientGUI/ui/mainwindow.ui" line="429"/>
+        <location filename="../ClientGUI/ui/mainwindow.ui" line="430"/>
         <source>Construct Ships</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="menu-arsenal">
-        <location filename="../ClientGUI/ui/mainwindow.ui" line="434"/>
+        <location filename="../ClientGUI/ui/mainwindow.ui" line="435"/>
         <source>Arsenal</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="menu-battle">
-        <location filename="../ClientGUI/ui/mainwindow.ui" line="439"/>
+        <location filename="../ClientGUI/ui/mainwindow.ui" line="440"/>
         <source>Battle Maps</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="menu-anchorage">
+        <location filename="../ClientGUI/ui/mainwindow.ui" line="445"/>
+        <source>Anchorage</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2265,7 +2282,7 @@ Great at battle and bad at politics--so cool!</source>
     <message id="techview-na">
         <location filename="../ClientGUI/ui/techview.ui" line="106"/>
         <location filename="../ClientGUI/ui/techview.ui" line="130"/>
-        <location filename="../ClientGUI/ui/techview.cpp" line="86"/>
+        <location filename="../ClientGUI/ui/techview.cpp" line="108"/>
         <source>N/A</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2275,39 +2292,44 @@ Great at battle and bad at politics--so cool!</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="techview-toship">
-        <location filename="../ClientGUI/ui/techview.ui" line="147"/>
-        <location filename="../ClientGUI/ui/techview.cpp" line="170"/>
+        <location filename="../ClientGUI/ui/techview.ui" line="149"/>
+        <location filename="../ClientGUI/ui/techview.cpp" line="182"/>
         <source>Switch to ship</source>
         <translation type="unfinished"></translation>
     </message>
+    <message id="techview-update-local">
+        <location filename="../ClientGUI/ui/techview.ui" line="156"/>
+        <source>Update</source>
+        <translation type="unfinished"></translation>
+    </message>
     <message id="techview-equip-type">
-        <location filename="../ClientGUI/ui/techview.ui" line="159"/>
+        <location filename="../ClientGUI/ui/techview.ui" line="170"/>
         <source>EquipType:</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="techview-equip">
-        <location filename="../ClientGUI/ui/techview.ui" line="166"/>
+        <location filename="../ClientGUI/ui/techview.ui" line="177"/>
         <source>Equip:</source>
         <oldsource>Equipment:</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message id="techview-ship-nationality">
-        <location filename="../ClientGUI/ui/techview.ui" line="205"/>
+        <location filename="../ClientGUI/ui/techview.ui" line="216"/>
         <source>Nationality:</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="techview-ship-class">
-        <location filename="../ClientGUI/ui/techview.ui" line="251"/>
+        <location filename="../ClientGUI/ui/techview.ui" line="262"/>
         <source>ShipClass:</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="techview-ship-type">
-        <location filename="../ClientGUI/ui/techview.ui" line="218"/>
+        <location filename="../ClientGUI/ui/techview.ui" line="229"/>
         <source>ShipType:</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="techview-ship">
-        <location filename="../ClientGUI/ui/techview.ui" line="264"/>
+        <location filename="../ClientGUI/ui/techview.ui" line="275"/>
         <source>Ship:</source>
         <translation type="unfinished"></translation>
     </message>

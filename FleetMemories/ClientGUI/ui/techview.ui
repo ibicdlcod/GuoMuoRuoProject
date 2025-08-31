@@ -87,7 +87,7 @@
     </layout>
    </item>
    <item>
-    <layout class="QVBoxLayout" name="verticalLayout_2">
+    <layout class="QVBoxLayout" name="localView">
      <item>
       <layout class="QHBoxLayout" name="horizontalLayout_2">
        <item>
@@ -142,11 +142,22 @@
      <item>
       <layout class="QHBoxLayout" name="horizontalLayout_4">
        <item>
-        <widget class="QPushButton" name="equipOrShip">
-         <property name="text">
-          <string id="techview-toship">Switch to ship</string>
-         </property>
-        </widget>
+        <layout class="QVBoxLayout" name="verticalLayout_2">
+         <item>
+          <widget class="QPushButton" name="equipOrShip">
+           <property name="text">
+            <string id="techview-toship">Switch to ship</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="updateLocal">
+           <property name="text">
+            <string id="techview-update-local">Update</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
        </item>
        <item>
         <layout class="QVBoxLayout" name="verticalLayout">
