@@ -43,6 +43,7 @@ void EquipModel::switchDisplayType(int index) {
     int newRowCount = rowCount();
     emit needReCalculatePages();
     adjustRowCount(oldRowCount, newRowCount);
+    firstPage();
     wholeTableChanged();
 }
 

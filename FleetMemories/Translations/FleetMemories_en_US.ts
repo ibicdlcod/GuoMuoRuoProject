@@ -913,38 +913,38 @@ Great at battle and bad at politics--so cool!</translation>
         <translation type="unfinished"></translation>
     </message>
     <message id="equip-uuid">
-        <location filename="../ClientGUI/equipmodel.cpp" line="288"/>
-        <location filename="../ClientGUI/equipmodel.cpp" line="396"/>
+        <location filename="../ClientGUI/equipmodel.cpp" line="289"/>
+        <location filename="../ClientGUI/equipmodel.cpp" line="397"/>
         <source>Equipment UUID</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="equip-name">
-        <location filename="../ClientGUI/equipmodel.cpp" line="292"/>
-        <location filename="../ClientGUI/equipmodel.cpp" line="398"/>
+        <location filename="../ClientGUI/equipmodel.cpp" line="293"/>
+        <location filename="../ClientGUI/equipmodel.cpp" line="399"/>
         <source>Equipment name</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="equip-star">
-        <location filename="../ClientGUI/equipmodel.cpp" line="296"/>
-        <location filename="../ClientGUI/equipmodel.cpp" line="400"/>
+        <location filename="../ClientGUI/equipmodel.cpp" line="297"/>
+        <location filename="../ClientGUI/equipmodel.cpp" line="401"/>
         <source>Equipment improvement level</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="equip-attr">
-        <location filename="../ClientGUI/equipmodel.cpp" line="300"/>
-        <location filename="../ClientGUI/equipmodel.cpp" line="402"/>
+        <location filename="../ClientGUI/equipmodel.cpp" line="301"/>
+        <location filename="../ClientGUI/equipmodel.cpp" line="403"/>
         <source>Equipment attributes</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="destruct">
-        <location filename="../ClientGUI/equipmodel.cpp" line="304"/>
-        <location filename="../ClientGUI/equipmodel.cpp" line="404"/>
+        <location filename="../ClientGUI/equipmodel.cpp" line="305"/>
+        <location filename="../ClientGUI/equipmodel.cpp" line="405"/>
         <source>Destruct this equipment</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="equip-improve">
-        <location filename="../ClientGUI/equipmodel.cpp" line="308"/>
-        <location filename="../ClientGUI/equipmodel.cpp" line="406"/>
+        <location filename="../ClientGUI/equipmodel.cpp" line="309"/>
+        <location filename="../ClientGUI/equipmodel.cpp" line="407"/>
         <source>Improve this equipment</source>
         <translation type="unfinished"></translation>
     </message>
