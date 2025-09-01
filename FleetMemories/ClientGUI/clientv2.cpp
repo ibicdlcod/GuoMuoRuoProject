@@ -78,6 +78,8 @@ Clientv2::Clientv2(QObject *parent)
 
     connect(this, &Clientv2::receivedArsenalEquip,
             &equipModel, &EquipModel::updateEquipmentList);
+    connect(this, &Clientv2::receivedAnchorageShip,
+            &shipModel, &ShipModel::updateShipList);
     connect(&equipModel, &EquipModel::destructRequest,
             this, &Clientv2::doDestructEquip);
     connect(this, &Clientv2::gamestateChanged,
@@ -705,6 +707,12 @@ void Clientv2::doRefreshFactory() {
     socket.flush();
 }
 
+void Clientv2::doRefreshFactoryAnchorage() {
+    QByteArray msg = KP::clientDemandShipInfoUser();
+    sender->enqueue(msg);
+    socket.flush();
+}
+
 void Clientv2::doRefreshFactoryArsenal() {
     QByteArray msg = KP::clientDemandEquipInfoUser();
     sender->enqueue(msg);
@@ -1019,6 +1027,7 @@ void Clientv2::receivedInfo(const QJsonObject &djson) {
         updateShipCache(djson);
         break;
     case KP::InfoType::ShipInfoUser:
+        emit receivedAnchorageShip(djson);
         break;
     default: throw std::domain_error("info type not supported"); break;
     }

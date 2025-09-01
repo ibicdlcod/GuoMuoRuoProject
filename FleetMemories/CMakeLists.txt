@@ -34,6 +34,8 @@ set(CLIENT_SOURCES
     ClientGUI/main.cpp
     ClientGUI/networkerror.cpp
     ClientGUI/networkerror.h
+    ClientGUI/shipmodel.cpp
+    ClientGUI/shipmodel.h
     ClientGUI/steamauth.cpp
     ClientGUI/steamauth.h
     ClientGUI/ui/boxcenterfusionstyle.h
@@ -46,6 +48,8 @@ set(CLIENT_SOURCES
     ClientGUI/ui/factoryarea.cpp
     ClientGUI/ui/factoryarea.h
     ClientGUI/ui/factoryarea.ui
+    ClientGUI/ui/hpdelegate.cpp
+    ClientGUI/ui/hpdelegate.h
     ClientGUI/ui/keyenterreceiver.cpp
     ClientGUI/ui/keyenterreceiver.h
     ClientGUI/ui/licensearea.cpp
@@ -121,6 +125,8 @@ set(PROTOCOL_SOURCES
     Protocol/sender.h
     Protocol/ship.cpp
     Protocol/ship.h
+    Protocol/shipdynamic.cpp
+    Protocol/shipdynamic.h
     Protocol/shiptype.cpp
     Protocol/shiptype.h
     Protocol/tech.cpp

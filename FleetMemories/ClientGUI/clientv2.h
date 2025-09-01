@@ -62,6 +62,7 @@
 #include "ui/techview.h"
 #include "ui/equipview.h"
 #include "equipmodel.h"
+#include "shipmodel.h"
 
 void customMessageHandler(QtMsgType,
                           const QMessageLogContext &,
@@ -103,6 +104,7 @@ public:
     int equipBigTypeIndex = 0;
     int equipIndex = 0;
     EquipModel equipModel;
+    ShipModel shipModel;
     QMap<int, double> techCache;
 
 public slots:
@@ -114,6 +116,7 @@ public slots:
     void displayPrompt();
     void doDestructEquip(const QList<QUuid> &);
     void doRefreshFactory();
+    void doRefreshFactoryAnchorage();
     void doRefreshFactoryArsenal();
     Equipment * getEquipmentReg(int);
     Ship * getShipReg(int);
@@ -141,6 +144,7 @@ signals:
     void gamestateChanged(KP::GameState);
     void qout(QString, QColor background = QColor("white"),
               QColor foreground = QColor("black"));
+    void receivedAnchorageShip(const QJsonObject &);
     void receivedArsenalEquip(const QJsonObject &);
     void receivedFactoryRefresh(const QJsonObject &);
     void receivedGlobalTechInfo(const QJsonObject &);

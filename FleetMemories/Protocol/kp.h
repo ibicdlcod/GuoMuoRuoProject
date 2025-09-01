@@ -233,13 +233,13 @@ QByteArray clientDemandEquipInfo(QDateTime timeUtc
                                  = QDateTime(QDate(1970, 1, 1),
                                              QTime(0, 0, 0)));
 QByteArray clientDemandEquipInfoUser();
+QByteArray clientDemandResourceUpdate();
 QByteArray clientDemandShipInfo(QDateTime timeUtc
                                 = QDateTime(QDate(1970, 1, 1),
                                             QTime(0, 0, 0)));
 QByteArray clientDemandShipInfoUser();
-QByteArray clientDemandTech(int local = 0);
-QByteArray clientDemandResourceUpdate();
 QByteArray clientDemandSkillPoints(int);
+QByteArray clientDemandTech(int local = 0);
 QByteArray clientDevelop(int, bool convert = false, int factoryID = -1);
 QByteArray clientFactoryRefresh();
 QByteArray clientFetch(int factoryID = -1);

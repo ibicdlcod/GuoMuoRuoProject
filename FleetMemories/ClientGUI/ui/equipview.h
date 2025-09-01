@@ -8,8 +8,10 @@
 #include <QTableView>
 #include <QToolButton>
 #include <QWidget>
+#include <QLineEdit>
 #include "../equipmodel.h"
 #include "selectdelegate.h"
+#include "hpdelegate.h"
 
 namespace Ui {
 class EquipView;
@@ -37,12 +39,13 @@ public:
     explicit EquipView(QWidget *parent = nullptr);
     ~EquipView();
 
-    void activate(bool arsenal = true);
+    void activate(bool arsenal = true, bool isEquip = true);
     void enactPageNumChange(int currentPageNum, int totalPageNum);
 
 public slots:
     void recalculateArsenalRows();
     void reCalculateAvailableEquips(int);
+    void pageNumChangedLambda(int, int);
 
 signals:
     void rowCountHint(int);
@@ -60,9 +63,14 @@ private:
     EquipModel *model;
     QTableView *arsenalView;
     SelectDelegate *delegate;
+    HpDelegate *hpdelegate;
 
-    QComboBox *typebox;
-    QComboBox *equipbox;
+    QLabel *searchLabel;
+    QLineEdit *searchBox;
+    QLabel *typeLabel;
+    QComboBox *typeBox;
+    QLabel *equipLabel;
+    QComboBox *equipBox;
     QToolButton *firstButton;
     QToolButton *prevButton;
     QLabel *pageLabel;

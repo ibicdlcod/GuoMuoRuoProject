@@ -142,7 +142,7 @@ void FactoryArea::switchToState() {
         ui->ArsenalArea->show();
         equipview->setGeometry(ui->ArsenalArea->rect());
         update();
-        equipview->activate(true);
+        equipview->activate(true, true);
         break;
     case KP::Anchorage:
         //% "Anchorage"
@@ -151,7 +151,7 @@ void FactoryArea::switchToState() {
         ui->ArsenalArea->show();
         equipview->setGeometry(ui->ArsenalArea->rect());
         update();
-        equipview->activate(false);
+        equipview->activate(true, false);
         break;
     }
 }

@@ -117,27 +117,10 @@ QByteArray KP::clientDemandEquipInfo(QDateTime timeUtc) {
     return QCborValue::fromJsonValue(result).toCbor();
 }
 
-QByteArray KP::clientDemandShipInfo(QDateTime timeUtc) {
-    QJsonObject result;
-    result["type"] = DgramType::Request;
-    result["command"] = CommandType::DemandShipInfo;
-    result["timestamp"] = timeUtc.toString();
-    return QCborValue::fromJsonValue(result).toCbor();
-}
-
-
 QByteArray KP::clientDemandEquipInfoUser() {
     QJsonObject result;
     result["type"] = DgramType::Request;
     result["command"] = CommandType::DemandEquipInfoUser;
-    return QCborValue::fromJsonValue(result).toCbor();
-}
-
-QByteArray KP::clientDemandTech(int local) {
-    QJsonObject result;
-    result["type"] = DgramType::Request;
-    result["command"] = CommandType::DemandTech;
-    result["local"] = local;
     return QCborValue::fromJsonValue(result).toCbor();
 }
 
@@ -148,11 +131,34 @@ QByteArray KP::clientDemandResourceUpdate() {
     return QCborValue::fromJsonValue(result).toCbor();
 }
 
+QByteArray KP::clientDemandShipInfo(QDateTime timeUtc) {
+    QJsonObject result;
+    result["type"] = DgramType::Request;
+    result["command"] = CommandType::DemandShipInfo;
+    result["timestamp"] = timeUtc.toString();
+    return QCborValue::fromJsonValue(result).toCbor();
+}
+
+QByteArray KP::clientDemandShipInfoUser() {
+    QJsonObject result;
+    result["type"] = DgramType::Request;
+    result["command"] = CommandType::DemandShipInfoUser;
+    return QCborValue::fromJsonValue(result).toCbor();
+}
+
 QByteArray KP::clientDemandSkillPoints(int equipId) {
     QJsonObject result;
     result["type"] = DgramType::Request;
     result["command"] = CommandType::DemandSkillPoints;
     result["equipid"] = equipId;
+    return QCborValue::fromJsonValue(result).toCbor();
+}
+
+QByteArray KP::clientDemandTech(int local) {
+    QJsonObject result;
+    result["type"] = DgramType::Request;
+    result["command"] = CommandType::DemandTech;
+    result["local"] = local;
     return QCborValue::fromJsonValue(result).toCbor();
 }
 

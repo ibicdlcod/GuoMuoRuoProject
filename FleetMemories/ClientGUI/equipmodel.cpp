@@ -47,16 +47,26 @@ void EquipModel::switchDisplayType(int index) {
     wholeTableChanged();
 }
 
-void EquipModel::switchDisplayType2(QString equipName) {
+void EquipModel::switchDisplayType2(const QString &equipName) {
     int oldRowCount = rowCount();
     sortedEquipIds.clear();
+    bool pass = false;
     for(auto iter = clientEquips.keyValueBegin();
          iter != clientEquips.keyValueEnd();
          ++iter) {
+        pass = false;
         for(const auto &name:
              std::as_const(iter->second->localNames)) {
             if(name.localeAwareCompare(equipName) == 0)
-                sortedEquipIds.append(iter->first);
+                pass = true;
+            if(name.contains(equipName, Qt::CaseInsensitive))
+                pass = true;
+        }
+        if(iter->first.toString().contains(equipName)) {
+            pass = true;
+        }
+        if(pass) {
+            sortedEquipIds.append(iter->first);
         }
     }
     customSort();
@@ -284,10 +294,8 @@ QVariant EquipModel::data(const QModelIndex &index, int role) const {
         else if(index.column() == starCol) {
             if(starToDisplay == 0)
                 return QVariant();
-            else if(starToDisplay < 15)
-                return "★+" + QString::number(starToDisplay);
             else
-                return "★max";
+                return "★+" + QString::number(starToDisplay);
         }
         else if(index.column() == attrCol){ // attributes
             return equipToDisplay->attrPrimaryStr();
@@ -360,11 +368,11 @@ QVariant EquipModel::data(const QModelIndex &index, int role) const {
             QColor color = QColor();
             switch(QApplication::styleHints()->colorScheme()) {
             case Qt::ColorScheme::Dark:
-                color.setHsv(starToDisplay * 20, 128, 255);
+                color.setHsv(std::min(starToDisplay, 15) * 20, 128, 255);
                 break;
             case Qt::ColorScheme::Light: [[fallthrough]];
             default:
-                color.setHsv(starToDisplay * 20, 255, 128);
+                color.setHsv(std::min(starToDisplay, 15) * 20, 255, 128);
                 break;
             }
 
@@ -475,6 +483,7 @@ bool EquipModel::setData(const QModelIndex &index,
                          const QVariant &value,
                          int role) {
     int realRowIndex = index.row() + rowsPerPage * pageNum;
+    /* improve */
     if(role == Qt::CheckStateRole) {
         if(value.toInt() == Qt::Checked) {
             isDestructChecked[sortedEquipIds.value(realRowIndex)] = true;
@@ -506,6 +515,10 @@ int EquipModel::selectColumn() const {
     return isInArsenal ? -1 : 4;
 }
 
+int EquipModel::hpColumn() const {
+    return -1;
+}
+
 int EquipModel::currentPageNum() const {
     return pageNum;
 }
@@ -520,8 +533,13 @@ bool EquipModel::isReady() const {
     return ready;
 }
 
+int EquipModel::test() {
+    return 0;
+}
+
 void EquipModel::clearCheckBoxes() {
     isDestructChecked.clear();
+    /* improve */
 }
 
 void EquipModel::updateIllegalPage() {
@@ -540,11 +558,8 @@ void EquipModel::updateEquipmentList(const QJsonObject &input) {
     clientEquipStars.clear();
     sortedEquipIds.clear();
     int oldRowCount = rowCount();
-    static QMetaObject::Connection connection;
     Clientv2 &engine = Clientv2::getInstance();
     if(engine.isEquipRegistryCacheGood()) {
-        if(connection)
-            disconnect(connection);
         QJsonArray inputArray = input["content"].toArray();
         for(const QJsonValueRef item: inputArray) {
             QJsonObject itemObject = item.toObject();
@@ -564,6 +579,7 @@ void EquipModel::updateEquipmentList(const QJsonObject &input) {
         ready = true;
     }
     else {
+        /* not used */
     }
     return;
 }

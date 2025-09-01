@@ -13,26 +13,26 @@ public:
     explicit EquipModel(QObject *parent = nullptr, bool isInArsenal = true);
 
 signals:
-    virtual void destructRequest(const QList<QUuid> &) final;
+    void destructRequest(const QList<QUuid> &);
     void needReCalculateRows();
     void needReCalculatePages();
     void pageNumChanged(int currentPageNum, int totalPageNum);
 
 public slots:
     virtual void switchDisplayType(int) final;
-    virtual void switchDisplayType2(QString) final;
-    void firstPage();
-    void prevPage();
-    void nextPage();
-    void lastPage();
+    virtual void switchDisplayType2(const QString &) final;
+    virtual void firstPage();
+    virtual void prevPage();
+    virtual void nextPage();
+    virtual void lastPage();
     virtual void addEquipment(QUuid, int) final;
     virtual void enactDestruct() final;
     virtual void destructEquipment(const QList<QUuid> &) final;
     virtual void updateEquipmentList(const QJsonObject &) final;
-    void setPageNumHint(int);
-    void setRowsPerPageHint(int);
-    void setIsInArsenal(bool);
-    void wholeTableChanged();
+    virtual void setPageNumHint(int);
+    virtual void setRowsPerPageHint(int);
+    virtual void setIsInArsenal(bool);
+    virtual void wholeTableChanged();
 
 public:
     virtual int rowCount(const QModelIndex &parent
@@ -51,17 +51,19 @@ public:
     static const int equipCol = 1;
     static const int starCol = 2;
     virtual int destructColumn() const final;
-    int addStarColumn() const;
-    int hiddenSortColumn() const;
-    int selectColumn() const;
-    int currentPageNum() const;
-    int maximumPageNum() const;
-    bool isReady() const;
+    virtual int addStarColumn() const;
+    virtual int hiddenSortColumn() const;
+    virtual int selectColumn() const;
+    virtual int hpColumn() const;
+    virtual int currentPageNum() const;
+    virtual int maximumPageNum() const;
+    virtual bool isReady() const;
+    virtual int test();
 
 protected:
-    void adjustRowCount(int oldRowCount, int newRowCount);
-    void customSort();
-    int numberOfColumns() const;
+    virtual void adjustRowCount(int oldRowCount, int newRowCount);
+    virtual void customSort();
+    virtual int numberOfColumns() const;
     bool isInArsenal;
 
     int rowsPerPage = 1;
@@ -69,7 +71,7 @@ protected:
     bool ready = false;
 
 protected slots:
-    void updateIllegalPage();
+    virtual void updateIllegalPage();
 
 private slots:
     void clearCheckBoxes();
