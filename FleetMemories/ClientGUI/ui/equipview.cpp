@@ -191,6 +191,8 @@ void EquipView::activate(bool arsenal, bool isEquip) {
                model, &EquipModel::lastPage);
     disconnect(model, &EquipModel::pageNumChanged,
                this, &EquipView::enactPageNumChange);
+    disconnect(delegate, &SelectDelegate::itemSelected,
+               this, &EquipView::itemSelected);
 
     Clientv2 &engine = Clientv2::getInstance();
     disconnect(model, SIGNAL(needReCalculateRows()),
@@ -211,6 +213,8 @@ void EquipView::activate(bool arsenal, bool isEquip) {
         }
         if(arsenal) {
             model->setIsInArsenal(true);
+            equipSelect->destructButton->show();
+            equipSelect->addStarButton->show();
         }
         else {
             model->setIsInArsenal(false);
@@ -218,6 +222,8 @@ void EquipView::activate(bool arsenal, bool isEquip) {
                                                   delegate);
             connect(delegate, &SelectDelegate::itemSelected,
                     this, &EquipView::itemSelected);
+            equipSelect->destructButton->hide();
+            equipSelect->addStarButton->hide();
         }
         recalculateArsenalRows();
         connect(model, SIGNAL(needReCalculateRows()),
@@ -243,6 +249,7 @@ void EquipView::activate(bool arsenal, bool isEquip) {
         if(arsenal) {
             model->setIsInArsenal(true);
             arsenalView->setItemDelegateForColumn(model->hpColumn(), hpdelegate);
+            shipSelect->addStarButton->show();
         }
         else {
             model->setIsInArsenal(false);
@@ -251,6 +258,7 @@ void EquipView::activate(bool arsenal, bool isEquip) {
             arsenalView->setItemDelegateForColumn(model->hpColumn(), hpdelegate);
             connect(delegate, &SelectDelegate::itemSelected,
                     this, &EquipView::itemSelected);
+            shipSelect->addStarButton->hide();
         }
         recalculateArsenalRows();
         connect(model, SIGNAL(needReCalculateRows()),

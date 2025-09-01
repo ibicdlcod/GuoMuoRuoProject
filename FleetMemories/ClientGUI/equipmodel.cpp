@@ -491,7 +491,7 @@ bool EquipModel::setData(const QModelIndex &index,
                          const QVariant &value,
                          int role) {
     int realRowIndex = index.row() + rowsPerPage * pageNum;
-    /* improve */
+    /* TODO: add improve */
     if(role == Qt::CheckStateRole) {
         if(value.toInt() == Qt::Checked) {
             isDestructChecked[sortedEquipIds.value(realRowIndex)] = true;
@@ -543,7 +543,7 @@ bool EquipModel::isReady() const {
 
 void EquipModel::clearCheckBoxes() {
     isDestructChecked.clear();
-    /* improve */
+    /* TODO: add improve */
 }
 
 void EquipModel::updateIllegalPage() {
