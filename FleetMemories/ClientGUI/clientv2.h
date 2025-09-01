@@ -99,7 +99,7 @@ public:
     friend void TechView::demandSkillPoints(int);
     friend void TechView::resetLocalListName();
     friend void TechView::equipOrShip();
-    friend void EquipView::reCalculateAvailableEquips(int);
+    friend void EquipSelect::reCalculateAvailableEquips(int);
 
     int equipBigTypeIndex = 0;
     int equipIndex = 0;

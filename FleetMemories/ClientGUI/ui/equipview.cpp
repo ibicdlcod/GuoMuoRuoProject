@@ -50,26 +50,6 @@ EquipView::EquipView(QWidget *parent)
         break;
     }
 
-    searchLabel = new QLabel(this);
-    //% "Search:"
-    searchLabel->setText(qtTrId("equipview-search"));
-    searchBox = new QLineEdit(this);
-    searchBox->setObjectName("searchbox");
-    typeLabel = new QLabel(this);
-    //% "Equip type:"
-    typeLabel->setText(qtTrId("equipview-type"));
-    typeBox = new QComboBox(this);
-    typeBox->setObjectName("typeselect");
-    /*
-    typebox->setStyleSheet(
-        "QComboBox#typeselect { color: palette(base); }");
-*/
-    equipLabel = new QLabel(this);
-    //% "Equip:"
-    equipLabel->setText(qtTrId("equipview-equip"));
-    equipBox = new QComboBox(this);
-    equipBox->setObjectName("equipdef");
-
     firstButton = new QToolButton(this);
     prevButton = new QToolButton(this);
     pageLabel = new QLabel(this);
@@ -77,64 +57,11 @@ EquipView::EquipView(QWidget *parent)
     pageLabel->setText(qtTrId("retrieving-please-wait"));
     nextButton = new QToolButton(this);
     lastButton = new QToolButton(this);
-    destructButton = new QPushButton(this);
-    addStarButton = new QPushButton(this);
 
     firstButton->setIcon(first);
     prevButton->setIcon(prev);
     nextButton->setIcon(next);
     lastButton->setIcon(last);
-    //% "Destruct"
-    destructButton->setText(qtTrId("destruct-button"));
-    //% "Improve"
-    addStarButton->setText(qtTrId("add-star-button"));
-
-    QHBoxLayout *layout = ui->Navigator;
-    layout->addWidget(searchLabel);
-    layout->addWidget(searchBox);
-    layout->addWidget(typeLabel);
-    layout->addWidget(typeBox);
-    layout->addWidget(equipLabel);
-    layout->addWidget(equipBox);
-    layout->addWidget(firstButton);
-    layout->addWidget(prevButton);
-    layout->addWidget(pageLabel);
-    layout->addWidget(nextButton);
-    layout->addWidget(lastButton);
-    layout->addWidget(destructButton);
-    layout->addWidget(addStarButton);
-
-
-    QSizePolicy labelSize = QSizePolicy(QSizePolicy::Maximum,
-                                        QSizePolicy::Preferred,
-                                        QSizePolicy::Label);
-    searchLabel->setSizePolicy(labelSize);
-    QSizePolicy textEditSize = QSizePolicy(QSizePolicy::Maximum,
-                                           QSizePolicy::Maximum,
-                                           QSizePolicy::Label);
-    searchBox->setSizePolicy(textEditSize);
-    searchBox->setStyleSheet(QStringLiteral(
-        "QLineEdit#searchbox { background-color: palette(button); }"
-        ));
-    //searchBox->setSizeAdjustPolicy(QLineEdit::AdjustToContents);
-    //searchBox->setMaximumSize(QSize(50, 10));
-
-    typeLabel->setSizePolicy(labelSize);
-    typeBox->setSizePolicy(QSizePolicy(QSizePolicy::Maximum,
-                                       QSizePolicy::Preferred,
-                                       QSizePolicy::ComboBox));
-    typeBox->resize(QSize(100, pageLabel->size().height()));
-    //% "All equipments"
-    typeBox->addItem(qtTrId("all-equipments"));
-    typeBox->addItems(EquipType::getDisplayGroupsSorted());
-
-    equipLabel->setSizePolicy(labelSize);
-    QSizePolicy equipBoxSize = QSizePolicy(QSizePolicy::Maximum,
-                                           QSizePolicy::Preferred,
-                                           QSizePolicy::ComboBox);
-    equipBox->setSizePolicy(equipBoxSize);
-    equipBox->resize(QSize(100, pageLabel->size().height()));
-    equipBox->setSizeAdjustPolicy(QComboBox::AdjustToContents);
 
     pageLabel->setAlignment(Qt::AlignCenter);
     pageLabel->setSizePolicy(QSizePolicy(QSizePolicy::Maximum,
@@ -142,27 +69,34 @@ EquipView::EquipView(QWidget *parent)
                                          QSizePolicy::Label));
     pageLabel->resize(QSize(100, pageLabel->size().height()));
 
-    destructButton->setSizePolicy(QSizePolicy(QSizePolicy::Maximum,
-                                              QSizePolicy::Preferred,
-                                              QSizePolicy::PushButton));
-    destructButton->resize(QSize(100, pageLabel->size().height()));
+    equipSelect = new EquipSelect(pageLabel->size().height());
 
-    addStarButton->setSizePolicy(QSizePolicy(QSizePolicy::Maximum,
-                                             QSizePolicy::Preferred,
-                                             QSizePolicy::PushButton));
-    addStarButton->resize(QSize(100, pageLabel->size().height()));
+    QWidget *layoutWidget = new QWidget(this);
+    QHBoxLayout *layout = new QHBoxLayout(layoutWidget);
+    layout->addWidget(firstButton);
+    layout->addWidget(prevButton);
+    layout->addWidget(pageLabel);
+    layout->addWidget(nextButton);
+    layout->addWidget(lastButton);
+    layout->setContentsMargins(0,0,0,0);
+    QVBoxLayout *layout2 = ui->Navigator;
+    layout2->addWidget(equipSelect, 1, Qt::AlignHCenter);
+    layout2->addWidget(layoutWidget, 1, Qt::AlignHCenter);
+    layout2->setContentsMargins(0,0,0,0);
+    layout2->setSpacing(3);
 
-    connect(typeBox, &QComboBox::activated,
+    QSizePolicy labelSize = QSizePolicy(QSizePolicy::Maximum,
+                                        QSizePolicy::Maximum);
+    equipSelect->setSizePolicy(labelSize);
+    layoutWidget->setSizePolicy(labelSize);
+
+    connect(equipSelect, &EquipSelect::typeActivated,
             model, &EquipModel::switchDisplayType);
-    connect(equipBox, &QComboBox::activated,
-            model, [this]{
-                model->switchDisplayType2(equipBox->currentText());
-            });
-    connect(typeBox, &QComboBox::activated,
-            this, &EquipView::reCalculateAvailableEquips);
-    connect(destructButton, &QAbstractButton::clicked,
+    connect(equipSelect, &EquipSelect::equipActivated,
+            model, &EquipModel::switchDisplayType2);
+    connect(equipSelect, &EquipSelect::destructActivated,
             model, &EquipModel::enactDestruct);
-    connect(searchBox, &QLineEdit::textEdited,
+    connect(equipSelect, &EquipSelect::searchBoxChanged,
             model, &EquipModel::switchDisplayType2);
 
     delegate = new SelectDelegate(arsenalView);
@@ -218,28 +152,6 @@ void EquipView::itemSelected(QUuid id) {
     qCritical() << id;
 }
 
-void EquipView::reCalculateAvailableEquips(int index) {
-    Q_UNUSED(index);
-    equipBox->clear();
-    for(auto &equipReg:
-         Clientv2::getInstance().equipRegistryCache) {
-        if(
-            (typeBox->currentText().compare("All equipments") == 0
-             && equipReg->type.getDisplayGroup()
-                        .compare("VIRTUAL", Qt::CaseInsensitive) != 0
-             && !equipReg->localNames.value("ja_JP").isEmpty())
-            || equipReg->type.getDisplayGroup()
-                       .compare(typeBox->currentText(),
-                                Qt::CaseInsensitive) == 0) {
-            QString equipName = equipReg->toString(
-                settings->value("language", "ja_JP").toString());
-            if(equipName.isEmpty()) {
-                equipName = equipReg->toString("ja_JP");
-            }
-            equipBox->addItem(equipName);
-        }
-    }
-}
 
 void EquipView::pageNumChangedLambda(int current, int total) {
     columnResized(0, 0, 0);
@@ -283,8 +195,6 @@ void EquipView::activate(bool arsenal, bool isEquip) {
         }
         if(arsenal) {
             model->setIsInArsenal(true);
-            destructButton->show();
-            addStarButton->show();
         }
         else {
             model->setIsInArsenal(false);
@@ -292,8 +202,6 @@ void EquipView::activate(bool arsenal, bool isEquip) {
                                                   delegate);
             connect(delegate, &SelectDelegate::itemSelected,
                     this, &EquipView::itemSelected);
-            destructButton->hide();
-            addStarButton->hide();
         }
         recalculateArsenalRows();
         connect(model, SIGNAL(needReCalculateRows()),
@@ -302,10 +210,7 @@ void EquipView::activate(bool arsenal, bool isEquip) {
         connect(this, SIGNAL(rowCountHint(int)),
                 model, SLOT(setRowsPerPageHint(int)),
                 Qt::UniqueConnection);
-        typeLabel->show();
-        typeBox->show();
-        equipLabel->show();
-        equipBox->show();
+        equipSelect->show();
     }
     else {
         model = &engine.shipModel;
@@ -320,17 +225,15 @@ void EquipView::activate(bool arsenal, bool isEquip) {
         }
         if(arsenal) {
             model->setIsInArsenal(true);
-            arsenalView->setItemDelegateForColumn(model->hpColumn(), hpdelegate);;
-            addStarButton->show();
+            arsenalView->setItemDelegateForColumn(model->hpColumn(), hpdelegate);
         }
         else {
             model->setIsInArsenal(false);
             arsenalView->setItemDelegateForColumn(model->selectColumn(),
                                                   delegate);
-            arsenalView->setItemDelegateForColumn(model->hpColumn(), hpdelegate);;
+            arsenalView->setItemDelegateForColumn(model->hpColumn(), hpdelegate);
             connect(delegate, &SelectDelegate::itemSelected,
                     this, &EquipView::itemSelected);
-            addStarButton->hide();
         }
         recalculateArsenalRows();
         connect(model, SIGNAL(needReCalculateRows()),
@@ -339,10 +242,7 @@ void EquipView::activate(bool arsenal, bool isEquip) {
         connect(this, SIGNAL(rowCountHint(int)),
                 model, SLOT(setRowsPerPageHint(int)),
                 Qt::UniqueConnection);
-        typeLabel->hide();
-        typeBox->hide();
-        equipLabel->hide();
-        equipBox->hide();
+        equipSelect->hide();
     }
     connect(model, &EquipModel::pageNumChanged,
             this, &EquipView::pageNumChangedLambda);

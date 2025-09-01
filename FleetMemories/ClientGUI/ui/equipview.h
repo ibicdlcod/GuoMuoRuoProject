@@ -12,6 +12,7 @@
 #include "../equipmodel.h"
 #include "selectdelegate.h"
 #include "hpdelegate.h"
+#include "equipselect.h"
 
 namespace Ui {
 class EquipView;
@@ -44,7 +45,6 @@ public:
 
 public slots:
     void recalculateArsenalRows();
-    void reCalculateAvailableEquips(int);
     void pageNumChangedLambda(int, int);
 
 signals:
@@ -73,15 +73,7 @@ private:
     QToolButton *lastButton;
 
     /* equip */
-    QLabel *searchLabel;
-    QLineEdit *searchBox;
-    QLabel *typeLabel;
-    QComboBox *typeBox;
-    QLabel *equipLabel;
-    QComboBox *equipBox;
-
-    QPushButton *destructButton;
-    QPushButton *addStarButton;
+    EquipSelect *equipSelect;
 
     /* ship */
     QLabel *searchLabel2;

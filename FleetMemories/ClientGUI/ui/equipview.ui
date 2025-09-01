@@ -90,7 +90,7 @@
        <number>0</number>
       </property>
       <item>
-       <layout class="QHBoxLayout" name="Navigator"/>
+       <layout class="QVBoxLayout" name="Navigator"/>
       </item>
      </layout>
     </widget>

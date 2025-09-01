@@ -42,6 +42,8 @@ set(CLIENT_SOURCES
     ClientGUI/ui/developwindow.cpp
     ClientGUI/ui/developwindow.h
     ClientGUI/ui/developwindow.ui
+    ClientGUI/ui/equipselect.cpp
+    ClientGUI/ui/equipselect.h
     ClientGUI/ui/equipview.h
     ClientGUI/ui/equipview.cpp
     ClientGUI/ui/equipview.ui
@@ -72,6 +74,8 @@ set(CLIENT_SOURCES
     ClientGUI/ui/portarea.ui
     ClientGUI/ui/selectdelegate.cpp
     ClientGUI/ui/selectdelegate.h
+    ClientGUI/ui/shipselect.cpp
+    ClientGUI/ui/shipselect.h
     ClientGUI/ui/sortie.cpp
     ClientGUI/ui/sortie.h
     ClientGUI/ui/sortie.ui
