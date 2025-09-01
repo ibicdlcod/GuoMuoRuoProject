@@ -533,10 +533,6 @@ bool EquipModel::isReady() const {
     return ready;
 }
 
-int EquipModel::test() {
-    return 0;
-}
-
 void EquipModel::clearCheckBoxes() {
     isDestructChecked.clear();
     /* improve */

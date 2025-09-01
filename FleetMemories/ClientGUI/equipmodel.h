@@ -58,7 +58,6 @@ public:
     virtual int currentPageNum() const;
     virtual int maximumPageNum() const;
     virtual bool isReady() const;
-    virtual int test();
 
 protected:
     virtual void adjustRowCount(int oldRowCount, int newRowCount);

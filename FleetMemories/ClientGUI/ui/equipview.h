@@ -65,19 +65,33 @@ private:
     SelectDelegate *delegate;
     HpDelegate *hpdelegate;
 
+    /* shared */
+    QToolButton *firstButton;
+    QToolButton *prevButton;
+    QLabel *pageLabel;
+    QToolButton *nextButton;
+    QToolButton *lastButton;
+
+    /* equip */
     QLabel *searchLabel;
     QLineEdit *searchBox;
     QLabel *typeLabel;
     QComboBox *typeBox;
     QLabel *equipLabel;
     QComboBox *equipBox;
-    QToolButton *firstButton;
-    QToolButton *prevButton;
-    QLabel *pageLabel;
-    QToolButton *nextButton;
-    QToolButton *lastButton;
+
     QPushButton *destructButton;
     QPushButton *addStarButton;
+
+    /* ship */
+    QLabel *searchLabel2;
+    QLineEdit *searchBox2;
+    QLabel *nationLabel;
+    QComboBox *nationBox;
+    QLabel *typeLabel2;
+    QComboBox *typeBox2;
+    QLabel *classLabel;
+    QComboBox *classBox;
 };
 
 #endif // EQUIPVIEW_H

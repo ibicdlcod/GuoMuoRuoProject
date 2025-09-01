@@ -162,6 +162,8 @@ EquipView::EquipView(QWidget *parent)
             this, &EquipView::reCalculateAvailableEquips);
     connect(destructButton, &QAbstractButton::clicked,
             model, &EquipModel::enactDestruct);
+    connect(searchBox, &QLineEdit::textEdited,
+            model, &EquipModel::switchDisplayType2);
 
     delegate = new SelectDelegate(arsenalView);
     hpdelegate = new HpDelegate(arsenalView);
@@ -245,10 +247,12 @@ void EquipView::pageNumChangedLambda(int current, int total) {
 }
 
 void EquipView::activate(bool arsenal, bool isEquip) {
+    arsenalView->setItemDelegateForColumn(model->selectColumn(),
+                                          new QStyledItemDelegate());
+    arsenalView->setItemDelegateForColumn(model->hpColumn(),
+                                          new QStyledItemDelegate());
     disconnect(model, &EquipModel::pageNumChanged,
                this, &EquipView::pageNumChangedLambda);
-    disconnect(searchBox, &QLineEdit::textEdited,
-               model, &EquipModel::switchDisplayType2);
     disconnect(firstButton, &QAbstractButton::clicked,
                model, &EquipModel::firstPage);
     disconnect(prevButton, &QAbstractButton::clicked,
@@ -303,9 +307,8 @@ void EquipView::activate(bool arsenal, bool isEquip) {
         equipLabel->show();
         equipBox->show();
     }
-    else {;
+    else {
         model = &engine.shipModel;
-        arsenalView->setItemDelegateForColumn(model->hpColumn(), hpdelegate);;
         arsenalView->setModel(model);
         if(!model->isReady()) {
             pageLabel->setText(qtTrId("retrieving-please-wait"));
@@ -316,14 +319,15 @@ void EquipView::activate(bool arsenal, bool isEquip) {
             arsenalView->show();
         }
         if(arsenal) {
-            arsenalView->setItemDelegate(new QStyledItemDelegate());
             model->setIsInArsenal(true);
+            arsenalView->setItemDelegateForColumn(model->hpColumn(), hpdelegate);;
             addStarButton->show();
         }
         else {
             model->setIsInArsenal(false);
             arsenalView->setItemDelegateForColumn(model->selectColumn(),
                                                   delegate);
+            arsenalView->setItemDelegateForColumn(model->hpColumn(), hpdelegate);;
             connect(delegate, &SelectDelegate::itemSelected,
                     this, &EquipView::itemSelected);
             addStarButton->hide();
@@ -342,8 +346,6 @@ void EquipView::activate(bool arsenal, bool isEquip) {
     }
     connect(model, &EquipModel::pageNumChanged,
             this, &EquipView::pageNumChangedLambda);
-    connect(searchBox, &QLineEdit::textEdited,
-            model, &EquipModel::switchDisplayType2);
     connect(firstButton, &QAbstractButton::clicked,
             model, &EquipModel::firstPage);
     connect(prevButton, &QAbstractButton::clicked,

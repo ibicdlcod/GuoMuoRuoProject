@@ -44,7 +44,6 @@ public:
     static const int uidCol = 0;
     static const int equipCol = 1;
     static const int starCol = 2;
-    virtual int test() override;
 
     virtual int maximumPageNum() const override;
 

@@ -21,6 +21,30 @@ void ShipModel::switchShipDisplayType(const QString &nationality,
                                       const QString &shipclass,
                                       const QString &searchTerm) {
 
+    int oldRowCount = rowCount();
+    sortedShipIds.clear();
+    bool pass = true;
+    static auto meta = QMetaEnum::fromType<KP::ShipNationality>();
+    for(auto iter = clientShips.keyValueBegin();
+         iter != clientShips.keyValueEnd();
+         ++iter) {
+        pass = true;
+        /* nationality check */
+        if(!nationality.isEmpty() &&
+            qtTrId(meta.key(iter->second->getNationality()))
+                    .localeAwareCompare(nationality) != 0) {
+            pass = false;
+        }
+        if(pass) {
+            sortedShipIds.append(iter->first);
+        }
+    }
+    customSort();
+    int newRowCount = rowCount();
+    emit needReCalculatePages();
+    adjustRowCount(oldRowCount, newRowCount);
+    firstPage();
+    wholeTableChanged();
 }
 
 void ShipModel::addShip(QUuid uid, int def) {
@@ -78,10 +102,6 @@ int ShipModel::columnCount(const QModelIndex &parent) const {
         return 0;
     else
         return numberOfColumns();
-}
-
-int ShipModel::test() {
-    return 1;
 }
 
 QVariant ShipModel::data(const QModelIndex &index,
@@ -188,7 +208,7 @@ QVariant ShipModel::data(const QModelIndex &index,
             return qtTrId("ship-improve");
         }
         else if(index.column() == selectColumn()) {
-            //% "Select"
+            //% "Select this"
             return qtTrId("ship-select");
         }
         else if(index.column() == hpColumn()) {
