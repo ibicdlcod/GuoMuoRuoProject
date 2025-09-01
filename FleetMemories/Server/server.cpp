@@ -2048,10 +2048,10 @@ int64 Server::newEquipHasMotherCal(int equipId) {
             = 1.0
               + settings->value("rule/maxskillpointsamplifier",
                                 5.0).toDouble()
-                    * (atan(pow(
+                    * (atan(sqrt(
                            settings->value("rule/normalproductionstockpile",
                                            30.0).toDouble()
-                               / x, 0.5))
+                               / x))
                        - atan(1.0));
         sonSkillPoints *= skillPointsAmplifier;
     }
