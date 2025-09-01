@@ -401,158 +401,163 @@ Great at battle and bad at politics--so cool!</translation>
         <source>Submarine Tender</source>
         <translation>Submarine Tender</translation>
     </message>
-    <message id="light-cruiser-aa">
+    <message id="torpedo-cruiser-aviation">
         <location filename="../Protocol/shiptype.cpp" line="25"/>
+        <source>Light Cruiser (Advanced Torpedos/Aviation)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="light-cruiser-aa">
+        <location filename="../Protocol/shiptype.cpp" line="27"/>
         <source>Light Cruiser (Advanced Anti-Air)</source>
         <translation>Light Cruiser (Advanced Anti-Air)</translation>
     </message>
     <message id="heavy-cruiser">
-        <location filename="../Protocol/shiptype.cpp" line="27"/>
+        <location filename="../Protocol/shiptype.cpp" line="29"/>
         <source>Heavy Cruiser</source>
         <translation>Heavy Cruiser</translation>
     </message>
     <message id="heavy-cruiser-torp">
-        <location filename="../Protocol/shiptype.cpp" line="29"/>
+        <location filename="../Protocol/shiptype.cpp" line="31"/>
         <source>Heavy Cruiser (Advanced Torpedos)</source>
         <translation>Heavy Cruiser (Advanced Torpedos)</translation>
     </message>
     <message id="aviation-cruiser">
-        <location filename="../Protocol/shiptype.cpp" line="31"/>
+        <location filename="../Protocol/shiptype.cpp" line="33"/>
         <source>Heavy Cruiser (Advanced Aviation)</source>
         <translation>Heavy Cruiser (Advanced Aviation)</translation>
     </message>
     <message id="aviation-cruiser-torp">
-        <location filename="../Protocol/shiptype.cpp" line="33"/>
+        <location filename="../Protocol/shiptype.cpp" line="35"/>
         <source>Heavy Cruiser (Advanced Aviation &amp; Torpedos)</source>
         <translation>Heavy Cruiser (Advanced Aviation &amp; Torpedos)</translation>
     </message>
     <message id="heavy-cruiser-aa">
-        <location filename="../Protocol/shiptype.cpp" line="35"/>
+        <location filename="../Protocol/shiptype.cpp" line="37"/>
         <source>Heavy Cruiser (Advanced Anti-Air)</source>
         <translation>Heavy Cruiser (Advanced Anti-Air)</translation>
     </message>
     <message id="battleship">
-        <location filename="../Protocol/shiptype.cpp" line="37"/>
+        <location filename="../Protocol/shiptype.cpp" line="39"/>
         <source>Battleship</source>
         <translation>Battleship</translation>
     </message>
     <message id="battlecruiser">
-        <location filename="../Protocol/shiptype.cpp" line="39"/>
+        <location filename="../Protocol/shiptype.cpp" line="41"/>
         <source>Battlecruiser</source>
         <translation>Battlecruiser</translation>
     </message>
     <message id="highspeed-battleship">
-        <location filename="../Protocol/shiptype.cpp" line="41"/>
+        <location filename="../Protocol/shiptype.cpp" line="43"/>
         <source>Battleship (High speed)</source>
         <translation>Battleship (High speed)</translation>
     </message>
     <message id="aviation-battleship">
-        <location filename="../Protocol/shiptype.cpp" line="43"/>
+        <location filename="../Protocol/shiptype.cpp" line="45"/>
         <source>Battleship (Advanced Aviation)</source>
         <translation>Battleship (Advanced Aviation)</translation>
     </message>
     <message id="escort-unknown-special">
-        <location filename="../Protocol/shiptype.cpp" line="48"/>
+        <location filename="../Protocol/shiptype.cpp" line="50"/>
         <source>Escort (uncategorized)</source>
         <translation>Escort (uncategorized)</translation>
     </message>
     <message id="lead-destroyer">
-        <location filename="../Protocol/shiptype.cpp" line="52"/>
+        <location filename="../Protocol/shiptype.cpp" line="54"/>
         <source>Lead Destroyer</source>
         <translation>Lead Destroyer</translation>
     </message>
     <message id="destroyer">
-        <location filename="../Protocol/shiptype.cpp" line="56"/>
+        <location filename="../Protocol/shiptype.cpp" line="58"/>
         <source>Destroyer</source>
         <translation>Destroyer</translation>
     </message>
     <message id="light-cruiser-unknown-special">
-        <location filename="../Protocol/shiptype.cpp" line="60"/>
+        <location filename="../Protocol/shiptype.cpp" line="62"/>
         <source>Light Cruiser (uncategorized)</source>
         <translation>Light Cruiser (uncategorized)</translation>
     </message>
     <message id="heavy-cruiser-unknown-special">
-        <location filename="../Protocol/shiptype.cpp" line="63"/>
+        <location filename="../Protocol/shiptype.cpp" line="65"/>
         <source>Heavy Cruiser (uncategorized)</source>
         <translation>Heavy Cruiser (uncategorized)</translation>
     </message>
     <message id="battleship-unknown-special">
-        <location filename="../Protocol/shiptype.cpp" line="66"/>
+        <location filename="../Protocol/shiptype.cpp" line="68"/>
         <source>BattleShip (uncategorized)</source>
         <translation>BattleShip (uncategorized)</translation>
     </message>
     <message id="type-cv">
-        <location filename="../Protocol/shiptype.cpp" line="70"/>
+        <location filename="../Protocol/shiptype.cpp" line="72"/>
         <source>Carrier</source>
         <translation>Carrier</translation>
     </message>
     <message id="light-carrier">
-        <location filename="../Protocol/shiptype.cpp" line="74"/>
+        <location filename="../Protocol/shiptype.cpp" line="76"/>
         <source>(Light)</source>
         <translation>(Light)</translation>
     </message>
     <message id="asw-carrier">
-        <location filename="../Protocol/shiptype.cpp" line="77"/>
+        <location filename="../Protocol/shiptype.cpp" line="79"/>
         <source>(Advanced Anti-Sub)</source>
         <translation>(Advanced Anti-Sub)</translation>
     </message>
     <message id="escort-carrier">
-        <location filename="../Protocol/shiptype.cpp" line="80"/>
+        <location filename="../Protocol/shiptype.cpp" line="82"/>
         <source>(Escort)</source>
         <translation>(Escort)</translation>
     </message>
     <message id="armored-carrier">
-        <location filename="../Protocol/shiptype.cpp" line="84"/>
+        <location filename="../Protocol/shiptype.cpp" line="86"/>
         <source>(Armored)</source>
         <translation>(Armored)</translation>
     </message>
     <message id="night-carrier">
-        <location filename="../Protocol/shiptype.cpp" line="88"/>
+        <location filename="../Protocol/shiptype.cpp" line="90"/>
         <source>(Night Aviation)</source>
         <translation>(Night Aviation)</translation>
     </message>
     <message id="type-ss">
-        <location filename="../Protocol/shiptype.cpp" line="95"/>
+        <location filename="../Protocol/shiptype.cpp" line="97"/>
         <source>Submarine</source>
         <translation>Submarine</translation>
     </message>
     <message id="aviation-submarine">
-        <location filename="../Protocol/shiptype.cpp" line="98"/>
+        <location filename="../Protocol/shiptype.cpp" line="100"/>
         <source>(Aviation)</source>
         <translation>(Aviation)</translation>
     </message>
     <message id="type-av">
-        <location filename="../Protocol/shiptype.cpp" line="105"/>
+        <location filename="../Protocol/shiptype.cpp" line="107"/>
         <source>Seaplane Carrier</source>
         <translation>Seaplane Carrier</translation>
     </message>
     <message id="type-av-torp">
-        <location filename="../Protocol/shiptype.cpp" line="108"/>
+        <location filename="../Protocol/shiptype.cpp" line="110"/>
         <source>(Advanced Torpedos)</source>
         <translation>(Advanced Torpedos)</translation>
     </message>
     <message id="supply-ship">
-        <location filename="../Protocol/shiptype.cpp" line="114"/>
+        <location filename="../Protocol/shiptype.cpp" line="116"/>
         <source>Supply ship</source>
         <translation>Supply ship</translation>
     </message>
     <message id="amphibious-assault">
-        <location filename="../Protocol/shiptype.cpp" line="117"/>
+        <location filename="../Protocol/shiptype.cpp" line="119"/>
         <source>Amphibious assault ship</source>
         <translation>Amphibious assault ship</translation>
     </message>
     <message id="repair">
-        <location filename="../Protocol/shiptype.cpp" line="120"/>
+        <location filename="../Protocol/shiptype.cpp" line="122"/>
         <source>Repair ship</source>
         <translation>Repair ship</translation>
     </message>
     <message id="type-land">
-        <location filename="../Protocol/shiptype.cpp" line="123"/>
+        <location filename="../Protocol/shiptype.cpp" line="125"/>
         <source>Land Structure</source>
         <translation>Land Structure</translation>
     </message>
     <message id="unknown-ship-type">
-        <location filename="../Protocol/shiptype.cpp" line="126"/>
+        <location filename="../Protocol/shiptype.cpp" line="128"/>
         <source>Unknown</source>
         <translation>Unknown</translation>
     </message>
@@ -913,44 +918,44 @@ Great at battle and bad at politics--so cool!</translation>
         <translation type="unfinished"></translation>
     </message>
     <message id="equip-uuid">
-        <location filename="../ClientGUI/equipmodel.cpp" line="324"/>
-        <location filename="../ClientGUI/equipmodel.cpp" line="436"/>
+        <location filename="../ClientGUI/equipmodel.cpp" line="332"/>
+        <location filename="../ClientGUI/equipmodel.cpp" line="444"/>
         <source>Equipment UUID</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="equip-name">
-        <location filename="../ClientGUI/equipmodel.cpp" line="328"/>
-        <location filename="../ClientGUI/equipmodel.cpp" line="438"/>
+        <location filename="../ClientGUI/equipmodel.cpp" line="336"/>
+        <location filename="../ClientGUI/equipmodel.cpp" line="446"/>
         <source>Equipment name</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="equip-star">
-        <location filename="../ClientGUI/equipmodel.cpp" line="332"/>
-        <location filename="../ClientGUI/equipmodel.cpp" line="440"/>
+        <location filename="../ClientGUI/equipmodel.cpp" line="340"/>
+        <location filename="../ClientGUI/equipmodel.cpp" line="448"/>
         <source>Equipment improvement level</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="equip-attr">
-        <location filename="../ClientGUI/equipmodel.cpp" line="336"/>
-        <location filename="../ClientGUI/equipmodel.cpp" line="442"/>
+        <location filename="../ClientGUI/equipmodel.cpp" line="344"/>
+        <location filename="../ClientGUI/equipmodel.cpp" line="450"/>
         <source>Equipment attributes</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="destruct">
-        <location filename="../ClientGUI/equipmodel.cpp" line="340"/>
-        <location filename="../ClientGUI/equipmodel.cpp" line="444"/>
+        <location filename="../ClientGUI/equipmodel.cpp" line="348"/>
+        <location filename="../ClientGUI/equipmodel.cpp" line="452"/>
         <source>Destruct this equipment</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="equip-improve">
-        <location filename="../ClientGUI/equipmodel.cpp" line="344"/>
-        <location filename="../ClientGUI/equipmodel.cpp" line="446"/>
+        <location filename="../ClientGUI/equipmodel.cpp" line="352"/>
+        <location filename="../ClientGUI/equipmodel.cpp" line="454"/>
         <source>Improve this equipment</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="equip-select">
-        <location filename="../ClientGUI/equipmodel.cpp" line="348"/>
-        <location filename="../ClientGUI/equipmodel.cpp" line="448"/>
+        <location filename="../ClientGUI/equipmodel.cpp" line="356"/>
+        <location filename="../ClientGUI/equipmodel.cpp" line="456"/>
         <source>Select this equipment</source>
         <translation type="unfinished"></translation>
     </message>
@@ -997,6 +1002,7 @@ Great at battle and bad at politics--so cool!</translation>
     </message>
     <message id="equipview-search">
         <location filename="../ClientGUI/ui/equipselect.cpp" line="13"/>
+        <location filename="../ClientGUI/ui/shipselect.cpp" line="11"/>
         <source>Search:</source>
         <translation>Search:</translation>
     </message>
@@ -1012,10 +1018,15 @@ Great at battle and bad at politics--so cool!</translation>
     </message>
     <message id="retrieving-please-wait">
         <location filename="../ClientGUI/ui/equipview.cpp" line="57"/>
-        <location filename="../ClientGUI/ui/equipview.cpp" line="189"/>
-        <location filename="../ClientGUI/ui/equipview.cpp" line="219"/>
+        <location filename="../ClientGUI/ui/equipview.cpp" line="205"/>
+        <location filename="../ClientGUI/ui/equipview.cpp" line="236"/>
         <location filename="../ClientGUI/ui/navigator.cpp" line="16"/>
         <source>Retrieving data, please wait...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="no-ship">
+        <location filename="../ClientGUI/ui/equipview.cpp" line="146"/>
+        <source>No suitable Ship</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="destruct-button">
@@ -1025,6 +1036,7 @@ Great at battle and bad at politics--so cool!</translation>
     </message>
     <message id="add-star-button">
         <location filename="../ClientGUI/ui/equipselect.cpp" line="51"/>
+        <location filename="../ClientGUI/ui/shipselect.cpp" line="45"/>
         <source>Improve</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1036,7 +1048,7 @@ Great at battle and bad at politics--so cool!</translation>
         <translation type="unfinished"></translation>
     </message>
     <message id="no-equip">
-        <location filename="../ClientGUI/ui/equipview.cpp" line="131"/>
+        <location filename="../ClientGUI/ui/equipview.cpp" line="142"/>
         <location filename="../ClientGUI/ui/navigator.cpp" line="77"/>
         <source>No suitable Equipment</source>
         <translation type="unfinished"></translation>
@@ -1076,7 +1088,26 @@ Great at battle and bad at politics--so cool!</translation>
         <source>Hello!</source>
         <translation type="unfinished"></translation>
     </message>
+    <message id="shipview-nation">
+        <location filename="../ClientGUI/ui/shipselect.cpp" line="17"/>
+        <source>Nationality:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="shipview-type">
+        <location filename="../ClientGUI/ui/shipselect.cpp" line="21"/>
+        <source>Type:</source>
+        <translation type="unfinished">Type:</translation>
+    </message>
+    <message id="shipview-class">
+        <location filename="../ClientGUI/ui/shipselect.cpp" line="25"/>
+        <source>Class:</source>
+        <translation type="unfinished"></translation>
+    </message>
     <message id="all-nationality">
+        <location filename="../ClientGUI/ui/shipselect.cpp" line="73"/>
+        <location filename="../ClientGUI/ui/shipselect.cpp" line="117"/>
+        <location filename="../ClientGUI/ui/shipselect.cpp" line="127"/>
+        <location filename="../ClientGUI/ui/shipselect.cpp" line="139"/>
         <location filename="../ClientGUI/ui/techview.cpp" line="56"/>
         <location filename="../ClientGUI/ui/techview.cpp" line="463"/>
         <source>All nationalities</source>
@@ -1936,58 +1967,76 @@ Great at battle and bad at politics--so cool!</translation>
         <source>Remodel target %1 does not exist!</source>
         <translation type="unfinished"></translation>
     </message>
+    <message id="all-shiptypes">
+        <location filename="../ClientGUI/shipmodel.cpp" line="29"/>
+        <location filename="../ClientGUI/ui/shipselect.cpp" line="130"/>
+        <location filename="../ClientGUI/ui/shipselect.cpp" line="142"/>
+        <source>All ship types</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="all-shipclasses">
+        <location filename="../ClientGUI/shipmodel.cpp" line="31"/>
+        <location filename="../ClientGUI/ui/shipselect.cpp" line="145"/>
+        <source>All ship classes</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="fleet-idle">
+        <location filename="../ClientGUI/shipmodel.cpp" line="238"/>
+        <source>Idle</source>
+        <translation type="unfinished"></translation>
+    </message>
     <message id="ship-uuid">
-        <location filename="../ClientGUI/shipmodel.cpp" line="196"/>
-        <location filename="../ClientGUI/shipmodel.cpp" line="310"/>
+        <location filename="../ClientGUI/shipmodel.cpp" line="264"/>
+        <location filename="../ClientGUI/shipmodel.cpp" line="378"/>
         <source>UUID</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="ship-name">
-        <location filename="../ClientGUI/shipmodel.cpp" line="200"/>
-        <location filename="../ClientGUI/shipmodel.cpp" line="313"/>
+        <location filename="../ClientGUI/shipmodel.cpp" line="268"/>
+        <location filename="../ClientGUI/shipmodel.cpp" line="381"/>
         <source>Name</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="ship-star">
-        <location filename="../ClientGUI/shipmodel.cpp" line="204"/>
-        <location filename="../ClientGUI/shipmodel.cpp" line="316"/>
+        <location filename="../ClientGUI/shipmodel.cpp" line="272"/>
+        <location filename="../ClientGUI/shipmodel.cpp" line="384"/>
         <source>Modernization</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="ship-improve">
-        <location filename="../ClientGUI/shipmodel.cpp" line="208"/>
-        <location filename="../ClientGUI/shipmodel.cpp" line="319"/>
+        <location filename="../ClientGUI/shipmodel.cpp" line="276"/>
+        <location filename="../ClientGUI/shipmodel.cpp" line="387"/>
         <source>Modernize</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="ship-select">
-        <location filename="../ClientGUI/shipmodel.cpp" line="212"/>
-        <location filename="../ClientGUI/shipmodel.cpp" line="322"/>
+        <location filename="../ClientGUI/shipmodel.cpp" line="280"/>
+        <location filename="../ClientGUI/shipmodel.cpp" line="390"/>
         <source>Select this</source>
         <oldsource>Select</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message id="ship-hp">
-        <location filename="../ClientGUI/shipmodel.cpp" line="216"/>
-        <location filename="../ClientGUI/shipmodel.cpp" line="325"/>
+        <location filename="../ClientGUI/shipmodel.cpp" line="284"/>
+        <location filename="../ClientGUI/shipmodel.cpp" line="393"/>
         <source>HP</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="ship-cond">
-        <location filename="../ClientGUI/shipmodel.cpp" line="220"/>
-        <location filename="../ClientGUI/shipmodel.cpp" line="328"/>
+        <location filename="../ClientGUI/shipmodel.cpp" line="288"/>
+        <location filename="../ClientGUI/shipmodel.cpp" line="396"/>
         <source>Cond.</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="ship-lv">
-        <location filename="../ClientGUI/shipmodel.cpp" line="224"/>
-        <location filename="../ClientGUI/shipmodel.cpp" line="331"/>
+        <location filename="../ClientGUI/shipmodel.cpp" line="292"/>
+        <location filename="../ClientGUI/shipmodel.cpp" line="399"/>
         <source>Level</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="ship-pos">
-        <location filename="../ClientGUI/shipmodel.cpp" line="228"/>
-        <location filename="../ClientGUI/shipmodel.cpp" line="334"/>
+        <location filename="../ClientGUI/shipmodel.cpp" line="296"/>
+        <location filename="../ClientGUI/shipmodel.cpp" line="402"/>
         <source>Position</source>
         <translation type="unfinished"></translation>
     </message>

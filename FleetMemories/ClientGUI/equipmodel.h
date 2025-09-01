@@ -21,6 +21,11 @@ signals:
 public slots:
     virtual void switchDisplayType(int) final;
     virtual void switchDisplayType2(const QString &) final;
+    virtual void switchShipDisplayType(const QString &nationality,
+                                       const QString &shiptype,
+                                       const QString &shipclass,
+                                       const QString &searchTerm
+                                       = QLatin1String(""));
     virtual void firstPage();
     virtual void prevPage();
     virtual void nextPage();

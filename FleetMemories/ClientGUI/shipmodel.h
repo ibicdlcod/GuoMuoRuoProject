@@ -11,12 +11,16 @@ class ShipModel : public EquipModel
 public:
     explicit ShipModel(QObject *parent = nullptr, bool isInArsenal = true);
 
+signals:
+    void typeBoxHint(const QStringList &types);
+    void classBoxHint(const QStringList &types);
+
 public slots:
     virtual void switchShipDisplayType(const QString &nationality,
                                        const QString &shiptype,
                                        const QString &shipclass,
                                        const QString &searchTerm
-                                       = QLatin1String("")) final;
+                                       = QLatin1String("")) override final;
 
     virtual void addShip(QUuid, int) final;
     virtual void updateShipList(const QJsonObject &) final;

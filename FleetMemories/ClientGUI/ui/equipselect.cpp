@@ -42,7 +42,7 @@ EquipSelect::EquipSelect(int height, QWidget *parent)
     layout->addWidget(destructButton);
     layout->addWidget(addStarButton);
     layout->setContentsMargins(0,0,0,0);
-    layout->setSpacing(1);
+    layout->setSpacing(6);
     layout->setAlignment(Qt::AlignCenter);
 
     //% "Destruct"
@@ -63,7 +63,7 @@ EquipSelect::EquipSelect(int height, QWidget *parent)
         "QLineEdit#searchbox { background-color: palette(button); }"
         ));
     //searchBox->setSizeAdjustPolicy(QLineEdit::AdjustToContents);
-    //searchBox->setMaximumSize(QSize(50, 10));
+    searchBox->setMinimumSize(QSize(150, height));
 
     typeLabel->setSizePolicy(labelSize);
     typeBox->setSizePolicy(QSizePolicy(QSizePolicy::Maximum,

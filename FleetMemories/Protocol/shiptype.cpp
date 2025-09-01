@@ -21,6 +21,8 @@ QString ShipType::toString() const {
     case 0x34: return qtTrId("light-aviation-cruiser");
         //% "Submarine Tender"
     case 0x35: return qtTrId("submarine-tender");
+        //% "Light Cruiser (Advanced Torpedos/Aviation)"
+    case 0x36: return qtTrId("torpedo-cruiser-aviation");
         //% "Light Cruiser (Advanced Anti-Air)"
     case 0x38: return qtTrId("light-cruiser-aa");
         //% "Heavy Cruiser"

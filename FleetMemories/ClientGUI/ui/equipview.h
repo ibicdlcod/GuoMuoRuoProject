@@ -13,6 +13,7 @@
 #include "selectdelegate.h"
 #include "hpdelegate.h"
 #include "equipselect.h"
+#include "shipselect.h"
 
 namespace Ui {
 class EquipView;
@@ -76,14 +77,7 @@ private:
     EquipSelect *equipSelect;
 
     /* ship */
-    QLabel *searchLabel2;
-    QLineEdit *searchBox2;
-    QLabel *nationLabel;
-    QComboBox *nationBox;
-    QLabel *typeLabel2;
-    QComboBox *typeBox2;
-    QLabel *classLabel;
-    QComboBox *classBox;
+    ShipSelect *shipSelect;
 };
 
 #endif // EQUIPVIEW_H

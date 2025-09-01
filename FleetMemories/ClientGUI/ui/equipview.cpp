@@ -69,7 +69,8 @@ EquipView::EquipView(QWidget *parent)
                                          QSizePolicy::Label));
     pageLabel->resize(QSize(100, pageLabel->size().height()));
 
-    equipSelect = new EquipSelect(pageLabel->size().height());
+    equipSelect = new EquipSelect(20);
+    shipSelect = new ShipSelect(20);
 
     QWidget *layoutWidget = new QWidget(this);
     QHBoxLayout *layout = new QHBoxLayout(layoutWidget);
@@ -81,13 +82,15 @@ EquipView::EquipView(QWidget *parent)
     layout->setContentsMargins(0,0,0,0);
     QVBoxLayout *layout2 = ui->Navigator;
     layout2->addWidget(equipSelect, 1, Qt::AlignHCenter);
+    layout2->addWidget(shipSelect, 1, Qt::AlignHCenter);
     layout2->addWidget(layoutWidget, 1, Qt::AlignHCenter);
     layout2->setContentsMargins(0,0,0,0);
-    layout2->setSpacing(3);
+    layout2->setSpacing(1);
 
     QSizePolicy labelSize = QSizePolicy(QSizePolicy::Maximum,
                                         QSizePolicy::Maximum);
     equipSelect->setSizePolicy(labelSize);
+    shipSelect->setSizePolicy(labelSize);
     layoutWidget->setSizePolicy(labelSize);
 
     connect(equipSelect, &EquipSelect::typeActivated,
@@ -98,6 +101,12 @@ EquipView::EquipView(QWidget *parent)
             model, &EquipModel::enactDestruct);
     connect(equipSelect, &EquipSelect::searchBoxChanged,
             model, &EquipModel::switchDisplayType2);
+    connect(shipSelect, &ShipSelect::selectChanged,
+            &engine.shipModel, &ShipModel::switchShipDisplayType);
+    connect(&engine.shipModel, &ShipModel::typeBoxHint,
+            shipSelect, &ShipSelect::typeBoxHinted);
+    connect(&engine.shipModel, &ShipModel::classBoxHint,
+            shipSelect, &ShipSelect::classBoxHinted);
 
     delegate = new SelectDelegate(arsenalView);
     hpdelegate = new HpDelegate(arsenalView);
@@ -127,8 +136,15 @@ void EquipView::enactPageNumChange(int currentPageNum, int totalPageNum) {
         lastButton->setEnabled(true);
     }
     if(totalPageNum == 0) {
-        //% "No suitable Equipment"
-        pageLabel->setText(qtTrId("no-equip"));
+        Clientv2 &engine = Clientv2::getInstance();
+        if(model == &engine.equipModel) {
+            //% "No suitable Equipment"
+            pageLabel->setText(qtTrId("no-equip"));
+        }
+        else {
+            //% "No suitable Ship"
+            pageLabel->setText(qtTrId("no-ship"));
+        }
         return;
     }
     pageLabel->setText(QString::number(currentPageNum + 1)
@@ -211,6 +227,7 @@ void EquipView::activate(bool arsenal, bool isEquip) {
                 model, SLOT(setRowsPerPageHint(int)),
                 Qt::UniqueConnection);
         equipSelect->show();
+        shipSelect->hide();
     }
     else {
         model = &engine.shipModel;
@@ -243,6 +260,7 @@ void EquipView::activate(bool arsenal, bool isEquip) {
                 model, SLOT(setRowsPerPageHint(int)),
                 Qt::UniqueConnection);
         equipSelect->hide();
+        shipSelect->show();
     }
     connect(model, &EquipModel::pageNumChanged,
             this, &EquipView::pageNumChangedLambda);

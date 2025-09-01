@@ -24,20 +24,83 @@ void ShipModel::switchShipDisplayType(const QString &nationality,
     int oldRowCount = rowCount();
     sortedShipIds.clear();
     bool pass = true;
+    bool pass1 = false;
+    //% "All ship types"
+    QStringList typePasses = {qtTrId("all-shiptypes")};
+    //% "All ship classes"
+    QStringList classPasses = {qtTrId("all-shipclasses")};;
     static auto meta = QMetaEnum::fromType<KP::ShipNationality>();
     for(auto iter = clientShips.keyValueBegin();
          iter != clientShips.keyValueEnd();
          ++iter) {
         pass = true;
-        /* nationality check */
-        if(!nationality.isEmpty() &&
-            qtTrId(meta.key(iter->second->getNationality()))
-                    .localeAwareCompare(nationality) != 0) {
-            pass = false;
+        /* search text */
+        if(!searchTerm.isEmpty()) {
+            pass1 = false;
+            for(const auto &name:
+                 std::as_const(iter->second->localNames)) {
+                if(name.localeAwareCompare(searchTerm) == 0)
+                    pass1 = true;
+                if(name.contains(searchTerm, Qt::CaseInsensitive))
+                    pass1 = true;
+            }
+            if(iter->first.toString().contains(searchTerm)) {
+                pass1 = true;
+            }
+            pass = pass1;
+        }
+        else {
+            /* nationality check */
+            if(!nationality.isEmpty() &&
+                qtTrId(meta.key(iter->second->getNationality()))
+                        .localeAwareCompare(nationality) != 0) {
+                pass = false;
+            }
+            if(shiptype.isEmpty() && shipclass.isEmpty()) {
+                if(pass) {
+                    QString type = iter->second->getType().toString();
+                    if(!typePasses.contains(type)) {
+                        typePasses.append(type);
+                    }
+                }
+            }
+
+            /* type check */
+            if(!shiptype.isEmpty() &&
+                iter->second->getType().toString().localeAwareCompare(
+                    shiptype) != 0) {
+                pass = false;
+            }
+            QString classText =
+                iter->second->shipClassText[
+                    settings->value("language", "ja_JP").toString()
+            ];
+            if(classText.isEmpty()) {
+                classText = iter->second->shipClassText["ja_JP"];
+            }
+            if(shipclass.isEmpty()) {
+                if(pass) {
+                    if(!classPasses.contains(classText)) {
+                        classPasses.append(classText);
+                    }
+                }
+            }
+
+            /* class check */
+            if(!shipclass.isEmpty() && classText.localeAwareCompare(
+                    shipclass) != 0) {
+                pass = false;
+            }
         }
         if(pass) {
             sortedShipIds.append(iter->first);
         }
+    }
+    if(searchTerm.isEmpty() && shiptype.isEmpty() && shipclass.isEmpty()) {
+        emit typeBoxHint(typePasses);
+    }
+    if(searchTerm.isEmpty() && shipclass.isEmpty()) {
+        emit classBoxHint(classPasses);
     }
     customSort();
     int newRowCount = rowCount();
@@ -82,6 +145,7 @@ void ShipModel::updateShipList(const QJsonObject &input) {
         emit needReCalculateRows();
         emit needReCalculatePages();
         ready = true;
+        switchShipDisplayType("", "", "", "");
     }
     else {
         /* not used */
@@ -169,6 +233,10 @@ QVariant ShipModel::data(const QModelIndex &index,
             return Ship::getLevel(displayExp);
         }
         else if(index.column() == fleetPosColumn()) {
+            if(attr->fleetIndex == 0 && attr->fleetPosIndex == 0) {
+                //% "Idle"
+                return qtTrId("fleet-idle");
+            }
             return QStringLiteral("%1-%2").arg(attr->fleetIndex)
                 .arg(attr->fleetPosIndex);
         }
@@ -368,7 +436,7 @@ bool ShipModel::setData(const QModelIndex &index,
                         const QVariant &value,
                         int role) {
     int realRowIndex = index.row() + rowsPerPage * pageNum;
-    /* improve */
+    /* TODO: add modernize */
     return false;
 }
 
@@ -407,7 +475,19 @@ int ShipModel::maximumPageNum() const {
 }
 
 void ShipModel::customSort() {
-
+    std::sort(sortedShipIds.begin(),
+              sortedShipIds.end(),
+              [this](QUuid a, QUuid b)
+              {
+                  if((*clientShips[a]).isNotEqual(*clientShips[b]))
+                      return (*clientShips[a]) < (*clientShips[b]);
+                  else if(clientShipDynamicAttrs[a]->star
+                           != clientShipDynamicAttrs[b]->star)
+                      return clientShipDynamicAttrs[a]->star >
+                             clientShipDynamicAttrs[b]->star;
+                  else
+                      return a < b;
+              });
 }
 
 int ShipModel::numberOfColumns() const {
@@ -419,7 +499,7 @@ int ShipModel::numberOfColumns() const {
 }
 
 void ShipModel::clearShipCheckBoxes() {
-    /* improve */
+    /* TODO: add modernize */
 }
 
 int ShipModel::numberOfShip() const {

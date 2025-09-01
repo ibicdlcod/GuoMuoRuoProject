@@ -77,6 +77,14 @@ void EquipModel::switchDisplayType2(const QString &equipName) {
     wholeTableChanged();
 }
 
+void EquipModel::switchShipDisplayType(const QString &nationality,
+                           const QString &shiptype,
+                           const QString &shipclass,
+                           const QString &searchTerm) {
+    /* do nothing */
+    ;
+}
+
 void EquipModel::firstPage() {
     int oldRowCount = rowCount();
     pageNum = 0;
