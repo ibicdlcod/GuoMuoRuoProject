@@ -845,8 +845,14 @@ void Server::offerEquipInfoUser(const CSteamID &uid,
         QSqlDatabase db = QSqlDatabase::database();
         QSqlQuery query;
         /* TODO: use left join to calculate KC star + FM star */
-        query.prepare("SELECT EquipDef, EquipUuid, Star"
-                      " FROM UserEquip WHERE User = :id;");
+        query.prepare("SELECT UserEquip.EquipDef, "
+                      "UserEquip.EquipUuid, "
+                      "UserEquip.Star, "
+                      "UserKCEquip.Star "
+                      "FROM UserEquip "
+                      "LEFT JOIN UserKCEquip "
+                      "ON UserEquip.EquipUuid = UserKCEquip.EquipUuid "
+                      "WHERE UserEquip.User = :id;");
         query.bindValue(":id", uid.ConvertToUint64());
         if(!query.exec() || !query.isSelect()) {
             qCritical() << query.lastQuery();
@@ -859,14 +865,16 @@ void Server::offerEquipInfoUser(const CSteamID &uid,
             QUuid serial;
             int def;
             int star;
+            int starkc;
             while(query.next()) {
                 QJsonObject output;
                 def = query.value(0).toInt();
                 serial = query.value(1).toUuid();
                 star = query.value(2).toInt();
+                starkc = query.value(3).isNull() ? 0 : query.value(3).toInt();
                 output["def"] = def;
                 output["serial"] = serial.toString();
-                output["star"] = star;
+                output["star"] = star + starkc;
                 userEquipInfos.append(output);
             }
             connection->flush();
