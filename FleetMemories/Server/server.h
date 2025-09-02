@@ -149,6 +149,7 @@ private:
     void sqlinitEquipName() const;
     void sqlinitEquipSP() const;
     void sqlinitEquipU() const;
+    void sqlinitEquipUKC() const;
     void sqlinitFacto() const;
     void sqlinitMapNode() const;
     void sqlinitMapRelation() const;
@@ -174,6 +175,7 @@ private:
 
     QSet<int> openShips;
     QMap<int, Ship *> shipRegistry;
+    QMap<int, int> shipOldIdToNewId;
     QMultiMap<int, int> shipRemodelGroup;
 
     std::random_device random;

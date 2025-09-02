@@ -201,7 +201,20 @@ Q_GLOBAL_STATIC(QString,
                     "EquipUuid TEXT PRIMARY KEY, "
                     "EquipDef INTEGER NOT NULL, "
                     "Star INTEGER DEFAULT 0, "
-                    "FOREIGN KEY(User) REFERENCES NewUsers(UserID),"
+                    "FOREIGN KEY(User) REFERENCES NewUsers(UserID), "
+                    "FOREIGN KEY(EquipDef) REFERENCES EquipName(EquipID)"
+                    ");"
+                    ));
+
+/* Equipment of users(KC) */
+Q_GLOBAL_STATIC(QString,
+                userKCEquip,
+                QStringLiteral(
+                    "CREATE TABLE UserKCEquip ("
+                    "EquipUuid TEXT PRIMARY KEY, "
+                    "EquipDef INTEGER NOT NULL, "
+                    "Star INTEGER DEFAULT 0, "
+                    "SkillPoints INTEGER DEFAULT 0, "
                     "FOREIGN KEY(EquipDef) REFERENCES EquipName(EquipID)"
                     ");"
                     ));
@@ -831,6 +844,7 @@ void Server::offerEquipInfoUser(const CSteamID &uid,
     try{
         QSqlDatabase db = QSqlDatabase::database();
         QSqlQuery query;
+        /* TODO: use left join to calculate KC star + FM star */
         query.prepare("SELECT EquipDef, EquipUuid, Star"
                       " FROM UserEquip WHERE User = :id;");
         query.bindValue(":id", uid.ConvertToUint64());
@@ -2047,8 +2061,9 @@ void Server::migrate(const CSteamID &uid, const QJsonObject &input) {
     auto hqlv = input["hqlv"].toInt();
     auto admiralName = input["nickname"].toString();
     auto equips = input["equips"].toObject();
-    QList<std::tuple<int, int, int>> equipData;
-    QList<std::tuple<int, int>> shipData;
+    QMultiMap<int, std::tuple<int, int>> equipData;
+    QMap<int, int> shipData;
+    QMap<int, int> sourceModels;
     for(auto equip: equips) {
         auto equipObj = equip.toObject();
         int equipExp = 0;
@@ -2059,22 +2074,103 @@ void Server::migrate(const CSteamID &uid, const QJsonObject &input) {
         if(equipObj["id"].toInt() == 335) {
             continue;
         }
-        equipData.append({equipObj["id"].toInt(), equipStar, equipExp});
+        equipData.insert(equipObj["id"].toInt(), {equipStar, equipExp});
     }
     auto ships = input["ships"].toObject();
     for(auto ship: ships) {
         auto shipId = ship.toObject()["id"].toInt();
         auto shipExp = ship.toObject()["exp"].toInt();
         int fmShipId = 0;
-        for(auto fmShip: std::as_const(shipRegistry)) {
-            if(fmShip->attr["OldInternalNo."] == shipId) {
-                fmShipId = fmShip->getId();
+        int latestShipId = 0;
+        Ship *fmShip = shipRegistry[shipOldIdToNewId[shipId]];
+        fmShipId = fmShip->getId();
+        auto laterModels = fmShip->getLaterModels(shipRegistry);
+        if(laterModels.isEmpty())
+            latestShipId = fmShipId;
+        else
+            latestShipId = *std::max_element(laterModels.cbegin(),
+                                             laterModels.cend());
+        if(fmShipId != 0) {
+            if(!shipData.contains(latestShipId)) {
+                shipData[latestShipId] = shipExp;
+            }
+            else {
+                shipData[latestShipId] += shipExp;
+            }
+            if(!sourceModels.contains(latestShipId)) {
+                sourceModels[latestShipId] = fmShipId;
+            }
+            else {
+                sourceModels[latestShipId] = std::max(fmShipId,
+                                                      sourceModels[latestShipId]);
             }
         }
-        if(fmShipId != 0) {
-            shipData.append({fmShipId, shipExp});
+    }
+
+    QSqlDatabase db = QSqlDatabase::database();
+    for(auto equipDef: equipData.uniqueKeys()) {
+        auto dat = equipData.values(equipDef);
+        std::sort(dat.begin(), dat.end(), [](std::tuple<int, int> a,
+                                             std::tuple<int, int> b)
+                  {
+            return std::get<0>(a) > std::get<0>(b);
+        });
+
+        auto iter = dat.begin();
+        QSqlQuery query;
+        query.prepare("SELECT UserKCEquip.EquipUuid "
+                      "FROM UserKCEquip "
+                      "INNER JOIN UserEquip "
+                      "ON UserEquip.EquipUuid = UserKCEquip.EquipUuid "
+                      "WHERE UserEquip.User = :id AND UserKCEquip.EquipDef = :def "
+                      "ORDER BY UserKCEquip.star DESC");
+        query.bindValue(":id", uid.ConvertToUint64());
+        query.bindValue(":def", equipDef);
+        query.exec();
+        query.isSelect();
+        while(query.next() && iter != dat.end()) {
+            QSqlQuery query2;
+            query2.prepare("REPLACE INTO UserKCEquip "
+                          "(EquipUuid, EquipDef, Star, Skillpoints) "
+                          "VALUES (:id, :def, :star, :sp);");
+            query2.bindValue(":id", query.value(0).toString());
+            query2.bindValue(":def", equipDef);
+            query2.bindValue(":star", std::get<0>(*iter));
+            query2.bindValue(":sp", std::get<1>(*iter) * 10000);
+            if(!query2.exec()) {
+                qCritical() << query2.lastQuery();
+                throw DBError(qtTrId("equip-import-failed"),
+                              query.lastError());
+            }
+            iter++;
+        }
+        while(iter != dat.end()) {
+            QUuid newUid = newEquip(uid, equipDef, true);
+
+            QSqlQuery query2;
+            query2.prepare("REPLACE INTO UserKCEquip "
+                           "(EquipUuid, EquipDef, Star, Skillpoints) "
+                           "VALUES (:id, :def, :star, :sp);");
+            query2.bindValue(":id", newUid);
+            query2.bindValue(":def", equipDef);
+            query2.bindValue(":star", std::get<0>(*iter));
+            query2.bindValue(":sp", std::get<1>(*iter) * 10000);
+            if(!query2.exec()) {
+                qCritical() << query2.lastQuery();
+                throw DBError(qtTrId("equip-import-failed"),
+                              query.lastError());
+            }
+            iter++;
         }
     }
+
+    /*
+    for(auto shipId: shipData.keys()) {
+        qCritical() << shipRegistry[shipId]->localNames["ja_JP"]
+                    << "\t" << shipData[shipId]
+                    << "\t" << shipRegistry[sourceModels[shipId]]->localNames["ja_JP"];
+    }
+*/
     qInfo() << "Success!";
 }
 
@@ -2731,9 +2827,9 @@ void Server::receivedReq(const QJsonObject &djson,
                            this,
                            [connection, uid, djson, this]
                            {offerTechInfo(
-                                 connection,
-                                 uid,
-                                 djson["local"].toInt());});
+                  connection,
+                  uid,
+                  djson["local"].toInt());});
     }
     break;
     case KP::CommandType::DemandSkillPoints: {
@@ -2741,9 +2837,9 @@ void Server::receivedReq(const QJsonObject &djson,
                            this,
                            [connection, uid, djson, this]
                            {offerSPInfo(
-                                 connection,
-                                 uid,
-                                 djson["equipid"].toInt());});
+                  connection,
+                  uid,
+                  djson["equipid"].toInt());});
     }
     break;
     case KP::CommandType::DemandResourceUpdate: {
@@ -2751,8 +2847,8 @@ void Server::receivedReq(const QJsonObject &djson,
                            this,
                            [connection, uid, this]
                            {offerResourceInfo(
-                                 connection,
-                                 uid);});
+                  connection,
+                  uid);});
     }
     break;
     case KP::CommandType::DestructEquip: {
@@ -2842,11 +2938,15 @@ bool Server::shipRefresh() {
     qInfo() << qtTrId("ship-load-good");
 
     for(auto ship: std::as_const(shipRegistry)) {
+        if(ship->isAmnesiac()) {
+            continue;
+        }
         auto latermodels = ship->getLaterModels(shipRegistry);
         if(!latermodels.empty()) {
             auto latestmodel = *std::max_element(latermodels.constBegin(), latermodels.constEnd());
             shipRemodelGroup.insert(latestmodel, ship->getId());
         }
+        shipOldIdToNewId[ship->attr["OldInternalNo."]] = ship->getId();
     }
     for(auto shipID: shipRemodelGroup.uniqueKeys()) {
         shipRemodelGroup.insert(shipID, shipID);
@@ -3002,6 +3102,9 @@ void Server::sqlinit() const {
         if(!tables.contains("UserShip")) {
             sqlinitShipU();
         }
+        if(!tables.contains("UserKCEquip")) {
+            sqlinitEquipUKC();
+        }
     }
 }
 
@@ -3047,6 +3150,19 @@ void Server::sqlinitEquipU() const {
     if(!query.exec()) {
         //% "Create Equipment database for user failed."
         throw DBError(qtTrId("equip-db-user-gen-failure"),
+                      query.lastError());
+    }
+}
+
+void Server::sqlinitEquipUKC() const {
+    //% "Equipment database (kancolle) for user does not exist, creating..."
+    qWarning() << qtTrId("equip-db-kc-user-lack");
+    QSqlQuery query;
+    query.prepare(*userKCEquip);
+    if(!query.exec()) {
+        qCritical() << query.lastQuery();
+        //% "Create Equipment database (kancolle) for user failed."
+        throw DBError(qtTrId("equip-db-kc-user-gen-failure"),
                       query.lastError());
     }
 }
