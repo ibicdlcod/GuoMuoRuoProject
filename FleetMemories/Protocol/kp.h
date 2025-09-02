@@ -132,7 +132,8 @@ enum CommandType{
     DemandResourceUpdate,
     DestructEquip,
     Switch,
-    MessageTest
+    MessageTest,
+    Migrate
 };
 Q_ENUM_NS(CommandType)
 
@@ -244,6 +245,7 @@ QByteArray clientDevelop(int, bool convert = false, int factoryID = -1);
 QByteArray clientFactoryRefresh();
 QByteArray clientFetch(int factoryID = -1);
 QByteArray clientHello();
+QByteArray clientMigrate(const QJsonObject &);
 QByteArray clientStateChange(GameState);
 QByteArray clientSteamAuth(uint8 [], uint32);
 QByteArray clientSteamLogout();

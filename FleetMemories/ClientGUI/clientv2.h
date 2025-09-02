@@ -160,6 +160,7 @@ private slots:
     void errorOccurred(QAbstractSocket::SocketError);
     void errorOccurredStr(const QString &);
     void handshakeInterrupted(const QSslError &);
+    void migrate(const QJsonObject &);
     void pskRequired(QSslPreSharedKeyAuthenticator *);
     void readyRead();
     void sendEATActual();

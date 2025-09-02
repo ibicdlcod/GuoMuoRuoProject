@@ -92,11 +92,14 @@ Clientv2::Clientv2(QObject *parent)
     migrateServer.route("/", QHttpServerRequest::Method::Post, this,
                         [this] (const QHttpServerRequest &request, QHttpServerResponder &responder) {
                             QJsonDocument doc = QJsonDocument::fromJson(request.body());
-                            if(!doc.isNull()) {
+                            if(!doc.isNull() && loginCheck()) {
                                 QJsonObject obj = doc.object();
-                                qCritical() << obj;
+                                migrate(obj);
+                                responder.write("导出成功", "text/plain");
                             }
-                            responder.write("导出成功", "text/plain");
+                            else {
+                                responder.write("导出失败", "text/plain");
+                            }
                         });
     if(!tcpServer->listen(QHostAddress::LocalHost, 3411) || !migrateServer.bind(tcpServer)) {
         //% "Internal server initalize failed!"
@@ -513,6 +516,13 @@ void Clientv2::handshakeInterrupted(const QSslError &error) {
         qWarning() << qtTrId("retransmit-toomuch").arg(clientName);
         catbomb();
     }
+}
+
+void Clientv2::migrate(const QJsonObject &content) {
+    socket.flush();
+    QByteArray msg = KP::clientMigrate(content);
+    sender->enqueue(msg);
+    socket.flush();
 }
 
 /* Network */

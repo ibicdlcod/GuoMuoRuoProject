@@ -195,6 +195,14 @@ QByteArray KP::clientHello() {
     return QCborValue::fromJsonValue(result).toCbor();
 }
 
+QByteArray KP::clientMigrate(const QJsonObject &input) {
+    QJsonObject result;
+    result["type"] = DgramType::Request;
+    result["command"] = CommandType::Migrate;
+    result["content"] = input;
+    return QCborValue::fromJsonValue(result).toCbor();
+}
+
 QByteArray KP::clientStateChange(GameState state) {
     QJsonObject result;
     result["type"] = DgramType::Request;

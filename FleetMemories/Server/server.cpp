@@ -1018,7 +1018,7 @@ void Server::offerShipInfoUser(const CSteamID &uid,
                 output["exp"] = exp;
                 output["expcap"] = expCap;
                 output["equip"] = QJsonArray({
-                                              slot1.toString(),
+                    slot1.toString(),
                     slot2.toString(),
                     slot3.toString(),
                     slot4.toString(),
@@ -2043,6 +2043,41 @@ bool Server::importShipFromCSV() {
     return shipRefresh();
 }
 
+void Server::migrate(const CSteamID &uid, const QJsonObject &input) {
+    auto hqlv = input["hqlv"].toInt();
+    auto admiralName = input["nickname"].toString();
+    auto equips = input["equips"].toObject();
+    QList<std::tuple<int, int, int>> equipData;
+    QList<std::tuple<int, int>> shipData;
+    for(auto equip: equips) {
+        auto equipObj = equip.toObject();
+        int equipExp = 0;
+        if(equipObj.contains("exp")) {
+            equipExp = equipObj["exp"].toInt();
+        }
+        int equipStar = equipObj["star"].toInt();
+        if(equipObj["id"].toInt() == 335) {
+            continue;
+        }
+        equipData.append({equipObj["id"].toInt(), equipStar, equipExp});
+    }
+    auto ships = input["ships"].toObject();
+    for(auto ship: ships) {
+        auto shipId = ship.toObject()["id"].toInt();
+        auto shipExp = ship.toObject()["exp"].toInt();
+        int fmShipId = 0;
+        for(auto fmShip: std::as_const(shipRegistry)) {
+            if(fmShip->attr["OldInternalNo."] == shipId) {
+                fmShipId = fmShip->getId();
+            }
+        }
+        if(fmShipId != 0) {
+            shipData.append({fmShipId, shipExp});
+        }
+    }
+    qInfo() << "Success!";
+}
+
 /* 3-Resources.md#Natural regeneration */
 void Server::naturalRegen(const CSteamID &uid) {
     try{
@@ -2164,7 +2199,7 @@ int64 Server::newEquipHasMotherCal(int equipId) {
                     * (atan(sqrt(
                            settings->value("rule/normalproductionstockpile",
                                            30.0).toDouble()
-                               / x))
+                           / x))
                        - atan(1.0));
         sonSkillPoints *= skillPointsAmplifier;
     }
@@ -2571,7 +2606,6 @@ void Server::receivedReq(const QJsonObject &djson,
                 newEquip(uid, equipid, true), equipid);
             senderM.sendMessage(connection, msg);
         }
-
     }
     break;
     case KP::CommandType::Admingenerateequips: {
@@ -2738,6 +2772,12 @@ void Server::receivedReq(const QJsonObject &djson,
         senderM.sendMessage(connection, msg);
     }
     break;
+    case KP::CommandType::Migrate: {
+        migrate(uid, djson["content"].toObject());
+        QByteArray msg = KP::serverSuccess();
+        senderM.sendMessage(connection, msg);
+    }
+    break;
     default:
         throw std::domain_error(QString("User %1: command type not supported")
                                     .arg(uid.ConvertToUint64()).toUtf8());
@@ -2800,6 +2840,18 @@ bool Server::shipRefresh() {
     }
     //% "Load ship registry success!"
     qInfo() << qtTrId("ship-load-good");
+
+    for(auto ship: std::as_const(shipRegistry)) {
+        auto latermodels = ship->getLaterModels(shipRegistry);
+        if(!latermodels.empty()) {
+            auto latestmodel = *std::max_element(latermodels.constBegin(), latermodels.constEnd());
+            shipRemodelGroup.insert(latestmodel, ship->getId());
+        }
+    }
+    for(auto shipID: shipRemodelGroup.uniqueKeys()) {
+        shipRemodelGroup.insert(shipID, shipID);
+    }
+
     return true;
 }
 

@@ -127,6 +127,7 @@ private:
     bool importMapNodeFromCSV();
     bool importMapRelationFromCSV();
     bool importShipFromCSV();
+    void migrate(const CSteamID &, const QJsonObject &);
     void naturalRegen(const CSteamID &);
     QUuid newEquip(const CSteamID &, int, bool direct = false);
     void newEquipHasMother(const CSteamID &, int);
@@ -173,6 +174,7 @@ private:
 
     QSet<int> openShips;
     QMap<int, Ship *> shipRegistry;
+    QMultiMap<int, int> shipRemodelGroup;
 
     std::random_device random;
     std::mt19937 mt;
