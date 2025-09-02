@@ -1394,7 +1394,7 @@ void Server::doDevelop(CSteamID &uid, int equipid,
                                          calculateTech(uid, equipid).first,
                                          settings->value(
                                                      "rule/sigmaconstant",
-                                                     1.0).toDouble(),
+                                                     2.0).toDouble(),
                                          mt));
             query.bindValue(":eqid", equipid);
             query.bindValue(":id", uid.ConvertToUint64());

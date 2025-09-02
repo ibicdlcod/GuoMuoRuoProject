@@ -108,7 +108,7 @@ void DevelopWindow::displaySuccessRate2() {
                     cache[equipId],
                     settings->value(
                                 "rule/sigmaconstant",
-                                1.0).toDouble()
+                                2.0).toDouble()
                     )*100) + "%");
     }
     else {

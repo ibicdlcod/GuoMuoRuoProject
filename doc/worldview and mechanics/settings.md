@@ -45,7 +45,7 @@
 |          rule/regenattech0           |                 24                  |                 regenerate factor at tech 0                  |
 |          rule/motherspscale          |                 0.2                 | the higher this value, the more son equipment's tech matters in determining mother skill point requirement of son equipment |
 |          rule/maxresources           |               3600000               |                   max resources stockpile                    |
-|          rule/sigmaconstant          |                 1.0                 | the larger this value, the less effect tech has on development/construction success rate |
+|          rule/sigmaconstant          |                 2.0                 | the larger this value, the less effect tech has on development/construction success rate |
 |      rule/equipmentstandardstar      |                 15                  | the larger this value, the less effective improving equipment does |
 |            server/logfile            |            ServerLog.log            |                                                              |
 |           server/language            |                en_US                |                                                              |
