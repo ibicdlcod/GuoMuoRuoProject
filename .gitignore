@@ -90,8 +90,8 @@ static_build/
 *.ods
 */.qtc_clangd/
 *.user
-!CyberFleet/redistributable_bin/*
-!CyberFleet/redistributable_bin/*/*
-!CyberFleet/steam/*
-!CyberFleet/steam/*/*
-!CyberFleet/steam/*/*/*
+!FleetMemories/redistributable_bin/*
+!FleetMemories/redistributable_bin/*/*
+!FleetMemories/steam/*
+!FleetMemories/steam/*/*
+!FleetMemories/steam/*/*/*

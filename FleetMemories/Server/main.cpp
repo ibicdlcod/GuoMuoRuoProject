@@ -22,7 +22,7 @@ int main(int argc, char *argv[]) {
     SteamErrMsg err;
     /* doubt this will have actual effect */
     constexpr int gamePort = 1826;
-    constexpr int queryPort = 1424;
+    constexpr int queryPort = 1425;
     /* if queryPort is not open, you are running duplicate instances. */
     if(SteamGameServer_InitEx(
             INADDR_ANY, gamePort, queryPort,

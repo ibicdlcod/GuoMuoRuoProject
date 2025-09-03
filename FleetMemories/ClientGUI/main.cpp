@@ -89,6 +89,9 @@ int main(int argc, char *argv[]) {
 
     /* GUI */
     MainWindow w(nullptr, argc, argv);
+#if defined(Q_OS_UNIX)
+    //w.setWindowFlags(Qt::FramelessWindowHint);
+#endif
     w.show();
     /* End GUI */
 
