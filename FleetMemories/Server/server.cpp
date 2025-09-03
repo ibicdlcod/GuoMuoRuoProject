@@ -309,6 +309,18 @@ Q_GLOBAL_STATIC(QString,
                     ");"
                     ));
 
+/* Equipment of users(KC) */
+Q_GLOBAL_STATIC(QString,
+                userKCShip,
+                QStringLiteral(
+                    "CREATE TABLE UserKCShip ("
+                    "ShipUuid TEXT PRIMARY KEY, "
+                    "ShipDef INTEGER NOT NULL, "
+                    "Exp INTEGER DEFAULT 0, "
+                    "FOREIGN KEY(ShipDef) REFERENCES EquipName(ShipID)"
+                    ");"
+                    ));
+
 /* Not customized, since set this lesser than 60 creates problems */
 const int elapsedMaxTolerance = steamRateLimit;
 
@@ -474,7 +486,7 @@ bool Server::parseSpec(const QStringList &cmdParts) {
     try {
         if(cmdParts.length() > 0) {
             QString primary = cmdParts[0];
-
+            
             if(primary.compare("ll", Qt::CaseInsensitive) == 0) {
                 // TODO: this is not IPv6 compliant
                 parseListen({"listen", "0.0.0.0", "1826"});
@@ -666,14 +678,14 @@ Server::calculateTech(const CSteamID &uid, int jobID) {
                         if(childIDs.contains(def))
                             pass = true;
                     }
-
+                    
                     if(pass) {
                         result.append({serial, def, weight});
                         source.append({equips.value(serial)->getTech(),
                                        weight});
                     }
                 }
-
+                
             /* 2-Technology.md#Local technology */
             virtual_skill_point_effect:
                 if(isEquip) {
@@ -690,7 +702,7 @@ Server::calculateTech(const CSteamID &uid, int jobID) {
                                        weight});
                     }
                 }
-
+                
                 if(jobID != 0) {
                     return {Tech::calLevelLocal(source), result};
                 }
@@ -1031,7 +1043,7 @@ void Server::offerShipInfoUser(const CSteamID &uid,
                 slot5Planes = query.value(query.record().indexOf("Slot5Planes")).toInt();
                 fleetIndex = query.value(query.record().indexOf("FleetIndex")).toInt();
                 fleetPosIndex = query.value(query.record().indexOf("FleetPosIndex")).toInt();
-
+                
                 output["def"] = def;
                 output["serial"] = serial.toString();
                 output["star"] = star;
@@ -1316,7 +1328,7 @@ void Server::doDevelop(CSteamID &uid, int equipid,
             senderM.sendMessage(connection, msg);
             return;
         }
-
+        
     /* 4.3-Development.md#Possess limit */
     possess_limit:
         if(equip->disallowMassProduction() && (
@@ -1328,7 +1340,7 @@ void Server::doDevelop(CSteamID &uid, int equipid,
             senderM.sendMessage(connection, msg);
             return;
         }
-
+        
     /* 4.4-Precondition.md#Normal preconditions (father) */
     father_required:
         auto [fatherExists, missingFatherId] = User::haveFather(uid, equipid, equipRegistry);
@@ -1339,13 +1351,13 @@ void Server::doDevelop(CSteamID &uid, int equipid,
             senderM.sendMessage(connection, msg);
             return;
         }
-
+        
         if(User::isFactoryBusy(uid, factoryid)) {
             QByteArray msg = KP::serverDevelopFailed(KP::FactoryBusy);
             senderM.sendMessage(connection, msg);
             return;
         }
-
+        
     /* 4.4-Precondition.md#Special preconditions (mother) */
     mother_required:
         int64 sonSkillPointReq = newEquipHasMotherCal(equipid);
@@ -1360,7 +1372,7 @@ void Server::doDevelop(CSteamID &uid, int equipid,
             senderM.sendMessage(connection, msg);
             return;
         }
-
+        
         ResOrd resRequired = equip->devRes();
         QByteArray msg = resRequired.resourceDesired();
         senderM.sendMessage(connection, msg);
@@ -1454,7 +1466,7 @@ void Server::doFetch(CSteamID &uid, int factoryid, QSslSocket *connection) {
         else {
             bool success = query.value(2).toBool();
             if(!success) {
-
+                
             /* 4.5-Skillpoints.md#Development fail */
             consolation_skill_point:
                 QByteArray msg = KP::serverPenguin();
@@ -1476,7 +1488,7 @@ void Server::doFetch(CSteamID &uid, int factoryid, QSslSocket *connection) {
                     User::addSkillPoints(uid, jobID,
                                          (stdSkillPoints * techFactor) / difficultyFactor);
                 }
-
+                
             }
             else if(isEquip) {
                 QByteArray msg = KP::serverNewEquip(
@@ -1624,7 +1636,7 @@ void Server::generateTestEquip(const CSteamID &uid) {
                 double chance = 1.0 - atan(equip->getTech()/difficulty)
                                           / acos(0);
                 double random_double = dist(mt);
-
+                
                 if(random_double < chance){
                     qInfo() << "SUCCESS" << "\t" << equip->toString("ja_JP");
                     QUuid newId = newEquip(uid, equip->getId(), true);
@@ -1649,7 +1661,7 @@ void Server::generateTestShip(const CSteamID &uid) {
                 double chance = 1.0 - atan(ship->getTech()/difficulty)
                                           / acos(0);
                 double random_double = dist(mt);
-
+                
                 if(random_double < chance){
                     qInfo() << "SUCCESS" << "\t" << ship->toString("ja_JP");
                     QUuid newId = newShip(uid, ship->getId(), true);
@@ -1702,7 +1714,7 @@ bool Server::importEquipFromCSV() {
     QStringList indicatorParts = titleIndicator.split(",");
     QString title = textStream.readLine();
     QStringList titleParts = title.split(",");
-
+    
     int importedEquips = 0;
     while(!textStream.atEnd()) {
         QString text = textStream.readLine();
@@ -1806,7 +1818,7 @@ bool Server::importMapNodeFromCSV() {
         throw DBError(qtTrId("database-uninit"));
         return false;
     }
-
+    
     QString csvFileName =
         settings->value("server/map_node_reg_csv", "Map_nodes.csv").toString();
     QFile *csvFile = new QFile(csvFileName);
@@ -1815,13 +1827,13 @@ bool Server::importMapNodeFromCSV() {
         qCritical() << qtTrId("bad-csv").arg(csvFileName);
         return false;
     }
-
+    
     QTextStream textStream(csvFile);
     QString titleIndicator = textStream.readLine();
     QStringList indicatorParts = titleIndicator.split(",");
     QString title = textStream.readLine();
     QStringList titleParts = title.split(",");
-
+    
     int importedMapNodes = 0;
     while(!textStream.atEnd()) {
         QString text = textStream.readLine();
@@ -1843,13 +1855,13 @@ bool Server::importMapNodeFromCSV() {
                               query.lastError());
                 return false;
             }
-
+            
             for(int i = 0; i < titleParts.length(); ++i) {
                 if(indicatorParts[i].compare("name", Qt::CaseInsensitive)
                     == 0) {
                     QString lang = titleParts[i];
                     QString content = lineParts[i];
-
+                    
                     QSqlQuery query;
                     query.prepare(
                         "UPDATE MapNode "
@@ -1869,7 +1881,7 @@ bool Server::importMapNodeFromCSV() {
                          == 0) {
                     QString attr = titleParts[i];
                     int content = lineParts[i].toInt();
-
+                    
                     QSqlQuery query;
                     query.prepare(
                         "REPLACE INTO MapResource "
@@ -1905,7 +1917,7 @@ bool Server::importMapRelationFromCSV() {
         throw DBError(qtTrId("database-uninit"));
         return false;
     }
-
+    
     QString csvFileName =
         settings->value("server/map_relation_reg_csv", "Map_relations.csv").toString();
     QFile *csvFile = new QFile(csvFileName);
@@ -1914,12 +1926,12 @@ bool Server::importMapRelationFromCSV() {
         qCritical() << qtTrId("bad-csv").arg(csvFileName);
         return false;
     }
-
+    
     QTextStream textStream(csvFile);
     QString title = textStream.readLine();
     QStringList titleParts = title.split(",");
     Q_UNUSED(titleParts)
-
+    
     int importedMapRelations = 0;
     while(!textStream.atEnd()) {
         QString text = textStream.readLine();
@@ -1945,7 +1957,7 @@ bool Server::importMapRelationFromCSV() {
                               query.lastError());
                 return false;
             }
-
+            
             importedMapRelations++;
             if(importedMapRelations % 10 == 0)
                 qInfo() << QString("Imported %1 map relation(s)")
@@ -1965,7 +1977,7 @@ bool Server::importShipFromCSV() {
         throw DBError(qtTrId("database-uninit"));
         return false;
     }
-
+    
     QString csvFileName =
         settings->value("server/ship_reg_csv", "Ship.csv").toString();
     QFile *csvFile = new QFile(csvFileName);
@@ -1974,13 +1986,13 @@ bool Server::importShipFromCSV() {
         qCritical() << qtTrId("bad-csv").arg(csvFileName);
         return false;
     }
-
+    
     QTextStream textStream(csvFile);
     QString titleIndicator = textStream.readLine();
     QStringList indicatorParts = titleIndicator.split(",");
     QString title = textStream.readLine();
     QStringList titleParts = title.split(",");
-
+    
     int importedShips = 0;
     while(!textStream.atEnd()) {
         QString text = textStream.readLine();
@@ -2033,7 +2045,7 @@ bool Server::importShipFromCSV() {
                         QString lang = titleParts[i];
                         QString content = lineParts[i];
                         QString textattr = indicatorParts[i];
-
+                        
                         QSqlQuery query;
                         query.prepare(
                             "REPLACE INTO ShipName "
@@ -2114,16 +2126,16 @@ void Server::migrate(const CSteamID &uid, const QJsonObject &input) {
             }
         }
     }
-
+    
     QSqlDatabase db = QSqlDatabase::database();
     for(auto equipDef: equipData.uniqueKeys()) {
         auto dat = equipData.values(equipDef);
         std::sort(dat.begin(), dat.end(), [](std::tuple<int, int> a,
                                              std::tuple<int, int> b)
                   {
-            return std::get<0>(a) > std::get<0>(b);
-        });
-
+                      return std::get<0>(a) > std::get<0>(b);
+                  });
+        
         auto iter = dat.begin();
         QSqlQuery query;
         query.prepare("SELECT UserKCEquip.EquipUuid "
@@ -2139,8 +2151,8 @@ void Server::migrate(const CSteamID &uid, const QJsonObject &input) {
         while(query.next() && iter != dat.end()) {
             QSqlQuery query2;
             query2.prepare("REPLACE INTO UserKCEquip "
-                          "(EquipUuid, EquipDef, Star, Skillpoints) "
-                          "VALUES (:id, :def, :star, :sp);");
+                           "(EquipUuid, EquipDef, Star, Skillpoints) "
+                           "VALUES (:id, :def, :star, :sp);");
             query2.bindValue(":id", query.value(0).toString());
             query2.bindValue(":def", equipDef);
             query2.bindValue(":star", std::get<0>(*iter));
@@ -2154,7 +2166,7 @@ void Server::migrate(const CSteamID &uid, const QJsonObject &input) {
         }
         while(iter != dat.end()) {
             QUuid newUid = newEquip(uid, equipDef, true);
-
+            
             QSqlQuery query2;
             query2.prepare("REPLACE INTO UserKCEquip "
                            "(EquipUuid, EquipDef, Star, Skillpoints) "
@@ -2166,19 +2178,72 @@ void Server::migrate(const CSteamID &uid, const QJsonObject &input) {
             if(!query2.exec()) {
                 qCritical() << query2.lastQuery();
                 throw DBError(qtTrId("equip-import-failed"),
-                              query.lastError());
+                              query2.lastError());
             }
             iter++;
         }
     }
-
-    /*
-    for(auto shipId: shipData.keys()) {
-        qCritical() << shipRegistry[shipId]->localNames["ja_JP"]
-                    << "\t" << shipData[shipId]
-                    << "\t" << shipRegistry[sourceModels[shipId]]->localNames["ja_JP"];
+    
+    for(auto shipId = shipData.keyBegin(); shipId != shipData.keyEnd();
+         ++shipId) {
+        auto kcShipId = sourceModels[*shipId];
+        auto fmShipUid = QUuid();
+        auto fmShipDef = 0;
+        for(auto fmShipIdCandidate: shipRemodelGroup.values(*shipId)) {
+            QSqlQuery query;
+            query.prepare("SELECT ShipUuid "
+                          "FROM UserShip "
+                          "WHERE User = :id AND ShipDef = :def "
+                          "ORDER BY Exp DESC");
+            query.bindValue(":id", uid.ConvertToUint64());
+            query.bindValue(":def", fmShipIdCandidate);
+            if(Q_UNLIKELY(!query.exec())) {
+                qCritical() << query.lastQuery();
+                //% "User %1: import ship from KC failed, error %2"
+                throw DBError(qtTrId("user-migrate-ship-failed")
+                                  .arg(uid.ConvertToUint64()), query.lastError());
+                return;
+            }
+            query.isSelect();
+            if(query.next()) {
+                fmShipUid = query.value(0).toUuid();
+                fmShipDef = fmShipIdCandidate;
+            }
+        }
+        if(fmShipDef != 0) {
+            QSqlQuery query;
+            query.prepare("UPDATE UserShip "
+                          "SET Shipdef = :newdef "
+                          "WHERE User = :id AND ShipDef = :def;");
+            query.bindValue(":id", uid.ConvertToUint64());
+            query.bindValue(":def", fmShipDef);
+            query.bindValue(":newdef", kcShipId);
+            if(Q_UNLIKELY(!query.exec())) {
+                qCritical() << query.lastQuery();
+                //% "User %1: import ship from KC failed, error %2"
+                throw DBError(qtTrId("user-migrate-ship-failed")
+                                  .arg(uid.ConvertToUint64()), query.lastError());
+                return;
+            }
+        }
+        else {
+            fmShipUid = newShip(uid, kcShipId, true);
+        }
+        QSqlQuery query;
+        query.prepare("REPLACE INTO UserKCShip "
+                      "(ShipUuid, ShipDef, Exp) "
+                      "VALUES(:id, :def, :exp);");
+        query.bindValue(":id", fmShipUid);
+        query.bindValue(":def", kcShipId);
+        query.bindValue(":exp", shipData[*shipId]);
+        if(Q_UNLIKELY(!query.exec())) {
+            qCritical() << query.lastQuery();
+            //% "User %1: import ship from KC failed, error %2"
+            throw DBError(qtTrId("user-migrate-ship-failed")
+                              .arg(uid.ConvertToUint64()), query.lastError());
+        }
     }
-*/
+    
     qInfo() << "Success!";
 }
 
@@ -2806,7 +2871,7 @@ void Server::receivedReq(const QJsonObject &djson,
             QTimer::singleShot(100,
                                this,
                                [connection, this]{offerShipInfo(connection);});
-
+            
         }
         else {
             connection->flush();
@@ -2913,7 +2978,7 @@ void Server::sendTestMessages() {
                 offerShipInfoUser(user, connectedPeers[user]);
             }
         }
-
+        
     }
 }
 
@@ -2944,7 +3009,7 @@ bool Server::shipRefresh() {
     }
     //% "Load ship registry success!"
     qInfo() << qtTrId("ship-load-good");
-
+    
     for(auto ship: std::as_const(shipRegistry)) {
         if(ship->isAmnesiac()) {
             continue;
@@ -2959,7 +3024,7 @@ bool Server::shipRefresh() {
     for(auto shipID: shipRemodelGroup.uniqueKeys()) {
         shipRemodelGroup.insert(shipID, shipID);
     }
-
+    
     return true;
 }
 
@@ -3007,7 +3072,7 @@ QList<QUuid> Server::retireEquip(const CSteamID &uid, const QList<QUuid> &trash)
                        "WHERE User = :uid AND EquipUuid = :eid;");
         query2.bindValue(":uid", uid.ConvertToUint64());
         query2.bindValue(":eid", trashItem.toString());
-
+        
         query2.exec();
         query2.isSelect();
         if(Q_UNLIKELY(!query2.first())) {
@@ -3024,13 +3089,13 @@ QList<QUuid> Server::retireEquip(const CSteamID &uid, const QList<QUuid> &trash)
             currentRes.addResources(refundRes);
             User::setResources(uid, currentRes);
         }
-
+        
         QSqlQuery query;
         query.prepare("DELETE FROM UserEquip "
                       "WHERE User = :uid AND EquipUuid = :eid;");
         query.bindValue(":uid", uid.ConvertToUint64());
         query.bindValue(":eid", trashItem.toString());
-
+        
         if(Q_UNLIKELY(!query.exec())) {
             //% "User id %1: delete equipment failed!"
             throw DBError(qtTrId("delete-equip-failed")
@@ -3112,6 +3177,9 @@ void Server::sqlinit() const {
         }
         if(!tables.contains("UserKCEquip")) {
             sqlinitEquipUKC();
+        }
+        if(!tables.contains("UserKCShip")) {
+            sqlinitShipUKC();
         }
     }
 }
@@ -3256,6 +3324,19 @@ void Server::sqlinitShipU() const {
     if(!query.exec()) {
         //% "Create Ship database for user failed."
         throw DBError(qtTrId("ship-db-user-gen-failure"),
+                      query.lastError());
+    }
+}
+
+void Server::sqlinitShipUKC() const {
+    //% "Ship database (kancolle) for user does not exist, creating..."
+    qWarning() << qtTrId("ship-db-kc-user-lack");
+    QSqlQuery query;
+    query.prepare(*userKCShip);
+    if(!query.exec()) {
+        qCritical() << query.lastQuery();
+        //% "Create Equipment database (kancolle) for user failed."
+        throw DBError(qtTrId("ship-db-kc-user-gen-failure"),
                       query.lastError());
     }
 }
