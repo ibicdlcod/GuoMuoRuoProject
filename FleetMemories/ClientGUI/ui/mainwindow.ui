@@ -394,8 +394,8 @@ border-style: none;</string>
    </widget>
    <addaction name="menuNaval_Base"/>
    <addaction name="menuTech"/>
-   <addaction name="menuSortie"/>
    <addaction name="menuFleet"/>
+   <addaction name="menuSortie"/>
    <addaction name="menuDock"/>
    <addaction name="menuFactory"/>
   </widget>
