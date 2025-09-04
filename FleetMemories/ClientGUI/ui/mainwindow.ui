@@ -45,10 +45,10 @@
        </sizepolicy>
       </property>
       <property name="frameShape">
-       <enum>QFrame::StyledPanel</enum>
+       <enum>QFrame::Shape::StyledPanel</enum>
       </property>
       <property name="frameShadow">
-       <enum>QFrame::Raised</enum>
+       <enum>QFrame::Shadow::Raised</enum>
       </property>
       <layout class="QHBoxLayout" name="horizontalLayout_2">
        <property name="spacing">
@@ -179,10 +179,10 @@
        <string notr="true"/>
       </property>
       <property name="frameShape">
-       <enum>QFrame::StyledPanel</enum>
+       <enum>QFrame::Shape::StyledPanel</enum>
       </property>
       <property name="frameShadow">
-       <enum>QFrame::Raised</enum>
+       <enum>QFrame::Shadow::Raised</enum>
       </property>
       <property name="lineWidth">
        <number>0</number>
@@ -342,7 +342,7 @@ border-style: none;</string>
      <x>0</x>
      <y>0</y>
      <width>1366</width>
-     <height>21</height>
+     <height>23</height>
     </rect>
    </property>
    <property name="font">
@@ -402,7 +402,7 @@ border-style: none;</string>
   <widget class="QStatusBar" name="statusbar"/>
   <action name="actionDevelop_Equipment">
    <property name="text">
-    <string id="menu-develop">Develop Equipment</string>
+    <string id="develop-equipment">Develop Equipment</string>
    </property>
   </action>
   <action name="actionBack_to_naval_base">
@@ -427,12 +427,12 @@ border-style: none;</string>
   </action>
   <action name="actionConstruct_Ships">
    <property name="text">
-    <string id="menu-construct">Construct Ships</string>
+    <string id="construct-ships">Construct Ships</string>
    </property>
   </action>
   <action name="actionArsenal">
    <property name="text">
-    <string id="menu-arsenal">Arsenal</string>
+    <string id="arsenal">Arsenal</string>
    </property>
   </action>
   <action name="actionBattle">
@@ -442,7 +442,7 @@ border-style: none;</string>
   </action>
   <action name="actionAnchorage">
    <property name="text">
-    <string id="menu-anchorage">Anchorage</string>
+    <string id="anchorage">Anchorage</string>
    </property>
   </action>
  </widget>

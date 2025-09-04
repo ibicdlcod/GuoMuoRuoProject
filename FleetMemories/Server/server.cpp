@@ -1198,7 +1198,7 @@ bool Server::addEquipStar(const QUuid &equipUid, int amount = 1) {
         else {
             int star = query.value(2).toInt();
             if(star + amount > INT_MAX) {
-                //% "Equip id %1: not allowed to improve beyond 15 stars."
+                //% "Equip id %1: not allowed to improve beyond possible stars."
                 qDebug() << qtTrId("improve-beyond-possible")
                                 .arg(equipUid.toString());
                 return false;
@@ -2017,6 +2017,7 @@ bool Server::importShipFromCSV() {
                         query.bindValue(":value", lineParts[i].toInt(nullptr, 16));
                         if(!query.exec()) {
                             qCritical() << query.lastQuery();
+                            //% "Ship import failed!"
                             throw DBError(qtTrId("ship-import-failed"),
                                           query.lastError());
                             return false;
