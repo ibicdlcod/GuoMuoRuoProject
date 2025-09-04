@@ -70,7 +70,6 @@ EquipSelect::EquipSelect(int height, QWidget *parent)
                                        QSizePolicy::Preferred,
                                        QSizePolicy::ComboBox));
     typeBox->resize(QSize(100, height));
-    //% "All equipments"
     typeBox->addItem(qtTrId("all-equipments"));
     typeBox->addItems(EquipType::getDisplayGroupsSorted());
 

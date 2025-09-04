@@ -423,7 +423,8 @@ void TechView::resetLocalListName() {
         for(auto &equipReg:
              Clientv2::getInstance().equipRegistryCache) {
             if(
-                (ui->localListType1->currentText().compare("All equipments") == 0
+                (ui->localListType1->currentText().
+                     localeAwareCompare(qtTrId("all-equipments")) == 0
                  && equipReg->type.getDisplayGroup()
                             .compare("VIRTUAL", Qt::CaseInsensitive) != 0
                  && !equipReg->localNames.value("ja_JP").isEmpty())

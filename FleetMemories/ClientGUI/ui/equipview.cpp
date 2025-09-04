@@ -282,6 +282,9 @@ void EquipView::activate(bool arsenal, bool isEquip) {
             model, &EquipModel::lastPage);
     connect(model, &EquipModel::pageNumChanged,
             this, &EquipView::enactPageNumChange);
+    if(model->isReady()) {
+        model->firstPage();
+    }
 }
 
 void EquipView::recalculateArsenalRows() {
