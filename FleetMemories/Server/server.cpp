@@ -973,10 +973,12 @@ void Server::offerShipInfoUser(const CSteamID &uid,
     try{
         QSqlDatabase db = QSqlDatabase::database();
         QSqlQuery query;
-        query.prepare("SELECT ShipDef, ShipUuid, Star, "
+        query.prepare("SELECT UserShip.ShipDef,"
+                      "UserShip.ShipUuid,"
+                      "Star, "
                       "CurrentHP, "
                       "Condition, "
-                      "Exp, "
+                      "UserShip.Exp, "
                       "ExpCap, "
                       "Slot1, "
                       "Slot2, "
@@ -990,8 +992,12 @@ void Server::offerShipInfoUser(const CSteamID &uid,
                       "Slot4Planes, "
                       "Slot5Planes, "
                       "FleetIndex, "
-                      "FleetPosIndex "
-                      "FROM Usership WHERE User = :id;");
+                      "FleetPosIndex, "
+                      "UserKCShip.Exp "
+                      "FROM UserShip "
+                      "LEFT JOIN UserKCShip "
+                      "ON UserShip.ShipUuid = UserKCShip.ShipUuid "
+                      "WHERE User = :id;");
         query.bindValue(":id", uid.ConvertToUint64());
         if(!query.exec() || !query.isSelect()) {
             qCritical() << query.lastQuery();
@@ -1021,14 +1027,15 @@ void Server::offerShipInfoUser(const CSteamID &uid,
             int slot5Planes;
             int fleetIndex;
             int fleetPosIndex;
+            int expKC;
             while(query.next()) {
                 QJsonObject output;
-                def = query.value(query.record().indexOf("ShipDef")).toInt();
-                serial = query.value(query.record().indexOf("ShipUuid")).toUuid();
+                def = query.value(query.record().indexOf("UserShip.ShipDef")).toInt();
+                serial = query.value(query.record().indexOf("UserShip.ShipUuid")).toUuid();
                 star = query.value(query.record().indexOf("Star")).toInt();
                 currentHP = query.value(query.record().indexOf("CurrentHP")).toInt();
                 condition = query.value(query.record().indexOf("Condition")).toInt();
-                exp = query.value(query.record().indexOf("Exp")).toInt();
+                exp = query.value(query.record().indexOf("UserShip.Exp")).toInt();
                 expCap = query.value(query.record().indexOf("ExpCap")).toInt();
                 slot1 = query.value(query.record().indexOf("Slot1")).toUuid();
                 slot2 = query.value(query.record().indexOf("Slot2")).toUuid();
@@ -1043,13 +1050,14 @@ void Server::offerShipInfoUser(const CSteamID &uid,
                 slot5Planes = query.value(query.record().indexOf("Slot5Planes")).toInt();
                 fleetIndex = query.value(query.record().indexOf("FleetIndex")).toInt();
                 fleetPosIndex = query.value(query.record().indexOf("FleetPosIndex")).toInt();
+                expKC = query.value(query.record().indexOf("UserKCShip.Exp")).toInt();
                 
                 output["def"] = def;
                 output["serial"] = serial.toString();
                 output["star"] = star;
                 output["hp"] = currentHP;
                 output["cond"] = condition;
-                output["exp"] = exp;
+                output["exp"] = exp + expKC;
                 output["expcap"] = expCap;
                 output["equip"] = QJsonArray({
                     slot1.toString(),
