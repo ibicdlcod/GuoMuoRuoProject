@@ -1206,7 +1206,7 @@ bool Server::addEquipStar(const QUuid &equipUid, int amount = 1) {
         else {
             int star = query.value(2).toInt();
             if(star + amount > INT_MAX) {
-                //% "Equip id %1: not allowed to improve beyond 15 stars."
+                //% "Equip id %1: not allowed to improve beyond possible stars."
                 qDebug() << qtTrId("improve-beyond-possible")
                                 .arg(equipUid.toString());
                 return false;
@@ -2025,6 +2025,7 @@ bool Server::importShipFromCSV() {
                         query.bindValue(":value", lineParts[i].toInt(nullptr, 16));
                         if(!query.exec()) {
                             qCritical() << query.lastQuery();
+                            //% "Import ship database failed!"
                             throw DBError(qtTrId("ship-import-failed"),
                                           query.lastError());
                             return false;
@@ -2167,8 +2168,9 @@ void Server::migrate(const CSteamID &uid, const QJsonObject &input) {
             query2.bindValue(":sp", std::get<1>(*iter) * 10000);
             if(!query2.exec()) {
                 qCritical() << query2.lastQuery();
-                throw DBError(qtTrId("equip-import-failed"),
-                              query.lastError());
+                //% "User %1: import equip from KC failed, error %2"
+                throw DBError(qtTrId("user-migrate-equip-failed")
+                                  .arg(uid.ConvertToUint64()), query.lastError());
             }
             iter++;
         }
@@ -2185,8 +2187,9 @@ void Server::migrate(const CSteamID &uid, const QJsonObject &input) {
             query2.bindValue(":sp", std::get<1>(*iter) * 10000);
             if(!query2.exec()) {
                 qCritical() << query2.lastQuery();
-                throw DBError(qtTrId("equip-import-failed"),
-                              query2.lastError());
+                //% "User %1: import equip from KC failed, error %2"
+                throw DBError(qtTrId("user-migrate-equip-failed")
+                                  .arg(uid.ConvertToUint64()), query.lastError());
             }
             iter++;
         }
@@ -3210,18 +3213,20 @@ void Server::sqlinitEquipName() const {
     QSqlQuery query;
     query.prepare(*equipName);
     if(!query.exec()) {
-        //% "Create Equipment name failed."
-        throw DBError(qtTrId("equip-name-gen-failure"),
+        //% "Create Equipment name database failed."
+        throw DBError(qtTrId("equip-name-db-gen-failure"),
                       query.lastError());
     }
 }
 
 void Server::sqlinitEquipSP() const {
+    //% "User equipment skillpoints database does not exist, creating..."
+    qWarning() << qtTrId("equip-sp-db-lack");
     QSqlQuery query;
     query.prepare(*userEquipSkillPoints);
     if(!query.exec()) {
-        //% "User equipment skillpoints fetch failure!"
-        throw DBError(qtTrId("equip-db-user-sp-gen-failure"),
+        //% "User equipment skillpoints fetch failure."
+        throw DBError(qtTrId("equip-sp-db-gen-failure"),
                       query.lastError());
     }
 }
@@ -3361,13 +3366,13 @@ void Server::sqlinitUsers() const {
     }
 }
 void Server::sqlinitUserA() const {
-    //% "User database does not exist, creating..."
-    qWarning() << qtTrId("user-db-lack");
+    //% "User attributes database does not exist, creating..."
+    qWarning() << qtTrId("user-db-attr-lack");
     QSqlQuery query;
     query.prepare(*userAttr);
     if(!query.exec()) {
-        //% "Create User database failed."
-        throw DBError(qtTrId("user-db-gen-failure"),
+        //% "Create User attributes database failed."
+        throw DBError(qtTrId("user-db-attr-gen-failure"),
                       query.lastError());
     }
 }

@@ -124,19 +124,16 @@ void FactoryArea::setState(KP::FactoryState state) {
 void FactoryArea::switchToState() {
     switch(factoryState) {
     case KP::Development:
-        //% "Develop equipment"
         ui->FactoryLabel->setText(qtTrId("develop-equipment"));
         ui->Slots->show();
         ui->ArsenalArea->hide();
         break;
     case KP::Construction:
-        //% "Consturct Ships"
         ui->FactoryLabel->setText(qtTrId("construct-ships"));
         ui->Slots->show();
         ui->ArsenalArea->hide();
         break;
     case KP::Arsenal:
-        //% "Arsenal"
         ui->FactoryLabel->setText(qtTrId("arsenal"));
         ui->Slots->hide();
         ui->ArsenalArea->show();
@@ -145,7 +142,6 @@ void FactoryArea::switchToState() {
         equipview->activate(true, true);
         break;
     case KP::Anchorage:
-        //% "Anchorage"
         ui->FactoryLabel->setText(qtTrId("anchorage"));
         ui->Slots->hide();
         ui->ArsenalArea->show();

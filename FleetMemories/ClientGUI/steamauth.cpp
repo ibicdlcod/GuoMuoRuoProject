@@ -33,7 +33,7 @@ void SteamAuth::OnEncryptedAppTicketResponse(
     EncryptedAppTicketResponse_t *pEncryptedAppTicketResponse,
     bool bIOFailure) {
     if(bIOFailure) {
-        //% "There has been an IO Failure when requesting the Encrypted App Ticket.\n"
+        //% "There has been an IO Failure when requesting the Encrypted App Ticket."
         qWarning() << qtTrId("steam-bIOFailure").toUtf8();
         emit eATFailed();
         return;
