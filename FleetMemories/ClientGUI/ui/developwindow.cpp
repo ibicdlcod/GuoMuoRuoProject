@@ -18,7 +18,7 @@ DevelopWindow::DevelopWindow(QWidget *parent)
             continue;
         ui->listType->addItem(equipType);
     }
-    ui->listType->addItem("All equipments");
+    ui->listType->addItem(qtTrId("all-equipments"));
 
     ui->listType->setCurrentIndex(Clientv2::getInstance().equipBigTypeIndex);
 
@@ -69,7 +69,8 @@ void DevelopWindow::resetListName(int equiptypeInt) {
     for(auto &equipReg:
          Clientv2::getInstance().equipRegistryCache) {
         if(
-            (ui->listType->currentText().compare("All equipments") == 0
+            (ui->listType->currentText().
+                 localeAwareCompare(qtTrId("all-equipments")) == 0
              && equipReg->type.getDisplayGroup()
                         .compare("VIRTUAL", Qt::CaseInsensitive) != 0
              && !equipReg->localNames.value("ja_JP").isEmpty())

@@ -50,7 +50,7 @@ void MapRender::paintEvent(QPaintEvent * /* event */)
     if (antialiased)
         painter.setRenderHint(QPainter::Antialiasing, true);
 
-    painter.drawEllipse(0, 0, 300, 300);
+    //painter.drawEllipse(0, 0, 300, 300);
 
     painter.setRenderHint(QPainter::Antialiasing, false);
     painter.setPen(palette().dark().color());

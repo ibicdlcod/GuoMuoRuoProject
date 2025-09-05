@@ -973,10 +973,12 @@ void Server::offerShipInfoUser(const CSteamID &uid,
     try{
         QSqlDatabase db = QSqlDatabase::database();
         QSqlQuery query;
-        query.prepare("SELECT ShipDef, ShipUuid, Star, "
+        query.prepare("SELECT UserShip.ShipDef,"
+                      "UserShip.ShipUuid,"
+                      "Star, "
                       "CurrentHP, "
                       "Condition, "
-                      "Exp, "
+                      "UserShip.Exp, "
                       "ExpCap, "
                       "Slot1, "
                       "Slot2, "
@@ -990,8 +992,12 @@ void Server::offerShipInfoUser(const CSteamID &uid,
                       "Slot4Planes, "
                       "Slot5Planes, "
                       "FleetIndex, "
-                      "FleetPosIndex "
-                      "FROM Usership WHERE User = :id;");
+                      "FleetPosIndex, "
+                      "UserKCShip.Exp "
+                      "FROM UserShip "
+                      "LEFT JOIN UserKCShip "
+                      "ON UserShip.ShipUuid = UserKCShip.ShipUuid "
+                      "WHERE User = :id;");
         query.bindValue(":id", uid.ConvertToUint64());
         if(!query.exec() || !query.isSelect()) {
             qCritical() << query.lastQuery();
@@ -1021,14 +1027,15 @@ void Server::offerShipInfoUser(const CSteamID &uid,
             int slot5Planes;
             int fleetIndex;
             int fleetPosIndex;
+            int expKC;
             while(query.next()) {
                 QJsonObject output;
-                def = query.value(query.record().indexOf("ShipDef")).toInt();
-                serial = query.value(query.record().indexOf("ShipUuid")).toUuid();
+                def = query.value(query.record().indexOf("UserShip.ShipDef")).toInt();
+                serial = query.value(query.record().indexOf("UserShip.ShipUuid")).toUuid();
                 star = query.value(query.record().indexOf("Star")).toInt();
                 currentHP = query.value(query.record().indexOf("CurrentHP")).toInt();
                 condition = query.value(query.record().indexOf("Condition")).toInt();
-                exp = query.value(query.record().indexOf("Exp")).toInt();
+                exp = query.value(query.record().indexOf("UserShip.Exp")).toInt();
                 expCap = query.value(query.record().indexOf("ExpCap")).toInt();
                 slot1 = query.value(query.record().indexOf("Slot1")).toUuid();
                 slot2 = query.value(query.record().indexOf("Slot2")).toUuid();
@@ -1043,13 +1050,14 @@ void Server::offerShipInfoUser(const CSteamID &uid,
                 slot5Planes = query.value(query.record().indexOf("Slot5Planes")).toInt();
                 fleetIndex = query.value(query.record().indexOf("FleetIndex")).toInt();
                 fleetPosIndex = query.value(query.record().indexOf("FleetPosIndex")).toInt();
+                expKC = query.value(query.record().indexOf("UserKCShip.Exp")).toInt();
                 
                 output["def"] = def;
                 output["serial"] = serial.toString();
                 output["star"] = star;
                 output["hp"] = currentHP;
                 output["cond"] = condition;
-                output["exp"] = exp;
+                output["exp"] = exp + expKC;
                 output["expcap"] = expCap;
                 output["equip"] = QJsonArray({
                     slot1.toString(),
@@ -1733,6 +1741,19 @@ bool Server::importEquipFromCSV() {
                     qWarning() << lineParts[0]
                                << "\tUnsupported type: " << lineParts[3];
                 }
+                QSqlQuery query;
+                query.prepare(
+                    "INSERT OR REPLACE INTO EquipName "
+                    "(EquipID) "
+                    "VALUES (:id);");
+                query.bindValue(":id", equipid);
+                if(!query.exec()) {
+                    qCritical () << query.lastQuery();
+                    //% "Import equipment database failed!"
+                    throw DBError(qtTrId("equip-import-failed"),
+                                  query.lastError());
+                    return false;
+                }
                 for(int i = 0; i < titleParts.length(); ++i) {
                     if(indicatorParts[i].compare("name", Qt::CaseInsensitive)
                         == 0) {
@@ -1900,9 +1921,11 @@ bool Server::importMapNodeFromCSV() {
                 }
             }
             importedMapNodes++;
-            if(importedMapNodes % 10 == 0)
-                qInfo() << QString("Imported %1 map node(s)")
+            if(importedMapNodes % 10 == 0) {
+                //% "Imported %1 map node(s)"
+                qInfo() << qtTrId("num-of-map-node-imports")
                                .arg(importedMapNodes);
+            }
         }
     }
     csvFile->close();
@@ -1911,6 +1934,7 @@ bool Server::importMapNodeFromCSV() {
     settings->setValue("server/mapdbtimestamp", QDateTime::currentDateTimeUtc());
     return true;
 }
+
 bool Server::importMapRelationFromCSV() {
     QSqlDatabase db = QSqlDatabase::database();
     if(!db.isValid()) {
@@ -1959,9 +1983,11 @@ bool Server::importMapRelationFromCSV() {
             }
             
             importedMapRelations++;
-            if(importedMapRelations % 10 == 0)
-                qInfo() << QString("Imported %1 map relation(s)")
+            if(importedMapRelations % 10 == 0) {
+                //% "Imported %1 map relation(s)"
+                qInfo() << qtTrId("num-of-map-relation-imports")
                                .arg(importedMapRelations);
+            }
         }
     }
     csvFile->close();
@@ -2043,6 +2069,7 @@ bool Server::importShipFromCSV() {
                     else if(!indicatorParts[i].isEmpty()
                              && indicatorParts[i].compare(
                                     "id", Qt::CaseInsensitive) != 0){
+                        /* TODO: change to set */
                         QString lang = titleParts[i];
                         QString content = lineParts[i];
                         QString textattr = indicatorParts[i];
@@ -2066,9 +2093,10 @@ bool Server::importShipFromCSV() {
                 }
             }
             importedShips++;
-            if(importedShips % 10 == 0)
-                qInfo() << QString("Imported %1 ship(s)")
-                               .arg(importedShips);
+            if(importedShips % 10 == 0) {
+                //% "Imported %1 ship(s)"
+                qInfo() << qtTrId("num-of-ship-imports").arg(importedShips);
+            }
         }
     }
     csvFile->close();
@@ -2246,8 +2274,9 @@ void Server::migrate(const CSteamID &uid, const QJsonObject &input) {
                               .arg(uid.ConvertToUint64()), query.lastError());
         }
     }
-    
-    qInfo() << "Success!";
+
+    //% "User %1: import from KC data success!"
+    qInfo() << qtTrId("import-kc-data-success").arg(uid.ConvertToUint64());
 }
 
 /* 3-Resources.md#Natural regeneration */
@@ -2537,7 +2566,7 @@ void Server::receivedAuth(const QJsonObject &djson,
                     rgubKey, sizeof(rgubKey))) {
                 //% "%1: Ticket failed to decrypt"
                 qCritical() << qtTrId("ticket-decrypt-failed")
-                                   .arg(peerInfo.toString()).toUtf8();
+                                   .arg(peerInfo.toString());
                 QByteArray msg = KP::serverLogFail(KP::TicketFailedToDecrypt);
                 senderM.sendMessage(connection, msg);
                 delete [] rgubTicket;
@@ -2551,7 +2580,7 @@ void Server::receivedAuth(const QJsonObject &djson,
                     cubDecrypted, KP::steamAppId)) {
                 //% "%1: Ticket is not from correct App ID"
                 qCritical() << qtTrId("ticket-appid-wrong")
-                                   .arg(peerInfo.toString()).toUtf8();
+                                   .arg(peerInfo.toString());
                 QByteArray msg = KP::serverLogFail
                     (KP::TicketIsntFromCorrectAppID);
                 senderM.sendMessage(connection, msg);
@@ -2568,11 +2597,11 @@ void Server::receivedAuth(const QJsonObject &djson,
                     cubDecrypted));
             qint64 elapsed = requestThen.secsTo(now);
             //% "Elapsed: %1 second(s)"
-            qDebug() << qtTrId("time-gone").arg(elapsed).toUtf8();
+            qDebug() << qtTrId("time-gone").arg(elapsed);
             if(elapsed > elapsedMaxTolerance) {
                 //% "%1: Request timeout"
                 qCritical() << qtTrId("request-timeout")
-                                   .arg(peerInfo.toString()).toUtf8();
+                                   .arg(peerInfo.toString());
                 QByteArray msg = KP::serverLogFail(KP::RequestTimeout);
                 senderM.sendMessage(connection, msg);
                 delete [] rgubTicket;
@@ -2586,7 +2615,7 @@ void Server::receivedAuth(const QJsonObject &djson,
             if(steamID == k_steamIDNil) {
                 //% "%1: Steam ID invalid"
                 qCritical() << qtTrId("steam-id-wrong")
-                                   .arg(peerInfo.toString()).toUtf8();
+                                   .arg(peerInfo.toString());
                 QByteArray msg = KP::serverLogFail(KP::SteamIdInvalid);
                 senderM.sendMessage(connection, msg);
                 delete [] rgubTicket;
@@ -2596,7 +2625,7 @@ void Server::receivedAuth(const QJsonObject &djson,
                 /* We are logged in here */
                 uint64 idnum = steamID.ConvertToUint64();
                 //% "User login: %1"
-                qInfo() << qtTrId("user-login").arg(idnum).toUtf8();
+                qInfo() << qtTrId("user-login").arg(idnum);
                 if(connectedPeers.contains(steamID)) {
                     receivedForceLogout(steamID);
                 }
@@ -2604,7 +2633,7 @@ void Server::receivedAuth(const QJsonObject &djson,
                 if(User::isSuperUser(steamID)) {
                     //% "Superuser login: %1"
                     qWarning() << qtTrId("superuser-login").
-                                  arg(idnum).toUtf8();
+                                  arg(idnum);
                     /*
                     for(auto &equip: equipRegistry) {
                         if(equip->type != EquipType("Virtual-precondition"))
@@ -2762,7 +2791,7 @@ void Server::receivedReq(const QJsonObject &djson,
             auto meta = QMetaEnum::fromType<KP::GameState>();
             //% "Game state %1 not supported!"
             throw std::domain_error(qtTrId("gamestate-invalid")
-                                        .arg(meta.valueToKey(state)).toUtf8());
+                                        .arg(meta.valueToKey(state)).toStdString());
             break;
         }
     }
@@ -2830,8 +2859,9 @@ void Server::receivedReq(const QJsonObject &djson,
         case KP::GameState::Factory: refreshClientFactory
                 (uid, connection); break;
         default:
-            throw std::domain_error(QString("User %1: command type not supported")
-                                        .arg(uid.ConvertToUint64()).toUtf8());
+            //% "User %1: command type not supported"
+            throw std::domain_error(qtTrId("command-type-wrong")
+                                        .arg(uid.ConvertToUint64()).toStdString());
             break;
         }
         break;
@@ -2948,11 +2978,13 @@ void Server::receivedReq(const QJsonObject &djson,
         migrate(uid, djson["content"].toObject());
         QByteArray msg = KP::serverSuccess();
         senderM.sendMessage(connection, msg);
+        offerEquipInfoUser(uid, connection);
+        offerShipInfoUser(uid, connection);
     }
     break;
     default:
         throw std::domain_error(QString("User %1: command type not supported")
-                                    .arg(uid.ConvertToUint64()).toUtf8());
+                                    .arg(uid.ConvertToUint64()).toStdString());
         break;
     }
     return;
