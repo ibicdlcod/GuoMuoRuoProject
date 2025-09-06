@@ -6,7 +6,7 @@ HpDelegate::HpDelegate(QObject *parent)
     : QStyledItemDelegate{parent}
 {}
 
-void HpDelegate::paint( QPainter *painter,
+void HpDelegate::paint(QPainter *painter,
                        const QStyleOptionViewItem &option,
                        const QModelIndex &index) const
 {
@@ -25,6 +25,7 @@ void HpDelegate::paint( QPainter *painter,
 
     QPalette pal = progressBarOption.palette;
     QColor col = QColor(0,255,0);
+    QColor textCol = QColor();
 
     switch(QApplication::styleHints()->colorScheme()) {
     case Qt::ColorScheme::Dark:
@@ -37,6 +38,16 @@ void HpDelegate::paint( QPainter *painter,
     }
 
     pal.setColor(QPalette::Highlight, col);
+    switch(QApplication::styleHints()->colorScheme()) {
+    case Qt::ColorScheme::Dark:
+        textCol = QColor(255, 255, 255);
+        break;
+    case Qt::ColorScheme::Light: [[fallthrough]];
+    default:
+        textCol = QColor(0, 0, 0);
+        break;
+    }
+    pal.setColor(QPalette::HighlightedText, textCol);
     progressBarOption.palette = pal;
 
     QApplication::style()->drawControl(QStyle::CE_ProgressBar,

@@ -186,6 +186,7 @@ void Clientv2::catbomb() {
         gameState = KP::Offline;
         delete sender;
         authSent = false;
+        attemptMode = false;
         emit gamestateChanged(KP::Offline);
     }
     else if(attemptMode){
