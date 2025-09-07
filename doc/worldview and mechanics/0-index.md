@@ -1,6 +1,8 @@
 # Index
 
-* [Technology](2-technology.md)
+- [Overview](1-overview.md)
+- [Technology](2-technology.md)
+
 * [Resources](3-resources.md)\[PARTIAL]
 
   * [Ore Purifier (DLC)](3.1-orepurifier.md)\[NOTYETIMPLEMENTED]

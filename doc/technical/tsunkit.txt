@@ -1,0 +1,3 @@
+https://tsunkit.net/api/assets/images/abyssalIcons/XXXX
+https://tsunkit.net/api/assets/images/shipIcons/XXX_200
+https://tsunkit.net/api/assets/images/equipTypeIcons/X

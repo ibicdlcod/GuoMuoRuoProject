@@ -89,6 +89,7 @@ Clientv2::Clientv2(QObject *parent)
     connect(timer, &QTimer::timeout, this, &Clientv2::uiRefresh);
     timer->start(1000);
 
+    /* 1-migrate.md */
     migrateServer.route("/", QHttpServerRequest::Method::Post, this,
                         [this] (const QHttpServerRequest &request, QHttpServerResponder &responder) {
                             QJsonDocument doc = QJsonDocument::fromJson(request.body());
