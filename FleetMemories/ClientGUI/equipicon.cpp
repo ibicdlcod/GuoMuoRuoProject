@@ -1,15 +1,13 @@
 #include "equipicon.h"
+#include <QImage>
+#include <QColor>
+#include <QApplication>
+#include <QStyleHints>
 
 QIcon Icute::equipIcon(EquipType type, bool isRound = false) {
     int iconName = type.iconGroup();
-    if(isRound) {
-        return QIcon(":/resources/equiptype/"
-                     + QString::number(iconName) + ".png");
-    }
-    else {
-        return QIcon(":/resources/equiptype/"
-                     + QString::number(iconName + 100) + ".png");
-    }
+    return QIcon("equipTypeIcons/"
+                 + QString::number(iconName) + ".png");
 }
 
 QIcon Icute::shipIcon(int shipId, bool isRound = false) {
@@ -25,6 +23,27 @@ QIcon Icute::shipIcon(int shipId, bool isRound = false) {
     case 0x70000: typeName = "SS"; break;
     default: typeName = "OTH"; break;
     }
-    return QIcon(":/resources/shiptype/"
+    QImage image(":/resources/shiptype/"
                  + typeName + ".png");
+
+    switch(QApplication::styleHints()->colorScheme()) {
+    case Qt::ColorScheme::Dark:
+        if (image.format() != QImage::Format_ARGB32) {
+            image = image.convertToFormat(QImage::Format_ARGB32);
+        }
+
+        for (int y = 0; y < image.height(); ++y) {
+            for (int x = 0; x < image.width(); ++x) {
+                QColor color = image.pixelColor(x, y);
+                // Invert RGB components, keeping alpha channel as is
+                color.setRgb(255 - color.red(), 255 - color.green(), 255 - color.blue(), color.alpha());
+                image.setPixelColor(x, y, color);
+            }
+        }
+        break;
+    case Qt::ColorScheme::Light: [[fallthrough]];
+    default:
+        break;
+    }
+    return QIcon(QPixmap::fromImage(image));
 }

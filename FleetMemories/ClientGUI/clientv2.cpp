@@ -520,6 +520,7 @@ void Clientv2::handshakeInterrupted(const QSslError &error) {
     }
 }
 
+/* 1-migrate.md */
 void Clientv2::migrate(const QJsonObject &content) {
     socket.flush();
     QByteArray msg = KP::clientMigrate(content);
@@ -1414,11 +1415,27 @@ void Clientv2::sendTestMessages() {
         sender->enqueue(msg);
     }
 */
-    for(auto ship: std::as_const(shipRegistryCache)) {
-        qCritical() << ship->localNames["ja_JP"]
-                    << "\t" << ship->shipClassText["ja_JP"]
-                    << "\t" << ship->shipOrderText["ja_JP"];
+    QSet<int> iconGroups;
+    for(auto equip: std::as_const(equipRegistryCache)) {
+        iconGroups.insert(equip->type.iconGroup());
     }
+    for(auto iconGroup: iconGroups)  {
+        resourceFetcher.downloadFile(
+            QString("https://tsunkit.net/api/assets/images/equipTypeIcons/%1").arg(iconGroup),
+            QString("%1.png").arg(iconGroup),
+            QStringLiteral("equipTypeIcons/"));
+        QEventLoop loop;
+        QTimer timer; // Optional: for timeout
+        timer.setSingleShot(true); // Ensure timer only fires once
+
+        // Connect the signal you're waiting for to the QEventLoop::quit slot
+        connect(&resourceFetcher, &ResourceFetch::finished, &loop, &QEventLoop::quit);
+
+        timer.start(50000); // 5-second timeout
+
+        loop.exec();
+    }
+    //resourceFetcher.downloadFile();
 }
 
 /* CLI */

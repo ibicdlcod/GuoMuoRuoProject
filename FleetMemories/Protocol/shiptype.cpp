@@ -133,6 +133,7 @@ int ShipType::toInt() const {
     return iRep;
 }
 
+/* 5.4-Construction.md */
 const ResOrd ShipType::consResBase() const {
     using namespace KP;
 

@@ -20,9 +20,9 @@
 
   * [Attributes](4.2-attributes.md)[See above]
   * [Capital-ness and fleet type](5.1-capitalness.md)[NOTYETIMPLEMENTED]
-  * Home port and initial ship
-  * Ship blueprint
-  * Construction
+  * [Home port and initial ship](5.2-homeport.md)[NOTYETIMPLEMENTED]
+  * [Ship blueprint](5.3-blueprint.md)[NOTYETIMPLEMENTED]
+  * [Construction](5.4-construction.md)[NOTYETIMPLEMENTED]
   * Equip slots (including extra)
   * Visible bonuses
   * Experience and modernization

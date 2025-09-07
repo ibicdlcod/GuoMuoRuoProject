@@ -34,6 +34,8 @@ set(CLIENT_SOURCES
     ClientGUI/main.cpp
     ClientGUI/networkerror.cpp
     ClientGUI/networkerror.h
+    ClientGUI/resourcefetch.cpp
+    ClientGUI/resourcefetch.h
     ClientGUI/shipmodel.cpp
     ClientGUI/shipmodel.h
     ClientGUI/steamauth.cpp

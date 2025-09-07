@@ -2106,6 +2106,7 @@ bool Server::importShipFromCSV() {
     return shipRefresh();
 }
 
+/* 1-migrate.md */
 void Server::migrate(const CSteamID &uid, const QJsonObject &input) {
     auto hqlv = input["hqlv"].toInt();
     auto admiralName = input["nickname"].toString();
