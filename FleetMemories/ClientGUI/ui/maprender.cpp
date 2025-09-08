@@ -5,6 +5,7 @@
 MapRender::MapRender(QWidget *parent)
     : QWidget{parent} {
     antialiased = false;
+
     QImage image(":/resources/map/globe.png");
     if (image.format() != QImage::Format_ARGB32) {
         image = image.convertToFormat(QImage::Format_ARGB32);
@@ -15,8 +16,8 @@ MapRender::MapRender(QWidget *parent)
             QColor color = image.pixelColor(x, y);
             int distancey = std::min(y, image.height() - y);
             int distancex = std::min(x, image.width() - x);
-            int distance = std::min(distancey, distancex);
-            double alpha = std::max(distance, 255);
+            double distance = std::min(distancey, distancex);
+            double alpha = std::min(distance, 255.0);
             color.setRgb(color.red(), color.green(), color.blue(), alpha);
             image.setPixelColor(x, y, color);
         }
@@ -43,7 +44,8 @@ void MapRender::mouseReleaseEvent(QMouseEvent *event)
 {
     if (event->button() == Qt::LeftButton && mousePressedInside) {
         if (rect().contains(event->pos())) { // Check if release occurred within widget
-            qCritical() << event->pos();
+            qCritical() << (double)event->pos().x() / this->width() * globeMapWidth;
+            qCritical() << (double)event->pos().y() / this->height() * globeMapHeight;
             update();
         }
     }
