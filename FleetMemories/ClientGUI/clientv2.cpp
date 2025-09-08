@@ -458,6 +458,46 @@ void Clientv2::switchToTech2() {
     socket.flush();
 }
 
+void Clientv2::tsunkitAssets() {
+    QSet<int> iconGroups;
+    for(auto equip: std::as_const(equipRegistryCache)) {
+        iconGroups.insert(equip->type.iconGroup());
+    }
+    for(auto iconGroup: iconGroups)  {
+        resourceFetcher.downloadFile(
+            QString("https://tsunkit.net/api/assets/images/equipTypeIcons/%1").arg(iconGroup),
+            QString("%1.png").arg(iconGroup),
+            QStringLiteral("equipTypeIcons/"));
+        QEventLoop loop;
+
+        // Connect the signal you're waiting for to the QEventLoop::quit slot
+        connect(&resourceFetcher, &ResourceFetch::finished, &loop, &QEventLoop::quit);
+
+        loop.exec();
+    }
+    QSet<int> oldInternalIDs;
+    for(auto ship: std::as_const(shipRegistryCache)) {
+        oldInternalIDs.insert(ship->attr["OldInternalNo."]);
+    }
+    for(auto oldInternalID: oldInternalIDs)  {
+        if(oldInternalID == 0) {
+            continue;
+        }
+        resourceFetcher.downloadFile(
+            QString("https://tsunkit.net/api/assets/images/shipIcons/%1_100").arg(oldInternalID),
+            QString("%1.png").arg(oldInternalID),
+            QStringLiteral("shipIcons/"));
+        QEventLoop loop;
+
+        // Connect the signal you're waiting for to the QEventLoop::quit slot
+        connect(&resourceFetcher, &ResourceFetch::finished, &loop, &QEventLoop::quit);
+
+        loop.exec();
+    }
+    qInfo() << "Download success!";
+    emit tsunkitAssetsComplete();
+}
+
 /* Refresh UI? */
 void Clientv2::uiRefresh() {
     //qDebug("UIREFRESH");
@@ -1220,6 +1260,8 @@ void Clientv2::receivedMsg(const QJsonObject &djson) {
         demandEquipCache();
         connect(this, &Clientv2::equipRegistryComplete,
                 this, &Clientv2::demandShipCache);
+        connect(this, &Clientv2::shipRegistryComplete,
+                this, &Clientv2::tsunkitAssets);
         break;
     case KP::AllowClientFinish:
         gameState = KP::Offline;
@@ -1435,7 +1477,6 @@ void Clientv2::sendTestMessages() {
 
         loop.exec();
     }
-    //resourceFetcher.downloadFile();
 }
 
 /* CLI */

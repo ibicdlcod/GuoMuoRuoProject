@@ -87,6 +87,7 @@ public slots:
     void switchToFactory();
     void switchToTech();
     void switchToTech2();
+    void tsunkitAssets();
     void uiRefresh();
     Q_DECL_DEPRECATED void update();
 
@@ -94,6 +95,7 @@ signals:
     void aboutToQuit();
     void equipRegistryComplete();
     void shipRegistryComplete();
+    void tsunkitAssetsComplete();
     void gamestateChanged(KP::GameState);
     void qout(QString, QColor background = QColor("white"),
               QColor foreground = QColor("black"));

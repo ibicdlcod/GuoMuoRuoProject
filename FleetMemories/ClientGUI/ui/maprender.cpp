@@ -5,7 +5,24 @@
 MapRender::MapRender(QWidget *parent)
     : QWidget{parent} {
     antialiased = false;
-    pixmap.load(":/resources/map/globe.png");
+    QImage image(":/resources/map/globe.png");
+    if (image.format() != QImage::Format_ARGB32) {
+        image = image.convertToFormat(QImage::Format_ARGB32);
+    }
+
+    for (int y = 0; y < image.height(); ++y) {
+        for (int x = 0; x < image.width(); ++x) {
+            QColor color = image.pixelColor(x, y);
+            int distancey = std::min(y, image.height() - y);
+            int distancex = std::min(x, image.width() - x);
+            int distance = std::min(distancey, distancex);
+            double alpha = std::max(distance, 255);
+            color.setRgb(color.red(), color.green(), color.blue(), alpha);
+            image.setPixelColor(x, y, color);
+        }
+    }
+    pixmap = QPixmap::fromImage(image);
+    //pixmap.load(":/resources/map/globe.png");
 
     //pen = QPen(Qt::blue, 0);
     brush = (QBrush(Qt::black));

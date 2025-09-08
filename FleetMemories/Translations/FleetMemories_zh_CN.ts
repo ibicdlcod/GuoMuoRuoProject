@@ -23,25 +23,25 @@ Great at battle and bad at politics--so cool!</source>
     </message>
     <message id="invalid-command">
         <location filename="../Protocol/commandline.cpp" line="247"/>
-        <location filename="../ClientGUI/clientv2.cpp" line="1397"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="1439"/>
         <source>Invalid Command, use &apos;commands&apos; for valid commands, &apos;help&apos; for help, &apos;exit&apos; to exit.</source>
         <translation>不合理的命令，使用commands查看可用命令，help查看帮助，exit退出。</translation>
     </message>
     <message id="exit-helper">
         <location filename="../Protocol/commandline.cpp" line="252"/>
-        <location filename="../ClientGUI/clientv2.cpp" line="1444"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="1485"/>
         <source>Use &apos;exit&apos; to quit.</source>
         <translation>使用exit退出。</translation>
     </message>
     <message id="good-command">
         <location filename="../Protocol/commandline.cpp" line="255"/>
-        <location filename="../ClientGUI/clientv2.cpp" line="1447"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="1488"/>
         <source>Available commands:</source>
         <translation>可用命令：</translation>
     </message>
     <message id="all-command">
         <location filename="../Protocol/commandline.cpp" line="260"/>
-        <location filename="../ClientGUI/clientv2.cpp" line="1452"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="1493"/>
         <source>All commands:</source>
         <translation>全部命令：</translation>
     </message>
@@ -599,300 +599,300 @@ Great at battle and bad at politics--so cool!</source>
         <location filename="../ClientGUI/clientv2.cpp" line="392"/>
         <location filename="../ClientGUI/clientv2.cpp" line="406"/>
         <location filename="../ClientGUI/clientv2.cpp" line="425"/>
-        <location filename="../ClientGUI/clientv2.cpp" line="1093"/>
-        <location filename="../ClientGUI/clientv2.cpp" line="1403"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="1133"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="1445"/>
         <source>You have insufficient privileges (typically you need to login).</source>
         <translation>你没有所需权限（一般情况下你需要登录）。</translation>
     </message>
     <message id="change-gamestate-offline">
-        <location filename="../ClientGUI/clientv2.cpp" line="482"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="522"/>
         <source>You cannot change game state while offline.</source>
         <translation>你不能在离线的时候改变游戏状态。</translation>
     </message>
     <message id="network-error">
-        <location filename="../ClientGUI/clientv2.cpp" line="500"/>
-        <location filename="../ClientGUI/clientv2.cpp" line="511"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="540"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="551"/>
         <location filename="../ClientGUI/networkerror.cpp" line="4"/>
         <source>Network error: %1</source>
         <translation>网络错误：%1</translation>
     </message>
     <message id="handshake-timeout">
-        <location filename="../ClientGUI/clientv2.cpp" line="513"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="553"/>
         <source>%1: handshake timeout, trying to re-transmit</source>
         <translation>%1：握手超时，重新发送中</translation>
     </message>
     <message id="retransmit-toomuch">
-        <location filename="../ClientGUI/clientv2.cpp" line="518"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="558"/>
         <source>%1: max restransmit time exceeded!</source>
         <translation>%1：重发次数超过限制！</translation>
     </message>
     <message id="read-dgram-failed">
-        <location filename="../ClientGUI/clientv2.cpp" line="551"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="591"/>
         <location filename="../Server/server.cpp" line="566"/>
         <source>Read datagram failed due to: %1</source>
         <translation>读取数据码失败，原因：%1</translation>
     </message>
     <message id="addequip-usage">
-        <location filename="../ClientGUI/clientv2.cpp" line="603"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="643"/>
         <source>Usage: addequip [equipid]</source>
         <translation>用法：addequip [装备ID]</translation>
     </message>
     <message id="develop-invalid-id">
-        <location filename="../ClientGUI/clientv2.cpp" line="610"/>
-        <location filename="../ClientGUI/clientv2.cpp" line="629"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="650"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="669"/>
         <source>Equipment id invalid.</source>
         <translation>装备ID不合规。</translation>
     </message>
     <message id="develop-usage">
-        <location filename="../ClientGUI/clientv2.cpp" line="622"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="662"/>
         <source>Usage: develop [equipid] [FactorySlot]</source>
         <translation>用法：develop [装备ID] [装备槽位]</translation>
     </message>
     <message id="fetch-usage">
-        <location filename="../ClientGUI/clientv2.cpp" line="667"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="707"/>
         <source>Usage: fetch [FactorySlot]</source>
         <translation>用法：fetch [装备槽位]</translation>
     </message>
     <message id="switch-usage">
-        <location filename="../ClientGUI/clientv2.cpp" line="682"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="722"/>
         <source>Usage: switch [gamestate]</source>
         <translation>用法：switch [游戏状态]</translation>
     </message>
     <message id="game-unexpected-state">
-        <location filename="../ClientGUI/clientv2.cpp" line="693"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="733"/>
         <source>Nonexistent gamestate: %1</source>
         <translation>不存在的游戏状态：%1</translation>
     </message>
     <message id="gamestate-offline">
-        <location filename="../ClientGUI/clientv2.cpp" line="697"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="737"/>
         <source>Use &apos;disconnect&apos; for logout.</source>
         <translation>要登出请用disconnect。</translation>
     </message>
     <message id="goodbye-gui">
-        <location filename="../ClientGUI/clientv2.cpp" line="755"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="795"/>
         <source>Goodbye.</source>
         <translation>再见。</translation>
     </message>
     <message id="connected-already">
-        <location filename="../ClientGUI/clientv2.cpp" line="818"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="858"/>
         <source>Already connected, disconnect first.</source>
         <translation>已经连接，请先断开连接。</translation>
     </message>
     <message id="connect-duplicate">
-        <location filename="../ClientGUI/clientv2.cpp" line="823"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="863"/>
         <source>Do not attempt duplicate connections!</source>
         <translation>不要重复尝试连接！</translation>
     </message>
     <message id="connect-usage">
-        <location filename="../ClientGUI/clientv2.cpp" line="829"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="869"/>
         <source>Usage: connect [ip] [port]</source>
         <translation>用法：connect [IP] [端口]</translation>
     </message>
     <message id="ip-invalid">
-        <location filename="../ClientGUI/clientv2.cpp" line="837"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="877"/>
         <location filename="../Server/server.cpp" line="2438"/>
         <source>IP isn&apos;t valid.</source>
         <translation>IP不合法。</translation>
     </message>
     <message id="port-invalid">
-        <location filename="../ClientGUI/clientv2.cpp" line="843"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="883"/>
         <location filename="../Server/server.cpp" line="2444"/>
         <source>Port isn&apos;t valid, it must fall between 1024 and 49151</source>
         <translation>端口不合法，必须在1024和49151之间</translation>
     </message>
     <message id="disconnect-when-offline">
-        <location filename="../ClientGUI/clientv2.cpp" line="865"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="905"/>
         <source>You are not online.</source>
         <translation>你不在线上。</translation>
     </message>
     <message id="disconnect-attempt">
-        <location filename="../ClientGUI/clientv2.cpp" line="871"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="911"/>
         <source>Attempting to disconnect...</source>
         <translation>试图断连……</translation>
     </message>
     <message id="remote-disconnect">
-        <location filename="../ClientGUI/clientv2.cpp" line="981"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="1021"/>
         <source>Remote disconnected.</source>
         <translation>远程主机断开连接。</translation>
     </message>
     <message id="logout-success">
-        <location filename="../ClientGUI/clientv2.cpp" line="1057"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="1097"/>
         <source>%1: logout success</source>
         <translation>%1：登出成功</translation>
     </message>
     <message id="logout-forced">
-        <location filename="../ClientGUI/clientv2.cpp" line="1062"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="1102"/>
         <source>%1: logged elsewhere, force quitting</source>
         <translation>%1：账号在别处登录，强制下线</translation>
     </message>
     <message id="logout-notonline">
-        <location filename="../ClientGUI/clientv2.cpp" line="1076"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="1116"/>
         <source>%1: logout failure, not online</source>
         <translation>%1：登出失败，不在线上</translation>
     </message>
     <message id="client-bad-json">
-        <location filename="../ClientGUI/clientv2.cpp" line="1087"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="1127"/>
         <source>Client sent a bad JSON.</source>
         <translation>客户端发送了不合理的JSON。</translation>
     </message>
     <message id="client-unsupported-json">
-        <location filename="../ClientGUI/clientv2.cpp" line="1090"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="1130"/>
         <source>Client sent an unsupported JSON.</source>
         <translation>客户端发送了不支持的JSON。</translation>
     </message>
     <message id="equip-not-exist">
-        <location filename="../ClientGUI/clientv2.cpp" line="1098"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="1138"/>
         <source>This equipment does not exist.</source>
         <translation>该装备不存在。</translation>
     </message>
     <message id="equip-not-developable-father">
-        <location filename="../ClientGUI/clientv2.cpp" line="1106"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="1146"/>
         <source>This equipment requires you to possess %1 (id: %2) in order to develop.</source>
         <translation>该装备要求你拥有装备%1（ID:%2）才能开发。</translation>
     </message>
     <message id="equip-not-developable-mother">
-        <location filename="../ClientGUI/clientv2.cpp" line="1116"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="1156"/>
         <source>This equipment requires you to possess extra %3 skillpoints of %1 (id: %2) in order to develop.</source>
         <translation>该装备要求你拥有装备%1（ID:%2）的%3技能点才能开发。</translation>
     </message>
     <message id="factory-busy">
-        <location filename="../ClientGUI/clientv2.cpp" line="1126"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="1166"/>
         <source>You have not selected an available factory slot.</source>
         <translation>你没有选择一个空闲的工厂槽。</translation>
     </message>
     <message id="resource-lack">
-        <location filename="../ClientGUI/clientv2.cpp" line="1130"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="1170"/>
         <source>You do not have sufficient resources.</source>
         <translation>你没有足够的资源。</translation>
     </message>
     <message id="massproduction-disallowed">
-        <location filename="../ClientGUI/clientv2.cpp" line="1134"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="1174"/>
         <source>You have reached possessing limit for this equipment!</source>
         <translation>你达到了该装备的拥有上限！</translation>
     </message>
     <message id="production-disallowed">
-        <location filename="../ClientGUI/clientv2.cpp" line="1138"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="1178"/>
         <source>This equipment does not allow mass production!</source>
         <translation>该装备不能量产！</translation>
     </message>
     <message id="equip-develop-failed">
-        <location filename="../ClientGUI/clientv2.cpp" line="1142"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="1182"/>
         <source>Equipment development failed.</source>
         <translation>装备开发失败。</translation>
     </message>
     <message id="resource-require">
-        <location filename="../ClientGUI/clientv2.cpp" line="1149"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="1189"/>
         <source>This operation requires %1oil/%2explosives/%3steel/%4rubber/%5aluminum/%6tungsten/%7chromium</source>
         <translation>该操作需要%1油%2弹%3钢%4橡胶%5铝%6钨%7铬</translation>
     </message>
     <message id="develop-start">
-        <location filename="../ClientGUI/clientv2.cpp" line="1161"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="1201"/>
         <source>Start developing equipment.</source>
         <translation>装备开发开始。</translation>
     </message>
     <message id="fairy-busy">
-        <location filename="../ClientGUI/clientv2.cpp" line="1165"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="1205"/>
         <source>Fairy is still working on %1.</source>
         <translation>妖精还在工作，标的：%1。</translation>
     </message>
     <message id="factory-empty">
-        <location filename="../ClientGUI/clientv2.cpp" line="1169"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="1209"/>
         <source>Factory slot is empty.</source>
         <translation>工厂槽是空的。</translation>
     </message>
     <message id="develop-penguin">
-        <location filename="../ClientGUI/clientv2.cpp" line="1174"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="1214"/>
         <source>You got a cute penguin.</source>
         <translation>你得到了一只可爱的企鹅。</translation>
     </message>
     <message id="develop-success">
-        <location filename="../ClientGUI/clientv2.cpp" line="1183"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="1223"/>
         <source>You got new equipment %1, serial number %2</source>
         <translation>你得到了新装备%1，序列号%2</translation>
     </message>
     <message id="develop-success-id">
-        <location filename="../ClientGUI/clientv2.cpp" line="1192"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="1232"/>
         <source>You get new equipment with id %1, serial number %2</source>
         <translation>你得到了新装备ID%1，序列号%2</translation>
     </message>
     <message id="server-hello">
-        <location filename="../ClientGUI/clientv2.cpp" line="1201"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="1241"/>
         <source>Server is alive and responding.</source>
         <translation>服务器在线且有响应。</translation>
     </message>
     <message id="client-start">
-        <location filename="../ClientGUI/clientv2.cpp" line="1212"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="1252"/>
         <source>You can now play the game.</source>
         <translation>你现在可以游戏了。</translation>
     </message>
     <message id="client-finish">
-        <location filename="../ClientGUI/clientv2.cpp" line="1230"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="1272"/>
         <source>The client can now exit normally.</source>
         <translation>客户端现在可正常退出。</translation>
     </message>
     <message id="destruct-equip-list">
-        <location filename="../ClientGUI/clientv2.cpp" line="1243"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="1285"/>
         <source>The following equipment are destructed: %1</source>
         <translation>以下装备被废弃：%1</translation>
     </message>
     <message id="operation-success">
-        <location filename="../ClientGUI/clientv2.cpp" line="1249"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="1291"/>
         <source>Operation success!</source>
         <translation>操作成功！</translation>
     </message>
     <message id="login-success">
-        <location filename="../ClientGUI/clientv2.cpp" line="1264"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="1306"/>
         <source>%1: login success</source>
         <translation>%1：登录成功</translation>
     </message>
     <message id="ticket-decrypt-fail">
-        <location filename="../ClientGUI/clientv2.cpp" line="1274"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="1316"/>
         <source>Login failed: cannot decrypt ticket.</source>
         <translation>登录失败：无法解密票据。</translation>
     </message>
     <message id="ticket-incorrect-appid">
-        <location filename="../ClientGUI/clientv2.cpp" line="1276"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="1318"/>
         <source>Login failed: ticket is from incorrect app id.</source>
         <translation>登录失败：票据源APPID不对。</translation>
     </message>
     <message id="ticket-timeout">
-        <location filename="../ClientGUI/clientv2.cpp" line="1278"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="1320"/>
         <source>Login failed: ticket timeouted.</source>
         <translation>登录失败：票据超时。</translation>
     </message>
     <message id="steam-id-invalid">
-        <location filename="../ClientGUI/clientv2.cpp" line="1280"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="1322"/>
         <source>Login failed: steam id is invalid.</source>
         <translation>登录失败：Steam ID不合理。</translation>
     </message>
     <message id="steam-auth-fail">
-        <location filename="../ClientGUI/clientv2.cpp" line="1282"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="1324"/>
         <source>Login failed: steam authentication failed.</source>
         <translation>登录失败：Steam验证失败。</translation>
     </message>
     <message id="login-failed">
-        <location filename="../ClientGUI/clientv2.cpp" line="1286"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="1328"/>
         <source>%1: login failure, reason: %2</source>
         <translation>%1：登录失败，原因：%2</translation>
     </message>
     <message id="switch-cert-when-connecting">
-        <location filename="../ClientGUI/clientv2.cpp" line="1460"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="1501"/>
         <location filename="../Server/server.cpp" line="3408"/>
         <source>Switch certificate when connected have no effect.</source>
         <translation>在线时转换证书没有效果。</translation>
     </message>
     <message id="client-pem">
-        <location filename="../ClientGUI/clientv2.cpp" line="1471"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="1512"/>
         <source>Client PEM is now %1.</source>
         <translation>客户端PEM现在是%1。</translation>
     </message>
     <message id="equipment-cache-length">
-        <location filename="../ClientGUI/clientv2.cpp" line="1497"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="1538"/>
         <source>Equipment cache length: %1</source>
         <translation>装备缓存长度：%1</translation>
     </message>
     <message id="shipment-cache-length">
-        <location filename="../ClientGUI/clientv2.cpp" line="1527"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="1568"/>
         <source>Ship cache length: %1</source>
         <translation>舰船缓存长度：%1</translation>
     </message>
@@ -2095,32 +2095,32 @@ Great at battle and bad at politics--so cool!</source>
         <translation type="obsolete">装备开发</translation>
     </message>
     <message id="bytes-read-total">
-        <location filename="../ClientGUI/resourcefetch.cpp" line="17"/>
+        <location filename="../ClientGUI/resourcefetch.cpp" line="18"/>
         <source>Read %1 of %2 bytes</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="url-invalid">
-        <location filename="../ClientGUI/resourcefetch.cpp" line="54"/>
+        <location filename="../ClientGUI/resourcefetch.cpp" line="55"/>
         <source>Invalid URL: %1: %2</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="unable-to-save-file">
-        <location filename="../ClientGUI/resourcefetch.cpp" line="80"/>
+        <location filename="../ClientGUI/resourcefetch.cpp" line="87"/>
         <source>Unable to save the file %1: %2.</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="download-failed">
-        <location filename="../ClientGUI/resourcefetch.cpp" line="114"/>
+        <location filename="../ClientGUI/resourcefetch.cpp" line="121"/>
         <source>Download failed: %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="download-success">
-        <location filename="../ClientGUI/resourcefetch.cpp" line="121"/>
+        <location filename="../ClientGUI/resourcefetch.cpp" line="128"/>
         <source>Downloaded %1 bytes to %2 in %3</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="ssl-errors">
-        <location filename="../ClientGUI/resourcefetch.cpp" line="151"/>
+        <location filename="../ClientGUI/resourcefetch.cpp" line="158"/>
         <source>One or more TLS errors has occurred: %1</source>
         <translation type="unfinished"></translation>
     </message>

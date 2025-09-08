@@ -2,6 +2,7 @@
 #include <QNetworkReply>
 #include <QFileInfo>
 #include <QDir>
+#include <QTimer>
 
 ResourceFetch::ResourceFetch(QObject *parent)
     : QObject{parent}
@@ -64,6 +65,12 @@ void ResourceFetch::downloadFile(const QString &urlSpec,
     if (useDirectory)
         fileName.prepend(downloadDirectory + '/');
 
+    if(QFile::exists(fileName)) {
+        //% "File %1 exists."
+        //qInfo() << qtTrId("file-exists").arg(fileName);
+        QTimer::singleShot(1, this, [this]{emit finished();});
+        return;
+    }
     file = openFileForWrite(fileName);
     if (!file)
         return;
