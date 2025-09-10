@@ -45,10 +45,7 @@
        </sizepolicy>
       </property>
       <property name="frameShape">
-       <enum>QFrame::Shape::StyledPanel</enum>
-      </property>
-      <property name="frameShadow">
-       <enum>QFrame::Shadow::Raised</enum>
+       <enum>QFrame::NoFrame</enum>
       </property>
       <layout class="QHBoxLayout" name="horizontalLayout_2">
        <property name="spacing">
@@ -179,10 +176,7 @@
        <string notr="true"/>
       </property>
       <property name="frameShape">
-       <enum>QFrame::Shape::StyledPanel</enum>
-      </property>
-      <property name="frameShadow">
-       <enum>QFrame::Shadow::Raised</enum>
+       <enum>QFrame::NoFrame</enum>
       </property>
       <property name="lineWidth">
        <number>0</number>
@@ -249,6 +243,16 @@
         </widget>
        </item>
        <item>
+        <widget class="QWidget" name="FleetArea" native="true">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+           <horstretch>1</horstretch>
+           <verstretch>1</verstretch>
+          </sizepolicy>
+         </property>
+        </widget>
+       </item>
+       <item>
         <widget class="QWidget" name="TechArea" native="true"/>
        </item>
        <item>
@@ -288,6 +292,7 @@
       <zorder>PortArea</zorder>
       <zorder>TechArea</zorder>
       <zorder>BattleArea</zorder>
+      <zorder>FleetArea</zorder>
      </widget>
     </item>
     <item>
@@ -342,7 +347,7 @@ border-style: none;</string>
      <x>0</x>
      <y>0</y>
      <width>1366</width>
-     <height>23</height>
+     <height>21</height>
     </rect>
    </property>
    <property name="font">
@@ -363,6 +368,7 @@ border-style: none;</string>
     <property name="title">
      <string id="menu-fleet">Fleet</string>
     </property>
+    <addaction name="actionCompose"/>
    </widget>
    <widget class="QMenu" name="menuDock">
     <property name="title">
@@ -443,6 +449,11 @@ border-style: none;</string>
   <action name="actionAnchorage">
    <property name="text">
     <string id="anchorage">Anchorage</string>
+   </property>
+  </action>
+  <action name="actionCompose">
+   <property name="text">
+    <string id="menu-compose">Compose</string>
    </property>
   </action>
  </widget>

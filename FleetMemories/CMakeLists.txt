@@ -52,8 +52,13 @@ set(CLIENT_SOURCES
     ClientGUI/ui/factoryarea.cpp
     ClientGUI/ui/factoryarea.h
     ClientGUI/ui/factoryarea.ui
+    ClientGUI/ui/fleetview.h
+    ClientGUI/ui/fleetview.cpp
+    ClientGUI/ui/fleetview.ui
     ClientGUI/ui/hpdelegate.cpp
     ClientGUI/ui/hpdelegate.h
+    ClientGUI/ui/interactivelabel.h
+    ClientGUI/ui/interactivelabel.cpp
     ClientGUI/ui/keyenterreceiver.cpp
     ClientGUI/ui/keyenterreceiver.h
     ClientGUI/ui/licensearea.cpp

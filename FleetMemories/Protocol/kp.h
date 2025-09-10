@@ -94,7 +94,8 @@ enum GameState{
     Port,
     Factory,
     TechView,
-    BattleView
+    BattleView,
+    FleetView
 };
 Q_ENUM_NS(GameState)
 

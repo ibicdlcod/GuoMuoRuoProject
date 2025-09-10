@@ -420,6 +420,19 @@ void Clientv2::switchToFactory() {
     }
 }
 
+void Clientv2::switchToFleetView() {
+    if(!loggedIn()) {
+        emit qout(qtTrId("access-denied-login-first"));
+        return;
+    }
+    if(gameState == KP::FleetView) {
+        return;
+    } else {
+        gameState = KP::FleetView;
+        emit gamestateChanged(KP::FleetView);
+    }
+}
+
 void Clientv2::switchToTech() {
     if(!loggedIn()) {
         emit qout(qtTrId("access-denied-login-first"));

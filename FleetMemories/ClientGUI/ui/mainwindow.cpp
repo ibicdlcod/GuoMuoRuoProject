@@ -100,6 +100,10 @@ MainWindow::MainWindow(QWidget *parent, int argc, char ** argv)
             &engine, &Clientv2::switchToBattleView);
     connect(ui->actionBattle, &QAction::triggered,
             this, &MainWindow::switchToSortie);
+    connect(ui->actionCompose, &QAction::triggered,
+            &engine, &Clientv2::switchToFleetView);
+    connect(ui->actionCompose, &QAction::triggered,
+            this, &MainWindow::switchToFleet);
     connect(ui->actionLogout, &QAction::triggered,
             &engine, &Clientv2::parseDisconnectReq);
     connect(ui->actionExit, &QAction::triggered,
@@ -113,7 +117,10 @@ MainWindow::MainWindow(QWidget *parent, int argc, char ** argv)
     factoryArea = new FactoryArea(ui->FactoryArea);
     techArea = new TechView(ui->TechArea);
     battleArea = new Sortie(ui->BattleArea);
+    fleetArea = new FleetView(ui->FleetArea);
+    ui->FleetArea->hide();
     licenseArea->hide();
+
     QTimer::singleShot(100, this,
                        [this]
                        {
@@ -196,6 +203,12 @@ void MainWindow::gamestateChanged(KP::GameState state) {
                            [this]
                            {adjustArea(battleArea, ui->BattleArea->frameSize());}))
                             : ui->BattleArea->hide();
+    state == KP::FleetView ? (
+        ui->FleetArea->show(),
+        QTimer::singleShot(1, this,
+                           [this]
+                           {adjustArea(fleetArea, ui->FleetArea->frameSize());}))
+                            : ui->FleetArea->hide();
 }
 
 void MainWindow::printMessage(QString text, QColor background,
@@ -246,6 +259,14 @@ void MainWindow::switchToDevelop() {
     }
     factoryArea->setState(KP::Development);
     factoryArea->switchToState();
+}
+
+void MainWindow::switchToFleet() {
+    Clientv2 &engine = Clientv2::getInstance();
+    if(!engine.loggedIn()) {
+        return;
+    }
+    /* TODO:ADD */
 }
 
 void MainWindow::switchToSortie() {

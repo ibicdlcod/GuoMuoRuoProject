@@ -85,6 +85,7 @@ public slots:
     void showHelp(const QStringList &);
     void switchToBattleView();
     void switchToFactory();
+    void switchToFleetView();
     void switchToTech();
     void switchToTech2();
     void tsunkitAssets();

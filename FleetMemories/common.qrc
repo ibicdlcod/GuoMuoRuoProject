@@ -28,5 +28,6 @@
         <file>resources/shiptype/DE.png</file>
         <file>resources/shiptype/OTH.png</file>
         <file>resources/shiptype/SS.png</file>
+        <file>resources/shipIcons/0.png</file>
     </qresource>
 </RCC>

@@ -71,7 +71,7 @@ int main(int argc, char *argv[]) {
         }
     }*/
 #else
-    settings->setValue("server/language", "zh_CN");
+    settings->setValue("server/language", "en_US");
 #endif
 
     QStringList uiLanguages = QLocale::system().uiLanguages();

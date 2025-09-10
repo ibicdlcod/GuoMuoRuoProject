@@ -2788,6 +2788,10 @@ void Server::receivedReq(const QJsonObject &djson,
             ;
         }
         break;
+        case KP::GameState::FleetView: {
+            ;
+        }
+        break;
         default:
             auto meta = QMetaEnum::fromType<KP::GameState>();
             //% "Game state %1 not supported!"
