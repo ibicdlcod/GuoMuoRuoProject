@@ -46,9 +46,8 @@ FleetView::FleetView(QWidget *parent)
         QLabel *fleetIcon = new InteractiveLabel(this);
         fleetIcon->setObjectName(QString("fleetIcon-%1").arg(i+1));
         fleetIcon->setAlignment(Qt::AlignCenter);
-        fleetIcon->setMinimumSize(QSize(50, 50));
+        fleetIcon->setMinimumSize(QSize(60, 60));
         layout->addWidget(fleetIcon, i+1, 2);
-        layout->setRowMinimumHeight(i+1, 50);
     }
 
     QVBoxLayout *greatLayout = new QVBoxLayout(this);
@@ -56,6 +55,8 @@ FleetView::FleetView(QWidget *parent)
     greatLayout->setSpacing(3);
     greatLayout->addWidget(ui->FleetMenu);
     QScrollArea *scrollArea = new QScrollArea(this);
+    scrollArea->setStyleSheet(
+        "QScrollArea { border-style: none; }");
     scrollArea->setWidget(fleetGrid);
     scrollArea->setAlignment(Qt::AlignHCenter);
     greatLayout->addWidget(scrollArea);
