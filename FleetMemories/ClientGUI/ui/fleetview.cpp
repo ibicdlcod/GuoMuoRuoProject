@@ -4,9 +4,10 @@
 
 FleetView::FleetView(QWidget *parent)
     : QFrame(parent)
-    , ui(new Ui::FleetView)
+    , ui(new Ui::FleetView), equipView(nullptr)
 {
     ui->setupUi(this);
+    equipView.hide();
     QGridLayout *layout = new QGridLayout(ui->FleetGrid);
     layout->setContentsMargins(3, 3, 3, 3);
     layout->setSpacing(3);

@@ -1020,8 +1020,8 @@ Great at battle and bad at politics--so cool!</translation>
     </message>
     <message id="retrieving-please-wait">
         <location filename="../ClientGUI/ui/equipview.cpp" line="57"/>
-        <location filename="../ClientGUI/ui/equipview.cpp" line="207"/>
-        <location filename="../ClientGUI/ui/equipview.cpp" line="242"/>
+        <location filename="../ClientGUI/ui/equipview.cpp" line="214"/>
+        <location filename="../ClientGUI/ui/equipview.cpp" line="249"/>
         <location filename="../ClientGUI/ui/navigator.cpp" line="16"/>
         <source>Retrieving data, please wait...</source>
         <translation type="unfinished"></translation>
@@ -2146,7 +2146,7 @@ Great at battle and bad at politics--so cool!</translation>
         <translation type="unfinished"></translation>
     </message>
     <message id="fleet-no-ship">
-        <location filename="../ClientGUI/ui/fleetview.cpp" line="26"/>
+        <location filename="../ClientGUI/ui/fleetview.cpp" line="27"/>
         <source>None</source>
         <translation type="unfinished"></translation>
     </message>

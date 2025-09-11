@@ -50,6 +50,8 @@ public slots:
 
 signals:
     void rowCountHint(int);
+    void equipSelected(QUuid id);
+    void shipSelected(QUuid id);
 
 protected:
     void resizeEvent(QResizeEvent *event) override;

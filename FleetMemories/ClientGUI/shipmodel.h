@@ -4,12 +4,15 @@
 #include "equipmodel.h"
 #include "../Protocol/ship.h"
 #include "../Protocol/shipdynamic.h"
+#include "ui/interactivelabel.h"
 
 class ShipModel : public EquipModel
 {
     Q_OBJECT
 public:
     explicit ShipModel(QObject *parent = nullptr, bool isInArsenal = true);
+
+    friend class InteractiveLabel;
 
 signals:
     void typeBoxHint(const QStringList &types);

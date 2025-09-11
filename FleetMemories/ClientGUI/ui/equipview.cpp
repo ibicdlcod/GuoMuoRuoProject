@@ -165,7 +165,14 @@ void EquipView::columnResized(int logicalIndex, int oldSize, int newSize) {
 }
 
 void EquipView::itemSelected(QUuid id) {
-    qCritical() << id;
+    Clientv2 &engine = Clientv2::getInstance();
+    if(model == &engine.equipModel) {
+        emit equipSelected(id);
+    }
+    else {
+        emit shipSelected(id);
+    }
+    hide();
 }
 
 
@@ -282,7 +289,7 @@ void EquipView::activate(bool arsenal, bool isEquip) {
             model, &EquipModel::lastPage);
     connect(model, &EquipModel::pageNumChanged,
             this, &EquipView::enactPageNumChange);
-    if(model->isReady()) {
+    if(model->isReady() && arsenal) {
         model->firstPage();
     }
 }
