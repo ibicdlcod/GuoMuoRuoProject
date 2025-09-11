@@ -2121,17 +2121,17 @@ Great at battle and bad at politics--so cool!</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="fleet-pos-head">
-        <location filename="../ClientGUI/ui/fleetview.cpp" line="19"/>
+        <location filename="../ClientGUI/ui/fleetview.cpp" line="23"/>
         <source>Pos</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="ship-name-head">
-        <location filename="../ClientGUI/ui/fleetview.cpp" line="32"/>
+        <location filename="../ClientGUI/ui/fleetview.cpp" line="36"/>
         <source>Ship Name</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="fleet-no-ship">
-        <location filename="../ClientGUI/ui/fleetview.cpp" line="39"/>
+        <location filename="../ClientGUI/ui/fleetview.cpp" line="43"/>
         <source>None</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2318,47 +2318,42 @@ Great at battle and bad at politics--so cool!</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="fleetview-fleet">
-        <location filename="../ClientGUI/ui/fleetview.ui" line="75"/>
+        <location filename="../ClientGUI/ui/fleetview.ui" line="81"/>
         <source>Fleet:</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="fleetview-fleet1">
-        <location filename="../ClientGUI/ui/fleetview.ui" line="94"/>
+        <location filename="../ClientGUI/ui/fleetview.ui" line="106"/>
         <source>1</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="fleetview-fleet2">
-        <location filename="../ClientGUI/ui/fleetview.ui" line="113"/>
+        <location filename="../ClientGUI/ui/fleetview.ui" line="131"/>
         <source>2</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="fleetview-fleet3">
-        <location filename="../ClientGUI/ui/fleetview.ui" line="132"/>
+        <location filename="../ClientGUI/ui/fleetview.ui" line="156"/>
         <source>3</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="fleetview-fleet4">
-        <location filename="../ClientGUI/ui/fleetview.ui" line="151"/>
+        <location filename="../ClientGUI/ui/fleetview.ui" line="181"/>
         <source>4</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="fleetview-fleetexp">
-        <location filename="../ClientGUI/ui/fleetview.ui" line="158"/>
+        <location filename="../ClientGUI/ui/fleetview.ui" line="188"/>
         <source>Expedition Fleet:</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="fleetview-fleet-type">
-        <location filename="../ClientGUI/ui/fleetview.ui" line="168"/>
+        <location filename="../ClientGUI/ui/fleetview.ui" line="198"/>
         <source>Fleet type:</source>
         <translation type="unfinished"></translation>
     </message>
-    <message id="switch-to-escort">
-        <location filename="../ClientGUI/ui/fleetview.ui" line="190"/>
-        <source>Switch to escort</source>
-        <translation type="unfinished"></translation>
-    </message>
     <message id="fleet-save">
-        <location filename="../ClientGUI/ui/fleetview.ui" line="197"/>
+        <location filename="../ClientGUI/ui/fleetview.ui" line="208"/>
         <source>Save</source>
         <translation type="unfinished"></translation>
     </message>

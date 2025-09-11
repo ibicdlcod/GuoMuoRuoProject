@@ -331,5 +331,8 @@ void MainWindow::resizeEvent(QResizeEvent *event) {
     if(!ui->BattleArea->isHidden()) {
         adjustArea(battleArea, ui->BattleArea->size());
     }
+    if(!ui->FleetArea->isHidden()) {
+        adjustArea(fleetArea, ui->FleetArea->size());
+    }
     QWidget::resizeEvent(event);
 }
