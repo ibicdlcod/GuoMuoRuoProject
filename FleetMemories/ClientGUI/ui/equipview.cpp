@@ -315,3 +315,9 @@ void EquipView::resizeEvent(QResizeEvent *event) {
     recalculateArsenalRows();
     QWidget::resizeEvent(event);
 }
+
+void EquipView::closeEvent(QCloseEvent *event) {
+    disconnect(this, &EquipView::shipSelected,
+               nullptr, nullptr);
+    QWidget::closeEvent(event);
+}

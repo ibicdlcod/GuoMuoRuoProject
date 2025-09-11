@@ -2145,8 +2145,18 @@ Great at battle and bad at politics--so cool!</translation>
         <source>One or more TLS errors has occurred: %1</source>
         <translation type="unfinished"></translation>
     </message>
+    <message id="fleet-pos-head">
+        <location filename="../ClientGUI/ui/fleetview.cpp" line="19"/>
+        <source>Pos</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="ship-name-head">
+        <location filename="../ClientGUI/ui/fleetview.cpp" line="32"/>
+        <source>Ship Name</source>
+        <translation type="unfinished"></translation>
+    </message>
     <message id="fleet-no-ship">
-        <location filename="../ClientGUI/ui/fleetview.cpp" line="27"/>
+        <location filename="../ClientGUI/ui/fleetview.cpp" line="39"/>
         <source>None</source>
         <translation type="unfinished"></translation>
     </message>

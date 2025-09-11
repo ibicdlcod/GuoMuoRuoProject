@@ -11,6 +11,12 @@ FleetView::FleetView(QWidget *parent)
     QGridLayout *layout = new QGridLayout(ui->FleetGrid);
     layout->setContentsMargins(3, 3, 3, 3);
     layout->setSpacing(3);
+    QLabel *fleetPosHeader = new QLabel(this);
+    fleetPosHeader->setObjectName(QStringLiteral("fleetPos-Head"));
+    fleetPosHeader->setAlignment(Qt::AlignCenter);
+    layout->addWidget(fleetPosHeader, 0, 0);
+    //% "Pos"
+    fleetPosHeader->setText(qtTrId("fleet-pos-head"));
     for(int i = 0; i < 7; ++i) {
         QLabel *fleetPos = new QLabel(this);
         fleetPos->setObjectName(QString("fleetPos-%1").arg(i+1));
@@ -18,6 +24,12 @@ FleetView::FleetView(QWidget *parent)
         layout->addWidget(fleetPos, i+1, 0);
         fleetPos->setText(QString("%1").arg(i+1));
     }
+    QLabel *shipNameHeader = new QLabel(this);
+    shipNameHeader->setObjectName(QStringLiteral("shipName-Head"));
+    shipNameHeader->setAlignment(Qt::AlignCenter);
+    layout->addWidget(shipNameHeader, 0, 1);
+    //% "Ship Name"
+    shipNameHeader->setText(qtTrId("ship-name-head"));
     for(int i = 0; i < 7; ++i) {
         QLabel *shipName = new QLabel(this);
         shipName->setObjectName(QString("shipName-%1").arg(i+1));
