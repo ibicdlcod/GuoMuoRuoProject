@@ -23,10 +23,10 @@
   * [Home port and initial ship](5.2-homeport.md)[NOTYETIMPLEMENTED]
   * [Ship blueprint](5.3-blueprint.md)[NOTYETIMPLEMENTED]
   * [Construction](5.4-construction.md)[NOTYETIMPLEMENTED]
-  * Equip slots (including extra)
-  * Visible bonuses
-  * Experience and modernization
-  * Remodel
+  * [Equip slots](5.5-equipslots.md) (including extra)[NOTYETIMPLEMENTED]
+  * [Visible bonuses](5.6-visiblebonus.md)[NOTYETIMPLEMENTED]
+  * [Experience and modernization](5.7-experience.md) [NOTYETIMPLEMENTED]
+  * [Remodel](5.8-remodel.md) [NOTYETIMPLEMENTED]
   * Cloning Vats
   * Labor condition
   * Enemies (Amnesiac Fleet)
@@ -38,7 +38,6 @@
   * Historical Mode (DLC)
   * Quests and Achievements
   * Expedition quests
-
 * Drill
 
   * vs AI

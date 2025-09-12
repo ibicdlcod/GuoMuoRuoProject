@@ -208,5 +208,5 @@ bool Ship::isAmnesiac() const {
 
 int Ship::getLevel(int exp) {
     /* inverse of y / 100 = (x)(x-1)/2 */
-    return std::floor((1.0 + sqrt(1.0 + 8.0 * (exp / 100.0)))/ 2.0);
+    return std::floor((1.0 + sqrt(1.0 + 8.0 * (exp / settings->value("rule/shipexpscale", 100.0).toDouble())))/ 2.0);
 }
