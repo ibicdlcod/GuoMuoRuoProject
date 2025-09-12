@@ -2100,6 +2100,11 @@ Great at battle and bad at politics--so cool!</source>
         <source>Invalid URL: %1: %2</source>
         <translation type="unfinished"></translation>
     </message>
+    <message id="file-exists">
+        <location filename="../ClientGUI/resourcefetch.cpp" line="70"/>
+        <source>File %1 exists.</source>
+        <translation type="unfinished"></translation>
+    </message>
     <message id="unable-to-save-file">
         <location filename="../ClientGUI/resourcefetch.cpp" line="87"/>
         <source>Unable to save the file %1: %2.</source>
@@ -2135,9 +2140,6 @@ Great at battle and bad at politics--so cool!</source>
         <source>None</source>
         <translation type="unfinished"></translation>
     </message>
-</context>
-<context>
-    <name>DevelopWindow</name>
     <message id="select-equipment-name">
         <location filename="../ClientGUI/ui/developwindow.ui" line="50"/>
         <source>Select Equipment Name:</source>
@@ -2163,6 +2165,229 @@ Great at battle and bad at politics--so cool!</source>
         <source>Calculating...</source>
         <translation type="unfinished"></translation>
     </message>
+    <message id="fleetview-fleet">
+        <location filename="../ClientGUI/ui/fleetview.ui" line="81"/>
+        <source>Fleet:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="fleetview-fleet1">
+        <location filename="../ClientGUI/ui/fleetview.ui" line="106"/>
+        <source>1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="fleetview-fleet2">
+        <location filename="../ClientGUI/ui/fleetview.ui" line="131"/>
+        <source>2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="fleetview-fleet3">
+        <location filename="../ClientGUI/ui/fleetview.ui" line="156"/>
+        <source>3</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="fleetview-fleet4">
+        <location filename="../ClientGUI/ui/fleetview.ui" line="181"/>
+        <source>4</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="fleetview-fleetexp">
+        <location filename="../ClientGUI/ui/fleetview.ui" line="188"/>
+        <source>Expedition Fleet:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="fleetview-fleet-type">
+        <location filename="../ClientGUI/ui/fleetview.ui" line="198"/>
+        <source>Fleet type:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="fleet-save">
+        <location filename="../ClientGUI/ui/fleetview.ui" line="208"/>
+        <source>Save</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="develop-equipment">
+        <location filename="../ClientGUI/ui/mainwindow.ui" line="411"/>
+        <location filename="../ClientGUI/ui/factoryarea.cpp" line="127"/>
+        <source>Develop Equipment</source>
+        <oldsource>Develop equipment</oldsource>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="construct-ships">
+        <location filename="../ClientGUI/ui/mainwindow.ui" line="436"/>
+        <location filename="../ClientGUI/ui/factoryarea.cpp" line="132"/>
+        <source>Construct Ships</source>
+        <oldsource>Consturct Ships</oldsource>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="arsenal">
+        <location filename="../ClientGUI/ui/mainwindow.ui" line="441"/>
+        <location filename="../ClientGUI/ui/factoryarea.cpp" line="137"/>
+        <source>Arsenal</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="anchorage">
+        <location filename="../ClientGUI/ui/mainwindow.ui" line="451"/>
+        <location filename="../ClientGUI/ui/factoryarea.cpp" line="145"/>
+        <source>Anchorage</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="mainwindow-title">
+        <location filename="../ClientGUI/ui/mainwindow.ui" line="14"/>
+        <source>FleetMemories</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="menu-sortie">
+        <location filename="../ClientGUI/ui/mainwindow.ui" line="363"/>
+        <source>Sortie</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="menu-fleet">
+        <location filename="../ClientGUI/ui/mainwindow.ui" line="369"/>
+        <source>Fleet</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="menu-dock">
+        <location filename="../ClientGUI/ui/mainwindow.ui" line="375"/>
+        <source>Dock</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="menu-factory">
+        <location filename="../ClientGUI/ui/mainwindow.ui" line="380"/>
+        <source>Factory</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="menu-naval-base">
+        <location filename="../ClientGUI/ui/mainwindow.ui" line="389"/>
+        <source>Naval Base</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="menu-tech">
+        <location filename="../ClientGUI/ui/mainwindow.ui" line="397"/>
+        <source>Tech</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="menu-back-to-naval-base">
+        <location filename="../ClientGUI/ui/mainwindow.ui" line="416"/>
+        <source>Back to naval base</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="menu-logout">
+        <location filename="../ClientGUI/ui/mainwindow.ui" line="421"/>
+        <source>Logout</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="menu-exit">
+        <location filename="../ClientGUI/ui/mainwindow.ui" line="426"/>
+        <source>Exit program</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="menu-view-tech">
+        <location filename="../ClientGUI/ui/mainwindow.ui" line="431"/>
+        <source>View Tech</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="menu-battle">
+        <location filename="../ClientGUI/ui/mainwindow.ui" line="446"/>
+        <source>Battle Maps</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="menu-compose">
+        <location filename="../ClientGUI/ui/mainwindow.ui" line="456"/>
+        <source>Compose</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="login-options-server">
+        <location filename="../ClientGUI/ui/newlogins.ui" line="58"/>
+        <source>Server:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="login-options-port">
+        <location filename="../ClientGUI/ui/newlogins.ui" line="84"/>
+        <source>Port:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="login-options-connect">
+        <location filename="../ClientGUI/ui/newlogins.ui" line="104"/>
+        <source>Connect</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="techview-globaltech">
+        <location filename="../ClientGUI/ui/techview.ui" line="24"/>
+        <source>GlobalTech:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="techview-calculating">
+        <location filename="../ClientGUI/ui/techview.ui" line="34"/>
+        <source>Calculating...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="techview-update">
+        <location filename="../ClientGUI/ui/techview.ui" line="83"/>
+        <source>Update</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="techview-localtech">
+        <location filename="../ClientGUI/ui/techview.ui" line="96"/>
+        <source>LocalTech:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="techview-na">
+        <location filename="../ClientGUI/ui/techview.ui" line="106"/>
+        <location filename="../ClientGUI/ui/techview.ui" line="130"/>
+        <location filename="../ClientGUI/ui/techview.cpp" line="108"/>
+        <source>N/A</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="techview-skillpoints">
+        <location filename="../ClientGUI/ui/techview.ui" line="120"/>
+        <source>Skill Points:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="techview-toship">
+        <location filename="../ClientGUI/ui/techview.ui" line="149"/>
+        <location filename="../ClientGUI/ui/techview.cpp" line="182"/>
+        <source>Switch to ship</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="techview-update-local">
+        <location filename="../ClientGUI/ui/techview.ui" line="156"/>
+        <source>Update</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="techview-equip-type">
+        <location filename="../ClientGUI/ui/techview.ui" line="170"/>
+        <source>EquipType:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="techview-equip">
+        <location filename="../ClientGUI/ui/techview.ui" line="177"/>
+        <source>Equip:</source>
+        <oldsource>Equipment:</oldsource>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="techview-ship-nationality">
+        <location filename="../ClientGUI/ui/techview.ui" line="216"/>
+        <source>Nationality:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="techview-ship-class">
+        <location filename="../ClientGUI/ui/techview.ui" line="262"/>
+        <source>ShipClass:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="techview-ship-type">
+        <location filename="../ClientGUI/ui/techview.ui" line="229"/>
+        <source>ShipType:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="techview-ship">
+        <location filename="../ClientGUI/ui/techview.ui" line="275"/>
+        <source>Ship:</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>DevelopWindow</name>
     <message>
         <location filename="../ClientGUI/ui/developwindow.ui" line="14"/>
         <source>Develop Equipment</source>
@@ -2317,46 +2542,6 @@ Great at battle and bad at politics--so cool!</source>
         <source>Form</source>
         <translation type="unfinished"></translation>
     </message>
-    <message id="fleetview-fleet">
-        <location filename="../ClientGUI/ui/fleetview.ui" line="81"/>
-        <source>Fleet:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message id="fleetview-fleet1">
-        <location filename="../ClientGUI/ui/fleetview.ui" line="106"/>
-        <source>1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message id="fleetview-fleet2">
-        <location filename="../ClientGUI/ui/fleetview.ui" line="131"/>
-        <source>2</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message id="fleetview-fleet3">
-        <location filename="../ClientGUI/ui/fleetview.ui" line="156"/>
-        <source>3</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message id="fleetview-fleet4">
-        <location filename="../ClientGUI/ui/fleetview.ui" line="181"/>
-        <source>4</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message id="fleetview-fleetexp">
-        <location filename="../ClientGUI/ui/fleetview.ui" line="188"/>
-        <source>Expedition Fleet:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message id="fleetview-fleet-type">
-        <location filename="../ClientGUI/ui/fleetview.ui" line="198"/>
-        <source>Fleet type:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message id="fleet-save">
-        <location filename="../ClientGUI/ui/fleetview.ui" line="208"/>
-        <source>Save</source>
-        <translation type="unfinished"></translation>
-    </message>
 </context>
 <context>
     <name>LicenseArea</name>
@@ -2374,97 +2559,6 @@ Great at battle and bad at politics--so cool!</source>
 </context>
 <context>
     <name>MainWindow</name>
-    <message id="develop-equipment">
-        <location filename="../ClientGUI/ui/mainwindow.ui" line="411"/>
-        <location filename="../ClientGUI/ui/factoryarea.cpp" line="127"/>
-        <source>Develop Equipment</source>
-        <oldsource>Develop equipment</oldsource>
-        <translation type="unfinished"></translation>
-    </message>
-    <message id="construct-ships">
-        <location filename="../ClientGUI/ui/mainwindow.ui" line="436"/>
-        <location filename="../ClientGUI/ui/factoryarea.cpp" line="132"/>
-        <source>Construct Ships</source>
-        <oldsource>Consturct Ships</oldsource>
-        <translation type="unfinished"></translation>
-    </message>
-    <message id="arsenal">
-        <location filename="../ClientGUI/ui/mainwindow.ui" line="441"/>
-        <location filename="../ClientGUI/ui/factoryarea.cpp" line="137"/>
-        <source>Arsenal</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message id="anchorage">
-        <location filename="../ClientGUI/ui/mainwindow.ui" line="451"/>
-        <location filename="../ClientGUI/ui/factoryarea.cpp" line="145"/>
-        <source>Anchorage</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message id="mainwindow-title">
-        <location filename="../ClientGUI/ui/mainwindow.ui" line="14"/>
-        <source>FleetMemories</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message id="menu-sortie">
-        <location filename="../ClientGUI/ui/mainwindow.ui" line="363"/>
-        <source>Sortie</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message id="menu-fleet">
-        <location filename="../ClientGUI/ui/mainwindow.ui" line="369"/>
-        <source>Fleet</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message id="menu-dock">
-        <location filename="../ClientGUI/ui/mainwindow.ui" line="375"/>
-        <source>Dock</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message id="menu-factory">
-        <location filename="../ClientGUI/ui/mainwindow.ui" line="380"/>
-        <source>Factory</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message id="menu-naval-base">
-        <location filename="../ClientGUI/ui/mainwindow.ui" line="389"/>
-        <source>Naval Base</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message id="menu-tech">
-        <location filename="../ClientGUI/ui/mainwindow.ui" line="397"/>
-        <source>Tech</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message id="menu-back-to-naval-base">
-        <location filename="../ClientGUI/ui/mainwindow.ui" line="416"/>
-        <source>Back to naval base</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message id="menu-logout">
-        <location filename="../ClientGUI/ui/mainwindow.ui" line="421"/>
-        <source>Logout</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message id="menu-exit">
-        <location filename="../ClientGUI/ui/mainwindow.ui" line="426"/>
-        <source>Exit program</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message id="menu-view-tech">
-        <location filename="../ClientGUI/ui/mainwindow.ui" line="431"/>
-        <source>View Tech</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message id="menu-battle">
-        <location filename="../ClientGUI/ui/mainwindow.ui" line="446"/>
-        <source>Battle Maps</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message id="menu-compose">
-        <location filename="../ClientGUI/ui/mainwindow.ui" line="456"/>
-        <source>Compose</source>
-        <translation type="unfinished"></translation>
-    </message>
     <message>
         <location filename="../ClientGUI/ui/mainwindow.ui" line="69"/>
         <location filename="../ClientGUI/ui/mainwindow.ui" line="76"/>
@@ -2486,21 +2580,6 @@ Great at battle and bad at politics--so cool!</source>
 </context>
 <context>
     <name>NewLoginS</name>
-    <message id="login-options-server">
-        <location filename="../ClientGUI/ui/newlogins.ui" line="58"/>
-        <source>Server:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message id="login-options-port">
-        <location filename="../ClientGUI/ui/newlogins.ui" line="84"/>
-        <source>Port:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message id="login-options-connect">
-        <location filename="../ClientGUI/ui/newlogins.ui" line="104"/>
-        <source>Connect</source>
-        <translation type="unfinished"></translation>
-    </message>
     <message>
         <location filename="../ClientGUI/ui/newlogins.ui" line="14"/>
         <source>Frame</source>
@@ -2548,80 +2627,6 @@ Great at battle and bad at politics--so cool!</source>
 </context>
 <context>
     <name>TechView</name>
-    <message id="techview-globaltech">
-        <location filename="../ClientGUI/ui/techview.ui" line="24"/>
-        <source>GlobalTech:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message id="techview-calculating">
-        <location filename="../ClientGUI/ui/techview.ui" line="34"/>
-        <source>Calculating...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message id="techview-update">
-        <location filename="../ClientGUI/ui/techview.ui" line="83"/>
-        <source>Update</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message id="techview-localtech">
-        <location filename="../ClientGUI/ui/techview.ui" line="96"/>
-        <source>LocalTech:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message id="techview-na">
-        <location filename="../ClientGUI/ui/techview.ui" line="106"/>
-        <location filename="../ClientGUI/ui/techview.ui" line="130"/>
-        <location filename="../ClientGUI/ui/techview.cpp" line="108"/>
-        <source>N/A</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message id="techview-skillpoints">
-        <location filename="../ClientGUI/ui/techview.ui" line="120"/>
-        <source>Skill Points:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message id="techview-toship">
-        <location filename="../ClientGUI/ui/techview.ui" line="149"/>
-        <location filename="../ClientGUI/ui/techview.cpp" line="182"/>
-        <source>Switch to ship</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message id="techview-update-local">
-        <location filename="../ClientGUI/ui/techview.ui" line="156"/>
-        <source>Update</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message id="techview-equip-type">
-        <location filename="../ClientGUI/ui/techview.ui" line="170"/>
-        <source>EquipType:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message id="techview-equip">
-        <location filename="../ClientGUI/ui/techview.ui" line="177"/>
-        <source>Equip:</source>
-        <oldsource>Equipment:</oldsource>
-        <translation type="unfinished"></translation>
-    </message>
-    <message id="techview-ship-nationality">
-        <location filename="../ClientGUI/ui/techview.ui" line="216"/>
-        <source>Nationality:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message id="techview-ship-class">
-        <location filename="../ClientGUI/ui/techview.ui" line="262"/>
-        <source>ShipClass:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message id="techview-ship-type">
-        <location filename="../ClientGUI/ui/techview.ui" line="229"/>
-        <source>ShipType:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message id="techview-ship">
-        <location filename="../ClientGUI/ui/techview.ui" line="275"/>
-        <source>Ship:</source>
-        <translation type="unfinished"></translation>
-    </message>
     <message>
         <location filename="../ClientGUI/ui/techview.ui" line="14"/>
         <source>Frame</source>

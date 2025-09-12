@@ -425,11 +425,12 @@ QVariant ShipModel::headerData(int section, Qt::Orientation orientation,
 
 Qt::ItemFlags ShipModel::flags(const QModelIndex &index) const {
     if(index.column() == addStarColumn()) {
-        return QAbstractTableModel::flags(index)
+        return QAbstractTableModel::flags(index) // clazy:exclude=skipped-base-method
                | Qt::ItemIsUserCheckable;
     }
-    else
-        return QAbstractTableModel::flags(index);
+    else {
+        return QAbstractTableModel::flags(index); // clazy:exclude=skipped-base-method
+    }
 }
 
 bool ShipModel::setData(const QModelIndex &index,
