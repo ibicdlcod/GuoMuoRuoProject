@@ -43,6 +43,10 @@ QString ShipType::toString() const {
     case 0x52: return qtTrId("highspeed-battleship");
         //% "Battleship (Advanced Aviation)"
     case 0x54: return qtTrId("aviation-battleship");
+        //% "Battlecruiser (Advanced Aviation)"
+    case 0x55: return qtTrId("aviation-battlecruiser");
+        //% "Battleship (High speed & Aviation)"
+    case 0x56: return qtTrId("highspeed-av-battleship");
     default:
         switch((iRep & 0xf0) >> 4) {
         case 1:
