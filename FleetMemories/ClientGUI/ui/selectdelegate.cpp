@@ -48,7 +48,7 @@ bool SelectDelegate::editorEvent(QEvent *event,
         x = r.left() + (r.width() - w) / 2;//the X coordinate
         y = r.top() + (r.height() - h) / 2;//the Y coordinate
 
-        if( clickX > x && clickX < x + w )
+        if( clickX > x && clickX < x + w ) {
             if( clickY > y && clickY < y + h )
             {
                 emit itemSelected(QUuid(
@@ -56,6 +56,7 @@ bool SelectDelegate::editorEvent(QEvent *event,
                              model->index(index.row(), 0),
                              Qt::ToolTipRole).toString()));
             }
+        }
     }
 
     return true;

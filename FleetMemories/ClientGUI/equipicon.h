@@ -9,8 +9,9 @@ namespace Icute
 /* this function is deliberately not placed in Protocol,
  * otherwith both Protocol and Server must depend on Qt::Gui
  */
-QIcon equipIcon(EquipType, bool);
-QIcon shipIcon(int, bool);
+QIcon equipTypeIcon(EquipType, bool);
+QIcon shipTypeIcon(int, bool);
+QPixmap shipIcon(int);
 };
 
 #endif // EQUIPICON_H

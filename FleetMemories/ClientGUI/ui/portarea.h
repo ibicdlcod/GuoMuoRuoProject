@@ -17,6 +17,7 @@ public:
 
 public slots:
     void equipRegistryComplete();
+    void hello();
     void shipRegistryComplete();
 
 protected:

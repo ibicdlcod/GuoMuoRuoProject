@@ -143,6 +143,8 @@ MainWindow::MainWindow(QWidget *parent, int argc, char ** argv)
             portArea, &PortArea::equipRegistryComplete);
     connect(&engine, &Clientv2::shipRegistryComplete,
             portArea, &PortArea::shipRegistryComplete);
+    connect(&engine, &Clientv2::tsunkitAssetsComplete,
+            portArea, &PortArea::hello);
 }
 
 MainWindow::~MainWindow()
@@ -187,9 +189,12 @@ void MainWindow::gamestateChanged(KP::GameState state) {
                                        ui->PortArea->frameSize()
                                       );}))
                       : ui->PortArea->hide();
-    state == KP::Factory ? (ui->FactoryArea->show(), factoryRefresh(),
-                            factoryArea->resize(ui->FactoryArea->size())) :
-        ui->FactoryArea->hide();
+    state == KP::Factory ? (
+        ui->FactoryArea->show(),
+        QTimer::singleShot(1, this, [this]{
+                           factoryRefresh();
+                           factoryArea->resize(ui->FactoryArea->size());}))
+                         : ui->FactoryArea->hide();
     state == KP::TechView ? (
         ui->TechArea->show(),
         QTimer::singleShot(1, this,

@@ -57,11 +57,14 @@ EquipView::EquipView(QWidget *parent)
     pageLabel->setText(qtTrId("retrieving-please-wait"));
     nextButton = new QToolButton(this);
     lastButton = new QToolButton(this);
+    unselectButton = new QPushButton(this);
 
     firstButton->setIcon(first);
     prevButton->setIcon(prev);
     nextButton->setIcon(next);
     lastButton->setIcon(last);
+    //% "Unselect"
+    unselectButton->setText(qtTrId("equipview-unselect"));
 
     pageLabel->setAlignment(Qt::AlignCenter);
     pageLabel->setSizePolicy(QSizePolicy(QSizePolicy::Maximum,
@@ -79,6 +82,7 @@ EquipView::EquipView(QWidget *parent)
     layout->addWidget(pageLabel);
     layout->addWidget(nextButton);
     layout->addWidget(lastButton);
+    layout->addWidget(unselectButton);
     layout->setContentsMargins(0,0,0,0);
     QVBoxLayout *layout2 = ui->Navigator;
     layout2->addWidget(equipSelect, 1, Qt::AlignHCenter);
@@ -200,6 +204,8 @@ void EquipView::activate(bool arsenal, bool isEquip) {
                this, &EquipView::enactPageNumChange);
     disconnect(delegate, &SelectDelegate::itemSelected,
                this, &EquipView::itemSelected);
+    disconnect(unselectButton, &QPushButton::clicked,
+               nullptr, nullptr);
 
     Clientv2 &engine = Clientv2::getInstance();
     disconnect(model, SIGNAL(needReCalculateRows()),
@@ -207,6 +213,9 @@ void EquipView::activate(bool arsenal, bool isEquip) {
     disconnect(this, SIGNAL(rowCountHint(int)),
                model, SLOT(setRowsPerPageHint(int)));
     arsenalView->setItemDelegate(new QStyledItemDelegate());
+    if(arsenal) {
+        unselectButton->hide();
+    }
     if(isEquip) {
         model = &engine.equipModel;
         arsenalView->setModel(model);
@@ -231,6 +240,10 @@ void EquipView::activate(bool arsenal, bool isEquip) {
                     this, &EquipView::itemSelected);
             equipSelect->destructButton->hide();
             equipSelect->addStarButton->hide();
+            unselectButton->show();
+            connect(unselectButton, &QPushButton::clicked,
+                    this, [this]{emit equipSelected(QUuid());
+                                 hide();});
         }
         recalculateArsenalRows();
         connect(model, SIGNAL(needReCalculateRows()),
@@ -266,6 +279,10 @@ void EquipView::activate(bool arsenal, bool isEquip) {
             connect(delegate, &SelectDelegate::itemSelected,
                     this, &EquipView::itemSelected);
             shipSelect->addStarButton->hide();
+            unselectButton->show();
+            connect(unselectButton, &QPushButton::clicked,
+                    this, [this]{emit shipSelected(QUuid());
+                                 hide();});
         }
         recalculateArsenalRows();
         connect(model, SIGNAL(needReCalculateRows()),

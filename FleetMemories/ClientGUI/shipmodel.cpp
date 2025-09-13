@@ -16,6 +16,10 @@ ShipModel::ShipModel(QObject *parent, bool isInArsenal)
     ready = false;
 }
 
+std::tuple<Ship *, ShipDynamic *> ShipModel::getShip(QUuid id) {
+    return {clientShips[id], clientShipDynamicAttrs[id]};
+}
+
 void ShipModel::switchShipDisplayType(const QString &nationality,
                                       const QString &shiptype,
                                       const QString &shipclass,
@@ -233,7 +237,7 @@ QVariant ShipModel::data(const QModelIndex &index,
             return Ship::getLevel(displayExp);
         }
         else if(index.column() == fleetPosColumn()) {
-            if(attr->fleetIndex == 0 && attr->fleetPosIndex == 0) {
+            if(attr->fleetIndex == -1 && attr->fleetPosIndex == -1) {
                 //% "Idle"
                 return qtTrId("fleet-idle");
             }
@@ -248,7 +252,7 @@ QVariant ShipModel::data(const QModelIndex &index,
     break;
     case Qt::DecorationRole: {
         if(index.column() == equipCol) {
-            return Icute::shipIcon(shipToDisplay->getId(), false);
+            return Icute::shipTypeIcon(shipToDisplay->getId(), false);
         }
         else
             return QVariant();

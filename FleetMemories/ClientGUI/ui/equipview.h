@@ -75,6 +75,7 @@ private:
     QLabel *pageLabel;
     QToolButton *nextButton;
     QToolButton *lastButton;
+    QPushButton *unselectButton;
 
     /* equip */
     EquipSelect *equipSelect;

@@ -31,6 +31,11 @@ void PortArea::equipRegistryComplete() {
 }
 
 void PortArea::shipRegistryComplete() {
+    //% "Loading Assets..."
+    ui->CentralMessage->setText(qtTrId("load-assets"));
+}
+
+void PortArea::hello() {
     //% "Hello!"
     ui->CentralMessage->setText(qtTrId("client-hello"));
 }

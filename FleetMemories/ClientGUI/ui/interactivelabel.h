@@ -9,8 +9,10 @@ class InteractiveLabel : public QLabel
 {
     Q_OBJECT
 public:
-    explicit InteractiveLabel(FleetView* parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags());
-    QUuid shipUID;
+    explicit InteractiveLabel(int index = 0,
+                              FleetView* parent = nullptr,
+                              Qt::WindowFlags f = Qt::WindowFlags());
+    void paintEvent(QPaintEvent *event) override;
 
 public slots:
     void shipSelected(QUuid);
@@ -21,11 +23,12 @@ signals:
 protected:
     void mousePressEvent(QMouseEvent* event) override;
     void mouseReleaseEvent(QMouseEvent* event) override;
-    void paintEvent(QPaintEvent *event) override;
 
     bool mousePressedInside = false;
 
     FleetView * parentView;
+    QUuid shipUID;
+    int index;
 };
 
 #endif // INTERACTIVELABEL_H

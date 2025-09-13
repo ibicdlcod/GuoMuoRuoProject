@@ -245,7 +245,7 @@ void TechView::updateGlobalTechViewTable(const QJsonObject &djson) {
             QTableWidgetItem *newItem2;
             newItem2 = new QTableWidgetItem(
                 thisEquip->toString(settings->value("language", "ja_JP").toString()));
-            newItem2->setIcon(Icute::equipIcon(thisEquip->type, false));
+            newItem2->setIcon(Icute::equipTypeIcon(thisEquip->type, false));
             newItem2->setFlags(newItem->flags() & ~Qt::ItemIsEditable);
             ui->globalViewTable->setItem(currentRowCount + i, 1, newItem2);
             QTableWidgetItem *newItem3 = new TableWidgetItemNumber(
@@ -265,7 +265,7 @@ void TechView::updateGlobalTechViewTable(const QJsonObject &djson) {
             QTableWidgetItem *newItem2;
             newItem2 = new QTableWidgetItem(
                 thisShip->toString(settings->value("language", "ja_JP").toString()));
-            newItem2->setIcon(Icute::shipIcon(thisShip->getId(), false));
+            newItem2->setIcon(Icute::shipTypeIcon(thisShip->getId(), false));
             newItem2->setFlags(newItem->flags() & ~Qt::ItemIsEditable);
             ui->globalViewTable->setItem(currentRowCount + i, 1, newItem2);
             QTableWidgetItem *newItem3 = new TableWidgetItemNumber(
@@ -352,7 +352,7 @@ void TechView::updateLocalTechViewTable(const QJsonObject &djson) {
             else {
                 newItem2 = new QTableWidgetItem(
                     thisEquip->toString(settings->value("language", "ja_JP").toString()));
-                newItem2->setIcon(Icute::equipIcon(thisEquip->type, false));
+                newItem2->setIcon(Icute::equipTypeIcon(thisEquip->type, false));
             }
         }
         else {
@@ -364,7 +364,7 @@ void TechView::updateLocalTechViewTable(const QJsonObject &djson) {
             else {
                 newItem2 = new QTableWidgetItem(
                     thisShip->toString(settings->value("language", "ja_JP").toString()));
-                newItem2->setIcon(Icute::shipIcon(thisShip->getId(), false));
+                newItem2->setIcon(Icute::shipTypeIcon(thisShip->getId(), false));
             }
         }
         newItem2->setFlags(newItem->flags() & ~Qt::ItemIsEditable);

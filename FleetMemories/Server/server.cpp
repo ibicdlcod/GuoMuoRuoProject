@@ -296,8 +296,8 @@ Q_GLOBAL_STATIC(QString,
                     "Slot3Planes INTEGER DEFAULT 0, "
                     "Slot4Planes INTEGER DEFAULT 0, "
                     "Slot5Planes INTEGER DEFAULT 0, "
-                    "FleetIndex INTEGER DEFAULT 0, "
-                    "FleetPosIndex INTEGER DEFAULT 0, "
+                    "FleetIndex INTEGER DEFAULT -1, "
+                    "FleetPosIndex INTEGER DEFAULT -1, "
                     "FOREIGN KEY(User) REFERENCES NewUsers(UserID),"
                     "FOREIGN KEY(ShipDef) REFERENCES ShipName(ShipID)"
                     "FOREIGN KEY(Slot1) REFERENCES UserEquip(EquipUuid)"
@@ -969,6 +969,40 @@ void Server::offerShipInfo(QSslSocket *connection, int index = 0) {
 
 void Server::offerShipInfoUser(const CSteamID &uid,
                                QSslSocket *connection) {
+    QList<KP::FleetType> fleetTypes(4);
+    for(int i = 0; i < 4; ++i) {
+        QSqlQuery query;
+        if(!query.prepare("SELECT Attribute, Intvalue "
+                           "FROM UserAttr "
+                           "WHERE UserID = :uid "
+                           "AND Attribute LIKE 'Fleet%';")) {
+            qWarning() << query.lastError().databaseText();
+        }
+        query.bindValue(":uid", uid.ConvertToUint64());
+        //query.bindValue(":attr", QString("Fleet%1").arg(i+1));
+        //query.bindValue(":value", KP::NormalFleet);
+        if(!query.exec() || !query.isSelect()) {
+            qCritical() << query.lastQuery();
+            //% "Set User Fleet Up failed!"
+            throw DBError(qtTrId("init-userfleet-failed"),
+                          query.lastError());
+            return;
+        }
+        else {
+            while(query.next()) {
+                auto fleetIndexStr = query.value(0).toString();
+                bool isInt;
+                int fleetIndex = fleetIndexStr
+                                     .last(fleetIndexStr.size() - 5)
+                                     .toInt(&isInt) - 1;
+                if(isInt) {
+                    fleetTypes[fleetIndex] =
+                        static_cast<KP::FleetType>(query.value(1).toInt());
+                }
+            }
+        }
+    }
+
     QJsonArray userShipInfos;
     try{
         QSqlDatabase db = QSqlDatabase::database();
@@ -1076,6 +1110,9 @@ void Server::offerShipInfoUser(const CSteamID &uid,
                 });
                 output["fleetindex"] = fleetIndex;
                 output["fleetposindex"] = fleetPosIndex;
+                output["fleettype"] = fleetIndex == -1
+                                          ? KP::NormalFleet
+                                          : fleetTypes[fleetIndex];
                 userShipInfos.append(output);
             }
             connection->flush();
@@ -2789,7 +2826,7 @@ void Server::receivedReq(const QJsonObject &djson,
         }
         break;
         case KP::GameState::FleetView: {
-            ;
+            offerShipInfoUser(uid, connection);
         }
         break;
         default:
@@ -3010,12 +3047,10 @@ void Server::sendTestMessages() {
             //qInfo() << ship->getNationality();
         }
 */
-        for(auto user: connectedUsers) {
+        qCritical() << shipRegistry[274007556]->getLaterModels(shipRegistry);
+        for(auto user: std::as_const(connectedUsers)) {
             if(!User::isSuperUser(user)) {
                 continue;
-            }
-            else {
-                offerShipInfoUser(user, connectedPeers[user]);
             }
         }
         
@@ -3477,6 +3512,7 @@ void Server::userInit(CSteamID &uid) {
             return;
         }
     }
+
     for(int i = 0; i < 4; ++i) {
         QSqlQuery factoryNew;
         if(!factoryNew.prepare("INSERT INTO Factories "
@@ -3491,6 +3527,25 @@ void Server::userInit(CSteamID &uid) {
             throw DBError(qtTrId("user-factory-init-fail").
                           arg(uid.ConvertToUint64()),
                           factoryNew.lastError());
+            return;
+        }
+    }
+
+    for(int i = 0; i < 4; ++i) {
+        QSqlQuery insert;
+        if(!insert.prepare("INSERT INTO UserAttr "
+                            "(UserID, Attribute, Intvalue) "
+                            "VALUES (:uid, :attr, :value);")) {
+            qWarning() << insert.lastError().databaseText();
+        }
+        insert.bindValue(":uid", uid.ConvertToUint64());
+        insert.bindValue(":attr", QString("Fleet%1").arg(i+1));
+        insert.bindValue(":value", KP::NormalFleet);
+        if(!insert.exec()) {
+            qCritical() << insert.lastQuery();
+            //% "Set User Fleet Up failed!"
+            throw DBError(qtTrId("init-userfleet-failed"),
+                          insert.lastError());
             return;
         }
     }

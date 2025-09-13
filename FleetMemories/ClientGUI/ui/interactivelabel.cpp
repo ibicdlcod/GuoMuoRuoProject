@@ -3,9 +3,12 @@
 #include <QPainter>
 #include "equipview.h"
 #include "../clientv2.h"
+#include "../equipicon.h"
 
-InteractiveLabel::InteractiveLabel(FleetView* parent, Qt::WindowFlags f)
-    : QLabel(parent, f), parentView(parent) {
+InteractiveLabel::InteractiveLabel(int index,
+                                   FleetView* parent,
+                                   Qt::WindowFlags f)
+    : index(index), QLabel(parent, f), parentView(parent) {
 }
 
 void InteractiveLabel::mousePressEvent(QMouseEvent *event)
@@ -26,6 +29,16 @@ void InteractiveLabel::mouseReleaseEvent(QMouseEvent *event)
             view->setMinimumHeight(viewMinimumHeight);
             view->setAttribute(Qt::WA_DeleteOnClose, false);
             view->show();
+            QScreen *screen = view->screen();
+            QRect screenGeometry = screen->availableGeometry();
+            int width = screenGeometry.width() / 1.5;
+            int height = screenGeometry.height() / 1.5;
+            QPoint center = screenGeometry.center();
+            QRect windowGeometry = QRect(center.x() - width / 2,
+                                         center.y() - height / 2,
+                                         width,
+                                         height);
+            view->setGeometry(windowGeometry);
             connect(view, &EquipView::shipSelected,
                     this, &InteractiveLabel::shipSelected);
         }
@@ -36,37 +49,23 @@ void InteractiveLabel::mouseReleaseEvent(QMouseEvent *event)
 
 void InteractiveLabel::paintEvent(QPaintEvent * /* event */)
 {
-    QImage image;
+    int oldInternalId = 0;
     if(shipUID.isNull()) {
-        image = QImage(":/resources/shipIcons/0.png");
+        ; // remains 0
     }
     else {
         Clientv2 &engine = Clientv2::getInstance();
         auto ships = engine.shipModel.clientShips;
         if(!ships.contains(shipUID)
             || !ships[shipUID]->attr.contains("OldInternalNo.")) {
-            image = QImage(":/resources/shipIcons/0.png");
+            ; // remains 0
         }
         else {
-            image = QImage(QString("shipIcons/%1.png").arg(
-                ships[shipUID]->attr["OldInternalNo."]));
+            oldInternalId = ships[shipUID]->attr["OldInternalNo."];
         }
     }
 
-    if (image.format() != QImage::Format_ARGB32) {
-        image = image.convertToFormat(QImage::Format_ARGB32);
-    }
-
-    for (int y = 0; y < image.height(); ++y) {
-        for (int x = 0; x < image.width(); ++x) {
-            QColor color = image.pixelColor(x, y);
-            int alpha = std::hypot(x - image.width() / 2.0, y - image.width() / 2.0)
-                                > image.width() / 2.0 ? 0 : color.alpha();
-            color.setRgb(color.red(), color.green(), color.blue(), alpha);
-            image.setPixelColor(x, y, color);
-        }
-    }
-    QPixmap pixmap = QPixmap::fromImage(image);
+    QPixmap pixmap = Icute::shipIcon(oldInternalId);
 
     int size = std::min(this->width(), this->height());
     QPainter painter(this);
@@ -83,6 +82,7 @@ void InteractiveLabel::paintEvent(QPaintEvent * /* event */)
 
 void InteractiveLabel::shipSelected(QUuid id) {
     shipUID = id;
+    parentView->modifyFleetShip(index, id);
     update();
     EquipView *view = &parentView->equipView;
     disconnect(view, &EquipView::shipSelected,

@@ -250,6 +250,9 @@
            <verstretch>1</verstretch>
           </sizepolicy>
          </property>
+         <property name="styleSheet">
+          <string notr="true"/>
+         </property>
         </widget>
        </item>
        <item>

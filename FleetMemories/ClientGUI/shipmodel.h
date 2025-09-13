@@ -11,12 +11,13 @@ class ShipModel : public EquipModel
     Q_OBJECT
 public:
     explicit ShipModel(QObject *parent = nullptr, bool isInArsenal = true);
+    std::tuple<Ship *, ShipDynamic *> getShip(QUuid);
 
-    friend class InteractiveLabel;
+    friend void InteractiveLabel::paintEvent(QPaintEvent *);
 
 signals:
-    void typeBoxHint(const QStringList &types);
-    void classBoxHint(const QStringList &types);
+    void typeBoxHint(QStringList &types);
+    void classBoxHint(QStringList &types);
 
 public slots:
     virtual void switchShipDisplayType(const QString &nationality,

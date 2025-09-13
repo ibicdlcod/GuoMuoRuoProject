@@ -19,7 +19,7 @@ std::pair<bool, int> haveFather(const CSteamID &,
 std::tuple<bool, int, int64> haveMotherSP(const CSteamID &,
                                            int, QMap<int, Equipment *> &,
                                            int64);
-void init(const CSteamID &);
+Q_DECL_DEPRECATED void init(const CSteamID &);
 bool isFactoryBusy(const CSteamID &, int);
 std::tuple<bool, int> isFactoryFinished(const CSteamID &, int);
 bool isSuperUser(const CSteamID &);

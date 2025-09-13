@@ -217,6 +217,29 @@ enum ShipNationality{
 };
 Q_ENUM_NS(ShipNationality)
 
+enum FleetType {
+    NormalFleet = 0,
+    CarrierFleet = 1,
+    SurfaceFleet = 2,
+    TransportFleet = 3
+};
+Q_ENUM_NS(FleetType);
+
+Q_GLOBAL_STATIC(QStringList,
+                fleetTypes,
+                QStringList(
+                    {
+//% "Normal"
+QT_TRID_NOOP("NormalFleet"),
+//% "Carrier"
+QT_TRID_NOOP("CarrierFleet"),
+//% "Surface"
+QT_TRID_NOOP("SurfaceFleet"),
+//% "Transport"
+QT_TRID_NOOP("TransportFleet"),
+                    }));
+
+
 void initLog(bool server = false);
 #if defined (Q_OS_WIN)
 void winConsoleCheck();

@@ -316,7 +316,7 @@ QVariant EquipModel::data(const QModelIndex &index, int role) const {
     break;
     case Qt::DecorationRole: {
         if(index.column() == equipCol) {
-            return Icute::equipIcon(equipToDisplay->type, false);
+            return Icute::equipTypeIcon(equipToDisplay->type, false);
         }
         else
             return QVariant();

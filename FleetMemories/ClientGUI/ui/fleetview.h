@@ -2,11 +2,24 @@
 #define FLEETVIEW_H
 
 #include <QFrame>
+#include <QGridLayout>
 #include "equipview.h"
+#include "../../Protocol/kp.h"
 
 namespace Ui {
 class FleetView;
 }
+
+struct FleetPos {
+    int fleetindex = -1;
+    int posindex = -1;
+    bool operator==(const FleetPos &other) const = default;
+    int operator<=>(const FleetPos &other) const {
+        /* no fleet may contain more than 16 ships */
+        return (fleetindex - other.fleetindex) * 0x10
+               + (posindex - other.posindex);
+    }
+};
 
 class FleetView : public QFrame
 {
@@ -17,8 +30,20 @@ public:
     ~FleetView();
     EquipView equipView;
 
+public slots:
+    void modifyFleetShip(int posindex, QUuid uid);
+
+private slots:
+    void modifyFleetIndex(bool checked);
+    void modifyFleetType(int fleetTypeIndex);
+    void receivedShipInfo(const QJsonObject &info);
+
 private:
     Ui::FleetView *ui;
+    QMap<FleetPos, QUuid> ships;
+    int currentActiveFleet = 0;
+    QMap<int, KP::FleetType> fleetTypes;
+    QGridLayout *grid;
 };
 
 #endif // FLEETVIEW_H

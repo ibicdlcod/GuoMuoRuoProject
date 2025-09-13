@@ -4,13 +4,13 @@
 #include <QApplication>
 #include <QStyleHints>
 
-QIcon Icute::equipIcon(EquipType type, bool isRound = false) {
+QIcon Icute::equipTypeIcon(EquipType type, bool isRound = false) {
     int iconName = type.iconGroup();
     return QIcon("equipTypeIcons/"
                  + QString::number(iconName) + ".png");
 }
 
-QIcon Icute::shipIcon(int shipId, bool isRound = false) {
+QIcon Icute::shipTypeIcon(int shipId, bool isRound = false) {
     Q_UNUSED(isRound)
     QString typeName;
     switch(shipId & 0x000F0000) {
@@ -46,4 +46,29 @@ QIcon Icute::shipIcon(int shipId, bool isRound = false) {
         break;
     }
     return QIcon(QPixmap::fromImage(image));
+}
+
+QPixmap Icute::shipIcon(int oldInternalId) {
+    QImage image;
+    if(oldInternalId == 0) {
+        image = QImage(":/resources/shipIcons/0.png");
+    }
+    else {
+        image = QImage(QString("shipIcons/%1.png").arg(oldInternalId));
+    }
+
+    if (image.format() != QImage::Format_ARGB32) {
+        image = image.convertToFormat(QImage::Format_ARGB32);
+    }
+
+    for (int y = 0; y < image.height(); ++y) {
+        for (int x = 0; x < image.width(); ++x) {
+            QColor color = image.pixelColor(x, y);
+            int alpha = std::hypot(x - image.width() / 2.0, y - image.width() / 2.0)
+                                > image.width() / 2.0 ? 0 : color.alpha();
+            color.setRgb(color.red(), color.green(), color.blue(), alpha);
+            image.setPixelColor(x, y, color);
+        }
+    }
+    return QPixmap::fromImage(image);
 }

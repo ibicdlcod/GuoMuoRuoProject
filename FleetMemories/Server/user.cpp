@@ -225,7 +225,7 @@ std::tuple<bool, int, int64> User::haveMotherSP(
     }
 }
 
-void User::init(const CSteamID &uid) {
+Q_DECL_DEPRECATED void User::init(const CSteamID &uid) {
     QSqlDatabase db = QSqlDatabase::database();
     /* 4.1-Factoryslot.md */
     for(int i = 0; i < KP::initFactory; ++i) {

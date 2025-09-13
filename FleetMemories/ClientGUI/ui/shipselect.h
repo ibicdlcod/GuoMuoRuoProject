@@ -21,8 +21,8 @@ signals:
                        = QLatin1String(""));
 
 public slots:
-    void typeBoxHinted(const QStringList &types);
-    void classBoxHinted(const QStringList &types);
+    void typeBoxHinted(QStringList &types);
+    void classBoxHinted(QStringList &types);
 
 public:
     QLabel *searchLabel;
