@@ -119,7 +119,7 @@ void EquipSelect::reCalculateAvailableEquips(int index) {
                        .compare(typeBox->currentText(),
                                 Qt::CaseInsensitive) == 0) {
             QString equipName = equipReg->toString(
-                settings->value("language", "ja_JP").toString());
+                settings->value("client/language", "ja_JP").toString());
             if(equipName.isEmpty()) {
                 equipName = equipReg->toString("ja_JP");
             }

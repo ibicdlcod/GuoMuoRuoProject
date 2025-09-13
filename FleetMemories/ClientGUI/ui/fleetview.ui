@@ -203,7 +203,7 @@
      <widget class="QComboBox" name="fleetTypeSelect"/>
     </item>
     <item>
-     <widget class="QPushButton" name="pushButton_2">
+     <widget class="QPushButton" name="saveButton">
       <property name="text">
        <string id="fleet-save">Save</string>
       </property>

@@ -244,7 +244,7 @@ void TechView::updateGlobalTechViewTable(const QJsonObject &djson) {
         if(thisEquip && !thisEquip->isInvalid()) {
             QTableWidgetItem *newItem2;
             newItem2 = new QTableWidgetItem(
-                thisEquip->toString(settings->value("language", "ja_JP").toString()));
+                thisEquip->toString(settings->value("client/language", "ja_JP").toString()));
             newItem2->setIcon(Icute::equipTypeIcon(thisEquip->type, false));
             newItem2->setFlags(newItem->flags() & ~Qt::ItemIsEditable);
             ui->globalViewTable->setItem(currentRowCount + i, 1, newItem2);
@@ -264,7 +264,7 @@ void TechView::updateGlobalTechViewTable(const QJsonObject &djson) {
         if(thisShip) {
             QTableWidgetItem *newItem2;
             newItem2 = new QTableWidgetItem(
-                thisShip->toString(settings->value("language", "ja_JP").toString()));
+                thisShip->toString(settings->value("client/language", "ja_JP").toString()));
             newItem2->setIcon(Icute::shipTypeIcon(thisShip->getId(), false));
             newItem2->setFlags(newItem->flags() & ~Qt::ItemIsEditable);
             ui->globalViewTable->setItem(currentRowCount + i, 1, newItem2);
@@ -351,7 +351,7 @@ void TechView::updateLocalTechViewTable(const QJsonObject &djson) {
             }
             else {
                 newItem2 = new QTableWidgetItem(
-                    thisEquip->toString(settings->value("language", "ja_JP").toString()));
+                    thisEquip->toString(settings->value("client/language", "ja_JP").toString()));
                 newItem2->setIcon(Icute::equipTypeIcon(thisEquip->type, false));
             }
         }
@@ -363,7 +363,7 @@ void TechView::updateLocalTechViewTable(const QJsonObject &djson) {
             }
             else {
                 newItem2 = new QTableWidgetItem(
-                    thisShip->toString(settings->value("language", "ja_JP").toString()));
+                    thisShip->toString(settings->value("client/language", "ja_JP").toString()));
                 newItem2->setIcon(Icute::shipTypeIcon(thisShip->getId(), false));
             }
         }
@@ -432,7 +432,7 @@ void TechView::resetLocalListName() {
                            .compare(ui->localListType1->currentText(),
                                     Qt::CaseInsensitive) == 0) {
                 QString equipName = equipReg->toString(
-                    settings->value("language", "ja_JP").toString());
+                    settings->value("client/language", "ja_JP").toString());
                 if(equipName.isEmpty()) {
                     equipName = equipReg->toString("ja_JP");
                 }
@@ -483,7 +483,7 @@ void TechView::resetLocalListName() {
             }
             classText =
                 shipReg->shipClassText[
-                    settings->value("language", "ja_JP").toString()
+                    settings->value("client/language", "ja_JP").toString()
             ];
             if(classText.isEmpty()) {
                 classText = shipReg->shipClassText["ja_JP"];
@@ -503,7 +503,7 @@ void TechView::resetLocalListName() {
 
             if(pass) {
                 QString shipName = shipReg->toString(
-                    settings->value("language", "ja_JP").toString());
+                    settings->value("client/language", "ja_JP").toString());
                 if(shipName.isEmpty()) {
                     shipName = shipReg->toString("ja_JP");
                 }

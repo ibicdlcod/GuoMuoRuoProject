@@ -188,6 +188,14 @@ QByteArray KP::clientFetch(int factoryID) {
     return QCborValue::fromJsonValue(result).toCbor();
 }
 
+QByteArray KP::clientFleetData(const QJsonArray &input) {
+    QJsonObject result;
+    result["type"] = DgramType::Request;
+    result["command"] = CommandType::FleetData;
+    result["content"] = input;
+    return QCborValue::fromJsonValue(result).toCbor();
+}
+
 QByteArray KP::clientHello() {
     QJsonObject result;
     result["type"] = DgramType::Auth;

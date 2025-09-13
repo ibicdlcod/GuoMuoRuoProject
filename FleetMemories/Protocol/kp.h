@@ -37,8 +37,12 @@ namespace KP {
 Q_NAMESPACE
 
 #pragma message(NOT_M_CONST)
-static constexpr int initDock = 4;
+static constexpr int initDock = 2;
 static constexpr int initFactory = 4;
+static constexpr int fleetsSize = 4;
+static constexpr int normalFleetSize = 7;
+static constexpr int combinedFleetSize = 14;
+static constexpr int fleetRepSize = 0x10;
 #pragma message(NOT_M_CONST)
 static constexpr qint64 secsinMin = 60;
 static constexpr int equipIdMax = 0x10000;
@@ -134,7 +138,8 @@ enum CommandType{
     DestructEquip,
     Switch,
     MessageTest,
-    Migrate
+    Migrate,
+    FleetData
 };
 Q_ENUM_NS(CommandType)
 
@@ -268,6 +273,7 @@ QByteArray clientDemandTech(int local = 0);
 QByteArray clientDevelop(int, bool convert = false, int factoryID = -1);
 QByteArray clientFactoryRefresh();
 QByteArray clientFetch(int factoryID = -1);
+QByteArray clientFleetData(const QJsonArray &);
 QByteArray clientHello();
 QByteArray clientMigrate(const QJsonObject &);
 QByteArray clientStateChange(GameState);

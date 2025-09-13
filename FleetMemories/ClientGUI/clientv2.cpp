@@ -125,19 +125,6 @@ bool Clientv2::loggedIn() const {
     return gameState != KP::Offline;
 }
 
-/* Part of steam verification */
-void Clientv2::sendEncryptedAppTicket(uint8 rgubTicket [], uint32 cubTicket) {
-    try {
-        authCache = KP::clientSteamAuth(rgubTicket, cubTicket);
-        connect(&socket, &QSslSocket::encrypted,
-                this, &Clientv2::sendEATActual);
-    }  catch (NetworkError &e) {
-        qCritical("Network error when sending Encrypted Ticket");
-        qCritical() << e.what();
-    }
-    return;
-}
-
 /* public slots */
 /* Make actual connections */
 void Clientv2::autoPassword() {
@@ -309,6 +296,25 @@ bool Clientv2::parseSpec(const QStringList &cmdParts) {
         qWarning() << (clientName + ":") << e.what();
         return true;
     }
+}
+
+/* Part of steam verification */
+void Clientv2::sendEncryptedAppTicket(uint8 rgubTicket [], uint32 cubTicket) {
+    try {
+        authCache = KP::clientSteamAuth(rgubTicket, cubTicket);
+        connect(&socket, &QSslSocket::encrypted,
+                this, &Clientv2::sendEATActual);
+    }  catch (NetworkError &e) {
+        qCritical("Network error when sending Encrypted Ticket");
+        qCritical() << e.what();
+    }
+    return;
+}
+
+void Clientv2::sendFleetData(const QJsonArray &content) {
+    QByteArray msg = KP::clientFleetData(content);
+    sender->enqueue(msg);
+    socket.flush();
 }
 
 /* Parse server JSON response */
@@ -1235,7 +1241,7 @@ void Clientv2::receivedMsg(const QJsonObject &djson) {
             qInfo() <<
                 qtTrId("develop-success")
                     .arg(equipRegistryCache.value(equipDefInt)->toString(
-                             settings->value("language", "ja_JP").toString()),
+                             settings->value("client/language", "ja_JP").toString()),
                          djson["serial"].toString());
             equipModel.addEquipment(serial, equipDefInt);
         }

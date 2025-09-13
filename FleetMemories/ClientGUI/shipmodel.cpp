@@ -77,7 +77,7 @@ void ShipModel::switchShipDisplayType(const QString &nationality,
             }
             QString classText =
                 iter->second->shipClassText[
-                    settings->value("language", "ja_JP").toString()
+                    settings->value("client/language", "ja_JP").toString()
             ];
             if(classText.isEmpty()) {
                 classText = iter->second->shipClassText["ja_JP"];

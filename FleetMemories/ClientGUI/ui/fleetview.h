@@ -11,12 +11,13 @@ class FleetView;
 }
 
 struct FleetPos {
+    static constexpr int fleetRep = KP::fleetRepSize;
     int fleetindex = -1;
     int posindex = -1;
     bool operator==(const FleetPos &other) const = default;
     int operator<=>(const FleetPos &other) const {
         /* no fleet may contain more than 16 ships */
-        return (fleetindex - other.fleetindex) * 0x10
+        return (fleetindex - other.fleetindex) * fleetRep
                + (posindex - other.posindex);
     }
 };
@@ -37,6 +38,7 @@ private slots:
     void modifyFleetIndex(bool checked);
     void modifyFleetType(int fleetTypeIndex);
     void receivedShipInfo(const QJsonObject &info);
+    void sendFleetData(bool checked);
 
 private:
     Ui::FleetView *ui;

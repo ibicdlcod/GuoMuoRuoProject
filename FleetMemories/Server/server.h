@@ -161,6 +161,7 @@ private:
     void sqlinitUsers() const;
     void sqlinitUserA() const;
     void switchCert(const QStringList &);
+    void updateFleet(CSteamID &, const QJsonArray &);
     void userInit(CSteamID &);
 
     bool listening = false;

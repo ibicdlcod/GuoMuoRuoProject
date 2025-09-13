@@ -78,6 +78,7 @@ public slots:
     void parseQuit();
     bool parseSpec(const QStringList &);
     void sendEncryptedAppTicket(uint8 [], uint32);
+    void sendFleetData(const QJsonArray &);
     void serverResponse(const QString &, const QByteArray &);
     void serverResponseStd(const QJsonObject &);
     void serverResponseNonStd(const QByteArray &);

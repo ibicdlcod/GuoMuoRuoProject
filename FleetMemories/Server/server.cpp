@@ -969,8 +969,8 @@ void Server::offerShipInfo(QSslSocket *connection, int index = 0) {
 
 void Server::offerShipInfoUser(const CSteamID &uid,
                                QSslSocket *connection) {
-    QList<KP::FleetType> fleetTypes(4);
-    for(int i = 0; i < 4; ++i) {
+    QList<KP::FleetType> fleetTypes(KP::fleetsSize);
+    for(int i = 0; i < KP::fleetsSize; ++i) {
         QSqlQuery query;
         if(!query.prepare("SELECT Attribute, Intvalue "
                            "FROM UserAttr "
@@ -3024,6 +3024,10 @@ void Server::receivedReq(const QJsonObject &djson,
         offerShipInfoUser(uid, connection);
     }
     break;
+    case KP::CommandType::FleetData: {
+        updateFleet(uid, djson["content"].toArray());
+    }
+    break;
     default:
         throw std::domain_error(QString("User %1: command type not supported")
                                     .arg(uid.ConvertToUint64()).toStdString());
@@ -3459,12 +3463,70 @@ void Server::switchCert(const QStringList &input) {
                    .arg(settings->value("networkserver/pem", "Default").toString());
 }
 
+void Server::updateFleet(CSteamID &uid, const QJsonArray &input)
+{
+    QSqlQuery query;
+    query.prepare("UPDATE UserShip SET FleetIndex = -1, "
+                  "FleetPosIndex = -1 "
+                  "WHERE User = :uid");
+    query.bindValue(":uid", uid.ConvertToUint64());
+    if(Q_UNLIKELY(!query.exec())) {
+        qCritical() << query.lastQuery();
+        //% "Update fleet (clear fleet) failure!"
+        throw DBError(qtTrId("update-fleet-clear-failure"),
+                      query.lastError());
+        return;
+    }
+    QList<KP::FleetType> fleetTypes(KP::fleetsSize, KP::NormalFleet);
+    for(const auto &shipData: input) {
+        auto shipDataObj = shipData.toObject();
+        QSqlQuery query;
+        query.prepare("UPDATE UserShip SET FleetIndex = :fid, "
+                      "FleetPosIndex = :fpid "
+                      "WHERE ShipUuid = :uuid");
+        query.bindValue(":fid", shipDataObj["pos"].toInt()
+                                    / KP::fleetRepSize);
+        query.bindValue(":fpid", shipDataObj["pos"].toInt()
+                                     % KP::fleetRepSize);
+        query.bindValue(":uuid", shipDataObj["uuid"].toString());
+        if(Q_UNLIKELY(!query.exec())) {
+            qCritical() << query.lastQuery();
+            //% "Update fleet failure!"
+            throw DBError(qtTrId("update-fleet-failure"),
+                          query.lastError());
+            return;
+        }
+        fleetTypes[shipDataObj["pos"].toInt() / KP::fleetRepSize]
+            = static_cast<KP::FleetType>
+            (shipDataObj["fleettype"].toInt());
+    }
+    for(auto iter = fleetTypes.begin();
+         iter != fleetTypes.end();
+         ++iter) {
+        QSqlQuery query;
+        query.prepare("UPDATE UserAttr SET Intvalue = :type "
+                      "WHERE Attribute = :attr "
+                      "AND UserID = :uid");
+        query.bindValue(":uid", uid.ConvertToUint64());
+        query.bindValue(":attr", QString("Fleet%1")
+                                     .arg(iter - fleetTypes.begin() + 1));
+        query.bindValue(":type", *iter);
+        if(Q_UNLIKELY(!query.exec())) {
+            qCritical() << query.lastQuery();
+            //% "Update fleet failure!"
+            throw DBError(qtTrId("update-fleet-failure"),
+                          query.lastError());
+            return;
+        }
+    }
+}
+
 void Server::userInit(CSteamID &uid) {
     static const QMap<QString, int> defaults
         = {
             std::pair(QStringLiteral("FleetSize"), 1),
-            std::pair(QStringLiteral("FactorySize"), 4),
-            std::pair(QStringLiteral("Docksize"), 2),
+            std::pair(QStringLiteral("FactorySize"), KP::initFactory),
+            std::pair(QStringLiteral("Docksize"), KP::initDock),
             std::pair(QStringLiteral("O"), 10000), // oil
             std::pair(QStringLiteral("E"), 10000), // explosives
             std::pair(QStringLiteral("S"), 10000), // steel

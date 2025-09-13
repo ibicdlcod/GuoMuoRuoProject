@@ -14,6 +14,7 @@ public:
     std::tuple<Ship *, ShipDynamic *> getShip(QUuid);
 
     friend void InteractiveLabel::paintEvent(QPaintEvent *);
+    friend void FleetView::modifyFleetShip(int, QUuid);
 
 signals:
     void typeBoxHint(QStringList &types);
