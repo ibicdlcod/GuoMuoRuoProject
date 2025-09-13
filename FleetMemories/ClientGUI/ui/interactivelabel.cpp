@@ -50,18 +50,18 @@ void InteractiveLabel::mouseReleaseEvent(QMouseEvent *event)
 void InteractiveLabel::paintEvent(QPaintEvent * /* event */)
 {
     int oldInternalId = 0;
-    if(shipUID.isNull()) {
+    if(shipUId.isNull()) {
         ; // remains 0
     }
     else {
         Clientv2 &engine = Clientv2::getInstance();
         auto ships = engine.shipModel.clientShips;
-        if(!ships.contains(shipUID)
-            || !ships[shipUID]->attr.contains("OldInternalNo.")) {
+        if(!ships.contains(shipUId)
+            || !ships[shipUId]->attr.contains("OldInternalNo.")) {
             ; // remains 0
         }
         else {
-            oldInternalId = ships[shipUID]->attr["OldInternalNo."];
+            oldInternalId = ships[shipUId]->attr["OldInternalNo."];
         }
     }
 
@@ -81,10 +81,13 @@ void InteractiveLabel::paintEvent(QPaintEvent * /* event */)
 }
 
 void InteractiveLabel::shipSelected(QUuid id) {
-    shipUID = id;
     parentView->modifyFleetShip(index, id);
-    update();
     EquipView *view = &parentView->equipView;
     disconnect(view, &EquipView::shipSelected,
                this, &InteractiveLabel::shipSelected);
+}
+
+void InteractiveLabel::updateShipUId(QUuid id) {
+    shipUId = id;
+    update();
 }

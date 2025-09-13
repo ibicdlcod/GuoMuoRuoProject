@@ -2158,7 +2158,7 @@ Great at battle and bad at politics--so cool!</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="fleet-pos-head">
-        <location filename="../ClientGUI/ui/fleetview.cpp" line="32"/>
+        <location filename="../ClientGUI/ui/fleetview.cpp" line="33"/>
         <source>Pos</source>
         <translation type="unfinished"></translation>
     </message>

@@ -23,7 +23,7 @@ FleetView::FleetView(QWidget *parent)
 
     grid = new QGridLayout(fleetGrid);
     grid->setContentsMargins(3, 3, 3, 3);
-    grid->setVerticalSpacing(3);
+    grid->setSpacing(3);
     grid->setHorizontalSpacing(10);
     QLabel *fleetPosHeader = new QLabel(this);
     fleetPosHeader->setObjectName(QStringLiteral("fleetPos-Head"));
@@ -37,6 +37,9 @@ FleetView::FleetView(QWidget *parent)
         fleetPos->setAlignment(Qt::AlignCenter);
         grid->addWidget(fleetPos, i+1, 0);
         fleetPos->setText(QString("%1").arg(i+1));
+        auto font = fleetPos->font();
+        font.setPointSize(30);
+        fleetPos->setFont(font);
     }
     QLabel *shipNameHeader = new QLabel(this);
     shipNameHeader->setObjectName(QStringLiteral("shipName-Head"));
@@ -49,7 +52,8 @@ FleetView::FleetView(QWidget *parent)
         shipName->setObjectName(QString("shipName-%1").arg(i+1));
         shipName->setAlignment(Qt::AlignCenter);
         auto font = shipName->font();
-        font.setPixelSize(60);
+        shipName->setMaximumSize(QSize(200, 55));
+        font.setPointSize(40);
         shipName->setFont(font);
         grid->addWidget(shipName, i+1, 1);
         //% ""
@@ -145,17 +149,13 @@ void FleetView::modifyFleetIndex(bool checked) {
         qobject_cast<QPushButton *>(QObject::sender())->setEnabled(false);
         if(newType == KP::NormalFleet) {
             for(int i = KP::normalFleetSize; i < KP::combinedFleetSize; ++i) {
-                qobject_cast<InteractiveLabel *>(
-                    grid->itemAtPosition(i + 1, 2)->widget())
-                    ->shipSelected(QUuid());
+                modifyFleetShip(i, QUuid());
                 for(int j = 0; j < grid->columnCount(); ++j) {
                     grid->itemAtPosition(i + 1, j)->widget()->hide();
                 }
             }
             for(int i = 0; i < KP::normalFleetSize; ++i) {
-                qobject_cast<InteractiveLabel *>(
-                    grid->itemAtPosition(i + 1, 2)->widget())
-                    ->shipSelected(ships[FleetPos{currentActiveFleet, i}]);
+                modifyFleetShip(i, ships[FleetPos{currentActiveFleet, i}]);
             }
         }
         else {
@@ -165,9 +165,7 @@ void FleetView::modifyFleetIndex(bool checked) {
                 }
             }
             for(int i = 0; i < KP::combinedFleetSize; ++i) {
-                qobject_cast<InteractiveLabel *>(
-                    grid->itemAtPosition(i + 1, 2)->widget())
-                    ->shipSelected(ships[FleetPos{currentActiveFleet, i}]);
+                modifyFleetShip(i, ships[FleetPos{currentActiveFleet, i}]);
             }
         }
     }
@@ -185,10 +183,7 @@ void FleetView::modifyFleetShip(int posIndex, QUuid uid) {
             oldPos = iter->first;
         }
     }
-    if(oldPos == newPos) {
-        return;
-    }
-    if(oldPos != FleetPos({-1, -1})) {
+    if(oldPos != FleetPos({-1, -1}) && oldPos != newPos) {
         /* do switch */
         auto oldUid = ships.contains(newPos)
                           ? ships[newPos] : QUuid();
@@ -197,6 +192,8 @@ void FleetView::modifyFleetShip(int posIndex, QUuid uid) {
             qobject_cast<InteractiveLabel *>
                 (grid->itemAtPosition(oldPos.posindex + 1, 2)->widget())
                     ->shipSelected(oldUid);
+            auto oldText = qobject_cast<QLabel *>
+                (grid->itemAtPosition(oldPos.posindex + 1, 1)->widget());
             if(!oldUid.isNull()) {
                 QString oldName
                     = shipInModel[oldUid]->toString(
@@ -204,18 +201,19 @@ void FleetView::modifyFleetShip(int posIndex, QUuid uid) {
                 if(oldName.isEmpty()) {
                     oldName = shipInModel[oldUid]->toString("ja_JP");
                 }
-                qobject_cast<QLabel *>
-                    (grid->itemAtPosition(oldPos.posindex + 1, 1)->widget())
-                        ->setText(oldName);
+                oldText->setText(oldName);
             }
             else {
-                qobject_cast<QLabel *>
-                    (grid->itemAtPosition(oldPos.posindex + 1, 1)->widget())
-                        ->setText("");
+                oldText->setText("");
             }
         }
     }
     ships[newPos] = uid;
+    qobject_cast<InteractiveLabel *>
+        (grid->itemAtPosition(newPos.posindex + 1, 2)->widget())
+        ->updateShipUId(uid);
+    auto newText = qobject_cast<QLabel *>
+        (grid->itemAtPosition(newPos.posindex + 1, 1)->widget());
     if(!uid.isNull()) {
         QString newName = shipInModel[uid]
                               ->toString(settings
@@ -224,14 +222,26 @@ void FleetView::modifyFleetShip(int posIndex, QUuid uid) {
         if(newName.isEmpty()) {
             newName = shipInModel[uid]->toString("ja_JP");
         }
-        qobject_cast<QLabel *>
-            (grid->itemAtPosition(newPos.posindex + 1, 1)->widget())
-                ->setText(newName);
+        newText->setText(newName);
+        QFont font = newText->font();
+        int fontSize = 1;
+        while(true)
+        {
+            font.setPointSize(fontSize);
+            QRect r = QFontMetrics(font).boundingRect(newText->text());
+            if (r.height() < newText->maximumHeight()
+                && r.width() < newText->maximumWidth())
+                fontSize++;
+            else {
+                fontSize--;
+                font.setPointSize(fontSize);
+                break;
+            }
+        }
+        newText->setFont(font);
     }
     else {
-        qobject_cast<QLabel *>
-            (grid->itemAtPosition(newPos.posindex + 1, 1)->widget())
-                ->setText("");
+        newText->setText("");
     }
 }
 
@@ -242,9 +252,7 @@ void FleetView::modifyFleetType(int index) {
     if(newType == KP::NormalFleet) {
         for(int i = KP::normalFleetSize; i < KP::combinedFleetSize; ++i) {
             ships.remove(FleetPos{currentActiveFleet, i});
-            qobject_cast<InteractiveLabel *>(
-                grid->itemAtPosition(i + 1, 2)->widget())
-                ->shipSelected(QUuid());
+            modifyFleetShip(i, QUuid());
             for(int j = 0; j < grid->columnCount(); ++j) {
                 grid->itemAtPosition(i + 1, j)->widget()->hide();
             }
@@ -280,17 +288,13 @@ void FleetView::receivedShipInfo(const QJsonObject &info) {
     ui->fleetTypeSelect->setCurrentIndex(fleetTypes[currentActiveFleet]);
     if(fleetTypes[currentActiveFleet] == KP::NormalFleet) {
         for(int i = KP::normalFleetSize; i < KP::combinedFleetSize; ++i) {
-            qobject_cast<InteractiveLabel *>(
-                grid->itemAtPosition(i + 1, 2)->widget())
-                ->shipSelected(QUuid());
+            modifyFleetShip(i, QUuid());
             for(int j = 0; j < grid->columnCount(); ++j) {
                 grid->itemAtPosition(i + 1, j)->widget()->hide();
             }
         }
         for(int i = 0; i < KP::normalFleetSize; ++i) {
-            qobject_cast<InteractiveLabel *>(
-                grid->itemAtPosition(i + 1, 2)->widget())
-                ->shipSelected(ships[FleetPos{currentActiveFleet, i}]);
+            modifyFleetShip(i, ships[FleetPos{currentActiveFleet, i}]);
         }
     }
     else {
@@ -300,9 +304,7 @@ void FleetView::receivedShipInfo(const QJsonObject &info) {
             }
         }
         for(int i = 0; i < KP::combinedFleetSize; ++i) {
-            qobject_cast<InteractiveLabel *>(
-                grid->itemAtPosition(i + 1, 2)->widget())
-                ->shipSelected(ships[FleetPos{currentActiveFleet, i}]);
+            modifyFleetShip(i, ships[FleetPos{currentActiveFleet, i}]);
         }
     }
 }

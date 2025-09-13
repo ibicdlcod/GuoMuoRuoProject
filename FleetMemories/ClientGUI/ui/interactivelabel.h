@@ -16,6 +16,7 @@ public:
 
 public slots:
     void shipSelected(QUuid);
+    void updateShipUId(QUuid);
 
 signals:
     void clicked();
@@ -27,7 +28,7 @@ protected:
     bool mousePressedInside = false;
 
     FleetView * parentView;
-    QUuid shipUID;
+    QUuid shipUId;
     int index;
 };
 
