@@ -17,6 +17,8 @@ ShipModel::ShipModel(QObject *parent, bool isInArsenal)
 }
 
 std::tuple<Ship *, ShipDynamic *> ShipModel::getShip(QUuid id) {
+    if(!clientShips.contains(id))
+        return {nullptr, nullptr};
     return {clientShips[id], clientShipDynamicAttrs[id]};
 }
 

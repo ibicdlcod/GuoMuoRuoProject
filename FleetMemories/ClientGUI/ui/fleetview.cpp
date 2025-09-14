@@ -188,6 +188,12 @@ void FleetView::modifyFleetShip(int posIndex, QUuid uid) {
         auto oldUid = ships.contains(newPos)
                           ? ships[newPos] : QUuid();
         ships[oldPos] = oldUid;
+        if(!oldUid.isNull()) {
+            engine.shipModel.clientShipDynamicAttrs[oldUid]->fleetIndex
+                = oldPos.fleetindex;
+            engine.shipModel.clientShipDynamicAttrs[oldUid]->fleetPosIndex
+                = oldPos.posindex;
+        }
         if(oldPos.fleetindex == currentActiveFleet) {
             qobject_cast<InteractiveLabel *>
                 (grid->itemAtPosition(oldPos.posindex + 1, 2)->widget())
@@ -208,13 +214,23 @@ void FleetView::modifyFleetShip(int posIndex, QUuid uid) {
             }
         }
     }
+    if(uid.isNull() && !ships[newPos].isNull()) {
+        engine.shipModel.clientShipDynamicAttrs[ships[newPos]]->fleetIndex
+            = -1;
+        engine.shipModel.clientShipDynamicAttrs[ships[newPos]]->fleetPosIndex
+            = -1;
+    }
     ships[newPos] = uid;
     qobject_cast<InteractiveLabel *>
         (grid->itemAtPosition(newPos.posindex + 1, 2)->widget())
-        ->updateShipUId(uid);
+            ->updateShipUId(uid);
     auto newText = qobject_cast<QLabel *>
         (grid->itemAtPosition(newPos.posindex + 1, 1)->widget());
     if(!uid.isNull()) {
+        engine.shipModel.clientShipDynamicAttrs[uid]->fleetIndex
+            = newPos.fleetindex;
+        engine.shipModel.clientShipDynamicAttrs[uid]->fleetPosIndex
+            = newPos.posindex;
         QString newName = shipInModel[uid]
                               ->toString(settings
                                              ->value("client/language", "ja_JP")
