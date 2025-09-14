@@ -2158,43 +2158,43 @@ Great at battle and bad at politics--so cool!</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="fleet-pos-head">
-        <location filename="../ClientGUI/ui/fleetview.cpp" line="33"/>
+        <location filename="../ClientGUI/ui/fleetview.cpp" line="34"/>
         <source>Pos</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="fleetview-equip-slot-ex">
-        <location filename="../ClientGUI/ui/fleetview.cpp" line="92"/>
+        <location filename="../ClientGUI/ui/fleetview.cpp" line="93"/>
         <source>Equip Ex</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="fleetview-equip-slot">
-        <location filename="../ClientGUI/ui/fleetview.cpp" line="96"/>
+        <location filename="../ClientGUI/ui/fleetview.cpp" line="97"/>
         <source>Equip %1</source>
         <oldsource>Equip Ex</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message id="fleetview-view-ship-attr">
-        <location filename="../ClientGUI/ui/fleetview.cpp" line="119"/>
+        <location filename="../ClientGUI/ui/fleetview.cpp" line="118"/>
         <source>Attributes</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="NormalFleet">
-        <location filename="../Protocol/kp.h" line="239"/>
+        <location filename="../Protocol/kp.h" line="240"/>
         <source>Normal</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="CarrierFleet">
-        <location filename="../Protocol/kp.h" line="241"/>
+        <location filename="../Protocol/kp.h" line="242"/>
         <source>Carrier</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="SurfaceFleet">
-        <location filename="../Protocol/kp.h" line="243"/>
+        <location filename="../Protocol/kp.h" line="244"/>
         <source>Surface</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="TransportFleet">
-        <location filename="../Protocol/kp.h" line="245"/>
+        <location filename="../Protocol/kp.h" line="246"/>
         <source>Transport</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2580,6 +2580,29 @@ Great at battle and bad at politics--so cool!</source>
     <message>
         <location filename="../ClientGUI/ui/portarea.ui" line="49"/>
         <source>Hello!</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>ShipEquip</name>
+    <message>
+        <location filename="../ClientGUI/ui/shipequip.ui" line="14"/>
+        <source>Form</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ClientGUI/ui/shipequip.ui" line="47"/>
+        <source>Text</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ClientGUI/ui/shipequip.ui" line="57"/>
+        <source>※+1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ClientGUI/ui/shipequip.ui" line="75"/>
+        <source>天山一二型甲改二(村田隊／電探装備)</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

@@ -4,6 +4,7 @@
 #include <QMetaEnum>
 #include <QStyleHints>
 #include "interactivelabel.h"
+#include "shipequip.h"
 #include "../clientv2.h"
 #include "../../Protocol/kp.h"
 
@@ -86,7 +87,7 @@ FleetView::FleetView(QWidget *parent)
         QLabel *equipSlotHeader = new QLabel(this);
         equipSlotHeader->setObjectName(QStringLiteral("equipslot-head-%1").arg(j+1));
         equipSlotHeader->setAlignment(Qt::AlignCenter);
-        grid->addWidget(equipSlotHeader, 0, shipIconColumn + 1 + j);
+        grid->addWidget(equipSlotHeader, 0, equipSlotsColumn + j);
         if(j == KP::maxEquipSlots) {
             //% "Equip Ex"
             equipSlotHeader->setText(qtTrId("fleetview-equip-slot-ex"));
@@ -96,25 +97,23 @@ FleetView::FleetView(QWidget *parent)
             equipSlotHeader->setText(qtTrId("fleetview-equip-slot").arg(j+1));
         }
         for(int i = 0; i < KP::combinedFleetSize; ++i) {
-            QLabel *equipWidget = new QLabel(this);
+            ShipEquip *equipWidget = new ShipEquip(i, j, this);
             equipWidget->setObjectName(QString("equipslot-%1-%2").arg(i+1).arg(j+1));
-            equipWidget->setAlignment(Qt::AlignCenter);
+            //equipWidget->setAlignment(Qt::AlignCenter);
             equipWidget->setMinimumSize(QSize(120, 60));
             equipWidget->setMaximumSize(QSize(120, 60));
             equipWidget->setSizePolicy(QSizePolicy::Fixed,
                                        QSizePolicy::Fixed);
-            equipWidget->setStyleSheet("background-color: red;");
-            equipWidget->setText("天山一二型甲改二(村田隊／電探装備)");
-            equipWidget->setWordWrap(true);
-            grid->addWidget(equipWidget, i+1, shipIconColumn + 1 + j);
+            grid->addWidget(equipWidget, i+1, equipSlotsColumn + j);
+            equipWidget->hide();
         }
     }
     for(int i = 0; i < KP::combinedFleetSize; ++i) {
         QPushButton *attrButton = new QPushButton(this);
         attrButton->setObjectName(QString("attr-button-%1").arg(i+1));
         attrButton->setSizePolicy(QSizePolicy::Fixed,
-                                   QSizePolicy::Fixed);
-        grid->addWidget(attrButton, i+1, shipIconColumn + 2 + KP::maxEquipSlots);
+                                  QSizePolicy::Fixed);
+        grid->addWidget(attrButton, i+1, equipSlotsColumn + 1 + KP::maxEquipSlots);
         //% "Attributes"
         attrButton->setText(qtTrId("fleetview-view-ship-attr"));
     }
@@ -173,11 +172,35 @@ FleetView::FleetView(QWidget *parent)
     }
     connect(ui->saveButton, &QPushButton::clicked,
             this, &FleetView::sendFleetData);
+
+    for(int i = 0; i < KP::fleetsSize; ++i) {
+        for(int j = 0; j < KP::combinedFleetSize; ++j) {
+            shipPlaneCount[FleetPos{i, j}] = 0;
+        }
+    }
 }
 
 FleetView::~FleetView()
 {
     delete ui;
+}
+
+QUuid FleetView::getShipUuid(int shipIndex) {
+    if(!ships.contains(FleetPos{currentActiveFleet, shipIndex}))
+        return QUuid();
+    return ships[FleetPos{currentActiveFleet, shipIndex}];
+}
+
+Ship * FleetView::getShip(int shipIndex) {
+    Clientv2 &engine = Clientv2::getInstance();
+    auto [ship, shipattr] = engine.shipModel.getShip(getShipUuid(shipIndex));
+    return ship;
+}
+
+ShipDynamic * FleetView::getShipDynamic(int shipIndex) {
+    Clientv2 &engine = Clientv2::getInstance();
+    auto [ship, shipattr] = engine.shipModel.getShip(getShipUuid(shipIndex));
+    return shipattr;
 }
 
 void FleetView::modifyFleetIndex(bool checked) {
@@ -243,9 +266,16 @@ void FleetView::modifyFleetShip(int posIndex, QUuid uid) {
                           ? ships[newPos] : QUuid();
         ships[oldPos] = oldUid;
         auto [ship, shipD] = shipModel->getShip(oldUid);
+        int slotNum = 0;
+        bool slotExEnabled = false;
         if(!oldUid.isNull()) {
             shipD->fleetIndex = oldPos.fleetindex;
             shipD->fleetPosIndex = oldPos.posindex;
+            slotNum = ship->attr["Equipslots"];
+            if(Ship::getLevel(std::min(shipD->exp, shipD->expCap))
+                >= KP::levelUnlockExSlot) {
+                slotExEnabled = true;
+            }
         }
         if(oldPos.fleetindex == currentActiveFleet) {
             qobject_cast<InteractiveLabel *>
@@ -270,14 +300,41 @@ void FleetView::modifyFleetShip(int posIndex, QUuid uid) {
                 oldText->setText("");
                 oldLvText->setText("");
             }
+            for(int j = 0; j < slotNum; ++j) {
+                grid->itemAtPosition(oldPos.posindex + 1,
+                                     equipSlotsColumn + j)->widget()->show();
+            }
+            for(int j = slotNum; j < KP::maxEquipSlots; ++j) {
+                /* TODO: unselect equip */
+                grid->itemAtPosition(oldPos.posindex + 1,
+                                     equipSlotsColumn + j)->widget()->hide();
+            }
+            if(slotExEnabled) {
+                grid->itemAtPosition(oldPos.posindex + 1,
+                                     equipSlotsColumn + KP::maxEquipSlots)
+                    ->widget()->show();
+            }
+            else {
+                /* TODO: unselect equip */
+                grid->itemAtPosition(oldPos.posindex + 1,
+                                     equipSlotsColumn + KP::maxEquipSlots)
+                    ->widget()->hide();
+            }
+            emit newPlaneCountInfo(oldPos.posindex, ship ? ship->attr["Planes"] : 0);
         }
     }
+    else if(!ships[newPos].isNull()) {
+        std::get<1>(shipModel->getShip(ships[newPos]))->fleetIndex
+            = -1;
+        std::get<1>(shipModel->getShip(ships[newPos]))->fleetPosIndex
+            = -1;
+    }/*
     if(uid.isNull() && !ships[newPos].isNull()) {
         std::get<1>(shipModel->getShip(ships[newPos]))->fleetIndex
             = -1;
         std::get<1>(shipModel->getShip(ships[newPos]))->fleetPosIndex
             = -1;
-    }
+    }*/
     ships[newPos] = uid;
     qobject_cast<InteractiveLabel *>
         (grid->itemAtPosition(newPos.posindex + 1, shipIconColumn)->widget())
@@ -287,6 +344,8 @@ void FleetView::modifyFleetShip(int posIndex, QUuid uid) {
     auto newLvText = qobject_cast<QLabel *>
         (grid->itemAtPosition(newPos.posindex + 1, lvColumn)->widget());
     auto [ship, shipD] = shipModel->getShip(uid);
+    int slotNum = 0;
+    bool slotExEnabled = false;
     if(!uid.isNull()) {
         shipD->fleetIndex = newPos.fleetindex;
         shipD->fleetPosIndex = newPos.posindex;
@@ -315,11 +374,37 @@ void FleetView::modifyFleetShip(int posIndex, QUuid uid) {
         newText->setFont(font);
         newLvText->setText(QString("Lv %1").arg(
             Ship::getLevel(std::min(shipD->exp, shipD->expCap))));
+        slotNum = ship->attr["Equipslots"];
+        if(Ship::getLevel(std::min(shipD->exp, shipD->expCap))
+            >= KP::levelUnlockExSlot) {
+            slotExEnabled = true;
+        }
     }
     else {
         newText->setText("");
         newLvText->setText("");
     }
+    for(int j = 0; j < slotNum; ++j) {
+        grid->itemAtPosition(newPos.posindex + 1,
+                             equipSlotsColumn + j)->widget()->show();
+    }
+    for(int j = slotNum; j < KP::maxEquipSlots; ++j) {
+        /* TODO: unselect equip */
+        grid->itemAtPosition(newPos.posindex + 1,
+                             equipSlotsColumn + j)->widget()->hide();
+    }
+    if(slotExEnabled) {
+        grid->itemAtPosition(newPos.posindex + 1,
+                             equipSlotsColumn + KP::maxEquipSlots)
+            ->widget()->show();
+    }
+    else {
+        /* TODO: unselect equip */
+        grid->itemAtPosition(newPos.posindex + 1,
+                             equipSlotsColumn + KP::maxEquipSlots)
+            ->widget()->hide();
+    }
+    emit newPlaneCountInfo(newPos.posindex, ship ? ship->attr["Planes"] : 0);
 }
 
 void FleetView::modifyFleetType(int index) {
@@ -405,4 +490,16 @@ void FleetView::sendFleetData(bool checked) {
     }
     Clientv2 &engine = Clientv2::getInstance();
     engine.sendFleetData(content);
+}
+
+void FleetView::modifyPlaneCount(int shipPosIndex, int equipSlotIndex, int diff) {
+    shipPlaneCount[FleetPos{currentActiveFleet, shipPosIndex}] += diff;
+    int shipPlanes = 0;
+    if(getShip(shipPosIndex) && getShip(shipPosIndex)
+                                     ->attr.contains("Planes")) {
+        shipPlanes = getShip(shipPosIndex)->attr["Planes"];
+    }
+    emit planeCountInfo(shipPosIndex, equipSlotIndex,
+                        shipPlaneCount[FleetPos{currentActiveFleet, shipPosIndex}],
+                        shipPlanes);
 }

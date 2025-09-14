@@ -18,13 +18,11 @@ public slots:
     void shipSelected(QUuid);
     void updateShipUId(QUuid);
 
-signals:
-    void clicked();
-
 protected:
     void mousePressEvent(QMouseEvent* event) override;
     void mouseReleaseEvent(QMouseEvent* event) override;
 
+private:
     bool mousePressedInside = false;
 
     FleetView * parentView;

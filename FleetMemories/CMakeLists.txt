@@ -81,6 +81,9 @@ set(CLIENT_SOURCES
     ClientGUI/ui/portarea.ui
     ClientGUI/ui/selectdelegate.cpp
     ClientGUI/ui/selectdelegate.h
+    ClientGUI/ui/shipequip.h
+    ClientGUI/ui/shipequip.cpp
+    ClientGUI/ui/shipequip.ui
     ClientGUI/ui/shipselect.cpp
     ClientGUI/ui/shipselect.h
     ClientGUI/ui/sortie.cpp

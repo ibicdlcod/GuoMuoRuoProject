@@ -243,8 +243,8 @@ QVariant ShipModel::data(const QModelIndex &index,
                 //% "Idle"
                 return qtTrId("fleet-idle");
             }
-            return QStringLiteral("%1-%2").arg(attr->fleetIndex)
-                .arg(attr->fleetPosIndex);
+            return QStringLiteral("%1-%2").arg(attr->fleetIndex + 1)
+                .arg(attr->fleetPosIndex + 1);
         }
         else {
             Q_UNREACHABLE();
