@@ -3,6 +3,7 @@
 #include <QToolButton>
 #include <QStyleHints>
 #include <QStyledItemDelegate>
+#include <QWheelEvent>
 #include "../clientv2.h"
 
 extern std::unique_ptr<QSettings> settings;
@@ -337,4 +338,15 @@ void EquipView::closeEvent(QCloseEvent *event) {
     disconnect(this, &EquipView::shipSelected,
                nullptr, nullptr);
     QWidget::closeEvent(event);
+}
+
+void EquipView::wheelEvent(QWheelEvent *event) {
+    event->accept();
+    auto value = event->angleDelta().y();
+    if(value > 0 && prevButton->isEnabled()) {
+        model->prevPage();
+    }
+    if(value < 0 && nextButton->isEnabled()) {
+        model->nextPage();
+    }
 }

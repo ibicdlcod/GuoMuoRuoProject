@@ -56,6 +56,7 @@ signals:
 protected:
     void resizeEvent(QResizeEvent *event) override;
     void closeEvent(QCloseEvent *event) override;
+    void wheelEvent(QWheelEvent *event) override;
 
 private slots:
     void columnResized(int logicalIndex, int oldSize, int newSize);

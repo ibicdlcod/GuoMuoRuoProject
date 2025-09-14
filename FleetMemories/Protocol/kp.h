@@ -43,6 +43,7 @@ static constexpr int fleetsSize = 4;
 static constexpr int normalFleetSize = 7;
 static constexpr int combinedFleetSize = 14;
 static constexpr int fleetRepSize = 0x10;
+static constexpr int maxEquipSlots = 5;
 #pragma message(NOT_M_CONST)
 static constexpr qint64 secsinMin = 60;
 static constexpr int equipIdMax = 0x10000;

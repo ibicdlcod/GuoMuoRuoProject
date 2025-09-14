@@ -49,7 +49,8 @@ private:
 
     int posColumn = 0;
     int nameColumn = 1;
-    int shipIconColumn = 2;
+    int lvColumn = 2;
+    int shipIconColumn = 3;
 };
 
 #endif // FLEETVIEW_H
