@@ -46,6 +46,10 @@ private:
     int currentActiveFleet = 0;
     QMap<int, KP::FleetType> fleetTypes;
     QGridLayout *grid;
+
+    int posColumn = 0;
+    int nameColumn = 1;
+    int shipIconColumn = 2;
 };
 
 #endif // FLEETVIEW_H

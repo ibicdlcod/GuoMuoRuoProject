@@ -2055,75 +2055,75 @@ Great at battle and bad at politics--so cool!</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="all-shiptypes">
-        <location filename="../ClientGUI/shipmodel.cpp" line="33"/>
+        <location filename="../ClientGUI/shipmodel.cpp" line="35"/>
         <location filename="../ClientGUI/ui/shipselect.cpp" line="130"/>
         <location filename="../ClientGUI/ui/shipselect.cpp" line="142"/>
         <source>All ship types</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="all-shipclasses">
-        <location filename="../ClientGUI/shipmodel.cpp" line="35"/>
+        <location filename="../ClientGUI/shipmodel.cpp" line="37"/>
         <location filename="../ClientGUI/ui/shipselect.cpp" line="145"/>
         <source>All ship classes</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="fleet-idle">
-        <location filename="../ClientGUI/shipmodel.cpp" line="242"/>
+        <location filename="../ClientGUI/shipmodel.cpp" line="244"/>
         <source>Idle</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="ship-uuid">
-        <location filename="../ClientGUI/shipmodel.cpp" line="268"/>
-        <location filename="../ClientGUI/shipmodel.cpp" line="382"/>
+        <location filename="../ClientGUI/shipmodel.cpp" line="270"/>
+        <location filename="../ClientGUI/shipmodel.cpp" line="384"/>
         <source>UUID</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="ship-name">
-        <location filename="../ClientGUI/shipmodel.cpp" line="272"/>
-        <location filename="../ClientGUI/shipmodel.cpp" line="385"/>
+        <location filename="../ClientGUI/shipmodel.cpp" line="274"/>
+        <location filename="../ClientGUI/shipmodel.cpp" line="387"/>
         <source>Name</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="ship-star">
-        <location filename="../ClientGUI/shipmodel.cpp" line="276"/>
-        <location filename="../ClientGUI/shipmodel.cpp" line="388"/>
+        <location filename="../ClientGUI/shipmodel.cpp" line="278"/>
+        <location filename="../ClientGUI/shipmodel.cpp" line="390"/>
         <source>Modernization</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="ship-improve">
-        <location filename="../ClientGUI/shipmodel.cpp" line="280"/>
-        <location filename="../ClientGUI/shipmodel.cpp" line="391"/>
+        <location filename="../ClientGUI/shipmodel.cpp" line="282"/>
+        <location filename="../ClientGUI/shipmodel.cpp" line="393"/>
         <source>Modernize</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="ship-select">
-        <location filename="../ClientGUI/shipmodel.cpp" line="284"/>
-        <location filename="../ClientGUI/shipmodel.cpp" line="394"/>
+        <location filename="../ClientGUI/shipmodel.cpp" line="286"/>
+        <location filename="../ClientGUI/shipmodel.cpp" line="396"/>
         <source>Select this</source>
         <oldsource>Select</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message id="ship-hp">
-        <location filename="../ClientGUI/shipmodel.cpp" line="288"/>
-        <location filename="../ClientGUI/shipmodel.cpp" line="397"/>
+        <location filename="../ClientGUI/shipmodel.cpp" line="290"/>
+        <location filename="../ClientGUI/shipmodel.cpp" line="399"/>
         <source>HP</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="ship-cond">
-        <location filename="../ClientGUI/shipmodel.cpp" line="292"/>
-        <location filename="../ClientGUI/shipmodel.cpp" line="400"/>
+        <location filename="../ClientGUI/shipmodel.cpp" line="294"/>
+        <location filename="../ClientGUI/shipmodel.cpp" line="402"/>
         <source>Cond.</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="ship-lv">
-        <location filename="../ClientGUI/shipmodel.cpp" line="296"/>
-        <location filename="../ClientGUI/shipmodel.cpp" line="403"/>
+        <location filename="../ClientGUI/shipmodel.cpp" line="298"/>
+        <location filename="../ClientGUI/shipmodel.cpp" line="405"/>
         <source>Level</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="ship-pos">
-        <location filename="../ClientGUI/shipmodel.cpp" line="300"/>
-        <location filename="../ClientGUI/shipmodel.cpp" line="406"/>
+        <location filename="../ClientGUI/shipmodel.cpp" line="302"/>
+        <location filename="../ClientGUI/shipmodel.cpp" line="408"/>
         <source>Position</source>
         <translation type="unfinished"></translation>
     </message>

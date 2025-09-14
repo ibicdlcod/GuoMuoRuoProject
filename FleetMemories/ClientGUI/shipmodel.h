@@ -4,7 +4,6 @@
 #include "equipmodel.h"
 #include "../Protocol/ship.h"
 #include "../Protocol/shipdynamic.h"
-#include "ui/interactivelabel.h"
 
 class ShipModel : public EquipModel
 {
@@ -12,9 +11,6 @@ class ShipModel : public EquipModel
 public:
     explicit ShipModel(QObject *parent = nullptr, bool isInArsenal = true);
     std::tuple<Ship *, ShipDynamic *> getShip(QUuid);
-
-    friend void InteractiveLabel::paintEvent(QPaintEvent *);
-    friend void FleetView::modifyFleetShip(int, QUuid);
 
 signals:
     void typeBoxHint(QStringList &types);

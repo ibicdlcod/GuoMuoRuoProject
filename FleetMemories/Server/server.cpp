@@ -979,8 +979,6 @@ void Server::offerShipInfoUser(const CSteamID &uid,
             qWarning() << query.lastError().databaseText();
         }
         query.bindValue(":uid", uid.ConvertToUint64());
-        //query.bindValue(":attr", QString("Fleet%1").arg(i+1));
-        //query.bindValue(":value", KP::NormalFleet);
         if(!query.exec() || !query.isSelect()) {
             qCritical() << query.lastQuery();
             //% "Set User Fleet Up failed!"
@@ -993,7 +991,8 @@ void Server::offerShipInfoUser(const CSteamID &uid,
                 auto fleetIndexStr = query.value(0).toString();
                 bool isInt;
                 int fleetIndex = fleetIndexStr
-                                     .last(fleetIndexStr.size() - 5)
+                                     .last(fleetIndexStr.size()
+                                           - QStringLiteral("Fleet").size())
                                      .toInt(&isInt) - 1;
                 if(isInt) {
                     fleetTypes[fleetIndex] =

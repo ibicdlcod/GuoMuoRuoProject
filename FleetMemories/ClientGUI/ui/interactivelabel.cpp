@@ -55,13 +55,13 @@ void InteractiveLabel::paintEvent(QPaintEvent * /* event */)
     }
     else {
         Clientv2 &engine = Clientv2::getInstance();
-        auto ships = engine.shipModel.clientShips;
-        if(!ships.contains(shipUId)
-            || !ships[shipUId]->attr.contains("OldInternalNo.")) {
+        auto [ship, shipattr] = engine.shipModel.getShip(shipUId);
+        if(ship == nullptr
+            || !ship->attr.contains("OldInternalNo.")) {
             ; // remains 0
         }
         else {
-            oldInternalId = ships[shipUId]->attr["OldInternalNo."];
+            oldInternalId = ship->attr["OldInternalNo."];
         }
     }
 

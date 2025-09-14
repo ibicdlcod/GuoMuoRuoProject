@@ -28,14 +28,14 @@ FleetView::FleetView(QWidget *parent)
     QLabel *fleetPosHeader = new QLabel(this);
     fleetPosHeader->setObjectName(QStringLiteral("fleetPos-Head"));
     fleetPosHeader->setAlignment(Qt::AlignCenter);
-    grid->addWidget(fleetPosHeader, 0, 0);
+    grid->addWidget(fleetPosHeader, 0, posColumn);
     //% "Pos"
     fleetPosHeader->setText(qtTrId("fleet-pos-head"));
     for(int i = 0; i < KP::combinedFleetSize; ++i) {
         QLabel *fleetPos = new QLabel(this);
         fleetPos->setObjectName(QString("fleetPos-%1").arg(i+1));
         fleetPos->setAlignment(Qt::AlignCenter);
-        grid->addWidget(fleetPos, i+1, 0);
+        grid->addWidget(fleetPos, i+1, posColumn);
         fleetPos->setText(QString("%1").arg(i+1));
         auto font = fleetPos->font();
         font.setPointSize(30);
@@ -44,7 +44,7 @@ FleetView::FleetView(QWidget *parent)
     QLabel *shipNameHeader = new QLabel(this);
     shipNameHeader->setObjectName(QStringLiteral("shipName-Head"));
     shipNameHeader->setAlignment(Qt::AlignCenter);
-    grid->addWidget(shipNameHeader, 0, 1);
+    grid->addWidget(shipNameHeader, 0, nameColumn);
     //% ""
     //shipNameHeader->setText(qtTrId("ship-name-head"));
     for(int i = 0; i < KP::combinedFleetSize; ++i) {
@@ -55,7 +55,7 @@ FleetView::FleetView(QWidget *parent)
         shipName->setMaximumSize(QSize(200, 55));
         font.setPointSize(40);
         shipName->setFont(font);
-        grid->addWidget(shipName, i+1, 1);
+        grid->addWidget(shipName, i+1, nameColumn);
         //% ""
         //shipName->setText(qtTrId("fleet-no-ship"));
     }
@@ -64,7 +64,7 @@ FleetView::FleetView(QWidget *parent)
         fleetIcon->setObjectName(QString("fleetIcon-%1").arg(i+1));
         fleetIcon->setAlignment(Qt::AlignCenter);
         fleetIcon->setMinimumSize(QSize(60, 60));
-        grid->addWidget(fleetIcon, i+1, 2);
+        grid->addWidget(fleetIcon, i+1, shipIconColumn);
     }
 
     QVBoxLayout *greatLayout = new QVBoxLayout(this);
@@ -133,7 +133,9 @@ void FleetView::modifyFleetIndex(bool checked) {
     QString sender = QObject::sender()->objectName();
     int newFleetIndex = 0;
     if(sender.startsWith("fleet_")) {
-        newFleetIndex = sender.last(sender.size() - 6).toInt() - 1;
+        newFleetIndex = sender.last(sender.size()
+                                    - QStringLiteral("fleet_").size())
+                            .toInt() - 1;
     }
     if(newFleetIndex == currentActiveFleet) {
         return;
@@ -173,7 +175,7 @@ void FleetView::modifyFleetIndex(bool checked) {
 
 void FleetView::modifyFleetShip(int posIndex, QUuid uid) {
     Clientv2 &engine = Clientv2::getInstance();
-    auto shipInModel = engine.shipModel.clientShips;
+    auto shipModel = &engine.shipModel;
     FleetPos oldPos = FleetPos({-1, -1});
     FleetPos newPos = FleetPos({currentActiveFleet, posIndex});
     for(auto iter = ships.keyValueBegin();
@@ -189,9 +191,9 @@ void FleetView::modifyFleetShip(int posIndex, QUuid uid) {
                           ? ships[newPos] : QUuid();
         ships[oldPos] = oldUid;
         if(!oldUid.isNull()) {
-            engine.shipModel.clientShipDynamicAttrs[oldUid]->fleetIndex
+            std::get<1>(shipModel->getShip(oldUid))->fleetIndex
                 = oldPos.fleetindex;
-            engine.shipModel.clientShipDynamicAttrs[oldUid]->fleetPosIndex
+            std::get<1>(shipModel->getShip(oldUid))->fleetPosIndex
                 = oldPos.posindex;
         }
         if(oldPos.fleetindex == currentActiveFleet) {
@@ -202,10 +204,11 @@ void FleetView::modifyFleetShip(int posIndex, QUuid uid) {
                 (grid->itemAtPosition(oldPos.posindex + 1, 1)->widget());
             if(!oldUid.isNull()) {
                 QString oldName
-                    = shipInModel[oldUid]->toString(
+                    = std::get<0>(shipModel->getShip(oldUid))->toString(
                         settings->value("client/language", "ja_JP").toString());
                 if(oldName.isEmpty()) {
-                    oldName = shipInModel[oldUid]->toString("ja_JP");
+                    oldName = std::get<0>(shipModel->getShip(oldUid))
+                                  ->toString("ja_JP");
                 }
                 oldText->setText(oldName);
             }
@@ -215,9 +218,9 @@ void FleetView::modifyFleetShip(int posIndex, QUuid uid) {
         }
     }
     if(uid.isNull() && !ships[newPos].isNull()) {
-        engine.shipModel.clientShipDynamicAttrs[ships[newPos]]->fleetIndex
+        std::get<1>(shipModel->getShip(ships[newPos]))->fleetIndex
             = -1;
-        engine.shipModel.clientShipDynamicAttrs[ships[newPos]]->fleetPosIndex
+        std::get<1>(shipModel->getShip(ships[newPos]))->fleetPosIndex
             = -1;
     }
     ships[newPos] = uid;
@@ -227,16 +230,16 @@ void FleetView::modifyFleetShip(int posIndex, QUuid uid) {
     auto newText = qobject_cast<QLabel *>
         (grid->itemAtPosition(newPos.posindex + 1, 1)->widget());
     if(!uid.isNull()) {
-        engine.shipModel.clientShipDynamicAttrs[uid]->fleetIndex
+        std::get<1>(shipModel->getShip(uid))->fleetIndex
             = newPos.fleetindex;
-        engine.shipModel.clientShipDynamicAttrs[uid]->fleetPosIndex
+        std::get<1>(shipModel->getShip(uid))->fleetPosIndex
             = newPos.posindex;
-        QString newName = shipInModel[uid]
+        QString newName = std::get<0>(shipModel->getShip(uid))
                               ->toString(settings
                                              ->value("client/language", "ja_JP")
                                              .toString());
         if(newName.isEmpty()) {
-            newName = shipInModel[uid]->toString("ja_JP");
+            newName = std::get<0>(shipModel->getShip(uid))->toString("ja_JP");
         }
         newText->setText(newName);
         QFont font = newText->font();
