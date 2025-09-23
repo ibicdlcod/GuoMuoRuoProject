@@ -89,6 +89,7 @@ public slots:
     void switchToFleetView();
     void switchToTech();
     void switchToTech2();
+    void switchToTech3(int);
     void tsunkitAssets();
     void uiRefresh();
     Q_DECL_DEPRECATED void update();

@@ -32,9 +32,16 @@ DevelopWindow::DevelopWindow(QWidget *parent)
     connect(ui->listType, &QComboBox::currentIndexChanged,
             this, &DevelopWindow::displaySuccessRate);
     connect(ui->listName, &QComboBox::currentIndexChanged,
-            this, &DevelopWindow::displaySuccessRate);
+            this, &DevelopWindow::displaySuccessRate2);
     connect(ui->idText, &QTextEdit::textChanged,
             this, &DevelopWindow::displaySuccessRate2);
+    connect(ui->calButton, &QPushButton::clicked,
+            this, &DevelopWindow::devDemandChance);
+    Clientv2 &engine = Clientv2::getInstance();
+    connect(&engine, &Clientv2::receivedGlobalTechInfo,
+            this, [this]{QTimer::singleShot(100, this, [this]{displaySuccessRate2();});});
+    connect(&engine, &Clientv2::receivedLocalTechInfo,
+            this, [this]{QTimer::singleShot(100, this, [this]{displaySuccessRate2();});});
     displaySuccessRate2();
 }
 
@@ -115,5 +122,19 @@ void DevelopWindow::displaySuccessRate2() {
     else {
         //% "Unknown"
         ui->rateNumber->setText(qtTrId("develop-success-rate-unknown"));
+    }
+    update();
+}
+
+void DevelopWindow::devDemandChance(bool checked)
+{
+    Clientv2 &engine = Clientv2::getInstance();
+    auto cache = engine.techCache;
+    auto equipId = equipIdDesired();
+    if(!cache.contains(0)) {
+        engine.switchToTech2();
+    }
+    if(!cache.contains(equipId)) {
+        engine.switchToTech3(equipId);
     }
 }

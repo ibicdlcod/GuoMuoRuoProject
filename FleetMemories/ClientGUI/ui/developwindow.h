@@ -28,6 +28,7 @@ public slots:
 
 private slots:
     void displaySuccessRate(int);
+    void devDemandChance(bool checked = false);
 
 private:
     Ui::DevelopWindow *ui;

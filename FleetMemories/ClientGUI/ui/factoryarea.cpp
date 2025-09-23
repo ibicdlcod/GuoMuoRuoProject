@@ -56,6 +56,9 @@ FactoryArea::FactoryArea(QWidget *parent) :
         (*iter)->setSlotnum(iter - slotfs.begin());
         (*iter)->setStatus();
     }
+    w.setAttribute(Qt::WA_DeleteOnClose, false);
+    connect(&w, &QDialog::finished,
+            this, &FactoryArea::doDevelop);
 }
 
 FactoryArea::~FactoryArea()
@@ -75,15 +78,12 @@ void FactoryArea::developClicked(bool checked, int slotnum) {
             return;
         }
         else {
-            DevelopWindow w;
-            if(w.exec() == QDialog::Rejected)
-                qDebug() << "NODEVELOP";
-            else {
-                QTimer::singleShot(100, &engine, &Clientv2::doRefreshFactory);
-                QString msg = QStringLiteral("develop %1 %2")
-                                  .arg(w.equipIdDesired()).arg(slotnum);
-                qDebug() << msg;
-                engine.parse(msg);
+            currentSlotNum = slotnum;
+            w.show();
+            static bool initial = true;
+            if(initial) {
+                w.resetListName(Clientv2::getInstance().equipBigTypeIndex);
+                initial = false;
             }
         }
     }
@@ -153,8 +153,22 @@ void FactoryArea::switchToState() {
 }
 
 void FactoryArea::resizeEvent(QResizeEvent *event) {
-    if(factoryState == KP::Arsenal) {
+    if(factoryState == KP::Arsenal || factoryState == KP::Anchorage) {
         equipview->recalculateArsenalRows();
     }
     QWidget::resizeEvent(event);
+}
+
+void FactoryArea::doDevelop(int result) {
+    Clientv2 &engine = Clientv2::getInstance();
+    if(result == QDialog::Rejected) {
+        qDebug() << "NODEVELOP";
+    }
+    else if(result == QDialog::Accepted) {
+        QTimer::singleShot(100, &engine, &Clientv2::doRefreshFactory);
+        QString msg = QStringLiteral("develop %1 %2")
+                          .arg(w.equipIdDesired()).arg(currentSlotNum);
+        qDebug() << msg;
+        engine.parse(msg);
+    }
 }

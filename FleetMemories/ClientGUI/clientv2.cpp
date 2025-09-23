@@ -477,6 +477,13 @@ void Clientv2::switchToTech2() {
     socket.flush();
 }
 
+void Clientv2::switchToTech3(int techId) {
+    socket.flush();
+    QByteArray msg = KP::clientDemandTech(techId);
+    sender->enqueue(msg);
+    socket.flush();
+}
+
 void Clientv2::tsunkitAssets() {
     QSet<int> iconGroups;
     for(auto equip: std::as_const(equipRegistryCache)) {
