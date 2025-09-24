@@ -4,10 +4,10 @@
 #include <QFrame>
 #include <QTableView>
 #include <QHeaderView>
-#include "ClientGUI/ui/developwindow.h"
-#include "FactorySlot/factoryslot.h"
-#include "equipview.h"
-#include "../../Protocol/kp.h"
+#include "developwindow.h"
+#include "../../../FactorySlot/factoryslot.h"
+#include "../views/equipview.h"
+#include "../../../Protocol/kp.h"
 
 namespace Ui {
 class FactoryArea;

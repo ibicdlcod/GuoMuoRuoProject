@@ -9,7 +9,7 @@
 #include <QToolButton>
 #include <QWidget>
 #include <QLineEdit>
-#include "../equipmodel.h"
+#include "../../equipmodel.h"
 #include "selectdelegate.h"
 #include "hpdelegate.h"
 #include "equipselect.h"

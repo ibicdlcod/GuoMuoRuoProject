@@ -3,10 +3,10 @@
 
 #include <QFrame>
 #include <QGridLayout>
-#include "equipview.h"
-#include "../../Protocol/kp.h"
-#include "../../Protocol/ship.h"
-#include "../../Protocol/shipdynamic.h"
+#include "../views/equipview.h"
+#include "../../../Protocol/kp.h"
+#include "../../../Protocol/ship.h"
+#include "../../../Protocol/shipdynamic.h"
 
 namespace Ui {
 class FleetView;

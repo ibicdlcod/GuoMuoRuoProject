@@ -3,9 +3,9 @@
 #include <QHeaderView>
 #include <QSvgWidget>
 #include <QToolButton>
-#include "../clientv2.h"
 #include "developwindow.h"
-#include "equipview.h"
+#include "../../clientv2.h"
+#include "../views/equipview.h"
 
 FactoryArea::FactoryArea(QWidget *parent) :
     QFrame(parent),

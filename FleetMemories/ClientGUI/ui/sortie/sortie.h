@@ -3,7 +3,7 @@
 
 #include <QFrame>
 #include <QLabel>
-#include "../../Protocol/kp.h"
+#include "../../../Protocol/kp.h"
 #include "maprender.h"
 #include "mapviewwidget.h"
 

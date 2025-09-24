@@ -1,7 +1,7 @@
 #include "shipselect.h"
 #include <QHBoxLayout>
 #include <QMetaEnum>
-#include "../../Protocol/kp.h"
+#include "../../../Protocol/kp.h"
 
 ShipSelect::ShipSelect(int height, QWidget *parent)
     : height(height), QWidget{parent}

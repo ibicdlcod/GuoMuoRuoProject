@@ -5,8 +5,9 @@
 #include <QStyleHints>
 #include "interactivelabel.h"
 #include "shipequip.h"
-#include "../clientv2.h"
-#include "../../Protocol/kp.h"
+#include "shipdisplay.h"
+#include "../../clientv2.h"
+#include "../../../Protocol/kp.h"
 
 extern std::unique_ptr<QSettings> settings;
 
@@ -64,17 +65,14 @@ FleetView::FleetView(QWidget *parent)
         //shipName->setText(qtTrId("fleet-no-ship"));
     }
     for(int i = 0; i < KP::combinedFleetSize; ++i) {
-        QLabel *shipLv = new QLabel(this);
-        shipLv->setObjectName(QString("shipLv-%1").arg(i+1));
-        shipLv->setAlignment(Qt::AlignCenter);
-        auto font = shipLv->font();
-        shipLv->setMaximumSize(QSize(80, 55));
-        shipLv->setMinimumSize(QSize(80, 55));
-        shipLv->setSizePolicy(QSizePolicy::Fixed,
+        ShipDisplay *shipInfoDisplay = new ShipDisplay(this);
+        shipInfoDisplay->setObjectName(QString("shipLv-%1").arg(i+1));
+        shipInfoDisplay->setMaximumSize(QSize(90, 55));
+        shipInfoDisplay->setMinimumSize(QSize(90, 55));
+        shipInfoDisplay->setSizePolicy(QSizePolicy::Fixed,
                               QSizePolicy::Fixed);
-        font.setPointSize(20);
-        shipLv->setFont(font);
-        grid->addWidget(shipLv, i+1, lvColumn);
+        grid->addWidget(shipInfoDisplay, i+1, lvColumn);
+        shipInfoDisplay->hide();
     }
     for(int i = 0; i < KP::combinedFleetSize; ++i) {
         InteractiveLabel *fleetIcon = new InteractiveLabel(i, this);
@@ -283,7 +281,7 @@ void FleetView::modifyFleetShip(int posIndex, QUuid uid) {
                     ->shipSelected(oldUid);
             auto oldText = qobject_cast<QLabel *>
                 (grid->itemAtPosition(oldPos.posindex + 1, nameColumn)->widget());
-            auto oldLvText = qobject_cast<QLabel *>
+            auto oldLvText = qobject_cast<ShipDisplay *>
                 (grid->itemAtPosition(oldPos.posindex + 1, lvColumn)->widget());
             if(!oldUid.isNull()) {
                 QString oldName
@@ -293,12 +291,14 @@ void FleetView::modifyFleetShip(int posIndex, QUuid uid) {
                     oldName = ship->toString("ja_JP");
                 }
                 oldText->setText(oldName);
-                oldLvText->setText(QString("Lv %1").arg(
-                    Ship::getLevel(std::min(shipD->exp, shipD->expCap))));
+                oldLvText->show();
+                oldLvText->setContent(shipD->currentHP, ship->attr["Hitpoints"],
+                                      shipD->condition,
+                                      Ship::getLevel(std::min(shipD->exp, shipD->expCap)));
             }
             else {
                 oldText->setText("");
-                oldLvText->setText("");
+                oldLvText->hide();
             }
             for(int j = 0; j < slotNum; ++j) {
                 grid->itemAtPosition(oldPos.posindex + 1,
@@ -341,7 +341,7 @@ void FleetView::modifyFleetShip(int posIndex, QUuid uid) {
             ->updateShipUId(uid);
     auto newText = qobject_cast<QLabel *>
         (grid->itemAtPosition(newPos.posindex + 1, nameColumn)->widget());
-    auto newLvText = qobject_cast<QLabel *>
+    auto newLvText = qobject_cast<ShipDisplay *>
         (grid->itemAtPosition(newPos.posindex + 1, lvColumn)->widget());
     auto [ship, shipD] = shipModel->getShip(uid);
     int slotNum = 0;
@@ -372,8 +372,10 @@ void FleetView::modifyFleetShip(int posIndex, QUuid uid) {
             }
         }
         newText->setFont(font);
-        newLvText->setText(QString("Lv %1").arg(
-            Ship::getLevel(std::min(shipD->exp, shipD->expCap))));
+        newLvText->show();
+        newLvText->setContent(shipD->currentHP, ship->attr["Hitpoints"],
+                              shipD->condition,
+                              Ship::getLevel(std::min(shipD->exp, shipD->expCap)));
         slotNum = ship->attr["Equipslots"];
         if(Ship::getLevel(std::min(shipD->exp, shipD->expCap))
             >= KP::levelUnlockExSlot) {
@@ -382,7 +384,7 @@ void FleetView::modifyFleetShip(int posIndex, QUuid uid) {
     }
     else {
         newText->setText("");
-        newLvText->setText("");
+        newLvText->hide();
     }
     for(int j = 0; j < slotNum; ++j) {
         grid->itemAtPosition(newPos.posindex + 1,
@@ -424,6 +426,9 @@ void FleetView::modifyFleetType(int index) {
         for(int i = KP::normalFleetSize; i < KP::combinedFleetSize; ++i) {
             for(int j = 0; j < grid->columnCount(); ++j) {
                 grid->itemAtPosition(i + 1, j)->widget()->show();
+            }
+            for(int i = KP::normalFleetSize; i < KP::combinedFleetSize; ++i) {
+                modifyFleetShip(i, ships[FleetPos{currentActiveFleet, i}]);
             }
         }
     }

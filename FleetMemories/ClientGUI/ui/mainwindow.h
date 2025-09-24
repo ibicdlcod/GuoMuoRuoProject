@@ -6,10 +6,10 @@
 #include "portarea.h"
 #include "licensearea.h"
 #include "newlogins.h"
-#include "factoryarea.h"
+#include "factory/factoryarea.h"
 #include "techview.h"
-#include "sortie.h"
-#include "fleetview.h"
+#include "sortie/sortie.h"
+#include "fleet/fleetview.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }

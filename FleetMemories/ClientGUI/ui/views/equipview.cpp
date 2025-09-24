@@ -4,7 +4,7 @@
 #include <QStyleHints>
 #include <QStyledItemDelegate>
 #include <QWheelEvent>
-#include "../clientv2.h"
+#include "../../clientv2.h"
 
 extern std::unique_ptr<QSettings> settings;
 

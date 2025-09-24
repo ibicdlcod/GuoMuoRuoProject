@@ -41,24 +41,24 @@ set(CLIENT_SOURCES
     ClientGUI/steamauth.cpp
     ClientGUI/steamauth.h
     ClientGUI/ui/boxcenterfusionstyle.h
-    ClientGUI/ui/developwindow.cpp
-    ClientGUI/ui/developwindow.h
-    ClientGUI/ui/developwindow.ui
-    ClientGUI/ui/equipselect.cpp
-    ClientGUI/ui/equipselect.h
-    ClientGUI/ui/equipview.h
-    ClientGUI/ui/equipview.cpp
-    ClientGUI/ui/equipview.ui
-    ClientGUI/ui/factoryarea.cpp
-    ClientGUI/ui/factoryarea.h
-    ClientGUI/ui/factoryarea.ui
-    ClientGUI/ui/fleetview.h
-    ClientGUI/ui/fleetview.cpp
-    ClientGUI/ui/fleetview.ui
-    ClientGUI/ui/hpdelegate.cpp
-    ClientGUI/ui/hpdelegate.h
-    ClientGUI/ui/interactivelabel.h
-    ClientGUI/ui/interactivelabel.cpp
+    ClientGUI/ui/factory/developwindow.cpp
+    ClientGUI/ui/factory/developwindow.h
+    ClientGUI/ui/factory/developwindow.ui
+    ClientGUI/ui/views/equipselect.cpp
+    ClientGUI/ui/views/equipselect.h
+    ClientGUI/ui/views/equipview.h
+    ClientGUI/ui/views/equipview.cpp
+    ClientGUI/ui/views/equipview.ui
+    ClientGUI/ui/factory/factoryarea.cpp
+    ClientGUI/ui/factory/factoryarea.h
+    ClientGUI/ui/factory/factoryarea.ui
+    ClientGUI/ui/fleet/fleetview.h
+    ClientGUI/ui/fleet/fleetview.cpp
+    ClientGUI/ui/fleet/fleetview.ui
+    ClientGUI/ui/views/hpdelegate.cpp
+    ClientGUI/ui/views/hpdelegate.h
+    ClientGUI/ui/fleet/interactivelabel.h
+    ClientGUI/ui/fleet/interactivelabel.cpp
     ClientGUI/ui/keyenterreceiver.cpp
     ClientGUI/ui/keyenterreceiver.h
     ClientGUI/ui/licensearea.cpp
@@ -67,10 +67,10 @@ set(CLIENT_SOURCES
     ClientGUI/ui/mainwindow.cpp
     ClientGUI/ui/mainwindow.h
     ClientGUI/ui/mainwindow.ui
-    ClientGUI/ui/maprender.cpp
-    ClientGUI/ui/maprender.h
-    ClientGUI/ui/mapviewwidget.cpp
-    ClientGUI/ui/mapviewwidget.h
+    ClientGUI/ui/sortie/maprender.cpp
+    ClientGUI/ui/sortie/maprender.h
+    ClientGUI/ui/sortie/mapviewwidget.cpp
+    ClientGUI/ui/sortie/mapviewwidget.h
     ClientGUI/ui/navigator.cpp
     ClientGUI/ui/navigator.h
     ClientGUI/ui/newlogins.cpp
@@ -79,16 +79,16 @@ set(CLIENT_SOURCES
     ClientGUI/ui/portarea.cpp
     ClientGUI/ui/portarea.h
     ClientGUI/ui/portarea.ui
-    ClientGUI/ui/selectdelegate.cpp
-    ClientGUI/ui/selectdelegate.h
-    ClientGUI/ui/shipequip.h
-    ClientGUI/ui/shipequip.cpp
-    ClientGUI/ui/shipequip.ui
-    ClientGUI/ui/shipselect.cpp
-    ClientGUI/ui/shipselect.h
-    ClientGUI/ui/sortie.cpp
-    ClientGUI/ui/sortie.h
-    ClientGUI/ui/sortie.ui
+    ClientGUI/ui/views/selectdelegate.cpp
+    ClientGUI/ui/views/selectdelegate.h
+    ClientGUI/ui/fleet/shipequip.h
+    ClientGUI/ui/fleet/shipequip.cpp
+    ClientGUI/ui/fleet/shipequip.ui
+    ClientGUI/ui/views/shipselect.cpp
+    ClientGUI/ui/views/shipselect.h
+    ClientGUI/ui/sortie/sortie.cpp
+    ClientGUI/ui/sortie/sortie.h
+    ClientGUI/ui/sortie/sortie.ui
     ClientGUI/ui/techview.h
     ClientGUI/ui/techview.cpp
     ClientGUI/ui/techview.ui
@@ -167,6 +167,7 @@ qt_add_executable(CFClient
     ${CLIENT_SOURCES}
     common.qrc
     ${app_icon_resource_windows}
+    ClientGUI/ui/fleet/shipdisplay.h ClientGUI/ui/fleet/shipdisplay.cpp ClientGUI/ui/fleet/shipdisplay.ui
 )
 qt_add_executable(CFServer
     MANUAL_FINALIZATION

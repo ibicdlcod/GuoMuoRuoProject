@@ -3,7 +3,7 @@
 
 #include <QWidget>
 #include <QPen>
-#include "../../Protocol/kp.h"
+#include "../../../Protocol/kp.h"
 
 class MapRender : public QWidget
 {
