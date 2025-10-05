@@ -65,16 +65,10 @@ void InteractiveLabel::paintEvent(QPaintEvent * /* event */)
         }
     }
 
-    //QPixmap pixmap = Icute::shipIcon(oldInternalId);
+    QPixmap pixmap = Icute::shipIcon(oldInternalId);
 
     int size = std::min(this->width(), this->height());
     QPainter painter(this);
-    QIcon icon = Icute::shipIcon(oldInternalId);
-    icon.paint(&painter, QRect(this->width() / 2.0 - size / 2.0,
-                               this->height() / 2.0 - size / 2.0,
-                               size,
-                               size), Qt::AlignCenter);
-    /*
     painter.drawPixmap(QRect(this->width() / 2.0 - size / 2.0,
                              this->height() / 2.0 - size / 2.0,
                              size,
@@ -83,7 +77,7 @@ void InteractiveLabel::paintEvent(QPaintEvent * /* event */)
                                      Qt::KeepAspectRatio,
                                      Qt::SmoothTransformation
                                      )
-                       );*/
+                       );
 }
 
 void InteractiveLabel::shipSelected(QUuid id) {

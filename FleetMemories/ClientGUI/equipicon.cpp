@@ -48,7 +48,7 @@ QIcon Icute::shipTypeIcon(int shipId, bool isRound = false) {
     return QIcon(QPixmap::fromImage(image));
 }
 
-QIcon Icute::shipIcon(int oldInternalId) {
+QPixmap Icute::shipIcon(int oldInternalId) {
     QImage image;
     if(oldInternalId == 0) {
         image = QImage(":/resources/shipIcons/0.png");
@@ -70,5 +70,5 @@ QIcon Icute::shipIcon(int oldInternalId) {
             image.setPixelColor(x, y, color);
         }
     }
-    return QIcon(QPixmap::fromImage(image));
+    return QPixmap::fromImage(image);
 }

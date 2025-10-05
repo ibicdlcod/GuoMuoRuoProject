@@ -11,7 +11,7 @@ namespace Icute
  */
 QIcon equipTypeIcon(EquipType, bool);
 QIcon shipTypeIcon(int, bool);
-QIcon shipIcon(int);
+QPixmap shipIcon(int);
 };
 
 #endif // EQUIPICON_H
