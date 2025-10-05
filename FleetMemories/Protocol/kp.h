@@ -45,6 +45,10 @@ static constexpr int combinedFleetSize = 14;
 static constexpr int fleetRepSize = 0x10;
 static constexpr int maxEquipSlots = 5;
 static constexpr int levelUnlockExSlot = 30;
+static constexpr int normalFleetMaxSize = 20;
+static constexpr int combinedFleetMinSize = 15;
+static constexpr int combinedFleetMaxSize = 50;
+static constexpr int transportFleetMaxSize = 25;
 #pragma message(NOT_M_CONST)
 static constexpr qint64 secsinMin = 60;
 static constexpr int equipIdMax = 0x10000;
@@ -92,6 +96,7 @@ enum MsgType{
     EquipRetired,
     Success,
     MessageTestServer,
+    FleetFail
 };
 Q_ENUM_NS(MsgType)
 
@@ -192,6 +197,14 @@ enum AuthFailType{
 };
 Q_ENUM_NS(AuthFailType)
 
+enum FleetFailType{
+    ValidFleet,
+    FleetSizeError,
+    FleetTypeError,
+    EquipError
+};
+Q_ENUM_NS(FleetFailType)
+
 enum ConsoleCommandType{
     Help,
     Exit,
@@ -231,6 +244,13 @@ enum FleetType {
     TransportFleet = 3
 };
 Q_ENUM_NS(FleetType);
+
+enum CapitalType {
+    Screen = 0,
+    BattleShip = 1,
+    Carrier = 2,
+    OtherShip = 3
+};
 
 Q_GLOBAL_STATIC(QStringList,
                 fleetTypes,
@@ -292,6 +312,7 @@ QByteArray serverEquipInfo(const QJsonArray &, bool user = false,
                            QDateTime timeUtc = QDateTime::currentDateTimeUtc(),
                            bool cacheHit = false);
 QByteArray serverFairyBusy(int);
+QByteArray serverFleetFailure(FleetFailType);
 QByteArray serverGlobalTech(double, int);
 QByteArray serverGlobalTech(const QList<TechEntry> &, bool);
 QByteArray serverHello();

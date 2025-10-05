@@ -18,6 +18,8 @@ public:
     int toInt() const;
     QString iconGroup() const;
     int getTypeSort() const;
+    int getCapitalness() const;
+    KP::CapitalType getCapitalType() const;
 
 private:
     int iRep;

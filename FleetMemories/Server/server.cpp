@@ -2974,9 +2974,9 @@ void Server::receivedReq(const QJsonObject &djson,
                            this,
                            [connection, uid, djson, this]
                            {offerTechInfo(
-                  connection,
-                  uid,
-                  djson["local"].toInt());});
+                                 connection,
+                                 uid,
+                                 djson["local"].toInt());});
     }
     break;
     case KP::CommandType::DemandSkillPoints: {
@@ -2984,9 +2984,9 @@ void Server::receivedReq(const QJsonObject &djson,
                            this,
                            [connection, uid, djson, this]
                            {offerSPInfo(
-                  connection,
-                  uid,
-                  djson["equipid"].toInt());});
+                                 connection,
+                                 uid,
+                                 djson["equipid"].toInt());});
     }
     break;
     case KP::CommandType::DemandResourceUpdate: {
@@ -2994,8 +2994,8 @@ void Server::receivedReq(const QJsonObject &djson,
                            this,
                            [connection, uid, this]
                            {offerResourceInfo(
-                  connection,
-                  uid);});
+                                 connection,
+                                 uid);});
     }
     break;
     case KP::CommandType::DestructEquip: {
@@ -3024,7 +3024,16 @@ void Server::receivedReq(const QJsonObject &djson,
     }
     break;
     case KP::CommandType::FleetData: {
-        updateFleet(uid, djson["content"].toArray());
+        auto error = updateFleet(uid, djson["content"].toArray());
+        switch(error) {
+        case KP::FleetSizeError: [[fallthrough]];
+        case KP::FleetTypeError: {
+            QByteArray msg = KP::serverFleetFailure(error);
+            senderM.sendMessage(connection, msg);
+        }
+        break;
+        default: break;
+        }
     }
     break;
     default:
@@ -3462,8 +3471,117 @@ void Server::switchCert(const QStringList &input) {
                    .arg(settings->value("networkserver/pem", "Default").toString());
 }
 
-void Server::updateFleet(CSteamID &uid, const QJsonArray &input)
+KP::FleetFailType Server::updateFleet(CSteamID &uid, const QJsonArray &input)
 {
+    QMap<int, KP::FleetType> fleetTypes;
+    QMap<int, int> fleetSizes;
+    QMap<int, int> screenSizes;
+    QMap<int, int> battleShipSizes;
+    QMap<int, int> carrierSizes;
+    QMap<int, int> fleetShipNums;
+    for(const auto &shipData: input) {
+        auto shipDataObj = shipData.toObject();
+        auto fleetIndex = shipDataObj["pos"].toInt() / KP::fleetRepSize;
+        if(fleetIndex == -1)
+            continue;
+        fleetTypes[fleetIndex] = static_cast<KP::FleetType>
+            (shipDataObj["fleettype"].toInt());
+        QSqlQuery query;
+        query.prepare("SELECT ShipDef FROM UserShip "
+                      "WHERE ShipUuid = :uuid");
+        query.bindValue(":uuid", shipDataObj["uuid"].toString());
+        if(Q_UNLIKELY(!query.exec() || !query.isSelect())) {
+            qCritical() << query.lastQuery();
+            //% "Update fleet failure!"
+            throw DBError(qtTrId("update-fleet-failure"),
+                          query.lastError());
+            return KP::ValidFleet;
+        }
+        if(query.next()) {
+            auto ship = shipRegistry[query.value(0).toInt()];
+            if(!fleetSizes.contains(fleetIndex)) {
+                fleetSizes[fleetIndex] = 0;
+                screenSizes[fleetIndex] = 0;
+                battleShipSizes[fleetIndex] = 0;
+                carrierSizes[fleetIndex] = 0;
+                fleetShipNums[fleetIndex] = 0;
+            }
+            fleetSizes[fleetIndex] += ship->getType().getCapitalness();
+            switch(ship->getType().getCapitalType()) {
+            case KP::Screen:
+                screenSizes[fleetIndex] += ship->getType().getCapitalness();
+                break;
+            case KP::BattleShip:
+                battleShipSizes[fleetIndex] += ship->getType().getCapitalness();
+                break;
+            case KP::Carrier:
+                carrierSizes[fleetIndex] += ship->getType().getCapitalness();
+                break;
+            default: break;
+            }
+            fleetShipNums[fleetIndex] += 1;
+        }
+    }
+    try{
+        for(auto [fleetIndex, value]: fleetTypes.asKeyValueRange()) {
+            auto fleetSize = fleetSizes[fleetIndex];
+            switch(value) {
+            case KP::NormalFleet:
+                if(fleetShipNums[fleetIndex] > KP::normalFleetSize) {
+                    throw std::domain_error("fleet-size-error");
+                }
+                if(fleetSize > KP::normalFleetMaxSize) {
+                    throw std::domain_error("fleet-size-error");
+                }
+                break;
+            case KP::SurfaceFleet:
+                if(fleetShipNums[fleetIndex] > KP::combinedFleetSize) {
+                    throw std::domain_error("fleet-size-error");
+                }
+                if(fleetSize < KP::combinedFleetMinSize
+                    || fleetSize > KP::combinedFleetMaxSize) {
+                    throw std::domain_error("fleet-size-error");
+                }
+                if(battleShipSizes[fleetIndex] <= carrierSizes[fleetIndex]) {
+                    throw std::domain_error("fleet-type-unfit-error");
+                }
+                break;
+            case KP::CarrierFleet:
+                if(fleetShipNums[fleetIndex] > KP::combinedFleetSize) {
+                    throw std::domain_error("fleet-size-error");
+                }
+                if(fleetSize < KP::combinedFleetMinSize
+                    || fleetSize > KP::combinedFleetMaxSize) {
+                    throw std::domain_error("fleet-size-error");
+                }
+                if(battleShipSizes[fleetIndex] >= carrierSizes[fleetIndex]) {
+                    throw std::domain_error("fleet-type-unfit-error");
+                }
+                break;
+            case KP::TransportFleet:
+                if(fleetShipNums[fleetIndex] > KP::combinedFleetSize) {
+                    throw std::domain_error("fleet-size-error");
+                }
+                if(fleetSize > KP::transportFleetMaxSize) {
+                    throw std::domain_error("fleet-size-error");
+                }
+                if(screenSizes[fleetIndex] <= battleShipSizes[fleetIndex]
+                                                   + carrierSizes[fleetIndex]) {
+                    throw std::domain_error("fleet-type-unfit-error");
+                }
+                break;
+            }
+        }
+    }
+    catch(std::domain_error e) {
+        if(QStringLiteral("fleet-size-error").compare(e.what()) == 0) {
+            return KP::FleetSizeError;
+        }
+        if(QStringLiteral("fleet-type-unfit-error").compare(e.what()) == 0) {
+            return KP::FleetTypeError;
+        }
+    }
+
     QSqlQuery query;
     query.prepare("UPDATE UserShip SET FleetIndex = -1, "
                   "FleetPosIndex = -1 "
@@ -3474,9 +3592,8 @@ void Server::updateFleet(CSteamID &uid, const QJsonArray &input)
         //% "Update fleet (clear fleet) failure!"
         throw DBError(qtTrId("update-fleet-clear-failure"),
                       query.lastError());
-        return;
+        return KP::ValidFleet;
     }
-    QList<KP::FleetType> fleetTypes(KP::fleetsSize, KP::NormalFleet);
     for(const auto &shipData: input) {
         auto shipDataObj = shipData.toObject();
         QSqlQuery query;
@@ -3493,14 +3610,11 @@ void Server::updateFleet(CSteamID &uid, const QJsonArray &input)
             //% "Update fleet failure!"
             throw DBError(qtTrId("update-fleet-failure"),
                           query.lastError());
-            return;
+            return KP::ValidFleet;
         }
-        fleetTypes[shipDataObj["pos"].toInt() / KP::fleetRepSize]
-            = static_cast<KP::FleetType>
-            (shipDataObj["fleettype"].toInt());
     }
-    for(auto iter = fleetTypes.begin();
-         iter != fleetTypes.end();
+    for(auto iter = fleetTypes.keyValueBegin();
+         iter != fleetTypes.keyValueEnd();
          ++iter) {
         QSqlQuery query;
         query.prepare("UPDATE UserAttr SET Intvalue = :type "
@@ -3508,16 +3622,17 @@ void Server::updateFleet(CSteamID &uid, const QJsonArray &input)
                       "AND UserID = :uid");
         query.bindValue(":uid", uid.ConvertToUint64());
         query.bindValue(":attr", QString("Fleet%1")
-                                     .arg(iter - fleetTypes.begin() + 1));
-        query.bindValue(":type", *iter);
+                                     .arg(iter->first + 1));
+        query.bindValue(":type", iter->second);
         if(Q_UNLIKELY(!query.exec())) {
             qCritical() << query.lastQuery();
             //% "Update fleet failure!"
             throw DBError(qtTrId("update-fleet-failure"),
                           query.lastError());
-            return;
+            return KP::ValidFleet;
         }
     }
+    return KP::ValidFleet;
 }
 
 void Server::userInit(CSteamID &uid) {

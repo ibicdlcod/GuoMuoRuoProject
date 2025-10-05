@@ -1321,6 +1321,19 @@ void Clientv2::receivedMsg(const QJsonObject &djson) {
         qInfo() << "Received test message, id: " + djson["id"].toString();
     }
     break;
+    case KP::FleetFail: {
+        switch(djson["reason"].toInt()) {
+        case KP::FleetSizeError:
+            //% "Fleet is oversized."
+            qWarning() << qtTrId("fleet-size-error");
+            break;
+        case KP::FleetTypeError:
+            //% "Fleet does not suit its type."
+            qWarning() << qtTrId("fleet-type-error");
+            break;
+        }
+    }
+    break;
     default: throw std::domain_error("message not implemented"); break;
     }
 }

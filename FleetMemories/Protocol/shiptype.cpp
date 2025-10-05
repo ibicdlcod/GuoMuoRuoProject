@@ -47,6 +47,12 @@ QString ShipType::toString() const {
     case 0x55: return qtTrId("aviation-battlecruiser");
         //% "Battleship (High speed & Aviation)"
     case 0x56: return qtTrId("highspeed-av-battleship");
+        //% "Super Battleship"
+    case 0x58: return qtTrId("super-battleship");
+        //% "Super Battleship (High speed)"
+    case 0x5A: return qtTrId("super-highspeed-battleship");
+        //% "Super Battleship (Advanced Aviation)"
+    case 0x5C: return qtTrId("super-aviation-battleship");
     default:
         switch((iRep & 0xf0) >> 4) {
         case 1:
@@ -256,4 +262,80 @@ int ShipType::getTypeSort() const {
 
 bool ShipType::operator==(const ShipType &other) const {
     return iRep == other.iRep;
+}
+
+int ShipType::getCapitalness() const {
+    int result;
+    switch(iRep) {
+    case 0x10: return -1;
+    case 0x11: return 0;
+    default:
+        switch((iRep & 0xf0) >> 4) {
+        case 1:
+            return 0;
+        case 2:
+            return 1;
+        case 3:
+            result = 2;
+            if(iRep & 0x2)
+                result += 1;
+            return result;
+        case 4:
+            result = 3;
+            if(iRep & 0x2)
+                result += 1;
+            return result;
+        case 5:
+            result = 6;
+            if(iRep & 0x1)
+                result -= 2;
+            if(iRep & 0x2)
+                result -= 1;
+            return result;
+        case 6:
+            result = 5;
+            if(iRep & 0x1)
+                result -= 2;
+            if(iRep & 0x8)
+                result += 1;
+            else if(iRep & 0x2) // Yamato K2 does not benefit from this
+                result -= 1;
+            return result;
+        case 7:
+            return 0;
+        case 8:
+            result = 2;
+            if(iRep & 0x2)
+                result += 1;
+            return result;
+        case 9:
+            return 1;
+        case 0xa:
+            return 2;
+        case 0xb:
+            return 3;
+        case 0xc: // this value is useless as land structures won't in fleets
+            return 0;
+        }
+        return 0;
+    }
+}
+
+KP::CapitalType ShipType::getCapitalType() const {
+    switch((iRep & 0xf0) >> 4) {
+    case 1:
+        return KP::OtherShip;
+    case 2:
+        [[fallthrough]];
+    case 3:
+        return KP::Screen;
+    case 4:
+        [[fallthrough]];
+    case 5:
+        return KP::BattleShip;
+    case 6:
+        return KP::Carrier;
+    default:
+        return KP::OtherShip;
+    }
 }

@@ -317,6 +317,14 @@ QByteArray KP::serverFairyBusy(int jobID) {
     return QCborValue::fromJsonValue(result).toCbor();
 }
 
+QByteArray KP::serverFleetFailure(FleetFailType type) {
+    QJsonObject result;
+    result["type"] = DgramType::Message;
+    result["msgtype"] = MsgType::FleetFail;
+    result["reason"] = type;
+    return QCborValue::fromJsonValue(result).toCbor();
+}
+
 /* actually, both local and global use this function */
 QByteArray KP::serverGlobalTech(double tech, int jobId) {
     QJsonObject result;
