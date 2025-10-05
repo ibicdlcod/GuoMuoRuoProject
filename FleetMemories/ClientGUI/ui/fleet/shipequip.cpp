@@ -75,7 +75,9 @@ void ShipEquip::mouseReleaseEvent(QMouseEvent *event)
 void ShipEquip::paintEvent(QPaintEvent *event)
 {
     QPainter painter(this);
-    icon.paint(&painter, ui->typeIcon->geometry(), Qt::AlignCenter);
+    if(ui->typeIcon->isVisible()) {
+        icon.paint(&painter, ui->typeIcon->geometry(), Qt::AlignCenter);
+    }
 }
 
 void ShipEquip::updatePlaneCount(int count) {
@@ -119,11 +121,10 @@ void ShipEquip::updateEquipName(QUuid equipUid)
     disconnect(view, &EquipView::equipSelected,
                this, &ShipEquip::updateEquipName);
     if(equipUid.isNull()) {
-        if(ui->typeIcon->isVisible()) {
-            ui->equipText->setText(qtTrId("empty-equip-slot"));
-            ui->starText->setText("");
-            ui->typeIcon->hide();
-        }
+        ui->equipText->setText(qtTrId("empty-equip-slot"));
+        ui->starText->setText("");
+        ui->typeIcon->hide();
+        update();
         return;
     }
     Clientv2 &engine = Clientv2::getInstance();
