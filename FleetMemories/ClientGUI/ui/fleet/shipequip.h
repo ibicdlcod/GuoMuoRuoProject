@@ -28,6 +28,7 @@ signals:
 protected:
     void mousePressEvent(QMouseEvent* event) override;
     void mouseReleaseEvent(QMouseEvent* event) override;
+    void paintEvent(QPaintEvent *) override;
 
 private slots:
     void receivedPlaneCountInfo(int shipPosIndex, int equipSlotIndex,
@@ -42,6 +43,7 @@ private:
 
     FleetView * parentView;
     QUuid equipUId;
+    QIcon icon;
     int shipPosIndex;
     int equipSlotIndex;
     int planeCount = 0;

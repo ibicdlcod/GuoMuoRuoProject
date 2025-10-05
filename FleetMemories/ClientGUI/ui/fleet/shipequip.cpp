@@ -2,6 +2,7 @@
 #include "ui_shipequip.h"
 #include <QMouseEvent>
 #include <QStyleHints>
+#include <QPainter>
 #include "../../clientv2.h"
 #include "../../equipicon.h"
 
@@ -48,11 +49,33 @@ void ShipEquip::mouseReleaseEvent(QMouseEvent *event)
     static constexpr int viewMinimumHeight = 500;
     if (event->button() == Qt::LeftButton && mousePressedInside) {
         if (rect().contains(event->pos())) {
-            qCritical() << "FUCK";
+            EquipView *view = &(parentView->equipView);
+            view->activate(false, true);
+            view->setMinimumHeight(viewMinimumHeight);
+            view->setAttribute(Qt::WA_DeleteOnClose, false);
+            view->show();
+            QScreen *screen = view->screen();
+            QRect screenGeometry = screen->availableGeometry();
+            int width = screenGeometry.width() / 1.5;
+            int height = screenGeometry.height() / 1.5;
+            QPoint center = screenGeometry.center();
+            QRect windowGeometry = QRect(center.x() - width / 2,
+                                         center.y() - height / 2,
+                                         width,
+                                         height);
+            view->setGeometry(windowGeometry);
+            connect(view, &EquipView::equipSelected,
+                    this, &ShipEquip::updateEquipName);
         }
     }
     mousePressedInside = false;
     QWidget::mouseReleaseEvent(event); // Call base class implementation
+}
+
+void ShipEquip::paintEvent(QPaintEvent *event)
+{
+    QPainter painter(this);
+    icon.paint(&painter, ui->typeIcon->geometry(), Qt::AlignCenter);
 }
 
 void ShipEquip::updatePlaneCount(int count) {
@@ -92,6 +115,9 @@ void ShipEquip::receivedNewPlaneCountInfo(int shipPosIndex, int maxCount)
 
 void ShipEquip::updateEquipName(QUuid equipUid)
 {
+    EquipView *view = &(parentView->equipView);
+    disconnect(view, &EquipView::equipSelected,
+               this, &ShipEquip::updateEquipName);
     if(equipUid.isNull()) {
         if(ui->typeIcon->isVisible()) {
             ui->equipText->setText(qtTrId("empty-equip-slot"));
@@ -131,8 +157,5 @@ void ShipEquip::updateEquipName(QUuid equipUid)
 
     ui->starText->setText(star > 0 ? "★+" + QString::number(star) : "");
     ui->typeIcon->show();
-    ui->typeIcon->setPixmap(Icute::equipTypeIcon(equip->type, false)
-                                .pixmap(QSize(60, 60)).scaled(ui->typeIcon->width(),
-                                        ui->typeIcon->height(), Qt::KeepAspectRatio,
-                                        Qt::SmoothTransformation));
+    icon = Icute::equipTypeIcon(equip->type, false);
 }
