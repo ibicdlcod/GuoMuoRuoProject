@@ -22,6 +22,12 @@ EquipModel::EquipModel(QObject *parent, bool isInArsenal)
             this, [this](int, int){clearCheckBoxes();});
 }
 
+std::tuple<Equipment *, int> EquipModel::getEquip(QUuid euid) {
+    if(!clientEquips.contains(euid))
+        return {nullptr, 0};
+    return {clientEquips[euid], clientEquipStars[euid]};
+}
+
 void EquipModel::switchDisplayType(int index) {
     int oldRowCount = rowCount();
     sortedEquipIds.clear();

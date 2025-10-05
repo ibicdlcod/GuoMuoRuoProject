@@ -193,7 +193,8 @@ const QString EquipType::intToStrRep(int input) {
         if(iter->second == input)
             return iter->first;
     }
-    return QString("unknown");
+    //% "Unknown"
+    return qtTrId("unknown");
 }
 
 int EquipType::strToIntRep(QString input) {

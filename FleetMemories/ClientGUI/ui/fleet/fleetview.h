@@ -61,6 +61,7 @@ private:
     int currentActiveFleet = 0;
     QMap<int, KP::FleetType> fleetTypes;
     QGridLayout *grid;
+    QMap<QUuid, QList<QUuid>> shipEquips;
 
     int posColumn = 0;
     int nameColumn = 1;

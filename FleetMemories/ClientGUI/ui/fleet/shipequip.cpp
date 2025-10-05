@@ -1,6 +1,11 @@
 #include "shipequip.h"
 #include "ui_shipequip.h"
 #include <QMouseEvent>
+#include <QStyleHints>
+#include "../../clientv2.h"
+#include "../../equipicon.h"
+
+extern std::unique_ptr<QSettings> settings;
 
 ShipEquip::ShipEquip(int shipPosIndex,
                      int equipSlotIndex,
@@ -83,4 +88,51 @@ void ShipEquip::receivedNewPlaneCountInfo(int shipPosIndex, int maxCount)
     }
     ui->planeCountBox->setValue(0);
     ui->planeCountBox->setMaximum(maxCount);
+}
+
+void ShipEquip::updateEquipName(QUuid equipUid)
+{
+    if(equipUid.isNull()) {
+        if(ui->typeIcon->isVisible()) {
+            ui->equipText->setText(qtTrId("empty-equip-slot"));
+            ui->starText->setText("");
+            ui->typeIcon->hide();
+        }
+        return;
+    }
+    Clientv2 &engine = Clientv2::getInstance();
+    auto [equip, star] = engine.equipModel.getEquip(equipUid);
+    if(equip == nullptr) {
+        ui->equipText->setText(qtTrId("unknown"));
+        ui->starText->setText("");
+        ui->typeIcon->clear();
+        return;
+    }
+    QString localName = equip->toString(
+        settings->value("client/language", "ja_JP").toString());
+    if(localName.size() == 0)
+        localName = equip->toString("ja_JP");
+    ui->equipText->setText(localName);
+
+    QColor color = QColor();
+    switch(QApplication::styleHints()->colorScheme()) {
+    case Qt::ColorScheme::Dark:
+        color.setHsv(std::min(star, 15) * 20, 128, 255);
+        break;
+    case Qt::ColorScheme::Light: [[fallthrough]];
+    default:
+        color.setHsv(std::min(star, 15) * 20, 255, 128);
+        break;
+    }
+    QPalette palette = ui->starText->palette();
+    palette.setColor(ui->starText->foregroundRole(), color); // Set text color
+    ui->starText->setPalette(palette);
+    //ui->starText->setAutoFillBackground(true);
+
+    ui->starText->setText(star > 0 ? "★+" + QString::number(star) : "");
+    ui->typeIcon->show();
+    ui->typeIcon->setPixmap(Icute::equipTypeIcon(equip->type, false)
+                                .pixmap(QSize(60, 60)).scaled(ui->typeIcon->width(),
+                                        ui->typeIcon->height(), Qt::KeepAspectRatio,
+                                        Qt::SmoothTransformation));
 }

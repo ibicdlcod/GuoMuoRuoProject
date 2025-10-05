@@ -11,6 +11,7 @@ class EquipModel : public QAbstractTableModel
     Q_OBJECT
 public:
     explicit EquipModel(QObject *parent = nullptr, bool isInArsenal = true);
+    std::tuple<Equipment *, int> getEquip(QUuid);
 
 signals:
     void destructRequest(const QList<QUuid> &);

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ui version="4.0">
+<ui version="4.0" idbasedtr="true">
  <class>ShipEquip</class>
  <widget class="QWidget" name="ShipEquip">
   <property name="geometry">
@@ -43,8 +43,20 @@
      </item>
      <item>
       <widget class="QLabel" name="typeIcon">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>16777215</width>
+         <height>16777215</height>
+        </size>
+       </property>
        <property name="text">
-        <string>Text</string>
+        <string/>
        </property>
        <property name="alignment">
         <set>Qt::AlignCenter</set>
@@ -54,7 +66,7 @@
      <item>
       <widget class="QLabel" name="starText">
        <property name="text">
-        <string>※+1</string>
+        <string/>
        </property>
        <property name="alignment">
         <set>Qt::AlignCenter</set>
@@ -72,7 +84,7 @@
       </sizepolicy>
      </property>
      <property name="text">
-      <string>天山一二型甲改二(村田隊／電探装備)</string>
+      <string id="empty-equip-slot">Empty</string>
      </property>
      <property name="alignment">
       <set>Qt::AlignCenter</set>

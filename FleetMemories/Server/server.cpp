@@ -2825,6 +2825,7 @@ void Server::receivedReq(const QJsonObject &djson,
         }
         break;
         case KP::GameState::FleetView: {
+            offerEquipInfoUser(uid, connection);
             offerShipInfoUser(uid, connection);
         }
         break;
@@ -3528,41 +3529,51 @@ KP::FleetFailType Server::updateFleet(CSteamID &uid, const QJsonArray &input)
             switch(value) {
             case KP::NormalFleet:
                 if(fleetShipNums[fleetIndex] > KP::normalFleetSize) {
+                    qCritical() << "FUCK1";
                     throw std::domain_error("fleet-size-error");
                 }
                 if(fleetSize > KP::normalFleetMaxSize) {
+                    qCritical() << "FUCK1";
                     throw std::domain_error("fleet-size-error");
                 }
                 break;
             case KP::SurfaceFleet:
                 if(fleetShipNums[fleetIndex] > KP::combinedFleetSize) {
+                    qCritical() << "FUCK1";
                     throw std::domain_error("fleet-size-error");
                 }
                 if(fleetSize < KP::combinedFleetMinSize
                     || fleetSize > KP::combinedFleetMaxSize) {
+                    qCritical() << "FUCK1";
                     throw std::domain_error("fleet-size-error");
                 }
                 if(battleShipSizes[fleetIndex] <= carrierSizes[fleetIndex]) {
+                    qCritical() << "FUCK1";
                     throw std::domain_error("fleet-type-unfit-error");
                 }
                 break;
             case KP::CarrierFleet:
                 if(fleetShipNums[fleetIndex] > KP::combinedFleetSize) {
+                    qCritical() << "FUCK1";
                     throw std::domain_error("fleet-size-error");
                 }
                 if(fleetSize < KP::combinedFleetMinSize
                     || fleetSize > KP::combinedFleetMaxSize) {
+                    qCritical() << "FUCK1";
                     throw std::domain_error("fleet-size-error");
                 }
                 if(battleShipSizes[fleetIndex] >= carrierSizes[fleetIndex]) {
+                    qCritical() << "FUCK1";
                     throw std::domain_error("fleet-type-unfit-error");
                 }
                 break;
             case KP::TransportFleet:
                 if(fleetShipNums[fleetIndex] > KP::combinedFleetSize) {
+                    qCritical() << "FUCK1";
                     throw std::domain_error("fleet-size-error");
                 }
                 if(fleetSize > KP::transportFleetMaxSize) {
+                    qCritical() << "FUCK1";
                     throw std::domain_error("fleet-size-error");
                 }
                 if(screenSizes[fleetIndex] <= battleShipSizes[fleetIndex]

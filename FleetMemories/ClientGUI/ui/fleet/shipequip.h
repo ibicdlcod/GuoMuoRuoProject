@@ -18,6 +18,8 @@ public:
                        FleetView *parent = nullptr);
     ~ShipEquip();
 
+    void updateEquipName(QUuid equipUid);
+
 signals:
     void modifyPlaneCount(int shipPosindex,
                           int equipSlotIndex,
