@@ -29,6 +29,8 @@ ShipEquip::ShipEquip(int shipPosIndex,
             this, &ShipEquip::receivedPlaneCountInfo);
     connect(parentView, &FleetView::newPlaneCountInfo,
             this, &ShipEquip::receivedNewPlaneCountInfo);
+    connect(this, &ShipEquip::equipSelected,
+            parentView, &FleetView::equipSelected);
 }
 
 ShipEquip::~ShipEquip()
@@ -66,6 +68,8 @@ void ShipEquip::mouseReleaseEvent(QMouseEvent *event)
             view->setGeometry(windowGeometry);
             connect(view, &EquipView::equipSelected,
                     this, &ShipEquip::updateEquipName);
+            connect(view, &EquipView::equipSelected,
+                    this, &ShipEquip::processEquipSelect);
         }
     }
     mousePressedInside = false;
@@ -113,6 +117,14 @@ void ShipEquip::receivedNewPlaneCountInfo(int shipPosIndex, int maxCount)
     }
     ui->planeCountBox->setValue(0);
     ui->planeCountBox->setMaximum(maxCount);
+}
+
+void ShipEquip::processEquipSelect(QUuid equipUid)
+{
+    EquipView *view = &(parentView->equipView);
+    disconnect(view, &EquipView::equipSelected,
+            this, &ShipEquip::processEquipSelect);
+    emit equipSelected(shipPosIndex, equipSlotIndex, equipUid);
 }
 
 void ShipEquip::updateEquipName(QUuid equipUid)

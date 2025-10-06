@@ -20,8 +20,8 @@
    <property name="geometry">
     <rect>
      <x>9</x>
-     <y>146</y>
-     <width>816</width>
+     <y>284</y>
+     <width>596</width>
      <height>24</height>
     </rect>
    </property>
@@ -226,6 +226,27 @@
      </spacer>
     </item>
    </layout>
+  </widget>
+  <widget class="QLabel" name="waitLabel">
+   <property name="geometry">
+    <rect>
+     <x>9</x>
+     <y>9</y>
+     <width>649</width>
+     <height>61</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>48</pointsize>
+    </font>
+   </property>
+   <property name="text">
+    <string id="load-fleet-wait">Loading Fleets, please wait...</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignCenter</set>
+   </property>
   </widget>
  </widget>
  <resources/>

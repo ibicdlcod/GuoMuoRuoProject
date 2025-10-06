@@ -199,7 +199,7 @@
     </message>
     <message id="unknown">
         <location filename="../Protocol/equiptype.cpp" line="197"/>
-        <location filename="../ClientGUI/ui/fleet/shipequip.cpp" line="133"/>
+        <location filename="../ClientGUI/ui/fleet/shipequip.cpp" line="145"/>
         <source>Unknown</source>
         <translation type="unfinished">Unknown</translation>
     </message>
@@ -2442,6 +2442,11 @@ Great at battle and bad at politics--so cool!</translation>
 </context>
 <context>
     <name>FleetView</name>
+    <message id="load-fleet-wait">
+        <location filename="../ClientGUI/ui/fleet/fleetview.ui" line="245"/>
+        <source>Loading Fleets, please wait...</source>
+        <translation>Loading Fleets, please wait...</translation>
+    </message>
     <message id="fleetview-fleet">
         <location filename="../ClientGUI/ui/fleet/fleetview.ui" line="81"/>
         <source>Fleet:</source>
@@ -2698,7 +2703,7 @@ Great at battle and bad at politics--so cool!</translation>
     </message>
     <message id="empty-equip-slot">
         <location filename="../ClientGUI/ui/fleet/shipequip.ui" line="93"/>
-        <location filename="../ClientGUI/ui/fleet/shipequip.cpp" line="124"/>
+        <location filename="../ClientGUI/ui/fleet/shipequip.cpp" line="136"/>
         <source>Empty</source>
         <translation type="unfinished"></translation>
     </message>

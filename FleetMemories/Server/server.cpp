@@ -3531,7 +3531,7 @@ KP::FleetFailType Server::updateFleet(CSteamID &uid, const QJsonArray &input)
                 if(fleetShipNums[fleetIndex] > KP::normalFleetSize) {
                     throw std::domain_error("fleet-size-error");
                 }
-                if(fleetSize > KP::normalFleetMaxSize) {
+                if(fleetSize > KP::normalFleetMaxCapitalness) {
                     throw std::domain_error("fleet-size-error");
                 }
                 break;
@@ -3539,8 +3539,8 @@ KP::FleetFailType Server::updateFleet(CSteamID &uid, const QJsonArray &input)
                 if(fleetShipNums[fleetIndex] > KP::combinedFleetSize) {
                     throw std::domain_error("fleet-size-error");
                 }
-                if(fleetSize < KP::combinedFleetMinSize
-                    || fleetSize > KP::combinedFleetMaxSize) {
+                if(fleetSize < KP::combinedFleetMinCapitalness
+                    || fleetSize > KP::combinedFleetMaxCapitalness) {
                     throw std::domain_error("fleet-size-error");
                 }
                 if(battleShipSizes[fleetIndex] <= carrierSizes[fleetIndex]) {
@@ -3551,8 +3551,8 @@ KP::FleetFailType Server::updateFleet(CSteamID &uid, const QJsonArray &input)
                 if(fleetShipNums[fleetIndex] > KP::combinedFleetSize) {
                     throw std::domain_error("fleet-size-error");
                 }
-                if(fleetSize < KP::combinedFleetMinSize
-                    || fleetSize > KP::combinedFleetMaxSize) {
+                if(fleetSize < KP::combinedFleetMinCapitalness
+                    || fleetSize > KP::combinedFleetMaxCapitalness) {
                     throw std::domain_error("fleet-size-error");
                 }
                 if(battleShipSizes[fleetIndex] >= carrierSizes[fleetIndex]) {
@@ -3563,7 +3563,7 @@ KP::FleetFailType Server::updateFleet(CSteamID &uid, const QJsonArray &input)
                 if(fleetShipNums[fleetIndex] > KP::combinedFleetSize) {
                     throw std::domain_error("fleet-size-error");
                 }
-                if(fleetSize > KP::transportFleetMaxSize) {
+                if(fleetSize > KP::transportFleetMaxCapitalness) {
                     throw std::domain_error("fleet-size-error");
                 }
                 if(screenSizes[fleetIndex] <= battleShipSizes[fleetIndex]

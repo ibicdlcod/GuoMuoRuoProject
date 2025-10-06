@@ -3,6 +3,7 @@
 
 #include <QFrame>
 #include <QGridLayout>
+#include <QScrollArea>
 #include "../views/equipview.h"
 #include "../../../Protocol/kp.h"
 #include "../../../Protocol/ship.h"
@@ -42,11 +43,20 @@ signals:
                         int currentCount, int maxCount);
     void newPlaneCountInfo(int shipPosIndex, int maxCount);
     void resetPlaneCount(int shipPosIndex);
+    void modifyEquip(QUuid shipUid,
+                     int equipSlotIndex,
+                     QUuid equipUid);
 
 public slots:
     void modifyFleetShip(int posindex, QUuid uid);
     void modifyPlaneCount(int shipPosIndex, int equipSlotIndex,
                           int diff);
+    void equipSelected(int shipPosIndex,
+                       int equipSlotIndex,
+                       QUuid equipUid);
+    void equipSelectedPassive(QUuid shipUid,
+                              int equipSlotIndex,
+                              QUuid equipUid);
 
 private slots:
     void modifyFleetIndex(bool checked);
@@ -61,7 +71,7 @@ private:
     int currentActiveFleet = 0;
     QMap<int, KP::FleetType> fleetTypes;
     QGridLayout *grid;
-    QMap<QUuid, QList<QUuid>> shipEquips;
+    QScrollArea *scrollArea;
 
     int posColumn = 0;
     int nameColumn = 1;

@@ -261,7 +261,7 @@ Great at battle and bad at politics--so cool!</source>
     </message>
     <message id="unknown">
         <location filename="../Protocol/equiptype.cpp" line="197"/>
-        <location filename="../ClientGUI/ui/fleet/shipequip.cpp" line="133"/>
+        <location filename="../ClientGUI/ui/fleet/shipequip.cpp" line="145"/>
         <source>Unknown</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2417,6 +2417,11 @@ Great at battle and bad at politics--so cool!</source>
 </context>
 <context>
     <name>FleetView</name>
+    <message id="load-fleet-wait">
+        <location filename="../ClientGUI/ui/fleet/fleetview.ui" line="245"/>
+        <source>Loading Fleets, please wait...</source>
+        <translation type="unfinished"></translation>
+    </message>
     <message id="fleetview-fleet">
         <location filename="../ClientGUI/ui/fleet/fleetview.ui" line="81"/>
         <source>Fleet:</source>
@@ -2657,7 +2662,7 @@ Great at battle and bad at politics--so cool!</source>
     </message>
     <message id="empty-equip-slot">
         <location filename="../ClientGUI/ui/fleet/shipequip.ui" line="93"/>
-        <location filename="../ClientGUI/ui/fleet/shipequip.cpp" line="124"/>
+        <location filename="../ClientGUI/ui/fleet/shipequip.cpp" line="136"/>
         <source>Empty</source>
         <translation type="unfinished"></translation>
     </message>

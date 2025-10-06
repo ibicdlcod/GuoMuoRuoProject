@@ -119,8 +119,9 @@ FleetView::FleetView(QWidget *parent)
     QVBoxLayout *greatLayout = new QVBoxLayout(this);
     greatLayout->setContentsMargins(3, 3, 3, 3);
     greatLayout->setSpacing(3);
+    greatLayout->addWidget(ui->waitLabel);
     greatLayout->addWidget(ui->FleetMenu);
-    QScrollArea *scrollArea = new QScrollArea(this);
+    scrollArea = new QScrollArea(this);
     scrollArea->setStyleSheet(
         "QScrollArea { border-style: none; }");
     scrollArea->setWidget(fleetGrid);
@@ -176,6 +177,14 @@ FleetView::FleetView(QWidget *parent)
             shipPlaneCount[FleetPos{i, j}] = 0;
         }
     }
+
+    connect(this, &FleetView::modifyEquip,
+            &engine.equipModel, &EquipModel::setShipEquip);
+    connect(&engine.equipModel, &EquipModel::equipModified,
+            this, &FleetView::equipSelectedPassive);
+    ui->waitLabel->show();
+    ui->FleetMenu->hide();
+    scrollArea->hide();
 }
 
 FleetView::~FleetView()
@@ -306,10 +315,9 @@ void FleetView::modifyFleetShip(int posIndex, QUuid uid) {
                 qobject_cast<ShipEquip *>(
                     grid->itemAtPosition(oldPos.posindex + 1,
                                          equipSlotsColumn + j)->widget())
-                    ->updateEquipName(shipEquips[oldUid][j]);
+                    ->updateEquipName(engine.equipModel.getShipEquip(oldUid, j));
             }
             for(int j = slotNum; j < KP::maxEquipSlots; ++j) {
-                /* TODO: unselect equip */
                 grid->itemAtPosition(oldPos.posindex + 1,
                                      equipSlotsColumn + j)->widget()->hide();
             }
@@ -320,10 +328,9 @@ void FleetView::modifyFleetShip(int posIndex, QUuid uid) {
                 qobject_cast<ShipEquip *>(
                     grid->itemAtPosition(oldPos.posindex + 1,
                                          equipSlotsColumn + KP::maxEquipSlots)->widget())
-                    ->updateEquipName(shipEquips[oldUid][KP::maxEquipSlots]);
+                    ->updateEquipName(engine.equipModel.getShipEquip(oldUid, KP::maxEquipSlots));
             }
             else {
-                /* TODO: unselect equip */
                 grid->itemAtPosition(oldPos.posindex + 1,
                                      equipSlotsColumn + KP::maxEquipSlots)
                     ->widget()->hide();
@@ -400,10 +407,9 @@ void FleetView::modifyFleetShip(int posIndex, QUuid uid) {
         qobject_cast<ShipEquip *>(
             grid->itemAtPosition(newPos.posindex + 1,
                                  equipSlotsColumn + j)->widget())
-            ->updateEquipName(shipEquips[uid][j]);
+            ->updateEquipName(engine.equipModel.getShipEquip(uid, j));
     }
     for(int j = slotNum; j < KP::maxEquipSlots; ++j) {
-        /* TODO: unselect equip */
         grid->itemAtPosition(newPos.posindex + 1,
                              equipSlotsColumn + j)->widget()->hide();
     }
@@ -414,10 +420,9 @@ void FleetView::modifyFleetShip(int posIndex, QUuid uid) {
         qobject_cast<ShipEquip *>(
             grid->itemAtPosition(newPos.posindex + 1,
                                  equipSlotsColumn + KP::maxEquipSlots)->widget())
-            ->updateEquipName(shipEquips[uid][KP::maxEquipSlots]);
+            ->updateEquipName(engine.equipModel.getShipEquip(uid, KP::maxEquipSlots));
     }
     else {
-        /* TODO: unselect equip */
         grid->itemAtPosition(newPos.posindex + 1,
                              equipSlotsColumn + KP::maxEquipSlots)
             ->widget()->hide();
@@ -466,8 +471,10 @@ void FleetView::receivedShipInfo(const QJsonObject &info) {
             fleetTypes[attr->fleetIndex] =
                 static_cast<KP::FleetType>(itemObject["fleettype"].toInt());
         }
-        shipEquips[uid] = attr->slotEquip;
-        shipEquips[uid].append(attr->slotEquipEx);
+        for(int j = 0; j < KP::maxEquipSlots; ++j) {
+            engine.equipModel.setShipEquip(uid, j, attr->slotEquip[j]);
+        }
+        engine.equipModel.setShipEquip(uid, KP::maxEquipSlots, attr->slotEquipEx);
         delete attr;
     }
     ui->fleetTypeSelect->setCurrentIndex(fleetTypes[currentActiveFleet]);
@@ -492,6 +499,9 @@ void FleetView::receivedShipInfo(const QJsonObject &info) {
             modifyFleetShip(i, ships[FleetPos{currentActiveFleet, i}]);
         }
     }
+    ui->waitLabel->hide();
+    ui->FleetMenu->show();
+    scrollArea->show();
 }
 
 void FleetView::sendFleetData(bool checked) {
@@ -525,4 +535,24 @@ void FleetView::modifyPlaneCount(int shipPosIndex, int equipSlotIndex, int diff)
     emit planeCountInfo(shipPosIndex, equipSlotIndex,
                         shipPlaneCount[FleetPos{currentActiveFleet, shipPosIndex}],
                         shipPlanes);
+}
+
+void FleetView::equipSelected(int shipPosIndex,
+                              int equipSlotIndex,
+                              QUuid equipUid) {
+    emit modifyEquip(getShipUuid(shipPosIndex), equipSlotIndex, equipUid);
+}
+
+void FleetView::equipSelectedPassive(QUuid shipUid,
+                          int equipSlotIndex,
+                          QUuid equipUid)
+{
+    for(int i = 0; i < KP::combinedFleetSize; ++i) {
+        if(getShipUuid(i) == shipUid) {
+            qobject_cast<ShipEquip *>(
+                grid->itemAtPosition(i + 1,
+                                     equipSlotsColumn + equipSlotIndex)->widget())
+                ->updateEquipName(equipUid);
+        }
+    }
 }

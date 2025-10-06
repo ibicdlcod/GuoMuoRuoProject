@@ -84,9 +84,9 @@ void EquipModel::switchDisplayType2(const QString &equipName) {
 }
 
 void EquipModel::switchShipDisplayType(const QString &nationality,
-                           const QString &shiptype,
-                           const QString &shipclass,
-                           const QString &searchTerm) {
+                                       const QString &shiptype,
+                                       const QString &shipclass,
+                                       const QString &searchTerm) {
     /* do nothing */
     ;
 }
@@ -602,4 +602,41 @@ void EquipModel::wholeTableChanged() {
         emit dataChanged(topleft, bottomright, QList<int>());
     }
     emit headerDataChanged(Qt::Horizontal, 0, rowCount() - 1);
+}
+
+void EquipModel::setShipEquip(QUuid shipUID, int slotPos, QUuid equipUID) {
+    auto [oldShip, oldPos] = shipEquipReverse[equipUID];
+    QUuid oldEquip;
+    if(!shipEquips.contains(shipUID)) {
+        shipEquips[shipUID] = QList<QUuid>(KP::maxEquipSlots + 1, QUuid());
+        oldEquip = QUuid();
+    }
+    else {
+        oldEquip = shipEquips[shipUID][slotPos];
+    }
+    if(oldEquip == equipUID) {
+        return;
+    }
+    if(!oldEquip.isNull()) {
+        shipEquipReverse[oldEquip] = {QUuid(), -1};
+    }
+    if(!oldShip.isNull() && oldPos != -1) {
+        emit equipModified(oldShip, oldPos, QUuid());
+        shipEquips[oldShip][oldPos] = QUuid();
+    }
+    shipEquips[shipUID][slotPos] = equipUID;
+    if(!equipUID.isNull()) {
+        shipEquipReverse[equipUID] = {shipUID, slotPos};
+    }
+}
+
+QUuid EquipModel::getShipEquip(QUuid shipUID, int slotPos) {
+    if(!shipEquips.contains(shipUID)) {
+        return QUuid();
+    }
+    return shipEquips[shipUID][slotPos];
+}
+
+std::tuple<QUuid, int> EquipModel::getEquipShip(QUuid equip) {
+    return shipEquipReverse.value(equip, {QUuid(), -1});
 }

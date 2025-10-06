@@ -18,6 +18,9 @@ signals:
     void needReCalculateRows();
     void needReCalculatePages();
     void pageNumChanged(int currentPageNum, int totalPageNum);
+    void equipModified(QUuid shipUid,
+                       int equipSlotIndex,
+                       QUuid equipUid);
 
 public slots:
     virtual void switchDisplayType(int) final;
@@ -39,16 +42,19 @@ public slots:
     virtual void setRowsPerPageHint(int);
     virtual void setIsInArsenal(bool);
     virtual void wholeTableChanged();
+    virtual void setShipEquip(QUuid ship, int slotPos, QUuid equip) final;
+    virtual QUuid getShipEquip(QUuid ship, int slotPos) final;
+    virtual std::tuple<QUuid, int> getEquipShip(QUuid equip) final;
 
 public:
     virtual int rowCount(const QModelIndex &parent
                          = QModelIndex()) const override;
     virtual int columnCount(const QModelIndex &parent
-                         = QModelIndex()) const override;
+                            = QModelIndex()) const override;
     virtual QVariant data(const QModelIndex &index,
                           int role = Qt::DisplayRole) const override;
     virtual QVariant headerData(int section, Qt::Orientation orientation,
-                          int role = Qt::DisplayRole) const override;
+                                int role = Qt::DisplayRole) const override;
     virtual Qt::ItemFlags flags(const QModelIndex &index) const override;
     virtual bool setData(const QModelIndex &index,
                          const QVariant &value,
@@ -89,6 +95,9 @@ private:
     QHash<QUuid, int> clientEquipStars;
     QList<QUuid> sortedEquipIds; // not sort by uuid but equiptype
     QHash<QUuid, bool> isDestructChecked;
+
+    QMap<QUuid, QList<QUuid>> shipEquips;
+    QMap<QUuid, std::tuple<QUuid, int>> shipEquipReverse;
 };
 
 #endif // EQUIPMODEL_H

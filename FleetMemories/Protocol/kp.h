@@ -45,10 +45,10 @@ static constexpr int combinedFleetSize = 14;
 static constexpr int fleetRepSize = 0x10;
 static constexpr int maxEquipSlots = 5;
 static constexpr int levelUnlockExSlot = 30;
-static constexpr int normalFleetMaxSize = 20;
-static constexpr int combinedFleetMinSize = 15;
-static constexpr int combinedFleetMaxSize = 50;
-static constexpr int transportFleetMaxSize = 25;
+static constexpr int normalFleetMaxCapitalness = 20;
+static constexpr int combinedFleetMinCapitalness = 15;
+static constexpr int combinedFleetMaxCapitalness = 50;
+static constexpr int transportFleetMaxCapitalness = 25;
 #pragma message(NOT_M_CONST)
 static constexpr qint64 secsinMin = 60;
 static constexpr int equipIdMax = 0x10000;

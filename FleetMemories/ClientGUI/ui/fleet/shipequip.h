@@ -18,12 +18,16 @@ public:
                        FleetView *parent = nullptr);
     ~ShipEquip();
 
+public slots:
     void updateEquipName(QUuid equipUid);
 
 signals:
-    void modifyPlaneCount(int shipPosindex,
+    void modifyPlaneCount(int shipPosIndex,
                           int equipSlotIndex,
                           int diff);
+    void equipSelected(int shipPosIndex,
+                       int equipSlotIndex,
+                       QUuid equipUID);
 
 protected:
     void mousePressEvent(QMouseEvent* event) override;
@@ -34,6 +38,7 @@ private slots:
     void receivedPlaneCountInfo(int shipPosIndex, int equipSlotIndex,
                                 int currentCount, int maxCount);
     void receivedNewPlaneCountInfo(int shipPosindex, int maxCount);
+    void processEquipSelect(QUuid);
 
 private:
     void updatePlaneCount(int count);
