@@ -316,6 +316,10 @@ void FleetView::modifyFleetShip(int posIndex, QUuid uid) {
                     grid->itemAtPosition(oldPos.posindex + 1,
                                          equipSlotsColumn + j)->widget())
                     ->updateEquipName(engine.equipModel.getShipEquip(oldUid, j));
+                qobject_cast<ShipEquip *>(
+                    grid->itemAtPosition(oldPos.posindex + 1,
+                                         equipSlotsColumn + j)->widget())
+                    ->updatePlaneCountDirect(getShipDynamic(oldPos.posindex));
             }
             for(int j = slotNum; j < KP::maxEquipSlots; ++j) {
                 grid->itemAtPosition(oldPos.posindex + 1,
@@ -343,13 +347,7 @@ void FleetView::modifyFleetShip(int posIndex, QUuid uid) {
             = -1;
         std::get<1>(shipModel->getShip(ships[newPos]))->fleetPosIndex
             = -1;
-    }/*
-    if(uid.isNull() && !ships[newPos].isNull()) {
-        std::get<1>(shipModel->getShip(ships[newPos]))->fleetIndex
-            = -1;
-        std::get<1>(shipModel->getShip(ships[newPos]))->fleetPosIndex
-            = -1;
-    }*/
+    }
     ships[newPos] = uid;
     qobject_cast<InteractiveLabel *>
         (grid->itemAtPosition(newPos.posindex + 1, shipIconColumn)->widget())
@@ -408,6 +406,10 @@ void FleetView::modifyFleetShip(int posIndex, QUuid uid) {
             grid->itemAtPosition(newPos.posindex + 1,
                                  equipSlotsColumn + j)->widget())
             ->updateEquipName(engine.equipModel.getShipEquip(uid, j));
+        qobject_cast<ShipEquip *>(
+            grid->itemAtPosition(newPos.posindex + 1,
+                                 equipSlotsColumn + j)->widget())
+            ->updatePlaneCountDirect(getShipDynamic(newPos.posindex));
     }
     for(int j = slotNum; j < KP::maxEquipSlots; ++j) {
         grid->itemAtPosition(newPos.posindex + 1,
@@ -525,6 +527,11 @@ void FleetView::sendFleetData(bool checked) {
             equips.append(engine.equipModel.getShipEquip(iter->second, i).toString());
         }
         ship["equip"] = equips;
+        QJsonArray planes;
+        for(int i = 0; i < KP::maxEquipSlots; ++i) {
+            planes.append(shipPlaneCount[iter->first]);
+        }
+        ship["plane"] = planes;
         content.append(ship);
     }
     engine.sendFleetData(content);

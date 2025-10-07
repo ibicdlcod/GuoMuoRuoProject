@@ -88,6 +88,7 @@ void ShipEquip::paintEvent(QPaintEvent *event)
 }
 
 void ShipEquip::updatePlaneCount(int count) {
+    ui->planeCountBox->setValue(count);
     int diff = count - planeCount;
     planeCount = count;
     emit modifyPlaneCount(shipPosIndex, equipSlotIndex, diff);
@@ -118,7 +119,10 @@ void ShipEquip::receivedNewPlaneCountInfo(int shipPosIndex, int maxCount)
     if(shipPosIndex != this->shipPosIndex) {
         return;
     }
+    int cachedValue = ui->planeCountBox->value();
     ui->planeCountBox->setValue(0);
+    if(cachedValue != 0)
+        updatePlaneCount(cachedValue);
     ui->planeCountBox->setMaximum(maxCount);
 }
 
@@ -174,4 +178,9 @@ void ShipEquip::updateEquipName(QUuid equipUid)
     ui->starText->setText(star > 0 ? "★+" + QString::number(star) : "");
     ui->typeIcon->show();
     icon = Icute::equipTypeIcon(equip->type, false);
+}
+
+void ShipEquip::updatePlaneCountDirect(ShipDynamic *dynamic)
+{
+    ui->planeCountBox->setValue(dynamic->slotPlanes[equipSlotIndex]);
 }

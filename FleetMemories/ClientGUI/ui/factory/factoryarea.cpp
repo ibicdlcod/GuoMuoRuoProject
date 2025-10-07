@@ -138,6 +138,7 @@ void FactoryArea::switchToState() {
         ui->Slots->hide();
         ui->ArsenalArea->show();
         equipview->setGeometry(ui->ArsenalArea->rect());
+        equipview->recalculateArsenalRows();
         update();
         equipview->activate(true, true);
         break;
@@ -146,6 +147,7 @@ void FactoryArea::switchToState() {
         ui->Slots->hide();
         ui->ArsenalArea->show();
         equipview->setGeometry(ui->ArsenalArea->rect());
+        equipview->recalculateArsenalRows();
         update();
         equipview->activate(true, false);
         break;

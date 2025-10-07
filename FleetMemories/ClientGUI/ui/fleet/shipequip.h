@@ -20,6 +20,7 @@ public:
 
 public slots:
     void updateEquipName(QUuid equipUid);
+    void updatePlaneCountDirect(ShipDynamic *dynamic);
 
 signals:
     void modifyPlaneCount(int shipPosIndex,
