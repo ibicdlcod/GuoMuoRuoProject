@@ -7,6 +7,7 @@
 #include <QString>
 #include "resord.h"
 #include "equiptype.h"
+#include "ship.h"
 
 Q_GLOBAL_STATIC(QStringList,
                 attrIds,
@@ -91,6 +92,9 @@ public:
     double getTech() const;
     bool isInvalid() const;
     int skillPointsStd() const;
+
+    bool canEquip(Ship *ship) const;
+    bool canEquipEX(Ship *ship) const;
 
     /* 4.2-Attributes.md */
     QMap<QString, QString> localNames;

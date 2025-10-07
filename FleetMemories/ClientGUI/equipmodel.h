@@ -99,6 +99,8 @@ private:
 
     QMap<QUuid, QList<QUuid>> shipEquips;
     QMap<QUuid, std::tuple<QUuid, int>> shipEquipReverse;
+    Ship * currentActiveShip = nullptr;
+    bool currentActiveSlotEx = false;
 };
 
 #endif // EQUIPMODEL_H

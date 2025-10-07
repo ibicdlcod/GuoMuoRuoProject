@@ -5,7 +5,6 @@
 #include <QMap>
 #include <QSet>
 #include "resord.h"
-#include "ship.h"
 
 
 class EquipType
@@ -28,9 +27,6 @@ public:
     static int strToIntRep(QString);
     QString toString() const;
     int toInt() const;
-
-    bool canEquip(Ship *ship) const;
-    bool canEquipEX(Ship *ship) const;
 
     static int getSize(const int);
     static bool isMainGun(const int);

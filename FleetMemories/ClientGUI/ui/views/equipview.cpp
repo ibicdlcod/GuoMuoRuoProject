@@ -229,6 +229,7 @@ void EquipView::activate(bool arsenal, bool isEquip) {
             arsenalView->show();
         }
         if(arsenal) {
+            model->filterByShip(nullptr, false);
             model->setIsInArsenal(true);
             equipSelect->destructButton->show();
             equipSelect->addStarButton->show();

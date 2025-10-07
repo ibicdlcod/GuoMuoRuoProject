@@ -32,12 +32,38 @@ void EquipModel::switchDisplayType(int index) {
     int oldRowCount = rowCount();
     sortedEquipIds.clear();
     if(index == 0) {
-        sortedEquipIds.append(clientEquips.keys());
+        if(currentActiveShip == nullptr) {
+            sortedEquipIds.append(clientEquips.keys());
+        }
+        else {
+            for(auto iter = clientEquips.keyValueBegin();
+                 iter != clientEquips.keyValueEnd();
+                 ++iter) {
+                if(currentActiveSlotEx) {
+                    if(iter->second->canEquipEX(currentActiveShip))
+                        sortedEquipIds.append(iter->first);
+                }
+                else {
+                    if(iter->second->canEquip(currentActiveShip))
+                        sortedEquipIds.append(iter->first);
+                }
+            }
+        }
     }
     else {
         for(auto iter = clientEquips.keyValueBegin();
              iter != clientEquips.keyValueEnd();
              ++iter) {
+            if(currentActiveShip != nullptr) {
+                if(currentActiveSlotEx) {
+                    if(!(iter->second->canEquipEX(currentActiveShip)))
+                        continue;
+                }
+                else {
+                    if(!(iter->second->canEquip(currentActiveShip)))
+                        continue;
+                }
+            }
             if(iter->second->type.getDisplayGroup()
                     .localeAwareCompare(
                         EquipType::getDisplayGroupsSorted().at(index - 1))
@@ -60,6 +86,14 @@ void EquipModel::switchDisplayType2(const QString &equipName) {
     for(auto iter = clientEquips.keyValueBegin();
          iter != clientEquips.keyValueEnd();
          ++iter) {
+        if(currentActiveSlotEx) {
+            if(!(iter->second->canEquipEX(currentActiveShip)))
+                continue;
+        }
+        else {
+            if(!(iter->second->canEquip(currentActiveShip)))
+                continue;
+        }
         pass = false;
         for(const auto &name:
              std::as_const(iter->second->localNames)) {
@@ -643,7 +677,10 @@ std::tuple<QUuid, int> EquipModel::getEquipShip(QUuid equip) {
 
 void EquipModel::filterByShip(Ship *ship, bool isSlotEX)
 {
-    if(ship) {
-        qCritical() << ship->localNames["ja_JP"] << isSlotEX;
+    if(ship == currentActiveShip && isSlotEX == currentActiveSlotEx) {
+        return;
     }
+    currentActiveShip = ship;
+    currentActiveSlotEx = isSlotEX;
+    switchDisplayType(0);
 }
