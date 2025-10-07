@@ -252,6 +252,42 @@ enum CapitalType {
     OtherShip = 3
 };
 
+enum EquipSpecial{
+    NonSpecial = 0,
+    MidgetSub = 1,
+    DepthCharge = 2,
+    Smoke = 3,
+    Sonar = 4,
+    Ballon = 5,
+    APShell = 6,
+    AntilandShell = 7,
+    AntilandRocket = 8,
+    LandingCraft = 9,
+    LandingTank = 10,
+    Drum = 11,
+    TPMaterial = 12,
+    EngineTurbine = 13,
+    EngineBoiler = 14,
+    SearchLight = 15,
+    Starshell = 16,
+    RepairItem = 17,
+    UnderwayReplenish = 18,
+    Food = 19,
+    CommandFacility = 20,
+    AircraftPersonnel = 21,
+    RepairFacility = 22,
+    SurfacePersonnel = 23,
+    LimitedNightPlane = 24,
+    AntiAir = 25,
+    FlyingBoat = 26,
+    LBInterceptor = 27,
+    JetPlane = 28,
+    Bulge = 29,
+    AAControl = 30,
+    LandCorps = 31
+};
+Q_ENUM_NS(EquipSpecial)
+
 Q_GLOBAL_STATIC(QStringList,
                 fleetTypes,
                 QStringList(

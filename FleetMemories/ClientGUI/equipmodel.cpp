@@ -640,3 +640,10 @@ QUuid EquipModel::getShipEquip(QUuid shipUID, int slotPos) {
 std::tuple<QUuid, int> EquipModel::getEquipShip(QUuid equip) {
     return shipEquipReverse.value(equip, {QUuid(), -1});
 }
+
+void EquipModel::filterByShip(Ship *ship, bool isSlotEX)
+{
+    if(ship) {
+        qCritical() << ship->localNames["ja_JP"] << isSlotEX;
+    }
+}

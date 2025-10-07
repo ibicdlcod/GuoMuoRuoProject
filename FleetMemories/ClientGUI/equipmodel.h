@@ -45,6 +45,7 @@ public slots:
     virtual void setShipEquip(QUuid ship, int slotPos, QUuid equip) final;
     virtual QUuid getShipEquip(QUuid ship, int slotPos) final;
     virtual std::tuple<QUuid, int> getEquipShip(QUuid equip) final;
+    virtual void filterByShip(Ship *ship, bool isSlotEX) final;
 
 public:
     virtual int rowCount(const QModelIndex &parent

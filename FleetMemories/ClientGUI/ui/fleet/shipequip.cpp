@@ -48,11 +48,14 @@ void ShipEquip::mousePressEvent(QMouseEvent *event)
 
 void ShipEquip::mouseReleaseEvent(QMouseEvent *event)
 {
+    Clientv2 &engine = Clientv2::getInstance();
     static constexpr int viewMinimumHeight = 500;
     if (event->button() == Qt::LeftButton && mousePressedInside) {
         if (rect().contains(event->pos())) {
             EquipView *view = &(parentView->equipView);
             view->activate(false, true);
+            engine.equipModel.filterByShip(parentView->getShip(shipPosIndex),
+                                           equipSlotIndex == KP::maxEquipSlots);
             view->setMinimumHeight(viewMinimumHeight);
             view->setAttribute(Qt::WA_DeleteOnClose, false);
             QScreen *screen = view->screen();
@@ -130,7 +133,7 @@ void ShipEquip::processEquipSelect(QUuid equipUid)
 {
     EquipView *view = &(parentView->equipView);
     disconnect(view, &EquipView::equipSelected,
-            this, &ShipEquip::processEquipSelect);
+               this, &ShipEquip::processEquipSelect);
     emit equipSelected(shipPosIndex, equipSlotIndex, equipUid);
 }
 

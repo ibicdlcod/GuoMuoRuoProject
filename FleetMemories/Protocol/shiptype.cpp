@@ -85,7 +85,7 @@ QString ShipType::toString() const {
                 //% "(Light)"
                 result.append(" ").append(qtTrId("light-carrier")); break;
             case 2:
-                //% "(Advanced Anti-Sub)"
+                //% "(Advanced ASW)"
                 result.append(" ").append(qtTrId("asw-carrier")); break;
             case 3:
                 //% "(Escort)"

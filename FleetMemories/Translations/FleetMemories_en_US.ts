@@ -4,202 +4,204 @@
 <context>
     <name></name>
     <message id="SMALLGUNFLAT">
-        <location filename="../Protocol/equiptype.cpp" line="33"/>
-        <location filename="../Protocol/equiptype.cpp" line="162"/>
+        <location filename="../Protocol/equiptype.cpp" line="193"/>
+        <location filename="../Protocol/equiptype.cpp" line="324"/>
         <source>小口径主炮（平射）</source>
         <translation>Small-caliber gun (flat)</translation>
     </message>
     <message id="SMALLGUNFLAK">
-        <location filename="../Protocol/equiptype.cpp" line="35"/>
-        <location filename="../Protocol/equiptype.cpp" line="163"/>
+        <location filename="../Protocol/equiptype.cpp" line="195"/>
+        <location filename="../Protocol/equiptype.cpp" line="325"/>
         <source>小口径主炮（高角）</source>
         <translation>Small-caliber gun (flak)</translation>
     </message>
     <message id="MIDGUN">
-        <location filename="../Protocol/equiptype.cpp" line="37"/>
-        <location filename="../Protocol/equiptype.cpp" line="119"/>
-        <location filename="../Protocol/equiptype.cpp" line="120"/>
-        <location filename="../Protocol/equiptype.cpp" line="121"/>
+        <location filename="../Protocol/equiptype.cpp" line="197"/>
+        <location filename="../Protocol/equiptype.cpp" line="281"/>
+        <location filename="../Protocol/equiptype.cpp" line="282"/>
+        <location filename="../Protocol/equiptype.cpp" line="283"/>
         <source>中口径主炮</source>
         <translation>Mid-caliber gun</translation>
     </message>
     <message id="BIGGUN">
-        <location filename="../Protocol/equiptype.cpp" line="39"/>
-        <location filename="../Protocol/equiptype.cpp" line="95"/>
+        <location filename="../Protocol/equiptype.cpp" line="199"/>
+        <location filename="../Protocol/equiptype.cpp" line="255"/>
         <source>大口径主炮</source>
         <translation>Big-caliber gun</translation>
     </message>
     <message id="SUPERBIGGUN">
-        <location filename="../Protocol/equiptype.cpp" line="41"/>
-        <location filename="../Protocol/equiptype.cpp" line="164"/>
-        <location filename="../Protocol/equiptype.cpp" line="165"/>
+        <location filename="../Protocol/equiptype.cpp" line="201"/>
+        <location filename="../Protocol/equiptype.cpp" line="326"/>
+        <location filename="../Protocol/equiptype.cpp" line="327"/>
         <source>超大口径主炮</source>
         <translation>Superbig-caliber gun</translation>
     </message>
     <message id="SECGUN">
-        <location filename="../Protocol/equiptype.cpp" line="43"/>
-        <location filename="../Protocol/equiptype.cpp" line="159"/>
-        <location filename="../Protocol/equiptype.cpp" line="160"/>
-        <location filename="../Protocol/equiptype.cpp" line="161"/>
+        <location filename="../Protocol/equiptype.cpp" line="203"/>
+        <location filename="../Protocol/equiptype.cpp" line="321"/>
+        <location filename="../Protocol/equiptype.cpp" line="322"/>
+        <location filename="../Protocol/equiptype.cpp" line="323"/>
         <source>副炮</source>
         <translation>Secondary gun</translation>
     </message>
     <message id="FIGHTER">
-        <location filename="../Protocol/equiptype.cpp" line="45"/>
-        <location filename="../Protocol/equiptype.cpp" line="110"/>
-        <location filename="../Protocol/equiptype.cpp" line="111"/>
+        <location filename="../Protocol/equiptype.cpp" line="205"/>
+        <location filename="../Protocol/equiptype.cpp" line="272"/>
+        <location filename="../Protocol/equiptype.cpp" line="273"/>
         <source>舰载战斗机</source>
         <translation>Carrier fighter</translation>
     </message>
     <message id="BOMBDIVE">
-        <location filename="../Protocol/equiptype.cpp" line="47"/>
-        <location filename="../Protocol/equiptype.cpp" line="96"/>
-        <location filename="../Protocol/equiptype.cpp" line="97"/>
-        <location filename="../Protocol/equiptype.cpp" line="98"/>
-        <location filename="../Protocol/equiptype.cpp" line="99"/>
-        <location filename="../Protocol/equiptype.cpp" line="100"/>
-        <location filename="../Protocol/equiptype.cpp" line="101"/>
+        <location filename="../Protocol/equiptype.cpp" line="207"/>
+        <location filename="../Protocol/equiptype.cpp" line="256"/>
+        <location filename="../Protocol/equiptype.cpp" line="257"/>
+        <location filename="../Protocol/equiptype.cpp" line="258"/>
+        <location filename="../Protocol/equiptype.cpp" line="259"/>
+        <location filename="../Protocol/equiptype.cpp" line="260"/>
+        <location filename="../Protocol/equiptype.cpp" line="261"/>
+        <location filename="../Protocol/equiptype.cpp" line="262"/>
+        <location filename="../Protocol/equiptype.cpp" line="263"/>
         <source>舰载爆击机</source>
         <translation>Carrier dive bomber</translation>
     </message>
     <message id="BOMBTORP">
-        <location filename="../Protocol/equiptype.cpp" line="49"/>
-        <location filename="../Protocol/equiptype.cpp" line="102"/>
-        <location filename="../Protocol/equiptype.cpp" line="103"/>
-        <location filename="../Protocol/equiptype.cpp" line="104"/>
-        <location filename="../Protocol/equiptype.cpp" line="105"/>
-        <location filename="../Protocol/equiptype.cpp" line="106"/>
+        <location filename="../Protocol/equiptype.cpp" line="209"/>
+        <location filename="../Protocol/equiptype.cpp" line="264"/>
+        <location filename="../Protocol/equiptype.cpp" line="265"/>
+        <location filename="../Protocol/equiptype.cpp" line="266"/>
+        <location filename="../Protocol/equiptype.cpp" line="267"/>
+        <location filename="../Protocol/equiptype.cpp" line="268"/>
         <source>舰载雷击机</source>
         <translation>Carrier torpedo bomber</translation>
     </message>
     <message id="RECON">
-        <location filename="../Protocol/equiptype.cpp" line="51"/>
-        <location filename="../Protocol/equiptype.cpp" line="147"/>
-        <location filename="../Protocol/equiptype.cpp" line="148"/>
-        <location filename="../Protocol/equiptype.cpp" line="149"/>
-        <location filename="../Protocol/equiptype.cpp" line="150"/>
-        <location filename="../Protocol/equiptype.cpp" line="151"/>
-        <location filename="../Protocol/equiptype.cpp" line="152"/>
-        <location filename="../Protocol/equiptype.cpp" line="153"/>
-        <location filename="../Protocol/equiptype.cpp" line="154"/>
+        <location filename="../Protocol/equiptype.cpp" line="211"/>
+        <location filename="../Protocol/equiptype.cpp" line="309"/>
+        <location filename="../Protocol/equiptype.cpp" line="310"/>
+        <location filename="../Protocol/equiptype.cpp" line="311"/>
+        <location filename="../Protocol/equiptype.cpp" line="312"/>
+        <location filename="../Protocol/equiptype.cpp" line="313"/>
+        <location filename="../Protocol/equiptype.cpp" line="314"/>
+        <location filename="../Protocol/equiptype.cpp" line="315"/>
+        <location filename="../Protocol/equiptype.cpp" line="316"/>
         <source>侦察机</source>
         <translation>Recon plane</translation>
     </message>
     <message id="SEAPLANEBF">
-        <location filename="../Protocol/equiptype.cpp" line="53"/>
-        <location filename="../Protocol/equiptype.cpp" line="155"/>
-        <location filename="../Protocol/equiptype.cpp" line="156"/>
-        <location filename="../Protocol/equiptype.cpp" line="157"/>
-        <location filename="../Protocol/equiptype.cpp" line="158"/>
+        <location filename="../Protocol/equiptype.cpp" line="213"/>
+        <location filename="../Protocol/equiptype.cpp" line="317"/>
+        <location filename="../Protocol/equiptype.cpp" line="318"/>
+        <location filename="../Protocol/equiptype.cpp" line="319"/>
+        <location filename="../Protocol/equiptype.cpp" line="320"/>
         <source>水上爆击机/战斗机</source>
         <translation>Seaplane bomber/attacker</translation>
     </message>
     <message id="TORP">
-        <location filename="../Protocol/equiptype.cpp" line="55"/>
-        <location filename="../Protocol/equiptype.cpp" line="166"/>
-        <location filename="../Protocol/equiptype.cpp" line="167"/>
-        <location filename="../Protocol/equiptype.cpp" line="168"/>
+        <location filename="../Protocol/equiptype.cpp" line="215"/>
+        <location filename="../Protocol/equiptype.cpp" line="328"/>
+        <location filename="../Protocol/equiptype.cpp" line="329"/>
+        <location filename="../Protocol/equiptype.cpp" line="330"/>
         <source>鱼雷</source>
         <translation>Torpedo</translation>
     </message>
     <message id="AA">
-        <location filename="../Protocol/equiptype.cpp" line="57"/>
-        <location filename="../Protocol/equiptype.cpp" line="80"/>
-        <location filename="../Protocol/equiptype.cpp" line="81"/>
-        <location filename="../Protocol/equiptype.cpp" line="82"/>
+        <location filename="../Protocol/equiptype.cpp" line="217"/>
+        <location filename="../Protocol/equiptype.cpp" line="240"/>
+        <location filename="../Protocol/equiptype.cpp" line="241"/>
+        <location filename="../Protocol/equiptype.cpp" line="242"/>
         <source>防空装备</source>
         <translation>Anti-air</translation>
     </message>
     <message id="ASW">
-        <location filename="../Protocol/equiptype.cpp" line="59"/>
-        <location filename="../Protocol/equiptype.cpp" line="83"/>
-        <location filename="../Protocol/equiptype.cpp" line="84"/>
-        <location filename="../Protocol/equiptype.cpp" line="85"/>
-        <location filename="../Protocol/equiptype.cpp" line="86"/>
-        <location filename="../Protocol/equiptype.cpp" line="87"/>
-        <location filename="../Protocol/equiptype.cpp" line="88"/>
-        <location filename="../Protocol/equiptype.cpp" line="89"/>
-        <location filename="../Protocol/equiptype.cpp" line="90"/>
-        <location filename="../Protocol/equiptype.cpp" line="91"/>
+        <location filename="../Protocol/equiptype.cpp" line="219"/>
+        <location filename="../Protocol/equiptype.cpp" line="243"/>
+        <location filename="../Protocol/equiptype.cpp" line="244"/>
+        <location filename="../Protocol/equiptype.cpp" line="245"/>
+        <location filename="../Protocol/equiptype.cpp" line="246"/>
+        <location filename="../Protocol/equiptype.cpp" line="247"/>
+        <location filename="../Protocol/equiptype.cpp" line="248"/>
+        <location filename="../Protocol/equiptype.cpp" line="249"/>
+        <location filename="../Protocol/equiptype.cpp" line="250"/>
+        <location filename="../Protocol/equiptype.cpp" line="251"/>
         <source>对潜装备</source>
         <translation>ASW</translation>
     </message>
     <message id="RADAR">
-        <location filename="../Protocol/equiptype.cpp" line="61"/>
-        <location filename="../Protocol/equiptype.cpp" line="139"/>
-        <location filename="../Protocol/equiptype.cpp" line="140"/>
-        <location filename="../Protocol/equiptype.cpp" line="141"/>
-        <location filename="../Protocol/equiptype.cpp" line="142"/>
-        <location filename="../Protocol/equiptype.cpp" line="143"/>
-        <location filename="../Protocol/equiptype.cpp" line="144"/>
-        <location filename="../Protocol/equiptype.cpp" line="145"/>
-        <location filename="../Protocol/equiptype.cpp" line="146"/>
+        <location filename="../Protocol/equiptype.cpp" line="221"/>
+        <location filename="../Protocol/equiptype.cpp" line="301"/>
+        <location filename="../Protocol/equiptype.cpp" line="302"/>
+        <location filename="../Protocol/equiptype.cpp" line="303"/>
+        <location filename="../Protocol/equiptype.cpp" line="304"/>
+        <location filename="../Protocol/equiptype.cpp" line="305"/>
+        <location filename="../Protocol/equiptype.cpp" line="306"/>
+        <location filename="../Protocol/equiptype.cpp" line="307"/>
+        <location filename="../Protocol/equiptype.cpp" line="308"/>
         <source>雷达</source>
         <translation>Radar</translation>
     </message>
     <message id="LAND">
-        <location filename="../Protocol/equiptype.cpp" line="63"/>
-        <location filename="../Protocol/equiptype.cpp" line="114"/>
-        <location filename="../Protocol/equiptype.cpp" line="115"/>
-        <location filename="../Protocol/equiptype.cpp" line="116"/>
-        <location filename="../Protocol/equiptype.cpp" line="117"/>
-        <location filename="../Protocol/equiptype.cpp" line="118"/>
+        <location filename="../Protocol/equiptype.cpp" line="223"/>
+        <location filename="../Protocol/equiptype.cpp" line="276"/>
+        <location filename="../Protocol/equiptype.cpp" line="277"/>
+        <location filename="../Protocol/equiptype.cpp" line="278"/>
+        <location filename="../Protocol/equiptype.cpp" line="279"/>
+        <location filename="../Protocol/equiptype.cpp" line="280"/>
         <source>对陆装备</source>
         <translation>Anti-land equipment</translation>
     </message>
     <message id="ATTACKLB">
-        <location filename="../Protocol/equiptype.cpp" line="65"/>
-        <location filename="../Protocol/equiptype.cpp" line="92"/>
-        <location filename="../Protocol/equiptype.cpp" line="93"/>
-        <location filename="../Protocol/equiptype.cpp" line="94"/>
+        <location filename="../Protocol/equiptype.cpp" line="225"/>
+        <location filename="../Protocol/equiptype.cpp" line="252"/>
+        <location filename="../Protocol/equiptype.cpp" line="253"/>
+        <location filename="../Protocol/equiptype.cpp" line="254"/>
         <source>陆基攻击机</source>
         <translation>Land-based attacker</translation>
     </message>
     <message id="FIGHTERLB">
-        <location filename="../Protocol/equiptype.cpp" line="67"/>
-        <location filename="../Protocol/equiptype.cpp" line="112"/>
-        <location filename="../Protocol/equiptype.cpp" line="113"/>
+        <location filename="../Protocol/equiptype.cpp" line="227"/>
+        <location filename="../Protocol/equiptype.cpp" line="274"/>
+        <location filename="../Protocol/equiptype.cpp" line="275"/>
         <source>陆基战斗机</source>
         <translation>Land-based fighter</translation>
     </message>
     <message id="BULGE">
-        <location filename="../Protocol/equiptype.cpp" line="69"/>
-        <location filename="../Protocol/equiptype.cpp" line="107"/>
-        <location filename="../Protocol/equiptype.cpp" line="108"/>
-        <location filename="../Protocol/equiptype.cpp" line="109"/>
+        <location filename="../Protocol/equiptype.cpp" line="229"/>
+        <location filename="../Protocol/equiptype.cpp" line="269"/>
+        <location filename="../Protocol/equiptype.cpp" line="270"/>
+        <location filename="../Protocol/equiptype.cpp" line="271"/>
         <source>增设装甲</source>
         <translation>Bulge</translation>
     </message>
     <message id="PERS">
-        <location filename="../Protocol/equiptype.cpp" line="71"/>
-        <location filename="../Protocol/equiptype.cpp" line="137"/>
-        <location filename="../Protocol/equiptype.cpp" line="138"/>
+        <location filename="../Protocol/equiptype.cpp" line="231"/>
+        <location filename="../Protocol/equiptype.cpp" line="299"/>
+        <location filename="../Protocol/equiptype.cpp" line="300"/>
         <source>人员</source>
         <translation>Personnel</translation>
     </message>
     <message id="OTHER">
-        <location filename="../Protocol/equiptype.cpp" line="73"/>
-        <location filename="../Protocol/equiptype.cpp" line="122"/>
-        <location filename="../Protocol/equiptype.cpp" line="123"/>
-        <location filename="../Protocol/equiptype.cpp" line="124"/>
-        <location filename="../Protocol/equiptype.cpp" line="125"/>
-        <location filename="../Protocol/equiptype.cpp" line="126"/>
-        <location filename="../Protocol/equiptype.cpp" line="127"/>
-        <location filename="../Protocol/equiptype.cpp" line="128"/>
-        <location filename="../Protocol/equiptype.cpp" line="129"/>
-        <location filename="../Protocol/equiptype.cpp" line="130"/>
-        <location filename="../Protocol/equiptype.cpp" line="131"/>
-        <location filename="../Protocol/equiptype.cpp" line="132"/>
-        <location filename="../Protocol/equiptype.cpp" line="133"/>
-        <location filename="../Protocol/equiptype.cpp" line="134"/>
-        <location filename="../Protocol/equiptype.cpp" line="135"/>
-        <location filename="../Protocol/equiptype.cpp" line="136"/>
+        <location filename="../Protocol/equiptype.cpp" line="233"/>
+        <location filename="../Protocol/equiptype.cpp" line="284"/>
+        <location filename="../Protocol/equiptype.cpp" line="285"/>
+        <location filename="../Protocol/equiptype.cpp" line="286"/>
+        <location filename="../Protocol/equiptype.cpp" line="287"/>
+        <location filename="../Protocol/equiptype.cpp" line="288"/>
+        <location filename="../Protocol/equiptype.cpp" line="289"/>
+        <location filename="../Protocol/equiptype.cpp" line="290"/>
+        <location filename="../Protocol/equiptype.cpp" line="291"/>
+        <location filename="../Protocol/equiptype.cpp" line="292"/>
+        <location filename="../Protocol/equiptype.cpp" line="293"/>
+        <location filename="../Protocol/equiptype.cpp" line="294"/>
+        <location filename="../Protocol/equiptype.cpp" line="295"/>
+        <location filename="../Protocol/equiptype.cpp" line="296"/>
+        <location filename="../Protocol/equiptype.cpp" line="297"/>
+        <location filename="../Protocol/equiptype.cpp" line="298"/>
         <source>其他</source>
         <translation>Others</translation>
     </message>
     <message id="unknown">
-        <location filename="../Protocol/equiptype.cpp" line="197"/>
-        <location filename="../ClientGUI/ui/fleet/shipequip.cpp" line="152"/>
+        <location filename="../Protocol/equiptype.cpp" line="359"/>
+        <location filename="../ClientGUI/ui/fleet/shipequip.cpp" line="155"/>
         <source>Unknown</source>
         <translation type="unfinished">Unknown</translation>
     </message>
@@ -529,8 +531,9 @@ Great at battle and bad at politics--so cool!</translation>
     </message>
     <message id="asw-carrier">
         <location filename="../Protocol/shiptype.cpp" line="89"/>
-        <source>(Advanced Anti-Sub)</source>
-        <translation>(Advanced Anti-Sub)</translation>
+        <source>(Advanced ASW)</source>
+        <oldsource>(Advanced Anti-Sub)</oldsource>
+        <translation type="unfinished">(Advanced Anti-Sub)</translation>
     </message>
     <message id="escort-carrier">
         <location filename="../Protocol/shiptype.cpp" line="92"/>
@@ -2238,22 +2241,22 @@ Great at battle and bad at politics--so cool!</translation>
         <translation type="unfinished"></translation>
     </message>
     <message id="NormalFleet">
-        <location filename="../Protocol/kp.h" line="260"/>
+        <location filename="../Protocol/kp.h" line="296"/>
         <source>Normal</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="CarrierFleet">
-        <location filename="../Protocol/kp.h" line="262"/>
+        <location filename="../Protocol/kp.h" line="298"/>
         <source>Carrier</source>
         <translation type="unfinished">Carrier</translation>
     </message>
     <message id="SurfaceFleet">
-        <location filename="../Protocol/kp.h" line="264"/>
+        <location filename="../Protocol/kp.h" line="300"/>
         <source>Surface</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="TransportFleet">
-        <location filename="../Protocol/kp.h" line="266"/>
+        <location filename="../Protocol/kp.h" line="302"/>
         <source>Transport</source>
         <translation type="unfinished">Transport</translation>
     </message>
@@ -2705,7 +2708,7 @@ Great at battle and bad at politics--so cool!</translation>
     </message>
     <message id="empty-equip-slot">
         <location filename="../ClientGUI/ui/fleet/shipequip.ui" line="93"/>
-        <location filename="../ClientGUI/ui/fleet/shipequip.cpp" line="143"/>
+        <location filename="../ClientGUI/ui/fleet/shipequip.cpp" line="146"/>
         <source>Empty</source>
         <translation type="unfinished"></translation>
     </message>

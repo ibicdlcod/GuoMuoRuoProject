@@ -5,10 +5,13 @@
 #include <QMap>
 #include <QSet>
 #include "resord.h"
+#include "ship.h"
+
 
 class EquipType
 {
 public:
+
     EquipType();
     EquipType(int);
     EquipType(QString);
@@ -25,6 +28,9 @@ public:
     static int strToIntRep(QString);
     QString toString() const;
     int toInt() const;
+
+    bool canEquip(Ship *ship) const;
+    bool canEquipEX(Ship *ship) const;
 
     static int getSize(const int);
     static bool isMainGun(const int);
@@ -98,7 +104,9 @@ private:
         std::pair("Bomb-torp-fight",        0x0600),
         std::pair("Bomb-torp-dive",         0x0300),
         std::pair("Bomb-dive",              0x0100),
+        std::pair("Bomb-dive-night",        0x0110),
         std::pair("Bomb-dive-fight",        0x0500),
+        std::pair("Bomb-dive-fight-night",  0x0510),
         std::pair("Bomb-dive-fight-jet",    0x001C0500),
         std::pair("Bomb-dive-fight-n2",     0x00180500),
         std::pair("Bomb-dive-n2",           0x00180100),
@@ -184,9 +192,11 @@ private:
         std::pair("Attack-lb-big",          49),
         std::pair("Big-gun",                3),
         std::pair("Bomb-dive",              7),
+        std::pair("Bomb-dive-night",        58),
         std::pair("Bomb-dive-fight",        7),
         std::pair("Bomb-dive-fight-jet",    40),
         std::pair("Bomb-dive-fight-n2",     7),
+        std::pair("Bomb-dive-fight-night",  58),
         std::pair("Bomb-dive-n2",           7),
         std::pair("Bomb-dive-torp-fight",   7),
         std::pair("Bomb-torp",              8),
@@ -277,8 +287,10 @@ private:
         std::pair("Fighter",                "Antiair"),
         std::pair("Fighter-night",          "Antiair"),
         std::pair("Bomb-dive",              "Bombing"),
+        std::pair("Bomb-dive-night",        "Bombing"),
         std::pair("Bomb-dive-fight",        "Bombing"),
         std::pair("Bomb-dive-fight-n2",     "Bombing"),
+        std::pair("Bomb-dive-fight-night",  "Bombing"),
         std::pair("Bomb-dive-n2",           "Bombing"),
         std::pair("Bomb-dive-torp-fight",   "Bombing"),
         std::pair("Bomb-dive-fight-jet",    "Bombing"),
@@ -374,6 +386,8 @@ private:
         std::pair("Bomb-dive-fight-n2",     17),
         std::pair("Bomb-dive-n2",           17),
         std::pair("Bomb-dive-torp-fight",   17),
+        std::pair("Bomb-dive-night",        17),
+        std::pair("Bomb-dive-fight-night",  17),
         std::pair("Bomb-dive-fight-jet",    18),
         std::pair("Bomb-torp",              19),
         std::pair("Bomb-torp-fight",        19),

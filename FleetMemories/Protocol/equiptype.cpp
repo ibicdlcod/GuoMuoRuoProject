@@ -1,4 +1,5 @@
 #include "equiptype.h"
+#include "utility.h"
 
 EquipType::EquipType()
     : iRep(0) {
@@ -26,6 +27,165 @@ int EquipType::toInt() const {
     return iRep;
 }
 
+bool EquipType::canEquip(Ship *ship) const
+{
+    if(isLb()) {
+        return Utility::checkMask(ship->getId(), 0x000f0000, 0x000C0000);
+    }
+    switch(getSpecial())
+    {
+    case 0:
+        if(isRadar()) {
+            switch(getSize()) {
+            case 7:
+                return Utility::checkMask(ship->getId(), 0x000f0000, 0x00070000);
+            case 1:
+                return !Utility::checkMask(ship->getId(), 0x000f0000, 0x00070000);
+            case 2:
+            {
+                if(Utility::checkMask(ship->getId(), 0xffffffff, 0x10351501))
+                    return false; // Conte di Cavour (nonremodeled)
+                if(Utility::checkMask(ship->getId(), 0xffffff00, 0x30130100))
+                    return false; // 天龍型改二
+                if(Utility::checkMask(ship->getId(), 0xf8ff0f00, 0x38130500))
+                    return false; // 夕張改二特/丁
+                if(Utility::checkMask(ship->getId(), 0xffffff00, 0x10A34800))
+                    return false; // Gotland
+                if(Utility::checkMask(ship->getId(), 0xffffff00, 0x0f161700))
+                    return false; // 春日丸、八幡丸
+
+                if(Utility::checkMask(ship->getId(), 0xffffffff, 0x30121504))
+                    return true; // 初霜改二
+                if(Utility::checkMask(ship->getId(), 0xffffffff, 0x3B12370A))
+                    return true; // 霞改二乙
+                if(Utility::checkMask(ship->getId(), 0x00ff0f00, 0x00120B00))
+                    return true; // 秋月型
+                if(Utility::checkMask(ship->getId(), 0xffffffff, 0x20190101))
+                    return true; // 速吸改
+                if(Utility::checkMask(ship->getId(), 0xffffffff, 0x201A0200))
+                    return true; // 神州丸改
+                if(Utility::checkMask(ship->getId(), 0x00ffffff, 0x00190300))
+                    return true; // 宗谷（全形态）
+
+                if(Utility::checkMask(ship->getId(), 0x000f0000, 0x00030000))
+                    return true;
+                if(Utility::checkMask(ship->getId(), 0x000f0000, 0x00040000))
+                    return true;
+                if(Utility::checkMask(ship->getId(), 0x000f0000, 0x00050000))
+                    return true;
+                if(Utility::checkMask(ship->getId(), 0x000f0000, 0x00060000))
+                    return true;
+                if(Utility::checkMask(ship->getId(), 0x000f0000, 0x00080000))
+                    return true;
+                return false;
+            }
+            case 3:
+                return Utility::checkMask(ship->getId(), 0x000f0000, 0x00050000);
+            }
+        }
+        else if(isPatrol()) {
+            if(getSize() == 2) {
+                if(Utility::checkMask(ship->getId(), 0xffffffff, 0x10190402))
+                    return false; // 山汐丸(未改造)
+                if(Utility::checkMask(ship->getId(), 0xffffffff, 0x101A0400))
+                    return false; // 熊野丸(未改造)
+                if(Utility::checkMask(ship->getId(), 0xffffff00, 0x20163700))
+                    return false; // 大鷹型改
+                if(Utility::checkMask(ship->getId(), 0x000f4000, 0x00054000))
+                    return true;
+                if(Utility::checkMask(ship->getId(), 0x000f4000, 0x00044000))
+                    return true;
+                if(Utility::checkMask(ship->getId(), 0x000f4000, 0x00034000))
+                    return true;
+                if(Utility::checkMask(ship->getId(), 0x000f0000, 0x000B0000))
+                    return true;
+                if(Utility::checkMask(ship->getId(), 0xffff8000, 0x30158000))
+                    return true; // 大和改二、武蔵改二
+                if(Utility::checkMask(ship->getId(), 0xffffff00, 0x30150302))
+                    return true; // 陸奥改二
+                if(Utility::checkMask(ship->getId(), 0xffffffff, 0x3041184A))
+                    return true; // Samuel B.Roberts Mk.II
+                if(Utility::checkMask(ship->getId(), 0xffffff00, 0x30130100))
+                    return true; // 天龍型改二
+                if(Utility::checkMask(ship->getId(), 0x00ff0fff, 0x00680501))
+                    return true; // Commandant Teste
+                if(Utility::checkMask(ship->getId(), 0xffffffff, 0x10182401))
+                    return false; // 日進
+                if(Utility::checkMask(ship->getId(), 0x00ffffff, 0x00182401))
+                    return true; // 日進改/甲
+                if(Utility::checkMask(ship->getId(), 0xffffffff, 0x201A0200))
+                    return true; // 神州丸改
+                if(Utility::checkMask(ship->getId(), 0x00ffffff, 0x00190101))
+                    return true; // 速吸
+                if(Utility::checkMask(ship->getId(), 0x00ffffff, 0x00190201))
+                    return true; // 神威/神威改母
+                if(Utility::checkMask(ship->getId(), 0xffffffff, 0x0C190300))
+                    return true; // 宗谷(南極観測船)
+
+            }
+            if(Utility::checkMask(ship->getId(), 0xffffff00, 0x0f161700))
+                return false; // 春日丸、八幡丸
+            if(Utility::checkMask(ship->getId(), 0xffffff00, 0x10163700))
+                return false; // 大鷹型
+            if(Utility::checkMask(ship->getId(), 0xffffffff, 0x30163101))
+                return false; // 鳳翔改二
+
+            if(Utility::checkMask(ship->getId(), 0x00ffffff, 0x00190402))
+                return true; // 山汐丸
+            if(Utility::checkMask(ship->getId(), 0x00ffffff, 0x001A0400))
+                return true; // 熊野丸
+            if(Utility::checkMask(ship->getId(), 0x00ffffff, 0x001A0100))
+                return true; // あきつ丸
+            if(Utility::checkMask(ship->getId(), 0x000f2000, 0x00062000))
+                return true; // 加賀改二護、Victorious/改(or anyone similar)
+            if(Utility::checkMask(ship->getId(), 0x000f1000, 0x00061000))
+                return true;
+            if(Utility::checkMask(ship->getId(), 0xffffff00, 0x30154200))
+                return true; // 伊勢型改二
+            return false;
+        }
+        return false;
+    case KP::MidgetSub:
+    case KP::DepthCharge:
+    case KP::Smoke:
+    case KP::Sonar:
+    case KP::Ballon:
+    case KP::APShell:
+    case KP::AntilandShell:
+    case KP::AntilandRocket:
+    case KP::LandingCraft:
+    case KP::LandingTank:
+    case KP::Drum:
+    case KP::TPMaterial:
+    case KP::EngineTurbine:
+    case KP::EngineBoiler:
+    case KP::SearchLight:
+    case KP::Starshell:
+    case KP::RepairItem:
+    case KP::UnderwayReplenish:
+    case KP::Food:
+    case KP::CommandFacility:
+    case KP::AircraftPersonnel:
+    case KP::RepairFacility:
+    case KP::SurfacePersonnel:
+    case KP::LimitedNightPlane:
+    case KP::AntiAir:
+    case KP::FlyingBoat:
+    case KP::LBInterceptor:
+    case KP::JetPlane:
+    case KP::Bulge:
+    case KP::AAControl:
+    case KP::LandCorps:
+    default: break;
+    }
+
+    return false;
+}
+
+bool EquipType::canEquipEX(Ship *ship) const
+{
+    return false;
+}
 
 const QList<QString> EquipType::getDisplayGroupsSorted() {
     return {
@@ -94,9 +254,11 @@ QString EquipType::getDisplayGroup() {
         std::pair("Attack-lb-big",          qtTrId("ATTACKLB")),
         std::pair("Big-gun",                qtTrId("BIGGUN")),
         std::pair("Bomb-dive",              qtTrId("BOMBDIVE")),
+        std::pair("Bomb-dive-night",        qtTrId("BOMBDIVE")),
         std::pair("Bomb-dive-fight",        qtTrId("BOMBDIVE")),
         std::pair("Bomb-dive-fight-jet",    qtTrId("BOMBDIVE")),
         std::pair("Bomb-dive-fight-n2",     qtTrId("BOMBDIVE")),
+        std::pair("Bomb-dive-fight-night",  qtTrId("BOMBDIVE")),
         std::pair("Bomb-dive-n2",           qtTrId("BOMBDIVE")),
         std::pair("Bomb-dive-torp-fight",   qtTrId("BOMBDIVE")),
         std::pair("Bomb-torp",              qtTrId("BOMBTORP")),
