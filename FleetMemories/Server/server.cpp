@@ -3080,8 +3080,14 @@ void Server::sendTestMessages() {
         qWarning() << "Server isn't listening, abort.";
     }
     else {
+        /*
         for(auto ship: std::as_const(shipRegistry)) {
             qInfo() << ship->customFlags;
+        }*/
+        for(auto equip: std::as_const(equipRegistry)) {
+            if(equip->type.isCarrierPlane()) {
+                qInfo() << equip->localNames["ja_JP"];
+            }
         }
     }
 }

@@ -922,7 +922,7 @@ Great at battle and bad at politics--so cool!</source>
     </message>
     <message id="switch-cert-when-connecting">
         <location filename="../ClientGUI/clientv2.cpp" line="1540"/>
-        <location filename="../Server/server.cpp" line="3476"/>
+        <location filename="../Server/server.cpp" line="3482"/>
         <source>Switch certificate when connected have no effect.</source>
         <translation>在线时转换证书没有效果。</translation>
     </message>
@@ -1355,7 +1355,7 @@ Great at battle and bad at politics--so cool!</source>
         <location filename="../Server/server.cpp" line="1882"/>
         <location filename="../Server/server.cpp" line="1984"/>
         <location filename="../Server/server.cpp" line="2046"/>
-        <location filename="../Server/server.cpp" line="3093"/>
+        <location filename="../Server/server.cpp" line="3099"/>
         <source>Database uninitialized!</source>
         <translation>数据库未初始化！</translation>
     </message>
@@ -1608,230 +1608,230 @@ Great at battle and bad at politics--so cool!</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="ship-refresh-failed">
-        <location filename="../Server/server.cpp" line="3100"/>
+        <location filename="../Server/server.cpp" line="3106"/>
         <source>Load ship table failed!</source>
         <translation>加载舰船列表失败！</translation>
     </message>
     <message id="ship-load-good">
-        <location filename="../Server/server.cpp" line="3115"/>
+        <location filename="../Server/server.cpp" line="3121"/>
         <source>Load ship registry success!</source>
         <translation>加载舰船列表成功！</translation>
     </message>
     <message id="factory-state-error">
-        <location filename="../Server/server.cpp" line="3148"/>
+        <location filename="../Server/server.cpp" line="3154"/>
         <source>Open user %1&apos;s factory failed!</source>
         <translation>打开用户%1的工厂槽失败！</translation>
     </message>
     <message id="delete-equip-nonexistent">
-        <location filename="../Server/server.cpp" line="3184"/>
+        <location filename="../Server/server.cpp" line="3190"/>
         <source>User id %1: equipment %2 does not exist!</source>
         <translation>用户ID%1：装备%2不存在！</translation>
     </message>
     <message id="delete-equip-failed">
-        <location filename="../Server/server.cpp" line="3205"/>
+        <location filename="../Server/server.cpp" line="3211"/>
         <source>User id %1: delete equipment failed!</source>
         <translation>用户ID%1：废弃装备失败！</translation>
     </message>
     <message id="delete-equip">
-        <location filename="../Server/server.cpp" line="3212"/>
+        <location filename="../Server/server.cpp" line="3218"/>
         <source>User id %1: deleted equipment %2</source>
         <translation>用户ID%1：废弃装备%2</translation>
     </message>
     <message id="open-db-failed">
-        <location filename="../Server/server.cpp" line="3236"/>
+        <location filename="../Server/server.cpp" line="3242"/>
         <source>Open database failed!</source>
         <oldsource>User id %1: deleted equipment %2</oldsource>
         <translation>数据库打开失败！</translation>
     </message>
     <message id="sql-connect-success">
-        <location filename="../Server/server.cpp" line="3240"/>
+        <location filename="../Server/server.cpp" line="3246"/>
         <source>SQL connection successful!</source>
         <translation>数据库连接成功！</translation>
     </message>
     <message id="equip-db-lack">
-        <location filename="../Server/server.cpp" line="3293"/>
+        <location filename="../Server/server.cpp" line="3299"/>
         <source>Equipment database does not exist, creating...</source>
         <translation>创建装备数据库……</translation>
     </message>
     <message id="equip-db-gen-failure">
-        <location filename="../Server/server.cpp" line="3298"/>
+        <location filename="../Server/server.cpp" line="3304"/>
         <source>Create Equipment database failed.</source>
         <translation>创建装备数据库失败。</translation>
     </message>
     <message id="equip-name-db-lack">
-        <location filename="../Server/server.cpp" line="3305"/>
+        <location filename="../Server/server.cpp" line="3311"/>
         <source>Equipment name database does not exist, creating...</source>
         <translation>创建装备名数据库……</translation>
     </message>
     <message id="equip-name-db-gen-failure">
-        <location filename="../Server/server.cpp" line="3310"/>
+        <location filename="../Server/server.cpp" line="3316"/>
         <source>Create Equipment name database failed.</source>
         <translation>创建装备名数据库失败。</translation>
     </message>
     <message id="equip-sp-db-lack">
-        <location filename="../Server/server.cpp" line="3317"/>
+        <location filename="../Server/server.cpp" line="3323"/>
         <source>User equipment skillpoints database does not exist, creating...</source>
         <translation>创建装备技能点数据库……</translation>
     </message>
     <message id="equip-sp-db-gen-failure">
-        <location filename="../Server/server.cpp" line="3322"/>
+        <location filename="../Server/server.cpp" line="3328"/>
         <source>User equipment skillpoints fetch failure.</source>
         <oldsource>User equipment skillpoints fetch failure!</oldsource>
         <translation>创建装备技能点数据库失败。</translation>
     </message>
     <message id="equip-db-user-lack">
-        <location filename="../Server/server.cpp" line="3329"/>
+        <location filename="../Server/server.cpp" line="3335"/>
         <source>Equipment database for user does not exist, creating...</source>
         <translation>创建用户装备数据库……</translation>
     </message>
     <message id="equip-db-user-gen-failure">
-        <location filename="../Server/server.cpp" line="3334"/>
+        <location filename="../Server/server.cpp" line="3340"/>
         <source>Create Equipment database for user failed.</source>
         <translation>创建用户装备数据库失败。</translation>
     </message>
     <message id="equip-db-kc-user-lack">
-        <location filename="../Server/server.cpp" line="3341"/>
+        <location filename="../Server/server.cpp" line="3347"/>
         <source>Equipment database (kancolle) for user does not exist, creating...</source>
         <translation>创建用户装备数据库（舰C）……</translation>
     </message>
     <message id="equip-db-kc-user-gen-failure">
-        <location filename="../Server/server.cpp" line="3347"/>
+        <location filename="../Server/server.cpp" line="3353"/>
         <source>Create Equipment database (kancolle) for user failed.</source>
         <translation>创建用户装备数据库（舰C）失败。</translation>
     </message>
     <message id="facto-db-lack">
-        <location filename="../Server/server.cpp" line="3354"/>
+        <location filename="../Server/server.cpp" line="3360"/>
         <source>Factory database does not exist, creating...</source>
         <translation>创建工厂数据库……</translation>
     </message>
     <message id="facto-db-gen-failure">
-        <location filename="../Server/server.cpp" line="3359"/>
+        <location filename="../Server/server.cpp" line="3365"/>
         <source>Create Factory database failed.</source>
         <translation>创建工厂数据库失败。</translation>
     </message>
     <message id="map-node-db-lack">
-        <location filename="../Server/server.cpp" line="3366"/>
+        <location filename="../Server/server.cpp" line="3372"/>
         <source>Map node database does not exist, creating...</source>
         <translation>创建海域点数据库……</translation>
     </message>
     <message id="map-node-db-gen-failure">
-        <location filename="../Server/server.cpp" line="3371"/>
+        <location filename="../Server/server.cpp" line="3377"/>
         <source>Create Map node database failed.</source>
         <translation>创建海域点数据库失败。</translation>
     </message>
     <message id="map-relation-db-lack">
-        <location filename="../Server/server.cpp" line="3378"/>
+        <location filename="../Server/server.cpp" line="3384"/>
         <source>Map relation database does not exist, creating...</source>
         <translation>创建海域关系数据库……</translation>
     </message>
     <message id="map-relation-db-gen-failure">
-        <location filename="../Server/server.cpp" line="3383"/>
+        <location filename="../Server/server.cpp" line="3389"/>
         <source>Create Map relation database failed.</source>
         <translation>创建海域关系数据库失败。</translation>
     </message>
     <message id="map-resource-db-lack">
-        <location filename="../Server/server.cpp" line="3390"/>
+        <location filename="../Server/server.cpp" line="3396"/>
         <source>Map resource database does not exist, creating...</source>
         <translation>创建海域资源数据库……</translation>
     </message>
     <message id="map-resource-db-gen-failure">
-        <location filename="../Server/server.cpp" line="3395"/>
+        <location filename="../Server/server.cpp" line="3401"/>
         <source>Create Map resource database failed.</source>
         <translation>创建海域资源数据库失败。</translation>
     </message>
     <message id="ship-db-lack">
-        <location filename="../Server/server.cpp" line="3402"/>
+        <location filename="../Server/server.cpp" line="3408"/>
         <source>Ship database does not exist, creating...</source>
         <translation>创建舰船数据库……</translation>
     </message>
     <message id="equip-ship-db-gen-failure">
-        <location filename="../Server/server.cpp" line="3407"/>
+        <location filename="../Server/server.cpp" line="3413"/>
         <source>Create Ship database failed.</source>
         <translation>创建舰船数据库失败。</translation>
     </message>
     <message id="ship-name-db-lack">
-        <location filename="../Server/server.cpp" line="3414"/>
+        <location filename="../Server/server.cpp" line="3420"/>
         <source>Ship name database does not exist, creating...</source>
         <translation>创建舰船名数据库……</translation>
     </message>
     <message id="equip-ship-name-gen-failure">
-        <location filename="../Server/server.cpp" line="3420"/>
+        <location filename="../Server/server.cpp" line="3426"/>
         <source>Create Ship name failed.</source>
         <translation>创建舰船名数据库失败。</translation>
     </message>
     <message id="ship-db-user-lack">
-        <location filename="../Server/server.cpp" line="3427"/>
+        <location filename="../Server/server.cpp" line="3433"/>
         <source>Ship database for user does not exist, creating...</source>
         <translation>创建用户舰船数据库……</translation>
     </message>
     <message id="ship-db-user-gen-failure">
-        <location filename="../Server/server.cpp" line="3432"/>
+        <location filename="../Server/server.cpp" line="3438"/>
         <source>Create Ship database for user failed.</source>
         <translation>创建用户舰船数据库失败。</translation>
     </message>
     <message id="ship-db-kc-user-lack">
-        <location filename="../Server/server.cpp" line="3439"/>
+        <location filename="../Server/server.cpp" line="3445"/>
         <source>Ship database (kancolle) for user does not exist, creating...</source>
         <translation>创建用户舰船数据库（舰C）……</translation>
     </message>
     <message id="ship-db-kc-user-gen-failure">
-        <location filename="../Server/server.cpp" line="3445"/>
+        <location filename="../Server/server.cpp" line="3451"/>
         <source>Create Equipment database (kancolle) for user failed.</source>
         <translation>创建用户舰船数据库（舰C）失败。</translation>
     </message>
     <message id="user-db-lack">
-        <location filename="../Server/server.cpp" line="3452"/>
+        <location filename="../Server/server.cpp" line="3458"/>
         <source>User database does not exist, creating...</source>
         <translation>创建用户数据库……</translation>
     </message>
     <message id="user-db-gen-failure">
-        <location filename="../Server/server.cpp" line="3457"/>
+        <location filename="../Server/server.cpp" line="3463"/>
         <source>Create User database failed.</source>
         <translation>创建用户数据库失败。</translation>
     </message>
     <message id="user-db-attr-lack">
-        <location filename="../Server/server.cpp" line="3463"/>
+        <location filename="../Server/server.cpp" line="3469"/>
         <source>User attributes database does not exist, creating...</source>
         <translation>创建用户属性数据库……</translation>
     </message>
     <message id="user-db-attr-gen-failure">
-        <location filename="../Server/server.cpp" line="3468"/>
+        <location filename="../Server/server.cpp" line="3474"/>
         <source>Create User attributes database failed.</source>
         <translation>创建用户属性数据库失败。</translation>
     </message>
     <message id="server-pem">
-        <location filename="../Server/server.cpp" line="3487"/>
+        <location filename="../Server/server.cpp" line="3493"/>
         <source>Server PEM is now %1.</source>
         <translation>服务器PEM现在是%1。</translation>
     </message>
     <message id="update-fleet-clear-failure">
-        <location filename="../Server/server.cpp" line="3610"/>
+        <location filename="../Server/server.cpp" line="3616"/>
         <source>Update fleet (clear fleet) failure!</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="update-fleet-failure">
-        <location filename="../Server/server.cpp" line="3513"/>
-        <location filename="../Server/server.cpp" line="3628"/>
-        <location filename="../Server/server.cpp" line="3642"/>
-        <location filename="../Server/server.cpp" line="3658"/>
-        <location filename="../Server/server.cpp" line="3678"/>
+        <location filename="../Server/server.cpp" line="3519"/>
+        <location filename="../Server/server.cpp" line="3634"/>
+        <location filename="../Server/server.cpp" line="3648"/>
+        <location filename="../Server/server.cpp" line="3664"/>
+        <location filename="../Server/server.cpp" line="3684"/>
         <source>Update fleet failure!</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="user-data-init-fail">
-        <location filename="../Server/server.cpp" line="3713"/>
-        <location filename="../Server/server.cpp" line="3733"/>
+        <location filename="../Server/server.cpp" line="3719"/>
+        <location filename="../Server/server.cpp" line="3739"/>
         <source>%1: User data init failure!</source>
         <translation>%1：用户数据初始化失败！</translation>
     </message>
     <message id="user-factory-init-fail">
-        <location filename="../Server/server.cpp" line="3751"/>
+        <location filename="../Server/server.cpp" line="3757"/>
         <source>Init 4 factory slots for user %1 failed!</source>
         <translation>%1：用户4个工厂槽初始化失败！</translation>
     </message>
     <message id="init-userfleet-failed">
         <location filename="../Server/server.cpp" line="992"/>
-        <location filename="../Server/server.cpp" line="3771"/>
+        <location filename="../Server/server.cpp" line="3777"/>
         <source>Set User Fleet Up failed!</source>
         <translation type="unfinished"></translation>
     </message>

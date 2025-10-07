@@ -47,6 +47,7 @@ public:
     static bool isNight2(const int);
     static bool isBomber(const int);
     static bool isJet(const int);
+    static bool isCarrierPlane(const int);
     static bool isVirtual(const int);
 
     int getSize() const;
@@ -68,6 +69,7 @@ public:
     bool isNight2() const;
     bool isBomber() const;
     bool isJet() const;
+    bool isCarrierPlane() const;
     bool isVirtual() const;
 
     static QList<QString> allEquipTypes();

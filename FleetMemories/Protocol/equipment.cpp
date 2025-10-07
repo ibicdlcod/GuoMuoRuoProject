@@ -204,7 +204,8 @@ bool Equipment::canEquip(Ship *ship) const
     }
     switch(type.getSpecial())
     {
-    case KP::NonSpecial:
+    case KP::NonSpecial: [[fallthrough]];
+    case KP::LimitedNightPlane:
         if(type.isRadar()) {
             switch(type.getSize()) {
             case 7:
@@ -245,8 +246,6 @@ bool Equipment::canEquip(Ship *ship) const
                     if(ship->customFlags["patrolautogyro"] == -1)
                         return false;
                 }
-                if(Utility::checkMask(ship->getId(), 0xffffff00, 0x20163700))
-                    return false; // 大鷹型改
                 if(Utility::checkMask(ship->getId(), 0x000f4000, 0x00054000))
                     return true;
                 if(Utility::checkMask(ship->getId(), 0x000f4000, 0x00044000))
@@ -264,9 +263,6 @@ bool Equipment::canEquip(Ship *ship) const
                 if(ship->customFlags["patrolliason"] == -1)
                     return false;
             }
-            if(Utility::checkMask(ship->getId(), 0xffffff00, 0x10163700))
-                return false; // 大鷹型
-
             if(Utility::checkMask(ship->getId(), 0x000f2000, 0x00062000))
                 return true; // 加賀改二護、Victorious/改(or anyone similar)
             if(Utility::checkMask(ship->getId(), 0x000f1000, 0x00061000))
@@ -275,7 +271,172 @@ bool Equipment::canEquip(Ship *ship) const
                 return true; // 伊勢型改二
             return false;
         }
+        else if(type.isCarrierPlane()) {
+            bool result = true;
+            bool canEquipRecon = Utility::checkMask(ship->getId(), 0x000f0000, 0x00060000);
+            if(Utility::checkMask(ship->getId(), 0xffffff00, 0x30154200))
+                canEquipRecon = true; // 伊勢型改二
+            if(Utility::checkMask(ship->getId(), 0x00ffff00, 0x00163700))
+                canEquipRecon = false; // 大鷹型
+            if(Utility::checkMask(ship->getId(), 0xffffff00, 0x30163700))
+                canEquipRecon = true; // 大鷹型改二
+            bool canEquipDiveBomb = Utility::checkMask(ship->getId(), 0x000f0000, 0x00060000);
+            if(ship->customFlags.contains("divebomber")) {
+                if(ship->customFlags["divebomber"] == 1)
+                    canEquipDiveBomb = true;
+                if(ship->customFlags["divebomber"] == -1)
+                    canEquipDiveBomb = false;
+            }
+            bool canEquipTorpBomb = Utility::checkMask(ship->getId(), 0x000f0000, 0x00060000);
+            if(ship->customFlags.contains("torpbomber")) {
+                if(ship->customFlags["torpbomber"] == 1)
+                    canEquipTorpBomb = true;
+                if(ship->customFlags["torpbomber"] == -1)
+                    canEquipTorpBomb = false;
+            }
+            bool canEquipFighter = Utility::checkMask(ship->getId(), 0x000f0000, 0x00060000);
+            if(ship->customFlags.contains("fighter")) {
+                if(ship->customFlags["fighter"] == 1)
+                    canEquipFighter = true;
+                if(ship->customFlags["fighter"] == -1)
+                    canEquipFighter = false;
+            }
 
+            result = result && (!type.isRecon() || canEquipRecon);
+            result = result && (!type.isDiveBomber() || canEquipDiveBomb);
+            result = result && (!type.isTorpBomber() || canEquipTorpBomb);
+            result = result && (!type.isFighter() || canEquipFighter);
+
+            return result;
+        }
+        else if(type.isSeaplane()) {
+            bool result = true;
+            bool canEquipRecon =
+                Utility::checkMask(ship->getId(), 0x000f0000, 0x00030000)
+                || Utility::checkMask(ship->getId(), 0x000f0000, 0x00040000)
+                || Utility::checkMask(ship->getId(), 0x000f0000, 0x00050000)
+                || Utility::checkMask(ship->getId(), 0x000f0000, 0x00080000);
+            if(ship->customFlags.contains("sprecon")) {
+                if(ship->customFlags["sprecon"] == 1)
+                    canEquipRecon = true;
+                if(ship->customFlags["sprecon"] == -1)
+                    canEquipRecon = false;
+            }
+            bool canEquipDiveBomb =
+                Utility::checkMask(ship->getId(), 0x000f4000, 0x00034000)
+                || Utility::checkMask(ship->getId(), 0x000f4000, 0x00044000)
+                || Utility::checkMask(ship->getId(), 0x000f4000, 0x00054000)
+                || Utility::checkMask(ship->getId(), 0x000f0000, 0x00080000)
+                || Utility::checkMask(ship->getId(), 0x000f0000, 0x00090000);
+            if(ship->customFlags.contains("spbomber")) {
+                if(ship->customFlags["spbomber"] == 1)
+                    canEquipDiveBomb = true;
+                if(ship->customFlags["spbomber"] == -1)
+                    canEquipDiveBomb = false;
+            }
+            bool canEquipFighter =
+                Utility::checkMask(ship->getId(), 0x000f4000, 0x00034000)
+                || Utility::checkMask(ship->getId(), 0x000f4000, 0x00044000)
+                || Utility::checkMask(ship->getId(), 0x000f4000, 0x00054000)
+                || Utility::checkMask(ship->getId(), 0x000f0000, 0x00080000);
+            if(ship->customFlags.contains("spfighter")) {
+                if(ship->customFlags["spfighter"] == 1)
+                    canEquipFighter = true;
+                if(ship->customFlags["spfighter"] == -1)
+                    canEquipFighter = false;
+            }
+            if(type.getSize() == 1 && Utility::checkMask(ship->getId(), 0x000ff000, 0x00074000)) {
+                return true;
+            }
+
+            result = result && (!type.isRecon() || canEquipRecon);
+            result = result && (!type.isDiveBomber() || canEquipDiveBomb);
+            result = result && (!type.isFighter() || canEquipFighter);
+
+            return result;
+        }
+        else if(type.isTorp()) {
+            if(!type.isSurface()) {
+                return Utility::checkMask(ship->getId(), 0x000f0000, 0x00070000);
+            }
+            else {
+                if(Utility::checkMask(ship->getId(), 0x000f0000, 0x00020000))
+                    return true;
+                if(Utility::checkMask(ship->getId(), 0x000f0000, 0x00030000))
+                    return true;
+                if(Utility::checkMask(ship->getId(), 0x000f0000, 0x00040000))
+                    return true;
+                if(Utility::checkMask(ship->getId(), 0x000f0000, 0x00070000))
+                    return true;
+                if(Utility::checkMask(ship->getId(), 0x000f1000, 0x00051000))
+                    return true;
+                if(Utility::checkMask(ship->getId(), 0x000ff000, 0x00011000))
+                    return true;
+            }
+        }
+        else if(type.isSecGun()) {
+            if(type.getSize() == 3) {
+                if(Utility::checkMask(ship->getId(), 0x000f0000, 0x00040000))
+                    return true;
+                if(Utility::checkMask(ship->getId(), 0x000f0000, 0x00050000))
+                    return true;
+                if(Utility::checkMask(ship->getId(), 0x000f0000, 0x00060000))
+                    return true;
+                return false;
+            }
+            else {
+                if(ship->customFlags.contains("secgun")) {
+                    if(ship->customFlags["secgun"] == 1)
+                        return true;
+                    if(ship->customFlags["secgun"] == -1)
+                        return false;
+                    if(ship->customFlags["secgun"] == 12)
+                        return getId() == 524; //12cm単装高角砲＋25mm機銃増備
+                }
+                if(Utility::checkMask(ship->getId(), 0x000f0000, 0x00030000))
+                    return true;
+                if(Utility::checkMask(ship->getId(), 0x000f0000, 0x00040000))
+                    return true;
+                if(Utility::checkMask(ship->getId(), 0x000f0000, 0x00050000))
+                    return true;
+                if(Utility::checkMask(ship->getId(), 0x000f0000, 0x00060000))
+                    return true;
+                if(Utility::checkMask(ship->getId(), 0x000f0000, 0x00080000))
+                    return true;
+                return false;
+            }
+        }
+        else if(type.isMainGun()){
+            switch(type.getSize()) {
+            case 1:
+                if(ship->customFlags.contains("smallgun")) {
+                    if(ship->customFlags["smallgun"] == 1)
+                        return true;
+                    if(ship->customFlags["smallgun"] == -1)
+                        return false;
+                    if(ship->customFlags["smallgun"] == 12)
+                        return getId() == 48; //12cm単装高角砲
+                    if(ship->customFlags["smallgun"] == 382)
+                        return getId() == 229 || getId() == 379 || getId() == 382;
+                }
+                if(Utility::checkMask(ship->getId(), 0x000f0000, 0x00010000))
+                    return true;
+                if(Utility::checkMask(ship->getId(), 0x000f0000, 0x00020000))
+                    return true;
+                if(Utility::checkMask(ship->getId(), 0x000f0000, 0x00030000))
+                    return true;
+                if(Utility::checkMask(ship->getId(), 0x000f0000, 0x00080000))
+                    return true;
+                return false;
+            case 2:
+            case 3:
+            case 4:
+            case 5:
+            case 6:
+            default: return false;
+            }
+
+        }
         return false;
     case KP::MidgetSub:
     case KP::DepthCharge:
@@ -300,7 +461,6 @@ bool Equipment::canEquip(Ship *ship) const
     case KP::AircraftPersonnel:
     case KP::RepairFacility:
     case KP::SurfacePersonnel:
-    case KP::LimitedNightPlane:
     case KP::AntiAir:
     case KP::FlyingBoat:
     case KP::LBInterceptor:

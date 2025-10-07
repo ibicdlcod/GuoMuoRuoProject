@@ -287,6 +287,15 @@ bool EquipType::isJet(const int type) {
     return getSpecial(type) == 28;
 }
 
+bool EquipType::isCarrierPlane(const int type) {
+    return (isRecon(type)
+            || isBomber(type)
+            || isFighter(type))
+           && !isPatrol(type)
+           && !isSeaplane(type)
+           && !isLb(type);
+}
+
 bool EquipType::isVirtual(const int type) {
     return type == 0x01000000;
 }
@@ -365,6 +374,10 @@ bool EquipType::isBomber() const {
 
 bool EquipType::isJet() const {
     return isJet(iRep);
+}
+
+bool EquipType::isCarrierPlane() const {
+    return isCarrierPlane(iRep);
 }
 
 bool EquipType::isVirtual() const {
