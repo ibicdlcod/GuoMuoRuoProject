@@ -79,8 +79,15 @@ Ship::Ship(int shipId)
     }
     else {
         while(query2.next()) {
-            attr[query2.value(1).toString()]
-                = query2.value(0).toInt();
+            QString attrName = query2.value(1).toString();
+            if(attrName.startsWith("CUSTOM")) {
+                customFlags[attrName.last(attrName.length()
+                                          - QStringLiteral("CUSTOM").length())]
+                    = query2.value(0).toInt();
+            }
+            else {
+                attr[attrName] = query2.value(0).toInt();
+            }
         }
     }
 }

@@ -953,6 +953,13 @@ void Server::offerShipInfo(QSslSocket *connection, int index = 0) {
             attrs[a->first] = a->second;
         }
         result["attr"] = attrs;
+        QJsonObject customAttrs;
+        for(auto a = e->customFlags.keyValueBegin();
+             a != e->customFlags.keyValueEnd();
+             ++a) {
+            customAttrs[a->first] = a->second;
+        }
+        result["custom"] = customAttrs;
         shipInfos.append(result);
     }
     connection->flush();
@@ -2069,7 +2076,7 @@ bool Server::importShipFromCSV() {
                 for(int i = 0; i < titleParts.length(); ++i) {
                     if(titleParts[i].compare("remodel",
                                               Qt::CaseInsensitive)
-                        == 0 ){
+                        == 0){
                         QSqlQuery query;
                         query.prepare("REPLACE INTO ShipReg "
                                       "(ShipID, Attribute, Intvalue) "
@@ -2087,13 +2094,33 @@ bool Server::importShipFromCSV() {
                     }
                     else if(indicatorParts[i].compare("attr",
                                                        Qt::CaseInsensitive)
-                             == 0 ){
+                             == 0){
                         QSqlQuery query;
                         query.prepare("REPLACE INTO ShipReg "
                                       "(ShipID, Attribute, Intvalue) "
                                       "VALUES (:id, :attr, :value);");
                         query.bindValue(":id", shipid);
                         query.bindValue(":attr", titleParts[i]);
+                        query.bindValue(":value", lineParts[i].toInt());
+                        if(!query.exec()) {
+                            qCritical() << query.lastQuery();
+                            throw DBError(qtTrId("ship-import-failed"),
+                                          query.lastError());
+                            return false;
+                        }
+                    }
+                    else if(indicatorParts[i].compare("customflags",
+                                                       Qt::CaseInsensitive)
+                             == 0){
+                        if(lineParts[i].isEmpty()) {
+                            continue;
+                        }
+                        QSqlQuery query;
+                        query.prepare("REPLACE INTO ShipReg "
+                                      "(ShipID, Attribute, Intvalue) "
+                                      "VALUES (:id, :attr, :value);");
+                        query.bindValue(":id", shipid);
+                        query.bindValue(":attr", "CUSTOM"+titleParts[i]);
                         query.bindValue(":value", lineParts[i].toInt());
                         if(!query.exec()) {
                             qCritical() << query.lastQuery();
@@ -3053,20 +3080,9 @@ void Server::sendTestMessages() {
         qWarning() << "Server isn't listening, abort.";
     }
     else {
-        /*
-        auto meta = QMetaEnum::fromType<KP::ShipNationality>();
         for(auto ship: std::as_const(shipRegistry)) {
-            qInfo() << meta.valueToKey(ship->getNationality());
-            //qInfo() << ship->getNationality();
+            qInfo() << ship->customFlags;
         }
-*/
-        qCritical() << shipRegistry[274007556]->getLaterModels(shipRegistry);
-        for(auto user: std::as_const(connectedUsers)) {
-            if(!User::isSuperUser(user)) {
-                continue;
-            }
-        }
-        
     }
 }
 

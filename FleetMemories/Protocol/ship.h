@@ -34,7 +34,7 @@ public:
     QMap<QString, QString> shipClassText;
     QMap<QString, QString> shipOrderText;
     QMap<QString, int> attr;
-    QStringList customflags; // unused for now
+    QMap<QString, int> customFlags;
 
 private:
     int shipRegId;
