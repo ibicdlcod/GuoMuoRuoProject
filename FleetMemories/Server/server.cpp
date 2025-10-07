@@ -3613,6 +3613,37 @@ KP::FleetFailType Server::updateFleet(CSteamID &uid, const QJsonArray &input)
                           query.lastError());
             return KP::ValidFleet;
         }
+        for(int i = 0; i < KP::maxEquipSlots; ++i) {
+            QSqlQuery query;
+            query.prepare("UPDATE UserShip SET Slot"+QString::number(i+1)
+                          +" = :euuid "
+                          "WHERE ShipUuid = :uuid");
+            query.bindValue(":euuid", shipDataObj["equip"].toArray()[i].toString());
+            query.bindValue(":uuid", shipDataObj["uuid"].toString());
+            if(Q_UNLIKELY(!query.exec())) {
+                qCritical() << query.lastQuery();
+                //% "Update fleet failure!"
+                throw DBError(qtTrId("update-fleet-failure"),
+                              query.lastError());
+                return KP::ValidFleet;
+            }
+        }
+        {
+            QSqlQuery query;
+            query.prepare("UPDATE UserShip SET SlotEX = :euuid "
+                          "WHERE ShipUuid = :uuid");
+            query.bindValue(":euuid",
+                            shipDataObj["equip"].toArray()
+                                [KP::maxEquipSlots].toString());
+            query.bindValue(":uuid", shipDataObj["uuid"].toString());
+            if(Q_UNLIKELY(!query.exec())) {
+                qCritical() << query.lastQuery();
+                //% "Update fleet failure!"
+                throw DBError(qtTrId("update-fleet-failure"),
+                              query.lastError());
+                return KP::ValidFleet;
+            }
+        }
     }
     for(auto iter = fleetTypes.keyValueBegin();
          iter != fleetTypes.keyValueEnd();

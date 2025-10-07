@@ -507,6 +507,7 @@ void FleetView::receivedShipInfo(const QJsonObject &info) {
 void FleetView::sendFleetData(bool checked) {
     Q_UNUSED(checked)
     QJsonArray content;
+    Clientv2 &engine = Clientv2::getInstance();
     for(auto iter = ships.constKeyValueBegin();
          iter != ships.constKeyValueEnd();
          ++iter) {
@@ -519,9 +520,13 @@ void FleetView::sendFleetData(bool checked) {
             iter->first.fleetindex * FleetPos::fleetRep
             + iter->first.posindex;
         ship["fleettype"] = fleetTypes[iter->first.fleetindex];
+        QJsonArray equips;
+        for(int i = 0; i <= KP::maxEquipSlots; ++i) {
+            equips.append(engine.equipModel.getShipEquip(iter->second, i).toString());
+        }
+        ship["equip"] = equips;
         content.append(ship);
     }
-    Clientv2 &engine = Clientv2::getInstance();
     engine.sendFleetData(content);
 }
 
@@ -544,8 +549,8 @@ void FleetView::equipSelected(int shipPosIndex,
 }
 
 void FleetView::equipSelectedPassive(QUuid shipUid,
-                          int equipSlotIndex,
-                          QUuid equipUid)
+                                     int equipSlotIndex,
+                                     QUuid equipUid)
 {
     for(int i = 0; i < KP::combinedFleetSize; ++i) {
         if(getShipUuid(i) == shipUid) {

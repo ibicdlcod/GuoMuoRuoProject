@@ -28,7 +28,6 @@ void InteractiveLabel::mouseReleaseEvent(QMouseEvent *event)
             view->activate(false, false);
             view->setMinimumHeight(viewMinimumHeight);
             view->setAttribute(Qt::WA_DeleteOnClose, false);
-            view->show();
             QScreen *screen = view->screen();
             QRect screenGeometry = screen->availableGeometry();
             int width = screenGeometry.width() / 1.5;
@@ -39,6 +38,10 @@ void InteractiveLabel::mouseReleaseEvent(QMouseEvent *event)
                                          width,
                                          height);
             view->setGeometry(windowGeometry);
+            view->update();
+            view->show();
+            view->recalculateArsenalRows();
+            view->update();
             connect(view, &EquipView::shipSelected,
                     this, &InteractiveLabel::shipSelected);
         }

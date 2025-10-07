@@ -82,7 +82,7 @@
     </layout>
    </item>
    <item alignment="Qt::AlignHCenter|Qt::AlignVCenter">
-    <widget class="QLabel" name="equipText">
+    <widget class="ElidedLabel" name="equipText">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
        <horstretch>0</horstretch>
@@ -102,6 +102,13 @@
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>ElidedLabel</class>
+   <extends>QLabel</extends>
+   <header location="global">ClientGUI/ui/fleet/elidedlabel.h</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

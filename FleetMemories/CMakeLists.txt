@@ -44,6 +44,8 @@ set(CLIENT_SOURCES
     ClientGUI/ui/factory/developwindow.cpp
     ClientGUI/ui/factory/developwindow.h
     ClientGUI/ui/factory/developwindow.ui
+    ClientGUI/ui/fleet/elidedlabel.h
+    ClientGUI/ui/fleet/elidedlabel.cpp
     ClientGUI/ui/views/equipselect.cpp
     ClientGUI/ui/views/equipselect.h
     ClientGUI/ui/views/equipview.h
@@ -81,6 +83,9 @@ set(CLIENT_SOURCES
     ClientGUI/ui/portarea.ui
     ClientGUI/ui/views/selectdelegate.cpp
     ClientGUI/ui/views/selectdelegate.h
+    ClientGUI/ui/fleet/shipdisplay.h
+    ClientGUI/ui/fleet/shipdisplay.cpp
+    ClientGUI/ui/fleet/shipdisplay.ui
     ClientGUI/ui/fleet/shipequip.h
     ClientGUI/ui/fleet/shipequip.cpp
     ClientGUI/ui/fleet/shipequip.ui
@@ -167,7 +172,6 @@ qt_add_executable(CFClient
     ${CLIENT_SOURCES}
     common.qrc
     ${app_icon_resource_windows}
-    ClientGUI/ui/fleet/shipdisplay.h ClientGUI/ui/fleet/shipdisplay.cpp ClientGUI/ui/fleet/shipdisplay.ui
 )
 qt_add_executable(CFServer
     MANUAL_FINALIZATION

@@ -261,7 +261,7 @@ Great at battle and bad at politics--so cool!</source>
     </message>
     <message id="unknown">
         <location filename="../Protocol/equiptype.cpp" line="197"/>
-        <location filename="../ClientGUI/ui/fleet/shipequip.cpp" line="145"/>
+        <location filename="../ClientGUI/ui/fleet/shipequip.cpp" line="148"/>
         <source>Unknown</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1808,24 +1808,26 @@ Great at battle and bad at politics--so cool!</source>
     <message id="update-fleet-failure">
         <location filename="../Server/server.cpp" line="3497"/>
         <location filename="../Server/server.cpp" line="3612"/>
-        <location filename="../Server/server.cpp" line="3631"/>
+        <location filename="../Server/server.cpp" line="3626"/>
+        <location filename="../Server/server.cpp" line="3642"/>
+        <location filename="../Server/server.cpp" line="3662"/>
         <source>Update fleet failure!</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="user-data-init-fail">
-        <location filename="../Server/server.cpp" line="3666"/>
-        <location filename="../Server/server.cpp" line="3686"/>
+        <location filename="../Server/server.cpp" line="3697"/>
+        <location filename="../Server/server.cpp" line="3717"/>
         <source>%1: User data init failure!</source>
         <translation>%1：用户数据初始化失败！</translation>
     </message>
     <message id="user-factory-init-fail">
-        <location filename="../Server/server.cpp" line="3704"/>
+        <location filename="../Server/server.cpp" line="3735"/>
         <source>Init 4 factory slots for user %1 failed!</source>
         <translation>%1：用户4个工厂槽初始化失败！</translation>
     </message>
     <message id="init-userfleet-failed">
         <location filename="../Server/server.cpp" line="985"/>
-        <location filename="../Server/server.cpp" line="3724"/>
+        <location filename="../Server/server.cpp" line="3755"/>
         <source>Set User Fleet Up failed!</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2677,7 +2679,7 @@ Great at battle and bad at politics--so cool!</source>
     </message>
     <message id="empty-equip-slot">
         <location filename="../ClientGUI/ui/fleet/shipequip.ui" line="93"/>
-        <location filename="../ClientGUI/ui/fleet/shipequip.cpp" line="136"/>
+        <location filename="../ClientGUI/ui/fleet/shipequip.cpp" line="139"/>
         <source>Empty</source>
         <translation type="unfinished"></translation>
     </message>
