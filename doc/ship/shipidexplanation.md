@@ -22,26 +22,27 @@
 |  0x21000   |  Destroyers with Daihatsu capabilities (bitwise operation)   |
 |  0x22000   | Destroyers with Amphibious tank capabilites (bitwise operation) |
 |  0x24000   |    Destroyers with Bulge capabilities (bitwise operation)    |
-|  0x28000   |       Leading destroyer(Tashkent) (bitwise operation)        |
+|  0x28000   |            Leading destroyer (bitwise operation)             |
 |  0x30000   |                        Light cruisers                        |
 |  0x31000   |                      Training cruisers                       |
 |  0x32000   | Light cruisers with advanced torpedo capabilities (bitwise operation) |
 |  0x34000   |        Light (Aviation) cruisers (bitwise operation)         |
-|  0x35000*  |                      Submarine tenders                       |
+|  0x35000*  |   Submarine tenders (count as both training and aviation)    |
 |  0x38000   |                  Light (Anti-air) cruisers                   |
 |  0x40000   |                        Heavy cruisers                        |
-|  0x44000   |                  Heavy (Aviation) cruisers                   |
-|  0x46000   | Heavy (Aviation) cruisers with advanced torpedo capabilities (bitwise operation) |
+|  0x44000   |        Heavy (Aviation) cruisers (bitwise operation)         |
+|  0x42000   | Heavy cruisers with advanced torpedo capabilities (bitwise operation) |
 |  0x48000   |                  Heavy (Anti-air) cruisers                   |
 |  0x50000   |                         Battleships                          |
-|  0x51000   |                        Battlecruisers                        |
-|  0x52000   |                   Battleships (high-speed)                   |
-|  0x54000   |                     Aviation battleships                     |
+|  0x51000   |              Battlecruisers (bitwise operation)              |
+|  0x52000   |         Battleships (high-speed) (bitwise operation)         |
+|  0x54000   |           Aviation battleships (bitwise operation)           |
+|  0x58000   |            Super battleships (bitwise operation)             |
 |  0x60000   |                           Carriers                           |
 |  0x61000   |              Light carriers (bitwise operation)              |
 |  0x62000   | Carriers with advanced anti-sub capabilities (bitwise operation) |
-|  0x63000   |             Escort carriers (bitwise operation)              |
-|  0x64000   |                       Armored Carriers                       |
+|  0x63000   |      Escort carriers (count as both light and anti-sub)      |
+|  0x64000   |             Armored Carriers (bitwise operation)             |
 |  0x68000   | Carriers with night aviation capabilities (bitwise operation) |
 |  0x70000   |                          Submarines                          |
 |  0x74000   |             Submarine with aviation capabilities             |
