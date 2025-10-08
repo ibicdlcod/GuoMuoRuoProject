@@ -127,6 +127,50 @@ int User::getEquipAmount(const CSteamID &uid, int equipId) {
     }
 }
 
+int User::getEquipDef(QUuid equipUuid) {
+    QSqlDatabase db = QSqlDatabase::database();
+    QSqlQuery query;
+
+    query.prepare("SELECT EquipDef "
+                  "FROM UserEquip WHERE EquipUuid = :euuid ");
+    query.bindValue(":euuid", equipUuid);
+    if(Q_UNLIKELY(!query.exec() || !query.isSelect())) {
+        qCritical() << query.lastQuery();
+        //% "Get equipment data of %1 failed!"
+        throw DBError(qtTrId("user-get-equip-data-failed").arg(equipUuid.toString()),
+                      query.lastError());
+        return 0;
+    }
+    else {
+        if(query.next()) {
+            return query.value(0).toInt();
+        }
+    }
+    return 0;
+}
+
+int User::getShipDef(QUuid shipUuid) {
+    QSqlDatabase db = QSqlDatabase::database();
+    QSqlQuery query;
+
+    query.prepare("SELECT ShipDef "
+                  "FROM UserShip WHERE ShipUuid = :suuid ");
+    query.bindValue(":suuid", shipUuid);
+    if(Q_UNLIKELY(!query.exec() || !query.isSelect())) {
+        qCritical() << query.lastQuery();
+        //% "Get ship data of %1 failed!"
+        throw DBError(qtTrId("user-get-ship-data-failed").arg(shipUuid.toString()),
+                      query.lastError());
+        return 0;
+    }
+    else {
+        if(query.next()) {
+            return query.value(0).toInt();
+        }
+    }
+    return 0;
+}
+
 int64 User::getSkillPoints(const CSteamID &uid, int equipId) {
     QSqlDatabase db = QSqlDatabase::database();
     QSqlQuery query;

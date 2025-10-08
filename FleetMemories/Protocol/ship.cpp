@@ -133,7 +133,7 @@ bool Ship::isNotEqual(const Ship &other) const {
 }
 
 QString Ship::toString(QString lang) const {
-    return localNames[lang];
+    return localNames[lang].isEmpty() ? localNames["ja_JP"] : localNames[lang];
 }
 
 const ResOrd Ship::consRes() const {

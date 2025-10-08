@@ -98,7 +98,7 @@ bool Equipment::isNotEqual(const Equipment &other) const {
 }
 
 QString Equipment::toString(QString lang) const {
-    return localNames[lang];
+    return localNames[lang].isEmpty() ? localNames["ja_JP"] : localNames[lang];
 }
 
 const QString Equipment::attrStr() const {
@@ -733,7 +733,7 @@ bool Equipment::canEquip(Ship *ship) const
         return true;
     case KP::CommandFacility:
         if(ship->customFlags.contains("commandfac")) {
-            if(ship->customFlags["commandfac"] == 1)
+            if(ship->customFlags["commandfac"] > 0)
                 return true;
             if(ship->customFlags["commandfac"] == -1)
                 return false;
@@ -902,5 +902,235 @@ bool Equipment::canEquip(Ship *ship) const
 
 bool Equipment::canEquipEX(Ship *ship) const
 {
-    return false;
+    switch(type.getSpecial())
+    {
+    case KP::RepairItem: return true;
+    case KP::Food: return true;
+    case KP::UnderwayReplenish: return canEquip(ship);
+    case KP::AntilandShell:
+        if(Utility::checkMask(ship->getId(), 0x000f0000, 0x00040000))
+            return true;
+        if(Utility::checkMask(ship->getId(), 0x000f0000, 0x00050000))
+            return true;
+        return false;
+    case KP::NonSpecial:
+        if(type.isSecGun()) {
+            if(getId() == 66 || getId() == 220) {
+                /* 8cm */
+                if(ship->customFlags.contains("secgunex")) {
+                    return ship->customFlags["secgunex"] & 0x1;
+                }
+                else {
+                    if(Utility::checkMask(ship->getId(), 0x000f1000, 0x00031000))
+                        return true;
+                    if(Utility::checkMask(ship->getId(), 0x000f0000, 0x000B0000))
+                        return true;
+                }
+                return false;
+            }
+            if(getId() == 71 || getId() == 275) {
+                /* 10cm連装高角砲(砲架) 系列 */
+                if(ship->customFlags.contains("secgunex")) {
+                    return ship->customFlags["secgunex"] & 0x2;
+                }
+                return false;
+            }
+            if(getId() == 464) {
+                /* 10cm連装高角砲群 集中配備 */
+                if(ship->customFlags.contains("secgunex")) {
+                    return ship->customFlags["secgunex"] & 0x4;
+                }
+                return false;
+            }
+            if(getId() == 524) {
+                /* 12cm単装高角砲＋25mm機銃増備 */
+                if(ship->customFlags.contains("secgunex")) {
+                    return ship->customFlags["secgunex"] & 0x8;
+                }
+                else {
+                    if(Utility::checkMask(ship->getId(), 0x000f1000, 0x00031000))
+                        return true;
+                    if(Utility::checkMask(ship->getId(), 0x000f0000, 0x000B0000))
+                        return true;
+                }
+                return false;
+            }
+            if(getId() == 10 || getId() == 130) {
+                /* 12.7cm連装高角砲 系列 */
+                if(ship->customFlags.contains("secgunex")) {
+                    return ship->customFlags["secgunex"] & 0x10;
+                }
+                return false;
+            }
+            if(getId() == 12 || getId() == 234 || getId() == 463) {
+                /* 15.5cm三連装副砲 系列 */
+                if(ship->customFlags.contains("secgunex")) {
+                    return ship->customFlags["secgunex"] & 0x20;
+                }
+                return false;
+            }
+            return false;
+        }
+        else if(type.isRadar()) {
+            if(type.getSize() == 7) {
+                return canEquip(ship);
+            }
+            if(getId() == 27 || getId() == 106 || getId() == 450) {
+                /* 13号対空電探 系列 */
+                if(ship->customFlags.contains("radarex")) {
+                    return ship->customFlags["radarex"] & 0x1;
+                }
+                else {
+                    if(Utility::checkMask(ship->getId(), 0x00ff0f00, 0x00130600))
+                        return true; // 阿賀野型
+                    if(Utility::checkMask(ship->getId(), 0x00ff0f00, 0x00130700))
+                        return true; // 大淀型
+                    if(Utility::checkMask(ship->getId(), 0x00ff0f00, 0x00120900))
+                        return true; // 夕雲型
+                    if(Utility::checkMask(ship->getId(), 0x00ff0f00, 0x00120B00))
+                        return true; // 秋月型
+                    if(Utility::checkMask(ship->getId(), 0x00ff0f00, 0x00120C00))
+                        return true; // 松型
+                }
+                return false;
+            }
+            if(getId() == 28 || getId() == 88 || getId() == 240 || getId() == 517) {
+                /* 22号対水上電探 系列 */
+                if(ship->customFlags.contains("radarex")) {
+                    return ship->customFlags["radarex"] & 0x2;
+                }
+                else {
+                    if(Utility::checkMask(ship->getId(), 0x00ff0f00, 0x00120800))
+                        return true; // 陽炎型
+                    if(Utility::checkMask(ship->getId(), 0x00ff0f00, 0x00120900))
+                        return true; // 夕雲型
+                    if(Utility::checkMask(ship->getId(), 0x00ff0f00, 0x00120C00))
+                        return true; // 松型
+                }
+                return false;
+            }
+            if(getId() == 506) {
+                /* 電探装備マスト(13号改＋22号電探改四) */
+                if(ship->customFlags.contains("radarex")) {
+                    return ship->customFlags["radarex"] & 0x4;
+                }
+                return false;
+            }
+            if(getId() == 410 || getId() == 411) {
+                /* 21号対空電探改二 42号対空電探改二 */
+                if(ship->customFlags.contains("radarex")) {
+                    return ship->customFlags["radarex"] & 0x8;
+                }
+                return false;
+            }
+            if(getId() == 527) {
+                /* Type281 レーダー */
+                if(Utility::checkMask(ship->getId(), 0x00ff0000, 0x00530000))
+                    return true;
+                if(Utility::checkMask(ship->getId(), 0x00ff0000, 0x00560000))
+                    return true;
+                if(Utility::checkMask(ship->getId(), 0x00ff0000, 0x00550000))
+                    return true;
+                return false;
+            }
+            if(getId() == 528) {
+                /* Type274 射撃管制レーダー */
+                if(Utility::checkMask(ship->getId(), 0x00ff0000, 0x00530000))
+                    return true;
+                if(Utility::checkMask(ship->getId(), 0x00ff0000, 0x00550000))
+                    return true;
+                return false;
+            }
+            if(getId() == 124) {
+                /* FuMO25 レーダー */
+                if(Utility::checkMask(ship->getId(), 0xf0000000, 0x10000000))
+                    return false;
+                if(Utility::checkMask(ship->getId(), 0x00ff0000, 0x00250000))
+                    return true;
+                if(Utility::checkMask(ship->getId(), 0x00ff0000, 0x00240000))
+                    return true;
+                return false;
+            }
+            if(type.getSize() == 3) {
+                if(Utility::checkMask(ship->getId(), 0xffff8000, 0x30158000))
+                    return true; // 大和改二、武蔵改二
+                return false;
+            }
+            return false;
+        }
+        else if(type.isTorp()) {
+            if(getId() == 442 || getId() == 443) {
+                return Utility::checkMask(ship->getId(), 0x000f0000, 0x00070000);
+            }
+            return false;
+        }
+        return false;
+    case KP::AntiAir:
+        return canEquip(ship);
+    case KP::DepthCharge:
+        if(type.getSize() == 2) {
+            return false;
+        }
+        else if(type.getSize() == 1) {
+            if(Utility::checkMask(ship->getId(), 0x000f0000, 0x00010000))
+                return true;
+            if(Utility::checkMask(ship->getId(), 0xffffffff, 0x40126602))
+                return true; // 时雨改三
+        }
+        return false;
+    case KP::LandingCraft:
+        if(getId() == 408) {
+            if(Utility::checkMask(ship->getId(), 0x00ff0fff, 0x001A0200))
+                return true; // 神州丸
+        }
+        return false;
+    case KP::LandingTank:
+        if(getId() == 525 || getId() == 526) {
+            if(ship->customFlags.contains("toku4")) {
+                if(ship->customFlags["toku4"] == 1)
+                    return true;
+                if(ship->customFlags["toku4"] == -1)
+                    return false;
+            }
+        }
+        return false;
+    case KP::SurfacePersonnel:
+        return canEquip(ship);
+    case KP::AircraftPersonnel:
+        if(Utility::checkMask(ship->getId(), 0x000f0000, 0x00060000))
+            return canEquip(ship);
+    case KP::EngineTurbine:
+        return canEquip(ship);
+    case KP::EngineBoiler:
+        return ship->attr["Speed"] >= 41;
+    case KP::Bulge:
+        return canEquip(ship);
+    case KP::CommandFacility:
+        if(getId() == 413) {
+            if(Utility::checkMask(ship->getId(), 0x00ff0f00, 0x00130200)) {
+                return canEquip(ship);
+            }
+            if(Utility::checkMask(ship->getId(), 0x00ff0f00, 0x00130300)) {
+                return canEquip(ship);
+            }
+            if(Utility::checkMask(ship->getId(), 0x00ff0f00, 0x00130400)) {
+                return canEquip(ship);
+            }
+            if(Utility::checkMask(ship->getId(), 0x00ff0f00, 0x00130600)) {
+                return canEquip(ship);
+            }
+            if(Utility::checkMask(ship->getId(), 0x00ff0f00, 0x00130700)) {
+                return canEquip(ship);
+            }
+            if(Utility::checkMask(ship->getId(), 0x00ff0f00, 0x00120900)) {
+                return canEquip(ship);
+            }
+            if(Utility::checkMask(ship->getId(), 0x00ff0f00, 0x00120B00)) {
+                return canEquip(ship);
+            }
+        }
+        return false;
+    default:
+        return false;
+    }
 }

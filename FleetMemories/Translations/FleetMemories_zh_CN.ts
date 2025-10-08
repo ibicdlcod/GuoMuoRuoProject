@@ -877,7 +877,8 @@ Great at battle and bad at politics--so cool!</source>
     </message>
     <message id="fleet-size-error">
         <location filename="../ClientGUI/clientv2.cpp" line="1328"/>
-        <source>Fleet is oversized.</source>
+        <source>Fleet is oversized or undersized.</source>
+        <oldsource>Fleet is oversized.</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message id="fleet-type-error">
@@ -1811,27 +1812,37 @@ Great at battle and bad at politics--so cool!</source>
     </message>
     <message id="update-fleet-failure">
         <location filename="../Server/server.cpp" line="3519"/>
-        <location filename="../Server/server.cpp" line="3634"/>
-        <location filename="../Server/server.cpp" line="3648"/>
-        <location filename="../Server/server.cpp" line="3664"/>
-        <location filename="../Server/server.cpp" line="3684"/>
+        <location filename="../Server/server.cpp" line="3636"/>
+        <location filename="../Server/server.cpp" line="3663"/>
+        <location filename="../Server/server.cpp" line="3692"/>
+        <location filename="../Server/server.cpp" line="3712"/>
         <source>Update fleet failure!</source>
         <translation type="unfinished"></translation>
     </message>
+    <message id="ship-cant-equip-it">
+        <location filename="../Server/server.cpp" line="3648"/>
+        <source>Ship %1 can&apos;t equip %2!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="ship-cant-equip-it-extra">
+        <location filename="../Server/server.cpp" line="3676"/>
+        <source>Ship %1 can&apos;t equip %2 in extra slot!</source>
+        <translation type="unfinished"></translation>
+    </message>
     <message id="user-data-init-fail">
-        <location filename="../Server/server.cpp" line="3719"/>
-        <location filename="../Server/server.cpp" line="3739"/>
+        <location filename="../Server/server.cpp" line="3747"/>
+        <location filename="../Server/server.cpp" line="3767"/>
         <source>%1: User data init failure!</source>
         <translation>%1：用户数据初始化失败！</translation>
     </message>
     <message id="user-factory-init-fail">
-        <location filename="../Server/server.cpp" line="3757"/>
+        <location filename="../Server/server.cpp" line="3785"/>
         <source>Init 4 factory slots for user %1 failed!</source>
         <translation>%1：用户4个工厂槽初始化失败！</translation>
     </message>
     <message id="init-userfleet-failed">
         <location filename="../Server/server.cpp" line="992"/>
-        <location filename="../Server/server.cpp" line="3777"/>
+        <location filename="../Server/server.cpp" line="3805"/>
         <source>Set User Fleet Up failed!</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1866,55 +1877,65 @@ Great at battle and bad at politics--so cool!</source>
         <source>User %1: get equipment amount of %2 failed!</source>
         <translation>用户%1：获取装备%2的数量失败！</translation>
     </message>
+    <message id="user-get-equip-data-failed">
+        <location filename="../Server/user.cpp" line="140"/>
+        <source>Get equipment data of %1 failed!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="user-get-ship-data-failed">
+        <location filename="../Server/user.cpp" line="162"/>
+        <source>Get ship data of %1 failed!</source>
+        <translation type="unfinished"></translation>
+    </message>
     <message id="user-get-skillpoint-failed">
-        <location filename="../Server/user.cpp" line="141"/>
+        <location filename="../Server/user.cpp" line="185"/>
         <source>User %1: get skill point of equipment %2 failed!</source>
         <translation>用户%1：获取装备%2的技能点失败！</translation>
     </message>
     <message id="init-userfactory-failed">
-        <location filename="../Server/user.cpp" line="239"/>
+        <location filename="../Server/user.cpp" line="283"/>
         <source>Set User Factory Up failed!</source>
         <translation>初始化工厂槽失败！</translation>
     </message>
     <message id="user-nonexistent-uid">
-        <location filename="../Server/user.cpp" line="257"/>
-        <location filename="../Server/user.cpp" line="278"/>
-        <location filename="../Server/user.cpp" line="299"/>
+        <location filename="../Server/user.cpp" line="301"/>
+        <location filename="../Server/user.cpp" line="322"/>
+        <location filename="../Server/user.cpp" line="343"/>
         <source>User ID %1 does not exist!</source>
         <translation>用户%1不存在！</translation>
     </message>
     <message id="new-ship-failed">
-        <location filename="../Server/user.cpp" line="365"/>
+        <location filename="../Server/user.cpp" line="409"/>
         <source>User id %1: new ship failed!</source>
         <translation>用户%1：建造舰船失败！</translation>
     </message>
     <message id="new-ship">
-        <location filename="../Server/user.cpp" line="372"/>
+        <location filename="../Server/user.cpp" line="416"/>
         <source>User id %1: new ship %2 definition %3</source>
         <translation>用户%1：建造舰船序列号%2，船名ID%3</translation>
     </message>
     <message id="new-equip-failed">
-        <location filename="../Server/user.cpp" line="328"/>
+        <location filename="../Server/user.cpp" line="372"/>
         <source>User id %1: new equipment failed!</source>
         <translation>用户%1：开发装备失败！</translation>
     </message>
     <message id="new-equip">
-        <location filename="../Server/user.cpp" line="335"/>
+        <location filename="../Server/user.cpp" line="379"/>
         <source>User id %1: new equipment %2 definition %3</source>
         <translation>用户%1：开发装备序列号%2，装备名ID%3</translation>
     </message>
     <message id="dbfail-when-refresh-factory">
-        <location filename="../Server/user.cpp" line="388"/>
+        <location filename="../Server/user.cpp" line="432"/>
         <source>User ID %1: DB failure when refreshing factory</source>
         <translation>用户%1：更新工厂时发生数据库错误</translation>
     </message>
     <message id="set-resources-failed">
-        <location filename="../Server/user.cpp" line="429"/>
+        <location filename="../Server/user.cpp" line="473"/>
         <source>User id %1: set resources failed!</source>
         <translation>用户%1：更新资源失败！</translation>
     </message>
     <message id="set-resources">
-        <location filename="../Server/user.cpp" line="435"/>
+        <location filename="../Server/user.cpp" line="479"/>
         <source>User id %1: set resources</source>
         <translation>用户%1：更新资源</translation>
     </message>

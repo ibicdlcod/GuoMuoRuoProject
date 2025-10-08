@@ -13,6 +13,8 @@ void addSkillPoints(const CSteamID &, int, int64);
 int getCurrentFactoryParallel(const CSteamID &, int);
 ResOrd getCurrentResources(const CSteamID &);
 int getEquipAmount(const CSteamID &, int);
+int getEquipDef(QUuid);
+int getShipDef(QUuid);
 int64 getSkillPoints(const CSteamID &, int);
 std::pair<bool, int> haveFather(const CSteamID &,
                                 int, QMap<int, Equipment *> &);

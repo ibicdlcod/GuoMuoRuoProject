@@ -1324,7 +1324,7 @@ void Clientv2::receivedMsg(const QJsonObject &djson) {
     case KP::FleetFail: {
         switch(djson["reason"].toInt()) {
         case KP::FleetSizeError:
-            //% "Fleet is oversized."
+            //% "Fleet is oversized or undersized."
             qWarning() << qtTrId("fleet-size-error");
             break;
         case KP::FleetTypeError:

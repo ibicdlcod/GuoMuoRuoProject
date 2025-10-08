@@ -3002,9 +3002,9 @@ void Server::receivedReq(const QJsonObject &djson,
                            this,
                            [connection, uid, djson, this]
                            {offerTechInfo(
-                                 connection,
-                                 uid,
-                                 djson["local"].toInt());});
+                  connection,
+                  uid,
+                  djson["local"].toInt());});
     }
     break;
     case KP::CommandType::DemandSkillPoints: {
@@ -3012,9 +3012,9 @@ void Server::receivedReq(const QJsonObject &djson,
                            this,
                            [connection, uid, djson, this]
                            {offerSPInfo(
-                                 connection,
-                                 uid,
-                                 djson["equipid"].toInt());});
+                  connection,
+                  uid,
+                  djson["equipid"].toInt());});
     }
     break;
     case KP::CommandType::DemandResourceUpdate: {
@@ -3022,8 +3022,8 @@ void Server::receivedReq(const QJsonObject &djson,
                            this,
                            [connection, uid, this]
                            {offerResourceInfo(
-                                 connection,
-                                 uid);});
+                  connection,
+                  uid);});
     }
     break;
     case KP::CommandType::DestructEquip: {
@@ -3619,6 +3619,8 @@ KP::FleetFailType Server::updateFleet(CSteamID &uid, const QJsonArray &input)
     }
     for(const auto &shipData: input) {
         auto shipDataObj = shipData.toObject();
+        Ship * ship = shipRegistry.value(
+            User::getShipDef(QUuid(shipDataObj["uuid"].toString())), nullptr);
         QSqlQuery query;
         query.prepare("UPDATE UserShip SET FleetIndex = :fid, "
                       "FleetPosIndex = :fpid "
@@ -3636,10 +3638,23 @@ KP::FleetFailType Server::updateFleet(CSteamID &uid, const QJsonArray &input)
             return KP::ValidFleet;
         }
         for(int i = 0; i < KP::maxEquipSlots; ++i) {
+            Equipment *equip = equipRegistry.value(
+                User::getEquipDef(
+                    QUuid(shipDataObj["equip"].toArray()[i].toString())), nullptr);
+            if(ship && equip) {
+                if(!equip->canEquip(ship)) {
+                    //% "Ship %1 can't equip %2!"
+                    qWarning()
+                        << qtTrId("ship-cant-equip-it")
+                               .arg(ship->toString(settings->value("server/language", "ja_JP").toString()),
+                                    equip->toString(settings->value("server/language", "ja_JP").toString()));
+                    return KP::EquipError;
+                }
+            }
             QSqlQuery query;
             query.prepare("UPDATE UserShip SET Slot"+QString::number(i+1)
                           +" = :euuid "
-                          "WHERE ShipUuid = :uuid");
+                            "WHERE ShipUuid = :uuid");
             query.bindValue(":euuid", shipDataObj["equip"].toArray()[i].toString());
             query.bindValue(":uuid", shipDataObj["uuid"].toString());
             if(Q_UNLIKELY(!query.exec())) {
@@ -3651,6 +3666,19 @@ KP::FleetFailType Server::updateFleet(CSteamID &uid, const QJsonArray &input)
             }
         }
         {
+            Equipment *equip = equipRegistry.value(
+                User::getEquipDef(QUuid(shipDataObj["equip"].toArray()
+                                            [KP::maxEquipSlots].toString())), nullptr);
+            if(ship && equip) {
+                if(!equip->canEquipEX(ship)) {
+                    //% "Ship %1 can't equip %2 in extra slot!"
+                    qWarning()
+                        << qtTrId("ship-cant-equip-it-extra")
+                               .arg(ship->toString(settings->value("server/language", "ja_JP").toString()),
+                                    equip->toString(settings->value("server/language", "ja_JP").toString()));
+                    return KP::EquipError;
+                }
+            }
             QSqlQuery query;
             query.prepare("UPDATE UserShip SET SlotEX = :euuid "
                           "WHERE ShipUuid = :uuid");
