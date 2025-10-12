@@ -81,6 +81,8 @@ FleetView::FleetView(QWidget *parent)
         fleetIcon->setMinimumSize(QSize(60, 60));
         grid->addWidget(fleetIcon, i+1, shipIconColumn);
     }
+/* 5.5-equipslots.md */
+equip_slots:
     for(int j = 0; j < KP::maxEquipSlots + 1; ++j) {
         QLabel *equipSlotHeader = new QLabel(this);
         equipSlotHeader->setObjectName(QStringLiteral("equipslot-head-%1").arg(j+1));
