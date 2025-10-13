@@ -2463,9 +2463,10 @@ void Server::naturalRegen(const CSteamID &uid) {
                                         al + regenPower,
                                         rare + regenPower,
                                         rare + regenPower);
-            if(regenMins > 0)
-                qDebug() << regenMins << " minute(s) passed"
-                                         "for regeneration purposes.";
+            if(regenMins > 0) {
+                //% "%1 minute(s) passed for regeneration purposes.";
+                qDebug() << qtTrId("regen-min").arg(regenMins);
+            }
             regenAmount *= (qint64)regenMins;
             int normalCap = settings->value("rule/regencapnormal", 2500).toInt();
             int alCap = settings->value("rule/regencapaluminum", 2000).toInt();
