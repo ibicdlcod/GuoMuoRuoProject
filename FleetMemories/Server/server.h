@@ -63,6 +63,8 @@
 #include "../Protocol/peerinfo.h"
 #include "../Protocol/receiver.h"
 #include "../Protocol/ship.h"
+#include "../Protocol/map.h"
+#include "../Protocol/mapwithdiff.h"
 #include "servermastersender.h"
 #include "sslserver.h"
 
@@ -127,6 +129,7 @@ private:
     bool importMapNodeFromCSV();
     bool importMapRelationFromCSV();
     bool importShipFromCSV();
+    [[nodiscard]] bool mapRefresh();
     void migrate(const CSteamID &, const QJsonObject &);
     void naturalRegen(const CSteamID &);
     QUuid newEquip(const CSteamID &, int, bool direct = false);
@@ -179,6 +182,9 @@ private:
     QMap<int, Ship *> shipRegistry;
     QMap<int, int> shipOldIdToNewId;
     QMultiMap<int, int> shipRemodelGroup;
+
+    QMap<int, MapWithDiff *> normalMaps;
+    QSet<int> resourceMaps;
 
     std::random_device random;
     std::mt19937 mt;

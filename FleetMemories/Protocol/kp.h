@@ -36,6 +36,8 @@ class ResOrd;
 namespace KP {
 Q_NAMESPACE
 
+/* Not in settings, because these values usually
+ * have to be respected by both server and client */
 #pragma message(NOT_M_CONST)
 static constexpr int initDock = 2;
 static constexpr int initFactory = 4;
@@ -49,7 +51,10 @@ static constexpr int normalFleetMaxCapitalness = 20;
 static constexpr int combinedFleetMinCapitalness = 15;
 static constexpr int combinedFleetMaxCapitalness = 50;
 static constexpr int transportFleetMaxCapitalness = 25;
-#pragma message(NOT_M_CONST)
+static constexpr int resourceMapIDStart = 1024;
+static constexpr int resourceMapIDEnd = 2048;
+static constexpr int mapIDDifficultyMask = 4096;
+static constexpr int hiddenMap = 99;
 static constexpr qint64 secsinMin = 60;
 static constexpr int equipIdMax = 0x10000;
 #pragma message(NOT_M_CONST)
@@ -287,6 +292,14 @@ enum EquipSpecial{
     LandCorps = 31
 };
 Q_ENUM_NS(EquipSpecial)
+
+enum Difficulty {
+    Early,
+    Medium,
+    Late,
+    Historical
+};
+Q_ENUM_NS(Difficulty)
 
 Q_GLOBAL_STATIC(QStringList,
                 fleetTypes,

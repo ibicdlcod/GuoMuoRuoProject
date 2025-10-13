@@ -2,16 +2,16 @@
 #define MAPWITHDIFF_H
 
 #include "map.h"
+#include "kp.h"
 
 class MapWithDiff : public Map
 {
-    Q_OBJECT
 
 public:
-    MapWithDiff(int id, Difficulty diff);
+    explicit MapWithDiff(const Map &Map, KP::Difficulty diff);
     bool operator==(const MapWithDiff &other);
 
-    Difficulty diff;
+    KP::Difficulty diff;
 };
 
 #endif // MAPWITHDIFF_H

@@ -267,6 +267,7 @@ Q_GLOBAL_STATIC(QString,
                     "Attribute TEXT NOT NULL, "
                     "Intvalue INTEGER, "
                     "FOREIGN KEY(MapID) REFERENCES MapNode(MapID) "
+                    "CONSTRAINT noduplicate UNIQUE(MapID, Attribute) "
                     ");"
                     ));
 
@@ -459,6 +460,10 @@ bool Server::listen(const QHostAddress &address, quint16 port) {
             if(!shipRefresh()) {
                 //% "Ship init failed!"
                 qCritical() << qtTrId("ship-init-failure");
+            }
+            if(!mapRefresh()) {
+                //% "Map init failed!"
+                qCritical() << qtTrId("map-init-failure");
             }
         }
     } else {
@@ -1872,8 +1877,11 @@ bool Server::importEquipFromCSV() {
 }
 
 bool Server::importMapFromCSV() {
-    return importMapNodeFromCSV()
-           && importMapRelationFromCSV();
+    if(!(importMapNodeFromCSV()
+          && importMapRelationFromCSV())) {
+        return false;
+    }
+    return mapRefresh();
 }
 
 bool Server::importMapNodeFromCSV() {
@@ -2167,6 +2175,81 @@ bool Server::importShipFromCSV() {
     qInfo() << qtTrId("ship-import-good");
     settings->setValue("server/shipdbtimestamp", QDateTime::currentDateTimeUtc());
     return shipRefresh();
+}
+
+bool Server::mapRefresh()
+{
+    QSqlDatabase db = QSqlDatabase::database();
+    if(!db.isValid()) {
+        //% "Database uninitialized!"
+        throw DBError(qtTrId("database-uninit"));
+        return false;
+    }
+    QSqlQuery query;
+    query.prepare("SELECT DISTINCT MapID FROM MapNode;");
+    if(!query.exec()) {
+        //% "Load map table failed!"
+        throw DBError(qtTrId("map-refresh-failed"),
+                      query.lastError());
+        return false;
+    }
+    query.isSelect();
+    QSqlRecord rec = query.record();
+    int idCol = rec.indexOf("MapID");
+    while(query.next()) {
+        int mapID = query.value(idCol).toInt();
+        if(mapID >= KP::resourceMapIDStart && mapID < KP::resourceMapIDEnd) {
+            resourceMaps.insert(mapID);
+        }
+        else if(mapID < KP::resourceMapIDStart) {
+            int x = 0;
+            int y = 0;
+            {
+                QSqlQuery query;
+                query.prepare("SELECT Attribute, Intvalue FROM MapResource "
+                              "WHERE MapID = :id AND (Attribute = 'x' OR Attribute = 'y');");
+                query.bindValue(":id", mapID);
+                if(!query.exec()) {
+                    qCritical() << query.lastQuery();
+                    //% "Load map table failed!"
+                    throw DBError(qtTrId("map-refresh-failed"),
+                                  query.lastError());
+                    return false;
+                }
+                query.isSelect();
+                QSqlRecord rec = query.record();
+                int attrCol = rec.indexOf("Attribute");
+                int valueCol = rec.indexOf("Intvalue");
+                while(query.next()) {
+                    if(query.value(attrCol).toString().compare("x", Qt::CaseInsensitive)) {
+                        x = query.value(valueCol).toInt();
+                    }
+                    if(query.value(attrCol).toString().compare("y", Qt::CaseInsensitive)) {
+                        y = query.value(valueCol).toInt();
+                    }
+                }
+            }
+            Map m{mapID, x, y};
+            if(mapID == KP::hiddenMap) {
+                normalMaps.insert(mapID + KP::Historical * KP::mapIDDifficultyMask,
+                                  new MapWithDiff(m, KP::Historical));
+            }
+            else {
+                auto meta = QMetaEnum::fromType<KP::GameState>();
+                for(int i = 0; i < meta.keyCount(); ++i) {
+                    if(static_cast<KP::Difficulty>(meta.value(i)) == KP::Historical) {
+                        continue;
+                    }
+                    normalMaps.insert(mapID + meta.value(i) * KP::mapIDDifficultyMask,
+                                      new MapWithDiff(m, static_cast<KP::Difficulty>(meta.value(i))));
+                }
+            }
+        }
+    }
+    //% "Load map registry success!"
+    qInfo() << qtTrId("map-load-good");
+
+    return true;
 }
 
 /* 1-migrate.md */
@@ -3002,9 +3085,9 @@ void Server::receivedReq(const QJsonObject &djson,
                            this,
                            [connection, uid, djson, this]
                            {offerTechInfo(
-                  connection,
-                  uid,
-                  djson["local"].toInt());});
+                                 connection,
+                                 uid,
+                                 djson["local"].toInt());});
     }
     break;
     case KP::CommandType::DemandSkillPoints: {
@@ -3012,9 +3095,9 @@ void Server::receivedReq(const QJsonObject &djson,
                            this,
                            [connection, uid, djson, this]
                            {offerSPInfo(
-                  connection,
-                  uid,
-                  djson["equipid"].toInt());});
+                                 connection,
+                                 uid,
+                                 djson["equipid"].toInt());});
     }
     break;
     case KP::CommandType::DemandResourceUpdate: {
@@ -3022,8 +3105,8 @@ void Server::receivedReq(const QJsonObject &djson,
                            this,
                            [connection, uid, this]
                            {offerResourceInfo(
-                  connection,
-                  uid);});
+                                 connection,
+                                 uid);});
     }
     break;
     case KP::CommandType::DestructEquip: {
