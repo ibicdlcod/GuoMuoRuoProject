@@ -1,0 +1,2519 @@
+<!DOCTYPE html>
+<!-- saved from url=(0106)https://learn.microsoft.com/en-us/office/vba/library-reference/concepts/getting-started-with-vba-in-office -->
+<html class="layout layout-holy-grail show-table-of-contents conceptual show-breadcrumb default-focus theme-dark" lang="en-us" dir="ltr" data-authenticated="false" data-auth-status-determined="true" data-target="docs" x-ms-format-detection="none" style="--window-inner-height: 731px !important; --atlas-header-height: 256px !important; --atlas-footer-height: 129px !important; --atlas-header-visible-height: 0px !important; --atlas-footer-visible-height: 0px !important;"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><script src="chrome-extension://fgddmllnllkalaagkghckoinaemmogpe/scripts/content/gps.js"></script>
+			<title>Getting started with VBA in Office | Microsoft Learn</title>
+			
+			<meta name="viewport" content="width=device-width, initial-scale=1.0">
+			<meta name="color-scheme" content="light dark">
+
+			<meta name="description" content="Office VBA reference topic">
+			<link rel="canonical" href="https://learn.microsoft.com/en-us/office/vba/library-reference/concepts/getting-started-with-vba-in-office"> 
+
+			<!-- Non-customizable open graph and sharing-related metadata -->
+			<meta name="twitter:card" content="summary_large_image">
+			<meta name="twitter:site" content="@MicrosoftLearn">
+			<meta property="og:type" content="website">
+			<meta property="og:image:alt" content="Microsoft Learn">
+			<meta property="og:image" content="https://learn.microsoft.com/en-us/media/open-graph-image.png">
+			<!-- Page specific open graph and sharing-related metadata -->
+			<meta property="og:title" content="Getting started with VBA in Office">
+			<meta property="og:url" content="https://learn.microsoft.com/en-us/office/vba/library-reference/concepts/getting-started-with-vba-in-office">
+			<meta property="og:description" content="Office VBA reference topic">
+			<meta name="platform_id" content="71446705-978e-816e-d13b-9b0fee41e995"> 
+			<meta name="locale" content="en-us">
+			 <meta name="adobe-target" content="true">
+			<meta name="uhfHeaderId" content="MSDocsHeader-VBA">
+
+			<meta name="page_type" content="conceptual">
+
+			<!--page specific meta tags-->
+			
+
+			<!-- custom meta tags -->
+			
+		<meta name="breadcrumb_path" content="/office/vba/breadcrumb/toc.json">
+	
+		<meta name="ms.suite" content="office">
+	
+		<meta name="ms.author" content="o365devx">
+	
+		<meta name="author" content="o365devx">
+	
+		<meta name="ms.topic" content="conceptual">
+	
+		<meta name="feedback_system" content="Standard">
+	
+		<meta name="ms.service" content="office">
+	
+		<meta name="ms.subservice" content="vba">
+	
+		<meta name="ms.assetid" content="7208a87a-a567-41d9-af5b-0df3884c58d9">
+	
+		<meta name="ms.date" content="2019-08-14T00:00:00Z">
+	
+		<meta name="ms.localizationpriority" content="high">
+	
+		<meta name="document_id" content="7ff8fedb-54cc-ce30-08f7-a2238b0a71b7">
+	
+		<meta name="document_version_independent_id" content="26e8360b-49da-8e39-0dca-b485c694f0b6">
+	
+		<meta name="updated_at" content="2025-01-11T03:00:00Z">
+	
+		<meta name="original_content_git_url" content="https://github.com/MicrosoftDocs/VBA-Docs/blob/live/Library-Reference/Concepts/getting-started-with-vba-in-office.md">
+	
+		<meta name="gitcommit" content="https://github.com/MicrosoftDocs/VBA-Docs/blob/b35ea2c9db00cf3123c617d5a00afae2efc93b15/Library-Reference/Concepts/getting-started-with-vba-in-office.md">
+	
+		<meta name="git_commit_id" content="b35ea2c9db00cf3123c617d5a00afae2efc93b15">
+	
+		<meta name="site_name" content="Docs">
+	
+		<meta name="depot_name" content="MSDN.VBA-Docs">
+	
+		<meta name="schema" content="Conceptual">
+	
+		<meta name="toc_rel" content="../../api/toc.json">
+	
+		<meta name="feedback_product_url" content="">
+	
+		<meta name="feedback_help_link_type" content="">
+	
+		<meta name="feedback_help_link_url" content="">
+	
+		<meta name="word_count" content="5106">
+	
+		<meta name="asset_id" content="library-reference/concepts/getting-started-with-vba-in-office">
+	
+		<meta name="moniker_range_name" content="">
+	
+		<meta name="item_type" content="Content">
+	
+		<meta name="source_path" content="Library-Reference/Concepts/getting-started-with-vba-in-office.md">
+	
+		<meta name="previous_tlsh_hash" content="6782EDC2B71C9B00AFC24D1B685BBB80B1F0C249BC607EE8163235E2D19E2DD35FE498DAFB5B7305137006930256624E76EAE739807C337569B25CADC26C2315F66C2BF6DA">
+	
+		<meta name="github_feedback_content_git_url" content="https://github.com/MicrosoftDocs/VBA-Docs/blob/main/Library-Reference/Concepts/getting-started-with-vba-in-office.md">
+	 
+		<meta name="cmProducts" content="https://authoring-docs-microsoft.poolparty.biz/devrel/60932d05-feee-4685-a73b-595e25dd9318" data-source="generated">
+	
+		<meta name="cmProducts" content="https://authoring-docs-microsoft.poolparty.biz/devrel/3e34b70d-bca0-4369-a01b-71d1edfd427b" data-source="generated">
+	
+		<meta name="spProducts" content="https://authoring-docs-microsoft.poolparty.biz/devrel/c43bb58b-1190-419b-8d18-e6052371b599" data-source="generated">
+	
+		<meta name="spProducts" content="https://authoring-docs-microsoft.poolparty.biz/devrel/8ca32b3f-fa14-46df-b09a-9c4a591d6396" data-source="generated">
+	
+
+			<!-- assets and js globals -->
+			
+			<link rel="stylesheet" href="./Getting started with VBA in Office _ Microsoft Learn_files/site-ltr.css">
+			<link rel="preconnect" href="https://mscom.demdex.net/" crossorigin="">
+						<link rel="dns-prefetch" href="https://target.microsoft.com/">
+						<link rel="dns-prefetch" href="https://microsoftmscompoc.tt.omtrdc.net/">
+						<link rel="preload" as="script" href="./Getting started with VBA in Office _ Microsoft Learn_files/at.js.下载" integrity="sha384-1/viVM50hgc33O2gOgkWz3EjiD/Fy/ld1dKYXJRUyjNYVEjSUGcSN+iPiQF7e4cu" crossorigin="anonymous" id="adobe-target-script" type="application/javascript">
+			<script src="./Getting started with VBA in Office _ Microsoft Learn_files/wcp-consent.js.下载"></script>
+			<script src="./Getting started with VBA in Office _ Microsoft Learn_files/ms.jsll-4.min.js.下载"></script>
+			<script src="./Getting started with VBA in Office _ Microsoft Learn_files/deprecation.js.下载"></script>
+
+			<!-- msdocs global object -->
+			<script id="msdocs-script">
+		var msDocs = {
+  "environment": {
+    "accessLevel": "online",
+    "azurePortalHostname": "portal.azure.com",
+    "reviewFeatures": false,
+    "supportLevel": "production",
+    "systemContent": true,
+    "siteName": "learn",
+    "legacyHosting": false
+  },
+  "data": {
+    "contentLocale": "en-us",
+    "contentDir": "ltr",
+    "userLocale": "en-us",
+    "userDir": "ltr",
+    "pageTemplate": "Conceptual",
+    "brand": "",
+    "context": {},
+    "standardFeedback": true,
+    "showFeedbackReport": false,
+    "feedbackHelpLinkType": "",
+    "feedbackHelpLinkUrl": "",
+    "feedbackSystem": "Standard",
+    "feedbackGitHubRepo": "",
+    "feedbackProductUrl": "",
+    "extendBreadcrumb": false,
+    "isEditDisplayable": true,
+    "isPrivateUnauthorized": false,
+    "hideViewSource": false,
+    "isPermissioned": false,
+    "hasRecommendations": true,
+    "contributors": [
+      {
+        "name": "o365devx",
+        "url": "https://github.com/o365devx"
+      },
+      {
+        "name": "lindalu-MSFT",
+        "url": "https://github.com/lindalu-MSFT"
+      },
+      {
+        "name": "DhurataJ",
+        "url": "https://github.com/DhurataJ"
+      },
+      {
+        "name": "AlexJerabek",
+        "url": "https://github.com/AlexJerabek"
+      },
+      {
+        "name": "sandial1",
+        "url": "https://github.com/sandial1"
+      },
+      {
+        "name": "Linda-Editor",
+        "url": "https://github.com/Linda-Editor"
+      },
+      {
+        "name": "OfficeGSX",
+        "url": "https://github.com/OfficeGSX"
+      },
+      {
+        "name": "nschonni",
+        "url": "https://github.com/nschonni"
+      },
+      {
+        "name": "kbrandl",
+        "url": "https://github.com/kbrandl"
+      },
+      {
+        "name": "Saisang",
+        "url": "https://github.com/Saisang"
+      }
+    ]
+  },
+  "functions": {}
+};;
+	</script>
+
+			<!-- base scripts, msdocs global should be before this -->
+			<script src="./Getting started with VBA in Office _ Microsoft Learn_files/index-docs.js.下载"></script><style></style>
+			
+
+			<!-- json-ld -->
+			
+		<link rel="preload" as="image" href="https://learn.microsoft.com/en-us/media/ask-learn/meet-ask-learn-base.png"><link rel="preload" as="image" href="https://learn.microsoft.com/en-us/media/ask-learn/check-for-accuracy-base.png"><script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"name":"Learn","position":1,"@type":"ListItem","item":"https://learn.microsoft.com/en-us/"},{"name":"VBA","position":2,"@type":"ListItem","item":"https://learn.microsoft.com/en-us/office/vba/"}]}</script></head>
+	
+			<body id="body" data-bi-name="body" class="layout-body " lang="en-us" dir="ltr">
+				<header class="layout-body-header">
+		<div class="header-holder has-default-focus">
+			
+		<a href="https://learn.microsoft.com/en-us/office/vba/library-reference/concepts/getting-started-with-vba-in-office#main" style="z-index: 1070" class="outline-color-text visually-hidden-until-focused position-fixed inner-focus focus-visible top-0 left-0 right-0 padding-xs text-align-center background-color-body">
+			Skip to main content
+		</a>
+	
+		<a href="https://learn.microsoft.com/en-us/office/vba/library-reference/concepts/getting-started-with-vba-in-office#" data-skip-to-ask-learn="" style="z-index: 1070" class="outline-color-text visually-hidden-until-focused position-fixed inner-focus focus-visible top-0 left-0 right-0 padding-xs text-align-center background-color-body">
+			Skip to Ask Learn chat experience
+		</a>
+	
+
+			<div hidden="" id="cookie-consent-holder" data-test-id="cookie-consent-container"></div><div id="banner-holder" class="has-default-focus has-overflow-hidden display-none-visual-diff theme-light"><!----><section data-bi-name="tier1-event-banner" data-dismissable="disappearing" class="tier1-event-banner position-relative padding-block-md ignite-banner display-none-visual-diff">
+		<div class="uhf-container display-flex-tablet align-items-center">
+			<div class="has-backdrop-filter-blur margin-right-xxl-tablet">
+				<h2 class="title is-2 is-responsive text-wrap-pretty margin-bottom-xs"><!---->Microsoft Ignite<!----></h2>
+				<p class="font-size-sm"><!---->November 17–21, 2025<!----></p>
+			</div>
+			<p class="container is-max-mobile display-none display-block-widescreen has-backdrop-filter-blur font-size-sm margin-left-none margin-right-xxl text-wrap-pretty">
+				Session catalog is live—personalize your event experience across AI, cloud, and more.
+			</p>
+			<a data-bi-name="CTA" class="button margin-top-sm margin-bottom-sm-tablet " href="https://aka.ms/msigniteFY26_MSLearn2?wt.mc_ID=Ignite2025_marx_corp_bn_oo_bn_MS_Learn">
+				<span><!---->Register now<!----></span>
+				<span class="icon" aria-hidden="true">
+					<span class="docon docon-chevron-right-light"></span>
+				</span>
+			</a>
+		</div>
+		<button type="button" data-dismiss="" data-bi-name="close" class="button delete delete-lg position-absolute top-0 right-0 margin-xs margin-sm-tablet ">
+			<span class="visually-hidden"><!---->Dismiss alert<!----></span>
+		</button>
+	</section><!----></div>
+			<!-- Unsupported browser warning -->
+			<div id="unsupported-browser" style="background-color: white; color: black; padding: 16px; border-bottom: 1px solid grey;" hidden="">
+				<div style="max-width: 800px; margin: 0 auto;">
+					<p style="font-size: 24px">This browser is no longer supported.</p>
+					<p style="font-size: 16px; margin-top: 16px;">
+						Upgrade to Microsoft Edge to take advantage of the latest features, security updates, and technical support.
+					</p>
+					<div style="margin-top: 12px;">
+						<a href="https://go.microsoft.com/fwlink/p/?LinkID=2092881" style="background-color: #0078d4; border: 1px solid #0078d4; color: white; padding: 6px 12px; border-radius: 2px; display: inline-block;">
+							Download Microsoft Edge
+						</a>
+						<a href="https://learn.microsoft.com/en-us/lifecycle/faq/internet-explorer-microsoft-edge" style="background-color: white; padding: 6px 12px; border: 1px solid #505050; color: #171717; border-radius: 2px; display: inline-block;">
+							More info about Internet Explorer and Microsoft Edge
+						</a>
+					</div>
+				</div>
+			</div>
+			<!-- site header -->
+			<header id="ms--site-header" data-test-id="site-header-wrapper" role="banner" itemscope="itemscope" itemtype="http://schema.org/Organization">
+				<div id="ms--mobile-nav" class="site-header display-none-tablet padding-inline-none gap-none" data-bi-name="mobile-header" data-test-id="mobile-header"><!---->
+		<div id="ms--site-header-hamburger" data-test-id="site-header-hamburger">
+			<button type="button" class="button button-clear inner-focus" data-test-id="mobile-nav-open-button" data-bi-name="mobile-nav-open-button" title="Global navigation" aria-label="Global navigation">
+				<span class="icon" aria-hidden="true">
+					<span class="docon docon-menu"></span>
+				</span>
+			</button>
+		</div>
+
+		<!-- Brand -->
+		
+		<a class="site-header-brand" itemprop="url" href="https://learn.microsoft.com/en-us/" data-bi-name="site-header-brand-learn-mobile" data-test-id="site-header-brand-mobile">
+			<span><!---->Learn<!----></span>
+		</a>
+	
+
+		<!-- MS logo -->
+		
+				<a href="https://www.microsoft.com/" aria-label="Microsoft" itemprop="url" data-bi-name="site-header-microsoft-logo-mobile" data-test-id="site-header-microsoft-logo-mobile" class="site-header-logo site-header-logo-centered">
+					
+		<svg aria-hidden="true" viewBox="0 0 25 25" fill="none" xmlns="http://www.w3.org/2000/svg" itemprop="logo" itemscope="itemscope">
+			<path d="M11.5216 0.5H0V11.9067H11.5216V0.5Z" fill="#f25022"></path>
+			<path d="M24.2418 0.5H12.7202V11.9067H24.2418V0.5Z" fill="#7fba00"></path>
+			<path d="M11.5216 13.0933H0V24.5H11.5216V13.0933Z" fill="#00a4ef"></path>
+			<path d="M24.2418 13.0933H12.7202V24.5H24.2418V13.0933Z" fill="#ffb900"></path>
+		</svg>
+	
+				</a>
+		  
+
+		<!-- Search -->
+		
+		<search-expander data-test-id="site-header-search-mobile" class="display-flex flex-grow-1 justify-content-flex-end">
+			<div hidden="" id="ms--site-header-search-mobile" class="display-flex align-items-center gap-xxs width-full padding-left-xxs">
+				
+		<form class="flex-grow-1" method="GET" role="search" id="ms--site-header-search-form-mobile" data-bi-name="site-header-search-form-mobile" name="site-header-search-form-mobile" aria-label="Search" action="https://learn.microsoft.com/en-us/search/">
+			<div class="autocomplete display-block" data-bi-name="autocomplete"><!---->
+			<div class="field-body control ">
+				<input role="combobox" maxlength="100" aria-autocomplete="list" autocapitalize="off" autocomplete="off" autocorrect="off" spellcheck="false" id="site-header-search-autocomplete-input-mobile" data-test-id="site-header-search-autocomplete-input-mobile" class="autocomplete-input input 
+						
+						width-full" type="search" name="terms" aria-expanded="false" aria-owns="ax-3-listbox" aria-controls="ax-3-listbox" aria-activedescendant="" aria-label="Search" aria-describedby="ms--site-header-search-autocomplete-input-mobile-description" placeholder="Search" data-bi-name="site-header-search-autocomplete-input-mobile" pattern=".*">
+
+				
+
+				<span aria-hidden="true" class="autocomplete-loader loader has-text-primary " hidden=""></span>
+
+				<span hidden="" id="ms--site-header-search-autocomplete-input-mobile-description">
+					Suggestions will filter as you type
+				</span>
+			</div>
+
+			<ul role="listbox" id="ax-3-listbox" data-test-id="site-header-search-autocomplete-input-mobile-listbox" class="autocomplete-suggestions is-vertically-scrollable padding-xxs " aria-label="Suggestions" hidden="">
+				
+				
+			</ul>
+		<!----></div>
+			<!-- mobile safari will not dispatch submit event unless there's a submit button that is not display:none -->
+			<button type="submit" class="visually-hidden" tabindex="-1" aria-hidden="true"></button>
+			<input name="category" hidden="" value="">
+			
+			
+		</form>
+	
+				<button data-search-expander-trigger-close="" type="button" class="button button-clear inner-focus" aria-controls="ms--site-header-search-mobile" aria-label="Close search" data-bi-name="site-header-search-close-mobile" data-test-id="site-header-search-close-mobile">
+					<span class="icon" aria-hidden="true">
+						<span class="docon docon-navigate-close"></span>
+					</span>
+				</button>
+			</div>
+			<button data-search-expander-trigger-open="" type="button" class="button button-clear inner-focus" aria-controls="ms--site-header-search-mobile" aria-label="Open search" data-bi-name="site-header-search-open-mobile" data-test-id="site-header-search-open-mobile">
+				<span class="icon" aria-hidden="true">
+					<span class="docon docon-search"></span>
+				</span>
+			</button>
+		</search-expander>
+	
+
+		<!-- User avatar/Sign in -->
+		<!---->
+		<a href="https://learn.microsoft.com/en-us/office/vba/library-reference/concepts/getting-started-with-vba-in-office#" data-bi-name="site-header-sign-in-mobile" data-test-id="site-header-sign-in-mobile" class="link-button font-size-sm flex-shrink-0 docs-sign-in auth-status-determined not-authenticated margin-right-xs margin-left-xxs">
+			Sign in
+		</a>
+	 
+		<details data-bi-name="site-header-user-mobile" class="popover popover-right auth-status-determined authenticated margin-right-xs margin-left-xxs">
+			<summary data-bi-name="site-header-user-avatar" aria-label="Your Account" data-test-id="site-header-user-mobile">
+				<div class="persona persona-sm">
+					<figure class="persona-avatar">
+						<img alt="" data-profile-property="avatarThumbnailUrl">
+					</figure>
+				</div>
+			</summary>
+			<div class="popover-content width-auto" data-bi-name="site-header-user-menu">
+				<div class="persona persona-sm">
+					<figure class="persona-avatar">
+						<img alt="" data-profile-property="avatarUrl" aria-labelledby="ms--user-display-name-mobile">
+					</figure>
+					<div class="persona-details" data-test-id="persona-detail-mobile">
+						<p class="persona-name" data-profile-property="displayName" id="ms--user-display-name-mobile"></p>
+						<p data-profile-property="upn"></p>
+					</div>
+				</div>
+				<ul class="padding-block-xs">
+					<li class="padding-bottom-xs">
+						<a data-profile-property="profileUrl" class="font-size-sm" data-bi-name="site-header-user-profile" href="https://learn.microsoft.com/en-us/users/me/activity/">
+							Profile
+						</a>
+					</li>
+					<li>
+						<a data-profile-property="settingsUrl" class="font-size-sm" data-bi-name="site-header-user-settings" href="https://learn.microsoft.com/en-us/users/me/settings/">
+							Settings
+						</a>
+					</li>
+				</ul>
+				<div class="border-top padding-top-xs">
+					<a class="docs-sign-out font-size-sm" href="https://learn.microsoft.com/en-us/office/vba/library-reference/concepts/getting-started-with-vba-in-office#" data-bi-name="site-header-sign-out-mobile" data-test-id="site-header-user-sign-out-mobile">
+						Sign out
+					</a>
+				</div>
+			</div>
+		</details>
+	<!---->
+	<!----></div>
+				<div id="ms--primary-nav" class="site-header display-none display-flex-tablet" data-bi-name="L1-header" data-test-id="primary-header"><!---->
+		<!-- MS logo -->
+		
+				<a href="https://www.microsoft.com/" aria-label="Microsoft" itemprop="url" data-bi-name="site-header-microsoft-logo" data-test-id="site-header-microsoft-logo" class="site-header-logo ">
+					
+		<svg aria-hidden="true" viewBox="0 0 25 25" fill="none" xmlns="http://www.w3.org/2000/svg" itemprop="logo" itemscope="itemscope">
+			<path d="M11.5216 0.5H0V11.9067H11.5216V0.5Z" fill="#f25022"></path>
+			<path d="M24.2418 0.5H12.7202V11.9067H24.2418V0.5Z" fill="#7fba00"></path>
+			<path d="M11.5216 13.0933H0V24.5H11.5216V13.0933Z" fill="#00a4ef"></path>
+			<path d="M24.2418 13.0933H12.7202V24.5H24.2418V13.0933Z" fill="#ffb900"></path>
+		</svg>
+	
+				</a>
+		  
+
+		<!-- Divider -->
+		<div class="site-header-divider"></div>
+
+		<!-- Brand -->
+		
+		<a class="site-header-brand" itemprop="url" href="https://learn.microsoft.com/en-us/" data-bi-name="site-header-brand-learn" data-test-id="site-header-brand">
+			<span><!---->Learn<!----></span>
+		</a>
+	
+
+		<div id="ms--search-expander-wrapper" class="display-flex justify-content-space-between flex-grow-1 align-items-center overflow-x-hidden height-full">
+			<!-- Main Nav -->
+			
+		<overflow-menu class="align-self-stretch" style="display: block; overflow: hidden; width: 100%;">
+			<nav class="site-header-nav" data-bi-name="primary-nav" data-overflow-menu-container="" aria-label="Global" style="visibility: visible; overflow: hidden;">
+				<button type="button" data-overflow-menu-prev-button="" data-bi-name="site-header-btn-prev" class="button button-clear button-sm inner-focus" hidden="" aria-label="Previous">
+					<span class="icon" aria-hidden="true">
+						<span class="docon docon-chevron-left-light"></span>
+					</span>
+				</button>
+
+				
+		<ul class="display-flex gap-xxs-desktop">
+			<!---->
+			<li aria-setsize="4" aria-posinset="1">
+				<panel-controller data-bi-name="site-header-btn-1-documentation">
+					<button type="button" aria-expanded="false" class="site-header-button" data-overflow-menu-item="" aria-controls="ms--panel-1" data-test-id="site-header-panel-controller-1" style="white-space: nowrap;">
+						<span><!---->Documentation<!----></span>
+						<span class="icon expanded-indicator" aria-hidden="true">
+							<span class="docon docon-chevron-down-light"></span>
+						</span>
+					</button>
+					<div class="site-header-panel" hidden="" id="ms--panel-1" data-bi-name="panel-1-documentation" data-test-id="site-header-panel-1">
+						
+		<div class="site-header-panel-content">
+			<ul class="site-header-panel-links">
+				<!---->
+				<li>
+					<a class="button button-clear button-sm button-block text-align-left font-weight-normal justify-content-flex-start inner-focus border-none background-color-body-accent-onhover" href="https://learn.microsoft.com/en-us/docs/" data-bi-name="panel-link-1-all-product-documentation">
+						All product documentation
+					</a>
+				</li>
+			<!---->
+				<li>
+					<a class="button button-clear button-sm button-block text-align-left font-weight-normal justify-content-flex-start inner-focus border-none background-color-body-accent-onhover" href="https://learn.microsoft.com/en-us/azure/?product=popular" data-bi-name="panel-link-2-azure-documentation">
+						Azure documentation
+					</a>
+				</li>
+			<!---->
+				<li>
+					<a class="button button-clear button-sm button-block text-align-left font-weight-normal justify-content-flex-start inner-focus border-none background-color-body-accent-onhover" href="https://learn.microsoft.com/en-us/dynamics365/" data-bi-name="panel-link-3-dynamics-365-documentation">
+						Dynamics 365 documentation
+					</a>
+				</li>
+			<!---->
+				<li>
+					<a class="button button-clear button-sm button-block text-align-left font-weight-normal justify-content-flex-start inner-focus border-none background-color-body-accent-onhover" href="https://learn.microsoft.com/en-us/copilot/" data-bi-name="panel-link-4-microsoft-copilot-documentation">
+						Microsoft Copilot documentation
+					</a>
+				</li>
+			<!---->
+				<li>
+					<a class="button button-clear button-sm button-block text-align-left font-weight-normal justify-content-flex-start inner-focus border-none background-color-body-accent-onhover" href="https://learn.microsoft.com/en-us/microsoft-365/" data-bi-name="panel-link-5-microsoft-365-documentation">
+						Microsoft 365 documentation
+					</a>
+				</li>
+			<!---->
+				<li>
+					<a class="button button-clear button-sm button-block text-align-left font-weight-normal justify-content-flex-start inner-focus border-none background-color-body-accent-onhover" href="https://learn.microsoft.com/en-us/power-platform/" data-bi-name="panel-link-6-power-platform-documentation">
+						Power Platform documentation
+					</a>
+				</li>
+			<!---->
+				<li>
+					<a class="button button-clear button-sm button-block text-align-left font-weight-normal justify-content-flex-start inner-focus border-none background-color-body-accent-onhover" href="https://learn.microsoft.com/en-us/samples/" data-bi-name="panel-link-7-code-samples">
+						Code samples
+					</a>
+				</li>
+			<!---->
+				<li>
+					<a class="button button-clear button-sm button-block text-align-left font-weight-normal justify-content-flex-start inner-focus border-none background-color-body-accent-onhover" href="https://learn.microsoft.com/en-us/troubleshoot/" data-bi-name="panel-link-8-troubleshooting-documentation">
+						Troubleshooting documentation
+					</a>
+				</li>
+			<!---->
+			</ul>
+			
+		</div>
+		
+			<section class="site-header-panel-featured-content"><!----><!---->
+				<article class="card position-relative background-color-body-accent-onhover background-color-body-medium box-shadow-none" data-bi-name="featured-card-1-ai-tour">
+					<div class="card-content">
+						<p class="card-supertitle line-clamp-2 line-height-normal"><!---->Free to join. Request to attend.<!----></p>
+						<a class="card-title color-text background-color-transparent stretched-link" href="https://aitour.microsoft.com/?wt.mc_id=itour26_learnmarketingspot_wwl">
+							Microsoft AI Tour
+						</a>
+						<p class="card-content-description line-clamp-2"><!---->Take your business to the AI frontier.<!----></p>
+					</div>
+				</article>
+			<!----><!----></section>
+		
+	
+					</div>
+				</panel-controller>
+			</li>
+		<!---->
+			<li aria-setsize="4" aria-posinset="2">
+				<panel-controller data-bi-name="site-header-btn-2-training">
+					<button type="button" aria-expanded="false" class="site-header-button" data-overflow-menu-item="" aria-controls="ms--panel-2" data-test-id="site-header-panel-controller-2" style="white-space: nowrap;">
+						<span><!---->Training<!----></span>
+						<span class="icon expanded-indicator" aria-hidden="true">
+							<span class="docon docon-chevron-down-light"></span>
+						</span>
+					</button>
+					<div class="site-header-panel" hidden="" id="ms--panel-2" data-bi-name="panel-2-training" data-test-id="site-header-panel-2">
+						
+		<div class="site-header-panel-content">
+			<ul class="site-header-panel-links">
+				<!---->
+				<li>
+					<a class="button button-clear button-sm button-block text-align-left font-weight-normal justify-content-flex-start inner-focus border-none background-color-body-accent-onhover" href="https://learn.microsoft.com/en-us/training/" data-bi-name="panel-link-1-training">
+						All training
+					</a>
+				</li>
+			<!---->
+				<li>
+					<a class="button button-clear button-sm button-block text-align-left font-weight-normal justify-content-flex-start inner-focus border-none background-color-body-accent-onhover" href="https://learn.microsoft.com/en-us/training/browse/?products=azure" data-bi-name="panel-link-2-azure-training">
+						Azure training
+					</a>
+				</li>
+			<!---->
+				<li>
+					<a class="button button-clear button-sm button-block text-align-left font-weight-normal justify-content-flex-start inner-focus border-none background-color-body-accent-onhover" href="https://learn.microsoft.com/en-us/training/browse/?products=dynamics-365" data-bi-name="panel-link-3-dynamics-365-training">
+						Dynamics 365 training
+					</a>
+				</li>
+			<!---->
+				<li>
+					<a class="button button-clear button-sm button-block text-align-left font-weight-normal justify-content-flex-start inner-focus border-none background-color-body-accent-onhover" href="https://learn.microsoft.com/en-us/training/browse/?products=ms-copilot" data-bi-name="panel-link-4-microsoft-copilot-training">
+						Microsoft Copilot training
+					</a>
+				</li>
+			<!---->
+				<li>
+					<a class="button button-clear button-sm button-block text-align-left font-weight-normal justify-content-flex-start inner-focus border-none background-color-body-accent-onhover" href="https://learn.microsoft.com/en-us/training/browse/?products=m365" data-bi-name="panel-link-5-microsoft-365-training">
+						Microsoft 365 training
+					</a>
+				</li>
+			<!---->
+				<li>
+					<a class="button button-clear button-sm button-block text-align-left font-weight-normal justify-content-flex-start inner-focus border-none background-color-body-accent-onhover" href="https://learn.microsoft.com/en-us/training/browse/?products=power-platform" data-bi-name="panel-link-6-microsoft-power-platform-training">
+						Microsoft Power Platform training
+					</a>
+				</li>
+			<!---->
+				<li>
+					<a class="button button-clear button-sm button-block text-align-left font-weight-normal justify-content-flex-start inner-focus border-none background-color-body-accent-onhover" href="https://learn.microsoft.com/en-us/credentials/" data-bi-name="panel-link-7-credentials">
+						Credentials
+					</a>
+				</li>
+			<!---->
+				<li>
+					<a class="button button-clear button-sm button-block text-align-left font-weight-normal justify-content-flex-start inner-focus border-none background-color-body-accent-onhover" href="https://learn.microsoft.com/en-us/training/career-paths/" data-bi-name="panel-link-8-career-paths">
+						Career paths
+					</a>
+				</li>
+			<!---->
+				<li>
+					<a class="button button-clear button-sm button-block text-align-left font-weight-normal justify-content-flex-start inner-focus border-none background-color-body-accent-onhover" href="https://learn.microsoft.com/en-us/plans/ai/" data-bi-name="panel-link-9-ai-generated-plans">
+						AI-generated Plans
+					</a>
+				</li>
+			<!---->
+			</ul>
+			
+		</div>
+		
+			<section class="site-header-panel-featured-content"><!----><!---->
+				<article class="card position-relative background-color-body-accent-onhover background-color-body-medium box-shadow-none" data-bi-name="featured-card-1-ai-tour">
+					<div class="card-content">
+						<p class="card-supertitle line-clamp-2 line-height-normal"><!---->Free to join. Request to attend.<!----></p>
+						<a class="card-title color-text background-color-transparent stretched-link" href="https://aitour.microsoft.com/?wt.mc_id=itour26_learnmarketingspot_wwl">
+							Microsoft AI Tour
+						</a>
+						<p class="card-content-description line-clamp-2"><!---->Take your business to the AI frontier.<!----></p>
+					</div>
+				</article>
+			<!----><!----></section>
+		
+	
+					</div>
+				</panel-controller>
+			</li>
+		<!---->
+			<li aria-setsize="4" aria-posinset="3">
+				<panel-controller data-bi-name="site-header-btn-3-qna">
+					<button type="button" aria-expanded="false" class="site-header-button" data-overflow-menu-item="" aria-controls="ms--panel-3" data-test-id="site-header-panel-controller-3" style="white-space: nowrap;">
+						<span><!---->Q&amp;A<!----></span>
+						<span class="icon expanded-indicator" aria-hidden="true">
+							<span class="docon docon-chevron-down-light"></span>
+						</span>
+					</button>
+					<div class="site-header-panel" hidden="" id="ms--panel-3" data-bi-name="panel-3-qna" data-test-id="site-header-panel-3">
+						
+		<div class="site-header-panel-content">
+			<ul class="site-header-panel-links">
+				<!---->
+				<li>
+					<a class="button button-clear button-sm button-block text-align-left font-weight-normal justify-content-flex-start inner-focus border-none background-color-body-accent-onhover" href="https://learn.microsoft.com/en-us/answers/questions/ask/" data-bi-name="panel-link-1-ask-a-question">
+						Ask a question
+					</a>
+				</li>
+			<!---->
+				<li>
+					<a class="button button-clear button-sm button-block text-align-left font-weight-normal justify-content-flex-start inner-focus border-none background-color-body-accent-onhover" href="https://learn.microsoft.com/en-us/answers/tags/133/azure/" data-bi-name="panel-link-2-azure-questions">
+						Azure questions
+					</a>
+				</li>
+			<!---->
+				<li>
+					<a class="button button-clear button-sm button-block text-align-left font-weight-normal justify-content-flex-start inner-focus border-none background-color-body-accent-onhover" href="https://learn.microsoft.com/en-us/answers/tags/60/windows/" data-bi-name="panel-link-3-windows-questions">
+						Windows questions
+					</a>
+				</li>
+			<!---->
+				<li>
+					<a class="button button-clear button-sm button-block text-align-left font-weight-normal justify-content-flex-start inner-focus border-none background-color-body-accent-onhover" href="https://learn.microsoft.com/en-us/answers/tags/9/m365/" data-bi-name="panel-link-4-m365-questions">
+						Microsoft 365 questions
+					</a>
+				</li>
+			<!---->
+				<li>
+					<a class="button button-clear button-sm button-block text-align-left font-weight-normal justify-content-flex-start inner-focus border-none background-color-body-accent-onhover" href="https://learn.microsoft.com/en-us/answers/tags/131/office-outlook/" data-bi-name="panel-link-5-microsoft-outlook-questions">
+						Microsoft Outlook questions
+					</a>
+				</li>
+			<!---->
+				<li>
+					<a class="button button-clear button-sm button-block text-align-left font-weight-normal justify-content-flex-start inner-focus border-none background-color-body-accent-onhover" href="https://learn.microsoft.com/en-us/answers/tags/108/office-teams/" data-bi-name="panel-link-6-microsoft-teams-questions">
+						Microsoft Teams questions
+					</a>
+				</li>
+			<!---->
+				<li>
+					<a class="button button-clear button-sm button-block text-align-left font-weight-normal justify-content-flex-start inner-focus border-none background-color-body-accent-onhover" href="https://learn.microsoft.com/en-us/answers/tags/" data-bi-name="panel-link-7-popular-tags">
+						Popular tags
+					</a>
+				</li>
+			<!---->
+				<li>
+					<a class="button button-clear button-sm button-block text-align-left font-weight-normal justify-content-flex-start inner-focus border-none background-color-body-accent-onhover" href="https://learn.microsoft.com/en-us/answers/questions/" data-bi-name="panel-link-8-all-questions">
+						All questions
+					</a>
+				</li>
+			<!---->
+			</ul>
+			
+		</div>
+		
+			<section class="site-header-panel-featured-content"><!----><!---->
+				<article class="card position-relative background-color-body-accent-onhover background-color-body-medium box-shadow-none" data-bi-name="featured-card-1-ai-tour">
+					<div class="card-content">
+						<p class="card-supertitle line-clamp-2 line-height-normal"><!---->Free to join. Request to attend.<!----></p>
+						<a class="card-title color-text background-color-transparent stretched-link" href="https://aitour.microsoft.com/?wt.mc_id=itour26_learnmarketingspot_wwl">
+							Microsoft AI Tour
+						</a>
+						<p class="card-content-description line-clamp-2"><!---->Take your business to the AI frontier.<!----></p>
+					</div>
+				</article>
+			<!----><!----></section>
+		
+	
+					</div>
+				</panel-controller>
+			</li>
+		<!---->
+			<li aria-setsize="4" aria-posinset="4">
+				<panel-controller data-bi-name="site-header-btn-4-topics">
+					<button type="button" aria-expanded="false" class="site-header-button" data-overflow-menu-item="" aria-controls="ms--panel-4" data-test-id="site-header-panel-controller-4" style="white-space: nowrap;">
+						<span><!---->Topics<!----></span>
+						<span class="icon expanded-indicator" aria-hidden="true">
+							<span class="docon docon-chevron-down-light"></span>
+						</span>
+					</button>
+					<div class="site-header-panel" hidden="" id="ms--panel-4" data-bi-name="panel-4-topics" data-test-id="site-header-panel-4">
+						
+		<div class="site-header-panel-content">
+			<ul class="site-header-panel-cards">
+				<!---->
+				<li>
+					<article class="card position-relative background-color-body-accent-onhover background-color-body-medium box-shadow-none" data-bi-name="panel-card-1-ai">
+						<div class="card-content">
+							<a class="card-title color-text background-color-transparent stretched-link" href="https://learn.microsoft.com/en-us/ai/">
+								Artificial intelligence
+							</a>
+							<p class="card-content-description line-clamp-2"><!---->Learning hub to build AI skills<!----></p>
+						</div>
+					</article>
+				</li>
+			<!---->
+				<li>
+					<article class="card position-relative background-color-body-accent-onhover background-color-body-medium box-shadow-none" data-bi-name="panel-card-2-compliance">
+						<div class="card-content">
+							<a class="card-title color-text background-color-transparent stretched-link" href="https://learn.microsoft.com/en-us/compliance/">
+								Compliance
+							</a>
+							<p class="card-content-description line-clamp-2"><!---->Compliance resources you need to get started with your business<!----></p>
+						</div>
+					</article>
+				</li>
+			<!---->
+				<li>
+					<article class="card position-relative background-color-body-accent-onhover background-color-body-medium box-shadow-none" data-bi-name="panel-card-3-devops">
+						<div class="card-content">
+							<a class="card-title color-text background-color-transparent stretched-link" href="https://learn.microsoft.com/en-us/devops/">
+								DevOps
+							</a>
+							<p class="card-content-description line-clamp-2"><!---->DevOps practices, Git version control and Agile methods<!----></p>
+						</div>
+					</article>
+				</li>
+			<!---->
+				<li>
+					<article class="card position-relative background-color-body-accent-onhover background-color-body-medium box-shadow-none" data-bi-name="panel-card-4-microsoft-learn-for-organizations">
+						<div class="card-content">
+							<a class="card-title color-text background-color-transparent stretched-link" href="https://learn.microsoft.com/en-us/training/organizations/">
+								Learn for Organizations
+							</a>
+							<p class="card-content-description line-clamp-2"><!---->Curated offerings from Microsoft to boost your team’s technical skills<!----></p>
+						</div>
+					</article>
+				</li>
+			<!---->
+				<li>
+					<article class="card position-relative background-color-body-accent-onhover background-color-body-medium box-shadow-none" data-bi-name="panel-card-5-platform-engineering">
+						<div class="card-content">
+							<a class="card-title color-text background-color-transparent stretched-link" href="https://learn.microsoft.com/en-us/platform-engineering/">
+								Platform engineering
+							</a>
+							<p class="card-content-description line-clamp-2"><!---->Tools from Microsoft and others to build personalized developer experiences<!----></p>
+						</div>
+					</article>
+				</li>
+			<!---->
+				<li>
+					<article class="card position-relative background-color-body-accent-onhover background-color-body-medium box-shadow-none" data-bi-name="panel-card-6-security">
+						<div class="card-content">
+							<a class="card-title color-text background-color-transparent stretched-link" href="https://learn.microsoft.com/en-us/security/">
+								Security
+							</a>
+							<p class="card-content-description line-clamp-2"><!---->Guidance to help you tackle security challenges<!----></p>
+						</div>
+					</article>
+				</li>
+			<!---->
+				<li>
+					<article class="card position-relative background-color-body-accent-onhover background-color-body-medium box-shadow-none" data-bi-name="panel-card-7-assessments">
+						<div class="card-content">
+							<a class="card-title color-text background-color-transparent stretched-link" href="https://learn.microsoft.com/en-us/assessments/">
+								Assessments
+							</a>
+							<p class="card-content-description line-clamp-2"><!---->Interactive guidance with custom recommendations<!----></p>
+						</div>
+					</article>
+				</li>
+			<!---->
+				<li>
+					<article class="card position-relative background-color-body-accent-onhover background-color-body-medium box-shadow-none" data-bi-name="panel-card-8-student-hub">
+						<div class="card-content">
+							<a class="card-title color-text background-color-transparent stretched-link" href="https://learn.microsoft.com/en-us/training/student-hub/">
+								Student hub
+							</a>
+							<p class="card-content-description line-clamp-2"><!---->Self-paced and interactive training for students<!----></p>
+						</div>
+					</article>
+				</li>
+			<!---->
+				<li>
+					<article class="card position-relative background-color-body-accent-onhover background-color-body-medium box-shadow-none" data-bi-name="panel-card-9-educator-center">
+						<div class="card-content">
+							<a class="card-title color-text background-color-transparent stretched-link" href="https://learn.microsoft.com/en-us/training/educator-center/">
+								Educator center
+							</a>
+							<p class="card-content-description line-clamp-2"><!---->Resources for educators to bring technical innovation in their classroom<!----></p>
+						</div>
+					</article>
+				</li>
+			<!---->
+			</ul>
+			
+		</div>
+		
+			<section class="site-header-panel-featured-content"><!----><!---->
+				<article class="card position-relative background-color-body-accent-onhover background-color-body-medium box-shadow-none" data-bi-name="featured-card-1-ai-tour">
+					<div class="card-content">
+						<p class="card-supertitle line-clamp-2 line-height-normal"><!---->Free to join. Request to attend.<!----></p>
+						<a class="card-title color-text background-color-transparent stretched-link" href="https://aitour.microsoft.com/?wt.mc_id=itour26_learnmarketingspot_wwl">
+							Microsoft AI Tour
+						</a>
+						<p class="card-content-description line-clamp-2"><!---->Take your business to the AI frontier.<!----></p>
+					</div>
+				</article>
+			<!----><!----></section>
+		
+	
+					</div>
+				</panel-controller>
+			</li>
+		<!---->
+		</ul>
+	
+
+				<button type="button" data-overflow-menu-next-button="" data-bi-name="site-header-btn-next" class="button button-clear button-sm inner-focus margin-left-auto" hidden="" aria-label="Next">
+					<span class="icon" aria-hidden="true">
+						<span class="docon docon-chevron-right-light"></span>
+					</span>
+				</button>
+			</nav>
+		</overflow-menu>
+	
+
+			<!-- Search -->
+			
+		<search-expander data-test-id="site-header-search" class="flex-grow-1 margin-left-xxs">
+			<div hidden="" id="ms--site-header-search" class="display-flex align-items-center gap-xxs ">
+				
+		<form class="flex-grow-1" method="GET" role="search" id="ms--site-header-search-form" data-bi-name="site-header-search-form" name="site-header-search-form" aria-label="Search" action="https://learn.microsoft.com/en-us/search/">
+			<div class="autocomplete display-block" data-bi-name="autocomplete"><!---->
+			<div class="field-body control ">
+				<input role="combobox" maxlength="100" aria-autocomplete="list" autocapitalize="off" autocomplete="off" autocorrect="off" spellcheck="false" id="site-header-search-autocomplete-input" data-test-id="site-header-search-autocomplete-input" class="autocomplete-input input input-sm
+						
+						width-full" type="search" name="terms" aria-expanded="false" aria-owns="ax-2-listbox" aria-controls="ax-2-listbox" aria-activedescendant="" aria-label="Search" aria-describedby="ms--site-header-search-autocomplete-input-description" placeholder="Search" data-bi-name="site-header-search-autocomplete-input" pattern=".*">
+
+				
+
+				<span aria-hidden="true" class="autocomplete-loader loader has-text-primary " hidden=""></span>
+
+				<span hidden="" id="ms--site-header-search-autocomplete-input-description">
+					Suggestions will filter as you type
+				</span>
+			</div>
+
+			<ul role="listbox" id="ax-2-listbox" data-test-id="site-header-search-autocomplete-input-listbox" class="autocomplete-suggestions is-vertically-scrollable padding-xxs " aria-label="Suggestions" hidden="">
+				
+				
+			</ul>
+		<!----></div>
+			<!-- mobile safari will not dispatch submit event unless there's a submit button that is not display:none -->
+			<button type="submit" class="visually-hidden" tabindex="-1" aria-hidden="true"></button>
+			<input name="category" hidden="" value="">
+			
+			
+		</form>
+	
+				<button data-search-expander-trigger-close="" type="button" class="button button-clear inner-focus" aria-controls="ms--site-header-search" aria-label="Close search" data-bi-name="site-header-search-close" data-test-id="site-header-search-close">
+					<span class="icon" aria-hidden="true">
+						<span class="docon docon-navigate-close"></span>
+					</span>
+				</button>
+			</div>
+			<button data-search-expander-trigger-open="" type="button" class="button button-clear inner-focus" aria-controls="ms--site-header-search" aria-label="Open search" data-bi-name="site-header-search-open" data-test-id="site-header-search-open">
+				<span class="icon" aria-hidden="true">
+					<span class="docon docon-search"></span>
+				</span>
+			</button>
+		</search-expander>
+	
+		</div>
+
+		<!-- User avatar/Sign in -->
+		<!---->
+		<a href="https://learn.microsoft.com/en-us/office/vba/library-reference/concepts/getting-started-with-vba-in-office#" data-bi-name="site-header-sign-in" data-test-id="site-header-sign-in" class="link-button font-size-sm flex-shrink-0 docs-sign-in auth-status-determined not-authenticated ">
+			Sign in
+		</a>
+	 
+		<details data-bi-name="site-header-user" class="popover popover-right auth-status-determined authenticated ">
+			<summary data-bi-name="site-header-user-avatar" aria-label="Your Account" data-test-id="site-header-user">
+				<div class="persona ">
+					<figure class="persona-avatar">
+						<img alt="" data-profile-property="avatarThumbnailUrl">
+					</figure>
+				</div>
+			</summary>
+			<div class="popover-content width-auto" data-bi-name="site-header-user-menu">
+				<div class="persona ">
+					<figure class="persona-avatar">
+						<img alt="" data-profile-property="avatarUrl" aria-labelledby="ms--user-display-name">
+					</figure>
+					<div class="persona-details" data-test-id="persona-detail">
+						<p class="persona-name" data-profile-property="displayName" id="ms--user-display-name"></p>
+						<p data-profile-property="upn"></p>
+					</div>
+				</div>
+				<ul class="padding-block-xs">
+					<li class="padding-bottom-xs">
+						<a data-profile-property="profileUrl" class="font-size-sm" data-bi-name="site-header-user-profile" href="https://learn.microsoft.com/en-us/users/me/activity/">
+							Profile
+						</a>
+					</li>
+					<li>
+						<a data-profile-property="settingsUrl" class="font-size-sm" data-bi-name="site-header-user-settings" href="https://learn.microsoft.com/en-us/users/me/settings/">
+							Settings
+						</a>
+					</li>
+				</ul>
+				<div class="border-top padding-top-xs">
+					<a class="docs-sign-out font-size-sm" href="https://learn.microsoft.com/en-us/office/vba/library-reference/concepts/getting-started-with-vba-in-office#" data-bi-name="site-header-sign-out" data-test-id="site-header-user-sign-out">
+						Sign out
+					</a>
+				</div>
+			</div>
+		</details>
+	<!---->
+	<!----></div>
+				<div id="ms--secondary-nav" class="display-none display-flex-tablet" data-bi-name="L2-header" data-test-id="secondary-header"><!----><div class="site-header width-full"><!----> 
+		<a class="site-header-brand font-size-h6 padding-inline-none margin-right-xxs" itemprop="url" href="https://learn.microsoft.com/en-us/office/vba/api/overview" data-bi-name="secondary-nav-link-category-visual-basic-for-applications">
+			<span>
+				Visual Basic for Applications
+				
+			</span>
+		</a>
+	 
+		
+		<nav class="site-header-nav width-auto" data-bi-name="secondary-nav" aria-label="Site">
+			<ul class="display-flex">
+				<!---->
+		<li class="dropdown">
+			<button type="button" aria-expanded="false" class="dropdown-trigger site-header-button  site-header-button-icon-chevron" aria-controls="bx-13" data-bi-name="secondary-nav-btn-1-browse-by-product" value="undefined">
+				<span><!---->Browse by product<!----></span>
+				<span aria-hidden="true" class="icon expanded-indicator ">
+					<span class="docon docon-chevron-down-light"></span>
+				</span>
+			</button>
+			<ul class="dropdown-menu padding-bottom-xxs background-color-body-medium" id="bx-13" aria-label="Browse by product" data-bi-name="secondary-nav-menu-1-browse-by-product">
+				<!---->
+				<li>
+					<a class="has-external-link-indicator site-header-button width-full justify-content-flex-start padding-inline-xs padding-block-xxs " href="https://learn.microsoft.com/en-us/office/vba/api/overview/access/" data-bi-name="secondary-nav-link-1-access">
+						<span><!---->Access<!----></span>
+					</a>
+				</li>
+		  <!---->
+				<li>
+					<a class="has-external-link-indicator site-header-button width-full justify-content-flex-start padding-inline-xs padding-block-xxs " href="https://learn.microsoft.com/en-us/office/vba/api/overview/excel/" data-bi-name="secondary-nav-link-2-excel">
+						<span><!---->Excel<!----></span>
+					</a>
+				</li>
+		  <!---->
+				<li>
+					<a class="has-external-link-indicator site-header-button width-full justify-content-flex-start padding-inline-xs padding-block-xxs " href="https://learn.microsoft.com/en-us/office/vba/api/overview/office-mac/" data-bi-name="secondary-nav-link-3-office-for-mac">
+						<span><!---->Office for Mac<!----></span>
+					</a>
+				</li>
+		  <!---->
+				<li>
+					<a class="has-external-link-indicator site-header-button width-full justify-content-flex-start padding-inline-xs padding-block-xxs " href="https://learn.microsoft.com/en-us/office/vba/api/overview/outlook/" data-bi-name="secondary-nav-link-4-outlook">
+						<span><!---->Outlook<!----></span>
+					</a>
+				</li>
+		  <!---->
+				<li>
+					<a class="has-external-link-indicator site-header-button width-full justify-content-flex-start padding-inline-xs padding-block-xxs " href="https://learn.microsoft.com/en-us/office/vba/api/overview/powerpoint/" data-bi-name="secondary-nav-link-5-powerpoint">
+						<span><!---->PowerPoint<!----></span>
+					</a>
+				</li>
+		  <!---->
+				<li>
+					<a class="has-external-link-indicator site-header-button width-full justify-content-flex-start padding-inline-xs padding-block-xxs " href="https://learn.microsoft.com/en-us/office/vba/api/overview/project/" data-bi-name="secondary-nav-link-6-project">
+						<span><!---->Project<!----></span>
+					</a>
+				</li>
+		  <!---->
+				<li>
+					<a class="has-external-link-indicator site-header-button width-full justify-content-flex-start padding-inline-xs padding-block-xxs " href="https://learn.microsoft.com/en-us/office/vba/api/overview/publisher/" data-bi-name="secondary-nav-link-7-publisher">
+						<span><!---->Publisher<!----></span>
+					</a>
+				</li>
+		  <!---->
+				<li>
+					<a class="has-external-link-indicator site-header-button width-full justify-content-flex-start padding-inline-xs padding-block-xxs " href="https://learn.microsoft.com/en-us/office/vba/api/overview/visio/" data-bi-name="secondary-nav-link-8-visio">
+						<span><!---->Visio<!----></span>
+					</a>
+				</li>
+		  <!---->
+				<li>
+					<a class="has-external-link-indicator site-header-button width-full justify-content-flex-start padding-inline-xs padding-block-xxs " href="https://learn.microsoft.com/en-us/office/vba/api/overview/word/" data-bi-name="secondary-nav-link-9-word">
+						<span><!---->Word<!----></span>
+					</a>
+				</li>
+		  <!---->
+			</ul>
+		</li>
+	<!---->
+				<li>
+					<a data-test-id="header-link-vba-language-reference" class="has-external-link-indicator site-header-button " href="https://learn.microsoft.com/en-us/office/vba/api/overview/language-reference/" data-bi-name="secondary-nav-link-2-vba-language-reference">
+						<span><!---->VBA language reference<!----></span>
+					</a>
+				</li>
+		  <!---->
+				<li>
+					<a data-test-id="header-link-office-library-reference" class="has-external-link-indicator site-header-button " href="https://learn.microsoft.com/en-us/office/vba/api/overview/library-reference/" data-bi-name="secondary-nav-link-3-office-library-reference">
+						<span><!---->Office library reference<!----></span>
+					</a>
+				</li>
+		  <!---->
+		<li class="dropdown" hidden="">
+			<button type="button" aria-expanded="false" class="dropdown-trigger site-header-button  site-header-button-icon-chevron" aria-controls="bx-14" data-bi-name="secondary-nav-btn-more" value="undefined">
+				<span><!---->More<!----></span>
+				<span aria-hidden="true" class="icon expanded-indicator ">
+					<span class="docon docon-chevron-down-light"></span>
+				</span>
+			</button>
+			<ul class="dropdown-menu padding-bottom-xxs background-color-body-medium" id="bx-14" aria-label="More" data-bi-name="secondary-nav-menu-more">
+				<!---->
+		<li class="dropdown" hidden="">
+			<button type="button" aria-expanded="false" class="dropdown-trigger site-header-button  width-full justify-content-space-between padding-inline-xs padding-block-xxs" aria-controls="bx-15" data-bi-name="secondary-nav-btn-1-browse-by-product" value="undefined">
+				<span><!---->Browse by product<!----></span>
+				<span aria-hidden="true" class="icon  margin-left-xs">
+					<span class="docon docon-chevron-right-light"></span>
+				</span>
+			</button>
+			<ul class="dropdown-menu padding-bottom-xxs background-color-body-medium" id="bx-15" aria-label="Browse by product" data-bi-name="secondary-nav-menu-1-browse-by-product">
+				<!---->
+				<li>
+					<a class="has-external-link-indicator site-header-button width-full justify-content-flex-start padding-inline-xs padding-block-xxs " href="https://learn.microsoft.com/en-us/office/vba/api/overview/access/" data-bi-name="secondary-nav-link-1-access">
+						<span><!---->Access<!----></span>
+					</a>
+				</li>
+		  <!---->
+				<li>
+					<a class="has-external-link-indicator site-header-button width-full justify-content-flex-start padding-inline-xs padding-block-xxs " href="https://learn.microsoft.com/en-us/office/vba/api/overview/excel/" data-bi-name="secondary-nav-link-2-excel">
+						<span><!---->Excel<!----></span>
+					</a>
+				</li>
+		  <!---->
+				<li>
+					<a class="has-external-link-indicator site-header-button width-full justify-content-flex-start padding-inline-xs padding-block-xxs " href="https://learn.microsoft.com/en-us/office/vba/api/overview/office-mac/" data-bi-name="secondary-nav-link-3-office-for-mac">
+						<span><!---->Office for Mac<!----></span>
+					</a>
+				</li>
+		  <!---->
+				<li>
+					<a class="has-external-link-indicator site-header-button width-full justify-content-flex-start padding-inline-xs padding-block-xxs " href="https://learn.microsoft.com/en-us/office/vba/api/overview/outlook/" data-bi-name="secondary-nav-link-4-outlook">
+						<span><!---->Outlook<!----></span>
+					</a>
+				</li>
+		  <!---->
+				<li>
+					<a class="has-external-link-indicator site-header-button width-full justify-content-flex-start padding-inline-xs padding-block-xxs " href="https://learn.microsoft.com/en-us/office/vba/api/overview/powerpoint/" data-bi-name="secondary-nav-link-5-powerpoint">
+						<span><!---->PowerPoint<!----></span>
+					</a>
+				</li>
+		  <!---->
+				<li>
+					<a class="has-external-link-indicator site-header-button width-full justify-content-flex-start padding-inline-xs padding-block-xxs " href="https://learn.microsoft.com/en-us/office/vba/api/overview/project/" data-bi-name="secondary-nav-link-6-project">
+						<span><!---->Project<!----></span>
+					</a>
+				</li>
+		  <!---->
+				<li>
+					<a class="has-external-link-indicator site-header-button width-full justify-content-flex-start padding-inline-xs padding-block-xxs " href="https://learn.microsoft.com/en-us/office/vba/api/overview/publisher/" data-bi-name="secondary-nav-link-7-publisher">
+						<span><!---->Publisher<!----></span>
+					</a>
+				</li>
+		  <!---->
+				<li>
+					<a class="has-external-link-indicator site-header-button width-full justify-content-flex-start padding-inline-xs padding-block-xxs " href="https://learn.microsoft.com/en-us/office/vba/api/overview/visio/" data-bi-name="secondary-nav-link-8-visio">
+						<span><!---->Visio<!----></span>
+					</a>
+				</li>
+		  <!---->
+				<li>
+					<a class="has-external-link-indicator site-header-button width-full justify-content-flex-start padding-inline-xs padding-block-xxs " href="https://learn.microsoft.com/en-us/office/vba/api/overview/word/" data-bi-name="secondary-nav-link-9-word">
+						<span><!---->Word<!----></span>
+					</a>
+				</li>
+		  <!---->
+			</ul>
+		</li>
+	<!---->
+				<li hidden="">
+					<a class="has-external-link-indicator site-header-button width-full justify-content-flex-start padding-inline-xs padding-block-xxs " href="https://learn.microsoft.com/en-us/office/vba/api/overview/language-reference/" data-bi-name="secondary-nav-link-2-vba-language-reference">
+						<span><!---->VBA language reference<!----></span>
+					</a>
+				</li>
+		  <!---->
+				<li hidden="">
+					<a class="has-external-link-indicator site-header-button width-full justify-content-flex-start padding-inline-xs padding-block-xxs " href="https://learn.microsoft.com/en-us/office/vba/api/overview/library-reference/" data-bi-name="secondary-nav-link-3-office-library-reference">
+						<span><!---->Office library reference<!----></span>
+					</a>
+				</li>
+		  <!---->
+			</ul>
+		</li>
+	<!---->
+			</ul>
+		</nav>
+	
+		<span class="nav-bar-spacer"></span>
+		 
+	 <!----></div><!----></div>
+			</header>
+			
+		<!-- banner -->
+		<div data-banner="">
+			<div id="disclaimer-holder"></div>
+			
+		</div>
+		<!-- banner end -->
+	
+		</div>
+	</header>
+				 <section id="layout-body-menu" class="layout-body-menu display-flex" data-bi-name="menu">
+					<div id="left-container" class="left-container display-none display-block-tablet padding-inline-sm padding-bottom-sm width-full">
+		<nav id="affixed-left-container" class="margin-top-sm-tablet position-sticky display-flex flex-direction-column" aria-label="Primary" data-bi-name="left toc" role="navigation" style="top: 24px; height: calc(-49px + 100vh); max-height: 17994.5px;"><form action="javascript:" role="search" aria-label="Search" class="margin-bottom-xxs"><label class="visually-hidden" for="ax-0">Search</label><div class="autocomplete display-block" data-bi-name="autocomplete"><!---->
+			<div class="field-body control has-icons-left">
+				<input role="combobox" maxlength="100" aria-autocomplete="list" autocapitalize="off" autocomplete="off" autocorrect="off" spellcheck="false" id="ax-0" data-test-id="ax-0" class="autocomplete-input input input-sm
+						control has-icons-left
+						width-full" type="text" aria-expanded="false" aria-owns="ax-1-listbox" aria-controls="ax-1-listbox" aria-activedescendant="" aria-describedby="ms--ax-0-description" placeholder="Filter by title" pattern=".*">
+
+				
+					<span aria-hidden="true" class="icon is-small is-left">
+						<span class="has-text-primary docon docon-filter-settings"></span>
+					</span>
+			  
+
+				<span aria-hidden="true" class="autocomplete-loader loader has-text-primary " hidden=""></span>
+
+				<span hidden="" id="ms--ax-0-description">
+					Suggestions will filter as you type
+				</span>
+			</div>
+
+			<ul role="listbox" id="ax-1-listbox" data-test-id="ax-0-listbox" class="autocomplete-suggestions is-vertically-scrollable padding-xxs " aria-label="Suggestions" hidden="">
+				
+				
+			</ul>
+		<!----></div></form><ul class="tree table-of-contents is-vertically-scrollable flex-grow-1 flex-shrink-1" role="tree" aria-label="Table of contents" data-bi-name="tree" data-is-collapsible="true"><li role="none"><a aria-setsize="12" aria-level="1" aria-posinset="1" role="treeitem" tabindex="-1" class="tree-item is-leaf has-external-link-indicator" data-bi-name="tree-leaf" href="https://learn.microsoft.com/en-us/office/vba/api/overview/">Office VBA Reference</a></li><li class="tree-item" aria-setsize="12" aria-level="1" aria-posinset="2" role="treeitem" tabindex="-1" id="title-2-1" aria-expanded="false"><span data-bi-name="tree-expander" class="tree-expander"><span class="tree-expander-indicator docon docon-chevron-right-light" aria-hidden="true"></span>Access</span></li><li class="tree-item" aria-setsize="12" aria-level="1" aria-posinset="3" role="treeitem" tabindex="-1" id="title-3-1" aria-expanded="false"><span data-bi-name="tree-expander" class="tree-expander"><span class="tree-expander-indicator docon docon-chevron-right-light" aria-hidden="true"></span>Excel</span></li><li class="tree-item" aria-setsize="12" aria-level="1" aria-posinset="4" role="treeitem" tabindex="-1" id="title-4-1" aria-expanded="false"><span data-bi-name="tree-expander" class="tree-expander"><span class="tree-expander-indicator docon docon-chevron-right-light" aria-hidden="true"></span>Office for Mac</span></li><li class="tree-item" aria-setsize="12" aria-level="1" aria-posinset="5" role="treeitem" tabindex="-1" id="title-5-1" aria-expanded="false"><span data-bi-name="tree-expander" class="tree-expander"><span class="tree-expander-indicator docon docon-chevron-right-light" aria-hidden="true"></span>Outlook</span></li><li class="tree-item" aria-setsize="12" aria-level="1" aria-posinset="6" role="treeitem" tabindex="-1" id="title-6-1" aria-expanded="false"><span data-bi-name="tree-expander" class="tree-expander"><span class="tree-expander-indicator docon docon-chevron-right-light" aria-hidden="true"></span>PowerPoint</span></li><li class="tree-item" aria-setsize="12" aria-level="1" aria-posinset="7" role="treeitem" tabindex="-1" id="title-7-1" aria-expanded="false"><span data-bi-name="tree-expander" class="tree-expander"><span class="tree-expander-indicator docon docon-chevron-right-light" aria-hidden="true"></span>Project</span></li><li class="tree-item" aria-setsize="12" aria-level="1" aria-posinset="8" role="treeitem" tabindex="-1" id="title-8-1" aria-expanded="false"><span data-bi-name="tree-expander" class="tree-expander"><span class="tree-expander-indicator docon docon-chevron-right-light" aria-hidden="true"></span>Publisher</span></li><li class="tree-item" aria-setsize="12" aria-level="1" aria-posinset="9" role="treeitem" tabindex="-1" id="title-9-1" aria-expanded="false"><span data-bi-name="tree-expander" class="tree-expander"><span class="tree-expander-indicator docon docon-chevron-right-light" aria-hidden="true"></span>Visio</span></li><li class="tree-item" aria-setsize="12" aria-level="1" aria-posinset="10" role="treeitem" tabindex="-1" id="title-10-1" aria-expanded="false"><span data-bi-name="tree-expander" class="tree-expander"><span class="tree-expander-indicator docon docon-chevron-right-light" aria-hidden="true"></span>Word</span></li><li class="tree-item" aria-setsize="12" aria-level="1" aria-posinset="11" role="treeitem" tabindex="-1" id="title-11-1" aria-expanded="false"><span data-bi-name="tree-expander" class="tree-expander"><span class="tree-expander-indicator docon docon-chevron-right-light" aria-hidden="true"></span>Language reference</span></li><li class="tree-item is-expanded" aria-setsize="12" aria-level="1" aria-posinset="12" role="treeitem" tabindex="-1" id="title-12-1" aria-expanded="true"><span data-bi-name="tree-expander" class="tree-expander"><span class="tree-expander-indicator docon docon-chevron-right-light" aria-hidden="true"></span>Library reference</span><ul class="tree-group" role="group"><li role="none"><a aria-setsize="3" aria-level="2" aria-posinset="1" role="treeitem" tabindex="-1" class="tree-item is-leaf has-external-link-indicator" data-bi-name="tree-leaf" href="https://learn.microsoft.com/en-us/office/vba/api/overview/library-reference">Overview</a></li><li class="tree-item is-expanded" aria-setsize="3" aria-level="2" aria-posinset="2" role="treeitem" tabindex="-1" id="title-12-1_2-2" aria-expanded="true"><span data-bi-name="tree-expander" class="tree-expander"><span class="tree-expander-indicator docon docon-chevron-right-light" aria-hidden="true"></span>Concepts</span><ul class="tree-group" role="group"><li role="none"><a aria-setsize="12" aria-level="3" aria-posinset="1" role="treeitem" tabindex="-1" class="tree-item is-leaf has-external-link-indicator" data-bi-name="tree-leaf" href="https://learn.microsoft.com/en-us/office/vba/library-reference/concepts/concepts-object-library-reference-for-office">Overview</a></li><li role="none"><a aria-setsize="12" aria-level="3" aria-posinset="2" role="treeitem" tabindex="-1" class="tree-item is-leaf has-external-link-indicator" data-bi-name="tree-leaf" href="https://learn.microsoft.com/en-us/office/vba/library-reference/concepts/customize-the-office-fluent-ribbon-by-using-a-managed-com-add-in">Customize the Office Fluent ribbon by using a managed COM add-in</a></li><li role="none"><a aria-setsize="12" aria-level="3" aria-posinset="3" role="treeitem" tabindex="-1" class="tree-item is-leaf has-external-link-indicator" data-bi-name="tree-leaf" href="https://learn.microsoft.com/en-us/office/vba/library-reference/concepts/customize-the-office-fluent-ribbon-by-using-an-open-xml-formats-file">Customize the Office Fluent ribbon by using an Open XML formats file</a></li><li role="none"><a aria-setsize="12" aria-level="3" aria-posinset="4" role="treeitem" tabindex="-1" class="tree-item is-leaf has-external-link-indicator" data-bi-name="tree-leaf" href="https://learn.microsoft.com/en-us/office/vba/library-reference/concepts/getting-help-on-macintosh-keywords-office">Getting help on Macintosh keywords</a></li><li role="none"><a aria-setsize="12" aria-level="3" aria-posinset="5" role="treeitem" tabindex="0" class="tree-item is-leaf has-external-link-indicator is-selected" data-bi-name="tree-leaf" href="https://learn.microsoft.com/en-us/office/vba/library-reference/concepts/getting-started-with-vba-in-office" aria-current="page">Getting started with VBA in Office</a></li><li role="none"><a aria-setsize="12" aria-level="3" aria-posinset="6" role="treeitem" tabindex="-1" class="tree-item is-leaf has-external-link-indicator" data-bi-name="tree-leaf" href="https://learn.microsoft.com/en-us/office/vba/library-reference/concepts/how-autosave-impacts-addins-and-macros">How AutoSave impacts add-ins and macros</a></li><li role="none"><a aria-setsize="12" aria-level="3" aria-posinset="7" role="treeitem" tabindex="-1" class="tree-item is-leaf has-external-link-indicator" data-bi-name="tree-leaf" href="https://learn.microsoft.com/en-us/office/vba/library-reference/concepts/ole-programmatic-identifiers-office">OLE programmatic identifiers</a></li><li role="none"><a aria-setsize="12" aria-level="3" aria-posinset="8" role="treeitem" tabindex="-1" class="tree-item is-leaf has-external-link-indicator" data-bi-name="tree-leaf" href="https://learn.microsoft.com/en-us/office/vba/library-reference/concepts/overview-of-the-office-fluent-ribbon">Overview of the Office Fluent ribbon</a></li><li role="none"><a aria-setsize="12" aria-level="3" aria-posinset="9" role="treeitem" tabindex="-1" class="tree-item is-leaf has-external-link-indicator" data-bi-name="tree-leaf" href="https://learn.microsoft.com/en-us/office/vba/library-reference/concepts/security-notes-for-microsoft-office-solution-developers">Security notes for Office solution developers</a></li><li role="none"><a aria-setsize="12" aria-level="3" aria-posinset="10" role="treeitem" tabindex="-1" class="tree-item is-leaf has-external-link-indicator" data-bi-name="tree-leaf" href="https://learn.microsoft.com/en-us/office/vba/library-reference/concepts/using-the-document-inspector">Use the Document Inspector</a></li><li role="none"><a aria-setsize="12" aria-level="3" aria-posinset="11" role="treeitem" tabindex="-1" class="tree-item is-leaf has-external-link-indicator" data-bi-name="tree-leaf" href="https://learn.microsoft.com/en-us/office/vba/library-reference/concepts/what-s-new-for-vba-in-office-2019">What's new for VBA in Office 2019</a></li><li role="none"><a aria-setsize="12" aria-level="3" aria-posinset="12" role="treeitem" tabindex="-1" class="tree-item is-leaf has-external-link-indicator" data-bi-name="tree-leaf" href="https://learn.microsoft.com/en-us/office/vba/library-reference/concepts/what-s-new-for-vba-in-office-2016">What's new for VBA in Office 2016</a></li></ul></li><li class="tree-item" aria-setsize="3" aria-level="2" aria-posinset="3" role="treeitem" tabindex="-1" id="title-12-1_3-2" aria-expanded="false"><span data-bi-name="tree-expander" class="tree-expander"><span class="tree-expander-indicator docon docon-chevron-right-light" aria-hidden="true"></span>Reference</span></li></ul></li></ul></nav>
+	</div>
+			  </section>
+
+				<main id="main" role="main" class="layout-body-main " data-bi-name="content" lang="en-us" dir="ltr">
+					
+			<div id="ms--content-header" class="content-header default-focus border-bottom-none" data-bi-name="content-header">
+		<div class="content-header-controls margin-xxs margin-inline-sm-tablet">
+			<button type="button" class="contents-button button button-sm margin-right-xxs" data-bi-name="contents-expand" aria-haspopup="true" data-contents-button="">
+				<span class="icon" aria-hidden="true"><span class="docon docon-menu"></span></span>
+				<span class="contents-expand-title"> Table of contents </span>
+			</button>
+			<button type="button" class="ap-collapse-behavior ap-expanded button button-sm" data-bi-name="ap-collapse" aria-controls="action-panel">
+				<span class="icon" aria-hidden="true"><span class="docon docon-exit-mode"></span></span>
+				<span>Exit editor mode</span>
+			</button>
+		</div>
+	</div>
+			<div data-main-column="" class="padding-sm padding-top-none padding-top-sm-tablet">
+				<div>
+					
+		<div id="article-header" class="background-color-body margin-bottom-xs display-none-print">
+			<div class="display-flex align-items-center justify-content-space-between">
+				
+		<details id="article-header-breadcrumbs-overflow-popover" class="popover" data-for="article-header-breadcrumbs" hidden="">
+			<summary class="button button-clear button-primary button-sm inner-focus" aria-label="All breadcrumbs">
+				<span class="icon">
+					<span class="docon docon-more"></span>
+				</span>
+			</summary>
+			<div id="article-header-breadcrumbs-overflow" class="popover-content padding-none"><!---->
+			<nav>
+				<ol class="list-style-none">
+					<!---->
+								<li class="line-clamp-1">
+									<a class="display-block has-inner-focus padding-inline-xs padding-block-xxs border-radius font-size-sm" href="https://learn.microsoft.com/en-us/">
+										Learn
+									</a>
+								</li>
+							<!----><!---->
+								<li class="line-clamp-1">
+									<a class="display-block has-inner-focus padding-inline-xs padding-block-xxs border-radius font-size-sm" href="https://learn.microsoft.com/en-us/office/vba/">
+										VBA
+									</a>
+								</li>
+							<!---->
+				</ol>
+			</nav>
+			
+		<!----></div>
+		</details>
+
+		<bread-crumbs id="article-header-breadcrumbs" role="group" aria-label="Breadcrumbs" data-test-id="article-header-breadcrumbs" class="overflow-hidden flex-grow-1 margin-right-sm margin-right-md-tablet margin-right-lg-desktop margin-left-negative-xxs padding-left-xxs" style="display: block; white-space: nowrap; overflow: hidden;"><!---->
+			<nav>
+				<ol class="breadcrumbs">
+					<!---->
+								<li class="breadcrumbs-item" data-bread-crumbs-collapse-target="">
+									<a href="https://learn.microsoft.com/en-us/"><!---->Learn<!----></a>
+								</li>
+							<!----><!---->
+								<li class="breadcrumbs-item" data-bread-crumbs-collapse-target="" style="">
+									<a href="https://learn.microsoft.com/en-us/office/vba/" style=""><!---->VBA<!----></a>
+								</li>
+							<!---->
+				</ol>
+			</nav>
+		<!----></bread-crumbs>
+	 
+		<div id="article-header-page-actions" class="margin-left-auto display-flex flex-wrap-no-wrap align-items-stretch">
+			
+		<button class="button button-sm border-none inner-focus display-none-tablet flex-shrink-0 " data-bi-name="ask-learn-assistant-entry" data-test-id="ask-learn-assistant-modal-entry-mobile" data-ask-learn-modal-entry="" type="button" style="min-width: max-content;" aria-expanded="false" aria-label="Ask Learn">
+			<span class="icon font-size-lg" aria-hidden="true">
+				<span class="docon docon-chat-sparkle-fill gradient-ask-learn-logo"></span>
+			</span>
+		</button>
+		<button class="button button-sm display-none display-inline-flex-tablet display-none-desktop flex-shrink-0 margin-right-xxs border-color-ask-learn " data-bi-name="ask-learn-assistant-entry" data-test-id="ask-learn-assistant-modal-entry-tablet" data-ask-learn-modal-entry="" type="button" style="min-width: max-content;" aria-expanded="false">
+			<span class="icon font-size-lg" aria-hidden="true">
+				<span class="docon docon-chat-sparkle-fill gradient-ask-learn-logo"></span>
+			</span>
+			<span>Ask Learn</span>
+		</button>
+		<button class="button button-sm display-none flex-shrink-0 display-inline-flex-desktop margin-right-xxs border-color-ask-learn " data-bi-name="ask-learn-assistant-entry" data-test-id="ask-learn-assistant-flyout-entry" data-ask-learn-flyout-entry="" data-flyout-button="toggle" type="button" style="min-width: max-content;" aria-expanded="false" aria-controls="ask-learn-flyout">
+			<span class="icon font-size-lg" aria-hidden="true">
+				<span class="docon docon-chat-sparkle-fill gradient-ask-learn-logo"></span>
+			</span>
+			<span>Ask Learn</span>
+		</button>
+	 
+		<button type="button" id="ms--focus-mode-button" data-focus-mode="" data-bi-name="focus-mode-entry" class="button button-sm flex-shrink-0 margin-right-xxs display-none display-inline-flex-desktop">
+			<span class="icon font-size-lg" aria-hidden="true">
+				<span class="docon docon-glasses"></span>
+			</span>
+			<span>Focus mode</span>
+		</button>
+	 
+
+			<details class="popover popover-right" id="article-header-page-actions-overflow">
+				<summary class="justify-content-flex-start button button-clear button-sm button-primary inner-focus" aria-label="More actions" title="More actions">
+					<span class="icon" aria-hidden="true">
+						<span class="docon docon-more-vertical"></span>
+					</span>
+				</summary>
+				<div class="popover-content">
+					
+		<button data-page-action-item="overflow-mobile" type="button" class="button-block button-sm has-inner-focus button button-clear display-none-tablet justify-content-flex-start text-align-left" data-bi-name="contents-expand" data-contents-button="" data-popover-close="">
+			<span class="icon">
+				<span class="docon docon-editor-list-bullet" aria-hidden="true"></span>
+			</span>
+			<span class="contents-expand-title">Table of contents</span>
+		</button>
+	 
+		<a id="lang-link-overflow" class="button-sm has-inner-focus button button-clear button-block justify-content-flex-start text-align-left" data-bi-name="language-toggle" data-page-action-item="overflow-all" data-check-hidden="true" data-read-in-link="" href="https://learn.microsoft.com/en-us/office/vba/library-reference/concepts/getting-started-with-vba-in-office" hidden="" data-bi="{&quot;cN&quot;:&quot;language-toggle&quot;,&quot;value&quot;:&quot;off&quot;}">
+			<span class="icon" aria-hidden="true" data-read-in-link-icon="">
+				<span class="docon docon-locale-globe"></span>
+			</span>
+			<span data-read-in-link-text="">Read in English</span>
+		</a>
+	 
+		<button type="button" class="collection button button-clear button-sm button-block justify-content-flex-start text-align-left inner-focus" data-list-type="collection" data-bi-name="collection" data-page-action-item="overflow-all" data-check-hidden="true" data-popover-close="" data-pressed="false" title="Add Getting started with VBA in Office | Microsoft Learn to a collection">
+			<span class="icon" aria-hidden="true">
+				<span class="docon docon-circle-addition"></span>
+			</span>
+			<span class="collection-status">Add to Collections</span>
+		</button>
+	
+					
+		<button type="button" class="collection button button-block button-clear button-sm justify-content-flex-start text-align-left inner-focus" data-list-type="plan" data-bi-name="plan" data-page-action-item="overflow-all" data-check-hidden="true" data-popover-close="" data-pressed="false" title="Add Getting started with VBA in Office | Microsoft Learn to a plan">
+			<span class="icon" aria-hidden="true">
+				<span class="docon docon-circle-addition"></span>
+			</span>
+			<span class="plan-status">Add to plan</span>
+		</button>
+	  
+		<a data-contenteditbtn="" class="button button-clear button-block button-sm inner-focus justify-content-flex-start text-align-left text-decoration-none" data-bi-name="edit" href="https://github.com/MicrosoftDocs/VBA-Docs/blob/main/Library-Reference/Concepts/getting-started-with-vba-in-office.md" data-original_content_git_url="https://github.com/MicrosoftDocs/VBA-Docs/blob/live/Library-Reference/Concepts/getting-started-with-vba-in-office.md" data-original_content_git_url_template="{repo}/blob/{branch}/Library-Reference/Concepts/getting-started-with-vba-in-office.md" data-pr_repo="" data-pr_branch="">
+			<span class="icon" aria-hidden="true">
+				<span class="docon docon-edit-outline"></span>
+			</span>
+			<span>Edit</span>
+		</a>
+	
+					
+		<hr class="margin-block-xxs">
+		<h4 class="font-size-sm padding-left-xxs">Share via</h4>
+		
+					<a class="button button-clear button-sm inner-focus button-block justify-content-flex-start text-align-left text-decoration-none share-facebook" data-bi-name="facebook" data-page-action-item="overflow-all" href="https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Flearn.microsoft.com%2Fen-us%2Foffice%2Fvba%2Flibrary-reference%2Fconcepts%2Fgetting-started-with-vba-in-office%3FWT.mc_id%3Dfacebook">
+						<span class="icon color-primary" aria-hidden="true">
+							<span class="docon docon-facebook-share"></span>
+						</span>
+						<span>Facebook</span>
+					</a>
+
+					<a href="https://twitter.com/intent/tweet?original_referer=https%3A%2F%2Flearn.microsoft.com%2Fen-us%2Foffice%2Fvba%2Flibrary-reference%2Fconcepts%2Fgetting-started-with-vba-in-office%3FWT.mc_id%3Dtwitter&amp;text=%0A%0D%0Ahttps%3A%2F%2Flearn.microsoft.com%2Fen-us%2Foffice%2Fvba%2Flibrary-reference%2Fconcepts%2Fgetting-started-with-vba-in-office%3FWT.mc_id%3Dtwitter&amp;tw_p=tweetbutton&amp;url=https%3A%2F%2Flearn.microsoft.com%2Fen-us%2Foffice%2Fvba%2Flibrary-reference%2Fconcepts%2Fgetting-started-with-vba-in-office%3FWT.mc_id%3Dtwitter" class="button button-clear button-sm inner-focus button-block justify-content-flex-start text-align-left text-decoration-none share-twitter" data-bi-name="twitter" data-page-action-item="overflow-all">
+						<span class="icon color-text" aria-hidden="true">
+							<span class="docon docon-xlogo-share"></span>
+						</span>
+						<span>x.com</span>
+					</a>
+
+					<a href="https://www.linkedin.com/feed/?shareActive=true&amp;text=%0A%0D%0Ahttps%3A%2F%2Flearn.microsoft.com%2Fen-us%2Foffice%2Fvba%2Flibrary-reference%2Fconcepts%2Fgetting-started-with-vba-in-office%3FWT.mc_id%3Dlinkedin" class="button button-clear button-sm inner-focus button-block justify-content-flex-start text-align-left text-decoration-none share-linkedin" data-bi-name="linkedin" data-page-action-item="overflow-all">
+						<span class="icon color-primary" aria-hidden="true">
+							<span class="docon docon-linked-in-logo"></span>
+						</span>
+						<span>LinkedIn</span>
+					</a>
+					<a href="mailto:?subject=%5BShared%20Article%5D%20Getting%20started%20with%20VBA%20in%20Office%20%7C%20Microsoft%20Learn&amp;body=%0A%0D%0Ahttps%3A%2F%2Flearn.microsoft.com%2Fen-us%2Foffice%2Fvba%2Flibrary-reference%2Fconcepts%2Fgetting-started-with-vba-in-office%3FWT.mc_id%3Demail" class="button button-clear button-sm inner-focus button-block justify-content-flex-start text-align-left text-decoration-none share-email" data-bi-name="email" data-page-action-item="overflow-all">
+						<span class="icon color-primary" aria-hidden="true">
+							<span class="docon docon-mail-message"></span>
+						</span>
+						<span>Email</span>
+					</a>
+			  
+	 
+		<hr class="margin-block-xxs">
+		<button class="button button-block button-clear button-sm justify-content-flex-start text-align-left inner-focus" type="button" data-bi-name="print" data-page-action-item="overflow-all" data-popover-close="" data-print-page="" data-check-hidden="true">
+			<span class="icon color-primary" aria-hidden="true">
+				<span class="docon docon-print"></span>
+			</span>
+			<span>Print</span>
+		</button>
+	
+				</div>
+			</details>
+		</div>
+	
+			</div>
+		</div>
+	  
+		<!-- privateUnauthorizedTemplate is hidden by default -->
+		<div unauthorized-private-section="" data-bi-name="permission-content-unauthorized-private" hidden="">
+			<hr class="hr margin-top-xs margin-bottom-sm">
+			<div class="notification notification-info">
+				<div class="notification-content">
+					<p class="margin-top-none notification-title">
+						<span class="icon">
+							<span class="docon docon-exclamation-circle-solid" aria-hidden="true"></span>
+						</span>
+						<span>Note</span>
+					</p>
+					<p class="margin-top-none authentication-determined not-authenticated">
+						Access to this page requires authorization. You can try <a class="docs-sign-in" href="https://learn.microsoft.com/en-us/office/vba/library-reference/concepts/getting-started-with-vba-in-office#" data-bi-name="permission-content-sign-in">signing in</a> or <a class="docs-change-directory" data-bi-name="permisson-content-change-directory">changing directories</a>.
+					</p>
+					<p class="margin-top-none authentication-determined authenticated">
+						Access to this page requires authorization. You can try <a class="docs-change-directory" data-bi-name="permisson-content-change-directory">changing directories</a>.
+					</p>
+				</div>
+			</div>
+		</div>
+	
+					<div class="content"><h1 id="getting-started-with-vba-in-office">Getting started with VBA in Office</h1></div>
+					
+		<div id="article-metadata" class="page-metadata-container display-flex gap-xxs justify-content-space-between align-items-center flex-wrap-wrap">
+			
+		<div class="margin-block-xxs">
+			<ul class="metadata page-metadata" data-bi-name="page info" lang="en-us" dir="ltr">
+				  <li class="visibility-hidden-visual-diff">
+			<local-time format="twoDigitNumeric" datetime="2022-06-08T00:00:00.000Z" data-article-date-source="calculated" class="">06/08/2022</local-time>
+		</li>  
+			</ul>
+		</div>
+	 
+				<div id="user-feedback" class="margin-block-xxs display-none display-none-print" hidden="" data-hide-on-archived="">
+					
+		<button id="user-feedback-button" data-test-id="conceptual-feedback-button" class="button button-sm button-clear button-primary display-none" type="button" data-bi-name="user-feedback-button" data-user-feedback-button="" hidden="">
+			<span class="icon" aria-hidden="true">
+				<span class="docon docon-like"></span>
+			</span>
+			<span>Feedback</span>
+		</button>
+	
+				</div>
+		  
+		</div>
+	 
+		<nav id="center-doc-outline" class="doc-outline is-hidden-desktop display-none-print margin-bottom-sm" data-bi-name="intopic toc" aria-label="In this article"><!---->
+			<h2 id="ms--in-this-article" class="title is-6 margin-block-xs"><!---->In this article<!----></h2>
+			 
+		<ol id="content-well-in-this-article-list" class="border-left padding-left-xxs">
+			<!---->
+					<li class=" ">
+						<a href="https://learn.microsoft.com/en-us/office/vba/library-reference/concepts/getting-started-with-vba-in-office#when-to-use-vba-and-why" class=""><!---->When to use VBA and why<!----></a>
+					</li>
+				<!---->
+					<li class=" ">
+						<a href="https://learn.microsoft.com/en-us/office/vba/library-reference/concepts/getting-started-with-vba-in-office#vba-programming-101" class=""><!---->VBA Programming 101<!----></a>
+					</li>
+				<!---->
+					<li class=" ">
+						<a href="https://learn.microsoft.com/en-us/office/vba/library-reference/concepts/getting-started-with-vba-in-office#macros-and-the-visual-basic-editor" class=""><!---->Macros and the Visual Basic Editor<!----></a>
+					</li>
+				<!---->
+					<li class=" ">
+						<a href="https://learn.microsoft.com/en-us/office/vba/library-reference/concepts/getting-started-with-vba-in-office#programming-tips-and-tricks" class=""><!---->Programming tips and tricks<!----></a>
+					</li>
+				<!---->
+					<li class=" expandable">
+						<a href="https://learn.microsoft.com/en-us/office/vba/library-reference/concepts/getting-started-with-vba-in-office#going-further-with-programming" class=""><!---->Going further with programming<!----></a>
+					</li>
+				<!---->
+					<li class=" expandable">
+						<a href="https://learn.microsoft.com/en-us/office/vba/library-reference/concepts/getting-started-with-vba-in-office#all-of-my-office-applications-example-code" class=""><!---->All of my Office applications: example code<!----></a>
+					</li>
+				<!---->
+		</ol>
+	 
+		<button type="button" aria-expanded="false" data-show-more="" class="link-button font-weight-semibold font-size-sm margin-top-xxs margin-left-xs" aria-controls="content-well-in-this-article-list" data-title="Show 2 more" data-bi-name="show-more-btn">
+			<span class="show-more-text "><!---->Show 2 more<!----></span>
+			
+		</button>
+	 
+		<!----></nav>
+	
+					<div class="content"><p>Are you facing a repetitive clean up of fifty tables in Word? Do you want a particular document to prompt the user for input when it opens? Are you having difficulty figuring out how to get your contacts from Microsoft Outlook into a Microsoft Excel spreadsheet efficiently?</p>
+<p>You can perform these tasks and accomplish a great deal more by using Visual Basic for Applications (VBA) for Office—a simple, but powerful programming language that you can use to extend Office applications.</p>
+<p>This article is for experienced Office users who want to learn about VBA and who want some insight into how programming can help them to customize Office.</p>
+<p>The Office suite of applications has a rich set of features. There are many different ways to author, format, and manipulate documents, email, databases, forms, spreadsheets, and presentations. The great power of VBA programming in Office is that nearly every operation that you can perform with a mouse, keyboard, or a dialog box can also be done by using VBA. Further, if it can be done once with VBA, it can be done just as easily a hundred times. (In fact, the automation of repetitive tasks is one of the most common uses of VBA in Office.)</p>
+<p>Beyond the power of scripting VBA to accelerate every-day tasks, you can use VBA to add new functionality to Office applications or to prompt and interact with the user of your documents in ways that are specific to your business needs. For example, you could write some VBA code that displays a pop up message that reminds users to save a document to a particular network drive the first time they try to save it.</p>
+<p>This article explores some of the primary reasons to leverage the power of VBA programming. It explores the VBA language and the out-of-the-box tools that you can use to work with your solutions. Finally, it includes some tips and ways to avoid some common programming frustrations and missteps.</p>
+<div class="alert is-info">
+<p class="alert-title"><span class="docon docon-status-error-outline" aria-hidden="true"></span> Note</p>
+<p>Interested in developing solutions that extend the Office experience across <a href="https://learn.microsoft.com/en-us/office/dev/add-ins/overview/office-add-in-availability" data-linktype="absolute-path">multiple platforms</a>? Check out the new <a href="https://learn.microsoft.com/en-us/office/dev/add-ins/overview/office-add-ins" data-linktype="absolute-path">Office Add-ins model</a>. Office Add-ins have a small footprint compared to VSTO Add-ins and solutions, and you can build them by using almost any web programming technology, such as HTML5, JavaScript, CSS3, and XML.</p>
+</div>
+<div class="heading-wrapper" data-heading-level="h2"><a class="anchor-link docon docon-link" href="https://learn.microsoft.com/en-us/office/vba/library-reference/concepts/getting-started-with-vba-in-office#when-to-use-vba-and-why" aria-label="Section titled: When to use VBA and why"></a><h2 id="when-to-use-vba-and-why" class="heading-anchor">When to use VBA and why</h2></div>
+<p>There are several principal reasons to consider VBA programming in Office.</p>
+<div class="heading-wrapper" data-heading-level="h3"><a class="anchor-link docon docon-link" href="https://learn.microsoft.com/en-us/office/vba/library-reference/concepts/getting-started-with-vba-in-office#automation-and-repetition" aria-label="Section titled: Automation and repetition"></a><h3 id="automation-and-repetition" class="heading-anchor">Automation and repetition</h3></div>
+<p>VBA is effective and efficient when it comes to repetitive solutions to formatting or correction problems. For example, have you ever changed the style of the paragraph at the top of each page in Word? Have you ever had to reformat multiple tables that were pasted from Excel into a Word document or an Outlook email? Have you ever had to make the same change in multiple Outlook contacts?</p>
+<p>If you have a change that you have to make more than ten or twenty times, it may be worth automating it with VBA. If it is a change that you have to do hundreds of times, it certainly is worth considering. Almost any formatting or editing change that you can do by hand, can be done in VBA.</p>
+<div class="heading-wrapper" data-heading-level="h3"><a class="anchor-link docon docon-link" href="https://learn.microsoft.com/en-us/office/vba/library-reference/concepts/getting-started-with-vba-in-office#extensions-to-user-interaction" aria-label="Section titled: Extensions to user interaction"></a><h3 id="extensions-to-user-interaction" class="heading-anchor">Extensions to user interaction</h3></div>
+<p>There are times when you want to encourage or compel users to interact with the Office application or document in a particular way that is not part of the standard application. For example, you might want to prompt users to take some particular action when they open, save, or print a document.</p>
+<div class="heading-wrapper" data-heading-level="h3"><a class="anchor-link docon docon-link" href="https://learn.microsoft.com/en-us/office/vba/library-reference/concepts/getting-started-with-vba-in-office#interaction-between-office-applications" aria-label="Section titled: Interaction between Office applications"></a><h3 id="interaction-between-office-applications" class="heading-anchor">Interaction between Office applications</h3></div>
+<p>Do you need to copy all of your contacts from Outlook to Word and then format them in some particular way? Or, do you need to move data from Excel to a set of PowerPoint slides? Sometimes simple copy and paste does not do what you want it to do, or it is too slow. Use VBA programming to interact with the details of two or more Office applications at the same time and then modify the content in one application based on the content in another.</p>
+<div class="heading-wrapper" data-heading-level="h3"><a class="anchor-link docon docon-link" href="https://learn.microsoft.com/en-us/office/vba/library-reference/concepts/getting-started-with-vba-in-office#doing-things-another-way" aria-label="Section titled: Doing things another way"></a><h3 id="doing-things-another-way" class="heading-anchor">Doing things another way</h3></div>
+<p>VBA programming is a powerful solution, but it is not always the optimal approach. Sometimes it makes sense to use other ways to achieve your aims.</p>
+<p>The critical question to ask is whether there is an easier way. Before you begin a VBA project, consider the built-in tools and standard functionalities. For example, if you have a time-consuming editing or layout task, consider using styles or accelerator keys to solve the problem. Can you perform the task once and then use CTRL+Y (Redo) to repeat it? Can you create a new document with the correct format or template, and then copy the content into that new document?</p>
+<p>Office applications are powerful; the solution that you need may already be there. Take some time to learn more about Office before you jump into programming.</p>
+<p>Before you begin a VBA project, ensure that you have the time to work with VBA. Programming requires focus and can be unpredictable. Especially as a beginner, never turn to programming unless you have time to work carefully. Trying to write a "quick script" to solve a problem when a deadline looms can result in a very stressful situation. If you are in a rush, you might want to use conventional methods, even if they are monotonous and repetitive.</p>
+<div class="heading-wrapper" data-heading-level="h2"><a class="anchor-link docon docon-link" href="https://learn.microsoft.com/en-us/office/vba/library-reference/concepts/getting-started-with-vba-in-office#vba-programming-101" aria-label="Section titled: VBA Programming 101"></a><h2 id="vba-programming-101" class="heading-anchor">VBA Programming 101</h2></div>
+<div class="heading-wrapper" data-heading-level="h3"><a class="anchor-link docon docon-link" href="https://learn.microsoft.com/en-us/office/vba/library-reference/concepts/getting-started-with-vba-in-office#using-code-to-make-applications-do-things" aria-label="Section titled: Using code to make applications do things"></a><h3 id="using-code-to-make-applications-do-things" class="heading-anchor">Using code to make applications do things</h3></div>
+<p>You might think that writing code is mysterious or difficult, but the basic principles use every-day reasoning and are quite accessible. Microsoft Office applications are created in such a way that they expose things called objects that can receive instructions, in much the same way that a phone is designed with buttons that you use to interact with the phone. When you press a button, the phone recognizes the instruction and includes the corresponding number in the sequence that you are dialing. In programming, you interact with the application by sending instructions to various objects in the application. These objects are expansive, but they have their limits. They can only do what they are designed to do, and they will only do what you instruct them to do.</p>
+<p>For example, consider the user who opens a document in Word, makes a few changes, saves the document, and then closes it. In the world of VBA programming, Word exposes a Document object. By using VBA code, you can instruct the Document object to do things such as Open, Save, or Close.</p>
+<p>The following section discusses how objects are organized and described.</p>
+<div class="heading-wrapper" data-heading-level="h3"><a class="anchor-link docon docon-link" href="https://learn.microsoft.com/en-us/office/vba/library-reference/concepts/getting-started-with-vba-in-office#the-object-model" aria-label="Section titled: The Object Model"></a><h3 id="the-object-model" class="heading-anchor">The Object Model</h3></div>
+<p>Developers organize programming objects in a hierarchy, and that hierarchy is called the object model of the application. Word, for example, has a top-level Application object that contains a Document object. The Document object contains Paragraph objects and so on. Object models roughly mirror what you see in the user interface. They are a conceptual map of the application and its capabilities.</p>
+<p>The definition of an object is called a class, so you might see these two terms used interchangeably. Technically, a class is the description or template that is used to create, or instantiate, an object.</p>
+<p>Once an object exists, you can manipulate it by setting its properties and calling its methods. If you think of the object as a noun, the properties are the adjectives that describe the noun and the methods are the verbs that animate the noun. Changing a property changes some quality of appearance or behavior of the object. Calling one of the object methods causes the object to perform some action.</p>
+<p>The VBA code in this article runs against an open Office application where many of the objects that the code manipulates are already up and running; for example, the Application itself, the Worksheet in Excel, the Document in Word, the Presentation in PowerPoint, the Explorer and Folder objects in Outlook. Once you know the basic layout of the object model and some key properties of the Application that give access to its current state, you can start to extend and manipulate that Office application with VBA in Office.</p>
+<div class="heading-wrapper" data-heading-level="h3"><a class="anchor-link docon docon-link" href="https://learn.microsoft.com/en-us/office/vba/library-reference/concepts/getting-started-with-vba-in-office#methods" aria-label="Section titled: Methods"></a><h3 id="methods" class="heading-anchor">Methods</h3></div>
+<p>In Word, for example, you can change the properties and invoke the methods of the current Word document by using the <strong>ActiveDocument</strong> property of the <strong>Application</strong> object. This <strong>ActiveDocument</strong> property returns a reference to the <strong>Document</strong> object that is currently active in the Word application. "Returns a reference to" means "gives you access to."</p>
+<p>The following code does exactly what it says; that is, it saves the active document in the application.</p>
+<div class="codeHeader" id="code-try-0" data-bi-name="code-header"><span class="language">VB</span>
+		<button type="button" class="action position-relative display-none-print" data-bi-name="copy">
+			<span class="icon margin-right-xxs" aria-hidden="true">
+				<span class="docon docon-edit-copy"></span>
+			</span>
+			<span>Copy</span>
+			<div class="successful-copy-alert position-absolute right-0 top-0 left-0 bottom-0 display-flex align-items-center justify-content-center has-text-success-invert has-background-success is-transparent" aria-hidden="true">
+				<span class="icon font-size-lg">
+					<span class="docon docon-check-mark"></span>
+				</span>
+			</div>
+		</button>
+	</div><pre class="has-inner-focus"><code class="lang-vb"><span>Application.ActiveDocument.Save
+</span></code></pre>
+<p>Read the code from left to right, "In this Application, with the Document referenced by ActiveDocument, invoke the <strong>Save</strong> method." Be aware that <strong>Save</strong> is the simplest form of method; it does not require any detailed instructions from you. You instruct a <strong>Document</strong> object to <strong>Save</strong> and it does not require any more input from you.</p>
+<p>If a method requires more information, those details are called parameters. The following code runs the <strong>SaveAs</strong> method, which requires a new name for the file.</p>
+<div class="codeHeader" id="code-try-1" data-bi-name="code-header"><span class="language">VB</span>
+		<button type="button" class="action position-relative display-none-print" data-bi-name="copy">
+			<span class="icon margin-right-xxs" aria-hidden="true">
+				<span class="docon docon-edit-copy"></span>
+			</span>
+			<span>Copy</span>
+			<div class="successful-copy-alert position-absolute right-0 top-0 left-0 bottom-0 display-flex align-items-center justify-content-center has-text-success-invert has-background-success is-transparent" aria-hidden="true">
+				<span class="icon font-size-lg">
+					<span class="docon docon-check-mark"></span>
+				</span>
+			</div>
+		</button>
+	</div><pre class="has-inner-focus"><code class="lang-vb"><span>Application.ActiveDocument.SaveAs (<span class="hljs-string">"New Document Name.docx"</span>)
+</span></code></pre>
+<p>Values listed in parentheses after a method name are the parameters. Here, the new name for the file is a parameter for the <strong>SaveAs</strong> method.</p>
+<div class="heading-wrapper" data-heading-level="h3"><a class="anchor-link docon docon-link" href="https://learn.microsoft.com/en-us/office/vba/library-reference/concepts/getting-started-with-vba-in-office#properties" aria-label="Section titled: Properties"></a><h3 id="properties" class="heading-anchor">Properties</h3></div>
+<p>You use the same syntax to set a property that you use to read a property. The following code executes a method to select cell A1 in Excel and then to set a property to put something in that cell.</p>
+<div class="codeHeader" id="code-try-2" data-bi-name="code-header"><span class="language">VB</span>
+		<button type="button" class="action position-relative display-none-print" data-bi-name="copy">
+			<span class="icon margin-right-xxs" aria-hidden="true">
+				<span class="docon docon-edit-copy"></span>
+			</span>
+			<span>Copy</span>
+			<div class="successful-copy-alert position-absolute right-0 top-0 left-0 bottom-0 display-flex align-items-center justify-content-center has-text-success-invert has-background-success is-transparent" aria-hidden="true">
+				<span class="icon font-size-lg">
+					<span class="docon docon-check-mark"></span>
+				</span>
+			</div>
+		</button>
+	</div><pre class="has-inner-focus"><code class="lang-vb"><span>    Application.ActiveSheet.Range(<span class="hljs-string">"A1"</span>).<span class="hljs-keyword">Select</span>
+    Application.Selection.Value = <span class="hljs-string">"Hello World"</span>
+</span></code></pre>
+<p>The first challenge in VBA programming is to get a feeling for the object model of each Office application and to read the object, method, and property syntax. The object models are similar in all Office applications, but each is specific to the kind of documents and objects that it manipulates.</p>
+<p>In the first line of the code snippet, there is the <strong>Application</strong> object, Excel this time, and then the <strong>ActiveSheet</strong>, which provides access to the active worksheet. After that is a term not as familiar, Range, which means "define a range of cells in this way." The code instructs <strong>Range</strong> to create itself with just A1 as its defined set of cells. In other words, the first line of code defines an object, the Range, and runs a method against it to select it. The result is automatically stored in another property of the <strong>Application</strong> called <strong>Selection</strong>.</p>
+<p>The second line of code sets the <strong>Value</strong> property of <strong>Selection</strong> to the text "Hello World", and that value appears in cell A1.</p>
+<p>The simplest VBA code that you write might simply gain access to objects in the Office application that you are working with and set properties. For example, you could get access to the rows in a table in Word and change their formatting in your VBA script.</p>
+<p>That sounds simple, but it can be incredibly useful; once you can write that code, you can harness all of the power of programming to make those same changes in several tables or documents, or make them according to some logic or condition. For a computer, making 1000 changes is no different from making 10, so there is an economy of scale here with larger documents and problems, and that is where VBA can really shine and save you time.</p>
+<div class="heading-wrapper" data-heading-level="h2"><a class="anchor-link docon docon-link" href="https://learn.microsoft.com/en-us/office/vba/library-reference/concepts/getting-started-with-vba-in-office#macros-and-the-visual-basic-editor" aria-label="Section titled: Macros and the Visual Basic Editor"></a><h2 id="macros-and-the-visual-basic-editor" class="heading-anchor">Macros and the Visual Basic Editor</h2></div>
+<p>Now that you know something about how Office applications expose their object models, you are probably eager to try calling object methods, setting object properties, and responding to object events. To do so, you must write your code in a place and in a way that Office can understand; typically, by using the Visual Basic Editor. Although it is installed by default, many users don't know that it is even available until it is enabled on the ribbon.</p>
+<p>All Office applications use the ribbon. One tab on the ribbon is the <strong>Developer</strong> tab, where you access the Visual Basic Editor and other developer tools. Because Office does not display the <strong>Developer</strong> tab by default, you must enable it by using the following procedure:</p>
+<div class="heading-wrapper" data-heading-level="h3"><a class="anchor-link docon docon-link" href="https://learn.microsoft.com/en-us/office/vba/library-reference/concepts/getting-started-with-vba-in-office#to-enable-the-developer-tab" aria-label="Section titled: To enable the Developer tab"></a><h3 id="to-enable-the-developer-tab" class="heading-anchor">To enable the Developer tab</h3></div>
+<ol>
+<li><p>On the <strong>File</strong> tab, choose <strong>Options</strong> to open the <strong>Options</strong> dialog box.</p>
+</li>
+<li><p>Choose <strong>Customize Ribbon</strong> on the left side of the dialog box.</p>
+</li>
+<li><p>Under <strong>Choose commands from</strong> on the left side of the dialog box, select <strong>Popular Commands</strong>.</p>
+</li>
+<li><p>Under <strong>Customize the Ribbon</strong> on the right side of the dialog box, select <strong>Main Tabs</strong> in the drop down list box, and then select the <strong>Developer</strong> checkbox.</p>
+</li>
+<li><p>Choose <strong>OK</strong>.</p>
+</li>
+</ol>
+<div class="alert is-info">
+<p class="alert-title"><span class="docon docon-status-error-outline" aria-hidden="true"></span> Note</p>
+<p>In Office 2007, you displayed the <strong>Developer</strong> tab by choosing the Office button, choosing <strong>Options</strong>, and then selecting the <strong>Show Developer tab in Ribbon</strong> check box in the <strong>Popular</strong> category of the <strong>Options</strong> dialog box.</p>
+</div>
+<p>After you enable the <strong>Developer</strong> tab, it is easy to find the <strong>Visual Basic</strong> and <strong>Macros</strong> buttons.</p>
+<p><strong>Figure 1. Buttons on the Developer tab</strong></p>
+<p><img src="./Getting started with VBA in Office _ Microsoft Learn_files/a3f71a29-06f2-4ee5-8c30-5dc60ad2ed31.png" alt="Buttons on the Developer tab" data-linktype="relative-path"></p>
+<div class="heading-wrapper" data-heading-level="h3"><a class="anchor-link docon docon-link" href="https://learn.microsoft.com/en-us/office/vba/library-reference/concepts/getting-started-with-vba-in-office#security-issues" aria-label="Section titled: Security issues"></a><h3 id="security-issues" class="heading-anchor">Security issues</h3></div>
+<p>To protect Office users against viruses and dangerous macro code, you cannot save macro code in a standard Office document that uses a standard file extension. Instead, you must save the code in a file with a special extension. For example you cannot save macros in a standard Word document with a .docx extension; instead, you must use a special Word Macro-Enabled Document with a .docm extension.</p>
+<p>When you open a .docm file, Office security might still prevent the macros in the document from running, with or without telling you. Examine the settings and options in the Trust Center on all Office applications. The default setting disables macro from running, but warns you that macros have been disabled and gives you the option to turn them back on for that document.</p>
+<p>You can designate specific folders where macros can run by creating Trusted Locations, Trusted Documents, or Trusted Publishers. The most portable option is to use Trusted Publishers, which works with digitally signed documents that you distribute. For more information about the security settings in a particular Office application, open the <strong>Options</strong> dialog box, choose <strong>Trust Center</strong>, and then choose <strong>Trust Center Settings</strong>.</p>
+<div class="alert is-info">
+<p class="alert-title"><span class="docon docon-status-error-outline" aria-hidden="true"></span> Note</p>
+<p>Some Office applications, like Outlook, save macros by default in a master template on your local computer. Although that strategy reduces the local security issues on your own computer when you run your own macros, it requires a deployment strategy if you want to distribute your macro.</p>
+</div>
+<div class="heading-wrapper" data-heading-level="h3"><a class="anchor-link docon docon-link" href="https://learn.microsoft.com/en-us/office/vba/library-reference/concepts/getting-started-with-vba-in-office#recording-a-macro" aria-label="Section titled: Recording a macro"></a><h3 id="recording-a-macro" class="heading-anchor">Recording a macro</h3></div>
+<p>When you choose the <strong>Macro</strong> button on the <strong>Developer</strong> tab, it opens the <strong>Macros</strong> dialog box, which gives you access to VBA subroutines or macros that you can access from a particular document or application. The <strong>Visual Basic</strong> button opens the Visual Basic Editor, where you create and edit VBA code.</p>
+<p>Another button on the <strong>Developer</strong> tab in Word and Excel is the <strong>Record Macro</strong> button, which automatically generates VBA code that can reproduce the actions that you perform in the application. <strong>Record Macro</strong> is a terrific tool that you can use to learn more about VBA. Reading the generated code can give you insight into VBA and provide a stable bridge between your knowledge of Office as a user and your knowledge as a programmer. The only caveat is that the generated code can be confusing because the Macro editor must make some assumptions about your intentions, and those assumptions are not necessarily accurate.</p>
+<div class="heading-wrapper" data-heading-level="h4"><a class="anchor-link docon docon-link" href="https://learn.microsoft.com/en-us/office/vba/library-reference/concepts/getting-started-with-vba-in-office#to-record-a-macro" aria-label="Section titled: To record a macro"></a><h4 id="to-record-a-macro" class="heading-anchor">To record a macro</h4></div>
+<ol>
+<li><p>Open Excel to a new Workbook and choose the <strong>Developer</strong> tab in the ribbon. Choose <strong>Record Macro</strong> and accept all of the default settings in the <strong>Record Macro</strong> dialog box, including <strong>Macro1</strong> as the name of the macro and <strong>This Workbook</strong> as the location.</p>
+</li>
+<li><p>Choose <strong>OK</strong> to begin recording the macro. Note how the button text changes to <strong>Stop Recording</strong>. Choose that button the instant you complete the actions that you want to record.</p>
+</li>
+<li><p>Choose cell B1 and type the programmer's classic first string: Hello World. Stop typing and look at the <strong>Stop Recording</strong> button; it is grayed out because Excel is waiting for you to finish typing the value in the cell.</p>
+</li>
+<li><p>Choose cell B2 to complete the action in cell B1, and then choose <strong>Stop Recording</strong>.</p>
+</li>
+<li><p>Choose <strong>Macros</strong> on the <strong>Developer</strong> tab, select <strong>Macro1</strong> if it is not selected, and then choose <strong>Edit</strong> to view the code from Macro1 in the Visual Basic Editor.</p>
+</li>
+</ol>
+<p><strong>Figure 2. Macro code in Visual Basic Editor</strong></p>
+<p><img src="./Getting started with VBA in Office _ Microsoft Learn_files/5d9acd78-5168-4a0c-83b6-3f1e440bf649.png" alt="Macro code in Visual Basic Editor" data-linktype="relative-path"></p>
+<div class="heading-wrapper" data-heading-level="h3"><a class="anchor-link docon docon-link" href="https://learn.microsoft.com/en-us/office/vba/library-reference/concepts/getting-started-with-vba-in-office#looking-at-the-code" aria-label="Section titled: Looking at the code"></a><h3 id="looking-at-the-code" class="heading-anchor">Looking at the code</h3></div>
+<p>The macro that you created should look similar to the following code.</p>
+<div class="codeHeader" id="code-try-3" data-bi-name="code-header"><span class="language">VB</span>
+		<button type="button" class="action position-relative display-none-print" data-bi-name="copy">
+			<span class="icon margin-right-xxs" aria-hidden="true">
+				<span class="docon docon-edit-copy"></span>
+			</span>
+			<span>Copy</span>
+			<div class="successful-copy-alert position-absolute right-0 top-0 left-0 bottom-0 display-flex align-items-center justify-content-center has-text-success-invert has-background-success is-transparent" aria-hidden="true">
+				<span class="icon font-size-lg">
+					<span class="docon docon-check-mark"></span>
+				</span>
+			</div>
+		</button>
+	</div><pre class="has-inner-focus"><code class="lang-vb"><span><span class="hljs-keyword">Sub</span> Macro1()
+<span class="hljs-comment">'</span>
+<span class="hljs-comment">' Macro1 Macro</span>
+<span class="hljs-comment">'</span>
+<span class="hljs-comment">'</span>
+    Range(<span class="hljs-string">"B1"</span>).<span class="hljs-keyword">Select</span>
+    ActiveCell.FormulaR1C1 = <span class="hljs-string">"Hello World"</span>
+    Range(<span class="hljs-string">"B2"</span>).<span class="hljs-keyword">Select</span>
+<span class="hljs-keyword">End</span> <span class="hljs-keyword">Sub</span>
+</span></code></pre>
+<p>Be aware of the similarities to the earlier code snippet that selected text in cell A1, and the differences. In this code, cell B1 is selected, and then the string "Hello World" is applied to the cell that has been made active. The quotes around the text specify a string value as opposed to a numeric value.</p>
+<p>Remember how you chose cell B2 to display the <strong>Stop Recording</strong> button again? That action shows up as a line of code as well. The macro recorder records every keystroke.</p>
+<p>The lines of code that start with an apostrophe and colored green by the editor are comments that explain the code or remind you and other programmers the purpose of the code. VBA ignores any line, or portion of a line, that begins with a single quote. Writing clear and appropriate comments in your code is an important topic, but that discussion is out of the scope of this article. Subsequent references to this code in the article don't include those four comment lines.</p>
+<p>When the macro recorder generates the code, it uses a complex algorithm to determine the methods and the properties that you intended. If you don't recognize a given property, there are many resources available to help you. For example, in the macro that you recorded, the macro recorder generated code that refers to the <strong>FormulaR1C1</strong> property. Not sure what that means?</p>
+<div class="alert is-info">
+<p class="alert-title"><span class="docon docon-status-error-outline" aria-hidden="true"></span> Note</p>
+<p>Be aware that <strong>Application</strong> object is implied in all VBA macros. The code that you recorded works with <strong>Application.</strong> at the beginning of each line.</p>
+</div>
+<div class="heading-wrapper" data-heading-level="h3"><a class="anchor-link docon docon-link" href="https://learn.microsoft.com/en-us/office/vba/library-reference/concepts/getting-started-with-vba-in-office#using-developer-help" aria-label="Section titled: Using Developer Help"></a><h3 id="using-developer-help" class="heading-anchor">Using Developer Help</h3></div>
+<p>Select <strong>FormulaR1C1</strong> in the recorded macro and press F1. The Help system runs a quick search, determines that the appropriate subjects are in the Excel Developer section of the Excel Help, and lists the <strong>FormulaR1C1</strong> property. You can choose the link to read more about the property, but before you do, be aware of the <strong>Excel Object Model Reference</strong> link near the bottom of the window. Choose the link to view a long list of objects that Excel uses in its object model to describe the Worksheets and their components.</p>
+<p>Choose any one of those to see the properties and methods that apply to that particular object, along with cross references to different related options. Many Help entries also have brief code examples that can help you. For example, you can follow the links in the <strong>Borders</strong> object to see how to set a border in VBA.</p>
+<div class="codeHeader" id="code-try-4" data-bi-name="code-header"><span class="language">VB</span>
+		<button type="button" class="action position-relative display-none-print" data-bi-name="copy">
+			<span class="icon margin-right-xxs" aria-hidden="true">
+				<span class="docon docon-edit-copy"></span>
+			</span>
+			<span>Copy</span>
+			<div class="successful-copy-alert position-absolute right-0 top-0 left-0 bottom-0 display-flex align-items-center justify-content-center has-text-success-invert has-background-success is-transparent" aria-hidden="true">
+				<span class="icon font-size-lg">
+					<span class="docon docon-check-mark"></span>
+				</span>
+			</div>
+		</button>
+	</div><pre class="has-inner-focus"><code class="lang-vb"><span>Worksheets(<span class="hljs-number">1</span>).Range(<span class="hljs-string">"A1"</span>).Borders.LineStyle = xlDouble
+</span></code></pre>
+<div class="heading-wrapper" data-heading-level="h3"><a class="anchor-link docon docon-link" href="https://learn.microsoft.com/en-us/office/vba/library-reference/concepts/getting-started-with-vba-in-office#editing-the-code" aria-label="Section titled: Editing the code"></a><h3 id="editing-the-code" class="heading-anchor">Editing the code</h3></div>
+<p>The Borders code looks different from the recorded macro. One thing that can be confusing with an object model is that there is more than one way to address any given object, cell A1 in this example.</p>
+<p>Sometimes the best way to learn programming is to make minor changes to some working code and see what happens as a result. Try it now. Open <strong>Macro1</strong> in the Visual Basic Editor and change the code to the following.</p>
+<div class="codeHeader" id="code-try-5" data-bi-name="code-header"><span class="language">VB</span>
+		<button type="button" class="action position-relative display-none-print" data-bi-name="copy">
+			<span class="icon margin-right-xxs" aria-hidden="true">
+				<span class="docon docon-edit-copy"></span>
+			</span>
+			<span>Copy</span>
+			<div class="successful-copy-alert position-absolute right-0 top-0 left-0 bottom-0 display-flex align-items-center justify-content-center has-text-success-invert has-background-success is-transparent" aria-hidden="true">
+				<span class="icon font-size-lg">
+					<span class="docon docon-check-mark"></span>
+				</span>
+			</div>
+		</button>
+	</div><pre class="has-inner-focus"><code class="lang-vb"><span><span class="hljs-keyword">Sub</span> Macro1()
+    Worksheets(<span class="hljs-number">1</span>).Range(<span class="hljs-string">"A1"</span>).Value = <span class="hljs-string">"Wow!"</span>
+    Worksheets(<span class="hljs-number">1</span>).Range(<span class="hljs-string">"A1"</span>).Borders.LineStyle = xlDouble
+<span class="hljs-keyword">End</span> <span class="hljs-keyword">Sub</span>
+</span></code></pre>
+<div class="alert is-success">
+<p class="alert-title"><span class="docon docon-lightbulb" aria-hidden="true"></span> Tip</p>
+<p>Use Copy and Paste as much as possible when working with code to avoid typing errors.</p>
+</div>
+<p>You don't need to save the code to try it out, so return to the Excel document, choose <strong>Macros</strong> on the <strong>Developer</strong> tab, choose <strong>Macro1</strong>, and then choose <strong>Run</strong>. Cell A1 now contains the text Wow! and has a double-line border around it.</p>
+<p><strong>Figure 3. Results of your first macro</strong></p>
+<p><img src="./Getting started with VBA in Office _ Microsoft Learn_files/a9c16102-00ad-4f89-b3b5-20f0052bfa20.png" alt="Results of your first macro" data-linktype="relative-path"></p>
+<p>You just combined macro recording, reading the object model documentation, and simple programming to make a VBA program that does something. Congratulations!</p>
+<p>Did not work? Read on for debugging suggestions in VBA.</p>
+<div class="heading-wrapper" data-heading-level="h2"><a class="anchor-link docon docon-link" href="https://learn.microsoft.com/en-us/office/vba/library-reference/concepts/getting-started-with-vba-in-office#programming-tips-and-tricks" aria-label="Section titled: Programming tips and tricks"></a><h2 id="programming-tips-and-tricks" class="heading-anchor">Programming tips and tricks</h2></div>
+<div class="heading-wrapper" data-heading-level="h3"><a class="anchor-link docon docon-link" href="https://learn.microsoft.com/en-us/office/vba/library-reference/concepts/getting-started-with-vba-in-office#start-with-examples" aria-label="Section titled: Start with examples"></a><h3 id="start-with-examples" class="heading-anchor">Start with examples</h3></div>
+<p>The VBA community is very large; a search on the Web can almost always yield an example of VBA code that does something similar to what you want to do. If you cannot find a good example, try to break the task down into smaller units and search on each of those, or try to think of a more common, but similar problem. Starting with an example can save you hours of time.</p>
+<p>That does not mean that free and well-thought-out code is on the Web waiting for you to come along. In fact, some of the code that you find might have bugs or mistakes. The idea is that the examples you find online or in VBA documentation give you a head start. Remember that learning programming requires time and thought. Before you get in a big rush to use another solution to solve your problem, ask yourself whether VBA is the right choice for this problem.</p>
+<div class="heading-wrapper" data-heading-level="h3"><a class="anchor-link docon docon-link" href="https://learn.microsoft.com/en-us/office/vba/library-reference/concepts/getting-started-with-vba-in-office#make-a-simpler-problem" aria-label="Section titled: Make a simpler problem"></a><h3 id="make-a-simpler-problem" class="heading-anchor">Make a simpler problem</h3></div>
+<p>Programming can get complex quickly. It's critical, especially as a beginner, that you break the problem down to the smallest possible logical units, then write and test each piece in isolation. If you have too much code in front of you and you get confused or muddled, stop and set the problem aside. When you come back to the problem, copy out a small piece of the problem into a new module, solve that piece, get the code working, and test it to ensure that it works. Then move on to the next part.</p>
+<div class="heading-wrapper" data-heading-level="h3"><a class="anchor-link docon docon-link" href="https://learn.microsoft.com/en-us/office/vba/library-reference/concepts/getting-started-with-vba-in-office#bugs-and-debugging" aria-label="Section titled: Bugs and debugging"></a><h3 id="bugs-and-debugging" class="heading-anchor">Bugs and debugging</h3></div>
+<p>There are two main types of programming errors: syntax errors, which violate the grammatical rules of the programming language, and run-time errors, which look syntactically correct, but fail when VBA attempts to execute the code.</p>
+<p>Although they can be frustrating to fix, syntax errors are easy to catch; the Visual Basic Editor beeps and flashes at you if you type a syntax error in your code.</p>
+<p>For example, string values must be surrounded by double quotes in VBA. To find out what happens when you use single quotes instead, return to the Visual Basic Editor and replace the "Wow!" string in the code example with 'Wow!' (that is, the word Wow enclosed in single quotes). If you choose the next line, the Visual Basic Editor reacts. The error "Compile error: Expected: expression" is not that helpful, but the line that generates the error turns red to tell you that you have a syntax error in that line and as a result, this program will not run.</p>
+<p>Choose <strong>OK</strong> and change the text back to"Wow!".</p>
+<p>Runtime errors are harder to catch because the programming syntax looks correct, but the code fails when VBA tries to execute it.</p>
+<p>For example, open the Visual Basic Editor and change the <strong>Value</strong> property name to ValueX in your Macro, deliberately introducing a runtime error since the <strong>Range</strong> object does not have a property called ValueX. Go back to the Excel document, open the <strong>Macros</strong> dialog box and run Macro1 again. You should see a Visual Basic message box that explains the run-time error with the text, "Object doesn't support this property of method." Although that text is clear, choose <strong>Debug</strong> to find out more.</p>
+<p>When you return to the Visual Basic Editor, it is in a special debug mode that uses a yellow highlight to show you the line of code that failed. As expected, the line that includes the ValueX property is highlighted.</p>
+<!-- Missing figure: **Figure 4. Visual Basic debugger at work**-->
+<p>You can make changes to VBA code that is running, so change ValueX back to <strong>Value</strong> and choose the little green play button underneath the <strong>Debug</strong> menu. The program should run normally again.</p>
+<p>It's a good idea to learn how to use the debugger more deliberately for longer, more complex programs. At a minimum, learn a how to set break-points to stop execution at a point where you want to take a look at the code, how to add watches to see the values of different variables and properties as the code runs, and how to step through the code line by line. These options are all available in the <strong>Debug</strong> menu and serious debugger users typically memorize the accompanying keyboard shortcuts.</p>
+<div class="heading-wrapper" data-heading-level="h3"><a class="anchor-link docon docon-link" href="https://learn.microsoft.com/en-us/office/vba/library-reference/concepts/getting-started-with-vba-in-office#using-reference-materials-well" aria-label="Section titled: Using reference materials well"></a><h3 id="using-reference-materials-well" class="heading-anchor">Using reference materials well</h3></div>
+<p>To open the Developer Reference that is built into Office Help, open the Help reference from any Office application by choosing the question mark in the ribbon or by pressing F1. Then, to the right of the <strong>Search</strong> button, choose the dropdown arrow to filter the contents. Choose <strong>Developer Reference</strong>. If you don't see the table of contents in the left panel, choose the little book icon to open it, and then expand the Object Model Reference from there.</p>
+<p><strong>Figure 4. Filtering on developer Help applies to all Office applications</strong></p>
+<p><img src="./Getting started with VBA in Office _ Microsoft Learn_files/5deb3fe2-2c45-4fb0-851c-3816bce8f68d.png" alt="Filtering on developer Help applies to all Office applications" data-linktype="relative-path"></p>
+<p>Time spent browsing the Object Model reference pays off. After you understand the basics of VBA syntax and the object model for the Office application that you are working with, you advance from guesswork to methodical programming.</p>
+<p>Of course the <a href="https://developer.microsoft.com/office" data-linktype="external">Microsoft Office Developer Center</a> is an excellent portal for articles, tips, and community information.</p>
+<div class="heading-wrapper" data-heading-level="h3"><a class="anchor-link docon docon-link" href="https://learn.microsoft.com/en-us/office/vba/library-reference/concepts/getting-started-with-vba-in-office#searching-forums-and-groups" aria-label="Section titled: Searching forums and groups"></a><h3 id="searching-forums-and-groups" class="heading-anchor">Searching forums and groups</h3></div>
+<p>All programmers get stuck sometimes, even after reading every reference article they can find and losing sleep at night thinking about different ways to solve a problem. Fortunately, the Internet has fostered a community of developers who help each other solve programming problems.</p>
+<p>Any search on the Web for "office developer forum" reveals several discussion groups. You can search on "office development" or a description of your problem to discover forums, blog posts, and articles as well.</p>
+<p>If you have done everything that you can to solve a problem, don't be afraid to post your question to a developers forum. These forums welcome posts from newer programmers and many of the experienced developers are glad to help.</p>
+<p>The following are a few points of etiquette to follow when you post to a developer forum:</p>
+<ul>
+<li><p>Before you post, look on the site for an FAQ or for guidelines that members want you to follow. Ensure that you post content that is consistent with those guidelines and in the correct section of the forum.</p>
+</li>
+<li><p>Include a clear and complete code sample, and consider editing your code to clarify it for others if it is part of a longer section of code.</p>
+</li>
+<li><p>Describe your problem clearly and concisely, and summarize any steps that you have taken to solve the problem. Take the time to write your post as well as you can, especially if you are flustered or in a hurry. Present the situation in a way that will make sense to readers the first time that they read the problem statement.</p>
+</li>
+<li><p>Be polite and express your appreciation.</p>
+</li>
+</ul>
+<p><a name="odc_office14_ta_AddingVBAProgrammingToYourOfficeToolkit_GoingFurtherWithProgramming"> </a></p>
+<div class="heading-wrapper" data-heading-level="h2"><a class="anchor-link docon docon-link" href="https://learn.microsoft.com/en-us/office/vba/library-reference/concepts/getting-started-with-vba-in-office#going-further-with-programming" aria-label="Section titled: Going further with programming"></a><h2 id="going-further-with-programming" class="heading-anchor">Going further with programming</h2></div>
+<p>Although this article is short and only scratches the surface of VBA and programming, it is hopefully enough to get you started.</p>
+<p>This section briefly discusses a few more key topics.</p>
+<div class="heading-wrapper" data-heading-level="h3"><a class="anchor-link docon docon-link" href="https://learn.microsoft.com/en-us/office/vba/library-reference/concepts/getting-started-with-vba-in-office#variables" aria-label="Section titled: Variables"></a><h3 id="variables" class="heading-anchor">Variables</h3></div>
+<p>In the simple examples in this article you manipulated objects that the application had already created. You might want to create your own objects to store values or references to other objects for temporary use in your application. These are called variables.</p>
+<p>To use a variable in VBA, must tell VBA which type of object the variable represents by using the <strong>Dim</strong> statement. You then set its value and use it to set other variables or properties.</p>
+<div class="codeHeader" id="code-try-6" data-bi-name="code-header"><span class="language">VB</span>
+		<button type="button" class="action position-relative display-none-print" data-bi-name="copy">
+			<span class="icon margin-right-xxs" aria-hidden="true">
+				<span class="docon docon-edit-copy"></span>
+			</span>
+			<span>Copy</span>
+			<div class="successful-copy-alert position-absolute right-0 top-0 left-0 bottom-0 display-flex align-items-center justify-content-center has-text-success-invert has-background-success is-transparent" aria-hidden="true">
+				<span class="icon font-size-lg">
+					<span class="docon docon-check-mark"></span>
+				</span>
+			</div>
+		</button>
+	</div><pre class="has-inner-focus"><code class="lang-vb"><span>    <span class="hljs-keyword">Dim</span> MyStringVariable <span class="hljs-keyword">As</span> <span class="hljs-built_in">String</span>
+    MyStringVariable = <span class="hljs-string">"Wow!"</span>
+    Worksheets(<span class="hljs-number">1</span>).Range(<span class="hljs-string">"A1"</span>).Value = MyStringVariable
+</span></code></pre>
+<div class="heading-wrapper" data-heading-level="h3"><a class="anchor-link docon docon-link" href="https://learn.microsoft.com/en-us/office/vba/library-reference/concepts/getting-started-with-vba-in-office#branching-and-looping" aria-label="Section titled: Branching and looping"></a><h3 id="branching-and-looping" class="heading-anchor">Branching and looping</h3></div>
+<p>The simple programs in this article execute one line at a time, from the top down. The real power in programming comes from the options that you have to determine which lines of code to execute, based on one or more conditions that you specify. You can extend those capabilities even further when you can repeat an operation many times. For example, the following code extends Macro1.</p>
+<div class="codeHeader" id="code-try-7" data-bi-name="code-header"><span class="language">VB</span>
+		<button type="button" class="action position-relative display-none-print" data-bi-name="copy">
+			<span class="icon margin-right-xxs" aria-hidden="true">
+				<span class="docon docon-edit-copy"></span>
+			</span>
+			<span>Copy</span>
+			<div class="successful-copy-alert position-absolute right-0 top-0 left-0 bottom-0 display-flex align-items-center justify-content-center has-text-success-invert has-background-success is-transparent" aria-hidden="true">
+				<span class="icon font-size-lg">
+					<span class="docon docon-check-mark"></span>
+				</span>
+			</div>
+		</button>
+	</div><pre class="has-inner-focus"><code class="lang-vb"><span><span class="hljs-keyword">Sub</span> Macro1()
+    <span class="hljs-keyword">If</span> Worksheets(<span class="hljs-number">1</span>).Range(<span class="hljs-string">"A1"</span>).Value = <span class="hljs-string">"Yes!"</span> <span class="hljs-keyword">Then</span>
+        <span class="hljs-keyword">Dim</span> i <span class="hljs-keyword">As</span> <span class="hljs-built_in">Integer</span>
+        <span class="hljs-keyword">For</span> i = <span class="hljs-number">2</span> <span class="hljs-keyword">To</span> <span class="hljs-number">10</span>
+            Worksheets(<span class="hljs-number">1</span>).Range(<span class="hljs-string">"A"</span> &amp; i).Value = <span class="hljs-string">"OK! "</span> &amp; i
+        <span class="hljs-keyword">Next</span> i
+    <span class="hljs-keyword">Else</span>
+        MsgBox <span class="hljs-string">"Put Yes! in cell A1"</span>
+    <span class="hljs-keyword">End</span> <span class="hljs-keyword">If</span>
+<span class="hljs-keyword">End</span> <span class="hljs-keyword">Sub</span>
+</span></code></pre>
+<p>Type or paste the code into the Visual Basic Editor and then run it. Follow the directions in the message box that appears and change the text in cell A1 from Wow! to Yes! and run it again to see the power of looping. This code snippet demonstrates variables, branching and looping. Read it carefully after you see it in action and try to determine what happens as each line executes.</p>
+<div class="heading-wrapper" data-heading-level="h2"><a class="anchor-link docon docon-link" href="https://learn.microsoft.com/en-us/office/vba/library-reference/concepts/getting-started-with-vba-in-office#all-of-my-office-applications-example-code" aria-label="Section titled: All of my Office applications: example code"></a><h2 id="all-of-my-office-applications-example-code" class="heading-anchor">All of my Office applications: example code</h2></div>
+<p>Here are a few scripts to try; each solves a real-world Office problem.</p>
+<div class="heading-wrapper" data-heading-level="h3"><a class="anchor-link docon docon-link" href="https://learn.microsoft.com/en-us/office/vba/library-reference/concepts/getting-started-with-vba-in-office#create-an-email-in-outlook" aria-label="Section titled: Create an email in Outlook"></a><h3 id="create-an-email-in-outlook" class="heading-anchor">Create an email in Outlook</h3></div>
+<div class="codeHeader" id="code-try-8" data-bi-name="code-header"><span class="language">VB</span>
+		<button type="button" class="action position-relative display-none-print" data-bi-name="copy">
+			<span class="icon margin-right-xxs" aria-hidden="true">
+				<span class="docon docon-edit-copy"></span>
+			</span>
+			<span>Copy</span>
+			<div class="successful-copy-alert position-absolute right-0 top-0 left-0 bottom-0 display-flex align-items-center justify-content-center has-text-success-invert has-background-success is-transparent" aria-hidden="true">
+				<span class="icon font-size-lg">
+					<span class="docon docon-check-mark"></span>
+				</span>
+			</div>
+		</button>
+	</div><pre class="has-inner-focus"><code class="lang-vb"><span><span class="hljs-keyword">Sub</span> MakeMessage()
+    <span class="hljs-keyword">Dim</span> OutlookMessage <span class="hljs-keyword">As</span> Outlook.MailItem
+    <span class="hljs-keyword">Set</span> OutlookMessage = Application.CreateItem(olMailItem)
+    OutlookMessage.Subject = <span class="hljs-string">"Hello World!"</span>
+    OutlookMessage.Display
+    <span class="hljs-keyword">Set</span> OutlookMessage = <span class="hljs-literal">Nothing</span>
+<span class="hljs-keyword">End</span> <span class="hljs-keyword">Sub</span>
+</span></code></pre>
+<p>Be aware that there are situations in which you might want to automate email in Outlook; you can use templates as well.</p>
+<div class="heading-wrapper" data-heading-level="h3"><a class="anchor-link docon docon-link" href="https://learn.microsoft.com/en-us/office/vba/library-reference/concepts/getting-started-with-vba-in-office#delete-empty-rows-in-an-excel-worksheet" aria-label="Section titled: Delete empty rows in an Excel worksheet"></a><h3 id="delete-empty-rows-in-an-excel-worksheet" class="heading-anchor">Delete empty rows in an Excel worksheet</h3></div>
+<div class="codeHeader" id="code-try-9" data-bi-name="code-header"><span class="language">VB</span>
+		<button type="button" class="action position-relative display-none-print" data-bi-name="copy">
+			<span class="icon margin-right-xxs" aria-hidden="true">
+				<span class="docon docon-edit-copy"></span>
+			</span>
+			<span>Copy</span>
+			<div class="successful-copy-alert position-absolute right-0 top-0 left-0 bottom-0 display-flex align-items-center justify-content-center has-text-success-invert has-background-success is-transparent" aria-hidden="true">
+				<span class="icon font-size-lg">
+					<span class="docon docon-check-mark"></span>
+				</span>
+			</div>
+		</button>
+	</div><pre class="has-inner-focus"><code class="lang-vb"><span><span class="hljs-keyword">Sub</span> DeleteEmptyRows()
+    SelectedRange = Selection.Rows.Count
+    ActiveCell.Offset(<span class="hljs-number">0</span>, <span class="hljs-number">0</span>).<span class="hljs-keyword">Select</span>
+    <span class="hljs-keyword">For</span> i = <span class="hljs-number">1</span> <span class="hljs-keyword">To</span> SelectedRange
+        <span class="hljs-keyword">If</span> ActiveCell.Value = <span class="hljs-string">""</span> <span class="hljs-keyword">Then</span>
+            Selection.EntireRow.Delete
+        <span class="hljs-keyword">Else</span>
+            ActiveCell.Offset(<span class="hljs-number">1</span>, <span class="hljs-number">0</span>).<span class="hljs-keyword">Select</span>
+        <span class="hljs-keyword">End</span> <span class="hljs-keyword">If</span>
+    <span class="hljs-keyword">Next</span> i
+<span class="hljs-keyword">End</span> <span class="hljs-keyword">Sub</span>
+</span></code></pre>
+<p>Be aware that you can select a column of cells and run this macro to delete all rows in the selected column that have a blank cell.</p>
+<div class="heading-wrapper" data-heading-level="h3"><a class="anchor-link docon docon-link" href="https://learn.microsoft.com/en-us/office/vba/library-reference/concepts/getting-started-with-vba-in-office#delete-empty-text-boxes-in-powerpoint" aria-label="Section titled: Delete empty text boxes in PowerPoint"></a><h3 id="delete-empty-text-boxes-in-powerpoint" class="heading-anchor">Delete empty text boxes in PowerPoint</h3></div>
+<div class="codeHeader" id="code-try-10" data-bi-name="code-header"><span class="language">VB</span>
+		<button type="button" class="action position-relative display-none-print" data-bi-name="copy">
+			<span class="icon margin-right-xxs" aria-hidden="true">
+				<span class="docon docon-edit-copy"></span>
+			</span>
+			<span>Copy</span>
+			<div class="successful-copy-alert position-absolute right-0 top-0 left-0 bottom-0 display-flex align-items-center justify-content-center has-text-success-invert has-background-success is-transparent" aria-hidden="true">
+				<span class="icon font-size-lg">
+					<span class="docon docon-check-mark"></span>
+				</span>
+			</div>
+		</button>
+	</div><pre class="has-inner-focus"><code class="lang-vb"><span><span class="hljs-keyword">Sub</span> RemoveEmptyTextBoxes()
+    <span class="hljs-keyword">Dim</span> SlideObj <span class="hljs-keyword">As</span> Slide
+    <span class="hljs-keyword">Dim</span> ShapeObj <span class="hljs-keyword">As</span> Shape
+    <span class="hljs-keyword">Dim</span> ShapeIndex <span class="hljs-keyword">As</span> <span class="hljs-built_in">Integer</span>
+    <span class="hljs-keyword">For</span> <span class="hljs-keyword">Each</span> SlideObj <span class="hljs-keyword">In</span> ActivePresentation.Slides
+        <span class="hljs-keyword">For</span> ShapeIndex = SlideObj.Shapes.Count <span class="hljs-keyword">To</span> <span class="hljs-number">1</span> <span class="hljs-keyword">Step</span> <span class="hljs-number">-1</span>
+            <span class="hljs-keyword">Set</span> ShapeObj = SlideObj.Shapes(ShapeIndex)
+            <span class="hljs-keyword">If</span> ShapeObj.Type = msoTextBox <span class="hljs-keyword">Then</span>
+                <span class="hljs-keyword">If</span> Trim(ShapeObj.TextFrame.TextRange.<span class="hljs-keyword">Text</span>) = <span class="hljs-string">""</span> <span class="hljs-keyword">Then</span>
+                    ShapeObj.Delete
+                <span class="hljs-keyword">End</span> <span class="hljs-keyword">If</span>
+            <span class="hljs-keyword">End</span> <span class="hljs-keyword">If</span>
+        <span class="hljs-keyword">Next</span> ShapeIndex
+    <span class="hljs-keyword">Next</span> SlideObj
+<span class="hljs-keyword">End</span> <span class="hljs-keyword">Sub</span>
+</span></code></pre>
+<p>Be aware that this code loops through all of the slides and deletes all text boxes that don't have any text. The count variable decrements instead of increments because each time the code deletes an object, it removes that object from the collection, which reduces the count.</p>
+<div class="heading-wrapper" data-heading-level="h3"><a class="anchor-link docon docon-link" href="https://learn.microsoft.com/en-us/office/vba/library-reference/concepts/getting-started-with-vba-in-office#copy-a-contact-from-outlook-to-word" aria-label="Section titled: Copy a contact from Outlook to Word"></a><h3 id="copy-a-contact-from-outlook-to-word" class="heading-anchor">Copy a contact from Outlook to Word</h3></div>
+<div class="codeHeader" id="code-try-11" data-bi-name="code-header"><span class="language">VB</span>
+		<button type="button" class="action position-relative display-none-print" data-bi-name="copy">
+			<span class="icon margin-right-xxs" aria-hidden="true">
+				<span class="docon docon-edit-copy"></span>
+			</span>
+			<span>Copy</span>
+			<div class="successful-copy-alert position-absolute right-0 top-0 left-0 bottom-0 display-flex align-items-center justify-content-center has-text-success-invert has-background-success is-transparent" aria-hidden="true">
+				<span class="icon font-size-lg">
+					<span class="docon docon-check-mark"></span>
+				</span>
+			</div>
+		</button>
+	</div><pre class="has-inner-focus" role="group" aria-label="Horizontally scrollable code" tabindex="0"><code class="lang-vb"><span><span class="hljs-keyword">Sub</span> CopyCurrentContact()
+   <span class="hljs-keyword">Dim</span> OutlookObj <span class="hljs-keyword">As</span> <span class="hljs-built_in">Object</span>
+   <span class="hljs-keyword">Dim</span> InspectorObj <span class="hljs-keyword">As</span> <span class="hljs-built_in">Object</span>
+   <span class="hljs-keyword">Dim</span> ItemObj <span class="hljs-keyword">As</span> <span class="hljs-built_in">Object</span>
+   <span class="hljs-keyword">Set</span> OutlookObj = CreateObject(<span class="hljs-string">"Outlook.Application"</span>)
+   <span class="hljs-keyword">Set</span> InspectorObj = OutlookObj.ActiveInspector
+   <span class="hljs-keyword">Set</span> ItemObj = InspectorObj.CurrentItem
+   Application.ActiveDocument.Range.InsertAfter (ItemObj.FullName &amp; <span class="hljs-string">" from "</span> &amp; ItemObj.CompanyName)
+<span class="hljs-keyword">End</span> <span class="hljs-keyword">Sub</span>
+</span></code></pre>
+<p>Be aware that this code copies the currently open contact in Outlook into the open Word document. This code only works if there is a contact currently open for inspection in Outlook.</p>
+<div class="heading-wrapper" data-heading-level="h3"><a class="anchor-link docon docon-link" href="https://learn.microsoft.com/en-us/office/vba/library-reference/concepts/getting-started-with-vba-in-office#support-and-feedback" aria-label="Section titled: Support and feedback"></a><h3 id="support-and-feedback" class="heading-anchor">Support and feedback</h3></div>
+<p>Have questions or feedback about Office VBA or this documentation? Please see <a href="https://learn.microsoft.com/en-us/office/vba/articles/feedback-support" data-linktype="relative-path">Office VBA support and feedback</a> for guidance about the ways you can receive support and provide feedback.</p>
+</div>
+					
+		<div id="ms--inline-notifications" class="margin-block-xs" data-bi-name="inline-notification"></div>
+	 
+		<div id="assertive-live-region" role="alert" aria-live="assertive" class="visually-hidden" aria-relevant="additions" aria-atomic="true"></div>
+		<div id="polite-live-region" role="status" aria-live="polite" class="visually-hidden" aria-relevant="additions" aria-atomic="true"></div>
+	
+					
+		<!-- feedback section -->
+		<section id="site-user-feedback-footer" class="font-size-sm margin-top-md display-none-print display-none-desktop" data-test-id="site-user-feedback-footer" data-bi-name="site-feedback-section">
+			<hr class="hr">
+			<h2 id="ms--feedback" class="title is-3">Feedback</h2>
+			<div class="display-flex flex-wrap-wrap align-items-center" data-feedback-experiment="disabled">
+				<p class="font-weight-semibold margin-xxs margin-left-none">
+					Was this page helpful?
+				</p>
+				<div class="buttons">
+					<button class="thumb-rating-button like button button-primary button-sm" data-test-id="footer-rating-yes" data-binary-rating-response="rating-yes" type="button" title="This article is helpful" data-bi-name="button-rating-yes" aria-pressed="false">
+						<span class="icon" aria-hidden="true">
+							<span class="docon docon-like"></span>
+						</span>
+						<span>Yes</span>
+					</button>
+					<button class="thumb-rating-button dislike button button-primary button-sm" id="standard-rating-no-button" data-test-id="footer-rating-no" data-binary-rating-response="rating-no" type="button" title="This article is not helpful" data-bi-name="button-rating-no" aria-pressed="false">
+						<span class="icon" aria-hidden="true">
+							<span class="docon docon-dislike"></span>
+						</span>
+						<span>No</span>
+					</button>
+					<details class="popover popover-top" id="mobile-help-popover" data-test-id="footer-feedback-popover" hidden="">
+						<summary class="thumb-rating-button dislike button button-primary button-sm" data-test-id="details-footer-rating-no" data-binary-rating-response="rating-no" title="This article is not helpful" data-bi-name="button-rating-no" aria-pressed="false" data-bi-an="feedback-unhelpful-popover">
+							<span class="icon" aria-hidden="true">
+								<span class="docon docon-dislike"></span>
+							</span>
+							<span>No</span>
+						</summary>
+						<div class="popover-content width-200 width-300-tablet" role="dialog" aria-labelledby="popover-heading" aria-describedby="popover-description">
+							<p id="popover-heading" class="font-size-lg margin-bottom-xxs font-weight-semibold">
+								Need help with this topic?
+							</p>
+							<p id="popover-description" class="font-size-sm margin-bottom-xs">
+								Want to try using Ask Learn to clarify or guide you through this topic?
+							</p>
+							
+		<div class="buttons flex-direction-row flex-wrap justify-content-center gap-xxs">
+			<div>
+				
+		<button class="button button-sm border inner-focus display-none margin-right-xxs" data-bi-name="ask-learn-assistant-entry-troubleshoot" data-test-id="ask-learn-assistant-modal-entry-mobile-feedback" data-ask-learn-modal-entry-feedback="" data-bi-an="feedback-unhelpful-popover" type="button" style="min-width: max-content;" aria-expanded="false" aria-label="Ask Learn" hidden="">
+			<span class="icon font-size-lg" aria-hidden="true">
+				<span class="docon docon-chat-sparkle-fill gradient-ask-learn-logo"></span>
+			</span>
+		</button>
+		<button class="button button-sm display-inline-flex display-none-desktop flex-shrink-0 margin-right-xxs border-color-ask-learn margin-right-xxs" data-bi-name="ask-learn-assistant-entry-troubleshoot" data-bi-an="feedback-unhelpful-popover" data-test-id="ask-learn-assistant-modal-entry-tablet-feedback" data-ask-learn-modal-entry-feedback="" type="button" style="min-width: max-content;" aria-expanded="false" hidden="">
+			<span class="icon font-size-lg" aria-hidden="true">
+				<span class="docon docon-chat-sparkle-fill gradient-ask-learn-logo"></span>
+			</span>
+			<span>Ask Learn</span>
+		</button>
+		<button class="button button-sm display-none flex-shrink-0 display-inline-flex-desktop margin-right-xxs border-color-ask-learn margin-right-xxs" data-bi-name="ask-learn-assistant-entry-troubleshoot" data-bi-an="feedback-unhelpful-popover" data-test-id="ask-learn-assistant-flyout-entry-feedback" data-ask-learn-flyout-entry-show-only="" data-flyout-button="toggle" type="button" style="min-width: max-content;" aria-expanded="false" aria-controls="ask-learn-flyout" hidden="">
+			<span class="icon font-size-lg" aria-hidden="true">
+				<span class="docon docon-chat-sparkle-fill gradient-ask-learn-logo"></span>
+			</span>
+			<span>Ask Learn</span>
+		</button>
+	
+			</div>
+			<button type="button" class="button button-sm margin-right-xxs" data-help-option="suggest-fix" data-bi-name="feedback-suggest" data-bi-an="feedback-unhelpful-popover" data-test-id="suggest-fix">
+				<span class="icon" aria-hidden="true">
+					<span class="docon docon-feedback"></span>
+				</span>
+				<span> Suggest a fix? </span>
+			</button>
+		</div>
+	
+						</div>
+					</details>
+				</div>
+			</div>
+			<div class="display-flex flex-wrap-wrap align-items-center" data-feedback-experiment="enabled" hidden="">
+				<p class="font-weight-semibold margin-xxs margin-left-none">
+					Was this page helpful?
+				</p>
+				<div class="buttons margin-bottom-none">
+					<button class="thumb-rating-button like button button-primary button-clear button-sm margin-none" data-test-id="footer-rating-yes-experiment" data-binary-rating-response="rating-yes" type="button" title="This article is helpful" aria-label="This article is helpful" data-bi-name="button-rating-yes" aria-pressed="false">
+						<span class="icon" aria-hidden="true">
+							<span class="docon docon-like"></span>
+						</span>
+					</button>
+					<button class="thumb-rating-button dislike button button-primary button-clear button-sm margin-none" id="standard-rating-no-button-experiment" data-test-id="footer-rating-no-experiment" data-binary-rating-response="rating-no" type="button" title="This article is not helpful" aria-label="This article is not helpful" data-bi-name="button-rating-no" aria-pressed="false">
+						<span class="icon" aria-hidden="true">
+							<span class="docon docon-dislike"></span>
+						</span>
+					</button>
+					<details class="popover popover-top" id="mobile-help-popover-experiment" data-test-id="footer-feedback-popover-experiment" hidden="">
+						<summary class="thumb-rating-button dislike button button-primary button-clear button-sm margin-none" data-test-id="details-footer-rating-no-experiment" data-binary-rating-response="rating-no" title="This article is not helpful" aria-label="This article is not helpful" data-bi-name="button-rating-no" aria-pressed="false" data-bi-an="feedback-unhelpful-popover">
+							<span class="icon" aria-hidden="true">
+								<span class="docon docon-dislike"></span>
+							</span>
+						</summary>
+						<div class="popover-content width-200 width-300-tablet" role="dialog" aria-labelledby="popover-heading-experiment" aria-describedby="popover-description-experiment">
+							<p id="popover-heading-experiment" class="font-size-lg margin-bottom-xxs font-weight-semibold">
+								Need help with this topic?
+							</p>
+							<p id="popover-description-experiment" class="font-size-sm margin-bottom-xs">
+								Want to try using Ask Learn to clarify or guide you through this topic?
+							</p>
+							
+		<div class="buttons flex-direction-row flex-wrap justify-content-center gap-xxs">
+			<div>
+				
+		<button class="button button-sm border inner-focus display-none margin-right-xxs" data-bi-name="ask-learn-assistant-entry-troubleshoot" data-test-id="ask-learn-assistant-modal-entry-mobile-feedback-experiment" data-ask-learn-modal-entry-feedback="" data-bi-an="feedback-unhelpful-popover" type="button" style="min-width: max-content;" aria-expanded="false" aria-label="Ask Learn" hidden="">
+			<span class="icon font-size-lg" aria-hidden="true">
+				<span class="docon docon-chat-sparkle-fill gradient-ask-learn-logo"></span>
+			</span>
+		</button>
+		<button class="button button-sm display-inline-flex display-none-desktop flex-shrink-0 margin-right-xxs border-color-ask-learn margin-right-xxs" data-bi-name="ask-learn-assistant-entry-troubleshoot" data-bi-an="feedback-unhelpful-popover" data-test-id="ask-learn-assistant-modal-entry-tablet-feedback-experiment" data-ask-learn-modal-entry-feedback="" type="button" style="min-width: max-content;" aria-expanded="false" hidden="">
+			<span class="icon font-size-lg" aria-hidden="true">
+				<span class="docon docon-chat-sparkle-fill gradient-ask-learn-logo"></span>
+			</span>
+			<span>Ask Learn</span>
+		</button>
+		<button class="button button-sm display-none flex-shrink-0 display-inline-flex-desktop margin-right-xxs border-color-ask-learn margin-right-xxs" data-bi-name="ask-learn-assistant-entry-troubleshoot" data-bi-an="feedback-unhelpful-popover" data-test-id="ask-learn-assistant-flyout-entry-feedback-experiment" data-ask-learn-flyout-entry-show-only="" data-flyout-button="toggle" type="button" style="min-width: max-content;" aria-expanded="false" aria-controls="ask-learn-flyout" hidden="">
+			<span class="icon font-size-lg" aria-hidden="true">
+				<span class="docon docon-chat-sparkle-fill gradient-ask-learn-logo"></span>
+			</span>
+			<span>Ask Learn</span>
+		</button>
+	
+			</div>
+			<button type="button" class="button button-sm margin-right-xxs" data-help-option="suggest-fix-experiment" data-bi-name="feedback-suggest" data-bi-an="feedback-unhelpful-popover" data-test-id="suggest-fix">
+				<span class="icon" aria-hidden="true">
+					<span class="docon docon-feedback"></span>
+				</span>
+				<span> Suggest a fix? </span>
+			</button>
+		</div>
+	
+						</div>
+					</details>
+				</div>
+			</div>
+		</section>
+		<!-- end feedback section -->
+	
+				</div>
+				
+		<div id="ms--additional-resources-mobile" class="display-none-print">
+			<hr class="hr">
+			<h2 id="ms--additional-resources-mobile-heading" class="title is-3">
+				Additional resources
+			</h2>
+			
+		<section id="right-rail-recommendations-mobile" class="" data-bi-name="recommendations"><!---->
+		
+		<article class="margin-top-md margin-top-sm-desktop">
+			
+		<p class="font-weight-semibold font-size-md display-flex align-items-center">
+			<span class="icon margin-right-xxs" aria-hidden="true">
+				<span class="docon docon-book-art64"></span>
+			</span>
+			Documentation
+		</p>
+	
+			<div class="margin-top-xs ">
+				
+		<ul aria-live="polite" aria-relevant="additions" id="right-rail-recommendations-list-0">
+			<!---->
+					<li class="padding-none margin-top-xs margin-bottom-none position-relative ">
+						  
+				<p class="line-clamp-3">
+					<a class="display-block inner-focus font-weight-semibold font-size-sm has-line-height-reset stretched-link" href="https://learn.microsoft.com/en-us/office/vba/library-reference/concepts/what-s-new-for-vba-in-office-2019?source=recommendations" data-bi-name="right-rail-recommendation-item-0">
+						What's new for VBA in Office 2019
+					</a>
+				</p>
+		   
+						
+		<p class="font-size-sm has-line-height-reset color-text-subtle margin-top-xxs line-clamp-3">
+			Office VBA reference topic
+		</p>
+	
+					</li>
+				<!---->
+					<li class="padding-none margin-top-sm margin-bottom-none position-relative ">
+						  
+				<p class="line-clamp-3">
+					<a class="display-block inner-focus font-weight-semibold font-size-sm has-line-height-reset stretched-link" href="https://learn.microsoft.com/en-us/office/vba/library-reference/concepts/how-autosave-impacts-addins-and-macros?source=recommendations" data-bi-name="right-rail-recommendation-item-1">
+						How AutoSave impacts add-ins and macros
+					</a>
+				</p>
+		   
+						
+		<p class="font-size-sm has-line-height-reset color-text-subtle margin-top-xxs line-clamp-3">
+			Office VBA reference topic
+		</p>
+	
+					</li>
+				<!---->
+					<li class="padding-none margin-top-sm margin-bottom-none position-relative ">
+						  
+				<p class="line-clamp-3">
+					<a class="display-block inner-focus font-weight-semibold font-size-sm has-line-height-reset stretched-link" href="https://learn.microsoft.com/en-us/office/vba/api/overview/library-reference/reference-object-library-reference-for-office?source=recommendations" data-bi-name="right-rail-recommendation-item-2">
+						Reference (Object library reference for Office)
+					</a>
+				</p>
+		   
+						
+		<p class="font-size-sm has-line-height-reset color-text-subtle margin-top-xxs line-clamp-3">
+			Office VBA reference topic
+		</p>
+	
+					</li>
+				<!---->
+					<li class="padding-none margin-top-sm margin-bottom-none position-relative expandable">
+						  
+				<p class="line-clamp-3">
+					<a class="display-block inner-focus font-weight-semibold font-size-sm has-line-height-reset stretched-link" href="https://learn.microsoft.com/en-us/office/vba/api/overview/?source=recommendations" data-bi-name="right-rail-recommendation-item-3">
+						Office Visual Basic for Applications (VBA) reference
+					</a>
+				</p>
+		   
+						
+		<p class="font-size-sm has-line-height-reset color-text-subtle margin-top-xxs line-clamp-3">
+			This reference is for experienced Office users who want to learn about VBA and who want some insight into how programming can help them to customize Office.
+		</p>
+	
+					</li>
+				<!---->
+					<li class="padding-none margin-top-sm margin-bottom-none position-relative expandable">
+						  
+				<p class="line-clamp-3">
+					<a class="display-block inner-focus font-weight-semibold font-size-sm has-line-height-reset stretched-link" href="https://learn.microsoft.com/en-us/office/vba/library-reference/concepts/getting-help-on-macintosh-keywords-office?source=recommendations" data-bi-name="right-rail-recommendation-item-4">
+						Get Help on Macintosh keywords (Office)
+					</a>
+				</p>
+		   
+						
+		<p class="font-size-sm has-line-height-reset color-text-subtle margin-top-xxs line-clamp-3">
+			How to get Help on Office on Macintosh keywords
+		</p>
+	
+					</li>
+				<!---->
+					<li class="padding-none margin-top-sm margin-bottom-none position-relative expandable">
+						  
+				<p class="line-clamp-3">
+					<a class="display-block inner-focus font-weight-semibold font-size-sm has-line-height-reset stretched-link" href="https://learn.microsoft.com/en-us/office/vba/api/overview/library-reference?source=recommendations" data-bi-name="right-rail-recommendation-item-5">
+						Library reference for Visual Basic for Applications (VBA)
+					</a>
+				</p>
+		   
+						
+		<p class="font-size-sm has-line-height-reset color-text-subtle margin-top-xxs line-clamp-3">
+			Conceptual overviews, programming tasks, samples, and references to guide you in developing solutions based on Office.
+		</p>
+	
+					</li>
+				<!---->
+					<li class="padding-none margin-top-sm margin-bottom-none position-relative expandable">
+						  
+				<p class="line-clamp-3">
+					<a class="display-block inner-focus font-weight-semibold font-size-sm has-line-height-reset stretched-link" href="https://learn.microsoft.com/en-us/office/vba/api/overview/excel/object-model?source=recommendations" data-bi-name="right-rail-recommendation-item-6">
+						Excel object model for Visual Basic for Applications (VBA)
+					</a>
+				</p>
+		   
+						
+		<p class="font-size-sm has-line-height-reset color-text-subtle margin-top-xxs line-clamp-3">
+			This section of the Excel VBA Reference contains documentation for all the objects, properties, methods, and events contained in the Excel object model.
+		</p>
+	
+					</li>
+				<!---->
+					<li class="padding-none margin-top-sm margin-bottom-none position-relative expandable">
+						  
+				<p class="line-clamp-3">
+					<a class="display-block inner-focus font-weight-semibold font-size-sm has-line-height-reset stretched-link" href="https://learn.microsoft.com/en-us/office/vba/library-reference/concepts/what-s-new-for-vba-in-office-2016?source=recommendations" data-bi-name="right-rail-recommendation-item-7">
+						What's new for VBA in Office 2016
+					</a>
+				</p>
+		   
+						
+		<p class="font-size-sm has-line-height-reset color-text-subtle margin-top-xxs line-clamp-3">
+			Office VBA reference topic
+		</p>
+	
+					</li>
+				<!---->
+		</ul>
+	
+			</div>
+			<!---->
+				
+		<button type="button" aria-expanded="false" data-show-more="" class="link-button font-weight-semibold font-size-sm margin-top-sm" aria-controls="right-rail-recommendations-list-0" data-title="Show 5 more" data-bi-name="show-more-btn">
+			<span class="show-more-text "><!---->Show 5 more<!----></span>
+			
+		</button>
+	
+		  <!---->
+		</article>
+	<!----></section>
+	 
+		<section id="right-rail-training-mobile" class="" data-bi-name="learning-resource-card"><!---->
+		
+		<article class="margin-top-md margin-top-sm-desktop">
+			
+		<p class="font-weight-semibold font-size-md display-flex align-items-center">
+			<span class="icon margin-right-xxs" aria-hidden="true">
+				<span class="docon docon-cube-cone-ball-shapes"></span>
+			</span>
+			Training
+		</p>
+	
+			<div class="margin-top-xs position-relative">
+				<!---->
+		<div class="position-relative margin-top-xs">
+			 
+				<p class="has-line-height-reset color-text-subtle font-size-xs font-weight-semibold">
+					Learning path
+				</p>
+		   
+				<p class="line-clamp-3">
+					<a class="display-block inner-focus font-weight-semibold font-size-sm has-line-height-reset stretched-link" href="https://learn.microsoft.com/en-us/training/paths/use-advance-techniques-canvas-apps-custom-updates-optimization/?source=recommendations">
+						Use advance techniques in canvas apps to perform custom updates and optimization - Training
+					</a>
+				</p>
+		   
+			
+		<p class="font-size-sm has-line-height-reset color-text-subtle margin-top-xxs line-clamp-3">
+			Use advance techniques in canvas apps to perform custom updates and optimization
+		</p>
+	
+		</div>
+	<!---->
+		<div class="position-relative margin-top-sm">
+			 
+				<p class="has-line-height-reset color-text-subtle font-size-xs font-weight-semibold">
+					Certification
+				</p>
+		   
+				<p class="line-clamp-3">
+					<a class="display-block inner-focus font-weight-semibold font-size-sm has-line-height-reset stretched-link" href="https://learn.microsoft.com/en-us/credentials/certifications/mos-outlook-2016/?source=recommendations">
+						Microsoft Office Specialist: Outlook (Office 2016) - Certifications
+					</a>
+				</p>
+		   
+			
+		<p class="font-size-sm has-line-height-reset color-text-subtle margin-top-xxs line-clamp-3">
+			Demonstrate that you have the skills needed to get the most out of Outlook 2016 by earning a Microsoft Office Specialist (MOS) certification.
+		</p>
+	
+		</div>
+	<!---->
+			</div>
+			
+		</article>
+	<!----></section>
+	 
+		<section id="right-rail-events-mobile" class="" data-bi-name="events-card" hidden=""></section>
+	 
+		<section id="right-rail-qna-mobile" class="margin-top-xxs" data-bi-name="qna-link-card" hidden=""></section>
+	
+		</div>
+	
+			</div>
+			
+		<div id="action-panel" role="region" aria-label="Action Panel" class="action-panel" tabindex="-1"></div>
+	
+		
+				</main>
+				<aside id="layout-body-aside" class="layout-body-aside " data-bi-name="aside">
+					
+		<div id="ms--additional-resources" class="right-container padding-sm display-none display-block-desktop height-full" data-bi-name="pageactions" role="complementary" aria-label="Additional resources">
+			<div id="affixed-right-container" data-bi-name="right-column" class="position-sticky" style="top: 24px; max-height: 17847.5px; height: calc(-48px + 100vh);">
+				
+		<nav id="side-doc-outline" class="doc-outline border-bottom padding-bottom-xs margin-bottom-xs" data-bi-name="intopic toc" aria-label="In this article" style="overflow: auto; max-height: calc(100% - 81.1016px);"><!---->
+			<h2 class="title is-6 margin-top-xxs margin-bottom-xs">
+				In this article
+			</h2>
+			
+		<ol id="right-rail-in-this-article-list" class="padding-right-xxs">
+			<!---->
+					<li class="border-left-md padding-left-xxs border-color-transparent">
+						<a href="https://learn.microsoft.com/en-us/office/vba/library-reference/concepts/getting-started-with-vba-in-office#when-to-use-vba-and-why" class="color-text-subtle" aria-current="false"><!---->When to use VBA and why<!----></a>
+					</li>
+				<!---->
+					<li class="border-left-md padding-left-xxs border-color-transparent">
+						<a href="https://learn.microsoft.com/en-us/office/vba/library-reference/concepts/getting-started-with-vba-in-office#vba-programming-101" class="color-text-subtle" aria-current="false"><!---->VBA Programming 101<!----></a>
+					</li>
+				<!---->
+					<li class="border-left-md padding-left-xxs border-color-primary">
+						<a href="https://learn.microsoft.com/en-us/office/vba/library-reference/concepts/getting-started-with-vba-in-office#macros-and-the-visual-basic-editor" class="font-weight-semibold color-text" aria-current="true"><!---->Macros and the Visual Basic Editor<!----></a>
+					</li>
+				<!---->
+					<li class="border-left-md border-color-transparent padding-left-xxs ">
+						<a href="https://learn.microsoft.com/en-us/office/vba/library-reference/concepts/getting-started-with-vba-in-office#programming-tips-and-tricks" class="color-text-subtle"><!---->Programming tips and tricks<!----></a>
+					</li>
+				<!---->
+					<li class="border-left-md border-color-transparent padding-left-xxs ">
+						<a href="https://learn.microsoft.com/en-us/office/vba/library-reference/concepts/getting-started-with-vba-in-office#going-further-with-programming" class="color-text-subtle"><!---->Going further with programming<!----></a>
+					</li>
+				<!---->
+					<li class="border-left-md border-color-transparent padding-left-xxs ">
+						<a href="https://learn.microsoft.com/en-us/office/vba/library-reference/concepts/getting-started-with-vba-in-office#all-of-my-office-applications-example-code" class="color-text-subtle"><!---->All of my Office applications: example code<!----></a>
+					</li>
+				<!---->
+		</ol>
+	
+		<!----></nav>
+	
+				<!-- Feedback -->
+				
+		<section id="ms--site-user-feedback-right-rail" class="font-size-sm display-none-print" data-test-id="site-user-feedback-right-rail" data-bi-name="site-feedback-right-rail">
+			<div data-feedback-experiment="disabled">
+				<p class="font-weight-semibold margin-bottom-xs">Was this page helpful?</p>
+				<div class="buttons">
+					<button class="thumb-rating-button like button button-primary button-sm" data-test-id="right-rail-rating-yes" data-binary-rating-response="rating-yes" type="button" title="This article is helpful" data-bi-name="button-rating-yes" aria-pressed="false">
+						<span class="icon" aria-hidden="true">
+							<span class="docon docon-like"></span>
+						</span>
+						<span>Yes</span>
+					</button>
+					<button class="thumb-rating-button dislike button button-primary button-sm" id="right-rail-no-button" data-test-id="right-rail-rating-no" data-binary-rating-response="rating-no" type="button" title="This article is not helpful" data-bi-name="button-rating-no" aria-pressed="false">
+						<span class="icon" aria-hidden="true">
+							<span class="docon docon-dislike"></span>
+						</span>
+						<span>No</span>
+					</button>
+					<details class="popover" id="help-popover" data-test-id="feedback-popover" hidden="">
+						<summary tabindex="0" class="thumb-rating-button dislike button button-primary button-sm" data-test-id="details-right-rail-rating-no" data-binary-rating-response="rating-no" title="This article is not helpful" data-bi-name="button-rating-no" aria-pressed="false" data-bi-an="feedback-unhelpful-popover">
+							<span class="icon" aria-hidden="true">
+								<span class="docon docon-dislike"></span>
+							</span>
+							<span>No</span>
+						</summary>
+						<div class="popover-content width-200 width-300-tablet" role="dialog" aria-labelledby="popover-heading" aria-describedby="popover-description">
+							<p id="popover-heading-right-rail" class="font-size-lg margin-bottom-xxs font-weight-semibold">
+								Need help with this topic?
+							</p>
+							<p id="popover-description-right-rail" class="font-size-sm margin-bottom-xs">
+								Want to try using Ask Learn to clarify or guide you through this topic?
+							</p>
+							
+		<div class="buttons flex-direction-row flex-wrap justify-content-center gap-xxs">
+			<div>
+				
+		<button class="button button-sm border inner-focus display-none margin-right-xxs" data-bi-name="ask-learn-assistant-entry-troubleshoot" data-test-id="ask-learn-assistant-modal-entry-mobile-feedback" data-ask-learn-modal-entry-feedback="" data-bi-an="feedback-unhelpful-popover" type="button" style="min-width: max-content;" aria-expanded="false" aria-label="Ask Learn" hidden="">
+			<span class="icon font-size-lg" aria-hidden="true">
+				<span class="docon docon-chat-sparkle-fill gradient-ask-learn-logo"></span>
+			</span>
+		</button>
+		<button class="button button-sm display-inline-flex display-none-desktop flex-shrink-0 margin-right-xxs border-color-ask-learn margin-right-xxs" data-bi-name="ask-learn-assistant-entry-troubleshoot" data-bi-an="feedback-unhelpful-popover" data-test-id="ask-learn-assistant-modal-entry-tablet-feedback" data-ask-learn-modal-entry-feedback="" type="button" style="min-width: max-content;" aria-expanded="false" hidden="">
+			<span class="icon font-size-lg" aria-hidden="true">
+				<span class="docon docon-chat-sparkle-fill gradient-ask-learn-logo"></span>
+			</span>
+			<span>Ask Learn</span>
+		</button>
+		<button class="button button-sm display-none flex-shrink-0 display-inline-flex-desktop margin-right-xxs border-color-ask-learn margin-right-xxs" data-bi-name="ask-learn-assistant-entry-troubleshoot" data-bi-an="feedback-unhelpful-popover" data-test-id="ask-learn-assistant-flyout-entry-feedback" data-ask-learn-flyout-entry-show-only="" data-flyout-button="toggle" type="button" style="min-width: max-content;" aria-expanded="false" aria-controls="ask-learn-flyout" hidden="">
+			<span class="icon font-size-lg" aria-hidden="true">
+				<span class="docon docon-chat-sparkle-fill gradient-ask-learn-logo"></span>
+			</span>
+			<span>Ask Learn</span>
+		</button>
+	
+			</div>
+			<button type="button" class="button button-sm margin-right-xxs" data-help-option="suggest-fix" data-bi-name="feedback-suggest" data-bi-an="feedback-unhelpful-popover" data-test-id="suggest-fix">
+				<span class="icon" aria-hidden="true">
+					<span class="docon docon-feedback"></span>
+				</span>
+				<span> Suggest a fix? </span>
+			</button>
+		</div>
+	
+						</div>
+					</details>
+				</div>
+			</div>
+			<div class="display-flex flex-wrap-wrap align-items-center" data-feedback-experiment="enabled" hidden="">
+				<p class="font-weight-semibold margin-xxs margin-left-none">
+					Was this page helpful?
+				</p>
+				<div class="buttons margin-bottom-none">
+					<button class="thumb-rating-button like button button-primary button-clear button-sm margin-none" data-test-id="right-rail-rating-yes-experiment" data-binary-rating-response="rating-yes" type="button" title="This article is helpful" aria-label="This article is helpful" data-bi-name="button-rating-yes" aria-pressed="false">
+						<span class="icon" aria-hidden="true">
+							<span class="docon docon-like"></span>
+						</span>
+					</button>
+					<button class="thumb-rating-button dislike button button-primary button-clear button-sm margin-none" id="right-rail-no-button-experiment" data-test-id="right-rail-rating-no-experiment" data-binary-rating-response="rating-no" type="button" title="This article is not helpful" aria-label="This article is not helpful" data-bi-name="button-rating-no" aria-pressed="false">
+						<span class="icon" aria-hidden="true">
+							<span class="docon docon-dislike"></span>
+						</span>
+					</button>
+					<details class="popover" id="help-popover-experiment" data-test-id="feedback-popover-experiment" hidden="">
+						<summary tabindex="0" class="thumb-rating-button dislike button button-primary button-clear button-sm margin-none" data-test-id="details-right-rail-rating-no-experiment" data-binary-rating-response="rating-no" title="This article is not helpful" aria-label="This article is not helpful" data-bi-name="button-rating-no" aria-pressed="false" data-bi-an="feedback-unhelpful-popover">
+							<span class="icon" aria-hidden="true">
+								<span class="docon docon-dislike"></span>
+							</span>
+						</summary>
+						<div class="popover-content width-200 width-300-tablet" role="dialog" aria-labelledby="popover-heading-right-rail-experiment" aria-describedby="popover-description-right-rail-experiment">
+							<p id="popover-heading-right-rail-experiment" class="font-size-lg margin-bottom-xxs font-weight-semibold">
+								Need help with this topic?
+							</p>
+							<p id="popover-description-right-rail-experiment" class="font-size-sm margin-bottom-xs">
+								Want to try using Ask Learn to clarify or guide you through this topic?
+							</p>
+							
+		<div class="buttons flex-direction-row flex-wrap justify-content-center gap-xxs">
+			<div>
+				
+		<button class="button button-sm border inner-focus display-none margin-right-xxs" data-bi-name="ask-learn-assistant-entry-troubleshoot" data-test-id="ask-learn-assistant-modal-entry-mobile-feedback-experiment" data-ask-learn-modal-entry-feedback="" data-bi-an="feedback-unhelpful-popover" type="button" style="min-width: max-content;" aria-expanded="false" aria-label="Ask Learn" hidden="">
+			<span class="icon font-size-lg" aria-hidden="true">
+				<span class="docon docon-chat-sparkle-fill gradient-ask-learn-logo"></span>
+			</span>
+		</button>
+		<button class="button button-sm display-inline-flex display-none-desktop flex-shrink-0 margin-right-xxs border-color-ask-learn margin-right-xxs" data-bi-name="ask-learn-assistant-entry-troubleshoot" data-bi-an="feedback-unhelpful-popover" data-test-id="ask-learn-assistant-modal-entry-tablet-feedback-experiment" data-ask-learn-modal-entry-feedback="" type="button" style="min-width: max-content;" aria-expanded="false" hidden="">
+			<span class="icon font-size-lg" aria-hidden="true">
+				<span class="docon docon-chat-sparkle-fill gradient-ask-learn-logo"></span>
+			</span>
+			<span>Ask Learn</span>
+		</button>
+		<button class="button button-sm display-none flex-shrink-0 display-inline-flex-desktop margin-right-xxs border-color-ask-learn margin-right-xxs" data-bi-name="ask-learn-assistant-entry-troubleshoot" data-bi-an="feedback-unhelpful-popover" data-test-id="ask-learn-assistant-flyout-entry-feedback-experiment" data-ask-learn-flyout-entry-show-only="" data-flyout-button="toggle" type="button" style="min-width: max-content;" aria-expanded="false" aria-controls="ask-learn-flyout" hidden="">
+			<span class="icon font-size-lg" aria-hidden="true">
+				<span class="docon docon-chat-sparkle-fill gradient-ask-learn-logo"></span>
+			</span>
+			<span>Ask Learn</span>
+		</button>
+	
+			</div>
+			<button type="button" class="button button-sm margin-right-xxs" data-help-option="suggest-fix-experiment" data-bi-name="feedback-suggest" data-bi-an="feedback-unhelpful-popover" data-test-id="suggest-fix">
+				<span class="icon" aria-hidden="true">
+					<span class="docon docon-feedback"></span>
+				</span>
+				<span> Suggest a fix? </span>
+			</button>
+		</div>
+	
+						</div>
+					</details>
+				</div>
+			</div>
+		</section>
+	
+			</div>
+		</div>
+	
+			  </aside> <section id="layout-body-flyout" class="layout-body-flyout " data-bi-name="flyout">
+					 <div class="height-full border-left background-color-body-medium" id="ask-learn-flyout"><!---->
+		<article class="chat-container  position-sticky top-0 " data-chat-container-name="ask-learn-flyout" data-test-id="chat-login-ask-learn-flyout">
+			<div class="chat-container-header">
+				<header class="display-flex justify-content-center align-items-center padding-xs">
+					<h2 class="font-size-md padding-right-xxs"><!---->
+		<div class="font-weight-semibold">
+			<span class="icon" aria-hidden="true">
+				<span class="docon docon-chat-sparkle-fill gradient-ask-learn-logo"></span>
+			</span>
+			<span><!---->Ask Learn<!----></span>
+		</div>
+	<!----></h2>
+					<span class="badge badge-filled badge-sm"><!---->Preview<!----></span>
+
+					<div class="margin-left-auto display-flex flex-wrap-no-wrap align-items-stretch">
+						
+		<button type="button" class="button button-clear inner-focus modal-close" data-flyout-button="close" data-autofocus="" data-bi-an="ask-learn-assistant" data-bi-name="close-chat" aria-label="Close">
+			<span class="icon" aria-hidden="true">
+				<span class="docon docon-navigate-close"></span>
+			</span>
+		</button>
+	
+					</div>
+				</header>
+			</div>
+			<div class="text-align-center padding-top-xl padding-inline-md">
+				<p class="margin-bottom-lg"><!---->Ask Learn is an AI assistant that can answer questions, clarify concepts, and define terms using trusted Microsoft documentation.<!----></p>
+				<p class="margin-bottom-lg"><!---->Please sign in to use Ask Learn.<!----></p>
+				<a href="https://learn.microsoft.com/en-us/office/vba/library-reference/concepts/getting-started-with-vba-in-office#" class="docs-sign-in button button-primary button-filled button-sm">
+					Sign in
+				</a>
+			</div>
+		</article>
+	<!----></div>
+			  </section> <div class="layout-body-footer " data-bi-name="layout-footer">
+		<footer id="footer" data-test-id="footer" data-bi-name="footer" class="footer-layout has-padding has-default-focus border-top  uhf-container" role="contentinfo">
+			<div class="display-flex gap-xs flex-wrap-wrap is-full-height padding-right-lg-desktop">
+				
+		<a data-mscc-ic="false" href="https://learn.microsoft.com/en-us/locale?target=https%3A%2F%2Flearn.microsoft.com%2Fen-us%2Foffice%2Fvba%2Flibrary-reference%2Fconcepts%2Fgetting-started-with-vba-in-office" data-bi-name="select-locale" class="locale-selector-link flex-shrink-0 button button-sm button-clear external-link-indicator" id="" title="" aria-label="Content language selector. Currently set to English (United States)."><span class="icon" aria-hidden="true"><span class="docon docon-world"></span></span><span class="local-selector-link-text">English (United States)</span></a>
+	
+				<div class="ccpa-privacy-link" data-ccpa-privacy-link="">
+		
+		<a data-mscc-ic="false" href="https://aka.ms/yourcaliforniaprivacychoices" data-bi-name="your-privacy-choices" class="button button-sm button-clear flex-shrink-0 external-link-indicator" id="" title="">
+		<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 30 14" xml:space="preserve" height="16" width="43" aria-hidden="true" focusable="false">
+			<path d="M7.4 12.8h6.8l3.1-11.6H7.4C4.2 1.2 1.6 3.8 1.6 7s2.6 5.8 5.8 5.8z" style="fill-rule:evenodd;clip-rule:evenodd;fill:#fff"></path>
+			<path d="M22.6 0H7.4c-3.9 0-7 3.1-7 7s3.1 7 7 7h15.2c3.9 0 7-3.1 7-7s-3.2-7-7-7zm-21 7c0-3.2 2.6-5.8 5.8-5.8h9.9l-3.1 11.6H7.4c-3.2 0-5.8-2.6-5.8-5.8z" style="fill-rule:evenodd;clip-rule:evenodd;fill:#06f"></path>
+			<path d="M24.6 4c.2.2.2.6 0 .8L22.5 7l2.2 2.2c.2.2.2.6 0 .8-.2.2-.6.2-.8 0l-2.2-2.2-2.2 2.2c-.2.2-.6.2-.8 0-.2-.2-.2-.6 0-.8L20.8 7l-2.2-2.2c-.2-.2-.2-.6 0-.8.2-.2.6-.2.8 0l2.2 2.2L23.8 4c.2-.2.6-.2.8 0z" style="fill:#fff"></path>
+			<path d="M12.7 4.1c.2.2.3.6.1.8L8.6 9.8c-.1.1-.2.2-.3.2-.2.1-.5.1-.7-.1L5.4 7.7c-.2-.2-.2-.6 0-.8.2-.2.6-.2.8 0L8 8.6l3.8-4.5c.2-.2.6-.2.9 0z" style="fill:#06f"></path>
+		</svg>
+	
+			<span>Your Privacy Choices</span></a>
+	
+	</div>
+				<div class="flex-shrink-0">
+		<div class="dropdown has-caret-up">
+			<button data-test-id="theme-selector-button" class="dropdown-trigger button button-clear button-sm has-inner-focus theme-dropdown-trigger" aria-controls="{{ themeMenuId }}" aria-expanded="false" title="Theme" data-bi-name="theme">
+				<span class="icon">
+					<span class="docon docon-sun" aria-hidden="true"></span>
+				</span>
+				<span>Theme</span>
+				<span class="icon expanded-indicator" aria-hidden="true">
+					<span class="docon docon-chevron-down-light"></span>
+				</span>
+			</button>
+			<div class="dropdown-menu" id="{{ themeMenuId }}" role="menu">
+				<ul class="theme-selector padding-xxs" data-test-id="theme-dropdown-menu">
+					<li class="theme display-block">
+						<button class="button button-clear button-sm theme-control button-block justify-content-flex-start text-align-left" data-theme-to="light" aria-pressed="false">
+							<span class="theme-light margin-right-xxs">
+								<span class="theme-selector-icon border display-inline-block has-body-background" aria-hidden="true">
+									<svg class="svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 22 14">
+										<rect width="22" height="14" class="has-fill-body-background"></rect>
+										<rect x="5" y="5" width="12" height="4" class="has-fill-secondary"></rect>
+										<rect x="5" y="2" width="2" height="1" class="has-fill-secondary"></rect>
+										<rect x="8" y="2" width="2" height="1" class="has-fill-secondary"></rect>
+										<rect x="11" y="2" width="3" height="1" class="has-fill-secondary"></rect>
+										<rect x="1" y="1" width="2" height="2" class="has-fill-secondary"></rect>
+										<rect x="5" y="10" width="7" height="2" rx="0.3" class="has-fill-primary"></rect>
+										<rect x="19" y="1" width="2" height="2" rx="1" class="has-fill-secondary"></rect>
+									</svg>
+								</span>
+							</span>
+							<span role="menuitem"> Light </span>
+						</button>
+					</li>
+					<li class="theme display-block">
+						<button class="button button-clear button-sm theme-control button-block justify-content-flex-start text-align-left is-selected" data-theme-to="dark" aria-pressed="true">
+							<span class="theme-dark margin-right-xxs">
+								<span class="border theme-selector-icon display-inline-block has-body-background" aria-hidden="true">
+									<svg class="svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 22 14">
+										<rect width="22" height="14" class="has-fill-body-background"></rect>
+										<rect x="5" y="5" width="12" height="4" class="has-fill-secondary"></rect>
+										<rect x="5" y="2" width="2" height="1" class="has-fill-secondary"></rect>
+										<rect x="8" y="2" width="2" height="1" class="has-fill-secondary"></rect>
+										<rect x="11" y="2" width="3" height="1" class="has-fill-secondary"></rect>
+										<rect x="1" y="1" width="2" height="2" class="has-fill-secondary"></rect>
+										<rect x="5" y="10" width="7" height="2" rx="0.3" class="has-fill-primary"></rect>
+										<rect x="19" y="1" width="2" height="2" rx="1" class="has-fill-secondary"></rect>
+									</svg>
+								</span>
+							</span>
+							<span role="menuitem"> Dark </span>
+						</button>
+					</li>
+					<li class="theme display-block">
+						<button class="button button-clear button-sm theme-control button-block justify-content-flex-start text-align-left" data-theme-to="high-contrast" aria-pressed="false">
+							<span class="theme-high-contrast margin-right-xxs">
+								<span class="border theme-selector-icon display-inline-block has-body-background" aria-hidden="true">
+									<svg class="svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 22 14">
+										<rect width="22" height="14" class="has-fill-body-background"></rect>
+										<rect x="5" y="5" width="12" height="4" class="has-fill-secondary"></rect>
+										<rect x="5" y="2" width="2" height="1" class="has-fill-secondary"></rect>
+										<rect x="8" y="2" width="2" height="1" class="has-fill-secondary"></rect>
+										<rect x="11" y="2" width="3" height="1" class="has-fill-secondary"></rect>
+										<rect x="1" y="1" width="2" height="2" class="has-fill-secondary"></rect>
+										<rect x="5" y="10" width="7" height="2" rx="0.3" class="has-fill-primary"></rect>
+										<rect x="19" y="1" width="2" height="2" rx="1" class="has-fill-secondary"></rect>
+									</svg>
+								</span>
+							</span>
+							<span role="menuitem"> High contrast </span>
+						</button>
+					</li>
+				</ul>
+			</div>
+		</div>
+	</div>
+			</div>
+			<ul class="links" data-bi-name="footerlinks">
+				<li class="manage-cookies-holder" hidden=""></li>
+				<li>
+		
+		<a data-mscc-ic="false" href="https://learn.microsoft.com/en-us/principles-for-ai-generated-content" data-bi-name="aiDisclaimer" class=" external-link-indicator" id="" title="">AI Disclaimer</a>
+	
+	</li><li>
+		
+		<a data-mscc-ic="false" href="https://learn.microsoft.com/en-us/previous-versions/" data-bi-name="archivelink" class=" external-link-indicator" id="" title="">Previous Versions</a>
+	
+	</li> <li>
+		
+		<a data-mscc-ic="false" href="https://techcommunity.microsoft.com/t5/microsoft-learn-blog/bg-p/MicrosoftLearnBlog" data-bi-name="bloglink" class=" external-link-indicator" id="" title="">Blog</a>
+	
+	</li> <li>
+		
+		<a data-mscc-ic="false" href="https://learn.microsoft.com/en-us/contribute" data-bi-name="contributorGuide" class=" external-link-indicator" id="" title="">Contribute</a>
+	
+	</li><li>
+		
+		<a data-mscc-ic="false" href="https://go.microsoft.com/fwlink/?LinkId=521839" data-bi-name="privacy" class=" external-link-indicator" id="" title="">Privacy</a>
+	
+	</li><li>
+		
+		<a data-mscc-ic="false" href="https://learn.microsoft.com/en-us/legal/termsofuse" data-bi-name="termsofuse" class=" external-link-indicator" id="" title="">Terms of Use</a>
+	
+	</li><li>
+		
+		<a data-mscc-ic="false" href="https://www.microsoft.com/legal/intellectualproperty/Trademarks/" data-bi-name="trademarks" class=" external-link-indicator" id="" title="">Trademarks</a>
+	
+	</li>
+				<li>© Microsoft 2025</li>
+			</ul>
+		</footer>
+	
+			
+		</div><script src="./Getting started with VBA in Office _ Microsoft Learn_files/at.js.下载" async="" defer="" integrity="sha384-1/viVM50hgc33O2gOgkWz3EjiD/Fy/ld1dKYXJRUyjNYVEjSUGcSN+iPiQF7e4cu" crossorigin="anonymous"></script></body></html>

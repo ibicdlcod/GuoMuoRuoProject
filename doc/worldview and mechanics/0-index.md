@@ -19,17 +19,17 @@
 * Ships
 
   * [Attributes](4.2-attributes.md)[See above]
-  * [Capital-ness and fleet type](5.1-capitalness.md)[NOTYETIMPLEMENTED]
+  * [Capital-ness and fleet type](5.1-capitalness.md)
   * [Home port and initial ship](5.2-homeport.md)[NOTYETIMPLEMENTED]
   * [Ship blueprint](5.3-blueprint.md)[NOTYETIMPLEMENTED]
   * [Construction](5.4-construction.md)[NOTYETIMPLEMENTED]
-  * [Equip slots](5.5-equipslots.md) (including extra)[NOTYETIMPLEMENTED]
+  * [Equip slots](5.5-equipslots.md) (including extra)
   * [Visible bonuses](5.6-visiblebonus.md)[NOTYETIMPLEMENTED]
   * [Experience and modernization](5.7-experience.md) [NOTYETIMPLEMENTED]
   * [Remodel](5.8-remodel.md) [NOTYETIMPLEMENTED]
-  * Cloning Vats
-  * Labor condition
-  * Enemies (Amnesiac Fleet)
+  * [Cloning Vats (DLC)](5.9-cloning vats.md) [NOTYETIMPLEMENTED]
+  * [Labor condition](5.10-labor.md) [PARTIAL]
+  * Enemies (Amnesiac Fleet)[NOTYETIMPLEMENTED]
 * Sortie Map
 
   * Normal map and map relations
