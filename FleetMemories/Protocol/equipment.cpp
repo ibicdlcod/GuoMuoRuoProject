@@ -15,7 +15,7 @@ Equipment::Equipment(int equipId)
     if(equipId == 0) {
         return;
     }
-    QStringList supportedLangs = {"ja_JP", "zh_CN", "en_US"};
+    QStringList supportedLangs = KP::supportedLangs;
 
     for(auto &lang: supportedLangs) {
         QSqlQuery query;

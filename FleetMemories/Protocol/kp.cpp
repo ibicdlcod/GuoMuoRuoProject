@@ -397,6 +397,22 @@ QByteArray KP::serverLogout(KP::LogoutType reason) {
     return QCborValue::fromJsonValue(result).toCbor();
 }
 
+QByteArray KP::serverMapInfo(const QJsonArray &input, bool user,
+                             QDateTime timeUtc, bool cacheHit) {
+    QJsonObject result;
+    result["type"] = DgramType::Info;
+    if(user)
+        result["infotype"] = InfoType::MapInfoUser;
+    else {
+        result["infotype"] = InfoType::MapInfo;
+        result["timestamp"] = timeUtc.toString();
+    }
+    if(!cacheHit) {
+        result["content"] = input;
+    }
+    return QCborValue::fromJsonValue(result).toCbor();
+}
+
 QByteArray KP::serverNewEquip(QUuid serial, int equipDid) {
     QJsonObject result;
     result["type"] = DgramType::Message;

@@ -59,6 +59,7 @@ static constexpr qint64 secsinMin = 60;
 static constexpr int equipIdMax = 0x10000;
 #pragma message(NOT_M_CONST)
 const int steamAppId = 2632870; // Go request your own steam appid if modding!
+static const QStringList supportedLangs = {"ja_JP", "zh_CN", "en_US"};
 
 enum DgramType{
     Auth,
@@ -189,7 +190,9 @@ enum InfoType{
     SkillPointInfo,
     ResourceInfo,
     ShipInfo,
-    ShipInfoUser
+    ShipInfoUser,
+    MapInfo,
+    MapInfoUser,
 };
 Q_ENUM_NS(InfoType)
 
@@ -369,6 +372,9 @@ QByteArray serverLackPrivate();
 QByteArray serverLogFail(AuthFailType);
 QByteArray serverLogSuccess(bool);
 QByteArray serverLogout(LogoutType);
+QByteArray serverMapInfo(const QJsonArray &, bool user = false,
+                         QDateTime timeUtc = QDateTime::currentDateTimeUtc(),
+                         bool cacheHit = false);
 QByteArray serverNewEquip(QUuid, int);
 QByteArray serverParseError(MsgType, const QString &,
                             const QString &);

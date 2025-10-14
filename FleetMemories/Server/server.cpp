@@ -910,6 +910,35 @@ void Server::offerEquipInfoUser(const CSteamID &uid,
     }
 }
 
+void Server::offerMapInfo(QSslSocket *connection)
+{
+    QJsonArray mapInfos;
+    for(const auto map: std::as_const(normalMaps)) {
+        QJsonObject mapInfo;
+        mapInfo["id"] = map->id;
+        QJsonObject ename;
+        for(auto lang = map->localNames.keyValueBegin();
+             lang != map->localNames.keyValueEnd();
+             ++lang) {
+            ename[lang->first] = lang->second;
+        }
+        mapInfo["name"] = ename;
+        mapInfo["x"] = map->x;
+        mapInfo["y"] = map->y;
+        mapInfo["diff"] = map->diff;
+        mapInfos.append(mapInfo);
+    }
+    connection->flush();
+    QByteArray msg =
+        KP::serverMapInfo(mapInfos, false,
+                          settings->value("server/mapdbtimestamp",
+                                          QDateTime::currentDateTimeUtc()
+                                          ).toDateTime()
+                          );
+    senderM.sendMessage(connection, msg);
+    connection->flush();
+}
+
 void Server::offerResourceInfo(QSslSocket *connection,
                                const CSteamID &uid) {
     ResOrd ordinary = User::getCurrentResources(uid);
@@ -1881,6 +1910,7 @@ bool Server::importMapFromCSV() {
           && importMapRelationFromCSV())) {
         return false;
     }
+    settings->setValue("server/mapdbtimestamp", QDateTime::currentDateTimeUtc());
     return mapRefresh();
 }
 
@@ -2198,10 +2228,49 @@ bool Server::mapRefresh()
     int idCol = rec.indexOf("MapID");
     while(query.next()) {
         int mapID = query.value(idCol).toInt();
-        if(mapID >= KP::resourceMapIDStart && mapID < KP::resourceMapIDEnd) {
-            resourceMaps.insert(mapID);
+        {
+            QSqlQuery query;
+            query.prepare("SELECT Attribute, Intvalue FROM MapResource "
+                          "WHERE MapID = :id;");
+            query.bindValue(":id", mapID);
+            if(!query.exec()) {
+                qCritical() << query.lastQuery();
+                //% "Load map table failed!"
+                throw DBError(qtTrId("map-refresh-failed"),
+                              query.lastError());
+                return false;
+            }
+            query.isSelect();
+            QSqlRecord rec = query.record();
+            int attrCol = rec.indexOf("Attribute");
+            int valueCol = rec.indexOf("Intvalue");
+            int O,E,S,A,R,W,C;
+            while(query.next()) {
+                if(query.value(attrCol).toString().compare("O", Qt::CaseInsensitive)) {
+                    O = query.value(valueCol).toInt();
+                }
+                if(query.value(attrCol).toString().compare("E", Qt::CaseInsensitive)) {
+                    E = query.value(valueCol).toInt();
+                }
+                if(query.value(attrCol).toString().compare("S", Qt::CaseInsensitive)) {
+                    S = query.value(valueCol).toInt();
+                }
+                if(query.value(attrCol).toString().compare("R", Qt::CaseInsensitive)) {
+                    R = query.value(valueCol).toInt();
+                }
+                if(query.value(attrCol).toString().compare("A", Qt::CaseInsensitive)) {
+                    A = query.value(valueCol).toInt();
+                }
+                if(query.value(attrCol).toString().compare("W", Qt::CaseInsensitive)) {
+                    W = query.value(valueCol).toInt();
+                }
+                if(query.value(attrCol).toString().compare("C", Qt::CaseInsensitive)) {
+                    C = query.value(valueCol).toInt();
+                }
+            }
+            resourceMaps[mapID] = ResOrd(O, E, S, R, A, W, C);
         }
-        else if(mapID < KP::resourceMapIDStart) {
+        if(mapID < KP::resourceMapIDStart) {
             int x = 0;
             int y = 0;
             {
@@ -2230,6 +2299,25 @@ bool Server::mapRefresh()
                 }
             }
             Map m{mapID, x, y};
+            {
+                QStringList supportedLangs = KP::supportedLangs;
+                for(const auto &supportedLang: supportedLangs) {
+                    QSqlQuery query;
+                    query.prepare("SELECT "+supportedLang+" FROM MapNode "
+                                                              "WHERE MapID = :id;");
+                    query.bindValue(":id", mapID);
+                    if(!query.exec()) {
+                        //% "Load map table failed!"
+                        throw DBError(qtTrId("map-refresh-failed"),
+                                      query.lastError());
+                        return false;
+                    }
+                    query.isSelect();
+                    if(query.next()) {
+                        m.localNames[supportedLang] = query.value(0).toString();
+                    }
+                }
+            }
             if(mapID == KP::hiddenMap) {
                 normalMaps.insert(mapID + KP::Historical * KP::mapIDDifficultyMask,
                                   new MapWithDiff(m, KP::Historical));
@@ -3086,9 +3174,9 @@ void Server::receivedReq(const QJsonObject &djson,
                            this,
                            [connection, uid, djson, this]
                            {offerTechInfo(
-                                 connection,
-                                 uid,
-                                 djson["local"].toInt());});
+                  connection,
+                  uid,
+                  djson["local"].toInt());});
     }
     break;
     case KP::CommandType::DemandSkillPoints: {
@@ -3096,9 +3184,9 @@ void Server::receivedReq(const QJsonObject &djson,
                            this,
                            [connection, uid, djson, this]
                            {offerSPInfo(
-                                 connection,
-                                 uid,
-                                 djson["equipid"].toInt());});
+                  connection,
+                  uid,
+                  djson["equipid"].toInt());});
     }
     break;
     case KP::CommandType::DemandResourceUpdate: {
@@ -3106,8 +3194,8 @@ void Server::receivedReq(const QJsonObject &djson,
                            this,
                            [connection, uid, this]
                            {offerResourceInfo(
-                                 connection,
-                                 uid);});
+                  connection,
+                  uid);});
     }
     break;
     case KP::CommandType::DestructEquip: {
@@ -3167,11 +3255,14 @@ void Server::sendTestMessages() {
         /*
         for(auto ship: std::as_const(shipRegistry)) {
             qInfo() << ship->customFlags;
-        }*/
+        }
         for(auto equip: std::as_const(equipRegistry)) {
             if(equip->type.isCarrierPlane()) {
                 qInfo() << equip->localNames["ja_JP"];
             }
+        }*/
+        for(auto connectedPeer: connectedPeers) {
+            offerMapInfo(connectedPeer);
         }
     }
 }

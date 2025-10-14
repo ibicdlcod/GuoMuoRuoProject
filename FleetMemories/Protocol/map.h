@@ -10,6 +10,8 @@ class Map
 public:
     Map(int id, int x, int y);
 
+    QString toString(QString lang);
+
     int id;
     QHash<QString, QString> localNames;
     int x;

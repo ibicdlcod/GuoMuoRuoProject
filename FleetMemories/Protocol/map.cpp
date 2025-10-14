@@ -5,3 +5,8 @@ Map::Map(int id, int x, int y)
 {
 
 }
+
+QString Map::toString(QString lang)
+{
+    return localNames[lang].isEmpty() ? localNames["en_US"] : localNames[lang];
+}

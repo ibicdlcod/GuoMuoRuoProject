@@ -9,6 +9,7 @@ typedef QMap<KP::ResourceType, int> ResTuple;
 /* 3-Resources.md */
 struct ResOrd
 {
+    ResOrd() = default;
     ResOrd(ResTuple);
     ResOrd(int, int, int, int, int, int, int);
 

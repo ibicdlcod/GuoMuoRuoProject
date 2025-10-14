@@ -95,6 +95,7 @@ private slots:
     double getSkillPointsEffect(const CSteamID &, int);
     void offerEquipInfo(QSslSocket *, int);
     void offerEquipInfoUser(const CSteamID &, QSslSocket *);
+    void offerMapInfo(QSslSocket *);
     void offerTechInfo(QSslSocket *, const CSteamID &, int jobID = 0);
     void offerTechInfoComponents(QSslSocket *, const QList<TechEntry> &,
                                    bool, bool);
@@ -184,7 +185,7 @@ private:
     QMultiMap<int, int> shipRemodelGroup;
 
     QMap<int, MapWithDiff *> normalMaps;
-    QSet<int> resourceMaps;
+    QMap<int, ResOrd> resourceMaps;
 
     std::random_device random;
     std::mt19937 mt;
