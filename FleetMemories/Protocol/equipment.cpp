@@ -199,8 +199,9 @@ int Equipment::skillPointsStd() const {
 
 bool Equipment::canEquip(Ship *ship) const
 {
+    int shipID = ship->getId();
     if(type.isLb()) {
-        return Utility::checkMask(ship->getId(), 0x000f0000, 0x000C0000);
+        return Utility::checkMask(shipID, 0x000f0000, 0x000C0000);
     }
     switch(type.getSpecial())
     {
@@ -209,11 +210,11 @@ bool Equipment::canEquip(Ship *ship) const
         if(type.isRadar()) {
             switch(type.getSize()) {
             case 7:
-                return Utility::checkMask(ship->getId(), 0x000f0000, 0x00070000);
+                return Utility::checkMask(shipID, 0x000f0000, 0x00070000);
             case 1:
-                if(Utility::checkMask(ship->getId(), 0x00ff0fff, 0x001A0301))
+                if(Utility::checkMask(shipID, 0x00ff0fff, 0x001A0301))
                     return false;
-                return !Utility::checkMask(ship->getId(), 0x000f0000, 0x00070000);
+                return !Utility::checkMask(shipID, 0x000f0000, 0x00070000);
             case 2:
             {
                 if(ship->customFlags.contains("bigradar")) {
@@ -222,24 +223,24 @@ bool Equipment::canEquip(Ship *ship) const
                     if(ship->customFlags["bigradar"] == -1)
                         return false;
                 }
-                if(Utility::checkMask(ship->getId(), 0x00ff0000, 0x00220000))
+                if(Utility::checkMask(shipID, 0x00ff0000, 0x00220000))
                     return getId() == 124; // Z-class
-                if(Utility::checkMask(ship->getId(), 0x00ff0f00, 0x00120B00))
+                if(Utility::checkMask(shipID, 0x00ff0f00, 0x00120B00))
                     return true; // 秋月型
-                if(Utility::checkMask(ship->getId(), 0x000f0000, 0x00030000))
+                if(Utility::checkMask(shipID, 0x000f0000, 0x00030000))
                     return true;
-                if(Utility::checkMask(ship->getId(), 0x000f0000, 0x00040000))
+                if(Utility::checkMask(shipID, 0x000f0000, 0x00040000))
                     return true;
-                if(Utility::checkMask(ship->getId(), 0x000f0000, 0x00050000))
+                if(Utility::checkMask(shipID, 0x000f0000, 0x00050000))
                     return true;
-                if(Utility::checkMask(ship->getId(), 0x000f0000, 0x00060000))
+                if(Utility::checkMask(shipID, 0x000f0000, 0x00060000))
                     return true;
-                if(Utility::checkMask(ship->getId(), 0x000f0000, 0x00080000))
+                if(Utility::checkMask(shipID, 0x000f0000, 0x00080000))
                     return true;
                 return false;
             }
             case 3:
-                return Utility::checkMask(ship->getId(), 0x000f0000, 0x00050000);
+                return Utility::checkMask(shipID, 0x000f0000, 0x00050000);
             }
         }
         else if(type.isPatrol()) {
@@ -250,15 +251,15 @@ bool Equipment::canEquip(Ship *ship) const
                     if(ship->customFlags["patrolautogyro"] == -1)
                         return false;
                 }
-                if(Utility::checkMask(ship->getId(), 0x000f4000, 0x00054000))
+                if(Utility::checkMask(shipID, 0x000f4000, 0x00054000))
                     return true;
-                if(Utility::checkMask(ship->getId(), 0x000f4000, 0x00044000))
+                if(Utility::checkMask(shipID, 0x000f4000, 0x00044000))
                     return true;
-                if(Utility::checkMask(ship->getId(), 0x000f4000, 0x00034000))
+                if(Utility::checkMask(shipID, 0x000f4000, 0x00034000))
                     return true;
-                if(Utility::checkMask(ship->getId(), 0x000f0000, 0x000B0000))
+                if(Utility::checkMask(shipID, 0x000f0000, 0x000B0000))
                     return true;
-                if(Utility::checkMask(ship->getId(), 0xffff8000, 0x30158000))
+                if(Utility::checkMask(shipID, 0xffff8000, 0x30158000))
                     return true; // 大和改二、武蔵改二
             }
             if(ship->customFlags.contains("patrolliason")) {
@@ -267,41 +268,41 @@ bool Equipment::canEquip(Ship *ship) const
                 if(ship->customFlags["patrolliason"] == -1)
                     return false;
             }
-            if(Utility::checkMask(ship->getId(), 0x000f2000, 0x00062000))
+            if(Utility::checkMask(shipID, 0x000f2000, 0x00062000))
                 return true; // 加賀改二護、Victorious/改(or anyone similar)
-            if(Utility::checkMask(ship->getId(), 0x000f1000, 0x00061000))
+            if(Utility::checkMask(shipID, 0x000f1000, 0x00061000))
                 return true;
-            if(Utility::checkMask(ship->getId(), 0xffffff00, 0x30154200))
+            if(Utility::checkMask(shipID, 0xffffff00, 0x30154200))
                 return true; // 伊勢型改二
             return false;
         }
         else if(type.isCarrierPlane()) {
-            if(Utility::checkMask(ship->getId(), 0x000f0000, 0x000C0000)) {
+            if(Utility::checkMask(shipID, 0x000f0000, 0x000C0000)) {
                 return true;
             }
             bool result = true;
-            bool canEquipRecon = Utility::checkMask(ship->getId(), 0x000f0000, 0x00060000);
-            if(Utility::checkMask(ship->getId(), 0xffffff00, 0x30154200))
+            bool canEquipRecon = Utility::checkMask(shipID, 0x000f0000, 0x00060000);
+            if(Utility::checkMask(shipID, 0xffffff00, 0x30154200))
                 canEquipRecon = true; // 伊勢型改二
-            if(Utility::checkMask(ship->getId(), 0x00ffff00, 0x00163700))
+            if(Utility::checkMask(shipID, 0x00ffff00, 0x00163700))
                 canEquipRecon = false; // 大鷹型
-            if(Utility::checkMask(ship->getId(), 0xffffff00, 0x30163700))
+            if(Utility::checkMask(shipID, 0xffffff00, 0x30163700))
                 canEquipRecon = true; // 大鷹型改二
-            bool canEquipDiveBomb = Utility::checkMask(ship->getId(), 0x000f0000, 0x00060000);
+            bool canEquipDiveBomb = Utility::checkMask(shipID, 0x000f0000, 0x00060000);
             if(ship->customFlags.contains("divebomber")) {
                 if(ship->customFlags["divebomber"] == 1)
                     canEquipDiveBomb = true;
                 if(ship->customFlags["divebomber"] == -1)
                     canEquipDiveBomb = false;
             }
-            bool canEquipTorpBomb = Utility::checkMask(ship->getId(), 0x000f0000, 0x00060000);
+            bool canEquipTorpBomb = Utility::checkMask(shipID, 0x000f0000, 0x00060000);
             if(ship->customFlags.contains("torpbomber")) {
                 if(ship->customFlags["torpbomber"] == 1)
                     canEquipTorpBomb = true;
                 if(ship->customFlags["torpbomber"] == -1)
                     canEquipTorpBomb = false;
             }
-            bool canEquipFighter = Utility::checkMask(ship->getId(), 0x000f0000, 0x00060000);
+            bool canEquipFighter = Utility::checkMask(shipID, 0x000f0000, 0x00060000);
             if(ship->customFlags.contains("fighter")) {
                 if(ship->customFlags["fighter"] == 1)
                     canEquipFighter = true;
@@ -317,18 +318,18 @@ bool Equipment::canEquip(Ship *ship) const
             return result;
         }
         else if(type.isSeaplane()) {
-            if(Utility::checkMask(ship->getId(), 0x000f0000, 0x000C0000)) {
+            if(Utility::checkMask(shipID, 0x000f0000, 0x000C0000)) {
                 return true;
             }
-            if(type.getSize() == 1 && Utility::checkMask(ship->getId(), 0x000ff000, 0x00074000)) {
+            if(type.getSize() == 1 && Utility::checkMask(shipID, 0x000ff000, 0x00074000)) {
                 return true;
             }
             bool result = true;
             bool canEquipRecon =
-                Utility::checkMask(ship->getId(), 0x000f0000, 0x00030000)
-                || Utility::checkMask(ship->getId(), 0x000f0000, 0x00040000)
-                || Utility::checkMask(ship->getId(), 0x000f0000, 0x00050000)
-                || Utility::checkMask(ship->getId(), 0x000f0000, 0x00080000);
+                Utility::checkMask(shipID, 0x000f0000, 0x00030000)
+                || Utility::checkMask(shipID, 0x000f0000, 0x00040000)
+                || Utility::checkMask(shipID, 0x000f0000, 0x00050000)
+                || Utility::checkMask(shipID, 0x000f0000, 0x00080000);
             if(ship->customFlags.contains("sprecon")) {
                 if(ship->customFlags["sprecon"] == 1)
                     canEquipRecon = true;
@@ -336,11 +337,11 @@ bool Equipment::canEquip(Ship *ship) const
                     canEquipRecon = false;
             }
             bool canEquipDiveBomb =
-                Utility::checkMask(ship->getId(), 0x000f4000, 0x00034000)
-                || Utility::checkMask(ship->getId(), 0x000f4000, 0x00044000)
-                || Utility::checkMask(ship->getId(), 0x000f4000, 0x00054000)
-                || Utility::checkMask(ship->getId(), 0x000f0000, 0x00080000)
-                || Utility::checkMask(ship->getId(), 0x000f0000, 0x00090000);
+                Utility::checkMask(shipID, 0x000f4000, 0x00034000)
+                || Utility::checkMask(shipID, 0x000f4000, 0x00044000)
+                || Utility::checkMask(shipID, 0x000f4000, 0x00054000)
+                || Utility::checkMask(shipID, 0x000f0000, 0x00080000)
+                || Utility::checkMask(shipID, 0x000f0000, 0x00090000);
             if(ship->customFlags.contains("spbomber")) {
                 if(ship->customFlags["spbomber"] == 1)
                     canEquipDiveBomb = true;
@@ -350,10 +351,10 @@ bool Equipment::canEquip(Ship *ship) const
                     canEquipDiveBomb = getId() == 194; // Laté 298B
             }
             bool canEquipFighter =
-                Utility::checkMask(ship->getId(), 0x000f4000, 0x00034000)
-                || Utility::checkMask(ship->getId(), 0x000f4000, 0x00044000)
-                || Utility::checkMask(ship->getId(), 0x000f4000, 0x00054000)
-                || Utility::checkMask(ship->getId(), 0x000f0000, 0x00080000);
+                Utility::checkMask(shipID, 0x000f4000, 0x00034000)
+                || Utility::checkMask(shipID, 0x000f4000, 0x00044000)
+                || Utility::checkMask(shipID, 0x000f4000, 0x00054000)
+                || Utility::checkMask(shipID, 0x000f0000, 0x00080000);
             if(ship->customFlags.contains("spfighter")) {
                 if(ship->customFlags["spfighter"] == 1)
                     canEquipFighter = true;
@@ -369,7 +370,7 @@ bool Equipment::canEquip(Ship *ship) const
         }
         else if(type.isTorp()) {
             if(!type.isSurface()) {
-                return Utility::checkMask(ship->getId(), 0x000f0000, 0x00070000);
+                return Utility::checkMask(shipID, 0x000f0000, 0x00070000);
             }
             else {
                 if(ship->customFlags.contains("torp")) {
@@ -378,31 +379,31 @@ bool Equipment::canEquip(Ship *ship) const
                     if(ship->customFlags["torp"] == -1)
                         return false;
                 }
-                if(Utility::checkMask(ship->getId(), 0x000f0000, 0x00020000))
+                if(Utility::checkMask(shipID, 0x000f0000, 0x00020000))
                     return true;
-                if(Utility::checkMask(ship->getId(), 0x000f0000, 0x00030000))
+                if(Utility::checkMask(shipID, 0x000f0000, 0x00030000))
                     return true;
-                if(Utility::checkMask(ship->getId(), 0x000f0000, 0x00040000))
+                if(Utility::checkMask(shipID, 0x000f0000, 0x00040000))
                     return true;
-                if(Utility::checkMask(ship->getId(), 0x000f0000, 0x00070000))
+                if(Utility::checkMask(shipID, 0x000f0000, 0x00070000))
                     return true;
-                if(Utility::checkMask(ship->getId(), 0x000f1000, 0x00051000))
+                if(Utility::checkMask(shipID, 0x000f1000, 0x00051000))
                     return true;
-                if(Utility::checkMask(ship->getId(), 0x000ff000, 0x00011000))
+                if(Utility::checkMask(shipID, 0x000ff000, 0x00011000))
                     return true;
                 return false;
             }
         }
         else if(type.isSecGun()) {
-            if(type.isFlak() && Utility::checkMask(ship->getId(), 0x000f0000, 0x000C0000)) {
+            if(type.isFlak() && Utility::checkMask(shipID, 0x000f0000, 0x000C0000)) {
                 return true;
             }
             if(type.getSize() == 3) {
-                if(Utility::checkMask(ship->getId(), 0x000f0000, 0x00040000))
+                if(Utility::checkMask(shipID, 0x000f0000, 0x00040000))
                     return true;
-                if(Utility::checkMask(ship->getId(), 0x000f0000, 0x00050000))
+                if(Utility::checkMask(shipID, 0x000f0000, 0x00050000))
                     return true;
-                if(Utility::checkMask(ship->getId(), 0x000f0000, 0x00060000))
+                if(Utility::checkMask(shipID, 0x000f0000, 0x00060000))
                     return true;
                 return false;
             }
@@ -415,21 +416,21 @@ bool Equipment::canEquip(Ship *ship) const
                     if(ship->customFlags["secgun"] == 12)
                         return getId() == 524; //12cm単装高角砲＋25mm機銃増備
                 }
-                if(Utility::checkMask(ship->getId(), 0x000f0000, 0x00030000))
+                if(Utility::checkMask(shipID, 0x000f0000, 0x00030000))
                     return true;
-                if(Utility::checkMask(ship->getId(), 0x000f0000, 0x00040000))
+                if(Utility::checkMask(shipID, 0x000f0000, 0x00040000))
                     return true;
-                if(Utility::checkMask(ship->getId(), 0x000f0000, 0x00050000))
+                if(Utility::checkMask(shipID, 0x000f0000, 0x00050000))
                     return true;
-                if(Utility::checkMask(ship->getId(), 0x000f0000, 0x00060000))
+                if(Utility::checkMask(shipID, 0x000f0000, 0x00060000))
                     return true;
-                if(Utility::checkMask(ship->getId(), 0x000f0000, 0x00080000))
+                if(Utility::checkMask(shipID, 0x000f0000, 0x00080000))
                     return true;
                 return false;
             }
         }
         else if(type.isMainGun()) {
-            if(type.isFlak() && Utility::checkMask(ship->getId(), 0x000f0000, 0x000C0000)) {
+            if(type.isFlak() && Utility::checkMask(shipID, 0x000f0000, 0x000C0000)) {
                 return true;
             }
             switch(type.getSize()) {
@@ -444,51 +445,51 @@ bool Equipment::canEquip(Ship *ship) const
                     if(ship->customFlags["smallgun"] == 382)
                         return getId() == 229 || getId() == 379 || getId() == 382;
                 }
-                if(Utility::checkMask(ship->getId(), 0x000f0000, 0x00010000))
+                if(Utility::checkMask(shipID, 0x000f0000, 0x00010000))
                     return true;
-                if(Utility::checkMask(ship->getId(), 0x000f0000, 0x00020000))
+                if(Utility::checkMask(shipID, 0x000f0000, 0x00020000))
                     return true;
-                if(Utility::checkMask(ship->getId(), 0x000f0000, 0x00030000))
+                if(Utility::checkMask(shipID, 0x000f0000, 0x00030000))
                     return true;
-                if(Utility::checkMask(ship->getId(), 0x000f0000, 0x00080000))
+                if(Utility::checkMask(shipID, 0x000f0000, 0x00080000))
                     return true;
                 return false;
             case 2:
                 if(ship->customFlags.contains("midgun")) {
-                    if(ship->customFlags["midgun"] == 1)
+                    if(ship->customFlags["midgun"] > 0)
                         return true;
-                    if(ship->customFlags["midgun"] == -1)
+                    if(ship->customFlags["midgun"] < 0)
                         return false;
                 }
-                if(Utility::checkMask(ship->getId(), 0x000f0000, 0x00030000))
+                if(Utility::checkMask(shipID, 0x000f0000, 0x00030000))
                     return true;
-                if(Utility::checkMask(ship->getId(), 0x000f0000, 0x00040000))
+                if(Utility::checkMask(shipID, 0x000f0000, 0x00040000))
                     return true;
                 return false;
             case 3:
                 if(ship->customFlags.contains("midgun")) {
-                    if(ship->customFlags["midgun"] == 1)
+                    if(ship->customFlags["midgun"] >= 2)
                         return true;
-                    if(ship->customFlags["midgun"] == -1)
+                    if(ship->customFlags["midgun"] < 0)
                         return false;
                 }
-                if(Utility::checkMask(ship->getId(), 0x000f0000, 0x00040000))
+                if(Utility::checkMask(shipID, 0x000f0000, 0x00040000))
                     return true;
-                if(Utility::checkMask(ship->getId(), 0x000f1000, 0x00050000))
+                if(Utility::checkMask(shipID, 0x000f1000, 0x00050000))
                     return true;
                 return false;
             case 4:
-                if(Utility::checkMask(ship->getId(), 0x000f0000, 0x00050000))
+                if(Utility::checkMask(shipID, 0x000f0000, 0x00050000))
                     return true;
                 return false;
             case 5:
-                if(Utility::checkMask(ship->getId(), 0x000f1000, 0x00050000))
+                if(Utility::checkMask(shipID, 0x000f1000, 0x00050000))
                     return true;
                 return false;
             case 6:
-                if(Utility::checkMask(ship->getId(), 0x000f8000, 0x00058000))
+                if(Utility::checkMask(shipID, 0x000f8000, 0x00058000))
                     return true;
-                if(Utility::checkMask(ship->getId(), 0xffff0f00, 0x30150300))
+                if(Utility::checkMask(shipID, 0xffff0f00, 0x30150300))
                     return true; // 長門改二、陸奥改二
                 return false;
             default: return false;
@@ -501,13 +502,13 @@ bool Equipment::canEquip(Ship *ship) const
             if(ship->customFlags["smallgun"] == -2)
                 return false;
         }
-        if(Utility::checkMask(ship->getId(), 0x000f2000, 0x00082000))
+        if(Utility::checkMask(shipID, 0x000f2000, 0x00082000))
             return true;
-        if(Utility::checkMask(ship->getId(), 0x000f2000, 0x00032000))
+        if(Utility::checkMask(shipID, 0x000f2000, 0x00032000))
             return true;
-        if(Utility::checkMask(ship->getId(), 0x000f2000, 0x00042000))
+        if(Utility::checkMask(shipID, 0x000f2000, 0x00042000))
             return true;
-        if(Utility::checkMask(ship->getId(), 0x000f0000, 0x00070000))
+        if(Utility::checkMask(shipID, 0x000f0000, 0x00070000))
             return true;
         return false;
     case KP::DepthCharge:
@@ -517,15 +518,15 @@ bool Equipment::canEquip(Ship *ship) const
             if(ship->customFlags["depthcharge"] == -1)
                 return false;
         }
-        if(Utility::checkMask(ship->getId(), 0x000f0000, 0x00020000))
+        if(Utility::checkMask(shipID, 0x000f0000, 0x00020000))
             return true;
-        if(Utility::checkMask(ship->getId(), 0x000f0000, 0x00030000))
+        if(Utility::checkMask(shipID, 0x000f0000, 0x00030000))
             return true;
-        if(Utility::checkMask(ship->getId(), 0x000f0000, 0x00010000))
+        if(Utility::checkMask(shipID, 0x000f0000, 0x00010000))
             return true;
-        if(Utility::checkMask(ship->getId(), 0x000f0000, 0x00080000))
+        if(Utility::checkMask(shipID, 0x000f0000, 0x00080000))
             return true;
-        if(Utility::checkMask(ship->getId(), 0x000f0000, 0x000A0000))
+        if(Utility::checkMask(shipID, 0x000f0000, 0x000A0000))
             return true;
         return false;
     case KP::Ballon: [[fallthrough]];
@@ -536,13 +537,13 @@ bool Equipment::canEquip(Ship *ship) const
             if(ship->customFlags["smoke"] == -1)
                 return false;
         }
-        if(Utility::checkMask(ship->getId(), 0x000f0000, 0x00020000))
+        if(Utility::checkMask(shipID, 0x000f0000, 0x00020000))
             return true;
-        if(Utility::checkMask(ship->getId(), 0x000f0000, 0x00030000))
+        if(Utility::checkMask(shipID, 0x000f0000, 0x00030000))
             return true;
-        if(Utility::checkMask(ship->getId(), 0x000f0000, 0x00010000))
+        if(Utility::checkMask(shipID, 0x000f0000, 0x00010000))
             return true;
-        if(Utility::checkMask(ship->getId(), 0x000f0000, 0x00040000))
+        if(Utility::checkMask(shipID, 0x000f0000, 0x00040000))
             return true;
         return false;
     case KP::Sonar:
@@ -553,17 +554,17 @@ bool Equipment::canEquip(Ship *ship) const
                 if(ship->customFlags["bigsonar"] == -1)
                     return false;
             }
-            if(Utility::checkMask(ship->getId(), 0x000f0000, 0x00050000))
+            if(Utility::checkMask(shipID, 0x000f0000, 0x00050000))
                 return true;
-            if(Utility::checkMask(ship->getId(), 0x000f0000, 0x00040000))
+            if(Utility::checkMask(shipID, 0x000f0000, 0x00040000))
                 return true;
-            if(Utility::checkMask(ship->getId(), 0x000f0000, 0x00060000))
+            if(Utility::checkMask(shipID, 0x000f0000, 0x00060000))
                 return true;
-            if(Utility::checkMask(ship->getId(), 0x000f0000, 0x00080000))
+            if(Utility::checkMask(shipID, 0x000f0000, 0x00080000))
                 return true;
-            if(Utility::checkMask(ship->getId(), 0x000f0000, 0x000A0000))
+            if(Utility::checkMask(shipID, 0x000f0000, 0x000A0000))
                 return true;
-            if(Utility::checkMask(ship->getId(), 0x000f5000, 0x00035000))
+            if(Utility::checkMask(shipID, 0x000f5000, 0x00035000))
                 return true; // 潜水母舰
             return false;
         }
@@ -573,23 +574,23 @@ bool Equipment::canEquip(Ship *ship) const
             if(ship->customFlags["sonar"] == -1)
                 return false;
         }
-        if(Utility::checkMask(ship->getId(), 0x000f0000, 0x00020000))
+        if(Utility::checkMask(shipID, 0x000f0000, 0x00020000))
             return true;
-        if(Utility::checkMask(ship->getId(), 0x000f0000, 0x00030000))
+        if(Utility::checkMask(shipID, 0x000f0000, 0x00030000))
             return true;
-        if(Utility::checkMask(ship->getId(), 0x000f0000, 0x00010000))
+        if(Utility::checkMask(shipID, 0x000f0000, 0x00010000))
             return true;
-        if(Utility::checkMask(ship->getId(), 0x000f0000, 0x00070000))
+        if(Utility::checkMask(shipID, 0x000f0000, 0x00070000))
             return true;
         return false;
     case KP::APShell:
-        return Utility::checkMask(ship->getId(), 0x000f0000, 0x00050000);
+        return Utility::checkMask(shipID, 0x000f0000, 0x00050000);
     case KP::AntilandShell:
-        if(Utility::checkMask(ship->getId(), 0x000f0000, 0x00040000))
+        if(Utility::checkMask(shipID, 0x000f0000, 0x00040000))
             return true;
-        if(Utility::checkMask(ship->getId(), 0x000f0000, 0x00050000))
+        if(Utility::checkMask(shipID, 0x000f0000, 0x00050000))
             return true;
-        if(Utility::checkMask(ship->getId(), 0xffffffff, 0x3F182602))
+        if(Utility::checkMask(shipID, 0xffffffff, 0x3F182602))
             return true; // 三隈改二特
         return false;
     case KP::AntilandRocket:
@@ -599,23 +600,23 @@ bool Equipment::canEquip(Ship *ship) const
             if(ship->customFlags["alrocket"] == -1)
                 return false;
         }
-        if(Utility::checkMask(ship->getId(), 0x000ff000, 0x00031000))
+        if(Utility::checkMask(shipID, 0x000ff000, 0x00031000))
             return false;
-        if(Utility::checkMask(ship->getId(), 0x000f0000, 0x00020000))
+        if(Utility::checkMask(shipID, 0x000f0000, 0x00020000))
             return true;
-        if(Utility::checkMask(ship->getId(), 0x000f0000, 0x00010000))
+        if(Utility::checkMask(shipID, 0x000f0000, 0x00010000))
             return true;
-        if(Utility::checkMask(ship->getId(), 0x000f0000, 0x00030000))
+        if(Utility::checkMask(shipID, 0x000f0000, 0x00030000))
             return true;
-        if(Utility::checkMask(ship->getId(), 0x000f4000, 0x00044000))
+        if(Utility::checkMask(shipID, 0x000f4000, 0x00044000))
             return true;
-        if(Utility::checkMask(ship->getId(), 0x000f4000, 0x00054000))
+        if(Utility::checkMask(shipID, 0x000f4000, 0x00054000))
             return true;
-        if(Utility::checkMask(ship->getId(), 0x000f0000, 0x00080000))
+        if(Utility::checkMask(shipID, 0x000f0000, 0x00080000))
             return true;
-        if(Utility::checkMask(ship->getId(), 0x000f0000, 0x00070000))
+        if(Utility::checkMask(shipID, 0x000f0000, 0x00070000))
             return true;
-        if(Utility::checkMask(ship->getId(), 0x000f0000, 0x000A0000))
+        if(Utility::checkMask(shipID, 0x000f0000, 0x000A0000))
             return true;
         return false;
     case KP::LandingCraft:
@@ -625,11 +626,11 @@ bool Equipment::canEquip(Ship *ship) const
             if(ship->customFlags["landingcraft"] == -1)
                 return false;
         }
-        if(Utility::checkMask(ship->getId(), 0x000f1000, 0x00021000))
+        if(Utility::checkMask(shipID, 0x000f1000, 0x00021000))
             return true;
-        if(Utility::checkMask(ship->getId(), 0x000f0000, 0x00080000))
+        if(Utility::checkMask(shipID, 0x000f0000, 0x00080000))
             return true;
-        if(Utility::checkMask(ship->getId(), 0x000f0000, 0x000A0000))
+        if(Utility::checkMask(shipID, 0x000f0000, 0x000A0000))
             return true;
         return false;
     case KP::LandingTank:
@@ -639,39 +640,39 @@ bool Equipment::canEquip(Ship *ship) const
             if(ship->customFlags["landingtank"] == -1)
                 return false;
         }
-        if(Utility::checkMask(ship->getId(), 0x000f2000, 0x00022000))
+        if(Utility::checkMask(shipID, 0x000f2000, 0x00022000))
             return true;
-        if(Utility::checkMask(ship->getId(), 0x000f0000, 0x00070000))
+        if(Utility::checkMask(shipID, 0x000f0000, 0x00070000))
             return true;
-        if(Utility::checkMask(ship->getId(), 0x000f0000, 0x00080000))
+        if(Utility::checkMask(shipID, 0x000f0000, 0x00080000))
             return true;
-        if(Utility::checkMask(ship->getId(), 0x000f0000, 0x000A0000))
+        if(Utility::checkMask(shipID, 0x000f0000, 0x000A0000))
             return true;
         return false;
     case KP::Drum:
-        if(Utility::checkMask(ship->getId(), 0x000ff000, 0x00031000))
+        if(Utility::checkMask(shipID, 0x000ff000, 0x00031000))
             return false;
-        if(Utility::checkMask(ship->getId(), 0x000f0000, 0x00020000))
+        if(Utility::checkMask(shipID, 0x000f0000, 0x00020000))
             return true;
-        if(Utility::checkMask(ship->getId(), 0x000f0000, 0x00030000))
+        if(Utility::checkMask(shipID, 0x000f0000, 0x00030000))
             return true;
-        if(Utility::checkMask(ship->getId(), 0x000f4000, 0x00044000))
+        if(Utility::checkMask(shipID, 0x000f4000, 0x00044000))
             return true;
-        if(Utility::checkMask(ship->getId(), 0x000f0000, 0x00080000))
+        if(Utility::checkMask(shipID, 0x000f0000, 0x00080000))
             return true;
-        if(Utility::checkMask(ship->getId(), 0x000f0000, 0x00090000))
+        if(Utility::checkMask(shipID, 0x000f0000, 0x00090000))
             return true;
-        if(Utility::checkMask(ship->getId(), 0x000f0000, 0x000A0000))
+        if(Utility::checkMask(shipID, 0x000f0000, 0x000A0000))
             return true;
-        if(Utility::checkMask(ship->getId(), 0x000ff000, 0x00011000))
+        if(Utility::checkMask(shipID, 0x000ff000, 0x00011000))
             return true;
     case KP::TPMaterial: // TBD
         return false;
     case KP::EngineTurbine: [[fallthrough]];
     case KP::EngineBoiler:
-        if(Utility::checkMask(ship->getId(), 0xf00ff000, 0x30010000))
+        if(Utility::checkMask(shipID, 0xf00ff000, 0x30010000))
             return true;
-        if(Utility::checkMask(ship->getId(), 0x000ff000, 0x00010000))
+        if(Utility::checkMask(shipID, 0x000ff000, 0x00010000))
             return false;
         return true; // most of ships can equip it
     case KP::SearchLight:
@@ -680,7 +681,7 @@ bool Equipment::canEquip(Ship *ship) const
                 if(ship->customFlags["searchlight"] >= 3)
                     return true;
             }
-            if(Utility::checkMask(ship->getId(), 0x000f0000, 0x00050000))
+            if(Utility::checkMask(shipID, 0x000f0000, 0x00050000))
                 return true;
             return false;
         }
@@ -690,43 +691,43 @@ bool Equipment::canEquip(Ship *ship) const
             if(ship->customFlags["searchlight"] == -1)
                 return false;
         }
-        if(Utility::checkMask(ship->getId(), 0x000f0000, 0x00020000))
+        if(Utility::checkMask(shipID, 0x000f0000, 0x00020000))
             return true;
-        if(Utility::checkMask(ship->getId(), 0x000f0000, 0x00030000))
+        if(Utility::checkMask(shipID, 0x000f0000, 0x00030000))
             return true;
-        if(Utility::checkMask(ship->getId(), 0x000f0000, 0x00040000))
+        if(Utility::checkMask(shipID, 0x000f0000, 0x00040000))
             return true;
-        if(Utility::checkMask(ship->getId(), 0x000f0000, 0x00050000))
+        if(Utility::checkMask(shipID, 0x000f0000, 0x00050000))
             return true;
-        if(Utility::checkMask(ship->getId(), 0x000f0000, 0x00080000))
+        if(Utility::checkMask(shipID, 0x000f0000, 0x00080000))
             return true;
-        if(Utility::checkMask(ship->getId(), 0x000ff000, 0x00011000))
+        if(Utility::checkMask(shipID, 0x000ff000, 0x00011000))
             return true;
         return false;
     case KP::Starshell:
-        if(Utility::checkMask(ship->getId(), 0x000f0000, 0x00020000))
+        if(Utility::checkMask(shipID, 0x000f0000, 0x00020000))
             return true;
-        if(Utility::checkMask(ship->getId(), 0x000f0000, 0x00030000))
+        if(Utility::checkMask(shipID, 0x000f0000, 0x00030000))
             return true;
-        if(Utility::checkMask(ship->getId(), 0x000f0000, 0x00040000))
+        if(Utility::checkMask(shipID, 0x000f0000, 0x00040000))
             return true;
-        if(Utility::checkMask(ship->getId(), 0x000f0000, 0x00050000))
+        if(Utility::checkMask(shipID, 0x000f0000, 0x00050000))
             return true;
-        if(Utility::checkMask(ship->getId(), 0x000f0000, 0x00080000))
+        if(Utility::checkMask(shipID, 0x000f0000, 0x00080000))
             return true;
-        if(Utility::checkMask(ship->getId(), 0x000f0000, 0x000B0000))
+        if(Utility::checkMask(shipID, 0x000f0000, 0x000B0000))
             return true;
-        if(Utility::checkMask(ship->getId(), 0x000ff000, 0x00011000))
+        if(Utility::checkMask(shipID, 0x000ff000, 0x00011000))
             return true;
-        if(Utility::checkMask(ship->getId(), 0x00ffffff, 0x00190300))
+        if(Utility::checkMask(shipID, 0x00ffffff, 0x00190300))
             return true; // 宗谷
         return false;
     case KP::RepairItem:
         return true;
     case KP::UnderwayReplenish:
-        if(Utility::checkMask(ship->getId(), 0x000f0000, 0x00090000))
+        if(Utility::checkMask(shipID, 0x000f0000, 0x00090000))
             return true;
-        if(Utility::checkMask(ship->getId(), 0x00ff0fff, 0x001A0400))
+        if(Utility::checkMask(shipID, 0x00ff0fff, 0x001A0400))
             return true; // 熊野丸
         return false;
     case KP::Food:
@@ -738,52 +739,52 @@ bool Equipment::canEquip(Ship *ship) const
             if(ship->customFlags["commandfac"] == -1)
                 return false;
         }
-        if(Utility::checkMask(ship->getId(), 0x000f0000, 0x00030000))
+        if(Utility::checkMask(shipID, 0x000f0000, 0x00030000))
             return true;
-        if(Utility::checkMask(ship->getId(), 0x000f0000, 0x00040000))
+        if(Utility::checkMask(shipID, 0x000f0000, 0x00040000))
             return true;
-        if(Utility::checkMask(ship->getId(), 0x000f0000, 0x00050000))
+        if(Utility::checkMask(shipID, 0x000f0000, 0x00050000))
             return true;
-        if(Utility::checkMask(ship->getId(), 0x000f0000, 0x00060000))
+        if(Utility::checkMask(shipID, 0x000f0000, 0x00060000))
             return true;
-        if(Utility::checkMask(ship->getId(), 0x000f0000, 0x00080000))
+        if(Utility::checkMask(shipID, 0x000f0000, 0x00080000))
             return true;
-        if(Utility::checkMask(ship->getId(), 0x000f0000, 0x000A0000))
+        if(Utility::checkMask(shipID, 0x000f0000, 0x000A0000))
             return true;
-        if(Utility::checkMask(ship->getId(), 0x000f8000, 0x00028000))
+        if(Utility::checkMask(shipID, 0x000f8000, 0x00028000))
             return true;
-        if(Utility::checkMask(ship->getId(), 0x00ff0f00, 0x00120B00))
+        if(Utility::checkMask(shipID, 0x00ff0f00, 0x00120B00))
             return true; // 秋月型
         return false;
     case KP::AircraftPersonnel:
-        if(Utility::checkMask(ship->getId(), 0x000f0000, 0x000C0000)) {
+        if(Utility::checkMask(shipID, 0x000f0000, 0x000C0000)) {
             return true;
         }
-        if(Utility::checkMask(ship->getId(), 0x000f0000, 0x00060000))
+        if(Utility::checkMask(shipID, 0x000f0000, 0x00060000))
             return true;
-        if(Utility::checkMask(ship->getId(), 0x000f4000, 0x00054000))
+        if(Utility::checkMask(shipID, 0x000f4000, 0x00054000))
             return true;
-        if(Utility::checkMask(ship->getId(), 0x000f4000, 0x00044000))
+        if(Utility::checkMask(shipID, 0x000f4000, 0x00044000))
             return true;
-        if(Utility::checkMask(ship->getId(), 0x000f4000, 0x00034000))
+        if(Utility::checkMask(shipID, 0x000f4000, 0x00034000))
             return true;
-        if(Utility::checkMask(ship->getId(), 0x000f0000, 0x00080000))
+        if(Utility::checkMask(shipID, 0x000f0000, 0x00080000))
             return true;
-        if(Utility::checkMask(ship->getId(), 0xffffffff, 0x0A190300))
+        if(Utility::checkMask(shipID, 0xffffffff, 0x0A190300))
             return false; // 宗谷
-        if(Utility::checkMask(ship->getId(), 0xffffffff, 0x0B190300))
+        if(Utility::checkMask(shipID, 0xffffffff, 0x0B190300))
             return false; // 宗谷
-        if(Utility::checkMask(ship->getId(), 0x00ff0fff, 0x00190600))
+        if(Utility::checkMask(shipID, 0x00ff0fff, 0x00190600))
             return false; // 大泊
-        if(Utility::checkMask(ship->getId(), 0x000f0000, 0x00090000))
+        if(Utility::checkMask(shipID, 0x000f0000, 0x00090000))
             return true;
-        if(Utility::checkMask(ship->getId(), 0x00ff0fff, 0x001A0200))
+        if(Utility::checkMask(shipID, 0x00ff0fff, 0x001A0200))
             return true; // 神州丸
         return false;
     case KP::RepairFacility:
-        if(Utility::checkMask(ship->getId(), 0x000f0000, 0x000B0000))
+        if(Utility::checkMask(shipID, 0x000f0000, 0x000B0000))
             return true;
-        if(Utility::checkMask(ship->getId(), 0xffffffff, 0x20180501))
+        if(Utility::checkMask(shipID, 0xffffffff, 0x20180501))
             return true; // 秋津洲改
         return false;
     case KP::SurfacePersonnel:
@@ -793,17 +794,17 @@ bool Equipment::canEquip(Ship *ship) const
             if(ship->customFlags["lookout"] == -1)
                 return false;
         }
-        if(Utility::checkMask(ship->getId(), 0x000f0000, 0x00020000))
+        if(Utility::checkMask(shipID, 0x000f0000, 0x00020000))
             return true;
-        if(Utility::checkMask(ship->getId(), 0x000f0000, 0x00030000))
+        if(Utility::checkMask(shipID, 0x000f0000, 0x00030000))
             return true;
-        if(Utility::checkMask(ship->getId(), 0x000f0000, 0x00040000))
+        if(Utility::checkMask(shipID, 0x000f0000, 0x00040000))
             return true;
-        if(Utility::checkMask(ship->getId(), 0x000f0000, 0x00050000))
+        if(Utility::checkMask(shipID, 0x000f0000, 0x00050000))
             return true;
-        if(Utility::checkMask(ship->getId(), 0x000f0000, 0x00080000))
+        if(Utility::checkMask(shipID, 0x000f0000, 0x00080000))
             return true;
-        if(Utility::checkMask(ship->getId(), 0x000ff000, 0x00010000))
+        if(Utility::checkMask(shipID, 0x000ff000, 0x00010000))
             return true;
         return false;
     case KP::AntiAir:
@@ -815,21 +816,21 @@ bool Equipment::canEquip(Ship *ship) const
             if(ship->customFlags["flyingboat"] == -1)
                 return false;
         }
-        if(Utility::checkMask(ship->getId(), 0x000f0000, 0x000C0000)) {
+        if(Utility::checkMask(shipID, 0x000f0000, 0x000C0000)) {
             return true;
         }
         return false;
     case KP::LBInterceptor:
-        if(Utility::checkMask(ship->getId(), 0x000f0000, 0x000C0000)) {
+        if(Utility::checkMask(shipID, 0x000f0000, 0x000C0000)) {
             return true;
         }
         return false;
     case KP::JetPlane:
-        if(Utility::checkMask(ship->getId(), 0x000f0000, 0x000C0000)) {
+        if(Utility::checkMask(shipID, 0x000f0000, 0x000C0000)) {
             return true;
         }
         if(type.isRecon()) {
-            return Utility::checkMask(ship->getId(), 0x000f4000, 0x00064000);
+            return Utility::checkMask(shipID, 0x000f4000, 0x00064000);
         }
         if(type.isFighter() && type.isDiveBomber()) {
             if(ship->customFlags.contains("jet")) {
@@ -842,13 +843,13 @@ bool Equipment::canEquip(Ship *ship) const
         return false;
     case KP::Bulge:
         if(type.getSize() == 1) {
-            return Utility::checkMask(ship->getId(), 0x000f4000, 0x00024000);
+            return Utility::checkMask(shipID, 0x000f4000, 0x00024000);
         }
         if(type.getSize() == 2) {
             if(getId() == 268) {
-                if(Utility::checkMask(ship->getId(), 0x00f00000, 0x00700000))
+                if(Utility::checkMask(shipID, 0x00f00000, 0x00700000))
                     return true; // All Soviets
-                if(Utility::checkMask(ship->getId(), 0x00f00000, 0x00A00000))
+                if(Utility::checkMask(shipID, 0x00f00000, 0x00A00000))
                     return true; // All Nordics
                 if(ship->customFlags.contains("bulge")) {
                     if(ship->customFlags["bulge"] & 0x8)
@@ -859,22 +860,22 @@ bool Equipment::canEquip(Ship *ship) const
                 if(ship->customFlags["bulge"] & 0x2)
                     return true;
             }
-            if(Utility::checkMask(ship->getId(), 0x000f0000, 0x00040000))
+            if(Utility::checkMask(shipID, 0x000f0000, 0x00040000))
                 return true;
-            if(Utility::checkMask(ship->getId(), 0x000f0000, 0x00061000))
+            if(Utility::checkMask(shipID, 0x000f0000, 0x00061000))
                 return true;
-            if(Utility::checkMask(ship->getId(), 0x000f0000, 0x00080000))
+            if(Utility::checkMask(shipID, 0x000f0000, 0x00080000))
                 return true;
-            if(Utility::checkMask(ship->getId(), 0x000f1000, 0x00031000))
+            if(Utility::checkMask(shipID, 0x000f1000, 0x00031000))
                 return true;
-            if(Utility::checkMask(ship->getId(), 0x000f0000, 0x000B0000))
+            if(Utility::checkMask(shipID, 0x000f0000, 0x000B0000))
                 return true;
             return false;
         }
         if(type.getSize() == 3) {
-            if(Utility::checkMask(ship->getId(), 0x000f0000, 0x00050000))
+            if(Utility::checkMask(shipID, 0x000f0000, 0x00050000))
                 return true;
-            if(Utility::checkMask(ship->getId(), 0x000f1000, 0x00060000))
+            if(Utility::checkMask(shipID, 0x000f1000, 0x00060000))
                 return true;
             if(ship->customFlags.contains("bulge")) {
                 if(ship->customFlags["bulge"] & 0x4)
@@ -884,17 +885,17 @@ bool Equipment::canEquip(Ship *ship) const
         }
         return false;
     case KP::AAControl:
-        if(Utility::checkMask(ship->getId(), 0x00ff0fff, 0x00190600))
+        if(Utility::checkMask(shipID, 0x00ff0fff, 0x00190600))
             return false; // 大泊
-        if(Utility::checkMask(ship->getId(), 0x00ff0fff, 0x001A0301))
+        if(Utility::checkMask(shipID, 0x00ff0fff, 0x001A0301))
             return false; // 第百一号輸送艦
-        if(Utility::checkMask(ship->getId(), 0xffff0fff, 0x101A0200))
+        if(Utility::checkMask(shipID, 0xffff0fff, 0x101A0200))
             return false; // 未改造神州丸
-        if(Utility::checkMask(ship->getId(), 0x000f0000, 0x00070000))
+        if(Utility::checkMask(shipID, 0x000f0000, 0x00070000))
             return false;
         return true;
     case KP::LandCorps:
-        return Utility::checkMask(ship->getId(), 0x00ff0fff, 0x001A0301); // 第百一号輸送艦
+        return Utility::checkMask(shipID, 0x00ff0fff, 0x001A0301); // 第百一号輸送艦
     default:
         return false;
     }
@@ -902,15 +903,16 @@ bool Equipment::canEquip(Ship *ship) const
 
 bool Equipment::canEquipEX(Ship *ship) const
 {
+    int shipID = ship->getId();
     switch(type.getSpecial())
     {
     case KP::RepairItem: return true;
     case KP::Food: return true;
     case KP::UnderwayReplenish: return canEquip(ship);
     case KP::AntilandShell:
-        if(Utility::checkMask(ship->getId(), 0x000f0000, 0x00040000))
+        if(Utility::checkMask(shipID, 0x000f0000, 0x00040000))
             return true;
-        if(Utility::checkMask(ship->getId(), 0x000f0000, 0x00050000))
+        if(Utility::checkMask(shipID, 0x000f0000, 0x00050000))
             return true;
         return false;
     case KP::NonSpecial:
@@ -921,9 +923,9 @@ bool Equipment::canEquipEX(Ship *ship) const
                     return ship->customFlags["secgunex"] & 0x1;
                 }
                 else {
-                    if(Utility::checkMask(ship->getId(), 0x000f1000, 0x00031000))
+                    if(Utility::checkMask(shipID, 0x000f1000, 0x00031000))
                         return true;
-                    if(Utility::checkMask(ship->getId(), 0x000f0000, 0x000B0000))
+                    if(Utility::checkMask(shipID, 0x000f0000, 0x000B0000))
                         return true;
                 }
                 return false;
@@ -948,9 +950,9 @@ bool Equipment::canEquipEX(Ship *ship) const
                     return ship->customFlags["secgunex"] & 0x8;
                 }
                 else {
-                    if(Utility::checkMask(ship->getId(), 0x000f1000, 0x00031000))
+                    if(Utility::checkMask(shipID, 0x000f1000, 0x00031000))
                         return true;
-                    if(Utility::checkMask(ship->getId(), 0x000f0000, 0x000B0000))
+                    if(Utility::checkMask(shipID, 0x000f0000, 0x000B0000))
                         return true;
                 }
                 return false;
@@ -981,15 +983,15 @@ bool Equipment::canEquipEX(Ship *ship) const
                     return ship->customFlags["radarex"] & 0x1;
                 }
                 else {
-                    if(Utility::checkMask(ship->getId(), 0x00ff0f00, 0x00130600))
+                    if(Utility::checkMask(shipID, 0x00ff0f00, 0x00130600))
                         return true; // 阿賀野型
-                    if(Utility::checkMask(ship->getId(), 0x00ff0f00, 0x00130700))
+                    if(Utility::checkMask(shipID, 0x00ff0f00, 0x00130700))
                         return true; // 大淀型
-                    if(Utility::checkMask(ship->getId(), 0x00ff0f00, 0x00120900))
+                    if(Utility::checkMask(shipID, 0x00ff0f00, 0x00120900))
                         return true; // 夕雲型
-                    if(Utility::checkMask(ship->getId(), 0x00ff0f00, 0x00120B00))
+                    if(Utility::checkMask(shipID, 0x00ff0f00, 0x00120B00))
                         return true; // 秋月型
-                    if(Utility::checkMask(ship->getId(), 0x00ff0f00, 0x00120C00))
+                    if(Utility::checkMask(shipID, 0x00ff0f00, 0x00120C00))
                         return true; // 松型
                 }
                 return false;
@@ -1000,11 +1002,11 @@ bool Equipment::canEquipEX(Ship *ship) const
                     return ship->customFlags["radarex"] & 0x2;
                 }
                 else {
-                    if(Utility::checkMask(ship->getId(), 0x00ff0f00, 0x00120800))
+                    if(Utility::checkMask(shipID, 0x00ff0f00, 0x00120800))
                         return true; // 陽炎型
-                    if(Utility::checkMask(ship->getId(), 0x00ff0f00, 0x00120900))
+                    if(Utility::checkMask(shipID, 0x00ff0f00, 0x00120900))
                         return true; // 夕雲型
-                    if(Utility::checkMask(ship->getId(), 0x00ff0f00, 0x00120C00))
+                    if(Utility::checkMask(shipID, 0x00ff0f00, 0x00120C00))
                         return true; // 松型
                 }
                 return false;
@@ -1025,34 +1027,34 @@ bool Equipment::canEquipEX(Ship *ship) const
             }
             if(getId() == 527) {
                 /* Type281 レーダー */
-                if(Utility::checkMask(ship->getId(), 0x00ff0000, 0x00530000))
+                if(Utility::checkMask(shipID, 0x00ff0000, 0x00530000))
                     return true;
-                if(Utility::checkMask(ship->getId(), 0x00ff0000, 0x00560000))
+                if(Utility::checkMask(shipID, 0x00ff0000, 0x00560000))
                     return true;
-                if(Utility::checkMask(ship->getId(), 0x00ff0000, 0x00550000))
+                if(Utility::checkMask(shipID, 0x00ff0000, 0x00550000))
                     return true;
                 return false;
             }
             if(getId() == 528) {
                 /* Type274 射撃管制レーダー */
-                if(Utility::checkMask(ship->getId(), 0x00ff0000, 0x00530000))
+                if(Utility::checkMask(shipID, 0x00ff0000, 0x00530000))
                     return true;
-                if(Utility::checkMask(ship->getId(), 0x00ff0000, 0x00550000))
+                if(Utility::checkMask(shipID, 0x00ff0000, 0x00550000))
                     return true;
                 return false;
             }
             if(getId() == 124) {
                 /* FuMO25 レーダー */
-                if(Utility::checkMask(ship->getId(), 0xf0000000, 0x10000000))
+                if(Utility::checkMask(shipID, 0xf0000000, 0x10000000))
                     return false;
-                if(Utility::checkMask(ship->getId(), 0x00ff0000, 0x00250000))
+                if(Utility::checkMask(shipID, 0x00ff0000, 0x00250000))
                     return true;
-                if(Utility::checkMask(ship->getId(), 0x00ff0000, 0x00240000))
+                if(Utility::checkMask(shipID, 0x00ff0000, 0x00240000))
                     return true;
                 return false;
             }
             if(type.getSize() == 3) {
-                if(Utility::checkMask(ship->getId(), 0xffff8000, 0x30158000))
+                if(Utility::checkMask(shipID, 0xffff8000, 0x30158000))
                     return true; // 大和改二、武蔵改二
                 return false;
             }
@@ -1060,7 +1062,7 @@ bool Equipment::canEquipEX(Ship *ship) const
         }
         else if(type.isTorp()) {
             if(getId() == 442 || getId() == 443) {
-                return Utility::checkMask(ship->getId(), 0x000f0000, 0x00070000);
+                return Utility::checkMask(shipID, 0x000f0000, 0x00070000);
             }
             return false;
         }
@@ -1072,15 +1074,15 @@ bool Equipment::canEquipEX(Ship *ship) const
             return false;
         }
         else if(type.getSize() == 1) {
-            if(Utility::checkMask(ship->getId(), 0x000f0000, 0x00010000))
+            if(Utility::checkMask(shipID, 0x000f0000, 0x00010000))
                 return true;
-            if(Utility::checkMask(ship->getId(), 0xffffffff, 0x40126602))
+            if(Utility::checkMask(shipID, 0xffffffff, 0x40126602))
                 return true; // 时雨改三
         }
         return false;
     case KP::LandingCraft:
         if(getId() == 408) {
-            if(Utility::checkMask(ship->getId(), 0x00ff0fff, 0x001A0200))
+            if(Utility::checkMask(shipID, 0x00ff0fff, 0x001A0200))
                 return true; // 神州丸
         }
         return false;
@@ -1097,7 +1099,7 @@ bool Equipment::canEquipEX(Ship *ship) const
     case KP::SurfacePersonnel:
         return canEquip(ship);
     case KP::AircraftPersonnel:
-        if(Utility::checkMask(ship->getId(), 0x000f0000, 0x00060000))
+        if(Utility::checkMask(shipID, 0x000f0000, 0x00060000))
             return canEquip(ship);
     case KP::EngineTurbine:
         return canEquip(ship);
@@ -1107,25 +1109,25 @@ bool Equipment::canEquipEX(Ship *ship) const
         return canEquip(ship);
     case KP::CommandFacility:
         if(getId() == 413) {
-            if(Utility::checkMask(ship->getId(), 0x00ff0f00, 0x00130200)) {
+            if(Utility::checkMask(shipID, 0x00ff0f00, 0x00130200)) {
                 return canEquip(ship);
             }
-            if(Utility::checkMask(ship->getId(), 0x00ff0f00, 0x00130300)) {
+            if(Utility::checkMask(shipID, 0x00ff0f00, 0x00130300)) {
                 return canEquip(ship);
             }
-            if(Utility::checkMask(ship->getId(), 0x00ff0f00, 0x00130400)) {
+            if(Utility::checkMask(shipID, 0x00ff0f00, 0x00130400)) {
                 return canEquip(ship);
             }
-            if(Utility::checkMask(ship->getId(), 0x00ff0f00, 0x00130600)) {
+            if(Utility::checkMask(shipID, 0x00ff0f00, 0x00130600)) {
                 return canEquip(ship);
             }
-            if(Utility::checkMask(ship->getId(), 0x00ff0f00, 0x00130700)) {
+            if(Utility::checkMask(shipID, 0x00ff0f00, 0x00130700)) {
                 return canEquip(ship);
             }
-            if(Utility::checkMask(ship->getId(), 0x00ff0f00, 0x00120900)) {
+            if(Utility::checkMask(shipID, 0x00ff0f00, 0x00120900)) {
                 return canEquip(ship);
             }
-            if(Utility::checkMask(ship->getId(), 0x00ff0f00, 0x00120B00)) {
+            if(Utility::checkMask(shipID, 0x00ff0f00, 0x00120B00)) {
                 return canEquip(ship);
             }
         }
