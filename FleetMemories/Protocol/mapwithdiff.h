@@ -9,6 +9,7 @@ class MapWithDiff : public Map
 
 public:
     explicit MapWithDiff(const Map &Map, KP::Difficulty diff);
+    explicit MapWithDiff(const QJsonObject &);
     bool operator==(const MapWithDiff &other);
 
     KP::Difficulty diff;

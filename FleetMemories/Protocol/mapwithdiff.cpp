@@ -6,6 +6,17 @@ MapWithDiff::MapWithDiff(const Map &map, KP::Difficulty diff)
 
 }
 
+MapWithDiff::MapWithDiff(const QJsonObject &input)
+    : Map(input["id"].toInt(), input["x"].toInt(), input["y"].toInt()),
+    diff(static_cast<KP::Difficulty>(input["diff"].toInt()))
+{
+    QJsonObject lNames = input["name"].toObject();
+    for(auto &lang: lNames.keys()) {
+        localNames[lang] =
+            lNames.value(lang).toString();
+    }
+}
+
 bool MapWithDiff::operator==(const MapWithDiff &other) {
     return this->id == other.id && this->diff == other.diff;
 }

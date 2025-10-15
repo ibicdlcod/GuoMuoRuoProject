@@ -31,6 +31,11 @@ void PortArea::equipRegistryComplete() {
 }
 
 void PortArea::shipRegistryComplete() {
+    //% "Loading Maps..."
+    ui->CentralMessage->setText(qtTrId("load-map"));
+}
+
+void PortArea::mapRegistryComplete() {
     //% "Loading Assets..."
     ui->CentralMessage->setText(qtTrId("load-assets"));
 }

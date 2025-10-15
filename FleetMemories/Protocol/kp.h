@@ -145,6 +145,7 @@ enum CommandType{
     DemandEquipInfoUser,
     DemandShipInfo,
     DemandShipInfoUser,
+    DemandMapInfo,
     DemandTech,
     DemandSkillPoints,
     DemandResourceUpdate,
@@ -308,14 +309,14 @@ Q_GLOBAL_STATIC(QStringList,
                 fleetTypes,
                 QStringList(
                     {
-//% "Normal"
-QT_TRID_NOOP("NormalFleet"),
-//% "Carrier"
-QT_TRID_NOOP("CarrierFleet"),
-//% "Surface"
-QT_TRID_NOOP("SurfaceFleet"),
-//% "Transport"
-QT_TRID_NOOP("TransportFleet"),
+                        //% "Normal"
+                        QT_TRID_NOOP("NormalFleet"),
+                        //% "Carrier"
+                        QT_TRID_NOOP("CarrierFleet"),
+                        //% "Surface"
+                        QT_TRID_NOOP("SurfaceFleet"),
+                        //% "Transport"
+                        QT_TRID_NOOP("TransportFleet"),
                     }));
 
 
@@ -337,6 +338,9 @@ QByteArray clientDemandEquipInfo(QDateTime timeUtc
                                  = QDateTime(QDate(1970, 1, 1),
                                              QTime(0, 0, 0)));
 QByteArray clientDemandEquipInfoUser();
+QByteArray clientDemandMapInfo(QDateTime timeUtc
+                               = QDateTime(QDate(1970, 1, 1),
+                                           QTime(0, 0, 0)));
 QByteArray clientDemandResourceUpdate();
 QByteArray clientDemandShipInfo(QDateTime timeUtc
                                 = QDateTime(QDate(1970, 1, 1),
@@ -381,8 +385,8 @@ QByteArray serverParseError(MsgType, const QString &,
 QByteArray serverPenguin();
 QByteArray serverResourceUpdate(ResOrd);
 QByteArray serverShipInfo(const QJsonArray &, bool user = false,
-                           QDateTime timeUtc = QDateTime::currentDateTimeUtc(),
-                           bool cacheHit = false);
+                          QDateTime timeUtc = QDateTime::currentDateTimeUtc(),
+                          bool cacheHit = false);
 QByteArray serverSkillPoints(int, int64, int64);
 QByteArray serverSuccess();
 QByteArray serverTestMessages(int);

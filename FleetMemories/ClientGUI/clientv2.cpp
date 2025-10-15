@@ -196,6 +196,15 @@ void Clientv2::demandEquipCache() {
     sender->enqueue(msg);
 }
 
+void Clientv2::demandMapCache() {
+    QDateTime localCacheTimeStamp = settings->value("client/mapdbtimestamp",
+                                                    QDateTime(QDate(1970,01,01),
+                                                              QTime(0, 0, 0))
+                                                    ).toDateTime();
+    QByteArray msg = KP::clientDemandMapInfo(localCacheTimeStamp);
+    sender->enqueue(msg);
+}
+
 void Clientv2::demandShipCache() {
     QDateTime localCacheTimeStamp = settings->value("client/shipdbtimestamp",
                                                     QDateTime(QDate(1970,01,01),
@@ -1108,6 +1117,9 @@ void Clientv2::receivedInfo(const QJsonObject &djson) {
     case KP::InfoType::ShipInfoUser:
         emit receivedAnchorageShip(djson);
         break;
+    case KP::InfoType::MapInfo:
+        updateMapCache(djson);
+        break;
     default: throw std::domain_error("info type not supported"); break;
     }
 }
@@ -1287,6 +1299,8 @@ void Clientv2::receivedMsg(const QJsonObject &djson) {
         connect(this, &Clientv2::equipRegistryComplete,
                 this, &Clientv2::demandShipCache);
         connect(this, &Clientv2::shipRegistryComplete,
+                this, &Clientv2::demandMapCache);
+        connect(this, &Clientv2::mapRegistryComplete,
                 this, &Clientv2::tsunkitAssets);
         break;
     case KP::AllowClientFinish:
@@ -1580,6 +1594,37 @@ void Clientv2::updateEquipCache(const QJsonObject &input) {
 
     equipRegistryCacheGood = true;
     emit equipRegistryComplete();
+}
+
+void Clientv2::updateMapCache(const QJsonObject &input) {
+    QJsonObject cachedInput;
+    if(!input.contains("content")) {
+        cachedInput
+            = settings->value("client/mapdbcache").toJsonObject();
+    }
+    else {
+        settings->setValue("client/mapdbtimestamp",
+                           QDateTime::fromString(
+                               input["timestamp"].toString()));
+        settings->setValue("client/mapdbcache",
+                           input);
+        cachedInput = input;
+    }
+    QJsonArray mapDefs = cachedInput["content"].toArray();
+    for(auto mapDef: mapDefs) {
+        QJsonObject mapDValue = mapDef.toObject();
+        int eid = mapDValue.value("id").toInt()
+                  + KP::mapIDDifficultyMask * mapDValue.value("diff").toInt();
+        mapRegistryCache[eid] = new MapWithDiff(mapDValue);
+    }
+
+    //% "Map cache length: %1"
+    qDebug() << qtTrId("map-cache-length")
+                    .arg(Clientv2::getInstance()
+                             .mapRegistryCache.size());
+
+    mapRegistryCacheGood = true;
+    emit mapRegistryComplete();
 }
 
 void Clientv2::updateShipCache(const QJsonObject &input) {

@@ -70,7 +70,7 @@
          </spacer>
         </item>
         <item>
-         <widget class="QLabel" name="label">
+         <widget class="QLabel" name="diffLabel">
           <property name="text">
            <string extracomment="map-diff">Difficulty:</string>
           </property>
@@ -100,14 +100,14 @@
          </spacer>
         </item>
         <item>
-         <widget class="QLabel" name="label_2">
+         <widget class="QLabel" name="selectLabel">
           <property name="text">
            <string extracomment="selected-map">Selected Map:</string>
           </property>
          </widget>
         </item>
         <item>
-         <widget class="QLabel" name="label_3">
+         <widget class="QLabel" name="selectDisplay">
           <property name="text">
            <string extracomment="selected-map-id">None</string>
           </property>

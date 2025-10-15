@@ -124,6 +124,14 @@ QByteArray KP::clientDemandEquipInfoUser() {
     return QCborValue::fromJsonValue(result).toCbor();
 }
 
+QByteArray KP::clientDemandMapInfo(QDateTime timeUtc) {
+    QJsonObject result;
+    result["type"] = DgramType::Request;
+    result["command"] = CommandType::DemandMapInfo;
+    result["timestamp"] = timeUtc.toString();
+    return QCborValue::fromJsonValue(result).toCbor();
+}
+
 QByteArray KP::clientDemandResourceUpdate() {
     QJsonObject result;
     result["type"] = DgramType::Request;

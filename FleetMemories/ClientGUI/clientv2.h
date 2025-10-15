@@ -9,8 +9,10 @@
 #include "../Protocol/sender.h"
 #include "../Protocol/kp.h"
 #include "../Protocol/ship.h"
+#include "../Protocol/mapwithdiff.h"
 #include "ui/factory/developwindow.h"
 #include "ui/views/equipselect.h"
+#include "ui/sortie/maprender.h"
 #include "ui/techview.h"
 #include "steamauth.h"
 #include "equipmodel.h"
@@ -65,6 +67,7 @@ public slots:
     void backToNavalBase();
     void catbomb();
     void demandEquipCache();
+    void demandMapCache();
     void demandShipCache();
     void displayPrompt();
     void doDestructEquip(const QList<QUuid> &);
@@ -98,6 +101,7 @@ signals:
     void aboutToQuit();
     void equipRegistryComplete();
     void shipRegistryComplete();
+    void mapRegistryComplete();
     void tsunkitAssetsComplete();
     void gamestateChanged(KP::GameState);
     void qout(QString, QColor background = QColor("white"),
@@ -156,6 +160,7 @@ private:
     void showCommands(bool);
     void switchCert(const QStringList &);
     void updateEquipCache(const QJsonObject &);
+    void updateMapCache(const QJsonObject &);
     void updateShipCache(const QJsonObject &);
 
     explicit Clientv2(QObject * parent = nullptr);
@@ -183,7 +188,10 @@ private:
     bool equipRegistryCacheGood = false;
     QMap<int, Ship *> shipRegistryCache;
     bool shipRegistryCacheGood = false;
-
+public:
+    QMap<int, MapWithDiff *> mapRegistryCache;
+    bool mapRegistryCacheGood = false;
+private:
     QHttpServer migrateServer;
     QTcpServer *tcpServer = new QTcpServer();
 

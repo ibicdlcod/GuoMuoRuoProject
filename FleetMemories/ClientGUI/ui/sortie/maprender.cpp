@@ -1,10 +1,11 @@
 #include "maprender.h"
 #include <QPainter>
 #include <QMouseEvent>
+#include "../../clientv2.h"
 
 MapRender::MapRender(QWidget *parent)
     : QWidget{parent} {
-    antialiased = false;
+    antialiased = true;
 
     QImage image(":/resources/map/globe.png");
     if (image.format() != QImage::Format_ARGB32) {
@@ -23,13 +24,14 @@ MapRender::MapRender(QWidget *parent)
         }
     }
     pixmap = QPixmap::fromImage(image);
-    //pixmap.load(":/resources/map/globe.png");
 
-    //pen = QPen(Qt::blue, 0);
-    brush = (QBrush(Qt::black));
+    pen = Qt::NoPen;//QPen(Qt::blue, 0);
+    brush = QBrush(Qt::black);
+    brushHovered = QBrush(Qt::blue);
 
     setBackgroundRole(QPalette::Base);
     setAutoFillBackground(true);
+    setMouseTracking(true);
 }
 
 void MapRender::mousePressEvent(QMouseEvent *event)
@@ -40,12 +42,55 @@ void MapRender::mousePressEvent(QMouseEvent *event)
     QWidget::mousePressEvent(event); // Call base class implementation
 }
 
+void MapRender::mouseMoveEvent(QMouseEvent *event)
+{
+    hoverMapID = 0;
+    if (rect().contains(event->pos())) { // Check if release occurred within widget
+        static Clientv2 &engine = Clientv2::getInstance();
+        for(const auto map: std::as_const(engine.mapRegistryCache)) {
+            if(map->id == KP::hiddenMap) {
+                continue;
+            }
+            double distance = std::hypot(event->pos().x()
+                                                 / (double) this->width()
+                                                 * globeMapWidth
+                                             - map->x,
+                                         event->pos().y()
+                                                 / (double) this->height()
+                                                 * globeMapHeight
+                                             - map->y);
+            if(distance < circleSize) {
+                hoverMapID = map->id;
+                break;
+            }
+        }
+        update();
+    }
+    QWidget::mouseMoveEvent(event); // Call base class implementation
+}
+
 void MapRender::mouseReleaseEvent(QMouseEvent *event)
 {
     if (event->button() == Qt::LeftButton && mousePressedInside) {
         if (rect().contains(event->pos())) { // Check if release occurred within widget
-            qCritical() << (double)event->pos().x() / this->width() * globeMapWidth;
-            qCritical() << (double)event->pos().y() / this->height() * globeMapHeight;
+            static Clientv2 &engine = Clientv2::getInstance();
+            for(const auto map: std::as_const(engine.mapRegistryCache)) {
+                if(map->id == KP::hiddenMap) {
+                    continue;
+                }
+                double distance = std::hypot(event->pos().x()
+                                                     / (double) this->width()
+                                                     * globeMapWidth
+                                                 - map->x,
+                                             event->pos().y()
+                                                     / (double) this->height()
+                                                     * globeMapHeight
+                                                 - map->y);
+                if(distance < circleSize) {
+                    emit mapSelected(map->id);
+                    break;
+                }
+            }
             update();
         }
     }
@@ -56,6 +101,7 @@ void MapRender::mouseReleaseEvent(QMouseEvent *event)
 void MapRender::paintEvent(QPaintEvent * /* event */)
 {
     QPainter painter(this);
+    painter.setBrush(brush);
     painter.drawPixmap(QRect(0,0,this->width(),this->height()),
                        pixmap.scaled(QSize(this->width(), this->height()),
                                      Qt::KeepAspectRatio,
@@ -64,12 +110,24 @@ void MapRender::paintEvent(QPaintEvent * /* event */)
                        );
     painter.scale(this->width() / (double)globeMapWidth,
                   this->height() / (double)globeMapHeight);
-    painter.setPen(Qt::NoPen);
-    painter.setBrush(brush);
+    painter.setPen(pen);
     if (antialiased)
         painter.setRenderHint(QPainter::Antialiasing, true);
 
-    //painter.drawEllipse(0, 0, 300, 300);
+    static Clientv2 &engine = Clientv2::getInstance();
+    for(const auto map: std::as_const(engine.mapRegistryCache)) {
+        if(map->id == KP::hiddenMap) {
+            continue;
+        }
+        if(map->id == hoverMapID) {
+            painter.setBrush(brushHovered);
+        }
+        else {
+            painter.setBrush(brush);
+        }
+        painter.drawEllipse(map->x - circleSize / 2, map->y - circleSize / 2,
+                            circleSize, circleSize);
+    }
 
     painter.setRenderHint(QPainter::Antialiasing, false);
     painter.setPen(palette().dark().color());
