@@ -1348,6 +1348,11 @@ void Clientv2::receivedMsg(const QJsonObject &djson) {
         }
     }
     break;
+    case KP::AskForHomePort: {
+        QDialog d;
+        d.show();
+    }
+    break;
     default: throw std::domain_error("message not implemented"); break;
     }
 }

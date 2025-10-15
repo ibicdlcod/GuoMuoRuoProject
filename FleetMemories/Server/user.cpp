@@ -37,6 +37,22 @@ void User::addSkillPoints(const CSteamID &uid, int equipId, int64 skillPoints) {
     }
 }
 
+KP::ShipNationality User::checkHomePort(const CSteamID &uid) {
+    QSqlDatabase db = QSqlDatabase::database();
+    QSqlQuery query;
+    query.prepare("SELECT Intvalue "
+                  "FROM UserAttr WHERE UserID = :id "
+                  "AND Attribute = 'HomePort'");
+    query.bindValue(":id", QString::number(uid.ConvertToUint64()));
+
+    if(Q_UNLIKELY(!query.exec() ||!query.isSelect() || !query.first())) {
+        return KP::UnknownNation;
+    }
+    else {
+        return static_cast<KP::ShipNationality>(query.value(0).toInt());
+    }
+}
+
 int User::getCurrentFactoryParallel(const CSteamID &uid, int equipId) {
     QSqlDatabase db = QSqlDatabase::database();
     QSqlQuery query;

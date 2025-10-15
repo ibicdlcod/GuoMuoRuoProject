@@ -48,9 +48,10 @@ void MapRender::mouseMoveEvent(QMouseEvent *event)
     if (rect().contains(event->pos())) { // Check if release occurred within widget
         static Clientv2 &engine = Clientv2::getInstance();
         for(const auto map: std::as_const(engine.mapRegistryCache)) {
+            /*
             if(map->id == KP::hiddenMap) {
                 continue;
-            }
+            }*/
             double distance = std::hypot(event->pos().x()
                                                  / (double) this->width()
                                                  * globeMapWidth
@@ -75,9 +76,10 @@ void MapRender::mouseReleaseEvent(QMouseEvent *event)
         if (rect().contains(event->pos())) { // Check if release occurred within widget
             static Clientv2 &engine = Clientv2::getInstance();
             for(const auto map: std::as_const(engine.mapRegistryCache)) {
+                /*
                 if(map->id == KP::hiddenMap) {
                     continue;
-                }
+                }*/
                 double distance = std::hypot(event->pos().x()
                                                      / (double) this->width()
                                                      * globeMapWidth
@@ -116,9 +118,10 @@ void MapRender::paintEvent(QPaintEvent * /* event */)
 
     static Clientv2 &engine = Clientv2::getInstance();
     for(const auto map: std::as_const(engine.mapRegistryCache)) {
+        /*
         if(map->id == KP::hiddenMap) {
             continue;
-        }
+        }*/
         if(map->id == hoverMapID) {
             painter.setBrush(brushHovered);
         }

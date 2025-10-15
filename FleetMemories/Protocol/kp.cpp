@@ -255,6 +255,26 @@ QByteArray KP::clientTestMessages(int index) {
     return QCborValue::fromJsonValue(result).toCbor();
 }
 
+QByteArray KP::serverAskForHomePort()
+{
+    QJsonObject result;
+    result["type"] = DgramType::Message;
+    result["msgtype"] = MsgType::AskForHomePort;
+    QJsonArray array;
+    QList<KP::ShipNationality> availableHomePorts
+        = {KP::Japanese};
+    for(auto homeport: availableHomePorts) {
+        array.append(homeport);
+    }
+    result["choices"] = array;
+    /*
+    QList<KP::ShipNationality> availableHomePorts
+        = {KP::Japanese, KP::German, KP::Italian,
+           KP::American, KP::British, KP::French, KP::Soviet};
+    */
+    return QCborValue::fromJsonValue(result).toCbor();
+}
+
 QByteArray KP::serverDevelopFailed(GameError error) {
     QJsonObject result;
     result["type"] = DgramType::Message;

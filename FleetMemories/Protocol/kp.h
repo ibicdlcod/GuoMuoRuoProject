@@ -102,7 +102,8 @@ enum MsgType{
     EquipRetired,
     Success,
     MessageTestServer,
-    FleetFail
+    FleetFail,
+    AskForHomePort
 };
 Q_ENUM_NS(MsgType)
 
@@ -227,7 +228,7 @@ enum ConsoleCommandType{
 Q_ENUM_NS(ConsoleCommandType)
 
 enum ShipNationality{
-    Unknown = 0,
+    UnknownNation = 0,
     Japanese = 1,
     German = 2,
     Italian = 3,
@@ -298,9 +299,9 @@ enum EquipSpecial{
 Q_ENUM_NS(EquipSpecial)
 
 enum Difficulty {
-    Early,
-    Medium,
-    Late,
+    EarlyWar,
+    MidWar,
+    LateWar,
     Historical
 };
 Q_ENUM_NS(Difficulty)
@@ -359,6 +360,7 @@ QByteArray clientSteamAuth(uint8 [], uint32);
 QByteArray clientSteamLogout();
 QByteArray clientTestMessages(int);
 
+QByteArray serverAskForHomePort();
 QByteArray serverDevelopFailed(GameError);
 QByteArray serverDevelopStart();
 QByteArray serverEquipLackFather(GameError, int);

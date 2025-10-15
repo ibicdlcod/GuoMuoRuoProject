@@ -68,7 +68,7 @@ ShipSelect::ShipSelect(int height, QWidget *parent)
     nationBox->setSizeAdjustPolicy(QComboBox::AdjustToContents);
     auto meta = QMetaEnum::fromType<KP::ShipNationality>();
     for(int i = 0; i < meta.keyCount(); ++i) {
-        if(meta.value(i) == KP::ShipNationality::Unknown) {
+        if(meta.value(i) == KP::ShipNationality::UnknownNation) {
             //% "All nationalities"
             nationBox->addItem(qtTrId("all-nationality"));
         }

@@ -63,6 +63,7 @@ void Sortie::switchMap(int mapId) {
     if(!engine.mapRegistryCacheGood) {
         return;
     }
+    ui->DiffChoice->clear();
     auto meta = QMetaEnum::fromType<KP::Difficulty>();
     for(int i = 0; i < meta.keyCount(); ++i) {
         KP::Difficulty diff = static_cast<KP::Difficulty>(meta.value(i));
@@ -71,6 +72,22 @@ void Sortie::switchMap(int mapId) {
                                            [mapId + diff * KP::mapIDDifficultyMask]
                                                ->toString(settings->value("client/language", "ja_JP")
                                                               .toString()));
+            switch(diff)
+            {
+            case KP::EarlyWar:
+                ui->DiffChoice->addItem(qtTrId("diff-c"));
+                break;
+            case KP::MidWar:
+                ui->DiffChoice->addItem(qtTrId("diff-b"));
+                break;
+            case KP::LateWar:
+                ui->DiffChoice->addItem(qtTrId("diff-a"));
+                break;
+            case KP::Historical:
+                //% "Historical"
+                ui->DiffChoice->addItem(qtTrId("diff-s"));
+                break;
+            }
         }
     }
 }

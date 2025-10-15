@@ -1343,6 +1343,11 @@ void Server::clearNegativeSkillPoints(const CSteamID &uid) {
     }
 }
 
+void Server::decideHomePort(const CSteamID &uid, QSslSocket *connection) {
+    QByteArray msg = KP::serverAskForHomePort();
+    senderM.sendMessage(connection, msg);
+}
+
 void Server::decryptDatagram(QSslSocket *connection,
                              const QByteArray &clientMessage) {
     Q_ASSERT(connection->isEncrypted());
@@ -3007,6 +3012,9 @@ void Server::receivedReq(const QJsonObject &djson,
         auto state = djson["state"].toInt();
         switch(state) {
         case KP::GameState::Port: {
+            if(User::checkHomePort(uid) == KP::UnknownNation) {
+                decideHomePort(uid, connection);
+            }
             naturalRegen(uid);
             User::refreshPort(uid);
         }
