@@ -265,7 +265,7 @@ Great at battle and bad at politics--so cool!</source>
         <location filename="../Protocol/equiptype.cpp" line="198"/>
         <location filename="../ClientGUI/ui/fleet/shipequip.cpp" line="155"/>
         <source>Unknown</source>
-        <translation type="unfinished"></translation>
+        <translation>未知</translation>
     </message>
     <message id="terminial-required">
         <location filename="../Protocol/kp.cpp" line="36"/>
@@ -446,27 +446,27 @@ Great at battle and bad at politics--so cool!</source>
     <message id="aviation-battlecruiser">
         <location filename="../Protocol/shiptype.cpp" line="47"/>
         <source>Battlecruiser (Advanced Aviation)</source>
-        <translation type="unfinished"></translation>
+        <translation>航空战列巡洋舰</translation>
     </message>
     <message id="highspeed-av-battleship">
         <location filename="../Protocol/shiptype.cpp" line="49"/>
         <source>Battleship (High speed &amp; Aviation)</source>
-        <translation type="unfinished"></translation>
+        <translation>航空高速战舰</translation>
     </message>
     <message id="super-battleship">
         <location filename="../Protocol/shiptype.cpp" line="51"/>
         <source>Super Battleship</source>
-        <translation type="unfinished"></translation>
+        <translation>超级战舰</translation>
     </message>
     <message id="super-highspeed-battleship">
         <location filename="../Protocol/shiptype.cpp" line="53"/>
         <source>Super Battleship (High speed)</source>
-        <translation type="unfinished"></translation>
+        <translation>超级高速战舰</translation>
     </message>
     <message id="super-aviation-battleship">
         <location filename="../Protocol/shiptype.cpp" line="55"/>
         <source>Super Battleship (Advanced Aviation)</source>
-        <translation type="unfinished"></translation>
+        <translation>超级航空战舰</translation>
     </message>
     <message id="escort-unknown-special">
         <location filename="../Protocol/shiptype.cpp" line="60"/>
@@ -512,7 +512,7 @@ Great at battle and bad at politics--so cool!</source>
         <location filename="../Protocol/shiptype.cpp" line="89"/>
         <source>(Advanced ASW)</source>
         <oldsource>(Advanced Anti-Sub)</oldsource>
-        <translation type="unfinished">（高级反潜）</translation>
+        <translation>（高级反潜）</translation>
     </message>
     <message id="escort-carrier">
         <location filename="../Protocol/shiptype.cpp" line="92"/>
@@ -879,12 +879,12 @@ Great at battle and bad at politics--so cool!</source>
         <location filename="../ClientGUI/clientv2.cpp" line="1328"/>
         <source>Fleet is oversized or undersized.</source>
         <oldsource>Fleet is oversized.</oldsource>
-        <translation type="unfinished"></translation>
+        <translation>舰队规模过大或过小。</translation>
     </message>
     <message id="fleet-type-error">
         <location filename="../ClientGUI/clientv2.cpp" line="1332"/>
         <source>Fleet does not suit its type.</source>
-        <translation type="unfinished"></translation>
+        <translation>舰队组成与类型相悖。</translation>
     </message>
     <message id="login-success">
         <location filename="../ClientGUI/clientv2.cpp" line="1345"/>
@@ -1053,7 +1053,7 @@ Great at battle and bad at politics--so cool!</source>
     <message id="equipview-unselect">
         <location filename="../ClientGUI/ui/views/equipview.cpp" line="68"/>
         <source>Unselect</source>
-        <translation type="unfinished"></translation>
+        <translation>取消选择</translation>
     </message>
     <message id="no-ship">
         <location filename="../ClientGUI/ui/views/equipview.cpp" line="151"/>
@@ -1111,7 +1111,7 @@ Great at battle and bad at politics--so cool!</source>
     <message id="load-assets">
         <location filename="../ClientGUI/ui/portarea.cpp" line="35"/>
         <source>Loading Assets...</source>
-        <translation type="unfinished"></translation>
+        <translation>加载美术资源……</translation>
     </message>
     <message id="client-hello">
         <location filename="../ClientGUI/ui/portarea.cpp" line="40"/>
@@ -1234,7 +1234,7 @@ Great at battle and bad at politics--so cool!</source>
     <message id="map-init-failure">
         <location filename="../Server/server.cpp" line="466"/>
         <source>Map init failed!</source>
-        <translation type="unfinished"></translation>
+        <translation>初始化地图失败！</translation>
     </message>
     <message id="importcsv-usage">
         <location filename="../Server/server.cpp" line="537"/>
@@ -1477,12 +1477,12 @@ Great at battle and bad at politics--so cool!</source>
         <location filename="../Server/server.cpp" line="2284"/>
         <location filename="../Server/server.cpp" line="2311"/>
         <source>Load map table failed!</source>
-        <translation type="unfinished"></translation>
+        <translation>加载地图列表失败！</translation>
     </message>
     <message id="map-load-good">
         <location filename="../Server/server.cpp" line="2338"/>
         <source>Load map registry success!</source>
-        <translation type="unfinished"></translation>
+        <translation>加载地图数据库成功！</translation>
     </message>
     <message id="user-migrate-equip-failed">
         <location filename="../Server/server.cpp" line="2427"/>
@@ -1500,7 +1500,7 @@ Great at battle and bad at politics--so cool!</source>
     <message id="import-kc-data-success">
         <location filename="../Server/server.cpp" line="2514"/>
         <source>User %1: import from KC data success!</source>
-        <translation type="unfinished"></translation>
+        <translation>用户%1：导入舰C数据成功！</translation>
     </message>
     <message id="user-query-regen-time-fail">
         <location filename="../Server/server.cpp" line="2531"/>
@@ -1510,7 +1510,7 @@ Great at battle and bad at politics--so cool!</source>
     <message id="regen-min">
         <location filename="../Server/server.cpp" line="2556"/>
         <source>%1 minute(s) passed for regeneration purposes.</source>
-        <translation type="unfinished"></translation>
+        <translation>自然恢复已经过%1分钟。</translation>
     </message>
     <message id="natural-regen-failed">
         <location filename="../Server/server.cpp" line="2577"/>
@@ -1630,7 +1630,7 @@ Great at battle and bad at politics--so cool!</source>
     <message id="command-type-wrong">
         <location filename="../Server/server.cpp" line="3104"/>
         <source>User %1: command type not supported</source>
-        <translation type="unfinished"></translation>
+        <translation>用户%1：不支持的命令类型</translation>
     </message>
     <message id="ship-refresh-failed">
         <location filename="../Server/server.cpp" line="3281"/>
@@ -1832,7 +1832,7 @@ Great at battle and bad at politics--so cool!</source>
     <message id="update-fleet-clear-failure">
         <location filename="../Server/server.cpp" line="3791"/>
         <source>Update fleet (clear fleet) failure!</source>
-        <translation type="unfinished"></translation>
+        <translation>更新舰队（清除舰队）失败！</translation>
     </message>
     <message id="update-fleet-failure">
         <location filename="../Server/server.cpp" line="3694"/>
@@ -1841,17 +1841,17 @@ Great at battle and bad at politics--so cool!</source>
         <location filename="../Server/server.cpp" line="3867"/>
         <location filename="../Server/server.cpp" line="3887"/>
         <source>Update fleet failure!</source>
-        <translation type="unfinished"></translation>
+        <translation>更新舰队失败！</translation>
     </message>
     <message id="ship-cant-equip-it">
         <location filename="../Server/server.cpp" line="3823"/>
         <source>Ship %1 can&apos;t equip %2!</source>
-        <translation type="unfinished"></translation>
+        <translation>舰船%1无法装备%2！</translation>
     </message>
     <message id="ship-cant-equip-it-extra">
         <location filename="../Server/server.cpp" line="3851"/>
         <source>Ship %1 can&apos;t equip %2 in extra slot!</source>
-        <translation type="unfinished"></translation>
+        <translation>舰船%1无法在补强格装备%2！</translation>
     </message>
     <message id="user-data-init-fail">
         <location filename="../Server/server.cpp" line="3922"/>
@@ -1868,7 +1868,7 @@ Great at battle and bad at politics--so cool!</source>
         <location filename="../Server/server.cpp" line="1026"/>
         <location filename="../Server/server.cpp" line="3980"/>
         <source>Set User Fleet Up failed!</source>
-        <translation type="unfinished"></translation>
+        <translation>初始化用户舰队失败！</translation>
     </message>
     <message id="sender-error">
         <location filename="../Server/servermastersender.cpp" line="33"/>
@@ -1904,12 +1904,12 @@ Great at battle and bad at politics--so cool!</source>
     <message id="user-get-equip-data-failed">
         <location filename="../Server/user.cpp" line="140"/>
         <source>Get equipment data of %1 failed!</source>
-        <translation type="unfinished"></translation>
+        <translation>获取装备%1的数据失败！</translation>
     </message>
     <message id="user-get-ship-data-failed">
         <location filename="../Server/user.cpp" line="162"/>
         <source>Get ship data of %1 failed!</source>
-        <translation type="unfinished"></translation>
+        <translation>获取舰船%1的数据失败！</translation>
     </message>
     <message id="user-get-skillpoint-failed">
         <location filename="../Server/user.cpp" line="185"/>
@@ -2218,53 +2218,53 @@ Great at battle and bad at politics--so cool!</source>
     <message id="bytes-read-total">
         <location filename="../ClientGUI/resourcefetch.cpp" line="18"/>
         <source>Read %1 of %2 bytes</source>
-        <translation type="unfinished"></translation>
+        <translation>共%2字节，读取了%1字节</translation>
     </message>
     <message id="url-invalid">
         <location filename="../ClientGUI/resourcefetch.cpp" line="55"/>
         <source>Invalid URL: %1: %2</source>
-        <translation type="unfinished"></translation>
+        <translation>非法URL: %1，错误%2</translation>
     </message>
     <message id="unable-to-save-file">
         <location filename="../ClientGUI/resourcefetch.cpp" line="87"/>
         <source>Unable to save the file %1: %2.</source>
-        <translation type="unfinished"></translation>
+        <translation>未能保存入文件%1：错误%2。</translation>
     </message>
     <message id="download-failed">
         <location filename="../ClientGUI/resourcefetch.cpp" line="121"/>
         <source>Download failed: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>下载失败，错误：%1</translation>
     </message>
     <message id="download-success">
         <location filename="../ClientGUI/resourcefetch.cpp" line="128"/>
         <source>Downloaded %1 bytes to %2 in %3</source>
-        <translation type="unfinished"></translation>
+        <translation>下载了%1字节至文件夹%3下的文件%2</translation>
     </message>
     <message id="ssl-errors">
         <location filename="../ClientGUI/resourcefetch.cpp" line="158"/>
         <source>One or more TLS errors has occurred: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>发生了一个或多个TLS错误：%1</translation>
     </message>
     <message id="fleet-pos-head">
         <location filename="../ClientGUI/ui/fleet/fleetview.cpp" line="35"/>
         <source>Pos</source>
-        <translation type="unfinished"></translation>
+        <translation>位置</translation>
     </message>
     <message id="fleetview-equip-slot-ex">
         <location filename="../ClientGUI/ui/fleet/fleetview.cpp" line="93"/>
         <source>Equip Ex</source>
-        <translation type="unfinished"></translation>
+        <translation>补强装备栏</translation>
     </message>
     <message id="fleetview-equip-slot">
         <location filename="../ClientGUI/ui/fleet/fleetview.cpp" line="97"/>
         <source>Equip %1</source>
         <oldsource>Equip Ex</oldsource>
-        <translation type="unfinished"></translation>
+        <translation>装备栏%1</translation>
     </message>
     <message id="fleetview-view-ship-attr">
         <location filename="../ClientGUI/ui/fleet/fleetview.cpp" line="118"/>
         <source>Attributes</source>
-        <translation type="unfinished"></translation>
+        <translation>属性</translation>
     </message>
     <message id="ship-name-head">
         <source></source>
@@ -2279,27 +2279,27 @@ Great at battle and bad at politics--so cool!</source>
     <message id="NormalFleet">
         <location filename="../Protocol/kp.h" line="312"/>
         <source>Normal</source>
-        <translation type="unfinished"></translation>
+        <translation>通常舰队</translation>
     </message>
     <message id="CarrierFleet">
         <location filename="../Protocol/kp.h" line="314"/>
         <source>Carrier</source>
-        <translation type="unfinished">航空母舰</translation>
+        <translation>空母机动</translation>
     </message>
     <message id="SurfaceFleet">
         <location filename="../Protocol/kp.h" line="316"/>
         <source>Surface</source>
-        <translation type="unfinished"></translation>
+        <translation>水上打击</translation>
     </message>
     <message id="TransportFleet">
         <location filename="../Protocol/kp.h" line="318"/>
         <source>Transport</source>
-        <translation type="unfinished">运输</translation>
+        <translation>输送护卫</translation>
     </message>
     <message id="lv-display">
         <location filename="../ClientGUI/ui/fleet/shipdisplay.cpp" line="53"/>
         <source>Lv %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Lv %1</translation>
     </message>
 </context>
 <context>
@@ -2307,32 +2307,32 @@ Great at battle and bad at politics--so cool!</source>
     <message id="select-equipment-name">
         <location filename="../ClientGUI/ui/factory/developwindow.ui" line="50"/>
         <source>Select Equipment Name:</source>
-        <translation type="unfinished">选择装备名：</translation>
+        <translation>选择装备名：</translation>
     </message>
     <message id="select-equipment-type">
         <location filename="../ClientGUI/ui/factory/developwindow.ui" line="69"/>
         <source>Select Equipment Type:</source>
-        <translation type="unfinished">选择装备类型：</translation>
+        <translation>选择装备类型：</translation>
     </message>
     <message id="or-enter-equipment-id">
         <location filename="../ClientGUI/ui/factory/developwindow.ui" line="88"/>
         <source>Or Enter Equipment ID:</source>
-        <translation type="unfinished">或键入装备ID：</translation>
+        <translation>或键入装备ID：</translation>
     </message>
     <message id="dev-success-rate">
         <location filename="../ClientGUI/ui/factory/developwindow.ui" line="105"/>
         <source>Estimated success rate:</source>
-        <translation type="unfinished">估计成功率：</translation>
+        <translation>估计成功率：</translation>
     </message>
     <message id="dev-calculating">
         <location filename="../ClientGUI/ui/factory/developwindow.ui" line="112"/>
         <source>Calculating...</source>
-        <translation type="unfinished">正在计算……</translation>
+        <translation>正在计算……</translation>
     </message>
     <message id="develop-calculate">
         <location filename="../ClientGUI/ui/factory/developwindow.ui" line="119"/>
         <source>Calculate</source>
-        <translation type="unfinished"></translation>
+        <translation>计算</translation>
     </message>
     <message>
         <location filename="../ClientGUI/ui/factory/developwindow.ui" line="14"/>
@@ -2486,47 +2486,47 @@ Great at battle and bad at politics--so cool!</source>
     <message id="load-fleet-wait">
         <location filename="../ClientGUI/ui/fleet/fleetview.ui" line="245"/>
         <source>Loading Fleets, please wait...</source>
-        <translation type="unfinished"></translation>
+        <translation>加载舰队中，请等待……</translation>
     </message>
     <message id="fleetview-fleet">
         <location filename="../ClientGUI/ui/fleet/fleetview.ui" line="81"/>
         <source>Fleet:</source>
-        <translation type="unfinished"></translation>
+        <translation>舰队：</translation>
     </message>
     <message id="fleetview-fleet1">
         <location filename="../ClientGUI/ui/fleet/fleetview.ui" line="106"/>
         <source>1</source>
-        <translation type="unfinished"></translation>
+        <translation>1</translation>
     </message>
     <message id="fleetview-fleet2">
         <location filename="../ClientGUI/ui/fleet/fleetview.ui" line="131"/>
         <source>2</source>
-        <translation type="unfinished"></translation>
+        <translation>2</translation>
     </message>
     <message id="fleetview-fleet3">
         <location filename="../ClientGUI/ui/fleet/fleetview.ui" line="156"/>
         <source>3</source>
-        <translation type="unfinished"></translation>
+        <translation>3</translation>
     </message>
     <message id="fleetview-fleet4">
         <location filename="../ClientGUI/ui/fleet/fleetview.ui" line="181"/>
         <source>4</source>
-        <translation type="unfinished"></translation>
+        <translation>4</translation>
     </message>
     <message id="fleetview-fleetexp">
         <location filename="../ClientGUI/ui/fleet/fleetview.ui" line="188"/>
         <source>Expedition Fleet:</source>
-        <translation type="unfinished"></translation>
+        <translation>远征舰队：</translation>
     </message>
     <message id="fleetview-fleet-type">
         <location filename="../ClientGUI/ui/fleet/fleetview.ui" line="198"/>
         <source>Fleet type:</source>
-        <translation type="unfinished"></translation>
+        <translation>舰队类型：</translation>
     </message>
     <message id="fleet-save">
         <location filename="../ClientGUI/ui/fleet/fleetview.ui" line="208"/>
         <source>Save</source>
-        <translation type="unfinished"></translation>
+        <translation>保存</translation>
     </message>
     <message>
         <location filename="../ClientGUI/ui/fleet/fleetview.ui" line="14"/>
@@ -2555,91 +2555,91 @@ Great at battle and bad at politics--so cool!</source>
         <location filename="../ClientGUI/ui/factory/factoryarea.cpp" line="127"/>
         <source>Develop Equipment</source>
         <oldsource>Develop equipment</oldsource>
-        <translation type="unfinished">装备开发</translation>
+        <translation>装备开发</translation>
     </message>
     <message id="construct-ships">
         <location filename="../ClientGUI/ui/mainwindow.ui" line="439"/>
         <location filename="../ClientGUI/ui/factory/factoryarea.cpp" line="132"/>
         <source>Construct Ships</source>
         <oldsource>Consturct Ships</oldsource>
-        <translation type="unfinished">舰船建造</translation>
+        <translation>舰船建造</translation>
     </message>
     <message id="arsenal">
         <location filename="../ClientGUI/ui/mainwindow.ui" line="444"/>
         <location filename="../ClientGUI/ui/factory/factoryarea.cpp" line="137"/>
         <source>Arsenal</source>
-        <translation type="unfinished">军械库</translation>
+        <translation>军械库</translation>
     </message>
     <message id="anchorage">
         <location filename="../ClientGUI/ui/mainwindow.ui" line="454"/>
         <location filename="../ClientGUI/ui/factory/factoryarea.cpp" line="146"/>
         <source>Anchorage</source>
-        <translation type="unfinished">锚地</translation>
+        <translation>锚地</translation>
     </message>
     <message id="mainwindow-title">
         <location filename="../ClientGUI/ui/mainwindow.ui" line="14"/>
         <source>FleetMemories</source>
-        <translation type="unfinished">舰队记忆</translation>
+        <translation>舰队记忆</translation>
     </message>
     <message id="menu-sortie">
         <location filename="../ClientGUI/ui/mainwindow.ui" line="366"/>
         <source>Sortie</source>
-        <translation type="unfinished">出击</translation>
+        <translation>出击</translation>
     </message>
     <message id="menu-fleet">
         <location filename="../ClientGUI/ui/mainwindow.ui" line="372"/>
         <source>Fleet</source>
-        <translation type="unfinished">编成</translation>
+        <translation>编成</translation>
     </message>
     <message id="menu-dock">
         <location filename="../ClientGUI/ui/mainwindow.ui" line="378"/>
         <source>Dock</source>
-        <translation type="unfinished">入渠</translation>
+        <translation>入渠</translation>
     </message>
     <message id="menu-factory">
         <location filename="../ClientGUI/ui/mainwindow.ui" line="383"/>
         <source>Factory</source>
-        <translation type="unfinished">工厂</translation>
+        <translation>工厂</translation>
     </message>
     <message id="menu-naval-base">
         <location filename="../ClientGUI/ui/mainwindow.ui" line="392"/>
         <source>Naval Base</source>
-        <translation type="unfinished">母港</translation>
+        <translation>母港</translation>
     </message>
     <message id="menu-tech">
         <location filename="../ClientGUI/ui/mainwindow.ui" line="400"/>
         <source>Tech</source>
-        <translation type="unfinished">科技</translation>
+        <translation>科技</translation>
     </message>
     <message id="menu-back-to-naval-base">
         <location filename="../ClientGUI/ui/mainwindow.ui" line="419"/>
         <source>Back to naval base</source>
-        <translation type="unfinished">返回母港</translation>
+        <translation>返回母港</translation>
     </message>
     <message id="menu-logout">
         <location filename="../ClientGUI/ui/mainwindow.ui" line="424"/>
         <source>Logout</source>
-        <translation type="unfinished">登出</translation>
+        <translation>登出</translation>
     </message>
     <message id="menu-exit">
         <location filename="../ClientGUI/ui/mainwindow.ui" line="429"/>
         <source>Exit program</source>
-        <translation type="unfinished">退出程序</translation>
+        <translation>退出程序</translation>
     </message>
     <message id="menu-view-tech">
         <location filename="../ClientGUI/ui/mainwindow.ui" line="434"/>
         <source>View Tech</source>
-        <translation type="unfinished">查看科技</translation>
+        <translation>查看科技</translation>
     </message>
     <message id="menu-battle">
         <location filename="../ClientGUI/ui/mainwindow.ui" line="449"/>
         <source>Battle Maps</source>
-        <translation type="unfinished">战斗海域一览</translation>
+        <translation>战斗海域一览</translation>
     </message>
     <message id="menu-compose">
         <location filename="../ClientGUI/ui/mainwindow.ui" line="459"/>
         <source>Compose</source>
-        <translation type="unfinished"></translation>
+        <translation>编成</translation>
     </message>
     <message>
         <location filename="../ClientGUI/ui/mainwindow.ui" line="69"/>
@@ -2665,17 +2665,17 @@ Great at battle and bad at politics--so cool!</source>
     <message id="login-options-server">
         <location filename="../ClientGUI/ui/newlogins.ui" line="58"/>
         <source>Server:</source>
-        <translation type="unfinished">服务器：</translation>
+        <translation>服务器：</translation>
     </message>
     <message id="login-options-port">
         <location filename="../ClientGUI/ui/newlogins.ui" line="84"/>
         <source>Port:</source>
-        <translation type="unfinished">端口：</translation>
+        <translation>端口：</translation>
     </message>
     <message id="login-options-connect">
         <location filename="../ClientGUI/ui/newlogins.ui" line="104"/>
         <source>Connect</source>
-        <translation type="unfinished">连接</translation>
+        <translation>连接</translation>
     </message>
     <message>
         <location filename="../ClientGUI/ui/newlogins.ui" line="14"/>
@@ -2706,7 +2706,7 @@ Great at battle and bad at politics--so cool!</source>
     <message>
         <location filename="../ClientGUI/ui/fleet/shipdisplay.ui" line="72"/>
         <source>%v/%m</source>
-        <translation type="unfinished"></translation>
+        <translation>%v/%m</translation>
     </message>
     <message>
         <location filename="../ClientGUI/ui/fleet/shipdisplay.ui" line="79"/>
@@ -2716,7 +2716,7 @@ Great at battle and bad at politics--so cool!</source>
     <message>
         <location filename="../ClientGUI/ui/fleet/shipdisplay.ui" line="96"/>
         <source>Lv 0</source>
-        <translation type="unfinished"></translation>
+        <translation>Lv 0</translation>
     </message>
 </context>
 <context>
@@ -2730,7 +2730,7 @@ Great at battle and bad at politics--so cool!</source>
         <location filename="../ClientGUI/ui/fleet/shipequip.ui" line="93"/>
         <location filename="../ClientGUI/ui/fleet/shipequip.cpp" line="146"/>
         <source>Empty</source>
-        <translation type="unfinished"></translation>
+        <translation>空装备格</translation>
     </message>
 </context>
 <context>
@@ -2764,76 +2764,76 @@ Great at battle and bad at politics--so cool!</source>
     <message id="techview-globaltech">
         <location filename="../ClientGUI/ui/techview.ui" line="24"/>
         <source>GlobalTech:</source>
-        <translation type="unfinished">全局科技：</translation>
+        <translation>全局科技：</translation>
     </message>
     <message id="techview-calculating">
         <location filename="../ClientGUI/ui/techview.ui" line="34"/>
         <source>Calculating...</source>
-        <translation type="unfinished">正在计算……</translation>
+        <translation>正在计算……</translation>
     </message>
     <message id="techview-update">
         <location filename="../ClientGUI/ui/techview.ui" line="83"/>
         <source>Update</source>
-        <translation type="unfinished">更新</translation>
+        <translation>更新</translation>
     </message>
     <message id="techview-localtech">
         <location filename="../ClientGUI/ui/techview.ui" line="96"/>
         <source>LocalTech:</source>
-        <translation type="unfinished">局部科技：</translation>
+        <translation>局部科技：</translation>
     </message>
     <message id="techview-na">
         <location filename="../ClientGUI/ui/techview.ui" line="106"/>
         <location filename="../ClientGUI/ui/techview.ui" line="130"/>
         <location filename="../ClientGUI/ui/techview.cpp" line="108"/>
         <source>N/A</source>
-        <translation type="unfinished">不适用</translation>
+        <translation>不适用</translation>
     </message>
     <message id="techview-skillpoints">
         <location filename="../ClientGUI/ui/techview.ui" line="120"/>
         <source>Skill Points:</source>
-        <translation type="unfinished">技能点：</translation>
+        <translation>技能点：</translation>
     </message>
     <message id="techview-toship">
         <location filename="../ClientGUI/ui/techview.ui" line="149"/>
         <location filename="../ClientGUI/ui/techview.cpp" line="182"/>
         <source>Switch to ship</source>
-        <translation type="unfinished">转到舰船</translation>
+        <translation>转到舰船</translation>
     </message>
     <message id="techview-update-local">
         <location filename="../ClientGUI/ui/techview.ui" line="156"/>
         <source>Update</source>
-        <translation type="unfinished">更新</translation>
+        <translation>更新</translation>
     </message>
     <message id="techview-equip-type">
         <location filename="../ClientGUI/ui/techview.ui" line="170"/>
         <source>EquipType:</source>
-        <translation type="unfinished">装备类型：</translation>
+        <translation>装备类型：</translation>
     </message>
     <message id="techview-equip">
         <location filename="../ClientGUI/ui/techview.ui" line="177"/>
         <source>Equip:</source>
         <oldsource>Equipment:</oldsource>
-        <translation type="unfinished">装备：</translation>
+        <translation>装备：</translation>
     </message>
     <message id="techview-ship-nationality">
         <location filename="../ClientGUI/ui/techview.ui" line="216"/>
         <source>Nationality:</source>
-        <translation type="unfinished">国籍：</translation>
+        <translation>国籍：</translation>
     </message>
     <message id="techview-ship-class">
         <location filename="../ClientGUI/ui/techview.ui" line="262"/>
         <source>ShipClass:</source>
-        <translation type="unfinished">舰级：</translation>
+        <translation>舰级：</translation>
     </message>
     <message id="techview-ship-type">
         <location filename="../ClientGUI/ui/techview.ui" line="229"/>
         <source>ShipType:</source>
-        <translation type="unfinished">舰种：</translation>
+        <translation>舰种：</translation>
     </message>
     <message id="techview-ship">
         <location filename="../ClientGUI/ui/techview.ui" line="275"/>
         <source>Ship:</source>
-        <translation type="unfinished">舰船名：</translation>
+        <translation>舰船名：</translation>
     </message>
     <message>
         <location filename="../ClientGUI/ui/techview.ui" line="14"/>
@@ -2843,7 +2843,7 @@ Great at battle and bad at politics--so cool!</source>
     <message>
         <location filename="../ClientGUI/ui/techview.ui" line="57"/>
         <source>TextLabel</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 </TS>
