@@ -2139,25 +2139,25 @@ Great at battle and bad at politics--so cool!</translation>
         <translation type="unfinished">Unknown</translation>
     </message>
     <message id="diff-c">
-        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="41"/>
-        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="78"/>
+        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="42"/>
+        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="79"/>
         <source>Early</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="diff-b">
-        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="43"/>
-        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="81"/>
+        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="44"/>
+        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="82"/>
         <source>Medium</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="diff-a">
-        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="45"/>
-        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="84"/>
+        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="46"/>
+        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="85"/>
         <source>Late</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="diff-s">
-        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="88"/>
+        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="89"/>
         <source>Historical</source>
         <translation type="unfinished"></translation>
     </message>
