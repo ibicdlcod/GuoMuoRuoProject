@@ -66,6 +66,7 @@ public slots:
     void autoPassword();
     void backToNavalBase();
     void catbomb();
+    void chooseHomePort(KP::ShipNationality);
     void demandEquipCache();
     void demandMapCache();
     void demandShipCache();
@@ -99,6 +100,7 @@ public slots:
 
 signals:
     void aboutToQuit();
+    void askForHomePort(const QJsonObject &);
     void equipRegistryComplete();
     void shipRegistryComplete();
     void mapRegistryComplete();
