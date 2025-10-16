@@ -143,6 +143,8 @@ MainWindow::MainWindow(QWidget *parent, int argc, char ** argv)
             portArea, &PortArea::equipRegistryComplete);
     connect(&engine, &Clientv2::shipRegistryComplete,
             portArea, &PortArea::shipRegistryComplete);
+    connect(&engine, &Clientv2::mapRegistryComplete,
+            portArea, &PortArea::mapRegistryComplete);
     connect(&engine, &Clientv2::tsunkitAssetsComplete,
             portArea, &PortArea::hello);
 }

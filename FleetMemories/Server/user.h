@@ -10,6 +10,7 @@
 namespace User {
 
 void addSkillPoints(const CSteamID &, int, int64);
+KP::ShipNationality checkHomePort(const CSteamID &);
 int getCurrentFactoryParallel(const CSteamID &, int);
 ResOrd getCurrentResources(const CSteamID &);
 int getEquipAmount(const CSteamID &, int);

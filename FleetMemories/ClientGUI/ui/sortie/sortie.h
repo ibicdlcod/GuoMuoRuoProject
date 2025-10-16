@@ -25,6 +25,9 @@ public:
 protected:
     void resizeEvent(QResizeEvent *event) override;
 
+private slots:
+    void switchMap(int mapId);
+
 private:
     Ui::Sortie *ui;
     MapRender *renderer;

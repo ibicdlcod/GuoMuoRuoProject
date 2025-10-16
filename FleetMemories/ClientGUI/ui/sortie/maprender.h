@@ -14,8 +14,13 @@ public:
 #pragma message(NOT_M_CONST)
     static constexpr int globeMapWidth = 5632;
     static constexpr int globeMapHeight = 2048;
+    static constexpr int circleSize = 64;
+
+signals:
+    void mapSelected(int mapId);
 
 protected:
+    void mouseMoveEvent(QMouseEvent *event) override;
     void mousePressEvent(QMouseEvent *event) override;
     void mouseReleaseEvent(QMouseEvent *event) override;
     void paintEvent(QPaintEvent *event) override;
@@ -23,10 +28,12 @@ protected:
 private:
     QPen pen;
     QBrush brush;
+    QBrush brushHovered;
     bool antialiased;
     QPixmap pixmap;
 
     bool mousePressedInside = false;
+    int hoverMapID = 0;
 };
 
 #endif // MAPRENDER_H

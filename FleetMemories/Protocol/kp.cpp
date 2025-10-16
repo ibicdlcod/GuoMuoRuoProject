@@ -124,6 +124,14 @@ QByteArray KP::clientDemandEquipInfoUser() {
     return QCborValue::fromJsonValue(result).toCbor();
 }
 
+QByteArray KP::clientDemandMapInfo(QDateTime timeUtc) {
+    QJsonObject result;
+    result["type"] = DgramType::Request;
+    result["command"] = CommandType::DemandMapInfo;
+    result["timestamp"] = timeUtc.toString();
+    return QCborValue::fromJsonValue(result).toCbor();
+}
+
 QByteArray KP::clientDemandResourceUpdate() {
     QJsonObject result;
     result["type"] = DgramType::Request;
@@ -244,6 +252,26 @@ QByteArray KP::clientTestMessages(int index) {
     result["type"] = DgramType::Request;
     result["command"] = CommandType::MessageTest;
     result["id"] = index;
+    return QCborValue::fromJsonValue(result).toCbor();
+}
+
+QByteArray KP::serverAskForHomePort()
+{
+    QJsonObject result;
+    result["type"] = DgramType::Message;
+    result["msgtype"] = MsgType::AskForHomePort;
+    QJsonArray array;
+    QList<KP::ShipNationality> availableHomePorts
+        = {KP::Japanese};
+    for(auto homeport: availableHomePorts) {
+        array.append(homeport);
+    }
+    result["choices"] = array;
+    /*
+    QList<KP::ShipNationality> availableHomePorts
+        = {KP::Japanese, KP::German, KP::Italian,
+           KP::American, KP::British, KP::French, KP::Soviet};
+    */
     return QCborValue::fromJsonValue(result).toCbor();
 }
 

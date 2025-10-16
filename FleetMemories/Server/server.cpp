@@ -928,15 +928,17 @@ void Server::offerMapInfo(QSslSocket *connection)
         mapInfo["diff"] = map->diff;
         mapInfos.append(mapInfo);
     }
-    connection->flush();
-    QByteArray msg =
-        KP::serverMapInfo(mapInfos, false,
-                          settings->value("server/mapdbtimestamp",
-                                          QDateTime::currentDateTimeUtc()
-                                          ).toDateTime()
-                          );
-    senderM.sendMessage(connection, msg);
-    connection->flush();
+    QTimer::singleShot(100, this, [=, this]{
+        connection->flush();
+        QByteArray msg =
+            KP::serverMapInfo(mapInfos, false,
+                              settings->value("server/mapdbtimestamp",
+                                              QDateTime::currentDateTimeUtc()
+                                              ).toDateTime()
+                              );
+        senderM.sendMessage(connection, msg);
+        connection->flush();
+    });
 }
 
 void Server::offerResourceInfo(QSslSocket *connection,
@@ -1339,6 +1341,11 @@ void Server::clearNegativeSkillPoints(const CSteamID &uid) {
                           .arg(uid.ConvertToUint64()),
                       query.lastError());
     }
+}
+
+void Server::decideHomePort(const CSteamID &uid, QSslSocket *connection) {
+    QByteArray msg = KP::serverAskForHomePort();
+    senderM.sendMessage(connection, msg);
 }
 
 void Server::decryptDatagram(QSslSocket *connection,
@@ -2244,7 +2251,7 @@ bool Server::mapRefresh()
             QSqlRecord rec = query.record();
             int attrCol = rec.indexOf("Attribute");
             int valueCol = rec.indexOf("Intvalue");
-            int O,E,S,A,R,W,C;
+            int O = 0, E = 0, S = 0, A = 0, R = 0, W = 0, C = 0;
             while(query.next()) {
                 if(query.value(attrCol).toString().compare("O", Qt::CaseInsensitive)) {
                     O = query.value(valueCol).toInt();
@@ -2290,10 +2297,10 @@ bool Server::mapRefresh()
                 int attrCol = rec.indexOf("Attribute");
                 int valueCol = rec.indexOf("Intvalue");
                 while(query.next()) {
-                    if(query.value(attrCol).toString().compare("x", Qt::CaseInsensitive)) {
+                    if(query.value(attrCol).toString().compare("x", Qt::CaseInsensitive) == 0) {
                         x = query.value(valueCol).toInt();
                     }
-                    if(query.value(attrCol).toString().compare("y", Qt::CaseInsensitive)) {
+                    if(query.value(attrCol).toString().compare("y", Qt::CaseInsensitive) == 0) {
                         y = query.value(valueCol).toInt();
                     }
                 }
@@ -2323,7 +2330,7 @@ bool Server::mapRefresh()
                                   new MapWithDiff(m, KP::Historical));
             }
             else {
-                auto meta = QMetaEnum::fromType<KP::GameState>();
+                auto meta = QMetaEnum::fromType<KP::Difficulty>();
                 for(int i = 0; i < meta.keyCount(); ++i) {
                     if(static_cast<KP::Difficulty>(meta.value(i)) == KP::Historical) {
                         continue;
@@ -3005,6 +3012,9 @@ void Server::receivedReq(const QJsonObject &djson,
         auto state = djson["state"].toInt();
         switch(state) {
         case KP::GameState::Port: {
+            if(User::checkHomePort(uid) == KP::UnknownNation) {
+                decideHomePort(uid, connection);
+            }
             naturalRegen(uid);
             User::refreshPort(uid);
         }
@@ -3169,6 +3179,29 @@ void Server::receivedReq(const QJsonObject &djson,
                            {offerShipInfoUser(uid, connection);});
     }
     break;
+    case KP::CommandType::DemandMapInfo: {
+        auto clientTime = QDateTime::fromString(djson["timestamp"].toString());
+        auto serverTime = settings->value("server/mapdbtimestamp").toDateTime();
+        qint64 diff = clientTime.msecsTo(serverTime);
+        if(diff > settings->value("server/cachetolerancemsec", 10000).toInt()) {
+            QTimer::singleShot(100,
+                               this,
+                               [connection, this]{offerMapInfo(connection);});
+        }
+        else {
+            connection->flush();
+            QByteArray msg =
+                KP::serverMapInfo(QJsonArray(),
+                                  false,
+                                  settings->value("server/mapdbtimestamp",
+                                                  QDateTime::currentDateTimeUtc()
+                                                  ).toDateTime(),
+                                  true
+                                  );
+            senderM.sendMessage(connection, msg);
+            connection->flush();
+        }
+    }
     case KP::CommandType::DemandTech: {
         QTimer::singleShot(100,
                            this,
@@ -3252,18 +3285,14 @@ void Server::sendTestMessages() {
         qWarning() << "Server isn't listening, abort.";
     }
     else {
-        /*
-        for(auto ship: std::as_const(shipRegistry)) {
-            qInfo() << ship->customFlags;
-        }
+        for(auto ship: std::as_const(normalMaps)) {
+            qInfo() << ship->x << ship->y;
+        }/*
         for(auto equip: std::as_const(equipRegistry)) {
             if(equip->type.isCarrierPlane()) {
                 qInfo() << equip->localNames["ja_JP"];
             }
         }*/
-        for(auto connectedPeer: connectedPeers) {
-            offerMapInfo(connectedPeer);
-        }
     }
 }
 

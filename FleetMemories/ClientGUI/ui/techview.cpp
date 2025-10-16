@@ -51,7 +51,7 @@ TechView::TechView(QWidget *parent) :
 
     auto meta = QMetaEnum::fromType<KP::ShipNationality>();
     for(int i = 0; i < meta.keyCount(); ++i) {
-        if(meta.value(i) == KP::ShipNationality::Unknown) {
+        if(meta.value(i) == KP::ShipNationality::UnknownNation) {
             //% "All nationalities"
             ui->localListNation->addItem(qtTrId("all-nationality"));
         }
