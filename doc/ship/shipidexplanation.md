@@ -5,13 +5,13 @@
 |  0x200000  |                            German                            |
 |  0x300000  |                           Italian                            |
 |  0x400000  |            American(including Canadian, Filipino)            |
-|  0x500000  |               British(including Indian, Irish)               |
+|  0x500000  |       British(including Indian, Irish, South African)        |
 |  0x600000  |                            French                            |
 |  0x700000  |                            Soviet                            |
 |  0x800000  |                Chinese(regardless of regime)                 |
 |  0x900000  |                           Benelux                            |
-|  0xA00000  |                         Scandinavian                         |
-|  0xB00000  |                   Australian/New Zelandian                   |
+|  0xA00000  |                            Nordic                            |
+|  0xB00000  |                           Oceanian                           |
 |  0xC00000  |                  Iberian or Latin American                   |
 |  0XD00000  |             Eastern European(including Turkish)              |
 |  0XE00000  |                    Asian(excluding above)                    |
