@@ -4,17 +4,38 @@
 |  0x100000  |                           Japanese                           |
 |  0x200000  |                            German                            |
 |  0x300000  |                           Italian                            |
-|  0x400000  |            American(including Canadian, Filipino)            |
-|  0x500000  |       British(including Indian, Irish, South African)        |
+|  0x400000  |                           American                           |
+|  0x4000C0  |                           Canadian                           |
+|  0x500000  |                           British                            |
+|  0x5000F0  |                            Indian                            |
 |  0x600000  |                            French                            |
 |  0x700000  |                            Soviet                            |
 |  0x800000  |                Chinese(regardless of regime)                 |
-|  0x900000  |                           Benelux                            |
-|  0xA00000  |                            Nordic                            |
-|  0xB00000  |                           Oceanian                           |
-|  0xC00000  |                  Iberian or Latin American                   |
-|  0XD00000  |             Eastern European(including Turkish)              |
-|  0XE00000  |                    Asian(excluding above)                    |
+|  0x900000  |                            Dutch                             |
+|  0x9000B0  |                           Belgian                            |
+|  0xA00000  |                           Swedish                            |
+|  0xA00040  |                            Danish                            |
+|  0xA00080  |                          Norwegian                           |
+|  0xA000C0  |                           Finnish                            |
+|  0xB00000  |                          Australian                          |
+|  0xB00080  |                          New Zeland                          |
+|  0xB000C0  |           (Reserved for other Oceanian countries)            |
+|  0xC00000  |                           Spanish                            |
+|  0xC00020  |                          Portugese                           |
+|  0xC00040  |                          Brazilian                           |
+|  0xC00060  |                         Argentinian                          |
+|  0xC00080  |                           Peruvian                           |
+|  0xC000A0  |                           Chilean                            |
+|  0xC000C0  |        (Reserved for other Latin American countries)         |
+|  0XD00000  |                         Yugoslavian                          |
+|  0xD00020  |                            Polish                            |
+|  0xD00040  |                          Bulgarian                           |
+|  0xD00060  |                            Greek                             |
+|  0xD00080  |                           Romanian                           |
+|  0xD000A0  |                           Turkish                            |
+|  0xD000C0  |             Estonian (also other Baltic states)              |
+|  0xE00000  |                             Thai                             |
+|  0xE00080  |             (Reserved for other Asian countries)             |
 |  0xF00000  |                        Fantasy ships                         |
 |  0x10000   |                           Escorts                            |
 |  0x11000   |            Escort Destroyers (have base torpedo)             |
