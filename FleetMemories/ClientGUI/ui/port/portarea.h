@@ -2,6 +2,7 @@
 #define PORTAREA_H
 
 #include <QFrame>
+#include "choosehomeport.h"
 
 namespace Ui {
 class PortArea;
@@ -20,12 +21,14 @@ public slots:
     void hello();
     void mapRegistryComplete();
     void shipRegistryComplete();
+    void showChooseHomePort(const QJsonObject &);
 
 protected:
     void resizeEvent(QResizeEvent *event) override;
 
 private:
     Ui::PortArea *ui;
+    ChooseHomePort *homeport = nullptr;
 };
 
 #endif // PORTAREA_H

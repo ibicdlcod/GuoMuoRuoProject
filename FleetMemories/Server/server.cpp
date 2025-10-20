@@ -3269,6 +3269,13 @@ void Server::receivedReq(const QJsonObject &djson,
         }
     }
     break;
+    case KP::CommandType::SelectHomePort: {
+        KP::ShipNationality nation = static_cast<KP::ShipNationality>(
+            djson["nation"].toInt());
+        User::decideHomePort(uid, nation);
+        /* TODO: initial ship blueprint */
+    }
+    break;
     default:
         throw std::domain_error(QString("User %1: command type not supported")
                                     .arg(uid.ConvertToUint64()).toStdString());

@@ -211,6 +211,14 @@ QByteArray KP::clientHello() {
     return QCborValue::fromJsonValue(result).toCbor();
 }
 
+QByteArray KP::clientHomePort(ShipNationality nation) {
+    QJsonObject result;
+    result["type"] = DgramType::Request;
+    result["command"] = CommandType::SelectHomePort;
+    result["nation"] = nation;
+    return QCborValue::fromJsonValue(result).toCbor();
+}
+
 QByteArray KP::clientMigrate(const QJsonObject &input) {
     QJsonObject result;
     result["type"] = DgramType::Request;
@@ -270,7 +278,8 @@ QByteArray KP::serverAskForHomePort()
     /*
     QList<KP::ShipNationality> availableHomePorts
         = {KP::Japanese, KP::German, KP::Italian,
-           KP::American, KP::British, KP::French, KP::Soviet};
+           KP::American, KP::British, KP::French, KP::Soviet,
+           KP::Oceanian};
     */
     return QCborValue::fromJsonValue(result).toCbor();
 }

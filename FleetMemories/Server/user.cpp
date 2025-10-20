@@ -53,6 +53,28 @@ KP::ShipNationality User::checkHomePort(const CSteamID &uid) {
     }
 }
 
+void User::decideHomePort(const CSteamID &uid, KP::ShipNationality nation) {
+    QSqlDatabase db = QSqlDatabase::database();
+
+    QSqlQuery query2;
+    query2.prepare("INSERT INTO UserAttr (UserID, Attribute, Intvalue) "
+                   "VALUES (:id, 'HomePort', :nation);");
+    query2.bindValue(":id", uid.ConvertToUint64());
+    query2.bindValue(":nation", nation);
+    if(Q_UNLIKELY(!query2.exec())) {
+        qCritical() << query2.lastQuery();
+        //% "User %1: set home port failed!"
+        throw DBError(qtTrId("user-add-homeport-failure")
+                          .arg(uid.ConvertToUint64()),
+                      query2.lastError());
+    }
+    else {
+        //% "User %1: set home port"
+        qDebug() << qtTrId("user-add-homeport-success")
+                        .arg(uid.ConvertToUint64());
+    }
+}
+
 int User::getCurrentFactoryParallel(const CSteamID &uid, int equipId) {
     QSqlDatabase db = QSqlDatabase::database();
     QSqlQuery query;

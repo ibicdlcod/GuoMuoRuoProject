@@ -187,6 +187,12 @@ void Clientv2::catbomb() {
     displayPrompt();
 }
 
+void Clientv2::chooseHomePort(KP::ShipNationality nation)
+{
+    QByteArray msg = KP::clientHomePort(nation);
+    sender->enqueue(msg);
+}
+
 void Clientv2::demandEquipCache() {
     QDateTime localCacheTimeStamp = settings->value("client/equipdbtimestamp",
                                                     QDateTime(QDate(1970,01,01),
@@ -1349,8 +1355,7 @@ void Clientv2::receivedMsg(const QJsonObject &djson) {
     }
     break;
     case KP::AskForHomePort: {
-        QDialog d;
-        d.show();
+        emit askForHomePort(djson);
     }
     break;
     default: throw std::domain_error("message not implemented"); break;

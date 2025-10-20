@@ -22,6 +22,7 @@ Sortie::Sortie(QWidget *parent)
                                    ui->MapView);
     connect(renderer, &MapRender::mapSelected,
             this, &Sortie::switchMap);
+    ui->DiffChoice->setSizeAdjustPolicy(QComboBox::AdjustToContents);
 }
 
 Sortie::~Sortie()

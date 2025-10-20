@@ -154,7 +154,8 @@ enum CommandType{
     Switch,
     MessageTest,
     Migrate,
-    FleetData
+    FleetData,
+    SelectHomePort
 };
 Q_ENUM_NS(CommandType)
 
@@ -354,6 +355,7 @@ QByteArray clientFactoryRefresh();
 QByteArray clientFetch(int factoryID = -1);
 QByteArray clientFleetData(const QJsonArray &);
 QByteArray clientHello();
+QByteArray clientHomePort(ShipNationality);
 QByteArray clientMigrate(const QJsonObject &);
 QByteArray clientStateChange(GameState);
 QByteArray clientSteamAuth(uint8 [], uint32);

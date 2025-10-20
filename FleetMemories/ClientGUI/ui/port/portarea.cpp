@@ -1,5 +1,6 @@
 #include "portarea.h"
 #include "ui_portarea.h"
+#include "../../clientv2.h"
 
 PortArea::PortArea(QWidget *parent) :
     QFrame(parent),
@@ -11,6 +12,9 @@ PortArea::PortArea(QWidget *parent) :
     QFont font = ui->CentralMessage->font();
     font.setPixelSize(this->size().width() / 16);
     ui->CentralMessage->setFont(font);
+    Clientv2 &engine = Clientv2::getInstance();
+    connect(&engine, &Clientv2::askForHomePort,
+            this, &PortArea::showChooseHomePort);
 }
 
 PortArea::~PortArea()
@@ -43,4 +47,14 @@ void PortArea::mapRegistryComplete() {
 void PortArea::hello() {
     //% "Hello!"
     ui->CentralMessage->setText(qtTrId("client-hello"));
+}
+
+void PortArea::showChooseHomePort(const QJsonObject &input) {
+    if(homeport == nullptr) {
+        Clientv2 &engine = Clientv2::getInstance();
+        homeport = new ChooseHomePort(this, input);
+        homeport->show();
+        connect(homeport, &ChooseHomePort::portChosen,
+                &engine, &Clientv2::chooseHomePort);
+    }
 }

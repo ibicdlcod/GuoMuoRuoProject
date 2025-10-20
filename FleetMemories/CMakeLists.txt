@@ -41,6 +41,9 @@ set(CLIENT_SOURCES
     ClientGUI/steamauth.cpp
     ClientGUI/steamauth.h
     ClientGUI/ui/boxcenterfusionstyle.h
+    ClientGUI/ui/port/choosehomeport.h
+    ClientGUI/ui/port/choosehomeport.cpp
+    ClientGUI/ui/port/choosehomeport.ui
     ClientGUI/ui/factory/developwindow.cpp
     ClientGUI/ui/factory/developwindow.h
     ClientGUI/ui/factory/developwindow.ui
@@ -63,9 +66,9 @@ set(CLIENT_SOURCES
     ClientGUI/ui/fleet/interactivelabel.cpp
     ClientGUI/ui/keyenterreceiver.cpp
     ClientGUI/ui/keyenterreceiver.h
-    ClientGUI/ui/licensearea.cpp
-    ClientGUI/ui/licensearea.h
-    ClientGUI/ui/licensearea.ui
+    ClientGUI/ui/port/licensearea.cpp
+    ClientGUI/ui/port/licensearea.h
+    ClientGUI/ui/port/licensearea.ui
     ClientGUI/ui/mainwindow.cpp
     ClientGUI/ui/mainwindow.h
     ClientGUI/ui/mainwindow.ui
@@ -75,12 +78,12 @@ set(CLIENT_SOURCES
     ClientGUI/ui/sortie/mapviewwidget.h
     ClientGUI/ui/navigator.cpp
     ClientGUI/ui/navigator.h
-    ClientGUI/ui/newlogins.cpp
-    ClientGUI/ui/newlogins.h
-    ClientGUI/ui/newlogins.ui
-    ClientGUI/ui/portarea.cpp
-    ClientGUI/ui/portarea.h
-    ClientGUI/ui/portarea.ui
+    ClientGUI/ui/port/newlogins.cpp
+    ClientGUI/ui/port/newlogins.h
+    ClientGUI/ui/port/newlogins.ui
+    ClientGUI/ui/port/portarea.cpp
+    ClientGUI/ui/port/portarea.h
+    ClientGUI/ui/port/portarea.ui
     ClientGUI/ui/views/selectdelegate.cpp
     ClientGUI/ui/views/selectdelegate.h
     ClientGUI/ui/fleet/shipdisplay.h

@@ -3,9 +3,9 @@
 
 #include <QMainWindow>
 #include "../../FactorySlot/factoryslot.h"
-#include "portarea.h"
-#include "licensearea.h"
-#include "newlogins.h"
+#include "port/portarea.h"
+#include "port/licensearea.h"
+#include "port/newlogins.h"
 #include "factory/factoryarea.h"
 #include "techview.h"
 #include "sortie/sortie.h"

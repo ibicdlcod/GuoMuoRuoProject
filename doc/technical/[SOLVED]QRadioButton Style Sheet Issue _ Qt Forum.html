@@ -1,0 +1,1279 @@
+<!DOCTYPE html>
+<!-- saved from url=(0069)https://forum.qt.io/topic/41224/solved-qradiobutton-style-sheet-issue -->
+<html lang="zh-CN" data-dir="ltr" style="direction: ltr; --panel-offset: 0px;" class=" "><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><script src="chrome-extension://fgddmllnllkalaagkghckoinaemmogpe/scripts/content/gps.js"></script>
+<!-- Qt - Google Tag Manager -->
+<script async="" src="./[SOLVED]QRadioButton Style Sheet Issue _ Qt Forum_files/gtm.js.下载"></script><script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-K584VXP');</script>
+<!-- Qt - End Google Tag Manager -->
+<!-- Qt Web components -->
+<link rel="stylesheet" href="./[SOLVED]QRadioButton Style Sheet Issue _ Qt Forum_files/default.css">
+<script type="module" src="./[SOLVED]QRadioButton Style Sheet Issue _ Qt Forum_files/main.js.下载"></script>
+<!-- End Qt Web components -->
+<title>[SOLVED]QRadioButton Style Sheet Issue | Qt Forum</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta name="content-type" content="text/html; charset=UTF-8">
+	<meta name="apple-mobile-web-app-capable" content="yes">
+	<meta name="mobile-web-app-capable" content="yes">
+	<meta property="og:site_name" content="Qt Forum">
+	<meta name="msapplication-badge" content="frequency=30; polling-uri=https://forum.qt.io/sitemap.xml">
+	<meta name="theme-color" content="#ffffff">
+	<meta name="keywords" content="Qt,discussion,question,q&amp;a,answer,forum">
+	<meta name="msapplication-square150x150logo" content="https://ddgobkiprc33d.cloudfront.net/fdabc3bf-87df-44e6-90c8-11d09667ec3c.png">
+	<meta name="title" content="[SOLVED]QRadioButton Style Sheet Issue">
+	<meta property="og:title" content="[SOLVED]QRadioButton Style Sheet Issue">
+	<meta property="og:type" content="article">
+	<meta property="article:published_time" content="2014-05-10T08:23:39.000Z">
+	<meta property="article:modified_time" content="2014-05-10T10:08:11.000Z">
+	<meta property="article:section" content="General and Desktop">
+	<meta name="description" content="I want QRadioButton indicator to be of black color when checked and of white color when unchecked. For this, i have used this line of code and set at applica...">
+	<meta property="og:description" content="I want QRadioButton indicator to be of black color when checked and of white color when unchecked. For this, i have used this line of code and set at applica...">
+	<meta property="og:image" content="https://ddgobkiprc33d.cloudfront.net/fdabc3bf-87df-44e6-90c8-11d09667ec3c.png">
+	<meta property="og:image:url" content="https://ddgobkiprc33d.cloudfront.net/fdabc3bf-87df-44e6-90c8-11d09667ec3c.png">
+	<meta property="og:image:width" content="471">
+	<meta property="og:image:height" content="111">
+	<meta property="og:url" content="https://forum.qt.io/topic/41224/solved-qradiobutton-style-sheet-issue">
+	
+<link rel="stylesheet" type="text/css" href="./[SOLVED]QRadioButton Style Sheet Issue _ Qt Forum_files/client.css">
+<link rel="icon" type="image/x-icon" href="https://forum.qt.io/assets/uploads/system/favicon.ico?v=a2287ee9168">
+	<link rel="manifest" href="https://forum.qt.io/manifest.webmanifest" crossorigin="use-credentials">
+	<link rel="search" type="application/opensearchdescription+xml" title="Qt Forum" href="https://forum.qt.io/osd.xml">
+	<link rel="apple-touch-icon" href="https://forum.qt.io/assets/uploads/system/touchicon-orig.png">
+	<link rel="icon" sizes="36x36" href="https://forum.qt.io/assets/uploads/system/touchicon-36.png">
+	<link rel="icon" sizes="48x48" href="https://forum.qt.io/assets/uploads/system/touchicon-48.png">
+	<link rel="icon" sizes="72x72" href="https://forum.qt.io/assets/uploads/system/touchicon-72.png">
+	<link rel="icon" sizes="96x96" href="https://forum.qt.io/assets/uploads/system/touchicon-96.png">
+	<link rel="icon" sizes="144x144" href="https://forum.qt.io/assets/uploads/system/touchicon-144.png">
+	<link rel="icon" sizes="192x192" href="https://forum.qt.io/assets/uploads/system/touchicon-192.png">
+	<link rel="prefetch stylesheet" href="https://forum.qt.io/assets/plugins/nodebb-plugin-markdown/styles/default.css">
+	<link rel="prefetch" href="https://forum.qt.io/assets/language/en-GB/markdown.json?v=a2287ee9168">
+	<link rel="prefetch" href="https://forum.qt.io/assets/src/modules/composer.js?v=a2287ee9168">
+	<link rel="prefetch" href="https://forum.qt.io/assets/src/modules/composer/uploads.js?v=a2287ee9168">
+	<link rel="prefetch" href="https://forum.qt.io/assets/src/modules/composer/drafts.js?v=a2287ee9168">
+	<link rel="prefetch" href="https://forum.qt.io/assets/src/modules/composer/tags.js?v=a2287ee9168">
+	<link rel="prefetch" href="https://forum.qt.io/assets/src/modules/composer/categoryList.js?v=a2287ee9168">
+	<link rel="prefetch" href="https://forum.qt.io/assets/src/modules/composer/resize.js?v=a2287ee9168">
+	<link rel="prefetch" href="https://forum.qt.io/assets/src/modules/composer/autocomplete.js?v=a2287ee9168">
+	<link rel="prefetch" href="https://forum.qt.io/assets/templates/composer.tpl?v=a2287ee9168">
+	<link rel="prefetch" href="https://forum.qt.io/assets/language/en-GB/topic.json?v=a2287ee9168">
+	<link rel="prefetch" href="https://forum.qt.io/assets/language/en-GB/modules.json?v=a2287ee9168">
+	<link rel="prefetch" href="https://forum.qt.io/assets/language/en-GB/tags.json?v=a2287ee9168">
+	<link rel="canonical" href="https://forum.qt.io/topic/41224/solved-qradiobutton-style-sheet-issue">
+	<link rel="alternate" type="application/rss+xml" href="https://forum.qt.io/topic/41224.rss">
+	<link rel="up" href="https://forum.qt.io/category/10/general-and-desktop">
+	<link rel="author" href="https://forum.qt.io/user/kritika">
+	
+<script>
+var config = JSON.parse('{"relative_path":"","upload_url":"/assets/uploads","asset_base_url":"/assets","assetBaseUrl":"/assets","siteTitle":"Qt Forum","browserTitle":"Qt Forum","description":"Qt discussions, questions and answers","keywords":"Qt,discussion,question,q&amp;a,answer,forum","brand:logo":"https:&#x2F;&#x2F;ddgobkiprc33d.cloudfront.net&#x2F;fdabc3bf-87df-44e6-90c8-11d09667ec3c.png","titleLayout":"&#123;pageTitle&#125; | &#123;browserTitle&#125;","showSiteTitle":false,"maintenanceMode":false,"postQueue":0,"minimumTitleLength":3,"maximumTitleLength":255,"minimumPostLength":8,"maximumPostLength":32767,"minimumTagsPerTopic":0,"maximumTagsPerTopic":5,"minimumTagLength":3,"maximumTagLength":15,"undoTimeout":10000,"useOutgoingLinksPage":false,"allowGuestHandles":false,"allowTopicsThumbnail":false,"usePagination":false,"disableChat":false,"disableChatMessageEditing":false,"maximumChatMessageLength":1000,"socketioTransports":["websocket","polling"],"socketioOrigins":"https://forum.qt.io:*","websocketAddress":"","maxReconnectionAttempts":5,"reconnectionDelay":3000,"topicsPerPage":40,"postsPerPage":40,"maximumFileSize":2048,"theme:id":"nodebb-theme-qt","theme:src":"","defaultLang":"en-GB","userLang":"zh-CN","loggedIn":false,"uid":0,"cache-buster":"v=a2287ee9168","topicPostSort":"oldest_to_newest","categoryTopicSort":"recently_replied","csrf_token":"5385dba4aa9746f9cbfee920794eaa8173fbd04ec211b15ab7fb11d4dbb7666c6a48f51ef12e4d67878126df84b46e27b4209c5beef3f564b7d0eb1202387144","searchEnabled":true,"searchDefaultInQuick":"titles","bootswatchSkin":"","composer:showHelpTab":true,"enablePostHistory":true,"timeagoCutoff":30,"timeagoCodes":["af","am","ar","az-short","az","be","bg","bs","ca","cs","cy","da","de-short","de","dv","el","en-short","en","es-short","es","et","eu","fa-short","fa","fi","fr-short","fr","gl","he","hr","hu","hy","id","is","it-short","it","ja","jv","ko","ky","lt","lv","mk","nl","no","pl","pt-br-short","pt-br","pt-short","pt","ro","rs","ru","rw","si","sk","sl","sq","sr","sv","th","tr-short","tr","uk","ur","uz","vi","zh-CN","zh-TW"],"cookies":{"enabled":false,"message":"[[global:cookies.message]]","dismiss":"[[global:cookies.accept]]","link":"[[global:cookies.learn-more]]","link_url":"https:&#x2F;&#x2F;www.cookiesandyou.com"},"thumbs":{"size":512},"emailPrompt":0,"useragent":{"isSafari":false},"fontawesome":{"pro":false,"styles":["solid","brands","regular"],"version":"6.7.2"},"activitypub":{"probe":0},"acpLang":"zh-CN","topicSearchEnabled":false,"disableCustomUserSkins":true,"defaultBootswatchSkin":"","theme":{"enableQuickReply":true,"enableBreadcrumbs":true,"centerHeaderElements":false,"mobileTopicTeasers":false,"stickyToolbar":true,"autohideBottombar":true,"openSidebars":false,"chatModals":false},"openDraftsOnPageLoad":false,"markdown":{"highlight":1,"highlightLinesLanguageList":"[]","hljsLanguages":["common"],"theme":"default.css","defaultHighlightLanguage":"","externalMark":false},"composer-default":{},"spam-be-gone":{},"question-and-answer":{"makeDefault":"on","defaultCid":"0","forceQuestions":"on","defaultCid_4":"off","defaultCid_10":"off","defaultCid_11":"off","defaultCid_12":"off","defaultCid_13":"off","defaultCid_14":"off","defaultCid_52":"off","defaultCid_17":"off","defaultCid_21":"off","defaultCid_54":"off","defaultCid_20":"off","defaultCid_15":"off","defaultCid_45":"off","defaultCid_18":"off","defaultCid_19":"off","defaultCid_22":"off","defaultCid_53":"off","defaultCid_3":"off","defaultCid_6":"off","defaultCid_7":"off","defaultCid_23":"off","defaultCid_8":"off","defaultCid_9":"off","defaultCid_24":"off","defaultCid_25":"off","defaultCid_49":"off","defaultCid_48":"off","defaultCid_47":"off","defaultCid_34":"off","defaultCid_35":"off","defaultCid_36":"off","defaultCid_29":"off","defaultCid_39":"off","defaultCid_37":"off","defaultCid_46":"off","defaultCid_28":"off","defaultCid_43":"off","defaultCid_33":"off","defaultCid_26":"off","defaultCid_30":"off","defaultCid_40":"off","defaultCid_38":"off","defaultCid_42":"off","defaultCid_32":"off","defaultCid_41":"off","defaultCid_27":"off","defaultCid_31":"off","defaultCid_50":"off","defaultCid_51":"off","defaultCid_2":"off","defaultCid_5":"off","defaultCid_16":"off","defaultCid_44":"off","defaultCid_55":"off"}}');
+var app = {
+user: JSON.parse('{"uid":0,"username":"游客","displayname":"游客","userslug":"","fullname":"游客","email":"","icon:text":"?","icon:bgColor":"#aaa","groupTitle":"","groupTitleArray":[],"status":"offline","reputation":0,"email:confirmed":false,"unreadData":{"":{},"new":{},"watched":{},"unreplied":{}},"isAdmin":false,"isGlobalMod":false,"isMod":false,"privileges":{"chat":false,"chat:privileged":false,"upload:post:image":false,"upload:post:file":false,"signature":false,"invite":false,"group:create":false,"search:content":true,"search:users":false,"search:tags":true,"view:users":false,"view:tags":true,"view:groups":false,"local:login":false,"ban":false,"mute":false,"view:users:info":false},"blocks":[],"timeagoCode":"zh-CN","offline":true,"lastRoomId":null,"isEmailConfirmSent":false}')
+};
+document.documentElement.style.setProperty('--panel-offset', `${localStorage.getItem('panelOffset') || 0}px`);
+</script>
+
+
+
+
+<style>.topic [component="post/vote-count"]:hover{cursor:pointer}</style>
+
+<style type="text/css">.hljs-ln{border-collapse:collapse}.hljs-ln td{padding:0}.hljs-ln-n:before{content:attr(data-line-number)}</style></head>
+<body class="page-topic page-topic-41224 page-topic-solved-qradiobutton-style-sheet-issue template-topic page-topic-category-10 page-topic-category-general-and-desktop parent-category-4 parent-category-10 page-status-200 theme-qt user-guest skin-noskin">
+<!-- Qt - Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-K584VXP"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- Qt - End Google Tag Manager (noscript) -->
+<a class="visually-hidden-focusable position-absolute top-0 start-0 p-3 m-3 bg-body" style="z-index: 1021;" href="https://forum.qt.io/topic/41224/solved-qradiobutton-style-sheet-issue#content">跳转至内容</a>
+<div class="layout-container d-flex justify-content-between pb-4 pb-md-0">
+<nav component="sidebar/left" class=" text-dark bg-light sidebar sidebar-left start-0 border-end vh-100 d-none d-lg-flex flex-column justify-content-between sticky-top">
+<ul id="main-nav" class="list-unstyled d-flex flex-column w-100 gap-2 mt-2 overflow-y-auto">
+
+
+<li class="nav-item mx-2 " data-bs-original-title="版块">
+<a class="nav-link navigation-link d-flex gap-2 justify-content-between align-items-center" href="https://forum.qt.io/categories" aria-label="版块">
+<span class="d-flex gap-2 align-items-center text-nowrap truncate-open">
+<span class="position-relative">
+
+<i class="fa fa-fw fa-list" data-content=""></i>
+<span component="navigation/count" class="visible-closed position-absolute top-0 start-100 translate-middle badge rounded-1 bg-primary hidden"></span>
+
+</span>
+<span class="nav-text small visible-open fw-semibold text-truncate">版块</span>
+</span>
+<span component="navigation/count" class="visible-open badge rounded-1 bg-primary hidden"></span>
+</a>
+
+</li>
+
+
+
+<li class="nav-item mx-2 " data-bs-original-title="最新">
+<a class="nav-link navigation-link d-flex gap-2 justify-content-between align-items-center" href="https://forum.qt.io/recent" aria-label="最新">
+<span class="d-flex gap-2 align-items-center text-nowrap truncate-open">
+<span class="position-relative">
+
+<i class="fa fa-fw fa-clock-o" data-content=""></i>
+<span component="navigation/count" class="visible-closed position-absolute top-0 start-100 translate-middle badge rounded-1 bg-primary hidden"></span>
+
+</span>
+<span class="nav-text small visible-open fw-semibold text-truncate">最新</span>
+</span>
+<span component="navigation/count" class="visible-open badge rounded-1 bg-primary hidden"></span>
+</a>
+
+</li>
+
+
+
+<li class="nav-item mx-2 " data-bs-original-title="标签">
+<a class="nav-link navigation-link d-flex gap-2 justify-content-between align-items-center" href="https://forum.qt.io/tags" aria-label="标签">
+<span class="d-flex gap-2 align-items-center text-nowrap truncate-open">
+<span class="position-relative">
+
+<i class="fa fa-fw fa-tags" data-content=""></i>
+<span component="navigation/count" class="visible-closed position-absolute top-0 start-100 translate-middle badge rounded-1 bg-primary hidden"></span>
+
+</span>
+<span class="nav-text small visible-open fw-semibold text-truncate">标签</span>
+</span>
+<span component="navigation/count" class="visible-open badge rounded-1 bg-primary hidden"></span>
+</a>
+
+</li>
+
+
+
+<li class="nav-item mx-2 " data-bs-original-title="热门">
+<a class="nav-link navigation-link d-flex gap-2 justify-content-between align-items-center" href="https://forum.qt.io/popular" aria-label="热门">
+<span class="d-flex gap-2 align-items-center text-nowrap truncate-open">
+<span class="position-relative">
+
+<i class="fa fa-fw fa-fire" data-content=""></i>
+<span component="navigation/count" class="visible-closed position-absolute top-0 start-100 translate-middle badge rounded-1 bg-primary hidden"></span>
+
+</span>
+<span class="nav-text small visible-open fw-semibold text-truncate">热门</span>
+</span>
+<span component="navigation/count" class="visible-open badge rounded-1 bg-primary hidden"></span>
+</a>
+
+</li>
+
+
+
+<li class="nav-item mx-2 " data-bs-original-title="用户">
+<a class="nav-link navigation-link d-flex gap-2 justify-content-between align-items-center" href="https://forum.qt.io/users" aria-label="用户">
+<span class="d-flex gap-2 align-items-center text-nowrap truncate-open">
+<span class="position-relative">
+
+<i class="fa fa-fw fa-user" data-content=""></i>
+<span component="navigation/count" class="visible-closed position-absolute top-0 start-100 translate-middle badge rounded-1 bg-primary hidden"></span>
+
+</span>
+<span class="nav-text small visible-open fw-semibold text-truncate">用户</span>
+</span>
+<span component="navigation/count" class="visible-open badge rounded-1 bg-primary hidden"></span>
+</a>
+
+</li>
+
+
+
+<li class="nav-item mx-2 " data-bs-original-title="群组">
+<a class="nav-link navigation-link d-flex gap-2 justify-content-between align-items-center" href="https://forum.qt.io/groups" aria-label="群组">
+<span class="d-flex gap-2 align-items-center text-nowrap truncate-open">
+<span class="position-relative">
+
+<i class="fa fa-fw fa-group" data-content=""></i>
+<span component="navigation/count" class="visible-closed position-absolute top-0 start-100 translate-middle badge rounded-1 bg-primary hidden"></span>
+
+</span>
+<span class="nav-text small visible-open fw-semibold text-truncate">群组</span>
+</span>
+<span component="navigation/count" class="visible-open badge rounded-1 bg-primary hidden"></span>
+</a>
+
+</li>
+
+
+
+<li class="nav-item mx-2 " data-bs-original-title="搜索">
+<a class="nav-link navigation-link d-flex gap-2 justify-content-between align-items-center" href="https://forum.qt.io/search" aria-label="搜索">
+<span class="d-flex gap-2 align-items-center text-nowrap truncate-open">
+<span class="position-relative">
+
+<i class="fa fa-fw fa-search" data-content=""></i>
+<span component="navigation/count" class="visible-closed position-absolute top-0 start-100 translate-middle badge rounded-1 bg-primary hidden"></span>
+
+</span>
+<span class="nav-text small visible-open fw-semibold text-truncate">搜索</span>
+</span>
+<span component="navigation/count" class="visible-open badge rounded-1 bg-primary hidden"></span>
+</a>
+
+</li>
+
+
+
+<li class="nav-item mx-2 " data-bs-original-title="Get Qt Extensions">
+<a class="nav-link navigation-link d-flex gap-2 justify-content-between align-items-center" href="https://marketplace.qt.io/" target="_blank" aria-label="Get Qt Extensions">
+<span class="d-flex gap-2 align-items-center text-nowrap truncate-open">
+<span class="position-relative">
+
+<i class="fa fa-fw fa-shopping-basket" data-content=""></i>
+<span component="navigation/count" class="visible-closed position-absolute top-0 start-100 translate-middle badge rounded-1 bg-primary hidden"></span>
+
+</span>
+<span class="nav-text small visible-open fw-semibold text-truncate">Get Qt Extensions</span>
+</span>
+<span component="navigation/count" class="visible-open badge rounded-1 bg-primary hidden"></span>
+</a>
+
+</li>
+
+
+
+<li class="nav-item mx-2 " data-bs-original-title="未解决">
+<a class="nav-link navigation-link d-flex gap-2 justify-content-between align-items-center" href="https://forum.qt.io/unsolved" aria-label="未解决">
+<span class="d-flex gap-2 align-items-center text-nowrap truncate-open">
+<span class="position-relative">
+
+<i class="fa fa-fw fa-question-circle" data-content=""></i>
+<span component="navigation/count" class="visible-closed position-absolute top-0 start-100 translate-middle badge rounded-1 bg-primary hidden"></span>
+
+</span>
+<span class="nav-text small visible-open fw-semibold text-truncate">未解决</span>
+</span>
+<span component="navigation/count" class="visible-open badge rounded-1 bg-primary hidden"></span>
+</a>
+
+</li>
+
+
+</ul>
+<div class="sidebar-toggle-container align-self-start">
+
+<div class="sidebar-toggle m-2 d-none d-lg-block">
+<a href="https://forum.qt.io/topic/41224/solved-qradiobutton-style-sheet-issue#" role="button" component="sidebar/toggle" class="nav-link d-flex gap-2 align-items-center p-2 pointer w-100 text-nowrap" aria-label="侧栏滚动" data-bs-original-title="展开">
+<i class="fa fa-fw fa-angles-right"></i>
+<i class="fa fa-fw fa-angles-left"></i>
+<span class="nav-text visible-open fw-semibold small lh-1">折叠</span>
+</a>
+</div>
+</div>
+</nav>
+<main id="panel" class="d-flex flex-column gap-3 flex-grow-1 mt-3" style="min-width: 0;">
+
+<div class="container-lg px-md-4 brand-container">
+<div class="col-12 d-flex border-bottom pb-3 ">
+
+<div component="brand/wrapper" class="d-flex align-items-center gap-3 p-2 rounded-1 align-content-stretch ">
+
+<a component="brand/anchor" href="https://forum.qt.io/" title="品牌标识">
+<img component="brand/logo" alt="品牌标识" class="" src="./[SOLVED]QRadioButton Style Sheet Issue _ Qt Forum_files/fdabc3bf-87df-44e6-90c8-11d09667ec3c.png">
+</a>
+
+
+</div>
+
+
+<div data-widget-area="brand-header" class="flex-fill gap-3 p-2 align-self-center">
+
+<div class="d-flex flex-row justify-content-end"><ul class="qt-theme-widget__social-media-links">
+    <li>
+        <a href="https://www.facebook.com/qt/" target="_blank" rel="noopener">
+            <i class="fa-brands fa-facebook-f"></i>
+        </a>
+    </li>
+    <li>
+        <a href="https://twitter.com/qtproject" target="_blank" rel="noopener">
+            <i class="fa-brands fa-x-twitter"></i>
+        </a>
+    </li>
+    <li>
+        <a href="https://www.linkedin.com/company/qtgroup/" target="_blank" rel="noopener">
+            <i class="fa-brands fa-linkedin-in"></i>
+        </a>
+    </li>
+    <li>
+        <a href="https://www.youtube.com/user/QtStudios" target="_blank" rel="noopener">
+            <i class="fa-brands fa-youtube"></i>
+        </a>
+    </li>
+</ul></div>
+
+</div>
+
+</div>
+</div>
+
+<script>
+const headerEl = document.getElementById('header-menu');
+if (headerEl) {
+const rect = headerEl.getBoundingClientRect();
+const offset = Math.max(0, rect.bottom);
+document.documentElement.style.setProperty('--panel-offset', offset + `px`);
+} else {
+document.documentElement.style.setProperty('--panel-offset', `0px`);
+}
+</script>
+<div class="container-lg px-md-4 d-flex flex-column gap-3 h-100 mb-5 mb-lg-0" id="content">
+<noscript>
+<div class="alert alert-danger">
+<p>
+Your browser does not seem to support JavaScript. As a result, your viewing experience will be diminished, and you have been placed in <strong>read-only mode</strong>.
+</p>
+<p>
+Please download a browser that supports JavaScript, or enable it if it's disabled (i.e. NoScript).
+</p>
+</div>
+</noscript>
+<script type="application/ld+json">{
+"@context": "https://schema.org",
+"@type": "BreadcrumbList",
+"itemListElement": [{
+"@type": "ListItem",
+"position": 1,
+"name": "Qt Forum",
+"item": "https://forum.qt.io"
+}
+,{
+"@type": "ListItem",
+"position": 2,
+"name": "Qt Development"
+,"item": "https://forum.qt.io/category/4/qt-development"
+},{
+"@type": "ListItem",
+"position": 3,
+"name": "General and Desktop"
+,"item": "https://forum.qt.io/category/10/general-and-desktop"
+},{
+"@type": "ListItem",
+"position": 4,
+"name": "[SOLVED]QRadioButton Style Sheet Issue"
+
+}
+]}</script>
+
+
+<ol class="breadcrumb mb-0 " itemscope="itemscope" itemprop="breadcrumb" itemtype="http://schema.org/BreadcrumbList">
+
+<li itemscope="itemscope" itemprop="itemListElement" itemtype="http://schema.org/ListItem" class="breadcrumb-item ">
+<meta itemprop="position" content="1">
+<a href="https://forum.qt.io/" itemprop="item">
+<span class="fw-semibold" itemprop="name">主页</span>
+</a>
+</li>
+
+<li itemscope="itemscope" itemprop="itemListElement" itemtype="http://schema.org/ListItem" class="breadcrumb-item ">
+<meta itemprop="position" content="2">
+<a href="https://forum.qt.io/category/4/qt-development" itemprop="item">
+<span class="fw-semibold" itemprop="name">Qt Development</span>
+</a>
+</li>
+
+<li itemscope="itemscope" itemprop="itemListElement" itemtype="http://schema.org/ListItem" class="breadcrumb-item ">
+<meta itemprop="position" content="3">
+<a href="https://forum.qt.io/category/10/general-and-desktop" itemprop="item">
+<span class="fw-semibold" itemprop="name">General and Desktop</span>
+</a>
+</li>
+
+<li component="breadcrumb/current" itemscope="itemscope" itemprop="itemListElement" itemtype="http://schema.org/ListItem" class="breadcrumb-item active">
+<meta itemprop="position" content="4">
+
+<span class="fw-semibold" itemprop="name">[SOLVED]QRadioButton Style Sheet Issue</span>
+
+</li>
+
+</ol>
+
+
+
+<div data-widget-area="header">
+
+<style>
+.qt-global-banner-container {
+    display: flex;
+    align-items: center;
+    padding: var(--qt-size-2xs) var(--qt-size-m);
+    min-height: calc(var(--qt-size-5xl) - var(--qt-size-3xs));
+    background-color: var(--qt-color-development-secondary);
+}
+.qt-global-banner-link {
+    font-size: var(--qt-font-size-2xl);
+    color: var(--qt-color-development-primary);
+}
+
+@media (min-width: 576px) {
+  .qt-global-banner-container {
+    padding: 0 var(--qt-size-2xl);
+    min-height: calc(var(--qt-size-6xl));
+  }
+  .qt-global-banner-link {
+    font-size: var(--qt-font-size-3xl);
+  }
+}
+
+@media (min-width: 1200px) {
+  .qt-global-banner-container {
+    padding: 0 var(--qt-size-4xl);
+    min-height: calc(var(--qt-size-6xl) * 2);
+  }
+  .qt-global-banner-link {
+    font-size: var(--qt-font-size-4xl);
+  }
+}
+</style>
+
+<div class="qt-global-banner-container">
+    <a class="qt-global-banner-link" href="https://forum.qt.io/topic/162263/forum-updated-nodebb-v4.3-new-features" target="_blank">Forum Updated to NodeBB v4.3 + New Features</a>
+</div>
+
+</div>
+
+<div class="flex-fill" itemid="/topic/41224/solved-qradiobutton-style-sheet-issue" itemscope="" itemtype="https://schema.org/DiscussionForumPosting">
+<meta itemprop="headline" content="[SOLVED]QRadioButton Style Sheet Issue">
+<meta itemprop="text" content="[SOLVED]QRadioButton Style Sheet Issue">
+<meta itemprop="url" content="/topic/41224/solved-qradiobutton-style-sheet-issue">
+<meta itemprop="datePublished" content="2014-05-10T08:23:39.000Z">
+<meta itemprop="dateModified" content="2014-05-10T10:08:11.000Z">
+<div itemprop="author" itemscope="" itemtype="https://schema.org/Person">
+<meta itemprop="name" content="Kritika">
+<meta itemprop="url" content="/user/kritika">
+</div>
+<div class="d-flex flex-column gap-3">
+<div class="d-flex gap-2 flex-wrap flex-lg-nowrap">
+<div class="d-flex flex-column gap-3 flex-grow-1">
+<h1 component="post/header" class="tracking-tight fw-semibold fs-3 mb-0 text-break ">
+<span class="topic-title" component="topic/title">[SOLVED]QRadioButton Style Sheet Issue</span>
+</h1>
+<div class="topic-info d-flex gap-2 align-items-center flex-wrap ">
+<span component="topic/labels" class="d-flex gap-2 hidden">
+<span component="topic/scheduled" class="badge badge border border-gray-300 text-body hidden">
+<i class="fa fa-clock-o"></i> 已定时
+</span>
+<span component="topic/pinned" class="badge badge border border-gray-300 text-body hidden">
+<i class="fa fa-thumb-tack"></i> 已固定
+</span>
+<span component="topic/locked" class="badge badge border border-gray-300 text-body hidden">
+<i class="fa fa-lock"></i> 已锁定
+</span>
+<a component="topic/moved" href="https://forum.qt.io/category/" class="badge badge border border-gray-300 text-body text-decoration-none hidden">
+<i class="fa fa-arrow-circle-right"></i> 已移动
+</a>
+
+</span>
+<a href="https://forum.qt.io/category/10/general-and-desktop" class="badge px-1 text-truncate text-decoration-none border" style="color: #FFFFFF;background-color: #2cde85;border-color: #2cde85!important; max-width: 70vw;">
+			<i class="fa fa-fw fa-laptop"></i>
+			General and Desktop
+		</a>
+<div data-tid="41224" component="topic/tags" class="lh-1 tags tag-list d-flex flex-wrap hidden-xs hidden-empty gap-2"></div>
+<div class="d-flex gap-2"><span class="badge text-body border border-gray-300 stats text-xs">
+<i class="fa-regular fa-fw fa-message visible-xs-inline" title="帖子"></i>
+<span component="topic/post-count" title="3" class="fw-bold">3</span>
+<span class="hidden-xs text-lowercase fw-normal">帖子</span>
+</span>
+<span class="badge text-body border border-gray-300 stats text-xs">
+<i class="fa fa-fw fa-user visible-xs-inline" title="发布者"></i>
+<span title="2" class="fw-bold">2</span>
+<span class="hidden-xs text-lowercase fw-normal">发布者</span>
+</span>
+<span class="badge text-body border border-gray-300 stats text-xs">
+<i class="fa fa-fw fa-eye visible-xs-inline" title="浏览"></i>
+<span class="fw-bold" title="9143">9.1k</span>
+<span class="hidden-xs text-lowercase fw-normal">浏览</span>
+</span>
+
+<span class="badge text-body border border-gray-300 stats text-xs">
+<i class="fa fa-fw fa-bell-o visible-xs-inline" title="关注中"></i>
+<span class="fw-bold" title="9143">1</span>
+<span class="hidden-xs text-lowercase fw-normal">关注中</span>
+</span>
+</div>
+</div>
+</div>
+<div class="d-flex flex-wrap flex-lg-nowrap gap-2 align-items-center mt-2 hidden-empty" component="topic/thumb/list"></div>
+</div>
+<div class="row mb-4 mb-lg-0">
+<div class="topic col-lg-12">
+<div class="sticky-tools " style="top: 0;">
+<nav class="d-flex flex-nowrap my-2 p-0 border-0 rounded topic-main-buttons">
+<div class="d-flex flex-row p-2 text-bg-light border rounded w-100 align-items-center">
+<div class="d-flex me-auto mb-0 gap-2 align-items-center flex-wrap">
+
+
+<div class="btn-group bottom-sheet" component="thread/sort">
+<button class="btn btn-ghost btn-sm ff-secondary d-flex gap-2 align-items-center dropdown-toggle text-truncate" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" aria-label="帖子分类选项，从旧到新">
+<i class="fa fa-fw fa-arrow-down-wide-short text-primary"></i>
+<span class="d-none d-md-inline fw-semibold text-truncate text-nowrap">从旧到新</span>
+</button>
+<ul class="dropdown-menu p-1 text-sm" role="menu">
+<li>
+<a class="dropdown-item rounded-1 d-flex align-items-center gap-2" href="https://forum.qt.io/topic/41224/solved-qradiobutton-style-sheet-issue#" data-sort="oldest_to_newest" role="menuitem">
+<span class="flex-grow-1">从旧到新</span>
+<i class="flex-shrink-0 fa fa-fw text-secondary fa-check"></i>
+</a>
+</li>
+<li>
+<a class="dropdown-item rounded-1 d-flex align-items-center gap-2" href="https://forum.qt.io/topic/41224/solved-qradiobutton-style-sheet-issue#" data-sort="newest_to_oldest" role="menuitem">
+<span class="flex-grow-1">从新到旧</span>
+<i class="flex-shrink-0 fa fa-fw text-secondary"></i>
+</a>
+</li>
+<li>
+<a class="dropdown-item rounded-1 d-flex align-items-center gap-2" href="https://forum.qt.io/topic/41224/solved-qradiobutton-style-sheet-issue#" data-sort="most_votes" role="menuitem">
+<span class="flex-grow-1">最多赞同</span>
+<i class="flex-shrink-0 fa fa-fw text-secondary"></i>
+</a>
+</li>
+</ul>
+</div>
+
+
+<a class="btn btn-ghost btn-sm d-none d-lg-flex align-items-center align-self-stretch" target="_blank" href="https://forum.qt.io/topic/41224.rss" aria-label="RSS 订阅" data-bs-original-title="RSS 订阅"><i class="fa fa-rss text-primary"></i></a>
+
+</div>
+<div component="topic/reply/container" class="btn-group hidden">
+<a href="https://forum.qt.io/compose?tid=41224" class="d-flex px-3 gap-2 align-items-center btn btn-sm btn-primary fw-semibold" component="topic/reply" data-ajaxify="false" role="button"><i class="fa fa-fw fa-reply  d-sm-block d-md-none "></i><span class="d-none d-md-block text-truncate text-nowrap">回复</span></a>
+<button type="button" class="btn btn-sm btn-primary dropdown-toggle flex-0" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" aria-label="回复选项">
+<span class="caret"></span>
+</button>
+<ul class="dropdown-menu dropdown-menu-end p-1 text-sm" role="menu">
+<li><a class="dropdown-item rounded-1" href="https://forum.qt.io/topic/41224/solved-qradiobutton-style-sheet-issue#" component="topic/reply-as-topic" role="menuitem">在新帖中回复</a></li>
+</ul>
+</div>
+
+
+<a component="topic/reply/guest" href="https://forum.qt.io/login" class="d-flex gap-2 align-items-center fw-semibold btn btn-sm btn-primary"><i class="fa fa-fw fa-sign-in  d-sm-block d-md-none "></i><span>登录后回复</span></a>
+
+
+</div>
+</nav>
+</div>
+
+
+
+<div component="topic/deleted/message" class="alert alert-warning d-flex justify-content-between flex-wrap hidden">
+<span>此主题已被删除。只有拥有主题管理权限的用户可以查看。</span>
+<span>
+
+</span>
+</div>
+
+<div class="d-flex gap-0 gap-lg-5">
+<div class="posts-container" style="min-width: 0;">
+<ul component="topic" class="posts timeline list-unstyled p-0 py-3" style="min-width: 0;" data-tid="41224" data-cid="10">
+
+<li component="post" class="   topic-owner-post" data-index="0" data-pid="41222" data-uid="12438" data-timestamp="1399710219000" data-username="Kritika" data-userslug="kritika" itemprop="comment" itemtype="http://schema.org/Comment" itemscope="">
+<a component="post/anchor" data-index="0" id="1"></a>
+<meta itemprop="datePublished" content="2014-05-10T08:23:39.000Z">
+
+
+
+<div class="d-flex align-items-start gap-3 post-container-parent">
+<div class="bg-body d-none d-sm-block rounded-circle" style="outline: 2px solid var(--bs-body-bg);">
+<a class="d-inline-block position-relative text-decoration-none" href="https://forum.qt.io/user/kritika" aria-label="用户 Kritika 的资料页面">
+<span title="Kritika" data-uid="12438" class="avatar  avatar-rounded" component="user/picture" style="--avatar-size: 48px; background-color: #2196f3">K</span>
+
+<span component="user/status" class="position-absolute top-100 start-100 border border-white border-2 rounded-circle status offline"><span class="visually-hidden">离线</span></span>
+
+</a>
+</div>
+<div class="post-container d-flex gap-2 flex-grow-1 flex-column w-100" style="min-width:0;">
+<div class="d-flex align-items-start justify-content-between gap-1 flex-nowrap w-100 post-header" itemprop="author" itemscope="" itemtype="https://schema.org/Person">
+<div class="d-flex gap-1 flex-wrap align-items-center text-truncate">
+<meta itemprop="name" content="Kritika">
+<meta itemprop="url" content="/user/kritika">
+<div class="d-flex flex-nowrap gap-1 align-items-center text-truncate">
+<div class="bg-body d-sm-none">
+<a class="d-inline-block position-relative text-decoration-none" href="https://forum.qt.io/user/kritika">
+<span title="Kritika" data-uid="12438" class="avatar  avatar-rounded" component="user/picture" style="--avatar-size: 20px; background-color: #2196f3">K</span>
+
+<span component="user/status" class="position-absolute top-100 start-100 border border-white border-2 rounded-circle status offline"><span class="visually-hidden">离线</span></span>
+
+</a>
+</div>
+<a class="fw-bold text-nowrap text-truncate" href="https://forum.qt.io/user/kritika" data-username="Kritika" data-uid="12438">Kritika</a>
+</div>
+
+
+<div class="d-flex gap-1 align-items-center">
+<span class="text-muted">写于<a href="https://forum.qt.io/post/41222" class="timeago text-muted" title="2014年5月10日 16:23" datetime="2014-05-10T08:23:39.000Z">2014年5月10日 16:23</a></span>
+<i component="post/edit-indicator" class="fa fa-edit text-muted edit-icon hidden" title="编辑 Invalid Date"></i>
+<span data-editor="" component="post/editor" class="visually-hidden">最后由  编辑 <span class="timeago" title="Invalid Date" datetime="Invalid Date"></span></span>
+</div>
+
+</div>
+<div class="d-flex align-items-center gap-1 justify-content-end">
+<span class="bookmarked opacity-0 text-primary"><i class="fa fa-bookmark-o"></i></span>
+<a href="https://forum.qt.io/post/41222" class="post-index text-muted d-none d-md-inline">#1</a>
+</div>
+</div>
+<div class="content text-break" component="post/content" itemprop="text">
+<p dir="auto">I want QRadioButton indicator to be of black color when checked and of white color when unchecked.<br>
+For this, i have used this line of code and set at application level</p>
+<p dir="auto">@a.setStyleSheet("QRadiobutton::indicator::checked{background-color:black;} QRadioButton::indicator::unchecked{background-color:white;}");@</p>
+<p dir="auto">Using this, color requirement is fulfilled but the indicator shape is changed to square.<br>
+I want QRadioButton indicator to be of round shape. Can anyone tell why this is happening?</p>
+
+</div>
+<div component="post/footer" class="post-footer border-bottom pb-2">
+
+<div class="d-flex flex-wrap-reverse gap-2 justify-content-end">
+
+<a component="post/reply-count" data-target-component="post/replies/container" href="https://forum.qt.io/topic/41224/solved-qradiobutton-style-sheet-issue#" class="d-flex gap-2 align-items-center btn btn-ghost ff-secondary border rounded-1 p-1 text-muted text-decoration-none text-xs hidden">
+<span component="post/reply-count/avatars" class="d-flex gap-1 ">
+
+
+</span>
+<span class="ms-2 replies-count fw-semibold text-nowrap" component="post/reply-count/text" data-replies="0">1 条回复</span>
+<span class="ms-2 replies-last hidden-xs fw-semibold">最后回复 <span class="timeago" title=""></span></span>
+<i class="fa fa-fw fa-chevron-down" component="post/replies/open"></i>
+</a>
+
+<div component="post/actions" class="d-flex flex-grow-1 align-items-center justify-content-end gap-1 post-tools">
+<!-- This partial intentionally left blank; overwritten by nodebb-plugin-reactions -->
+<a component="post/reply" href="https://forum.qt.io/topic/41224/solved-qradiobutton-style-sheet-issue#" class="btn btn-ghost btn-sm hidden" title="回复"><i class="fa fa-fw fa-reply text-primary"></i></a>
+<a component="post/quote" href="https://forum.qt.io/topic/41224/solved-qradiobutton-style-sheet-issue#" class="btn btn-ghost btn-sm hidden" title="引用"><i class="fa fa-fw fa-quote-right text-primary"></i></a>
+
+
+<div class="d-flex votes align-items-center">
+<a component="post/upvote" href="https://forum.qt.io/topic/41224/solved-qradiobutton-style-sheet-issue#" class="btn btn-ghost btn-sm" title="顶贴">
+<i class="fa fa-fw fa-chevron-up text-primary"></i>
+</a>
+<meta itemprop="upvoteCount" content="1">
+<meta itemprop="downvoteCount" content="0">
+<a href="https://forum.qt.io/topic/41224/solved-qradiobutton-style-sheet-issue#" class="px-2 mx-1 btn btn-ghost btn-sm" component="post/vote-count" data-votes="1" title="投票人">1</a>
+
+</div>
+
+<span component="post/tools" class="dropdown bottom-sheet ">
+<a class="btn btn-ghost btn-sm ff-secondary dropdown-toggle" href="https://forum.qt.io/topic/41224/solved-qradiobutton-style-sheet-issue#" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" aria-label="帖子工具"><i class="fa fa-fw fa-ellipsis-v text-primary"></i></a>
+<ul class="dropdown-menu dropdown-menu-end p-1 text-sm" role="menu"></ul>
+</span>
+</div>
+</div>
+<div component="post/replies/container" class="my-2 col-11 border rounded-1 p-3 hidden-empty"></div>
+</div>
+</div>
+</div>
+
+</li>
+
+
+
+
+<li component="post" class="pt-4   " data-index="1" data-pid="228001" data-uid="13677" data-timestamp="1399711950000" data-username="Saugglocke" data-userslug="saugglocke" itemprop="comment" itemtype="http://schema.org/Comment" itemscope="">
+<a component="post/anchor" data-index="1" id="2"></a>
+<meta itemprop="datePublished" content="2014-05-10T08:52:30.000Z">
+
+
+
+<div class="d-flex align-items-start gap-3 post-container-parent">
+<div class="bg-body d-none d-sm-block rounded-circle" style="outline: 2px solid var(--bs-body-bg);">
+<a class="d-inline-block position-relative text-decoration-none" href="https://forum.qt.io/user/saugglocke" aria-label="用户 Saugglocke 的资料页面">
+<span title="Saugglocke" data-uid="13677" class="avatar  avatar-rounded" component="user/picture" style="--avatar-size: 48px; background-color: #1b5e20">S</span>
+
+<span component="user/status" class="position-absolute top-100 start-100 border border-white border-2 rounded-circle status offline"><span class="visually-hidden">离线</span></span>
+
+</a>
+</div>
+<div class="post-container d-flex gap-2 flex-grow-1 flex-column w-100" style="min-width:0;">
+<div class="d-flex align-items-start justify-content-between gap-1 flex-nowrap w-100 post-header" itemprop="author" itemscope="" itemtype="https://schema.org/Person">
+<div class="d-flex gap-1 flex-wrap align-items-center text-truncate">
+<meta itemprop="name" content="Saugglocke">
+<meta itemprop="url" content="/user/saugglocke">
+<div class="d-flex flex-nowrap gap-1 align-items-center text-truncate">
+<div class="bg-body d-sm-none">
+<a class="d-inline-block position-relative text-decoration-none" href="https://forum.qt.io/user/saugglocke">
+<span title="Saugglocke" data-uid="13677" class="avatar  avatar-rounded" component="user/picture" style="--avatar-size: 20px; background-color: #1b5e20">S</span>
+
+<span component="user/status" class="position-absolute top-100 start-100 border border-white border-2 rounded-circle status offline"><span class="visually-hidden">离线</span></span>
+
+</a>
+</div>
+<a class="fw-bold text-nowrap text-truncate" href="https://forum.qt.io/user/saugglocke" data-username="Saugglocke" data-uid="13677">Saugglocke</a>
+</div>
+
+
+<div class="d-flex gap-1 align-items-center">
+<span class="text-muted">写于<a href="https://forum.qt.io/post/228001" class="timeago text-muted" title="2014年5月10日 16:52" datetime="2014-05-10T08:52:30.000Z">2014年5月10日 16:52</a></span>
+<i component="post/edit-indicator" class="fa fa-edit text-muted edit-icon hidden" title="编辑 Invalid Date"></i>
+<span data-editor="" component="post/editor" class="visually-hidden">最后由  编辑 <span class="timeago" title="Invalid Date" datetime="Invalid Date"></span></span>
+</div>
+
+</div>
+<div class="d-flex align-items-center gap-1 justify-content-end">
+<span class="bookmarked opacity-0 text-primary"><i class="fa fa-bookmark-o"></i></span>
+<a href="https://forum.qt.io/post/228001" class="post-index text-muted d-none d-md-inline">#2</a>
+</div>
+</div>
+<div class="content text-break" component="post/content" itemprop="text">
+<p dir="auto">Just play a bit with the stylesheet. Maybe something like this?</p>
+<p dir="auto">@ QRadioButton::indicator::unchecked{ border: 1px solid darkgray; border-radius: 6px; background-color: white; width: 10px; height: 10px; margin-left: 5px;}</p>
+<p dir="auto">QRadioButton::indicator::checked{ border: 1px solid darkgray; border-radius: 6px; background-color: black; width: 10px; height: 10px; margin-left: 5px;}@</p>
+
+</div>
+<div component="post/footer" class="post-footer border-bottom pb-2">
+
+<div class="d-flex flex-wrap-reverse gap-2 justify-content-end">
+
+<a component="post/reply-count" data-target-component="post/replies/container" href="https://forum.qt.io/topic/41224/solved-qradiobutton-style-sheet-issue#" class="d-flex gap-2 align-items-center btn btn-ghost ff-secondary border rounded-1 p-1 text-muted text-decoration-none text-xs hidden">
+<span component="post/reply-count/avatars" class="d-flex gap-1 ">
+
+
+</span>
+<span class="ms-2 replies-count fw-semibold text-nowrap" component="post/reply-count/text" data-replies="0">1 条回复</span>
+<span class="ms-2 replies-last hidden-xs fw-semibold">最后回复 <span class="timeago" title=""></span></span>
+<i class="fa fa-fw fa-chevron-down" component="post/replies/open"></i>
+</a>
+
+<div component="post/actions" class="d-flex flex-grow-1 align-items-center justify-content-end gap-1 post-tools">
+<!-- This partial intentionally left blank; overwritten by nodebb-plugin-reactions -->
+<a component="post/reply" href="https://forum.qt.io/topic/41224/solved-qradiobutton-style-sheet-issue#" class="btn btn-ghost btn-sm hidden" title="回复"><i class="fa fa-fw fa-reply text-primary"></i></a>
+<a component="post/quote" href="https://forum.qt.io/topic/41224/solved-qradiobutton-style-sheet-issue#" class="btn btn-ghost btn-sm hidden" title="引用"><i class="fa fa-fw fa-quote-right text-primary"></i></a>
+
+
+<div class="d-flex votes align-items-center">
+<a component="post/upvote" href="https://forum.qt.io/topic/41224/solved-qradiobutton-style-sheet-issue#" class="btn btn-ghost btn-sm" title="顶贴">
+<i class="fa fa-fw fa-chevron-up text-primary"></i>
+</a>
+<meta itemprop="upvoteCount" content="1">
+<meta itemprop="downvoteCount" content="0">
+<a href="https://forum.qt.io/topic/41224/solved-qradiobutton-style-sheet-issue#" class="px-2 mx-1 btn btn-ghost btn-sm" component="post/vote-count" data-votes="1" title="投票人">1</a>
+
+</div>
+
+<span component="post/tools" class="dropdown bottom-sheet ">
+<a class="btn btn-ghost btn-sm ff-secondary dropdown-toggle" href="https://forum.qt.io/topic/41224/solved-qradiobutton-style-sheet-issue#" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" aria-label="帖子工具"><i class="fa fa-fw fa-ellipsis-v text-primary"></i></a>
+<ul class="dropdown-menu dropdown-menu-end p-1 text-sm" role="menu"></ul>
+</span>
+</div>
+</div>
+<div component="post/replies/container" class="my-2 col-11 border rounded-1 p-3 hidden-empty"></div>
+</div>
+</div>
+</div>
+
+</li>
+
+
+
+
+<li component="post" class="pt-4   topic-owner-post" data-index="2" data-pid="228003" data-uid="12438" data-timestamp="1399716491000" data-username="Kritika" data-userslug="kritika" itemprop="comment" itemtype="http://schema.org/Comment" itemscope="">
+<a component="post/anchor" data-index="2" id="3"></a>
+<meta itemprop="datePublished" content="2014-05-10T10:08:11.000Z">
+
+
+
+<div class="d-flex align-items-start gap-3 post-container-parent">
+<div class="bg-body d-none d-sm-block rounded-circle" style="outline: 2px solid var(--bs-body-bg);">
+<a class="d-inline-block position-relative text-decoration-none" href="https://forum.qt.io/user/kritika" aria-label="用户 Kritika 的资料页面">
+<span title="Kritika" data-uid="12438" class="avatar  avatar-rounded" component="user/picture" style="--avatar-size: 48px; background-color: #2196f3">K</span>
+
+<span component="user/status" class="position-absolute top-100 start-100 border border-white border-2 rounded-circle status offline"><span class="visually-hidden">离线</span></span>
+
+</a>
+</div>
+<div class="post-container d-flex gap-2 flex-grow-1 flex-column w-100" style="min-width:0;">
+<div class="d-flex align-items-start justify-content-between gap-1 flex-nowrap w-100 post-header" itemprop="author" itemscope="" itemtype="https://schema.org/Person">
+<div class="d-flex gap-1 flex-wrap align-items-center text-truncate">
+<meta itemprop="name" content="Kritika">
+<meta itemprop="url" content="/user/kritika">
+<div class="d-flex flex-nowrap gap-1 align-items-center text-truncate">
+<div class="bg-body d-sm-none">
+<a class="d-inline-block position-relative text-decoration-none" href="https://forum.qt.io/user/kritika">
+<span title="Kritika" data-uid="12438" class="avatar  avatar-rounded" component="user/picture" style="--avatar-size: 20px; background-color: #2196f3">K</span>
+
+<span component="user/status" class="position-absolute top-100 start-100 border border-white border-2 rounded-circle status offline"><span class="visually-hidden">离线</span></span>
+
+</a>
+</div>
+<a class="fw-bold text-nowrap text-truncate" href="https://forum.qt.io/user/kritika" data-username="Kritika" data-uid="12438">Kritika</a>
+</div>
+
+
+<div class="d-flex gap-1 align-items-center">
+<span class="text-muted">写于<a href="https://forum.qt.io/post/228003" class="timeago text-muted" title="2014年5月10日 18:08" datetime="2014-05-10T10:08:11.000Z">2014年5月10日 18:08</a></span>
+<i component="post/edit-indicator" class="fa fa-edit text-muted edit-icon hidden" title="编辑 Invalid Date"></i>
+<span data-editor="" component="post/editor" class="visually-hidden">最后由  编辑 <span class="timeago" title="Invalid Date" datetime="Invalid Date"></span></span>
+</div>
+
+</div>
+<div class="d-flex align-items-center gap-1 justify-content-end">
+<span class="bookmarked opacity-0 text-primary"><i class="fa fa-bookmark-o"></i></span>
+<a href="https://forum.qt.io/post/228003" class="post-index text-muted d-none d-md-inline">#3</a>
+</div>
+</div>
+<div class="content text-break" component="post/content" itemprop="text">
+<p dir="auto">Thanks Saugglocke.</p>
+<p dir="auto">It is working absolutely as  i want.</p>
+
+</div>
+<div component="post/footer" class="post-footer border-bottom pb-2">
+
+<div class="d-flex flex-wrap-reverse gap-2 justify-content-end">
+
+<a component="post/reply-count" data-target-component="post/replies/container" href="https://forum.qt.io/topic/41224/solved-qradiobutton-style-sheet-issue#" class="d-flex gap-2 align-items-center btn btn-ghost ff-secondary border rounded-1 p-1 text-muted text-decoration-none text-xs hidden">
+<span component="post/reply-count/avatars" class="d-flex gap-1 ">
+
+
+</span>
+<span class="ms-2 replies-count fw-semibold text-nowrap" component="post/reply-count/text" data-replies="0">1 条回复</span>
+<span class="ms-2 replies-last hidden-xs fw-semibold">最后回复 <span class="timeago" title=""></span></span>
+<i class="fa fa-fw fa-chevron-down" component="post/replies/open"></i>
+</a>
+
+<div component="post/actions" class="d-flex flex-grow-1 align-items-center justify-content-end gap-1 post-tools">
+<!-- This partial intentionally left blank; overwritten by nodebb-plugin-reactions -->
+<a component="post/reply" href="https://forum.qt.io/topic/41224/solved-qradiobutton-style-sheet-issue#" class="btn btn-ghost btn-sm hidden" title="回复"><i class="fa fa-fw fa-reply text-primary"></i></a>
+<a component="post/quote" href="https://forum.qt.io/topic/41224/solved-qradiobutton-style-sheet-issue#" class="btn btn-ghost btn-sm hidden" title="引用"><i class="fa fa-fw fa-quote-right text-primary"></i></a>
+
+
+<div class="d-flex votes align-items-center">
+<a component="post/upvote" href="https://forum.qt.io/topic/41224/solved-qradiobutton-style-sheet-issue#" class="btn btn-ghost btn-sm" title="顶贴">
+<i class="fa fa-fw fa-chevron-up text-primary"></i>
+</a>
+<meta itemprop="upvoteCount" content="1">
+<meta itemprop="downvoteCount" content="0">
+<a href="https://forum.qt.io/topic/41224/solved-qradiobutton-style-sheet-issue#" class="px-2 mx-1 btn btn-ghost btn-sm" component="post/vote-count" data-votes="1" title="投票人">1</a>
+
+</div>
+
+<span component="post/tools" class="dropdown bottom-sheet ">
+<a class="btn btn-ghost btn-sm ff-secondary dropdown-toggle" href="https://forum.qt.io/topic/41224/solved-qradiobutton-style-sheet-issue#" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" aria-label="帖子工具"><i class="fa fa-fw fa-ellipsis-v text-primary"></i></a>
+<ul class="dropdown-menu dropdown-menu-end p-1 text-sm" role="menu"></ul>
+</span>
+</div>
+</div>
+<div component="post/replies/container" class="my-2 col-11 border rounded-1 p-3 hidden-empty"></div>
+</div>
+</div>
+</div>
+
+</li>
+
+
+
+
+</ul>
+
+
+
+
+</div>
+<div class="d-flex d-none d-lg-block flex-grow-1 mt-2">
+<div class="sticky-top" style="top:6rem;  z-index:1;">
+<div class="d-flex flex-column gap-3 align-items-end">
+
+
+<div class="pagination-block d-none d-lg-block ready">
+<div class="scroller-content d-flex gap-2 flex-column align-items-start">
+<button class="pagetop btn btn-ghost btn-sm ff-secondary d-inline-flex border-0 align-items-center gap-2" style="padding: 4px 8px;"><i class="fa fa-fw fa-chevron-up"></i> <span class="timeago text-xs text-muted text-nowrap" title="2014年5月10日 16:23" datetime="2014-05-10T08:23:39.000Z">2014年5月10日 16:23</span></button>
+<div class="scroller-container position-relative">
+<div class="scroller-thumb d-flex gap-2 text-nowrap position-relative" style="height: 40px; top: 0px; left: -5px;">
+<div class="scroller-thumb-icon bg-primary rounded d-inline-block" style="width:9px; height: 40px;"></div>
+<div>
+<p class="small thumb-text d-none d-md-inline-block ff-secondary fw-semibold user-select-none mb-0">1 / 3</p>
+<p class="meta thumb-timestamp timeago text-xs text-muted ff-secondary fw-semibold mb-0 user-select-none" title="2014-05-10T08:23:39.000Z" datetime="2014-05-10T08:23:39.000Z">2014年5月10日 16:23</p>
+</div>
+</div>
+<div class="unread d-inline-block position-absolute bottom-0" style="height: 0px;">
+<div class="meta small position-absolute top-50 translate-middle-y text-nowrap fw-semibold ms-2">
+<a class="text-decoration-none" href="https://forum.qt.io/topic/41224/solved-qradiobutton-style-sheet-issue" aria-disabled="true" aria-label="未读帖子链接" tabindex="-1"></a>
+</div>
+</div>
+</div>
+<button class="pagebottom btn btn-ghost btn-sm ff-secondary d-inline-flex border-0 align-items-center gap-2" style="padding: 4px 8px;"><i class="fa fa-fw fa-chevron-down"></i> <span class="timeago text-xs text-muted text-nowrap" title="2014年5月10日 18:08" datetime="2014-05-10T10:08:11.000Z">2014年5月10日 18:08</span></button>
+</div>
+</div>
+
+
+</div>
+</div>
+</div>
+</div>
+
+</div>
+<div data-widget-area="sidebar" class="col-lg-3 col-sm-12 hidden">
+
+</div>
+</div>
+</div>
+</div>
+<div data-widget-area="footer">
+
+<!--<div style="padding-top: 2em">
+    <a href="https://www.qt.io/qt-world-summit-2023" target="_blank">
+        <img src="https://qt-files.s3.eu-west-1.amazonaws.com/banners/QtWS2023_Banner_New_1140x300.jpg" style="max-width: 100%" />
+    </a>
+</div>-->
+
+</div>
+
+<noscript>
+<nav component="pagination" class="pagination-container mt-3 hidden" aria-label="分页">
+<ul class="pagination pagination-sm gap-1 hidden-xs hidden-sm justify-content-center">
+<li class="page-item previous  disabled">
+<a class="page-link rounded fw-secondary px-3" href="?" data-page="1" aria-label="前一页"><i class="fa fa-chevron-left"></i> </a>
+</li>
+
+<li class="page-item next  disabled">
+<a class="page-link rounded fw-secondary px-3" href="?" data-page="1" aria-label="后一页"> <i class="fa fa-chevron-right"></i></a>
+</li>
+</ul>
+
+</nav>
+</noscript>
+</div><!-- /.container#content -->
+</main>
+<nav component="sidebar/right" class=" text-dark bg-light sidebar sidebar-right end-0 border-start vh-100 d-none d-lg-flex flex-column sticky-top">
+
+<ul id="logged-out-menu" class="list-unstyled d-flex flex-column w-100 gap-2 mt-2" role="menu">
+<li class="nav-item mx-2 order-last order-md-first" role="menuitem" data-bs-original-title="登录">
+<a class="nav-link" href="https://forum.qt.io/login" aria-label="登录">
+<span class="d-flex gap-2 align-items-center text-nowrap truncate-open">
+<span class="position-relative">
+<i class="fa fa-fw fa-sign-in"></i>
+</span>
+<span class="nav-text small visible-open fw-semibold">登录</span>
+</span>
+</a>
+</li>
+<hr class="my-2 mx-2 visible-open">
+
+
+
+<li component="sidebar/search" class="nav-item mx-2 search dropstart position-relative" role="menuitem" data-bs-original-title="搜索">
+<a component="search/button" id="search-button" href="https://forum.qt.io/topic/41224/solved-qradiobutton-style-sheet-issue#" role="button" class="nav-link d-flex gap-2 align-items-center text-truncate" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" aria-label="搜索">
+<span>
+<i class="fa fa-search fa-fw"></i>
+</span>
+<span class="nav-text small visible-open fw-semibold">搜索</span>
+</a>
+<div class="search-dropdown dropdown-menu p-2 shadow" role="menu">
+<form component="search/form" id="search-form" class="d-flex justify-content-end align-items-center" role="search" method="GET">
+<div component="search/fields" class="w-100" id="search-fields">
+<div class="d-flex gap-1">
+<input autocomplete="off" type="text" class="form-control" placeholder="搜索" name="query" value="" aria-label="输入内容进行搜索">
+<a class="btn btn-ghost advanced-search-link p-2" href="https://forum.qt.io/search" aria-label="高级搜索" data-bs-original-title="高级搜索">
+<i class="fa fa-gears text-muted"></i>
+</a>
+</div>
+<div id="quick-search-container" class="quick-search-container d-block mt-2 hidden">
+<div class="form-check filter-category mb-2 ms-2">
+<input class="form-check-input" type="checkbox" checked="">
+<label class="form-check-label name text-sm"></label>
+</div>
+<div class="text-center loading-indicator" style="display: none;"><i class="fa fa-spinner fa-spin"></i></div>
+<div class="quick-search-results-container"></div>
+</div>
+<button type="submit" class="btn btn-outline-secondary hide">搜索</button>
+</div>
+</form>
+</div>
+</li>
+
+
+</ul>
+
+<div class="visible-open small text-secondary mt-auto" data-widget-area="sidebar-footer">
+
+</div>
+</nav>
+</div>
+
+<div component="bottombar" class="bottombar d-flex flex-column d-lg-none ff-secondary gap-1 align-items-center fixed-bottom" style="transition: bottom 150ms linear; bottom: 0px;">
+<div class="d-flex w-100 navigator-mobile">
+<div class="pagination-block text-bg-light m-2 rounded-1 border border-gray-300 w-100 ready" style="height:30px;">
+<div class="position-relative">
+<div class="progress-bar rounded-1 bg-info d-block position-absolute" style="height: 28px; width: 0%;"></div>
+</div>
+<div class="wrapper dropup-center d-flex align-items-center justify-content-between w-100 h-100" style="padding: 5px 0px;">
+<div class="d-flex">
+<div class="lh-1 px-2">
+<i class="fa fa-angles-left pointer fa-fw pagetop fs-5" style="z-index: 1;"></i>
+</div>
+
+</div>
+<a href="https://forum.qt.io/topic/41224/solved-qradiobutton-style-sheet-issue#" class="text-reset dropdown-toggle d-inline-block px-3 text-decoration-none" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+<span class="d-inline-flex gap-2 align-items-center pagination-text position-relative fw-bold">1 / 3</span>
+</a>
+<div class="d-flex">
+
+<div class="lh-1 px-2">
+<i class="fa fa-angles-right pointer fa-fw pagebottom fs-5" style="z-index: 1;"></i>
+</div>
+</div>
+<ul class="dropdown-menu p-0" role="menu" style="width: 100%;">
+<li class="p-3">
+<div class="row">
+<div class="col-8 post-content overflow-hidden mb-3" style="height: 350px;"></div>
+<div class="col-4 ps-0 text-end">
+<div class="scroller-content">
+<span class="pointer pagetop">第一个帖子 <i class="fa fa-angle-double-up"></i></span>
+<div class="scroller-container border-gray-200" style="height: 300px;">
+<div class="scroller-thumb position-relative text-nowrap" style="height: 40px;">
+<span class="thumb-text text-sm fw-bold user-select-none position-relative pe-2" style="top: -15px;"></span>
+<div class="rounded-2 scroller-thumb-icon bg-primary d-inline-block position-relative" style="width: 9px; height:40px;"></div>
+</div>
+</div>
+<span class="pointer pagebottom">最后一个帖子 <i class="fa fa-angle-double-down"></i></span>
+</div>
+</div>
+</div>
+<div class="row">
+<div class="col-6">
+<button id="myNextPostBtn" class="btn btn-sm btn-ghost border form-control text-truncate" disabled="">转到我的下一个帖子</button>
+</div>
+<div class="col-6">
+<input type="number" class="form-control form-control-sm" id="indexInput" placeholder="跳转到帖子">
+</div>
+</div>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="bottombar-nav p-2 text-dark bg-light d-flex justify-content-between align-items-center w-100">
+<div class="bottombar-nav-left d-flex gap-3 align-items-center">
+<div>
+<a href="https://forum.qt.io/topic/41224/solved-qradiobutton-style-sheet-issue#" role="button" class="nav-link d-flex justify-content-between align-items-center position-relative" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+<span class="position-relative">
+<i class="fa fa-fw fa-lg fa-bars"></i>
+<span component="unread/count" data-unread-url="/unread" class="position-absolute top-0 start-100 translate-middle badge rounded-1 bg-primary hidden">0</span>
+</span>
+</a>
+<ul class="navigation-dropdown dropdown-menu" role="menu">
+
+
+<li class="nav-item " title="版块">
+<a class="nav-link navigation-link px-3 py-2 " href="https://forum.qt.io/categories">
+<span class="d-inline-flex justify-content-between align-items-center w-100">
+<span class="text-nowrap">
+
+<i class="fa fa-fw fa-list" data-content=""></i>
+
+<span class="nav-text px-2 fw-semibold">版块</span>
+</span>
+<span component="navigation/count" class="badge rounded-1 bg-primary hidden"></span>
+</span>
+</a>
+
+</li>
+
+
+
+<li class="nav-item " title="最新">
+<a class="nav-link navigation-link px-3 py-2 " href="https://forum.qt.io/recent">
+<span class="d-inline-flex justify-content-between align-items-center w-100">
+<span class="text-nowrap">
+
+<i class="fa fa-fw fa-clock-o" data-content=""></i>
+
+<span class="nav-text px-2 fw-semibold">最新</span>
+</span>
+<span component="navigation/count" class="badge rounded-1 bg-primary hidden"></span>
+</span>
+</a>
+
+</li>
+
+
+
+<li class="nav-item " title="标签">
+<a class="nav-link navigation-link px-3 py-2 " href="https://forum.qt.io/tags">
+<span class="d-inline-flex justify-content-between align-items-center w-100">
+<span class="text-nowrap">
+
+<i class="fa fa-fw fa-tags" data-content=""></i>
+
+<span class="nav-text px-2 fw-semibold">标签</span>
+</span>
+<span component="navigation/count" class="badge rounded-1 bg-primary hidden"></span>
+</span>
+</a>
+
+</li>
+
+
+
+<li class="nav-item " title="热门">
+<a class="nav-link navigation-link px-3 py-2 " href="https://forum.qt.io/popular">
+<span class="d-inline-flex justify-content-between align-items-center w-100">
+<span class="text-nowrap">
+
+<i class="fa fa-fw fa-fire" data-content=""></i>
+
+<span class="nav-text px-2 fw-semibold">热门</span>
+</span>
+<span component="navigation/count" class="badge rounded-1 bg-primary hidden"></span>
+</span>
+</a>
+
+</li>
+
+
+
+<li class="nav-item " title="用户">
+<a class="nav-link navigation-link px-3 py-2 " href="https://forum.qt.io/users">
+<span class="d-inline-flex justify-content-between align-items-center w-100">
+<span class="text-nowrap">
+
+<i class="fa fa-fw fa-user" data-content=""></i>
+
+<span class="nav-text px-2 fw-semibold">用户</span>
+</span>
+<span component="navigation/count" class="badge rounded-1 bg-primary hidden"></span>
+</span>
+</a>
+
+</li>
+
+
+
+<li class="nav-item " title="群组">
+<a class="nav-link navigation-link px-3 py-2 " href="https://forum.qt.io/groups">
+<span class="d-inline-flex justify-content-between align-items-center w-100">
+<span class="text-nowrap">
+
+<i class="fa fa-fw fa-group" data-content=""></i>
+
+<span class="nav-text px-2 fw-semibold">群组</span>
+</span>
+<span component="navigation/count" class="badge rounded-1 bg-primary hidden"></span>
+</span>
+</a>
+
+</li>
+
+
+
+<li class="nav-item " title="搜索">
+<a class="nav-link navigation-link px-3 py-2 " href="https://forum.qt.io/search">
+<span class="d-inline-flex justify-content-between align-items-center w-100">
+<span class="text-nowrap">
+
+<i class="fa fa-fw fa-search" data-content=""></i>
+
+<span class="nav-text px-2 fw-semibold">搜索</span>
+</span>
+<span component="navigation/count" class="badge rounded-1 bg-primary hidden"></span>
+</span>
+</a>
+
+</li>
+
+
+
+<li class="nav-item " title="Get Qt Extensions">
+<a class="nav-link navigation-link px-3 py-2 " href="https://marketplace.qt.io/" target="_blank">
+<span class="d-inline-flex justify-content-between align-items-center w-100">
+<span class="text-nowrap">
+
+<i class="fa fa-fw fa-shopping-basket" data-content=""></i>
+
+<span class="nav-text px-2 fw-semibold">Get Qt Extensions</span>
+</span>
+<span component="navigation/count" class="badge rounded-1 bg-primary hidden"></span>
+</span>
+</a>
+
+</li>
+
+
+
+<li class="nav-item " title="未解决">
+<a class="nav-link navigation-link px-3 py-2 " href="https://forum.qt.io/unsolved">
+<span class="d-inline-flex justify-content-between align-items-center w-100">
+<span class="text-nowrap">
+
+<i class="fa fa-fw fa-question-circle" data-content=""></i>
+
+<span class="nav-text px-2 fw-semibold">未解决</span>
+</span>
+<span component="navigation/count" class="badge rounded-1 bg-primary hidden"></span>
+</span>
+</a>
+
+</li>
+
+
+</ul>
+</div>
+</div>
+<div class="bottombar-nav-right d-flex gap-3 align-items-center">
+<div>
+
+<ul id="logged-out-menu" class="list-unstyled d-flex w-100 gap-3 mb-0 logged-out-menu">
+
+<li component="sidebar/search" class="nav-item mx-2 search">
+<a component="search/button" id="search-button" href="https://forum.qt.io/topic/41224/solved-qradiobutton-style-sheet-issue#" role="button" class="nav-link text-truncate" data-bs-toggle="dropdown" title="搜索" aria-haspopup="true" aria-expanded="false">
+<i class="fa fa-search fa-fw"></i>
+<span class="nav-text visible-open px-2 fw-semibold">搜索</span>
+</a>
+<div class="search-dropdown dropdown-menu p-2 shadow" role="menu">
+<form component="search/form" id="search-form" class="d-flex justify-content-end align-items-center" role="search" method="GET">
+<div component="search/fields" class="d-flex flex-column w-100 " id="search-fields">
+<div id="quick-search-container" class="quick-search-container d-block hidden">
+<div class="form-check filter-category mb-2 ms-2">
+<input class="form-check-input" type="checkbox" checked="">
+<label class="form-check-label name"></label>
+</div>
+<div class="text-center loading-indicator" style="display: none;"><i class="fa fa-spinner fa-spin"></i></div>
+<div class="quick-search-results-container"></div>
+</div>
+<div class="d-flex gap-1 input-container">
+<input autocomplete="off" type="text" class="form-control" placeholder="搜索" name="query" value="" aria-label="输入内容进行搜索">
+<a class="nav-link d-flex justify-content-center align-items-center advanced-search-link" href="https://forum.qt.io/search" title="高级搜索">
+<i class="fa fa-gears fa-fw text-muted"></i>
+</a>
+</div>
+<button type="submit" class="btn btn-outline-secondary hide">搜索</button>
+</div>
+</form>
+</div>
+</li>
+
+
+<li class="nav-item mx-2" title="登录">
+<a class="nav-link" href="https://forum.qt.io/login">
+<i class="fa fa-fw fa-sign-in"></i>
+</a>
+</li>
+</ul>
+
+</div>
+</div>
+</div>
+</div>
+
+
+<div>
+<div component="toaster/tray" class="alert-window fixed-bottom mb-5 mb-md-2 me-2 me-md-5 ms-auto" style="width:300px; z-index: 1090;">
+<div id="reconnect-alert" class="alert alert-dismissible alert-warning fade show" component="toaster/toast">
+<button type="button" class="btn-close" data-bs-dismiss="alert" aria-hidden="true"></button>
+<p class="mb-0">与 Qt Forum 的连接断开，我们正在尝试重连，请耐心等待</p>
+</div>
+</div>
+</div>
+
+<script defer="" src="./[SOLVED]QRadioButton Style Sheet Issue _ Qt Forum_files/nodebb.min.js.下载"></script>
+
+<script>
+if (document.readyState === 'loading') {
+document.addEventListener('DOMContentLoaded', prepareFooter);
+} else {
+prepareFooter();
+}
+function prepareFooter() {
+
+$(document).ready(function () {
+app.coldLoad();
+});
+}
+</script>
+
+</body></html>
