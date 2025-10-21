@@ -4,7 +4,7 @@
 #include <QAbstractTableModel>
 #include <QObject>
 #include <QUuid>
-#include "../Protocol/equipment.h"
+#include "../../Protocol/equipment.h"
 
 class EquipModel : public QAbstractTableModel
 {

@@ -12,11 +12,11 @@
 #include "../Protocol/mapwithdiff.h"
 #include "ui/factory/developwindow.h"
 #include "ui/views/equipselect.h"
-#include "ui/sortie/maprender.h"
 #include "ui/techview.h"
 #include "steamauth.h"
-#include "equipmodel.h"
-#include "shipmodel.h"
+#include "model/equipmodel.h"
+#include "model/shipmodel.h"
+#include "model/shipbpmodel.h"
 #include "resourcefetch.h"
 
 void customMessageHandler(QtMsgType,
@@ -60,6 +60,7 @@ public:
     int equipIndex = 0;
     EquipModel equipModel;
     ShipModel shipModel;
+    ShipBPModel shipBPModel;
     QMap<int, double> techCache;
 
 public slots:
@@ -116,7 +117,9 @@ signals:
     void receivedLocalTechInfo(const QJsonObject &);
     void receivedLocalTechInfo2(const QJsonObject &);
     void receivedResourceInfo(const QJsonObject &);
+    void receivedShipBlueprint(const QJsonObject &);
     void receivedSkillPointInfo(const QJsonObject &);
+    void uiRefreshSig();
 
 private slots:
     void changeGameState(KP::GameState);

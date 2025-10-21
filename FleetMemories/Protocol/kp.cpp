@@ -491,7 +491,7 @@ QByteArray KP::serverResourceUpdate(ResOrd ordinary) {
 }
 
 QByteArray KP::serverShipInfo(const QJsonArray &input, bool user,
-                               QDateTime timeUtc, bool cacheHit) {
+                              QDateTime timeUtc, bool cacheHit) {
     QJsonObject result;
     result["type"] = DgramType::Info;
     if(user)
@@ -503,6 +503,14 @@ QByteArray KP::serverShipInfo(const QJsonArray &input, bool user,
     if(!cacheHit) {
         result["content"] = input;
     }
+    return QCborValue::fromJsonValue(result).toCbor();
+}
+
+QByteArray KP::serverShipBPInfo(const QJsonObject &input) {
+    QJsonObject result;
+    result["type"] = DgramType::Info;
+    result["infotype"] = InfoType::ShipInfoUserBP;
+    result["content"] = input;
     return QCborValue::fromJsonValue(result).toCbor();
 }
 

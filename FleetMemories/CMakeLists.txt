@@ -29,15 +29,17 @@ set(CLIENT_SOURCES
     ClientGUI/clientv2.h
     ClientGUI/equipicon.h
     ClientGUI/equipicon.cpp
-    ClientGUI/equipmodel.h
-    ClientGUI/equipmodel.cpp
+    ClientGUI/model/equipmodel.h
+    ClientGUI/model/equipmodel.cpp
     ClientGUI/main.cpp
     ClientGUI/networkerror.cpp
     ClientGUI/networkerror.h
     ClientGUI/resourcefetch.cpp
     ClientGUI/resourcefetch.h
-    ClientGUI/shipmodel.cpp
-    ClientGUI/shipmodel.h
+    ClientGUI/model/shipbpmodel.h
+    ClientGUI/model/shipbpmodel.cpp
+    ClientGUI/model/shipmodel.cpp
+    ClientGUI/model/shipmodel.h
     ClientGUI/steamauth.cpp
     ClientGUI/steamauth.h
     ClientGUI/ui/boxcenterfusionstyle.h

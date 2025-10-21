@@ -6,7 +6,7 @@
 #include <QIcon>
 #include <QLabel>
 #include <QToolButton>
-#include "../equipmodel.h"
+#include "../model/equipmodel.h"
 
 class Navi : public QObject {
     Q_OBJECT

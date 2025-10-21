@@ -162,6 +162,7 @@ private:
     void sqlinitShip() const;
     void sqlinitShipName() const;
     void sqlinitShipU() const;
+    void sqlinitShipUBP() const;
     void sqlinitShipUKC() const;
     void sqlinitUsers() const;
     void sqlinitUserA() const;

@@ -1,0 +1,39 @@
+#ifndef SHIPBPMODEL_H
+#define SHIPBPMODEL_H
+
+#include "shipmodel.h"
+
+class ShipBPModel : public ShipModel
+{
+    Q_OBJECT
+public:
+    explicit ShipBPModel(QObject *parent = nullptr);
+    virtual void updateShipList(const QJsonObject &) override;
+
+    virtual QVariant data(const QModelIndex &index,
+                          int role = Qt::DisplayRole) const override;
+    virtual QVariant headerData(int section, Qt::Orientation orientation,
+                                int role = Qt::DisplayRole) const override;
+    virtual int hiddenSortColumn() const override;
+
+public slots:
+    virtual void switchShipDisplayType(const QString &nationality,
+                                       const QString &shiptype,
+                                       const QString &shipclass,
+                                       const QString &searchTerm
+                                       = QLatin1String("")) override;
+
+protected:
+    virtual void customSort() override;
+    virtual int numberOfColumns() const override;
+
+private:
+    virtual int numberOfShip() const override;
+    QHash<int, int> clientShipBPs;
+    QList<int> sortedShipBPIds;
+
+    static const int equipCol = 0;
+    static const int amountCol = 1;
+};
+
+#endif // SHIPBPMODEL_H

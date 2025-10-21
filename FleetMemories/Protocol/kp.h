@@ -173,7 +173,8 @@ enum FactoryState{
     Development,
     Construction,
     Arsenal,
-    Anchorage
+    Anchorage,
+    BlueprintView
 };
 Q_ENUM_NS(FactoryState)
 
@@ -194,6 +195,7 @@ enum InfoType{
     ResourceInfo,
     ShipInfo,
     ShipInfoUser,
+    ShipInfoUserBP,
     MapInfo,
     MapInfoUser,
 };
@@ -240,7 +242,7 @@ enum ShipNationality{
     Chinese = 8,
     Benelux = 9,
     Scandinavian = 0xA,
-    Oceanian = 0xB,
+    Commonwealth = 0xB,
     Latin = 0xC, // Iberian or Latin American
     EasternEuropean = 0xD,
     MinorAsian = 0xE,
@@ -391,6 +393,7 @@ QByteArray serverResourceUpdate(ResOrd);
 QByteArray serverShipInfo(const QJsonArray &, bool user = false,
                           QDateTime timeUtc = QDateTime::currentDateTimeUtc(),
                           bool cacheHit = false);
+QByteArray serverShipBPInfo(const QJsonObject &);
 QByteArray serverSkillPoints(int, int64, int64);
 QByteArray serverSuccess();
 QByteArray serverTestMessages(int);

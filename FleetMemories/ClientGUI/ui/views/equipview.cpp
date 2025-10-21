@@ -26,7 +26,7 @@ EquipView::EquipView(QWidget *parent)
     QLayout *layoutTop = ui->ArsenalControl->layout();
     layoutTop->addWidget(arsenalView);
     layoutTop->setAlignment(arsenalView, Qt::AlignCenter);
-    arsenalView->setMinimumSize(QSize(800,800));
+    arsenalView->setMinimumSize(QSize(100,100));
 
     arsenalView->verticalHeader()->setSectionResizeMode(QHeaderView::Fixed);
     arsenalView->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
@@ -106,6 +106,7 @@ EquipView::EquipView(QWidget *parent)
             model, &EquipModel::enactDestruct);
     connect(equipSelect, &EquipSelect::searchBoxChanged,
             model, &EquipModel::switchDisplayType2);
+
     connect(shipSelect, &ShipSelect::selectChanged,
             &engine.shipModel, &ShipModel::switchShipDisplayType);
     connect(&engine.shipModel, &ShipModel::typeBoxHint,
@@ -113,6 +114,16 @@ EquipView::EquipView(QWidget *parent)
     connect(&engine.shipModel, &ShipModel::classBoxHint,
             shipSelect, &ShipSelect::classBoxHinted);
 
+    connect(shipSelect, &ShipSelect::selectChanged,
+            &engine.shipBPModel, &ShipModel::switchShipDisplayType);
+    connect(&engine.shipBPModel, &ShipModel::typeBoxHint,
+            shipSelect, &ShipSelect::typeBoxHinted);
+    connect(&engine.shipBPModel, &ShipModel::classBoxHint,
+            shipSelect, &ShipSelect::classBoxHinted);
+        /*
+    connect(&engine, &Clientv2::uiRefreshSig,
+            this, &EquipView::recalculateArsenalRows);
+*/
     delegate = new SelectDelegate(arsenalView);
     hpdelegate = new HpDelegate(arsenalView);
 }
@@ -186,7 +197,7 @@ void EquipView::pageNumChangedLambda(int current, int total) {
     update();
 }
 
-void EquipView::activate(bool arsenal, bool isEquip) {
+void EquipView::activate(bool arsenal, bool isEquip, bool isBP) {
     arsenalView->setItemDelegateForColumn(model->selectColumn(),
                                           new QStyledItemDelegate());
     arsenalView->setItemDelegateForColumn(model->hpColumn(),
@@ -258,43 +269,69 @@ void EquipView::activate(bool arsenal, bool isEquip) {
         shipSelect->hide();
     }
     else {
-        model = &engine.shipModel;
-        arsenalView->setModel(model);
-        if(!model->isReady()) {
-            pageLabel->setText(qtTrId("retrieving-please-wait"));
-            engine.doRefreshFactoryAnchorage();
-            arsenalView->hide();
+        if(!isBP) {
+            model = &engine.shipModel;
+            arsenalView->setModel(model);
+            if(!model->isReady()) {
+                pageLabel->setText(qtTrId("retrieving-please-wait"));
+                engine.doRefreshFactoryAnchorage();
+                arsenalView->hide();
+            }
+            else {
+                arsenalView->show();
+            }
+            if(arsenal) {
+                model->setIsInArsenal(true);
+                arsenalView->setItemDelegateForColumn(model->hpColumn(), hpdelegate);
+                shipSelect->addStarButton->show();
+            }
+            else {
+                model->setIsInArsenal(false);
+                arsenalView->setItemDelegateForColumn(model->selectColumn(),
+                                                      delegate);
+                arsenalView->setItemDelegateForColumn(model->hpColumn(), hpdelegate);
+                connect(delegate, &SelectDelegate::itemSelected,
+                        this, &EquipView::itemSelected);
+                shipSelect->addStarButton->hide();
+                unselectButton->show();
+                connect(unselectButton, &QPushButton::clicked,
+                        this, [this]{emit shipSelected(QUuid());
+                                 hide();});
+            }
+            recalculateArsenalRows();
+            connect(model, SIGNAL(needReCalculateRows()),
+                    this, SLOT(recalculateArsenalRows()),
+                    Qt::UniqueConnection);
+            connect(this, SIGNAL(rowCountHint(int)),
+                    model, SLOT(setRowsPerPageHint(int)),
+                    Qt::UniqueConnection);
+            equipSelect->hide();
+            shipSelect->show();
         }
         else {
-            arsenalView->show();
-        }
-        if(arsenal) {
+        blueprint_view:
+            model = &engine.shipBPModel;
+            arsenalView->setModel(model);
+            if(!model->isReady()) {
+                pageLabel->setText(qtTrId("retrieving-please-wait"));
+                engine.doRefreshFactoryAnchorage();
+                arsenalView->hide();
+            }
+            else {
+                arsenalView->show();
+            }
             model->setIsInArsenal(true);
             arsenalView->setItemDelegateForColumn(model->hpColumn(), hpdelegate);
-            shipSelect->addStarButton->show();
+            recalculateArsenalRows();
+            connect(model, SIGNAL(needReCalculateRows()),
+                    this, SLOT(recalculateArsenalRows()),
+                    Qt::UniqueConnection);
+            connect(this, SIGNAL(rowCountHint(int)),
+                    model, SLOT(setRowsPerPageHint(int)),
+                    Qt::UniqueConnection);
+            equipSelect->hide();
+            shipSelect->show();
         }
-        else {
-            model->setIsInArsenal(false);
-            arsenalView->setItemDelegateForColumn(model->selectColumn(),
-                                                  delegate);
-            arsenalView->setItemDelegateForColumn(model->hpColumn(), hpdelegate);
-            connect(delegate, &SelectDelegate::itemSelected,
-                    this, &EquipView::itemSelected);
-            shipSelect->addStarButton->hide();
-            unselectButton->show();
-            connect(unselectButton, &QPushButton::clicked,
-                    this, [this]{emit shipSelected(QUuid());
-                                 hide();});
-        }
-        recalculateArsenalRows();
-        connect(model, SIGNAL(needReCalculateRows()),
-                this, SLOT(recalculateArsenalRows()),
-                Qt::UniqueConnection);
-        connect(this, SIGNAL(rowCountHint(int)),
-                model, SLOT(setRowsPerPageHint(int)),
-                Qt::UniqueConnection);
-        equipSelect->hide();
-        shipSelect->show();
     }
     connect(model, &EquipModel::pageNumChanged,
             this, &EquipView::pageNumChangedLambda);
@@ -321,6 +358,10 @@ void EquipView::recalculateArsenalRows() {
         emit rowCountHint(std::max(rowSizeAvailable / rowSize - 1, 1));
     arsenalView
         ->setMinimumSize(QSize(tableSizeWhole(arsenalView,
+                                              model).width(),
+                               ui->ArsenalControl->size().height()));
+    arsenalView
+        ->setMaximumSize(QSize(tableSizeWhole(arsenalView,
                                               model).width(),
                                ui->ArsenalControl->size().height()));
     arsenalView->show();

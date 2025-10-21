@@ -386,6 +386,7 @@ border-style: none;</string>
     <addaction name="actionConstruct_Ships"/>
     <addaction name="actionArsenal"/>
     <addaction name="actionAnchorage"/>
+    <addaction name="actionShip_Blueprints"/>
    </widget>
    <widget class="QMenu" name="menuNaval_Base">
     <property name="title">
@@ -457,6 +458,11 @@ border-style: none;</string>
   <action name="actionCompose">
    <property name="text">
     <string id="menu-compose">Compose</string>
+   </property>
+  </action>
+  <action name="actionShip_Blueprints">
+   <property name="text">
+    <string id="ship-blueprint-view">Ship Blueprints</string>
    </property>
   </action>
  </widget>

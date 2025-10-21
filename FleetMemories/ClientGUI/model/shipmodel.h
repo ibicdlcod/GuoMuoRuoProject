@@ -2,8 +2,8 @@
 #define SHIPMODEL_H
 
 #include "equipmodel.h"
-#include "../Protocol/ship.h"
-#include "../Protocol/shipdynamic.h"
+#include "../../Protocol/ship.h"
+#include "../../Protocol/shipdynamic.h"
 
 class ShipModel : public EquipModel
 {
@@ -21,10 +21,10 @@ public slots:
                                        const QString &shiptype,
                                        const QString &shipclass,
                                        const QString &searchTerm
-                                       = QLatin1String("")) override final;
+                                       = QLatin1String("")) override;
 
     virtual void addShip(QUuid, int) final;
-    virtual void updateShipList(const QJsonObject &) final;
+    virtual void updateShipList(const QJsonObject &);
 
 public:
     virtual int rowCount(const QModelIndex &parent
@@ -52,13 +52,13 @@ public:
 
     virtual int maximumPageNum() const override;
 
-private:
+protected:
     virtual void customSort() override;
     virtual int numberOfColumns() const override;
+    virtual int numberOfShip() const;
 
+private:
     void clearShipCheckBoxes();
-
-    int numberOfShip() const;
 
     QHash<QUuid, Ship *> clientShips;
     QHash<QUuid, ShipDynamic *> clientShipDynamicAttrs;

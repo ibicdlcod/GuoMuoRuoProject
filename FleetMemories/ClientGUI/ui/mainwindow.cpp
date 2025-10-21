@@ -96,6 +96,11 @@ MainWindow::MainWindow(QWidget *parent, int argc, char ** argv)
             &engine, &Clientv2::switchToFactory);
     connect(ui->actionAnchorage, &QAction::triggered,
             this, &MainWindow::switchToAnchorage);
+    connect(ui->actionShip_Blueprints, &QAction::triggered,
+            &engine, &Clientv2::switchToFactory);
+    connect(ui->actionShip_Blueprints, &QAction::triggered,
+            this, &MainWindow::switchToBlueprint);
+
     connect(ui->actionBattle, &QAction::triggered,
             &engine, &Clientv2::switchToBattleView);
     connect(ui->actionBattle, &QAction::triggered,
@@ -247,6 +252,15 @@ void MainWindow::switchToArsenal() {
         return;
     }
     factoryArea->setState(KP::Arsenal);
+    factoryArea->switchToState();
+}
+
+void MainWindow::switchToBlueprint() {
+    Clientv2 &engine = Clientv2::getInstance();
+    if(!engine.loggedIn()) {
+        return;
+    }
+    factoryArea->setState(KP::BlueprintView);
     factoryArea->switchToState();
 }
 

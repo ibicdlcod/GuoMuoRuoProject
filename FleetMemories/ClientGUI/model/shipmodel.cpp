@@ -1,8 +1,8 @@
 #include "shipmodel.h"
 #include <QApplication>
 #include <QStyleHints>
-#include "clientv2.h"
-#include "equipicon.h"
+#include "../clientv2.h"
+#include "../equipicon.h"
 
 extern std::unique_ptr<QSettings> settings;
 
@@ -365,7 +365,6 @@ QVariant ShipModel::data(const QModelIndex &index,
 
 QVariant ShipModel::headerData(int section, Qt::Orientation orientation,
                                int role) const {
-
     if(section >= rowCount() && orientation == Qt::Vertical)
         return QVariant();
     if(section >= columnCount() && orientation == Qt::Horizontal)

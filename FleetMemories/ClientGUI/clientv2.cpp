@@ -80,6 +80,8 @@ Clientv2::Clientv2(QObject *parent)
             &equipModel, &EquipModel::updateEquipmentList);
     connect(this, &Clientv2::receivedAnchorageShip,
             &shipModel, &ShipModel::updateShipList);
+    connect(this, &Clientv2::receivedShipBlueprint,
+            &shipBPModel, &ShipBPModel::updateShipList);
     connect(&equipModel, &EquipModel::destructRequest,
             this, &Clientv2::doDestructEquip);
     connect(this, &Clientv2::gamestateChanged,
@@ -542,6 +544,7 @@ void Clientv2::tsunkitAssets() {
 /* Refresh UI? */
 void Clientv2::uiRefresh() {
     //qDebug("UIREFRESH");
+    emit uiRefreshSig();
     SteamAPI_RunCallbacks();
 }
 
@@ -1122,6 +1125,9 @@ void Clientv2::receivedInfo(const QJsonObject &djson) {
         break;
     case KP::InfoType::ShipInfoUser:
         emit receivedAnchorageShip(djson);
+        break;
+    case KP::InfoType::ShipInfoUserBP:
+        emit receivedShipBlueprint(djson["content"].toObject());
         break;
     case KP::InfoType::MapInfo:
         updateMapCache(djson);

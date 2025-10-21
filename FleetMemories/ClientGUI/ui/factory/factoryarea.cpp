@@ -21,6 +21,7 @@ FactoryArea::FactoryArea(QWidget *parent) :
     ui->ArsenalArea->setLayout(layout);
     layout->addWidget(equipview);
     layout->setContentsMargins(0,0,0,0);
+    layout->setAlignment(Qt::AlignCenter);
 
     Clientv2 &engine = Clientv2::getInstance();
     connect(&engine, &Clientv2::receivedFactoryRefresh,
@@ -150,6 +151,16 @@ void FactoryArea::switchToState() {
         equipview->recalculateArsenalRows();
         update();
         equipview->activate(true, false);
+        break;
+    case KP::BlueprintView:
+        //% "Blueprints"
+        ui->FactoryLabel->setText(qtTrId("blueprintview"));
+        ui->Slots->hide();
+        ui->ArsenalArea->show();
+        equipview->setGeometry(ui->ArsenalArea->rect());
+        equipview->recalculateArsenalRows();
+        update();
+        equipview->activate(true, false, true);
         break;
     }
 }

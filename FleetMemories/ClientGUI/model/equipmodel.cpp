@@ -3,8 +3,8 @@
 #include <algorithm>
 #include <QApplication>
 #include <QStyleHints>
-#include "clientv2.h"
-#include "equipicon.h"
+#include "../clientv2.h"
+#include "../equipicon.h"
 
 extern std::unique_ptr<QSettings> settings;
 

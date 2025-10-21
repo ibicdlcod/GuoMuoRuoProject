@@ -27,7 +27,7 @@ ChooseHomePort::ChooseHomePort(QWidget *parent, const QJsonObject input)
             case KP::British:  ui->buttonGBR->setCheckable(true); break;
             case KP::French:   ui->buttonFRA->setCheckable(true); break;
             case KP::Soviet:   ui->buttonSOV->setCheckable(true); break;
-            case KP::Oceanian: ui->buttonOCE->setCheckable(true); break;
+            case KP::Commonwealth: ui->buttonOCE->setCheckable(true); break;
             default: break;
             }
         }
@@ -65,6 +65,6 @@ void ChooseHomePort::finishChoice(int status) {
         emit portChosen(KP::Soviet);
     }
     else if(ui->buttonOCE->isChecked()) {
-        emit portChosen(KP::Oceanian);
+        emit portChosen(KP::Commonwealth);
     }
 }

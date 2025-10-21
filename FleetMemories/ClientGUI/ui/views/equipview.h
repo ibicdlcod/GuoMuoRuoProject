@@ -9,7 +9,7 @@
 #include <QToolButton>
 #include <QWidget>
 #include <QLineEdit>
-#include "../../equipmodel.h"
+#include "../../model/equipmodel.h"
 #include "selectdelegate.h"
 #include "hpdelegate.h"
 #include "equipselect.h"
@@ -24,8 +24,9 @@ namespace {
  * how-to-determine-the-correct-size-of-a-qtablewidget */
 static QSize tableSizeWhole(QTableView *view, EquipModel *model) {
     int w = view->verticalHeader()->width() + 4; // +4 seems to be needed
-    for (int i = 0; i < model->columnCount(); i++)
+    for (int i = 0; i < model->columnCount(); i++) {
         w += view->columnWidth(i); // seems to include gridline (on my machine)
+    }
     int h = view->horizontalHeader()->height() + 4;
     for (int i = 0; i < model->rowCount(); i++)
         h += view->rowHeight(i);
@@ -41,7 +42,7 @@ public:
     explicit EquipView(QWidget *parent = nullptr);
     ~EquipView();
 
-    void activate(bool arsenal = true, bool isEquip = true);
+    void activate(bool arsenal = true, bool isEquip = true, bool isBP = false);
     void enactPageNumChange(int currentPageNum, int totalPageNum);
 
 public slots:

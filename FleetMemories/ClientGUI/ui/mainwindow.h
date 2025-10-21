@@ -41,6 +41,7 @@ private slots:
     void processCmd();
     void switchToAnchorage();
     void switchToArsenal();
+    void switchToBlueprint();
     void switchToConstruct();
     void switchToDevelop();
     void switchToFleet();

@@ -299,14 +299,14 @@ Q_GLOBAL_STATIC(QString,
                     "Slot5Planes INTEGER DEFAULT 0, "
                     "FleetIndex INTEGER DEFAULT -1, "
                     "FleetPosIndex INTEGER DEFAULT -1, "
-                    "FOREIGN KEY(User) REFERENCES NewUsers(UserID),"
-                    "FOREIGN KEY(ShipDef) REFERENCES ShipName(ShipID)"
-                    "FOREIGN KEY(Slot1) REFERENCES UserEquip(EquipUuid)"
-                    "FOREIGN KEY(Slot2) REFERENCES UserEquip(EquipUuid)"
-                    "FOREIGN KEY(Slot3) REFERENCES UserEquip(EquipUuid)"
-                    "FOREIGN KEY(Slot4) REFERENCES UserEquip(EquipUuid)"
-                    "FOREIGN KEY(Slot5) REFERENCES UserEquip(EquipUuid)"
-                    "FOREIGN KEY(SlotEX) REFERENCES UserEquip(EquipUuid)"
+                    "FOREIGN KEY(User) REFERENCES NewUsers(UserID), "
+                    "FOREIGN KEY(ShipDef) REFERENCES ShipName(ShipID) "
+                    "FOREIGN KEY(Slot1) REFERENCES UserEquip(EquipUuid) "
+                    "FOREIGN KEY(Slot2) REFERENCES UserEquip(EquipUuid) "
+                    "FOREIGN KEY(Slot3) REFERENCES UserEquip(EquipUuid) "
+                    "FOREIGN KEY(Slot4) REFERENCES UserEquip(EquipUuid) "
+                    "FOREIGN KEY(Slot5) REFERENCES UserEquip(EquipUuid) "
+                    "FOREIGN KEY(SlotEX) REFERENCES UserEquip(EquipUuid) "
                     ");"
                     ));
 
@@ -319,6 +319,20 @@ Q_GLOBAL_STATIC(QString,
                     "ShipDef INTEGER NOT NULL, "
                     "Exp INTEGER DEFAULT 0, "
                     "FOREIGN KEY(ShipDef) REFERENCES EquipName(ShipID)"
+                    ");"
+                    ));
+
+/* Ship of users */
+Q_GLOBAL_STATIC(QString,
+                userShipBP,
+                QStringLiteral(
+                    "CREATE TABLE UserShipBP ("
+                    "User BLOB NOT NULL, "
+                    "ShipDef INTEGER NOT NULL, "
+                    "Amount INTEGER DEFAULT 0, "
+                    "FOREIGN KEY(User) REFERENCES NewUsers(UserID), "
+                    "FOREIGN KEY(ShipDef) REFERENCES ShipName(ShipID) "
+                    "CONSTRAINT noduplicate UNIQUE(User, ShipDef) "
                     ");"
                     ));
 
@@ -1046,7 +1060,8 @@ void Server::offerShipInfoUser(const CSteamID &uid,
     }
 
     QJsonArray userShipInfos;
-    try{
+    try {
+    user_ship:
         QSqlDatabase db = QSqlDatabase::database();
         QSqlQuery query;
         query.prepare("SELECT UserShip.ShipDef,"
@@ -1127,7 +1142,7 @@ void Server::offerShipInfoUser(const CSteamID &uid,
                 fleetIndex = query.value(query.record().indexOf("FleetIndex")).toInt();
                 fleetPosIndex = query.value(query.record().indexOf("FleetPosIndex")).toInt();
                 expKC = query.value(query.record().indexOf("UserKCShip.Exp")).toInt();
-                
+
                 output["def"] = def;
                 output["serial"] = serial.toString();
                 output["star"] = star;
@@ -1161,6 +1176,34 @@ void Server::offerShipInfoUser(const CSteamID &uid,
             QByteArray msg =
                 KP::serverShipInfo(userShipInfos, true);
             QTimer::singleShot(100, this,
+                               [=, this](){senderM.sendMessage(connection, msg);});
+            connection->flush();
+        }
+    user_ship_bp:
+        QSqlQuery query2;
+        query2.prepare("SELECT ShipDef, Amount "
+                       "FROM UserShipBP "
+                       "WHERE User = :id;");
+        query2.bindValue(":id", uid.ConvertToUint64());
+        if(!query2.exec() || !query2.isSelect()) {
+            qCritical() << query2.lastQuery();
+            //% "Get user %1's ship list failed!"
+            throw DBError(qtTrId("user-get-ship-list-failed")
+                              .arg(uid.ConvertToUint64()),
+                          query2.lastError());
+        }
+        else {
+            QSqlRecord rec = query2.record();
+            int defCol = rec.indexOf("ShipDef");
+            int countCol = rec.indexOf("Amount");
+            QJsonObject userShipBP;
+            while(query2.next()) {
+                userShipBP[query2.value(defCol).toString()] = query2.value(countCol).toInt();
+            }
+            connection->flush();
+            QByteArray msg =
+                KP::serverShipBPInfo(userShipBP);
+            QTimer::singleShot(200, this,
                                [=, this](){senderM.sendMessage(connection, msg);});
             connection->flush();
         }
@@ -3207,9 +3250,9 @@ void Server::receivedReq(const QJsonObject &djson,
                            this,
                            [connection, uid, djson, this]
                            {offerTechInfo(
-                  connection,
-                  uid,
-                  djson["local"].toInt());});
+                                 connection,
+                                 uid,
+                                 djson["local"].toInt());});
     }
     break;
     case KP::CommandType::DemandSkillPoints: {
@@ -3217,9 +3260,9 @@ void Server::receivedReq(const QJsonObject &djson,
                            this,
                            [connection, uid, djson, this]
                            {offerSPInfo(
-                  connection,
-                  uid,
-                  djson["equipid"].toInt());});
+                                 connection,
+                                 uid,
+                                 djson["equipid"].toInt());});
     }
     break;
     case KP::CommandType::DemandResourceUpdate: {
@@ -3227,8 +3270,8 @@ void Server::receivedReq(const QJsonObject &djson,
                            this,
                            [connection, uid, this]
                            {offerResourceInfo(
-                  connection,
-                  uid);});
+                                 connection,
+                                 uid);});
     }
     break;
     case KP::CommandType::DestructEquip: {
@@ -3502,6 +3545,9 @@ void Server::sqlinit() const {
         if(!tables.contains("UserKCShip")) {
             sqlinitShipUKC();
         }
+        if(!tables.contains("UserShipBP")) {
+            sqlinitShipUBP();
+        }
     }
 }
 
@@ -3651,6 +3697,19 @@ void Server::sqlinitShipU() const {
     }
 }
 
+void Server::sqlinitShipUBP() const {
+    //% "Ship blueprint database for user does not exist, creating..."
+    qWarning() << qtTrId("ship-db-bp-user-lack");
+    QSqlQuery query;
+    query.prepare(*userShipBP);
+    if(!query.exec()) {
+        qCritical() << query.lastQuery();
+        //% "Create Ship blueprint database for user failed."
+        throw DBError(qtTrId("ship-db-bp-user-gen-failure"),
+                      query.lastError());
+    }
+}
+
 void Server::sqlinitShipUKC() const {
     //% "Ship database (kancolle) for user does not exist, creating..."
     qWarning() << qtTrId("ship-db-kc-user-lack");
@@ -3658,7 +3717,7 @@ void Server::sqlinitShipUKC() const {
     query.prepare(*userKCShip);
     if(!query.exec()) {
         qCritical() << query.lastQuery();
-        //% "Create Equipment database (kancolle) for user failed."
+        //% "Create Ship database (kancolle) for user failed."
         throw DBError(qtTrId("ship-db-kc-user-gen-failure"),
                       query.lastError());
     }
