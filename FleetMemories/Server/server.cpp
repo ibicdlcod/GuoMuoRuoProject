@@ -875,7 +875,6 @@ void Server::offerEquipInfoUser(const CSteamID &uid,
     try{
         QSqlDatabase db = QSqlDatabase::database();
         QSqlQuery query;
-        /* TODO: use left join to calculate KC star + FM star */
         query.prepare("SELECT UserEquip.EquipDef, "
                       "UserEquip.EquipUuid, "
                       "UserEquip.Star, "
@@ -3312,11 +3311,22 @@ void Server::receivedReq(const QJsonObject &djson,
         }
     }
     break;
+    home_port:
     case KP::CommandType::SelectHomePort: {
         KP::ShipNationality nation = static_cast<KP::ShipNationality>(
             djson["nation"].toInt());
+        switch(nation) {
+        case KP::Japanese: User::addShipBP(uid, 0x10120201); // Kamikaze
+        case KP::German: break;
+        case KP::Italian: break;
+        case KP::American: break;
+        case KP::British: break;
+        case KP::French: break;
+        case KP::Soviet: break;
+        case KP::Commonwealth: break;
+        default: break;
+        }
         User::decideHomePort(uid, nation);
-        /* TODO: initial ship blueprint */
     }
     break;
     default:
@@ -3325,9 +3335,6 @@ void Server::receivedReq(const QJsonObject &djson,
         break;
     }
     return;
-    Q_UNREACHABLE();
-    QByteArray msg2 = KP::accessDenied();
-    senderM.sendMessage(connection, msg2);
 }
 
 void Server::sendTestMessages() {
@@ -3335,8 +3342,12 @@ void Server::sendTestMessages() {
         qWarning() << "Server isn't listening, abort.";
     }
     else {
-        for(auto ship: std::as_const(normalMaps)) {
-            qInfo() << ship->x << ship->y;
+        for(auto ship: std::as_const(shipRegistry)) {
+            auto dis = std::bernoulli_distribution(0.10);
+            if(dis(mt)) {
+                for(auto user: connectedUsers)
+                    User::addShipBP(user, ship->getId());
+            }
         }/*
         for(auto equip: std::as_const(equipRegistry)) {
             if(equip->type.isCarrierPlane()) {

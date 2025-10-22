@@ -9,6 +9,43 @@
 
 extern std::unique_ptr<QSettings> settings;
 
+void User::addShipBP(const CSteamID &uid, int shipDef) {
+    QSqlDatabase db = QSqlDatabase::database();
+    int amount = 0;
+    QSqlQuery query;
+    query.prepare("SELECT Amount "
+                  "FROM UserShipBP WHERE User = :id "
+                  "AND ShipDef = :def");
+    query.bindValue(":id", uid.ConvertToUint64());
+    query.bindValue(":def", shipDef);
+
+    if(Q_UNLIKELY(!query.exec() || !query.isSelect() || !query.first())) {
+        ;
+    }
+    else {
+        amount = query.value(0).toInt();
+    }
+
+    QSqlQuery query2;
+    query2.prepare("REPLACE INTO UserShipBP (User, ShipDef, Amount) "
+                   "VALUES (:id, :eid, :sp)");
+    query2.bindValue(":id", uid.ConvertToUint64());
+    query2.bindValue(":eid", shipDef);
+    query2.bindValue(":sp", amount+1);
+    if(Q_UNLIKELY(!query2.exec())) {
+        qCritical() << query2.lastQuery();
+        //% "User %1: add blueprint of ship %2 failed!"
+        throw DBError(qtTrId("user-add-ship-bp-failed")
+                          .arg(uid.ConvertToUint64()).arg(shipDef),
+                      query2.lastError());
+    }
+    else {
+        //% "User %1: add blueprint of ship %2 success!"
+        qDebug() << qtTrId("user-add-ship-bp-success")
+                        .arg(uid.ConvertToUint64()).arg(shipDef);
+    }
+}
+
 void User::addSkillPoints(const CSteamID &uid, int equipId, int64 skillPoints) {
     QSqlDatabase db = QSqlDatabase::database();
     int64 existingSP = getSkillPoints(uid, equipId);
@@ -43,9 +80,9 @@ KP::ShipNationality User::checkHomePort(const CSteamID &uid) {
     query.prepare("SELECT Intvalue "
                   "FROM UserAttr WHERE UserID = :id "
                   "AND Attribute = 'HomePort'");
-    query.bindValue(":id", QString::number(uid.ConvertToUint64()));
+    query.bindValue(":id", uid.ConvertToUint64());
 
-    if(Q_UNLIKELY(!query.exec() ||!query.isSelect() || !query.first())) {
+    if(Q_UNLIKELY(!query.exec() || !query.isSelect() || !query.first())) {
         return KP::UnknownNation;
     }
     else {

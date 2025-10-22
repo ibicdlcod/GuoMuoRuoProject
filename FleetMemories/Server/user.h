@@ -9,6 +9,7 @@
 
 namespace User {
 
+void addShipBP(const CSteamID &, int);
 void addSkillPoints(const CSteamID &, int, int64);
 KP::ShipNationality checkHomePort(const CSteamID &);
 void decideHomePort(const CSteamID &, KP::ShipNationality);
