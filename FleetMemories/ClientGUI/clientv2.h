@@ -4,20 +4,19 @@
 #include <QColor>
 #include <QtNetwork>
 #include <QHttpServer>
-#include "../Protocol/equipment.h"
-#include "../Protocol/receiver.h"
-#include "../Protocol/sender.h"
 #include "../Protocol/kp.h"
-#include "../Protocol/ship.h"
-#include "../Protocol/mapwithdiff.h"
 #include "ui/factory/developwindow.h"
-#include "ui/views/equipselect.h"
+#include "ui/factory/constructwindow.h"
 #include "ui/techview.h"
-#include "steamauth.h"
 #include "model/equipmodel.h"
 #include "model/shipmodel.h"
 #include "model/shipbpmodel.h"
+#include "ui/views/equipselect.h"
+#include "../Protocol/receiver.h"
+#include "../Protocol/sender.h"
+#include "../Protocol/mapwithdiff.h"
 #include "resourcefetch.h"
+#include "steamauth.h"
 
 void customMessageHandler(QtMsgType,
                           const QMessageLogContext &,
@@ -50,6 +49,9 @@ public:
     /* ususally accesses equipregistryCache */
     friend int DevelopWindow::equipIdDesired();
     friend void DevelopWindow::resetListName(int);
+    friend void ConstructWindow::switchDisplay(const QString &nationality,
+                                               const QString &shiptype,
+                                               const QString &shipclass);
     friend void TechView::demandLocalTech(int);
     friend void TechView::demandSkillPoints(int);
     friend void TechView::resetLocalListName();

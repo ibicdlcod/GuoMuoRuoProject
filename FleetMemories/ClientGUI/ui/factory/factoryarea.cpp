@@ -57,9 +57,12 @@ FactoryArea::FactoryArea(QWidget *parent) :
         (*iter)->setSlotnum(iter - slotfs.begin());
         (*iter)->setStatus();
     }
-    w.setAttribute(Qt::WA_DeleteOnClose, false);
-    connect(&w, &QDialog::finished,
+    dev.setAttribute(Qt::WA_DeleteOnClose, false);
+    con.setAttribute(Qt::WA_DeleteOnClose, false);
+    connect(&dev, &QDialog::finished,
             this, &FactoryArea::doDevelop);
+    connect(&con, &QDialog::finished,
+            this, &FactoryArea::doConstruct);
 }
 
 FactoryArea::~FactoryArea()
@@ -80,16 +83,30 @@ void FactoryArea::developClicked(bool checked, int slotnum) {
         }
         else {
             currentSlotNum = slotnum;
-            w.show();
+            dev.show();
             static bool initial = true;
             if(initial) {
-                w.resetListName(Clientv2::getInstance().equipBigTypeIndex);
+                dev.resetListName(Clientv2::getInstance().equipBigTypeIndex);
                 initial = false;
             }
         }
     }
-    else {
-
+    else if(factoryState == KP::Construction){
+        if(slotfs[slotnum]->isComplete()) {
+            engine.doFetch({"fetch", QString::number(slotnum)});
+        }
+        else if(slotfs[slotnum]->isOnJob()) {
+            return;
+        }
+        else {
+            currentSlotNum = slotnum;
+            con.show();
+            static bool initial = true;
+            if(initial) {
+                con.initialize();
+                initial = false;
+            }
+        }
     }
     engine.doRefreshFactory();
 }
@@ -180,8 +197,23 @@ void FactoryArea::doDevelop(int result) {
     else if(result == QDialog::Accepted) {
         QTimer::singleShot(100, &engine, &Clientv2::doRefreshFactory);
         QString msg = QStringLiteral("develop %1 %2")
-                          .arg(w.equipIdDesired()).arg(currentSlotNum);
+                          .arg(dev.equipIdDesired()).arg(currentSlotNum);
         qDebug() << msg;
         engine.parse(msg);
+    }
+}
+
+void FactoryArea::doConstruct(int result) {
+    Clientv2 &engine = Clientv2::getInstance();
+    if(result == QDialog::Rejected) {
+        qDebug() << "NODEVELOP";
+    }
+    else if(result == QDialog::Accepted) {
+        qCritical() << "FUCK" << currentSlotNum;
+        QTimer::singleShot(100, &engine, &Clientv2::doRefreshFactory);
+        QString msg = QStringLiteral("develop %1 %2")
+                          .arg(dev.equipIdDesired()).arg(currentSlotNum);
+        qDebug() << msg;
+        //engine.parse(msg);
     }
 }

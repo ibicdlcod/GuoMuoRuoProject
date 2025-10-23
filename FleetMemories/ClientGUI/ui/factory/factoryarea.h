@@ -4,6 +4,7 @@
 #include <QFrame>
 #include <QTableView>
 #include <QHeaderView>
+#include "constructwindow.h"
 #include "developwindow.h"
 #include "../../../FactorySlot/factoryslot.h"
 #include "../views/equipview.h"
@@ -30,13 +31,17 @@ protected:
 
 private slots:
     void developClicked(bool checked = false, int slotnum = 0);
-    void doDevelop(int);
+    void doDevelop(int result);
+    void doConstruct(int result);
     void doFactoryRefresh(const QJsonObject &);
 
 private:
     Ui::FactoryArea *ui;
     EquipView *equipview;
-    DevelopWindow w;
+    DevelopWindow dev;
+    ConstructWindow con;
+    QList<QUuid> defaultEquips;
+    QUuid shipToRemodel = QUuid();
 
     KP::FactoryState factoryState = KP::Development;
     QList<FactorySlot *> slotfs;

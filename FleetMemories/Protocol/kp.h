@@ -241,7 +241,7 @@ enum ShipNationality{
     Soviet = 7, // includes any non-Baltic Soviet Republic
     Chinese = 8,
     Benelux = 9,
-    Scandinavian = 0xA,
+    Nordic = 0xA,
     Commonwealth = 0xB,
     Latin = 0xC, // Iberian or Latin American
     EasternEuropean = 0xD,
@@ -249,6 +249,42 @@ enum ShipNationality{
     Fantasy = 0xF
 };
 Q_ENUM_NS(ShipNationality)
+
+Q_GLOBAL_STATIC(QStringList,
+                nationLiteral,
+                QStringList(
+                    {
+                        //% "Japanese"
+                        QT_TRID_NOOP("Japanese"),
+                        //% "German"
+                        QT_TRID_NOOP("German"),
+                        //% "Italian"
+                        QT_TRID_NOOP("Italian"),
+                        //% "American"
+                        QT_TRID_NOOP("American"),
+                        //% "British"
+                        QT_TRID_NOOP("British"),
+                        //% "French"
+                        QT_TRID_NOOP("French"),
+                        //% "Soviet"
+                        QT_TRID_NOOP("Soviet"),
+                        //% "Chinese"
+                        QT_TRID_NOOP("Chinese"),
+                        //% "Benelux"
+                        QT_TRID_NOOP("Benelux"),
+                        //% "Nordic"
+                        QT_TRID_NOOP("Nordic"),
+                        //% "Commonwealth"
+                        QT_TRID_NOOP("Commonwealth"),
+                        //% "Iberian/Latin American"
+                        QT_TRID_NOOP("Latin"),
+                        //% "Eastern European"
+                        QT_TRID_NOOP("EasternEuropean"),
+                        //% "Other Asian"
+                        QT_TRID_NOOP("MinorAsian"),
+                        //% "Fantasy ships"
+                        QT_TRID_NOOP("Fantasy"),
+                    }));
 
 enum FleetType {
     NormalFleet = 0,

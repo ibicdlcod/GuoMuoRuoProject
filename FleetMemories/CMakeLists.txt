@@ -46,6 +46,9 @@ set(CLIENT_SOURCES
     ClientGUI/ui/port/choosehomeport.h
     ClientGUI/ui/port/choosehomeport.cpp
     ClientGUI/ui/port/choosehomeport.ui
+    ClientGUI/ui/factory/constructwindow.h
+    ClientGUI/ui/factory/constructwindow.cpp
+    ClientGUI/ui/factory/constructwindow.ui
     ClientGUI/ui/factory/developwindow.cpp
     ClientGUI/ui/factory/developwindow.h
     ClientGUI/ui/factory/developwindow.ui
