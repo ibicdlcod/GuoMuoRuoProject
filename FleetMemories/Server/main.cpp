@@ -42,7 +42,6 @@ int main(int argc, char *argv[]) {
 
     Server server(argc, argv);
 
-#pragma message(NOT_M_CONST)
     server.setApplicationName("FleetMemories Server");
     server.setApplicationVersion("0.60.1"); // temp
     server.setOrganizationName("Harusame Software");
@@ -55,7 +54,6 @@ int main(int argc, char *argv[]) {
 
     QTranslator translator;
 #ifdef QT_NO_DEBUG
-    settings->setValue("server/language", "zh_CN");
     /*
     if(!settings->contains("server/language")) {
         QString steamLanguage = SteamGameServerUtils()->GetSteamUILanguage();

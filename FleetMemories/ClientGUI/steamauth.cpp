@@ -44,8 +44,7 @@ void SteamAuth::OnEncryptedAppTicketResponse(
     case k_EResultOK:
     {
 /* better not to modify it */
-#pragma message(NOT_M_CONST)
-        uint8 rgubTicket[1024];
+        uint8 rgubTicket[KP::practicalBufferSize];
         uint32 cubTicket;
 
         if(SteamUser()->GetEncryptedAppTicket(rgubTicket, sizeof(rgubTicket), &cubTicket)) {

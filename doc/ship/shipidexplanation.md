@@ -19,14 +19,14 @@
 | 0x??9???00-0x??9???7F |                Dutch East Indies*->Indonesian                |
 | 0x??9???80-0x??9???AF |                            Dutch                             |
 | 0x??9???B0-0x??9???BF |                           Belgian                            |
-| 0x??9???C0-0x??9???CF |                          (Reserved)                          |
+| 0x??9???C0-0x??9???FF |                          (Reserved)                          |
 | 0x??A???00-0x??A???3F |                           Swedish                            |
 | 0x??A???40-0x??A???7F |                            Danish                            |
 | 0x??A???80-0x??A???AF |                          Norwegian                           |
 | 0x??A???B0-0x??A???BF |                   (Reserved for Icelandic)                   |
 | 0x??A???C0-0x??A???FF |                           Finnish                            |
 | 0x??B???00-0x??B???1F |                          Australian                          |
-| 0x??B???20-0x??B???2F |                         New Zealand                          |
+| 0x??B???20-0x??B???2F |                        New Zealander                         |
 | 0x??B???30-0x??B???3F | (Reserved for Papua New Guinean and other Oceanian countries) |
 | 0x??B???40-0x??B???4F |                 (Reserved for South African)                 |
 | 0x??B???50-0x??B???5F |                     (Reserved for Irish)                     |
@@ -54,7 +54,7 @@
 | 0x??D???60-0x??D???7F |                 Greek/(Reserved for Cypriot)                 |
 | 0x??D???80-0x??D???9F |                           Romanian                           |
 | 0x??D???A0-0x??D???BF |                           Turkish                            |
-| 0x??D???C0-0x??D???CF |                        Baltic states                         |
+| 0x??D???C0-0x??D???CF |            Baltic states (only when independent)             |
 | 0x??D???D0-0x??D???DF |                   (Reserved for Albanian)                    |
 | 0x??D???E0-0x??D???FF |           (Reserved for other European countries)            |
 | 0x??E???00-0x??E???1F |                             Thai                             |
@@ -62,13 +62,13 @@
 | 0x??E???40-0x??E???7F |               (Reserved for Arabic countries)                |
 | 0x??E???80-0x??E???9F |                 (Reserved for South Korean)                  |
 | 0x??E???A0-0x??E???BF |                 (Reserved for North Korean)                  |
-| 0x??E???C0-0x??E???FF |                (Reserved for other countries)                |
+| 0x??E???C0-0x??E???FF |                          (Reserved)                          |
 |      0x??F?????       |                        Fantasy ships                         |
 |      0x???10???       |                           Escorts                            |
 |      0x???11???       |            Escort Destroyers (have base torpedo)             |
 |      0x???20???       |                          Destroyers                          |
 |      0x???21???       |  Destroyers with Daihatsu capabilities (bitwise operation)   |
-|      0x???22???       | Destroyers with Amphibious tank capabilites (bitwise operation) |
+|      0x???22???       | Destroyers with Amphibious tank capabilities (bitwise operation) |
 |      0x???24???       |    Destroyers with Bulge capabilities (bitwise operation)    |
 |      0x???28???       |            Leading destroyer (bitwise operation)             |
 |      0x???30???       |                        Light cruisers                        |

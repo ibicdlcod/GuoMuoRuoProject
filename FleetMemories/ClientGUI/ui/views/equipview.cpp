@@ -229,6 +229,7 @@ void EquipView::activate(bool arsenal, bool isEquip, bool isBP) {
         unselectButton->hide();
     }
     if(isEquip) {
+        equip:
         model = &engine.equipModel;
         arsenalView->setModel(model);
         if(!model->isReady()) {
@@ -270,6 +271,7 @@ void EquipView::activate(bool arsenal, bool isEquip, bool isBP) {
     }
     else {
         if(!isBP) {
+        ship:
             model = &engine.shipModel;
             arsenalView->setModel(model);
             if(!model->isReady()) {

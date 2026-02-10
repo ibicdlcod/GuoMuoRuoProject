@@ -1,8 +1,7 @@
 #include "servermastersender.h"
 
 ServerMasterSender::ServerMasterSender(QObject *parent)
-    : QObject{parent}
-{
+    : QObject{parent} {
 
 }
 

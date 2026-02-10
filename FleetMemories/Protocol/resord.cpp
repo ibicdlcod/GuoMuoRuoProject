@@ -25,27 +25,45 @@ ResOrd::ResOrd(ResTuple input) {
 ResOrd::ResOrd(int oil, int explo, int steel, int rub,
                int al, int w, int cr)
     : o(oil), e(explo), s(steel), r(rub),
-      a(al), w(w), c(cr) {
+    a(al), w(w), c(cr) {
 
 }
 
-QString ResOrd::toString() const {
-    //% "%1 Oil "
-    QString oil = o != 0 ? (qtTrId("%1 Oil").arg(o)) : "";
-    //% "%1 Ammo "
-    QString explo = e != 0 ? (qtTrId("%1 Ammo").arg(e)) : "";
-    //% "%1 Steel "
-    QString steel = s != 0 ? (qtTrId("%1 Steel").arg(s)) : "";
-    //% "%1 Rubber "
-    QString rubber = r != 0 ? (qtTrId("%1 Rubber").arg(r)) : "";
-    //% "%1 Aluminum "
-    QString al = a != 0 ? (qtTrId("%1 Al").arg(a)) : "";
-    //% "%1 Tungsten "
-    QString ww = w != 0 ? (qtTrId("%1 W").arg(w)) : "";
-    //% "%1 Chromium "
-    QString cr = c != 0 ? (qtTrId("%1 Cr").arg(c)) : "";
-
-    return oil+explo+steel+rubber+al+ww+cr;
+QString ResOrd::toString(bool simplified) const {
+    if(!simplified) {
+        //% "%1 Oil "
+        QString oil = o != 0 ? (qtTrId("o-expr").arg(o)) : "";
+        //% "%1 Ammo "
+        QString explo = e != 0 ? (qtTrId("e-expr").arg(e)) : "";
+        //% "%1 Steel "
+        QString steel = s != 0 ? (qtTrId("s-expr").arg(s)) : "";
+        //% "%1 Rubber "
+        QString rubber = r != 0 ? (qtTrId("r-expr").arg(r)) : "";
+        //% "%1 Aluminum "
+        QString al = a != 0 ? (qtTrId("a-expr").arg(a)) : "";
+        //% "%1 Tungsten "
+        QString ww = w != 0 ? (qtTrId("w-expr").arg(w)) : "";
+        //% "%1 Chromium "
+        QString cr = c != 0 ? (qtTrId("c-expr").arg(c)) : "";
+        return oil+explo+steel+rubber+al+ww+cr;
+    }
+    else {
+        //% "%1O"
+        QString oil = o != 0 ? (qtTrId("o-expr-s").arg(o)) : "";
+        //% "%1E"
+        QString explo = e != 0 ? (qtTrId("e-expr-s").arg(e)) : "";
+        //% "%1S"
+        QString steel = s != 0 ? (qtTrId("s-expr-s").arg(s)) : "";
+        //% "%1R"
+        QString rubber = r != 0 ? (qtTrId("r-expr-s").arg(r)) : "";
+        //% "%1Al"
+        QString al = a != 0 ? (qtTrId("a-expr-s").arg(a)) : "";
+        //% "%1W"
+        QString ww = w != 0 ? (qtTrId("w-expr-s").arg(w)) : "";
+        //% "%1Cr"
+        QString cr = c != 0 ? (qtTrId("c-expr-s").arg(c)) : "";
+        return oil+explo+steel+rubber+al+ww+cr;
+    }
 }
 
 bool ResOrd::addResources(const ResOrd &amount) {

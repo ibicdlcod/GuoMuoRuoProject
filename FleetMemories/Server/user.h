@@ -6,6 +6,7 @@
 #include "../steam/steamclientpublic.h"
 #include "../Protocol/equipment.h"
 #include "../Protocol/resord.h"
+#include "server.h"
 
 namespace User {
 
@@ -30,8 +31,8 @@ std::tuple<bool, int> isFactoryFinished(const CSteamID &, int);
 bool isSuperUser(const CSteamID &);
 QUuid newEquip(const CSteamID &, int);
 QUuid newShip(const CSteamID &, int, int);
-void refreshFactory(const CSteamID &);
-void refreshPort(const CSteamID &);
+void refreshFactory(Server *server, const CSteamID &);
+void refreshPort(Server *server, const CSteamID &);
 void setResources(const CSteamID &, ResOrd);
 
 };

@@ -39,6 +39,9 @@ Q_NAMESPACE
 /* Not in settings, because these values usually
  * have to be respected by both server and client */
 #pragma message(NOT_M_CONST)
+/* this is deliberately not customized */
+static constexpr int practicalBufferSize = 1024;
+
 static constexpr int initDock = 2;
 static constexpr int initFactory = 4;
 static constexpr int fleetsSize = 4;
@@ -235,20 +238,90 @@ enum ShipNationality{
     Japanese = 1,
     German = 2,
     Italian = 3,
-    American = 4, // includes Canadian and Filipino
-    British = 5, // includes Indian and Irish
+    American = 4,
+    British = 5,
     French = 6,
     Soviet = 7, // includes any non-Baltic Soviet Republic
     Chinese = 8,
     Benelux = 9,
     Nordic = 0xA,
     Commonwealth = 0xB,
-    Latin = 0xC, // Iberian or Latin American
+    Latino = 0xC, // Iberian or Latin American
     EasternEuropean = 0xD,
     MinorAsian = 0xE,
     Fantasy = 0xF
 };
 Q_ENUM_NS(ShipNationality)
+
+enum ShipNationalityDetailed{
+    DUnknownNation = 0x00,
+    DJapanese = 0x10,
+    DGerman = 0x20,
+    DItalian = 0x30,
+    DItalianEastAfrican = 0x3E,
+    DLibyan = 0x3F,
+    DAmerican = 0x40,
+    DFilipino = 0x4F,
+    DBritish = 0x50,
+    DFrench = 0x60,
+    DFrenchIndochinese = 0x6E,
+    DOtherFrancophone = 0x6F,
+    DSovietRussian = 0x70,
+    DUkrainian = 0x7C,
+    DSovietNonRussian = 0x7E,
+    DChineseNationalist = 0x80,
+    DChineseModern = 0x88,
+    DDutchEastIndian = 0x90,
+    DDutch = 0x98,
+    DDutchAmerican = 0x9A,
+    DBelgian = 0x9B,
+    DDRCongolese = 0x9D,
+    DSwedish = 0xA0,
+    DDanish = 0xA4,
+    DNorwegian = 0xA8,
+    DIcelandic = 0xAB,
+    DFinnish = 0xAC,
+    DAustralian = 0xB0,
+    DNewZealander = 0xB2,
+    DOceanaian = 0xB3,
+    DSouthAfrican = 0xB4,
+    DIrish = 0xB5,
+    DMalaysian = 0xB6,
+    DSingaporean = 0xB7,
+    DIndian = 0xB8,
+    DPakistani = 0xBA,
+    DBangladeshi = 0xBB,
+    DCanadian = 0xBC,
+    DOtherCommonwealth = 0xBE,
+    DSpanish = 0xC0,
+    DPortuguese = 0xC2,
+    DBrazilian = 0xC4,
+    DArgentinian = 0xC6,
+    DPeruvian = 0xC8,
+    DChilean = 0xC9,
+    DMexican = 0xCA,
+    DColumbianOrEcuadoran = 0xCC,
+    DVenezuelan = 0xCD,
+    DCuban = 0xCE,
+    DOtherLatino = 0xCF,
+    DYugoslavian = 0xD0,
+    DPolish = 0xD2,
+    DBulgarian = 0xD4,
+    DGreekOrCypriot = 0xD6,
+    DRomanian = 0xD8,
+    DTurkish = 0xDA,
+    DBaltic = 0xDC,
+    DAlbanian = 0xDD,
+    DOtherEuropean = 0xDE,
+    DThai = 0xE0,
+    DIranian = 0xE2,
+    DArabic = 0xE4,
+    DSouthKorean = 0xE8,
+    DNorthKorean = 0xEA,
+    DOtherAsian = 0xEC,
+    DFantasy = 0xF0,
+};
+Q_ENUM_NS(ShipNationalityDetailed)
 
 Q_GLOBAL_STATIC(QStringList,
                 nationLiteral,

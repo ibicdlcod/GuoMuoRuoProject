@@ -5,17 +5,12 @@
 #include "kp.h"
 
 extern std::unique_ptr<QSettings> settings;
-/* this is deliberately not customized */
-#pragma message(NOT_M_CONST)
-namespace {
-const int practicalBufferSize = 1024;
-}
 
 Sender::Sender(QAbstractSocket *destination,
                QObject *parent) :
     QObject(parent),
     m_destination(destination),
-    m_buffer(practicalBufferSize, Qt::Uninitialized),
+    m_buffer(KP::practicalBufferSize, Qt::Uninitialized),
     m_hasRead(0),
     m_hasWritten(0),
     m_doneSignaled(false),
@@ -101,7 +96,7 @@ void Sender::send() {
     }
     if(m_partnum == 0 && m_source->bytesAvailable()) {
         m_partnumtotal = (m_source->bytesAvailable() - 1)
-                             / practicalBufferSize + 1;
+                             / KP::practicalBufferSize + 1;
         messageId = QUuid::createUuid();
     }
     qint64 read = m_source->read(m_buffer.data(), m_buffer.size());

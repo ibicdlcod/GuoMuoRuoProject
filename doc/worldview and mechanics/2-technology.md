@@ -88,7 +88,7 @@ Generally (variations may exist):
 
 | year this ship/equipment is functional | tech level |
 | :------------------------------------: | :--------: |
-|                  1908                  |     0      |
+|             1908 or older              |     0      |
 |                  1912                  |    0.25    |
 |                  1916                  |    0.5     |
 |                  1920                  |    0.75    |

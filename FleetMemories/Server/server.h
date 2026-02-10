@@ -79,6 +79,7 @@ public:
     void datagramReceivedNonStd(const QByteArray &, const PeerInfo &, QSslSocket *);
     void datagramReceivedStd(const QJsonObject &, const PeerInfo &, QSslSocket *);
     bool listen(const QHostAddress &, quint16);
+    void naturalRegen(const CSteamID &);
 
 public slots:
     void displayPrompt() override;
@@ -133,7 +134,6 @@ private:
     bool importShipFromCSV();
     [[nodiscard]] bool mapRefresh();
     void migrate(const CSteamID &, const QJsonObject &);
-    void naturalRegen(const CSteamID &);
     QUuid newEquip(const CSteamID &, int, bool direct = false);
     void newEquipHasMother(const CSteamID &, int);
     int64 newEquipHasMotherCal(int);

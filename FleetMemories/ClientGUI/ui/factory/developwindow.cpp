@@ -118,10 +118,14 @@ void DevelopWindow::displaySuccessRate2() {
                                 "rule/sigmaconstant",
                                 2.0).toDouble()
                     )*100) + "%");
+        ui->resourceAmount->setText(
+            engine.getEquipmentReg(equipId)->devRes().toString(true));
     }
     else {
         //% "Unknown"
         ui->rateNumber->setText(qtTrId("develop-success-rate-unknown"));
+        //% "Unknown"
+        ui->resourceAmount->setText(qtTrId("develop-resource-amount-unknown"));
     }
     update();
 }

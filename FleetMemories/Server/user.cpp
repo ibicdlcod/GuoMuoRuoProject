@@ -494,8 +494,8 @@ QUuid User::newShip(const CSteamID &uid, int shipDid, int startingHP) {
     }
 }
 
-void User::refreshFactory(const CSteamID &uid) {
-    //naturalRegen(uid);
+void User::refreshFactory(Server *server, const CSteamID &uid) {
+    server->naturalRegen(uid);
     QSqlDatabase db = QSqlDatabase::database();
     QSqlQuery query;
     query.prepare("UPDATE Factories "
@@ -509,8 +509,8 @@ void User::refreshFactory(const CSteamID &uid) {
     }
 }
 
-void User::refreshPort(const CSteamID &uid) {
-    //naturalRegen(uid);
+void User::refreshPort(Server *server, const CSteamID &uid) {
+    server->naturalRegen(uid);
 }
 
 void User::setResources(const CSteamID &uid, ResOrd goal) {

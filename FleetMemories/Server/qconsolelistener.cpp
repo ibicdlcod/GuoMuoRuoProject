@@ -1,6 +1,7 @@
 /* MIT License
 
 Copyright (c) 2018 Juan Gonzalez Burgos
+Copyright (c) 2025 Li Shangying
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -26,11 +27,10 @@ SOFTWARE.
 QConsoleListener::QConsoleListener(bool consolemode)
     : consolemode(consolemode)
 {
-    connect(
-                this, &QConsoleListener::finishedGetLine,
-                this, &QConsoleListener::on_finishedGetLine,
-                Qt::QueuedConnection
-                );
+    connect(this, &QConsoleListener::finishedGetLine,
+            this, &QConsoleListener::on_finishedGetLine,
+            Qt::QueuedConnection
+            );
 #if defined (Q_OS_WIN)
     m_notifier = new QWinEventNotifier(GetStdHandle(STD_INPUT_HANDLE));
 #else
@@ -40,48 +40,49 @@ QConsoleListener::QConsoleListener(bool consolemode)
     //        then we sync with main thread using a QueuedConnection with finishedGetLine
     m_notifier->moveToThread(&m_thread);
     connect(
-                &m_thread , &QThread::finished,
-                m_notifier, &QObject::deleteLater
-                );
+        &m_thread , &QThread::finished,
+        m_notifier, &QObject::deleteLater
+        );
+    /* ignore clazy warning, as heed to its advice make the cli unworkable */
 #if defined (Q_OS_WIN)
     connect(m_notifier, &QWinEventNotifier::activated,
 #else
     connect(m_notifier, &QSocketNotifier::activated,
 #endif
-                     [this]() {
-        /* the following is different from the original at https://github.com/juangburgos/QConsoleListener/blob/master/src/qconsolelistener.cpp
-         * becase windows console can't handle unicode
-         */
-        QString res;
+            [this]() {
+                /* the following is different from the original at https://github.com/juangburgos/QConsoleListener/blob/master/src/qconsolelistener.cpp
+                 * becase windows console can't handle unicode
+                 */
+                QString res;
 #if defined (Q_OS_WIN)
-        if(this->consolemode)
-        {
-            const int bufsize = 512;
-            wchar_t buf[bufsize];
-            DWORD read;
-            do {
-                ReadConsoleW(GetStdHandle(STD_INPUT_HANDLE),
-                             buf, bufsize, &read, NULL);
-                res += QString::fromWCharArray(buf, read);
-            } while (read > 0 && res[res.length() - 1] != '\n');
-            // could just do res.truncate(res.length() - 2), but better be safe
-            while (res.length() > 0
-                   && (res[res.length() - 1] == '\r' || res[res.length() - 1] == '\n'))
-                res.truncate(res.length() - 1);
-        }
-        else
-        {
-            std::string line;
-            std::getline(std::cin, line);
-            res = QString::fromStdString(line);
-        }
+                if(this->consolemode)
+                {
+                    const int bufsize = 512;
+                    wchar_t buf[bufsize];
+                    DWORD read;
+                    do {
+                        ReadConsoleW(GetStdHandle(STD_INPUT_HANDLE),
+                                     buf, bufsize, &read, NULL);
+                        res += QString::fromWCharArray(buf, read);
+                    } while (read > 0 && res[res.length() - 1] != '\n');
+                    // could just do res.truncate(res.length() - 2), but better be safe
+                    while (res.length() > 0
+                           && (res[res.length() - 1] == '\r' || res[res.length() - 1] == '\n'))
+                        res.truncate(res.length() - 1);
+                }
+                else
+                {
+                    std::string line;
+                    std::getline(std::cin, line);
+                    res = QString::fromStdString(line);
+                }
 #else
-        std::string line;
-        std::getline(std::cin, line);
-        res = QString::fromStdString(line);
+                std::string line;
+                std::getline(std::cin, line);
+                res = QString::fromStdString(line);
 #endif
-        Q_EMIT this->finishedGetLine(res);
-    });
+                Q_EMIT this->finishedGetLine(res);
+            });
     m_thread.start();
 }
 

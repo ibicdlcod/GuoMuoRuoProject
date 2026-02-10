@@ -13,7 +13,7 @@ struct ResOrd
     ResOrd(ResTuple);
     ResOrd(int, int, int, int, int, int, int);
 
-    QString toString() const;
+    QString toString(bool simpified = false) const;
     constexpr ResOrd& operator+=(const ResOrd& amount) {
         o += amount.o;
         e += amount.e;

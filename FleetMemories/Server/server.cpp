@@ -358,6 +358,9 @@ Server::~Server() noexcept {
     for(auto equip: std::as_const(equipRegistry)) {
         delete equip;
     }
+    for(auto ship: std::as_const(shipRegistry)) {
+        delete ship;
+    }
     disconnect(&receiverM, &Receiver::jsonReceivedWithInfo,
                this, &Server::datagramReceivedStd);
     disconnect(&receiverM, &Receiver::nonStandardReceivedWithInfo,
@@ -550,7 +553,7 @@ bool Server::parseSpec(const QStringList &cmdParts) {
                     //% "Usage: importcsv [equip|ship|map]"
                     qout << qtTrId("importcsv-usage") << Qt::endl;
                     return true;
-                }
+                } // else return false
             }
             else if(primary.compare("cert", Qt::CaseInsensitive) == 0) {
                 switchCert(cmdParts);
@@ -1574,8 +1577,7 @@ void Server::doDevelop(CSteamID &uid, int equipid,
 }
 
 void Server::doFetch(CSteamID &uid, int factoryid, QSslSocket *connection) {
-    naturalRegen(uid);
-    User::refreshFactory(uid);
+    User::refreshFactory(this, uid);
     QSqlDatabase db = QSqlDatabase::database();
     QSqlQuery query;
     query.prepare("SELECT CurrentJob, Done, Success "
@@ -1782,7 +1784,6 @@ void Server::generateTestEquip(const CSteamID &uid) {
 }
 
 void Server::generateTestShip(const CSteamID &uid) {
-    //deleteTestShip(uid);
     static const double difficulty = 4.0; // higher the value is easier
     std::uniform_real_distribution dist{0.0, 1.0};
     std::uniform_int_distribution dist2{0, 15};
@@ -2393,6 +2394,8 @@ bool Server::mapRefresh()
 void Server::migrate(const CSteamID &uid, const QJsonObject &input) {
     auto hqlv = input["hqlv"].toInt();
     auto admiralName = input["nickname"].toString();
+    Q_UNUSED(admiralName)
+    Q_UNUSED(hqlv)
     auto equips = input["equips"].toObject();
     QMultiMap<int, std::tuple<int, int>> equipData;
     QMap<int, int> shipData;
@@ -2812,8 +2815,7 @@ void Server::receivedAuth(const QJsonObject &djson,
         for(unsigned int i = 0; i < cubTicket; ++i) {
             rgubTicket[i] = rgubArray[i].toInteger();
         }
-#pragma message(NOT_M_CONST)
-        uint8 rgubDecrypted[1024];
+        uint8 rgubDecrypted[KP::practicalBufferSize];
         uint32 cubDecrypted = sizeof(rgubDecrypted);
 
 #pragma message(SECRET)
@@ -2947,9 +2949,8 @@ void Server::receivedAuth(const QJsonObject &djson,
             QByteArray msg = KP::weighAnchor();
             senderM.sendMessage(connection, msg);
             CSteamID uid = connectedUsers[connection];
-            naturalRegen(uid);
-            User::refreshPort(uid);
-            User::refreshFactory(uid);
+            User::refreshPort(this, uid);
+            User::refreshFactory(this, uid);
         }
         else {
             QByteArray msg = KP::serverLogFail(KP::SteamAuthFail);
@@ -3057,13 +3058,11 @@ void Server::receivedReq(const QJsonObject &djson,
             if(User::checkHomePort(uid) == KP::UnknownNation) {
                 decideHomePort(uid, connection);
             }
-            naturalRegen(uid);
-            User::refreshPort(uid);
+            User::refreshPort(this, uid);
         }
         break;
         case KP::GameState::Factory: {
-            naturalRegen(uid);
-            User::refreshFactory(uid);
+            User::refreshFactory(this, uid);
             refreshClientFactory(uid, connection);
         }
         break;
@@ -3343,6 +3342,8 @@ void Server::sendTestMessages() {
     }
     else {
         for(auto ship: std::as_const(shipRegistry)) {
+            if(ship->isAmnesiac())
+                continue;
             auto dis = std::bernoulli_distribution(0.10);
             if(dis(mt)) {
                 for(auto user: connectedUsers)
