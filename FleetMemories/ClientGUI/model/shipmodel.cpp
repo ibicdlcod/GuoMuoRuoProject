@@ -143,28 +143,19 @@ void ShipModel::enactModernize() {
     emit modernizeRequest(candidates);
 }
 
-void ShipModel::modernizedShips(const QList<QUuid> &modernized) {
-    int oldRowCount = rowCount();
+void ShipModel::modernizedShips(const QList<std::tuple<QUuid, int>> &modernized) {
+    QList<std::tuple<int, int>> modernizedDiff;
+    for(auto item: modernized) {
+        auto shipUid = std::get<0>(item);
+        int shipDef = clientShips[shipUid]->getId();
+        int oldstar = clientShipDynamicAttrs[shipUid]->star;
+        int newstar = std::get<1>(item);
+        clientShipDynamicAttrs[shipUid]->star = newstar;
+        int diffstar = newstar - oldstar;
+        modernizedDiff.append(std::make_tuple(shipDef, diffstar));
+    }
+    Clientv2::getInstance().shipBPModel.modernizedShips(modernizedDiff);
     bpCacheRefresh();
-    Clientv2 &engine = Clientv2::getInstance();
-    engine.doRefreshFactoryAnchorage();
-    /*
-    clientEquips.removeIf([&destructed](QHash<QUuid, Equipment *>::iterator i)
-                          {
-                              return destructed.contains(i.key());
-                          });
-    clientEquipStars.removeIf([&destructed](QHash<QUuid, int>::iterator i)
-                              {
-                                  return destructed.contains(i.key());
-                              });
-    sortedEquipIds.removeIf([&destructed](const QUuid &uid)
-                            {
-                                return destructed.contains(uid);
-                            });
-    */
-    int newRowCount = rowCount();
-    emit needReCalculatePages();
-    adjustRowCount(oldRowCount, newRowCount);
     wholeTableChanged();
 }
 

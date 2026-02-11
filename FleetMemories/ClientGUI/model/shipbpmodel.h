@@ -23,6 +23,7 @@ public slots:
                                        const QString &shipclass,
                                        const QString &searchTerm
                                        = QLatin1String("")) override;
+    virtual void modernizedShips(const QList<std::tuple<int, int>> &);
 
 protected:
     virtual void customSort() override;

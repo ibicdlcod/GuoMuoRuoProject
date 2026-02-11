@@ -39,6 +39,15 @@ void ShipBPModel::updateShipList(const QJsonObject &input) {
     return;
 }
 
+void ShipBPModel::modernizedShips(const QList<std::tuple<int, int> > &modernized) {
+    for(auto item: modernized) {
+        auto shipDef = std::get<0>(item);
+        int diffstar = std::get<1>(item);
+        clientShipBPs[shipDef] -= diffstar;
+    }
+    wholeTableChanged();
+}
+
 int ShipBPModel::numberOfColumns() const {
     return 3; // ship / amount / hiddensort
 }

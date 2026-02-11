@@ -134,7 +134,7 @@ private:
     bool importShipFromCSV();
     [[nodiscard]] bool mapRefresh();
     void migrate(const CSteamID &, const QJsonObject &);
-    QList<QUuid> modernize(const CSteamID &, const QList<QUuid> &);
+    QList<std::tuple<QUuid, int>> modernize(const CSteamID &, const QList<QUuid> &);
     QUuid newEquip(const CSteamID &, int, bool direct = false);
     void newEquipHasMother(const CSteamID &, int);
     int64 newEquipHasMotherCal(int);

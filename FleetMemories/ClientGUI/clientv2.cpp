@@ -1350,6 +1350,21 @@ void Clientv2::receivedMsg(const QJsonObject &djson) {
         equipModel.destructedEquipment(trash);
     }
     break;
+    case KP::ShipModernized: {
+        QJsonArray array = djson["shipdata"].toArray();
+        QList<std::tuple<QUuid, int>> shipList;
+        QStringList strList;
+        for(auto item: array) {
+            QUuid uid = QUuid(item.toObject()["shipid"].toString());
+            strList.append(item.toObject()["shipid"].toString());
+            int newstar = item.toObject()["newstar"].toInt();
+            shipList.append(std::make_tuple(uid, newstar));
+        }
+        //% "The following ships are modernized: %1"
+        qInfo() << qtTrId("modernize-ship-list").arg(strList.join(","));
+        shipModel.modernizedShips(shipList);
+    }
+    break;
     case KP::Success: {
         //% "Operation success!"
         qInfo() << qtTrId("operation-success");

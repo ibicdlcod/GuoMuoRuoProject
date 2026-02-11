@@ -1176,7 +1176,7 @@ void Server::offerShipInfoUser(const CSteamID &uid,
             }
             QByteArray msg =
                 KP::serverShipInfo(userShipInfos, true);
-            QTimer::singleShot(500, this,
+            QTimer::singleShot(100, this,
                                [=, this](){
                                    connection->flush();
                                    senderM.sendMessage(connection, msg);
@@ -2570,56 +2570,81 @@ void Server::migrate(const CSteamID &uid, const QJsonObject &input) {
     qInfo() << qtTrId("import-kc-data-success").arg(uid.ConvertToUint64());
 }
 
-QList<QUuid> Server::modernize(const CSteamID &uid, const QList<QUuid> &ships) {
-    QList<QUuid> result;
-    qCritical() << "FUCK";
-    /*
+QList<std::tuple<QUuid, int>> Server::modernize(
+    const CSteamID &uid, const QList<QUuid> &ships) {
+    QList<std::tuple<QUuid, int>> result;
+
     QSqlDatabase db = QSqlDatabase::database();
-    for(auto trashItem: trash) {
+    for(auto ship: ships) {
+        int star = 0;
+        int shipDef = 0;
+
         QSqlQuery query2;
-        query2.prepare("SELECT EquipDef FROM UserEquip "
-                       "WHERE User = :uid AND EquipUuid = :eid;");
+        query2.prepare("SELECT Star, ShipDef FROM UserShip "
+                       "WHERE User = :uid AND ShipUuid = :sid;");
         query2.bindValue(":uid", uid.ConvertToUint64());
-        query2.bindValue(":eid", trashItem.toString());
+        query2.bindValue(":sid", ship.toString());
 
         query2.exec();
         query2.isSelect();
         if(Q_UNLIKELY(!query2.first())) {
-            //% "User id %1: equipment %2 does not exist!"
-            qWarning() << qtTrId("delete-equip-nonexistent")
+            //% "User id %1: ship %2 does not exist when modernizing!"
+            qWarning() << qtTrId("modernize-ship-nonexistent")
                               .arg(uid.ConvertToUint64())
-                              .arg(trashItem.toString());
+                              .arg(ship.toString());
             break;
         }
         else {
-            int equipDef = query2.value(0).toInt();
-            ResOrd refundRes = equipRegistry[equipDef]->devRes() * 0.5;
-            ResOrd currentRes = User::getCurrentResources(uid);
-            currentRes.addResources(refundRes);
-            User::setResources(uid, currentRes);
+            star = query2.value(0).toInt();
+            shipDef = query2.value(1).toInt();
+        }
+
+        QSqlQuery query3;
+        query3.prepare("UPDATE UserShipBP "
+                       "SET Amount = Amount-1 "
+                       "WHERE User = :uid AND ShipDef = :def;");
+        query3.bindValue(":uid", uid.ConvertToUint64());
+        query3.bindValue(":def", shipDef);
+
+        if(Q_UNLIKELY(!query3.exec())) {
+            //% "User id %1: using blueprint of ship definition %2 failed when modernizing!"
+            throw DBError(qtTrId("modernize-ship-failed-def")
+                              .arg(uid.ConvertToUint64())
+                              .arg(shipDef),
+                          query3.lastError());
+            break;
+        }
+        else {
+            //% "User id %1: using blueprint of ship definition %2 when modernizing"
+            qDebug() << qtTrId("modernize-ship-def")
+                            .arg(uid.ConvertToUint64())
+                            .arg(shipDef);
         }
 
         QSqlQuery query;
-        query.prepare("DELETE FROM UserEquip "
-                      "WHERE User = :uid AND EquipUuid = :eid;");
+        query.prepare("UPDATE UserShip "
+                      "SET Star = :star "
+                      "WHERE User = :uid AND ShipUuid = :eid;");
+        query.bindValue(":star", star+1);
         query.bindValue(":uid", uid.ConvertToUint64());
-        query.bindValue(":eid", trashItem.toString());
+        query.bindValue(":eid", ship.toString());
 
         if(Q_UNLIKELY(!query.exec())) {
-            //% "User id %1: delete equipment failed!"
-            throw DBError(qtTrId("delete-equip-failed")
-                              .arg(uid.ConvertToUint64()),
+            //% "User id %1: modernize ship %2 failed!"
+            throw DBError(qtTrId("modernize-ship-failed")
+                              .arg(uid.ConvertToUint64())
+                              .arg(ship.toString()),
                           query.lastError());
             break;
         }
         else {
-            //% "User id %1: deleted equipment %2"
-            qDebug() << qtTrId("delete-equip").arg(uid.ConvertToUint64())
-                            .arg(trashItem.toString());
-            result.append(trashItem);
+            //% "User id %1: modernized ship %2 by 1 level"
+            qDebug() << qtTrId("modernize-ship")
+                            .arg(uid.ConvertToUint64())
+                            .arg(ship.toString());
+            result.append(std::make_tuple(ship, star+1));
         }
     }
-*/
     return result;
 }
 
@@ -3346,11 +3371,9 @@ void Server::receivedReq(const QJsonObject &djson,
         for(auto ship: array) {
             ships.append(QUuid(ship.toString()));
         }
-        QList<QUuid> shipsReturned = modernize(uid, ships);
-        /*
+        QList<std::tuple<QUuid, int>> shipsReturned = modernize(uid, ships);
         QByteArray msg = KP::serverShipModernized(shipsReturned);
         senderM.sendMessage(connection, msg);
-*/
     }
     break;
     case KP::CommandType::MessageTest: {
@@ -3525,7 +3548,7 @@ QList<QUuid> Server::retireEquip(const CSteamID &uid, const QList<QUuid> &trash)
         query2.exec();
         query2.isSelect();
         if(Q_UNLIKELY(!query2.first())) {
-            //% "User id %1: equipment %2 does not exist!"
+            //% "User id %1: equipment %2 does not exist when destructing!"
             qWarning() << qtTrId("delete-equip-nonexistent")
                               .arg(uid.ConvertToUint64())
                               .arg(trashItem.toString());

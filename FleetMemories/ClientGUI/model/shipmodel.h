@@ -26,7 +26,7 @@ public slots:
 
     virtual void addShip(QUuid, int) final;
     virtual void enactModernize() final;
-    virtual void modernizedShips(const QList<QUuid> &) final;
+    virtual void modernizedShips(const QList<std::tuple<QUuid, int>> &);
     virtual void updateShipList(const QJsonObject &);
 
 public:

@@ -502,6 +502,14 @@ QByteArray KP::serverResourceUpdate(ResOrd ordinary) {
     return QCborValue::fromJsonValue(result).toCbor();
 }
 
+QByteArray KP::serverShipBPInfo(const QJsonObject &input) {
+    QJsonObject result;
+    result["type"] = DgramType::Info;
+    result["infotype"] = InfoType::ShipInfoUserBP;
+    result["content"] = input;
+    return QCborValue::fromJsonValue(result).toCbor();
+}
+
 QByteArray KP::serverShipInfo(const QJsonArray &input, bool user,
                               QDateTime timeUtc, bool cacheHit) {
     QJsonObject result;
@@ -518,11 +526,19 @@ QByteArray KP::serverShipInfo(const QJsonArray &input, bool user,
     return QCborValue::fromJsonValue(result).toCbor();
 }
 
-QByteArray KP::serverShipBPInfo(const QJsonObject &input) {
+QByteArray KP::serverShipModernized(
+    const QList<std::tuple<QUuid, int>> &ships) {
     QJsonObject result;
-    result["type"] = DgramType::Info;
-    result["infotype"] = InfoType::ShipInfoUserBP;
-    result["content"] = input;
+    result["type"] = DgramType::Message;
+    result["msgtype"] = MsgType::ShipModernized;
+    QJsonArray shipList;
+    for(auto shipTuple: ships) {
+        QJsonObject item;
+        item["shipid"] = QJsonValue(std::get<0>(shipTuple).toString());
+        item["newstar"] = std::get<1>(shipTuple);
+        shipList.append(item);
+    }
+    result["shipdata"] = shipList;
     return QCborValue::fromJsonValue(result).toCbor();
 }
 

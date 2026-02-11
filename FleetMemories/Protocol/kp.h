@@ -106,7 +106,8 @@ enum MsgType{
     Success,
     MessageTestServer,
     FleetFail,
-    AskForHomePort
+    AskForHomePort,
+    ShipModernized,
 };
 Q_ENUM_NS(MsgType)
 
@@ -501,10 +502,11 @@ QByteArray serverParseError(MsgType, const QString &,
                             const QString &);
 QByteArray serverPenguin();
 QByteArray serverResourceUpdate(ResOrd);
+QByteArray serverShipBPInfo(const QJsonObject &);
 QByteArray serverShipInfo(const QJsonArray &, bool user = false,
                           QDateTime timeUtc = QDateTime::currentDateTimeUtc(),
                           bool cacheHit = false);
-QByteArray serverShipBPInfo(const QJsonObject &);
+QByteArray serverShipModernized(const QList<std::tuple<QUuid, int>> &);
 QByteArray serverSkillPoints(int, int64, int64);
 QByteArray serverSuccess();
 QByteArray serverTestMessages(int);
