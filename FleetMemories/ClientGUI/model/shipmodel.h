@@ -15,6 +15,7 @@ public:
 signals:
     void typeBoxHint(QStringList &types);
     void classBoxHint(QStringList &types);
+    void modernizeRequest(const QList<QUuid> &ships);
 
 public slots:
     virtual void switchShipDisplayType(const QString &nationality,
@@ -24,6 +25,8 @@ public slots:
                                        = QLatin1String("")) override;
 
     virtual void addShip(QUuid, int) final;
+    virtual void enactModernize() final;
+    virtual void modernizedShips(const QList<QUuid> &) final;
     virtual void updateShipList(const QJsonObject &);
 
 public:
@@ -51,6 +54,7 @@ public:
     static const int starCol = 2;
 
     virtual int maximumPageNum() const override;
+    void bpCacheRefresh();
 
 protected:
     virtual void customSort() override;
@@ -63,6 +67,8 @@ private:
     QHash<QUuid, Ship *> clientShips;
     QHash<QUuid, ShipDynamic *> clientShipDynamicAttrs;
     QList<QUuid> sortedShipIds; // not sort by uuid but equiptype
+    QHash<int, int> bpCache;
+    QHash<QUuid, bool> isModernizationChecked;
 };
 
 #endif // SHIPMODEL_H

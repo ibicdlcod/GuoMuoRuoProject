@@ -44,7 +44,6 @@ ShipSelect::ShipSelect(int height, QWidget *parent)
     //% "Modernize"
     addStarButton->setText(qtTrId("add-star-button-ship"));
 
-
     QSizePolicy labelSize = QSizePolicy(QSizePolicy::Maximum,
                                         QSizePolicy::Preferred,
                                         QSizePolicy::Label);
@@ -96,15 +95,9 @@ ShipSelect::ShipSelect(int height, QWidget *parent)
                                              QSizePolicy::PushButton));
     addStarButton->resize(QSize(100, height));
 
+    connect(addStarButton, &QAbstractButton::clicked,
+            this, &ShipSelect::modernizeActivated);
     /*
-    connect(typeBox, &QComboBox::activated,
-            this, &EquipSelect::typeActivated);
-    connect(equipBox, &QComboBox::activated,
-            this, [this]{
-                emit equipActivated(equipBox->currentText());
-            });
-    connect(destructButton, &QAbstractButton::clicked,
-            this, &EquipSelect::destructActivated);
     connect(searchBox, &QLineEdit::textEdited,
             this, &EquipSelect::searchBoxChanged);
     connect(this, &EquipSelect::typeActivated,

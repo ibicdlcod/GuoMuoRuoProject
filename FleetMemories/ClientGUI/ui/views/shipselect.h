@@ -19,6 +19,7 @@ signals:
                        const QString &shipclass,
                        const QString &searchTerm
                        = QLatin1String(""));
+    void modernizeActivated(bool checked = false);
 
 public slots:
     void typeBoxHinted(QStringList &types);

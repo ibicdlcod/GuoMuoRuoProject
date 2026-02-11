@@ -132,6 +132,18 @@ QByteArray KP::clientDemandMapInfo(QDateTime timeUtc) {
     return QCborValue::fromJsonValue(result).toCbor();
 }
 
+QByteArray KP::clientDemandModernizeShip(const QList<QUuid> &candidates) {
+    QJsonObject result;
+    result["type"] = DgramType::Request;
+    result["command"] = CommandType::ModernizeShip;
+    QJsonArray candidatesList;
+    for(auto candidate: candidates) {
+        candidatesList.append(QJsonValue(candidate.toString()));
+    }
+    result["equipids"] = candidatesList;
+    return QCborValue::fromJsonValue(result).toCbor();
+}
+
 QByteArray KP::clientDemandResourceUpdate() {
     QJsonObject result;
     result["type"] = DgramType::Request;

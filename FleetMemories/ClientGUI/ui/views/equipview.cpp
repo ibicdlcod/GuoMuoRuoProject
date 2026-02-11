@@ -113,6 +113,8 @@ EquipView::EquipView(QWidget *parent)
             shipSelect, &ShipSelect::typeBoxHinted);
     connect(&engine.shipModel, &ShipModel::classBoxHint,
             shipSelect, &ShipSelect::classBoxHinted);
+    connect(shipSelect, &ShipSelect::modernizeActivated,
+            &engine.shipModel, &ShipModel::enactModernize);
 
     connect(shipSelect, &ShipSelect::selectChanged,
             &engine.shipBPModel, &ShipModel::switchShipDisplayType);
@@ -243,6 +245,7 @@ void EquipView::activate(bool arsenal, bool isEquip, bool isBP) {
         if(arsenal) {
             model->filterByShip(nullptr, false);
             model->setIsInArsenal(true);
+            model->unsetShip();
             equipSelect->destructButton->show();
             equipSelect->addStarButton->show();
         }

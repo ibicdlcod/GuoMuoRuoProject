@@ -36,7 +36,7 @@ public slots:
     virtual void lastPage();
     virtual void addEquipment(QUuid, int) final;
     virtual void enactDestruct() final;
-    virtual void destructEquipment(const QList<QUuid> &) final;
+    virtual void destructedEquipment(const QList<QUuid> &) final;
     virtual void updateEquipmentList(const QJsonObject &) final;
     virtual void setPageNumHint(int);
     virtual void setRowsPerPageHint(int);
@@ -71,6 +71,7 @@ public:
     virtual int currentPageNum() const;
     virtual int maximumPageNum() const;
     virtual bool isReady() const;
+    virtual void unsetShip() final;
 
 protected:
     virtual void adjustRowCount(int oldRowCount, int newRowCount);

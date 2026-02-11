@@ -1174,12 +1174,14 @@ void Server::offerShipInfoUser(const CSteamID &uid,
                                           : fleetTypes[fleetIndex];
                 userShipInfos.append(output);
             }
-            connection->flush();
             QByteArray msg =
                 KP::serverShipInfo(userShipInfos, true);
-            QTimer::singleShot(100, this,
-                               [=, this](){senderM.sendMessage(connection, msg);});
-            connection->flush();
+            QTimer::singleShot(500, this,
+                               [=, this](){
+                                   connection->flush();
+                                   senderM.sendMessage(connection, msg);
+                                   connection->flush();
+                               });
         }
     user_ship_bp:
         QSqlQuery query2;
@@ -1202,12 +1204,14 @@ void Server::offerShipInfoUser(const CSteamID &uid,
             while(query2.next()) {
                 userShipBP[query2.value(defCol).toString()] = query2.value(countCol).toInt();
             }
-            connection->flush();
             QByteArray msg =
                 KP::serverShipBPInfo(userShipBP);
-            QTimer::singleShot(200, this,
-                               [=, this](){senderM.sendMessage(connection, msg);});
-            connection->flush();
+            QTimer::singleShot(1000, this,
+                               [=, this](){
+                                   connection->flush();
+                                   senderM.sendMessage(connection, msg);
+                                   connection->flush();
+                               });
         }
     } catch (DBError &e) {
         for(QString &i : e.whats()) {
@@ -1784,7 +1788,7 @@ void Server::generateTestEquip(const CSteamID &uid) {
 }
 
 void Server::generateTestShip(const CSteamID &uid) {
-    static const double difficulty = 4.0; // higher the value is easier
+    static const double difficulty = 100.0; // higher the value is easier
     std::uniform_real_distribution dist{0.0, 1.0};
     std::uniform_int_distribution dist2{0, 15};
     for(auto ship: std::as_const(shipRegistry)) {
@@ -2566,6 +2570,59 @@ void Server::migrate(const CSteamID &uid, const QJsonObject &input) {
     qInfo() << qtTrId("import-kc-data-success").arg(uid.ConvertToUint64());
 }
 
+QList<QUuid> Server::modernize(const CSteamID &uid, const QList<QUuid> &ships) {
+    QList<QUuid> result;
+    qCritical() << "FUCK";
+    /*
+    QSqlDatabase db = QSqlDatabase::database();
+    for(auto trashItem: trash) {
+        QSqlQuery query2;
+        query2.prepare("SELECT EquipDef FROM UserEquip "
+                       "WHERE User = :uid AND EquipUuid = :eid;");
+        query2.bindValue(":uid", uid.ConvertToUint64());
+        query2.bindValue(":eid", trashItem.toString());
+
+        query2.exec();
+        query2.isSelect();
+        if(Q_UNLIKELY(!query2.first())) {
+            //% "User id %1: equipment %2 does not exist!"
+            qWarning() << qtTrId("delete-equip-nonexistent")
+                              .arg(uid.ConvertToUint64())
+                              .arg(trashItem.toString());
+            break;
+        }
+        else {
+            int equipDef = query2.value(0).toInt();
+            ResOrd refundRes = equipRegistry[equipDef]->devRes() * 0.5;
+            ResOrd currentRes = User::getCurrentResources(uid);
+            currentRes.addResources(refundRes);
+            User::setResources(uid, currentRes);
+        }
+
+        QSqlQuery query;
+        query.prepare("DELETE FROM UserEquip "
+                      "WHERE User = :uid AND EquipUuid = :eid;");
+        query.bindValue(":uid", uid.ConvertToUint64());
+        query.bindValue(":eid", trashItem.toString());
+
+        if(Q_UNLIKELY(!query.exec())) {
+            //% "User id %1: delete equipment failed!"
+            throw DBError(qtTrId("delete-equip-failed")
+                              .arg(uid.ConvertToUint64()),
+                          query.lastError());
+            break;
+        }
+        else {
+            //% "User id %1: deleted equipment %2"
+            qDebug() << qtTrId("delete-equip").arg(uid.ConvertToUint64())
+                            .arg(trashItem.toString());
+            result.append(trashItem);
+        }
+    }
+*/
+    return result;
+}
+
 /* 3-Resources.md#Natural regeneration */
 void Server::naturalRegen(const CSteamID &uid) {
     try{
@@ -3283,6 +3340,19 @@ void Server::receivedReq(const QJsonObject &djson,
         senderM.sendMessage(connection, msg);
     }
     break;
+    case KP::CommandType::ModernizeShip: {
+        QList<QUuid> ships;
+        QJsonArray array = djson["equipids"].toArray();
+        for(auto ship: array) {
+            ships.append(QUuid(ship.toString()));
+        }
+        QList<QUuid> shipsReturned = modernize(uid, ships);
+        /*
+        QByteArray msg = KP::serverShipModernized(shipsReturned);
+        senderM.sendMessage(connection, msg);
+*/
+    }
+    break;
     case KP::CommandType::MessageTest: {
         int id = djson["id"].toInt();
         QByteArray msg = KP::serverTestMessages(id);
@@ -3341,7 +3411,7 @@ void Server::sendTestMessages() {
         qWarning() << "Server isn't listening, abort.";
     }
     else {
-        for(auto ship: std::as_const(shipRegistry)) {
+        /*for(auto ship: std::as_const(shipRegistry)) {
             if(ship->isAmnesiac())
                 continue;
             auto dis = std::bernoulli_distribution(0.10);
@@ -3349,7 +3419,10 @@ void Server::sendTestMessages() {
                 for(auto user: connectedUsers)
                     User::addShipBP(user, ship->getId());
             }
-        }/*
+        }*/
+        for(auto user: connectedUsers)
+            generateTestShip(user);
+        /*
         for(auto equip: std::as_const(equipRegistry)) {
             if(equip->type.isCarrierPlane()) {
                 qInfo() << equip->localNames["ja_JP"];

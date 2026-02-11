@@ -86,13 +86,15 @@ void EquipModel::switchDisplayType2(const QString &equipName) {
     for(auto iter = clientEquips.keyValueBegin();
          iter != clientEquips.keyValueEnd();
          ++iter) {
-        if(currentActiveSlotEx) {
-            if(!(iter->second->canEquipEX(currentActiveShip)))
-                continue;
-        }
-        else {
-            if(!(iter->second->canEquip(currentActiveShip)))
-                continue;
+        if(currentActiveShip != nullptr) {
+            if(currentActiveSlotEx) {
+                if(!(iter->second->canEquipEX(currentActiveShip)))
+                    continue;
+            }
+            else {
+                if(!(iter->second->canEquip(currentActiveShip)))
+                    continue;
+            }
         }
         pass = false;
         for(const auto &name:
@@ -187,7 +189,7 @@ void EquipModel::enactDestruct() {
     emit destructRequest(trash);
 }
 
-void EquipModel::destructEquipment(const QList<QUuid> &destructed) {
+void EquipModel::destructedEquipment(const QList<QUuid> &destructed) {
     int oldRowCount = rowCount();
     clientEquips.removeIf([&destructed](QHash<QUuid, Equipment *>::iterator i)
                           {
@@ -579,6 +581,10 @@ int EquipModel::maximumPageNum() const {
 
 bool EquipModel::isReady() const {
     return ready;
+}
+
+void EquipModel::unsetShip() {
+    currentActiveShip = nullptr;
 }
 
 void EquipModel::clearCheckBoxes() {

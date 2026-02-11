@@ -158,7 +158,8 @@ enum CommandType{
     MessageTest,
     Migrate,
     FleetData,
-    SelectHomePort
+    SelectHomePort,
+    ModernizeShip,
 };
 Q_ENUM_NS(CommandType)
 
@@ -454,6 +455,7 @@ QByteArray clientDemandEquipInfoUser();
 QByteArray clientDemandMapInfo(QDateTime timeUtc
                                = QDateTime(QDate(1970, 1, 1),
                                            QTime(0, 0, 0)));
+QByteArray clientDemandModernizeShip(const QList<QUuid> &);
 QByteArray clientDemandResourceUpdate();
 QByteArray clientDemandShipInfo(QDateTime timeUtc
                                 = QDateTime(QDate(1970, 1, 1),

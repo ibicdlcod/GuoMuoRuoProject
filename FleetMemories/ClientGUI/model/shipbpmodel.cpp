@@ -35,6 +35,7 @@ void ShipBPModel::updateShipList(const QJsonObject &input) {
     else {
         /* not used */
     }
+    engine.shipModel.bpCacheRefresh();
     return;
 }
 
@@ -44,6 +45,10 @@ int ShipBPModel::numberOfColumns() const {
 
 int ShipBPModel::hiddenSortColumn() const {
     return 2;
+}
+
+const QHash<int, int> ShipBPModel::getClientShipBPs() const {
+    return clientShipBPs;
 }
 
 int ShipBPModel::numberOfShip() const {

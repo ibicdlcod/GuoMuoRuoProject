@@ -84,6 +84,8 @@ Clientv2::Clientv2(QObject *parent)
             &shipBPModel, &ShipBPModel::updateShipList);
     connect(&equipModel, &EquipModel::destructRequest,
             this, &Clientv2::doDestructEquip);
+    connect(&shipModel, &ShipModel::modernizeRequest,
+            this, &Clientv2::doModernizeShip);
     connect(this, &Clientv2::gamestateChanged,
             this, &Clientv2::changeGameState);
     // May cause issues?
@@ -797,6 +799,15 @@ void Clientv2::doDestructEquip(const QList<QUuid> &trash) {
     }
 }
 
+void Clientv2::doModernizeShip(const QList<QUuid> &candidates) {
+    if(candidates.empty())
+        return;
+    else {
+        QByteArray msg = KP::clientDemandModernizeShip(candidates);
+        sender->enqueue(msg);
+    }
+}
+
 /* Request current factory state to server */
 void Clientv2::doRefreshFactory() {
     QByteArray msg = KP::clientFactoryRefresh();
@@ -1336,7 +1347,7 @@ void Clientv2::receivedMsg(const QJsonObject &djson) {
         }
         //% "The following equipment are destructed: %1"
         qInfo() << qtTrId("destruct-equip-list").arg(trashString.join(","));
-        equipModel.destructEquipment(trash);
+        equipModel.destructedEquipment(trash);
     }
     break;
     case KP::Success: {

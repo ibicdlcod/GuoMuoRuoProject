@@ -206,12 +206,12 @@ void FactoryArea::doDevelop(int result) {
 void FactoryArea::doConstruct(int result) {
     Clientv2 &engine = Clientv2::getInstance();
     if(result == QDialog::Rejected) {
-        qDebug() << "NODEVELOP";
+        qDebug() << "NOCONSTRUCT";
     }
     else if(result == QDialog::Accepted) {
         qCritical() << "FUCK" << currentSlotNum;
         QTimer::singleShot(100, &engine, &Clientv2::doRefreshFactory);
-        QString msg = QStringLiteral("develop %1 %2")
+        QString msg = QStringLiteral("construct %1 %2")
                           .arg(dev.equipIdDesired()).arg(currentSlotNum);
         qDebug() << msg;
         //engine.parse(msg);

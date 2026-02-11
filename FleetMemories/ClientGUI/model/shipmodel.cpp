@@ -14,6 +14,8 @@ ShipModel::ShipModel(QObject *parent, bool isInArsenal)
     : EquipModel{parent, isInArsenal}
 {
     ready = false;
+    connect(this, &ShipModel::pageNumChanged,
+            this, [this](int, int){clearShipCheckBoxes();});
 }
 
 std::tuple<Ship *, ShipDynamic *> ShipModel::getShip(QUuid id) {
@@ -26,7 +28,7 @@ void ShipModel::switchShipDisplayType(const QString &nationality,
                                       const QString &shiptype,
                                       const QString &shipclass,
                                       const QString &searchTerm) {
-
+    bpCacheRefresh();
     int oldRowCount = rowCount();
     sortedShipIds.clear();
     bool pass = true;
@@ -94,7 +96,7 @@ void ShipModel::switchShipDisplayType(const QString &nationality,
 
             /* class check */
             if(!shipclass.isEmpty() && classText.localeAwareCompare(
-                    shipclass) != 0) {
+                                            shipclass) != 0) {
                 pass = false;
             }
         }
@@ -117,6 +119,7 @@ void ShipModel::switchShipDisplayType(const QString &nationality,
 }
 
 void ShipModel::addShip(QUuid uid, int def) {
+    bpCacheRefresh();
     int oldRowCount = rowCount();
     Clientv2 &engine = Clientv2::getInstance();
     clientShips[uid] = engine.getShipReg(def);
@@ -128,7 +131,45 @@ void ShipModel::addShip(QUuid uid, int def) {
     wholeTableChanged();
 }
 
+void ShipModel::enactModernize() {
+    QList<QUuid> candidates;
+    for(auto iter = isModernizationChecked.keyValueBegin();
+         iter != isModernizationChecked.keyValueEnd();
+         ++iter) {
+        if(iter->second) {
+            candidates.append(iter->first);
+        }
+    }
+    emit modernizeRequest(candidates);
+}
+
+void ShipModel::modernizedShips(const QList<QUuid> &modernized) {
+    int oldRowCount = rowCount();
+    bpCacheRefresh();
+    Clientv2 &engine = Clientv2::getInstance();
+    engine.doRefreshFactoryAnchorage();
+    /*
+    clientEquips.removeIf([&destructed](QHash<QUuid, Equipment *>::iterator i)
+                          {
+                              return destructed.contains(i.key());
+                          });
+    clientEquipStars.removeIf([&destructed](QHash<QUuid, int>::iterator i)
+                              {
+                                  return destructed.contains(i.key());
+                              });
+    sortedEquipIds.removeIf([&destructed](const QUuid &uid)
+                            {
+                                return destructed.contains(uid);
+                            });
+    */
+    int newRowCount = rowCount();
+    emit needReCalculatePages();
+    adjustRowCount(oldRowCount, newRowCount);
+    wholeTableChanged();
+}
+
 void ShipModel::updateShipList(const QJsonObject &input) {
+    bpCacheRefresh();
     clientShips.clear();
     sortedShipIds.clear();
     int oldRowCount = rowCount();
@@ -189,16 +230,23 @@ QVariant ShipModel::data(const QModelIndex &index,
     if(!ready)
         return QVariant();
     switch (role) {
+    case Qt::AccessibleTextRole:
+        [[fallthrough]];
     case Qt::ToolTipRole:
         if(index.column() == uidCol) {
             return uidToDisplay.toString();
+        }
+        else if(index.column() == starCol) {
+            int bpNum = bpCache[shipToDisplay->getId()];
+            //% "Current Star %1, maximum star %2"
+            return qtTrId("ship-star-tooltip")
+                .arg(QString::number(attr->star),
+                     QString::number(attr->star+bpNum));
         }
         else {
             [[fallthrough]];
         }
     case Qt::StatusTipRole:
-        [[fallthrough]];
-    case Qt::AccessibleTextRole:
         [[fallthrough]];
     case Qt::DisplayRole: {
         if(index.column() == uidCol) {
@@ -222,10 +270,9 @@ QVariant ShipModel::data(const QModelIndex &index,
             return QVariant();
         }
         else if(index.column() == starCol) {
-            if(attr->star == 0)
-                return QVariant();
-            else
-                return "★+" + QString::number(attr->star);
+            int bpNum = bpCache[shipToDisplay->getId()];
+            return "★+" + QString::number(attr->star)
+                   + "/" + QString::number(attr->star+bpNum);
         }
         else if(index.column() == hpColumn()) {
             return QStringLiteral("%1/%2").arg(attr->currentHP)
@@ -329,7 +376,20 @@ QVariant ShipModel::data(const QModelIndex &index,
                 color.setHsv(std::min(attr->star, 60) * 5, 255, 128);
                 break;
             }
-
+            QBrush brush = QBrush(color);
+            return brush;
+        }
+        else if(index.column() == conditionColumn()) {
+            QColor color = QColor();
+            switch(QApplication::styleHints()->colorScheme()) {
+            case Qt::ColorScheme::Dark:
+                color.setHsv(attr->condition / 4, 128, 255);
+                break;
+            case Qt::ColorScheme::Light: [[fallthrough]];
+            default:
+                color.setHsv(attr->condition / 4, 255, 128);
+                break;
+            }
             QBrush brush = QBrush(color);
             return brush;
         }
@@ -338,8 +398,13 @@ QVariant ShipModel::data(const QModelIndex &index,
     }
     break;
     case Qt::CheckStateRole: {
-        if(index.column() == addStarColumn())
-            return Qt::Unchecked;
+        if(index.column() == starCol) {
+            if(isModernizationChecked.value(sortedShipIds.value(realRowIndex),
+                                             false))
+                return Qt::Checked;
+            else
+                return Qt::Unchecked;
+        }
         else
             return QVariant();
     }
@@ -353,8 +418,8 @@ QVariant ShipModel::data(const QModelIndex &index,
     break;
     case CheckAlignmentRole: {
         if(index.column() == destructColumn()
-            || index.column() == addStarColumn())
-            return Qt::AlignCenter;
+            || index.column() == starCol)
+            return static_cast<QVariant>(Qt::AlignVCenter | Qt::AlignLeft);
         else
             return QVariant();
     }
@@ -372,7 +437,15 @@ QVariant ShipModel::headerData(int section, Qt::Orientation orientation,
     switch (role) {
     case Qt::AccessibleTextRole: [[fallthrough]];
     case Qt::AccessibleDescriptionRole: [[fallthrough]];
-    case Qt::ToolTipRole: [[fallthrough]];
+    case Qt::WhatsThisRole: [[fallthrough]];
+    case Qt::ToolTipRole:
+        if(section == starCol) {
+            //% "Modernization/Maximum Modernization"
+            return qtTrId("ship-star-whatsthis");
+        }
+        else {
+            [[fallthrough]];
+        }
     case Qt::DisplayRole: {
         if(orientation == Qt::Vertical) {
             int realRowIndex = section + rowsPerPage * pageNum;
@@ -386,6 +459,7 @@ QVariant ShipModel::headerData(int section, Qt::Orientation orientation,
                 return qtTrId("ship-name");
             }
             else if(section == starCol) {
+                //% "Modernization"
                 return qtTrId("ship-star");
             }
             else if(section == addStarColumn()) {
@@ -414,7 +488,6 @@ QVariant ShipModel::headerData(int section, Qt::Orientation orientation,
     case Qt::DecorationRole:
     case Qt::EditRole:
     case Qt::StatusTipRole:
-    case Qt::WhatsThisRole:
     case Qt::SizeHintRole:
     case Qt::FontRole:
         return QVariant(); break;
@@ -429,9 +502,23 @@ QVariant ShipModel::headerData(int section, Qt::Orientation orientation,
 }
 
 Qt::ItemFlags ShipModel::flags(const QModelIndex &index) const {
-    if(index.column() == addStarColumn()) {
-        return QAbstractTableModel::flags(index) // clazy:exclude=skipped-base-method
-               | Qt::ItemIsUserCheckable;
+    if(index.column() == starCol) {
+        int realRowIndex = index.row() + rowsPerPage * pageNum;
+        QUuid uidToDisplay = sortedShipIds[realRowIndex];
+        Ship *shipToDisplay = clientShips[uidToDisplay];
+        int bpNum = bpCache[shipToDisplay->getId()];
+        if(bpNum == 0) {
+            return static_cast<QFlags<Qt::ItemFlag>>
+                (QAbstractTableModel::flags(index) // clazy:exclude=skipped-base-method
+                 | Qt::ItemIsUserCheckable
+                       & (~Qt::ItemIsEnabled));
+        }
+        else {
+            return QAbstractTableModel::flags(index) // clazy:exclude=skipped-base-method
+                   | Qt::ItemIsUserCheckable
+                   | Qt::ItemIsEnabled;
+
+        }
     }
     else {
         return QAbstractTableModel::flags(index); // clazy:exclude=skipped-base-method
@@ -442,16 +529,30 @@ bool ShipModel::setData(const QModelIndex &index,
                         const QVariant &value,
                         int role) {
     int realRowIndex = index.row() + rowsPerPage * pageNum;
-    /* TODO: add modernize */
+    QUuid uidToDisplay = sortedShipIds[realRowIndex];
+    Ship *shipToDisplay = clientShips[uidToDisplay];
+    int bpNum = bpCache[shipToDisplay->getId()];
+    if(role == Qt::CheckStateRole) {
+        if(value.toInt() == Qt::Checked and bpNum != 0) {
+            isModernizationChecked[sortedShipIds.value(realRowIndex)] = true;
+            emit dataChanged(index, index, {Qt::CheckStateRole});
+            return true;
+        }
+        else if(value.toInt() == Qt::Unchecked) {
+            isModernizationChecked[sortedShipIds.value(realRowIndex)] = false;
+            emit dataChanged(index, index, {Qt::CheckStateRole});
+            return true;
+        }
+    }
     return false;
 }
 
 int ShipModel::addStarColumn() const {
-    return isInArsenal ? 7 : -1;
+    return isInArsenal ? -1 : -1;
 }
 
 int ShipModel::hiddenSortColumn() const {
-    return isInArsenal ? 8 : 8;
+    return isInArsenal ? 7 : 8;
 }
 
 int ShipModel::selectColumn() const {
@@ -498,14 +599,19 @@ void ShipModel::customSort() {
 
 int ShipModel::numberOfColumns() const {
     if(isInArsenal) {
-        return 9; // ShipUuid Shipname Star CurrentHP Condition Level FleetPos Improve Hiddensort
+        return 8; // ShipUuid Shipname Star CurrentHP Condition Level FleetPos Hiddensort
     }
     else
         return 9; // ShipUuid Shipname Star CurrentHP Condition Level FleetPos Select Hiddensort
 }
 
+void ShipModel::bpCacheRefresh() {
+    Clientv2 &engine = Clientv2::getInstance();
+    bpCache = engine.shipBPModel.getClientShipBPs();
+}
+
 void ShipModel::clearShipCheckBoxes() {
-    /* TODO: add modernize */
+    isModernizationChecked.clear();
 }
 
 int ShipModel::numberOfShip() const {

@@ -15,6 +15,7 @@ public:
     virtual QVariant headerData(int section, Qt::Orientation orientation,
                                 int role = Qt::DisplayRole) const override;
     virtual int hiddenSortColumn() const override;
+    const QHash<int, int> getClientShipBPs() const;
 
 public slots:
     virtual void switchShipDisplayType(const QString &nationality,

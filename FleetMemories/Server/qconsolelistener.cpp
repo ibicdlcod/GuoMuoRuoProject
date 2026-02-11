@@ -43,11 +43,11 @@ QConsoleListener::QConsoleListener(bool consolemode)
         &m_thread , &QThread::finished,
         m_notifier, &QObject::deleteLater
         );
-    /* ignore clazy warning, as heed to its advice make the cli unworkable */
+
 #if defined (Q_OS_WIN)
-    connect(m_notifier, &QWinEventNotifier::activated,
+    connect(m_notifier, &QWinEventNotifier::activated, this,
 #else
-    connect(m_notifier, &QSocketNotifier::activated,
+    connect(m_notifier, &QSocketNotifier::activated, this,
 #endif
             [this]() {
                 /* the following is different from the original at https://github.com/juangburgos/QConsoleListener/blob/master/src/qconsolelistener.cpp
@@ -82,7 +82,8 @@ QConsoleListener::QConsoleListener(bool consolemode)
                 res = QString::fromStdString(line);
 #endif
                 Q_EMIT this->finishedGetLine(res);
-            });
+            },
+            Qt::DirectConnection);
     m_thread.start();
 }
 

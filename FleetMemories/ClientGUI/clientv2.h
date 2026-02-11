@@ -75,6 +75,7 @@ public slots:
     void demandShipCache();
     void displayPrompt();
     void doDestructEquip(const QList<QUuid> &);
+    void doModernizeShip(const QList<QUuid> &);
     void doRefreshFactory();
     void doRefreshFactoryAnchorage();
     void doRefreshFactoryArsenal();
