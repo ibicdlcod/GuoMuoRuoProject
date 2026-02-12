@@ -150,6 +150,7 @@ void FactoryArea::switchToState() {
         ui->FactoryLabel->setText(qtTrId("construct-ships"));
         ui->Slots->show();
         ui->ArsenalArea->hide();
+        con.switchDisplay();
         break;
     case KP::Arsenal:
         ui->FactoryLabel->setText(qtTrId("arsenal"));

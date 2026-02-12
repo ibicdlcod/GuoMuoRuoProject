@@ -36,8 +36,12 @@ set(CLIENT_SOURCES
     ClientGUI/networkerror.h
     ClientGUI/resourcefetch.cpp
     ClientGUI/resourcefetch.h
+    ClientGUI/model/localeawaresort.h
+    ClientGUI/model/localeawaresort.cpp
     ClientGUI/model/shipbpmodel.h
     ClientGUI/model/shipbpmodel.cpp
+    ClientGUI/model/shipdefmodel.h
+    ClientGUI/model/shipdefmodel.cpp
     ClientGUI/model/shipmodel.cpp
     ClientGUI/model/shipmodel.h
     ClientGUI/steamauth.cpp

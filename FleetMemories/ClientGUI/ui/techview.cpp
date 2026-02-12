@@ -418,7 +418,6 @@ void TechView::resizeColumns(bool global) {
 void TechView::resetLocalListName() {
     if(isEquipChoice) {
         ui->localListEquip->clear();
-        ;
         for(auto &equipReg:
              Clientv2::getInstance().equipRegistryCache) {
             if(

@@ -26,8 +26,8 @@ void ShipBPModel::updateShipList(const QJsonObject &input) {
         }
         int newRowCount = rowCount();
         adjustRowCount(oldRowCount, newRowCount);
-        //emit needReCalculateRows();
-        //emit needReCalculatePages();
+        emit needReCalculateRows();
+        emit needReCalculatePages();
         ready = true;
         switchShipDisplayType("", "", "", "");
         emit bpReady();
@@ -295,14 +295,9 @@ void ShipBPModel::switchShipDisplayType(const QString &nationality,
     if(searchTerm.isEmpty() && shipclass.isEmpty()) {
         emit classBoxHint(classPasses);
     }
-    qCritical() << clientShipBPs.size();
     customSort();
-    qCritical() << clientShipBPs.size();
     int newRowCount = rowCount();
-    qCritical() << clientShipBPs.size();
-    //emit needReCalculatePages();
+    emit needReCalculatePages();
     adjustRowCount(oldRowCount, newRowCount);
-    qCritical() << clientShipBPs.size();
     firstPage();
-    qCritical() << clientShipBPs.size();
 }

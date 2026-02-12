@@ -292,7 +292,7 @@
       </widget>
      </item>
      <item row="4" column="1">
-      <widget class="QTextEdit" name="idText_2">
+      <widget class="QTextEdit" name="searchBox">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
          <horstretch>0</horstretch>
@@ -304,6 +304,9 @@
          <width>0</width>
          <height>26</height>
         </size>
+       </property>
+       <property name="styleSheet">
+        <string notr="true"/>
        </property>
       </widget>
      </item>

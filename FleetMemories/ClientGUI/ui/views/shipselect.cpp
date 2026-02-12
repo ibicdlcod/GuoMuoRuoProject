@@ -150,7 +150,7 @@ ShipSelect::ShipSelect(int height, QWidget *parent)
 
 void ShipSelect::typeBoxHinted(QStringList &types) {
     std::sort(types.begin(), types.end(), [](QString a, QString b)
-              { return a.localeAwareCompare(b) > 0; });
+              { return a.localeAwareCompare(b) < 0; });
     typeBox->clear();
     typeBox->addItems(types);
     classBox->clear();
@@ -159,7 +159,7 @@ void ShipSelect::typeBoxHinted(QStringList &types) {
 
 void ShipSelect::classBoxHinted(QStringList &classes) {
     std::sort(classes.begin(), classes.end(), [](QString a, QString b)
-              { return a.localeAwareCompare(b) > 0; });
+              { return a.localeAwareCompare(b) < 0; });
     classBox->clear();
     classBox->addItems(classes);
     update();

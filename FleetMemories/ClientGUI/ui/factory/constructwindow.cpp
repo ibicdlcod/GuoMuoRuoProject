@@ -3,6 +3,7 @@
 #include "ui_constructwindow.h"
 #include "../../../Protocol/kp.h"
 #include <QMetaEnum>
+#include <QMessageBox>
 
 extern std::unique_ptr<QSettings> settings;
 
@@ -17,16 +18,17 @@ ConstructWindow::ConstructWindow(QWidget *parent)
             this, &ConstructWindow::switchDisplay);
     connect(ui->shipclass, &QComboBox::currentIndexChanged,
             this, &ConstructWindow::switchDisplay);
+    connect(ui->searchBox, &QTextEdit::textChanged,
+            this, [this](){switchDisplay();});
+    ui->searchBox->setStyleSheet(QStringLiteral(
+        "background-color: palette(button);"
+        ));
+    connect(ui->shipname, &QComboBox::currentIndexChanged,
+            this, &ConstructWindow::shipNameChanged);
 }
 
 ConstructWindow::~ConstructWindow()
 {
-    disconnect(ui->shipnation, &QComboBox::currentIndexChanged,
-               this, &ConstructWindow::switchDisplay);
-    disconnect(ui->shiptype, &QComboBox::currentIndexChanged,
-               this, &ConstructWindow::switchDisplay);
-    disconnect(ui->shipclass, &QComboBox::currentIndexChanged,
-               this, &ConstructWindow::switchDisplay);
     delete ui;
 }
 
@@ -43,35 +45,53 @@ void ConstructWindow::switchDisplay(int) {
         = ui->shipclass->currentText().
                   localeAwareCompare(qtTrId("all-shipclasses")) == 0
               ? QLatin1String("") : ui->shipclass->currentText();
-    const QString searchTerm = "";
-    ui->shipname->clear();
+    const QString searchTerm = ui->searchBox->toPlainText();
     Clientv2 &engine = Clientv2::getInstance();
-    /*
+
     if(!engine.shipBPModel.isReady()) {
-        qCritical() << "FUCK";
+        QMessageBox msgBox(this);
+        //% "Fetching ship blueprint data, please wait..."
+        msgBox.setText(qtTrId("wait-for-blueprint"));
         engine.doRefreshFactoryAnchorage();
         QTimer timer;
         timer.setSingleShot(true);
-        QEventLoop loop;
-        connect(&engine.shipBPModel, &ShipBPModel::bpReady, &loop, &QEventLoop::quit);
-        connect(&timer, &QTimer::timeout, &loop, &QEventLoop::quit);
+        connect(&engine.shipBPModel, &ShipBPModel::bpReady, &msgBox, &QMessageBox::close);
+        connect(&timer, &QTimer::timeout, &msgBox, &QMessageBox::close);
         timer.start(settings->value("networkclient/downloadwaittimemsec", 80000).toInt());
-        loop.exec();
+        msgBox.exec();
     }
-    qCritical() << "FUCK2" << engine.shipBPModel.bpCache.size();
-*/
+
     bool pass = true;
-    bool pass1 = false;
+    bool pass1 = true;
     //% "All ship types"
     QStringList typePasses = {qtTrId("all-shiptypes")};
     //% "All ship classes"
     QStringList classPasses = {qtTrId("all-shipclasses")};;
+    QList<int> namePasses = {};
     static auto meta = QMetaEnum::fromType<KP::ShipNationality>();
     for(auto iter = engine.shipBPModel.clientShipBPs.keyBegin();
          iter != engine.shipBPModel.clientShipBPs.keyEnd();
          ++iter) {
         Ship *ship = engine.shipRegistryCache[*iter];
         pass = true;
+
+        if(!searchTerm.isEmpty()) {
+            pass1 = false;
+            if(QString::number(ship->getId()).contains(searchTerm)) {
+                pass1 = true;
+            }
+            if(QString::number(ship->getId(), 16).contains(searchTerm)) {
+                pass1 = true;
+            }
+            for(const auto &name:
+                 std::as_const(ship->localNames)) {
+                if(name.localeAwareCompare(searchTerm) == 0)
+                    pass1 = true;
+                if(name.contains(searchTerm, Qt::CaseInsensitive))
+                    pass1 = true;
+            }
+            pass = pass1;
+        }
         if(!nationality.isEmpty() &&
             qtTrId(meta.key(ship->getNationality()))
                     .localeAwareCompare(nationality) != 0) {
@@ -86,7 +106,6 @@ void ConstructWindow::switchDisplay(int) {
                 }
             }
         }
-
         if(!shiptype.isEmpty() &&
             ship->getType().toString().localeAwareCompare(
                 shiptype) != 0) {
@@ -112,8 +131,9 @@ void ConstructWindow::switchDisplay(int) {
                                         shipclass) != 0) {
             pass = false;
         }
+
         if(pass) {
-            ui->shipname->addItem(ship->toString());
+            namePasses.append(ship->getId());
         }
     }
 
@@ -122,7 +142,7 @@ void ConstructWindow::switchDisplay(int) {
         disconnect(ui->shiptype, &QComboBox::currentIndexChanged,
                    this, &ConstructWindow::switchDisplay);
         std::sort(typePasses.begin(), typePasses.end(), [](QString a, QString b)
-                  { return a.localeAwareCompare(b) > 0; });
+                  { return a.localeAwareCompare(b) < 0; });
         ui->shiptype->clear();
         ui->shiptype->addItem(qtTrId("all-shiptypes"));
         ui->shiptype->addItems(typePasses);
@@ -131,12 +151,11 @@ void ConstructWindow::switchDisplay(int) {
         connect(ui->shiptype, &QComboBox::currentIndexChanged,
                 this, &ConstructWindow::switchDisplay);
     }
-
-    if(searchTerm.isEmpty() && shipclass.isEmpty()) {
+    else if(searchTerm.isEmpty() && shipclass.isEmpty()) {
         disconnect(ui->shipclass, &QComboBox::currentIndexChanged,
-                this, &ConstructWindow::switchDisplay);
+                   this, &ConstructWindow::switchDisplay);
         std::sort(classPasses.begin(), classPasses.end(), [](QString a, QString b)
-                  { return a.localeAwareCompare(b) > 0; });
+                  { return a.localeAwareCompare(b) < 0; });
         ui->shipclass->clear();
         ui->shipclass->addItem(qtTrId("all-shipclasses"));
         ui->shipclass->addItems(classPasses);
@@ -144,6 +163,14 @@ void ConstructWindow::switchDisplay(int) {
         connect(ui->shipclass, &QComboBox::currentIndexChanged,
                 this, &ConstructWindow::switchDisplay);
     }
+
+    if(ui->shipname->model() != engine.proxyModel) {
+        engine.proxyModel->setSourceModel(&engine.shipDefModel);
+        ui->shipname->setModel(engine.proxyModel);
+    }
+    engine.shipDefModel.setShips(namePasses);
+    ui->shipname->model()->sort(0);
+    update();
 }
 
 void ConstructWindow::initialize() {
@@ -156,4 +183,15 @@ void ConstructWindow::initialize() {
             ui->shipnation->addItem(qtTrId(meta.key(i)));
         }
     }
+}
+
+void ConstructWindow::shipNameChanged(int) {
+    Clientv2 &engine = Clientv2::getInstance();
+    auto index = engine.proxyModel->mapToSource(engine.proxyModel->index(ui->shipname->currentIndex(), 0));
+    if(index.row() == -1 || index.column() == -1)
+        return;
+    auto *ship = engine.shipDefModel.getCurrentShip(index);
+    qCritical() << ship->toString();
+    qWarning() << ship->getId();
+    qInfo() << ship->attr["Equipslots"];
 }

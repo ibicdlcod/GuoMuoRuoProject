@@ -1086,7 +1086,7 @@ Great at battle and bad at politics--so cool!</source>
         <location filename="../ClientGUI/ui/views/equipselect.cpp" line="73"/>
         <location filename="../ClientGUI/ui/navigator.cpp" line="36"/>
         <location filename="../ClientGUI/ui/techview.cpp" line="50"/>
-        <location filename="../ClientGUI/ui/techview.cpp" line="426"/>
+        <location filename="../ClientGUI/ui/techview.cpp" line="425"/>
         <source>All equipments</source>
         <translation>所有装备</translation>
     </message>
@@ -1159,17 +1159,23 @@ Great at battle and bad at politics--so cool!</source>
         <translation>近代化改造</translation>
     </message>
     <message id="all-nationality">
-        <location filename="../ClientGUI/ui/factory/constructwindow.cpp" line="36"/>
-        <location filename="../ClientGUI/ui/factory/constructwindow.cpp" line="153"/>
+        <location filename="../ClientGUI/ui/factory/constructwindow.cpp" line="38"/>
+        <location filename="../ClientGUI/ui/factory/constructwindow.cpp" line="180"/>
         <location filename="../ClientGUI/ui/views/shipselect.cpp" line="72"/>
         <location filename="../ClientGUI/ui/views/shipselect.cpp" line="110"/>
         <location filename="../ClientGUI/ui/views/shipselect.cpp" line="120"/>
         <location filename="../ClientGUI/ui/views/shipselect.cpp" line="132"/>
         <location filename="../ClientGUI/ui/techview.cpp" line="56"/>
-        <location filename="../ClientGUI/ui/techview.cpp" line="463"/>
+        <location filename="../ClientGUI/ui/techview.cpp" line="462"/>
         <source>All nationalities</source>
         <oldsource>All nationality</oldsource>
         <translation>所有国籍</translation>
+    </message>
+    <message id="wait-for-blueprint">
+        <location filename="../ClientGUI/ui/factory/constructwindow.cpp" line="54"/>
+        <source>Fetching ship blueprint data, please wait...</source>
+        <oldsource>Fetching ship bluepring data, please wait...</oldsource>
+        <translation type="unfinished"></translation>
     </message>
     <message id="techview-toequip">
         <location filename="../ClientGUI/ui/techview.cpp" line="174"/>
@@ -1180,8 +1186,8 @@ Great at battle and bad at politics--so cool!</source>
         <location filename="../ClientGUI/ui/techview.cpp" line="288"/>
         <location filename="../ClientGUI/ui/techview.cpp" line="325"/>
         <location filename="../ClientGUI/ui/techview.cpp" line="389"/>
-        <location filename="../ClientGUI/ui/techview.cpp" line="519"/>
-        <location filename="../ClientGUI/ui/techview.cpp" line="523"/>
+        <location filename="../ClientGUI/ui/techview.cpp" line="518"/>
+        <location filename="../ClientGUI/ui/techview.cpp" line="522"/>
         <source>Serial Num</source>
         <translation>序列号</translation>
     </message>
@@ -1189,8 +1195,8 @@ Great at battle and bad at politics--so cool!</source>
         <location filename="../ClientGUI/ui/techview.cpp" line="290"/>
         <location filename="../ClientGUI/ui/techview.cpp" line="325"/>
         <location filename="../ClientGUI/ui/techview.cpp" line="389"/>
-        <location filename="../ClientGUI/ui/techview.cpp" line="519"/>
-        <location filename="../ClientGUI/ui/techview.cpp" line="523"/>
+        <location filename="../ClientGUI/ui/techview.cpp" line="518"/>
+        <location filename="../ClientGUI/ui/techview.cpp" line="522"/>
         <source>Name</source>
         <translation>装备名</translation>
     </message>
@@ -1198,8 +1204,8 @@ Great at battle and bad at politics--so cool!</source>
         <location filename="../ClientGUI/ui/techview.cpp" line="292"/>
         <location filename="../ClientGUI/ui/techview.cpp" line="326"/>
         <location filename="../ClientGUI/ui/techview.cpp" line="390"/>
-        <location filename="../ClientGUI/ui/techview.cpp" line="520"/>
-        <location filename="../ClientGUI/ui/techview.cpp" line="524"/>
+        <location filename="../ClientGUI/ui/techview.cpp" line="519"/>
+        <location filename="../ClientGUI/ui/techview.cpp" line="523"/>
         <source>Tech</source>
         <translation>科技等级</translation>
     </message>
@@ -1207,8 +1213,8 @@ Great at battle and bad at politics--so cool!</source>
         <location filename="../ClientGUI/ui/techview.cpp" line="294"/>
         <location filename="../ClientGUI/ui/techview.cpp" line="326"/>
         <location filename="../ClientGUI/ui/techview.cpp" line="390"/>
-        <location filename="../ClientGUI/ui/techview.cpp" line="520"/>
-        <location filename="../ClientGUI/ui/techview.cpp" line="524"/>
+        <location filename="../ClientGUI/ui/techview.cpp" line="519"/>
+        <location filename="../ClientGUI/ui/techview.cpp" line="523"/>
         <source>Weight</source>
         <translation>权重</translation>
     </message>
@@ -2229,10 +2235,10 @@ Great at battle and bad at politics--so cool!</source>
     <message id="all-shiptypes">
         <location filename="../ClientGUI/model/shipbpmodel.cpp" line="221"/>
         <location filename="../ClientGUI/model/shipmodel.cpp" line="37"/>
-        <location filename="../ClientGUI/ui/factory/constructwindow.cpp" line="40"/>
-        <location filename="../ClientGUI/ui/factory/constructwindow.cpp" line="66"/>
-        <location filename="../ClientGUI/ui/factory/constructwindow.cpp" line="84"/>
-        <location filename="../ClientGUI/ui/factory/constructwindow.cpp" line="127"/>
+        <location filename="../ClientGUI/ui/factory/constructwindow.cpp" line="42"/>
+        <location filename="../ClientGUI/ui/factory/constructwindow.cpp" line="67"/>
+        <location filename="../ClientGUI/ui/factory/constructwindow.cpp" line="104"/>
+        <location filename="../ClientGUI/ui/factory/constructwindow.cpp" line="147"/>
         <location filename="../ClientGUI/ui/views/shipselect.cpp" line="123"/>
         <location filename="../ClientGUI/ui/views/shipselect.cpp" line="135"/>
         <source>All ship types</source>
@@ -2241,10 +2247,10 @@ Great at battle and bad at politics--so cool!</source>
     <message id="all-shipclasses">
         <location filename="../ClientGUI/model/shipbpmodel.cpp" line="223"/>
         <location filename="../ClientGUI/model/shipmodel.cpp" line="39"/>
-        <location filename="../ClientGUI/ui/factory/constructwindow.cpp" line="44"/>
-        <location filename="../ClientGUI/ui/factory/constructwindow.cpp" line="68"/>
-        <location filename="../ClientGUI/ui/factory/constructwindow.cpp" line="105"/>
-        <location filename="../ClientGUI/ui/factory/constructwindow.cpp" line="141"/>
+        <location filename="../ClientGUI/ui/factory/constructwindow.cpp" line="46"/>
+        <location filename="../ClientGUI/ui/factory/constructwindow.cpp" line="69"/>
+        <location filename="../ClientGUI/ui/factory/constructwindow.cpp" line="124"/>
+        <location filename="../ClientGUI/ui/factory/constructwindow.cpp" line="160"/>
         <location filename="../ClientGUI/ui/views/shipselect.cpp" line="138"/>
         <source>All ship classes</source>
         <translation>所有舰级</translation>
@@ -2263,6 +2269,7 @@ Great at battle and bad at politics--so cool!</source>
     <message id="ship-name">
         <location filename="../ClientGUI/model/shipbpmodel.cpp" line="117"/>
         <location filename="../ClientGUI/model/shipbpmodel.cpp" line="178"/>
+        <location filename="../ClientGUI/model/shipdefmodel.cpp" line="52"/>
         <location filename="../ClientGUI/model/shipmodel.cpp" line="307"/>
         <location filename="../ClientGUI/model/shipmodel.cpp" line="445"/>
         <source>Name</source>
@@ -2493,7 +2500,7 @@ Great at battle and bad at politics--so cool!</source>
         <translation>Lv %1</translation>
     </message>
     <message id="blueprintview">
-        <location filename="../ClientGUI/ui/factory/factoryarea.cpp" line="174"/>
+        <location filename="../ClientGUI/ui/factory/factoryarea.cpp" line="175"/>
         <source>Blueprints</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2674,22 +2681,22 @@ Great at battle and bad at politics--so cool!</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="default-equip-5">
-        <location filename="../ClientGUI/ui/factory/constructwindow.ui" line="325"/>
+        <location filename="../ClientGUI/ui/factory/constructwindow.ui" line="328"/>
         <source>Default Equipment 5:</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="ship-remodel">
-        <location filename="../ClientGUI/ui/factory/constructwindow.ui" line="361"/>
+        <location filename="../ClientGUI/ui/factory/constructwindow.ui" line="364"/>
         <source>Ship to Remodel:</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="cons-resource-required">
-        <location filename="../ClientGUI/ui/factory/constructwindow.ui" line="391"/>
+        <location filename="../ClientGUI/ui/factory/constructwindow.ui" line="394"/>
         <source>Resource required:</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="dev-calculating">
-        <location filename="../ClientGUI/ui/factory/constructwindow.ui" line="404"/>
+        <location filename="../ClientGUI/ui/factory/constructwindow.ui" line="407"/>
         <location filename="../ClientGUI/ui/factory/developwindow.ui" line="112"/>
         <location filename="../ClientGUI/ui/factory/developwindow.ui" line="152"/>
         <source>Calculating...</source>
@@ -2961,13 +2968,13 @@ Great at battle and bad at politics--so cool!</source>
     </message>
     <message id="arsenal">
         <location filename="../ClientGUI/ui/mainwindow.ui" line="445"/>
-        <location filename="../ClientGUI/ui/factory/factoryarea.cpp" line="155"/>
+        <location filename="../ClientGUI/ui/factory/factoryarea.cpp" line="156"/>
         <source>Arsenal</source>
         <translation>军械库</translation>
     </message>
     <message id="anchorage">
         <location filename="../ClientGUI/ui/mainwindow.ui" line="455"/>
-        <location filename="../ClientGUI/ui/factory/factoryarea.cpp" line="164"/>
+        <location filename="../ClientGUI/ui/factory/factoryarea.cpp" line="165"/>
         <source>Anchorage</source>
         <translation>锚地</translation>
     </message>

@@ -4,14 +4,16 @@
 #include <QColor>
 #include <QtNetwork>
 #include <QHttpServer>
-#include "../Protocol/kp.h"
 #include "ui/factory/developwindow.h"
 #include "ui/factory/constructwindow.h"
 #include "ui/techview.h"
+#include "ui/views/equipselect.h"
 #include "model/equipmodel.h"
 #include "model/shipmodel.h"
 #include "model/shipbpmodel.h"
-#include "ui/views/equipselect.h"
+#include "model/shipdefmodel.h"
+#include "model/localeawaresort.h"
+#include "../Protocol/kp.h"
 #include "../Protocol/receiver.h"
 #include "../Protocol/sender.h"
 #include "../Protocol/mapwithdiff.h"
@@ -55,12 +57,15 @@ public:
     friend void TechView::resetLocalListName();
     friend void TechView::equipOrShip();
     friend void EquipSelect::reCalculateAvailableEquips(int);
+    friend class ShipDefModel;
 
     int equipBigTypeIndex = 0;
     int equipIndex = 0;
     EquipModel equipModel;
     ShipModel shipModel;
     ShipBPModel shipBPModel;
+    ShipDefModel shipDefModel;
+    QSortFilterProxyModel *proxyModel = new LocaleAwareSort();
     QMap<int, double> techCache;
 
 public slots:

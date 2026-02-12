@@ -2,6 +2,7 @@
 #define CONSTRUCTWINDOW_H
 
 #include <QDialog>
+#include "../../model/shipdefmodel.h"
 
 namespace Ui {
 class ConstructWindow;
@@ -18,7 +19,8 @@ public:
     void initialize();
 
 public slots:
-    void switchDisplay(int);
+    void switchDisplay(int dummy = 0);
+    void shipNameChanged(int dummy = 0);
 
 private:
     Ui::ConstructWindow *ui;
