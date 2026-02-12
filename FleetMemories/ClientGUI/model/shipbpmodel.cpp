@@ -24,13 +24,13 @@ void ShipBPModel::updateShipList(const QJsonObject &input) {
             clientShipBPs[key.toInt()] = input[key].toInt();
             sortedShipBPIds.append(key.toInt());
         }
-        customSort();
         int newRowCount = rowCount();
         adjustRowCount(oldRowCount, newRowCount);
-        emit needReCalculateRows();
-        emit needReCalculatePages();
+        //emit needReCalculateRows();
+        //emit needReCalculatePages();
         ready = true;
         switchShipDisplayType("", "", "", "");
+        emit bpReady();
     }
     else {
         /* not used */
@@ -86,12 +86,7 @@ QVariant ShipBPModel::data(const QModelIndex &index,
         [[fallthrough]];
     case Qt::DisplayRole: {
         if(index.column() == equipCol) {
-            QString localName = shipToDisplay->toString(
-                settings->value("client/language", "ja_JP").toString());
-            if(localName.size() == 0)
-                return shipToDisplay->toString("ja_JP");
-            else
-                return localName;
+            return shipToDisplay->toString();
         }
         else if(index.column() == amountCol) {
             return clientShipBPs[defToDisplay];
@@ -227,6 +222,7 @@ void ShipBPModel::switchShipDisplayType(const QString &nationality,
     //% "All ship classes"
     QStringList classPasses = {qtTrId("all-shipclasses")};;
     static auto meta = QMetaEnum::fromType<KP::ShipNationality>();
+
     for(auto iter = clientShipBPs.keyValueBegin();
          iter != clientShipBPs.keyValueEnd();
          ++iter) {
@@ -299,10 +295,14 @@ void ShipBPModel::switchShipDisplayType(const QString &nationality,
     if(searchTerm.isEmpty() && shipclass.isEmpty()) {
         emit classBoxHint(classPasses);
     }
+    qCritical() << clientShipBPs.size();
     customSort();
+    qCritical() << clientShipBPs.size();
     int newRowCount = rowCount();
-    emit needReCalculatePages();
+    qCritical() << clientShipBPs.size();
+    //emit needReCalculatePages();
     adjustRowCount(oldRowCount, newRowCount);
+    qCritical() << clientShipBPs.size();
     firstPage();
-    wholeTableChanged();
+    qCritical() << clientShipBPs.size();
 }

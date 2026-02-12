@@ -244,12 +244,7 @@ QVariant ShipModel::data(const QModelIndex &index,
             return uidToDisplay.toString().first(9).last(8);
         }
         else if(index.column() == equipCol) {
-            QString localName = shipToDisplay->toString(
-                settings->value("client/language", "ja_JP").toString());
-            if(localName.size() == 0)
-                return shipToDisplay->toString("ja_JP");
-            else
-                return localName;
+            return shipToDisplay->toString();
         }
         else if(index.column() == hiddenSortColumn()) {
             return uidToDisplay;

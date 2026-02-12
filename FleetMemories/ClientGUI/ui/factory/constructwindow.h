@@ -18,9 +18,7 @@ public:
     void initialize();
 
 public slots:
-    void switchDisplay(const QString &nationality,
-                       const QString &shiptype,
-                       const QString &shipclass);
+    void switchDisplay(int);
 
 private:
     Ui::ConstructWindow *ui;

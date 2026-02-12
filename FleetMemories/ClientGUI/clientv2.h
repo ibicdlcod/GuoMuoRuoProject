@@ -49,9 +49,7 @@ public:
     /* ususally accesses equipregistryCache */
     friend int DevelopWindow::equipIdDesired();
     friend void DevelopWindow::resetListName(int);
-    friend void ConstructWindow::switchDisplay(const QString &nationality,
-                                               const QString &shiptype,
-                                               const QString &shipclass);
+    friend void ConstructWindow::switchDisplay(int);
     friend void TechView::demandLocalTech(int);
     friend void TechView::demandSkillPoints(int);
     friend void TechView::resetLocalListName();
@@ -99,6 +97,7 @@ public slots:
     void switchToTech2();
     void switchToTech3(int);
     void tsunkitAssets();
+    void tsunkitAssets2();
     void uiRefresh();
     Q_DECL_DEPRECATED void update();
 
@@ -204,6 +203,8 @@ private:
     QTcpServer *tcpServer = new QTcpServer();
 
     ResourceFetch resourceFetcher;
+    int downloadCompleted = 0;
+    int downloadRequired = 0;
 
 #pragma message(SALT_FISH)
     const QByteArray defaultSalt =

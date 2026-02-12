@@ -5,8 +5,6 @@
 #include "../Server/kerrors.h"
 #include "utility.h"
 
-extern std::unique_ptr<QSettings> settings;
-
 Ship::Ship(int shipId)
     : shipRegId(shipId){
     if(shipId == 0) {

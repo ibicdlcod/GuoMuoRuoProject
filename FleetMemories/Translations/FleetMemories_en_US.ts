@@ -246,25 +246,25 @@ Great at battle and bad at politics--so cool!</translation>
     </message>
     <message id="invalid-command">
         <location filename="../Protocol/commandline.cpp" line="247"/>
-        <location filename="../ClientGUI/clientv2.cpp" line="1535"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="1551"/>
         <source>Invalid Command, use &apos;commands&apos; for valid commands, &apos;help&apos; for help, &apos;exit&apos; to exit.</source>
         <translation>Invalid Command, use &apos;commands&apos; for valid commands, &apos;help&apos; for help, &apos;exit&apos; to exit.</translation>
     </message>
     <message id="exit-helper">
         <location filename="../Protocol/commandline.cpp" line="252"/>
-        <location filename="../ClientGUI/clientv2.cpp" line="1581"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="1597"/>
         <source>Use &apos;exit&apos; to quit.</source>
         <translation>Use &apos;exit&apos; to quit.</translation>
     </message>
     <message id="good-command">
         <location filename="../Protocol/commandline.cpp" line="255"/>
-        <location filename="../ClientGUI/clientv2.cpp" line="1584"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="1600"/>
         <source>Available commands:</source>
         <translation>Available commands:</translation>
     </message>
     <message id="all-command">
         <location filename="../Protocol/commandline.cpp" line="260"/>
-        <location filename="../ClientGUI/clientv2.cpp" line="1589"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="1605"/>
         <source>All commands:</source>
         <translation>All commands:</translation>
     </message>
@@ -648,322 +648,322 @@ Great at battle and bad at politics--so cool!</translation>
         <location filename="../ClientGUI/clientv2.cpp" line="431"/>
         <location filename="../ClientGUI/clientv2.cpp" line="450"/>
         <location filename="../ClientGUI/clientv2.cpp" line="463"/>
-        <location filename="../ClientGUI/clientv2.cpp" line="1195"/>
-        <location filename="../ClientGUI/clientv2.cpp" line="1541"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="1211"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="1557"/>
         <source>You have insufficient privileges (typically you need to login).</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="change-gamestate-offline">
-        <location filename="../ClientGUI/clientv2.cpp" line="568"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="584"/>
         <source>You cannot change game state while offline.</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="network-error">
-        <location filename="../ClientGUI/clientv2.cpp" line="586"/>
-        <location filename="../ClientGUI/clientv2.cpp" line="597"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="602"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="613"/>
         <location filename="../ClientGUI/networkerror.cpp" line="4"/>
         <source>Network error: %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="handshake-timeout">
-        <location filename="../ClientGUI/clientv2.cpp" line="599"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="615"/>
         <source>%1: handshake timeout, trying to re-transmit</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="retransmit-toomuch">
-        <location filename="../ClientGUI/clientv2.cpp" line="604"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="620"/>
         <source>%1: max restransmit time exceeded!</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="read-dgram-failed">
-        <location filename="../ClientGUI/clientv2.cpp" line="637"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="653"/>
         <location filename="../Server/server.cpp" line="588"/>
         <source>Read datagram failed due to: %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="addequip-usage">
-        <location filename="../ClientGUI/clientv2.cpp" line="689"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="705"/>
         <source>Usage: addequip [equipid]</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="develop-invalid-id">
-        <location filename="../ClientGUI/clientv2.cpp" line="696"/>
-        <location filename="../ClientGUI/clientv2.cpp" line="715"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="712"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="731"/>
         <source>Equipment id invalid.</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="develop-usage">
-        <location filename="../ClientGUI/clientv2.cpp" line="708"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="724"/>
         <source>Usage: develop [equipid] [FactorySlot]</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="fetch-usage">
-        <location filename="../ClientGUI/clientv2.cpp" line="753"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="769"/>
         <source>Usage: fetch [FactorySlot]</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="switch-usage">
-        <location filename="../ClientGUI/clientv2.cpp" line="768"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="784"/>
         <source>Usage: switch [gamestate]</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="game-unexpected-state">
-        <location filename="../ClientGUI/clientv2.cpp" line="779"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="795"/>
         <source>Nonexistent gamestate: %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="gamestate-offline">
-        <location filename="../ClientGUI/clientv2.cpp" line="783"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="799"/>
         <source>Use &apos;disconnect&apos; for logout.</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="goodbye-gui">
-        <location filename="../ClientGUI/clientv2.cpp" line="850"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="866"/>
         <source>Goodbye.</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="connected-already">
-        <location filename="../ClientGUI/clientv2.cpp" line="913"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="929"/>
         <source>Already connected, disconnect first.</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="connect-duplicate">
-        <location filename="../ClientGUI/clientv2.cpp" line="918"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="934"/>
         <source>Do not attempt duplicate connections!</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="connect-usage">
-        <location filename="../ClientGUI/clientv2.cpp" line="924"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="940"/>
         <source>Usage: connect [ip] [port]</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="ip-invalid">
-        <location filename="../ClientGUI/clientv2.cpp" line="932"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="948"/>
         <location filename="../Server/server.cpp" line="2807"/>
         <source>IP isn&apos;t valid.</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="port-invalid">
-        <location filename="../ClientGUI/clientv2.cpp" line="939"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="955"/>
         <location filename="../Server/server.cpp" line="2813"/>
         <source>Port isn&apos;t valid, it must fall between 1024 and 49151</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="disconnect-when-offline">
-        <location filename="../ClientGUI/clientv2.cpp" line="961"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="977"/>
         <source>You are not online.</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="disconnect-attempt">
-        <location filename="../ClientGUI/clientv2.cpp" line="967"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="983"/>
         <source>Attempting to disconnect...</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="remote-disconnect">
-        <location filename="../ClientGUI/clientv2.cpp" line="1077"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="1093"/>
         <source>Remote disconnected.</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="logout-success">
-        <location filename="../ClientGUI/clientv2.cpp" line="1159"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="1175"/>
         <source>%1: logout success</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="logout-forced">
-        <location filename="../ClientGUI/clientv2.cpp" line="1164"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="1180"/>
         <source>%1: logged elsewhere, force quitting</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="logout-notonline">
-        <location filename="../ClientGUI/clientv2.cpp" line="1178"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="1194"/>
         <source>%1: logout failure, not online</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="client-bad-json">
-        <location filename="../ClientGUI/clientv2.cpp" line="1189"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="1205"/>
         <source>Client sent a bad JSON.</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="client-unsupported-json">
-        <location filename="../ClientGUI/clientv2.cpp" line="1192"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="1208"/>
         <source>Client sent an unsupported JSON.</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="equip-not-exist">
-        <location filename="../ClientGUI/clientv2.cpp" line="1200"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="1216"/>
         <source>This equipment does not exist.</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="equip-not-developable-father">
-        <location filename="../ClientGUI/clientv2.cpp" line="1208"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="1224"/>
         <source>This equipment requires you to possess %1 (id: %2) in order to develop.</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="equip-not-developable-mother">
-        <location filename="../ClientGUI/clientv2.cpp" line="1218"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="1234"/>
         <source>This equipment requires you to possess extra %3 skillpoints of %1 (id: %2) in order to develop.</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="factory-busy">
-        <location filename="../ClientGUI/clientv2.cpp" line="1228"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="1244"/>
         <source>You have not selected an available factory slot.</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="resource-lack">
-        <location filename="../ClientGUI/clientv2.cpp" line="1232"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="1248"/>
         <source>You do not have sufficient resources.</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="massproduction-disallowed">
-        <location filename="../ClientGUI/clientv2.cpp" line="1236"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="1252"/>
         <source>You have reached possessing limit for this equipment!</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="production-disallowed">
-        <location filename="../ClientGUI/clientv2.cpp" line="1240"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="1256"/>
         <source>This equipment does not allow mass production!</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="equip-develop-failed">
-        <location filename="../ClientGUI/clientv2.cpp" line="1244"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="1260"/>
         <source>Equipment development failed.</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="resource-require">
-        <location filename="../ClientGUI/clientv2.cpp" line="1251"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="1267"/>
         <source>This operation requires %1oil/%2explosives/%3steel/%4rubber/%5aluminum/%6tungsten/%7chromium</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="develop-start">
-        <location filename="../ClientGUI/clientv2.cpp" line="1263"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="1279"/>
         <source>Start developing equipment.</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="fairy-busy">
-        <location filename="../ClientGUI/clientv2.cpp" line="1267"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="1283"/>
         <source>Fairy is still working on %1.</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="factory-empty">
-        <location filename="../ClientGUI/clientv2.cpp" line="1271"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="1287"/>
         <source>Factory slot is empty.</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="develop-penguin">
-        <location filename="../ClientGUI/clientv2.cpp" line="1276"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="1292"/>
         <source>You got a cute penguin.</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="develop-success">
-        <location filename="../ClientGUI/clientv2.cpp" line="1285"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="1301"/>
         <source>You got new equipment %1, serial number %2</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="develop-success-id">
-        <location filename="../ClientGUI/clientv2.cpp" line="1294"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="1310"/>
         <source>You get new equipment with id %1, serial number %2</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="server-hello">
-        <location filename="../ClientGUI/clientv2.cpp" line="1303"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="1319"/>
         <source>Server is alive and responding.</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="client-start">
-        <location filename="../ClientGUI/clientv2.cpp" line="1314"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="1330"/>
         <source>You can now play the game.</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="client-finish">
-        <location filename="../ClientGUI/clientv2.cpp" line="1336"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="1352"/>
         <source>The client can now exit normally.</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="destruct-equip-list">
-        <location filename="../ClientGUI/clientv2.cpp" line="1349"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="1365"/>
         <source>The following equipment are destructed: %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="modernize-ship-list">
-        <location filename="../ClientGUI/clientv2.cpp" line="1364"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="1380"/>
         <source>The following ships are modernized: %1</source>
         <oldsource>The following ship are modernized: %1</oldsource>
         <translation type="unfinished">The following ship are modernized: %1</translation>
     </message>
     <message id="operation-success">
-        <location filename="../ClientGUI/clientv2.cpp" line="1370"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="1386"/>
         <source>Operation success!</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="fleet-size-error">
-        <location filename="../ClientGUI/clientv2.cpp" line="1381"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="1397"/>
         <source>Fleet is oversized or undersized.</source>
         <oldsource>Fleet is oversized.</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message id="fleet-type-error">
-        <location filename="../ClientGUI/clientv2.cpp" line="1385"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="1401"/>
         <source>Fleet does not suit its type.</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="login-success">
-        <location filename="../ClientGUI/clientv2.cpp" line="1402"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="1418"/>
         <source>%1: login success</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="ticket-decrypt-fail">
-        <location filename="../ClientGUI/clientv2.cpp" line="1412"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="1428"/>
         <source>Login failed: cannot decrypt ticket.</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="ticket-incorrect-appid">
-        <location filename="../ClientGUI/clientv2.cpp" line="1414"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="1430"/>
         <source>Login failed: ticket is from incorrect app id.</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="ticket-timeout">
-        <location filename="../ClientGUI/clientv2.cpp" line="1416"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="1432"/>
         <source>Login failed: ticket timeouted.</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="steam-id-invalid">
-        <location filename="../ClientGUI/clientv2.cpp" line="1418"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="1434"/>
         <source>Login failed: steam id is invalid.</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="steam-auth-fail">
-        <location filename="../ClientGUI/clientv2.cpp" line="1420"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="1436"/>
         <source>Login failed: steam authentication failed.</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="login-failed">
-        <location filename="../ClientGUI/clientv2.cpp" line="1424"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="1440"/>
         <source>%1: login failure, reason: %2</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="switch-cert-when-connecting">
-        <location filename="../ClientGUI/clientv2.cpp" line="1597"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="1613"/>
         <location filename="../Server/server.cpp" line="3860"/>
         <source>Switch certificate when connected have no effect.</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="client-pem">
-        <location filename="../ClientGUI/clientv2.cpp" line="1608"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="1624"/>
         <source>Client PEM is now %1.</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="equipment-cache-length">
-        <location filename="../ClientGUI/clientv2.cpp" line="1634"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="1650"/>
         <source>Equipment cache length: %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="map-cache-length">
-        <location filename="../ClientGUI/clientv2.cpp" line="1665"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="1681"/>
         <source>Map cache length: %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="shipment-cache-length">
-        <location filename="../ClientGUI/clientv2.cpp" line="1695"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="1711"/>
         <source>Ship cache length: %1</source>
         <translation type="unfinished"></translation>
     </message>
@@ -982,31 +982,36 @@ Great at battle and bad at politics--so cool!</translation>
     <message id="equip-star">
         <location filename="../ClientGUI/model/equipmodel.cpp" line="382"/>
         <location filename="../ClientGUI/model/equipmodel.cpp" line="490"/>
-        <source>Equipment improvement level</source>
+        <source>Improvement level</source>
+        <oldsource>Equipment improvement level</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message id="equip-attr">
         <location filename="../ClientGUI/model/equipmodel.cpp" line="386"/>
         <location filename="../ClientGUI/model/equipmodel.cpp" line="492"/>
-        <source>Equipment attributes</source>
+        <source>Attributes</source>
+        <oldsource>Equipment attributes</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message id="destruct">
         <location filename="../ClientGUI/model/equipmodel.cpp" line="390"/>
         <location filename="../ClientGUI/model/equipmodel.cpp" line="494"/>
-        <source>Destruct this equipment</source>
+        <source>Destruct</source>
+        <oldsource>Destruct this equipment</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message id="equip-improve">
         <location filename="../ClientGUI/model/equipmodel.cpp" line="394"/>
         <location filename="../ClientGUI/model/equipmodel.cpp" line="496"/>
-        <source>Improve this equipment</source>
+        <source>Improve</source>
+        <oldsource>Improve this equipment</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message id="equip-select">
         <location filename="../ClientGUI/model/equipmodel.cpp" line="398"/>
         <location filename="../ClientGUI/model/equipmodel.cpp" line="498"/>
-        <source>Select this equipment</source>
+        <source>Select</source>
+        <oldsource>Select this equipment</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message id="steam-60-sec">
@@ -1102,7 +1107,7 @@ Great at battle and bad at politics--so cool!</translation>
         <location filename="../ClientGUI/ui/views/equipselect.cpp" line="73"/>
         <location filename="../ClientGUI/ui/navigator.cpp" line="36"/>
         <location filename="../ClientGUI/ui/techview.cpp" line="50"/>
-        <location filename="../ClientGUI/ui/techview.cpp" line="427"/>
+        <location filename="../ClientGUI/ui/techview.cpp" line="426"/>
         <source>All equipments</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1163,13 +1168,14 @@ Great at battle and bad at politics--so cool!</translation>
         <translation type="unfinished"></translation>
     </message>
     <message id="all-nationality">
-        <location filename="../ClientGUI/ui/factory/constructwindow.cpp" line="91"/>
+        <location filename="../ClientGUI/ui/factory/constructwindow.cpp" line="36"/>
+        <location filename="../ClientGUI/ui/factory/constructwindow.cpp" line="153"/>
         <location filename="../ClientGUI/ui/views/shipselect.cpp" line="72"/>
         <location filename="../ClientGUI/ui/views/shipselect.cpp" line="110"/>
         <location filename="../ClientGUI/ui/views/shipselect.cpp" line="120"/>
         <location filename="../ClientGUI/ui/views/shipselect.cpp" line="132"/>
         <location filename="../ClientGUI/ui/techview.cpp" line="56"/>
-        <location filename="../ClientGUI/ui/techview.cpp" line="464"/>
+        <location filename="../ClientGUI/ui/techview.cpp" line="463"/>
         <source>All nationalities</source>
         <oldsource>All nationality</oldsource>
         <translation type="unfinished"></translation>
@@ -1180,38 +1186,38 @@ Great at battle and bad at politics--so cool!</translation>
         <translation type="unfinished"></translation>
     </message>
     <message id="Serial-num">
-        <location filename="../ClientGUI/ui/techview.cpp" line="289"/>
-        <location filename="../ClientGUI/ui/techview.cpp" line="326"/>
-        <location filename="../ClientGUI/ui/techview.cpp" line="391"/>
-        <location filename="../ClientGUI/ui/techview.cpp" line="524"/>
-        <location filename="../ClientGUI/ui/techview.cpp" line="528"/>
+        <location filename="../ClientGUI/ui/techview.cpp" line="288"/>
+        <location filename="../ClientGUI/ui/techview.cpp" line="325"/>
+        <location filename="../ClientGUI/ui/techview.cpp" line="389"/>
+        <location filename="../ClientGUI/ui/techview.cpp" line="519"/>
+        <location filename="../ClientGUI/ui/techview.cpp" line="523"/>
         <source>Serial Num</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="Equip-name-def">
-        <location filename="../ClientGUI/ui/techview.cpp" line="291"/>
-        <location filename="../ClientGUI/ui/techview.cpp" line="326"/>
-        <location filename="../ClientGUI/ui/techview.cpp" line="391"/>
-        <location filename="../ClientGUI/ui/techview.cpp" line="524"/>
-        <location filename="../ClientGUI/ui/techview.cpp" line="528"/>
+        <location filename="../ClientGUI/ui/techview.cpp" line="290"/>
+        <location filename="../ClientGUI/ui/techview.cpp" line="325"/>
+        <location filename="../ClientGUI/ui/techview.cpp" line="389"/>
+        <location filename="../ClientGUI/ui/techview.cpp" line="519"/>
+        <location filename="../ClientGUI/ui/techview.cpp" line="523"/>
         <source>Name</source>
         <translation type="unfinished">Name</translation>
     </message>
     <message id="Equip-tech-level">
-        <location filename="../ClientGUI/ui/techview.cpp" line="293"/>
-        <location filename="../ClientGUI/ui/techview.cpp" line="327"/>
-        <location filename="../ClientGUI/ui/techview.cpp" line="392"/>
-        <location filename="../ClientGUI/ui/techview.cpp" line="525"/>
-        <location filename="../ClientGUI/ui/techview.cpp" line="529"/>
+        <location filename="../ClientGUI/ui/techview.cpp" line="292"/>
+        <location filename="../ClientGUI/ui/techview.cpp" line="326"/>
+        <location filename="../ClientGUI/ui/techview.cpp" line="390"/>
+        <location filename="../ClientGUI/ui/techview.cpp" line="520"/>
+        <location filename="../ClientGUI/ui/techview.cpp" line="524"/>
         <source>Tech</source>
         <translation>Tech</translation>
     </message>
     <message id="Weight">
-        <location filename="../ClientGUI/ui/techview.cpp" line="295"/>
-        <location filename="../ClientGUI/ui/techview.cpp" line="327"/>
-        <location filename="../ClientGUI/ui/techview.cpp" line="392"/>
-        <location filename="../ClientGUI/ui/techview.cpp" line="525"/>
-        <location filename="../ClientGUI/ui/techview.cpp" line="529"/>
+        <location filename="../ClientGUI/ui/techview.cpp" line="294"/>
+        <location filename="../ClientGUI/ui/techview.cpp" line="326"/>
+        <location filename="../ClientGUI/ui/techview.cpp" line="390"/>
+        <location filename="../ClientGUI/ui/techview.cpp" line="520"/>
+        <location filename="../ClientGUI/ui/techview.cpp" line="524"/>
         <source>Weight</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2216,84 +2222,90 @@ Great at battle and bad at politics--so cool!</translation>
         <translation type="unfinished"></translation>
     </message>
     <message id="ship-local-name-lack">
-        <location filename="../Protocol/ship.cpp" line="27"/>
-        <location filename="../Protocol/ship.cpp" line="44"/>
-        <location filename="../Protocol/ship.cpp" line="61"/>
+        <location filename="../Protocol/ship.cpp" line="25"/>
+        <location filename="../Protocol/ship.cpp" line="42"/>
+        <location filename="../Protocol/ship.cpp" line="59"/>
         <source>Local language (%1) for ship name not found!</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="ship-attr-lack">
-        <location filename="../Protocol/ship.cpp" line="77"/>
+        <location filename="../Protocol/ship.cpp" line="75"/>
         <source>Fetch ship attributes failure!</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="remodel-nonexistent">
-        <location filename="../Protocol/ship.cpp" line="166"/>
+        <location filename="../Protocol/ship.cpp" line="164"/>
         <source>Remodel target %1 does not exist!</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="all-shiptypes">
-        <location filename="../ClientGUI/model/shipbpmodel.cpp" line="226"/>
+        <location filename="../ClientGUI/model/shipbpmodel.cpp" line="221"/>
         <location filename="../ClientGUI/model/shipmodel.cpp" line="37"/>
-        <location filename="../ClientGUI/ui/factory/constructwindow.cpp" line="27"/>
+        <location filename="../ClientGUI/ui/factory/constructwindow.cpp" line="40"/>
+        <location filename="../ClientGUI/ui/factory/constructwindow.cpp" line="66"/>
+        <location filename="../ClientGUI/ui/factory/constructwindow.cpp" line="84"/>
+        <location filename="../ClientGUI/ui/factory/constructwindow.cpp" line="127"/>
         <location filename="../ClientGUI/ui/views/shipselect.cpp" line="123"/>
         <location filename="../ClientGUI/ui/views/shipselect.cpp" line="135"/>
         <source>All ship types</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="all-shipclasses">
-        <location filename="../ClientGUI/model/shipbpmodel.cpp" line="228"/>
+        <location filename="../ClientGUI/model/shipbpmodel.cpp" line="223"/>
         <location filename="../ClientGUI/model/shipmodel.cpp" line="39"/>
-        <location filename="../ClientGUI/ui/factory/constructwindow.cpp" line="29"/>
+        <location filename="../ClientGUI/ui/factory/constructwindow.cpp" line="44"/>
+        <location filename="../ClientGUI/ui/factory/constructwindow.cpp" line="68"/>
+        <location filename="../ClientGUI/ui/factory/constructwindow.cpp" line="105"/>
+        <location filename="../ClientGUI/ui/factory/constructwindow.cpp" line="141"/>
         <location filename="../ClientGUI/ui/views/shipselect.cpp" line="138"/>
         <source>All ship classes</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="fleet-idle">
-        <location filename="../ClientGUI/model/shipmodel.cpp" line="282"/>
+        <location filename="../ClientGUI/model/shipmodel.cpp" line="277"/>
         <source>Idle</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="ship-uuid">
-        <location filename="../ClientGUI/model/shipmodel.cpp" line="308"/>
-        <location filename="../ClientGUI/model/shipmodel.cpp" line="447"/>
+        <location filename="../ClientGUI/model/shipmodel.cpp" line="303"/>
+        <location filename="../ClientGUI/model/shipmodel.cpp" line="442"/>
         <source>UUID</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="ship-name">
-        <location filename="../ClientGUI/model/shipbpmodel.cpp" line="122"/>
-        <location filename="../ClientGUI/model/shipbpmodel.cpp" line="183"/>
-        <location filename="../ClientGUI/model/shipmodel.cpp" line="312"/>
-        <location filename="../ClientGUI/model/shipmodel.cpp" line="450"/>
+        <location filename="../ClientGUI/model/shipbpmodel.cpp" line="117"/>
+        <location filename="../ClientGUI/model/shipbpmodel.cpp" line="178"/>
+        <location filename="../ClientGUI/model/shipmodel.cpp" line="307"/>
+        <location filename="../ClientGUI/model/shipmodel.cpp" line="445"/>
         <source>Name</source>
         <translation>Name</translation>
     </message>
     <message id="bp-amount">
-        <location filename="../ClientGUI/model/shipbpmodel.cpp" line="125"/>
-        <location filename="../ClientGUI/model/shipbpmodel.cpp" line="187"/>
+        <location filename="../ClientGUI/model/shipbpmodel.cpp" line="120"/>
+        <location filename="../ClientGUI/model/shipbpmodel.cpp" line="182"/>
         <source>Amount</source>
         <translation>Amount</translation>
     </message>
     <message id="ship-star">
-        <location filename="../ClientGUI/model/shipmodel.cpp" line="316"/>
-        <location filename="../ClientGUI/model/shipmodel.cpp" line="454"/>
+        <location filename="../ClientGUI/model/shipmodel.cpp" line="311"/>
+        <location filename="../ClientGUI/model/shipmodel.cpp" line="449"/>
         <source>Modernization</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="ship-improve">
-        <location filename="../ClientGUI/model/shipmodel.cpp" line="320"/>
-        <location filename="../ClientGUI/model/shipmodel.cpp" line="457"/>
+        <location filename="../ClientGUI/model/shipmodel.cpp" line="315"/>
+        <location filename="../ClientGUI/model/shipmodel.cpp" line="452"/>
         <source>Modernize</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="ship-star-whatsthis">
-        <location filename="../ClientGUI/model/shipmodel.cpp" line="435"/>
+        <location filename="../ClientGUI/model/shipmodel.cpp" line="430"/>
         <source>Modernization/Maximum Modernization</source>
         <translation>Modernization/Maximum Modernization</translation>
     </message>
     <message id="ship-select">
-        <location filename="../ClientGUI/model/shipmodel.cpp" line="324"/>
-        <location filename="../ClientGUI/model/shipmodel.cpp" line="460"/>
+        <location filename="../ClientGUI/model/shipmodel.cpp" line="319"/>
+        <location filename="../ClientGUI/model/shipmodel.cpp" line="455"/>
         <source>Select this</source>
         <oldsource>Select</oldsource>
         <translation type="unfinished"></translation>
@@ -2304,26 +2316,26 @@ Great at battle and bad at politics--so cool!</translation>
         <translation type="unfinished"></translation>
     </message>
     <message id="ship-hp">
-        <location filename="../ClientGUI/model/shipmodel.cpp" line="328"/>
-        <location filename="../ClientGUI/model/shipmodel.cpp" line="463"/>
+        <location filename="../ClientGUI/model/shipmodel.cpp" line="323"/>
+        <location filename="../ClientGUI/model/shipmodel.cpp" line="458"/>
         <source>HP</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="ship-cond">
-        <location filename="../ClientGUI/model/shipmodel.cpp" line="332"/>
-        <location filename="../ClientGUI/model/shipmodel.cpp" line="466"/>
+        <location filename="../ClientGUI/model/shipmodel.cpp" line="327"/>
+        <location filename="../ClientGUI/model/shipmodel.cpp" line="461"/>
         <source>Cond.</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="ship-lv">
-        <location filename="../ClientGUI/model/shipmodel.cpp" line="336"/>
-        <location filename="../ClientGUI/model/shipmodel.cpp" line="469"/>
+        <location filename="../ClientGUI/model/shipmodel.cpp" line="331"/>
+        <location filename="../ClientGUI/model/shipmodel.cpp" line="464"/>
         <source>Level</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="ship-pos">
-        <location filename="../ClientGUI/model/shipmodel.cpp" line="340"/>
-        <location filename="../ClientGUI/model/shipmodel.cpp" line="472"/>
+        <location filename="../ClientGUI/model/shipmodel.cpp" line="335"/>
+        <location filename="../ClientGUI/model/shipmodel.cpp" line="467"/>
         <source>Position</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2360,12 +2372,12 @@ Great at battle and bad at politics--so cool!</translation>
         <translation type="unfinished"></translation>
     </message>
     <message id="download-success">
-        <location filename="../ClientGUI/resourcefetch.cpp" line="128"/>
+        <location filename="../ClientGUI/resourcefetch.cpp" line="129"/>
         <source>Downloaded %1 bytes to %2 in %3</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="ssl-errors">
-        <location filename="../ClientGUI/resourcefetch.cpp" line="158"/>
+        <location filename="../ClientGUI/resourcefetch.cpp" line="159"/>
         <source>One or more TLS errors has occurred: %1</source>
         <translation type="unfinished"></translation>
     </message>

@@ -10,6 +10,7 @@
 |        client/mapdbtimestamp         |               dynamic               |                                                              |
 |     networkclient/retransmitmax      |                  2                  |                    Client retransmit time                    |
 |  networkclient/connectwaittimemsec   |                8000                 |                                                              |
+|  networkclient/downloadwaittimemsec  |                80000                |                                                              |
 |          networkclient/pem           |           :/harusoft.pem            |                           Embedded                           |
 |    networkclient/autopasswordtime    |                1000                 |                                                              |
 |     networkclient/requestEATCall     | datetime at last successful attempt |                                                              |

@@ -120,6 +120,7 @@ void ResourceFetch::httpFinished()
             //% "Download failed: %1"
             qCritical() << qtTrId("download-failed").arg(errorString);
         }
+        QTimer::singleShot(100, this, [this](){emit finished();});
         return;
     }
     //! [networkreply-error-handling-2]
@@ -128,7 +129,7 @@ void ResourceFetch::httpFinished()
     qInfo() << qtTrId("download-success")
                    .arg(fi.size())
                    .arg(fi.fileName(), QDir::toNativeSeparators(fi.absolutePath()));
-    emit finished();
+    QTimer::singleShot(100, this, [this](){emit finished();});
 }
 
 //! [networkreply-readyread-2]

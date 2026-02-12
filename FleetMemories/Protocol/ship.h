@@ -5,6 +5,9 @@
 #include <QMap>
 #include <QUuid>
 #include "shiptype.h"
+#include <QSettings>
+
+extern std::unique_ptr<QSettings> settings;
 
 class Ship : public QObject
 {
@@ -15,7 +18,8 @@ public:
 
     int operator<=>(const Ship &) const;
     bool isNotEqual(const Ship &) const;
-    QString toString(QString) const;
+    QString toString(QString lang = settings->value("client/language", "ja_JP")
+                           .toString()) const;
 
     const ResOrd consRes() const;
     const int consTimeInSec() const;

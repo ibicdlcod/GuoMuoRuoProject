@@ -378,23 +378,23 @@ QVariant EquipModel::data(const QModelIndex &index, int role) const {
             return qtTrId("equip-name");
         }
         else if(index.column() == starCol) {
-            //% "Equipment improvement level"
+            //% "Improvement level"
             return qtTrId("equip-star");
         }
         else if(index.column() == attrCol) {
-            //% "Equipment attributes"
+            //% "Attributes"
             return qtTrId("equip-attr");
         }
         else if(index.column() == destructColumn()) {
-            //% "Destruct this equipment"
+            //% "Destruct"
             return qtTrId("destruct");
         }
         else if(index.column() == addStarColumn()) {
-            //% "Improve this equipment"
+            //% "Improve"
             return qtTrId("equip-improve");
         }
         else if(index.column() == selectColumn()) {
-            //% "Select this equipment"
+            //% "Select"
             return qtTrId("equip-select");
         }
         else

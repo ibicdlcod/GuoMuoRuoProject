@@ -508,39 +508,55 @@ void Clientv2::tsunkitAssets() {
     for(auto equip: std::as_const(equipRegistryCache)) {
         iconGroups.insert(equip->type.iconGroup());
     }
+    downloadRequired = iconGroups.size();
     for(auto iconGroup: iconGroups)  {
-        resourceFetcher.downloadFile(
+        ResourceFetch *resourceFetcher = new ResourceFetch();
+        resourceFetcher->downloadFile(
             QString("https://tsunkit.net/api/assets/images/equipTypeIcons/%1").arg(iconGroup),
             QString("%1.png").arg(iconGroup),
             QStringLiteral("equipTypeIcons/"));
-        QEventLoop loop;
 
         // Connect the signal you're waiting for to the QEventLoop::quit slot
-        connect(&resourceFetcher, &ResourceFetch::finished, &loop, &QEventLoop::quit);
-
-        loop.exec();
+        connect(resourceFetcher, &ResourceFetch::finished, this, [this]()
+                {
+            downloadCompleted += 1;
+            QObject::sender()->deleteLater();
+            if(downloadCompleted == downloadRequired) {
+                downloadCompleted = 0;
+                tsunkitAssets2();
+            }
+        });
     }
+}
+
+void Clientv2::tsunkitAssets2() {
     QSet<int> oldInternalIDs;
     for(auto ship: std::as_const(shipRegistryCache)) {
         oldInternalIDs.insert(ship->attr["OldInternalNo."]);
     }
+    downloadRequired = oldInternalIDs.size();
     for(auto oldInternalID: oldInternalIDs)  {
         if(oldInternalID == 0) {
+            downloadRequired -= 1;
             continue;
         }
-        resourceFetcher.downloadFile(
+        ResourceFetch *resourceFetcher = new ResourceFetch();
+        resourceFetcher->downloadFile(
             QString("https://tsunkit.net/api/assets/images/shipIcons/%1_100").arg(oldInternalID),
             QString("%1.png").arg(oldInternalID),
             QStringLiteral("shipIcons/"));
-        QEventLoop loop;
 
-        // Connect the signal you're waiting for to the QEventLoop::quit slot
-        connect(&resourceFetcher, &ResourceFetch::finished, &loop, &QEventLoop::quit);
-
-        loop.exec();
+        connect(resourceFetcher, &ResourceFetch::finished, this, [this]()
+                {
+                    downloadCompleted += 1;
+                    QObject::sender()->deleteLater();
+                    if(downloadCompleted == downloadRequired) {
+                        downloadCompleted = 0;
+                        qInfo() << "Download success!";
+                        emit tsunkitAssetsComplete();
+                    }
+                });
     }
-    qInfo() << "Download success!";
-    emit tsunkitAssetsComplete();
 }
 
 /* Refresh UI? */
@@ -1569,7 +1585,7 @@ void Clientv2::sendTestMessages() {
         // Connect the signal you're waiting for to the QEventLoop::quit slot
         connect(&resourceFetcher, &ResourceFetch::finished, &loop, &QEventLoop::quit);
 
-        timer.start(50000); // 5-second timeout
+        timer.start(settings->value("networkclient/downloadwaittimemsec", 80000).toInt());
 
         loop.exec();
     }

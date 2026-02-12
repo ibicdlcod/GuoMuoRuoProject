@@ -60,6 +60,7 @@ protected:
     virtual void customSort() override;
     virtual int numberOfColumns() const override;
     virtual int numberOfShip() const;
+    QHash<int, int> bpCache;
 
 private:
     void clearShipCheckBoxes();
@@ -67,7 +68,6 @@ private:
     QHash<QUuid, Ship *> clientShips;
     QHash<QUuid, ShipDynamic *> clientShipDynamicAttrs;
     QList<QUuid> sortedShipIds; // not sort by uuid but equiptype
-    QHash<int, int> bpCache;
     QHash<QUuid, bool> isModernizationChecked;
 };
 

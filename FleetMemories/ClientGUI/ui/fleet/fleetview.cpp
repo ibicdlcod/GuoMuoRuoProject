@@ -295,12 +295,7 @@ void FleetView::modifyFleetShip(int posIndex, QUuid uid) {
             auto oldLvText = qobject_cast<ShipDisplay *>
                 (grid->itemAtPosition(oldPos.posindex + 1, lvColumn)->widget());
             if(!oldUid.isNull()) {
-                QString oldName
-                    = ship->toString(
-                        settings->value("client/language", "ja_JP").toString());
-                if(oldName.isEmpty()) {
-                    oldName = ship->toString("ja_JP");
-                }
+                QString oldName = ship->toString();
                 oldText->setText(oldName);
                 oldLvText->show();
                 oldLvText->setContent(shipD->currentHP, ship->attr["Hitpoints"],
@@ -364,12 +359,7 @@ void FleetView::modifyFleetShip(int posIndex, QUuid uid) {
     if(!uid.isNull()) {
         shipD->fleetIndex = newPos.fleetindex;
         shipD->fleetPosIndex = newPos.posindex;
-        QString newName = ship->toString(settings
-                                             ->value("client/language", "ja_JP")
-                                             .toString());
-        if(newName.isEmpty()) {
-            newName = ship->toString("ja_JP");
-        }
+        QString newName = ship->toString();
         newText->setText(newName);
         QFont font = newText->font();
         int fontSize = 1;

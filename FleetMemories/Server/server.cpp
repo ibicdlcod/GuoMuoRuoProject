@@ -1764,7 +1764,7 @@ void Server::generateEquipChilds(int originalChild, int thisEquip) {
 
 void Server::generateTestEquip(const CSteamID &uid) {
     deleteTestEquip(uid);
-    static const double difficulty = 1.0; // higher the value is easier
+    static const double difficulty = 100.0; // higher the value is easier
     std::uniform_real_distribution dist{0.0, 1.0};
     std::uniform_int_distribution dist2{0, 15};
     for(auto equip: std::as_const(equipRegistry)) {
@@ -3444,7 +3444,7 @@ void Server::sendTestMessages() {
             }
         }*/
         for(auto user: connectedUsers)
-            generateTestShip(user);
+            generateTestEquip(user);
         /*
         for(auto equip: std::as_const(equipRegistry)) {
             if(equip->type.isCarrierPlane()) {

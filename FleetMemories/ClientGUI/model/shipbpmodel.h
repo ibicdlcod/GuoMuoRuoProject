@@ -2,11 +2,14 @@
 #define SHIPBPMODEL_H
 
 #include "shipmodel.h"
+#include "../ui/factory/constructwindow.h"
 
 class ShipBPModel : public ShipModel
 {
     Q_OBJECT
 public:
+    friend void ConstructWindow::switchDisplay(int);
+
     explicit ShipBPModel(QObject *parent = nullptr);
     virtual void updateShipList(const QJsonObject &) override;
 
@@ -16,6 +19,9 @@ public:
                                 int role = Qt::DisplayRole) const override;
     virtual int hiddenSortColumn() const override;
     const QHash<int, int> getClientShipBPs() const;
+
+signals:
+    void bpReady();
 
 public slots:
     virtual void switchShipDisplayType(const QString &nationality,
@@ -31,6 +37,7 @@ protected:
 
 private:
     virtual int numberOfShip() const override;
+    /* shipDef, amount */
     QHash<int, int> clientShipBPs;
     QList<int> sortedShipBPIds;
 
