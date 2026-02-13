@@ -135,6 +135,10 @@ void FactoryArea::doFactoryRefresh(const QJsonObject &input) {
     }
 }
 
+KP::FactoryState FactoryArea::getState() const {
+    return factoryState;
+}
+
 void FactoryArea::setState(KP::FactoryState state) {
     factoryState = state;
 }

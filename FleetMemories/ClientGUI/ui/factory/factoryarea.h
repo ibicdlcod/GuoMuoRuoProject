@@ -23,6 +23,7 @@ public:
     explicit FactoryArea(QWidget *parent = nullptr);
     ~FactoryArea();
 
+    KP::FactoryState getState() const;
     void setState(KP::FactoryState);
     void switchToState();
 

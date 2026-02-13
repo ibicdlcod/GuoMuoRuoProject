@@ -67,12 +67,11 @@ void ShipModel::switchShipDisplayType(const QString &nationality,
             if(shiptype.isEmpty() && shipclass.isEmpty()) {
                 if(pass) {
                     QString type = iter->second->getType().toString();
-                    if(!typePasses.contains(type)) {
+                    if(!typePasses.contains(type) && true/*type != qtTrId("all-shiptypes")*/) {
                         typePasses.append(type);
                     }
                 }
             }
-
             /* type check */
             if(!shiptype.isEmpty() &&
                 iter->second->getType().toString().localeAwareCompare(
@@ -88,7 +87,7 @@ void ShipModel::switchShipDisplayType(const QString &nationality,
             }
             if(shipclass.isEmpty()) {
                 if(pass) {
-                    if(!classPasses.contains(classText)) {
+                    if(!classPasses.contains(classText) && true/*classText != qtTrId("all-shipclasses")*/) {
                         classPasses.append(classText);
                     }
                 }
@@ -107,7 +106,7 @@ void ShipModel::switchShipDisplayType(const QString &nationality,
     if(searchTerm.isEmpty() && shiptype.isEmpty() && shipclass.isEmpty()) {
         emit typeBoxHint(typePasses);
     }
-    if(searchTerm.isEmpty() && shipclass.isEmpty()) {
+    else if(searchTerm.isEmpty() && shipclass.isEmpty()) {
         emit classBoxHint(classPasses);
     }
     customSort();

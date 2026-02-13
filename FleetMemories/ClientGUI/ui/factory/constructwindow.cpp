@@ -194,4 +194,5 @@ void ConstructWindow::shipNameChanged(int) {
     qCritical() << ship->toString();
     qWarning() << ship->getId();
     qInfo() << ship->attr["Equipslots"];
+    ui->equip1->setModel(&engine.equipModel);
 }

@@ -292,7 +292,7 @@ void ShipBPModel::switchShipDisplayType(const QString &nationality,
     if(searchTerm.isEmpty() && shiptype.isEmpty() && shipclass.isEmpty()) {
         emit typeBoxHint(typePasses);
     }
-    if(searchTerm.isEmpty() && shipclass.isEmpty()) {
+    else if(searchTerm.isEmpty() && shipclass.isEmpty()) {
         emit classBoxHint(classPasses);
     }
     customSort();

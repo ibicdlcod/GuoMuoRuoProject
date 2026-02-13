@@ -5,6 +5,7 @@
 #include <QStyleHints>
 #include "../clientv2.h"
 #include "../equipicon.h"
+#include "../ui/mainwindow.h"
 
 extern std::unique_ptr<QSettings> settings;
 
@@ -20,6 +21,26 @@ EquipModel::EquipModel(QObject *parent, bool isInArsenal)
             this, &EquipModel::updateIllegalPage);
     connect(this, &EquipModel::pageNumChanged,
             this, [this](int, int){clearCheckBoxes();});
+
+    /* fix rowCount = 1 bug */
+    QTimer *timer = new QTimer(this);
+    connect(timer, &QTimer::timeout, this, [this]()
+            {
+                if(rowCount() == 1) {
+                    for(auto *widget: QApplication::topLevelWidgets()) {
+                        if(qobject_cast<MainWindow *>(widget)) {
+                            MainWindow *mainWindow = qobject_cast<MainWindow *>(widget);
+                            auto geo = mainWindow->geometry();
+                            auto tempGeo = geo;
+                            tempGeo.setRect(tempGeo.x(), tempGeo.y(),
+                                            tempGeo.width(), tempGeo.height()-1);
+                            mainWindow->setGeometry(tempGeo);
+                            mainWindow->setGeometry(geo);
+                        }
+                    }
+                }
+    });
+    timer->start(100);
 }
 
 std::tuple<Equipment *, int> EquipModel::getEquip(QUuid euid) {
