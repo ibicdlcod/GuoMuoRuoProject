@@ -24,6 +24,10 @@ std::tuple<Ship *, ShipDynamic *> ShipModel::getShip(QUuid id) {
     return {clientShips[id], clientShipDynamicAttrs[id]};
 }
 
+QHash<QUuid, Ship *> ShipModel::getAllShips() {
+    return clientShips;
+}
+
 void ShipModel::switchShipDisplayType(const QString &nationality,
                                       const QString &shiptype,
                                       const QString &shipclass,

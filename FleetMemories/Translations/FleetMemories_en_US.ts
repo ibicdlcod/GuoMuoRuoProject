@@ -968,48 +968,49 @@ Great at battle and bad at politics--so cool!</translation>
         <translation type="unfinished"></translation>
     </message>
     <message id="equip-uuid">
-        <location filename="../ClientGUI/model/equipmodel.cpp" line="395"/>
-        <location filename="../ClientGUI/model/equipmodel.cpp" line="507"/>
+        <location filename="../ClientGUI/model/equipmodel.cpp" line="402"/>
+        <location filename="../ClientGUI/model/equipmodel.cpp" line="514"/>
+        <location filename="../ClientGUI/model/specequipmodel.cpp" line="55"/>
         <source>Equipment UUID</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="equip-name">
-        <location filename="../ClientGUI/model/equipmodel.cpp" line="399"/>
-        <location filename="../ClientGUI/model/equipmodel.cpp" line="509"/>
+        <location filename="../ClientGUI/model/equipmodel.cpp" line="406"/>
+        <location filename="../ClientGUI/model/equipmodel.cpp" line="516"/>
         <source>Equipment name</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="equip-star">
-        <location filename="../ClientGUI/model/equipmodel.cpp" line="403"/>
-        <location filename="../ClientGUI/model/equipmodel.cpp" line="511"/>
+        <location filename="../ClientGUI/model/equipmodel.cpp" line="410"/>
+        <location filename="../ClientGUI/model/equipmodel.cpp" line="518"/>
         <source>Improvement level</source>
         <oldsource>Equipment improvement level</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message id="equip-attr">
-        <location filename="../ClientGUI/model/equipmodel.cpp" line="407"/>
-        <location filename="../ClientGUI/model/equipmodel.cpp" line="513"/>
+        <location filename="../ClientGUI/model/equipmodel.cpp" line="414"/>
+        <location filename="../ClientGUI/model/equipmodel.cpp" line="520"/>
         <source>Attributes</source>
         <oldsource>Equipment attributes</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message id="destruct">
-        <location filename="../ClientGUI/model/equipmodel.cpp" line="411"/>
-        <location filename="../ClientGUI/model/equipmodel.cpp" line="515"/>
+        <location filename="../ClientGUI/model/equipmodel.cpp" line="418"/>
+        <location filename="../ClientGUI/model/equipmodel.cpp" line="522"/>
         <source>Destruct</source>
         <oldsource>Destruct this equipment</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message id="equip-improve">
-        <location filename="../ClientGUI/model/equipmodel.cpp" line="415"/>
-        <location filename="../ClientGUI/model/equipmodel.cpp" line="517"/>
+        <location filename="../ClientGUI/model/equipmodel.cpp" line="422"/>
+        <location filename="../ClientGUI/model/equipmodel.cpp" line="524"/>
         <source>Improve</source>
         <oldsource>Improve this equipment</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message id="equip-select">
-        <location filename="../ClientGUI/model/equipmodel.cpp" line="419"/>
-        <location filename="../ClientGUI/model/equipmodel.cpp" line="519"/>
+        <location filename="../ClientGUI/model/equipmodel.cpp" line="426"/>
+        <location filename="../ClientGUI/model/equipmodel.cpp" line="526"/>
         <source>Select</source>
         <oldsource>Select this equipment</oldsource>
         <translation type="unfinished"></translation>
@@ -1168,8 +1169,8 @@ Great at battle and bad at politics--so cool!</translation>
         <translation type="unfinished"></translation>
     </message>
     <message id="all-nationality">
-        <location filename="../ClientGUI/ui/factory/constructwindow.cpp" line="38"/>
-        <location filename="../ClientGUI/ui/factory/constructwindow.cpp" line="180"/>
+        <location filename="../ClientGUI/ui/factory/constructwindow.cpp" line="44"/>
+        <location filename="../ClientGUI/ui/factory/constructwindow.cpp" line="200"/>
         <location filename="../ClientGUI/ui/views/shipselect.cpp" line="77"/>
         <location filename="../ClientGUI/ui/views/shipselect.cpp" line="115"/>
         <location filename="../ClientGUI/ui/views/shipselect.cpp" line="125"/>
@@ -1181,9 +1182,14 @@ Great at battle and bad at politics--so cool!</translation>
         <translation type="unfinished"></translation>
     </message>
     <message id="wait-for-blueprint">
-        <location filename="../ClientGUI/ui/factory/constructwindow.cpp" line="54"/>
+        <location filename="../ClientGUI/ui/factory/constructwindow.cpp" line="60"/>
         <source>Fetching ship blueprint data, please wait...</source>
         <translation>Fetching ship blueprint data, please wait...</translation>
+    </message>
+    <message id="wait-for-equip">
+        <location filename="../ClientGUI/ui/factory/constructwindow.cpp" line="72"/>
+        <source>Fetching equipment data, please wait...</source>
+        <translation type="unfinished"></translation>
     </message>
     <message id="techview-toequip">
         <location filename="../ClientGUI/ui/techview.cpp" line="174"/>
@@ -2058,139 +2064,139 @@ Great at battle and bad at politics--so cool!</translation>
         <translation type="unfinished"></translation>
     </message>
     <message id="equip-attr-tech">
-        <location filename="../Protocol/equipment.h" line="17"/>
+        <location filename="../Protocol/equipment.h" line="20"/>
         <source>Tech</source>
         <translation>Technology</translation>
     </message>
     <message id="equip-attr-father">
-        <location filename="../Protocol/equipment.h" line="19"/>
+        <location filename="../Protocol/equipment.h" line="22"/>
         <source>Precedent</source>
         <translation>Precedent</translation>
     </message>
     <message id="equip-attr-father2">
-        <location filename="../Protocol/equipment.h" line="21"/>
+        <location filename="../Protocol/equipment.h" line="24"/>
         <source>Precedent 2</source>
         <translation>Precedent 2</translation>
     </message>
     <message id="equip-attr-mother">
-        <location filename="../Protocol/equipment.h" line="23"/>
+        <location filename="../Protocol/equipment.h" line="26"/>
         <source>Skill points pool</source>
         <translation>Skill points pool</translation>
     </message>
     <message id="equip-attr-disallowmassproduction">
-        <location filename="../Protocol/equipment.h" line="25"/>
+        <location filename="../Protocol/equipment.h" line="28"/>
         <source>Possessing limit</source>
         <translation>Possessing limit</translation>
     </message>
     <message id="equip-attr-hitpoints">
-        <location filename="../Protocol/equipment.h" line="27"/>
+        <location filename="../Protocol/equipment.h" line="30"/>
         <source>Hitpoints</source>
         <translation>Hitpoints</translation>
     </message>
     <message id="equip-attr-firepower">
-        <location filename="../Protocol/equipment.h" line="29"/>
+        <location filename="../Protocol/equipment.h" line="32"/>
         <source>Firepower</source>
         <translation>Firepower</translation>
     </message>
     <message id="equip-attr-armor">
-        <location filename="../Protocol/equipment.h" line="31"/>
+        <location filename="../Protocol/equipment.h" line="34"/>
         <source>Armor</source>
         <translation>Armor</translation>
     </message>
     <message id="equip-attr-armorpenetration">
-        <location filename="../Protocol/equipment.h" line="33"/>
+        <location filename="../Protocol/equipment.h" line="36"/>
         <source>AP</source>
         <translation>AP</translation>
     </message>
     <message id="equip-attr-accuracy">
-        <location filename="../Protocol/equipment.h" line="35"/>
+        <location filename="../Protocol/equipment.h" line="38"/>
         <source>Accuracy</source>
         <translation>Accuracy</translation>
     </message>
     <message id="equip-attr-torpedoaccuracy">
-        <location filename="../Protocol/equipment.h" line="37"/>
+        <location filename="../Protocol/equipment.h" line="40"/>
         <source>Accuracy(torp)</source>
         <translation>Accuracy(torp)</translation>
     </message>
     <message id="equip-attr-evasion">
-        <location filename="../Protocol/equipment.h" line="39"/>
+        <location filename="../Protocol/equipment.h" line="42"/>
         <source>Evasion</source>
         <translation>Evasion</translation>
     </message>
     <message id="equip-attr-los">
-        <location filename="../Protocol/equipment.h" line="41"/>
+        <location filename="../Protocol/equipment.h" line="44"/>
         <source>LOS</source>
         <translation>LOS</translation>
     </message>
     <message id="equip-attr-concealment">
-        <location filename="../Protocol/equipment.h" line="43"/>
+        <location filename="../Protocol/equipment.h" line="46"/>
         <source>Concealment</source>
         <translation>Concealment</translation>
     </message>
     <message id="equip-attr-firingrange">
-        <location filename="../Protocol/equipment.h" line="45"/>
+        <location filename="../Protocol/equipment.h" line="48"/>
         <source>Firing range</source>
         <translation>Firing range</translation>
     </message>
     <message id="equip-attr-firingspeed">
-        <location filename="../Protocol/equipment.h" line="47"/>
+        <location filename="../Protocol/equipment.h" line="50"/>
         <source>Firing speed</source>
         <translation>Firing speed</translation>
     </message>
     <message id="equip-attr-speed">
-        <location filename="../Protocol/equipment.h" line="49"/>
+        <location filename="../Protocol/equipment.h" line="52"/>
         <source>Ship speed</source>
         <translation>Ship speed</translation>
     </message>
     <message id="equip-attr-torpedo">
-        <location filename="../Protocol/equipment.h" line="51"/>
+        <location filename="../Protocol/equipment.h" line="54"/>
         <source>Torpedo</source>
         <translation>Torpedo</translation>
     </message>
     <message id="equip-attr-airtorpedo">
-        <location filename="../Protocol/equipment.h" line="53"/>
+        <location filename="../Protocol/equipment.h" line="56"/>
         <source>Torpedo(air)</source>
         <translation>Torpedo(air)</translation>
     </message>
     <message id="equip-attr-bombing">
-        <location filename="../Protocol/equipment.h" line="55"/>
+        <location filename="../Protocol/equipment.h" line="58"/>
         <source>Bombing</source>
         <translation>Bombing</translation>
     </message>
     <message id="equip-attr-antiair">
-        <location filename="../Protocol/equipment.h" line="57"/>
+        <location filename="../Protocol/equipment.h" line="60"/>
         <source>Anti-air</source>
         <translation>Anti-air</translation>
     </message>
     <message id="equip-attr-asw">
-        <location filename="../Protocol/equipment.h" line="59"/>
+        <location filename="../Protocol/equipment.h" line="62"/>
         <source>ASW</source>
         <translation>ASW</translation>
     </message>
     <message id="equip-attr-interception">
-        <location filename="../Protocol/equipment.h" line="61"/>
+        <location filename="../Protocol/equipment.h" line="64"/>
         <source>Interception</source>
         <translation>Interception</translation>
     </message>
     <message id="equip-attr-antibomber">
-        <location filename="../Protocol/equipment.h" line="63"/>
+        <location filename="../Protocol/equipment.h" line="66"/>
         <source>Anti-bomber</source>
         <oldsource>Anti bomber</oldsource>
         <translation>Anti-bomber</translation>
     </message>
     <message id="equip-attr-antiland">
-        <location filename="../Protocol/equipment.h" line="65"/>
+        <location filename="../Protocol/equipment.h" line="68"/>
         <source>Anti-land</source>
         <oldsource>Anti land</oldsource>
         <translation>Anti-land</translation>
     </message>
     <message id="equip-attr-transport">
-        <location filename="../Protocol/equipment.h" line="67"/>
+        <location filename="../Protocol/equipment.h" line="70"/>
         <source>Transport</source>
         <translation>Transport</translation>
     </message>
     <message id="equip-attr-flightrange">
-        <location filename="../Protocol/equipment.h" line="69"/>
+        <location filename="../Protocol/equipment.h" line="72"/>
         <source>Flight range</source>
         <translation>Flight range</translation>
     </message>
@@ -2245,11 +2251,11 @@ Great at battle and bad at politics--so cool!</translation>
     </message>
     <message id="all-shiptypes">
         <location filename="../ClientGUI/model/shipbpmodel.cpp" line="221"/>
-        <location filename="../ClientGUI/model/shipmodel.cpp" line="37"/>
-        <location filename="../ClientGUI/ui/factory/constructwindow.cpp" line="42"/>
-        <location filename="../ClientGUI/ui/factory/constructwindow.cpp" line="67"/>
-        <location filename="../ClientGUI/ui/factory/constructwindow.cpp" line="104"/>
-        <location filename="../ClientGUI/ui/factory/constructwindow.cpp" line="147"/>
+        <location filename="../ClientGUI/model/shipmodel.cpp" line="41"/>
+        <location filename="../ClientGUI/ui/factory/constructwindow.cpp" line="48"/>
+        <location filename="../ClientGUI/ui/factory/constructwindow.cpp" line="85"/>
+        <location filename="../ClientGUI/ui/factory/constructwindow.cpp" line="122"/>
+        <location filename="../ClientGUI/ui/factory/constructwindow.cpp" line="165"/>
         <location filename="../ClientGUI/ui/views/shipselect.cpp" line="128"/>
         <location filename="../ClientGUI/ui/views/shipselect.cpp" line="140"/>
         <location filename="../ClientGUI/ui/views/shipselect.cpp" line="186"/>
@@ -2258,24 +2264,25 @@ Great at battle and bad at politics--so cool!</translation>
     </message>
     <message id="all-shipclasses">
         <location filename="../ClientGUI/model/shipbpmodel.cpp" line="223"/>
-        <location filename="../ClientGUI/model/shipmodel.cpp" line="39"/>
-        <location filename="../ClientGUI/ui/factory/constructwindow.cpp" line="46"/>
-        <location filename="../ClientGUI/ui/factory/constructwindow.cpp" line="69"/>
-        <location filename="../ClientGUI/ui/factory/constructwindow.cpp" line="124"/>
-        <location filename="../ClientGUI/ui/factory/constructwindow.cpp" line="160"/>
+        <location filename="../ClientGUI/model/shipmodel.cpp" line="43"/>
+        <location filename="../ClientGUI/ui/factory/constructwindow.cpp" line="52"/>
+        <location filename="../ClientGUI/ui/factory/constructwindow.cpp" line="87"/>
+        <location filename="../ClientGUI/ui/factory/constructwindow.cpp" line="142"/>
+        <location filename="../ClientGUI/ui/factory/constructwindow.cpp" line="178"/>
         <location filename="../ClientGUI/ui/views/shipselect.cpp" line="143"/>
         <location filename="../ClientGUI/ui/views/shipselect.cpp" line="224"/>
         <source>All ship classes</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="fleet-idle">
-        <location filename="../ClientGUI/model/shipmodel.cpp" line="276"/>
+        <location filename="../ClientGUI/model/shipmodel.cpp" line="280"/>
         <source>Idle</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="ship-uuid">
-        <location filename="../ClientGUI/model/shipmodel.cpp" line="302"/>
-        <location filename="../ClientGUI/model/shipmodel.cpp" line="441"/>
+        <location filename="../ClientGUI/model/shipmodel.cpp" line="306"/>
+        <location filename="../ClientGUI/model/shipmodel.cpp" line="445"/>
+        <location filename="../ClientGUI/model/specshipmodel.cpp" line="54"/>
         <source>UUID</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2283,8 +2290,8 @@ Great at battle and bad at politics--so cool!</translation>
         <location filename="../ClientGUI/model/shipbpmodel.cpp" line="117"/>
         <location filename="../ClientGUI/model/shipbpmodel.cpp" line="178"/>
         <location filename="../ClientGUI/model/shipdefmodel.cpp" line="52"/>
-        <location filename="../ClientGUI/model/shipmodel.cpp" line="306"/>
-        <location filename="../ClientGUI/model/shipmodel.cpp" line="444"/>
+        <location filename="../ClientGUI/model/shipmodel.cpp" line="310"/>
+        <location filename="../ClientGUI/model/shipmodel.cpp" line="448"/>
         <source>Name</source>
         <translation>Name</translation>
     </message>
@@ -2295,55 +2302,55 @@ Great at battle and bad at politics--so cool!</translation>
         <translation>Amount</translation>
     </message>
     <message id="ship-star">
-        <location filename="../ClientGUI/model/shipmodel.cpp" line="310"/>
-        <location filename="../ClientGUI/model/shipmodel.cpp" line="448"/>
+        <location filename="../ClientGUI/model/shipmodel.cpp" line="314"/>
+        <location filename="../ClientGUI/model/shipmodel.cpp" line="452"/>
         <source>Modernization</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="ship-improve">
-        <location filename="../ClientGUI/model/shipmodel.cpp" line="314"/>
-        <location filename="../ClientGUI/model/shipmodel.cpp" line="451"/>
+        <location filename="../ClientGUI/model/shipmodel.cpp" line="318"/>
+        <location filename="../ClientGUI/model/shipmodel.cpp" line="455"/>
         <source>Modernize</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="ship-star-whatsthis">
-        <location filename="../ClientGUI/model/shipmodel.cpp" line="429"/>
+        <location filename="../ClientGUI/model/shipmodel.cpp" line="433"/>
         <source>Modernization/Maximum Modernization</source>
         <translation>Modernization/Maximum Modernization</translation>
     </message>
     <message id="ship-select">
-        <location filename="../ClientGUI/model/shipmodel.cpp" line="318"/>
-        <location filename="../ClientGUI/model/shipmodel.cpp" line="454"/>
+        <location filename="../ClientGUI/model/shipmodel.cpp" line="322"/>
+        <location filename="../ClientGUI/model/shipmodel.cpp" line="458"/>
         <source>Select this</source>
         <oldsource>Select</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message id="ship-star-tooltip">
-        <location filename="../ClientGUI/model/shipmodel.cpp" line="232"/>
+        <location filename="../ClientGUI/model/shipmodel.cpp" line="236"/>
         <source>Current Star %1, maximum star %2</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="ship-hp">
-        <location filename="../ClientGUI/model/shipmodel.cpp" line="322"/>
-        <location filename="../ClientGUI/model/shipmodel.cpp" line="457"/>
+        <location filename="../ClientGUI/model/shipmodel.cpp" line="326"/>
+        <location filename="../ClientGUI/model/shipmodel.cpp" line="461"/>
         <source>HP</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="ship-cond">
-        <location filename="../ClientGUI/model/shipmodel.cpp" line="326"/>
-        <location filename="../ClientGUI/model/shipmodel.cpp" line="460"/>
+        <location filename="../ClientGUI/model/shipmodel.cpp" line="330"/>
+        <location filename="../ClientGUI/model/shipmodel.cpp" line="464"/>
         <source>Cond.</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="ship-lv">
-        <location filename="../ClientGUI/model/shipmodel.cpp" line="330"/>
-        <location filename="../ClientGUI/model/shipmodel.cpp" line="463"/>
+        <location filename="../ClientGUI/model/shipmodel.cpp" line="334"/>
+        <location filename="../ClientGUI/model/shipmodel.cpp" line="467"/>
         <source>Level</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="ship-pos">
-        <location filename="../ClientGUI/model/shipmodel.cpp" line="334"/>
-        <location filename="../ClientGUI/model/shipmodel.cpp" line="466"/>
+        <location filename="../ClientGUI/model/shipmodel.cpp" line="338"/>
+        <location filename="../ClientGUI/model/shipmodel.cpp" line="470"/>
         <source>Position</source>
         <translation type="unfinished"></translation>
     </message>

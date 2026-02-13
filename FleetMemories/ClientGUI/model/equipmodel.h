@@ -11,7 +11,10 @@ class EquipModel : public QAbstractTableModel
     Q_OBJECT
 public:
     explicit EquipModel(QObject *parent = nullptr, bool isInArsenal = true);
+
     std::tuple<Equipment *, int> getEquip(QUuid);
+    QHash<QUuid, Equipment *> & getClientEquips();
+    QHash<QUuid, int> & getClientEquipStars();
 
 signals:
     void destructRequest(const QList<QUuid> &);
@@ -21,6 +24,7 @@ signals:
     void equipModified(QUuid shipUid,
                        int equipSlotIndex,
                        QUuid equipUid);
+    void equipReady();
 
 public slots:
     virtual void switchDisplayType(int) final;
@@ -83,13 +87,6 @@ protected:
     int pageNum = 0;
     bool ready = false;
 
-protected slots:
-    virtual void updateIllegalPage();
-
-private slots:
-    void clearCheckBoxes();
-
-private:
     int numberOfEquip() const;
     static const int attrCol = 3;
 
@@ -102,6 +99,13 @@ private:
     QMap<QUuid, std::tuple<QUuid, int>> shipEquipReverse;
     Ship * currentActiveShip = nullptr;
     bool currentActiveSlotEx = false;
+
+protected slots:
+    virtual void updateIllegalPage();
+
+private slots:
+    void clearCheckBoxes();
+
 };
 
 #endif // EQUIPMODEL_H

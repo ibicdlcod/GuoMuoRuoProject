@@ -29,13 +29,9 @@ set(CLIENT_SOURCES
     ClientGUI/clientv2.h
     ClientGUI/equipicon.h
     ClientGUI/equipicon.cpp
+    ClientGUI/main.cpp
     ClientGUI/model/equipmodel.h
     ClientGUI/model/equipmodel.cpp
-    ClientGUI/main.cpp
-    ClientGUI/networkerror.cpp
-    ClientGUI/networkerror.h
-    ClientGUI/resourcefetch.cpp
-    ClientGUI/resourcefetch.h
     ClientGUI/model/localeawaresort.h
     ClientGUI/model/localeawaresort.cpp
     ClientGUI/model/shipbpmodel.h
@@ -44,6 +40,14 @@ set(CLIENT_SOURCES
     ClientGUI/model/shipdefmodel.cpp
     ClientGUI/model/shipmodel.cpp
     ClientGUI/model/shipmodel.h
+    ClientGUI/model/specequipmodel.h
+    ClientGUI/model/specequipmodel.cpp
+    ClientGUI/model/specshipmodel.h
+    ClientGUI/model/specshipmodel.cpp
+    ClientGUI/networkerror.cpp
+    ClientGUI/networkerror.h
+    ClientGUI/resourcefetch.cpp
+    ClientGUI/resourcefetch.h
     ClientGUI/steamauth.cpp
     ClientGUI/steamauth.h
     ClientGUI/ui/boxcenterfusionstyle.h

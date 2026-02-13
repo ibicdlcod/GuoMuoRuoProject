@@ -49,6 +49,14 @@ std::tuple<Equipment *, int> EquipModel::getEquip(QUuid euid) {
     return {clientEquips[euid], clientEquipStars[euid]};
 }
 
+QHash<QUuid, Equipment *> & EquipModel::getClientEquips() {
+    return clientEquips;
+}
+
+QHash<QUuid, int> & EquipModel::getClientEquipStars() {
+    return clientEquipStars;
+}
+
 void EquipModel::switchDisplayType(int index) {
     int oldRowCount = rowCount();
     sortedEquipIds.clear();
@@ -345,8 +353,7 @@ QVariant EquipModel::data(const QModelIndex &index, int role) const {
             return uidToDisplay.toString().first(9).last(8);
         }
         else if(index.column() == equipCol) {
-            QString localName = equipToDisplay->toString(
-                settings->value("client/language", "ja_JP").toString());
+            QString localName = equipToDisplay->toString();
             if(localName.size() == 0)
                 return equipToDisplay->toString("ja_JP");
             else
@@ -648,6 +655,7 @@ void EquipModel::updateEquipmentList(const QJsonObject &input) {
         emit needReCalculateRows();
         emit needReCalculatePages();
         ready = true;
+        emit equipReady();
     }
     else {
         /* not used */

@@ -366,7 +366,7 @@
       </widget>
      </item>
      <item>
-      <widget class="QComboBox" name="listType_10">
+      <widget class="QComboBox" name="shipnameToRemodel">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
          <horstretch>0</horstretch>

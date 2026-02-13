@@ -9,6 +9,8 @@
 #include "ui/techview.h"
 #include "ui/views/equipselect.h"
 #include "model/equipmodel.h"
+#include "model/specequipmodel.h"
+#include "model/specshipmodel.h"
 #include "model/shipmodel.h"
 #include "model/shipbpmodel.h"
 #include "model/shipdefmodel.h"
@@ -58,14 +60,23 @@ public:
     friend void TechView::equipOrShip();
     friend void EquipSelect::reCalculateAvailableEquips(int);
     friend class ShipDefModel;
+    friend void ConstructWindow::shipNameChanged(int);
 
     int equipBigTypeIndex = 0;
     int equipIndex = 0;
     EquipModel equipModel;
+    QList<SpecEquipModel *> specModels = QList<SpecEquipModel *>({
+        new SpecEquipModel(&equipModel),
+        new SpecEquipModel(&equipModel),
+        new SpecEquipModel(&equipModel),
+        new SpecEquipModel(&equipModel),
+        new SpecEquipModel(&equipModel)
+    });
     ShipModel shipModel;
     ShipBPModel shipBPModel;
     ShipDefModel shipDefModel;
-    QSortFilterProxyModel *proxyModel = new LocaleAwareSort();
+    SpecShipModel *shipRemodelModel = new SpecShipModel(&shipModel);
+    QSortFilterProxyModel *proxyModel = new LocaleAwareSort(this);
     QMap<int, double> techCache;
 
 public slots:

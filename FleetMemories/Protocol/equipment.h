@@ -5,9 +5,12 @@
 #include <QMap>
 #include <QObject>
 #include <QString>
+#include <QSettings>
 #include "resord.h"
 #include "equiptype.h"
 #include "ship.h"
+
+extern std::unique_ptr<QSettings> settings;
 
 Q_GLOBAL_STATIC(QStringList,
                 attrIds,
@@ -80,7 +83,8 @@ public:
 
     int operator<=>(const Equipment &) const;
     bool isNotEqual(const Equipment &) const;
-    QString toString(QString) const;
+    QString toString(QString lang = settings->value("client/language", "ja_JP")
+                                        .toString()) const;
 
     const QString attrStr() const;
     const QString attrPrimaryStr() const;

@@ -11,6 +11,7 @@ class ShipModel : public EquipModel
 public:
     explicit ShipModel(QObject *parent = nullptr, bool isInArsenal = true);
     std::tuple<Ship *, ShipDynamic *> getShip(QUuid);
+    QHash<QUuid, Ship *> getAllShips();
 
 signals:
     void typeBoxHint(QStringList &types);
@@ -62,12 +63,11 @@ protected:
     virtual int numberOfShip() const;
     QHash<int, int> bpCache;
 
-private:
     void clearShipCheckBoxes();
 
     QHash<QUuid, Ship *> clientShips;
     QHash<QUuid, ShipDynamic *> clientShipDynamicAttrs;
-    QList<QUuid> sortedShipIds; // not sort by uuid but equiptype
+    QList<QUuid> sortedShipIds;
     QHash<QUuid, bool> isModernizationChecked;
 };
 

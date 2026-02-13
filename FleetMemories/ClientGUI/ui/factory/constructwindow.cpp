@@ -25,6 +25,12 @@ ConstructWindow::ConstructWindow(QWidget *parent)
         ));
     connect(ui->shipname, &QComboBox::currentIndexChanged,
             this, &ConstructWindow::shipNameChanged);
+    Clientv2 &engine = Clientv2::getInstance();
+    ui->equip1->setModel(engine.specModels[0]);
+    ui->equip2->setModel(engine.specModels[1]);
+    ui->equip3->setModel(engine.specModels[2]);
+    ui->equip4->setModel(engine.specModels[3]);
+    ui->equip5->setModel(engine.specModels[4]);
 }
 
 ConstructWindow::~ConstructWindow()
@@ -56,6 +62,18 @@ void ConstructWindow::switchDisplay(int) {
         QTimer timer;
         timer.setSingleShot(true);
         connect(&engine.shipBPModel, &ShipBPModel::bpReady, &msgBox, &QMessageBox::close);
+        connect(&timer, &QTimer::timeout, &msgBox, &QMessageBox::close);
+        timer.start(settings->value("networkclient/downloadwaittimemsec", 80000).toInt());
+        msgBox.exec();
+    }
+    if(!engine.equipModel.isReady()) {
+        QMessageBox msgBox(this);
+        //% "Fetching equipment data, please wait..."
+        msgBox.setText(qtTrId("wait-for-equip"));
+        engine.doRefreshFactoryArsenal();
+        QTimer timer;
+        timer.setSingleShot(true);
+        connect(&engine.equipModel, &EquipModel::equipReady, &msgBox, &QMessageBox::close);
         connect(&timer, &QTimer::timeout, &msgBox, &QMessageBox::close);
         timer.start(settings->value("networkclient/downloadwaittimemsec", 80000).toInt());
         msgBox.exec();
@@ -170,6 +188,8 @@ void ConstructWindow::switchDisplay(int) {
     }
     engine.shipDefModel.setShips(namePasses);
     ui->shipname->model()->sort(0);
+    shipNameChanged();
+
     update();
 }
 
@@ -188,11 +208,37 @@ void ConstructWindow::initialize() {
 void ConstructWindow::shipNameChanged(int) {
     Clientv2 &engine = Clientv2::getInstance();
     auto index = engine.proxyModel->mapToSource(engine.proxyModel->index(ui->shipname->currentIndex(), 0));
-    if(index.row() == -1 || index.column() == -1)
+    if(index.row() == -1 || index.column() == -1) {
+        for(int i = 0; i < 5; ++i) {
+            engine.specModels[i]->setEquip(0);
+        }
+        engine.shipRemodelModel->setShip(QList<int>());
         return;
+    }
     auto *ship = engine.shipDefModel.getCurrentShip(index);
-    qCritical() << ship->toString();
-    qWarning() << ship->getId();
-    qInfo() << ship->attr["Equipslots"];
-    ui->equip1->setModel(&engine.equipModel);
+    engine.specModels[0]->setEquip(ship->attr["Defaultequip1"]);
+    engine.specModels[1]->setEquip(ship->attr["Defaultequip2"]);
+    engine.specModels[2]->setEquip(ship->attr["Defaultequip3"]);
+    engine.specModels[3]->setEquip(ship->attr["Defaultequip4"]);
+    engine.specModels[4]->setEquip(ship->attr["Defaultequip5"]);
+    for(auto *box: {ui->equip1, ui->equip2, ui->equip3, ui->equip4, ui->equip5}) {
+        if(box->count() > 0) {
+            box->setCurrentIndex(0);
+        }
+    }
+
+shipToRemodel:
+    if(ui->shipnameToRemodel->model() != engine.shipRemodelModel) {
+        ui->shipnameToRemodel->setModel(engine.shipRemodelModel);
+    }
+    QList<int> availableShipsToRemodel;
+    auto allships = engine.shipRegistryCache;
+    for(auto shipattr = allships.keyValueBegin();
+         shipattr != allships.keyValueEnd();
+         ++shipattr) {
+        if(shipattr->second->attr["remodel"] == ship->getId()) {
+            availableShipsToRemodel.append(shipattr->first);
+        }
+    }
+    engine.shipRemodelModel->setShip(availableShipsToRemodel);
 }

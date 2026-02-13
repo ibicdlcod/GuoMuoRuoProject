@@ -4,8 +4,8 @@
 #include <QObject>
 #include <QMap>
 #include <QUuid>
-#include "shiptype.h"
 #include <QSettings>
+#include "shiptype.h"
 
 extern std::unique_ptr<QSettings> settings;
 
