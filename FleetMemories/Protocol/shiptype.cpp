@@ -158,49 +158,49 @@ const ResOrd ShipType::consResBase() const {
         std::pair(C, 0),};
     switch((iRep & 0xf0) >> 4) {
     case 1:
-        basic[S] += (100 + (iRep & 0x1 ? 50 : 0));
+        basic[S] += (75 + (iRep & 0x1 ? 15 : 0));
         basic[C] += 5;
         break;
     case 2:
-        basic[S] += 200;
+        basic[S] += 100;
         basic[C] += 10;
         break;
     case 3:
-        basic[S] += 350;
+        basic[S] += 200;
         basic[C] += 15;
         break;
     case 4:
-        basic[S] += 600;
+        basic[S] += 400;
         basic[C] += 20;
         break;
     case 5:
-        basic[S] += (2000 - (iRep & 0x1 ? 750 : 0));
+        basic[S] += (1600 - (iRep & 0x1 ? 800 : 0));
         basic[C] += 30;
         break;
     case 6:
-        basic[S] += (1500 - (iRep & 0x1 ? 750 : 0));
+        basic[S] += (1200 - (iRep & 0x1 ? 600 : 0));
         basic[C] += (25 - (iRep & 0x1 ? 10 : 0));
         basic[A] += (200 - (iRep & 0x1 ? 50 : 0));
         break;
     case 7:
-        basic[S] += 150;
-        basic[C] += 5;
+        basic[S] += 75;
+        basic[C] += 15;
         break;
     case 8:
-        basic[S] += 400;
+        basic[S] += 300;
         basic[C] += 15;
         break;
     case 9:
-        basic[S] += 800;
+        basic[S] += 500;
         basic[C] += 5;
         break;
     case 0xa:
-        basic[S] += 1000;
+        basic[S] += 700;
         basic[C] += 25;
         basic[R] += 100;
         break;
     case 0xb:
-        basic[S] += 500;
+        basic[S] += 450;
         basic[C] += 50;
         break;
     case 0xc:

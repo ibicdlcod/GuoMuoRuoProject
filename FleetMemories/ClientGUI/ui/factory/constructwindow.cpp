@@ -226,6 +226,7 @@ void ConstructWindow::shipNameChanged(int) {
             box->setCurrentIndex(0);
         }
     }
+    ui->resourceAmount->setText(ship->consRes().toString(true));
 
 shipToRemodel:
     if(ui->shipnameToRemodel->model() != engine.shipRemodelModel) {
