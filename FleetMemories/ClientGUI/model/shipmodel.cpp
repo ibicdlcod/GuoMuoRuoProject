@@ -121,11 +121,12 @@ void ShipModel::switchShipDisplayType(const QString &nationality,
     wholeTableChanged();
 }
 
-void ShipModel::addShip(QUuid uid, int def) {
+void ShipModel::addShip(QUuid uid, int def, int hp) {
     bpCacheRefresh();
     int oldRowCount = rowCount();
     Clientv2 &engine = Clientv2::getInstance();
     clientShips[uid] = engine.getShipReg(def);
+    clientShipDynamicAttrs[uid] = new ShipDynamic(hp, this);
     sortedShipIds.append(uid);
     customSort();
     int newRowCount = rowCount();
@@ -175,7 +176,7 @@ void ShipModel::updateShipList(const QJsonObject &input) {
             QUuid uid = QUuid(itemObject["serial"].toString());
             Ship *ship = engine.getShipReg(
                 itemObject["def"].toInt());
-            ShipDynamic *attr = new ShipDynamic(itemObject);
+            ShipDynamic *attr = new ShipDynamic(itemObject, this);
             clientShips[uid] = ship;
             clientShipDynamicAttrs[uid] = attr;
             sortedShipIds.append(uid);
@@ -211,6 +212,8 @@ int ShipModel::columnCount(const QModelIndex &parent) const {
 
 QVariant ShipModel::data(const QModelIndex &index,
                          int role) const {
+    if(!index.isValid())
+        return QVariant();
     if(index.row() >= rowCount() || index.column() >= columnCount())
         return QVariant();
     int realRowIndex = index.row() + rowsPerPage * pageNum;
@@ -597,6 +600,10 @@ int ShipModel::numberOfColumns() const {
 void ShipModel::bpCacheRefresh() {
     Clientv2 &engine = Clientv2::getInstance();
     bpCache = engine.shipBPModel.getClientShipBPs();
+}
+
+void ShipModel::clearCheckBoxes() {
+    clearShipCheckBoxes();
 }
 
 void ShipModel::clearShipCheckBoxes() {

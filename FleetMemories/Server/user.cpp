@@ -476,8 +476,7 @@ QUuid User::newShip(const CSteamID &uid, int shipDid, int startingHP) {
     query2.bindValue(":def", shipDid);
     query2.bindValue(":hp", startingHP);
     query2.bindValue(":rectime", QDateTime::currentSecsSinceEpoch());
-    const int expCapAt100 = (100 + 9900) / 2 * (100 - 1);
-    query2.bindValue(":cap", expCapAt100);
+    query2.bindValue(":cap", Ship::expCap(0));
     if(Q_UNLIKELY(!query2.exec())) {
         qCritical() << query2.lastQuery();
         //% "User id %1: new ship failed!"
@@ -499,7 +498,7 @@ void User::refreshFactory(Server *server, const CSteamID &uid) {
     QSqlDatabase db = QSqlDatabase::database();
     QSqlQuery query;
     query.prepare("UPDATE Factories "
-                  "SET Done = (datetime('now') > SuccessTime) "
+                  "SET Done = (unixepoch('now') > SuccessTime) "
                   "WHERE UserID = :id");
     query.bindValue(":id", uid.ConvertToUint64());
     if(Q_UNLIKELY(!query.exec())){

@@ -26,21 +26,27 @@ EquipModel::EquipModel(QObject *parent, bool isInArsenal)
     QTimer *timer = new QTimer(this);
     connect(timer, &QTimer::timeout, this, [this]()
             {
-                if(rowCount() == 1) {
-                    for(auto *widget: QApplication::topLevelWidgets()) {
-                        if(qobject_cast<MainWindow *>(widget)) {
-                            MainWindow *mainWindow = qobject_cast<MainWindow *>(widget);
-                            auto geo = mainWindow->geometry();
-                            auto tempGeo = geo;
-                            tempGeo.setRect(tempGeo.x(), tempGeo.y(),
-                                            tempGeo.width(), tempGeo.height()-1);
-                            mainWindow->setGeometry(tempGeo);
-                            mainWindow->setGeometry(geo);
+                QString className = metaObject()->className();
+                if(className == "EquipModel"
+                    || className == "ShipModel"
+                    || className == "ShipBPModel") {
+                    if(rowCount() == 1) {
+                        for(auto *widget: QApplication::topLevelWidgets()) {
+                            if(qobject_cast<MainWindow *>(widget)) {
+                                MainWindow *mainWindow = qobject_cast<MainWindow *>(widget);
+                                auto geo = mainWindow->geometry();
+                                auto tempGeo = geo;
+                                tempGeo.setRect(tempGeo.x(), tempGeo.y(),
+                                                tempGeo.width(), tempGeo.height()-1);
+                                mainWindow->setGeometry(tempGeo);
+                                mainWindow->setGeometry(geo);
+                            }
                         }
                     }
                 }
-    });
-    timer->start(100);
+            });
+    timer->start(1000);
+
 }
 
 std::tuple<Equipment *, int> EquipModel::getEquip(QUuid euid) {
@@ -321,6 +327,8 @@ int EquipModel::columnCount(const QModelIndex &parent) const {
 }
 
 QVariant EquipModel::data(const QModelIndex &index, int role) const {
+    if(!index.isValid())
+        return QVariant();
     if(index.row() >= rowCount() || index.column() >= columnCount())
         return QVariant();
     int realRowIndex = index.row() + rowsPerPage * pageNum;

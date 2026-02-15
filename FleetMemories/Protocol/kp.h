@@ -40,6 +40,7 @@ Q_NAMESPACE
  * have to be respected by both server and client */
 #pragma message(NOT_M_CONST)
 /* this is deliberately not customized */
+/* do not modify as this is used in steam tickets */
 static constexpr int practicalBufferSize = 1024;
 
 static constexpr int initDock = 2;
@@ -60,6 +61,7 @@ static constexpr int mapIDDifficultyMask = 4096;
 static constexpr int hiddenMap = 99;
 static constexpr qint64 secsinMin = 60;
 static constexpr int equipIdMax = 0x10000;
+static constexpr int conditionMax = 480;
 #pragma message(NOT_M_CONST)
 const int steamAppId = 2632870; // Go request your own steam appid if modding!
 static const QStringList supportedLangs = {"ja_JP", "zh_CN", "en_US"};
@@ -93,10 +95,12 @@ enum MsgType{
     AccessDenied,
     DevelopFailed,
     DevelopStart,
+    ConstructStart,
     ResourceRequired,
     FairyBusy,
     Penguin,
     NewEquip,
+    NewShip,
     Hello,
     LackPrivate,
     AllowClientStart,
@@ -108,6 +112,7 @@ enum MsgType{
     FleetFail,
     AskForHomePort,
     ShipModernized,
+    ShipBPRetired,
 };
 Q_ENUM_NS(MsgType)
 
@@ -161,6 +166,7 @@ enum CommandType{
     FleetData,
     SelectHomePort,
     ModernizeShip,
+    Construct,
 };
 Q_ENUM_NS(CommandType)
 
@@ -170,7 +176,11 @@ enum GameError{
     DevelopNotExist,
     FactoryBusy,
     MassProductionDisallowed,
-    ProductionDisallowed
+    ProductionDisallowed,
+    CloningDisallowed,
+    DefaultEquipIncorrect,
+    RemodelShipIncorrect,
+    BlueprintNonexistent,
 };
 Q_ENUM_NS(GameError)
 
@@ -448,6 +458,10 @@ QByteArray clientAdminTestEquip();
 QByteArray clientAdminTestEquipRemove();
 QByteArray clientAdminTestShip();
 QByteArray clientAdminTestShipRemove();
+QByteArray clientConstruct(int shipDef,
+                           const QList<QUuid> &defaultEquips,
+                           QUuid &shipToRemodel,
+                           int factoryID);
 QByteArray clientDemandDestructEquip(const QList<QUuid> &);
 QByteArray clientDemandEquipInfo(QDateTime timeUtc
                                  = QDateTime(QDate(1970, 1, 1),
@@ -477,8 +491,9 @@ QByteArray clientSteamLogout();
 QByteArray clientTestMessages(int);
 
 QByteArray serverAskForHomePort();
+QByteArray serverBlueprintRetired(int);
 QByteArray serverDevelopFailed(GameError);
-QByteArray serverDevelopStart();
+QByteArray serverDevelopStart(bool construct = false);
 QByteArray serverEquipLackFather(GameError, int);
 QByteArray serverEquipLackMother(GameError, int, int64);
 QByteArray serverEquipRetired(const QList<QUuid> &);
@@ -498,6 +513,7 @@ QByteArray serverMapInfo(const QJsonArray &, bool user = false,
                          QDateTime timeUtc = QDateTime::currentDateTimeUtc(),
                          bool cacheHit = false);
 QByteArray serverNewEquip(QUuid, int);
+QByteArray serverNewShip(QUuid, int, int);
 QByteArray serverParseError(MsgType, const QString &,
                             const QString &);
 QByteArray serverPenguin();

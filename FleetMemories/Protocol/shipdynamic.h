@@ -9,7 +9,8 @@ class ShipDynamic : public QObject
     Q_OBJECT
 public:
     explicit ShipDynamic(QObject *parent = nullptr);
-    explicit ShipDynamic(const QJsonObject &);
+    explicit ShipDynamic(const QJsonObject &, QObject *parent = nullptr);
+    explicit ShipDynamic(int, QObject *parent = nullptr);
 
     int star;
     int currentHP;

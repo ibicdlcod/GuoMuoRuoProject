@@ -1453,269 +1453,6 @@ void Server::deleteTestShip(const CSteamID &uid) {
     }
 }
 
-void Server::doConstruct(CSteamID &uid,
-                         int shipDef,
-                         QList<QUuid> &equips,
-                         QUuid prevShip,
-                         int factoryid,
-                         QSslSocket *connection) {
-    QSqlDatabase db = QSqlDatabase::database();
-    try{
-        if(!shipRegistry.contains(shipDef)) {
-            QByteArray msg =
-                KP::serverDevelopFailed(KP::DevelopNotExist);
-            senderM.sendMessage(connection, msg);
-            return;
-        }
-        Ship *ship = shipRegistry[shipDef];
-
-
-    bp: {
-        QSqlQuery query;
-        QString queryStr = QStringLiteral("SELECT Amount "
-                                          "FROM UserShipBP "
-                                          "WHERE User = :uid AND ShipDef = :def");
-        query.prepare(queryStr);
-        query.bindValue(":uid", uid.ConvertToUint64());
-        query.bindValue(":def", shipDef);
-        if(query.exec() && query.isSelect()) {
-            if(query.first() && query.value(0).toInt() > 0) {
-                ; // pass
-            }
-            else {
-                QByteArray msg =
-                    KP::serverDevelopFailed(KP::BlueprintNonexistent);
-                senderM.sendMessage(connection, msg);
-                return;
-            }
-        }
-        else {
-            //% "Database failed when constructing: query existing ship blueprints failed!"
-            throw DBError(qtTrId("dbfail-constructing-query-existing-bps"),
-                          query.lastError());
-        }
-    }
-
-    /* 5.4-construction.md#Possess limit */
-    possess_limit:
-        bool isCloning = false;
-        if(prevShip.isNull()) {
-            int latestmodel = 0;
-            auto latermodels = ship->getLaterModels(shipRegistry);
-            if(!latermodels.empty()) {
-                latestmodel = *std::max_element(latermodels.constBegin(), latermodels.constEnd());
-            }
-            QList<int> allModels = shipRemodelGroup.values(latestmodel);
-
-            QSqlQuery query;
-            QString queryStr = QStringLiteral("SELECT ShipUuid "
-                                              "FROM UserShip "
-                                              "WHERE User = :uid AND ShipDef in (");
-            for(int i = 0; i < allModels.size(); ++i) {
-                queryStr.append(":id");
-                queryStr.append(QString::number(i+1));
-                if(i != allModels.size() - 1) {
-                    queryStr.append(", ");
-                }
-            }
-            queryStr.append(");");
-            query.prepare(queryStr);
-            query.bindValue(":uid", uid.ConvertToUint64());
-            for(int i = 0; i < allModels.size(); ++i) {
-                QString idd = QStringLiteral(":id");
-                idd.append(QString::number(i+1));
-                query.bindValue(idd, allModels[i]);
-            }
-            if(query.exec() && query.isSelect()) {
-                while(query.next()) {
-                    isCloning = true;
-                    break;
-                }
-            }
-            else {
-                //% "Database failed when constructing: query existing models failed!"
-                throw DBError(qtTrId("dbfail-constructing-query-existing-models"),
-                              query.lastError());
-            }
-        }
-        /* debug */ isCloning = false;
-        if(isCloning) {
-            QByteArray msg =
-                KP::serverDevelopFailed(KP::CloningDisallowed);
-            senderM.sendMessage(connection, msg);
-            return;
-        }
-
-    resource_required:
-        ResOrd resRequired = ship->consRes();
-        QByteArray msg = resRequired.resourceDesired();
-        senderM.sendMessage(connection, msg);
-        ResOrd currentRes = User::getCurrentResources(uid);
-        if(!currentRes.spendResources(resRequired)){
-            connection->flush();
-            QTimer::singleShot(100, this, [this, connection]{
-                QByteArray msg =
-                    KP::serverDevelopFailed(KP::ResourceLack);
-                senderM.sendMessage(connection, msg);
-            });
-            return;
-        }
-
-    eat_default_equip:
-        QList<QUuid> trash;
-        if(equips.size() != KP::maxEquipSlots) {
-            QByteArray msg =
-                KP::serverDevelopFailed(KP::DefaultEquipIncorrect);
-            senderM.sendMessage(connection, msg);
-            return;
-        }
-        for(int i = 0; i < KP::maxEquipSlots; ++i) {
-            int equipDef = 0;
-            QSqlQuery query;
-            QString queryStr = QStringLiteral("SELECT EquipDef "
-                                              "FROM UserEquip "
-                                              "WHERE User = :uid AND EquipUuid = :euid");
-            query.prepare(queryStr);
-            query.bindValue(":uid", uid.ConvertToUint64());
-            query.bindValue(":euid", equips[i].toString());
-            if(query.exec() && query.isSelect()) {
-                if(query.first()) {
-                    equipDef = query.value(0).toInt();
-                }
-            }
-            else {
-                //% "Database failed when constructing: query existing equips failed!"
-                throw DBError(qtTrId("dbfail-constructing-query-existing-equips"),
-                              query.lastError());
-            }
-            QString de = QStringLiteral("Defaultequip");
-            de.append(QString::number(i+1));
-            if(equipDef == ship->attr[de]) {
-                if(equipDef != 0) {
-                    trash.append(equips[i]);
-                }
-            }
-            else {
-                QByteArray msg =
-                    KP::serverDevelopFailed(KP::DefaultEquipIncorrect);
-                senderM.sendMessage(connection, msg);
-                return;
-            }
-        }
-        QList<QUuid> destructed = retireEquip(uid, trash);
-        QByteArray msg2 = KP::serverEquipRetired(destructed);
-        senderM.sendMessage(connection, msg2);
-
-    decide_if_fresh_construction:
-        QList<int> remodelCandidate = ship->getPreviousModels(shipRegistry);
-        if(remodelCandidate.isEmpty()) {
-        fresh_construction:
-            if(!prevShip.isNull()) {
-                QByteArray msg =
-                    KP::serverDevelopFailed(KP::RemodelShipIncorrect);
-                senderM.sendMessage(connection, msg);
-                return;
-            }
-            qint64 startTime = QDateTime::currentSecsSinceEpoch();
-            qint64 successTime = startTime + ship->consTimeInSec();
-
-            QSqlDatabase db = QSqlDatabase::database();
-            QSqlQuery query;
-            query.prepare("UPDATE Factories "
-                          "SET StartTime = :st, "
-                          "SuccessTime = :succ, Done = 0, Success = :good, "
-                          "CurrentJob = :shipid "
-                          "WHERE UserID = :id AND FactoryID = :fid");
-            query.bindValue(":st", startTime);
-            query.bindValue(":succ", successTime);
-            query.bindValue(":good", true); // 100% success
-            query.bindValue(":shipid", ship->getId());
-            query.bindValue(":id", uid.ConvertToUint64());
-            query.bindValue(":fid", factoryid);
-            if(query.exec()) {
-                qDebug() << "SHIP DEV START";
-                /* only spend resources if database successfully register
-                 * the operation */
-                User::setResources(uid, currentRes);
-                QByteArray msg =
-                    KP::serverDevelopStart(true);
-                senderM.sendMessage(connection, msg);
-                offerResourceInfo(connection, uid);
-            }
-            else {
-                //% "Database failed when constructing."
-                throw DBError(qtTrId("dbfail-constructing"),
-                              query.lastError());
-                return;
-            }
-        }
-        else {
-        remodel:
-            int remodelDef = 0;
-            QSqlQuery query;
-            QString queryStr = QStringLiteral("SELECT ShipDef "
-                                              "FROM UserShip "
-                                              "WHERE User = :uid AND ShipUuid = :suid");
-            query.prepare(queryStr);
-            query.bindValue(":uid", uid.ConvertToUint64());
-            query.bindValue(":suid", prevShip.toString());
-            if(query.exec() && query.isSelect()) {
-                if(query.first()) {
-                    remodelDef = query.value(0).toInt();
-                }
-            }
-            else {
-                //% "Database failed when constructing: query existing ships failed!"
-                throw DBError(qtTrId("dbfail-constructing-query-existing-ships"),
-                              query.lastError());
-            }
-            if(!remodelCandidate.contains(remodelDef)) {
-                QByteArray msg =
-                    KP::serverDevelopFailed(KP::RemodelShipIncorrect);
-                senderM.sendMessage(connection, msg);
-                return;
-            }
-            else {
-                qCritical () << "REMODEL";
-            }
-        restore_default_equip_converter_remodel:
-            int levelDesired = (ship->getId() & 0xF0000000) >> 7;
-            int levelOriginal = 0;
-        }
-
-    delete_bp:
-    {
-        QSqlQuery query;
-        QString queryStr = QStringLiteral("UPDATE UserShipBP "
-                                          "SET Amount = Amount - 1 "
-                                          "WHERE User = :uid AND ShipDef = :def");
-        query.prepare(queryStr);
-        query.bindValue(":uid", uid.ConvertToUint64());
-        query.bindValue(":def", shipDef);
-        if(query.exec()) {
-            QByteArray msg = KP::serverBlueprintRetired(shipDef);
-            senderM.sendMessage(connection, msg);
-            return;
-        }
-        else {
-            //% "Database failed when constructing: delete existing ship blueprints failed!"
-            throw DBError(qtTrId("dbfail-constructing-delete-existing-bps"),
-                          query.lastError());
-        }
-    }
-
-        refreshClientFactory(uid, connection);
-    } catch (DBError &e) {
-        for(QString &i : e.whats()) {
-            qCritical() << i;
-        }
-        return;
-    } catch(std::exception &e) {
-        qCritical() << e.what();
-        return;
-    }
-}
-
 void Server::doDevelop(CSteamID &uid, int equipid,
                        int factoryid, QSslSocket *connection) {
     try{
@@ -1777,7 +1514,6 @@ void Server::doDevelop(CSteamID &uid, int equipid,
             return;
         }
         
-    resource_required:
         ResOrd resRequired = equip->devRes();
         QByteArray msg = resRequired.resourceDesired();
         senderM.sendMessage(connection, msg);
@@ -1791,7 +1527,6 @@ void Server::doDevelop(CSteamID &uid, int equipid,
             });
         }
         else {
-        start_develop:
             qint64 startTime = QDateTime::currentSecsSinceEpoch();
             qint64 successTime = startTime + equip->devTimeInSec();
             
@@ -1901,10 +1636,7 @@ void Server::doFetch(CSteamID &uid, int factoryid, QSslSocket *connection) {
                 senderM.sendMessage(connection, msg);
             }
             else {
-            add_ship:
-                QByteArray msg = KP::serverNewShip(
-                    newShip(uid, jobID), jobID, shipRegistry[jobID]->attr["Hitpoints"]);
-                senderM.sendMessage(connection, msg);
+                // TODO: is ship part
             }
             QSqlDatabase db = QSqlDatabase::database();
             QSqlQuery query;
@@ -1947,7 +1679,7 @@ bool Server::equipmentRefresh() {
     }
     equipRegistry.clear();
     for(auto equipID : std::as_const(openEquips)) {
-        equipRegistry[equipID] = new Equipment(equipID, this);
+        equipRegistry[equipID] = new Equipment(equipID);
     }
     //% "Load equipment registry success!"
     qInfo() << qtTrId("equip-load-good");
@@ -2011,7 +1743,6 @@ bool Server::exportEquipToCSV() const {
         }
     }
     csvFile->close();
-    delete csvFile;
     //% "Export equipment registry success!"
     qInfo() << qtTrId("equip-export-good");
     return true;
@@ -2222,7 +1953,6 @@ bool Server::importEquipFromCSV() {
         }
     }
     csvFile->close();
-    delete csvFile;
     //% "Import equipment registry success!"
     qInfo() << qtTrId("equip-import-good");
     settings->setValue("server/equipdbtimestamp", QDateTime::currentDateTimeUtc());
@@ -2334,7 +2064,6 @@ bool Server::importMapNodeFromCSV() {
         }
     }
     csvFile->close();
-    delete csvFile;
     //% "Import map node registry success!"
     qInfo() << qtTrId("map-node-import-good");
     settings->setValue("server/mapdbtimestamp", QDateTime::currentDateTimeUtc());
@@ -2397,7 +2126,6 @@ bool Server::importMapRelationFromCSV() {
         }
     }
     csvFile->close();
-    delete csvFile;
     //% "Import map relation registry success!"
     qInfo() << qtTrId("map-relation-import-good");
     settings->setValue("server/mapdbtimestamp", QDateTime::currentDateTimeUtc());
@@ -2527,7 +2255,6 @@ bool Server::importShipFromCSV() {
         }
     }
     csvFile->close();
-    delete csvFile;
     //% "Import ship registry success!"
     qInfo() << qtTrId("ship-import-good");
     settings->setValue("server/shipdbtimestamp", QDateTime::currentDateTimeUtc());
@@ -3051,7 +2778,9 @@ int64 Server::newEquipHasMotherCal(int equipId) {
 }
 
 QUuid Server::newShip(const CSteamID &uid, int shipId, bool direct) {
-    Q_UNUSED(direct)
+    if(!direct) {
+        /* consume starting equip */
+    }
     int startingHP;
     if(shipRegistry[shipId]->attr.contains("Hitpoints")) {
         startingHP = std::max(1, shipRegistry[shipId]->attr["Hitpoints"]);
@@ -3496,18 +3225,6 @@ void Server::receivedReq(const QJsonObject &djson,
         doDevelop(uid, equipid, djson["factory"].toInt(), connection);
     }
     break;
-    case KP::CommandType::Construct: {
-        int shipDef = djson["shipdef"].toInt();
-        QList<QUuid> defaultEquips;
-        QJsonArray equipArray = djson["defaultequip"].toArray();
-        for(auto equip: equipArray) {
-            QUuid uid = QUuid(equip.toString());
-            defaultEquips.append(uid);
-        }
-        QUuid shipToRemodel = QUuid(djson["shiptoremodel"].toString());
-        doConstruct(uid, shipDef, defaultEquips, shipToRemodel, djson["factory"].toInt(), connection);
-    }
-    break;
     case KP::CommandType::Fetch:
         doFetch(uid, djson["factory"].toInt(), connection);
         break;
@@ -3726,10 +3443,14 @@ void Server::sendTestMessages() {
                     User::addShipBP(user, ship->getId());
             }
         }*/
-        for(auto user: connectedUsers) {
-            QList<QUuid> a(5);
-            doConstruct(user,169411328,a,QUuid(),0,connectedPeers[user]);
-        }
+        for(auto user: connectedUsers)
+            generateTestEquip(user);
+        /*
+        for(auto equip: std::as_const(equipRegistry)) {
+            if(equip->type.isCarrierPlane()) {
+                qInfo() << equip->localNames["ja_JP"];
+            }
+        }*/
     }
 }
 
@@ -3756,7 +3477,7 @@ bool Server::shipRefresh() {
     }
     shipRegistry.clear();
     for(auto shipID : std::as_const(openShips)) {
-        shipRegistry[shipID] = new Ship(shipID, this);
+        shipRegistry[shipID] = new Ship(shipID);
     }
     //% "Load ship registry success!"
     qInfo() << qtTrId("ship-load-good");
@@ -3775,7 +3496,7 @@ bool Server::shipRefresh() {
     for(auto shipID: shipRemodelGroup.uniqueKeys()) {
         shipRemodelGroup.insert(shipID, shipID);
     }
-
+    
     return true;
 }
 

@@ -519,13 +519,13 @@ void Clientv2::tsunkitAssets() {
         // Connect the signal you're waiting for to the QEventLoop::quit slot
         connect(resourceFetcher, &ResourceFetch::finished, this, [this]()
                 {
-            downloadCompleted += 1;
-            QObject::sender()->deleteLater();
-            if(downloadCompleted == downloadRequired) {
-                downloadCompleted = 0;
-                tsunkitAssets2();
-            }
-        });
+                    downloadCompleted += 1;
+                    QObject::sender()->deleteLater();
+                    if(downloadCompleted == downloadRequired) {
+                        downloadCompleted = 0;
+                        tsunkitAssets2();
+                    }
+                });
     }
 }
 
@@ -717,6 +717,7 @@ void Clientv2::doAddEquip(const QStringList &cmdParts) {
         return;
     }
 }
+
 /* Develop equipment */
 void Clientv2::doDevelop(const QStringList &cmdParts) {
     if(cmdParts.length() < 3) {
@@ -806,6 +807,19 @@ void Clientv2::doSwitch(const QStringList &cmdParts) {
     }
 }
 
+void Clientv2::doConstructShip(int shipDef, const QList<QUuid> &defaultEquips,
+                               QUuid shipToRemodel,
+                               int factoryID) {
+    if(shipDef == 0) {
+        return;
+    }
+    QByteArray msg = KP::clientConstruct(shipDef,
+                                         defaultEquips,
+                                         shipToRemodel,
+                                         factoryID);
+    sender->enqueue(msg);
+}
+
 void Clientv2::doDestructEquip(const QList<QUuid> &trash) {
     if(trash.empty())
         return;
@@ -845,14 +859,14 @@ void Clientv2::doRefreshFactoryArsenal() {
 
 Equipment * Clientv2::getEquipmentReg(int equipid) {
     if(!equipRegistryCache.contains(equipid))
-        return new Equipment(0);
+        return new Equipment(0, this);
     else
         return equipRegistryCache.value(equipid);
 }
 
 Ship * Clientv2::getShipReg(int equipid) {
     if(!shipRegistryCache.contains(equipid))
-        return new Ship(0);
+        return new Ship(0, this);
     else
         return shipRegistryCache.value(equipid);
 }
@@ -1212,8 +1226,16 @@ void Clientv2::receivedMsg(const QJsonObject &djson) {
     case KP::DevelopFailed: {
         switch(djson["reason"].toInt()) {
         case KP::DevelopNotExist:
-            //% "This equipment does not exist."
+            //% "This equipment/ship does not exist."
             qWarning() << qtTrId("equip-not-exist");
+            break;
+        case KP::CloningDisallowed:
+            //% "You must use cloning vats to clone ships."
+            qWarning() << qtTrId("cloning-disallowed");
+            break;
+        case KP::BlueprintNonexistent:
+            //% "You don't have the appropriate blueprints."
+            qWarning() << qtTrId("blueprint-lack");
             break;
         case KP::DevelopNotOption: {
             Equipment *father = equipRegistryCache
@@ -1255,6 +1277,14 @@ void Clientv2::receivedMsg(const QJsonObject &djson) {
             //% "This equipment does not allow mass production!"
             qWarning() << qtTrId("production-disallowed");
             break;
+        case KP::DefaultEquipIncorrect:
+            //% "Default equipment provided is incorrect!"
+            qWarning() << qtTrId("default-equipment-incorrect");
+            break;
+        case KP::RemodelShipIncorrect:
+            //% "Ship to remodel is incorrect!"
+            qWarning() << qtTrId("ship-to-convert-incorrect");
+            break;
         default:
             //% "Equipment development failed."
             qInfo() << qtTrId("equip-develop-failed");
@@ -1275,8 +1305,11 @@ void Clientv2::receivedMsg(const QJsonObject &djson) {
     }
     break;
     case KP::DevelopStart:
-        //% "Start developing equipment."
+        //% "Developing equipment started."
         qInfo() << qtTrId("develop-start"); break;
+    case KP::ConstructStart:
+        //% "Constructing ship started."
+        qInfo() << qtTrId("construct-start"); break;
     case KP::FairyBusy: {
         if(djson["job"] != 0) {
             //% "Fairy is still working on %1."
@@ -1299,8 +1332,7 @@ void Clientv2::receivedMsg(const QJsonObject &djson) {
             //% "You got new equipment %1, serial number %2"
             qInfo() <<
                 qtTrId("develop-success")
-                    .arg(equipRegistryCache.value(equipDefInt)->toString(
-                             settings->value("client/language", "ja_JP").toString()),
+                    .arg(equipRegistryCache.value(equipDefInt)->toString(),
                          djson["serial"].toString());
             equipModel.addEquipment(serial, equipDefInt);
         }
@@ -1309,6 +1341,28 @@ void Clientv2::receivedMsg(const QJsonObject &djson) {
             qInfo() <<
                 qtTrId("develop-success-id")
                     .arg(djson["equipdef"].toInt())
+                    .arg(djson["serial"].toString());
+        }
+        doRefreshFactory();
+    }
+    break;
+    case KP::NewShip: {
+        int shipDefInt = djson["shipdef"].toInt();
+        QUuid serial = QUuid(djson["serial"].toString());
+        int hp = djson["hp"].toInt();
+        if(shipRegistryCache.contains(shipDefInt)) {
+            //% "You got new ship %1, serial number %2"
+            qInfo() <<
+                qtTrId("construct-success")
+                    .arg(shipRegistryCache.value(shipDefInt)->toString(),
+                         djson["serial"].toString());
+            shipModel.addShip(serial, shipDefInt, hp);
+        }
+        else {
+            //% "You get new equipment with id %1, serial number %2"
+            qInfo() <<
+                qtTrId("construct-success-id")
+                    .arg(djson["shipdef"].toInt())
                     .arg(djson["serial"].toString());
         }
         doRefreshFactory();
@@ -1364,6 +1418,10 @@ void Clientv2::receivedMsg(const QJsonObject &djson) {
         //% "The following equipment are destructed: %1"
         qInfo() << qtTrId("destruct-equip-list").arg(trashString.join(","));
         equipModel.destructedEquipment(trash);
+    }
+    break;
+    case KP::ShipBPRetired: {
+        shipBPModel.bpUsed(djson["shipdef"].toInt());
     }
     break;
     case KP::ShipModernized: {
@@ -1643,7 +1701,7 @@ void Clientv2::updateEquipCache(const QJsonObject &input) {
     for(auto equipDef: equipDefs) {
         QJsonObject equipDValue = equipDef.toObject();
         int eid = equipDValue.value("eid").toInt();
-        equipRegistryCache[eid] = new Equipment(equipDValue);
+        equipRegistryCache[eid] = new Equipment(equipDValue, this);
     }
 
     //% "Equipment cache length: %1"
@@ -1704,7 +1762,7 @@ void Clientv2::updateShipCache(const QJsonObject &input) {
     for(auto shipDef: shipDefs) {
         QJsonObject shipDValue = shipDef.toObject();
         int sid = shipDValue.value("sid").toInt();
-        shipRegistryCache[sid] = new Ship(shipDValue);
+        shipRegistryCache[sid] = new Ship(shipDValue, this);
     }
 
     //% "Ship cache length: %1"

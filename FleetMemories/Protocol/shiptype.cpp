@@ -216,17 +216,17 @@ int ShipType::consTimeBase() const {
     /* in principle all this should belong in settings,
      * but too cumbersome */
     switch((iRep & 0xf0) >> 4) {
-    case 1: return 100;
-    case 2: return 200;
-    case 3: return 300;
-    case 4: return 500;
-    case 5: return (2000 - (iRep & 0x1 ? 750 : 0));
-    case 6: return (1500 - (iRep & 0x1 ? 750 : 0));
-    case 7: return 150;
-    case 8: return 400 + (iRep & 0x2 ? 150 : 0);
-    case 9: return 800;
-    case 0xa: return 1200;
-    case 0xb: return 650;
+    case 1: return 50;
+    case 2: return 100;
+    case 3: return 150;
+    case 4: return 250;
+    case 5: return (1000 - (iRep & 0x1 ? 375 : 0));
+    case 6: return (750 - (iRep & 0x1 ? 375 : 0));
+    case 7: return 75;
+    case 8: return 150 + (iRep & 0x2 ? 50 : 0);
+    case 9: return 375;
+    case 0xa: return 300;
+    case 0xb: return 325;
     case 0xc:
         // TBD
         return 1;

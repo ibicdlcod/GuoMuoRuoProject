@@ -102,10 +102,7 @@ protected:
 
 protected slots:
     virtual void updateIllegalPage();
-
-private slots:
-    void clearCheckBoxes();
-
+    virtual void clearCheckBoxes();
 };
 
 #endif // EQUIPMODEL_H

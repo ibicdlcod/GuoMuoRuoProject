@@ -5,8 +5,8 @@
 #include "../Server/kerrors.h"
 #include "utility.h"
 
-Ship::Ship(int shipId)
-    : shipRegId(shipId){
+Ship::Ship(int shipId, QObject *parent)
+    : shipRegId(shipId), QObject(parent){
     if(shipId == 0) {
         return;
     }
@@ -90,7 +90,8 @@ Ship::Ship(int shipId)
     }
 }
 
-Ship::Ship(const QJsonObject &input) {
+Ship::Ship(const QJsonObject &input, QObject *parent)
+    : QObject(parent){
     shipRegId = input["sid"].toInt();
     if(shipRegId == 0)
         return;
@@ -175,6 +176,17 @@ QList<int> Ship::getLaterModels(const QMap<int, Ship *> &registry) const {
     return result;
 }
 
+QList<int> Ship::getPreviousModels(const QMap<int, Ship *> &registry) const {
+    QList<int> result;
+    for(auto [id, candidate]: registry.asKeyValueRange()) {
+        int remodel = candidate->attr["remodel"];
+        if(remodel == getId()) {
+            result.append(id);
+        }
+    }
+    return result;
+}
+
 KP::ShipNationality Ship::getNationality() const {
     return static_cast<KP::ShipNationality>((shipRegId & 0x00F00000) >> 20);
 }
@@ -214,4 +226,9 @@ bool Ship::isAmnesiac() const {
 int Ship::getLevel(int exp) {
     /* inverse of y / 100 = (x)(x-1)/2 */
     return std::floor((1.0 + sqrt(1.0 + 8.0 * (exp / settings->value("rule/shipexpscale", 100.0).toDouble())))/ 2.0);
+}
+
+int Ship::expCap(int numberOfRings) {
+    int levelCap = 100 * (numberOfRings + 1);
+    return (100 + (levelCap - 1) * 100) / 2 * (levelCap - 1);
 }

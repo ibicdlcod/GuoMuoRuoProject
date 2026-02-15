@@ -214,11 +214,9 @@ void FactoryArea::doConstruct(int result) {
         qDebug() << "NOCONSTRUCT";
     }
     else if(result == QDialog::Accepted) {
-        qCritical() << "FUCK" << currentSlotNum;
         QTimer::singleShot(100, &engine, &Clientv2::doRefreshFactory);
-        QString msg = QStringLiteral("construct %1 %2")
-                          .arg(dev.equipIdDesired()).arg(currentSlotNum);
-        qDebug() << msg;
-        //engine.parse(msg);
+        engine.doConstructShip(con.shipDefDesired(), con.defaultEquipsDesired(),
+                               con.shipToRemodelDesired(),
+                               currentSlotNum);
     }
 }

@@ -4,6 +4,7 @@
 #include "../../../Protocol/kp.h"
 #include <QMetaEnum>
 #include <QMessageBox>
+#include <QUuid>
 
 extern std::unique_ptr<QSettings> settings;
 
@@ -26,11 +27,11 @@ ConstructWindow::ConstructWindow(QWidget *parent)
     connect(ui->shipname, &QComboBox::currentIndexChanged,
             this, &ConstructWindow::shipNameChanged);
     Clientv2 &engine = Clientv2::getInstance();
-    ui->equip1->setModel(engine.specModels[0]);
-    ui->equip2->setModel(engine.specModels[1]);
-    ui->equip3->setModel(engine.specModels[2]);
-    ui->equip4->setModel(engine.specModels[3]);
-    ui->equip5->setModel(engine.specModels[4]);
+    equipBoxes = {ui->equip1, ui->equip2, ui->equip3, ui->equip4, ui->equip5};
+    assert(equipBoxes.size() == KP::maxEquipSlots);
+    for(int i = 0; i < KP::maxEquipSlots; ++i) {
+        equipBoxes[i]->setModel(engine.specModels[i]);
+    }
 }
 
 ConstructWindow::~ConstructWindow()
@@ -208,20 +209,28 @@ void ConstructWindow::initialize() {
 void ConstructWindow::shipNameChanged(int) {
     Clientv2 &engine = Clientv2::getInstance();
     auto index = engine.proxyModel->mapToSource(engine.proxyModel->index(ui->shipname->currentIndex(), 0));
-    if(index.row() == -1 || index.column() == -1) {
-        for(int i = 0; i < 5; ++i) {
+    if(!index.isValid()) {
+        for(int i = 0; i < KP::maxEquipSlots; ++i) {
             engine.specModels[i]->setEquip(0);
         }
         engine.shipRemodelModel->setShip(QList<int>());
+        shipDef = 0;
         return;
     }
     auto *ship = engine.shipDefModel.getCurrentShip(index);
-    engine.specModels[0]->setEquip(ship->attr["Defaultequip1"]);
-    engine.specModels[1]->setEquip(ship->attr["Defaultequip2"]);
-    engine.specModels[2]->setEquip(ship->attr["Defaultequip3"]);
-    engine.specModels[3]->setEquip(ship->attr["Defaultequip4"]);
-    engine.specModels[4]->setEquip(ship->attr["Defaultequip5"]);
-    for(auto *box: {ui->equip1, ui->equip2, ui->equip3, ui->equip4, ui->equip5}) {
+    if(ship == nullptr) {
+        shipDef = 0;
+    }
+    else {
+        shipDef = ship->getId();
+    }
+    for(int i = 0; i < KP::maxEquipSlots; ++i) {
+        char str[80];
+        strcpy(str, "Defaultequip");
+        engine.specModels[i]->setEquip(ship->attr[
+            strcat(str, QString::number(i+1).toLatin1().constData())]);
+    }
+    for(auto *box: equipBoxes) {
         if(box->count() > 0) {
             box->setCurrentIndex(0);
         }
@@ -242,4 +251,28 @@ shipToRemodel:
         }
     }
     engine.shipRemodelModel->setShip(availableShipsToRemodel);
+}
+
+int ConstructWindow::shipDefDesired() {
+    return shipDef;
+}
+
+QList<QUuid> ConstructWindow::defaultEquipsDesired() {
+    QList<QUuid> result(KP::maxEquipSlots, QUuid());
+    Clientv2 &engine = Clientv2::getInstance();
+    for(int i = 0; i < KP::maxEquipSlots; ++i) {
+        SpecEquipModel *model = engine.specModels[i];
+        auto uid = model->data(
+            model->index(equipBoxes[i]->currentIndex(), 0), Qt::ToolTipRole);
+        result[i] = uid.isValid() ? uid.toUuid() : QUuid();
+    }
+    return result;
+}
+
+QUuid ConstructWindow::shipToRemodelDesired() {
+    Clientv2 &engine = Clientv2::getInstance();
+    SpecShipModel *model = engine.shipRemodelModel;
+    auto uid = model->data(
+        model->index(ui->shipnameToRemodel->currentIndex(), 0), Qt::ToolTipRole);
+    return uid.isValid() ? uid.toUuid() : QUuid();
 }

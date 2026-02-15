@@ -10,8 +10,8 @@
 
 extern std::unique_ptr<QSettings> settings;
 
-Equipment::Equipment(int equipId)
-    : equipRegId(equipId){
+Equipment::Equipment(int equipId, QObject *parent)
+    : equipRegId(equipId), QObject(parent){
     if(equipId == 0) {
         return;
     }
@@ -67,7 +67,8 @@ Equipment::Equipment(int equipId)
     }
 }
 
-Equipment::Equipment(const QJsonObject &input) {
+Equipment::Equipment(const QJsonObject &input, QObject *parent)
+    : QObject(parent) {
     equipRegId = input["eid"].toInt();
     if(equipRegId == 0)
         return;

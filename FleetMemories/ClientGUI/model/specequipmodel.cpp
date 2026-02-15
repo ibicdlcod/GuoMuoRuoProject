@@ -16,6 +16,8 @@ int SpecEquipModel::columnCount(const QModelIndex &parent) const {
 
 QVariant SpecEquipModel::data(const QModelIndex &index,
                               int role) const {
+    if(!index.isValid())
+        return QVariant();
     if(index.row() >= rowCount() || index.column() >= columnCount())
         return QVariant();
     auto realRowIndex = index.row();

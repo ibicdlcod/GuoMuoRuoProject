@@ -97,6 +97,24 @@ QByteArray KP::clientAdminTestShipRemove() {
     return QCborValue::fromJsonValue(result).toCbor();
 }
 
+QByteArray KP::clientConstruct(int shipDef,
+                               const QList<QUuid> &defaultEquips,
+                               QUuid &shipToRemodel,
+                               int factoryID) {
+    QJsonObject result;
+    result["type"] = DgramType::Request;
+    result["command"] = CommandType::Construct;
+    result["shipdef"] = shipDef;
+    QJsonArray equipArray;
+    for(auto equip: defaultEquips) {
+        equipArray.append(QJsonValue(equip.toString()));
+    }
+    result["defaultequip"] = equipArray;
+    result["shiptoremodel"] = shipToRemodel.toString();
+    result["factory"] = factoryID;
+    return QCborValue::fromJsonValue(result).toCbor();
+}
+
 QByteArray KP::clientDemandDestructEquip(const QList<QUuid> &trash) {
     QJsonObject result;
     result["type"] = DgramType::Request;
@@ -296,6 +314,14 @@ QByteArray KP::serverAskForHomePort()
     return QCborValue::fromJsonValue(result).toCbor();
 }
 
+QByteArray KP::serverBlueprintRetired(int shipDef) {
+    QJsonObject result;
+    result["type"] = DgramType::Message;
+    result["msgtype"] = MsgType::ShipBPRetired;
+    result["shipdef"] = shipDef;
+    return QCborValue::fromJsonValue(result).toCbor();
+}
+
 QByteArray KP::serverDevelopFailed(GameError error) {
     QJsonObject result;
     result["type"] = DgramType::Message;
@@ -304,10 +330,10 @@ QByteArray KP::serverDevelopFailed(GameError error) {
     return QCborValue::fromJsonValue(result).toCbor();
 }
 
-QByteArray KP::serverDevelopStart() {
+QByteArray KP::serverDevelopStart(bool construct) {
     QJsonObject result;
     result["type"] = DgramType::Message;
-    result["msgtype"] = MsgType::DevelopStart;
+    result["msgtype"] = construct ? MsgType::ConstructStart : MsgType::DevelopStart;
     return QCborValue::fromJsonValue(result).toCbor();
 }
 
@@ -468,6 +494,16 @@ QByteArray KP::serverNewEquip(QUuid serial, int equipDid) {
     result["msgtype"] = MsgType::NewEquip;
     result["serial"] = serial.toString();
     result["equipdef"] = equipDid;
+    return QCborValue::fromJsonValue(result).toCbor();
+}
+
+QByteArray KP::serverNewShip(QUuid serial, int shipDid, int initialHP) {
+    QJsonObject result;
+    result["type"] = DgramType::Message;
+    result["msgtype"] = MsgType::NewShip;
+    result["serial"] = serial.toString();
+    result["shipdef"] = shipDid;
+    result["hp"] = initialHP;
     return QCborValue::fromJsonValue(result).toCbor();
 }
 

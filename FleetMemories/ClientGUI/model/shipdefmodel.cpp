@@ -28,7 +28,6 @@ QVariant ShipDefModel::data(const QModelIndex &index, int role) const
 {
     if (!index.isValid())
         return QVariant();
-
     auto *ship = getCurrentShip(index);
     switch (role) {
     case Qt::AccessibleTextRole:
@@ -93,5 +92,8 @@ void ShipDefModel::setShips(QList<int> shipIds) {
 }
 
 Ship * ShipDefModel::getCurrentShip(const QModelIndex &index) const {
+    if(!index.isValid()) {
+        return nullptr;
+    }
     return *((*ships).begin() + index.row());
 }

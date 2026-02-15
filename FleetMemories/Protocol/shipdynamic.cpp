@@ -1,12 +1,14 @@
 #include "shipdynamic.h"
 #include <QJsonObject>
 #include <QJsonArray>
+#include "ship.h"
 
 ShipDynamic::ShipDynamic(QObject *parent)
     : QObject{parent}
 {}
 
-ShipDynamic::ShipDynamic(const QJsonObject &input) {
+ShipDynamic::ShipDynamic(const QJsonObject &input, QObject *parent)
+    : QObject(parent) {
     star = input["star"].toInt();
     currentHP = input["hp"].toInt();
     condition = input["cond"].toInt();
@@ -23,4 +25,19 @@ ShipDynamic::ShipDynamic(const QJsonObject &input) {
     };
     fleetIndex = input["fleetindex"].toInt();
     fleetPosIndex = input["fleetposindex"].toInt();
+}
+
+ShipDynamic::ShipDynamic(int hp, QObject *parent)
+    : QObject(parent) {
+    /* for new ships */
+    star = 0;
+    currentHP = hp;
+    condition = KP::conditionMax;
+    exp = 0;
+    expCap = Ship::expCap(0);
+    slotEquip = QList<QUuid>(5, QUuid());
+    slotEquipEx = QUuid();
+    slotPlanes = QList<int>(5, 0);
+    fleetIndex = -1;
+    fleetPosIndex = -1;
 }

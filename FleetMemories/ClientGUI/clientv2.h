@@ -51,16 +51,16 @@ public:
     void doFetch(const QStringList &);
 
     /* ususally accesses equipregistryCache */
+    friend void ConstructWindow::switchDisplay(int);
+    friend void ConstructWindow::shipNameChanged(int);
     friend int DevelopWindow::equipIdDesired();
     friend void DevelopWindow::resetListName(int);
-    friend void ConstructWindow::switchDisplay(int);
+    friend void EquipSelect::reCalculateAvailableEquips(int);
+    friend void ShipDefModel::addShips(QList<int>);
     friend void TechView::demandLocalTech(int);
     friend void TechView::demandSkillPoints(int);
     friend void TechView::resetLocalListName();
     friend void TechView::equipOrShip();
-    friend void EquipSelect::reCalculateAvailableEquips(int);
-    friend class ShipDefModel;
-    friend void ConstructWindow::shipNameChanged(int);
 
     int equipBigTypeIndex = 0;
     int equipIndex = 0;
@@ -88,6 +88,8 @@ public slots:
     void demandMapCache();
     void demandShipCache();
     void displayPrompt();
+    void doConstructShip(int shipDef, const QList<QUuid> &defaultEquips,
+                         QUuid shipToRemodel, int factoryID);
     void doDestructEquip(const QList<QUuid> &);
     void doModernizeShip(const QList<QUuid> &);
     void doRefreshFactory();

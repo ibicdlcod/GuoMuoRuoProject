@@ -25,7 +25,7 @@ public slots:
                                        const QString &searchTerm
                                        = QLatin1String("")) override;
 
-    virtual void addShip(QUuid, int) final;
+    virtual void addShip(QUuid, int, int) final;
     virtual void enactModernize() final;
     virtual void modernizedShips(const QList<std::tuple<QUuid, int>> &);
     virtual void updateShipList(const QJsonObject &);
@@ -63,6 +63,7 @@ protected:
     virtual int numberOfShip() const;
     QHash<int, int> bpCache;
 
+    virtual void clearCheckBoxes() override;
     void clearShipCheckBoxes();
 
     QHash<QUuid, Ship *> clientShips;

@@ -60,12 +60,32 @@ const QHash<int, int> ShipBPModel::getClientShipBPs() const {
     return clientShipBPs;
 }
 
+void ShipBPModel::bpUsed(int shipDef) {
+    if(!clientShipBPs.contains(shipDef) || clientShipBPs[shipDef] < 1) {
+        return;
+    }
+    int oldRowCount = rowCount();
+    if(clientShipBPs[shipDef] == 1) {
+        clientShipBPs.remove(shipDef);
+        sortedShipBPIds.remove(1, sortedShipBPIds.indexOf(shipDef));
+    }
+    else {
+        clientShipBPs[shipDef] -= 1;
+    }
+    int newRowCount = rowCount();
+    emit needReCalculatePages();
+    adjustRowCount(oldRowCount, newRowCount);
+    wholeTableChanged();
+}
+
 int ShipBPModel::numberOfShip() const {
     return sortedShipBPIds.size();
 }
 
 QVariant ShipBPModel::data(const QModelIndex &index,
                            int role) const {
+    if(!index.isValid())
+        return QVariant();
     if(index.row() >= rowCount() || index.column() >= columnCount())
         return QVariant();
     int realRowIndex = index.row() + rowsPerPage * pageNum;

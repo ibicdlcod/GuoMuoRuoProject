@@ -13,8 +13,8 @@ class Ship : public QObject
 {
     Q_OBJECT
 public:
-    explicit Ship(int);
-    explicit Ship(const QJsonObject &);
+    explicit Ship(int, QObject *parent = nullptr);
+    explicit Ship(const QJsonObject &, QObject *parent = nullptr);
 
     int operator<=>(const Ship &) const;
     bool isNotEqual(const Ship &) const;
@@ -25,6 +25,7 @@ public:
     const int consTimeInSec() const;
     int getId() const;
     QList<int> getLaterModels(const QMap<int, Ship *> &) const;
+    QList<int> getPreviousModels(const QMap<int, Ship *> &) const;
     KP::ShipNationality getNationality() const;
     QList<int> getStartingEquip() const;
     double getTech() const;
@@ -33,6 +34,7 @@ public:
     bool isAmnesiac() const;
 
     static int getLevel(int);
+    static int expCap(int numberOfRings);
 
     QMap<QString, QString> localNames;
     QMap<QString, QString> shipClassText;

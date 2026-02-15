@@ -2,6 +2,7 @@
 #define CONSTRUCTWINDOW_H
 
 #include <QDialog>
+#include <QComboBox>
 #include "../../model/shipdefmodel.h"
 
 namespace Ui {
@@ -17,6 +18,9 @@ public:
     ~ConstructWindow();
 
     void initialize();
+    int shipDefDesired();
+    QList<QUuid> defaultEquipsDesired();
+    QUuid shipToRemodelDesired();
 
 public slots:
     void switchDisplay(int dummy = 0);
@@ -24,6 +28,9 @@ public slots:
 
 private:
     Ui::ConstructWindow *ui;
+    QList<QComboBox *> equipBoxes;
+
+    int shipDef;
 };
 
 #endif // CONSTRUCTWINDOW_H

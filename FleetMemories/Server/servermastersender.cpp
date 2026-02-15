@@ -14,6 +14,7 @@ void ServerMasterSender::addSender(QAbstractSocket *connection) {
 void ServerMasterSender::removeSender(QAbstractSocket *connection) {
     disconnect(agents[connection], &Sender::errorOccurred,
                this, &ServerMasterSender::errorHandle);
+    delete agents[connection];
     agents.remove(connection);
 }
 
