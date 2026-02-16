@@ -166,6 +166,25 @@ void ShipModel::modernizedShips(const QList<std::tuple<QUuid, int>> &modernized)
     wholeTableChanged();
 }
 
+void ShipModel::modifyShip(QUuid uid, int def, int hp) {
+    bpCacheRefresh();
+    int oldRowCount = rowCount();
+    Clientv2 &engine = Clientv2::getInstance();
+    clientShips[uid] = engine.getShipReg(def);
+    if(clientShipDynamicAttrs.contains(uid)) {
+        delete clientShipDynamicAttrs[uid];
+    }
+    clientShipDynamicAttrs[uid] = new ShipDynamic(hp, this);
+    if(!sortedShipIds.contains(uid)) {
+        sortedShipIds.append(uid);
+    }
+    customSort();
+    int newRowCount = rowCount();
+    emit needReCalculatePages();
+    adjustRowCount(oldRowCount, newRowCount);
+    wholeTableChanged();
+}
+
 void ShipModel::updateShipList(const QJsonObject &input) {
     bpCacheRefresh();
     clientShips.clear();

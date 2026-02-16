@@ -246,25 +246,25 @@ Great at battle and bad at politics--so cool!</translation>
     </message>
     <message id="invalid-command">
         <location filename="../Protocol/commandline.cpp" line="250"/>
-        <location filename="../ClientGUI/clientv2.cpp" line="1564"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="1586"/>
         <source>Invalid Command, use &apos;commands&apos; for valid commands, &apos;help&apos; for help, &apos;exit&apos; to exit.</source>
         <translation>Invalid Command, use &apos;commands&apos; for valid commands, &apos;help&apos; for help, &apos;exit&apos; to exit.</translation>
     </message>
     <message id="exit-helper">
         <location filename="../Protocol/commandline.cpp" line="255"/>
-        <location filename="../ClientGUI/clientv2.cpp" line="1610"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="1632"/>
         <source>Use &apos;exit&apos; to quit.</source>
         <translation>Use &apos;exit&apos; to quit.</translation>
     </message>
     <message id="good-command">
         <location filename="../Protocol/commandline.cpp" line="258"/>
-        <location filename="../ClientGUI/clientv2.cpp" line="1613"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="1635"/>
         <source>Available commands:</source>
         <translation>Available commands:</translation>
     </message>
     <message id="all-command">
         <location filename="../Protocol/commandline.cpp" line="263"/>
-        <location filename="../ClientGUI/clientv2.cpp" line="1618"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="1640"/>
         <source>All commands:</source>
         <translation>All commands:</translation>
     </message>
@@ -649,7 +649,7 @@ Great at battle and bad at politics--so cool!</translation>
         <location filename="../ClientGUI/clientv2.cpp" line="405"/>
         <location filename="../ClientGUI/clientv2.cpp" line="418"/>
         <location filename="../ClientGUI/clientv2.cpp" line="1180"/>
-        <location filename="../ClientGUI/clientv2.cpp" line="1570"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="1592"/>
         <source>You have insufficient privileges (typically you need to login).</source>
         <translation type="unfinished"></translation>
     </message>
@@ -898,109 +898,110 @@ Great at battle and bad at politics--so cool!</translation>
     </message>
     <message id="construct-success-id">
         <location filename="../ClientGUI/clientv2.cpp" line="1319"/>
-        <source>You get new equipment with id %1, serial number %2</source>
+        <source>You get new ship with id %1, serial number %2</source>
+        <oldsource>You get new equipment with id %1, serial number %2</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message id="server-hello">
-        <location filename="../ClientGUI/clientv2.cpp" line="1328"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="1350"/>
         <source>Server is alive and responding.</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="client-start">
-        <location filename="../ClientGUI/clientv2.cpp" line="1339"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="1361"/>
         <source>You can now play the game.</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="client-finish">
-        <location filename="../ClientGUI/clientv2.cpp" line="1361"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="1383"/>
         <source>The client can now exit normally.</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="destruct-equip-list">
-        <location filename="../ClientGUI/clientv2.cpp" line="1374"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="1396"/>
         <source>The following equipment are destructed: %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="modernize-ship-list">
-        <location filename="../ClientGUI/clientv2.cpp" line="1393"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="1415"/>
         <source>The following ships are modernized: %1</source>
         <oldsource>The following ship are modernized: %1</oldsource>
         <translation type="unfinished">The following ship are modernized: %1</translation>
     </message>
     <message id="operation-success">
-        <location filename="../ClientGUI/clientv2.cpp" line="1399"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="1421"/>
         <source>Operation success!</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="fleet-size-error">
-        <location filename="../ClientGUI/clientv2.cpp" line="1410"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="1432"/>
         <source>Fleet is oversized or undersized.</source>
         <oldsource>Fleet is oversized.</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message id="fleet-type-error">
-        <location filename="../ClientGUI/clientv2.cpp" line="1414"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="1436"/>
         <source>Fleet does not suit its type.</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="login-success">
-        <location filename="../ClientGUI/clientv2.cpp" line="1431"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="1453"/>
         <source>%1: login success</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="ticket-decrypt-fail">
-        <location filename="../ClientGUI/clientv2.cpp" line="1441"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="1463"/>
         <source>Login failed: cannot decrypt ticket.</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="ticket-incorrect-appid">
-        <location filename="../ClientGUI/clientv2.cpp" line="1443"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="1465"/>
         <source>Login failed: ticket is from incorrect app id.</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="ticket-timeout">
-        <location filename="../ClientGUI/clientv2.cpp" line="1445"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="1467"/>
         <source>Login failed: ticket timeouted.</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="steam-id-invalid">
-        <location filename="../ClientGUI/clientv2.cpp" line="1447"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="1469"/>
         <source>Login failed: steam id is invalid.</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="steam-auth-fail">
-        <location filename="../ClientGUI/clientv2.cpp" line="1449"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="1471"/>
         <source>Login failed: steam authentication failed.</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="login-failed">
-        <location filename="../ClientGUI/clientv2.cpp" line="1453"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="1475"/>
         <source>%1: login failure, reason: %2</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="switch-cert-when-connecting">
-        <location filename="../ClientGUI/clientv2.cpp" line="1626"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="1648"/>
         <location filename="../Server/server.cpp" line="4185"/>
         <source>Switch certificate when connected have no effect.</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="client-pem">
-        <location filename="../ClientGUI/clientv2.cpp" line="1637"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="1659"/>
         <source>Client PEM is now %1.</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="equipment-cache-length">
-        <location filename="../ClientGUI/clientv2.cpp" line="1663"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="1685"/>
         <source>Equipment cache length: %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="map-cache-length">
-        <location filename="../ClientGUI/clientv2.cpp" line="1694"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="1716"/>
         <source>Map cache length: %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="shipment-cache-length">
-        <location filename="../ClientGUI/clientv2.cpp" line="1724"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="1746"/>
         <source>Ship cache length: %1</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2364,13 +2365,13 @@ Great at battle and bad at politics--so cool!</translation>
         <translation type="unfinished"></translation>
     </message>
     <message id="fleet-idle">
-        <location filename="../ClientGUI/model/shipmodel.cpp" line="286"/>
+        <location filename="../ClientGUI/model/shipmodel.cpp" line="305"/>
         <source>Idle</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="ship-uuid">
-        <location filename="../ClientGUI/model/shipmodel.cpp" line="312"/>
-        <location filename="../ClientGUI/model/shipmodel.cpp" line="451"/>
+        <location filename="../ClientGUI/model/shipmodel.cpp" line="331"/>
+        <location filename="../ClientGUI/model/shipmodel.cpp" line="470"/>
         <location filename="../ClientGUI/model/specshipmodel.cpp" line="59"/>
         <source>UUID</source>
         <translation type="unfinished"></translation>
@@ -2379,8 +2380,8 @@ Great at battle and bad at politics--so cool!</translation>
         <location filename="../ClientGUI/model/shipbpmodel.cpp" line="140"/>
         <location filename="../ClientGUI/model/shipbpmodel.cpp" line="201"/>
         <location filename="../ClientGUI/model/shipdefmodel.cpp" line="54"/>
-        <location filename="../ClientGUI/model/shipmodel.cpp" line="316"/>
-        <location filename="../ClientGUI/model/shipmodel.cpp" line="454"/>
+        <location filename="../ClientGUI/model/shipmodel.cpp" line="335"/>
+        <location filename="../ClientGUI/model/shipmodel.cpp" line="473"/>
         <source>Name</source>
         <translation>Name</translation>
     </message>
@@ -2391,55 +2392,55 @@ Great at battle and bad at politics--so cool!</translation>
         <translation>Amount</translation>
     </message>
     <message id="ship-star">
-        <location filename="../ClientGUI/model/shipmodel.cpp" line="320"/>
-        <location filename="../ClientGUI/model/shipmodel.cpp" line="458"/>
+        <location filename="../ClientGUI/model/shipmodel.cpp" line="339"/>
+        <location filename="../ClientGUI/model/shipmodel.cpp" line="477"/>
         <source>Modernization</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="ship-improve">
-        <location filename="../ClientGUI/model/shipmodel.cpp" line="324"/>
-        <location filename="../ClientGUI/model/shipmodel.cpp" line="461"/>
+        <location filename="../ClientGUI/model/shipmodel.cpp" line="343"/>
+        <location filename="../ClientGUI/model/shipmodel.cpp" line="480"/>
         <source>Modernize</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="ship-star-whatsthis">
-        <location filename="../ClientGUI/model/shipmodel.cpp" line="439"/>
+        <location filename="../ClientGUI/model/shipmodel.cpp" line="458"/>
         <source>Modernization/Maximum Modernization</source>
         <translation>Modernization/Maximum Modernization</translation>
     </message>
     <message id="ship-select">
-        <location filename="../ClientGUI/model/shipmodel.cpp" line="328"/>
-        <location filename="../ClientGUI/model/shipmodel.cpp" line="464"/>
+        <location filename="../ClientGUI/model/shipmodel.cpp" line="347"/>
+        <location filename="../ClientGUI/model/shipmodel.cpp" line="483"/>
         <source>Select this</source>
         <oldsource>Select</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message id="ship-star-tooltip">
-        <location filename="../ClientGUI/model/shipmodel.cpp" line="242"/>
+        <location filename="../ClientGUI/model/shipmodel.cpp" line="261"/>
         <source>Current Star %1, maximum star %2</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="ship-hp">
-        <location filename="../ClientGUI/model/shipmodel.cpp" line="332"/>
-        <location filename="../ClientGUI/model/shipmodel.cpp" line="467"/>
+        <location filename="../ClientGUI/model/shipmodel.cpp" line="351"/>
+        <location filename="../ClientGUI/model/shipmodel.cpp" line="486"/>
         <source>HP</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="ship-cond">
-        <location filename="../ClientGUI/model/shipmodel.cpp" line="336"/>
-        <location filename="../ClientGUI/model/shipmodel.cpp" line="470"/>
+        <location filename="../ClientGUI/model/shipmodel.cpp" line="355"/>
+        <location filename="../ClientGUI/model/shipmodel.cpp" line="489"/>
         <source>Cond.</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="ship-lv">
-        <location filename="../ClientGUI/model/shipmodel.cpp" line="340"/>
-        <location filename="../ClientGUI/model/shipmodel.cpp" line="473"/>
+        <location filename="../ClientGUI/model/shipmodel.cpp" line="359"/>
+        <location filename="../ClientGUI/model/shipmodel.cpp" line="492"/>
         <source>Level</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="ship-pos">
-        <location filename="../ClientGUI/model/shipmodel.cpp" line="344"/>
-        <location filename="../ClientGUI/model/shipmodel.cpp" line="476"/>
+        <location filename="../ClientGUI/model/shipmodel.cpp" line="363"/>
+        <location filename="../ClientGUI/model/shipmodel.cpp" line="495"/>
         <source>Position</source>
         <translation type="unfinished"></translation>
     </message>

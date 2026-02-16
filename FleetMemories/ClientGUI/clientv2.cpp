@@ -1314,9 +1314,31 @@ void Clientv2::receivedMsg(const QJsonObject &djson) {
             shipModel.addShip(serial, shipDefInt, hp);
         }
         else {
-            //% "You get new equipment with id %1, serial number %2"
+            //% "You get new ship with id %1, serial number %2"
             qInfo() <<
                 qtTrId("construct-success-id")
+                    .arg(djson["shipdef"].toInt())
+                    .arg(djson["serial"].toString());
+        }
+        doRefreshFactory();
+    }
+    break;
+    case KP::ShipRemodeled: {
+        int shipDefInt = djson["shipdef"].toInt();
+        QUuid serial = QUuid(djson["serial"].toString());
+        int hp = djson["hp"].toInt();
+        if(shipRegistryCache.contains(shipDefInt)) {
+            //% "Ship serial number %2 is remodeled to %1"
+            qInfo() <<
+                qtTrId("remodel-success")
+                    .arg(shipRegistryCache.value(shipDefInt)->toString(),
+                         djson["serial"].toString());
+            shipModel.modifyShip(serial, shipDefInt, hp);
+        }
+        else {
+            //% "Ship serial number %2 is remodeled to id %1"
+            qInfo() <<
+                qtTrId("remodel-success-id")
                     .arg(djson["shipdef"].toInt())
                     .arg(djson["serial"].toString());
         }
