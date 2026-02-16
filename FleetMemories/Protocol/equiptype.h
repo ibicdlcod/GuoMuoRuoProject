@@ -1,3 +1,6 @@
+/* Copyright (C) 2026 Harusoft Inc.
+ * SPDX-License-Identifier: AGPL-3.0-or-later */
+
 #ifndef EQUIPTYPE_H
 #define EQUIPTYPE_H
 
@@ -73,6 +76,7 @@ public:
     bool isVirtual() const;
 
     static QList<QString> allEquipTypes();
+    friend class Server;
 
 private:
 #pragma message(USED_CXX17)
@@ -89,8 +93,8 @@ private:
         std::pair("Second-gun-flat",        0x4002),
         std::pair("Second-gun-flak",        0x6002),
         std::pair("Second-gun-flak-big",    0x6003),
-        std::pair("Torp",                   0x1800),
-        std::pair("Torp-sub",               0x0800),
+        std::pair("Torp",                   0x1802),
+        std::pair("Torp-sub",               0x0802),
         std::pair("Midget-sub",             0x00010000),
         std::pair("Fighter",                0x0400),
         std::pair("Fighter-night",          0x0410),
@@ -123,7 +127,7 @@ private:
         std::pair("Sp-recon-small",         0x0089),
         std::pair("Sp-recon",               0x008A),
         std::pair("Sp-recon-night",         0x009A),
-        std::pair("Sp-fight",               0x0408),
+        std::pair("Sp-fight",               0x040A),
         std::pair("Flyingboat",             0x001A0000),
         std::pair("Patrol-autogyro",        0x0042),
         std::pair("Patrol-liaison",         0x0041),

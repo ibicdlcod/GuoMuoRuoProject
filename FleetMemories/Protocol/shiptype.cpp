@@ -1,3 +1,6 @@
+/* Copyright (C) 2026 Harusoft Inc.
+ * SPDX-License-Identifier: AGPL-3.0-or-later */
+
 #include "shiptype.h"
 
 ShipType::ShipType(int shipId)
@@ -225,7 +228,7 @@ int ShipType::consTimeBase() const {
     case 7: return 75;
     case 8: return 150 + (iRep & 0x2 ? 50 : 0);
     case 9: return 375;
-    case 0xa: return 300;
+    case 0xa: return 625;
     case 0xb: return 325;
     case 0xc:
         // TBD

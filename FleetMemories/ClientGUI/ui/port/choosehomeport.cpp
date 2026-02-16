@@ -1,3 +1,6 @@
+/* Copyright (C) 2026 Harusoft Inc.
+ * SPDX-License-Identifier: AGPL-3.0-or-later */
+
 #include "choosehomeport.h"
 #include "ui_choosehomeport.h"
 #include <QJsonArray>

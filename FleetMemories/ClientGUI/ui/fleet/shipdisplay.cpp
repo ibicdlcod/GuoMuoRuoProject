@@ -1,3 +1,6 @@
+/* Copyright (C) 2026 Harusoft Inc.
+ * SPDX-License-Identifier: AGPL-3.0-or-later */
+
 #include "shipdisplay.h"
 #include "qstylehints.h"
 #include "ui_shipdisplay.h"

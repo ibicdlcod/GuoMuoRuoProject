@@ -15,7 +15,7 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
-    <layout class="QGridLayout" name="gridLayout_2">
+    <layout class="QGridLayout" name="gridLayout">
      <item row="0" column="0">
       <widget class="QLabel" name="typeLabel_3">
        <property name="sizePolicy">
@@ -49,7 +49,7 @@
       </widget>
      </item>
      <item row="0" column="2">
-      <widget class="QLabel" name="typeLabel_5">
+      <widget class="QLabel" name="DELabel1">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
          <horstretch>0</horstretch>
@@ -68,10 +68,29 @@
       </widget>
      </item>
      <item row="0" column="3">
+      <widget class="QLabel" name="DEText1">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>10</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>0</width>
+         <height>10</height>
+        </size>
+       </property>
+       <property name="text">
+        <string id="default-equip-none">(Not required)</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="4">
       <widget class="QComboBox" name="equip1">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-         <horstretch>2</horstretch>
+         <horstretch>1</horstretch>
          <verstretch>0</verstretch>
         </sizepolicy>
        </property>
@@ -113,7 +132,7 @@
       </widget>
      </item>
      <item row="1" column="2">
-      <widget class="QLabel" name="typeLabel_6">
+      <widget class="QLabel" name="DELabel2">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
          <horstretch>0</horstretch>
@@ -132,6 +151,25 @@
       </widget>
      </item>
      <item row="1" column="3">
+      <widget class="QLabel" name="DEText2">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>10</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>0</width>
+         <height>10</height>
+        </size>
+       </property>
+       <property name="text">
+        <string id="default-equip-none">(Not required)</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="4">
       <widget class="QComboBox" name="equip2">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
@@ -177,7 +215,7 @@
       </widget>
      </item>
      <item row="2" column="2">
-      <widget class="QLabel" name="typeLabel_7">
+      <widget class="QLabel" name="DELabel3">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
          <horstretch>0</horstretch>
@@ -196,6 +234,25 @@
       </widget>
      </item>
      <item row="2" column="3">
+      <widget class="QLabel" name="DEText3">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>10</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>0</width>
+         <height>10</height>
+        </size>
+       </property>
+       <property name="text">
+        <string id="default-equip-none">(Not required)</string>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="4">
       <widget class="QComboBox" name="equip3">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
@@ -241,7 +298,7 @@
       </widget>
      </item>
      <item row="3" column="2">
-      <widget class="QLabel" name="typeLabel_8">
+      <widget class="QLabel" name="DELabel4">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
          <horstretch>0</horstretch>
@@ -260,6 +317,25 @@
       </widget>
      </item>
      <item row="3" column="3">
+      <widget class="QLabel" name="DEText4">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>10</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>0</width>
+         <height>10</height>
+        </size>
+       </property>
+       <property name="text">
+        <string id="default-equip-none">(Not required)</string>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="4">
       <widget class="QComboBox" name="equip4">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
@@ -311,7 +387,7 @@
       </widget>
      </item>
      <item row="4" column="2">
-      <widget class="QLabel" name="typeLabel_9">
+      <widget class="QLabel" name="DELabel5">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
          <horstretch>0</horstretch>
@@ -330,6 +406,25 @@
       </widget>
      </item>
      <item row="4" column="3">
+      <widget class="QLabel" name="DEText5">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>10</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>0</width>
+         <height>10</height>
+        </size>
+       </property>
+       <property name="text">
+        <string id="default-equip-none">(Not required)</string>
+       </property>
+      </widget>
+     </item>
+     <item row="4" column="4">
       <widget class="QComboBox" name="equip5">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
@@ -347,7 +442,7 @@
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout_3">
      <item>
-      <widget class="QLabel" name="typeLabel_10">
+      <widget class="QLabel" name="remodelLabel">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
          <horstretch>0</horstretch>

@@ -1,3 +1,6 @@
+/* Copyright (C) 2026 Harusoft Inc.
+ * SPDX-License-Identifier: AGPL-3.0-or-later */
+
 #include "resord.h"
 #include <QSettings>
 #include "kp.h"
@@ -90,6 +93,18 @@ bool ResOrd::addResources(const ResOrd &amount,
         cap(maximum);
         return true;
     }
+}
+
+bool ResOrd::addResourcesNonnegative(const ResOrd &amount,
+                          const ResOrd &maximum) {
+    o = std::max(std::min(o + amount.o, maximum.o), o);
+    e = std::max(std::min(e + amount.e, maximum.e), e);
+    s = std::max(std::min(s + amount.s, maximum.s), s);
+    r = std::max(std::min(r + amount.r, maximum.r), r);
+    a = std::max(std::min(a + amount.a, maximum.a), a);
+    w = std::max(std::min(w + amount.w, maximum.w), w);
+    c = std::max(std::min(c + amount.c, maximum.c), c);
+    return true;
 }
 
 /* attempt to spend resources, will not change if failed */

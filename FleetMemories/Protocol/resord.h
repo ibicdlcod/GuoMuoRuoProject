@@ -1,3 +1,6 @@
+/* Copyright (C) 2026 Harusoft Inc.
+ * SPDX-License-Identifier: AGPL-3.0-or-later */
+
 #ifndef RESORD_H
 #define RESORD_H
 
@@ -68,6 +71,7 @@ struct ResOrd
     }
     bool addResources(const ResOrd &);
     bool addResources(const ResOrd &amount, const ResOrd &maximum);
+    bool addResourcesNonnegative(const ResOrd &amount, const ResOrd &maximum);
     bool spendResources(const ResOrd &);
     void cap(const ResOrd&);
     QByteArray resourceDesired() const;

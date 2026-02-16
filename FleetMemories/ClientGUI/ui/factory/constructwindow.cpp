@@ -1,3 +1,6 @@
+/* Copyright (C) 2026 Harusoft Inc.
+ * SPDX-License-Identifier: AGPL-3.0-or-later */
+
 #include "constructwindow.h"
 #include "../../clientv2.h"
 #include "ui_constructwindow.h"
@@ -227,12 +230,37 @@ void ConstructWindow::shipNameChanged(int) {
     for(int i = 0; i < KP::maxEquipSlots; ++i) {
         char str[80];
         strcpy(str, "Defaultequip");
-        engine.specModels[i]->setEquip(ship->attr[
-            strcat(str, QString::number(i+1).toLatin1().constData())]);
-    }
-    for(auto *box: equipBoxes) {
+        auto equip = ship->attr[
+            strcat(str, QString::number(i+1).toLatin1().constData())];
+        engine.specModels[i]->setEquip(equip);
+        auto *box = equipBoxes[i];
+        auto *label = ui->gridLayout->itemAtPosition(i, 2)->widget();
+        auto *equipText = qobject_cast<QLabel *>(ui->gridLayout->itemAtPosition(i, 3)->widget());
+
+        if(equipText) {
+            if(equip != 0) {
+                equipText->setText(engine.equipRegistryCache[equip]->toString());
+            }
+            else {
+                //% "(Not required)"
+                equipText->setText(qtTrId("default-equip-none"));
+            }
+        }
         if(box->count() > 0) {
             box->setCurrentIndex(0);
+            if(label) {
+                label->setStyleSheet("");
+            }
+        }
+        else if(equip != 0) {
+            if(label) {
+                label->setStyleSheet("color: red;");
+            }
+        }
+        else {
+            if(label) {
+                label->setStyleSheet("");
+            }
         }
     }
     ui->resourceAmount->setText(ship->consRes().toString(true));
@@ -251,6 +279,13 @@ shipToRemodel:
         }
     }
     engine.shipRemodelModel->setShip(availableShipsToRemodel);
+    if(ui->shipnameToRemodel->count() > 0
+        || ship->getPreviousModels(engine.shipRegistryCache).isEmpty()) {
+        ui->remodelLabel->setStyleSheet("");
+    }
+    else {
+        ui->remodelLabel->setStyleSheet("color: red;");
+    }
 }
 
 int ConstructWindow::shipDefDesired() {

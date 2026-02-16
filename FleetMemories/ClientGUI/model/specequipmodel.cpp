@@ -1,3 +1,6 @@
+/* Copyright (C) 2026 Harusoft Inc.
+ * SPDX-License-Identifier: AGPL-3.0-or-later */
+
 #include "specequipmodel.h"
 #include "../clientv2.h"
 #include "../equipicon.h"
@@ -39,8 +42,7 @@ QVariant SpecEquipModel::data(const QModelIndex &index,
     case Qt::DisplayRole: {
         auto uid = uidToDisplay.toString().first(9).last(8);
         auto star = "★" + QString::number(starToDisplay);
-        QString localName = equipToDisplay->toString();
-        QStringList list = {uid, star, localName};
+        QStringList list = {uid, star};
         return list.join(" ");
     }
     break;

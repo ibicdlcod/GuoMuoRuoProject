@@ -1,3 +1,6 @@
+/* Copyright (C) 2026 Harusoft Inc.
+ * SPDX-License-Identifier: AGPL-3.0-or-later */
+
 #ifndef KP_H
 #define KP_H
 
@@ -101,6 +104,7 @@ enum MsgType{
     Penguin,
     NewEquip,
     NewShip,
+    ShipRemodeled,
     Hello,
     LackPrivate,
     AllowClientStart,
@@ -513,6 +517,7 @@ QByteArray serverMapInfo(const QJsonArray &, bool user = false,
                          QDateTime timeUtc = QDateTime::currentDateTimeUtc(),
                          bool cacheHit = false);
 QByteArray serverNewEquip(QUuid, int);
+QByteArray serverNewmodelShip(QUuid, int, int);
 QByteArray serverNewShip(QUuid, int, int);
 QByteArray serverParseError(MsgType, const QString &,
                             const QString &);

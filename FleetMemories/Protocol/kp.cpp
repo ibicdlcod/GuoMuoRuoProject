@@ -1,3 +1,6 @@
+/* Copyright (C) 2026 Harusoft Inc.
+ * SPDX-License-Identifier: AGPL-3.0-or-later */
+
 #include "kp.h"
 #include <QFile>
 #include <QJsonArray>
@@ -501,6 +504,16 @@ QByteArray KP::serverNewShip(QUuid serial, int shipDid, int initialHP) {
     QJsonObject result;
     result["type"] = DgramType::Message;
     result["msgtype"] = MsgType::NewShip;
+    result["serial"] = serial.toString();
+    result["shipdef"] = shipDid;
+    result["hp"] = initialHP;
+    return QCborValue::fromJsonValue(result).toCbor();
+}
+
+QByteArray KP::serverNewmodelShip(QUuid serial, int shipDid, int initialHP) {
+    QJsonObject result;
+    result["type"] = DgramType::Message;
+    result["msgtype"] = MsgType::ShipRemodeled;
     result["serial"] = serial.toString();
     result["shipdef"] = shipDid;
     result["hp"] = initialHP;

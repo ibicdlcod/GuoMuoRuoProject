@@ -1,3 +1,6 @@
+/* Copyright (C) 2026 Harusoft Inc.
+ * SPDX-License-Identifier: AGPL-3.0-or-later */
+
 #include "portarea.h"
 #include "ui_portarea.h"
 #include "../../clientv2.h"

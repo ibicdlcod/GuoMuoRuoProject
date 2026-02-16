@@ -1,50 +1,6 @@
-/****************************************************************************
-**
-** Copyright (C) 2018 The Qt Company Ltd.
-** Contact: https://www.qt.io/licensing/
-**
-** $QT_BEGIN_LICENSE:BSD$
-** Commercial License Usage
-** Licensees holding valid commercial Qt licenses may use this file in
-** accordance with the commercial license agreement provided with the
-** Software or, alternatively, in accordance with the terms contained in
-** a written agreement between you and The Qt Company. For licensing terms
-** and conditions see https://www.qt.io/terms-conditions. For further
-** information use the contact form at https://www.qt.io/contact-us.
-**
-** BSD License Usage
-** Alternatively, you may use this file under the terms of the BSD license
-** as follows:
-**
-** "Redistribution and use in source and binary forms, with or without
-** modification, are permitted provided that the following conditions are
-** met:
-**   * Redistributions of source code must retain the above copyright
-**     notice, this list of conditions and the following disclaimer.
-**   * Redistributions in binary form must reproduce the above copyright
-**     notice, this list of conditions and the following disclaimer in
-**     the documentation and/or other materials provided with the
-**     distribution.
-**   * Neither the name of The Qt Company Ltd nor the names of its
-**     contributors may be used to endorse or promote products derived
-**     from this software without specific prior written permission.
-**
-**
-** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-** "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-** LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
-** A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
-** OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
-** SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
-** LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
-** DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
-** THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-** (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-** OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
-**
-** $QT_END_LICENSE$
-**
-****************************************************************************/
+/* Copyright (C) 2026 Harusoft Inc.
+ * SPDX-License-Identifier: AGPL-3.0-or-later */
+
 #define NOMINMAX
 #include "server.h"
 #include <QBuffer>
@@ -112,7 +68,7 @@ Q_GLOBAL_STATIC(QString,
                     "UserID BLOB PRIMARY KEY, "
                     "UserType TEXT NOT NULL DEFAULT 'commoner'"
                     ");"
-                    ));
+                    ))
 
 /* User-bound attributes */
 Q_GLOBAL_STATIC(QString,
@@ -125,7 +81,7 @@ Q_GLOBAL_STATIC(QString,
                     "FOREIGN KEY(UserID) REFERENCES NewUsers(UserID)"
                     "CONSTRAINT noduplicate UNIQUE(UserID, Attribute)"
                     ");"
-                    ));
+                    ))
 
 /* Equipment registry */
 Q_GLOBAL_STATIC(QString,
@@ -137,7 +93,7 @@ Q_GLOBAL_STATIC(QString,
                     "Intvalue INTEGER DEFAULT 0,"
                     "CONSTRAINT noduplicate UNIQUE(EquipID, Attribute)"
                     ");"
-                    ));
+                    ))
 
 /* Equipment name table */
 Q_GLOBAL_STATIC(QString,
@@ -149,7 +105,7 @@ Q_GLOBAL_STATIC(QString,
                     "zh_CN TEXT, "
                     "en_US TEXT"
                     ");"
-                    ));
+                    ))
 
 /* Ship registry */
 Q_GLOBAL_STATIC(QString,
@@ -161,7 +117,7 @@ Q_GLOBAL_STATIC(QString,
                     "Intvalue INTEGER DEFAULT 0,"
                     "CONSTRAINT noduplicate UNIQUE(ShipID, Attribute)"
                     ");"
-                    ));
+                    ))
 
 /* Ship name table */
 Q_GLOBAL_STATIC(QString,
@@ -173,24 +129,27 @@ Q_GLOBAL_STATIC(QString,
                     "textattr TEXT, "
                     "value TEXT "
                     ");"
-                    ));
+                    ))
 
 /* Factory slots of users */
 Q_GLOBAL_STATIC(QString,
                 userFactory,
                 QStringLiteral(
                     "CREATE TABLE Factories ("
-                    "UserID BLOB NOT NULL,"
-                    "FactoryID INTEGER NOT NULL,"
-                    "CurrentJob INTEGER DEFAULT 0,"
+                    "UserID BLOB NOT NULL, "
+                    "FactoryID INTEGER NOT NULL, "
+                    "CurrentJob INTEGER DEFAULT 0, "
                     "StartTime INTEGER, "
-                    "SuccessTime INTEGER,"
-                    "Done BOOL DEFAULT false,"
-                    "Success BOOL DEFAULT false,"
+                    "SuccessTime INTEGER, "
+                    "Done BOOL DEFAULT false, "
+                    "Success BOOL DEFAULT false, "
+                    /* ship to remodel */
+                    "PrevUuid TEXT, "
                     "FOREIGN KEY(UserID) REFERENCES NewUsers(UserID),"
+                    "FOREIGN KEY(PrevUuid) REFERENCES UserShip(ShipUuid),"
                     "CONSTRAINT noduplicate UNIQUE(UserID, FactoryID)"
                     ");"
-                    ));
+                    ))
 
 /* Equipment of users */
 Q_GLOBAL_STATIC(QString,
@@ -204,7 +163,7 @@ Q_GLOBAL_STATIC(QString,
                     "FOREIGN KEY(User) REFERENCES NewUsers(UserID), "
                     "FOREIGN KEY(EquipDef) REFERENCES EquipName(EquipID)"
                     ");"
-                    ));
+                    ))
 
 /* Equipment of users(KC) */
 Q_GLOBAL_STATIC(QString,
@@ -217,7 +176,7 @@ Q_GLOBAL_STATIC(QString,
                     "SkillPoints INTEGER DEFAULT 0, "
                     "FOREIGN KEY(EquipDef) REFERENCES EquipName(EquipID)"
                     ");"
-                    ));
+                    ))
 
 /* Equipment skill points */
 Q_GLOBAL_STATIC(QString,
@@ -231,7 +190,7 @@ Q_GLOBAL_STATIC(QString,
                     "FOREIGN KEY(EquipDef) REFERENCES EquipName(EquipID),"
                     "CONSTRAINT noduplicate UNIQUE(User, EquipDef) "
                     ");"
-                    ));
+                    ))
 
 /* Map node table */
 Q_GLOBAL_STATIC(QString,
@@ -243,7 +202,7 @@ Q_GLOBAL_STATIC(QString,
                     "zh_CN TEXT, "
                     "en_US TEXT "
                     ");"
-                    ));
+                    ))
 
 /* Map relation table */
 Q_GLOBAL_STATIC(QString,
@@ -256,7 +215,7 @@ Q_GLOBAL_STATIC(QString,
                     "FOREIGN KEY(Node1) REFERENCES MapNode(MapID),"
                     "FOREIGN KEY(Node2) REFERENCES MapNode(MapID) "
                     ");"
-                    ));
+                    ))
 
 /* Map resources table */
 Q_GLOBAL_STATIC(QString,
@@ -269,7 +228,7 @@ Q_GLOBAL_STATIC(QString,
                     "FOREIGN KEY(MapID) REFERENCES MapNode(MapID) "
                     "CONSTRAINT noduplicate UNIQUE(MapID, Attribute) "
                     ");"
-                    ));
+                    ))
 
 /* Ship of users */
 Q_GLOBAL_STATIC(QString,
@@ -308,7 +267,7 @@ Q_GLOBAL_STATIC(QString,
                     "FOREIGN KEY(Slot5) REFERENCES UserEquip(EquipUuid) "
                     "FOREIGN KEY(SlotEX) REFERENCES UserEquip(EquipUuid) "
                     ");"
-                    ));
+                    ))
 
 /* Equipment of users(KC) */
 Q_GLOBAL_STATIC(QString,
@@ -320,7 +279,7 @@ Q_GLOBAL_STATIC(QString,
                     "Exp INTEGER DEFAULT 0, "
                     "FOREIGN KEY(ShipDef) REFERENCES EquipName(ShipID)"
                     ");"
-                    ));
+                    ))
 
 /* Ship of users */
 Q_GLOBAL_STATIC(QString,
@@ -334,7 +293,7 @@ Q_GLOBAL_STATIC(QString,
                     "FOREIGN KEY(ShipDef) REFERENCES ShipName(ShipID) "
                     "CONSTRAINT noduplicate UNIQUE(User, ShipDef) "
                     ");"
-                    ));
+                    ))
 
 /* Not customized, since set this lesser than 60 creates problems */
 const int elapsedMaxTolerance = steamRateLimit;
@@ -1461,7 +1420,7 @@ void Server::doConstruct(CSteamID &uid,
                          QSslSocket *connection) {
     QSqlDatabase db = QSqlDatabase::database();
     try{
-        if(!shipRegistry.contains(shipDef)) {
+        if(Q_UNLIKELY(!shipRegistry.contains(shipDef))) {
             QByteArray msg =
                 KP::serverDevelopFailed(KP::DevelopNotExist);
             senderM.sendMessage(connection, msg);
@@ -1478,8 +1437,8 @@ void Server::doConstruct(CSteamID &uid,
         query.prepare(queryStr);
         query.bindValue(":uid", uid.ConvertToUint64());
         query.bindValue(":def", shipDef);
-        if(query.exec() && query.isSelect()) {
-            if(query.first() && query.value(0).toInt() > 0) {
+        if(Q_LIKELY(query.exec() && query.isSelect())) {
+            if(Q_LIKELY(query.first() && query.value(0).toInt() > 0)) {
                 ; // pass
             }
             else {
@@ -1526,7 +1485,7 @@ void Server::doConstruct(CSteamID &uid,
                 idd.append(QString::number(i+1));
                 query.bindValue(idd, allModels[i]);
             }
-            if(query.exec() && query.isSelect()) {
+            if(Q_LIKELY(query.exec() && query.isSelect())) {
                 while(query.next()) {
                     isCloning = true;
                     break;
@@ -1561,56 +1520,11 @@ void Server::doConstruct(CSteamID &uid,
             return;
         }
 
-    eat_default_equip:
-        QList<QUuid> trash;
-        if(equips.size() != KP::maxEquipSlots) {
-            QByteArray msg =
-                KP::serverDevelopFailed(KP::DefaultEquipIncorrect);
-            senderM.sendMessage(connection, msg);
-            return;
-        }
-        for(int i = 0; i < KP::maxEquipSlots; ++i) {
-            int equipDef = 0;
-            QSqlQuery query;
-            QString queryStr = QStringLiteral("SELECT EquipDef "
-                                              "FROM UserEquip "
-                                              "WHERE User = :uid AND EquipUuid = :euid");
-            query.prepare(queryStr);
-            query.bindValue(":uid", uid.ConvertToUint64());
-            query.bindValue(":euid", equips[i].toString());
-            if(query.exec() && query.isSelect()) {
-                if(query.first()) {
-                    equipDef = query.value(0).toInt();
-                }
-            }
-            else {
-                //% "Database failed when constructing: query existing equips failed!"
-                throw DBError(qtTrId("dbfail-constructing-query-existing-equips"),
-                              query.lastError());
-            }
-            QString de = QStringLiteral("Defaultequip");
-            de.append(QString::number(i+1));
-            if(equipDef == ship->attr[de]) {
-                if(equipDef != 0) {
-                    trash.append(equips[i]);
-                }
-            }
-            else {
-                QByteArray msg =
-                    KP::serverDevelopFailed(KP::DefaultEquipIncorrect);
-                senderM.sendMessage(connection, msg);
-                return;
-            }
-        }
-        QList<QUuid> destructed = retireEquip(uid, trash);
-        QByteArray msg2 = KP::serverEquipRetired(destructed);
-        senderM.sendMessage(connection, msg2);
-
     decide_if_fresh_construction:
         QList<int> remodelCandidate = ship->getPreviousModels(shipRegistry);
         if(remodelCandidate.isEmpty()) {
         fresh_construction:
-            if(!prevShip.isNull()) {
+            if(Q_UNLIKELY(!prevShip.isNull())) {
                 QByteArray msg =
                     KP::serverDevelopFailed(KP::RemodelShipIncorrect);
                 senderM.sendMessage(connection, msg);
@@ -1619,7 +1533,6 @@ void Server::doConstruct(CSteamID &uid,
             qint64 startTime = QDateTime::currentSecsSinceEpoch();
             qint64 successTime = startTime + ship->consTimeInSec();
 
-            QSqlDatabase db = QSqlDatabase::database();
             QSqlQuery query;
             query.prepare("UPDATE Factories "
                           "SET StartTime = :st, "
@@ -1632,7 +1545,7 @@ void Server::doConstruct(CSteamID &uid,
             query.bindValue(":shipid", ship->getId());
             query.bindValue(":id", uid.ConvertToUint64());
             query.bindValue(":fid", factoryid);
-            if(query.exec()) {
+            if(Q_LIKELY(query.exec())) {
                 qDebug() << "SHIP DEV START";
                 /* only spend resources if database successfully register
                  * the operation */
@@ -1659,7 +1572,7 @@ void Server::doConstruct(CSteamID &uid,
             query.prepare(queryStr);
             query.bindValue(":uid", uid.ConvertToUint64());
             query.bindValue(":suid", prevShip.toString());
-            if(query.exec() && query.isSelect()) {
+            if(Q_LIKELY(query.exec() && query.isSelect())) {
                 if(query.first()) {
                     remodelDef = query.value(0).toInt();
                 }
@@ -1669,19 +1582,97 @@ void Server::doConstruct(CSteamID &uid,
                 throw DBError(qtTrId("dbfail-constructing-query-existing-ships"),
                               query.lastError());
             }
-            if(!remodelCandidate.contains(remodelDef)) {
+            if(Q_UNLIKELY(!remodelCandidate.contains(remodelDef))) {
                 QByteArray msg =
                     KP::serverDevelopFailed(KP::RemodelShipIncorrect);
                 senderM.sendMessage(connection, msg);
                 return;
             }
             else {
-                qCritical () << "REMODEL";
+                qint64 startTime = QDateTime::currentSecsSinceEpoch();
+                qint64 successTime = startTime + ship->consTimeInSec();
+
+                QSqlQuery query;
+                query.prepare("UPDATE Factories "
+                              "SET StartTime = :st, "
+                              "SuccessTime = :succ, Done = 0, Success = :good, "
+                              "CurrentJob = :shipid, "
+                              "PrevUuid = :previd "
+                              "WHERE UserID = :id AND FactoryID = :fid ");
+                query.bindValue(":st", startTime);
+                query.bindValue(":succ", successTime);
+                query.bindValue(":good", true); // 100% success
+                query.bindValue(":shipid", ship->getId());
+                query.bindValue(":previd", prevShip.toString());
+                query.bindValue(":id", uid.ConvertToUint64());
+                query.bindValue(":fid", factoryid);
+                if(Q_LIKELY(query.exec())) {
+                    qDebug() << "SHIP REMODEL START";
+                    /* only spend resources if database successfully register
+                     * the operation */
+                    User::setResources(uid, currentRes);
+                    QByteArray msg =
+                        KP::serverDevelopStart(true);
+                    senderM.sendMessage(connection, msg);
+                    offerResourceInfo(connection, uid);
+                }
+                else {
+                    qCritical() << query.lastQuery();
+                    //% "Database failed when modernizing."
+                    throw DBError(qtTrId("dbfail-modernizing"),
+                                  query.lastError());
+                    return;
+                }
             }
         restore_default_equip_converter_remodel:
             int levelDesired = (ship->getId() & 0xF0000000) >> 7;
             int levelOriginal = 0;
         }
+
+    eat_default_equip:
+        QList<QUuid> trash;
+        if(Q_UNLIKELY(equips.size() != KP::maxEquipSlots)) {
+            QByteArray msg =
+                KP::serverDevelopFailed(KP::DefaultEquipIncorrect);
+            senderM.sendMessage(connection, msg);
+            return;
+        }
+        for(int i = 0; i < KP::maxEquipSlots; ++i) {
+            int equipDef = 0;
+            QSqlQuery query;
+            QString queryStr = QStringLiteral("SELECT EquipDef "
+                                              "FROM UserEquip "
+                                              "WHERE User = :uid AND EquipUuid = :euid");
+            query.prepare(queryStr);
+            query.bindValue(":uid", uid.ConvertToUint64());
+            query.bindValue(":euid", equips[i].toString());
+            if(Q_LIKELY(query.exec() && query.isSelect())) {
+                if(query.first()) {
+                    equipDef = query.value(0).toInt();
+                }
+            }
+            else {
+                //% "Database failed when constructing: query existing equips failed!"
+                throw DBError(qtTrId("dbfail-constructing-query-existing-equips"),
+                              query.lastError());
+            }
+            QString de = QStringLiteral("Defaultequip");
+            de.append(QString::number(i+1));
+            if(Q_LIKELY(equipDef == ship->attr[de])) {
+                if(equipDef != 0) {
+                    trash.append(equips[i]);
+                }
+            }
+            else {
+                QByteArray msg =
+                    KP::serverDevelopFailed(KP::DefaultEquipIncorrect);
+                senderM.sendMessage(connection, msg);
+                return;
+            }
+        }
+        QList<QUuid> destructed = retireEquip(uid, trash);
+        QByteArray msg2 = KP::serverEquipRetired(destructed);
+        senderM.sendMessage(connection, msg2);
 
     delete_bp:
     {
@@ -1692,7 +1683,7 @@ void Server::doConstruct(CSteamID &uid,
         query.prepare(queryStr);
         query.bindValue(":uid", uid.ConvertToUint64());
         query.bindValue(":def", shipDef);
-        if(query.exec()) {
+        if(Q_LIKELY(query.exec())) {
             QByteArray msg = KP::serverBlueprintRetired(shipDef);
             senderM.sendMessage(connection, msg);
             return;
@@ -1849,7 +1840,7 @@ void Server::doFetch(CSteamID &uid, int factoryid, QSslSocket *connection) {
     User::refreshFactory(this, uid);
     QSqlDatabase db = QSqlDatabase::database();
     QSqlQuery query;
-    query.prepare("SELECT CurrentJob, Done, Success "
+    query.prepare("SELECT CurrentJob, Done, Success, PrevUuid "
                   "FROM Factories "
                   "WHERE UserID = :id AND FactoryID = :fid");
     query.bindValue(":id", uid.ConvertToUint64());
@@ -1901,12 +1892,22 @@ void Server::doFetch(CSteamID &uid, int factoryid, QSslSocket *connection) {
                 senderM.sendMessage(connection, msg);
             }
             else {
-            add_ship:
-                QByteArray msg = KP::serverNewShip(
-                    newShip(uid, jobID), jobID, shipRegistry[jobID]->attr["Hitpoints"]);
-                senderM.sendMessage(connection, msg);
+                QUuid prevUuid = query.value(3).toUuid();
+                if(prevUuid.isNull()) {
+                add_ship:
+                    QByteArray msg = KP::serverNewShip(
+                        newShip(uid, jobID), jobID, shipRegistry[jobID]->attr["Hitpoints"]);
+                    senderM.sendMessage(connection, msg);
+                }
+                else {
+                remodel_ship:
+                    if(modifyShip(uid, prevUuid, jobID)) {
+                        QByteArray msg = KP::serverNewmodelShip(
+                            prevUuid, jobID, shipRegistry[jobID]->attr["Hitpoints"]);
+                        senderM.sendMessage(connection, msg);
+                    }
+                }
             }
-            QSqlDatabase db = QSqlDatabase::database();
             QSqlQuery query;
             query.prepare("UPDATE Factories "
                           "SET StartTime = NULL, "
@@ -2033,7 +2034,7 @@ void Server::generateEquipChilds(int originalChild, int thisEquip) {
 
 void Server::generateTestEquip(const CSteamID &uid) {
     deleteTestEquip(uid);
-    static const double difficulty = 100.0; // higher the value is easier
+    static const double difficulty = 10.0; // higher the value is easier
     std::uniform_real_distribution dist{0.0, 1.0};
     std::uniform_int_distribution dist2{0, 15};
     for(auto equip: std::as_const(equipRegistry)) {
@@ -2057,7 +2058,7 @@ void Server::generateTestEquip(const CSteamID &uid) {
 }
 
 void Server::generateTestShip(const CSteamID &uid) {
-    static const double difficulty = 100.0; // higher the value is easier
+    static const double difficulty = 10.0; // higher the value is easier
     std::uniform_real_distribution dist{0.0, 1.0};
     std::uniform_int_distribution dist2{0, 15};
     for(auto ship: std::as_const(shipRegistry)) {
@@ -2921,6 +2922,50 @@ QList<std::tuple<QUuid, int>> Server::modernize(
     return result;
 }
 
+bool Server::modifyShip(const CSteamID &uid, QUuid prevShip, int newDef) {
+    QSqlDatabase db = QSqlDatabase::database();
+    int startingHP;
+    if(shipRegistry[newDef]->attr.contains("Hitpoints")) {
+        startingHP = std::max(1, shipRegistry[newDef]->attr["Hitpoints"]);
+    }
+    else {
+        startingHP = 1;
+    }
+    QSqlQuery query2;
+    query2.prepare("UPDATE UserShip "
+                   "SET ShipDef = :def, CurrentHP = :hp, Condition = :cond, "
+                   "Slot1 = NULL, "
+                   "Slot2 = NULL, "
+                   "Slot3 = NULL, "
+                   "Slot4 = NULL, "
+                   "Slot5 = NULL, "
+                   "Slot1Planes = NULL, "
+                   "Slot2Planes = NULL, "
+                   "Slot3Planes = NULL, "
+                   "Slot4Planes = NULL, "
+                   "Slot5Planes = NULL "
+                   "WHERE User = :user AND ShipUuid = :suid;");
+    query2.bindValue(":def", newDef);
+    query2.bindValue(":hp", startingHP);
+    query2.bindValue(":cond", 480);
+    query2.bindValue(":user", uid.ConvertToUint64());
+    query2.bindValue(":suid", prevShip);
+    if(Q_UNLIKELY(!query2.exec())) {
+        qCritical() << query2.lastQuery();
+        //% "User id %1: remodel ship failed!"
+        throw DBError(qtTrId("remodel-ship-failed")
+                          .arg(uid.ConvertToUint64()),
+                      query2.lastError());
+        return false;
+    }
+    else {
+        //% "User id %1: remodeled ship %2 definition %3"
+        qDebug() << qtTrId("remodeled-ship").arg(uid.ConvertToUint64())
+                        .arg(prevShip.toString()).arg(newDef);
+        return true;
+    }
+}
+
 /* 3-Resources.md#Natural regeneration */
 void Server::naturalRegen(const CSteamID &uid) {
     try{
@@ -2971,7 +3016,7 @@ void Server::naturalRegen(const CSteamID &uid) {
             int regenInitFactor = settings->value("rule/regenattech0", 24).toInt();
             regenCap *= (qint64)(std::round(globalTechLevel * regenPerTech) + regenInitFactor);
             ResOrd currentRes = User::getCurrentResources(uid);
-            currentRes.addResources(regenAmount, regenCap);
+            currentRes.addResourcesNonnegative(regenAmount, regenCap);
             User::setResources(uid, currentRes);
             QSqlQuery query;
             query.prepare("UPDATE UserAttr SET Intvalue"
@@ -3717,18 +3762,19 @@ void Server::sendTestMessages() {
         qWarning() << "Server isn't listening, abort.";
     }
     else {
-        /*for(auto ship: std::as_const(shipRegistry)) {
+
+        for(auto user: connectedUsers) {
+            generateTestEquip(user);
+            generateTestShip(user);
+        }
+        for(auto ship: std::as_const(shipRegistry)) {
             if(ship->isAmnesiac())
                 continue;
-            auto dis = std::bernoulli_distribution(0.10);
+            auto dis = std::bernoulli_distribution(0.50);
             if(dis(mt)) {
                 for(auto user: connectedUsers)
                     User::addShipBP(user, ship->getId());
             }
-        }*/
-        for(auto user: connectedUsers) {
-            QList<QUuid> a(5);
-            doConstruct(user,169411328,a,QUuid(),0,connectedPeers[user]);
         }
     }
 }
