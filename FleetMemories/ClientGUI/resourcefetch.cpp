@@ -69,8 +69,6 @@ void ResourceFetch::downloadFile(const QString &urlSpec,
         fileName.prepend(downloadDirectory + '/');
 
     if(QFile::exists(fileName)) {
-        //% "File %1 exists."
-        //qDebug() << qtTrId("file-exists").arg(fileName);
         QTimer::singleShot(1, this, [this]{emit finished();});
         return;
     }

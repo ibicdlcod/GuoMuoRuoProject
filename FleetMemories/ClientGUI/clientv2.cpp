@@ -490,12 +490,19 @@ void Clientv2::tsunkitAssets2() {
         oldInternalIDs.insert(ship->attr["OldInternalNo."]);
     }
     downloadRequired = oldInternalIDs.size();
-    for(auto oldInternalID: oldInternalIDs)  {
+    int downloadStarted = 0;
+    for(auto oldInternalID: oldInternalIDs) {
         if(oldInternalID == 0) {
             downloadRequired -= 1;
             continue;
         }
+        while(downloadStarted - downloadCompleted > 200) {
+            QEventLoop loop;
+            QTimer::singleShot(100, &loop, &QEventLoop::quit);
+            loop.exec();
+        }
         ResourceFetch *resourceFetcher = new ResourceFetch();
+        downloadStarted += 1;
         resourceFetcher->downloadFile(
             QString("https://tsunkit.net/api/assets/images/shipIcons/%1_100").arg(oldInternalID),
             QString("%1.png").arg(oldInternalID),

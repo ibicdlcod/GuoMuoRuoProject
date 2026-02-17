@@ -17,10 +17,14 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # Lua
 add_subdirectory(lua-cmake/)
-if (${CMAKE_BUILD_TYPE} MATCHES "Release")
-    set(LUA_LIBRARY ${PROJECT_BINARY_DIR}/lua-cmake/src/lua-5.4.lib)
+if (${CMAKE_SYSTEM_NAME} MATCHES "Windows")
+    if (${CMAKE_BUILD_TYPE} MATCHES "Release")
+        set(LUA_LIBRARY ${PROJECT_BINARY_DIR}/lua-cmake/src/lua-5.4.lib)
+    else ()
+        set(LUA_LIBRARY ${PROJECT_BINARY_DIR}/lua-cmake/src/lua-5.4d.lib)
+    endif()
 else ()
-    set(LUA_LIBRARY ${PROJECT_BINARY_DIR}/lua-cmake/src/lua-5.4d.lib)
+    set(LUA_LIBRARY ${PROJECT_BINARY_DIR}/lua-cmake/src/liblua-5.4.a)
 endif()
 list(APPEND CMAKE_PREFIX_PATH ${PROJECT_SOURCE_DIR}/lua-cmake/src)
 include_directories(${PROJECT_SOURCE_DIR}/lua-cmake/src)
@@ -347,3 +351,20 @@ else ()
         "${CMAKE_CURRENT_SOURCE_DIR}/steam/lib/linux64/libsdkencryptedappticket.so"
         $<TARGET_FILE_DIR:CFServer>)
 endif()
+
+add_custom_command(TARGET CFServer POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+    "${PROJECT_SOURCE_DIR}/../doc/equip/Equip.csv"
+    $<TARGET_FILE_DIR:CFServer>)
+add_custom_command(TARGET CFServer POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+    "${PROJECT_SOURCE_DIR}/../doc/ship/Ship.csv"
+    $<TARGET_FILE_DIR:CFServer>)
+add_custom_command(TARGET CFServer POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+    "${PROJECT_SOURCE_DIR}/../doc/map/Map_nodes.csv"
+    $<TARGET_FILE_DIR:CFServer>)
+add_custom_command(TARGET CFServer POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+    "${PROJECT_SOURCE_DIR}/../doc/map/Map_relations.csv"
+    $<TARGET_FILE_DIR:CFServer>)

@@ -3078,7 +3078,7 @@ void Server::naturalRegen(const CSteamID &uid) {
                                         rare + regenPower,
                                         rare + regenPower);
             if(regenMins > 0) {
-                //% "%1 minute(s) passed for regeneration purposes.";
+                //% "%1 minute(s) passed for regeneration purposes."
                 qDebug() << qtTrId("regen-min").arg(regenMins);
             }
             regenAmount *= (qint64)regenMins;

@@ -10,6 +10,7 @@
 #include "qconsolelistener.h"
 #include "server.h"
 #include <sol/sol.hpp>
+#include <iostream>
 
 #if defined(Q_OS_UNIX)
 #include <netinet/in.h>
