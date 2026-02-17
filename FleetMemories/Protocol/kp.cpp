@@ -340,6 +340,14 @@ QByteArray KP::serverDevelopStart(bool construct) {
     return QCborValue::fromJsonValue(result).toCbor();
 }
 
+QByteArray KP::serverDisableShip(QUuid serial) {
+    QJsonObject result;
+    result["type"] = DgramType::Message;
+    result["msgtype"] = MsgType::DisableShip;
+    result["serial"] = serial.toString();
+    return QCborValue::fromJsonValue(result).toCbor();
+}
+
 QByteArray KP::serverEquipLackFather(GameError error, int father) {
     QJsonObject result;
     result["type"] = DgramType::Message;

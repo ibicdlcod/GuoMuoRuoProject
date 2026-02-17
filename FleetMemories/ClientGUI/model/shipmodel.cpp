@@ -166,19 +166,27 @@ void ShipModel::modernizedShips(const QList<std::tuple<QUuid, int>> &modernized)
     wholeTableChanged();
 }
 
-void ShipModel::modifyShip(QUuid uid, int def, int hp) {
+void ShipModel::modifyShip(QUuid uid, int def, int hp, bool disabling) {
     bpCacheRefresh();
     int oldRowCount = rowCount();
     Clientv2 &engine = Clientv2::getInstance();
-    clientShips[uid] = engine.getShipReg(def);
-    if(clientShipDynamicAttrs.contains(uid)) {
-        delete clientShipDynamicAttrs[uid];
+    if(disabling && clientShipDynamicAttrs.contains(uid)) {
+        clientShipDynamicAttrs[uid]->fleetIndex = -2;
     }
-    clientShipDynamicAttrs[uid] = new ShipDynamic(hp, this);
-    if(!sortedShipIds.contains(uid)) {
-        sortedShipIds.append(uid);
+    else {
+        clientShips[uid] = engine.getShipReg(def);
+        if(clientShipDynamicAttrs.contains(uid)) {
+            delete clientShipDynamicAttrs[uid];
+        }
+        clientShipDynamicAttrs[uid] = new ShipDynamic(hp, this);
+        clientShipDynamicAttrs[uid]->fleetIndex = -1;
+        clientShipDynamicAttrs[uid]->fleetPosIndex = -1;
+
+        if(!sortedShipIds.contains(uid)) {
+            sortedShipIds.append(uid);
+        }
+        customSort();
     }
-    customSort();
     int newRowCount = rowCount();
     emit needReCalculatePages();
     adjustRowCount(oldRowCount, newRowCount);
@@ -303,6 +311,10 @@ QVariant ShipModel::data(const QModelIndex &index,
             if(attr->fleetIndex == -1 && attr->fleetPosIndex == -1) {
                 //% "Idle"
                 return qtTrId("fleet-idle");
+            }
+            else if(attr->fleetIndex == -2) {
+                //% "Disabled"
+                return qtTrId("fleet-disabled");
             }
             return QStringLiteral("%1-%2").arg(attr->fleetIndex + 1)
                 .arg(attr->fleetPosIndex + 1);

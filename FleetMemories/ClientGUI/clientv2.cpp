@@ -1240,6 +1240,10 @@ void Clientv2::receivedMsg(const QJsonObject &djson) {
             //% "Ship to remodel is incorrect!"
             qWarning() << qtTrId("ship-to-convert-incorrect");
             break;
+        case KP::ShipisDisabled:
+            //% "Ship is disabled!"
+            qWarning() << qtTrId("ship-is-disabled");
+            break;
         default:
             //% "Equipment development failed."
             qInfo() << qtTrId("equip-develop-failed");
@@ -1328,12 +1332,12 @@ void Clientv2::receivedMsg(const QJsonObject &djson) {
         QUuid serial = QUuid(djson["serial"].toString());
         int hp = djson["hp"].toInt();
         if(shipRegistryCache.contains(shipDefInt)) {
+            shipModel.modifyShip(serial, shipDefInt, hp);
             //% "Ship serial number %2 is remodeled to %1"
             qInfo() <<
                 qtTrId("remodel-success")
                     .arg(shipRegistryCache.value(shipDefInt)->toString(),
                          djson["serial"].toString());
-            shipModel.modifyShip(serial, shipDefInt, hp);
         }
         else {
             //% "Ship serial number %2 is remodeled to id %1"
@@ -1342,6 +1346,14 @@ void Clientv2::receivedMsg(const QJsonObject &djson) {
                     .arg(djson["shipdef"].toInt())
                     .arg(djson["serial"].toString());
         }
+        doRefreshFactory();
+    }
+    break;
+    case KP::DisableShip: {
+        QUuid serial = QUuid(djson["serial"].toString());
+        shipModel.modifyShip(serial, 0, 0, true);
+        //% "Ship %1 is disabled."
+        qInfo() << qtTrId("ship-is-disabled-normal").arg(serial.toString());
         doRefreshFactory();
     }
     break;

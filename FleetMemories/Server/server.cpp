@@ -1566,7 +1566,7 @@ void Server::doConstruct(CSteamID &uid,
         remodel:
             int remodelDef = 0;
             QSqlQuery query;
-            QString queryStr = QStringLiteral("SELECT ShipDef "
+            QString queryStr = QStringLiteral("SELECT ShipDef, FleetIndex "
                                               "FROM UserShip "
                                               "WHERE User = :uid AND ShipUuid = :suid");
             query.prepare(queryStr);
@@ -1581,6 +1581,7 @@ void Server::doConstruct(CSteamID &uid,
                 //% "Database failed when constructing: query existing ships failed!"
                 throw DBError(qtTrId("dbfail-constructing-query-existing-ships"),
                               query.lastError());
+                return;
             }
             if(Q_UNLIKELY(!remodelCandidate.contains(remodelDef))) {
                 QByteArray msg =
@@ -1588,7 +1589,33 @@ void Server::doConstruct(CSteamID &uid,
                 senderM.sendMessage(connection, msg);
                 return;
             }
+            else if(Q_UNLIKELY(query.value(1).toInt() == -2)) {
+                QByteArray msg =
+                    KP::serverDevelopFailed(KP::ShipisDisabled);
+                senderM.sendMessage(connection, msg);
+                return;
+            }
             else {
+            disable_ship:
+                QSqlQuery query2;
+                query2.prepare("UPDATE UserShip "
+                               "SET FleetIndex = -2 "
+                               "WHERE User = :id AND ShipUuid = :suid ");
+                query2.bindValue(":id", uid.ConvertToUint64());
+                query2.bindValue(":suid", prevShip.toString());
+                if(Q_LIKELY(query2.exec())) {
+                    QByteArray msg = KP::serverDisableShip(prevShip);
+                    senderM.sendMessage(connection, msg);
+                }
+                else {
+                    qCritical() << query2.lastQuery();
+                    //% "Database failed when modernizing (locking previous ship)."
+                    throw DBError(qtTrId("dbfail-modernizing-prev-lock"),
+                                  query2.lastError());
+                    return;
+                }
+
+            actual_remodel:
                 qint64 startTime = QDateTime::currentSecsSinceEpoch();
                 qint64 successTime = startTime + ship->consTimeInSec();
 
@@ -1626,7 +1653,20 @@ void Server::doConstruct(CSteamID &uid,
             }
         restore_default_equip_converter_remodel:
             int levelDesired = (ship->getId() & 0xF0000000) >> 7;
-            int levelOriginal = 0;
+            int levelOriginal = (shipRegistry[remodelDef]->getId()
+                                 & 0xF0000000) >> 7;
+            if(levelDesired == levelOriginal) {
+                for(int i = 0; i < KP::maxEquipSlots; ++i) {
+                    QString key = QStringLiteral("Defaultequip");
+                    key.append(QString::number(i+1));
+                    int prevDefaultEquip = ship->attr[key];
+                    if(prevDefaultEquip != 0) {
+                        QByteArray msg = KP::serverNewEquip(
+                            newEquip(uid, prevDefaultEquip), prevDefaultEquip);
+                        senderM.sendMessage(connection, msg);
+                    }
+                }
+            }
         }
 
     eat_default_equip:
@@ -1912,7 +1952,8 @@ void Server::doFetch(CSteamID &uid, int factoryid, QSslSocket *connection) {
             query.prepare("UPDATE Factories "
                           "SET StartTime = NULL, "
                           "SuccessTime = NULL, Done = 0, Success = 0, "
-                          "CurrentJob = 0 "
+                          "CurrentJob = 0, "
+                          "PrevUuid = NULL "
                           "WHERE UserID = :id AND FactoryID = :fid");
             query.bindValue(":id", uid.ConvertToUint64());
             query.bindValue(":fid", factoryid);
@@ -2034,7 +2075,7 @@ void Server::generateEquipChilds(int originalChild, int thisEquip) {
 
 void Server::generateTestEquip(const CSteamID &uid) {
     deleteTestEquip(uid);
-    static const double difficulty = 10.0; // higher the value is easier
+    static const double difficulty = 100.0; // higher the value is easier
     std::uniform_real_distribution dist{0.0, 1.0};
     std::uniform_int_distribution dist2{0, 15};
     for(auto equip: std::as_const(equipRegistry)) {
@@ -2058,7 +2099,7 @@ void Server::generateTestEquip(const CSteamID &uid) {
 }
 
 void Server::generateTestShip(const CSteamID &uid) {
-    static const double difficulty = 10.0; // higher the value is easier
+    static const double difficulty = 100.0; // higher the value is easier
     std::uniform_real_distribution dist{0.0, 1.0};
     std::uniform_int_distribution dist2{0, 15};
     for(auto ship: std::as_const(shipRegistry)) {
@@ -2923,6 +2964,35 @@ QList<std::tuple<QUuid, int>> Server::modernize(
 }
 
 bool Server::modifyShip(const CSteamID &uid, QUuid prevShip, int newDef) {
+    int stars = 0;
+
+    QSqlQuery query;
+    query.prepare("SELECT ShipDef, Star "
+                  "FROM UserShip WHERE User = :id "
+                  "AND ShipUuid = :prev");
+    query.bindValue(":id", uid.ConvertToUint64());
+    query.bindValue(":prev", prevShip.toString());
+
+    if(Q_UNLIKELY(!(query.exec() && query.isSelect() && query.first()))) {
+        //% "Query ship %2 for user %1 failed!"
+        throw DBError(qtTrId("user-query-ship-fail")
+                          .arg(uid.ConvertToUint64())
+                          .arg(prevShip.toString()), query.lastError());
+        return false;
+    }
+    else {
+        int levelDesired = (shipRegistry[newDef]->getId()
+                            & 0xF0000000) >> 7;
+        int levelOriginal = (shipRegistry[query.value(0).toInt()]->getId()
+                             & 0xF0000000) >> 7;
+        if(levelDesired == levelOriginal) {
+            stars = query.value(1).toInt();
+        }
+        else {
+            stars = query.value(1).toInt() / 2;
+        }
+    }
+
     QSqlDatabase db = QSqlDatabase::database();
     int startingHP;
     if(shipRegistry[newDef]->attr.contains("Hitpoints")) {
@@ -2934,6 +3004,7 @@ bool Server::modifyShip(const CSteamID &uid, QUuid prevShip, int newDef) {
     QSqlQuery query2;
     query2.prepare("UPDATE UserShip "
                    "SET ShipDef = :def, CurrentHP = :hp, Condition = :cond, "
+                   "Star = :star, "
                    "Slot1 = NULL, "
                    "Slot2 = NULL, "
                    "Slot3 = NULL, "
@@ -2943,11 +3014,14 @@ bool Server::modifyShip(const CSteamID &uid, QUuid prevShip, int newDef) {
                    "Slot2Planes = NULL, "
                    "Slot3Planes = NULL, "
                    "Slot4Planes = NULL, "
-                   "Slot5Planes = NULL "
+                   "Slot5Planes = NULL, "
+                   "FleetIndex = -1, "
+                   "FleetPosIndex = -1 "
                    "WHERE User = :user AND ShipUuid = :suid;");
     query2.bindValue(":def", newDef);
     query2.bindValue(":hp", startingHP);
     query2.bindValue(":cond", 480);
+    query2.bindValue(":star", stars);
     query2.bindValue(":user", uid.ConvertToUint64());
     query2.bindValue(":suid", prevShip);
     if(Q_UNLIKELY(!query2.exec())) {
@@ -3658,9 +3732,9 @@ void Server::receivedReq(const QJsonObject &djson,
                            this,
                            [connection, uid, djson, this]
                            {offerTechInfo(
-                  connection,
-                  uid,
-                  djson["local"].toInt());});
+                                 connection,
+                                 uid,
+                                 djson["local"].toInt());});
     }
     break;
     case KP::CommandType::DemandSkillPoints: {
@@ -3668,9 +3742,9 @@ void Server::receivedReq(const QJsonObject &djson,
                            this,
                            [connection, uid, djson, this]
                            {offerSPInfo(
-                  connection,
-                  uid,
-                  djson["equipid"].toInt());});
+                                 connection,
+                                 uid,
+                                 djson["equipid"].toInt());});
     }
     break;
     case KP::CommandType::DemandResourceUpdate: {
@@ -3678,8 +3752,8 @@ void Server::receivedReq(const QJsonObject &djson,
                            this,
                            [connection, uid, this]
                            {offerResourceInfo(
-                  connection,
-                  uid);});
+                                 connection,
+                                 uid);});
     }
     break;
     case KP::CommandType::DestructEquip: {

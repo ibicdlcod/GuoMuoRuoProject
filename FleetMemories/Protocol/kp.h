@@ -117,6 +117,7 @@ enum MsgType{
     AskForHomePort,
     ShipModernized,
     ShipBPRetired,
+    DisableShip,
 };
 Q_ENUM_NS(MsgType)
 
@@ -185,6 +186,7 @@ enum GameError{
     DefaultEquipIncorrect,
     RemodelShipIncorrect,
     BlueprintNonexistent,
+    ShipisDisabled,
 };
 Q_ENUM_NS(GameError)
 
@@ -498,6 +500,7 @@ QByteArray serverAskForHomePort();
 QByteArray serverBlueprintRetired(int);
 QByteArray serverDevelopFailed(GameError);
 QByteArray serverDevelopStart(bool construct = false);
+QByteArray serverDisableShip(QUuid);
 QByteArray serverEquipLackFather(GameError, int);
 QByteArray serverEquipLackMother(GameError, int, int64);
 QByteArray serverEquipRetired(const QList<QUuid> &);

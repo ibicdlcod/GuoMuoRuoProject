@@ -15,6 +15,21 @@ set(CMAKE_AUTORCC ON)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+# Lua
+add_subdirectory(lua-cmake/)
+if (${CMAKE_BUILD_TYPE} MATCHES "Release")
+    set(LUA_LIBRARY ${PROJECT_BINARY_DIR}/lua-cmake/src/lua-5.4.lib)
+else ()
+    set(LUA_LIBRARY ${PROJECT_BINARY_DIR}/lua-cmake/src/lua-5.4d.lib)
+endif()
+list(APPEND CMAKE_PREFIX_PATH ${PROJECT_SOURCE_DIR}/lua-cmake/src)
+include_directories(${PROJECT_SOURCE_DIR}/lua-cmake/src)
+include_directories(${PROJECT_BINARY_DIR}/lua-cmake/src)
+find_package(Lua REQUIRED)
+
+include_directories(${PROJECT_SOURCE_DIR}/sol2/include)
+# end Lua
+
 find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Core Gui Widgets)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS
     UiPlugin LinguistTools Sql SvgWidgets Network HttpServer)
@@ -237,6 +252,7 @@ add_dependencies(CFServer update_translations)
 target_link_libraries(CFProtocol PRIVATE Qt${QT_VERSION_MAJOR}::Core)
 target_link_libraries(CFProtocol PRIVATE Qt${QT_VERSION_MAJOR}::Sql)
 target_link_libraries(CFProtocol PRIVATE Qt${QT_VERSION_MAJOR}::Network)
+target_link_libraries(CFProtocol PRIVATE lua_library)
 target_link_libraries(CFClient PRIVATE Qt${QT_VERSION_MAJOR}::HttpServer)
 target_link_libraries(CFClient PRIVATE Qt${QT_VERSION_MAJOR}::SvgWidgets)
 target_link_libraries(CFClient PRIVATE Qt${QT_VERSION_MAJOR}::Widgets)
@@ -249,12 +265,14 @@ else ()
 endif()
 target_link_libraries(CFClient PRIVATE ${STEAM_LIBRARY})
 target_link_libraries(CFClient PRIVATE ${STEAM_APPENCRYPT_LIBRARY})
+target_link_libraries(CFClient PRIVATE lua_library)
 target_link_libraries(CFServer PRIVATE Qt${QT_VERSION_MAJOR}::Core)
 target_link_libraries(CFServer PRIVATE Qt${QT_VERSION_MAJOR}::Sql)
 target_link_libraries(CFServer PRIVATE Qt${QT_VERSION_MAJOR}::Network)
 target_link_libraries(CFServer PRIVATE CFProtocol)
 target_link_libraries(CFServer PRIVATE ${STEAM_LIBRARY})
 target_link_libraries(CFServer PRIVATE ${STEAM_APPENCRYPT_LIBRARY})
+target_link_libraries(CFServer PRIVATE lua_library)
 
 set_target_properties(CFClient PROPERTIES
     MACOSX_BUNDLE_GUI_IDENTIFIER moe.fleetmemories.fleetmemories

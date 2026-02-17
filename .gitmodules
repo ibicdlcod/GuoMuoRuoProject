@@ -1,0 +1,6 @@
+[submodule "FleetMemories/lua-cmake"]
+	path = FleetMemories/lua-cmake
+	url = https://gitlab.com/codelibre/lua/lua-cmake.git
+[submodule "FleetMemories/sol2"]
+	path = FleetMemories/sol2
+	url = https://github.com/ThePhD/sol2.git

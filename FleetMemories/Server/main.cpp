@@ -9,6 +9,7 @@
 #include "../Protocol/kp.h"
 #include "qconsolelistener.h"
 #include "server.h"
+#include <sol/sol.hpp>
 
 #if defined(Q_OS_UNIX)
 #include <netinet/in.h>
@@ -22,6 +23,17 @@ const int STEAM_ERROR = 1;
 }
 
 int main(int argc, char *argv[]) {
+    /* lua testing */
+    std::cout << "=== opening a state ===" << std::endl;
+
+    sol::state lua;
+    // open some common libraries
+    lua.open_libraries(sol::lib::base, sol::lib::package);
+    lua.script("print('bark bark bark!')");
+
+    std::cout << std::endl;
+    /* end lua testing */
+
     SteamErrMsg err;
     /* doubt this will have actual effect */
     constexpr int gamePort = 1826;
