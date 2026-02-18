@@ -6,6 +6,7 @@
 #include <QHeaderView>
 #include <QSvgWidget>
 #include <QToolButton>
+#include <QMessageBox>
 #include "developwindow.h"
 #include "../../clientv2.h"
 #include "../views/equipview.h"
@@ -82,6 +83,7 @@ void FactoryArea::developClicked(bool checked, int slotnum) {
             engine.doFetch({"fetch", QString::number(slotnum)});
         }
         else if(slotfs[slotnum]->isOnJob()) {
+            forceFetch(slotnum);
             return;
         }
         else {
@@ -99,6 +101,7 @@ void FactoryArea::developClicked(bool checked, int slotnum) {
             engine.doFetch({"fetch", QString::number(slotnum)});
         }
         else if(slotfs[slotnum]->isOnJob()) {
+            forceFetch(slotnum);
             return;
         }
         else {
@@ -221,5 +224,18 @@ void FactoryArea::doConstruct(int result) {
         engine.doConstructShip(con.shipDefDesired(), con.defaultEquipsDesired(),
                                con.shipToRemodelDesired(),
                                currentSlotNum);
+    }
+}
+
+void FactoryArea::forceFetch(int slotnum) {
+    QMessageBox msgBox(this);
+    //% "Do you really want to spend resources to speed up this slot?"
+    msgBox.setText(qtTrId("force-fetch-question"));
+    msgBox.setStandardButtons(
+        QMessageBox::Ok | QMessageBox::Cancel);
+    msgBox.exec();
+    int result = msgBox.result();
+    if(result & QMessageBox::Ok) {
+        qCritical() << result;
     }
 }

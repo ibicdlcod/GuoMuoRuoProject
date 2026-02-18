@@ -3795,6 +3795,7 @@ void Server::receivedReq(const QJsonObject &djson,
     case KP::CommandType::FleetData: {
         auto error = updateFleet(uid, djson["content"].toArray());
         switch(error) {
+        case KP::FleetContainsDisabled: [[fallthrough]];
         case KP::FleetSizeError: [[fallthrough]];
         case KP::FleetTypeError: {
             QByteArray msg = KP::serverFleetFailure(error);
@@ -3837,6 +3838,14 @@ void Server::sendTestMessages() {
     }
     else {
 
+        QDateTime zero = QDateTime(QDate(1969, 12, 31), QTime(0, 0), QTimeZone::UTC);
+        QDateTime interval = zero.addSecs(105000);
+        if(interval > zero)
+            qCritical() << interval.toString("dd:hh:mm:ss");
+        else {
+            ;
+        }
+        /*
         for(auto user: connectedUsers) {
             generateTestEquip(user);
             generateTestShip(user);
@@ -3850,6 +3859,7 @@ void Server::sendTestMessages() {
                     User::addShipBP(user, ship->getId());
             }
         }
+*/
     }
 }
 
@@ -4287,8 +4297,9 @@ KP::FleetFailType Server::updateFleet(CSteamID &uid, const QJsonArray &input)
         fleetTypes[fleetIndex] = static_cast<KP::FleetType>
             (shipDataObj["fleettype"].toInt());
         QSqlQuery query;
-        query.prepare("SELECT ShipDef FROM UserShip "
-                      "WHERE ShipUuid = :uuid");
+        query.prepare("SELECT ShipDef, FleetIndex FROM UserShip "
+                      "WHERE User = :user AND ShipUuid = :uuid");
+        query.bindValue(":user", uid.ConvertToUint64());
         query.bindValue(":uuid", shipDataObj["uuid"].toString());
         if(Q_UNLIKELY(!query.exec() || !query.isSelect())) {
             qCritical() << query.lastQuery();
@@ -4298,6 +4309,10 @@ KP::FleetFailType Server::updateFleet(CSteamID &uid, const QJsonArray &input)
             return KP::ValidFleet;
         }
         if(query.next()) {
+            auto prevFleetIndex = query.value(1).toInt();
+            if(prevFleetIndex == -2) {
+                return KP::FleetContainsDisabled;
+            }
             auto ship = shipRegistry[query.value(0).toInt()];
             if(!fleetSizes.contains(fleetIndex)) {
                 fleetSizes[fleetIndex] = 0;

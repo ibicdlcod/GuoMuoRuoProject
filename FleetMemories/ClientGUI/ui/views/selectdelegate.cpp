@@ -4,6 +4,7 @@
 #include "selectdelegate.h"
 #include <QApplication>
 #include <QMouseEvent>
+#include "../../model/shipmodel.h"
 
 SelectDelegate::SelectDelegate(QObject *parent)
     : QAbstractItemDelegate{parent}
@@ -21,7 +22,15 @@ void SelectDelegate::paint(QPainter *painter,
     y = r.top() + (r.height() - h) / 2;//the Y coordinate
     button.rect = QRect(x,y,w,h);
     button.text = "Select";
-    button.state = QStyle::State_Enabled;
+    if(getDisabled(index)) {
+        button.state &= ~QStyle::State_Enabled;
+        button.state &= ~QStyle::State_On;
+    }
+    else {
+        button.state |= QStyle::State_Enabled;
+        button.state |= QStyle::State_On;
+    }
+
 
     QApplication::style()->drawControl(QStyle::CE_PushButton,
                                        &button,
@@ -38,6 +47,10 @@ bool SelectDelegate::editorEvent(QEvent *event,
                                  const QStyleOptionViewItem &option,
                                  const QModelIndex &index)
 {
+    if(getDisabled(index)) {
+        return false;
+    }
+
     if(event->type() == QEvent::MouseButtonRelease)
     {
         QMouseEvent * e = (QMouseEvent *)event;
@@ -55,12 +68,24 @@ bool SelectDelegate::editorEvent(QEvent *event,
             if( clickY > y && clickY < y + h )
             {
                 emit itemSelected(QUuid(
-                    model->data(
-                             model->index(index.row(), 0),
-                             Qt::ToolTipRole).toString()));
+                    model->data(model->index(index.row(), 0),
+                                Qt::ToolTipRole).toString()));
             }
         }
     }
 
     return true;
+}
+
+bool SelectDelegate::getDisabled(const QModelIndex &index) const {
+    bool button_disabled = false;
+    if(qobject_cast<const ShipModel *>(index.model())) {
+        const ShipModel *model = qobject_cast<const ShipModel *>(index.model());
+        QString str = model->data(model->index(index.row(), model->fleetPosColumn()),
+                                  Qt::DisplayRole).toString();
+        if(str == qtTrId("fleet-disabled")) {
+            button_disabled = true;
+        }
+    }
+    return button_disabled;
 }

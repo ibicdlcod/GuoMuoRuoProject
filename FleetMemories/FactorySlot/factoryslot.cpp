@@ -65,9 +65,21 @@ void FactorySlot::setStatus() {
         } else if(completeTime.isValid()) {
             QDateTime current = QDateTime::currentDateTime(QTimeZone::UTC);
             QTime zero = QTime(0, 0);
-            QTime interval = zero.addSecs(current.secsTo(completeTime));
-            if(interval > zero)
-                this->setText(interval.toString("hh:mm:ss"));
+            int elapsed = current.secsTo(completeTime);
+            qCritical() << elapsed << slotnum;
+            QTime interval = zero.addSecs(elapsed);
+            static int secInADay = 60*60*24;
+            if(elapsed > 0) {
+                int days = elapsed / secInADay;
+                if(days > 0) {
+                    this->setText(QString::number(elapsed / secInADay)
+                                  + "D+"
+                                  + interval.toString("hh:mm:ss"));
+                }
+                else {
+                    this->setText(interval.toString("hh:mm:ss"));
+                }
+            }
             else {
                 completed = true;
             }

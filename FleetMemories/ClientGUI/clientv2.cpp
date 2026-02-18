@@ -1454,6 +1454,10 @@ void Clientv2::receivedMsg(const QJsonObject &djson) {
             //% "Fleet does not suit its type."
             qWarning() << qtTrId("fleet-type-error");
             break;
+        case KP::FleetContainsDisabled:
+            //% "Fleet contains ships unavailable for battle."
+            qWarning() << qtTrId("fleet-disabled-error");
+            break;
         }
     }
     break;

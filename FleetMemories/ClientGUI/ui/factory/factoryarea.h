@@ -40,6 +40,8 @@ private slots:
     void doFactoryRefresh(const QJsonObject &);
 
 private:
+    void forceFetch(int slotnum);
+
     Ui::FactoryArea *ui;
     EquipView *equipview;
     DevelopWindow dev;

@@ -235,7 +235,8 @@ enum FleetFailType{
     ValidFleet,
     FleetSizeError,
     FleetTypeError,
-    EquipError
+    EquipError,
+    FleetContainsDisabled,
 };
 Q_ENUM_NS(FleetFailType)
 

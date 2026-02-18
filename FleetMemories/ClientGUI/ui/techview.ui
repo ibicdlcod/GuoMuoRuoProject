@@ -153,7 +153,7 @@
          <item>
           <widget class="QPushButton" name="updateLocal">
            <property name="text">
-            <string id="techview-update-local">Update</string>
+            <string id="techview-update-local">Update Local Tech</string>
            </property>
           </widget>
          </item>

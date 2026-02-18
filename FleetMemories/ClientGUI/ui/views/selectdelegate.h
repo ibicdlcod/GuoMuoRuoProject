@@ -25,6 +25,9 @@ public:
 
 signals:
     void itemSelected(QUuid id);
+
+private:
+    bool getDisabled(const QModelIndex &index) const;
 };
 
 #endif // SELECTDELEGATE_H
