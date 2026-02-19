@@ -14,6 +14,7 @@
 #include "kerrors.h"
 #include "sslserver.h"
 #include "user.h"
+#include "../Protocol/utility.h"
 
 QT_BEGIN_NAMESPACE
 
@@ -305,6 +306,7 @@ Server::Server(int argc, char ** argv) : CommandLine(argc, argv) {
     mt = std::mt19937(random());
 
     lua.open_libraries(sol::lib::base);
+    lua.set_function("checkmask", &Utility::checkMask);
     sol::usertype<Ship> ship_type
         = lua.new_usertype<Ship>("Ship",
                                  sol::constructors<>()); // we don't need to construct in lua
@@ -314,6 +316,21 @@ Server::Server(int argc, char ** argv) : CommandLine(argc, argv) {
         = lua.new_usertype<Equipment>("Equipment",
                                       sol::constructors<>());
     equipment_type.set("type", sol::readonly(&Equipment::type));
+    sol::usertype<EquipType> equiptype_type
+        = lua.new_usertype<EquipType>("EquipType",
+                                      sol::constructors<>());
+    equiptype_type["getSpecial"] = qOverload<void>(&EquipType::getSpecial);
+    equiptype_type["isLb"] = qOverload<void>(&EquipType::isLb);
+    equiptype_type["isRadar"] = qOverload<void>(&EquipType::isRadar);
+    equiptype_type["getSize"] = qOverload<void>(&EquipType::getSize);
+    equiptype_type["isPatrol"] = qOverload<void>(&EquipType::isPatrol);
+    equiptype_type["isCarrierPlane"] = qOverload<void>(&EquipType::isCarrierPlane);
+    equiptype_type["isSeaplane"] = qOverload<void>(&EquipType::isSeaplane);
+    equiptype_type["isTorp"] = qOverload<void>(&EquipType::isTorp);
+    equiptype_type["isSurface"] = qOverload<void>(&EquipType::isSurface);
+    equiptype_type["isSecGun"] = qOverload<void>(&EquipType::isSecGun);
+    equiptype_type["isFlak"] = qOverload<void>(&EquipType::isFlak);
+    equiptype_type["isMainGun"] = qOverload<void>(&EquipType::isMainGun);
 
     connect(&receiverM, &Receiver::jsonReceivedWithInfo,
             this, &Server::datagramReceivedStd);

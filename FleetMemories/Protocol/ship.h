@@ -9,6 +9,7 @@
 #include <QUuid>
 #include <QSettings>
 #include "shiptype.h"
+#include "lua.h"
 
 extern std::unique_ptr<QSettings> settings;
 
@@ -43,7 +44,7 @@ public:
     QMap<QString, QString> shipClassText;
     QMap<QString, QString> shipOrderText;
     QMap<QString, int> attr;
-    QMap<QString, int> customFlags;
+    LuaMap customFlags;
 
 private:
     int shipRegId;
