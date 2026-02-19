@@ -402,12 +402,19 @@ border-style: none;</string>
     </property>
     <addaction name="actionView_Tech"/>
    </widget>
+   <widget class="QMenu" name="menuHelp">
+    <property name="title">
+     <string id="menu-help">Help</string>
+    </property>
+    <addaction name="actionSettings"/>
+   </widget>
    <addaction name="menuNaval_Base"/>
    <addaction name="menuTech"/>
    <addaction name="menuFleet"/>
    <addaction name="menuSortie"/>
    <addaction name="menuDock"/>
    <addaction name="menuFactory"/>
+   <addaction name="menuHelp"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <action name="actionDevelop_Equipment">
@@ -463,6 +470,11 @@ border-style: none;</string>
   <action name="actionShip_Blueprints">
    <property name="text">
     <string id="ship-blueprint-view">Ship Blueprints</string>
+   </property>
+  </action>
+  <action name="actionSettings">
+   <property name="text">
+    <string id="menu-settings">Settings</string>
    </property>
   </action>
  </widget>

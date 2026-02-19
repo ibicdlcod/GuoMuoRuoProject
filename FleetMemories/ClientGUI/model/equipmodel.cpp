@@ -36,13 +36,14 @@ EquipModel::EquipModel(QObject *parent, bool isInArsenal)
                     if(rowCount() == 1) {
                         for(auto *widget: QApplication::topLevelWidgets()) {
                             if(qobject_cast<MainWindow *>(widget)) {
-                                MainWindow *mainWindow = qobject_cast<MainWindow *>(widget);
-                                auto geo = mainWindow->geometry();
+                                mainWindow = widget;
+                                MainWindow *mainWindowM = qobject_cast<MainWindow *>(widget);
+                                auto geo = mainWindowM->geometry();
                                 auto tempGeo = geo;
                                 tempGeo.setRect(tempGeo.x(), tempGeo.y(),
                                                 tempGeo.width(), tempGeo.height()-1);
-                                mainWindow->setGeometry(tempGeo);
-                                mainWindow->setGeometry(geo);
+                                mainWindowM->setGeometry(tempGeo);
+                                mainWindowM->setGeometry(geo);
                             }
                         }
                     }
@@ -307,7 +308,7 @@ int EquipModel::numberOfColumns() const {
         return 7; // uid/equip/star/attr/destruct/addstar/hiddensort
     }
     else
-        return 6; // uid/equip/star/attr/select/hiddensort
+        return 7; // uid/equip/star/attr/position/select/hiddensort
 }
 
 int EquipModel::numberOfEquip() const {
@@ -389,6 +390,39 @@ QVariant EquipModel::data(const QModelIndex &index, int role) const {
         else if(index.column() == attrCol){ // attributes
             return equipToDisplay->attrPrimaryStr();
         }
+        else if(index.column() == fleetPosColumn()){ // attributes
+            if(!shipEquipReverse.contains(uidToDisplay)) {
+                //% "Idle"
+                return qtTrId("equip-idle");
+            }
+            else {
+                auto [shipUid, equipPos] = shipEquipReverse[uidToDisplay];
+                if(equipPos == -1) {
+                    return qtTrId("equip-idle");
+                }
+                else {
+                    Ship *ship = std::get<0>(
+                        engine.shipModel.getShip(shipUid));
+                    QString shipStr = ship->toString();
+                    QString shipUidSimple = "("+shipUid.toString().first(9).last(8)+")";
+                    MainWindow *mainWindowM = qobject_cast<MainWindow *>(mainWindow);
+                    QString posStr;
+                    if(mainWindowM) {
+                        FleetPos pos = mainWindowM->getFleetArea()->getShipIndex(shipUid);
+                        posStr = QStringLiteral("%1-%2(%3)").arg(pos.fleetindex + 1)
+                                     .arg(pos.posindex + 1)
+                                     .arg(equipPos);
+                        if(pos.fleetindex == -1 && pos.posindex == -1) {
+                            posStr = qtTrId("fleet-idle");
+                        }
+                        else if(pos.fleetindex == -2) {
+                            posStr = qtTrId("fleet-disabled");
+                        }
+                    }
+                    return QStringList({shipStr, shipUidSimple, posStr}).join(" ");
+                }
+            }
+        }
         else {
             Q_UNREACHABLE();
             return "";
@@ -435,6 +469,10 @@ QVariant EquipModel::data(const QModelIndex &index, int role) const {
         else if(index.column() == selectColumn()) {
             //% "Select"
             return qtTrId("equip-select");
+        }
+        else if(index.column() == fleetPosColumn()) {
+            //% "Position"
+            return qtTrId("equip-pos");
         }
         else
             return QVariant();
@@ -533,8 +571,10 @@ QVariant EquipModel::headerData(int section, Qt::Orientation orientation,
                 return qtTrId("destruct");
             else if(section == addStarColumn())
                 return qtTrId("equip-improve");
-            else if(section == selectColumn()) {
+            else if(section == selectColumn())
                 return qtTrId("equip-select");
+            else if(section == fleetPosColumn()) {
+                return qtTrId("equip-pos");
             }
             else
                 return QVariant();
@@ -597,15 +637,19 @@ int EquipModel::addStarColumn() const {
 }
 
 int EquipModel::hiddenSortColumn() const {
-    return isInArsenal ? 6 : 5;
+    return isInArsenal ? 6 : 6;
 }
 
 int EquipModel::selectColumn() const {
-    return isInArsenal ? -1 : 4;
+    return isInArsenal ? -1 : 5;
 }
 
 int EquipModel::hpColumn() const {
     return -1;
+}
+
+int EquipModel::fleetPosColumn() const {
+    return isInArsenal ? -1 : 4;
 }
 
 int EquipModel::currentPageNum() const {

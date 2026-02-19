@@ -39,6 +39,7 @@ public:
     QUuid getShipUuid(int shipIndex);
     Ship * getShip(int shipIndex);
     ShipDynamic * getShipDynamic(int shipIndex);
+    FleetPos getShipIndex(QUuid shipUuid);
     EquipView equipView;
 
 signals:

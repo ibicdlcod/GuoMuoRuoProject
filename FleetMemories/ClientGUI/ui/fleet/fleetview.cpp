@@ -215,6 +215,15 @@ ShipDynamic * FleetView::getShipDynamic(int shipIndex) {
     return shipattr;
 }
 
+FleetPos FleetView::getShipIndex(QUuid shipUuid) {
+    for(auto [pos, shipLocal] : ships.asKeyValueRange()) {
+        if(shipLocal == shipUuid) {
+            return pos;
+        }
+    }
+    return FleetPos(-1, -1);
+}
+
 void FleetView::modifyFleetIndex(bool checked) {
     Q_UNUSED(checked)
     QString sender = QObject::sender()->objectName();

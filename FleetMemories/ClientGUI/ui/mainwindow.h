@@ -13,6 +13,7 @@
 #include "techview.h"
 #include "sortie/sortie.h"
 #include "fleet/fleetview.h"
+#include "settingswindow.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -27,6 +28,8 @@ public:
                int argc = 0,
                char ** argv = nullptr);
     ~MainWindow();
+
+    FleetView * getFleetArea() const;
 
 signals:
     void cmdMessage(const QString &);
@@ -64,5 +67,6 @@ private:
     TechView *techArea;
     Sortie *battleArea;
     FleetView *fleetArea;
+    SettingsWindow settingsWindow;
 };
 #endif // MAINWINDOW_H

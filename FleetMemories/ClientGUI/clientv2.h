@@ -94,6 +94,7 @@ public slots:
     void doConstructShip(int shipDef, const QList<QUuid> &defaultEquips,
                          QUuid shipToRemodel, int factoryID);
     void doDestructEquip(const QList<QUuid> &);
+    void doForceFetch(int);
     void doModernizeShip(const QList<QUuid> &);
     void doRefreshFactory();
     void doRefreshFactoryAnchorage();

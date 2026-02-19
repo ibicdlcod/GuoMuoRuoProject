@@ -791,6 +791,11 @@ void Clientv2::doDestructEquip(const QList<QUuid> &trash) {
     }
 }
 
+void Clientv2::doForceFetch(int slotnum) {
+    QByteArray msg = KP::clientFetch(slotnum, true);
+    sender->enqueue(msg);
+}
+
 void Clientv2::doModernizeShip(const QList<QUuid> &candidates) {
     if(candidates.empty())
         return;

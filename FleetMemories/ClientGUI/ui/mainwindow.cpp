@@ -103,7 +103,6 @@ MainWindow::MainWindow(QWidget *parent, int argc, char ** argv)
             &engine, &Clientv2::switchToFactory);
     connect(ui->actionShip_Blueprints, &QAction::triggered,
             this, &MainWindow::switchToBlueprint);
-
     connect(ui->actionBattle, &QAction::triggered,
             &engine, &Clientv2::switchToBattleView);
     connect(ui->actionBattle, &QAction::triggered,
@@ -118,6 +117,8 @@ MainWindow::MainWindow(QWidget *parent, int argc, char ** argv)
             &engine, &Clientv2::parseQuit);
     connect(&engine, &Clientv2::receivedResourceInfo,
             this, &MainWindow::updateResources);
+    connect(ui->actionSettings, &QAction::triggered,
+            &settingsWindow, &QDialog::show);
 
     portArea = new PortArea(ui->PortArea);
     licenseArea = new LicenseArea(ui->License);
@@ -165,6 +166,10 @@ MainWindow::~MainWindow()
     delete factoryArea;
     delete techArea;
     delete ui;
+}
+
+FleetView * MainWindow::getFleetArea() const {
+    return fleetArea;
 }
 
 void MainWindow::adjustArea(QFrame *input, const QSize &size) {

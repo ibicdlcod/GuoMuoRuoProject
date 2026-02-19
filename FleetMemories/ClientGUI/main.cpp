@@ -59,21 +59,19 @@ int main(int argc, char *argv[]) {
 #endif
 
     QTranslator translator;
-#ifdef QT_NO_DEBUG
-    QString steamLanguage = SteamUtils()->GetSteamUILanguage();
-    QMap<QString, QString> LanguageView;
-    LanguageView["english"] = QStringLiteral("en_US");
-    LanguageView["schinese"] = QStringLiteral("zh_CN");
-    LanguageView["japanese"] = QStringLiteral("ja_JP");
-    if(LanguageView.contains(steamLanguage)) {
-        settings->setValue("client/language", LanguageView[steamLanguage]);
+    if(!(settings->contains("client/language"))) {
+        QString steamLanguage = SteamUtils()->GetSteamUILanguage();
+        QMap<QString, QString> LanguageView;
+        LanguageView["english"] = QStringLiteral("en_US");
+        LanguageView["schinese"] = QStringLiteral("zh_CN");
+        LanguageView["japanese"] = QStringLiteral("ja_JP");
+        if(LanguageView.contains(steamLanguage)) {
+            settings->setValue("client/language", LanguageView[steamLanguage]);
+        }
+        else {
+            qWarning() << "Steam language not natively supported";
+        }
     }
-    else {
-        qWarning() << "Language not natively supported";
-    }
-#else
-    settings->setValue("client/language", "en_US");
-#endif
 
     QStringList uiLanguages = QLocale::system().uiLanguages();
     if(settings->contains("client/language")) {

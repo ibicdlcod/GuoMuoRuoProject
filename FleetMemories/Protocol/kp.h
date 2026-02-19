@@ -487,7 +487,7 @@ QByteArray clientDemandSkillPoints(int);
 QByteArray clientDemandTech(int local = 0);
 QByteArray clientDevelop(int, bool convert = false, int factoryID = -1);
 QByteArray clientFactoryRefresh();
-QByteArray clientFetch(int factoryID = -1);
+QByteArray clientFetch(int factoryID = -1, bool forced = false);
 QByteArray clientFleetData(const QJsonArray &);
 QByteArray clientHello();
 QByteArray clientHomePort(ShipNationality);

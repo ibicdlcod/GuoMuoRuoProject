@@ -75,6 +75,7 @@ public:
     virtual int hiddenSortColumn() const;
     virtual int selectColumn() const;
     virtual int hpColumn() const;
+    virtual int fleetPosColumn() const;
     virtual int currentPageNum() const;
     virtual int maximumPageNum() const;
     virtual bool isReady() const;
@@ -106,6 +107,9 @@ protected:
 protected slots:
     virtual void updateIllegalPage();
     virtual void clearCheckBoxes();
+
+private:
+    QObject *mainWindow = nullptr;
 };
 
 #endif // EQUIPMODEL_H

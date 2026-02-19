@@ -66,7 +66,6 @@ void FactorySlot::setStatus() {
             QDateTime current = QDateTime::currentDateTime(QTimeZone::UTC);
             QTime zero = QTime(0, 0);
             int elapsed = current.secsTo(completeTime);
-            qCritical() << elapsed << slotnum;
             QTime interval = zero.addSecs(elapsed);
             static int secInADay = 60*60*24;
             if(elapsed > 0) {

@@ -223,9 +223,8 @@ void TechView::updateGlobalTechViewTable(const QJsonObject &djson) {
     }
     ui->globalViewTable->setColumnCount(5);
     QJsonArray contents = djson["content"].toArray();
-    int currentRowCount = ui->globalViewTable->rowCount();
     ui->globalViewTable->clear();
-    currentRowCount = 0;
+    int currentRowCount = 0;
     ui->globalViewTable->setRowCount(contents.size());
     int i = 0;
     for(auto &content: std::as_const(contents)) {

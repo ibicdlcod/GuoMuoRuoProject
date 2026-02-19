@@ -1876,7 +1876,8 @@ void Server::doDevelop(CSteamID &uid, int equipid,
     }
 }
 
-void Server::doFetch(CSteamID &uid, int factoryid, QSslSocket *connection) {
+void Server::doFetch(CSteamID &uid, int factoryid, QSslSocket *connection,
+                     bool forced) {
     User::refreshFactory(this, uid);
     QSqlDatabase db = QSqlDatabase::database();
     QSqlQuery query;
@@ -1895,11 +1896,32 @@ void Server::doFetch(CSteamID &uid, int factoryid, QSslSocket *connection) {
         int jobID = query.value(0).toInt();
         bool isEquip = jobID < KP::equipIdMax;
         bool done = query.value(1).toBool();
-        if(!done) {
+        if(!done && !forced) {
             QByteArray msg = KP::serverFairyBusy(jobID);
             senderM.sendMessage(connection, msg);
         }
         else {
+            if(forced) {
+                ResOrd resRequired =
+                    isEquip ?
+                        equipRegistry[jobID]->devRes() :
+                        shipRegistry[jobID]->consRes();
+
+                ResOrd currentRes = User::getCurrentResources(uid);
+                if(!currentRes.spendResources(resRequired)){
+                    connection->flush();
+                    QTimer::singleShot(100, this, [this, connection]{
+                        QByteArray msg =
+                            KP::serverDevelopFailed(KP::ResourceLack);
+                        senderM.sendMessage(connection, msg);
+                    });
+                    return;
+                }
+                else {
+                    User::setResources(uid, currentRes);
+                    offerResourceInfo(connection, uid);
+                }
+            }
             bool success = query.value(2).toBool();
             if(!success) {
                 
@@ -1924,7 +1946,6 @@ void Server::doFetch(CSteamID &uid, int factoryid, QSslSocket *connection) {
                     User::addSkillPoints(uid, jobID,
                                          (stdSkillPoints * techFactor) / difficultyFactor);
                 }
-                
             }
             else if(isEquip) {
                 QByteArray msg = KP::serverNewEquip(
@@ -3628,7 +3649,7 @@ void Server::receivedReq(const QJsonObject &djson,
     }
     break;
     case KP::CommandType::Fetch:
-        doFetch(uid, djson["factory"].toInt(), connection);
+        doFetch(uid, djson["factory"].toInt(), connection, djson["forced"].toBool());
         break;
     case KP::CommandType::Refresh:
         switch(djson["view"].toInt()) {
@@ -4438,8 +4459,8 @@ KP::FleetFailType Server::updateFleet(CSteamID &uid, const QJsonArray &input)
                     //% "Ship %1 can't equip %2!"
                     qWarning()
                         << qtTrId("ship-cant-equip-it")
-                               .arg(ship->toString(settings->value("server/language", "ja_JP").toString()),
-                                    equip->toString(settings->value("server/language", "ja_JP").toString()));
+                               .arg(ship->toString(),
+                                    equip->toString());
                     return KP::EquipError;
                 }
             }
@@ -4466,8 +4487,8 @@ KP::FleetFailType Server::updateFleet(CSteamID &uid, const QJsonArray &input)
                     //% "Ship %1 can't equip %2 in extra slot!"
                     qWarning()
                         << qtTrId("ship-cant-equip-it-extra")
-                               .arg(ship->toString(settings->value("server/language", "ja_JP").toString()),
-                                    equip->toString(settings->value("server/language", "ja_JP").toString()));
+                               .arg(ship->toString(),
+                                    equip->toString());
                     return KP::EquipError;
                 }
             }

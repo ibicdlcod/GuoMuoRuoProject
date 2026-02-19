@@ -73,68 +73,71 @@ set(CLIENT_SOURCES
     ClientGUI/steamauth.cpp
     ClientGUI/steamauth.h
     ClientGUI/ui/boxcenterfusionstyle.h
-    ClientGUI/ui/port/choosehomeport.h
-    ClientGUI/ui/port/choosehomeport.cpp
-    ClientGUI/ui/port/choosehomeport.ui
     ClientGUI/ui/factory/constructwindow.h
     ClientGUI/ui/factory/constructwindow.cpp
     ClientGUI/ui/factory/constructwindow.ui
     ClientGUI/ui/factory/developwindow.cpp
     ClientGUI/ui/factory/developwindow.h
     ClientGUI/ui/factory/developwindow.ui
-    ClientGUI/ui/fleet/elidedlabel.h
-    ClientGUI/ui/fleet/elidedlabel.cpp
-    ClientGUI/ui/views/equipselect.cpp
-    ClientGUI/ui/views/equipselect.h
-    ClientGUI/ui/views/equipview.h
-    ClientGUI/ui/views/equipview.cpp
-    ClientGUI/ui/views/equipview.ui
     ClientGUI/ui/factory/factoryarea.cpp
     ClientGUI/ui/factory/factoryarea.h
     ClientGUI/ui/factory/factoryarea.ui
+    ClientGUI/ui/fleet/elidedlabel.h
+    ClientGUI/ui/fleet/elidedlabel.cpp
     ClientGUI/ui/fleet/fleetview.h
     ClientGUI/ui/fleet/fleetview.cpp
     ClientGUI/ui/fleet/fleetview.ui
-    ClientGUI/ui/views/hpdelegate.cpp
-    ClientGUI/ui/views/hpdelegate.h
     ClientGUI/ui/fleet/interactivelabel.h
     ClientGUI/ui/fleet/interactivelabel.cpp
-    ClientGUI/ui/keyenterreceiver.cpp
-    ClientGUI/ui/keyenterreceiver.h
-    ClientGUI/ui/port/licensearea.cpp
-    ClientGUI/ui/port/licensearea.h
-    ClientGUI/ui/port/licensearea.ui
-    ClientGUI/ui/mainwindow.cpp
-    ClientGUI/ui/mainwindow.h
-    ClientGUI/ui/mainwindow.ui
-    ClientGUI/ui/sortie/maprender.cpp
-    ClientGUI/ui/sortie/maprender.h
-    ClientGUI/ui/sortie/mapviewwidget.cpp
-    ClientGUI/ui/sortie/mapviewwidget.h
-    ClientGUI/ui/navigator.cpp
-    ClientGUI/ui/navigator.h
-    ClientGUI/ui/port/newlogins.cpp
-    ClientGUI/ui/port/newlogins.h
-    ClientGUI/ui/port/newlogins.ui
-    ClientGUI/ui/port/portarea.cpp
-    ClientGUI/ui/port/portarea.h
-    ClientGUI/ui/port/portarea.ui
-    ClientGUI/ui/views/selectdelegate.cpp
-    ClientGUI/ui/views/selectdelegate.h
     ClientGUI/ui/fleet/shipdisplay.h
     ClientGUI/ui/fleet/shipdisplay.cpp
     ClientGUI/ui/fleet/shipdisplay.ui
     ClientGUI/ui/fleet/shipequip.h
     ClientGUI/ui/fleet/shipequip.cpp
     ClientGUI/ui/fleet/shipequip.ui
-    ClientGUI/ui/views/shipselect.cpp
-    ClientGUI/ui/views/shipselect.h
+    ClientGUI/ui/keyenterreceiver.cpp
+    ClientGUI/ui/keyenterreceiver.h
+    ClientGUI/ui/mainwindow.cpp
+    ClientGUI/ui/mainwindow.h
+    ClientGUI/ui/mainwindow.ui
+    ClientGUI/ui/navigator.cpp
+    ClientGUI/ui/navigator.h
+    ClientGUI/ui/port/choosehomeport.h
+    ClientGUI/ui/port/choosehomeport.cpp
+    ClientGUI/ui/port/choosehomeport.ui
+    ClientGUI/ui/port/licensearea.cpp
+    ClientGUI/ui/port/licensearea.h
+    ClientGUI/ui/port/licensearea.ui
+    ClientGUI/ui/port/newlogins.cpp
+    ClientGUI/ui/port/newlogins.h
+    ClientGUI/ui/port/newlogins.ui
+    ClientGUI/ui/port/portarea.cpp
+    ClientGUI/ui/port/portarea.h
+    ClientGUI/ui/port/portarea.ui
+    ClientGUI/ui/sortie/maprender.cpp
+    ClientGUI/ui/sortie/maprender.h
+    ClientGUI/ui/sortie/mapviewwidget.cpp
+    ClientGUI/ui/sortie/mapviewwidget.h
+    ClientGUI/ui/settingswindow.h
+    ClientGUI/ui/settingswindow.cpp
+    ClientGUI/ui/settingswindow.ui
     ClientGUI/ui/sortie/sortie.cpp
     ClientGUI/ui/sortie/sortie.h
     ClientGUI/ui/sortie/sortie.ui
     ClientGUI/ui/techview.h
     ClientGUI/ui/techview.cpp
     ClientGUI/ui/techview.ui
+    ClientGUI/ui/views/equipselect.cpp
+    ClientGUI/ui/views/equipselect.h
+    ClientGUI/ui/views/equipview.h
+    ClientGUI/ui/views/equipview.cpp
+    ClientGUI/ui/views/equipview.ui
+    ClientGUI/ui/views/hpdelegate.cpp
+    ClientGUI/ui/views/hpdelegate.h
+    ClientGUI/ui/views/selectdelegate.cpp
+    ClientGUI/ui/views/selectdelegate.h
+    ClientGUI/ui/views/shipselect.cpp
+    ClientGUI/ui/views/shipselect.h
     ${TS_FILES}
 )
 set(SERVER_SOURCES

@@ -73,7 +73,7 @@ private:
     void deleteTestShip(const CSteamID &);
     void doConstruct(CSteamID &, int, QList<QUuid> &, QUuid, int, QSslSocket *);
     void doDevelop(CSteamID &, int, int, QSslSocket *);
-    void doFetch(CSteamID &, int, QSslSocket *);
+    void doFetch(CSteamID &, int, QSslSocket *, bool forced = false);
     void doHandshake(QSslSocket *, const QByteArray &);
     [[nodiscard]] bool equipmentRefresh();
     void exitGraceSpec() override;

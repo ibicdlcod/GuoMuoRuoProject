@@ -7,7 +7,9 @@
 |       client/equipdbtimestamp        |               dynamic               |                                                              |
 |         client/equipdbcache          |               dynamic               |                                                              |
 |        client/shipdbtimestamp        |               dynamic               |                                                              |
+|          client/shipdbcache          |               dynamic               |                                                              |
 |        client/mapdbtimestamp         |               dynamic               |                                                              |
+|          client/mapdbcache           |               dynamic               |                                                              |
 |     networkclient/retransmitmax      |                  2                  |                    Client retransmit time                    |
 |  networkclient/connectwaittimemsec   |                8000                 |                                                              |
 |  networkclient/downloadwaittimemsec  |                80000                |                                                              |

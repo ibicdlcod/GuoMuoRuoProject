@@ -236,6 +236,7 @@ void FactoryArea::forceFetch(int slotnum) {
     msgBox.exec();
     int result = msgBox.result();
     if(result & QMessageBox::Ok) {
-        qCritical() << result;
+        Clientv2 &engine = Clientv2::getInstance();
+        engine.doForceFetch(slotnum);
     }
 }

@@ -221,11 +221,12 @@ QByteArray KP::clientFactoryRefresh() {
     return QCborValue::fromJsonValue(result).toCbor();
 }
 
-QByteArray KP::clientFetch(int factoryID) {
+QByteArray KP::clientFetch(int factoryID, bool forced) {
     QJsonObject result;
     result["type"] = DgramType::Request;
     result["command"] = CommandType::Fetch;
     result["factory"] = factoryID;
+    result["forced"] = forced;
     return QCborValue::fromJsonValue(result).toCbor();
 }
 

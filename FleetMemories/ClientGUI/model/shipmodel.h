@@ -50,7 +50,7 @@ public:
     virtual int addStarColumn() const override;
     virtual int hiddenSortColumn() const override;
     virtual int selectColumn() const override;
-    int fleetPosColumn() const;
+    virtual int fleetPosColumn() const override;
     int levelColumn() const;
     int conditionColumn() const;
     virtual int hpColumn() const override;
