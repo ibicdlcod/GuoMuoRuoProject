@@ -4,7 +4,7 @@
 - [Technology](2-technology.md)
 
 * [Resources](3-resources.md) [PARTIAL]
-* [Ore Purifier (DLC)](3.1-orepurifier.md) [NOTYETIMPLEMENTED]
+  * [Ore Purifier (DLC)](3.1-orepurifier.md) [NOTYETIMPLEMENTED]
 * [Equipment](4-equipment.md)
 
   * [Factory slot](4.1-factoryslot.md) [PARTIAL]
@@ -25,8 +25,9 @@
   * [Visible bonuses](5.6-visiblebonus.md) [NOTYETIMPLEMENTED]
   * [Experience and modernization](5.7-experience.md) [NOTYETIMPLEMENTED]
   * [Remodel](5.8-remodel.md) [NOTYETIMPLEMENTED]
-  * [Cloning Vats (DLC)](5.9-cloning vats.md) [NOTYETIMPLEMENTED]
+  * [Cloning Vats](5.9-cloning vats.md) [NOTYETIMPLEMENTED]
   * [Labor condition](5.10-labor.md) [PARTIAL]
+  * Decoration [NOTYETIMPLEMENTED]
   * Enemies (Amnesiac Fleet) [NOTYETIMPLEMENTED]
 * [Sortie Map](6-sortie.md)
   * [Normal map and map relations](6.1-map.md) [PARTIAL]

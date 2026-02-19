@@ -138,12 +138,14 @@ QString Ship::toString(QString lang) const {
     return localNames[lang].isEmpty() ? localNames["ja_JP"] : localNames[lang];
 }
 
+/* 5.4-construction.md#Resource cost */
 const ResOrd Ship::consRes() const {
     qint64 devResScale = settings->value("rule/devresscale", 10).toLongLong();
     return getType().consResBase() * (qint64)std::round((getTech() + 1.0)
                                                          * devResScale);
 }
 
+/* 5.4-construction.md#Construct time */
 const int Ship::consTimeInSec() const {
     qint64 devTimebase = getType().consTimeBase();
     qint64 devResScale = settings->value("rule/devresscale", 10).toLongLong();

@@ -10,6 +10,7 @@
 #include <QScreen>
 #include <QStyleHints>
 #include <QScrollBar>
+#include <QMessageBox>
 #include "keyenterreceiver.h"
 #include "../clientv2.h"
 
@@ -119,6 +120,31 @@ MainWindow::MainWindow(QWidget *parent, int argc, char ** argv)
             this, &MainWindow::updateResources);
     connect(ui->actionSettings, &QAction::triggered,
             &settingsWindow, &QDialog::show);
+    connect(ui->actionLicense, &QAction::triggered,
+            this, [this](){
+        QMessageBox box(this);
+        QString notice;
+        QDir currentDir = QDir::current();
+        QString openingwords = settings->value("license_notice",
+                                               ":/openingwords.txt").toString();
+        QFile licenseFile(currentDir.filePath(openingwords));
+        if(Q_UNLIKELY(!licenseFile.open(QIODevice::ReadOnly | QIODevice::Text))) {
+            //% "Can't find license file, exiting."
+            qFatal() << qtTrId("licence-not-found").toUtf8();
+        }
+        else {
+            QTextStream instream1(&licenseFile);
+            notice = instream1.readAll();
+        }
+        notice.replace("<https://www.gnu.org/licenses/>",
+                       "<a href=\"https://www.gnu.org/licenses\">the GNU.org page</a>");
+        notice.replace("\n", "<br>");
+        notice = "<p align='center'>" + notice + "</p>";
+        box.setText(notice);
+        box.exec();
+    });
+    connect(ui->actionAbout_Qt, &QAction::triggered,
+            QApplication::instance(), &QApplication::aboutQt);
 
     portArea = new PortArea(ui->PortArea);
     licenseArea = new LicenseArea(ui->License);

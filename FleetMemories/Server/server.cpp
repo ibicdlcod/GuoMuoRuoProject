@@ -1412,6 +1412,7 @@ void Server::deleteTestShip(const CSteamID &uid) {
     }
 }
 
+/* 5.4-construction.md */
 void Server::doConstruct(CSteamID &uid,
                          int shipDef,
                          QList<QUuid> &equips,
@@ -1497,7 +1498,6 @@ void Server::doConstruct(CSteamID &uid,
                               query.lastError());
             }
         }
-        /* debug */ isCloning = false;
         if(isCloning) {
             QByteArray msg =
                 KP::serverDevelopFailed(KP::CloningDisallowed);
@@ -1505,6 +1505,7 @@ void Server::doConstruct(CSteamID &uid,
             return;
         }
 
+    /* 5.4-construction.md#Resource cost */
     resource_required:
         ResOrd resRequired = ship->consRes();
         QByteArray msg = resRequired.resourceDesired();
@@ -1563,6 +1564,7 @@ void Server::doConstruct(CSteamID &uid,
             }
         }
         else {
+            /* 5.8-remodel.md */
         remodel:
             int remodelDef = 0;
             QSqlQuery query;
@@ -1661,9 +1663,16 @@ void Server::doConstruct(CSteamID &uid,
                     key.append(QString::number(i+1));
                     int prevDefaultEquip = ship->attr[key];
                     if(prevDefaultEquip != 0) {
-                        QByteArray msg = KP::serverNewEquip(
-                            newEquip(uid, prevDefaultEquip), prevDefaultEquip);
-                        senderM.sendMessage(connection, msg);
+                        auto type = equipRegistry[prevDefaultEquip]->type;
+                        if(type.isCarrierPlane()
+                            || type.isSeaplane()) {
+                            ;
+                        }
+                        else {
+                            QByteArray msg = KP::serverNewEquip(
+                                newEquip(uid, prevDefaultEquip), prevDefaultEquip);
+                            senderM.sendMessage(connection, msg);
+                        }
                     }
                 }
             }
@@ -1700,7 +1709,14 @@ void Server::doConstruct(CSteamID &uid,
             de.append(QString::number(i+1));
             if(Q_LIKELY(equipDef == ship->attr[de])) {
                 if(equipDef != 0) {
-                    trash.append(equips[i]);
+                    auto type = equipRegistry[equipDef]->type;
+                    if(type.isCarrierPlane()
+                        || type.isSeaplane()) {
+                        ;
+                    }
+                    else {
+                        trash.append(equips[i]);
+                    }
                 }
             }
             else {
@@ -1710,9 +1726,11 @@ void Server::doConstruct(CSteamID &uid,
                 return;
             }
         }
-        QList<QUuid> destructed = retireEquip(uid, trash);
-        QByteArray msg2 = KP::serverEquipRetired(destructed);
-        senderM.sendMessage(connection, msg2);
+        if(!trash.isEmpty()) {
+            QList<QUuid> destructed = retireEquip(uid, trash);
+            QByteArray msg2 = KP::serverEquipRetired(destructed);
+            senderM.sendMessage(connection, msg2);
+        }
 
     delete_bp:
     {

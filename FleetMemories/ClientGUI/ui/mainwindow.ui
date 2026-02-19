@@ -407,6 +407,8 @@ border-style: none;</string>
      <string id="menu-help">Help</string>
     </property>
     <addaction name="actionSettings"/>
+    <addaction name="actionLicense"/>
+    <addaction name="actionAbout_Qt"/>
    </widget>
    <addaction name="menuNaval_Base"/>
    <addaction name="menuTech"/>
@@ -475,6 +477,16 @@ border-style: none;</string>
   <action name="actionSettings">
    <property name="text">
     <string id="menu-settings">Settings</string>
+   </property>
+  </action>
+  <action name="actionAbout_Qt">
+   <property name="text">
+    <string id="menu-about-qt">About Qt</string>
+   </property>
+  </action>
+  <action name="actionLicense">
+   <property name="text">
+    <string id="menu-license">License</string>
    </property>
   </action>
  </widget>
