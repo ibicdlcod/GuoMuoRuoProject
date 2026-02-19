@@ -12,6 +12,8 @@
 #include "resord.h"
 #include "equiptype.h"
 #include "ship.h"
+#define SOL_ALL_SAFETIES_ON 1
+#include <sol/sol.hpp>
 
 extern std::unique_ptr<QSettings> settings;
 
@@ -102,6 +104,8 @@ public:
 
     bool canEquip(Ship *ship) const;
     bool canEquipEX(Ship *ship) const;
+    bool canEquip(Ship *ship, sol::state &ts) const;
+    bool canEquipEX(Ship *ship, sol::state &ts) const;
 
     /* 4.2-Attributes.md */
     QMap<QString, QString> localNames;

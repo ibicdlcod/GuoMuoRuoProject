@@ -171,6 +171,7 @@ set(PROTOCOL_SOURCES
     Protocol/equiptype.h
     Protocol/kp.cpp
     Protocol/kp.h
+    Protocol/lua.h
     Protocol/map.cpp
     Protocol/map.h
     Protocol/mapwithdiff.cpp

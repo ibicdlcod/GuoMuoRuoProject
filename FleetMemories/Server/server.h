@@ -11,6 +11,7 @@
 #include <QSslConfiguration>
 #include <QtNetwork>
 #include <random>
+#include <sol/sol.hpp>
 #include "steam/steamclientpublic.h"
 
 #include "../Protocol/commandline.h"
@@ -149,6 +150,8 @@ private:
 
     std::random_device random;
     std::mt19937 mt;
+
+    sol::state lua;
 
 #pragma message(SALT_FISH)
     const QByteArray defaultSalt =

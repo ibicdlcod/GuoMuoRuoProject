@@ -9,8 +9,6 @@
 #include "../Protocol/kp.h"
 #include "qconsolelistener.h"
 #include "server.h"
-#include <sol/sol.hpp>
-#include <iostream>
 
 #if defined(Q_OS_UNIX)
 #include <netinet/in.h>
@@ -24,7 +22,7 @@ const int STEAM_ERROR = 1;
 }
 
 int main(int argc, char *argv[]) {
-    /* lua testing */
+    /* lua testing
     std::cout << "=== opening a state ===" << std::endl;
 
     sol::state lua;
@@ -33,7 +31,7 @@ int main(int argc, char *argv[]) {
     lua.script("print('bark bark bark!')");
 
     std::cout << std::endl;
-    /* end lua testing */
+     end lua testing */
 
     SteamErrMsg err;
     /* doubt this will have actual effect */

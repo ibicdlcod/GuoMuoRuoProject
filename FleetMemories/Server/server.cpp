@@ -303,7 +303,18 @@ const int elapsedMaxTolerance = steamRateLimit;
 Server::Server(int argc, char ** argv) : CommandLine(argc, argv) {
     /* no *settings could be used here */
     mt = std::mt19937(random());
-    
+
+    lua.open_libraries(sol::lib::base);
+    sol::usertype<Ship> ship_type
+        = lua.new_usertype<Ship>("Ship",
+                                 sol::constructors<>()); // we don't need to construct in lua
+    ship_type["getId"] = &Ship::getId;
+    ship_type.set("customFlags", sol::readonly(&Ship::customFlags));
+    sol::usertype<Equipment> equipment_type
+        = lua.new_usertype<Equipment>("Equipment",
+                                      sol::constructors<>());
+    equipment_type.set("type", sol::readonly(&Equipment::type));
+
     connect(&receiverM, &Receiver::jsonReceivedWithInfo,
             this, &Server::datagramReceivedStd);
     connect(&receiverM, &Receiver::nonStandardReceivedWithInfo,
@@ -3771,9 +3782,9 @@ void Server::receivedReq(const QJsonObject &djson,
                            this,
                            [connection, uid, djson, this]
                            {offerTechInfo(
-                                 connection,
-                                 uid,
-                                 djson["local"].toInt());});
+                  connection,
+                  uid,
+                  djson["local"].toInt());});
     }
     break;
     case KP::CommandType::DemandSkillPoints: {
@@ -3781,9 +3792,9 @@ void Server::receivedReq(const QJsonObject &djson,
                            this,
                            [connection, uid, djson, this]
                            {offerSPInfo(
-                                 connection,
-                                 uid,
-                                 djson["equipid"].toInt());});
+                  connection,
+                  uid,
+                  djson["equipid"].toInt());});
     }
     break;
     case KP::CommandType::DemandResourceUpdate: {
@@ -3791,8 +3802,8 @@ void Server::receivedReq(const QJsonObject &djson,
                            this,
                            [connection, uid, this]
                            {offerResourceInfo(
-                                 connection,
-                                 uid);});
+                  connection,
+                  uid);});
     }
     break;
     case KP::CommandType::DestructEquip: {
@@ -3876,14 +3887,7 @@ void Server::sendTestMessages() {
         qWarning() << "Server isn't listening, abort.";
     }
     else {
-
-        QDateTime zero = QDateTime(QDate(1969, 12, 31), QTime(0, 0), QTimeZone::UTC);
-        QDateTime interval = zero.addSecs(105000);
-        if(interval > zero)
-            qCritical() << interval.toString("dd:hh:mm:ss");
-        else {
-            ;
-        }
+        qCritical() << equipRegistry[1]->canEquip(shipRegistry[169411328], lua);
         /*
         for(auto user: connectedUsers) {
             generateTestEquip(user);

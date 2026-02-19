@@ -503,7 +503,7 @@ bool Equipment::canEquip(Ship *ship) const
         return false;
     case KP::MidgetSub:
         if(ship->customFlags.contains("torp")) {
-            if(ship->customFlags["smallgun"] == -2)
+            if(ship->customFlags["torp"] == -2)
                 return false;
         }
         if(Utility::checkMask(shipID, 0x000f2000, 0x00082000))
@@ -1139,4 +1139,30 @@ bool Equipment::canEquipEX(Ship *ship) const
     default:
         return false;
     }
+}
+
+bool Equipment::canEquip(Ship *ship, sol::state &lua) const {
+    lua["thisequip"] = this;
+    lua["thisship"] = ship;
+    auto value = lua.safe_script_file("lua/canequip.lua",
+                                      sol::script_pass_on_error);
+    if(!value.valid()) {
+        sol::error err = value;
+        qCritical()
+            //% "The code from the file %1 has failed to run: %2"
+            << qtTrId("lua-error").arg("lua/canequip.lua")
+                   .arg(err.what());
+        return false;
+    }
+    else {
+        bool boolvalue = value;
+        qInfo() << boolvalue;
+    }
+    return true;
+}
+
+bool Equipment::canEquipEX(Ship *ship, sol::state &lua) const {
+    lua["thisequip"] = this;
+    lua["thisship"] = ship;
+    return true;
 }
