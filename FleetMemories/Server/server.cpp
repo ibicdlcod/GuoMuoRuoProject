@@ -3920,9 +3920,13 @@ void Server::sendTestMessages() {
         for(int i = 0; i < 100; ++i) {
             qCritical() << RNGesus::setDropValue(100, mt);
         }*/
+        int i = 0;
         for(auto equip: equipRegistry) {
             for(auto ship: shipRegistry) {
-                qCritical() << equip->toString() << ship->toString() << equip->canEquip(ship, lua);
+                equip->canEquip(ship, lua);
+                ++i;
+                if(i % 10000 == 0)
+                    qInfo("FUCK");
             }
         }
         /*
