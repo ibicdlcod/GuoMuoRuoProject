@@ -3923,10 +3923,11 @@ void Server::sendTestMessages() {
         int i = 0;
         for(auto equip: equipRegistry) {
             for(auto ship: shipRegistry) {
+                //qInfo() << equip->toString() << ship->toString();
                 equip->canEquip(ship, lua);
                 ++i;
                 if(i % 10000 == 0)
-                    qInfo("FUCK");
+                    qWarning() << (QStringLiteral("FUCK") + QString::number(i));
             }
         }
         /*
