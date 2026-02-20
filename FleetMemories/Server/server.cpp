@@ -15,6 +15,8 @@
 #include "sslserver.h"
 #include "user.h"
 #include "../Protocol/utility.h"
+#include "../Protocol/lua.h"
+#include "rngesus.h"
 
 QT_BEGIN_NAMESPACE
 
@@ -278,7 +280,7 @@ Q_GLOBAL_STATIC(QString,
                     "ShipUuid TEXT PRIMARY KEY, "
                     "ShipDef INTEGER NOT NULL, "
                     "Exp INTEGER DEFAULT 0, "
-                    "FOREIGN KEY(ShipDef) REFERENCES EquipName(ShipID)"
+                    "FOREIGN KEY(ShipDef) REFERENCES ShipName(ShipID)"
                     ");"
                     ))
 
@@ -305,32 +307,7 @@ Server::Server(int argc, char ** argv) : CommandLine(argc, argv) {
     /* no *settings could be used here */
     mt = std::mt19937(random());
 
-    lua.open_libraries(sol::lib::base);
-    lua.set_function("checkmask", &Utility::checkMask);
-    sol::usertype<Ship> ship_type
-        = lua.new_usertype<Ship>("Ship",
-                                 sol::constructors<>()); // we don't need to construct in lua
-    ship_type["getId"] = &Ship::getId;
-    ship_type.set("customFlags", sol::readonly(&Ship::customFlags));
-    sol::usertype<Equipment> equipment_type
-        = lua.new_usertype<Equipment>("Equipment",
-                                      sol::constructors<>());
-    equipment_type.set("type", sol::readonly(&Equipment::type));
-    sol::usertype<EquipType> equiptype_type
-        = lua.new_usertype<EquipType>("EquipType",
-                                      sol::constructors<>());
-    equiptype_type["getSpecial"] = qOverload<void>(&EquipType::getSpecial);
-    equiptype_type["isLb"] = qOverload<void>(&EquipType::isLb);
-    equiptype_type["isRadar"] = qOverload<void>(&EquipType::isRadar);
-    equiptype_type["getSize"] = qOverload<void>(&EquipType::getSize);
-    equiptype_type["isPatrol"] = qOverload<void>(&EquipType::isPatrol);
-    equiptype_type["isCarrierPlane"] = qOverload<void>(&EquipType::isCarrierPlane);
-    equiptype_type["isSeaplane"] = qOverload<void>(&EquipType::isSeaplane);
-    equiptype_type["isTorp"] = qOverload<void>(&EquipType::isTorp);
-    equiptype_type["isSurface"] = qOverload<void>(&EquipType::isSurface);
-    equiptype_type["isSecGun"] = qOverload<void>(&EquipType::isSecGun);
-    equiptype_type["isFlak"] = qOverload<void>(&EquipType::isFlak);
-    equiptype_type["isMainGun"] = qOverload<void>(&EquipType::isMainGun);
+    LuaInit::init(lua);
 
     connect(&receiverM, &Receiver::jsonReceivedWithInfo,
             this, &Server::datagramReceivedStd);
@@ -457,6 +434,7 @@ bool Server::listen(const QHostAddress &address, quint16 port) {
             qCritical () << sslServer.errorString();
         else {
             sqlinit();
+            luaInitEquipable();
             if(!equipmentRefresh()) {
                 //% "Equipment init failed!"
                 qCritical() << qtTrId("equip-init-failure");
@@ -549,6 +527,14 @@ bool Server::parseSpec(const QStringList &cmdParts) {
             else if(primary.compare("test", Qt::CaseInsensitive) == 0) {
                 sendTestMessages();
                 return true;
+            }
+            else if(primary.compare("lua", Qt::CaseInsensitive) == 0) {
+                if(cmdParts.length() > 1
+                    && cmdParts[1].compare(
+                           "canequip", Qt::CaseInsensitive) == 0) {
+                    luaInitEquipable();
+                    return true;
+                }
             }
         }
         return false;
@@ -2643,6 +2629,22 @@ bool Server::importShipFromCSV() {
     return shipRefresh();
 }
 
+void Server::luaInitEquipable() {
+    auto value = lua.safe_script_file("lua/canequip.lua",
+                                      sol::script_pass_on_error);
+    if(!value.valid()) {
+        sol::error err = value;
+        qCritical()
+            //% "The code from the file %1 has failed to run: %2"
+            << qtTrId("lua-canequip-error").arg("lua/canequip.lua")
+                   .arg(err.what());
+    }
+    else {
+        //% "Load equipability table success!"
+        qInfo() << qtTrId("lua-canequip-success");
+    }
+}
+
 bool Server::mapRefresh()
 {
     QSqlDatabase db = QSqlDatabase::database();
@@ -2788,19 +2790,29 @@ void Server::migrate(const CSteamID &uid, const QJsonObject &input) {
     QMap<int, int> sourceModels;
     for(auto equip: equips) {
         auto equipObj = equip.toObject();
+        if(equipObj["id"].toInt() == 335) { // equip 335 is not honored
+            continue;
+        }
+        if(!equipRegistry.contains(equipObj["id"].toInt())) {
+            //% "Equip id %1 don't exist!"
+            qWarning() << qtTrId("equipid-dont-exist").arg(equipObj["id"].toInt());
+            continue;
+        }
         int equipExp = 0;
         if(equipObj.contains("exp")) {
             equipExp = equipObj["exp"].toInt();
         }
         int equipStar = equipObj["star"].toInt();
-        if(equipObj["id"].toInt() == 335) {
-            continue;
-        }
         equipData.insert(equipObj["id"].toInt(), {equipStar, equipExp});
     }
     auto ships = input["ships"].toObject();
     for(auto ship: ships) {
         auto shipId = ship.toObject()["id"].toInt();
+        if(!shipOldIdToNewId.contains(shipId)) {
+            //% "Ship old id %1 don't exist!"
+            qWarning() << qtTrId("shipoldid-dont-exist").arg(shipId);
+            continue;
+        }
         auto shipExp = ship.toObject()["exp"].toInt();
         int fmShipId = 0;
         int latestShipId = 0;
@@ -3799,9 +3811,9 @@ void Server::receivedReq(const QJsonObject &djson,
                            this,
                            [connection, uid, djson, this]
                            {offerTechInfo(
-                  connection,
-                  uid,
-                  djson["local"].toInt());});
+                                 connection,
+                                 uid,
+                                 djson["local"].toInt());});
     }
     break;
     case KP::CommandType::DemandSkillPoints: {
@@ -3809,9 +3821,9 @@ void Server::receivedReq(const QJsonObject &djson,
                            this,
                            [connection, uid, djson, this]
                            {offerSPInfo(
-                  connection,
-                  uid,
-                  djson["equipid"].toInt());});
+                                 connection,
+                                 uid,
+                                 djson["equipid"].toInt());});
     }
     break;
     case KP::CommandType::DemandResourceUpdate: {
@@ -3819,8 +3831,8 @@ void Server::receivedReq(const QJsonObject &djson,
                            this,
                            [connection, uid, this]
                            {offerResourceInfo(
-                  connection,
-                  uid);});
+                                 connection,
+                                 uid);});
     }
     break;
     case KP::CommandType::DestructEquip: {
@@ -3904,7 +3916,15 @@ void Server::sendTestMessages() {
         qWarning() << "Server isn't listening, abort.";
     }
     else {
-        qCritical() << equipRegistry[1]->canEquip(shipRegistry[169411328], lua);
+        /*
+        for(int i = 0; i < 100; ++i) {
+            qCritical() << RNGesus::setDropValue(100, mt);
+        }*/
+        for(auto equip: equipRegistry) {
+            for(auto ship: shipRegistry) {
+                qCritical() << equip->toString() << ship->toString() << equip->canEquip(ship, lua);
+            }
+        }
         /*
         for(auto user: connectedUsers) {
             generateTestEquip(user);

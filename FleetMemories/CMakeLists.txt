@@ -172,6 +172,7 @@ set(PROTOCOL_SOURCES
     Protocol/kp.cpp
     Protocol/kp.h
     Protocol/lua.h
+    Protocol/lua.cpp
     Protocol/map.cpp
     Protocol/map.h
     Protocol/mapwithdiff.cpp
@@ -372,3 +373,12 @@ add_custom_command(TARGET CFServer POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_if_different
     "${PROJECT_SOURCE_DIR}/../doc/map/Map_relations.csv"
     $<TARGET_FILE_DIR:CFServer>)
+# add_custom_command(TARGET CFClient POST_BUILD
+#     COMMAND ${CMAKE_COMMAND} -E copy_if_different
+#     "${PROJECT_SOURCE_DIR}/lua/canequip.lua"
+#     $<TARGET_FILE_DIR:CFClient>)
+# add_custom_command(TARGET CFServer POST_BUILD
+#     COMMAND ${CMAKE_COMMAND} -E copy_if_different
+#     "${PROJECT_SOURCE_DIR}/lua/canequip.lua"
+#     $<TARGET_FILE_DIR:CFServer>)
+

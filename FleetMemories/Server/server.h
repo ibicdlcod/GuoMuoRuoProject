@@ -89,6 +89,7 @@ private:
     bool importMapNodeFromCSV();
     bool importMapRelationFromCSV();
     bool importShipFromCSV();
+    void luaInitEquipable();
     [[nodiscard]] bool mapRefresh();
     void migrate(const CSteamID &, const QJsonObject &);
     bool modifyShip(const CSteamID &, QUuid prevShip, int newDef);

@@ -1142,30 +1142,18 @@ bool Equipment::canEquipEX(Ship *ship) const
 }
 
 bool Equipment::canEquip(Ship *ship, sol::state &lua) const {
-    auto value = lua.safe_script_file("lua/canequip.lua",
-                                      sol::script_pass_on_error);
-    if(!value.valid()) {
-        sol::error err = value;
+    sol::protected_function lua_canEquip = lua["can_equip"];
+    auto result = lua_canEquip(this, ship);
+    if(result.valid()) {
+        return result;
+    }
+    else {
+        sol::error err = result;
         qCritical()
-            //% "The code from the file %1 has failed to run: %2"
+            //% "The function can_equip from the file %1 has failed to run: %2"
             << qtTrId("lua-error").arg("lua/canequip.lua")
                    .arg(err.what());
         return false;
-    }
-    else {
-        sol::protected_function lua_canEquip = lua["can_equip"];
-        auto result = lua_canEquip(this, ship);
-        if(result.valid()) {
-            return result;
-        }
-        else {
-            sol::error err = result;
-            qCritical()
-                //% "The function can_equip from the file %1 has failed to run: %2"
-                << qtTrId("lua-error").arg("lua/canequip.lua")
-                       .arg(err.what());
-            return false;
-        }
     }
 }
 

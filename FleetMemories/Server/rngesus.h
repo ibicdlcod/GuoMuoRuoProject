@@ -15,6 +15,18 @@ struct ShipDropInfo
 
 namespace RNGesus {
 
+double setDropValue(double rarity,
+                  std::mt19937 &engine) {
+    static double a = 0.406226;
+    static double b = 1.28317;
+    std::exponential_distribution<> dist(a);
+    double result;
+    double test = dist(engine);
+    result = test > b ? b : test;
+    return result * rarity;
+}
+
+
 /* TBD: capital ships can nullify small damages */
 double calDamage(double firepower, double armor, double armorPenetration,
                  std::mt19937 &engine,
