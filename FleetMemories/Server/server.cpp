@@ -3930,6 +3930,16 @@ void Server::sendTestMessages() {
                     qWarning() << (QStringLiteral("FUCK") + QString::number(i));
             }
         }
+        i = 0;
+        for(auto equip: equipRegistry) {
+            for(auto ship: shipRegistry) {
+                //qInfo() << equip->toString() << ship->toString();
+                equip->canEquipEX(ship, lua);
+                ++i;
+                if(i % 10000 == 0)
+                    qWarning() << (QStringLiteral("FUCK") + QString::number(i));
+            }
+        }
         /*
         for(auto user: connectedUsers) {
             generateTestEquip(user);

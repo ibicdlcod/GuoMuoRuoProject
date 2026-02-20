@@ -1,7 +1,86 @@
 --data is updated to 2025 spring event--
+local function general_ex(equipid, equiptype, shipid, flags)
+	if equiptype:isSecGun() then
+		if equipid == 66 or equipid == 220 then --8cm高角炮系
+			if flags:get('secgunex') and ((flags:get('secgunex') & 0x1) ~= 0) then
+				return true
+			else
+				return checkmask(shipid, 0x000f1000, 0x00031000)
+					or checkmask(shipid, 0x000f0000, 0x000B0000)
+			end
+		elseif equipid == 71 or equipid == 275 then --10cm連装高角砲(砲架)系列
+			return flags:get('secgunex') and ((flags:get('secgunex') & 0x2) ~= 0)
+		elseif equipid == 464 then --10cm連装高角砲群 集中配備
+			return flags:get('secgunex') and ((flags:get('secgunex') & 0x4) ~= 0)
+		elseif equipid == 524 then --12cm単装高角砲＋25mm機銃増備
+			if flags:get('secgunex') and ((flags:get('secgunex') & 0x8) ~= 0) then
+				return true
+			else
+				return checkmask(shipid, 0x000f1000, 0x00031000)
+					or checkmask(shipid, 0x000f0000, 0x000B0000)
+			end
+		elseif equipid == 10 or equipid == 130 then --12.7cm連装高角砲系
+			return flags:get('secgunex') and ((flags:get('secgunex') & 0x10) ~= 0)
+		elseif equipid == 12 or equipid == 234 or equipid == 463 then --15.5cm三連装副砲系
+			return flags:get('secgunex') and ((flags:get('secgunex') & 0x20) ~= 0)
+		else
+			return false
+		end
+	elseif equiptype:isRadar() then
+		if equiptype:getSize() == 7 then
+			return general(equipid, equiptype, shipid, flags, false)
+		elseif equipid == 27 or equipid == 106 or equipid == 450 then --13号对空电探系
+			if flags:get('radarex') and ((flags:get('radarex') & 0x1) ~= 0) then
+				return true
+			else
+				return checkmask(shipid, 0x00ff0f00, 0x00130600) --阿贺野型
+					or checkmask(shipid, 0x00ff0f00, 0x00130700) --大淀型
+					or checkmask(shipid, 0x00ff0f00, 0x00120900) --夕云型
+					or checkmask(shipid, 0x00ff0f00, 0x00120B00) --秋月型
+					or checkmask(shipid, 0x00ff0f00, 0x00120C00) --松型
+			end
+		elseif equipid == 28 or equipid == 88 or equipid == 240 or equipid == 517 then --22号对水上电探系
+			if flags:get('radarex') and ((flags:get('radarex') & 0x2) ~= 0) then
+				return true
+			else
+				return checkmask(shipid, 0x00ff0f00, 0x00120800) --阳炎型
+					or checkmask(shipid, 0x00ff0f00, 0x00120900) --夕云型
+					or checkmask(shipid, 0x00ff0f00, 0x00120C00) --松型
+			end
+		elseif equipid == 506 then --電探装備マスト(13号改＋22号電探改四)
+			return flags:get('radarex') and ((flags:get('radarex') & 0x4) ~= 0)
+		elseif equipid == 410 or equipid == 411 then --21/42号对空电探改二
+			return flags:get('radarex') and ((flags:get('radarex') & 0x8) ~= 0)
+		elseif equipid == 527 then --Type281 レーダー 
+			return checkmask(shipid, 0x00ff0000, 0x00530000)
+				or checkmask(shipid, 0x00ff1000, 0x00550000) --ban巡战
+				or checkmask(shipid, 0x00ff0000, 0x00560000)
+		elseif equipid == 528 then --Type274 射撃管制レーダー
+			return checkmask(shipid, 0x00ff0000, 0x00530000)
+				or checkmask(shipid, 0x00ff0000, 0x00550000)
+		elseif equipid == 124 then
+			if checkmask(shipid, 0xf0000000, 0x10000000) then
+				return false
+			end
+			return checkmask(shipid, 0x00ff0000, 0x00250000)
+				or checkmask(shipid, 0x00ff0000, 0x00240000)
+		elseif equiptype:getSize() == 3 then
+			return checkmask(shipid, 0xf0ff8000, 0x30158000) --大和改二、武藏改二
+		else
+			return false
+		end
+	elseif equiptype:isTorp() then
+		if equipid == 442 or equipid == 443 then --潜水舰后部鱼雷发射管
+			return checkmask(shipid, 0x000f0000, 0x00070000)
+		end
+	else
+		return false
+	end
+end
+
 local function general(equipid, equiptype, shipid, flags, isex)
 	if isex then
-		return false --incomplete
+		return general_ex(equipid, equiptype, shipid, flags)
 	end
 	if equiptype:isRadar() then
 		if equiptype:getSize() == 7 then --潜水舰电探
@@ -237,7 +316,14 @@ end
 
 local function depthcharge(equipid, equiptype, shipid, flags, isex)
 	if isex then
-		return false --incomplete
+		if equiptype:getSize() == 2 then
+			return false --will change in new updates
+		elseif equiptype:getSize() == 1 then
+			return checkmask(shipid, 0x000f8000, 0x00010000) --海防和护卫驱逐(not present in KC)
+				or checkmask(shipid, 0xffffffff, 0x40126602) --时雨改三
+		else
+			return false
+		end
 	end
 	if flags:get('depthcharge') == 1 then
 		return true
@@ -246,7 +332,7 @@ local function depthcharge(equipid, equiptype, shipid, flags, isex)
 	end
 	return checkmask(shipid, 0x000f0000, 0x00020000)
 		or checkmask(shipid, 0x000f0000, 0x00030000)
-		or checkmask(shipid, 0x000f0000, 0x00010000)
+		or checkmask(shipid, 0x000f8000, 0x00010000)
 		or checkmask(shipid, 0x000f0000, 0x00080000)
 		or checkmask(shipid, 0x000f0000, 0x000A0000) --登陆舰
 end
@@ -262,7 +348,7 @@ local function smoke(equipid, equiptype, shipid, flags, isex)
 	end
 	return checkmask(shipid, 0x000f0000, 0x00020000)
 		or checkmask(shipid, 0x000f0000, 0x00030000)
-		or checkmask(shipid, 0x000f0000, 0x00010000)
+		or checkmask(shipid, 0x000f0000, 0x00018000)
 		or checkmask(shipid, 0x000f0000, 0x00040000)
 end
 
@@ -294,7 +380,7 @@ local function sonar(equipid, equiptype, shipid, flags, isex)
 	end
 	return checkmask(shipid, 0x000f0000, 0x00020000)
 		or checkmask(shipid, 0x000f0000, 0x00030000)
-		or checkmask(shipid, 0x000f0000, 0x00010000)
+		or checkmask(shipid, 0x000f0000, 0x00018000)
 		or checkmask(shipid, 0x000f0000, 0x00070000)
 end
 
@@ -321,7 +407,7 @@ local function alrocket(equipid, equiptype, shipid, flags, isex)
 		return false
 	end
 	return checkmask(shipid, 0x000f0000, 0x00020000)
-		or checkmask(shipid, 0x000f0000, 0x00010000)
+		or checkmask(shipid, 0x000f0000, 0x00018000)
 		or checkmask(shipid, 0x000f0000, 0x00030000)
 		or checkmask(shipid, 0x000f4000, 0x00044000)
 		or checkmask(shipid, 0x000f4000, 0x00054000)
@@ -333,6 +419,7 @@ end
 local function landcraft(equipid, equiptype, shipid, flags, isex)
 	if isex then
 		return checkmask(shipid, 0xffffffff, 0x30130305) --鬼怒改二(different mechanic in KC)
+			or checkmask(shipid, 0x00ff0fff, 0x001A0200) --神州丸
 	end
 	if flags:get('landingcraft') == 1 then
 		return true
@@ -349,7 +436,15 @@ end
 
 local function landtank(equipid, equiptype, shipid, flags, isex)
 	if isex then
-		return false--incomplete
+		if equipid == 525 or equipid == 526 then --特四
+			if flags:get('toku4') == 1 then
+				return true
+			elseif flags:get('toku4') == -1 then
+				return false
+			end
+		else
+			return false
+		end
 	end
 	if flags:get('landingtank') == 1 then
 		return true
@@ -385,9 +480,9 @@ local function tpmaterial(equipid, equiptype, shipid, flags, isex)
 	return false --dormant
 end
 
-local function engineboiler(equipid, equiptype, shipid, flags, isex)
+local function engineboiler(equipid, equiptype, shipid, flags, isex, ship)
 	if isex then
-		; --incomplete
+		return ship.attr:get('Speed') and ship.attr:get('Speed') >= 41
 	end
 	if checkmask(shipid, 0xf00ff000, 0x30010000) then
 		return true
@@ -400,7 +495,7 @@ end
 
 local function engineturbine(equipid, equiptype, shipid, flags, isex)
 	if isex then
-		; --incomplete
+		return engineboiler(equipid, equiptype, shipid, flags, false)
 	end
 	return engineboiler(equipid, equiptype, shipid, flags, isex)
 end
@@ -455,7 +550,6 @@ local function repairitem(equipid, equiptype, shipid, flags, isex)
 end
 
 local function underwayreplenish(equipid, equiptype, shipid, flags, isex)
-	--isex?
 	return checkmask(shipid, 0x000f0000, 0x00090000)
 		or checkmask(shipid, 0x00ff0fff, 0x001A0400) --熊野丸
 end
@@ -466,7 +560,19 @@ end
 
 local function commandfac(equipid, equiptype, shipid, flags, isex)
 	if isex then
-		return false--incomplete
+		precheck = false
+		if equipid == 413 then --水雷战队司令部
+			precheck = checkmask(shipid, 0x00ff0f00, 0x00130200)
+				or checkmask(shipid, 0x00ff0f00, 0x00130300)
+				or checkmask(shipid, 0x00ff0f00, 0x00130400)
+				or checkmask(shipid, 0x00ff0f00, 0x00130600)
+				or checkmask(shipid, 0x00ff0f00, 0x00130700)
+				or checkmask(shipid, 0x00ff0f00, 0x00120900)
+				or checkmask(shipid, 0x00ff0f00, 0x00120B00)
+		end
+		if not precheck then
+			return false
+		end
 	end
 	if flags:get('commandfac') == nil then
 		;
@@ -486,7 +592,7 @@ end
 
 local function airpersonnel(equipid, equiptype, shipid, flags, isex)
 	if isex then
-		return false--incomplete
+		return checkmask(shipid, 0x000f0000, 0x00060000)
 	end
 	return checkmask(shipid, 0x000f0000, 0x000C0000)
 		or checkmask(shipid, 0x000f0000, 0x00060000)
@@ -507,9 +613,6 @@ local function repairfac(equipid, equiptype, shipid, flags, isex)
 end
 
 local function surfacepersonnel(equipid, equiptype, shipid, flags, isex)
-	if isex then
-		return false--incomplete
-	end
 	if flags:get('lookout') == 1 then
 		return true
 	elseif flags:get('lookout') == -1 then
@@ -566,9 +669,6 @@ local function jetplane(equipid, equiptype, shipid, flags, isex)
 end
 
 local function bulge(equipid, equiptype, shipid, flags, isex)
-	if isex then
-		return false --incomplete
-	end
 	if equiptype:getSize() == 1 then
 		return checkmask(shipid, 0x000f4000, 0x00024000) --驱逐（装甲能力）
 	elseif equiptype:getSize() == 2 then
@@ -602,9 +702,6 @@ local function bulge(equipid, equiptype, shipid, flags, isex)
 end
 
 local function aacontrol(equipid, equiptype, shipid, flags, isex)
-	if isex then
-		return false--incomplete
-	end
 	return not (checkmask(shipid, 0x00ff0fff, 0x00190600) --大泊
 		or checkmask(shipid, 0x00ff0fff, 0x001A0301) --第百一号輸送艦
 		or checkmask(shipid, 0xffff0fff, 0x101A0200) --神州丸（未改造）
@@ -612,9 +709,9 @@ local function aacontrol(equipid, equiptype, shipid, flags, isex)
 		)
 end
 
-local function aacontrol(equipid, equiptype, shipid, flags, isex)
+local function landcorps(equipid, equiptype, shipid, flags, isex)
 	if isex then
-		return false--incomplete
+		return false
 	end
 	return checkmask(shipid, 0x00ff0fff, 0x001A0301) --第百一号輸送艦
 end
@@ -667,6 +764,16 @@ function can_equip(thisequip, thisship)
 	
 	local func = generaltype[thisequip.type:getSpecial()] or generaltype.default
 	
+	if func == engineboiler then
+	return func(
+		thisequip:getId(),
+		thisequip.type,
+		thisship:getId(),
+		thisship.customFlags,
+		false,
+		thisship)
+	end
+	
 	return func(
 		thisequip:getId(),
 		thisequip.type,
@@ -674,12 +781,23 @@ function can_equip(thisequip, thisship)
 		thisship.customFlags,
 		false)
 end
+
 function can_equip_ex(thisequip, thisship)
 	if thisequip.type:isLb() then
 		return false --陆航
 	end
 	
 	local func = generaltype[thisequip.type:getSpecial()] or generaltype.default
+	
+	if func == engineboiler then
+	return func(
+		thisequip:getId(),
+		thisequip.type,
+		thisship:getId(),
+		thisship.customFlags,
+		true,
+		thisship)
+	end
 	
 	return func(
 		thisequip:getId(),

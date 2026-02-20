@@ -15,6 +15,7 @@ void init(sol::state &lua) {
                                  sol::constructors<>()); // we don't need to construct in lua
     ship_type["getId"] = &Ship::getId;
     ship_type.set("customFlags", sol::readonly(&Ship::customFlags));
+    ship_type.set("attr", sol::readonly(&Ship::attr));
     sol::usertype<Equipment> equipment_type
         = lua.new_usertype<Equipment>("Equipment",
                                       sol::constructors<>());
