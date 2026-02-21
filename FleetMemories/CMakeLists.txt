@@ -253,10 +253,19 @@ qt_add_translations(
     INCLUDE_DIRECTORIES ${CMAKE_CURRENT_SOURCE_DIR}
     LRELEASE_OPTIONS -idbased)
 
+add_custom_target(copy_assets
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+    "${PROJECT_SOURCE_DIR}/lua"
+    "${PROJECT_BINARY_DIR}/lua"
+    COMMENT "Copying lua files"
+)
 # frequently error but not always
 add_dependencies(CFProtocol update_translations)
 add_dependencies(CFClient update_translations)
 add_dependencies(CFServer update_translations)
+add_dependencies(CFProtocol copy_assets)
+add_dependencies(CFClient copy_assets)
+add_dependencies(CFServer copy_assets)
 
 target_link_libraries(CFProtocol PRIVATE Qt${QT_VERSION_MAJOR}::Core)
 target_link_libraries(CFProtocol PRIVATE Qt${QT_VERSION_MAJOR}::Sql)
@@ -373,14 +382,3 @@ add_custom_command(TARGET CFServer POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_if_different
     "${PROJECT_SOURCE_DIR}/../doc/map/Map_relations.csv"
     $<TARGET_FILE_DIR:CFServer>)
-add_custom_command(TARGET CFClient POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy_if_different
-    ARGS
-    "${PROJECT_SOURCE_DIR}/lua/canequip.lua"
-    "${PROJECT_BINARY_DIR}/lua")
-add_custom_command(TARGET CFServer POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy_if_different
-    ARGS
-    "${PROJECT_SOURCE_DIR}/lua/canequip.lua"
-    "${PROJECT_BINARY_DIR}/lua")
-

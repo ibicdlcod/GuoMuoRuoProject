@@ -434,7 +434,6 @@ bool Server::listen(const QHostAddress &address, quint16 port) {
             qCritical () << sslServer.errorString();
         else {
             sqlinit();
-            luaInitEquipable();
             if(!equipmentRefresh()) {
                 //% "Equipment init failed!"
                 qCritical() << qtTrId("equip-init-failure");
@@ -447,6 +446,8 @@ bool Server::listen(const QHostAddress &address, quint16 port) {
                 //% "Map init failed!"
                 qCritical() << qtTrId("map-init-failure");
             }
+            luaInitEquipable();
+            luaInitMap();
         }
     } else {
         listening = true;
@@ -533,6 +534,12 @@ bool Server::parseSpec(const QStringList &cmdParts) {
                     && cmdParts[1].compare(
                            "canequip", Qt::CaseInsensitive) == 0) {
                     luaInitEquipable();
+                    return true;
+                }
+                else if(cmdParts.length() > 1
+                         && cmdParts[1].compare(
+                                "map", Qt::CaseInsensitive) == 0) {
+                    luaInitMap();
                     return true;
                 }
             }
@@ -903,6 +910,7 @@ void Server::offerMapInfo(QSslSocket *connection)
 {
     QJsonArray mapInfos;
     for(const auto map: std::as_const(normalMaps)) {
+        int unionId = map->id % KP::mapIDDifficultyMask;
         QJsonObject mapInfo;
         mapInfo["id"] = map->id;
         QJsonObject ename;
@@ -915,6 +923,42 @@ void Server::offerMapInfo(QSslSocket *connection)
         mapInfo["x"] = map->x;
         mapInfo["y"] = map->y;
         mapInfo["diff"] = map->diff;
+        if(lua["maps"][unionId] != sol::nil) {
+            QJsonArray startingNodes;
+            sol::table tab = lua["maps"][unionId]["starting_nodes"];
+            tab.for_each(
+                [&startingNodes](sol::object const& key, sol::object const& value) {
+                    if (value.is<int>()) {
+                        startingNodes.append(QJsonValue(value.as<int>()));
+                    }
+                });
+            mapInfo["startingnodes"] = startingNodes;
+            QJsonObject nodeInfos;
+            sol::table table = lua["maps"][unionId];
+            for(const auto &pair: table) {
+                QJsonObject nodeInfo;
+                sol::object key = pair.first;
+                sol::object value = pair.second;
+                if(key.is<int>()) {
+                    sol::table info = value.as<sol::table>();
+                    nodeInfo["x"] = (double)info["x"];
+                    nodeInfo["y"] = (double)info["y"];
+                    nodeInfo["battletype"] = (int)info["battle_type"];
+                    nodeInfo["lb"] = (int)info["lb_distance"];
+                    QJsonArray nextNodes;
+                    sol::table nextNodeTable = info["next_nodes"];
+                    nextNodeTable.for_each(
+                        [&nextNodes](sol::object const& key, sol::object const& value) {
+                            if (value.is<int>()) {
+                                nextNodes.append(QJsonValue(value.as<int>()));
+                            }
+                        });
+                    nodeInfo["next"] = nextNodes;
+                    nodeInfos[QString::number(key.as<int>())] = nodeInfo;
+                }
+                mapInfo["nodeinfo"] = nodeInfos;
+            }
+        }
         mapInfos.append(mapInfo);
     }
     QTimer::singleShot(100, this, [=, this]{
@@ -2645,6 +2689,55 @@ void Server::luaInitEquipable() {
     }
 }
 
+void Server::luaInitMap() {
+    auto value = lua.safe_script_file("lua/maps.lua",
+                                      sol::script_pass_on_error);
+    if(!value.valid()) {
+        sol::error err = value;
+        qCritical()
+            //% "The code from the file %1 has failed to run: %2"
+            << qtTrId("lua-map-error").arg("lua/maps.lua")
+                   .arg(err.what());
+    }
+    else {
+        //% "Load map table success!"
+        qInfo() << qtTrId("lua-map-success");
+    }
+    QSet<int> normalMapUnions;
+    for(auto map: std::as_const(normalMaps)) {
+        normalMapUnions.insert(map->id % KP::mapIDDifficultyMask);
+    }
+    for(auto map: normalMapUnions) {
+        QString name = QStringLiteral("lua/map%1.lua").arg(map);
+        QFile file(name);
+        if(!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+            //% "Map file %1 don't exist!"
+            qWarning() << qtTrId("map-file-nonexistent").arg(name);
+            continue;
+        }
+        else {
+            auto value = lua.safe_script_file(name.toStdString(),
+                                              sol::script_pass_on_error);
+            if(!value.valid()) {
+                sol::error err = value;
+                qCritical()
+                    << qtTrId("lua-map-error").arg(name)
+                           .arg(err.what());
+            }
+            else {
+                //% "Load map %1 info success!"
+                qInfo() << qtTrId("lua-map-success-spec").arg(map);
+                QFileInfo fileInfo(name);
+                QDateTime lastModifiedDate = fileInfo.lastModified(QTimeZone::UTC);
+                QDateTime mapDBTimeStamp = settings->value("server/mapdbtimestamp").toDateTime();
+                if(lastModifiedDate > mapDBTimeStamp) {
+                    settings->setValue("server/mapdbtimestamp", lastModifiedDate);
+                }
+            }
+        }
+    }
+}
+
 bool Server::mapRefresh()
 {
     QSqlDatabase db = QSqlDatabase::database();
@@ -3811,9 +3904,9 @@ void Server::receivedReq(const QJsonObject &djson,
                            this,
                            [connection, uid, djson, this]
                            {offerTechInfo(
-                                 connection,
-                                 uid,
-                                 djson["local"].toInt());});
+                  connection,
+                  uid,
+                  djson["local"].toInt());});
     }
     break;
     case KP::CommandType::DemandSkillPoints: {
@@ -3821,9 +3914,9 @@ void Server::receivedReq(const QJsonObject &djson,
                            this,
                            [connection, uid, djson, this]
                            {offerSPInfo(
-                                 connection,
-                                 uid,
-                                 djson["equipid"].toInt());});
+                  connection,
+                  uid,
+                  djson["equipid"].toInt());});
     }
     break;
     case KP::CommandType::DemandResourceUpdate: {
@@ -3831,8 +3924,8 @@ void Server::receivedReq(const QJsonObject &djson,
                            this,
                            [connection, uid, this]
                            {offerResourceInfo(
-                                 connection,
-                                 uid);});
+                  connection,
+                  uid);});
     }
     break;
     case KP::CommandType::DestructEquip: {
@@ -3916,18 +4009,7 @@ void Server::sendTestMessages() {
         qWarning() << "Server isn't listening, abort.";
     }
     else {
-        /*
-        for(int i = 0; i < 100; ++i) {
-            qCritical() << RNGesus::setDropValue(100, mt);
-        }*/
-        int i = 0;
-        for(auto equip: equipRegistry) {
-            for(auto ship: shipRegistry) {
-                if(ship->toString() == "占守" && equip->type.getSpecial() == KP::Sonar) {
-                    qCritical() << equip->toString() << equip->canEquip(ship, lua);
-                }
-            }
-        }
+        luaInitMap();
         /*
         for(auto user: connectedUsers) {
             generateTestEquip(user);

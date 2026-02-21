@@ -366,6 +366,8 @@ border-style: none;</string>
      <string id="menu-sortie">Sortie</string>
     </property>
     <addaction name="actionBattle"/>
+    <addaction name="actionExpedition"/>
+    <addaction name="actionResource_status"/>
    </widget>
    <widget class="QMenu" name="menuFleet">
     <property name="title">
@@ -456,7 +458,7 @@ border-style: none;</string>
   </action>
   <action name="actionBattle">
    <property name="text">
-    <string id="menu-battle">Battle Maps</string>
+    <string id="menu-battle">Battle</string>
    </property>
   </action>
   <action name="actionAnchorage">
@@ -487,6 +489,16 @@ border-style: none;</string>
   <action name="actionLicense">
    <property name="text">
     <string id="menu-license">License</string>
+   </property>
+  </action>
+  <action name="actionExpedition">
+   <property name="text">
+    <string id="menu-expedition">Expedition</string>
+   </property>
+  </action>
+  <action name="actionResource_status">
+   <property name="text">
+    <string id="menu-naval-supermacy">Current Resource Gain</string>
    </property>
   </action>
  </widget>

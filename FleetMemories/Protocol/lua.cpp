@@ -8,7 +8,7 @@ namespace LuaInit {
 
 void init(sol::state &lua) {
 
-    lua.open_libraries(sol::lib::base);
+    lua.open_libraries(sol::lib::base, sol::lib::package, sol::lib::math);
     lua.set_function("checkmask", &Utility::checkMask);
     sol::usertype<Ship> ship_type
         = lua.new_usertype<Ship>("Ship",
