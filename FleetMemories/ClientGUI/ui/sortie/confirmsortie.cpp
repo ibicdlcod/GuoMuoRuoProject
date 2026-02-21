@@ -12,7 +12,9 @@ ConfirmSortie::ConfirmSortie(QWidget *parent, QString mapText, QString diffText)
         if(qobject_cast<MainWindow *>(widget)) {
             MainWindow *mainWindowM = qobject_cast<MainWindow *>(widget);
             fv = mainWindowM->getFleetArea();
+            mainWindowM->getFleetAreaWidget()->removeWidget(fv);
             ui->fleetLayout->addWidget(fv);
+            fv->show();
             mainWindowM->fleetArea = nullptr;
         }
     }
@@ -21,12 +23,11 @@ ConfirmSortie::ConfirmSortie(QWidget *parent, QString mapText, QString diffText)
 ConfirmSortie::~ConfirmSortie() {
     for(auto *widget: QApplication::topLevelWidgets()) {
         if(qobject_cast<MainWindow *>(widget)) {
-            ui->fleetLayout->removeWidget(fv);
             fv->hide();
             MainWindow *mainWindowM = qobject_cast<MainWindow *>(widget);
+            ui->fleetLayout->removeWidget(fv);
+            mainWindowM->getFleetAreaWidget()->addWidget(fv);
             mainWindowM->fleetArea = fv;
-            fv->setParent(mainWindowM->getFleetAreaWidget());
-            fv->show();
         }
     }
     delete ui;

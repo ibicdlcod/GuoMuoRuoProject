@@ -215,7 +215,7 @@
     </message>
     <message id="licence-not-found">
         <location filename="../Protocol/commandline.cpp" line="144"/>
-        <location filename="../ClientGUI/ui/mainwindow.cpp" line="133"/>
+        <location filename="../ClientGUI/ui/mainwindow.cpp" line="129"/>
         <location filename="../ClientGUI/ui/port/licensearea.cpp" line="33"/>
         <source>Can&apos;t find license file, exiting.</source>
         <translation>Can&apos;t find license file, exiting.</translation>
@@ -3244,27 +3244,27 @@ Great at battle and bad at politics--so cool!</translation>
 <context>
     <name>MainWindow</name>
     <message id="develop-equipment">
-        <location filename="../ClientGUI/ui/mainwindow.ui" line="426"/>
+        <location filename="../ClientGUI/ui/mainwindow.ui" line="311"/>
         <location filename="../ClientGUI/ui/factory/factoryarea.cpp" line="155"/>
         <source>Develop Equipment</source>
         <oldsource>Develop equipment</oldsource>
         <translation type="unfinished">Develop Equipment</translation>
     </message>
     <message id="construct-ships">
-        <location filename="../ClientGUI/ui/mainwindow.ui" line="451"/>
+        <location filename="../ClientGUI/ui/mainwindow.ui" line="336"/>
         <location filename="../ClientGUI/ui/factory/factoryarea.cpp" line="160"/>
         <source>Construct Ships</source>
         <oldsource>Consturct Ships</oldsource>
         <translation type="unfinished">Construct Ships</translation>
     </message>
     <message id="arsenal">
-        <location filename="../ClientGUI/ui/mainwindow.ui" line="456"/>
+        <location filename="../ClientGUI/ui/mainwindow.ui" line="341"/>
         <location filename="../ClientGUI/ui/factory/factoryarea.cpp" line="166"/>
         <source>Arsenal</source>
         <translation type="unfinished">Arsenal</translation>
     </message>
     <message id="anchorage">
-        <location filename="../ClientGUI/ui/mainwindow.ui" line="466"/>
+        <location filename="../ClientGUI/ui/mainwindow.ui" line="351"/>
         <location filename="../ClientGUI/ui/factory/factoryarea.cpp" line="175"/>
         <source>Anchorage</source>
         <translation type="unfinished"></translation>
@@ -3275,98 +3275,98 @@ Great at battle and bad at politics--so cool!</translation>
         <translation type="unfinished"></translation>
     </message>
     <message id="menu-sortie">
-        <location filename="../ClientGUI/ui/mainwindow.ui" line="366"/>
+        <location filename="../ClientGUI/ui/mainwindow.ui" line="251"/>
         <source>Sortie</source>
         <translation type="unfinished">Sortie</translation>
     </message>
     <message id="menu-fleet">
-        <location filename="../ClientGUI/ui/mainwindow.ui" line="374"/>
+        <location filename="../ClientGUI/ui/mainwindow.ui" line="259"/>
         <source>Fleet</source>
         <translation type="unfinished">Fleet</translation>
     </message>
     <message id="menu-dock">
-        <location filename="../ClientGUI/ui/mainwindow.ui" line="380"/>
+        <location filename="../ClientGUI/ui/mainwindow.ui" line="265"/>
         <source>Dock</source>
         <translation type="unfinished">Dock</translation>
     </message>
     <message id="menu-factory">
-        <location filename="../ClientGUI/ui/mainwindow.ui" line="385"/>
+        <location filename="../ClientGUI/ui/mainwindow.ui" line="270"/>
         <source>Factory</source>
         <translation type="unfinished">Factory</translation>
     </message>
     <message id="menu-naval-base">
-        <location filename="../ClientGUI/ui/mainwindow.ui" line="395"/>
+        <location filename="../ClientGUI/ui/mainwindow.ui" line="280"/>
         <source>Naval Base</source>
         <translation type="unfinished">Naval Base</translation>
     </message>
     <message id="menu-tech">
-        <location filename="../ClientGUI/ui/mainwindow.ui" line="403"/>
+        <location filename="../ClientGUI/ui/mainwindow.ui" line="288"/>
         <source>Tech</source>
         <translation type="unfinished">Tech</translation>
     </message>
     <message id="menu-help">
-        <location filename="../ClientGUI/ui/mainwindow.ui" line="409"/>
+        <location filename="../ClientGUI/ui/mainwindow.ui" line="294"/>
         <source>Help</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="menu-back-to-naval-base">
-        <location filename="../ClientGUI/ui/mainwindow.ui" line="431"/>
+        <location filename="../ClientGUI/ui/mainwindow.ui" line="316"/>
         <source>Back to naval base</source>
         <translation type="unfinished">Back to naval base</translation>
     </message>
     <message id="menu-logout">
-        <location filename="../ClientGUI/ui/mainwindow.ui" line="436"/>
+        <location filename="../ClientGUI/ui/mainwindow.ui" line="321"/>
         <source>Logout</source>
         <translation type="unfinished">Logout</translation>
     </message>
     <message id="menu-exit">
-        <location filename="../ClientGUI/ui/mainwindow.ui" line="441"/>
+        <location filename="../ClientGUI/ui/mainwindow.ui" line="326"/>
         <source>Exit program</source>
         <translation type="unfinished">Exit program</translation>
     </message>
     <message id="menu-view-tech">
-        <location filename="../ClientGUI/ui/mainwindow.ui" line="446"/>
+        <location filename="../ClientGUI/ui/mainwindow.ui" line="331"/>
         <source>View Tech</source>
         <translation type="unfinished">View Tech</translation>
     </message>
     <message id="menu-battle">
-        <location filename="../ClientGUI/ui/mainwindow.ui" line="461"/>
+        <location filename="../ClientGUI/ui/mainwindow.ui" line="346"/>
         <source>Battle</source>
         <oldsource>Battle Maps</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message id="menu-compose">
-        <location filename="../ClientGUI/ui/mainwindow.ui" line="471"/>
+        <location filename="../ClientGUI/ui/mainwindow.ui" line="356"/>
         <source>Compose</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="ship-blueprint-view">
-        <location filename="../ClientGUI/ui/mainwindow.ui" line="476"/>
+        <location filename="../ClientGUI/ui/mainwindow.ui" line="361"/>
         <source>Ship Blueprints</source>
         <translation>Ship Blueprints</translation>
     </message>
     <message id="menu-settings">
-        <location filename="../ClientGUI/ui/mainwindow.ui" line="481"/>
+        <location filename="../ClientGUI/ui/mainwindow.ui" line="366"/>
         <source>Settings</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="menu-about-qt">
-        <location filename="../ClientGUI/ui/mainwindow.ui" line="486"/>
+        <location filename="../ClientGUI/ui/mainwindow.ui" line="371"/>
         <source>About Qt</source>
         <translation type="unfinished">About Qt</translation>
     </message>
     <message id="menu-license">
-        <location filename="../ClientGUI/ui/mainwindow.ui" line="491"/>
+        <location filename="../ClientGUI/ui/mainwindow.ui" line="376"/>
         <source>License</source>
         <translation type="unfinished">License</translation>
     </message>
     <message id="menu-expedition">
-        <location filename="../ClientGUI/ui/mainwindow.ui" line="496"/>
+        <location filename="../ClientGUI/ui/mainwindow.ui" line="381"/>
         <source>Expedition</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="menu-naval-supermacy">
-        <location filename="../ClientGUI/ui/mainwindow.ui" line="501"/>
+        <location filename="../ClientGUI/ui/mainwindow.ui" line="386"/>
         <source>Current Resource Gain</source>
         <translation type="unfinished"></translation>
     </message>

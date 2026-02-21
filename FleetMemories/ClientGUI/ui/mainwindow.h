@@ -5,6 +5,7 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <QStackedLayout>
 #include "../../FactorySlot/factoryslot.h"
 #include "port/portarea.h"
 #include "port/licensearea.h"
@@ -30,7 +31,7 @@ public:
     ~MainWindow();
 
     FleetView * getFleetArea() const;
-    QWidget * getFleetAreaWidget() const;
+    QLayout * getFleetAreaWidget() const;
     friend class ConfirmSortie;
 
 signals:
@@ -40,7 +41,7 @@ protected:
     void resizeEvent(QResizeEvent *) override;
 
 private slots:
-    void adjustArea(QFrame *, const QSize &);
+    void adjustArea(QWidget *, const QSize &);
     void factoryRefresh();
     void gamestateChanged(KP::GameState);
     void gamestateInit();
@@ -70,5 +71,7 @@ private:
     Sortie *battleArea;
     FleetView *fleetArea;
     SettingsWindow settingsWindow;
+
+    QStackedLayout *lay;
 };
 #endif // MAINWINDOW_H

@@ -34,13 +34,9 @@ MainWindow::MainWindow(QWidget *parent, int argc, char ** argv)
     /* this is done instead of in *.ui for it does not cascade */
     ui->MainArea->setObjectName("mainArea");
     ui->MainArea->setStyleSheet("QWidget#mainArea { border-style: none }");
+    lay = new QStackedLayout();
 
     move(screen()->geometry().center() - frameGeometry().center());
-    ui->PortArea->hide();
-    ui->FactoryArea->hide();
-    ui->LoginScreen->hide();
-    ui->TechArea->hide();
-    ui->BattleArea->hide();
 
     ui->ResourcesBar->hide();
     ui->OilLabel->setPixmap(QPixmap(QStringLiteral(
@@ -146,29 +142,36 @@ MainWindow::MainWindow(QWidget *parent, int argc, char ** argv)
     connect(ui->actionAbout_Qt, &QAction::triggered,
             QApplication::instance(), &QApplication::aboutQt);
 
-    portArea = new PortArea(ui->PortArea);
-    licenseArea = new LicenseArea(ui->License);
-    newLoginScreen = new NewLoginS(ui->LoginScreen);
-    factoryArea = new FactoryArea(ui->FactoryArea);
-    techArea = new TechView(ui->TechArea);
-    battleArea = new Sortie(ui->BattleArea);
-    fleetArea = new FleetView(ui->FleetArea);
-    ui->FleetArea->hide();
-    licenseArea->hide();
+    portArea = new PortArea();
+    licenseArea = new LicenseArea();
+    newLoginScreen = new NewLoginS();
+    factoryArea = new FactoryArea();
+    techArea = new TechView();
+    battleArea = new Sortie();
+    fleetArea = new FleetView();
+
+    lay->addWidget(portArea);
+    lay->addWidget(licenseArea);
+    lay->addWidget(newLoginScreen);
+    lay->addWidget(factoryArea);
+    lay->addWidget(techArea);
+    lay->addWidget(battleArea);
+    lay->addWidget(fleetArea);
+
+    ui->MainArea->setLayout(lay);
+    lay->setContentsMargins(0,0,0,0);
 
     QTimer::singleShot(100, this,
                        [this]
                        {
-                           licenseArea->show();
+                           lay->setCurrentWidget(licenseArea);
                            adjustArea(licenseArea,
-                                      ui->License->size());
+                                      ui->MainArea->frameSize());
                        });
     connect(licenseArea, &LicenseArea::showLicenseComplete,
-            ui->License, &QWidget::hide);
+            lay, [this](){lay->setCurrentWidget(newLoginScreen);});
     connect(licenseArea, &LicenseArea::showLicenseComplete,
             this, &MainWindow::gamestateInit);
-    connect(licenseArea, &LicenseArea::showLicenseComplete,
-            newLoginScreen, &QWidget::show);
     QTimer::singleShot(settings->value("client/licenseareapersist",
                                        5000).toInt(), this,
                        [this]{
@@ -186,11 +189,6 @@ MainWindow::MainWindow(QWidget *parent, int argc, char ** argv)
 
 MainWindow::~MainWindow()
 {
-    delete portArea;
-    delete licenseArea;
-    delete newLoginScreen;
-    delete factoryArea;
-    delete techArea;
     delete ui;
 }
 
@@ -198,11 +196,11 @@ FleetView * MainWindow::getFleetArea() const {
     return fleetArea;
 }
 
-QWidget * MainWindow::getFleetAreaWidget() const {
-    return ui->FleetArea;
+QLayout * MainWindow::getFleetAreaWidget() const {
+    return lay;
 }
 
-void MainWindow::adjustArea(QFrame *input, const QSize &size) {
+void MainWindow::adjustArea(QWidget *input, const QSize &size) {
     input->move(0, 0);
     input->resize(size);
     update();
@@ -217,49 +215,22 @@ void MainWindow::factoryRefresh() {
 void MainWindow::gamestateInit() {
     gamestateChanged(KP::Offline);
     adjustArea(newLoginScreen,
-               ui->LoginScreen->frameSize());
+               ui->MainArea->frameSize());
     update();
 }
 
 void MainWindow::gamestateChanged(KP::GameState state) {
-    state == KP::Offline ? ui->LoginScreen->show()
-                         : ui->LoginScreen->hide();
     state == KP::Offline ? ui->ResourcesBar->hide()
                          : ui->ResourcesBar->show();
-    state == KP::Port ? (
-        licenseArea->neverComplete(),
-        ui->PortArea->show(),
-        QTimer::singleShot(1, this,
-                           [this]
-                           {adjustArea(portArea,
-                                       ui->PortArea->frameSize()
-                                      );}))
-                      : ui->PortArea->hide();
-    state == KP::Factory ? (
-        ui->FactoryArea->show(),
-        QTimer::singleShot(1, this, [this]{
-                           factoryRefresh();
-                           factoryArea->resize(ui->FactoryArea->size());}))
-                         : ui->FactoryArea->hide();
-    state == KP::TechView ? (
-        ui->TechArea->show(),
-        QTimer::singleShot(1, this,
-                           [this]
-                           {adjustArea(techArea,
-                                        ui->TechArea->frameSize());}))
-                          : ui->TechArea->hide();
-    state == KP::BattleView ? (
-        ui->BattleArea->show(),
-        QTimer::singleShot(1, this,
-                           [this]
-                           {adjustArea(battleArea, ui->BattleArea->frameSize());}))
-                            : ui->BattleArea->hide();
-    state == KP::FleetView ? (
-        ui->FleetArea->show(),
-        QTimer::singleShot(1, this,
-                           [this]
-                           {adjustArea(fleetArea, ui->FleetArea->frameSize());}))
-                            : ui->FleetArea->hide();
+    switch(state) {
+    case KP::Offline: lay->setCurrentWidget(newLoginScreen); break;
+    case KP::Port: lay->setCurrentWidget(portArea); break;
+    case KP::Factory: lay->setCurrentWidget(factoryArea); break;
+    case KP::TechView: lay->setCurrentWidget(techArea); break;
+    case KP::BattleView: lay->setCurrentWidget(battleArea); break;
+    case KP::FleetView: lay->setCurrentWidget(fleetArea); break;
+    }
+    adjustArea(lay->currentWidget(), ui->MainArea->frameSize());
 }
 
 void MainWindow::printMessage(QString text, QColor background,
@@ -373,26 +344,6 @@ void MainWindow::updateResources(const QJsonObject &djson) {
 
 /* reimplement */
 void MainWindow::resizeEvent(QResizeEvent *event) {
-    if(!ui->PortArea->isHidden()) {
-        adjustArea(portArea, ui->PortArea->size());
-    }
-    if(!ui->License->isHidden()) {
-        adjustArea(licenseArea, ui->License->size());
-    }
-    if(!ui->LoginScreen->isHidden()) {
-        adjustArea(newLoginScreen, ui->LoginScreen->size());
-    }
-    if(!ui->FactoryArea->isHidden()) {
-        adjustArea(factoryArea, ui->FactoryArea->size());
-    }
-    if(!ui->TechArea->isHidden()) {
-        adjustArea(techArea, ui->TechArea->size());
-    }
-    if(!ui->BattleArea->isHidden()) {
-        adjustArea(battleArea, ui->BattleArea->size());
-    }
-    if(!ui->FleetArea->isHidden()) {
-        adjustArea(fleetArea, ui->FleetArea->size());
-    }
+    adjustArea(lay->currentWidget(), ui->MainArea->frameSize());
     QWidget::resizeEvent(event);
 }
