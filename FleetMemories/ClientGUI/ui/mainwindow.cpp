@@ -198,7 +198,12 @@ FleetView * MainWindow::getFleetArea() const {
     return fleetArea;
 }
 
+QWidget * MainWindow::getFleetAreaWidget() const {
+    return ui->FleetArea;
+}
+
 void MainWindow::adjustArea(QFrame *input, const QSize &size) {
+    input->move(0, 0);
     input->resize(size);
     update();
 }

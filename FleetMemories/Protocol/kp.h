@@ -376,7 +376,7 @@ Q_GLOBAL_STATIC(QStringList,
                         QT_TRID_NOOP("MinorAsian"),
                         //% "Fantasy ships"
                         QT_TRID_NOOP("Fantasy"),
-                    }));
+                    }))
 
 enum FleetType {
     NormalFleet = 0,
@@ -437,6 +437,18 @@ enum Difficulty {
 };
 Q_ENUM_NS(Difficulty)
 
+using DiffMap = QMap<Difficulty, QString>;
+Q_GLOBAL_STATIC(DiffMap,
+                diffEnumtoStr,
+                DiffMap(
+                    {
+                        {EarlyWar, "C"},
+                        {MidWar, "B"},
+                        {LateWar, "A"},
+                        {Historical, "H"}
+                    }
+                    ))
+
 Q_GLOBAL_STATIC(QStringList,
                 fleetTypes,
                 QStringList(
@@ -449,7 +461,7 @@ Q_GLOBAL_STATIC(QStringList,
                         QT_TRID_NOOP("SurfaceFleet"),
                         //% "Transport"
                         QT_TRID_NOOP("TransportFleet"),
-                    }));
+                    }))
 
 
 void initLog(bool server = false);

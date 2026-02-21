@@ -105,12 +105,7 @@ ShipSelect::ShipSelect(int height, QWidget *parent)
 
     connect(addStarButton, &QAbstractButton::clicked,
             this, &ShipSelect::modernizeActivated);
-    /*
-    connect(searchBox, &QLineEdit::textEdited,
-            this, &EquipSelect::searchBoxChanged);
-    connect(this, &EquipSelect::typeActivated,
-            this, &EquipSelect::reCalculateAvailableEquips);
-*/
+
     connect(nationBox, &QComboBox::activated,
             this, [this]{
                 emit selectChanged(
@@ -183,6 +178,7 @@ void ShipSelect::typeBoxHinted(QStringList &types) {
     /* disconnect to eliminate infinite recursion */
     disconnect(qobject_cast<ShipModel *>(QObject::sender()), &ShipModel::typeBoxHint,
                this, &ShipSelect::typeBoxHinted);
+    types.removeOne(qtTrId("all-shiptypes"));
     std::sort(types.begin(), types.end(), [](QString a, QString b)
               { return a.localeAwareCompare(b) < 0; });
     typeBox->clear();
@@ -221,6 +217,7 @@ void ShipSelect::classBoxHinted(QStringList &classes) {
     /* disconnect to eliminate infinite recursion */
     disconnect(qobject_cast<ShipModel *>(QObject::sender()), &ShipModel::classBoxHint,
                this, &ShipSelect::classBoxHinted);
+    classes.removeOne(qtTrId("all-shipclasses"));
     std::sort(classes.begin(), classes.end(), [](QString a, QString b)
               { return a.localeAwareCompare(b) < 0; });
     classBox->clear();

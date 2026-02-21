@@ -18,6 +18,7 @@ public:
     const ResOrd consResBase() const;
     int consTimeBase() const;
     QString toString() const;
+    QString toDetailedString() const;
     int toInt() const;
     QString iconGroup() const;
     int getTypeSort() const;

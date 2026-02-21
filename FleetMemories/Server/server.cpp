@@ -944,7 +944,9 @@ void Server::offerMapInfo(QSslSocket *connection)
                     nodeInfo["x"] = (double)info["x"];
                     nodeInfo["y"] = (double)info["y"];
                     nodeInfo["battletype"] = (int)info["battle_type"];
-                    nodeInfo["lb"] = (int)info["lb_distance"];
+                    if(info["lb_distance"] != sol::nil) {
+                        nodeInfo["lb"] = (int)info["lb_distance"];
+                    }
                     QJsonArray nextNodes;
                     sol::table nextNodeTable = info["next_nodes"];
                     nextNodeTable.for_each(
@@ -3904,9 +3906,9 @@ void Server::receivedReq(const QJsonObject &djson,
                            this,
                            [connection, uid, djson, this]
                            {offerTechInfo(
-                  connection,
-                  uid,
-                  djson["local"].toInt());});
+                                 connection,
+                                 uid,
+                                 djson["local"].toInt());});
     }
     break;
     case KP::CommandType::DemandSkillPoints: {
@@ -3914,9 +3916,9 @@ void Server::receivedReq(const QJsonObject &djson,
                            this,
                            [connection, uid, djson, this]
                            {offerSPInfo(
-                  connection,
-                  uid,
-                  djson["equipid"].toInt());});
+                                 connection,
+                                 uid,
+                                 djson["equipid"].toInt());});
     }
     break;
     case KP::CommandType::DemandResourceUpdate: {
@@ -3924,8 +3926,8 @@ void Server::receivedReq(const QJsonObject &djson,
                            this,
                            [connection, uid, this]
                            {offerResourceInfo(
-                  connection,
-                  uid);});
+                                 connection,
+                                 uid);});
     }
     break;
     case KP::CommandType::DestructEquip: {

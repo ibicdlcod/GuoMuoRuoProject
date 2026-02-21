@@ -114,6 +114,9 @@ set(CLIENT_SOURCES
     ClientGUI/ui/port/portarea.cpp
     ClientGUI/ui/port/portarea.h
     ClientGUI/ui/port/portarea.ui
+    ClientGUI/ui/sortie/confirmsortie.h
+    ClientGUI/ui/sortie/confirmsortie.cpp
+    ClientGUI/ui/sortie/confirmsortie.ui
     ClientGUI/ui/sortie/maprender.cpp
     ClientGUI/ui/sortie/maprender.h
     ClientGUI/ui/sortie/mapviewwidget.cpp

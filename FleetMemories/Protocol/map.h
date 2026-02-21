@@ -6,6 +6,9 @@
 
 #include "qpoint.h"
 #include <QHash>
+#include <QSettings>
+
+extern std::unique_ptr<QSettings> settings;
 
 class Map
 {
@@ -13,7 +16,8 @@ class Map
 public:
     Map(int id, int x, int y);
 
-    QString toString(QString lang);
+    QString toString(QString lang = settings->value("client/language", "en_US")
+                                        .toString());
 
     int id;
     QHash<QString, QString> localNames;

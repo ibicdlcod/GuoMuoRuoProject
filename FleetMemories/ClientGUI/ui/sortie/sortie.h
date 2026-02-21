@@ -30,6 +30,7 @@ protected:
 
 private slots:
     void switchMap(int mapId);
+    void confirmSortieStart();
 
 private:
     Ui::Sortie *ui;
@@ -37,6 +38,8 @@ private:
     MapViewWidget *globeFrame;
 
     KP::SortieState sortieState = KP::MapView;
+    int mapIndex = 0;
+    QString mapStr;
 };
 
 #endif // SORTIE_H

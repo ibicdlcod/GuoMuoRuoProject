@@ -30,6 +30,8 @@ public:
     ~MainWindow();
 
     FleetView * getFleetArea() const;
+    QWidget * getFleetAreaWidget() const;
+    friend class ConfirmSortie;
 
 signals:
     void cmdMessage(const QString &);

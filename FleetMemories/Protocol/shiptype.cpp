@@ -9,6 +9,24 @@ ShipType::ShipType(int shipId)
 }
 
 QString ShipType::toString() const {
+    switch(iRep >> 4) {
+    case 0x1: return qtTrId("escort");
+    case 0x2: return qtTrId("destroyer");
+    case 0x3: return qtTrId("light-cruiser");
+    case 0x4: return qtTrId("heavy-cruiser");
+    case 0x5: return qtTrId("battleship");
+    case 0x6: return qtTrId("type-cv");
+    case 0x7: return qtTrId("type-ss");
+    case 0x8: return qtTrId("type-av");
+    case 0x9: return qtTrId("supply-ship");
+    case 0xa: return qtTrId("amphibious-assault");
+    case 0xb: return qtTrId("repair");
+    case 0xc: return qtTrId("type-land");
+    default: return qtTrId("unknown-ship-type");
+    }
+}
+
+QString ShipType::toDetailedString() const {
     switch(iRep) {
         //% "Escort"
     case 0x10: return qtTrId("escort");
@@ -62,7 +80,7 @@ QString ShipType::toString() const {
             //% "Escort (uncategorized)"
             return qtTrId("escort-unknown-special");
         case 2:
-            if((iRep & 0xf) >= 8) {
+            if((iRep & 0x8) == 8) {
                 //% "Lead Destroyer"
                 return qtTrId("lead-destroyer");
             }

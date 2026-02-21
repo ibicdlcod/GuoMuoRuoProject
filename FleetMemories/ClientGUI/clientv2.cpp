@@ -1755,7 +1755,6 @@ void Clientv2::updateMapCache(const QJsonObject &input) {
     QJsonArray mapDefs = cachedInput["content"].toArray();
     for(auto mapDef: mapDefs) {
         QJsonObject mapDValue = mapDef.toObject();
-        qCritical() << mapDValue;
         int eid = mapDValue.value("id").toInt()
                   + KP::mapIDDifficultyMask * mapDValue.value("diff").toInt();
         mapRegistryCache[eid] = new MapWithDiff(mapDValue);

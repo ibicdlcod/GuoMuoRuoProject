@@ -20,8 +20,7 @@ maps[1] = {
 maps[1][1] = {
 	x = 0.200,
 	y = 0.500,
-	battle_type = maps.Battle_type.NORMAL,
-	lb_distance = 99,
+	battle_type = maps.Battle_type.STARTING,
 	next_nodes = {2},
 	branch_rule = {
 		C = function(
@@ -36,6 +35,27 @@ maps[1][1] = {
 			return 2
 		end,
 	},
+}
+
+maps[1][2] = {
+	x = 0.500,
+	y = 0.500,
+	battle_type = maps.Battle_type.NORMAL,
+	lb_distance = 99,
+	next_nodes = {3, 4, 5},
+	branch_rule = {
+		C = function(
+			ships,
+			los,
+			fleet_type,
+			capitalness, --[0]total/[1]surface/[2]carrier/[3]screens
+			ship_tags,
+			ship_speeds,
+			equipment_list, --list of lists
+			user_state)
+			return 4
+		end,
+	},
 	enemy = {
 		C = function()
 			choice = math.random(1, 4)
@@ -47,10 +67,65 @@ maps[1][1] = {
 				return {0x7F020200}
 			elseif choice == 4 then
 				return {0x7F020300}
+			else
+				return {}
 			end
 		end,
 	},
 	droptable = {
+		C = {
+			0x10120201,
+			0x10120202,
+			0x10120202,
+			0x10120203,
+			0x10120203,
+			0x10120204,
+			0x10120204,
+			0x10120205,
+			0x10120205,
+			0x10120301,
+			0x10120302,
+			0x10120303,
+			0x10120304,
+			0x10120305,
+			0x10120306,
+			0x10120307,
+			0x10120308,
+		},
+	},
+	exec = {
+		C = function(battleresult, user_state)
+			return false --user state not modified
+		end,
+	},
+}
+
+maps[1][4] = {
+	x = 0.800,
+	y = 0.500,
+	battle_type = maps.Battle_type.BOSS,
+	lb_distance = 99,
+	next_nodes = {},
+	branch_rule = {},
+	enemy = {
+	--incomplete
+		C = function()
+			choice = math.random(1, 4)
+			if choice == 1 then
+				return {0x7F010100, 0x7F011100}
+			elseif choice == 2 then
+				return {0x7F020100}
+			elseif choice == 3 then
+				return {0x7F020200}
+			elseif choice == 4 then
+				return {0x7F020300}
+			else
+				return {}
+			end
+		end,
+	},
+	droptable = {
+	--incomplete
 		C = {
 			0x10120201,
 			0x10120202,

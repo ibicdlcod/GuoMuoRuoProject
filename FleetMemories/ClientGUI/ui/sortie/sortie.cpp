@@ -9,6 +9,9 @@
 #include <QPainter>
 #include "maprender.h"
 #include "../../clientv2.h"
+#include "confirmsortie.h"
+#include <QMessageBox>
+
 extern std::unique_ptr<QSettings> settings;
 
 Sortie::Sortie(QWidget *parent)
@@ -25,7 +28,9 @@ Sortie::Sortie(QWidget *parent)
                                    ui->MapView);
     connect(renderer, &MapRender::mapSelected,
             this, &Sortie::switchMap);
-    ui->DiffChoice->setSizeAdjustPolicy(QComboBox::AdjustToContents);
+    ui->diffChoice->setSizeAdjustPolicy(QComboBox::AdjustToContents);
+    connect(ui->sortieButton, &QPushButton::clicked,
+            this, &Sortie::confirmSortieStart);
 }
 
 Sortie::~Sortie()
@@ -40,13 +45,13 @@ void Sortie::setState(KP::SortieState state) {
 void Sortie::switchToState() {
     switch(sortieState) {
     case KP::MapView:
-        ui->DiffChoice->clear();
+        ui->diffChoice->clear();
         //% "Early"
-        ui->DiffChoice->addItem(qtTrId("diff-c"));
+        ui->diffChoice->addItem(qtTrId("diff-c"));
         //% "Medium"
-        ui->DiffChoice->addItem(qtTrId("diff-b"));
+        ui->diffChoice->addItem(qtTrId("diff-b"));
         //% "Late"
-        ui->DiffChoice->addItem(qtTrId("diff-a"));
+        ui->diffChoice->addItem(qtTrId("diff-a"));
         ui->MapSelect->show();
         ui->BattleScreen->hide();
         update();
@@ -63,35 +68,63 @@ void Sortie::resizeEvent(QResizeEvent *event) {
 }
 
 void Sortie::switchMap(int mapId) {
+    mapIndex = mapId;
     Clientv2 &engine = Clientv2::getInstance();
     if(!engine.mapRegistryCacheGood) {
         return;
     }
-    ui->DiffChoice->clear();
+    ui->diffChoice->clear();
     auto meta = QMetaEnum::fromType<KP::Difficulty>();
     for(int i = 0; i < meta.keyCount(); ++i) {
         KP::Difficulty diff = static_cast<KP::Difficulty>(meta.value(i));
         if(engine.mapRegistryCache.contains(mapId + diff * KP::mapIDDifficultyMask)) {
-            ui->selectDisplay->setText(engine.mapRegistryCache
-                                           [mapId + diff * KP::mapIDDifficultyMask]
-                                               ->toString(settings->value("client/language", "ja_JP")
-                                                              .toString()));
+            mapStr = engine.mapRegistryCache[mapId + diff * KP::mapIDDifficultyMask]
+                             ->toString();
+            ui->selectDisplay->setText(mapStr);
             switch(diff)
             {
             case KP::EarlyWar:
-                ui->DiffChoice->addItem(qtTrId("diff-c"));
+                ui->diffChoice->addItem(qtTrId("diff-c"));
                 break;
             case KP::MidWar:
-                ui->DiffChoice->addItem(qtTrId("diff-b"));
+                ui->diffChoice->addItem(qtTrId("diff-b"));
                 break;
             case KP::LateWar:
-                ui->DiffChoice->addItem(qtTrId("diff-a"));
+                ui->diffChoice->addItem(qtTrId("diff-a"));
                 break;
             case KP::Historical:
                 //% "Historical"
-                ui->DiffChoice->addItem(qtTrId("diff-s"));
+                ui->diffChoice->addItem(qtTrId("diff-s"));
                 break;
             }
         }
     }
+}
+
+void Sortie::confirmSortieStart() {
+    if(mapIndex == 0) {
+        return;
+    }
+    KP::Difficulty selected;
+    if(ui->diffChoice->currentText() == qtTrId("diff-c")) {
+        selected = KP::EarlyWar;
+    }
+    else if(ui->diffChoice->currentText() == qtTrId("diff-b")) {
+        selected = KP::MidWar;
+    }
+    else if(ui->diffChoice->currentText() == qtTrId("diff-a")) {
+        selected = KP::LateWar;
+    }
+    else if(ui->diffChoice->currentText() == qtTrId("diff-s")) {
+        selected = KP::Historical;
+    }
+    else {
+        return;
+    }
+    int mapIndexSpec = selected * KP::mapIDDifficultyMask + mapIndex;
+    ConfirmSortie *conf = new ConfirmSortie(this, mapStr, ui->diffChoice->currentText());
+    if(conf->exec() == QDialog::Accepted) {
+        qCritical() << mapIndexSpec;
+    }
+    delete conf;
 }
