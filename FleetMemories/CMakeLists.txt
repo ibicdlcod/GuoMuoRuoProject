@@ -373,12 +373,14 @@ add_custom_command(TARGET CFServer POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_if_different
     "${PROJECT_SOURCE_DIR}/../doc/map/Map_relations.csv"
     $<TARGET_FILE_DIR:CFServer>)
-# add_custom_command(TARGET CFClient POST_BUILD
-#     COMMAND ${CMAKE_COMMAND} -E copy_if_different
-#     "${PROJECT_SOURCE_DIR}/lua/canequip.lua"
-#     $<TARGET_FILE_DIR:CFClient>)
-# add_custom_command(TARGET CFServer POST_BUILD
-#     COMMAND ${CMAKE_COMMAND} -E copy_if_different
-#     "${PROJECT_SOURCE_DIR}/lua/canequip.lua"
-#     $<TARGET_FILE_DIR:CFServer>)
+add_custom_command(TARGET CFClient POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+    ARGS
+    "${PROJECT_SOURCE_DIR}/lua/canequip.lua"
+    "${PROJECT_BINARY_DIR}/lua")
+add_custom_command(TARGET CFServer POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+    ARGS
+    "${PROJECT_SOURCE_DIR}/lua/canequip.lua"
+    "${PROJECT_BINARY_DIR}/lua")
 

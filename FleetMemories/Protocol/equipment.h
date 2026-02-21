@@ -102,8 +102,6 @@ public:
     bool isInvalid() const;
     int skillPointsStd() const;
 
-    bool canEquip(Ship *ship) const;
-    bool canEquipEX(Ship *ship) const;
     bool canEquip(Ship *ship, sol::state &ts) const;
     bool canEquipEX(Ship *ship, sol::state &ts) const;
 

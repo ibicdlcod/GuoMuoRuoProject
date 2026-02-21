@@ -21,6 +21,9 @@ Clientv2::Clientv2(QObject *parent)
     attemptMode(false),
     logoutPending(false),
     gameState(KP::Offline) {
+
+    LuaInit::init(lua);
+
     connect(&socket, &QSslSocket::preSharedKeyAuthenticationRequired,
             this, &Clientv2::pskRequired);
     connect(&socket, &QSslSocket::encrypted,
@@ -1390,6 +1393,7 @@ void Clientv2::receivedMsg(const QJsonObject &djson) {
             QByteArray msg = KP::clientDemandResourceUpdate();
             sender->enqueue(msg);
         }
+        luaInitEquipable();
         demandEquipCache();
         connect(this, &Clientv2::equipRegistryComplete,
                 this, &Clientv2::demandShipCache);
@@ -1621,6 +1625,22 @@ bool Clientv2::loginCheck() {
         return false;
     }
     return true;
+}
+
+void Clientv2::luaInitEquipable() {
+    auto value = lua.safe_script_file("lua/canequip.lua",
+                                      sol::script_pass_on_error);
+    if(!value.valid()) {
+        sol::error err = value;
+        qCritical()
+            //% "The code from the file %1 has failed to run: %2"
+            << qtTrId("lua-canequip-error").arg("lua/canequip.lua")
+                   .arg(err.what());
+    }
+    else {
+        //% "Load equipability table success!"
+        qInfo() << qtTrId("lua-canequip-success");
+    }
 }
 
 void Clientv2::sendTestMessages() {

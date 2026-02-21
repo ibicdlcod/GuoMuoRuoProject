@@ -68,6 +68,7 @@ QHash<QUuid, int> & EquipModel::getClientEquipStars() {
 }
 
 void EquipModel::switchDisplayType(int index) {
+    Clientv2 &engine = Clientv2::getInstance();
     int oldRowCount = rowCount();
     sortedEquipIds.clear();
     if(index == 0) {
@@ -79,11 +80,11 @@ void EquipModel::switchDisplayType(int index) {
                  iter != clientEquips.keyValueEnd();
                  ++iter) {
                 if(currentActiveSlotEx) {
-                    if(iter->second->canEquipEX(currentActiveShip))
+                    if(iter->second->canEquipEX(currentActiveShip, engine.lua))
                         sortedEquipIds.append(iter->first);
                 }
                 else {
-                    if(iter->second->canEquip(currentActiveShip))
+                    if(iter->second->canEquip(currentActiveShip, engine.lua))
                         sortedEquipIds.append(iter->first);
                 }
             }
@@ -95,11 +96,11 @@ void EquipModel::switchDisplayType(int index) {
              ++iter) {
             if(currentActiveShip != nullptr) {
                 if(currentActiveSlotEx) {
-                    if(!(iter->second->canEquipEX(currentActiveShip)))
+                    if(!(iter->second->canEquipEX(currentActiveShip, engine.lua)))
                         continue;
                 }
                 else {
-                    if(!(iter->second->canEquip(currentActiveShip)))
+                    if(!(iter->second->canEquip(currentActiveShip, engine.lua)))
                         continue;
                 }
             }
@@ -119,6 +120,7 @@ void EquipModel::switchDisplayType(int index) {
 }
 
 void EquipModel::switchDisplayType2(const QString &equipName) {
+    Clientv2 &engine = Clientv2::getInstance();
     int oldRowCount = rowCount();
     sortedEquipIds.clear();
     bool pass = false;
@@ -127,11 +129,11 @@ void EquipModel::switchDisplayType2(const QString &equipName) {
          ++iter) {
         if(currentActiveShip != nullptr) {
             if(currentActiveSlotEx) {
-                if(!(iter->second->canEquipEX(currentActiveShip)))
+                if(!(iter->second->canEquipEX(currentActiveShip, engine.lua)))
                     continue;
             }
             else {
-                if(!(iter->second->canEquip(currentActiveShip)))
+                if(!(iter->second->canEquip(currentActiveShip, engine.lua)))
                     continue;
             }
         }

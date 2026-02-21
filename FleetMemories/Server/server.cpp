@@ -3923,21 +3923,9 @@ void Server::sendTestMessages() {
         int i = 0;
         for(auto equip: equipRegistry) {
             for(auto ship: shipRegistry) {
-                //qInfo() << equip->toString() << ship->toString();
-                equip->canEquip(ship, lua);
-                ++i;
-                if(i % 10000 == 0)
-                    qWarning() << (QStringLiteral("FUCK") + QString::number(i));
-            }
-        }
-        i = 0;
-        for(auto equip: equipRegistry) {
-            for(auto ship: shipRegistry) {
-                //qInfo() << equip->toString() << ship->toString();
-                equip->canEquipEX(ship, lua);
-                ++i;
-                if(i % 10000 == 0)
-                    qWarning() << (QStringLiteral("FUCK") + QString::number(i));
+                if(ship->toString() == "占守" && equip->type.getSpecial() == KP::Sonar) {
+                    qCritical() << equip->toString() << equip->canEquip(ship, lua);
+                }
             }
         }
         /*
@@ -4529,7 +4517,7 @@ KP::FleetFailType Server::updateFleet(CSteamID &uid, const QJsonArray &input)
                 User::getEquipDef(
                     QUuid(shipDataObj["equip"].toArray()[i].toString())), nullptr);
             if(ship && equip) {
-                if(!equip->canEquip(ship)) {
+                if(!equip->canEquip(ship, lua)) {
                     //% "Ship %1 can't equip %2!"
                     qWarning()
                         << qtTrId("ship-cant-equip-it")
@@ -4557,7 +4545,7 @@ KP::FleetFailType Server::updateFleet(CSteamID &uid, const QJsonArray &input)
                 User::getEquipDef(QUuid(shipDataObj["equip"].toArray()
                                             [KP::maxEquipSlots].toString())), nullptr);
             if(ship && equip) {
-                if(!equip->canEquipEX(ship)) {
+                if(!equip->canEquipEX(ship, lua)) {
                     //% "Ship %1 can't equip %2 in extra slot!"
                     qWarning()
                         << qtTrId("ship-cant-equip-it-extra")

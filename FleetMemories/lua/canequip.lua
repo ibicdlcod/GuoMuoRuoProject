@@ -348,7 +348,7 @@ local function smoke(equipid, equiptype, shipid, flags, isex)
 	end
 	return checkmask(shipid, 0x000f0000, 0x00020000)
 		or checkmask(shipid, 0x000f0000, 0x00030000)
-		or checkmask(shipid, 0x000f0000, 0x00018000)
+		or checkmask(shipid, 0x000f0000, 0x00010000)
 		or checkmask(shipid, 0x000f0000, 0x00040000)
 end
 
@@ -380,11 +380,11 @@ local function sonar(equipid, equiptype, shipid, flags, isex)
 	end
 	return checkmask(shipid, 0x000f0000, 0x00020000)
 		or checkmask(shipid, 0x000f0000, 0x00030000)
-		or checkmask(shipid, 0x000f0000, 0x00018000)
+		or checkmask(shipid, 0x000f8000, 0x00010000)
 		or checkmask(shipid, 0x000f0000, 0x00070000)
 end
 
-local function sonar(equipid, equiptype, shipid, flags, isex)
+local function apshell(equipid, equiptype, shipid, flags, isex)
 	return (not isex) and checkmask(shipid, 0x000f0000, 0x00050000)
 end
 
@@ -407,7 +407,7 @@ local function alrocket(equipid, equiptype, shipid, flags, isex)
 		return false
 	end
 	return checkmask(shipid, 0x000f0000, 0x00020000)
-		or checkmask(shipid, 0x000f0000, 0x00018000)
+		or checkmask(shipid, 0x000f8000, 0x00010000)
 		or checkmask(shipid, 0x000f0000, 0x00030000)
 		or checkmask(shipid, 0x000f4000, 0x00044000)
 		or checkmask(shipid, 0x000f4000, 0x00054000)

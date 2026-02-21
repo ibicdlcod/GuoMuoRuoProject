@@ -24,6 +24,7 @@
 #include "../Protocol/mapwithdiff.h"
 #include "resourcefetch.h"
 #include "steamauth.h"
+#include "../Protocol/lua.h"
 
 void customMessageHandler(QtMsgType,
                           const QMessageLogContext &,
@@ -81,6 +82,8 @@ public:
     SpecShipModel *shipRemodelModel = new SpecShipModel(&shipModel);
     QSortFilterProxyModel *proxyModel = new LocaleAwareSort(this);
     QMap<int, double> techCache;
+
+    sol::state lua;
 
 public slots:
     void autoPassword();
@@ -174,6 +177,7 @@ private:
     const QStringList getValidCommands() const;
     void invalidCommand();
     bool loginCheck();
+    void luaInitEquipable();
     void parseConnectReq(const QStringList &);
     bool parseGameCommands(const QString &, const QStringList &);
     void qls(const QStringList &);
