@@ -144,11 +144,15 @@ set(CLIENT_SOURCES
     ${TS_FILES}
 )
 set(SERVER_SOURCES
+    Server/erfinv.h
+    Server/fleetinfo.h
+    Server/fleetinfo.cpp
     Server/kerrors.cpp
     Server/kerrors.h
     Server/main.cpp
     Server/qconsolelistener.cpp
     Server/qconsolelistener.h
+    Server/rngesus.h
     Server/server.cpp
     Server/server.h
     Server/servermastersender.cpp
@@ -157,8 +161,6 @@ set(SERVER_SOURCES
     Server/sslserver.h
     Server/user.cpp
     Server/user.h
-    Server/erfinv.h
-    Server/rngesus.h
     ${TS_FILES}
 )
 set(PROTOCOL_SOURCES

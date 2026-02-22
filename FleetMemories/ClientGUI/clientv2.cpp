@@ -370,6 +370,11 @@ void Clientv2::showHelp(const QStringList &cmdParts) {
     }
 }
 
+void Clientv2::sortie(int mapId, int fleetIndex, bool isExpedition) {
+    QByteArray msg = KP::clientSortie(mapId, fleetIndex, isExpedition);
+    sender->enqueue(msg);
+}
+
 void Clientv2::switchToBattleView() {
     if(!loggedIn()) {
         emit qout(qtTrId("access-denied-login-first"));
@@ -1142,7 +1147,20 @@ void Clientv2::receivedInfo(const QJsonObject &djson) {
         emit receivedShipBlueprint(djson["content"].toObject());
         break;
     case KP::InfoType::MapInfo:
-        updateMapCache(djson);
+        if(djson["bad"].toBool()) {
+            int mapId = djson["mapid"].toInt();
+            QString mapStr = QString::number(mapId);
+            for(auto map : mapRegistryCache) {
+                if(map->id == mapId) {
+                    mapStr = map->toString();
+                }
+            }
+            //% "Map %1 is not open"
+            qWarning() << qtTrId("map-closed").arg(mapStr);
+        }
+        else {
+            updateMapCache(djson);
+        }
         break;
     default: throw std::domain_error("info type not supported"); break;
     }
@@ -1466,6 +1484,18 @@ void Clientv2::receivedMsg(const QJsonObject &djson) {
         case KP::FleetContainsDisabled:
             //% "Fleet contains ships unavailable for battle."
             qWarning() << qtTrId("fleet-disabled-error");
+            break;
+        case KP::EquipError:
+            //% "Fleet contains equipment unavailable for battle."
+            qWarning() << qtTrId("fleet-equip-error");
+            break;
+        case KP::FleetDontFitMap:
+            //% "Fleet don't fit this map."
+            qWarning() << qtTrId("fleet-dont-fit-map");
+            break;
+        case KP::ValidFleet:
+            //% "Modify fleet success!"
+            qInfo() << qtTrId("valid-fleet");
             break;
         }
     }

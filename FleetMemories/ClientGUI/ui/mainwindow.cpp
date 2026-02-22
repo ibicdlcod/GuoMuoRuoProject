@@ -118,27 +118,27 @@ MainWindow::MainWindow(QWidget *parent, int argc, char ** argv)
             &settingsWindow, &QDialog::show);
     connect(ui->actionLicense, &QAction::triggered,
             this, [this](){
-        QMessageBox box(this);
-        QString notice;
-        QDir currentDir = QDir::current();
-        QString openingwords = settings->value("license_notice",
-                                               ":/openingwords.txt").toString();
-        QFile licenseFile(currentDir.filePath(openingwords));
-        if(Q_UNLIKELY(!licenseFile.open(QIODevice::ReadOnly | QIODevice::Text))) {
-            //% "Can't find license file, exiting."
-            qFatal() << qtTrId("licence-not-found").toUtf8();
-        }
-        else {
-            QTextStream instream1(&licenseFile);
-            notice = instream1.readAll();
-        }
-        notice.replace("<https://www.gnu.org/licenses/>",
-                       "<a href=\"https://www.gnu.org/licenses\">the GNU.org page</a>");
-        notice.replace("\n", "<br>");
-        notice = "<p align='center'>" + notice + "</p>";
-        box.setText(notice);
-        box.exec();
-    });
+                QMessageBox box(this);
+                QString notice;
+                QDir currentDir = QDir::current();
+                QString openingwords = settings->value("license_notice",
+                                                       ":/openingwords.txt").toString();
+                QFile licenseFile(currentDir.filePath(openingwords));
+                if(Q_UNLIKELY(!licenseFile.open(QIODevice::ReadOnly | QIODevice::Text))) {
+                    //% "Can't find license file, exiting."
+                    qFatal() << qtTrId("licence-not-found").toUtf8();
+                }
+                else {
+                    QTextStream instream1(&licenseFile);
+                    notice = instream1.readAll();
+                }
+                notice.replace("<https://www.gnu.org/licenses/>",
+                               "<a href=\"https://www.gnu.org/licenses\">the GNU.org page</a>");
+                notice.replace("\n", "<br>");
+                notice = "<p align='center'>" + notice + "</p>";
+                box.setText(notice);
+                box.exec();
+            });
     connect(ui->actionAbout_Qt, &QAction::triggered,
             QApplication::instance(), &QApplication::aboutQt);
 
@@ -185,6 +185,9 @@ MainWindow::MainWindow(QWidget *parent, int argc, char ** argv)
             portArea, &PortArea::mapRegistryComplete);
     connect(&engine, &Clientv2::tsunkitAssetsComplete,
             portArea, &PortArea::hello);
+
+    connect(lay, &QStackedLayout::currentChanged,
+            this, &MainWindow::adjust);
 }
 
 MainWindow::~MainWindow()
@@ -198,6 +201,19 @@ FleetView * MainWindow::getFleetArea() const {
 
 QLayout * MainWindow::getFleetAreaWidget() const {
     return lay;
+}
+
+void MainWindow::adjust(int) {
+    QTimer::singleShot(10, this,
+                       [this]
+                       {
+                           auto geo = geometry();
+                           auto tempGeo = geo;
+                           tempGeo.setRect(tempGeo.x(), tempGeo.y(),
+                                           tempGeo.width(), tempGeo.height()-1);
+                           setGeometry(tempGeo);
+                           setGeometry(geo);
+                       });
 }
 
 void MainWindow::adjustArea(QWidget *input, const QSize &size) {
@@ -254,6 +270,7 @@ void MainWindow::switchToAnchorage() {
     }
     factoryArea->setState(KP::Anchorage);
     factoryArea->switchToState();
+    adjust();
 }
 
 void MainWindow::switchToArsenal() {
@@ -263,6 +280,7 @@ void MainWindow::switchToArsenal() {
     }
     factoryArea->setState(KP::Arsenal);
     factoryArea->switchToState();
+    adjust();
 }
 
 void MainWindow::switchToBlueprint() {
@@ -272,6 +290,7 @@ void MainWindow::switchToBlueprint() {
     }
     factoryArea->setState(KP::BlueprintView);
     factoryArea->switchToState();
+    adjust();
 }
 
 void MainWindow::switchToConstruct() {
@@ -281,6 +300,7 @@ void MainWindow::switchToConstruct() {
     }
     factoryArea->setState(KP::Construction);
     factoryArea->switchToState();
+    adjust();
 }
 
 void MainWindow::switchToDevelop() {
@@ -290,6 +310,7 @@ void MainWindow::switchToDevelop() {
     }
     factoryArea->setState(KP::Development);
     factoryArea->switchToState();
+    adjust();
 }
 
 void MainWindow::switchToFleet() {
@@ -297,6 +318,7 @@ void MainWindow::switchToFleet() {
     if(!engine.loggedIn()) {
         return;
     }
+    adjust();
     /* TODO:ADD */
 }
 
@@ -307,6 +329,7 @@ void MainWindow::switchToSortie() {
     }
     battleArea->setState(KP::MapView);
     battleArea->switchToState();
+    adjust();
 }
 
 void MainWindow::updateColorScheme(Qt::ColorScheme colorscheme) {

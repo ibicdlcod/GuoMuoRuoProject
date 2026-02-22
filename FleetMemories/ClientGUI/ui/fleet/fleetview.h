@@ -36,10 +36,12 @@ public:
     explicit FleetView(QWidget *parent = nullptr);
     ~FleetView();
 
-    QUuid getShipUuid(int shipIndex);
-    Ship * getShip(int shipIndex);
-    ShipDynamic * getShipDynamic(int shipIndex);
-    FleetPos getShipIndex(QUuid shipUuid);
+    QUuid getShipUuid(int shipIndex) const;
+    Ship * getShip(int shipIndex) const;
+    ShipDynamic * getShipDynamic(int shipIndex) const;
+    FleetPos getShipIndex(QUuid shipUuid) const;
+    int getFleetIndex() const;
+    void simplify(bool positive = true);
     EquipView equipView;
 
 signals:
@@ -76,6 +78,7 @@ private:
     QMap<int, KP::FleetType> fleetTypes;
     QGridLayout *grid;
     QScrollArea *scrollArea;
+    bool simplified = false;
 
     int posColumn = 0;
     int nameColumn = 1;

@@ -34,6 +34,7 @@ EquipModel::EquipModel(QObject *parent, bool isInArsenal)
                     || className == "ShipModel"
                     || className == "ShipBPModel") {
                     if(rowCount() == 1) {
+                        /*
                         for(auto *widget: QApplication::topLevelWidgets()) {
                             if(qobject_cast<MainWindow *>(widget)) {
                                 mainWindow = widget;
@@ -45,7 +46,7 @@ EquipModel::EquipModel(QObject *parent, bool isInArsenal)
                                 mainWindowM->setGeometry(tempGeo);
                                 mainWindowM->setGeometry(geo);
                             }
-                        }
+                        }*/
                     }
                 }
             });

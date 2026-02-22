@@ -261,6 +261,16 @@ QByteArray KP::clientMigrate(const QJsonObject &input) {
     return QCborValue::fromJsonValue(result).toCbor();
 }
 
+QByteArray KP::clientSortie(int mapId, int fleetIndex, bool expedition) {
+    QJsonObject result;
+    result["type"] = DgramType::Request;
+    result["command"] = CommandType::RequestSortie;
+    result["mapid"] = mapId;
+    result["fleetindex"] = fleetIndex;
+    result["expedition"] = expedition;
+    return QCborValue::fromJsonValue(result).toCbor();
+}
+
 QByteArray KP::clientStateChange(GameState state) {
     QJsonObject result;
     result["type"] = DgramType::Request;
@@ -497,6 +507,24 @@ QByteArray KP::serverMapInfo(const QJsonArray &input, bool user,
     if(!cacheHit) {
         result["content"] = input;
     }
+    return QCborValue::fromJsonValue(result).toCbor();
+}
+
+QByteArray KP::serverMapNotOpen(int mapId) {
+    QJsonObject result;
+    result["type"] = DgramType::Info;
+    result["infotype"] = InfoType::MapInfo;
+    result["bad"] = true;
+    result["mapid"] = mapId;
+    return QCborValue::fromJsonValue(result).toCbor();
+}
+
+QByteArray KP::serverMapStart(int mapId, int startNode) {
+    QJsonObject result;
+    result["type"] = DgramType::Info;
+    result["infotype"] = InfoType::MapStart;
+    result["mapid"] = mapId; // relative id
+    result["start"] = startNode;
     return QCborValue::fromJsonValue(result).toCbor();
 }
 

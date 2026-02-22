@@ -17,6 +17,7 @@
 #include "../Protocol/utility.h"
 #include "../Protocol/lua.h"
 #include "rngesus.h"
+#include "fleetinfo.h"
 
 QT_BEGIN_NAMESPACE
 
@@ -3980,6 +3981,13 @@ void Server::receivedReq(const QJsonObject &djson,
         }
     }
     break;
+    case KP::CommandType::RequestSortie: {
+        int mapId = djson["mapid"].toInt();
+        int fleetIndex = djson["fleetindex"].toInt();
+        bool expedition = djson["expedition"].toBool();
+        startSortie(uid, connection, mapId, fleetIndex, expedition);
+    }
+    break;
     home_port:
     case KP::CommandType::SelectHomePort: {
         KP::ShipNationality nation = static_cast<KP::ShipNationality>(
@@ -4430,6 +4438,57 @@ void Server::sqlinitUserA() const {
     }
 }
 
+void Server::startSortie(const CSteamID &uid, QSslSocket *connection,
+                         int mapId, int fleetIndex, bool expedition) {
+    KP::Difficulty diff = static_cast<KP::Difficulty>
+        (mapId / KP::mapIDDifficultyMask);
+    QString diffStr = (*KP::diffEnumtoStr)[diff];
+    const char *diffStrC = diffStr.toUtf8().constData();
+    mapId = mapId % KP::mapIDDifficultyMask;
+    if(expedition) {
+        return;//TODO: add expedition
+    }
+    if(lua["maps"][mapId] == sol::nil
+        || lua["maps"][mapId]["branch_rule"] == sol::nil
+        || lua["maps"][mapId]["branch_rule"][diffStrC]
+               == sol::nil) {
+        QByteArray msg = KP::serverMapNotOpen(mapId);
+        senderM.sendMessage(connection, msg);
+    }
+    else {
+        FleetInfo info;
+        //TODO: populate fleetinfo
+        sol::protected_function luaChooseStartingNode
+            = lua["maps"][mapId]["branch_rule"][diffStrC];
+        auto result = luaChooseStartingNode(info.ships,
+                                            info.los(),
+                                            info.type,
+                                            info.capitalness(),
+                                            info.shipTags,
+                                            info.shipSpeeds(),
+                                            info.equipList,
+                                            0);
+        if(result.valid()) {
+            int startNode = result;
+            if(startNode == 0) { // not valid
+                QByteArray msg = KP::serverFleetFailure(KP::FleetDontFitMap);
+                senderM.sendMessage(connection, msg);
+            }
+            else {
+                QByteArray msg = KP::serverMapStart(mapId, startNode);
+                senderM.sendMessage(connection, msg);
+            }
+        }
+        else {
+            sol::error err = result;
+            qCritical()
+                //% "Map %1 lua file has failed to run: %2"
+                << qtTrId("lua-error-branch").arg(mapId)
+                       .arg(err.what());
+            return;
+        }
+    }
+}
 void Server::switchCert(const QStringList &input) {
     if(listening) {
         //% "Switch certificate when connected have no effect."

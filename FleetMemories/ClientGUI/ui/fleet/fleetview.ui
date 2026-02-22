@@ -183,16 +183,6 @@
      </widget>
     </item>
     <item>
-     <widget class="QLabel" name="label_2">
-      <property name="text">
-       <string id="fleetview-fleetexp">Expedition Fleet:</string>
-      </property>
-     </widget>
-    </item>
-    <item>
-     <widget class="QComboBox" name="comboBox"/>
-    </item>
-    <item>
      <widget class="QLabel" name="label_5">
       <property name="text">
        <string id="fleetview-fleet-type">Fleet type:</string>

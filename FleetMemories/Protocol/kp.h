@@ -172,6 +172,7 @@ enum CommandType{
     SelectHomePort,
     ModernizeShip,
     Construct,
+    RequestSortie,
 };
 Q_ENUM_NS(CommandType)
 
@@ -219,6 +220,7 @@ enum InfoType{
     ShipInfoUserBP,
     MapInfo,
     MapInfoUser,
+    MapStart,
 };
 Q_ENUM_NS(InfoType)
 
@@ -237,6 +239,7 @@ enum FleetFailType{
     FleetTypeError,
     EquipError,
     FleetContainsDisabled,
+    FleetDontFitMap,
 };
 Q_ENUM_NS(FleetFailType)
 
@@ -393,6 +396,7 @@ enum CapitalType {
     OtherShip = 3
 };
 
+/* must be consistent with canequip.lua */
 enum EquipSpecial{
     NonSpecial = 0,
     MidgetSub = 1,
@@ -430,10 +434,10 @@ enum EquipSpecial{
 Q_ENUM_NS(EquipSpecial)
 
 enum Difficulty {
-    EarlyWar,
-    MidWar,
-    LateWar,
-    Historical
+    EarlyWar = 0,
+    MidWar = 1,
+    LateWar = 2,
+    Historical = 3
 };
 Q_ENUM_NS(Difficulty)
 
@@ -504,6 +508,7 @@ QByteArray clientFleetData(const QJsonArray &);
 QByteArray clientHello();
 QByteArray clientHomePort(ShipNationality);
 QByteArray clientMigrate(const QJsonObject &);
+QByteArray clientSortie(int, int, bool);
 QByteArray clientStateChange(GameState);
 QByteArray clientSteamAuth(uint8 [], uint32);
 QByteArray clientSteamLogout();
@@ -532,6 +537,8 @@ QByteArray serverLogout(LogoutType);
 QByteArray serverMapInfo(const QJsonArray &, bool user = false,
                          QDateTime timeUtc = QDateTime::currentDateTimeUtc(),
                          bool cacheHit = false);
+QByteArray serverMapNotOpen(int mapId);
+QByteArray serverMapStart(int mapId, int startNode);
 QByteArray serverNewEquip(QUuid, int);
 QByteArray serverNewmodelShip(QUuid, int, int);
 QByteArray serverNewShip(QUuid, int, int);

@@ -41,6 +41,7 @@ protected:
     void resizeEvent(QResizeEvent *) override;
 
 private slots:
+    void adjust(int dummy = 0);
     void adjustArea(QWidget *, const QSize &);
     void factoryRefresh();
     void gamestateChanged(KP::GameState);

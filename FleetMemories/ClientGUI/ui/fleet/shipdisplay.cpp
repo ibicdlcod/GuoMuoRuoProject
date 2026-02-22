@@ -48,6 +48,7 @@ void ShipDisplay::setContent(int currentHP, int maxHP, int cond, int lv) {
         textCol = QColor(0, 0, 0);
         break;
     }
+    //pal.setColor(QPalette::Text, anotherCol);
     pal.setColor(QPalette::HighlightedText, textCol);
     ui->hpBar->setPalette(pal);
 

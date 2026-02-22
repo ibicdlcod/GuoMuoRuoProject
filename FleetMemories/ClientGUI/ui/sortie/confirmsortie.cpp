@@ -15,6 +15,7 @@ ConfirmSortie::ConfirmSortie(QWidget *parent, QString mapText, QString diffText)
             mainWindowM->getFleetAreaWidget()->removeWidget(fv);
             ui->fleetLayout->addWidget(fv);
             fv->show();
+            fv->simplify();
             mainWindowM->fleetArea = nullptr;
         }
     }
@@ -28,7 +29,17 @@ ConfirmSortie::~ConfirmSortie() {
             ui->fleetLayout->removeWidget(fv);
             mainWindowM->getFleetAreaWidget()->addWidget(fv);
             mainWindowM->fleetArea = fv;
+            fv->simplify(false);
         }
     }
     delete ui;
+}
+
+int ConfirmSortie::getFleetIndex() const {
+    if(!fv) {
+        return -1;
+    }
+    else {
+        return fv->getFleetIndex();
+    }
 }

@@ -197,31 +197,75 @@ FleetView::~FleetView()
     delete ui;
 }
 
-QUuid FleetView::getShipUuid(int shipIndex) {
+QUuid FleetView::getShipUuid(int shipIndex) const {
     if(!ships.contains(FleetPos{currentActiveFleet, shipIndex}))
         return QUuid();
     return ships[FleetPos{currentActiveFleet, shipIndex}];
 }
 
-Ship * FleetView::getShip(int shipIndex) {
+Ship * FleetView::getShip(int shipIndex) const {
     Clientv2 &engine = Clientv2::getInstance();
     auto [ship, shipattr] = engine.shipModel.getShip(getShipUuid(shipIndex));
     return ship;
 }
 
-ShipDynamic * FleetView::getShipDynamic(int shipIndex) {
+ShipDynamic * FleetView::getShipDynamic(int shipIndex) const {
     Clientv2 &engine = Clientv2::getInstance();
     auto [ship, shipattr] = engine.shipModel.getShip(getShipUuid(shipIndex));
     return shipattr;
 }
 
-FleetPos FleetView::getShipIndex(QUuid shipUuid) {
+FleetPos FleetView::getShipIndex(QUuid shipUuid) const {
     for(auto [pos, shipLocal] : ships.asKeyValueRange()) {
         if(shipLocal == shipUuid) {
             return pos;
         }
     }
     return FleetPos(-1, -1);
+}
+
+int FleetView::getFleetIndex() const {
+    return currentActiveFleet;
+}
+
+void FleetView::simplify(bool positive) {
+    if(positive) {
+        simplified = true;
+        for(int i = 0; i < grid->rowCount(); ++i) {
+            for(int j = equipSlotsColumn;
+                 j <= equipSlotsColumn + KP::maxEquipSlots + 1; ++j) {
+                auto item = grid->itemAtPosition(i, j);
+                if(item) {
+                    item->widget()->hide();
+                }
+            }
+            auto item = grid->itemAtPosition(i, shipIconColumn);
+            if(item) {
+                item->widget()->setDisabled(true);
+            }
+        }
+    }
+    else {
+        simplified = false;
+        auto normal = fleetTypes[currentActiveFleet] == KP::NormalFleet;
+        for(int i = 0; i < (normal
+                                 ? (KP::normalFleetSize + 1)
+                                 : (KP::combinedFleetSize + 1)); ++i) {
+            for(int j = equipSlotsColumn;
+                 j <= equipSlotsColumn + KP::maxEquipSlots + 1; ++j) {
+                auto item = grid->itemAtPosition(i, j);
+                if(item) {
+                    item->widget()->show();
+                }
+            }
+        }
+        for(int i = 0; i < grid->rowCount(); ++i) {
+            auto item = grid->itemAtPosition(i, shipIconColumn);
+            if(item) {
+                item->widget()->setDisabled(false);
+            }
+        }
+    }
 }
 
 void FleetView::modifyFleetIndex(bool checked) {
@@ -266,6 +310,9 @@ void FleetView::modifyFleetIndex(bool checked) {
                 modifyFleetShip(i, ships[FleetPos{currentActiveFleet, i}]);
             }
         }
+    }
+    if(simplified) {
+        simplify();
     }
 }
 

@@ -53,7 +53,6 @@ void Sortie::switchToState() {
         //% "Late"
         ui->diffChoice->addItem(qtTrId("diff-a"));
         ui->MapSelect->show();
-        ui->BattleScreen->hide();
         update();
         break;
     default:
@@ -73,13 +72,14 @@ void Sortie::switchMap(int mapId) {
     if(!engine.mapRegistryCacheGood) {
         return;
     }
+    int index = ui->diffChoice->currentIndex();
     ui->diffChoice->clear();
     auto meta = QMetaEnum::fromType<KP::Difficulty>();
     for(int i = 0; i < meta.keyCount(); ++i) {
         KP::Difficulty diff = static_cast<KP::Difficulty>(meta.value(i));
         if(engine.mapRegistryCache.contains(mapId + diff * KP::mapIDDifficultyMask)) {
             mapStr = engine.mapRegistryCache[mapId + diff * KP::mapIDDifficultyMask]
-                             ->toString();
+                         ->toString();
             ui->selectDisplay->setText(mapStr);
             switch(diff)
             {
@@ -98,6 +98,9 @@ void Sortie::switchMap(int mapId) {
                 break;
             }
         }
+    }
+    if(index < ui->diffChoice->count()) {
+        ui->diffChoice->setCurrentIndex(index);
     }
 }
 
@@ -124,7 +127,8 @@ void Sortie::confirmSortieStart() {
     int mapIndexSpec = selected * KP::mapIDDifficultyMask + mapIndex;
     ConfirmSortie *conf = new ConfirmSortie(this, mapStr, ui->diffChoice->currentText());
     if(conf->exec() == QDialog::Accepted) {
-        qCritical() << mapIndexSpec;
+        Clientv2 &engine = Clientv2::getInstance();
+        engine.sortie(mapIndexSpec, conf->getFleetIndex(), false);
     }
     delete conf;
 }

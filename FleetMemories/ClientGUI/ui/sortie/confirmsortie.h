@@ -17,6 +17,8 @@ public:
                            QString diffText = QStringLiteral(""));
     ~ConfirmSortie();
 
+    int getFleetIndex() const;
+
 private:
     Ui::ConfirmSortie *ui;
     FleetView *fv;

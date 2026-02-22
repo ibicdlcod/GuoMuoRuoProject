@@ -127,6 +127,7 @@ private:
     void sqlinitShipUKC() const;
     void sqlinitUsers() const;
     void sqlinitUserA() const;
+    void startSortie(const CSteamID &, QSslSocket *, int, int, bool);
     void switchCert(const QStringList &);
     KP::FleetFailType updateFleet(CSteamID &, const QJsonArray &);
     void userInit(CSteamID &);

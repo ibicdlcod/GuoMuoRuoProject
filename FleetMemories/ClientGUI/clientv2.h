@@ -115,6 +115,7 @@ public slots:
     void serverResponseNonStd(const QByteArray &);
     void setTicketCache(uint8 [], uint32);
     void showHelp(const QStringList &);
+    void sortie(int, int, bool expedition = false);
     void switchToBattleView();
     void switchToFactory();
     void switchToFleetView();
