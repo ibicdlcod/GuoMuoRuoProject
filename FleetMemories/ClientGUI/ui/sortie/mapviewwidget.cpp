@@ -4,7 +4,7 @@
 #include "mapviewwidget.h"
 #include <QResizeEvent>
 
-MapViewWidget::MapViewWidget(QWidget *widget,
+MapViewWidget::MapViewWidget(QList<QWidget *> subWidgets,
                              float width,
                              float height,
                              QWidget *parent) :
@@ -14,7 +14,11 @@ MapViewWidget::MapViewWidget(QWidget *widget,
 
     // add spacer, then your widget, then spacer
     layout->addItem(new QSpacerItem(0, 0));
-    layout->addWidget(widget);
+    innerLayout = new QStackedLayout();
+    for(auto subWidget: subWidgets) {
+        innerLayout->addWidget(subWidget);
+    }
+    layout->addLayout(innerLayout);
     layout->addItem(new QSpacerItem(0, 0));
     layout->setContentsMargins(0, 0, 0, 0);
     layout->setSpacing(0);
@@ -41,4 +45,8 @@ void MapViewWidget::resizeEvent(QResizeEvent *event)
     layout->setStretch(0, outerStretch);
     layout->setStretch(1, widgetStretch);
     layout->setStretch(2, outerStretch);
+}
+
+void MapViewWidget::setCurrentWidget(QWidget *widget) {
+    return innerLayout->setCurrentWidget(widget);
 }

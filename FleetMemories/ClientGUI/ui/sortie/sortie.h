@@ -8,6 +8,7 @@
 #include <QLabel>
 #include "../../../Protocol/kp.h"
 #include "maprender.h"
+#include "mapdetail.h"
 #include "mapviewwidget.h"
 
 namespace Ui {
@@ -22,8 +23,7 @@ public:
     explicit Sortie(QWidget *parent = nullptr);
     ~Sortie();
 
-    void setState(KP::SortieState);
-    void switchToState();
+    void switchToState(KP::SortieState);
 
 protected:
     void resizeEvent(QResizeEvent *event) override;
@@ -31,10 +31,12 @@ protected:
 private slots:
     void switchMap(int mapId);
     void confirmSortieStart();
+    void sortieStart(const QJsonObject &djson);
 
 private:
     Ui::Sortie *ui;
     MapRender *renderer;
+    MapDetail *detail;
     MapViewWidget *globeFrame;
 
     KP::SortieState sortieState = KP::MapView;

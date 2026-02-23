@@ -202,6 +202,7 @@ Q_ENUM_NS(FactoryState)
 
 enum SortieState{
     MapView,
+    MapDetail,
     DrillView,
     BattleScreen
 };

@@ -17,6 +17,7 @@ namespace RNGesus {
 
 double setDropValue(double rarity,
                   std::mt19937 &engine) {
+    //https://www.wolframalpha.com/input?i2d=true&i=optimize+Integrate%5BPower%5B%5C%2840%291-x%5C%2841%29%2C2%5Da*Power%5Be%2C-ax%5D%2C%7Bx%2C0%2C1%7D%5D-Integrate%5BPower%5B%5C%2840%291-x%5C%2841%29%2C2%5Da*Power%5Be%2C-ax%5D%2C%7Bx%2C1%2Cb%7D%5D-Power%5B%5C%2840%29b-1%5C%2841%29%2C2%5D*Power%5Be%2C-ab%5D+whenIntegrate%5Bxa*Power%5Be%2C-ax%5D%2C%7Bx%2C0%2Cb%7D%5D+%2BPower%5Be%2C-ab%5Db%3D1&lang=zh
     static double a = 0.406226;
     static double b = 1.28317;
     std::exponential_distribution<> dist(a);

@@ -7,7 +7,6 @@
 #include <QLabel>
 #include <QResizeEvent>
 #include <QPainter>
-#include "maprender.h"
 #include "../../clientv2.h"
 #include "confirmsortie.h"
 #include <QMessageBox>
@@ -21,16 +20,21 @@ Sortie::Sortie(QWidget *parent)
     ui->setupUi(this);
 
     renderer = new MapRender(this);
+    detail = new MapDetail(this);
 
-    globeFrame = new MapViewWidget(renderer,
+    globeFrame = new MapViewWidget({renderer, detail},
                                    MapRender::globeMapWidth,
                                    MapRender::globeMapHeight,
                                    ui->MapView);
+    ui->MapView->setStyleSheet("background-color: yellow;");
     connect(renderer, &MapRender::mapSelected,
             this, &Sortie::switchMap);
     ui->diffChoice->setSizeAdjustPolicy(QComboBox::AdjustToContents);
     connect(ui->sortieButton, &QPushButton::clicked,
             this, &Sortie::confirmSortieStart);
+    Clientv2 &engine = Clientv2::getInstance();
+    connect(&engine, &Clientv2::receivedMapStart,
+            this, &Sortie::sortieStart);
 }
 
 Sortie::~Sortie()
@@ -38,13 +42,11 @@ Sortie::~Sortie()
     delete ui;
 }
 
-void Sortie::setState(KP::SortieState state) {
+void Sortie::switchToState(KP::SortieState state) {
     sortieState = state;
-}
-
-void Sortie::switchToState() {
     switch(sortieState) {
     case KP::MapView:
+        globeFrame->setCurrentWidget(renderer);
         ui->diffChoice->clear();
         //% "Early"
         ui->diffChoice->addItem(qtTrId("diff-c"));
@@ -52,7 +54,23 @@ void Sortie::switchToState() {
         ui->diffChoice->addItem(qtTrId("diff-b"));
         //% "Late"
         ui->diffChoice->addItem(qtTrId("diff-a"));
-        ui->MapSelect->show();
+        for (int i = 0; i < ui->mapSelectBar->count(); ++i) {
+            QLayoutItem *item = ui->mapSelectBar->itemAt(i);
+            if (item->widget()) {
+                item->widget()->show();
+            }
+        }
+        update();
+        break;
+    case KP::MapDetail:
+        globeFrame->setCurrentWidget(detail);
+        for (int i = 0; i < ui->mapSelectBar->count(); ++i) {
+            QLayoutItem *item = ui->mapSelectBar->itemAt(i);
+            if (item->widget()) {
+                item->widget()->hide();
+            }
+        }
+        detail->show();
         update();
         break;
     default:
@@ -131,4 +149,9 @@ void Sortie::confirmSortieStart() {
         engine.sortie(mapIndexSpec, conf->getFleetIndex(), false);
     }
     delete conf;
+}
+
+void Sortie::sortieStart(const QJsonObject &djson) {
+    switchToState(KP::MapDetail);
+    qCritical() << djson;
 }

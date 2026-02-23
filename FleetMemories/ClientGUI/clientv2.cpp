@@ -1150,9 +1150,10 @@ void Clientv2::receivedInfo(const QJsonObject &djson) {
         if(djson["bad"].toBool()) {
             int mapId = djson["mapid"].toInt();
             QString mapStr = QString::number(mapId);
-            for(auto map : mapRegistryCache) {
+            for(auto map : std::as_const(mapRegistryCache)) {
                 if(map->id == mapId) {
                     mapStr = map->toString();
+                    break;
                 }
             }
             //% "Map %1 is not open"
@@ -1161,6 +1162,11 @@ void Clientv2::receivedInfo(const QJsonObject &djson) {
         else {
             updateMapCache(djson);
         }
+        break;
+    case KP::InfoType::MapStart:
+        gameState == KP::BattleView;
+        emit gamestateChanged(KP::BattleView);
+        emit receivedMapStart(djson);
         break;
     default: throw std::domain_error("info type not supported"); break;
     }

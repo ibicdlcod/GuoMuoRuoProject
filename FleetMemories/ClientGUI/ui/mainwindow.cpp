@@ -327,8 +327,7 @@ void MainWindow::switchToSortie() {
     if(!engine.loggedIn()) {
         return;
     }
-    battleArea->setState(KP::MapView);
-    battleArea->switchToState();
+    battleArea->switchToState(KP::MapView);
     adjust();
 }
 

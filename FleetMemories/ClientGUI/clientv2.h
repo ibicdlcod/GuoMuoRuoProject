@@ -144,6 +144,7 @@ signals:
     void receivedGlobalTechInfo2(const QJsonObject &);
     void receivedLocalTechInfo(const QJsonObject &);
     void receivedLocalTechInfo2(const QJsonObject &);
+    void receivedMapStart(const QJsonObject &);
     void receivedResourceInfo(const QJsonObject &);
     void receivedShipBlueprint(const QJsonObject &);
     void receivedSkillPointInfo(const QJsonObject &);
