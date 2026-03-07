@@ -294,6 +294,19 @@ bool Clientv2::parseSpec(const QStringList &cmdParts) {
     }
 }
 
+void Clientv2::queryNextNode(int mapId, int prevNode) {
+    if(!isInBattle()) {
+        //% "You can't enter a sortie map illegally!"
+        qWarning() << qtTrId("illegal-map-progress");
+        return;
+    }
+    else {
+        QByteArray msg = KP::clientQueryNextNode(mapId, prevNode);
+        sender->enqueue(msg);
+        socket.flush();
+    }
+}
+
 /* Part of steam verification */
 void Clientv2::sendEncryptedAppTicket(uint8 rgubTicket [], uint32 cubTicket) {
     try {
@@ -1196,6 +1209,13 @@ void Clientv2::receivedInfo(const QJsonObject &djson) {
         emit gamestateChanged(KP::SortieMapView);
         emit receivedMapStart(djson);
         break;
+    case KP::InfoType::MapProgress: {
+        int mapId = djson["mapid"].toInt();
+        int nextNodeId = djson["next"].toInt();
+        MapNode node = mapRegistryCache[mapId]->nodes[nextNodeId];
+        emit progressToNode(node, nextNodeId);
+        break;
+    }
     default: throw std::domain_error("info type not supported"); break;
     }
 }
@@ -1314,6 +1334,22 @@ void Clientv2::receivedMsg(const QJsonObject &djson) {
         default:
             //% "Equipment development failed."
             qInfo() << qtTrId("equip-develop-failed");
+            break;
+        }
+    } break;
+    case KP::BattleError: {
+        switch(djson["reason"].toInt()) {
+        case KP::FleetBusy:
+            //% "Fleet is busy!"
+            qWarning() << qtTrId("fleet-is-busy");
+            break;
+        case KP::FleetLost:
+            //% "Fleet is not in correct map position!"
+            qWarning() << qtTrId("fleet-is-at-wrong-map-or-node");
+            break;
+        default:
+            //% "Process battle info failed."
+            qInfo() << qtTrId("battle-failed");
             break;
         }
     } break;

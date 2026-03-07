@@ -3,10 +3,12 @@
 FleetInfo::FleetInfo() {}
 
 double FleetInfo::los() {
+    /* TODO: incomplete */
     return 0;
 }
 
 LuaMap FleetInfo::capitalness() {
+    /* TODO: incomplete */
     return LuaMap({
                    {"Total", 0},
                    {"Surface", 0},

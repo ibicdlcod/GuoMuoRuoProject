@@ -10,6 +10,7 @@
 #include "../../clientv2.h"
 #include "confirmsortie.h"
 #include <QMessageBox>
+#include "../mainwindow.h"
 
 extern std::unique_ptr<QSettings> settings;
 
@@ -34,6 +35,8 @@ Sortie::Sortie(QWidget *parent)
     Clientv2 &engine = Clientv2::getInstance();
     connect(&engine, &Clientv2::receivedMapStart,
             this, &Sortie::sortieStart);
+    connect(&engine, &Clientv2::progressToNode,
+            this, &Sortie::dealWithNode);
 }
 
 Sortie::~Sortie()
@@ -80,9 +83,22 @@ void Sortie::switchToState(KP::SortieState state) {
     }
 }
 
+KP::FleetType Sortie::getCurrentFleetType() {
+    for(auto *widget: QApplication::topLevelWidgets()) {
+        if(qobject_cast<MainWindow *>(widget)) {
+            MainWindow *mainWindowM = qobject_cast<MainWindow *>(widget);
+            auto fv = mainWindowM->getFleetArea();
+            if(fv) {
+                return fv->getCurrentFleetType();
+            }
+        }
+    }
+    /* default */
+    return KP::NormalFleet;
+}
+
 void Sortie::resizeEvent(QResizeEvent *event) {
     globeFrame->resize(ui->MapView->size());
-
     QWidget::resizeEvent(event);
 }
 
@@ -147,14 +163,44 @@ void Sortie::confirmSortieStart() {
     int mapIndexSpec = selected * KP::mapIDDifficultyMask + mapIndex;
     ConfirmSortie *conf = new ConfirmSortie(this, mapStr, ui->diffChoice->currentText());
     if(conf->exec() == QDialog::Accepted) {
+        int fi = conf->getFleetIndex();
+        delete conf;
+        /* check empty fleets */
+        for(auto *widget: QApplication::topLevelWidgets()) {
+            if(qobject_cast<MainWindow *>(widget)) {
+                MainWindow *mainWindowM = qobject_cast<MainWindow *>(widget);
+                auto fv = mainWindowM->getFleetArea();
+                if(fv && fv->isCurrentFleetEmpty()) {
+                    //% "Fleet is empty."
+                    qWarning() << qtTrId("fleet-empty");
+                    return;
+                }
+            }
+        }
+
         Clientv2 &engine = Clientv2::getInstance();
-        engine.sortie(mapIndexSpec, conf->getFleetIndex(), false);
+        engine.sortie(mapIndexSpec, fi, false);
     }
-    delete conf;
 }
 
 void Sortie::sortieStart(const QJsonObject &djson) {
     Clientv2 &engine = Clientv2::getInstance();
-    detail->displayDetailedMap(engine.mapRegistryCache[djson["mapid"].toInt()]);
     engine.enterBattle();
+    currentMap = engine.mapRegistryCache[djson["mapid"].toInt()];
+    detail->displayDetailedMap(currentMap);
+    dealWithNode(currentMap->nodes[djson["start"].toInt()], djson["start"].toInt());
+}
+
+void Sortie::dealWithNode(const MapNode &node, int nodeId) {
+    Clientv2 &engine = Clientv2::getInstance();
+    detail->changeCurrentNode(node);
+    switch(node.type) {
+    case KP::STARTING:
+        engine.queryNextNode(currentMap->id, nodeId);
+        break;
+    case KP::NORMAL:
+        [[fallthrough]];
+    case KP::BOSS:
+        break;
+    }
 }

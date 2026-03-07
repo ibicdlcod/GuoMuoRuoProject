@@ -261,6 +261,15 @@ QByteArray KP::clientMigrate(const QJsonObject &input) {
     return QCborValue::fromJsonValue(result).toCbor();
 }
 
+QByteArray KP::clientQueryNextNode(int mapId, int prevNode) {
+    QJsonObject result;
+    result["type"] = DgramType::Request;
+    result["command"] = CommandType::ProgressMap;
+    result["mapid"] = mapId; // absolute id
+    result["prevnode"] = prevNode;
+    return QCborValue::fromJsonValue(result).toCbor();
+}
+
 QByteArray KP::clientSortie(int mapId, int fleetIndex, bool expedition) {
     QJsonObject result;
     result["type"] = DgramType::Request;
@@ -325,6 +334,14 @@ QByteArray KP::serverAskForHomePort()
            KP::American, KP::British, KP::French, KP::Soviet,
            KP::Oceanian};
     */
+    return QCborValue::fromJsonValue(result).toCbor();
+}
+
+QByteArray KP::serverBattleError(GameError error) {
+    QJsonObject result;
+    result["type"] = DgramType::Message;
+    result["msgtype"] = MsgType::BattleError;
+    result["reason"] = error;
     return QCborValue::fromJsonValue(result).toCbor();
 }
 
@@ -516,6 +533,15 @@ QByteArray KP::serverMapNotOpen(int mapId) {
     result["infotype"] = InfoType::MapInfo;
     result["bad"] = true;
     result["mapid"] = mapId;
+    return QCborValue::fromJsonValue(result).toCbor();
+}
+
+QByteArray KP::serverMapProgress(int mapId, int nextNode) {
+    QJsonObject result;
+    result["type"] = DgramType::Info;
+    result["infotype"] = InfoType::MapProgress;
+    result["mapid"] = mapId; // relative id
+    result["next"] = nextNode;
     return QCborValue::fromJsonValue(result).toCbor();
 }
 

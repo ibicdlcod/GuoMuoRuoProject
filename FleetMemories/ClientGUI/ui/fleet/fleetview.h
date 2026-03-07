@@ -40,7 +40,9 @@ public:
     Ship * getShip(int shipIndex) const;
     ShipDynamic * getShipDynamic(int shipIndex) const;
     FleetPos getShipIndex(QUuid shipUuid) const;
-    int getFleetIndex() const;
+    int getActiveFleet() const;
+    KP::FleetType getCurrentFleetType() const;
+    bool isCurrentFleetEmpty() const;
     void simplify(bool positive = true);
     EquipView equipView;
 

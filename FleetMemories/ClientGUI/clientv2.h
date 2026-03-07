@@ -111,6 +111,7 @@ public slots:
     void parseDisconnectReq();
     void parseQuit();
     bool parseSpec(const QStringList &);
+    void queryNextNode(int mapId, int prevNode);
     void sendEncryptedAppTicket(uint8 [], uint32);
     void sendFleetData(const QJsonArray &);
     void serverResponse(const QString &, const QByteArray &);
@@ -137,6 +138,7 @@ signals:
     void gamestateChanged(KP::GameState);
     void lockBattle();
     void mapRegistryComplete();
+    void progressToNode(const MapNode &, int);
     void qout(QString, QColor background = QColor("white"),
               QColor foreground = QColor("black"));
     void receivedAnchorageShip(const QJsonObject &);

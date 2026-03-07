@@ -224,8 +224,21 @@ FleetPos FleetView::getShipIndex(QUuid shipUuid) const {
     return FleetPos(-1, -1);
 }
 
-int FleetView::getFleetIndex() const {
+int FleetView::getActiveFleet() const {
     return currentActiveFleet;
+}
+
+KP::FleetType FleetView::getCurrentFleetType() const {
+    return fleetTypes[currentActiveFleet];
+}
+
+bool FleetView::isCurrentFleetEmpty() const {
+    int count = 0;
+    for(int i = 0; i < KP::combinedFleetSize; ++i) {
+        if(!ships.value(FleetPos(currentActiveFleet, i), QUuid()).isNull())
+            count++;
+    }
+    return count == 0;
 }
 
 void FleetView::simplify(bool positive) {

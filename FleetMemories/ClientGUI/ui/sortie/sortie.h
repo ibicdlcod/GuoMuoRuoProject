@@ -24,6 +24,10 @@ public:
     ~Sortie();
 
     void switchToState(KP::SortieState);
+    KP::FleetType getCurrentFleetType();
+
+public slots:
+    void dealWithNode(const MapNode &node, int nodeId);
 
 protected:
     void resizeEvent(QResizeEvent *event) override;
@@ -42,6 +46,7 @@ private:
     KP::SortieState sortieState = KP::MapView;
     int mapIndex = 0;
     QString mapStr;
+    Map *currentMap;
 };
 
 #endif // SORTIE_H

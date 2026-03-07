@@ -2,6 +2,7 @@
 #define MAPDETAIL_H
 
 #include <QWidget>
+#include <QPropertyAnimation>
 #include "../../Protocol/map.h"
 
 namespace Ui {
@@ -18,7 +19,18 @@ public:
     static constexpr int circleBorderSize = 2;
     static constexpr int circleSize = 24;
 
+    Q_PROPERTY(QPointF fleetcenter
+                   READ getFleetCenter
+                       WRITE setFleetCenter
+                           NOTIFY fleetCenterChanged)
     void displayDetailedMap(Map *map);
+    void changeCurrentNode(const MapNode &node);
+    static QPixmap recolorImage(const QString &filename, const QColor &color);
+    QPointF getFleetCenter() const;
+    void setFleetCenter(const QPointF &input);
+
+signals:
+    void fleetCenterChanged();
 
 private:
     virtual void paintEvent(QPaintEvent *event) override;
@@ -26,9 +38,19 @@ private:
 private:
     Ui::MapDetail *ui;
 
+    QPropertyAnimation *animation;
     Map *mapPointer;
     bool antialiased;
+    QPointF fleetCenter;
+    MapNode currentNode;
+    bool uninitialized = true;
+    KP::FleetType currentFleetType;
+
     QPixmap rudder;
+    QPixmap carrierFleetIcon;
+    QPixmap surfaceFleetIcon;
+    QPixmap transportFleetIcon;
+    QPixmap normalFleetIcon;
 };
 
 #endif // MAPDETAIL_H

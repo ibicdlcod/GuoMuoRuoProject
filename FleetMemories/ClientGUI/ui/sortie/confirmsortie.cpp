@@ -40,6 +40,6 @@ int ConfirmSortie::getFleetIndex() const {
         return -1;
     }
     else {
-        return fv->getFleetIndex();
+        return fv->getActiveFleet();
     }
 }

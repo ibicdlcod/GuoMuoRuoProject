@@ -99,8 +99,10 @@ private:
     void newEquipHasMother(const CSteamID &, int);
     int64 newEquipHasMotherCal(int);
     QUuid newShip(const CSteamID &, int, bool direct = false);
+    int nextNode(const CSteamID &, QSslSocket *, int mapId, int prevNode, int fleetIndex);
     void parseListen(const QStringList &);
     void parseUnlisten();
+    void progressMap(const CSteamID &, QSslSocket *, int, int);
     void receivedAuth(const QJsonObject &, const PeerInfo &, QSslSocket *);
     void receivedForceLogout(CSteamID &);
     void receivedLogin(CSteamID &, const PeerInfo &, QSslSocket *);

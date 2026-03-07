@@ -118,6 +118,7 @@ enum MsgType{
     ShipModernized,
     ShipBPRetired,
     DisableShip,
+    BattleError,
 };
 Q_ENUM_NS(MsgType)
 
@@ -174,6 +175,7 @@ enum CommandType{
     ModernizeShip,
     Construct,
     RequestSortie,
+    ProgressMap,
 };
 Q_ENUM_NS(CommandType)
 
@@ -189,6 +191,8 @@ enum GameError{
     RemodelShipIncorrect,
     BlueprintNonexistent,
     ShipisDisabled,
+    FleetBusy,
+    FleetLost,
 };
 Q_ENUM_NS(GameError)
 
@@ -209,6 +213,13 @@ enum SortieState{
 };
 Q_ENUM_NS(SortieState)
 
+enum BattleState{
+    BeforeBattle,
+    DuringBattle,
+    AfterBattle,
+};
+Q_ENUM_NS(BattleState)
+
 enum InfoType{
     FactoryInfo,
     EquipInfo,
@@ -223,6 +234,7 @@ enum InfoType{
     MapInfo,
     MapInfoUser,
     MapStart,
+    MapProgress,
 };
 Q_ENUM_NS(InfoType)
 
@@ -518,6 +530,7 @@ QByteArray clientFleetData(const QJsonArray &);
 QByteArray clientHello();
 QByteArray clientHomePort(ShipNationality);
 QByteArray clientMigrate(const QJsonObject &);
+QByteArray clientQueryNextNode(int, int);
 QByteArray clientSortie(int, int, bool);
 QByteArray clientStateChange(GameState);
 QByteArray clientSteamAuth(uint8 [], uint32);
@@ -525,6 +538,7 @@ QByteArray clientSteamLogout();
 QByteArray clientTestMessages(int);
 
 QByteArray serverAskForHomePort();
+QByteArray serverBattleError(GameError);
 QByteArray serverBlueprintRetired(int);
 QByteArray serverDevelopFailed(GameError);
 QByteArray serverDevelopStart(bool construct = false);
@@ -548,6 +562,7 @@ QByteArray serverMapInfo(const QJsonArray &, bool user = false,
                          QDateTime timeUtc = QDateTime::currentDateTimeUtc(),
                          bool cacheHit = false);
 QByteArray serverMapNotOpen(int mapId);
+QByteArray serverMapProgress(int mapId, int nextNode);
 QByteArray serverMapStart(int mapId, int startNode);
 QByteArray serverNewEquip(QUuid, int);
 QByteArray serverNewmodelShip(QUuid, int, int);

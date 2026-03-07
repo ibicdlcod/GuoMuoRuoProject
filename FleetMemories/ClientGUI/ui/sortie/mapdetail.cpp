@@ -3,6 +3,7 @@
 #include "maprender.h"
 #include <QPainter>
 #include <QStyleHints>
+#include "../mainwindow.h"
 
 MapDetail::MapDetail(QWidget *parent)
     : QWidget(parent)
@@ -10,21 +11,85 @@ MapDetail::MapDetail(QWidget *parent)
     ui->setupUi(this);
     antialiased = true;
 
-    QImage image(":/Assets/Image/rudder.png");
-    if (image.format() != QImage::Format_ARGB32) {
-        image = image.convertToFormat(QImage::Format_ARGB32);
-    }
+    rudder = recolorImage(":/Assets/Image/rudder.png", QColor(192, 192, 0));
+    carrierFleetIcon = recolorImage(":/Assets/Image/fleetIcons/carrier.png", QColor(0, 192, 0));
+    surfaceFleetIcon = recolorImage(":/Assets/Image/fleetIcons/battleship.png", QColor(0, 192, 0));
+    transportFleetIcon = recolorImage(":/Assets/Image/fleetIcons/transport.png", QColor(0, 192, 0));
+    normalFleetIcon = recolorImage(":/Assets/Image/fleetIcons/normal.png", QColor(0, 192, 0));
 
-    rudder = QPixmap::fromImage(image);
+    /* https://stackoverflow.com/questions/43428627/applying-qpropertyanimation-to-qrect */
+    animation = new QPropertyAnimation(this, "fleetcenter");
+    connect(animation, &QPropertyAnimation::valueChanged, this, [this](){
+        update();
+    });
 }
 
 MapDetail::~MapDetail() {
     delete ui;
 }
 
+QPixmap MapDetail::recolorImage(const QString &filename, const QColor &color) {
+    QImage image(filename);
+    if (image.format() != QImage::Format_ARGB32) {
+        image = image.convertToFormat(QImage::Format_ARGB32);
+    }
+
+    QPixmap newImage(image.size()); // Create a new, empty pixmap
+    newImage.fill(Qt::transparent); // Ensure the new pixmap is transparent initially
+
+    QPainter painter(&newImage);
+    painter.drawPixmap(0, 0, QPixmap::fromImage(image)); // Draw the source image to use its alpha channel
+    painter.setCompositionMode(QPainter::CompositionMode_SourceIn);
+    painter.fillRect(newImage.rect(), color); // Fill with yellow (R: 255, G: 255, B: 0)
+    painter.end();
+    return newImage;
+}
+
+QPointF MapDetail::getFleetCenter() const {
+    return fleetCenter;
+}
+
+void MapDetail::setFleetCenter(const QPointF &input) {
+    if(input == fleetCenter) {
+        return;
+    }
+    fleetCenter = input;
+    emit fleetCenterChanged();
+}
+
 void MapDetail::displayDetailedMap(Map *map) {
     mapPointer = map;
-    update();
+    for(auto *widget: QApplication::topLevelWidgets()) {
+        if(qobject_cast<MainWindow *>(widget)) {
+            MainWindow *mainWindowM = qobject_cast<MainWindow *>(widget);
+            auto fv = mainWindowM->getFleetArea();
+            if(fv) {
+                currentFleetType = fv->getCurrentFleetType();
+                return;
+            }
+        }
+    }
+    /* default */
+    currentFleetType = KP::NormalFleet;
+}
+
+void MapDetail::changeCurrentNode(const MapNode &node) {
+    if(uninitialized) {
+        currentNode = node;
+        setFleetCenter(QPointF(currentNode.x, currentNode.y));
+        update();
+        uninitialized = false;
+    }
+    else {
+        //animation->setEasingCurve(QEasingCurve::InBack);
+        animation->setDuration(1000);
+        animation->setStartValue(QPointF(currentNode.x,
+                                         currentNode.y));
+        animation->setEndValue(QPointF(node.x,
+                                       node.y));
+        animation->start();
+        currentNode = node;
+    }
 }
 
 void MapDetail::paintEvent(QPaintEvent *event) {
@@ -66,7 +131,7 @@ void MapDetail::paintEvent(QPaintEvent *event) {
     for(const auto &node: std::as_const(mapPointer->nodes)) {
         static QBrush redBrush = QBrush(Qt::red);
         painter.setBrush(redBrush);
-        painter.setPen(QPen(Qt::white, circleBorderSize));
+        painter.setPen(QPen(Qt::white, 0));
         switch(node.type) {
         case KP::STARTING:
             painter.drawPixmap(node.x * width() - circleSize,
@@ -85,4 +150,18 @@ void MapDetail::paintEvent(QPaintEvent *event) {
                                 circleSize * 2, circleSize * 2); break;
         }
     }
+    QPixmap *icon;
+    switch(currentFleetType) {
+    case KP::NormalFleet: icon = &normalFleetIcon; break;
+    case KP::CarrierFleet: icon = &carrierFleetIcon; break;
+    case KP::SurfaceFleet: icon = &surfaceFleetIcon; break;
+    case KP::TransportFleet: icon = &transportFleetIcon; break;
+    }
+
+    painter.drawPixmap(fleetCenter.x() * width() - circleSize * 1.5,
+                       fleetCenter.y() * height() - circleSize * 1.5,
+                       icon->scaled(QSize(circleSize * 3, circleSize * 3),
+                                    Qt::KeepAspectRatio,
+                                    Qt::SmoothTransformation
+                                    ));
 }

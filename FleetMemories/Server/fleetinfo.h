@@ -1,9 +1,10 @@
 #ifndef FLEETINFO_H
 #define FLEETINFO_H
+#include "lua.h"
+#include "../Protocol/shipdynamic.h"
 #include "../Protocol/kp.h"
 #include "../Protocol/ship.h"
 #include "../Protocol/equipment.h"
-#include "lua.h"
 
 class FleetInfo
 {
@@ -15,6 +16,7 @@ public:
 
     KP::FleetType type;
     std::vector<Ship *> ships;
+    std::vector<ShipDynamic *> shipDynamics;
     std::vector<Ship *> shipTags;
     std::vector<std::vector<Equipment *>> equipList;
     std::vector<std::vector<int>> planeCounts;

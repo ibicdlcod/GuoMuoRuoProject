@@ -36,5 +36,13 @@
         <file>resources/shipCond/warn.svg</file>
         <file>resources/shipCond/warndark.svg</file>
         <file>Assets/Image/rudder.png</file>
+        <file>Assets/Image/fleetIcons/battleship.png</file>
+        <file>Assets/Image/fleetIcons/carrier.png</file>
+        <file>Assets/Image/fleetIcons/LICENSE_battleship.png.txt</file>
+        <file>Assets/Image/fleetIcons/LICENSE_carrier.png.txt</file>
+        <file>Assets/Image/fleetIcons/LICENSE_normal.png.txt</file>
+        <file>Assets/Image/fleetIcons/LICENSE_transport.png.txt</file>
+        <file>Assets/Image/fleetIcons/normal.png</file>
+        <file>Assets/Image/fleetIcons/transport.png</file>
     </qresource>
 </RCC>
