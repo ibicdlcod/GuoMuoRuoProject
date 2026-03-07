@@ -66,6 +66,11 @@ MainWindow::MainWindow(QWidget *parent, int argc, char ** argv)
 
     Clientv2 &engine = Clientv2::getInstance();
 
+    unlockBattle();
+    connect(&engine, &Clientv2::lockBattle,
+            this, &MainWindow::lockBattle);
+    connect(&engine, &Clientv2::unlockBattle,
+            this, &MainWindow::unlockBattle);
     connect(this, &MainWindow::cmdMessage,
             &engine, &Clientv2::parse);
     connect(&engine, &Clientv2::qout,
@@ -76,38 +81,6 @@ MainWindow::MainWindow(QWidget *parent, int argc, char ** argv)
             this, &MainWindow::processCmd);
     connect(&engine, &Clientv2::gamestateChanged,
             this, &MainWindow::gamestateChanged);
-    connect(ui->actionBack_to_naval_base, &QAction::triggered,
-            &engine, &Clientv2::backToNavalBase);
-    connect(ui->actionView_Tech, &QAction::triggered,
-            &engine, &Clientv2::switchToTech);
-    connect(ui->actionDevelop_Equipment, &QAction::triggered,
-            &engine, &Clientv2::switchToFactory);
-    connect(ui->actionDevelop_Equipment, &QAction::triggered,
-            this, &MainWindow::switchToDevelop);
-    connect(ui->actionConstruct_Ships, &QAction::triggered,
-            &engine, &Clientv2::switchToFactory);
-    connect(ui->actionConstruct_Ships, &QAction::triggered,
-            this, &MainWindow::switchToConstruct);
-    connect(ui->actionArsenal, &QAction::triggered,
-            &engine, &Clientv2::switchToFactory);
-    connect(ui->actionArsenal, &QAction::triggered,
-            this, &MainWindow::switchToArsenal);
-    connect(ui->actionAnchorage, &QAction::triggered,
-            &engine, &Clientv2::switchToFactory);
-    connect(ui->actionAnchorage, &QAction::triggered,
-            this, &MainWindow::switchToAnchorage);
-    connect(ui->actionShip_Blueprints, &QAction::triggered,
-            &engine, &Clientv2::switchToFactory);
-    connect(ui->actionShip_Blueprints, &QAction::triggered,
-            this, &MainWindow::switchToBlueprint);
-    connect(ui->actionBattle, &QAction::triggered,
-            &engine, &Clientv2::switchToBattleView);
-    connect(ui->actionBattle, &QAction::triggered,
-            this, &MainWindow::switchToSortie);
-    connect(ui->actionCompose, &QAction::triggered,
-            &engine, &Clientv2::switchToFleetView);
-    connect(ui->actionCompose, &QAction::triggered,
-            this, &MainWindow::switchToFleet);
     connect(ui->actionLogout, &QAction::triggered,
             &engine, &Clientv2::parseDisconnectReq);
     connect(ui->actionExit, &QAction::triggered,
@@ -203,6 +176,79 @@ QLayout * MainWindow::getFleetAreaWidget() const {
     return lay;
 }
 
+void MainWindow::lockBattle() {
+    /* must ensure consistency with below */
+    Clientv2 &engine = Clientv2::getInstance();
+    disconnect(ui->actionBack_to_naval_base, &QAction::triggered,
+               &engine, &Clientv2::backToNavalBase);
+    disconnect(ui->actionView_Tech, &QAction::triggered,
+               &engine, &Clientv2::switchToTech);
+    disconnect(ui->actionDevelop_Equipment, &QAction::triggered,
+               &engine, &Clientv2::switchToFactory);
+    disconnect(ui->actionDevelop_Equipment, &QAction::triggered,
+               this, &MainWindow::switchToDevelop);
+    disconnect(ui->actionConstruct_Ships, &QAction::triggered,
+               &engine, &Clientv2::switchToFactory);
+    disconnect(ui->actionConstruct_Ships, &QAction::triggered,
+               this, &MainWindow::switchToConstruct);
+    disconnect(ui->actionArsenal, &QAction::triggered,
+               &engine, &Clientv2::switchToFactory);
+    disconnect(ui->actionArsenal, &QAction::triggered,
+               this, &MainWindow::switchToArsenal);
+    disconnect(ui->actionAnchorage, &QAction::triggered,
+               &engine, &Clientv2::switchToFactory);
+    disconnect(ui->actionAnchorage, &QAction::triggered,
+               this, &MainWindow::switchToAnchorage);
+    disconnect(ui->actionShip_Blueprints, &QAction::triggered,
+               &engine, &Clientv2::switchToFactory);
+    disconnect(ui->actionShip_Blueprints, &QAction::triggered,
+               this, &MainWindow::switchToBlueprint);
+    disconnect(ui->actionBattle, &QAction::triggered,
+               &engine, &Clientv2::switchToBattleView);
+    disconnect(ui->actionBattle, &QAction::triggered,
+               this, &MainWindow::switchToSortie);
+    disconnect(ui->actionCompose, &QAction::triggered,
+               &engine, &Clientv2::switchToFleetView);
+    disconnect(ui->actionCompose, &QAction::triggered,
+               this, &MainWindow::switchToFleet);
+}
+
+void MainWindow::unlockBattle() {
+    Clientv2 &engine = Clientv2::getInstance();
+    connect(ui->actionBack_to_naval_base, &QAction::triggered,
+            &engine, &Clientv2::backToNavalBase);
+    connect(ui->actionView_Tech, &QAction::triggered,
+            &engine, &Clientv2::switchToTech);
+    connect(ui->actionDevelop_Equipment, &QAction::triggered,
+            &engine, &Clientv2::switchToFactory);
+    connect(ui->actionDevelop_Equipment, &QAction::triggered,
+            this, &MainWindow::switchToDevelop);
+    connect(ui->actionConstruct_Ships, &QAction::triggered,
+            &engine, &Clientv2::switchToFactory);
+    connect(ui->actionConstruct_Ships, &QAction::triggered,
+            this, &MainWindow::switchToConstruct);
+    connect(ui->actionArsenal, &QAction::triggered,
+            &engine, &Clientv2::switchToFactory);
+    connect(ui->actionArsenal, &QAction::triggered,
+            this, &MainWindow::switchToArsenal);
+    connect(ui->actionAnchorage, &QAction::triggered,
+            &engine, &Clientv2::switchToFactory);
+    connect(ui->actionAnchorage, &QAction::triggered,
+            this, &MainWindow::switchToAnchorage);
+    connect(ui->actionShip_Blueprints, &QAction::triggered,
+            &engine, &Clientv2::switchToFactory);
+    connect(ui->actionShip_Blueprints, &QAction::triggered,
+            this, &MainWindow::switchToBlueprint);
+    connect(ui->actionBattle, &QAction::triggered,
+            &engine, &Clientv2::switchToBattleView);
+    connect(ui->actionBattle, &QAction::triggered,
+            this, &MainWindow::switchToSortie);
+    connect(ui->actionCompose, &QAction::triggered,
+            &engine, &Clientv2::switchToFleetView);
+    connect(ui->actionCompose, &QAction::triggered,
+            this, &MainWindow::switchToFleet);
+}
+
 void MainWindow::adjust(int) {
     QTimer::singleShot(10, this,
                        [this]
@@ -236,6 +282,12 @@ void MainWindow::gamestateInit() {
 }
 
 void MainWindow::gamestateChanged(KP::GameState state) {
+    Clientv2 &engine = Clientv2::getInstance();
+    if(engine.isInBattle() ^ (state == KP::BattleMapView)) {
+        qCritical() << "FUCK";
+        /* lock */
+        return;
+    }
     state == KP::Offline ? ui->ResourcesBar->hide()
                          : ui->ResourcesBar->show();
     switch(state) {
@@ -243,7 +295,10 @@ void MainWindow::gamestateChanged(KP::GameState state) {
     case KP::Port: lay->setCurrentWidget(portArea); break;
     case KP::Factory: lay->setCurrentWidget(factoryArea); break;
     case KP::TechView: lay->setCurrentWidget(techArea); break;
-    case KP::BattleView: lay->setCurrentWidget(battleArea); break;
+    case KP::BattleMapView: lay->setCurrentWidget(battleArea);
+        battleArea->switchToState(KP::MapDetail); break;
+    case KP::SortieMapView: lay->setCurrentWidget(battleArea);
+        battleArea->switchToState(KP::MapView); break;
     case KP::FleetView: lay->setCurrentWidget(fleetArea); break;
     }
     adjustArea(lay->currentWidget(), ui->MainArea->frameSize());

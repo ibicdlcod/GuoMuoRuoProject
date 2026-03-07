@@ -58,11 +58,11 @@ void MapRender::mouseMoveEvent(QMouseEvent *event)
             double distance = std::hypot(event->pos().x()
                                                  / (double) this->width()
                                                  * globeMapWidth
-                                             - map->x,
+                                             - map->worldX,
                                          event->pos().y()
                                                  / (double) this->height()
                                                  * globeMapHeight
-                                             - map->y);
+                                             - map->worldY);
             if(distance < circleSize) {
                 hoverMapID = map->id;
                 break;
@@ -86,11 +86,11 @@ void MapRender::mouseReleaseEvent(QMouseEvent *event)
                 double distance = std::hypot(event->pos().x()
                                                      / (double) this->width()
                                                      * globeMapWidth
-                                                 - map->x,
+                                                 - map->worldX,
                                              event->pos().y()
                                                      / (double) this->height()
                                                      * globeMapHeight
-                                                 - map->y);
+                                                 - map->worldY);
                 if(distance < circleSize) {
                     emit mapSelected(map->id);
                     break;
@@ -107,14 +107,14 @@ void MapRender::paintEvent(QPaintEvent * /* event */)
 {
     QPainter painter(this);
     painter.setBrush(brush);
-    painter.drawPixmap(QRect(0,0,this->width(),this->height()),
-                       pixmap.scaled(QSize(this->width(), this->height()),
+    painter.drawPixmap(QRect(0,0,width(),height()),
+                       pixmap.scaled(QSize(width(), height()),
                                      Qt::KeepAspectRatio,
                                      Qt::SmoothTransformation
                                      )
                        );
-    painter.scale(this->width() / (double)globeMapWidth,
-                  this->height() / (double)globeMapHeight);
+    painter.scale(width() / (double)globeMapWidth,
+                  height() / (double)globeMapHeight);
     painter.setPen(pen);
     if (antialiased)
         painter.setRenderHint(QPainter::Antialiasing, true);
@@ -131,11 +131,12 @@ void MapRender::paintEvent(QPaintEvent * /* event */)
         else {
             painter.setBrush(brush);
         }
-        painter.drawEllipse(map->x - circleSize / 2, map->y - circleSize / 2,
+        painter.drawEllipse(map->worldX - circleSize / 2,
+                            map->worldY - circleSize / 2,
                             circleSize, circleSize);
     }
 
-    painter.setRenderHint(QPainter::Antialiasing, false);
+    //painter.setRenderHint(QPainter::Antialiasing, false);
     painter.setPen(palette().dark().color());
     painter.setBrush(Qt::NoBrush);
 }

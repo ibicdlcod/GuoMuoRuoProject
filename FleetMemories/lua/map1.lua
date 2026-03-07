@@ -22,6 +22,7 @@ maps[1][1] = {
 	y = 0.500,
 	battle_type = maps.Battle_type.STARTING,
 	next_nodes = {2},
+	lb_distance = 99,
 	branch_rule = {
 		C = function(
 			ships,
@@ -98,6 +99,7 @@ maps[1][2] = {
 			return false --user state not modified
 		end,
 	},
+	experience = 100,
 }
 
 maps[1][4] = {
@@ -151,4 +153,5 @@ maps[1][4] = {
 			return false --user state not modified
 		end,
 	},
+	experience = 200,
 }

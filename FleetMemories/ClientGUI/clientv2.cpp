@@ -75,6 +75,16 @@ Clientv2::~Clientv2() noexcept {
 }
 
 /* public */
+void Clientv2::enterBattle() {
+    gameState = KP::BattleMapView;
+    emit gamestateChanged(KP::BattleMapView);
+    emit lockBattle();
+}
+
+bool Clientv2::isInBattle() const {
+    return gameState == KP::BattleMapView;
+}
+
 bool Clientv2::isEquipRegistryCacheGood() const {
     return equipRegistryCacheGood;
 }
@@ -85,6 +95,12 @@ bool Clientv2::isShipRegistryCacheGood() const {
 
 bool Clientv2::loggedIn() const {
     return gameState != KP::Offline;
+}
+
+void Clientv2::leaveBattle() {
+    gameState = KP::SortieMapView;
+    emit gamestateChanged(KP::SortieMapView);
+    emit unlockBattle();
 }
 
 /* public slots */
@@ -137,6 +153,9 @@ void Clientv2::catbomb() {
         delete sender;
         authSent = false;
         attemptMode = false;
+        if(isInBattle()) {
+            emit unlockBattle();
+        }
         emit gamestateChanged(KP::Offline);
     }
     else if(attemptMode){
@@ -380,11 +399,11 @@ void Clientv2::switchToBattleView() {
         emit qout(qtTrId("access-denied-login-first"));
         return;
     }
-    if(gameState == KP::BattleView) {
+    if(gameState == KP::SortieMapView) {
         return;
     } else {
-        gameState = KP::BattleView;
-        emit gamestateChanged(KP::BattleView);
+        gameState = KP::SortieMapView;
+        emit gamestateChanged(KP::SortieMapView);
     }
 }
 
@@ -750,6 +769,11 @@ void Clientv2::doFetch(const QStringList &cmdParts) {
 
 /* Switch view */
 void Clientv2::doSwitch(const QStringList &cmdParts) {
+    if(gameState == KP::BattleMapView) {
+        //% "You can't leave battle without normal methods."
+        qWarning() << qtTrId("gamestate-battle-leave");
+        return;
+    }
     if(cmdParts.length() < 2) {
         //% "Usage: switch [gamestate]"
         emit qout(qtTrId("switch-usage"));
@@ -764,6 +788,10 @@ void Clientv2::doSwitch(const QStringList &cmdParts) {
         if(statevalue == -1) {
             //% "Nonexistent gamestate: %1"
             qWarning() << qtTrId("game-unexpected-state").arg(secondary);
+        }
+        else if(statevalue == KP::BattleMapView) {
+            //% "You can't enter battle without normal methods."
+            qWarning() << qtTrId("gamestate-battle");
         }
         else if(statevalue == KP::Offline) {
             //% "Use 'disconnect' for logout."
@@ -1164,8 +1192,8 @@ void Clientv2::receivedInfo(const QJsonObject &djson) {
         }
         break;
     case KP::InfoType::MapStart:
-        gameState == KP::BattleView;
-        emit gamestateChanged(KP::BattleView);
+        gameState = KP::SortieMapView;
+        emit gamestateChanged(KP::SortieMapView);
         emit receivedMapStart(djson);
         break;
     default: throw std::domain_error("info type not supported"); break;

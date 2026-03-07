@@ -921,8 +921,8 @@ void Server::offerMapInfo(QSslSocket *connection)
             ename[lang->first] = lang->second;
         }
         mapInfo["name"] = ename;
-        mapInfo["x"] = map->x;
-        mapInfo["y"] = map->y;
+        mapInfo["x"] = map->worldX;
+        mapInfo["y"] = map->worldY;
         mapInfo["diff"] = map->diff;
         if(lua["maps"][unionId] != sol::nil) {
             QJsonArray startingNodes;
@@ -2832,7 +2832,7 @@ bool Server::mapRefresh()
                     }
                 }
             }
-            Map m{mapID, x, y};
+            Map m{mapID, x, y, QMap<int, MapNode>()};
             {
                 QStringList supportedLangs = KP::supportedLangs;
                 for(const auto &supportedLang: supportedLangs) {
@@ -3717,7 +3717,11 @@ void Server::receivedReq(const QJsonObject &djson,
             ;
         }
         break;
-        case KP::GameState::BattleView: {
+        case KP::GameState::SortieMapView: {
+            ;
+        }
+        break;
+        case KP::GameState::BattleMapView: {
             ;
         }
         break;

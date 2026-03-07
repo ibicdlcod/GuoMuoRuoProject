@@ -4,9 +4,10 @@
 #ifndef MAP_H
 #define MAP_H
 
-#include "qpoint.h"
+#include <QPoint>
 #include <QHash>
 #include <QSettings>
+#include "mapnode.h"
 
 extern std::unique_ptr<QSettings> settings;
 
@@ -14,15 +15,17 @@ class Map
 {
 
 public:
-    Map(int id, int x, int y);
+    Map(int id, int worldX, int worldY, QMap<int, MapNode> &&nodes);
+    Map(int id, int worldX, int worldY, const QJsonObject &nodesObject);
 
     QString toString(QString lang = settings->value("client/language", "en_US")
                                         .toString());
 
     int id;
     QHash<QString, QString> localNames;
-    int x;
-    int y;
+    int worldX;
+    int worldY;
+    QMap<int, MapNode> nodes;
 };
 
 #endif // MAP_H

@@ -2,6 +2,7 @@
  * SPDX-License-Identifier: AGPL-3.0-or-later */
 
 #include "mapwithdiff.h"
+#include <QJsonArray>
 
 MapWithDiff::MapWithDiff(const Map &map, KP::Difficulty diff)
     : Map{map}, diff(diff)
@@ -10,8 +11,8 @@ MapWithDiff::MapWithDiff(const Map &map, KP::Difficulty diff)
 }
 
 MapWithDiff::MapWithDiff(const QJsonObject &input)
-    : Map(input["id"].toInt(), input["x"].toInt(), input["y"].toInt()),
-    diff(static_cast<KP::Difficulty>(input["diff"].toInt()))
+    : diff(static_cast<KP::Difficulty>(input["diff"].toInt())),
+    Map(input["id"].toInt(), input["x"].toInt(), input["y"].toInt(), input["nodeinfo"].toObject())
 {
     QJsonObject lNames = input["name"].toObject();
     for(auto &lang: lNames.keys()) {

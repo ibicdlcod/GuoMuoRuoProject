@@ -217,6 +217,7 @@ qt_add_library(CFProtocol
     STATIC
     MANUAL_FINALIZATION
     ${PROTOCOL_SOURCES}
+    Protocol/mapnode.cpp Protocol/mapnode.h
 )
 qt_add_executable(CFClient
     MANUAL_FINALIZATION

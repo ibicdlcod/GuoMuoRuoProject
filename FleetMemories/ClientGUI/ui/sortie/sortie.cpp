@@ -26,7 +26,6 @@ Sortie::Sortie(QWidget *parent)
                                    MapRender::globeMapWidth,
                                    MapRender::globeMapHeight,
                                    ui->MapView);
-    ui->MapView->setStyleSheet("background-color: yellow;");
     connect(renderer, &MapRender::mapSelected,
             this, &Sortie::switchMap);
     ui->diffChoice->setSizeAdjustPolicy(QComboBox::AdjustToContents);
@@ -70,6 +69,9 @@ void Sortie::switchToState(KP::SortieState state) {
                 item->widget()->hide();
             }
         }
+        //https://forum.qt.io/topic/12006/solved-background-color-in-stylesheet-not-taking-effect/2
+        //detail->setAttribute(Qt::WA_StyledBackground, true);
+        //detail->setStyleSheet("QWidget { background-color: #FF0000; }");
         detail->show();
         update();
         break;
@@ -152,6 +154,7 @@ void Sortie::confirmSortieStart() {
 }
 
 void Sortie::sortieStart(const QJsonObject &djson) {
-    switchToState(KP::MapDetail);
-    qCritical() << djson;
+    Clientv2 &engine = Clientv2::getInstance();
+    detail->displayDetailedMap(engine.mapRegistryCache[djson["mapid"].toInt()]);
+    engine.enterBattle();
 }

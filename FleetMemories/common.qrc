@@ -35,5 +35,6 @@
         <file>resources/shipCond/gooddark.svg</file>
         <file>resources/shipCond/warn.svg</file>
         <file>resources/shipCond/warndark.svg</file>
+        <file>Assets/Image/rudder.png</file>
     </qresource>
 </RCC>

@@ -126,8 +126,9 @@ enum GameState{
     Port,
     Factory,
     TechView,
-    BattleView,
-    FleetView
+    SortieMapView,
+    FleetView,
+    BattleMapView
 };
 Q_ENUM_NS(GameState)
 
@@ -441,6 +442,14 @@ enum Difficulty {
     Historical = 3
 };
 Q_ENUM_NS(Difficulty)
+
+/* must ensure consistency with maps.lua */
+enum BattleType {
+    STARTING = 0,
+    NORMAL = 1,
+    BOSS = 2,
+};
+Q_ENUM_NS(BattleType)
 
 using DiffMap = QMap<Difficulty, QString>;
 Q_GLOBAL_STATIC(DiffMap,

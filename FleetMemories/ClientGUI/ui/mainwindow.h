@@ -34,6 +34,10 @@ public:
     QLayout * getFleetAreaWidget() const;
     friend class ConfirmSortie;
 
+public slots:
+    void lockBattle();
+    void unlockBattle();
+
 signals:
     void cmdMessage(const QString &);
 

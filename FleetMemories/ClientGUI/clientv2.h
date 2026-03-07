@@ -49,8 +49,11 @@ public:
         confirm
     };
     Q_ENUM(Password);
+    void enterBattle();
+    bool isInBattle() const;
     bool isEquipRegistryCacheGood() const;
     bool isShipRegistryCacheGood() const;
+    void leaveBattle();
     bool loggedIn() const;
     void doFetch(const QStringList &);
 
@@ -131,10 +134,9 @@ signals:
     void aboutToQuit();
     void askForHomePort(const QJsonObject &);
     void equipRegistryComplete();
-    void shipRegistryComplete();
-    void mapRegistryComplete();
-    void tsunkitAssetsComplete();
     void gamestateChanged(KP::GameState);
+    void lockBattle();
+    void mapRegistryComplete();
     void qout(QString, QColor background = QColor("white"),
               QColor foreground = QColor("black"));
     void receivedAnchorageShip(const QJsonObject &);
@@ -148,7 +150,10 @@ signals:
     void receivedResourceInfo(const QJsonObject &);
     void receivedShipBlueprint(const QJsonObject &);
     void receivedSkillPointInfo(const QJsonObject &);
+    void shipRegistryComplete();
+    void tsunkitAssetsComplete();
     void uiRefreshSig();
+    void unlockBattle();
 
 private slots:
     void changeGameState(KP::GameState);
