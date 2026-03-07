@@ -31,6 +31,7 @@ public:
 
 signals:
     void fleetCenterChanged();
+    void moveFinished();
 
 private:
     virtual void paintEvent(QPaintEvent *event) override;

@@ -8,6 +8,7 @@
 #include <QSettings>
 #include <QTranslator>
 #include <QStyleFactory>
+#include <QSurfaceFormat>
 #include "../steam/steam_api.h"
 
 #include "clientv2.h"
@@ -22,6 +23,9 @@ const int STEAM_ERROR = 1;
 }
 
 int main(int argc, char *argv[]) {
+    QSurfaceFormat format;
+    format.setDepthBufferSize(24);
+    QSurfaceFormat::setDefaultFormat(format);
 
     /* Steam initialization */
     if(SteamAPI_RestartAppIfNecessary(KP::steamAppId)) {

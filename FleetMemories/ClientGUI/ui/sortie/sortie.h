@@ -10,6 +10,7 @@
 #include "maprender.h"
 #include "mapdetail.h"
 #include "mapviewwidget.h"
+#include "opengl/battlewidget.h"
 
 namespace Ui {
 class Sortie;
@@ -41,6 +42,7 @@ private:
     Ui::Sortie *ui;
     MapRender *renderer;
     MapDetail *detail;
+    BattleWidget *battleW;
     MapViewWidget *globeFrame;
 
     KP::SortieState sortieState = KP::MapView;

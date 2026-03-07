@@ -213,6 +213,14 @@ QByteArray KP::clientDevelop(int equipid, bool convert, int factoryID) {
     return QCborValue::fromJsonValue(result).toCbor();
 }
 
+QByteArray KP::clientDoBattleNode(const QJsonObject &contents) {
+    QJsonObject result;
+    result["type"] = DgramType::Request;
+    result["command"] = CommandType::EnterBattleNode;
+    result["content"] = contents;
+    return QCborValue::fromJsonValue(result).toCbor();
+}
+
 QByteArray KP::clientFactoryRefresh() {
     QJsonObject result;
     result["type"] = DgramType::Request;

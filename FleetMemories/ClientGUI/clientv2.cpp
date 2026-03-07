@@ -818,6 +818,11 @@ void Clientv2::doSwitch(const QStringList &cmdParts) {
     }
 }
 
+void Clientv2::doBattle(const QJsonObject &contents) {
+    QByteArray msg = KP::clientDoBattleNode(contents);
+    sender->enqueue(msg);
+}
+
 void Clientv2::doConstructShip(int shipDef, const QList<QUuid> &defaultEquips,
                                QUuid shipToRemodel,
                                int factoryID) {
@@ -1346,6 +1351,10 @@ void Clientv2::receivedMsg(const QJsonObject &djson) {
         case KP::FleetLost:
             //% "Fleet is not in correct map position!"
             qWarning() << qtTrId("fleet-is-at-wrong-map-or-node");
+            break;
+        case KP::ServerError:
+            //% "Process battle info failed due to error on server side."
+            qWarning() << qtTrId("battle-failed-server");
             break;
         default:
             //% "Process battle info failed."

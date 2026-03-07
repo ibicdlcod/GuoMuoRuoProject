@@ -7,10 +7,11 @@
 #include <QLabel>
 #include <QResizeEvent>
 #include <QPainter>
+#include <QMessageBox>
 #include "../../clientv2.h"
 #include "confirmsortie.h"
-#include <QMessageBox>
 #include "../mainwindow.h"
+#include "battleplan.h"
 
 extern std::unique_ptr<QSettings> settings;
 
@@ -22,8 +23,9 @@ Sortie::Sortie(QWidget *parent)
 
     renderer = new MapRender(this);
     detail = new MapDetail(this);
+    battleW = new BattleWidget(this);
 
-    globeFrame = new MapViewWidget({renderer, detail},
+    globeFrame = new MapViewWidget({renderer, detail, battleW},
                                    MapRender::globeMapWidth,
                                    MapRender::globeMapHeight,
                                    ui->MapView);
@@ -201,6 +203,38 @@ void Sortie::dealWithNode(const MapNode &node, int nodeId) {
     case KP::NORMAL:
         [[fallthrough]];
     case KP::BOSS:
-        break;
+        QEventLoop loop;
+        // Connect the desired signal to the loop's quit() slot
+        QObject::connect(detail, &MapDetail::moveFinished, &loop, &QEventLoop::quit);
+
+        // Optional: Add a timeout using a QTimer
+        QTimer timer;
+        timer.setSingleShot(true);
+        QObject::connect(&timer, &QTimer::timeout, &loop, &QEventLoop::quit);
+        timer.start(5000); // 5 second timeout
+
+        // Execute the event loop here; it blocks until loop.quit() is called
+        loop.exec();
+
+        // Check if a timeout occurred
+        if (timer.isActive()) {
+            timer.stop();
+            // Signal was received within the timeout
+            BattlePlan *plan = new BattlePlan();
+            while(plan->exec() != QDialog::Accepted) {
+                ;
+            }
+            /* TODO: extract info from battleplan */
+            delete plan;
+            QJsonObject planinfo;
+            engine.doBattle(planinfo);
+            break;
+        } else {
+            // Timeout occurred
+            //% "Fleet move failed!"
+            qCritical() << qtTrId("fleet-move-error");
+            /* TODO: leave battle */
+            break;
+        }
     }
 }

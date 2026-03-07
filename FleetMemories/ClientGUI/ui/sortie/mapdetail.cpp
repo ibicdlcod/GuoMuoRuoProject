@@ -131,7 +131,7 @@ void MapDetail::paintEvent(QPaintEvent *event) {
     for(const auto &node: std::as_const(mapPointer->nodes)) {
         static QBrush redBrush = QBrush(Qt::red);
         painter.setBrush(redBrush);
-        painter.setPen(QPen(Qt::white, 0));
+        painter.setPen(Qt::NoPen);
         switch(node.type) {
         case KP::STARTING:
             painter.drawPixmap(node.x * width() - circleSize,
@@ -164,4 +164,7 @@ void MapDetail::paintEvent(QPaintEvent *event) {
                                     Qt::KeepAspectRatio,
                                     Qt::SmoothTransformation
                                     ));
+    if(animation->currentValue() == animation->endValue()) {
+        emit moveFinished();
+    }
 }

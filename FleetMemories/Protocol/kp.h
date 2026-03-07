@@ -176,6 +176,7 @@ enum CommandType{
     Construct,
     RequestSortie,
     ProgressMap,
+    EnterBattleNode,
 };
 Q_ENUM_NS(CommandType)
 
@@ -193,6 +194,7 @@ enum GameError{
     ShipisDisabled,
     FleetBusy,
     FleetLost,
+    ServerError,
 };
 Q_ENUM_NS(GameError)
 
@@ -214,6 +216,7 @@ enum SortieState{
 Q_ENUM_NS(SortieState)
 
 enum BattleState{
+    NoBattle,
     BeforeBattle,
     DuringBattle,
     AfterBattle,
@@ -524,6 +527,7 @@ QByteArray clientDemandShipInfoUser();
 QByteArray clientDemandSkillPoints(int);
 QByteArray clientDemandTech(int local = 0);
 QByteArray clientDevelop(int, bool convert = false, int factoryID = -1);
+QByteArray clientDoBattleNode(const QJsonObject &);
 QByteArray clientFactoryRefresh();
 QByteArray clientFetch(int factoryID = -1, bool forced = false);
 QByteArray clientFleetData(const QJsonArray &);

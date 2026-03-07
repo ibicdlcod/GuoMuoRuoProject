@@ -34,11 +34,18 @@ find_package(Lua REQUIRED)
 include_directories(${PROJECT_SOURCE_DIR}/sol2/include)
 # end Lua
 
+# OpenGL
+set(TINYGLTF_HEADER_ONLY ON CACHE INTERNAL "" FORCE)
+set(TINYGLTF_INSTALL OFF CACHE INTERNAL "" FORCE)
+add_subdirectory(${PROJECT_SOURCE_DIR}/ClientGUI/ui/sortie/opengl/tinygltf)
+# end OpenGL
+
 find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Core Gui Widgets)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS
-    UiPlugin LinguistTools Sql SvgWidgets Network HttpServer)
+    UiPlugin LinguistTools Sql SvgWidgets Network HttpServer OpenGL OpenGLWidgets)
 
 include_directories(${root_SOURCE_DIR}/FactorySlot)
+
 add_subdirectory(FactorySlot)
 
 set(TS_FILES
@@ -117,6 +124,9 @@ set(CLIENT_SOURCES
     ClientGUI/ui/settingswindow.h
     ClientGUI/ui/settingswindow.cpp
     ClientGUI/ui/settingswindow.ui
+    ClientGUI/ui/sortie/battleplan.h
+    ClientGUI/ui/sortie/battleplan.cpp
+    ClientGUI/ui/sortie/battleplan.ui
     ClientGUI/ui/sortie/confirmsortie.h
     ClientGUI/ui/sortie/confirmsortie.cpp
     ClientGUI/ui/sortie/confirmsortie.ui
@@ -127,6 +137,10 @@ set(CLIENT_SOURCES
     ClientGUI/ui/sortie/maprender.h
     ClientGUI/ui/sortie/mapviewwidget.cpp
     ClientGUI/ui/sortie/mapviewwidget.h
+    ClientGUI/ui/sortie/opengl/battlewidget.cpp
+    ClientGUI/ui/sortie/opengl/battlewidget.h
+    ClientGUI/ui/sortie/opengl/geometryengine.cpp
+    ClientGUI/ui/sortie/opengl/geometryengine.h
     ClientGUI/ui/sortie/sortie.cpp
     ClientGUI/ui/sortie/sortie.h
     ClientGUI/ui/sortie/sortie.ui
@@ -224,12 +238,15 @@ qt_add_executable(CFClient
     ${CLIENT_SOURCES}
     common.qrc
     ${app_icon_resource_windows}
+
 )
 qt_add_executable(CFServer
     MANUAL_FINALIZATION
     ${SERVER_SOURCES}
     common.qrc
 )
+
+target_include_directories(CFClient PRIVATE ${PROJECT_SOURCE_DIR}/ClientGUI/ui/sortie/opengl/tinygltf)
 
 if (${CMAKE_SYSTEM_NAME} MATCHES "Windows")
     find_library(STEAM_LIBRARY steam_api64 HINTS redistributable_bin/win64)
@@ -284,6 +301,8 @@ target_link_libraries(CFClient PRIVATE Qt${QT_VERSION_MAJOR}::HttpServer)
 target_link_libraries(CFClient PRIVATE Qt${QT_VERSION_MAJOR}::SvgWidgets)
 target_link_libraries(CFClient PRIVATE Qt${QT_VERSION_MAJOR}::Widgets)
 target_link_libraries(CFClient PRIVATE Qt${QT_VERSION_MAJOR}::Network)
+target_link_libraries(CFClient PRIVATE Qt${QT_VERSION_MAJOR}::OpenGL)
+target_link_libraries(CFClient PRIVATE Qt${QT_VERSION_MAJOR}::OpenGLWidgets)
 target_link_libraries(CFClient PRIVATE CFProtocol)
 if (${CMAKE_SYSTEM_NAME} MATCHES "Windows")
     target_link_libraries(CFClient PRIVATE factoryslot/FactorySlot)
@@ -300,6 +319,18 @@ target_link_libraries(CFServer PRIVATE CFProtocol)
 target_link_libraries(CFServer PRIVATE ${STEAM_LIBRARY})
 target_link_libraries(CFServer PRIVATE ${STEAM_APPENCRYPT_LIBRARY})
 target_link_libraries(CFServer PRIVATE lua_library)
+
+set(shaders_resource_files
+    "ClientGUI/ui/sortie/opengl/fshader.glsl"
+    "ClientGUI/ui/sortie/opengl/vshader.glsl"
+)
+
+qt6_add_resources(CFClient "shaders"
+    PREFIX
+        "/"
+    FILES
+        ${shaders_resource_files}
+)
 
 set_target_properties(CFClient PROPERTIES
     MACOSX_BUNDLE_GUI_IDENTIFIER moe.fleetmemories.fleetmemories

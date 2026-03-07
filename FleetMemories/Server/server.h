@@ -102,7 +102,12 @@ private:
     int nextNode(const CSteamID &, QSslSocket *, int mapId, int prevNode, int fleetIndex);
     void parseListen(const QStringList &);
     void parseUnlisten();
+    void processBattle(const CSteamID &, QSslSocket *, const QJsonObject &);
+    const QJsonObject processBattleCore(const CSteamID &, int, int, int, const QJsonObject &);
     void progressMap(const CSteamID &, QSslSocket *, int, int);
+    std::optional<QList<int>> queryMapProgress(const CSteamID &, QSslSocket *,
+                                               KP::BattleState,
+                                               int map = 0, int node = 0);
     void receivedAuth(const QJsonObject &, const PeerInfo &, QSslSocket *);
     void receivedForceLogout(CSteamID &);
     void receivedLogin(CSteamID &, const PeerInfo &, QSslSocket *);
