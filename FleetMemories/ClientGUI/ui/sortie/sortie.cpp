@@ -39,6 +39,12 @@ Sortie::Sortie(QWidget *parent)
             this, &Sortie::sortieStart);
     connect(&engine, &Clientv2::progressToNode,
             this, &Sortie::dealWithNode);
+    connect(&engine, &Clientv2::battleProcess,
+            this, &Sortie::battleProcess);
+    connect(&engine, &Clientv2::battleEnd,
+            this, &Sortie::battleEnd);
+    connect(&engine, &Clientv2::mapEnd,
+            this, &Sortie::sortieEnd);
 }
 
 Sortie::~Sortie()
@@ -80,6 +86,9 @@ void Sortie::switchToState(KP::SortieState state) {
         detail->show();
         update();
         break;
+    case KP::BattleScreen:
+        globeFrame->setCurrentWidget(battleW);
+        update();
     default:
         break;
     }
@@ -193,7 +202,35 @@ void Sortie::sortieStart(const QJsonObject &djson) {
     dealWithNode(currentMap->nodes[djson["start"].toInt()], djson["start"].toInt());
 }
 
+void Sortie::battleProcess(const QJsonObject &djson) {
+    Clientv2 &engine = Clientv2::getInstance();
+    switchToState(KP::BattleScreen);
+    currentBattleProcess = djson;
+    /* TODO: battle animation */
+}
+
+void Sortie::battleEnd() {
+    Clientv2 &engine = Clientv2::getInstance();
+    /* TODO: display battle result */
+    currentBattleProcess;
+    /* TODO: a dialog for attack or retreat */
+    switchToState(KP::MapDetail);
+    engine.queryNextNode(currentMap->id, currentNodeId);
+}
+
+void Sortie::sortieEnd() {
+    Clientv2 &engine = Clientv2::getInstance();
+    currentBattleProcess = QJsonObject();
+    mapIndex = 0;
+    currentMap = nullptr;
+    currentNodeId = 0;
+    //% "This sortie ended successfully."
+    qInfo() << qtTrId("sortie-end");
+    switchToState(KP::MapView);
+}
+
 void Sortie::dealWithNode(const MapNode &node, int nodeId) {
+    currentNodeId = nodeId;
     Clientv2 &engine = Clientv2::getInstance();
     detail->changeCurrentNode(node);
     switch(node.type) {

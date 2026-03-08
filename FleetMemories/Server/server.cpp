@@ -3512,10 +3512,31 @@ void Server::processBattle(const CSteamID &uid, QSslSocket *connection,
         return;
     }
     QJsonObject battleProcess = processBattleCore(uid,
-                                                 result.value()[0],
+                                                  result.value()[0],
             result.value()[1],
             result.value()[3],
             battlePlan);
+    QByteArray msg = KP::serverBattleProcess(battleProcess);
+    senderM.sendMessage(connection, msg);
+    QTimer::singleShot(battleProcess["time"].toInt(),
+            this, [this, uid, connection](){
+        QSqlQuery query;
+        query.prepare("UPDATE UserAttr SET Intvalue = :type "
+                      "WHERE Attribute = 'InBattle' "
+                      "AND UserID = :uid");
+        query.bindValue(":uid", uid.ConvertToUint64());
+        query.bindValue(":type", KP::AfterBattle);
+        if(Q_UNLIKELY(!query.exec())) {
+            qCritical() << query.lastQuery();
+            //% "User %1: start node battle failure!"
+            throw DBError(qtTrId("sortie-node-battle-failure").arg(uid.ConvertToUint64()),
+                          query.lastError());
+            return;
+        }
+        QByteArray msg = KP::serverBattleEnd();
+        senderM.sendMessage(connection, msg);
+    }
+    );
 }
 
 const QJsonObject Server::processBattleCore(const CSteamID &uid,
@@ -3874,6 +3895,38 @@ void Server::receivedLogin(CSteamID &uid,
     }
     else {
         /* existing user */
+        /* TODO: force end existing battles */
+        {
+            QSqlQuery query;
+            query.prepare("UPDATE UserAttr SET Intvalue = :type "
+                          "WHERE Attribute = 'InBattle' "
+                          "AND UserID = :uid");
+            query.bindValue(":uid", uid.ConvertToUint64());
+            query.bindValue(":type", KP::NoBattle);
+            if(Q_UNLIKELY(!query.exec())) {
+                qCritical() << query.lastQuery();
+                //% "User %1: start node battle failure!"
+                throw DBError(qtTrId("sortie-node-battle-failure").arg(uid.ConvertToUint64()),
+                              query.lastError());
+                return;
+            }
+        }
+        {
+            QSqlQuery query;
+            query.prepare("UPDATE UserAttr SET Intvalue = 0 "
+                          "WHERE Attribute = 'CurrentMap' "
+                          "OR Attribute = 'CurrentNode' "
+                          "OR Attribute = 'ActiveFleet' "
+                          "AND UserID = :uid");
+            query.bindValue(":uid", uid.ConvertToUint64());
+            if(Q_UNLIKELY(!query.exec())) {
+                qCritical() << query.lastQuery();
+                //% "User %1: start node battle failure!"
+                throw DBError(qtTrId("sortie-node-battle-failure").arg(uid.ConvertToUint64()),
+                              query.lastError());
+                return;
+            }
+        }
     }
     
     connectedPeers[uid] = connection;
@@ -5031,7 +5084,7 @@ void Server::userInit(CSteamID &uid) {
         std::pair(QStringLiteral("CurrentMap"), 0),
         std::pair(QStringLiteral("CurrentNode"), 0),
         std::pair(QStringLiteral("ActiveFleet"), 0),
-        std::pair(QStringLiteral("InBattle"), 0)
+        std::pair(QStringLiteral("InBattle"), KP::NoBattle)
     };
     {
         QSqlQuery insert;

@@ -66,7 +66,7 @@ void BattleWidget::initializeGL()
 {
     initializeOpenGLFunctions();
 
-    glClearColor(1, 1, 1, 1);
+    glClearColor(0, 1, 0, 1);
 
     initShaders();
 
@@ -80,11 +80,13 @@ void BattleWidget::initializeGL()
 void BattleWidget::initShaders()
 {
     // Compile vertex shader
-    if (!program.addShaderFromSourceFile(QOpenGLShader::Vertex, ":/vshader.glsl"))
+    if (!program.addShaderFromSourceFile(QOpenGLShader::Vertex,
+                                         ":/ClientGUI/ui/sortie/opengl/vshader.glsl"))
         close();
 
     // Compile fragment shader
-    if (!program.addShaderFromSourceFile(QOpenGLShader::Fragment, ":/fshader.glsl"))
+    if (!program.addShaderFromSourceFile(QOpenGLShader::Fragment,
+                                         ":/ClientGUI/ui/sortie/opengl/fshader.glsl"))
         close();
 
     // Link shader pipeline

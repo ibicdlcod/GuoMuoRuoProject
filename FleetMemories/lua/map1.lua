@@ -108,7 +108,19 @@ maps[1][4] = {
 	battle_type = maps.Battle_type.BOSS,
 	lb_distance = 99,
 	next_nodes = {},
-	branch_rule = {},
+	branch_rule = {
+		C = function(
+			ships,
+			los,
+			fleet_type,
+			capitalness, --[0]total/[1]surface/[2]carrier/[3]screens
+			ship_tags,
+			ship_speeds,
+			equipment_list, --list of lists
+			user_state)
+			return 0
+		end,
+		},
 	enemy = {
 	--incomplete
 		C = function()

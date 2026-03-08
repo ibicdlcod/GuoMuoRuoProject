@@ -44,5 +44,7 @@
         <file>Assets/Image/fleetIcons/LICENSE_transport.png.txt</file>
         <file>Assets/Image/fleetIcons/normal.png</file>
         <file>Assets/Image/fleetIcons/transport.png</file>
+        <file>ClientGUI/ui/sortie/opengl/fshader.glsl</file>
+        <file>ClientGUI/ui/sortie/opengl/vshader.glsl</file>
     </qresource>
 </RCC>

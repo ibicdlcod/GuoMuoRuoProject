@@ -345,11 +345,27 @@ QByteArray KP::serverAskForHomePort()
     return QCborValue::fromJsonValue(result).toCbor();
 }
 
+QByteArray KP::serverBattleEnd() {
+    QJsonObject result;
+    result["type"] = DgramType::Message;
+    result["msgtype"] = MsgType::BattleProcess;
+    result["end"] = true;
+    return QCborValue::fromJsonValue(result).toCbor();
+}
+
 QByteArray KP::serverBattleError(GameError error) {
     QJsonObject result;
     result["type"] = DgramType::Message;
     result["msgtype"] = MsgType::BattleError;
     result["reason"] = error;
+    return QCborValue::fromJsonValue(result).toCbor();
+}
+
+QByteArray KP::serverBattleProcess(const QJsonObject &contents) {
+    QJsonObject result;
+    result["type"] = DgramType::Message;
+    result["msgtype"] = MsgType::BattleProcess;
+    result["content"] = contents;
     return QCborValue::fromJsonValue(result).toCbor();
 }
 

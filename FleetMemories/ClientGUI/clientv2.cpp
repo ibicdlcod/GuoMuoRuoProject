@@ -1217,6 +1217,11 @@ void Clientv2::receivedInfo(const QJsonObject &djson) {
     case KP::InfoType::MapProgress: {
         int mapId = djson["mapid"].toInt();
         int nextNodeId = djson["next"].toInt();
+        if(nextNodeId == 0) {
+            leaveBattle();
+            emit mapEnd();
+            break;
+        }
         MapNode node = mapRegistryCache[mapId]->nodes[nextNodeId];
         emit progressToNode(node, nextNodeId);
         break;
@@ -1229,7 +1234,9 @@ void Clientv2::receivedInfo(const QJsonObject &djson) {
 void Clientv2::receivedLogout(const QJsonObject &djson) {
     if(djson["success"].toBool()) {
         if(!djson.contains("reason")) {
-            throw std::domain_error("message not implemented");
+            //% "Message not implemented";
+            qWarning() << qtTrId("message-not-implemented");
+            return;
         }
         else if(djson["reason"] == KP::LogoutSuccess) {
             //% "%1: logout success"
@@ -1241,8 +1248,10 @@ void Clientv2::receivedLogout(const QJsonObject &djson) {
             qCritical() << qtTrId("logout-forced")
                                .arg(djson["username"].toString());
         }
-        else
-            throw std::domain_error("message not implemented");
+        else {
+            qWarning() << qtTrId("message-not-implemented");
+            return;
+        }
 
         gameState = KP::Offline;
         delete sender;
@@ -1360,6 +1369,14 @@ void Clientv2::receivedMsg(const QJsonObject &djson) {
             //% "Process battle info failed."
             qInfo() << qtTrId("battle-failed");
             break;
+        }
+    } break;
+    case KP::BattleProcess: {
+        if(djson["end"].toBool()) {
+            emit battleEnd();
+        }
+        else {
+            emit battleProcess(djson["content"].toObject());
         }
     } break;
     case KP::ResourceRequired: {
@@ -1583,7 +1600,8 @@ void Clientv2::receivedMsg(const QJsonObject &djson) {
         emit askForHomePort(djson);
     }
     break;
-    default: throw std::domain_error("message not implemented"); break;
+    default:
+        qWarning() << qtTrId("message-not-implemented"); break;
     }
 }
 
@@ -1610,7 +1628,8 @@ void Clientv2::receivedNewLogin(const QJsonObject &djson) {
         case KP::SteamIdInvalid: reas = qtTrId("steam-id-invalid"); break;
             //% "Login failed: steam authentication failed."
         case KP::SteamAuthFail: reas = qtTrId("steam-auth-fail"); break;
-        default: throw std::domain_error("message not implemented"); break;
+        default:
+            qWarning() << qtTrId("message-not-implemented"); break;
         }
         //% "%1: login failure, reason: %2"
         qInfo() << qtTrId("login-failed")

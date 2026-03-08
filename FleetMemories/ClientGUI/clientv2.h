@@ -135,9 +135,12 @@ public slots:
 signals:
     void aboutToQuit();
     void askForHomePort(const QJsonObject &);
+    void battleEnd();
+    void battleProcess(const QJsonObject &);
     void equipRegistryComplete();
     void gamestateChanged(KP::GameState);
     void lockBattle();
+    void mapEnd();
     void mapRegistryComplete();
     void progressToNode(const MapNode &, int);
     void qout(QString, QColor background = QColor("white"),

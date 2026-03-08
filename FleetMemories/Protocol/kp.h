@@ -119,6 +119,7 @@ enum MsgType{
     ShipBPRetired,
     DisableShip,
     BattleError,
+    BattleProcess,
 };
 Q_ENUM_NS(MsgType)
 
@@ -543,6 +544,8 @@ QByteArray clientTestMessages(int);
 
 QByteArray serverAskForHomePort();
 QByteArray serverBattleError(GameError);
+QByteArray serverBattleEnd();
+QByteArray serverBattleProcess(const QJsonObject &);
 QByteArray serverBlueprintRetired(int);
 QByteArray serverDevelopFailed(GameError);
 QByteArray serverDevelopStart(bool construct = false);

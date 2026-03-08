@@ -66,7 +66,7 @@ void SteamAuth::OnEncryptedAppTicketResponse(
         //% "Calling RequestEncryptedAppTicket while not connected to steam results in this error."
         qWarning() << qtTrId("k_EResultNoConnection");
         //% "Steam ID: %1"
-        qInfo() << qtTrId("display-user-name").append(SteamFriends()->GetPersonaName());
+        qInfo() << qtTrId("display-user-name").arg(SteamFriends()->GetPersonaName());
         emit eATFailed();
         break;
     case k_EResultDuplicateRequest:

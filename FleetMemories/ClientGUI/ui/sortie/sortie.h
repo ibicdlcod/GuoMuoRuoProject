@@ -6,6 +6,7 @@
 
 #include <QFrame>
 #include <QLabel>
+#include <QJsonObject>
 #include "../../../Protocol/kp.h"
 #include "maprender.h"
 #include "mapdetail.h"
@@ -37,6 +38,9 @@ private slots:
     void switchMap(int mapId);
     void confirmSortieStart();
     void sortieStart(const QJsonObject &djson);
+    void battleProcess(const QJsonObject &djson);
+    void battleEnd();
+    void sortieEnd();
 
 private:
     Ui::Sortie *ui;
@@ -49,6 +53,8 @@ private:
     int mapIndex = 0;
     QString mapStr;
     Map *currentMap;
+    int currentNodeId = 0;
+    QJsonObject currentBattleProcess;
 };
 
 #endif // SORTIE_H
