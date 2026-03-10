@@ -7,6 +7,7 @@
 #include <QFrame>
 #include <QTableView>
 #include <QHeaderView>
+#include <QStackedLayout>
 #include "constructwindow.h"
 #include "developwindow.h"
 #include "../../../FactorySlot/factoryslot.h"
@@ -38,12 +39,15 @@ private slots:
     void doDevelop(int result);
     void doConstruct(int result);
     void doFactoryRefresh(const QJsonObject &);
+    void stackResize(int);
 
 private:
     void forceFetch(int slotnum);
 
     Ui::FactoryArea *ui;
+    QStackedLayout *lay;
     EquipView *equipview;
+    QWidget *slotControl;
     DevelopWindow dev;
     ConstructWindow con;
     QList<QUuid> defaultEquips;

@@ -13,9 +13,8 @@ Ship::Ship(int shipId, QObject *parent)
     if(shipId == 0) {
         return;
     }
-    QStringList supportedLangs = KP::supportedLangs;
 
-    for(auto &lang: supportedLangs) {
+    for(auto &lang: *KP::supportedLangs) {
         QSqlQuery query;
         query.prepare(
             "SELECT value FROM ShipName "
@@ -32,7 +31,7 @@ Ship::Ship(int shipId, QObject *parent)
             localNames[lang] = query.value(0).toString();
         }
     }
-    for(auto &lang: supportedLangs) {
+    for(auto &lang: *KP::supportedLangs) {
         QSqlQuery query;
         query.prepare(
             "SELECT value FROM ShipName "
@@ -49,7 +48,7 @@ Ship::Ship(int shipId, QObject *parent)
             shipClassText[lang] = query.value(0).toString();
         }
     }
-    for(auto &lang: supportedLangs) {
+    for(auto &lang: *KP::supportedLangs) {
         QSqlQuery query;
         query.prepare(
             "SELECT value FROM ShipName "

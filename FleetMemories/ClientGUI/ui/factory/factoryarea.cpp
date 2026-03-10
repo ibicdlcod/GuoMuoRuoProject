@@ -10,55 +10,48 @@
 #include "developwindow.h"
 #include "../../clientv2.h"
 #include "../views/equipview.h"
+#include "FactorySlot/factoryslot.h"
 
 FactoryArea::FactoryArea(QWidget *parent) :
     QFrame(parent),
     ui(new Ui::FactoryArea)
 {
     ui->setupUi(this);
-    equipview = new EquipView(ui->ArsenalArea);
-    ui->Slots->setObjectName("slotcontrol");
-    ui->Slots->setStyleSheet(
-        "QFrame#slotcontrol { border-style: none; }");
 
-    QVBoxLayout *layout = new QVBoxLayout();
-    ui->ArsenalArea->setLayout(layout);
-    layout->addWidget(equipview);
-    layout->setContentsMargins(0,0,0,0);
-    layout->setAlignment(Qt::AlignCenter);
+    equipview = new EquipView();
+    //ui->Slots->setObjectName("slotcontrol");
+    //ui->Slots->setStyleSheet(
+    //    "QFrame#slotcontrol { border-style: none; }");
+
+    lay = new QStackedLayout();
+    lay->setContentsMargins(0,0,0,0);
+    lay->setAlignment(Qt::AlignCenter);
+    lay->addWidget(equipview);
 
     Clientv2 &engine = Clientv2::getInstance();
     connect(&engine, &Clientv2::receivedFactoryRefresh,
             this, &FactoryArea::doFactoryRefresh);
 
-    slotfs.append(ui->Factory_Slot_0);
-    slotfs.append(ui->Factory_Slot_1);
-    slotfs.append(ui->Factory_Slot_2);
-    slotfs.append(ui->Factory_Slot_3);
-    slotfs.append(ui->Factory_Slot_4);
-    slotfs.append(ui->Factory_Slot_5);
-    slotfs.append(ui->Factory_Slot_6);
-    slotfs.append(ui->Factory_Slot_7);
-    slotfs.append(ui->Factory_Slot_8);
-    slotfs.append(ui->Factory_Slot_9);
-    slotfs.append(ui->Factory_Slot_10);
-    slotfs.append(ui->Factory_Slot_11);
-    slotfs.append(ui->Factory_Slot_12);
-    slotfs.append(ui->Factory_Slot_13);
-    slotfs.append(ui->Factory_Slot_14);
-    slotfs.append(ui->Factory_Slot_15);
-    slotfs.append(ui->Factory_Slot_16);
-    slotfs.append(ui->Factory_Slot_17);
-    slotfs.append(ui->Factory_Slot_18);
-    slotfs.append(ui->Factory_Slot_19);
-    slotfs.append(ui->Factory_Slot_20);
-    slotfs.append(ui->Factory_Slot_21);
-    slotfs.append(ui->Factory_Slot_22);
-    slotfs.append(ui->Factory_Slot_23);
+    slotControl = new QWidget();
+    QHBoxLayout *layH = new QHBoxLayout();
+    for(int i = 0; i < KP::factorySlotColumns; ++i) {
+        QVBoxLayout *layV = new QVBoxLayout();
+        for(int j = 0; j < KP::factorySlotRows; ++j) {
+            FactorySlot *facto = new FactorySlot();
+            facto->setSlotnum(j + i * KP::factorySlotRows);
+            slotfs.append(facto);
+            layV->addWidget(facto);
+        }
+        layH->addLayout(layV);
+    }
+    slotControl->setLayout(layH);
+    lay->addWidget(slotControl);
+    ui->ArsenalArea->setLayout(lay);
+
     for(auto iter = slotfs.begin(); iter < slotfs.end(); ++iter) {
         connect((*iter), &FactorySlot::clickedSpec,
                 this, &FactoryArea::developClicked);
-        (*iter)->setSlotnum(iter - slotfs.begin());
+        //(*iter)->setSlotnum(iter - slotfs.begin());
         (*iter)->setStatus();
     }
     dev.setAttribute(Qt::WA_DeleteOnClose, false);
@@ -67,11 +60,31 @@ FactoryArea::FactoryArea(QWidget *parent) :
             this, &FactoryArea::doDevelop);
     connect(&con, &QDialog::finished,
             this, &FactoryArea::doConstruct);
+    connect(lay, &QStackedLayout::currentChanged,
+            this, &FactoryArea::stackResize);
 }
 
 FactoryArea::~FactoryArea()
 {
     delete ui;
+}
+
+void FactoryArea::stackResize(int) {
+    QSizePolicy policy = ui->ArsenalArea->sizePolicy();
+    int size = 1;
+    if(lay->currentWidget() == slotControl) {
+        size = 1;
+        policy.setVerticalPolicy(QSizePolicy::Maximum);
+        ui->ArsenalArea->setMaximumHeight(200);
+    }
+    else if(lay->currentWidget() == equipview) {
+        size = 8;
+        policy.setVerticalPolicy(QSizePolicy::Expanding);
+        ui->ArsenalArea->setMaximumHeight(QWIDGETSIZE_MAX);
+    }
+    policy.setVerticalStretch(size);
+    ui->ArsenalArea->setSizePolicy(policy);
+    ui->ArsenalArea->update();
 }
 
 void FactoryArea::developClicked(bool checked, int slotnum) {
@@ -153,29 +166,23 @@ void FactoryArea::switchToState() {
     switch(factoryState) {
     case KP::Development:
         ui->FactoryLabel->setText(qtTrId("develop-equipment"));
-        ui->Slots->show();
-        ui->ArsenalArea->hide();
+        lay->setCurrentWidget(slotControl);
         break;
     case KP::Construction:
         ui->FactoryLabel->setText(qtTrId("construct-ships"));
-        ui->Slots->show();
-        ui->ArsenalArea->hide();
+        lay->setCurrentWidget(slotControl);
         con.switchDisplay();
         break;
     case KP::Arsenal:
         ui->FactoryLabel->setText(qtTrId("arsenal"));
-        ui->Slots->hide();
-        ui->ArsenalArea->show();
-        equipview->setGeometry(ui->ArsenalArea->rect());
+        lay->setCurrentWidget(equipview);
         equipview->recalculateArsenalRows();
         update();
         equipview->activate(true, true);
         break;
     case KP::Anchorage:
         ui->FactoryLabel->setText(qtTrId("anchorage"));
-        ui->Slots->hide();
-        ui->ArsenalArea->show();
-        equipview->setGeometry(ui->ArsenalArea->rect());
+        lay->setCurrentWidget(equipview);
         equipview->recalculateArsenalRows();
         update();
         equipview->activate(true, false);
@@ -183,9 +190,7 @@ void FactoryArea::switchToState() {
     case KP::BlueprintView:
         //% "Blueprints"
         ui->FactoryLabel->setText(qtTrId("blueprintview"));
-        ui->Slots->hide();
-        ui->ArsenalArea->show();
-        equipview->setGeometry(ui->ArsenalArea->rect());
+        lay->setCurrentWidget(equipview);
         equipview->recalculateArsenalRows();
         update();
         equipview->activate(true, false, true);

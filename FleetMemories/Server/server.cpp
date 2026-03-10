@@ -2834,8 +2834,7 @@ bool Server::mapRefresh()
             }
             Map m{mapID, x, y, QMap<int, MapNode>()};
             {
-                QStringList supportedLangs = KP::supportedLangs;
-                for(const auto &supportedLang: supportedLangs) {
+                for(const auto &supportedLang: *KP::supportedLangs) {
                     QSqlQuery query;
                     query.prepare("SELECT "+supportedLang+" FROM MapNode "
                                                           "WHERE MapID = :id;");

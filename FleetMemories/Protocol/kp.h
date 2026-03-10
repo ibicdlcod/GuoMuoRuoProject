@@ -65,9 +65,18 @@ static constexpr int hiddenMap = 99;
 static constexpr qint64 secsinMin = 60;
 static constexpr int equipIdMax = 0x10000;
 static constexpr int conditionMax = 480;
+static constexpr int factorySlotRows = 6;
+static constexpr int factorySlotColumns = 4;
 #pragma message(NOT_M_CONST)
 const int steamAppId = 2632870; // Go request your own steam appid if modding!
-static const QStringList supportedLangs = {"ja_JP", "zh_CN", "en_US"};
+Q_GLOBAL_STATIC(QStringList,
+                supportedLangs,
+                QStringList(
+                    {
+                        "ja_JP",
+                        "zh_CN",
+                        "en_US"
+                    }))
 
 enum DgramType{
     Auth,

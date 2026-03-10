@@ -12,9 +12,12 @@ SettingsWindow::SettingsWindow(QWidget *parent)
     , ui(new Ui::SettingsWindow)
 {
     ui->setupUi(this);
-    for(auto &lang: KP::supportedLangs) {
+    for(auto &lang: *KP::supportedLangs) {
         QLocale locale = QLocale(lang);
-        ui->languageBox->addItem(locale.nativeLanguageName());
+        ui->languageBox->addItem(
+            QStringLiteral("%1(%2)").arg(
+                locale.nativeLanguageName(),
+                locale.nativeTerritoryName()));
         if(lang == settings->value("client/language").toString()) {
             ui->languageBox->setCurrentIndex(ui->languageBox->count() - 1);
         }
@@ -32,9 +35,9 @@ SettingsWindow::SettingsWindow(QWidget *parent)
             this, &SettingsWindow::handleCellChange);
     connect(ui->languageBox, &QComboBox::currentIndexChanged,
             this, [this](){
-        settings->setValue("client/language",
-                           KP::supportedLangs[ui->languageBox->currentIndex()]);
-    });
+                settings->setValue("client/language",
+                                   (*KP::supportedLangs)[ui->languageBox->currentIndex()]);
+            });
 }
 
 SettingsWindow::~SettingsWindow()
@@ -88,8 +91,8 @@ void SettingsWindow::handleCellChange(int row, int column) {
     }
     if(!ui->settingsTable->item(row, 0)->text().isEmpty()) {
         if(!ui->settingsTable->item(row, 1)->text().isEmpty()) {
-        settings->setValue(ui->settingsTable->item(row, 0)->text(),
-                           ui->settingsTable->item(row, 1)->text());
+            settings->setValue(ui->settingsTable->item(row, 0)->text(),
+                               ui->settingsTable->item(row, 1)->text());
         }
         else {
             settings->remove(ui->settingsTable->item(row, 0)->text());
