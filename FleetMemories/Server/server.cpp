@@ -299,6 +299,20 @@ Q_GLOBAL_STATIC(QString,
                     ");"
                     ))
 
+/* Drop info of users */
+Q_GLOBAL_STATIC(QString,
+                userShipDrop,
+                QStringLiteral(
+                    "CREATE TABLE UserShipDrop ("
+                    "User BLOB NOT NULL, "
+                    "ShipDef INTEGER NOT NULL, "
+                    "Amount FLOAT, "
+                    "FOREIGN KEY(User) REFERENCES NewUsers(UserID), "
+                    "FOREIGN KEY(ShipDef) REFERENCES ShipName(ShipID) "
+                    "CONSTRAINT noduplicate UNIQUE(User, ShipDef) "
+                    ");"
+                    ))
+
 /* Not customized, since set this lesser than 60 creates problems */
 const int elapsedMaxTolerance = steamRateLimit;
 
@@ -2676,6 +2690,74 @@ bool Server::importShipFromCSV() {
     return shipRefresh();
 }
 
+void Server::initUserDropInfo(const CSteamID &uid) {
+    QSqlDatabase db = QSqlDatabase::database();
+    QList<QMap<int, double> *> results;
+    int j = 0;
+    QMap<int, double> *result;
+    for(Ship *ship: std::as_const(shipRegistry)) {
+        if(j % 500 == 0) {
+            result = new QMap<int, double>();
+            results.append(result);
+        }
+        if(ship->isAmnesiac()) {
+            continue;
+        }
+        (*result)[ship->getId()] = RNGesus::setDropValue(ship->attr["rarity"], mt);
+        j++;
+    }
+    for(auto *resultPtr: results) {
+        auto result = *resultPtr;
+        QString queryStr;
+        queryStr.append("INSERT INTO UserShipDrop (User, ShipDef, Amount) ");
+        queryStr.append("SELECT s.column1, s.column2, s.column3 ");
+        queryStr.append("FROM ( ");
+        queryStr.append("SELECT :uid AS column1, ");
+        queryStr.append(":firstkey AS column2, ");
+        queryStr.append(":first AS column3 ");
+        int i = 0;
+        for(const auto [key, value]: result.asKeyValueRange()) {
+            i++;
+            if(key == result.firstKey()) {
+                continue;
+            }
+            queryStr.append("UNION ALL ");
+            queryStr.append("SELECT :uid, ");
+            queryStr.append(":key"+QString::number(i)+", ");
+            queryStr.append(":value"+QString::number(i)+" ");
+        }
+        queryStr.append(") AS s ");
+        queryStr.append("WHERE NOT EXISTS ( SELECT 1 FROM UserShipDrop t WHERE t.User = s.column1 AND t.ShipDef = s.column2);");
+        QSqlQuery query2;
+        query2.prepare(queryStr);
+        query2.bindValue(":uid", uid.ConvertToUint64());
+        query2.bindValue(":firstkey", result.firstKey());
+        query2.bindValue(":first", result.first());
+        i = 0;
+        for(const auto [key, value]: result.asKeyValueRange()) {
+            i++;
+            if(key == result.firstKey()) {
+                continue;
+            }
+            query2.bindValue(":key"+QString::number(i), key);
+            query2.bindValue(":value"+QString::number(i), value);
+        }
+        if(Q_UNLIKELY(!query2.exec())) {
+            qCritical() << query2.lastQuery();
+            //% "User %1: add dropinfo of ship failed!"
+            throw DBError(qtTrId("user-add-ship-dropinfo-failed")
+                          .arg(uid.ConvertToUint64()),
+                          query2.lastError());
+        }
+        else {
+            //% "User %1: add dropinfo of ship success!"
+            qDebug() << qtTrId("user-add-ship-dropinfo-success")
+                        .arg(uid.ConvertToUint64());
+        }
+        delete resultPtr;
+    }
+}
+
 void Server::luaInitEquipable() {
     auto value = lua.safe_script_file("lua/canequip.lua",
                                       sol::script_pass_on_error);
@@ -3927,6 +4009,8 @@ void Server::receivedLogin(CSteamID &uid,
             }
         }
     }
+drop_table:
+    initUserDropInfo(uid);
     
     connectedPeers[uid] = connection;
     connectedUsers[connection] = uid;
@@ -4294,12 +4378,12 @@ void Server::sendTestMessages() {
         qWarning() << "Server isn't listening, abort.";
     }
     else {
-        luaInitMap();
         /*
         for(auto user: connectedUsers) {
             generateTestEquip(user);
             generateTestShip(user);
         }
+*/
         for(auto ship: std::as_const(shipRegistry)) {
             if(ship->isAmnesiac())
                 continue;
@@ -4309,7 +4393,6 @@ void Server::sendTestMessages() {
                     User::addShipBP(user, ship->getId());
             }
         }
-*/
     }
 }
 
@@ -4515,6 +4598,9 @@ void Server::sqlinit() const {
         if(!tables.contains("UserShipBP")) {
             sqlinitShipUBP();
         }
+        if(!tables.contains("UserShipDrop")) {
+            sqlinitShipDrop();
+        }
     }
 }
 
@@ -4635,6 +4721,18 @@ void Server::sqlinitShip() const {
     if(!query.exec()) {
         //% "Create Ship database failed."
         throw DBError(qtTrId("equip-ship-db-gen-failure"),
+                      query.lastError());
+    }
+}
+
+void Server::sqlinitShipDrop() const {
+    //% "Ship drop database does not exist, creating..."
+    qWarning() << qtTrId("ship-db-drop-lack");
+    QSqlQuery query;
+    query.prepare(*userShipDrop);
+    if(!query.exec()) {
+        //% "Create Ship drop database failed."
+        throw DBError(qtTrId("equip-ship-drop-db-gen-failure"),
                       query.lastError());
     }
 }

@@ -38,6 +38,6 @@ void refreshFactory(Server *server, const CSteamID &);
 void refreshPort(Server *server, const CSteamID &);
 void setResources(const CSteamID &, ResOrd);
 
-};
+}
 
 #endif // USER_H

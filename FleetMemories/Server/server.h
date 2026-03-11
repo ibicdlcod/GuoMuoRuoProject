@@ -89,6 +89,7 @@ private:
     bool importMapNodeFromCSV();
     bool importMapRelationFromCSV();
     bool importShipFromCSV();
+    void initUserDropInfo(const CSteamID &);
     void luaInitEquipable();
     void luaInitMap();
     [[nodiscard]] bool mapRefresh();
@@ -128,6 +129,7 @@ private:
     void sqlinitMapRelation() const;
     void sqlinitMapResource() const;
     void sqlinitShip() const;
+    void sqlinitShipDrop() const;
     void sqlinitShipName() const;
     void sqlinitShipU() const;
     void sqlinitShipUBP() const;
