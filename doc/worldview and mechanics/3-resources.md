@@ -2,7 +2,7 @@
 
 It's been said the core of KC is resource management, and this game inevitably inherits this characteristic.
 
-Base resource type is 7 compared to 4 in KC. However other resource types are simplified. For example, you just pay double resources plus a fixed percentage of the ship's construction costs to instantly repair a ship instead of spending a bucket. [NOTYETIMPLEMENTED]
+Base resource type is 7 compared to 4 in KC. However other resource types are simplified. For example, you just pay double resources to instantly repair/construct a ship instead of spending a bucket/fire.
 
 ### Base types
 
@@ -41,22 +41,20 @@ You gain resources from world's land resource points via having naval supremacy 
 
 This amount is only affected by absolute caps.
 
-You lost naval supremacy at each map by 0.02% per minute.
-
-You set the map's naval supremacy to 100/200/300% by successfully sortieing and defeating the boss of a map at C/B/A difficulty.
-
-You gain naval supremacy by 10/20/30% per successful expedition by defeating boss or sub-bosses (any fleet at map endpoint) at C/B/A difficulty (each expedition takes 15 minutes per battle which is 30-60 minutes), capped by 100/200/300%.
+Naval supremacy is explained [here](6.2-supremacy.md)
 
 ### Supply chain and attrition[NOTYETIMPLEMENTED]
 
 ## You spend resources by:
 
-- Develop equipment
-- Improve equipment
-- Construct ships
-- Supply ships
-- Repair ships
-- Sending LBAS
+- Develop equipment (explosives, steel, possibly oil, possibly aluminum, possibly rubber, possibly chromium, possibly tungsten)
+- Improve equipment (same as above)
+- Construct ships (steel, chromium, possibly aluminum)
+- Remodel ships (same as above)
+- Supply ships (oil, explosives)
+- Maintenance of planes on ships, including LBAS (same as development, which means oil, explosives, rubber, aluminum, chromium for jet planes, tungsten for rocket planes)
+- Repair ships (same as construct ships)
+- Sending LBAS (oil, explosives)
 
 Details will be explored later.
 

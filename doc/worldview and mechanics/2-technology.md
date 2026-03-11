@@ -41,7 +41,7 @@ We will deal with skill points later.
 
 [Implemented in Tech::calExperiment]
 
-When developing/constructing the success rate would be:
+When developing equipment the success rate would be:
 $$
 \text{Successrate}=\int_{t_{\text{wanted}}-t_{\text{current}}}^{\infty}\frac{1}{\sigma\sqrt{2\pi}}e^{-\frac{1}{2}(\frac{x}{\sigma})^2}dx
 $$
@@ -72,13 +72,11 @@ An equipment that does not have a predecessor will have it's local technology no
 
 [Implemented in Tech::calCapable]
 
-The highest among global and local would be in effect. However local technology x level behind will cause a detrimental effect of
+The highest among global and local would be in effect. However local technology $x$ level behind will cause a detrimental effect of
 $$
--\frac{cx}{\sqrt{1+x^2}}
+-\frac{x^2}{2\sqrt{1+x^2}}
 $$
 be applied on global technology (the reverse is also true). The resulting technology will NOT be lower than the lowest among global and local technology.
-
-$c$: [rule/techcombinedeffects](settings.md)
 
 ## How characteristic tech level are determined
 

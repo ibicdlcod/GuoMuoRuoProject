@@ -119,7 +119,7 @@ const QString Equipment::attrStr() const {
         }
         else if(attrValue != 0) {
             QString toTranslate = QString("equip-attr-")
-                                  + attrName.toLower();
+            + attrName.toLower();
             result = result + qtTrId(toTranslate.toUtf8())
                      + " "
                      + (attrValue > 0 ? "+" : "")
@@ -154,9 +154,23 @@ const QString Equipment::attrPrimaryStr() const {
 
 /* 4.3-Development.md#Resource cost */
 const ResOrd Equipment::devRes() const {
+    using namespace KP;
+    ResTuple result = {std::pair(O, 0),
+        std::pair(E, 0),
+        std::pair(S, 0),
+        std::pair(R, 0),
+        std::pair(A, 0),
+        std::pair(W, 0),
+        std::pair(C, 0),};
+    if(isRocketPlane()) // Rocket aircrafts
+    {
+        result[W] += 20;
+    }
+    ResOrd result2 = ResOrd(result);
+    result2 += type.devResBase();
     qint64 devResScale = settings->value("rule/devresscale", 10).toLongLong();
-    return type.devResBase() * (qint64)std::round((getTech() + 1.0)
-                                                   * devResScale);
+    return result2 * (qint64)std::round((getTech() + 1.0)
+                                         * devResScale);
 }
 
 /* 4.3-Development.md#Development time */
@@ -169,7 +183,7 @@ const int Equipment::devTimeInSec() const {
 /* under new doctrine this should always return true */
 bool Equipment::disallowMassProduction() const {
     return attr.contains("Disallowmassproduction")
-           && attr.value("Disallowmassproduction") > 0;
+    && attr.value("Disallowmassproduction") > 0;
 }
 
 bool Equipment::disallowProduction() const {
@@ -198,6 +212,11 @@ int Equipment::skillPointsStd() const {
                                             10000.0).toDouble();
     return std::lround(std::pow(skillPointFactor, getTech())
                        * skillPointBase);
+}
+
+bool Equipment::isRocketPlane() const {
+    /* TODO:temp solution */
+    return equipRegId == 350 || equipRegId == 351 || equipRegId == 352;
 }
 
 bool Equipment::canEquip(Ship *ship, sol::state &lua) const {
