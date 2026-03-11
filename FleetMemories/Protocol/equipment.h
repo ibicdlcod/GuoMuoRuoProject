@@ -101,6 +101,7 @@ public:
     double getTech() const;
     bool isInvalid() const;
     int skillPointsStd() const;
+    bool isRocketPlane() const;
 
     bool canEquip(Ship *ship, sol::state &ts) const;
     bool canEquipEX(Ship *ship, sol::state &ts) const;

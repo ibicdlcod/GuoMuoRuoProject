@@ -31,8 +31,8 @@
   * Enemies (Amnesiac Fleet) [NOTYETIMPLEMENTED]
 * [Sortie Map](6-sortie.md)
   * [Normal map and map relations](6.1-map.md) [PARTIAL]
-  * [Naval Supremacy and Normal expedition](6.2-supermacy.md) [NOTYETIMPLEMENTED]
-  * Emergency repair [NOTYETIMPLEMENTED]
+  * [Naval Supremacy and Normal expedition](6.2-supremacy.md) [NOTYETIMPLEMENTED]
+  * Retreat rule [NOTYETIMPLEMENTED]
   * Historical Mode (DLC) [NOTYETIMPLEMENTED]
   * Quests and Achievements [NOTYETIMPLEMENTED]
   * Expedition quests
@@ -42,8 +42,8 @@
   * vs Player
 * Maintenance
 
-  * Supply
-  * Repair
+  * [Supply](8.1-supply.md)
+  * [Repair](8.2-repair.md)
 * Battle mechanic
 
   * Tactical Goal (for friend fleet)
@@ -58,5 +58,6 @@
   * Battle phase
   * Disengaging phase (If we want night battle, we prevent them disengage; if we don't, we try to disengage)
   * Night battle
+  * Night-battle-start node
   * Commander's abilities
   * LBAS

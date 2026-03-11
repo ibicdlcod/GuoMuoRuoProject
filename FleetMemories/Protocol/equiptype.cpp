@@ -469,7 +469,7 @@ const ResOrd EquipType::devResBase() const {
         basic[A] += isLb() ? 4 : 0;
         basic[A] += isJet() ? 10 : 0;
         basic[S] += isJet() ? 15 : 0;
-        basic[R] += 2;
+        basic[R] += 4;
         basic[C] += isJet() ? 5 : 0;
     }
     else {
@@ -494,7 +494,7 @@ const ResOrd EquipType::devResBase() const {
         case 6: // AP shell
             basic[E] += 20;
             basic[S] += 40;
-            basic[W] += 25;
+            basic[W] += 40;
             break;
         case 7: // AL shell
             basic[E] += 30;

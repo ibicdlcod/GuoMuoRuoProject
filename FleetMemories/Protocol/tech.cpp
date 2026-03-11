@@ -11,14 +11,14 @@ extern std::unique_ptr<QSettings> settings;
 /* 2-Technology.md#Combined effects */
 double Tech::calCapable(double globalTech, double localTech,
                         double wantedTech) {
-    double maxDeterimental =
-        settings->value("rule/techcombinedeffects", 3.0).toDouble();
+    //double maxDeterimental =
+    //    settings->value("rule/techcombinedeffects", 3.0).toDouble();
     double min = std::min(globalTech, localTech);
     double max = std::max(globalTech, localTech);
     double detrimentalEffect = 0.0;
     if(min < wantedTech) {
         double lag = wantedTech - min;
-        detrimentalEffect = maxDeterimental * lag / std::hypot(1.0, lag);
+        detrimentalEffect = 0.5 * lag * lag / std::hypot(1.0, lag);
     }
     return std::max(min, max - detrimentalEffect);
 }
