@@ -81,6 +81,22 @@ void ShipBPModel::bpUsed(int shipDef) {
     wholeTableChanged();
 }
 
+void ShipBPModel::bpAdded(int shipDef) {
+    int oldRowCount = rowCount();
+    if(!clientShipBPs.contains(shipDef)) {
+        clientShipBPs[shipDef] = 1;
+        sortedShipBPIds.append(shipDef);
+    }
+    else {
+        clientShipBPs[shipDef] += 1;
+    }
+    int newRowCount = rowCount();
+    emit needReCalculatePages();
+    adjustRowCount(oldRowCount, newRowCount);
+    customSort();
+    wholeTableChanged();
+}
+
 int ShipBPModel::numberOfShip() const {
     return sortedShipBPIds.size();
 }

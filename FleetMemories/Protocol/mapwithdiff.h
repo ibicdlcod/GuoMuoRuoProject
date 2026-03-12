@@ -16,6 +16,9 @@ public:
     bool operator==(const MapWithDiff &other);
 
     KP::Difficulty diff;
+
+    static KP::Difficulty getDiff(int mapId);
+    static int getUnionId(int mapId);
 };
 
 #endif // MAPWITHDIFF_H

@@ -115,13 +115,13 @@ MainWindow::MainWindow(QWidget *parent, int argc, char ** argv)
     connect(ui->actionAbout_Qt, &QAction::triggered,
             QApplication::instance(), &QApplication::aboutQt);
 
-    portArea = new PortArea();
-    licenseArea = new LicenseArea();
-    newLoginScreen = new NewLoginS();
-    factoryArea = new FactoryArea();
-    techArea = new TechView();
-    battleArea = new Sortie();
-    fleetArea = new FleetView();
+    portArea = new PortArea(this);
+    licenseArea = new LicenseArea(this);
+    newLoginScreen = new NewLoginS(this);
+    factoryArea = new FactoryArea(this);
+    techArea = new TechView(this);
+    battleArea = new Sortie(this);
+    fleetArea = new FleetView(this);
 
     lay->addWidget(portArea);
     lay->addWidget(licenseArea);
@@ -141,7 +141,7 @@ MainWindow::MainWindow(QWidget *parent, int argc, char ** argv)
                            adjustArea(licenseArea,
                                       ui->MainArea->frameSize());
                        });
-    connect(licenseArea, &LicenseArea::showLicenseComplete,
+    auto connectionA = connect(licenseArea, &LicenseArea::showLicenseComplete,
             lay, [this](){lay->setCurrentWidget(newLoginScreen);});
     connect(licenseArea, &LicenseArea::showLicenseComplete,
             this, &MainWindow::gamestateInit);
@@ -156,6 +156,11 @@ MainWindow::MainWindow(QWidget *parent, int argc, char ** argv)
             portArea, &PortArea::shipRegistryComplete);
     connect(&engine, &Clientv2::mapRegistryComplete,
             portArea, &PortArea::mapRegistryComplete);
+    connect(&engine, &Clientv2::tsunkitAssetsComplete,
+            this, [this, &connectionA](){
+        disconnect(connectionA);
+        lay->setCurrentWidget(portArea);
+    });
     connect(&engine, &Clientv2::tsunkitAssetsComplete,
             portArea, &PortArea::hello);
 

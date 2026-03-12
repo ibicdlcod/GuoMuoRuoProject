@@ -76,6 +76,7 @@ private:
     void doDevelop(CSteamID &, int, int, QSslSocket *);
     void doFetch(CSteamID &, int, QSslSocket *, bool forced = false);
     void doHandshake(QSslSocket *, const QByteArray &);
+    int drop(CSteamID &uid, int mapId, int nodeId, KP::BattleAssessment ass);
     [[nodiscard]] bool equipmentRefresh();
     void exitGraceSpec() override;
     bool exportEquipToCSV() const;

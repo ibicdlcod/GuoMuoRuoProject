@@ -925,7 +925,7 @@ void Server::offerMapInfo(QSslSocket *connection)
 {
     QJsonArray mapInfos;
     for(const auto map: std::as_const(normalMaps)) {
-        int unionId = map->id % KP::mapIDDifficultyMask;
+        int unionId = MapWithDiff::getUnionId(map->id);
         QJsonObject mapInfo;
         mapInfo["id"] = map->id;
         QJsonObject ename;
@@ -2080,6 +2080,181 @@ remodel_ship:
     }
 }
 
+int Server::drop(CSteamID &uid, int mapId, int nodeId, KP::BattleAssessment ass)
+{
+    double assWeight;
+    switch(ass) {
+    case KP::SVictory: assWeight = 1; break;
+    case KP::AVictory: assWeight = 0.8; break;
+    case KP::BVictory: assWeight = 0.5; break;
+    default: assWeight = 0; break;
+    }
+    if(assWeight == 0) {
+        return 0;
+    }
+
+    /* mapid is absolute id */
+    /* [shipid, retrytimes] */
+    QMap<int, double> resultRare;
+    QMap<int, double> result;
+    KP::Difficulty diff = static_cast<KP::Difficulty>
+            (MapWithDiff::getDiff(mapId));
+    QString diffStr = (*KP::diffEnumtoStr)[diff];
+    QByteArray diffStrBytes = diffStr.toUtf8();
+    const char *diffStrC = diffStrBytes;
+    mapId = MapWithDiff::getUnionId(mapId);
+    if(lua["maps"][mapId] == sol::nil
+            || lua["maps"][mapId][nodeId] == sol::nil
+            || lua["maps"][mapId][nodeId]["raredroptable"] == sol::nil
+            || lua["maps"][mapId][nodeId]["raredroptable"][diffStrC]
+            == sol::nil
+            || lua["maps"][mapId][nodeId]["droptable"] == sol::nil
+            || lua["maps"][mapId][nodeId]["droptable"][diffStrC]
+            == sol::nil) {
+        //QByteArray msg = KP::serverBattleError(KP::DropError);
+        //senderM.sendMessage(connection, msg);
+        return -1; // error indicator
+    }
+    else {
+        sol::table rareDropTable = lua["maps"][mapId][nodeId]["raredroptable"][diffStrC];
+        rareDropTable.for_each(
+                    [&resultRare, assWeight](sol::object const& key, sol::object const& value) {
+            if (key.is<int>() && value.is<double>()) {
+                resultRare[key.as<int>()] = assWeight * value.as<double>();
+            }
+        });
+        sol::table dropTable = lua["maps"][mapId][nodeId]["droptable"][diffStrC];
+        dropTable.for_each(
+                    [&result, assWeight](sol::object const& key, sol::object const& value) {
+            if (key.is<int>() && value.is<double>()) {
+                result[key.as<int>()] = assWeight * value.as<double>();
+            }
+        });
+        QSqlDatabase db = QSqlDatabase::database();
+reduce_retry_times:
+        for(const auto [shipId, amount]: resultRare.asKeyValueRange()) {
+            QSqlQuery query;
+            query.prepare(
+                        "UPDATE UserShipDrop "
+                        "SET Amount = Amount - :value "
+                        "WHERE User = :uid AND ShipDef = :sid;");
+            query.bindValue(":uid", uid.ConvertToUint64());
+            query.bindValue(":sid", shipId);
+            query.bindValue(":value", amount);
+            if(!query.exec()) {
+                qCritical () << query.lastQuery();
+                //% "Update drop progress for user %1 failed!"
+                throw DBError(qtTrId("update-drop-progress-failed")
+                              .arg(uid.ConvertToUint64()),
+                              query.lastError());
+                return -1;
+            }
+        }
+        for(const auto [shipId, amount]: result.asKeyValueRange()) {
+            QSqlQuery query;
+            query.prepare(
+                        "UPDATE UserShipDrop "
+                        "SET Amount = Amount - :value "
+                        "WHERE User = :uid AND ShipDef = :sid;");
+            query.bindValue(":uid", uid.ConvertToUint64());
+            query.bindValue(":sid", shipId);
+            query.bindValue(":value", amount);
+            if(!query.exec()) {
+                qCritical () << query.lastQuery();
+                throw DBError(qtTrId("update-drop-progress-failed")
+                              .arg(uid.ConvertToUint64()),
+                              query.lastError());
+                return -1;
+            }
+        }
+    get_rare_drop:
+        {
+            QSqlQuery query;
+            QString queryStr0;
+            queryStr0.append("(");
+            for(int i = 0; i < resultRare.size(); ++i) {
+                if(i == 0)
+                    queryStr0.append("SELECT (:id"+QString::number(i)+") AS ShipDef ");
+                else
+                    queryStr0.append("UNION ALL SELECT (:id"+QString::number(i)+") ");
+            }
+            queryStr0.append(") s ");
+            QString queryStr =
+                    "SELECT UserShipDrop.ShipDef "
+                    "FROM UserShipDrop "
+                    "INNER JOIN "
+                    + queryStr0 +
+                    "ON UserShipDrop.ShipDef = s.ShipDef "
+                    "AND UserShipDrop.User = :uid "
+                    "AND UserShipDrop.Amount <= 0 "
+                    "ORDER BY RANDOM() LIMIT 1;";
+            query.prepare(queryStr);
+            query.bindValue(":uid", uid.ConvertToUint64());
+            int i = 0;
+            for(auto iter = resultRare.keyBegin();
+                iter != resultRare.keyEnd();
+                ++iter, ++i) {
+                query.bindValue(":id"+QString::number(i), *iter);
+            }
+            if(!query.exec()) {
+                qCritical () << query.lastQuery();
+                //% "Query drop candidate for user %1 failed!"
+                throw DBError(qtTrId("query-drop-candidate-failed")
+                              .arg(uid.ConvertToUint64()),
+                              query.lastError());
+                return -1;
+            }
+            else {
+                if(query.isSelect() && query.first()) {
+                    return query.value(0).toInt();
+                }
+            }
+        }
+    get_drop:
+        {
+            QSqlQuery query;
+            QString queryStr0;
+            queryStr0.append("(");
+            for(int i = 0; i < result.size(); ++i) {
+                if(i == 0)
+                    queryStr0.append("SELECT (:id"+QString::number(i)+") AS ShipDef ");
+                else
+                    queryStr0.append("UNION ALL SELECT (:id"+QString::number(i)+") ");
+            }
+            queryStr0.append(") s ");
+            QString queryStr =
+                    "SELECT UserShipDrop.ShipDef "
+                    "FROM UserShipDrop "
+                    "INNER JOIN "
+                    + queryStr0 +
+                    "ON UserShipDrop.ShipDef = s.ShipDef "
+                    "AND UserShipDrop.User = :uid "
+                    "ORDER BY UserShipDrop.Amount ASC, RANDOM() LIMIT 1;";
+            query.prepare(queryStr);
+            query.bindValue(":uid", uid.ConvertToUint64());
+            int i = 0;
+            for(auto iter = result.keyBegin();
+                iter != result.keyEnd();
+                ++iter, ++i) {
+                query.bindValue(":id"+QString::number(i), *iter);
+            }
+            if(!query.exec()) {
+                qCritical () << query.lastQuery();
+                throw DBError(qtTrId("query-drop-candidate-failed")
+                              .arg(uid.ConvertToUint64()),
+                              query.lastError());
+                return -1;
+            }
+            else {
+                if(query.isSelect() && query.first()) {
+                    return query.value(0).toInt();
+                }
+            }
+        }
+    }
+    return 0;
+}
+
 bool Server::equipmentRefresh() {
     QSqlDatabase db = QSqlDatabase::database();
     if(!db.isValid()) {
@@ -2703,7 +2878,7 @@ void Server::initUserDropInfo(const CSteamID &uid) {
         if(ship->isAmnesiac()) {
             continue;
         }
-        (*result)[ship->getId()] = RNGesus::setDropValue(ship->attr["rarity"], mt);
+        (*result)[ship->getId()] = RNGesus::setDropValue(ship->attr["Rarity"], mt);
         j++;
     }
     for(auto *resultPtr: results) {
@@ -2790,7 +2965,7 @@ void Server::luaInitMap() {
     }
     QSet<int> normalMapUnions;
     for(auto map: std::as_const(normalMaps)) {
-        normalMapUnions.insert(map->id % KP::mapIDDifficultyMask);
+        normalMapUnions.insert(MapWithDiff::getUnionId(map->id));
     }
     for(auto map: normalMapUnions) {
         QString name = QStringLiteral("lua/map%1.lua").arg(map);
@@ -3440,11 +3615,11 @@ QUuid Server::newShip(const CSteamID &uid, int shipId, bool direct) {
 int Server::nextNode(const CSteamID &uid, QSslSocket *connection,
                      int mapId, int prevNode, int fleetIndex) {
     KP::Difficulty diff = static_cast<KP::Difficulty>
-            (mapId / KP::mapIDDifficultyMask);
+            (MapWithDiff::getDiff(mapId));
     QString diffStr = (*KP::diffEnumtoStr)[diff];
     QByteArray diffStrBytes = diffStr.toUtf8();
     const char *diffStrC = diffStrBytes;
-    mapId = mapId % KP::mapIDDifficultyMask;
+    mapId = MapWithDiff::getUnionId(mapId);
     if(lua["maps"][mapId] == sol::nil
             || lua["maps"][mapId][prevNode] == sol::nil
             || lua["maps"][mapId][prevNode]["branch_rule"] == sol::nil
@@ -3609,8 +3784,8 @@ void Server::processBattle(const CSteamID &uid, QSslSocket *connection,
         query.bindValue(":type", KP::AfterBattle);
         if(Q_UNLIKELY(!query.exec())) {
             qCritical() << query.lastQuery();
-            //% "User %1: start node battle failure!"
-            throw DBError(qtTrId("sortie-node-battle-failure").arg(uid.ConvertToUint64()),
+            //% "User %1: end node battle failure!"
+            throw DBError(qtTrId("sortie-node-battle-failure-end").arg(uid.ConvertToUint64()),
                           query.lastError());
             return;
         }
@@ -3986,8 +4161,8 @@ void Server::receivedLogin(CSteamID &uid,
             query.bindValue(":type", KP::NoBattle);
             if(Q_UNLIKELY(!query.exec())) {
                 qCritical() << query.lastQuery();
-                //% "User %1: start node battle failure!"
-                throw DBError(qtTrId("sortie-node-battle-failure").arg(uid.ConvertToUint64()),
+                //% "User %1: force end node battle failure!"
+                throw DBError(qtTrId("sortie-node-battle-failure-end-force").arg(uid.ConvertToUint64()),
                               query.lastError());
                 return;
             }
@@ -4378,20 +4553,8 @@ void Server::sendTestMessages() {
         qWarning() << "Server isn't listening, abort.";
     }
     else {
-        /*
         for(auto user: connectedUsers) {
-            generateTestEquip(user);
-            generateTestShip(user);
-        }
-*/
-        for(auto ship: std::as_const(shipRegistry)) {
-            if(ship->isAmnesiac())
-                continue;
-            auto dis = std::bernoulli_distribution(0.50);
-            if(dis(mt)) {
-                for(auto user: connectedUsers)
-                    User::addShipBP(user, ship->getId());
-            }
+            drop(user, 1, 2, KP::SVictory);
         }
     }
 }
@@ -4814,11 +4977,11 @@ void Server::sqlinitUserA() const {
 void Server::startSortie(const CSteamID &uid, QSslSocket *connection,
                          int mapId, int fleetIndex, bool expedition) {
     KP::Difficulty diff = static_cast<KP::Difficulty>
-            (mapId / KP::mapIDDifficultyMask);
+            (MapWithDiff::getDiff(mapId));
     QString diffStr = (*KP::diffEnumtoStr)[diff];
     QByteArray diffStrBytes = diffStr.toUtf8();
     const char *diffStrC = diffStrBytes;
-    mapId = mapId % KP::mapIDDifficultyMask;
+    mapId = MapWithDiff::getUnionId(mapId);
     if(expedition) {
         return;//TODO: add expedition
     }

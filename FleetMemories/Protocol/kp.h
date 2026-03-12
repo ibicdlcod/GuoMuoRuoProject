@@ -126,6 +126,7 @@ enum MsgType{
     AskForHomePort,
     ShipModernized,
     ShipBPRetired,
+    ShipBPAdded,
     DisableShip,
     BattleError,
     BattleProcess,
@@ -205,6 +206,7 @@ enum GameError{
     FleetBusy,
     FleetLost,
     ServerError,
+    DropError
 };
 Q_ENUM_NS(GameError)
 
@@ -476,6 +478,16 @@ enum BattleType {
 };
 Q_ENUM_NS(BattleType)
 
+enum BattleAssessment {
+    SVictory = 0,
+    AVictory = 1,
+    BVictory = 2,
+    CDefeat = 3,
+    DDefeat = 4,
+    EDefeat = 5
+};
+Q_ENUM_NS(BattleAssessment)
+
 using DiffMap = QMap<Difficulty, QString>;
 Q_GLOBAL_STATIC(DiffMap,
                 diffEnumtoStr,
@@ -555,6 +567,7 @@ QByteArray serverAskForHomePort();
 QByteArray serverBattleError(GameError);
 QByteArray serverBattleEnd();
 QByteArray serverBattleProcess(const QJsonObject &);
+QByteArray serverBlueprintAdded(int);
 QByteArray serverBlueprintRetired(int);
 QByteArray serverDevelopFailed(GameError);
 QByteArray serverDevelopStart(bool construct = false);

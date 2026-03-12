@@ -22,6 +22,7 @@ public:
                                 int role = Qt::DisplayRole) const override;
     virtual int hiddenSortColumn() const override;
     const QHash<int, int> getClientShipBPs() const;
+    void bpAdded(int);
     void bpUsed(int);
 
 signals:

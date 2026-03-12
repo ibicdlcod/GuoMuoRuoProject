@@ -24,3 +24,11 @@ MapWithDiff::MapWithDiff(const QJsonObject &input)
 bool MapWithDiff::operator==(const MapWithDiff &other) {
     return this->id == other.id && this->diff == other.diff;
 }
+
+KP::Difficulty MapWithDiff::getDiff(int mapId) {
+    return static_cast<KP::Difficulty>((mapId / KP::mapIDDifficultyMask) & 0xF);
+}
+
+int MapWithDiff::getUnionId(int mapId) {
+    return (mapId & (~(KP::mapIDDifficultyMask * 0xF)));
+}

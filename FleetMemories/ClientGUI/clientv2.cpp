@@ -1365,11 +1365,16 @@ void Clientv2::receivedMsg(const QJsonObject &djson) {
             //% "Process battle info failed due to error on server side."
             qWarning() << qtTrId("battle-failed-server");
             break;
+        case KP::DropError:
+            //% "Process blueprint drop info failed due to error on server side."
+            qWarning() << qtTrId("battle-failed-server-drop");
+            break;
         default:
             //% "Process battle info failed."
             qInfo() << qtTrId("battle-failed");
             break;
         }
+        emit battleEnd();
     } break;
     case KP::BattleProcess: {
         if(djson["end"].toBool()) {
@@ -1541,6 +1546,10 @@ void Clientv2::receivedMsg(const QJsonObject &djson) {
     break;
     case KP::ShipBPRetired: {
         shipBPModel.bpUsed(djson["shipdef"].toInt());
+    }
+    break;
+    case KP::ShipBPAdded: {
+        shipBPModel.bpAdded(djson["shipdef"].toInt());
     }
     break;
     case KP::ShipModernized: {

@@ -369,6 +369,14 @@ QByteArray KP::serverBattleProcess(const QJsonObject &contents) {
     return QCborValue::fromJsonValue(result).toCbor();
 }
 
+QByteArray KP::serverBlueprintAdded(int shipDef) {
+    QJsonObject result;
+    result["type"] = DgramType::Message;
+    result["msgtype"] = MsgType::ShipBPAdded;
+    result["shipdef"] = shipDef;
+    return QCborValue::fromJsonValue(result).toCbor();
+}
+
 QByteArray KP::serverBlueprintRetired(int shipDef) {
     QJsonObject result;
     result["type"] = DgramType::Message;
