@@ -1602,6 +1602,9 @@ void Clientv2::receivedMsg(const QJsonObject &djson) {
             //% "Fleet don't fit this map."
             qWarning() << qtTrId("fleet-dont-fit-map");
             break;
+        case KP::FleetBusyInBattle:
+            qWarning() << qtTrId("fleet-is-busy");
+            break;
         case KP::ValidFleet:
             //% "Modify fleet success!"
             qInfo() << qtTrId("valid-fleet");

@@ -418,7 +418,7 @@ QVariant EquipModel::data(const QModelIndex &index, int role) const {
                         if(pos.fleetindex == -1 && pos.posindex == -1) {
                             posStr = qtTrId("fleet-idle");
                         }
-                        else if(pos.fleetindex == -2) {
+                        else if(pos.fleetindex == KP::disabledShip) {
                             posStr = qtTrId("fleet-disabled");
                         }
                     }

@@ -171,7 +171,7 @@ void ShipModel::modifyShip(QUuid uid, int def, int hp, bool disabling) {
     int oldRowCount = rowCount();
     Clientv2 &engine = Clientv2::getInstance();
     if(disabling && clientShipDynamicAttrs.contains(uid)) {
-        clientShipDynamicAttrs[uid]->fleetIndex = -2;
+        clientShipDynamicAttrs[uid]->fleetIndex = KP::disabledShip;
     }
     else {
         clientShips[uid] = engine.getShipReg(def);
@@ -312,7 +312,7 @@ QVariant ShipModel::data(const QModelIndex &index,
                 //% "Idle"
                 return qtTrId("fleet-idle");
             }
-            else if(attr->fleetIndex == -2) {
+            else if(attr->fleetIndex == KP::disabledShip) {
                 //% "Disabled"
                 return qtTrId("fleet-disabled");
             }

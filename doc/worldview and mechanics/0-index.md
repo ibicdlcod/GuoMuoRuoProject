@@ -23,7 +23,7 @@
   * [Construction](5.4-construction.md)
   * [Equip slots](5.5-equipslots.md)
   * [Visible bonuses](5.6-visiblebonus.md) [NOTYETIMPLEMENTED]
-  * [Experience and modernization](5.7-experience.md) [Experience gain and loss: NOTYETIMPLEMENTED]
+  * [Experience and modernization](5.7-experience.md) [Experience loss: NOTYETIMPLEMENTED]
   * [Remodel](5.8-remodel.md)
   * [Cloning Vats](5.9-cloning vats.md) [NOTYETIMPLEMENTED]
   * [Labor condition](5.10-labor.md) [Gain and loss: NOTYETIMPLEMENTED]

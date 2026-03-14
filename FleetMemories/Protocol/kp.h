@@ -52,6 +52,7 @@ static constexpr int fleetsSize = 4;
 static constexpr int normalFleetSize = 7;
 static constexpr int combinedFleetSize = 14;
 static constexpr int fleetRepSize = 0x10;
+static constexpr int disabledShip = -2;
 static constexpr int maxEquipSlots = 5;
 static constexpr int levelUnlockExSlot = 50;
 static constexpr int normalFleetMaxCapitalness = 20;
@@ -269,6 +270,7 @@ enum FleetFailType{
     EquipError,
     FleetContainsDisabled,
     FleetDontFitMap,
+    FleetBusyInBattle
 };
 Q_ENUM_NS(FleetFailType)
 

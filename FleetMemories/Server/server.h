@@ -91,6 +91,7 @@ private:
     bool importMapRelationFromCSV();
     bool importShipFromCSV();
     void initUserDropInfo(const CSteamID &);
+    void initUserEquipSPInfo(const CSteamID &);
     void luaInitEquipable();
     void luaInitMap();
     [[nodiscard]] bool mapRefresh();
@@ -106,6 +107,8 @@ private:
     void parseUnlisten();
     void processBattle(const CSteamID &, QSslSocket *, const QJsonObject &);
     void processDrop(const CSteamID &, QSslSocket *, int shipId);
+    void processExpGain(const CSteamID &, int fleetIndex,
+                        double baseExpGained, KP::BattleAssessment assm);
     const QJsonObject processBattleCore(const CSteamID &, int, int, int, const QJsonObject &);
     void progressMap(const CSteamID &, QSslSocket *, int, int);
     std::optional<QList<int>> queryMapProgress(const CSteamID &, QSslSocket *,
