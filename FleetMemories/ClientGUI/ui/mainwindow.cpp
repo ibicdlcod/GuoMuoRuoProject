@@ -1,4 +1,4 @@
-/* Copyright (C) 2026 Harusoft Inc.
+/* Copyright (C) 2026 Harusoft Ltd.
  * SPDX-License-Identifier: AGPL-3.0-or-later */
 
 #include "mainwindow.h"
@@ -141,8 +141,12 @@ MainWindow::MainWindow(QWidget *parent, int argc, char ** argv)
                            adjustArea(licenseArea,
                                       ui->MainArea->frameSize());
                        });
-    auto connectionA = connect(licenseArea, &LicenseArea::showLicenseComplete,
-            lay, [this](){lay->setCurrentWidget(newLoginScreen);});
+    connect(licenseArea, &LicenseArea::showLicenseComplete,
+            lay, [this](){
+                if(lay->currentWidget() == licenseArea) {
+                    lay->setCurrentWidget(newLoginScreen);
+                }
+            });
     connect(licenseArea, &LicenseArea::showLicenseComplete,
             this, &MainWindow::gamestateInit);
     QTimer::singleShot(settings->value("client/licenseareapersist",
@@ -157,10 +161,9 @@ MainWindow::MainWindow(QWidget *parent, int argc, char ** argv)
     connect(&engine, &Clientv2::mapRegistryComplete,
             portArea, &PortArea::mapRegistryComplete);
     connect(&engine, &Clientv2::tsunkitAssetsComplete,
-            this, [this, &connectionA](){
-        disconnect(connectionA);
-        lay->setCurrentWidget(portArea);
-    });
+            lay, [this](){
+                lay->setCurrentWidget(portArea);
+            });
     connect(&engine, &Clientv2::tsunkitAssetsComplete,
             portArea, &PortArea::hello);
 
@@ -280,10 +283,12 @@ void MainWindow::factoryRefresh() {
 }
 
 void MainWindow::gamestateInit() {
+    /*
     gamestateChanged(KP::Offline);
     adjustArea(newLoginScreen,
                ui->MainArea->frameSize());
     update();
+*/
 }
 
 void MainWindow::gamestateChanged(KP::GameState state) {

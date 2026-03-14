@@ -1,4 +1,4 @@
-/* Copyright (C) 2026 Harusoft Inc.
+/* Copyright (C) 2026 Harusoft Ltd.
  * SPDX-License-Identifier: AGPL-3.0-or-later */
 
 #include "equiptype.h"
@@ -269,7 +269,7 @@ bool EquipType::isRadar(const int type) {
         return false;
     if(!isFlak(type) && !isSurface(type))
         return false;
-    if(isMainGun(type) || isSecGun(type))
+    if(isMainGun(type) || isSecGun(type) || isTorp(type))
         return false;
     return true;
 }

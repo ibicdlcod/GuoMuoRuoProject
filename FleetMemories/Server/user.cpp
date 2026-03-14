@@ -1,4 +1,4 @@
-/* Copyright (C) 2026 Harusoft Inc.
+/* Copyright (C) 2026 Harusoft Ltd.
  * SPDX-License-Identifier: AGPL-3.0-or-later */
 
 #include "user.h"
@@ -12,7 +12,7 @@
 
 extern std::unique_ptr<QSettings> settings;
 
-void User::addShipBP(const CSteamID &uid, int shipDef) {
+bool User::addShipBP(const CSteamID &uid, int shipDef, bool reverse) {
     QSqlDatabase db = QSqlDatabase::database();
     int amount = 0;
     QSqlQuery query;
@@ -22,10 +22,15 @@ void User::addShipBP(const CSteamID &uid, int shipDef) {
     query.bindValue(":id", uid.ConvertToUint64());
     query.bindValue(":def", shipDef);
 
-    if(Q_UNLIKELY(!query.exec() || !query.isSelect() || !query.first())) {
-        ;
+    if(Q_UNLIKELY(!query.exec() || !query.isSelect())) {
+        qCritical() << query.lastQuery();
+        //% "User %1: query blueprint of ship %2 failed!"
+        throw DBError(qtTrId("user-query-ship-bp-failed")
+                          .arg(uid.ConvertToUint64()).arg(shipDef),
+                      query.lastError());
+        return false;
     }
-    else {
+    else if(query.first()){
         amount = query.value(0).toInt();
     }
 
@@ -34,18 +39,20 @@ void User::addShipBP(const CSteamID &uid, int shipDef) {
                    "VALUES (:id, :eid, :sp)");
     query2.bindValue(":id", uid.ConvertToUint64());
     query2.bindValue(":eid", shipDef);
-    query2.bindValue(":sp", amount+1);
+    query2.bindValue(":sp", amount+(reverse ? -1 : 1));
     if(Q_UNLIKELY(!query2.exec())) {
         qCritical() << query2.lastQuery();
         //% "User %1: add blueprint of ship %2 failed!"
         throw DBError(qtTrId("user-add-ship-bp-failed")
                           .arg(uid.ConvertToUint64()).arg(shipDef),
                       query2.lastError());
+        return false;
     }
     else {
         //% "User %1: add blueprint of ship %2 success!"
         qDebug() << qtTrId("user-add-ship-bp-success")
                         .arg(uid.ConvertToUint64()).arg(shipDef);
+        return true;
     }
 }
 

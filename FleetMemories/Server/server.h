@@ -1,4 +1,4 @@
-/* Copyright (C) 2026 Harusoft Inc.
+/* Copyright (C) 2026 Harusoft Ltd.
  * SPDX-License-Identifier: AGPL-3.0-or-later */
 
 #ifndef SERVER_H
@@ -72,11 +72,11 @@ private:
     void decryptDatagram(QSslSocket *, const QByteArray &);
     void deleteTestEquip(const CSteamID &);
     void deleteTestShip(const CSteamID &);
-    void doConstruct(CSteamID &, int, QList<QUuid> &, QUuid, int, QSslSocket *);
-    void doDevelop(CSteamID &, int, int, QSslSocket *);
-    void doFetch(CSteamID &, int, QSslSocket *, bool forced = false);
+    void doConstruct(const CSteamID &, int, QList<QUuid> &, QUuid, int, QSslSocket *);
+    void doDevelop(const CSteamID &, int, int, QSslSocket *);
+    void doFetch(const CSteamID &, int, QSslSocket *, bool forced = false);
     void doHandshake(QSslSocket *, const QByteArray &);
-    int drop(CSteamID &uid, int mapId, int nodeId, KP::BattleAssessment ass);
+    int drop(const CSteamID &uid, int mapId, int nodeId, KP::BattleAssessment ass);
     [[nodiscard]] bool equipmentRefresh();
     void exitGraceSpec() override;
     bool exportEquipToCSV() const;
@@ -105,17 +105,18 @@ private:
     void parseListen(const QStringList &);
     void parseUnlisten();
     void processBattle(const CSteamID &, QSslSocket *, const QJsonObject &);
+    void processDrop(const CSteamID &, QSslSocket *, int shipId);
     const QJsonObject processBattleCore(const CSteamID &, int, int, int, const QJsonObject &);
     void progressMap(const CSteamID &, QSslSocket *, int, int);
     std::optional<QList<int>> queryMapProgress(const CSteamID &, QSslSocket *,
                                                KP::BattleState,
                                                int map = 0, int node = 0);
     void receivedAuth(const QJsonObject &, const PeerInfo &, QSslSocket *);
-    void receivedForceLogout(CSteamID &);
-    void receivedLogin(CSteamID &, const PeerInfo &, QSslSocket *);
-    void receivedLogout(CSteamID &, const PeerInfo &, QSslSocket *);
+    void receivedForceLogout(const CSteamID &);
+    void receivedLogin(const CSteamID &, const PeerInfo &, QSslSocket *);
+    void receivedLogout(const CSteamID &, const PeerInfo &, QSslSocket *);
     void receivedReq(const QJsonObject &, const PeerInfo &, QSslSocket *);
-    void refreshClientFactory(CSteamID &, QSslSocket *);
+    void refreshClientFactory(const CSteamID &, QSslSocket *);
     QList<QUuid> retireEquip(const CSteamID &, const QList<QUuid> &);
     void sendTestMessages();
     [[nodiscard]] bool shipRefresh();
@@ -139,8 +140,8 @@ private:
     void sqlinitUserA() const;
     void startSortie(const CSteamID &, QSslSocket *, int, int, bool);
     void switchCert(const QStringList &);
-    KP::FleetFailType updateFleet(CSteamID &, const QJsonArray &);
-    void userInit(CSteamID &);
+    KP::FleetFailType updateFleet(const CSteamID &, const QJsonArray &);
+    void userInit(const CSteamID &);
 
     bool listening = false;
     SslServer sslServer;

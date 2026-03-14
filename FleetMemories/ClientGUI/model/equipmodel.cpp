@@ -1,4 +1,4 @@
-/* Copyright (C) 2026 Harusoft Inc.
+/* Copyright (C) 2026 Harusoft Ltd.
  * SPDX-License-Identifier: AGPL-3.0-or-later */
 
 #include "equipmodel.h"
@@ -770,9 +770,6 @@ std::tuple<QUuid, int> EquipModel::getEquipShip(QUuid equip) {
 
 void EquipModel::filterByShip(Ship *ship, bool isSlotEX)
 {
-    if(ship == currentActiveShip && isSlotEX == currentActiveSlotEx) {
-        return;
-    }
     currentActiveShip = ship;
     currentActiveSlotEx = isSlotEX;
     switchDisplayType(0);

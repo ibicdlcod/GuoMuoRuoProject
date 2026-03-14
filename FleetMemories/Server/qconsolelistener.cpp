@@ -1,7 +1,7 @@
 /* MIT License
 
 Copyright (c) 2018 Juan Gonzalez Burgos
-Copyright (c) 2026 Harusoft Inc.
+Copyright (c) 2026 Harusoft Ltd.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

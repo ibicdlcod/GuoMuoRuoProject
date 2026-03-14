@@ -19,7 +19,7 @@
   * [Attributes](4.2-attributes.md) [See above]
   * [Capital-ness and fleet type](5.1-capitalness.md)
   * [Home port and initial ship](5.2-homeport.md)
-  * [Ship blueprint and drop rule](5.3-blueprint.md) [Droprule: NOTYETIMPLEMENTED]
+  * [Ship blueprint and drop rule](5.3-blueprint.md)
   * [Construction](5.4-construction.md)
   * [Equip slots](5.5-equipslots.md)
   * [Visible bonuses](5.6-visiblebonus.md) [NOTYETIMPLEMENTED]

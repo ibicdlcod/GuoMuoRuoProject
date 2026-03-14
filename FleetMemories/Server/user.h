@@ -1,4 +1,4 @@
-/* Copyright (C) 2026 Harusoft Inc.
+/* Copyright (C) 2026 Harusoft Ltd.
  * SPDX-License-Identifier: AGPL-3.0-or-later */
 
 #ifndef USER_H
@@ -13,7 +13,7 @@
 
 namespace User {
 
-void addShipBP(const CSteamID &, int);
+bool addShipBP(const CSteamID &, int, bool reverse = false);
 void addSkillPoints(const CSteamID &, int, int64);
 KP::ShipNationality checkHomePort(const CSteamID &);
 void decideHomePort(const CSteamID &, KP::ShipNationality);

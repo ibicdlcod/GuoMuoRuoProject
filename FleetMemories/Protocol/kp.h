@@ -1,4 +1,4 @@
-/* Copyright (C) 2026 Harusoft Inc.
+/* Copyright (C) 2026 Harusoft Ltd.
  * SPDX-License-Identifier: AGPL-3.0-or-later */
 
 #ifndef KP_H
@@ -471,12 +471,17 @@ enum Difficulty {
 Q_ENUM_NS(Difficulty)
 
 /* must ensure consistency with maps.lua */
-enum BattleType {
+enum NodeType {
     STARTING = 0,
     NORMAL = 1,
     BOSS = 2,
+    EMPTY = 3,
+    DISASTER = 4,
+    NIGHT = 5,
+    AIR = 6,
+    TRANSPORT = 7,
 };
-Q_ENUM_NS(BattleType)
+Q_ENUM_NS(NodeType)
 
 enum BattleAssessment {
     SVictory = 0,

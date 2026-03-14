@@ -7,14 +7,14 @@ class MapNode
 {
 public:
     explicit MapNode(double x, double y, int lbDistance,
-                     KP::BattleType type, QList<int> &&nextNodes);
+                     KP::NodeType type, QList<int> &&nextNodes);
     explicit MapNode(const QJsonObject &);
     MapNode() = default;
 
     double x;
     double y;
     int lbDistance;
-    KP::BattleType type;
+    KP::NodeType type;
     QList<int> nextNodes;
 };
 

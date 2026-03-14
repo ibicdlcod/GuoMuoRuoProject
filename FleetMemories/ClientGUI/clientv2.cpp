@@ -1,4 +1,4 @@
-/* Copyright (C) 2026 Harusoft Inc.
+/* Copyright (C) 2026 Harusoft Ltd.
  * SPDX-License-Identifier: AGPL-3.0-or-later */
 
 #include "clientv2.h"
@@ -1549,7 +1549,11 @@ void Clientv2::receivedMsg(const QJsonObject &djson) {
     }
     break;
     case KP::ShipBPAdded: {
-        shipBPModel.bpAdded(djson["shipdef"].toInt());
+        int shipId = djson["shipdef"].toInt();
+        shipBPModel.bpAdded(shipId);
+        QString shipName = shipRegistryCache[shipId]->toString();
+        //% "We gained the following blueprint: %1"
+        qInfo() << qtTrId("bp-added").arg(shipName);
     }
     break;
     case KP::ShipModernized: {

@@ -1,4 +1,4 @@
-/* Copyright (C) 2026 Harusoft Inc.
+/* Copyright (C) 2026 Harusoft Ltd.
  * SPDX-License-Identifier: AGPL-3.0-or-later */
 
 #include "sortie.h"
@@ -175,8 +175,8 @@ void Sortie::confirmSortieStart() {
     ConfirmSortie *conf = new ConfirmSortie(this, mapStr, ui->diffChoice->currentText());
     if(conf->exec() == QDialog::Accepted) {
         int fi = conf->getFleetIndex();
-        delete conf;
         /* check empty fleets */
+        delete conf;
         for(auto *widget: QApplication::topLevelWidgets()) {
             if(qobject_cast<MainWindow *>(widget)) {
                 MainWindow *mainWindowM = qobject_cast<MainWindow *>(widget);
@@ -188,9 +188,11 @@ void Sortie::confirmSortieStart() {
                 }
             }
         }
-
         Clientv2 &engine = Clientv2::getInstance();
         engine.sortie(mapIndexSpec, fi, false);
+    }
+    else {
+        delete conf;
     }
 }
 

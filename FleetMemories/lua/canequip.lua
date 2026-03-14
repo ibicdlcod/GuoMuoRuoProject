@@ -521,14 +521,13 @@ local function searchlight(equipid, equiptype, shipid, flags, isex)
 		return true
 	elseif flags:get('searchlight') < 0 then
 		return false
-	else
-		return checkmask(shipid, 0x000f0000, 0x00020000)
-			or checkmask(shipid, 0x000f0000, 0x00030000)
-			or checkmask(shipid, 0x000f0000, 0x00040000)
-			or checkmask(shipid, 0x000f0000, 0x00050000)
-			or checkmask(shipid, 0x000f0000, 0x00080000)
-			or checkmask(shipid, 0x000ff000, 0x00011000)
 	end
+	return checkmask(shipid, 0x000f0000, 0x00020000)
+		or checkmask(shipid, 0x000f0000, 0x00030000)
+		or checkmask(shipid, 0x000f0000, 0x00040000)
+		or checkmask(shipid, 0x000f0000, 0x00050000)
+		or checkmask(shipid, 0x000f0000, 0x00080000)
+		or checkmask(shipid, 0x000ff000, 0x00011000)
 end
 
 local function starshell(equipid, equiptype, shipid, flags, isex)
@@ -759,7 +758,7 @@ local generaltype = {
 
 function can_equip(thisequip, thisship)
 	if thisequip.type:isLb() then
-		return checkmask(shipid, 0x000f0000, 0x000C0000) --陆航
+		return checkmask(thisship:getId(), 0x000f0000, 0x000C0000) --陆航
 	end
 	
 	local func = generaltype[thisequip.type:getSpecial()] or generaltype.default

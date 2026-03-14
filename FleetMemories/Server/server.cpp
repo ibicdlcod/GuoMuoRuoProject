@@ -1,4 +1,4 @@
-/* Copyright (C) 2026 Harusoft Inc.
+/* Copyright (C) 2026 Harusoft Ltd.
  * SPDX-License-Identifier: AGPL-3.0-or-later */
 
 #define NOMINMAX
@@ -1488,7 +1488,7 @@ void Server::deleteTestShip(const CSteamID &uid) {
 }
 
 /* 5.4-construction.md */
-void Server::doConstruct(CSteamID &uid,
+void Server::doConstruct(const CSteamID &uid,
                          int shipDef,
                          QList<QUuid> &equips,
                          QUuid prevShip,
@@ -1811,7 +1811,7 @@ delete_bp:
         {
             QSqlQuery query;
             QString queryStr = QStringLiteral("UPDATE UserShipBP "
-                                              "SET Amount = Amount - 1 "
+                                              "SET Amount = Amount-1 "
                                               "WHERE User = :uid AND ShipDef = :def");
             query.prepare(queryStr);
             query.bindValue(":uid", uid.ConvertToUint64());
@@ -1840,7 +1840,7 @@ delete_bp:
     }
 }
 
-void Server::doDevelop(CSteamID &uid, int equipid,
+void Server::doDevelop(const CSteamID &uid, int equipid,
                        int factoryid, QSslSocket *connection) {
     try{
         if(!equipRegistry.contains(equipid)) {
@@ -1969,7 +1969,7 @@ start_develop:
     }
 }
 
-void Server::doFetch(CSteamID &uid, int factoryid, QSslSocket *connection,
+void Server::doFetch(const CSteamID &uid, int factoryid, QSslSocket *connection,
                      bool forced) {
     User::refreshFactory(this, uid);
     QSqlDatabase db = QSqlDatabase::database();
@@ -2080,7 +2080,8 @@ remodel_ship:
     }
 }
 
-int Server::drop(CSteamID &uid, int mapId, int nodeId, KP::BattleAssessment ass)
+/* 5.3-blueprint.md#Drop rule */
+int Server::drop(const CSteamID &uid, int mapId, int nodeId, KP::BattleAssessment ass)
 {
     double assWeight;
     switch(ass) {
@@ -2090,7 +2091,7 @@ int Server::drop(CSteamID &uid, int mapId, int nodeId, KP::BattleAssessment ass)
     default: assWeight = 0; break;
     }
     if(assWeight == 0) {
-        return 0;
+        return 0; // no drop
     }
 
     /* mapid is absolute id */
@@ -2111,8 +2112,6 @@ int Server::drop(CSteamID &uid, int mapId, int nodeId, KP::BattleAssessment ass)
             || lua["maps"][mapId][nodeId]["droptable"] == sol::nil
             || lua["maps"][mapId][nodeId]["droptable"][diffStrC]
             == sol::nil) {
-        //QByteArray msg = KP::serverBattleError(KP::DropError);
-        //senderM.sendMessage(connection, msg);
         return -1; // error indicator
     }
     else {
@@ -2167,7 +2166,7 @@ reduce_retry_times:
                 return -1;
             }
         }
-    get_rare_drop:
+get_rare_drop:
         {
             QSqlQuery query;
             QString queryStr0;
@@ -2210,7 +2209,7 @@ reduce_retry_times:
                 }
             }
         }
-    get_drop:
+get_drop:
         {
             QSqlQuery query;
             QString queryStr0;
@@ -2878,7 +2877,7 @@ void Server::initUserDropInfo(const CSteamID &uid) {
         if(ship->isAmnesiac()) {
             continue;
         }
-        (*result)[ship->getId()] = RNGesus::setDropValue(ship->attr["Rarity"], mt);
+        (*result)[ship->getId()] = RNGesus::dropValue(ship->attr["Rarity"], mt);
         j++;
     }
     for(auto *resultPtr: results) {
@@ -3750,49 +3749,121 @@ void Server::parseUnlisten() {
 
 void Server::processBattle(const CSteamID &uid, QSslSocket *connection,
                            const QJsonObject &battlePlan) {
+    /* map, node, inbattle(0/1), activefleetindex */
     auto result = queryMapProgress(uid, connection, KP::BeforeBattle);
     if(!result.has_value()) {
         return;
     }
-    QSqlQuery query;
-    query.prepare("UPDATE UserAttr SET Intvalue = :type "
-                  "WHERE Attribute = 'InBattle' "
-                  "AND UserID = :uid");
-    query.bindValue(":uid", uid.ConvertToUint64());
-    query.bindValue(":type", KP::DuringBattle);
-    if(Q_UNLIKELY(!query.exec())) {
-        qCritical() << query.lastQuery();
-        //% "User %1: start node battle failure!"
-        throw DBError(qtTrId("sortie-node-battle-failure").arg(uid.ConvertToUint64()),
-                      query.lastError());
+
+    int mapId = result.value()[0]; // absolute id
+    int nodeId = result.value()[1];
+    int unionId = MapWithDiff::getUnionId(mapId);
+    KP::NodeType type = KP::EMPTY;
+    if(lua["maps"] != sol::nil
+            && lua["maps"][unionId] != sol::nil
+            && lua["maps"][unionId][nodeId] != sol::nil) {
+        int typeInt = lua["maps"][unionId][nodeId]["battle_type"];
+        type = static_cast<KP::NodeType>(typeInt);
+    }
+    else {
+        //% "Map info: query mapid %1 nodeid %2 failed!"
+        qCritical() << qtTrId("map-info-failure").arg(mapId).arg(nodeId);
         return;
     }
-    QJsonObject battleProcess = processBattleCore(uid,
-                                                  result.value()[0],
-            result.value()[1],
-            result.value()[3],
-            battlePlan);
-    QByteArray msg = KP::serverBattleProcess(battleProcess);
-    senderM.sendMessage(connection, msg);
-    QTimer::singleShot(battleProcess["time"].toInt(),
-            this, [this, uid, connection](){
+
+    switch(type) {
+    case KP::NORMAL: [[fallthrough]];
+    case KP::BOSS: [[fallthrough]];
+    case KP::NIGHT: [[fallthrough]];
+    case KP::AIR: {
         QSqlQuery query;
         query.prepare("UPDATE UserAttr SET Intvalue = :type "
                       "WHERE Attribute = 'InBattle' "
                       "AND UserID = :uid");
         query.bindValue(":uid", uid.ConvertToUint64());
-        query.bindValue(":type", KP::AfterBattle);
+        query.bindValue(":type", KP::DuringBattle);
         if(Q_UNLIKELY(!query.exec())) {
             qCritical() << query.lastQuery();
-            //% "User %1: end node battle failure!"
-            throw DBError(qtTrId("sortie-node-battle-failure-end").arg(uid.ConvertToUint64()),
+            //% "User %1: start node battle failure!"
+            throw DBError(qtTrId("sortie-node-battle-failure").arg(uid.ConvertToUint64()),
                           query.lastError());
             return;
         }
-        QByteArray msg = KP::serverBattleEnd();
+        QJsonObject battleProcess
+                = processBattleCore(uid,
+                                    mapId,
+                                    nodeId,
+                                    result.value()[3], // activefleet
+                battlePlan);
+        QByteArray msg = KP::serverBattleProcess(battleProcess);
+        senderM.sendMessage(connection, msg);
+        QTimer::singleShot(battleProcess["time"].toInt(),
+                this, [this, uid, connection, result,
+                battleProcess](){
+            QSqlQuery query;
+            query.prepare("UPDATE UserAttr SET Intvalue = :type "
+                          "WHERE Attribute = 'InBattle' "
+                          "AND UserID = :uid");
+            query.bindValue(":uid", uid.ConvertToUint64());
+            query.bindValue(":type", KP::AfterBattle);
+            if(Q_UNLIKELY(!query.exec())) {
+                qCritical() << query.lastQuery();
+                //% "User %1: end node battle failure!"
+                throw DBError(qtTrId("sortie-node-battle-failure-end").arg(uid.ConvertToUint64()),
+                              query.lastError());
+                return;
+            }
+            QByteArray msg = KP::serverBattleEnd();
+            senderM.sendMessage(connection, msg);
+            int dropShip = drop(uid, result.value()[0], result.value()[1],
+                    static_cast<KP::BattleAssessment>(battleProcess["assm"].toInt()));
+            if(dropShip == -1) {
+                QByteArray msg = KP::serverBattleError(KP::DropError);
+                senderM.sendMessage(connection, msg);
+            }
+            else if(dropShip != 0) {
+                processDrop(uid, connection, dropShip);
+            }
+        }
+        );
+    }
+        break;
+    case KP::STARTING:
+    case KP::EMPTY:
+    case KP::DISASTER:
+    case KP::TRANSPORT:
+    default: break;
+    }
+}
+
+void Server::processDrop(const CSteamID &uid, QSslSocket *connection,
+                         int shipId) {
+    if(!shipRegistry.contains(shipId)) {
+        //% "Attempt to drop invalid ship %1!"
+        qCritical() << qtTrId("ship-drop-illegal").arg(shipId);
+        return;
+    }
+    Ship * ship = shipRegistry[shipId];
+    QSqlQuery query;
+    query.prepare("UPDATE UserShipDrop SET Amount = :amount "
+                  "WHERE User = :uid "
+                  "AND ShipDef = :sid");
+    query.bindValue(":uid", uid.ConvertToUint64());
+    query.bindValue(":sid", shipId);
+    query.bindValue(":amount", RNGesus::dropValue(ship->attr["Rarity"], mt));
+    if(Q_UNLIKELY(!query.exec())) {
+        qCritical() << query.lastQuery();
+        //% "User %1: refresh database failure when drop ship %2!"
+        throw DBError(qtTrId("ship-drop-db-fail").arg(uid.ConvertToUint64())
+                      .arg(shipId),
+                      query.lastError());
+        return;
+    }
+
+    if(User::addShipBP(uid, shipId)) {
+        QByteArray msg = KP::serverBlueprintAdded(shipId);
         senderM.sendMessage(connection, msg);
     }
-    );
 }
 
 const QJsonObject Server::processBattleCore(const CSteamID &uid,
@@ -3802,6 +3873,7 @@ const QJsonObject Server::processBattleCore(const CSteamID &uid,
                                             const QJsonObject &battlePlan) {
     QJsonObject result;
     result["time"] = 5000; // in milliseconds;
+    result["assm"] = KP::SVictory; // assessment
     return result;
 }
 
@@ -3857,6 +3929,7 @@ void Server::progressMap(const CSteamID &uid, QSslSocket *connection,
     }
 }
 
+/* map, node, inbattle(0/1), activefleetindex */
 std::optional<QList<int>> Server::queryMapProgress(const CSteamID &uid,
                                                    QSslSocket *connection,
                                                    KP::BattleState desiredState,
@@ -3966,7 +4039,7 @@ void Server::receivedAuth(const QJsonObject &djson,
                     .arg(peerInfo.address.toString())
                     .arg(peerInfo.port);
             qCritical() << msg;
-            
+
             QByteArray msg2 = KP::serverLackPrivate();
             senderM.sendMessage(connection, msg2);
             delete [] rgubTicket;
@@ -4102,7 +4175,7 @@ void Server::receivedAuth(const QJsonObject &djson,
     }
 }
 
-void Server::receivedForceLogout(CSteamID &uid) {
+void Server::receivedForceLogout(const CSteamID &uid) {
     QSslSocket *client = connectedPeers[uid];
     if(client->isEncrypted()) {
         QByteArray msg = KP::serverLogout(KP::LogoutType::LoggedElsewhere);
@@ -4115,11 +4188,11 @@ void Server::receivedForceLogout(CSteamID &uid) {
 }
 
 /* nothing could shrink this function efficiently either */
-void Server::receivedLogin(CSteamID &uid,
+void Server::receivedLogin(const CSteamID &uid,
                            const PeerInfo &peerInfo,
                            QSslSocket *connection) {
     uint64 uidInt = uid.ConvertToUint64();
-    
+
     Q_UNUSED(peerInfo)
     QSqlDatabase db = QSqlDatabase::database();
     QSqlQuery query;
@@ -4186,13 +4259,13 @@ void Server::receivedLogin(CSteamID &uid,
     }
 drop_table:
     initUserDropInfo(uid);
-    
+
     connectedPeers[uid] = connection;
     connectedUsers[connection] = uid;
     senderM.addSender(connection);
 }
 
-void Server::receivedLogout(CSteamID &uid,
+void Server::receivedLogout(const CSteamID &uid,
                             const PeerInfo &peerInfo,
                             QSslSocket *connection) {
     if(!connectedPeers.contains(uid) || connectedPeers[uid] != connection) {
@@ -4386,7 +4459,7 @@ void Server::receivedReq(const QJsonObject &djson,
             QTimer::singleShot(100,
                                this,
                                [connection, this]{offerShipInfo(connection);});
-            
+
         }
         else {
             connection->flush();
@@ -4553,8 +4626,8 @@ void Server::sendTestMessages() {
         qWarning() << "Server isn't listening, abort.";
     }
     else {
-        for(auto user: connectedUsers) {
-            drop(user, 1, 2, KP::SVictory);
+        for(auto equip: equipRegistry.values()) {
+            qCritical() << equip->toString() << equip->type.isRadar();
         }
     }
 }
@@ -4586,7 +4659,7 @@ bool Server::shipRefresh() {
     }
     //% "Load ship registry success!"
     qInfo() << qtTrId("ship-load-good");
-    
+
     for(auto ship: std::as_const(shipRegistry)) {
         if(ship->isAmnesiac()) {
             continue;
@@ -4605,7 +4678,7 @@ bool Server::shipRefresh() {
     return true;
 }
 
-void Server::refreshClientFactory(CSteamID &uid, QSslSocket *connection) {
+void Server::refreshClientFactory(const CSteamID &uid, QSslSocket *connection) {
     QSqlDatabase db = QSqlDatabase::database();
     QSqlQuery query;
     query.prepare("SELECT FactoryID,"
@@ -4649,7 +4722,7 @@ QList<QUuid> Server::retireEquip(const CSteamID &uid, const QList<QUuid> &trash)
                        "WHERE User = :uid AND EquipUuid = :eid;");
         query2.bindValue(":uid", uid.ConvertToUint64());
         query2.bindValue(":eid", trashItem.toString());
-        
+
         query2.exec();
         query2.isSelect();
         if(Q_UNLIKELY(!query2.first())) {
@@ -4666,13 +4739,13 @@ QList<QUuid> Server::retireEquip(const CSteamID &uid, const QList<QUuid> &trash)
             currentRes.addResources(refundRes);
             User::setResources(uid, currentRes);
         }
-        
+
         QSqlQuery query;
         query.prepare("DELETE FROM UserEquip "
                       "WHERE User = :uid AND EquipUuid = :eid;");
         query.bindValue(":uid", uid.ConvertToUint64());
         query.bindValue(":eid", trashItem.toString());
-        
+
         if(Q_UNLIKELY(!query.exec())) {
             //% "User id %1: delete equipment failed!"
             throw DBError(qtTrId("delete-equip-failed")
@@ -5100,7 +5173,7 @@ void Server::switchCert(const QStringList &input) {
                .arg(settings->value("networkserver/pem", "Default").toString());
 }
 
-KP::FleetFailType Server::updateFleet(CSteamID &uid, const QJsonArray &input)
+KP::FleetFailType Server::updateFleet(const CSteamID &uid, const QJsonArray &input)
 {
     QMap<int, KP::FleetType> fleetTypes;
     QMap<int, int> fleetSizes;
@@ -5328,7 +5401,7 @@ KP::FleetFailType Server::updateFleet(CSteamID &uid, const QJsonArray &input)
     return KP::ValidFleet;
 }
 
-void Server::userInit(CSteamID &uid) {
+void Server::userInit(const CSteamID &uid) {
     static const QMap<QString, int> defaults
             = {
         std::pair(QStringLiteral("FleetSize"), 1),
