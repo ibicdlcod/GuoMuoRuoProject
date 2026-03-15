@@ -176,12 +176,20 @@ void FactoryArea::switchToState() {
     case KP::Arsenal:
         ui->FactoryLabel->setText(qtTrId("arsenal"));
         lay->setCurrentWidget(equipview);
+        if(initial) {
+            stackResize(0); // arg is useless
+            initial = false;
+        }
         equipview->recalculateArsenalRows();
         equipview->activate(true, true);
         break;
     case KP::Anchorage:
         ui->FactoryLabel->setText(qtTrId("anchorage"));
         lay->setCurrentWidget(equipview);
+        if(initial) {
+            stackResize(0); // arg is useless
+            initial = false;
+        }
         equipview->recalculateArsenalRows();
         equipview->activate(true, false);
         break;
@@ -189,6 +197,10 @@ void FactoryArea::switchToState() {
         //% "Blueprints"
         ui->FactoryLabel->setText(qtTrId("blueprintview"));
         lay->setCurrentWidget(equipview);
+        if(initial) {
+            stackResize(0); // arg is useless
+            initial = false;
+        }
         equipview->recalculateArsenalRows();
         equipview->activate(true, false, true);
         break;

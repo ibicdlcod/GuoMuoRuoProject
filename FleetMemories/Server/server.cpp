@@ -3929,7 +3929,9 @@ ship:
     QSqlQuery query;
     query.prepare("UPDATE UserShip "
                   "SET Exp = Exp + :expgain "
-                  "WHERE FleetIndex = :fleet AND User = :uid;");
+                  "WHERE FleetIndex = :fleet "
+                  "AND FleetFled = 0 "
+                  "AND User = :uid;");
     query.bindValue(":uid", uid.ConvertToUint64());
     query.bindValue(":expgain", (int)std::floor(expGained));
     query.bindValue(":fleet", fleetIndex);
@@ -3976,6 +3978,7 @@ equip:
                       "OR UserShip.Slot5 = UserEquip.EquipUuid "
                       "OR UserShip.SlotEX = UserEquip.EquipUuid) "
                       "AND UserShip.FleetIndex = :fleet "
+                      "AND UserShip.FleetFled = 0 "
                       "AND UserShip.User = :uid "
                       "AND UserEquipSP.EquipDef = UserEquip.EquipDef) "
                       "GROUP BY EquipDef "

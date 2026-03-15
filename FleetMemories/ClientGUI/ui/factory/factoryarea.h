@@ -56,6 +56,7 @@ private:
     KP::FactoryState factoryState = KP::Development;
     QList<FactorySlot *> slotfs;
     int currentSlotNum = 0;
+    bool initial = true;
 };
 
 #endif // FACTORYAREA_H

@@ -11,7 +11,7 @@
   * [Attributes](4.2-attributes.md)
   * [Development](4.3-development.md)
   * [Normal/Special/Virtual preconditions](4.4-precondition.md) [Virtual preconditions: PARTIAL]
-  * [Equipment skill points](4.5-skillpoints.md) [PARTIAL]
+  * [Equipment skill points](4.5-skillpoints.md) [Loss and Effect: NOTIMPLEMENTED]
   * [Destruct](4.6-destruct.md)
   * [Improvement](4.7-improve.md) [NOTYETIMPLEMENTED]
   * [Industrial plant](4.8-industrial.md) [NOTYETIMPLEMENTED]
@@ -32,6 +32,7 @@
 * [Sortie Map](6-sortie.md)
   * [Normal map and map relations](6.1-map.md) [PARTIAL]
   * [Naval Supremacy and Normal expedition](6.2-supremacy.md) [NOTYETIMPLEMENTED]
+  * Map gauge [NOTYETIMPLEMENTED]
   * Retreat rule [NOTYETIMPLEMENTED]
   * Historical Mode (DLC) [NOTYETIMPLEMENTED]
   * Quests and Achievements [NOTYETIMPLEMENTED]
