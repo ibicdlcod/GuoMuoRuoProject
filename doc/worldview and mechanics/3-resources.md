@@ -2,7 +2,7 @@
 
 It's been said the core of KC is resource management, and this game inevitably inherits this characteristic.
 
-Base resource type is 7 compared to 4 in KC. However other resource types are simplified. For example, you just pay double resources to instantly repair/construct a ship instead of spending a bucket/fire.
+Base resource type is 7 compared to 4 in KC. However other resource types are simplified. For example, you just pay double resources to instantly repair/construct a ship instead of spending a bucket/flamethrower.
 
 ### Base types
 
@@ -20,7 +20,7 @@ Command points (TBD)
 
 All ordinary resources are capped absolutely at [rule/maxresources](settings.md).
 
-## You gain resources by:
+## Gain
 
 ### Natural regeneration
 
@@ -35,7 +35,7 @@ Natural regeneration speed is the following per minute:
 + a is [rule/regenpertech](settings.md)
 + b is [rule/regenattech0](settings.md)
 
-### Naval Supremacy and Expedition[NOTYETIMPLEMENTED]
+### Naval Supremacy and Expedition
 
 You gain resources from world's land resource points via having naval supremacy at adjacent sea maps ([Details](../map/resource_relations.csv)).
 
@@ -47,7 +47,7 @@ Naval supremacy is explained [here](6.2-supremacy.md)
 
 Explained [here](8.1-supply.md)
 
-## You spend resources by:
+## Usage
 
 - Develop equipment (explosives, steel, possibly oil, possibly aluminum, possibly rubber, possibly chromium, possibly tungsten)
 - Improve equipment (same as above)
@@ -57,6 +57,4 @@ Explained [here](8.1-supply.md)
 - Maintenance of planes on ships, including LBAS (same as development, which means oil, explosives, rubber, aluminum, chromium for jet planes, tungsten for rocket planes)
 - Repair ships (same as construct ships)
 - Sending LBAS (oil, explosives)
-
-Details will be explored later.
 
