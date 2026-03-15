@@ -28,21 +28,19 @@ signals:
                        int equipSlotIndex,
                        QUuid equipUid);
     void equipReady();
+    void demandSkillPoints(int equipDef);
+    void improveRequest(const QList<QUuid> &equips);
 
 public slots:
     virtual void switchDisplayType(int) final;
     virtual void switchDisplayType2(const QString &) final;
-    virtual void switchShipDisplayType(const QString &nationality,
-                                       const QString &shiptype,
-                                       const QString &shipclass,
-                                       const QString &searchTerm
-                                       = QLatin1String(""));
     virtual void firstPage();
     virtual void prevPage();
     virtual void nextPage();
     virtual void lastPage();
     virtual void addEquipment(QUuid, int) final;
     virtual void enactDestruct() final;
+    virtual void enactModernize();
     virtual void destructedEquipment(const QList<QUuid> &) final;
     virtual void updateEquipmentList(const QJsonObject &) final;
     virtual void setPageNumHint(int);
@@ -53,6 +51,8 @@ public slots:
     virtual QUuid getShipEquip(QUuid ship, int slotPos) final;
     virtual std::tuple<QUuid, int> getEquipShip(QUuid equip) final;
     virtual void filterByShip(Ship *ship, bool isSlotEX) final;
+    virtual void processSkillPointInfo(int equipDef, int skillPoint) final;
+    virtual void modernizedEquips(const QList<std::tuple<QUuid, int>> &) final;
 
 public:
     virtual int rowCount(const QModelIndex &parent
@@ -71,7 +71,6 @@ public:
     static const int equipCol = 1;
     static const int starCol = 2;
     virtual int destructColumn() const final;
-    virtual int addStarColumn() const;
     virtual int hiddenSortColumn() const;
     virtual int selectColumn() const;
     virtual int hpColumn() const;
@@ -90,6 +89,7 @@ protected:
     int rowsPerPage = 1;
     int pageNum = 0;
     bool ready = false;
+    bool isEquipModel = true;
 
     int numberOfEquip() const;
     static const int attrCol = 3;
@@ -103,6 +103,7 @@ protected:
     QMap<QUuid, std::tuple<QUuid, int>> shipEquipReverse;
     Ship * currentActiveShip = nullptr;
     bool currentActiveSlotEx = false;
+    QHash<QUuid, bool> isModernizationChecked;
 
 protected slots:
     virtual void updateIllegalPage();
@@ -110,6 +111,7 @@ protected slots:
 
 private:
     QObject *mainWindow = nullptr;
+    QMap<int, int> skillPointReg;
 };
 
 #endif // EQUIPMODEL_H

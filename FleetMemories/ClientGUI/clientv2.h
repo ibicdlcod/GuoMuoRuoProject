@@ -94,6 +94,7 @@ public slots:
     void catbomb();
     void chooseHomePort(KP::ShipNationality);
     void demandEquipCache();
+    void demandEquipSkillPoints(int);
     void demandMapCache();
     void demandShipCache();
     void displayPrompt();
@@ -102,6 +103,7 @@ public slots:
                          QUuid shipToRemodel, int factoryID);
     void doDestructEquip(const QList<QUuid> &);
     void doForceFetch(int);
+    void doImproveEquip(const QList<QUuid> &);
     void doModernizeShip(const QList<QUuid> &);
     void doRefreshFactory();
     void doRefreshFactoryAnchorage();

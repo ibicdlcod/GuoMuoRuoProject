@@ -43,7 +43,9 @@ This amount is only affected by absolute caps.
 
 Naval supremacy is explained [here](6.2-supremacy.md)
 
-### Supply chain and attrition[NOTYETIMPLEMENTED]
+### Supply chain and attrition
+
+Explained [here](8.1-supply.md)
 
 ## You spend resources by:
 

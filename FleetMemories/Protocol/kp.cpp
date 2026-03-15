@@ -153,15 +153,16 @@ QByteArray KP::clientDemandMapInfo(QDateTime timeUtc) {
     return QCborValue::fromJsonValue(result).toCbor();
 }
 
-QByteArray KP::clientDemandModernizeShip(const QList<QUuid> &candidates) {
+QByteArray KP::clientDemandModernize(const QList<QUuid> &candidates, bool isEquip) {
     QJsonObject result;
     result["type"] = DgramType::Request;
-    result["command"] = CommandType::ModernizeShip;
+    result["command"] = CommandType::Modernize;
     QJsonArray candidatesList;
     for(auto candidate: candidates) {
         candidatesList.append(QJsonValue(candidate.toString()));
     }
     result["equipids"] = candidatesList;
+    result["isequip"] = isEquip;
     return QCborValue::fromJsonValue(result).toCbor();
 }
 
@@ -436,6 +437,22 @@ QByteArray KP::serverEquipRetired(const QList<QUuid> &trash) {
         trashList.append(QJsonValue(trashItem.toString()));
     }
     result["equipids"] = trashList;
+    return QCborValue::fromJsonValue(result).toCbor();
+}
+
+QByteArray KP::serverEquipImproved(
+    const QList<std::tuple<QUuid, int>> &equips) {
+    QJsonObject result;
+    result["type"] = DgramType::Message;
+    result["msgtype"] = MsgType::EquipImproved;
+    QJsonArray equipList;
+    for(auto equipTuple: equips) {
+        QJsonObject item;
+        item["equipid"] = QJsonValue(std::get<0>(equipTuple).toString());
+        item["newstar"] = std::get<1>(equipTuple);
+        equipList.append(item);
+    }
+    result["equipdata"] = equipList;
     return QCborValue::fromJsonValue(result).toCbor();
 }
 

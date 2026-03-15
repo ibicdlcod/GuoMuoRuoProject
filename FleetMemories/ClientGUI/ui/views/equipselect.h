@@ -20,6 +20,7 @@ signals:
     void typeActivated(int);
     void equipActivated(const QString &);
     void destructActivated(bool checked = false);
+    void improveActivated(bool checked = false);
     void searchBoxChanged(const QString &);
 
 public slots:

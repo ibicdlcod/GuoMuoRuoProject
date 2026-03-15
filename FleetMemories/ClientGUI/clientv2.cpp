@@ -42,6 +42,8 @@ Clientv2::Clientv2(QObject *parent)
             &shipBPModel, &ShipBPModel::updateShipList);
     connect(&equipModel, &EquipModel::destructRequest,
             this, &Clientv2::doDestructEquip);
+    connect(&equipModel, &EquipModel::improveRequest,
+            this, &Clientv2::doImproveEquip);
     connect(&shipModel, &ShipModel::modernizeRequest,
             this, &Clientv2::doModernizeShip);
     connect(this, &Clientv2::gamestateChanged,
@@ -181,6 +183,16 @@ void Clientv2::demandEquipCache() {
                                                     ).toDateTime();
     QByteArray msg = KP::clientDemandEquipInfo(localCacheTimeStamp);
     sender->enqueue(msg);
+}
+
+void Clientv2::demandEquipSkillPoints(int equipDef) {
+    socket.flush();
+    QByteArray msg = KP::clientDemandSkillPoints(equipDef);
+    const qint64 written = socket.write(msg);
+    if (written <= 0) {
+        throw NetworkError(socket.errorString());
+    }
+    return;
 }
 
 void Clientv2::demandMapCache() {
@@ -850,11 +862,20 @@ void Clientv2::doForceFetch(int slotnum) {
     sender->enqueue(msg);
 }
 
+void Clientv2::doImproveEquip(const QList<QUuid> &candidates) {
+    if(candidates.empty())
+        return;
+    else {
+        QByteArray msg = KP::clientDemandModernize(candidates, true);
+        sender->enqueue(msg);
+    }
+}
+
 void Clientv2::doModernizeShip(const QList<QUuid> &candidates) {
     if(candidates.empty())
         return;
     else {
-        QByteArray msg = KP::clientDemandModernizeShip(candidates);
+        QByteArray msg = KP::clientDemandModernize(candidates, false);
         sender->enqueue(msg);
     }
 }
@@ -1554,6 +1575,21 @@ void Clientv2::receivedMsg(const QJsonObject &djson) {
         QString shipName = shipRegistryCache[shipId]->toString();
         //% "We gained the following blueprint: %1"
         qInfo() << qtTrId("bp-added").arg(shipName);
+    }
+    break;
+    case KP::EquipImproved: {
+        QJsonArray array = djson["equipdata"].toArray();
+        QList<std::tuple<QUuid, int>> equipList;
+        QStringList strList;
+        for(auto item: array) {
+            QUuid uid = QUuid(item.toObject()["equipid"].toString());
+            strList.append(item.toObject()["equipid"].toString());
+            int newstar = item.toObject()["newstar"].toInt();
+            equipList.append(std::make_tuple(uid, newstar));
+        }
+        //% "The following equipments are improved: %1"
+        qInfo() << qtTrId("modernize-equip-list").arg(strList.join(","));
+        equipModel.modernizedEquips(equipList);
     }
     break;
     case KP::ShipModernized: {

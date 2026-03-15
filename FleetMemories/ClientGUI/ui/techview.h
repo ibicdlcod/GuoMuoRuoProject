@@ -26,6 +26,9 @@ public slots:
     void equipOrShip();
     void resetLocalListName();
 
+signals:
+    void skillPointInfo(int equipId, int skillPoint);
+
 protected:
     void resizeEvent(QResizeEvent *event) override;
     void showEvent(QShowEvent *event) override;

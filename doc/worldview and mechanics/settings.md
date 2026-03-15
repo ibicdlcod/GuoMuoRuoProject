@@ -49,7 +49,7 @@
 |          rule/motherspscale          |                 0.2                 | the higher this value, the more son equipment's tech matters in determining mother skill point requirement of son equipment |
 |          rule/maxresources           |               3600000               |                   max resources stockpile                    |
 |          rule/sigmaconstant          |                 2.0                 | the larger this value, the less effect tech has on development/construction success rate |
-|      rule/equipmentstandardstar      |                 15                  | the larger this value, the less effective improving equipment does |
+|      rule/equipmentstandardstar      |                 10                  | the larger this value, the less effective improving equipment does |
 |          rule/shipexpscale           |                 100                 |     the larger this value, the harder ship can level up      |
 |       rule/navalsupermacydecay       |               0.0001                | the larger this value, the harder it is to maintain naval supermacy in maps |
 |            server/logfile            |            ServerLog.log            |                                                              |

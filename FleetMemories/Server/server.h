@@ -49,7 +49,7 @@ private slots:
     std::pair<double, QList<TechEntry>>
     calculateTech(const CSteamID &, int jobID = 0);
     void handleNewConnection();
-    double getSkillPointsEffect(const CSteamID &, int);
+    double getBaseSkillPointEffect(const CSteamID &, int);
     void offerEquipInfo(QSslSocket *, int);
     void offerEquipInfoUser(const CSteamID &, QSslSocket *);
     void offerMapInfo(QSslSocket *);
@@ -72,7 +72,7 @@ private:
     void decryptDatagram(QSslSocket *, const QByteArray &);
     void deleteTestEquip(const CSteamID &);
     void deleteTestShip(const CSteamID &);
-    void doConstruct(const CSteamID &, int, QList<QUuid> &, QUuid, int, QSslSocket *);
+    void doConstruct(const CSteamID &, int, QList<QUuid> &, const QUuid &, int, QSslSocket *);
     void doDevelop(const CSteamID &, int, int, QSslSocket *);
     void doFetch(const CSteamID &, int, QSslSocket *, bool forced = false);
     void doHandshake(QSslSocket *, const QByteArray &);
@@ -83,6 +83,8 @@ private:
     void generateEquipChilds(int, int);
     void generateTestEquip(const CSteamID &);
     void generateTestShip(const CSteamID &);
+    double getEquipSkillPointEffect(const CSteamID &, const QUuid &);
+    double getImprovementFactor(const QUuid &);
     const QStringList getCommandsSpec() const override;
     const QStringList getValidCommands() const override;
     bool importEquipFromCSV();
@@ -98,6 +100,7 @@ private:
     void migrate(const CSteamID &, const QJsonObject &);
     bool modifyShip(const CSteamID &, QUuid prevShip, int newDef);
     QList<std::tuple<QUuid, int>> modernize(const CSteamID &, const QList<QUuid> &);
+    QList<std::tuple<QUuid, int>> modernizeEquip(const CSteamID &, const QList<QUuid> &);
     QUuid newEquip(const CSteamID &, int, bool direct = false);
     void newEquipHasMother(const CSteamID &, int);
     int64 newEquipHasMotherCal(int);

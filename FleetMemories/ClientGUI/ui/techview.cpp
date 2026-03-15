@@ -82,6 +82,8 @@ TechView::TechView(QWidget *parent) :
             this, &TechView::demandLocalTech);
     connect(ui->updateLocal, &QPushButton::clicked,
             this, &TechView::demandSkillPoints);
+    connect(this, &TechView::skillPointInfo,
+            &engine.equipModel, &EquipModel::processSkillPointInfo);
 
     ui->globalViewTable->setSortingEnabled(true);
     ui->localViewTable->setSortingEnabled(true);
@@ -398,6 +400,7 @@ void TechView::updateLocalTechViewTable(const QJsonObject &djson) {
 }
 
 void TechView::updateSkillPoints(const QJsonObject &djson) {
+    emit skillPointInfo(djson["equipid"].toInt(), djson["actualSP"].toInt());
     ui->skillPointsValue->setText(QString("%1/%2")
                                       .arg(djson["actualSP"].toInteger())
                                       .arg(djson["desiredSP"].toInteger()));

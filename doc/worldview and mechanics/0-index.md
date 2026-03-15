@@ -11,9 +11,9 @@
   * [Attributes](4.2-attributes.md)
   * [Development](4.3-development.md)
   * [Normal/Special/Virtual preconditions](4.4-precondition.md) [Virtual preconditions: PARTIAL]
-  * [Equipment skill points](4.5-skillpoints.md) [Loss and Effect: NOTIMPLEMENTED]
+  * [Equipment skill points](4.5-skillpoints.md) [Special skilled and Loss: NOTIMPLEMENTED]
   * [Destruct](4.6-destruct.md)
-  * [Improvement](4.7-improve.md) [NOTYETIMPLEMENTED]
+  * [Improvement](4.7-improve.md)
   * [Industrial plant](4.8-industrial.md) [NOTYETIMPLEMENTED]
 * [Ships](5-ships.md)
   * [Attributes](4.2-attributes.md) [See above]

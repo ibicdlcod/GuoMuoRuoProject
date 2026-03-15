@@ -17,6 +17,7 @@ ShipModel::ShipModel(QObject *parent, bool isInArsenal)
     : EquipModel{parent, isInArsenal}
 {
     ready = false;
+    isEquipModel = false;
     connect(this, &ShipModel::pageNumChanged,
             this, [this](int, int){clearShipCheckBoxes();});
 }
@@ -285,9 +286,6 @@ QVariant ShipModel::data(const QModelIndex &index,
         else if(index.column() == hiddenSortColumn()) {
             return uidToDisplay;
         }
-        else if(index.column() == addStarColumn()) {
-            return QVariant();
-        }
         else if(index.column() == selectColumn()) {
             return QVariant();
         }
@@ -349,10 +347,6 @@ QVariant ShipModel::data(const QModelIndex &index,
         else if(index.column() == starCol) {
             //% "Modernization"
             return qtTrId("ship-star");
-        }
-        else if(index.column() == addStarColumn()) {
-            //% "Modernize"
-            return qtTrId("ship-improve");
         }
         else if(index.column() == selectColumn()) {
             //% "Select this"
@@ -443,8 +437,7 @@ QVariant ShipModel::data(const QModelIndex &index,
     }
     break;
     case CheckAlignmentRole: {
-        if(index.column() == destructColumn()
-            || index.column() == starCol)
+        if(index.column() == starCol)
             return static_cast<QVariant>(Qt::AlignVCenter | Qt::AlignLeft);
         else
             return QVariant();
@@ -487,9 +480,6 @@ QVariant ShipModel::headerData(int section, Qt::Orientation orientation,
             else if(section == starCol) {
                 //% "Modernization"
                 return qtTrId("ship-star");
-            }
-            else if(section == addStarColumn()) {
-                return qtTrId("ship-improve");
             }
             else if(section == selectColumn()) {
                 return qtTrId("ship-select");
@@ -559,7 +549,7 @@ bool ShipModel::setData(const QModelIndex &index,
     Ship *shipToDisplay = clientShips[uidToDisplay];
     int bpNum = bpCache[shipToDisplay->getId()];
     if(role == Qt::CheckStateRole) {
-        if(value.toInt() == Qt::Checked and bpNum != 0) {
+        if(value.toInt() == Qt::Checked && bpNum != 0) {
             isModernizationChecked[sortedShipIds.value(realRowIndex)] = true;
             emit dataChanged(index, index, {Qt::CheckStateRole});
             return true;
@@ -571,10 +561,6 @@ bool ShipModel::setData(const QModelIndex &index,
         }
     }
     return false;
-}
-
-int ShipModel::addStarColumn() const {
-    return isInArsenal ? -1 : -1;
 }
 
 int ShipModel::hiddenSortColumn() const {

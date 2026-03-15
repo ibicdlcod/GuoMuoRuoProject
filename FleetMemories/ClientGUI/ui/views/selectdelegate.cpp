@@ -39,7 +39,7 @@ void SelectDelegate::paint(QPainter *painter,
 
 QSize SelectDelegate::sizeHint(const QStyleOptionViewItem &option,
                                const QModelIndex &index) const {
-    return QSize(15, 15);
+    return QSize(50, 20);
 }
 
 bool SelectDelegate::editorEvent(QEvent *event,

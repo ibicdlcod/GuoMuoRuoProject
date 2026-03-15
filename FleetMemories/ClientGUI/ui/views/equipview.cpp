@@ -109,6 +109,8 @@ EquipView::EquipView(QWidget *parent)
             model, &EquipModel::enactDestruct);
     connect(equipSelect, &EquipSelect::searchBoxChanged,
             model, &EquipModel::switchDisplayType2);
+    connect(equipSelect, &EquipSelect::improveActivated,
+            model, &EquipModel::enactModernize);
 
     connect(shipSelect, &ShipSelect::selectChanged,
             &engine.shipModel, &ShipModel::switchShipDisplayType);

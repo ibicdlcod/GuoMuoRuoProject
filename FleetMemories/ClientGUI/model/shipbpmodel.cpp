@@ -13,7 +13,8 @@ enum {
 
 ShipBPModel::ShipBPModel(QObject *parent)
     : ShipModel{parent}
-{}
+{
+}
 
 void ShipBPModel::updateShipList(const QJsonObject &input) {
     clientShipBPs.clear();
@@ -339,4 +340,8 @@ void ShipBPModel::switchShipDisplayType(const QString &nationality,
     emit needReCalculatePages();
     adjustRowCount(oldRowCount, newRowCount);
     firstPage();
+}
+
+Qt::ItemFlags ShipBPModel::flags(const QModelIndex &index) const {
+    return QAbstractTableModel::flags(index); // clazy:exclude=skipped-base-method
 }

@@ -707,7 +707,7 @@ Server::calculateTech(const CSteamID &uid, int jobID) {
                 /* 2-Technology.md#Local technology */
 virtual_skill_point_effect:
                 if(isEquip) {
-                    double weight = getSkillPointsEffect(uid, jobID)
+                    double weight = getBaseSkillPointEffect(uid, jobID)
                             * settings->value
                             ("rule/skillpointweightcontrib", 9.0)
                             .toDouble();
@@ -818,10 +818,11 @@ virtual_skill_point_effect:
     return{0, {}};
 }
 
-double Server::getSkillPointsEffect(const CSteamID &uid, int equipId) {
+double Server::getBaseSkillPointEffect(const CSteamID &uid, int equipId) {
     if(!equipRegistry.contains(equipId)) {
         //% "Skill points effect calculation failed due to invalid equipment ID!"
         qWarning() << qtTrId("equipid-invalid-skill-points-effect");
+        return 0;
     }
     double x = User::getSkillPoints(uid, equipId);
     double y = equipRegistry.value(equipId)->skillPointsStd();
@@ -1492,7 +1493,7 @@ void Server::deleteTestShip(const CSteamID &uid) {
 void Server::doConstruct(const CSteamID &uid,
                          int shipDef,
                          QList<QUuid> &equips,
-                         QUuid prevShip,
+                         const QUuid &prevShip,
                          int factoryid,
                          QSslSocket *connection) {
     QSqlDatabase db = QSqlDatabase::database();
@@ -2409,6 +2410,38 @@ void Server::generateTestShip(const CSteamID &uid) {
             }
         }
     }
+}
+
+double Server::getEquipSkillPointEffect(const CSteamID &uid,
+                                        const QUuid &equipUuid) {
+    return 1 - std::sqrt(0.5)
+            + getBaseSkillPointEffect(uid, User::getEquipDef(equipUuid))
+            + getImprovementFactor(equipUuid);
+}
+
+double Server::getImprovementFactor(const QUuid &equipUuid) {
+    QSqlDatabase db = QSqlDatabase::database();
+    QSqlQuery query;
+
+    query.prepare("SELECT Star "
+                  "FROM UserEquip "
+                  "WHERE EquipUuid = :euid ");
+    query.bindValue(":euid", equipUuid);
+    if(Q_UNLIKELY(!query.exec() || !query.isSelect())) {
+        //% "Get improvement factor of equipment %2 failed!"
+        throw DBError(qtTrId("user-get-skillpoint-failed")
+                      .arg(equipUuid.toString()),
+                      query.lastError());
+        return 0;
+    }
+    else if(query.first()) {
+        int star = query.value(0).toInt();
+        int stdstar = settings->value("rule/equipmentstandardstar", 10).toInt();
+        double s = (double)star / (double)stdstar;
+        return s / std::hypot(1, s) * (std::sqrt(0.5) - 0.5);
+    }
+    else
+        return 0;
 }
 
 const QStringList Server::getCommandsSpec() const {
@@ -3345,11 +3378,12 @@ QList<std::tuple<QUuid, int>> Server::modernize(
 
     QSqlDatabase db = QSqlDatabase::database();
     for(auto ship: ships) {
-        int star = 0;
         int shipDef = 0;
+        int star = 0;
 
+query_info:
         QSqlQuery query2;
-        query2.prepare("SELECT Star, ShipDef FROM UserShip "
+        query2.prepare("SELECT ShipDef, Star FROM UserShip "
                        "WHERE User = :uid AND ShipUuid = :sid;");
         query2.bindValue(":uid", uid.ConvertToUint64());
         query2.bindValue(":sid", ship.toString());
@@ -3364,10 +3398,31 @@ QList<std::tuple<QUuid, int>> Server::modernize(
             break;
         }
         else {
-            star = query2.value(0).toInt();
-            shipDef = query2.value(1).toInt();
+            shipDef = query2.value(0).toInt();
+            star = query2.value(1).toInt();
         }
 
+avoid_negative_bp:
+        QSqlQuery query4;
+        query4.prepare("SELECT Amount FROM UserShipBP "
+                       "WHERE User = :uid AND ShipDef = :def;");
+        query4.bindValue(":uid", uid.ConvertToUint64());
+        query4.bindValue(":def", shipDef);
+        if(Q_UNLIKELY(!query4.exec() || !query4.isSelect())) {
+            //% "User id %1: using blueprint of ship definition %2 failed when modernizing!"
+            throw DBError(qtTrId("modernize-ship-failed-def")
+                          .arg(uid.ConvertToUint64())
+                          .arg(shipDef),
+                          query4.lastError());
+            break;
+        }
+        else {
+            if(!query4.first() || query4.value(0).toInt() <= 0) {
+                break;
+            }
+        }
+
+consume_bp:
         QSqlQuery query3;
         query3.prepare("UPDATE UserShipBP "
                        "SET Amount = Amount-1 "
@@ -3384,17 +3439,17 @@ QList<std::tuple<QUuid, int>> Server::modernize(
             break;
         }
         else {
-            //% "User id %1: using blueprint of ship definition %2 when modernizing"
+            //% "User id %1: used blueprint of ship definition %2 when modernizing"
             qDebug() << qtTrId("modernize-ship-def")
                         .arg(uid.ConvertToUint64())
                         .arg(shipDef);
         }
 
+add_star:
         QSqlQuery query;
         query.prepare("UPDATE UserShip "
-                      "SET Star = :star "
+                      "SET Star = Star+1 "
                       "WHERE User = :uid AND ShipUuid = :eid;");
-        query.bindValue(":star", star+1);
         query.bindValue(":uid", uid.ConvertToUint64());
         query.bindValue(":eid", ship.toString());
 
@@ -3412,6 +3467,116 @@ QList<std::tuple<QUuid, int>> Server::modernize(
                         .arg(uid.ConvertToUint64())
                         .arg(ship.toString());
             result.append(std::make_tuple(ship, star+1));
+        }
+    }
+    return result;
+}
+
+/* 4.7-improve.md */
+QList<std::tuple<QUuid, int>> Server::modernizeEquip(
+        const CSteamID &uid, const QList<QUuid> &equips) {
+    QList<std::tuple<QUuid, int>> result;
+
+    QSqlDatabase db = QSqlDatabase::database();
+    for(auto equip: equips) {
+        int equipDef = 0;
+        int star = 0;
+
+query_info:
+        QSqlQuery query2;
+        query2.prepare("SELECT EquipDef, Star FROM UserEquip "
+                       "WHERE User = :uid AND EquipUuid = :sid;");
+        query2.bindValue(":uid", uid.ConvertToUint64());
+        query2.bindValue(":sid", equip.toString());
+
+        query2.exec();
+        query2.isSelect();
+        if(Q_UNLIKELY(!query2.first())) {
+            //% "User id %1: equip %2 does not exist when modernizing!"
+            qWarning() << qtTrId("modernize-equip-nonexistent")
+                          .arg(uid.ConvertToUint64())
+                          .arg(equip.toString());
+            break;
+        }
+        else {
+            equipDef = query2.value(0).toInt();
+            if(!equipRegistry.contains(equipDef)) {
+                //% "User %2 attempted to improve equipment def %1 that don't exist!"
+                qCritical() << qtTrId("equip-dont-exist-improve")
+                               .arg(equipDef)
+                               .arg(uid.ConvertToUint64());
+                break;
+            }
+            star = query2.value(1).toInt();
+        }
+
+avoid_negative_sp:
+        QSqlQuery query4;
+        query4.prepare("SELECT Intvalue FROM UserEquipSP "
+                       "WHERE User = :uid AND EquipDef = :def;");
+        query4.bindValue(":uid", uid.ConvertToUint64());
+        query4.bindValue(":def", equipDef);
+        if(Q_UNLIKELY(!query4.exec() || !query4.isSelect())) {
+            //% "User id %1: deduct skill points of equip definition %2 failed when improving!"
+            throw DBError(qtTrId("modernize-equip-failed-def")
+                          .arg(uid.ConvertToUint64())
+                          .arg(equipDef),
+                          query4.lastError());
+            break;
+        }
+        else {
+            if(!query4.first() || query4.value(0).toInt()
+                    < equipRegistry[equipDef]->skillPointsStd()) {
+                break;
+            }
+        }
+
+consume_sp:
+        QSqlQuery query3;
+        query3.prepare("UPDATE UserEquipSP "
+                       "SET Intvalue = Intvalue - :amount "
+                       "WHERE User = :uid AND EquipDef = :def;");
+        query3.bindValue(":uid", uid.ConvertToUint64());
+        query3.bindValue(":amount", equipRegistry[equipDef]->skillPointsStd());
+        query3.bindValue(":def", equipDef);
+
+        if(Q_UNLIKELY(!query3.exec())) {
+            //% "User id %1: deduct skill points of equip definition %2 failed when improving!"
+            throw DBError(qtTrId("modernize-equip-failed-def")
+                          .arg(uid.ConvertToUint64())
+                          .arg(equipDef),
+                          query3.lastError());
+            break;
+        }
+        else {
+            //% "User id %1: deducted skill points of equip definition %2 when improving"
+            qDebug() << qtTrId("modernize-equip-def")
+                        .arg(uid.ConvertToUint64())
+                        .arg(equipDef);
+        }
+
+add_star:
+        QSqlQuery query;
+        query.prepare("UPDATE UserEquip "
+                      "SET Star = Star+1 "
+                      "WHERE User = :uid AND EquipUuid = :eid;");
+        query.bindValue(":uid", uid.ConvertToUint64());
+        query.bindValue(":eid", equip.toString());
+
+        if(Q_UNLIKELY(!query.exec())) {
+            //% "User id %1: improve equip %2 failed!"
+            throw DBError(qtTrId("modernize-equip-failed")
+                          .arg(uid.ConvertToUint64())
+                          .arg(equip.toString()),
+                          query.lastError());
+            break;
+        }
+        else {
+            //% "User id %1: imporoved equip %2 by 1 level"
+            qDebug() << qtTrId("modernize-equip")
+                        .arg(uid.ConvertToUint64())
+                        .arg(equip.toString());
+            result.append(std::make_tuple(equip, star+1));
         }
     }
     return result;
@@ -3964,33 +4129,59 @@ flagship_bonus:
     {
         /* 4.5-skillpoints.md#Gain */
 equip:
-        QSqlQuery query;
-        query.prepare("UPDATE UserEquipSP "
-                      "SET Intvalue = Intvalue + COALESCE(( "
-                      "SELECT :expgain * COUNT(*) " // deal with multiple same-id equipments
-                      "FROM UserEquip "
-                      "INNER JOIN UserShip "
-                      "ON "
-                      "((UserShip.Slot1 = UserEquip.EquipUuid "
-                      "OR UserShip.Slot2 = UserEquip.EquipUuid "
-                      "OR UserShip.Slot3 = UserEquip.EquipUuid "
-                      "OR UserShip.Slot4 = UserEquip.EquipUuid "
-                      "OR UserShip.Slot5 = UserEquip.EquipUuid "
-                      "OR UserShip.SlotEX = UserEquip.EquipUuid) "
-                      "AND UserShip.FleetIndex = :fleet "
-                      "AND UserShip.FleetFled = 0 "
-                      "AND UserShip.User = :uid "
-                      "AND UserEquipSP.EquipDef = UserEquip.EquipDef) "
-                      "GROUP BY EquipDef "
-                      "), 0); ");
-        query.bindValue(":uid", uid.ConvertToUint64());
-        query.bindValue(":expgain", (int)std::floor(expGained));
-        query.bindValue(":fleet", fleetIndex);
-        if(Q_UNLIKELY(!query.exec())) {
-            qCritical() << query.lastQuery();
-            throw DBError(qtTrId("add-ship-exp-failre").arg(uid.ConvertToUint64()),
-                          query.lastError());
-            return;
+        {
+drop_temp_table:
+            QSqlQuery query;
+            query.prepare("DROP TABLE IF EXISTS temp.e;");
+            if(Q_UNLIKELY(!query.exec())) {
+                qCritical() << query.lastQuery();
+                throw DBError(qtTrId("add-ship-exp-failre").arg(uid.ConvertToUint64()),
+                              query.lastError());
+                return;
+            }
+        }
+        {
+create_temp_table:
+            QSqlQuery query;
+            query.prepare("CREATE TEMP TABLE e AS "
+                          "SELECT pow(:expgain, 2) AS amount, COUNT(*) AS cnt, EquipDef, UserShip.User "
+                          "FROM UserEquip "
+                          "INNER JOIN UserShip "
+                          "ON "
+                          "((UserShip.Slot1 = UserEquip.EquipUuid "
+                          "OR UserShip.Slot2 = UserEquip.EquipUuid "
+                          "OR UserShip.Slot3 = UserEquip.EquipUuid "
+                          "OR UserShip.Slot4 = UserEquip.EquipUuid "
+                          "OR UserShip.Slot5 = UserEquip.EquipUuid "
+                          "OR UserShip.SlotEX = UserEquip.EquipUuid) "
+                          "AND UserShip.FleetIndex = :fleet "
+                          "AND UserShip.FleetFled = 0 "
+                          "AND UserShip.User = :uid ) "
+                          "GROUP BY EquipDef;");
+            query.bindValue(":uid", uid.ConvertToUint64());
+            query.bindValue(":expgain", (int)std::floor(expGained));
+            query.bindValue(":fleet", fleetIndex);
+            if(Q_UNLIKELY(!query.exec())) {
+                qCritical() << query.lastQuery();
+                throw DBError(qtTrId("add-ship-exp-failre").arg(uid.ConvertToUint64()),
+                              query.lastError());
+                return;
+            }
+        }
+        {
+update_exp:
+            QSqlQuery query;
+            query.prepare("UPDATE UserEquipSP "
+                          "SET Intvalue = Intvalue + temp.e.cnt * temp.e.amount / sqrt(temp.e.amount + Intvalue) "
+                          "FROM temp.e "
+                          "WHERE UserEquipSP.EquipDef = temp.e.EquipDef "
+                          "AND UserEquipSP.User = temp.e.User; ");
+            if(Q_UNLIKELY(!query.exec())) {
+                qCritical() << query.lastQuery();
+                throw DBError(qtTrId("add-ship-exp-failre").arg(uid.ConvertToUint64()),
+                              query.lastError());
+                return;
+            }
         }
     }
 }
@@ -4678,15 +4869,27 @@ void Server::receivedReq(const QJsonObject &djson,
         senderM.sendMessage(connection, msg);
     }
         break;
-    case KP::CommandType::ModernizeShip: {
-        QList<QUuid> ships;
-        QJsonArray array = djson["equipids"].toArray();
-        for(auto ship: array) {
-            ships.append(QUuid(ship.toString()));
+    case KP::CommandType::Modernize: {
+        if(djson["isequip"].toBool()) {
+            QList<QUuid> equips;
+            QJsonArray array = djson["equipids"].toArray();
+            for(auto equip: array) {
+                equips.append(QUuid(equip.toString()));
+            }
+            QList<std::tuple<QUuid, int>> equipsReturned = modernizeEquip(uid, equips);
+            QByteArray msg = KP::serverEquipImproved(equipsReturned);
+            senderM.sendMessage(connection, msg);
         }
-        QList<std::tuple<QUuid, int>> shipsReturned = modernize(uid, ships);
-        QByteArray msg = KP::serverShipModernized(shipsReturned);
-        senderM.sendMessage(connection, msg);
+        else {
+            QList<QUuid> ships;
+            QJsonArray array = djson["equipids"].toArray();
+            for(auto ship: array) {
+                ships.append(QUuid(ship.toString()));
+            }
+            QList<std::tuple<QUuid, int>> shipsReturned = modernize(uid, ships);
+            QByteArray msg = KP::serverShipModernized(shipsReturned);
+            senderM.sendMessage(connection, msg);
+        }
     }
         break;
     case KP::CommandType::MessageTest: {
@@ -4763,8 +4966,10 @@ void Server::sendTestMessages() {
         qWarning() << "Server isn't listening, abort.";
     }
     else {
-        for(auto equip: equipRegistry.values()) {
-            qCritical() << equip->toString() << equip->type.isRadar();
+        for(auto user: connectedUsers) {
+            qCritical() << getEquipSkillPointEffect(user, QUuid("{fac132b6-07e0-59b6-899b-9014e87b616f}"));
+            qCritical() << getEquipSkillPointEffect(user, QUuid("{73b0b0d4-2155-54bf-bac4-f1986aaf42ba}"));
+            qCritical() << getEquipSkillPointEffect(user, QUuid("{c976554a-3ad5-5515-bcee-69b2ed5fa3f5}"));
         }
     }
 }

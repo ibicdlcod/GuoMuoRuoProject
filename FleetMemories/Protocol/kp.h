@@ -126,6 +126,7 @@ enum MsgType{
     FleetFail,
     AskForHomePort,
     ShipModernized,
+    EquipImproved,
     ShipBPRetired,
     ShipBPAdded,
     DisableShip,
@@ -184,7 +185,7 @@ enum CommandType{
     Migrate,
     FleetData,
     SelectHomePort,
-    ModernizeShip,
+    Modernize,
     Construct,
     RequestSortie,
     ProgressMap,
@@ -547,7 +548,7 @@ QByteArray clientDemandEquipInfoUser();
 QByteArray clientDemandMapInfo(QDateTime timeUtc
                                = QDateTime(QDate(1970, 1, 1),
                                            QTime(0, 0, 0)));
-QByteArray clientDemandModernizeShip(const QList<QUuid> &);
+QByteArray clientDemandModernize(const QList<QUuid> &, bool);
 QByteArray clientDemandResourceUpdate();
 QByteArray clientDemandShipInfo(QDateTime timeUtc
                                 = QDateTime(QDate(1970, 1, 1),
@@ -582,6 +583,7 @@ QByteArray serverDisableShip(QUuid);
 QByteArray serverEquipLackFather(GameError, int);
 QByteArray serverEquipLackMother(GameError, int, int64);
 QByteArray serverEquipRetired(const QList<QUuid> &);
+QByteArray serverEquipImproved(const QList<std::tuple<QUuid, int>> &);
 QByteArray serverEquipInfo(const QJsonArray &, bool user = false,
                            QDateTime timeUtc = QDateTime::currentDateTimeUtc(),
                            bool cacheHit = false);

@@ -117,7 +117,6 @@ void EquipModel::switchDisplayType(int index) {
     emit needReCalculatePages();
     adjustRowCount(oldRowCount, newRowCount);
     firstPage();
-    wholeTableChanged();
 }
 
 void EquipModel::switchDisplayType2(const QString &equipName) {
@@ -158,15 +157,6 @@ void EquipModel::switchDisplayType2(const QString &equipName) {
     emit needReCalculatePages();
     adjustRowCount(oldRowCount, newRowCount);
     firstPage();
-    wholeTableChanged();
-}
-
-void EquipModel::switchShipDisplayType(const QString &nationality,
-                                       const QString &shiptype,
-                                       const QString &shipclass,
-                                       const QString &searchTerm) {
-    /* do nothing */
-    ;
 }
 
 void EquipModel::firstPage() {
@@ -231,6 +221,18 @@ void EquipModel::enactDestruct() {
     emit destructRequest(trash);
 }
 
+void EquipModel::enactModernize() {
+    QList<QUuid> candidates;
+    for(auto iter = isModernizationChecked.keyValueBegin();
+         iter != isModernizationChecked.keyValueEnd();
+         ++iter) {
+        if(iter->second) {
+            candidates.append(iter->first);
+        }
+    }
+    emit improveRequest(candidates);
+}
+
 void EquipModel::destructedEquipment(const QList<QUuid> &destructed) {
     int oldRowCount = rowCount();
     clientEquips.removeIf([&destructed](QHash<QUuid, Equipment *>::iterator i)
@@ -256,6 +258,7 @@ void EquipModel::setPageNumHint(int input) {
     pageNum = input;
     int newRowCount = rowCount();
     adjustRowCount(oldRowCount, newRowCount);
+    wholeTableChanged();
     emit pageNumChanged(pageNum, maximumPageNum());
 }
 
@@ -265,6 +268,7 @@ void EquipModel::setRowsPerPageHint(int input) {
     emit needReCalculatePages();
     int newRowCount = rowCount();
     adjustRowCount(oldRowCount, newRowCount);
+    wholeTableChanged();
 }
 
 void EquipModel::setIsInArsenal(bool input) {
@@ -289,7 +293,6 @@ void EquipModel::adjustRowCount(int oldRowCount, int newRowCount) {
         //oldRowCount - newRowCount - 1);
         endRemoveRows();
     }
-    wholeTableChanged();
 }
 
 void EquipModel::customSort() {
@@ -308,7 +311,7 @@ void EquipModel::customSort() {
 
 int EquipModel::numberOfColumns() const {
     if(isInArsenal) {
-        return 7; // uid/equip/star/attr/destruct/addstar/hiddensort
+        return 6; // uid/equip/star/attr/destruct/hiddensort
     }
     else
         return 7; // uid/equip/star/attr/position/select/hiddensort
@@ -343,6 +346,12 @@ QVariant EquipModel::data(const QModelIndex &index, int role) const {
     QUuid uidToDisplay = sortedEquipIds[realRowIndex];
     Equipment *equipToDisplay = clientEquips[uidToDisplay];
     int starToDisplay = clientEquipStars[uidToDisplay];
+    int additionalStar = 0;
+    if(skillPointReg.contains(equipToDisplay->getId())) {
+        additionalStar =
+            skillPointReg[equipToDisplay->getId()]
+            / equipToDisplay->skillPointsStd();
+    }
 
     Clientv2 &engine = Clientv2::getInstance();
     bool ready = engine.isEquipRegistryCacheGood();
@@ -355,6 +364,12 @@ QVariant EquipModel::data(const QModelIndex &index, int role) const {
         }
         else if(index.column() == attrCol){ // attributes
             return equipToDisplay->attrStr();
+        }
+        else if(index.column() == starCol) {
+            //% "Current Star %1, maximum star %2"
+            return qtTrId("equip-star-tooltip")
+                .arg(QString::number(starToDisplay),
+                     QString::number(starToDisplay + additionalStar));
         }
         else {
             [[fallthrough]];
@@ -377,18 +392,15 @@ QVariant EquipModel::data(const QModelIndex &index, int role) const {
         else if(index.column() == hiddenSortColumn()) {
             return QString::number(equipToDisplay->type.getTypeSort());
         }
-        else if(index.column() == destructColumn()
-                 || index.column() == addStarColumn()) {
+        else if(index.column() == destructColumn()) {
             return QVariant();
         }
         else if(index.column() == selectColumn()) {
             return QVariant();
         }
         else if(index.column() == starCol) {
-            if(starToDisplay == 0)
-                return QVariant();
-            else
-                return "★+" + QString::number(starToDisplay);
+            return "★+" + QString::number(starToDisplay)
+                   + "/" + QString::number(starToDisplay + additionalStar);
         }
         else if(index.column() == attrCol){ // attributes
             return equipToDisplay->attrPrimaryStr();
@@ -465,10 +477,6 @@ QVariant EquipModel::data(const QModelIndex &index, int role) const {
             //% "Destruct"
             return qtTrId("destruct");
         }
-        else if(index.column() == addStarColumn()) {
-            //% "Improve"
-            return qtTrId("equip-improve");
-        }
         else if(index.column() == selectColumn()) {
             //% "Select"
             return qtTrId("equip-select");
@@ -521,8 +529,13 @@ QVariant EquipModel::data(const QModelIndex &index, int role) const {
             else
                 return Qt::Unchecked;
         }
-        else if(index.column() == addStarColumn())
-            return Qt::Unchecked;
+        else if(index.column() == starCol) {
+            if(isModernizationChecked.value(sortedEquipIds.value(realRowIndex),
+                                             false))
+                return Qt::Checked;
+            else
+                return Qt::Unchecked;
+        }
         else
             return QVariant();
     }
@@ -535,8 +548,9 @@ QVariant EquipModel::data(const QModelIndex &index, int role) const {
     }
     break;
     case CheckAlignmentRole: {
-        if(index.column() == destructColumn()
-            || index.column() == addStarColumn())
+        if(index.column() == starCol)
+            return static_cast<QVariant>(Qt::AlignVCenter | Qt::AlignLeft);
+        else if(index.column() == destructColumn())
             return Qt::AlignCenter;
         else
             return QVariant();
@@ -572,8 +586,6 @@ QVariant EquipModel::headerData(int section, Qt::Orientation orientation,
                 return qtTrId("equip-attr");
             else if(section == destructColumn())
                 return qtTrId("destruct");
-            else if(section == addStarColumn())
-                return qtTrId("equip-improve");
             else if(section == selectColumn())
                 return qtTrId("equip-select");
             else if(section == fleetPosColumn()) {
@@ -602,10 +614,32 @@ QVariant EquipModel::headerData(int section, Qt::Orientation orientation,
 }
 
 Qt::ItemFlags EquipModel::flags(const QModelIndex &index) const {
-    if(index.column() == destructColumn()
-        || index.column() == addStarColumn()) {
+    int realRowIndex = index.row() + rowsPerPage * pageNum;
+    if(index.column() == destructColumn()) {
         return QAbstractTableModel::flags(index)
                | Qt::ItemIsUserCheckable;
+    }
+    else if(index.column() == starCol) {
+        QUuid uidToDisplay = sortedEquipIds[realRowIndex];
+        Equipment *equipToDisplay = clientEquips[uidToDisplay];
+        int additionalStar = 0;
+        if(skillPointReg.contains(equipToDisplay->getId())) {
+            additionalStar =
+                skillPointReg[equipToDisplay->getId()]
+                / equipToDisplay->skillPointsStd();
+        }
+        if(additionalStar == 0) {
+            return static_cast<QFlags<Qt::ItemFlag>>
+                (QAbstractTableModel::flags(index) // clazy:exclude=skipped-base-method
+                 | Qt::ItemIsUserCheckable
+                       & (~Qt::ItemIsEnabled));
+        }
+        else {
+            return QAbstractTableModel::flags(index) // clazy:exclude=skipped-base-method
+                   | Qt::ItemIsUserCheckable
+                   | Qt::ItemIsEnabled;
+
+        }
     }
     else
         return QAbstractTableModel::flags(index);
@@ -616,7 +650,7 @@ bool EquipModel::setData(const QModelIndex &index,
                          int role) {
     int realRowIndex = index.row() + rowsPerPage * pageNum;
     /* TODO: add improve */
-    if(role == Qt::CheckStateRole) {
+    if(role == Qt::CheckStateRole && index.column() == destructColumn()) {
         if(value.toInt() == Qt::Checked) {
             isDestructChecked[sortedEquipIds.value(realRowIndex)] = true;
             emit dataChanged(index, index, {Qt::CheckStateRole});
@@ -628,6 +662,26 @@ bool EquipModel::setData(const QModelIndex &index,
             return true;
         }
     }
+    else if(role == Qt::CheckStateRole && index.column() == starCol) {
+        QUuid uidToDisplay = sortedEquipIds[realRowIndex];
+        Equipment *equipToDisplay = clientEquips[uidToDisplay];
+        int additionalStar = 0;
+        if(skillPointReg.contains(equipToDisplay->getId())) {
+            additionalStar =
+                skillPointReg[equipToDisplay->getId()]
+                / equipToDisplay->skillPointsStd();
+        }
+        if(value.toInt() == Qt::Checked && additionalStar != 0) {
+            isModernizationChecked[sortedEquipIds.value(realRowIndex)] = true;
+            emit dataChanged(index, index, {Qt::CheckStateRole});
+            return true;
+        }
+        else if(value.toInt() == Qt::Unchecked) {
+            isModernizationChecked[sortedEquipIds.value(realRowIndex)] = false;
+            emit dataChanged(index, index, {Qt::CheckStateRole});
+            return true;
+        }
+    }
     return false;
 }
 
@@ -635,12 +689,8 @@ int EquipModel::destructColumn() const {
     return isInArsenal ? 4 : -1;
 }
 
-int EquipModel::addStarColumn() const {
-    return isInArsenal ? 5 : -1;
-}
-
 int EquipModel::hiddenSortColumn() const {
-    return isInArsenal ? 6 : 6;
+    return isInArsenal ? 5 : 6;
 }
 
 int EquipModel::selectColumn() const {
@@ -722,6 +772,17 @@ void EquipModel::updateEquipmentList(const QJsonObject &input) {
 }
 
 void EquipModel::wholeTableChanged() {
+    if(isEquipModel) {
+        QSet<int> defs;
+        for(auto equipId: sortedEquipIds) {
+            int def = clientEquips[equipId]->getId();
+            defs.insert(def);
+        }
+        for(auto defNoduplicate: defs) {
+            Clientv2 &engine = Clientv2::getInstance();
+            engine.demandEquipSkillPoints(defNoduplicate);
+        }
+    }
     QModelIndex topleft = this->index(0, 0);
     QModelIndex bottomright = this->index(rowCount() - 1, columnCount() - 1);
     clearCheckBoxes();
@@ -773,4 +834,27 @@ void EquipModel::filterByShip(Ship *ship, bool isSlotEX)
     currentActiveShip = ship;
     currentActiveSlotEx = isSlotEX;
     switchDisplayType(0);
+}
+
+void EquipModel::processSkillPointInfo(int equipDef, int skillPoint) {
+    skillPointReg[equipDef] = skillPoint;
+    QModelIndex topleft = this->index(0, 0);
+    QModelIndex bottomright = this->index(rowCount() - 1, columnCount() - 1);
+    if(rowCount() > 0 && columnCount() > 0) {
+        emit dataChanged(topleft, bottomright, QList<int>());
+    }
+}
+
+void EquipModel::modernizedEquips(const QList<std::tuple<QUuid, int>> &modernized) {
+    for(auto item: modernized) {
+        auto equipUid = std::get<0>(item);
+        int equipDef = clientEquips[equipUid]->getId();
+        int newStar = std::get<1>(item);
+        clientEquipStars[equipUid] = newStar;
+        if(!skillPointReg.contains(equipDef)) {
+            skillPointReg[equipDef] = 0;
+        }
+        skillPointReg[equipDef] -= clientEquips[equipUid]->skillPointsStd();
+    }
+    wholeTableChanged();
 }

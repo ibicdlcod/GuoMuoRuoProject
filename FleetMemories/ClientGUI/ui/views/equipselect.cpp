@@ -102,6 +102,8 @@ EquipSelect::EquipSelect(int height, QWidget *parent)
             });
     connect(destructButton, &QAbstractButton::clicked,
             this, &EquipSelect::destructActivated);
+    connect(addStarButton, &QAbstractButton::clicked,
+            this, &EquipSelect::improveActivated);
     connect(searchBox, &QLineEdit::textEdited,
             this, &EquipSelect::searchBoxChanged);
     connect(this, &EquipSelect::typeActivated,

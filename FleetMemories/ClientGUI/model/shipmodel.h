@@ -26,10 +26,10 @@ public slots:
                                        const QString &shiptype,
                                        const QString &shipclass,
                                        const QString &searchTerm
-                                       = QLatin1String("")) override;
+                                       = QLatin1String(""));
 
     virtual void addShip(QUuid, int, int) final;
-    virtual void enactModernize() final;
+    virtual void enactModernize() override;
     virtual void modernizedShips(const QList<std::tuple<QUuid, int>> &);
     virtual void modifyShip(QUuid, int, int, bool disabling = false) final;
     virtual void updateShipList(const QJsonObject &);
@@ -47,7 +47,6 @@ public:
     virtual bool setData(const QModelIndex &index,
                          const QVariant &value,
                          int role = Qt::EditRole) override;
-    virtual int addStarColumn() const override;
     virtual int hiddenSortColumn() const override;
     virtual int selectColumn() const override;
     virtual int fleetPosColumn() const override;
@@ -73,7 +72,6 @@ protected:
     QHash<QUuid, Ship *> clientShips;
     QHash<QUuid, ShipDynamic *> clientShipDynamicAttrs;
     QList<QUuid> sortedShipIds;
-    QHash<QUuid, bool> isModernizationChecked;
 };
 
 #endif // SHIPMODEL_H
