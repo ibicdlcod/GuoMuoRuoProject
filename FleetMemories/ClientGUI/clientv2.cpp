@@ -1255,7 +1255,7 @@ void Clientv2::receivedInfo(const QJsonObject &djson) {
 void Clientv2::receivedLogout(const QJsonObject &djson) {
     if(djson["success"].toBool()) {
         if(!djson.contains("reason")) {
-            //% "Message not implemented";
+            //% "Message not implemented"
             qWarning() << qtTrId("message-not-implemented");
             return;
         }

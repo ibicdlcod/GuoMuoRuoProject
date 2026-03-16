@@ -11,6 +11,7 @@
 
 #include <QVector2D>
 #include <QVector3D>
+#include <QQuaternion>
 #include <iostream>
 
 struct VertexData
@@ -264,7 +265,7 @@ QOpenGLTexture* GeometryEngine::loadGLBTexture(const tinygltf::Model &model, int
     // Convert raw tinygltf image bytes to QImage
     QImage qimg(image.image.data(), image.width, image.height, QImage::Format_RGBA8888);
 
-    QOpenGLTexture *glTexture = new QOpenGLTexture(qimg.mirrored()); // OpenGL expects flipped Y
+    QOpenGLTexture *glTexture = new QOpenGLTexture(qimg.flipped(Qt::Vertical)); // OpenGL expects flipped Y
     glTexture->setMinificationFilter(QOpenGLTexture::LinearMipMapLinear);
     glTexture->setMagnificationFilter(QOpenGLTexture::Linear);
     return glTexture;

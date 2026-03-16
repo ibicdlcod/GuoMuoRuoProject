@@ -2429,7 +2429,7 @@ double Server::getImprovementFactor(const QUuid &equipUuid) {
     query.bindValue(":euid", equipUuid);
     if(Q_UNLIKELY(!query.exec() || !query.isSelect())) {
         //% "Get improvement factor of equipment %2 failed!"
-        throw DBError(qtTrId("user-get-skillpoint-failed")
+        throw DBError(qtTrId("user-get-equip-star-failed")
                       .arg(equipUuid.toString()),
                       query.lastError());
         return 0;
@@ -2984,7 +2984,7 @@ void Server::initUserEquipSPInfo(const CSteamID &uid) {
     }
     else {
         //% "User %1: add skillinfo of equip success!"
-        qDebug() << qtTrId("user-add-equip-sp-info-failed")
+        qDebug() << qtTrId("user-add-equip-sp-info-success")
                     .arg(uid.ConvertToUint64());
     }
 }
@@ -4265,8 +4265,8 @@ std::optional<QList<int>> Server::queryMapProgress(const CSteamID &uid,
                       " AND Attribute = 'CurrentMap'");
         query.bindValue(":id", uid.ConvertToUint64());
         if(Q_UNLIKELY(!query.exec() || !query.isSelect() || !query.first())) {
-            //% "Query user map progress data for user %1 failed!"
             qCritical() << query.lastQuery();
+            //% "Query user map progress data for user %1 failed!"
             throw DBError(qtTrId("user-query-progress-fail")
                           .arg(uid.ConvertToUint64()),
                           query.lastError());

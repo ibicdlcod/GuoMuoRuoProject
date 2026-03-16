@@ -24,27 +24,27 @@ void init(sol::state &lua) {
     sol::usertype<EquipType> equiptype_type
         = lua.new_usertype<EquipType>("EquipType",
                                       sol::constructors<>());
-    equiptype_type["getSpecial"] = qOverload<void>(&EquipType::getSpecial);
-    equiptype_type["isLb"] = qOverload<void>(&EquipType::isLb);
-    equiptype_type["isRadar"] = qOverload<void>(&EquipType::isRadar);
-    equiptype_type["getSize"] = qOverload<void>(&EquipType::getSize);
-    equiptype_type["isPatrol"] = qOverload<void>(&EquipType::isPatrol);
-    equiptype_type["isCarrierPlane"] = qOverload<void>(&EquipType::isCarrierPlane);
-    equiptype_type["isSeaplane"] = qOverload<void>(&EquipType::isSeaplane);
-    equiptype_type["isTorp"] = qOverload<void>(&EquipType::isTorp);
-    equiptype_type["isSurface"] = qOverload<void>(&EquipType::isSurface);
-    equiptype_type["isSecGun"] = qOverload<void>(&EquipType::isSecGun);
-    equiptype_type["isFlak"] = qOverload<void>(&EquipType::isFlak);
-    equiptype_type["isMainGun"] = qOverload<void>(&EquipType::isMainGun);
-    equiptype_type["isFighter"] = qOverload<void>(&EquipType::isFighter);
-    equiptype_type["isTorpBomber"] = qOverload<void>(&EquipType::isTorpBomber);
-    equiptype_type["isDiveBomber"] = qOverload<void>(&EquipType::isDiveBomber);
-    equiptype_type["isRecon"] = qOverload<void>(&EquipType::isRecon);
-    equiptype_type["isNight"] = qOverload<void>(&EquipType::isNight);
-    equiptype_type["isNight2"] = qOverload<void>(&EquipType::isNight2);
-    equiptype_type["isBomber"] = qOverload<void>(&EquipType::isBomber);
-    equiptype_type["isJet"] = qOverload<void>(&EquipType::isJet);
-    equiptype_type["isVirtual"] = qOverload<void>(&EquipType::isVirtual);
+    equiptype_type["getSpecial"] = qOverload<>(&EquipType::getSpecial);
+    equiptype_type["isLb"] = qOverload<>(&EquipType::isLb);
+    equiptype_type["isRadar"] = qOverload<>(&EquipType::isRadar);
+    equiptype_type["getSize"] = qOverload<>(&EquipType::getSize);
+    equiptype_type["isPatrol"] = qOverload<>(&EquipType::isPatrol);
+    equiptype_type["isCarrierPlane"] = qOverload<>(&EquipType::isCarrierPlane);
+    equiptype_type["isSeaplane"] = qOverload<>(&EquipType::isSeaplane);
+    equiptype_type["isTorp"] = qOverload<>(&EquipType::isTorp);
+    equiptype_type["isSurface"] = qOverload<>(&EquipType::isSurface);
+    equiptype_type["isSecGun"] = qOverload<>(&EquipType::isSecGun);
+    equiptype_type["isFlak"] = qOverload<>(&EquipType::isFlak);
+    equiptype_type["isMainGun"] = qOverload<>(&EquipType::isMainGun);
+    equiptype_type["isFighter"] = qOverload<>(&EquipType::isFighter);
+    equiptype_type["isTorpBomber"] = qOverload<>(&EquipType::isTorpBomber);
+    equiptype_type["isDiveBomber"] = qOverload<>(&EquipType::isDiveBomber);
+    equiptype_type["isRecon"] = qOverload<>(&EquipType::isRecon);
+    equiptype_type["isNight"] = qOverload<>(&EquipType::isNight);
+    equiptype_type["isNight2"] = qOverload<>(&EquipType::isNight2);
+    equiptype_type["isBomber"] = qOverload<>(&EquipType::isBomber);
+    equiptype_type["isJet"] = qOverload<>(&EquipType::isJet);
+    equiptype_type["isVirtual"] = qOverload<>(&EquipType::isVirtual);
 
 }
 

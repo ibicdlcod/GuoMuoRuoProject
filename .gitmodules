@@ -4,9 +4,6 @@
 [submodule "FleetMemories/sol2"]
 	path = FleetMemories/sol2
 	url = https://github.com/ThePhD/sol2.git
-[submodule "FleetMemories/tinygltf"]
-	path = FleetMemories/tinygltf
-	url = https://github.com/syoyo/tinygltf.git
 [submodule "FleetMemories/ClientGUI/ui/sortie/opengl/tinygltf"]
 	path = FleetMemories/ClientGUI/ui/sortie/opengl/tinygltf
 	url = https://github.com/syoyo/tinygltf.git
