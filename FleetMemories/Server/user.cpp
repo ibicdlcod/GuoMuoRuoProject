@@ -503,6 +503,26 @@ QUuid User::newShip(const CSteamID &uid, int shipDid, int startingHP) {
     }
 }
 
+bool User::openMap(const CSteamID &uid, int mapId) { // relative id
+    QSqlDatabase db = QSqlDatabase::database();
+    QSqlQuery query;
+    query.prepare("UPDATE UserMapState "
+                  "SET Supremacy = 0.0 "
+                  "WHERE User = :id AND MapDef = :def");
+    query.bindValue(":id", uid.ConvertToUint64());
+    query.bindValue(":def", mapId);
+    if(Q_UNLIKELY(!query.exec())){
+        //% "User ID %1: DB failure when opening map %2!"
+        throw DBError(qtTrId("dbfail-when-opening-map")
+                          .arg(uid.ConvertToUint64()).arg(mapId),
+                      query.lastError());
+        return false;
+    }
+    else {
+        return true;
+    }
+}
+
 void User::refreshFactory(Server *server, const CSteamID &uid) {
     server->naturalRegen(uid);
     QSqlDatabase db = QSqlDatabase::database();

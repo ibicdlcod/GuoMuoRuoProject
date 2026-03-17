@@ -15,6 +15,7 @@ maps[1] = {
 			return 1
 		end,
 	},
+	gauge = 0,
 }
 
 maps[1][1] = {
@@ -104,7 +105,7 @@ maps[1][2] = {
 	},
 }
 
-maps[1][2] = {
+maps[1][3] = {
 	x = 0.700,
 	y = 0.800,
 	battle_type = maps.Battle_type.NORMAL,

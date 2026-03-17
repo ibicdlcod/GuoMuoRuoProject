@@ -314,6 +314,32 @@ Q_GLOBAL_STATIC(QString,
                     ");"
                     ))
 
+/* Drop info of users */
+Q_GLOBAL_STATIC(QString,
+                userMapState,
+                QStringLiteral(
+                    "CREATE TABLE UserMapState ("
+                    "User BLOB NOT NULL, "
+                    "MapDef INTEGER NOT NULL, "
+                    "Supremacy FLOAT NOT NULL DEFAULT -1, "
+                    /* gauge remaining can be negative which makes DLC maps easier,
+                                                                                 * you still need to defeat boss flagship to win */
+                    "GaugeC INTEGER NOT NULL DEFAULT 0, "
+                    "GaugeB INTEGER NOT NULL DEFAULT 0, "
+                    "GaugeA INTEGER NOT NULL DEFAULT 0, "
+                    "GaugeH INTEGER NOT NULL DEFAULT 0, "
+                    /* unlock stages */
+                    /* use another table for user-map-puzzle-state */
+                    "CState INTEGER NOT NULL DEFAULT 0, "
+                    "BState INTEGER NOT NULL DEFAULT 0, "
+                    "AState INTEGER NOT NULL DEFAULT 0, "
+                    "HState INTEGER NOT NULL DEFAULT 0, "
+                    "FOREIGN KEY(User) REFERENCES NewUsers(UserID), "
+                    "FOREIGN KEY(MapDef) REFERENCES MapNode(MapID) "
+                    "CONSTRAINT noduplicate UNIQUE(User, MapDef) "
+                    ");"
+                    ))
+
 /* Not customized, since set this lesser than 60 creates problems */
 const int elapsedMaxTolerance = steamRateLimit;
 
@@ -923,8 +949,27 @@ void Server::offerEquipInfoUser(const CSteamID &uid,
     }
 }
 
-void Server::offerMapInfo(QSslSocket *connection)
+void Server::offerMapInfo(const CSteamID &uid, QSslSocket *connection)
 {
+    QSqlDatabase db = QSqlDatabase::database();
+    QMap<int, double> supremacies;
+    QSqlQuery query;
+    query.prepare("SELECT MapDef, Supremacy "
+                  "FROM UserMapState "
+                  "WHERE User = :id;");
+    query.bindValue(":id", uid.ConvertToUint64());
+    if(!query.exec() || !query.isSelect()) {
+        qCritical() << query.lastQuery();
+        //% "Get user %1's map supremacy failed!"
+        throw DBError(qtTrId("user-get-map-supremacy-failed")
+                      .arg(uid.ConvertToUint64()),
+                      query.lastError());
+    }
+    else {
+        while(query.next()) {
+            supremacies[query.value(0).toInt()] = query.value(1).toDouble();
+        }
+    }
     QJsonArray mapInfos;
     for(const auto map: std::as_const(normalMaps)) {
         int unionId = MapWithDiff::getUnionId(map->id);
@@ -940,6 +985,8 @@ void Server::offerMapInfo(QSslSocket *connection)
         mapInfo["x"] = map->worldX;
         mapInfo["y"] = map->worldY;
         mapInfo["diff"] = map->diff;
+        mapInfo["supremacy"] = supremacies.value(unionId, -1);
+
         if(lua["maps"][unionId] != sol::nil) {
             QJsonArray startingNodes;
             sol::table tab = lua["maps"][unionId]["starting_nodes"];
@@ -2169,7 +2216,7 @@ reduce_retry_times:
             }
         }
 get_rare_drop:
-        {
+        if(!resultRare.isEmpty()) {
             QSqlQuery query;
             QString queryStr0;
             queryStr0.append("(");
@@ -2212,7 +2259,7 @@ get_rare_drop:
             }
         }
 get_drop:
-        {
+        if(!result.isEmpty()) {
             QSqlQuery query;
             QString queryStr0;
             queryStr0.append("(");
@@ -2989,6 +3036,41 @@ void Server::initUserEquipSPInfo(const CSteamID &uid) {
     }
 }
 
+void Server::initUserMapStatus(const CSteamID &uid) {
+    QSqlDatabase db = QSqlDatabase::database();
+    for(int map: normalMapHasLua) {
+        QSqlQuery query2;
+        query2.prepare("INSERT OR IGNORE INTO UserMapState (User, MapDef, "
+                       "GaugeC, GaugeB, GaugeA, GaugeH) "
+                       "VALUES (:uid, :map, :amount1, :amount2, :amount3, :amount4);");
+        query2.bindValue(":uid", uid.ConvertToUint64());
+        query2.bindValue(":map", map);
+        int amount = 0;
+        if(lua["maps"][map] == sol::nil
+                || lua["maps"][map]["gauge"] == sol::nil) {
+        }
+        else {
+            amount = lua["maps"][map]["gauge"];
+        }
+        query2.bindValue(":amount1", amount);
+        query2.bindValue(":amount2", amount);
+        query2.bindValue(":amount3", amount);
+        query2.bindValue(":amount4", amount);
+        if(Q_UNLIKELY(!query2.exec())) {
+            qCritical() << query2.lastQuery();
+            //% "User %1: init map status failed!"
+            throw DBError(qtTrId("user-add-map-status-failed")
+                          .arg(uid.ConvertToUint64()),
+                          query2.lastError());
+        }
+        else {
+            //% "User %1: init map status success!"
+            qDebug() << qtTrId("user-add-map-status-success")
+                        .arg(uid.ConvertToUint64());
+        }
+    }
+}
+
 void Server::luaInitEquipable() {
     auto value = lua.safe_script_file("lua/canequip.lua",
                                       sol::script_pass_on_error);
@@ -3006,6 +3088,7 @@ void Server::luaInitEquipable() {
 }
 
 void Server::luaInitMap() {
+    normalMapHasLua.clear();
     auto value = lua.safe_script_file("lua/maps.lua",
                                       sol::script_pass_on_error);
     if(!value.valid()) {
@@ -3043,6 +3126,7 @@ void Server::luaInitMap() {
             else {
                 //% "Load map %1 info success!"
                 qInfo() << qtTrId("lua-map-success-spec").arg(map);
+                normalMapHasLua.append(map);
                 QFileInfo fileInfo(name);
                 QDateTime lastModifiedDate = fileInfo.lastModified(QTimeZone::UTC);
                 QDateTime mapDBTimeStamp = settings->value("server/mapdbtimestamp").toDateTime();
@@ -4546,6 +4630,7 @@ void Server::receivedLogin(const CSteamID &uid,
     else {
         /* existing user */
         /* TODO: force end existing battles */
+force_end_existing_battle:
         {
             QSqlQuery query;
             query.prepare("UPDATE UserAttr SET Intvalue = :type "
@@ -4561,6 +4646,7 @@ void Server::receivedLogin(const CSteamID &uid,
                 return;
             }
         }
+force_end_existing_sortie:
         {
             QSqlQuery query;
             query.prepare("UPDATE UserAttr SET Intvalue = 0 "
@@ -4582,6 +4668,8 @@ drop_table:
     initUserDropInfo(uid);
 equip_skillpoints_fill:
     initUserEquipSPInfo(uid);
+map_status:
+    initUserMapStatus(uid);
 
     connectedPeers[uid] = connection;
     connectedUsers[connection] = uid;
@@ -4813,7 +4901,8 @@ void Server::receivedReq(const QJsonObject &djson,
         if(diff > settings->value("server/cachetolerancemsec", 10000).toInt()) {
             QTimer::singleShot(100,
                                this,
-                               [connection, this]{offerMapInfo(connection);});
+                               [connection, uid, this]
+            {offerMapInfo(uid, connection);});
         }
         else {
             connection->flush();
@@ -4935,8 +5024,11 @@ home_port:
         KP::ShipNationality nation = static_cast<KP::ShipNationality>(
                     djson["nation"].toInt());
         int shipId = 0;
+        int mapId = 0;
         switch(nation) {
         case KP::Japanese: shipId = 0x10120201; // Kamikaze
+            mapId = 1; // Seto inland sea
+            break;
         case KP::German: break;
         case KP::Italian: break;
         case KP::American: break;
@@ -4949,6 +5041,9 @@ home_port:
         if(shipId != 0 && User::addShipBP(uid, shipId)) {
             QByteArray msg = KP::serverBlueprintAdded(shipId);
             senderM.sendMessage(connection, msg);
+        }
+        if(mapId != 0 && User::openMap(uid, mapId)) {
+            offerMapInfo(uid, connection);
         }
         User::decideHomePort(uid, nation);
     }
@@ -5179,6 +5274,9 @@ void Server::sqlinit() const {
         if(!tables.contains("UserShipDrop")) {
             sqlinitShipDrop();
         }
+        if(!tables.contains("UserMapState")) {
+            sqlinitUserM();
+        }
     }
 }
 
@@ -5377,6 +5475,7 @@ void Server::sqlinitUsers() const {
                       query.lastError());
     }
 }
+
 void Server::sqlinitUserA() const {
     //% "User attributes database does not exist, creating..."
     qWarning() << qtTrId("user-db-attr-lack");
@@ -5385,6 +5484,18 @@ void Server::sqlinitUserA() const {
     if(!query.exec()) {
         //% "Create User attributes database failed."
         throw DBError(qtTrId("user-db-attr-gen-failure"),
+                      query.lastError());
+    }
+}
+
+void Server::sqlinitUserM() const {
+    //% "User map info database does not exist, creating..."
+    qWarning() << qtTrId("user-db-map-lack");
+    QSqlQuery query;
+    query.prepare(*userMapState);
+    if(!query.exec()) {
+        //% "Create User map info database failed."
+        throw DBError(qtTrId("user-db-map-gen-failure"),
                       query.lastError());
     }
 }

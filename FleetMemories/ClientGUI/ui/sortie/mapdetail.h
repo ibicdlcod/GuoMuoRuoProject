@@ -16,7 +16,7 @@ class MapDetail : public QWidget
 public:
     explicit MapDetail(QWidget *parent = nullptr);
     ~MapDetail();
-    static constexpr int circleBorderSize = 2;
+    static constexpr int circleBorderSize = 4;
     static constexpr int circleSize = 24;
 
     Q_PROPERTY(QPointF fleetcenter

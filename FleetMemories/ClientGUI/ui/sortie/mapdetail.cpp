@@ -116,7 +116,7 @@ void MapDetail::paintEvent(QPaintEvent *event) {
                 pen.setColor(Qt::black);
                 break;
             }
-            pen.setWidth(circleBorderSize * 2);
+            pen.setWidth(circleBorderSize);
 
             static QList<qreal> dashes = {4, 6};
             pen.setDashPattern(dashes);
@@ -129,11 +129,13 @@ void MapDetail::paintEvent(QPaintEvent *event) {
         }
     }
     for(const auto &node: std::as_const(mapPointer->nodes)) {
-        static QBrush redBrush = QBrush(Qt::red);
+        static QBrush redBrush = QBrush(QColor(255,128,128));
         painter.setBrush(redBrush);
-        painter.setPen(Qt::NoPen);
+        QPen pen(Qt::red);
+        pen.setWidth(circleBorderSize);
         switch(node.type) {
         case KP::STARTING:
+            painter.setPen(pen);
             painter.drawPixmap(node.x * width() - circleSize,
                                node.y * height() - circleSize,
                                rudder.scaled(QSize(circleSize * 2, circleSize * 2),
@@ -141,10 +143,13 @@ void MapDetail::paintEvent(QPaintEvent *event) {
                                              Qt::SmoothTransformation
                                              )); break;
         case KP::NORMAL:
+            painter.setPen(pen);
             painter.drawEllipse(node.x * width() - circleSize / 2,
                                 node.y * height() - circleSize / 2,
                                 circleSize, circleSize); break;
         case KP::BOSS:
+            pen.setWidth(circleBorderSize * 2);
+            painter.setPen(pen);
             painter.drawEllipse(node.x * width() - circleSize,
                                 node.y * height() - circleSize,
                                 circleSize * 2, circleSize * 2); break;

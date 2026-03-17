@@ -34,6 +34,7 @@ std::tuple<bool, int> isFactoryFinished(const CSteamID &, int);
 bool isSuperUser(const CSteamID &);
 QUuid newEquip(const CSteamID &, int);
 QUuid newShip(const CSteamID &, int, int);
+bool openMap(const CSteamID &, int);
 void refreshFactory(Server *server, const CSteamID &);
 void refreshPort(Server *server, const CSteamID &);
 void setResources(const CSteamID &, ResOrd);

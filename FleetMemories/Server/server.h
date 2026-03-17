@@ -52,7 +52,7 @@ private slots:
     double getBaseSkillPointEffect(const CSteamID &, int);
     void offerEquipInfo(QSslSocket *, int);
     void offerEquipInfoUser(const CSteamID &, QSslSocket *);
-    void offerMapInfo(QSslSocket *);
+    void offerMapInfo(const CSteamID &, QSslSocket *);
     void offerTechInfo(QSslSocket *, const CSteamID &, int jobID = 0);
     void offerTechInfoComponents(QSslSocket *, const QList<TechEntry> &,
                                  bool, bool);
@@ -94,6 +94,7 @@ private:
     bool importShipFromCSV();
     void initUserDropInfo(const CSteamID &);
     void initUserEquipSPInfo(const CSteamID &);
+    void initUserMapStatus(const CSteamID &);
     void luaInitEquipable();
     void luaInitMap();
     [[nodiscard]] bool mapRefresh();
@@ -144,6 +145,7 @@ private:
     void sqlinitShipUKC() const;
     void sqlinitUsers() const;
     void sqlinitUserA() const;
+    void sqlinitUserM() const;
     void startSortie(const CSteamID &, QSslSocket *, int, int, bool);
     void switchCert(const QStringList &);
     KP::FleetFailType updateFleet(const CSteamID &, const QJsonArray &);
@@ -166,6 +168,7 @@ private:
     QMultiMap<int, int> shipRemodelGroup;
 
     QMap<int, MapWithDiff *> normalMaps;
+    QList<int> normalMapHasLua;
     QMap<int, ResOrd> resourceMaps;
 
     std::random_device random;
