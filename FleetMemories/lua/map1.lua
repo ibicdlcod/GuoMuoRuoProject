@@ -100,6 +100,61 @@ maps[1][2] = {
 		end,
 	},
 	expr = {
+		C = 50,
+	},
+}
+
+maps[1][2] = {
+	x = 0.700,
+	y = 0.800,
+	battle_type = maps.Battle_type.NORMAL,
+	lb_distance = 99,
+	next_nodes = {},
+	branch_rule = {
+		C = function(
+			ships,
+			los,
+			fleet_type,
+			capitalness, --[0]total/[1]surface/[2]carrier/[3]screens
+			ship_tags,
+			ship_speeds,
+			equipment_list, --list of lists
+			user_state)
+			return 0
+		end,
+	},
+	enemy = {
+		C = function()
+			return {}
+		end,
+	},
+	droptable = {
+		C = {
+			[0x10120202] = 1,
+			[0x10120203] = 1,
+			[0x10120204] = 1,
+			[0x10120205] = 1,
+			[0x10120303] = 1,
+			[0x10120304] = 1,
+			[0x10120305] = 1,
+			[0x10120306] = 1,
+			[0x10120307] = 1,
+			[0x10120308] = 1,
+		},
+	},
+	raredroptable = {
+		C = {
+			[0x10120201] = 1,
+			[0x10120301] = 1,
+			[0x10120302] = 1,
+		},
+	},
+	exec = {
+		C = function(battleresult, user_state)
+			return false --user state not modified
+		end,
+	},
+	expr = {
 		C = 100,
 	},
 }
@@ -169,5 +224,61 @@ maps[1][4] = {
 	},
 	expr = {
 		C = 200,
+	},
+}
+
+
+maps[1][5] = {
+	x = 0.700,
+	y = 0.200,
+	battle_type = maps.Battle_type.NORMAL,
+	lb_distance = 99,
+	next_nodes = {},
+	branch_rule = {
+		C = function(
+			ships,
+			los,
+			fleet_type,
+			capitalness, --[0]total/[1]surface/[2]carrier/[3]screens
+			ship_tags,
+			ship_speeds,
+			equipment_list, --list of lists
+			user_state)
+			return 0
+		end,
+	},
+	enemy = {
+		C = function()
+			return {}
+		end,
+	},
+	droptable = {
+		C = {
+			[0x10120202] = 1,
+			[0x10120203] = 1,
+			[0x10120204] = 1,
+			[0x10120205] = 1,
+			[0x10120303] = 1,
+			[0x10120304] = 1,
+			[0x10120305] = 1,
+			[0x10120306] = 1,
+			[0x10120307] = 1,
+			[0x10120308] = 1,
+		},
+	},
+	raredroptable = {
+		C = {
+			[0x10120201] = 1,
+			[0x10120301] = 1,
+			[0x10120302] = 1,
+		},
+	},
+	exec = {
+		C = function(battleresult, user_state)
+			return false --user state not modified
+		end,
+	},
+	expr = {
+		C = 100,
 	},
 }

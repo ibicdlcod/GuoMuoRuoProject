@@ -140,8 +140,7 @@ QString Ship::toString(QString lang) const {
 /* 5.4-construction.md#Resource cost */
 const ResOrd Ship::consRes() const {
     qint64 devResScale = settings->value("rule/devresscale", 10).toLongLong();
-    double techFactor = getTech() * getTech() / std::hypot(25.0, getTech()) + 0.1;
-    return getType().consResBase() * (qint64)std::round(techFactor
+    return getType().consResBase() * (qint64)std::round((getTech() + 1.0)
                                                          * devResScale);
 }
 
@@ -149,7 +148,8 @@ const ResOrd Ship::consRes() const {
 const int Ship::consTimeInSec() const {
     qint64 devTimebase = getType().consTimeBase();
     qint64 devResScale = settings->value("rule/devresscale", 10).toLongLong();
-    return devTimebase * (qint64)std::round((getTech() + 1.0) * devResScale);
+    double techFactor = getTech() * getTech() / std::hypot(5.0, getTech()) + 0.1;
+    return devTimebase * (qint64)std::round(techFactor  * devResScale);
 }
 
 int Ship::getId() const {
