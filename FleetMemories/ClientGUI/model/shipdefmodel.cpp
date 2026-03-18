@@ -100,6 +100,6 @@ Ship * ShipDefModel::getCurrentShip(const QModelIndex &index) const {
         return nullptr;
     }
     auto iter = (*ships).begin();
-    iter = std::advance(iter, index.row());
+    std::advance(iter, index.row());
     return *iter;
 }
