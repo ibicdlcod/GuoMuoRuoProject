@@ -302,7 +302,7 @@ enum ShipNationalityGroup{
     Nordic = 0xA,
     Commonwealth = 0xB,
     Latino = 0xC, // Iberian or Latin American
-    EasternEuropean = 0xD,
+    EasternEuropean = 0xD, // Some Western European countries get lumped here, but all are landlocked
     MinorAsian = 0xE,
     Fantasy = 0xF
 };

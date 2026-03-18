@@ -881,7 +881,7 @@ KP::ShipNationalitySubGroup KP::nationalityTable(QLocale::Territory ter) {
     case QLocale::Lesotho: return DOtherCommonwealth;
     case QLocale::Liberia: return DAmericanAssociates;
     case QLocale::Libya: return DLibyan;
-    case QLocale::Liechtenstein: return DGerman;
+    case QLocale::Liechtenstein: return DOtherEuropean;
     case QLocale::Lithuania: return DBaltic;
     case QLocale::Luxembourg: return DBeneluxOther;
     case QLocale::Macao: return DChineseOther; // just use QLocale::China->DChineseModern after 1999
