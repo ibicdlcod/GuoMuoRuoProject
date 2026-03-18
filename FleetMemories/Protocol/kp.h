@@ -316,7 +316,7 @@ enum ShipNationalitySubGroup{
      * Shounan, where 0xB7 is inappropriate) belongs here; Japanese LBAS that have connection to Taiwan/Korea but actual said people's
      * role is close to nonexistent that 0x8? / 0xE8 is inappropriate belongs here. */
     DJapaneseExterior = 0x1E,
-    DRyukyuan = 0x1F,
+    DRyukyuan = 0x1F, // The "Allegiance" property will not be changed from Japan until it is on UN non-selfgoverning territories list
     DGerman = 0x20,
     DAustrian = 0x2C, /* Austria-connected LBAS or WWI Austro-Hungarian navy might go here */
     DItalian = 0x30,
