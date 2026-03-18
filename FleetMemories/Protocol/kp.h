@@ -177,6 +177,7 @@ enum CommandType{
     DemandShipInfo,
     DemandShipInfoUser,
     DemandMapInfo,
+    DemandMapInfoUser,
     DemandTech,
     DemandSkillPoints,
     DemandResourceUpdate,
@@ -311,12 +312,12 @@ Q_ENUM_NS(ShipNationalityGroup)
 enum ShipNationalitySubGroup{
     DUnknownNation = 0x00,
     DJapanese = 0x10,
-    DJapaneseOutlying = 0x1D, /* Islands that have huge distance to Japanese mainland belongs here */
-    /* Japanese ships that are named after places in Southern Kuril Islands, Southern Kùyè(Sakhalin), occupied territories (like
-     * Shounan, where 0xB7 is inappropriate) belongs here; Japanese LBAS that have connection to Taiwan/Korea but actual said people's
-     * role is close to nonexistent that 0x8? / 0xE8 is inappropriate belongs here. */
+    /* Ships named after islands that have huge distance to Japanese mainland */
+    DJapaneseOutlying = 0x1D,
+    /* Ships named after places that are not controlled by modern Japan */
     DJapaneseExterior = 0x1E,
-    DRyukyuan = 0x1F, // The "Allegiance" property will not be changed from Japan until it is on UN non-selfgoverning territories list
+    /* Ships named after places in Okinawa Pref. or Southernmost islands Kagoshima Pref. */
+    DRyukyuan = 0x1F,
     DGerman = 0x20,
     DAustrian = 0x2C, /* Austria-connected LBAS or WWI Austro-Hungarian navy might go here */
     DItalian = 0x30,
@@ -568,6 +569,7 @@ QByteArray clientDemandEquipInfoUser();
 QByteArray clientDemandMapInfo(QDateTime timeUtc
                                = QDateTime(QDate(1970, 1, 1),
                                            QTime(0, 0, 0)));
+QByteArray clientDemandMapInfoUser();
 QByteArray clientDemandModernize(const QList<QUuid> &, bool);
 QByteArray clientDemandResourceUpdate();
 QByteArray clientDemandShipInfo(QDateTime timeUtc
@@ -616,9 +618,10 @@ QByteArray serverLackPrivate();
 QByteArray serverLogFail(AuthFailType);
 QByteArray serverLogSuccess(bool);
 QByteArray serverLogout(LogoutType);
-QByteArray serverMapInfo(const QJsonArray &, bool user = false,
+QByteArray serverMapInfo(const QJsonArray &,
                          QDateTime timeUtc = QDateTime::currentDateTimeUtc(),
                          bool cacheHit = false);
+QByteArray serverMapInfoUser(const QJsonObject &);
 QByteArray serverMapNotOpen(int mapId);
 QByteArray serverMapProgress(int mapId, int nextNode);
 QByteArray serverMapStart(int mapId, int startNode);

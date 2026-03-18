@@ -294,7 +294,6 @@ void MainWindow::gamestateInit() {
 void MainWindow::gamestateChanged(KP::GameState state) {
     Clientv2 &engine = Clientv2::getInstance();
     if(engine.isInBattle() ^ (state == KP::BattleMapView)) {
-        qCritical() << "FUCK";
         /* lock */
         return;
     }
@@ -393,6 +392,7 @@ void MainWindow::switchToSortie() {
         return;
     }
     battleArea->switchToState(KP::MapView);
+    engine.demandMapSupremacy();
     adjust();
 }
 

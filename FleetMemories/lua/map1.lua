@@ -14,6 +14,28 @@ maps[1] = {
 			user_state)
 			return 1
 		end,
+		B = function(
+			ships,
+			los,
+			fleet_type,
+			capitalness,
+			ship_tags,
+			ship_speeds,
+			equipment_list,
+			user_state)
+			return 1
+		end,
+		A = function(
+			ships,
+			los,
+			fleet_type,
+			capitalness,
+			ship_tags,
+			ship_speeds,
+			equipment_list,
+			user_state)
+			return 1
+		end,
 	},
 	gauge = 0,
 }
@@ -33,6 +55,28 @@ maps[1][1] = {
 			ship_tags,
 			ship_speeds,
 			equipment_list, --list of lists
+			user_state)
+			return 2
+		end,
+		B = function(
+			ships,
+			los,
+			fleet_type,
+			capitalness,
+			ship_tags,
+			ship_speeds,
+			equipment_list,
+			user_state)
+			return 2
+		end,
+		A = function(
+			ships,
+			los,
+			fleet_type,
+			capitalness,
+			ship_tags,
+			ship_speeds,
+			equipment_list,
 			user_state)
 			return 2
 		end,
@@ -57,6 +101,28 @@ maps[1][2] = {
 			user_state)
 			return 4
 		end,
+		B = function(
+			ships,
+			los,
+			fleet_type,
+			capitalness,
+			ship_tags,
+			ship_speeds,
+			equipment_list,
+			user_state)
+			return 4
+		end,
+		A = function(
+			ships,
+			los,
+			fleet_type,
+			capitalness,
+			ship_tags,
+			ship_speeds,
+			equipment_list,
+			user_state)
+			return 4
+		end,
 	},
 	enemy = {
 		C = function()
@@ -73,6 +139,12 @@ maps[1][2] = {
 				return {}
 			end
 		end,
+		B = function()
+			return {}
+		end,
+		A = function()
+			return {}
+		end,
 	},
 	droptable = {
 		C = {
@@ -87,6 +159,8 @@ maps[1][2] = {
 			[0x10120307] = 1,
 			[0x10120308] = 1,
 		},
+		B = {},
+		A = {},
 	},
 	raredroptable = {
 		C = {
@@ -94,14 +168,24 @@ maps[1][2] = {
 			[0x10120301] = 1,
 			[0x10120302] = 1,
 		},
+		B = {},
+		A = {},
 	},
 	exec = {
 		C = function(battleresult, user_state)
 			return false --user state not modified
 		end,
+		B = function(battleresult, user_state)
+			return false
+		end,
+		A = function(battleresult, user_state)
+			return false
+		end,
 	},
 	expr = {
 		C = 50,
+		B = 150,
+		A = 250,
 	},
 }
 
@@ -123,9 +207,37 @@ maps[1][3] = {
 			user_state)
 			return 0
 		end,
+		B = function(
+			ships,
+			los,
+			fleet_type,
+			capitalness,
+			ship_tags,
+			ship_speeds,
+			equipment_list,
+			user_state)
+			return 0
+		end,
+		A = function(
+			ships,
+			los,
+			fleet_type,
+			capitalness,
+			ship_tags,
+			ship_speeds,
+			equipment_list,
+			user_state)
+			return 0
+		end,
 	},
 	enemy = {
 		C = function()
+			return {}
+		end,
+		B = function()
+			return {}
+		end,
+		A = function()
 			return {}
 		end,
 	},
@@ -142,6 +254,8 @@ maps[1][3] = {
 			[0x10120307] = 1,
 			[0x10120308] = 1,
 		},
+		B = {},
+		A = {},
 	},
 	raredroptable = {
 		C = {
@@ -149,14 +263,24 @@ maps[1][3] = {
 			[0x10120301] = 1,
 			[0x10120302] = 1,
 		},
+		B = {},
+		A = {},
 	},
 	exec = {
 		C = function(battleresult, user_state)
 			return false --user state not modified
 		end,
+		B = function(battleresult, user_state)
+			return false
+		end,
+		A = function(battleresult, user_state)
+			return false
+		end,
 	},
 	expr = {
 		C = 100,
+		B = 250,
+		A = 400,
 	},
 }
 
@@ -178,6 +302,28 @@ maps[1][4] = {
 			user_state)
 			return 0
 		end,
+		B = function(
+			ships,
+			los,
+			fleet_type,
+			capitalness,
+			ship_tags,
+			ship_speeds,
+			equipment_list,
+			user_state)
+			return 0
+		end,
+		A = function(
+			ships,
+			los,
+			fleet_type,
+			capitalness,
+			ship_tags,
+			ship_speeds,
+			equipment_list,
+			user_state)
+			return 0
+		end,
 		},
 	enemy = {
 	--incomplete
@@ -195,6 +341,12 @@ maps[1][4] = {
 				return {}
 			end
 		end,
+		B = function()
+			return {}
+		end,
+		A = function()
+			return {}
+		end,
 	},
 	droptable = {
 		C = {
@@ -208,6 +360,8 @@ maps[1][4] = {
 			[0x10130101] = 1,
 			[0x10130102] = 1,
 		},
+		B = {},
+		A = {},
 	},
 	raredroptable = {
 		C = {
@@ -217,14 +371,24 @@ maps[1][4] = {
 			[0x10130202] = 1,
 			[0x10130205] = 1,
 		},
+		B = {},
+		A = {},
 	},
 	exec = {
 		C = function(battleresult, user_state)
 			return false --user state not modified
 		end,
+		B = function(battleresult, user_state)
+			return false
+		end,
+		A = function(battleresult, user_state)
+			return false
+		end,
 	},
 	expr = {
 		C = 200,
+		B = 450,
+		A = 700,
 	},
 }
 
@@ -247,9 +411,37 @@ maps[1][5] = {
 			user_state)
 			return 0
 		end,
+		B = function(
+			ships,
+			los,
+			fleet_type,
+			capitalness,
+			ship_tags,
+			ship_speeds,
+			equipment_list,
+			user_state)
+			return 0
+		end,
+		A = function(
+			ships,
+			los,
+			fleet_type,
+			capitalness,
+			ship_tags,
+			ship_speeds,
+			equipment_list,
+			user_state)
+			return 0
+		end,
 	},
 	enemy = {
 		C = function()
+			return {}
+		end,
+		B = function()
+			return {}
+		end,
+		A = function()
 			return {}
 		end,
 	},
@@ -266,6 +458,8 @@ maps[1][5] = {
 			[0x10120307] = 1,
 			[0x10120308] = 1,
 		},
+		B = {},
+		A = {},
 	},
 	raredroptable = {
 		C = {
@@ -273,13 +467,23 @@ maps[1][5] = {
 			[0x10120301] = 1,
 			[0x10120302] = 1,
 		},
+		B = {},
+		A = {},
 	},
 	exec = {
 		C = function(battleresult, user_state)
 			return false --user state not modified
 		end,
+		B = function(battleresult, user_state)
+			return false
+		end,
+		A = function(battleresult, user_state)
+			return false
+		end,
 	},
 	expr = {
 		C = 100,
+		B = 250,
+		A = 400,
 	},
 }

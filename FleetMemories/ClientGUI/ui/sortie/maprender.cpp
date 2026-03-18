@@ -5,6 +5,7 @@
 #include <QPainter>
 #include <QMouseEvent>
 #include "../../clientv2.h"
+#include "sortie.h"
 
 MapRender::MapRender(QWidget *parent)
     : QWidget{parent} {
@@ -29,12 +30,17 @@ MapRender::MapRender(QWidget *parent)
     pixmap = QPixmap::fromImage(image);
 
     pen = Qt::NoPen;//QPen(Qt::blue, 0);
-    brush = QBrush(Qt::black);
     brushHovered = QBrush(Qt::blue);
 
     setBackgroundRole(QPalette::Base);
     setAutoFillBackground(true);
     setMouseTracking(true);
+
+    Clientv2 &engine = Clientv2::getInstance();
+    connect(&engine, &Clientv2::mapSupremacyChanged,
+            this, [this](){
+                update();
+            });
 }
 
 void MapRender::mousePressEvent(QMouseEvent *event)
@@ -43,6 +49,22 @@ void MapRender::mousePressEvent(QMouseEvent *event)
         mousePressedInside = true;
     }
     QWidget::mousePressEvent(event); // Call base class implementation
+}
+
+void MapRender::setDiff(const QString &text) {
+    KP::Difficulty selected;
+    if(text == qtTrId("diff-c")) {
+        diff = KP::EarlyWar;
+    }
+    else if(text == qtTrId("diff-b")) {
+        diff = KP::MidWar;
+    }
+    else if(text == qtTrId("diff-a")) {
+        diff = KP::LateWar;
+    }
+    else if(text == qtTrId("diff-s")) {
+        diff = KP::Historical;
+    }
 }
 
 void MapRender::mouseMoveEvent(QMouseEvent *event)
@@ -121,6 +143,16 @@ void MapRender::paintEvent(QPaintEvent * /* event */)
 
     static Clientv2 &engine = Clientv2::getInstance();
     for(const auto map: std::as_const(engine.mapRegistryCache)) {
+        double supremacy = engine.mapSupremacies.value(map->id, -1);
+        double expectedSupremacy = 1.0;
+        switch(diff) {
+        case KP::EarlyWar: expectedSupremacy = 100.0; break;
+        case KP::MidWar: expectedSupremacy = 200.0; break;
+        case KP::LateWar: expectedSupremacy = 300.0; break;
+        case KP::Historical: expectedSupremacy = 400.0; break;
+        }
+        double hueFactor = std::min(1.0, supremacy / expectedSupremacy);
+
         /*
         if(map->id == KP::hiddenMap) {
             continue;
@@ -129,6 +161,12 @@ void MapRender::paintEvent(QPaintEvent * /* event */)
             painter.setBrush(brushHovered);
         }
         else {
+            if(hueFactor < 0) {
+                brush = QBrush(Qt::black);
+            }
+            else {
+                brush = QBrush(QColor::fromHsv(hueFactor * 120.0, 255, 255));
+            }
             painter.setBrush(brush);
         }
         painter.drawEllipse(map->worldX - circleSize / 2,

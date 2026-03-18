@@ -323,7 +323,7 @@ Q_GLOBAL_STATIC(QString,
                     "MapDef INTEGER NOT NULL, "
                     "Supremacy FLOAT NOT NULL DEFAULT -1, "
                     /* gauge remaining can be negative which makes DLC maps easier,
-                                                                                 * you still need to defeat boss flagship to win */
+                                                                                                     * you still need to defeat boss flagship to win */
                     "GaugeC INTEGER NOT NULL DEFAULT 0, "
                     "GaugeB INTEGER NOT NULL DEFAULT 0, "
                     "GaugeA INTEGER NOT NULL DEFAULT 0, "
@@ -357,9 +357,30 @@ Server::Server(int argc, char ** argv) : CommandLine(argc, argv) {
             this, &Server::datagramReceivedNonStd);
     connect(&senderM, &ServerMasterSender::errorMessage,
             this, &Server::senderMErrorMessage);
+
+    clock = new QTimer(this);
+    uint unixtime = QDateTime::currentDateTimeUtc().currentSecsSinceEpoch(); // current unix time
+    uint roundHour = unixtime + (60 - unixtime % 60); // round it up to an minute
+    QDateTime start;
+    start.setSecsSinceEpoch(roundHour);
+    clock->setSingleShot(true);
+    clock->start(QDateTime::currentDateTimeUtc().msecsTo(start));
+    connect(clock, &QTimer::timeout,
+            this, [this](){
+        minutePulse();
+        clock->setSingleShot(false);
+        clock->start(60 * 1000);
+        QObject::disconnect(clock, &QTimer::timeout, nullptr, nullptr);
+        connect(clock, &QTimer::timeout,
+                this, [this](){
+            minutePulse();
+        });
+    });
+
 }
 
 Server::~Server() noexcept {
+    delete clock;
     shutdown();
     for(auto equip: std::as_const(equipRegistry)) {
         delete equip;
@@ -951,25 +972,6 @@ void Server::offerEquipInfoUser(const CSteamID &uid,
 
 void Server::offerMapInfo(const CSteamID &uid, QSslSocket *connection)
 {
-    QSqlDatabase db = QSqlDatabase::database();
-    QMap<int, double> supremacies;
-    QSqlQuery query;
-    query.prepare("SELECT MapDef, Supremacy "
-                  "FROM UserMapState "
-                  "WHERE User = :id;");
-    query.bindValue(":id", uid.ConvertToUint64());
-    if(!query.exec() || !query.isSelect()) {
-        qCritical() << query.lastQuery();
-        //% "Get user %1's map supremacy failed!"
-        throw DBError(qtTrId("user-get-map-supremacy-failed")
-                      .arg(uid.ConvertToUint64()),
-                      query.lastError());
-    }
-    else {
-        while(query.next()) {
-            supremacies[query.value(0).toInt()] = query.value(1).toDouble();
-        }
-    }
     QJsonArray mapInfos;
     for(const auto map: std::as_const(normalMaps)) {
         int unionId = MapWithDiff::getUnionId(map->id);
@@ -985,7 +987,6 @@ void Server::offerMapInfo(const CSteamID &uid, QSslSocket *connection)
         mapInfo["x"] = map->worldX;
         mapInfo["y"] = map->worldY;
         mapInfo["diff"] = map->diff;
-        mapInfo["supremacy"] = supremacies.value(unionId, -1);
 
         if(lua["maps"][unionId] != sol::nil) {
             QJsonArray startingNodes;
@@ -1030,7 +1031,7 @@ void Server::offerMapInfo(const CSteamID &uid, QSslSocket *connection)
     QTimer::singleShot(100, this, [=, this]{
         connection->flush();
         QByteArray msg =
-                KP::serverMapInfo(mapInfos, false,
+                KP::serverMapInfo(mapInfos,
                                   settings->value("server/mapdbtimestamp",
                                                   QDateTime::currentDateTimeUtc()
                                                   ).toDateTime()
@@ -1038,6 +1039,35 @@ void Server::offerMapInfo(const CSteamID &uid, QSslSocket *connection)
         senderM.sendMessage(connection, msg);
         connection->flush();
     });
+}
+
+void Server::offerMapInfoUser(const CSteamID &uid, QSslSocket *connection)
+{
+    QSqlDatabase db = QSqlDatabase::database();
+    QMap<int, double> supremacies;
+    QSqlQuery query;
+    query.prepare("SELECT MapDef, Supremacy "
+                  "FROM UserMapState "
+                  "WHERE User = :id;");
+    query.bindValue(":id", uid.ConvertToUint64());
+    if(!query.exec() || !query.isSelect()) {
+        qCritical() << query.lastQuery();
+        //% "Get user %1's map supremacy failed!"
+        throw DBError(qtTrId("user-get-map-supremacy-failed")
+                      .arg(uid.ConvertToUint64()),
+                      query.lastError());
+    }
+    else {
+        while(query.next()) {
+            supremacies[query.value(0).toInt()] = query.value(1).toDouble();
+        }
+    }
+    QJsonObject mapSupremacies;
+    for(const auto [mapId, supremacy]: supremacies.asKeyValueRange()) {
+        mapSupremacies[QString::number(mapId)] = supremacy;
+    }
+    QByteArray msg = KP::serverMapInfoUser(mapSupremacies);
+    senderM.sendMessage(connection, msg);
 }
 
 void Server::offerResourceInfo(QSslSocket *connection,
@@ -3125,7 +3155,7 @@ void Server::luaInitMap() {
             }
             else {
                 //% "Load map %1 info success!"
-                qInfo() << qtTrId("lua-map-success-spec").arg(map);
+                qDebug() << qtTrId("lua-map-success-spec").arg(map);
                 normalMapHasLua.append(map);
                 QFileInfo fileInfo(name);
                 QDateTime lastModifiedDate = fileInfo.lastModified(QTimeZone::UTC);
@@ -3280,6 +3310,7 @@ void Server::migrate(const CSteamID &uid, const QJsonObject &input) {
     QMultiMap<int, std::tuple<int, int>> equipData;
     QMap<int, int> shipData;
     QMap<int, int> sourceModels;
+process_import_equip:
     for(auto equip: equips) {
         auto equipObj = equip.toObject();
         if(equipObj["id"].toInt() == 335) { // equip 335 is not honored
@@ -3297,6 +3328,7 @@ void Server::migrate(const CSteamID &uid, const QJsonObject &input) {
         int equipStar = equipObj["star"].toInt();
         equipData.insert(equipObj["id"].toInt(), {equipStar, equipExp});
     }
+process_import_ships:
     auto ships = input["ships"].toObject();
     for(auto ship: ships) {
         auto shipId = ship.toObject()["id"].toInt();
@@ -3333,6 +3365,7 @@ void Server::migrate(const CSteamID &uid, const QJsonObject &input) {
         }
     }
     
+add_equip:
     QSqlDatabase db = QSqlDatabase::database();
     for(auto equipDef: equipData.uniqueKeys()) {
         auto dat = equipData.values(equipDef);
@@ -3343,6 +3376,7 @@ void Server::migrate(const CSteamID &uid, const QJsonObject &input) {
         });
         
         auto iter = dat.begin();
+query_existing_imported_equip:
         QSqlQuery query;
         query.prepare("SELECT UserKCEquip.EquipUuid "
                       "FROM UserKCEquip "
@@ -3355,6 +3389,7 @@ void Server::migrate(const CSteamID &uid, const QJsonObject &input) {
         query.exec();
         query.isSelect();
         while(query.next() && iter != dat.end()) {
+replace_existing_equip:
             QSqlQuery query2;
             query2.prepare("REPLACE INTO UserKCEquip "
                            "(EquipUuid, EquipDef, Star, Skillpoints) "
@@ -3371,6 +3406,7 @@ void Server::migrate(const CSteamID &uid, const QJsonObject &input) {
             }
             iter++;
         }
+new_equip:
         while(iter != dat.end()) {
             QUuid newUid = newEquip(uid, equipDef, true);
             
@@ -3392,11 +3428,13 @@ void Server::migrate(const CSteamID &uid, const QJsonObject &input) {
         }
     }
     
+add_ship:
     for(auto shipId = shipData.keyBegin(); shipId != shipData.keyEnd();
         ++shipId) {
         auto kcShipId = sourceModels[*shipId];
         auto fmShipUid = QUuid();
         auto fmShipDef = 0;
+query_existing_imported_ship:
         for(auto fmShipIdCandidate: shipRemodelGroup.values(*shipId)) {
             QSqlQuery query;
             query.prepare("SELECT ShipUuid "
@@ -3418,6 +3456,7 @@ void Server::migrate(const CSteamID &uid, const QJsonObject &input) {
                 fmShipDef = fmShipIdCandidate;
             }
         }
+new_ship:
         if(fmShipDef != 0) {
             QSqlQuery query;
             query.prepare("UPDATE UserShip "
@@ -3437,6 +3476,7 @@ void Server::migrate(const CSteamID &uid, const QJsonObject &input) {
         else {
             fmShipUid = newShip(uid, kcShipId, true);
         }
+new_ship_as_imported:
         QSqlQuery query;
         query.prepare("REPLACE INTO UserKCShip "
                       "(ShipUuid, ShipDef, Exp) "
@@ -3454,6 +3494,21 @@ void Server::migrate(const CSteamID &uid, const QJsonObject &input) {
 
     //% "User %1: import from KC data success!"
     qInfo() << qtTrId("import-kc-data-success").arg(uid.ConvertToUint64());
+}
+
+void Server::minutePulse() {
+    qCritical() << QDateTime::currentDateTimeUtc();
+    QSqlQuery query;
+    query.prepare("UPDATE UserMapState "
+                  "SET Supremacy = (1.0 - 1.0 / :decay) * Supremacy "
+                  "WHERE Supremacy > 0;");
+    query.bindValue(":decay", settings->value("rule/navalsupremacydecay",
+                                              2880).toDouble());
+    if(Q_UNLIKELY(!query.exec())) {
+        qCritical() << query.lastQuery();
+        //% "Minute pulse: decrease supermacy failed!"
+        throw DBError(qtTrId("decrease-supremacy-failed"), query.lastError());
+    }
 }
 
 QList<std::tuple<QUuid, int>> Server::modernize(
@@ -4908,7 +4963,6 @@ void Server::receivedReq(const QJsonObject &djson,
             connection->flush();
             QByteArray msg =
                     KP::serverMapInfo(QJsonArray(),
-                                      false,
                                       settings->value("server/mapdbtimestamp",
                                                       QDateTime::currentDateTimeUtc()
                                                       ).toDateTime(),
@@ -4918,6 +4972,11 @@ void Server::receivedReq(const QJsonObject &djson,
             connection->flush();
         }
     }
+        break;
+    case KP::CommandType::DemandMapInfoUser: {
+        offerMapInfoUser(uid, connection);
+    }
+        break;
     case KP::CommandType::DemandTech: {
         QTimer::singleShot(100,
                            this,
@@ -5044,6 +5103,7 @@ home_port:
         }
         if(mapId != 0 && User::openMap(uid, mapId)) {
             offerMapInfo(uid, connection);
+            offerMapInfoUser(uid, connection);
         }
         User::decideHomePort(uid, nation);
     }
@@ -5060,11 +5120,33 @@ void Server::sendTestMessages() {
     if(!listening) {
         qWarning() << "Server isn't listening, abort.";
     }
-    else {
-        for(auto user: connectedUsers) {
-            qCritical() << getEquipSkillPointEffect(user, QUuid("{fac132b6-07e0-59b6-899b-9014e87b616f}"));
-            qCritical() << getEquipSkillPointEffect(user, QUuid("{73b0b0d4-2155-54bf-bac4-f1986aaf42ba}"));
-            qCritical() << getEquipSkillPointEffect(user, QUuid("{c976554a-3ad5-5515-bcee-69b2ed5fa3f5}"));
+    else {// 1. Read the source file (map2.lua)
+        QFile sourceFile("lua/map2.lua");
+        if (!sourceFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
+            qDebug() << "Could not open source file!";
+            return;
+        }
+
+        QString content = sourceFile.readAll();
+        sourceFile.close();
+
+        // 2. Loop from 3 to 86
+        for (int i = 3; i <= 86; ++i) {
+            QString newFileName = QString("lua/map%1.lua").arg(i);
+
+            // Replace "map[2]" with "map[i]"
+            // Using .arg(i) ensures the integer is converted to a string correctly
+            QString newContent = content;
+            newContent.replace("maps[2]", QString("maps[%1]").arg(i));
+
+            // 3. Write to the new file
+            QFile outFile(newFileName);
+            if (outFile.open(QIODevice::WriteOnly | QIODevice::Text)) {
+                QTextStream out(&outFile);
+                out << newContent;
+                outFile.close();
+                qDebug() << "Generated:" << newFileName;
+            }
         }
     }
 }

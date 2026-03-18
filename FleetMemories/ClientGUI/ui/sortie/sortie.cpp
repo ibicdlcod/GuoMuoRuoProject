@@ -45,6 +45,8 @@ Sortie::Sortie(QWidget *parent)
             this, &Sortie::battleEnd);
     connect(&engine, &Clientv2::mapEnd,
             this, &Sortie::sortieEnd);
+    connect(ui->diffChoice, &QComboBox::currentTextChanged,
+            renderer, &MapRender::setDiff);
 }
 
 Sortie::~Sortie()
@@ -53,9 +55,12 @@ Sortie::~Sortie()
 }
 
 void Sortie::switchToState(KP::SortieState state) {
-    sortieState = state;
-    switch(sortieState) {
+    Clientv2 &engine = Clientv2::getInstance();
+    switch(state) {
     case KP::MapView:
+        if(state != sortieState) {
+            engine.demandMapSupremacy();
+        }
         globeFrame->setCurrentWidget(renderer);
         ui->diffChoice->clear();
         //% "Early"
@@ -92,6 +97,7 @@ void Sortie::switchToState(KP::SortieState state) {
     default:
         break;
     }
+    sortieState = state;
 }
 
 KP::FleetType Sortie::getCurrentFleetType() {

@@ -19,6 +19,9 @@ public:
     static constexpr int globeMapHeight = 2048;
     static constexpr int circleSize = 64;
 
+public slots:
+    void setDiff(const QString &text);
+
 signals:
     void mapSelected(int mapId);
 
@@ -37,6 +40,7 @@ private:
 
     bool mousePressedInside = false;
     int hoverMapID = 0;
+    KP::Difficulty diff;
 };
 
 #endif // MAPRENDER_H

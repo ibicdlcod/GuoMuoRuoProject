@@ -53,6 +53,7 @@ private slots:
     void offerEquipInfo(QSslSocket *, int);
     void offerEquipInfoUser(const CSteamID &, QSslSocket *);
     void offerMapInfo(const CSteamID &, QSslSocket *);
+    void offerMapInfoUser(const CSteamID &, QSslSocket *);
     void offerTechInfo(QSslSocket *, const CSteamID &, int jobID = 0);
     void offerTechInfoComponents(QSslSocket *, const QList<TechEntry> &,
                                  bool, bool);
@@ -99,6 +100,7 @@ private:
     void luaInitMap();
     [[nodiscard]] bool mapRefresh();
     void migrate(const CSteamID &, const QJsonObject &);
+    void minutePulse();
     bool modifyShip(const CSteamID &, QUuid prevShip, int newDef);
     QList<std::tuple<QUuid, int>> modernize(const CSteamID &, const QList<QUuid> &);
     QList<std::tuple<QUuid, int>> modernizeEquip(const CSteamID &, const QList<QUuid> &);
@@ -175,6 +177,8 @@ private:
     std::mt19937 mt;
 
     sol::state lua;
+
+    QTimer *clock;
 
 #pragma message(SALT_FISH)
     const QByteArray defaultSalt =

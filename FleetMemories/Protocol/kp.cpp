@@ -153,6 +153,13 @@ QByteArray KP::clientDemandMapInfo(QDateTime timeUtc) {
     return QCborValue::fromJsonValue(result).toCbor();
 }
 
+QByteArray KP::clientDemandMapInfoUser() {
+    QJsonObject result;
+    result["type"] = DgramType::Request;
+    result["command"] = CommandType::DemandMapInfoUser;
+    return QCborValue::fromJsonValue(result).toCbor();
+}
+
 QByteArray KP::clientDemandModernize(const QList<QUuid> &candidates, bool isEquip) {
     QJsonObject result;
     result["type"] = DgramType::Request;
@@ -560,19 +567,23 @@ QByteArray KP::serverLogout(KP::LogoutType reason) {
     return QCborValue::fromJsonValue(result).toCbor();
 }
 
-QByteArray KP::serverMapInfo(const QJsonArray &input, bool user,
+QByteArray KP::serverMapInfo(const QJsonArray &input,
                              QDateTime timeUtc, bool cacheHit) {
     QJsonObject result;
     result["type"] = DgramType::Info;
-    if(user)
-        result["infotype"] = InfoType::MapInfoUser;
-    else {
-        result["infotype"] = InfoType::MapInfo;
-        result["timestamp"] = timeUtc.toString();
-    }
+    result["infotype"] = InfoType::MapInfo;
+    result["timestamp"] = timeUtc.toString();
     if(!cacheHit) {
         result["content"] = input;
     }
+    return QCborValue::fromJsonValue(result).toCbor();
+}
+
+QByteArray KP::serverMapInfoUser(const QJsonObject &input) {
+    QJsonObject result;
+    result["type"] = DgramType::Info;
+    result["infotype"] = InfoType::MapInfoUser;
+    result["content"] = input;
     return QCborValue::fromJsonValue(result).toCbor();
 }
 

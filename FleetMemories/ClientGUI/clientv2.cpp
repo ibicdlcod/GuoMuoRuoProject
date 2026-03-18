@@ -204,6 +204,11 @@ void Clientv2::demandMapCache() {
     sender->enqueue(msg);
 }
 
+void Clientv2::demandMapSupremacy() {
+    QByteArray msg = KP::clientDemandMapInfoUser();
+    sender->enqueue(msg);
+}
+
 void Clientv2::demandShipCache() {
     QDateTime localCacheTimeStamp = settings->value("client/shipdbtimestamp",
                                                     QDateTime(QDate(1970,01,01),
@@ -1229,6 +1234,16 @@ void Clientv2::receivedInfo(const QJsonObject &djson) {
         else {
             updateMapCache(djson);
         }
+        break;
+    case KP::InfoType::MapInfoUser: {
+        QJsonObject supremacies = djson["content"].toObject();
+        for(QJsonObject::const_iterator iter = supremacies.constBegin();
+             iter != supremacies.constEnd();
+             ++iter) {
+            mapSupremacies[iter.key().toInt()] = iter.value().toDouble();
+        }
+        emit mapSupremacyChanged();
+    }
         break;
     case KP::InfoType::MapStart:
         gameState = KP::SortieMapView;

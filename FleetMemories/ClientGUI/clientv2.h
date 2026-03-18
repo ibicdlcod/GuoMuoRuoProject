@@ -96,6 +96,7 @@ public slots:
     void demandEquipCache();
     void demandEquipSkillPoints(int);
     void demandMapCache();
+    void demandMapSupremacy();
     void demandShipCache();
     void displayPrompt();
     void doBattle(const QJsonObject &);
@@ -144,6 +145,7 @@ signals:
     void lockBattle();
     void mapEnd();
     void mapRegistryComplete();
+    void mapSupremacyChanged();
     void progressToNode(const MapNode &, int);
     void qout(QString, QColor background = QColor("white"),
               QColor foreground = QColor("black"));
@@ -239,6 +241,7 @@ private:
 public:
     QMap<int, MapWithDiff *> mapRegistryCache;
     bool mapRegistryCacheGood = false;
+    QMap<int, double> mapSupremacies;
 private:
     QHttpServer migrateServer;
     QTcpServer *tcpServer = new QTcpServer();

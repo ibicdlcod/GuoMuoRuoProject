@@ -4,6 +4,7 @@
 #include <QPainter>
 #include <QStyleHints>
 #include "../mainwindow.h"
+#include "../../clientv2.h"
 
 MapDetail::MapDetail(QWidget *parent)
     : QWidget(parent)
@@ -128,7 +129,7 @@ void MapDetail::paintEvent(QPaintEvent *event) {
                              nextNodePos - delta * circleSize * 1.5);
         }
     }
-    for(const auto &node: std::as_const(mapPointer->nodes)) {
+    for(const auto &[id, node]: mapPointer->nodes.asKeyValueRange()) {
         static QBrush redBrush = QBrush(QColor(255,128,128));
         painter.setBrush(redBrush);
         QPen pen(Qt::red);
