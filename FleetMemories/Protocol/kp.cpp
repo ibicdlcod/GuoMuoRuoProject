@@ -744,6 +744,22 @@ QByteArray KP::weighAnchor() {
 }
 
 KP::ShipNationalitySubGroup KP::nationalityTable(QLocale::Territory ter) {
+    /* The World War II involved not only the great powers but the people of subjugated colonies and practically subjugated countries.
+     * The great contribution or struggle of them subsequently made the colonial system became generally unviable and mostly replaced
+     * by international organizations based on lingua franca. To offer respect to them, all countries/territories (that Qt recognizes)
+     * is included in this function, even if they are landlocked, or not independent during WWII, or have no navy to speak of even today.
+     *
+     * If a great power's ship is primarily deployed to colonies during WWII, its nationality will count as that of said colony here.
+     * An example is De Ruyter, who is regarded as Dutch East Indian and dedicated to Indonesian people in this game, rather than Dutch.
+     *
+     * The below "nationality sub-groups" is primarily determined by status during WWII rather than modern status. Exceptions are made,
+     * such as South Korea having a significant navy in modern times, so Korea's space is not lumped with Japan's, which also have a
+     * large navy, despite Korea is Japan's colony during WWII. In paticular, the first hex digit "nationality group" is even more
+     * heavily based on WWII, regardless of how little these countries are connected in modern times.
+     *
+     * It's useless to pretend that no political points are made in this function; disagreers should fork this project instead of
+     * complaining. */
+
     switch(ter) {
     case QLocale::AnyTerritory: return KP::DUnknownNation;
     case QLocale::Afghanistan: return KP::DOtherAsian;
@@ -788,7 +804,7 @@ KP::ShipNationalitySubGroup KP::nationalityTable(QLocale::Territory ter) {
     case QLocale::Cameroon: return KP::DOtherFrancophone;
     case QLocale::Canada: return KP::DCanadian;
     case QLocale::CanaryIslands: return KP::DSpanish;
-    case QLocale::CaribbeanNetherlands: return KP::DDutchSpeakingAmericas;
+    case QLocale::CaribbeanNetherlands: return KP::DDutch;
     case QLocale::CapeVerde: return KP::DOtherLatino;
     case QLocale::CaymanIslands: return KP::DOtherCommonwealth;
     case QLocale::CentralAfricanRepublic: return KP::DOtherFrancophone;
@@ -826,7 +842,7 @@ KP::ShipNationalitySubGroup KP::nationalityTable(QLocale::Territory ter) {
     case QLocale::EuropeanUnion: return KP::DOtherEuropean;
     case QLocale::Europe: return KP::DOtherEuropean;
     case QLocale::FalklandIslands: return KP::DArgentinian; // just use QLocale::UnitedKingdom->DBritish for actual British ships
-    case QLocale::FaroeIslands: return KP::DDanish;
+    case QLocale::FaroeIslands: return KP::DDanishKingdom;
     case QLocale::Fiji: return KP::DOceanaian;
     case QLocale::Finland: return KP::DFinnish;
     case QLocale::France: return KP::DFrench;
@@ -840,7 +856,7 @@ KP::ShipNationalitySubGroup KP::nationalityTable(QLocale::Territory ter) {
     case QLocale::Ghana: return DOtherCommonwealth;
     case QLocale::Gibraltar: return DOtherEuropean; // just use QLocale::UnitedKingdom->DBritish for actual British ships
     case QLocale::Greece: return DGreekOrCypriot;
-    case QLocale::Greenland: return DDanish;
+    case QLocale::Greenland: return DDanishKingdom;
     case QLocale::Grenada: return DOtherCommonwealth;
     case QLocale::Guadeloupe: return DFrench;
     case QLocale::Guam: return DAmericanAssociates;
@@ -871,7 +887,7 @@ KP::ShipNationalitySubGroup KP::nationalityTable(QLocale::Territory ter) {
     case QLocale::Kazakhstan: return DCIS;
     case QLocale::Kenya: return DOtherCommonwealth;
     case QLocale::Kiribati: return DOceanaian;
-    case QLocale::Kosovo: return DYugoslavian;
+    // Kosovo: see "S" section below
     case QLocale::Kuwait: return DArabicAsian;
     case QLocale::Kyrgyzstan: return DCIS;
     case QLocale::Laos: return DIndochinese;
@@ -938,6 +954,8 @@ KP::ShipNationalitySubGroup KP::nationalityTable(QLocale::Territory ter) {
     case QLocale::Qatar: return DArabicAsian;
     case QLocale::Reunion: return DFrench;
     case QLocale::Romania: return DRomanian;
+    /* Soviet ships that are named after Baltic states cities also goes here,
+     * as they would belong to DBaltic->EasternEuropean otherwise */
     case QLocale::Russia: return DSovietOrRussian;
     case QLocale::Rwanda: return DCentralAfrican;
     case QLocale::SaintBarthelemy: return DOtherFrancophone;
@@ -948,10 +966,11 @@ KP::ShipNationalitySubGroup KP::nationalityTable(QLocale::Territory ter) {
     case QLocale::SaintPierreAndMiquelon: return DOtherFrancophone;
     case QLocale::SaintVincentAndGrenadines: return DOtherCommonwealth;
     case QLocale::Samoa: return DOceanaian;
-    case QLocale::SanMarino: return DItalian;
+    case QLocale::SanMarino: return DItalian; // done for linguistic reasons
     case QLocale::SaoTomeAndPrincipe: return DOtherLatino;
     case QLocale::SaudiArabia: return DArabicAsian;
     case QLocale::Senegal: return DOtherFrancophone;
+    case QLocale::Kosovo: [[fallthrough]];
     case QLocale::Serbia: return DYugoslavian;
     case QLocale::Seychelles: return DOtherFrancophone;
     case QLocale::SierraLeone: return DOtherCommonwealth;
@@ -1007,10 +1026,11 @@ KP::ShipNationalitySubGroup KP::nationalityTable(QLocale::Territory ter) {
     case QLocale::Yemen: return DArabicAsian;
     case QLocale::Zambia: return DOtherCommonwealth;
     case QLocale::Zimbabwe: return DOtherCommonwealth;
-
+    default: return DUnknownNation;
     }
+    return DUnknownNation;
 }
 
 KP::ShipNationalityGroup KP::generalNationalityTable(QLocale::Territory ter) {
-    return static_cast<KP::ShipNationalityGroup>(nationalityTable(ter) / 0x10);
+    return static_cast<KP::ShipNationalityGroup>(nationalityTable(ter) >> 4);
 }

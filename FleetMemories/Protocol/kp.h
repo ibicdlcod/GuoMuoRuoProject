@@ -314,10 +314,10 @@ enum ShipNationalitySubGroup{
     DGerman = 0x20,
     DItalian = 0x30,
     DAlbanian = 0x3A,
-    DEastAfrican = 0x3E,
+    DEastAfrican = 0x3E, /* Italian colonies and subsequent independent counties; not other East African countries */
     DLibyan = 0x3F,
     DAmerican = 0x40,
-    DAmericanAssociates = 0x4E, /* American unincorporated territories and COFA as well as Liberia goes here */
+    DAmericanAssociates = 0x4E, /* American unincorporated territories, states that have COFA with USA, as well as Liberia goes here */
     DFilipino = 0x4F,
     DBritish = 0x50,
     DFrench = 0x60,
@@ -343,6 +343,7 @@ enum ShipNationalitySubGroup{
     DBeneluxOther = 0x9F,
     DSwedish = 0xA0,
     DDanish = 0xA4,
+    DDanishKingdom = 0xA7,
     DNorwegian = 0xA8,
     DIcelandic = 0xAB,
     DFinnish = 0xAC,
@@ -357,7 +358,7 @@ enum ShipNationalitySubGroup{
     DPakistani = 0xBA,
     DBangladeshi = 0xBB,
     DCanadian = 0xBC,
-    DEgyptian = 0xBF,
+    DEgyptian = 0xBE,
     DOtherCommonwealth = 0xBF, /* British control in WWII, not actual membership in current Commonwealth */
     DSpanish = 0xC0,
     DPortuguese = 0xC2,
@@ -369,7 +370,7 @@ enum ShipNationalitySubGroup{
     DColumbianOrEcuadoran = 0xCC,
     DVenezuelan = 0xCD,
     DCuban = 0xCE,
-    DOtherLatino = 0xCF, /* include Spanish and Portuguese speaking territories outside Latin America */
+    DOtherLatino = 0xCF, /* includes Spanish and Portuguese controlled territories in WWII outside Latin America */
     DYugoslavian = 0xD0,
     DPolish = 0xD2,
     DBulgarian = 0xD4,

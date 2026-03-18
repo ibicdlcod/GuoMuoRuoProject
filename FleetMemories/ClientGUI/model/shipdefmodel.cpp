@@ -95,8 +95,11 @@ void ShipDefModel::setShips(QList<int> shipIds) {
 }
 
 Ship * ShipDefModel::getCurrentShip(const QModelIndex &index) const {
+    /* TODO: this is not debugged */
     if(!index.isValid()) {
         return nullptr;
     }
-    return *((*ships).begin() + index.row());
+    auto iter = (*ships).begin();
+    iter = std::advance(iter, index.row());
+    return *iter;
 }
