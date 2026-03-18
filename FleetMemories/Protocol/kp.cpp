@@ -254,7 +254,7 @@ QByteArray KP::clientHello() {
     return QCborValue::fromJsonValue(result).toCbor();
 }
 
-QByteArray KP::clientHomePort(ShipNationality nation) {
+QByteArray KP::clientHomePort(ShipNationalityGroup nation) {
     QJsonObject result;
     result["type"] = DgramType::Request;
     result["command"] = CommandType::SelectHomePort;
@@ -331,14 +331,14 @@ QByteArray KP::serverAskForHomePort()
     result["type"] = DgramType::Message;
     result["msgtype"] = MsgType::AskForHomePort;
     QJsonArray array;
-    QList<KP::ShipNationality> availableHomePorts
+    QList<KP::ShipNationalityGroup> availableHomePorts
         = {KP::Japanese};
     for(auto homeport: availableHomePorts) {
         array.append(homeport);
     }
     result["choices"] = array;
     /*
-    QList<KP::ShipNationality> availableHomePorts
+    QList<KP::ShipNationalityGroup> availableHomePorts
         = {KP::Japanese, KP::German, KP::Italian,
            KP::American, KP::British, KP::French, KP::Soviet,
            KP::Oceanian};
@@ -741,4 +741,276 @@ QByteArray KP::weighAnchor() {
     result["type"] = DgramType::Message;
     result["msgtype"] = MsgType::AllowClientStart;
     return QCborValue::fromJsonValue(result).toCbor();
+}
+
+KP::ShipNationalitySubGroup KP::nationalityTable(QLocale::Territory ter) {
+    switch(ter) {
+    case QLocale::AnyTerritory: return KP::DUnknownNation;
+    case QLocale::Afghanistan: return KP::DOtherAsian;
+    case QLocale::AlandIslands: return KP::DFinnish;
+    case QLocale::Albania: return KP::DAlbanian;
+    case QLocale::Algeria: return KP::DAlgerian;
+    case QLocale::AmericanSamoa: return KP::DAmericanAssociates;
+    case QLocale::Andorra: return KP::DOtherEuropean;
+    case QLocale::Angola: return KP::DOtherLatino;
+    case QLocale::Anguilla: return KP::DOtherCommonwealth;
+    case QLocale::Antarctica: return KP::DUnknownNation;
+    case QLocale::AntiguaAndBarbuda: return KP::DOtherCommonwealth;
+    case QLocale::Argentina: return KP::DArgentinian;
+    case QLocale::Armenia: return KP::DCIS;
+    case QLocale::Aruba: return KP::DDutchSpeakingAmericas;
+    case QLocale::AscensionIsland: return KP::DOtherCommonwealth;
+    case QLocale::Australia: return KP::DAustralian;
+    case QLocale::Austria: return KP::DGerman; /* the primary focus is WWII */
+    case QLocale::Azerbaijan: return KP::DCIS;
+    case QLocale::Bahamas: return KP::DOtherCommonwealth;
+    case QLocale::Bahrain: return KP::DArabic;
+    case QLocale::Bangladesh: return KP::DBangladeshi;
+    case QLocale::Barbados: return KP::DOtherCommonwealth;
+    case QLocale::Belarus: return KP::DCIS;
+    case QLocale::Belgium: return KP::DBelgian;
+    case QLocale::Belize: return KP::DOtherCommonwealth;
+    case QLocale::Benin: return KP::DOtherFrancophone;
+    case QLocale::Bermuda: return KP::DOtherCommonwealth;
+    case QLocale::Bhutan: return KP::DOtherAsian;
+    case QLocale::Bolivia: return KP::DOtherLatino;
+    case QLocale::BosniaAndHerzegovina: return KP::DYugoslavian;
+    case QLocale::Botswana: return KP::DOtherCommonwealth;
+    case QLocale::BouvetIsland: return KP::DNorwegian;
+    case QLocale::Brazil: return KP::DBrazilian;
+    case QLocale::BritishIndianOceanTerritory: return KP::DOtherCommonwealth;
+    case QLocale::BritishVirginIslands: return KP::DOtherCommonwealth;
+    case QLocale::Brunei: return KP::DMalaysianOrBruneian;
+    case QLocale::Bulgaria: return KP::DBulgarian;
+    case QLocale::BurkinaFaso: return KP::DOtherFrancophone;
+    case QLocale::Burundi: return KP::DCentralAfrican;
+    case QLocale::Cambodia: return KP::DIndochinese;
+    case QLocale::Cameroon: return KP::DOtherFrancophone;
+    case QLocale::Canada: return KP::DCanadian;
+    case QLocale::CanaryIslands: return KP::DSpanish;
+    case QLocale::CaribbeanNetherlands: return KP::DDutchSpeakingAmericas;
+    case QLocale::CapeVerde: return KP::DOtherLatino;
+    case QLocale::CaymanIslands: return KP::DOtherCommonwealth;
+    case QLocale::CentralAfricanRepublic: return KP::DOtherFrancophone;
+    case QLocale::CeutaAndMelilla: return KP::DSpanish;
+    case QLocale::Chad: return KP::DOtherFrancophone;
+    case QLocale::Chile: return KP::DChilean;
+    case QLocale::China: return KP::DChineseModern;
+    case QLocale::ChristmasIsland: return KP::DOceanaian;
+    case QLocale::ClippertonIsland: return KP::DOtherFrancophone;
+    case QLocale::CocosIslands: return KP::DOceanaian;
+    case QLocale::Colombia: return KP::DColumbianOrEcuadoran;
+    case QLocale::Comoros: return KP::DOtherFrancophone;
+    case QLocale::CongoBrazzaville: return KP::DOtherFrancophone;
+    case QLocale::CongoKinshasa: return KP::DCentralAfrican;
+    case QLocale::CookIslands: return KP::DOceanaian;
+    case QLocale::CostaRica: return KP::DOtherLatino;
+    case QLocale::Croatia: return KP::DYugoslavian;
+    case QLocale::Cuba: return KP::DCuban;
+    case QLocale::Curacao: return KP::DDutchSpeakingAmericas;
+    case QLocale::Cyprus: return KP::DGreekOrCypriot;
+    case QLocale::Czechia: return KP::DOtherEuropean;
+    case QLocale::Denmark: return KP::DDanish;
+    case QLocale::DiegoGarcia: return KP::DOtherCommonwealth;
+    case QLocale::Djibouti: return KP::DOtherFrancophone;
+    case QLocale::Dominica: return KP::DOtherLatino;
+    case QLocale::DominicanRepublic: return KP::DOtherLatino;
+    case QLocale::Ecuador: return KP::DColumbianOrEcuadoran;
+    case QLocale::Egypt: return KP::DEgyptian;
+    case QLocale::ElSalvador: return KP::DOtherLatino;
+    case QLocale::EquatorialGuinea: return KP::DOtherLatino;
+    case QLocale::Eritrea: return KP::DEastAfrican;
+    case QLocale::Estonia: return KP::DBaltic;
+    case QLocale::Eswatini: return KP::DOtherCommonwealth;
+    case QLocale::Ethiopia: return KP::DEastAfrican;
+    case QLocale::EuropeanUnion: return KP::DOtherEuropean;
+    case QLocale::Europe: return KP::DOtherEuropean;
+    case QLocale::FalklandIslands: return KP::DArgentinian; // just use QLocale::UnitedKingdom->DBritish for actual British ships
+    case QLocale::FaroeIslands: return KP::DDanish;
+    case QLocale::Fiji: return KP::DOceanaian;
+    case QLocale::Finland: return KP::DFinnish;
+    case QLocale::France: return KP::DFrench;
+    case QLocale::FrenchGuiana: return KP::DFrench; /* overseas departments (and not other dependencies of France) use DFrench */
+    case QLocale::FrenchPolynesia: return KP::DOtherFrancophone;
+    case QLocale::FrenchSouthernTerritories: return KP::DOtherFrancophone;
+    case QLocale::Gabon: return KP::DOtherFrancophone;
+    case QLocale::Gambia: return KP::DOtherCommonwealth;
+    case QLocale::Georgia: return KP::DCIS;
+    case QLocale::Germany: return KP::DGerman;
+    case QLocale::Ghana: return DOtherCommonwealth;
+    case QLocale::Gibraltar: return DOtherEuropean; // just use QLocale::UnitedKingdom->DBritish for actual British ships
+    case QLocale::Greece: return DGreekOrCypriot;
+    case QLocale::Greenland: return DDanish;
+    case QLocale::Grenada: return DOtherCommonwealth;
+    case QLocale::Guadeloupe: return DFrench;
+    case QLocale::Guam: return DAmericanAssociates;
+    case QLocale::Guatemala: return DOtherLatino;
+    case QLocale::Guernsey: return DOtherCommonwealth;
+    case QLocale::Guinea: return DOtherFrancophone;
+    case QLocale::GuineaBissau: return DOtherLatino;
+    case QLocale::Guyana: return DOtherCommonwealth;
+    case QLocale::Haiti: return DOtherLatino;
+    case QLocale::HeardAndMcDonaldIslands: return DOceanaian;
+    case QLocale::Honduras: return DOtherLatino;
+    case QLocale::HongKong: return DChineseOther; // just use QLocale::China->DChineseModern after 1997
+    case QLocale::Hungary: return DOtherEuropean;
+    case QLocale::Iceland: return DIcelandic;
+    case QLocale::India: return DIndian;
+    case QLocale::Indonesia: return DIndonesian;
+    case QLocale::Iran: return DIranian;
+    case QLocale::Iraq: return DArabic;
+    case QLocale::Ireland: return DIrish;
+    case QLocale::IsleOfMan: return DOtherCommonwealth;
+    case QLocale::Israel: return DIsraeli;
+    case QLocale::Italy: return DItalian;
+    case QLocale::IvoryCoast: return DOtherFrancophone;
+    case QLocale::Jamaica: return DOtherCommonwealth;
+    case QLocale::Japan: return DJapanese;
+    case QLocale::Jersey: return DOtherCommonwealth;
+    case QLocale::Jordan: return DArabic;
+    case QLocale::Kazakhstan: return DCIS;
+    case QLocale::Kenya: return DOtherCommonwealth;
+    case QLocale::Kiribati: return DOceanaian;
+    case QLocale::Kosovo: return DYugoslavian;
+    case QLocale::Kuwait: return DArabic;
+    case QLocale::Kyrgyzstan: return DCIS;
+    case QLocale::Laos: return DIndochinese;
+    case QLocale::LatinAmerica: return DOtherLatino;
+    case QLocale::Latvia: return DBaltic;
+    case QLocale::Lebanon: return DArabic;
+    case QLocale::Lesotho: return DOtherCommonwealth;
+    case QLocale::Liberia: return DAmericanAssociates;
+    case QLocale::Libya: return DLibyan;
+    case QLocale::Liechtenstein: return DGerman;
+    case QLocale::Lithuania: return DBaltic;
+    case QLocale::Luxembourg: return DBeneluxOther;
+    case QLocale::Macao: return DChineseOther; // just use QLocale::China->DChineseModern after 1999
+    case QLocale::Macedonia: return DYugoslavian;
+    case QLocale::Madagascar: return DOtherFrancophone;
+    case QLocale::Malawi: return DOtherCommonwealth;
+    case QLocale::Malaysia: return DMalaysianOrBruneian;
+    case QLocale::Maldives: return DOtherCommonwealth;
+    case QLocale::Mali: return DOtherFrancophone;
+    case QLocale::Malta: return DOtherCommonwealth;
+    case QLocale::MarshallIslands: return DAmericanAssociates; //(COFA)
+    case QLocale::Martinique: return DFrench;
+    case QLocale::Mauritania: return DMauritanian;
+    case QLocale::Mauritius: return DOtherCommonwealth;
+    case QLocale::Mayotte: return DFrench;
+    case QLocale::Mexico: return DMexican;
+    case QLocale::Micronesia: return DAmericanAssociates; //(COFA)
+    case QLocale::Moldova: return DCIS;
+    case QLocale::Monaco: return DOtherFrancophone;
+    case QLocale::Mongolia: return DMongolian;
+    case QLocale::Montenegro: return DYugoslavian;
+    case QLocale::Montserrat: return DOtherCommonwealth;
+    case QLocale::Morocco: return DMoroccoan;
+    case QLocale::Mozambique: return DOtherLatino;
+    case QLocale::Myanmar: return DOtherAsian;
+    case QLocale::Namibia: return DSouthAfricanOrNamibian;
+    case QLocale::NauruTerritory: return DOceanaian;
+    case QLocale::Nepal: return DOtherAsian;
+    case QLocale::Netherlands: return DDutch;
+    case QLocale::NewCaledonia: return DOtherFrancophone;
+    case QLocale::NewZealand: return DNewZealander;
+    case QLocale::Nicaragua: return DOtherLatino;
+    case QLocale::Niger: return DOtherFrancophone;
+    case QLocale::Nigeria: return DOtherCommonwealth;
+    case QLocale::Niue: return DOtherCommonwealth;
+    case QLocale::NorfolkIsland: return DAustralian;
+    case QLocale::NorthernMarianaIslands: return DAmericanAssociates;
+    case QLocale::NorthKorea: return DNorthKorean;
+    case QLocale::Norway: return DNorwegian;
+    case QLocale::Oman: return DArabic;
+    case QLocale::OutlyingOceania: return DOceanaian;
+    case QLocale::Pakistan: return DPakistani;
+    case QLocale::Palau: return DAmericanAssociates; //(COFA)
+    case QLocale::PalestinianTerritories: return DArabic;
+    case QLocale::Panama: return DOtherLatino;
+    case QLocale::PapuaNewGuinea: return DOceanaian;
+    case QLocale::Paraguay: return DOtherLatino;
+    case QLocale::Peru: return DOtherLatino;
+    case QLocale::Philippines: return DFilipino;
+    case QLocale::Pitcairn: return DOtherCommonwealth;
+    case QLocale::Poland: return DPolish;
+    case QLocale::Portugal: return DPortuguese;
+    case QLocale::PuertoRico: return DAmericanAssociates;
+    case QLocale::Qatar: return DArabic;
+    case QLocale::Reunion: return DFrench;
+    case QLocale::Romania: return DRomanian;
+    case QLocale::Russia: return DSovietOrRussian;
+    case QLocale::Rwanda: return DCentralAfrican;
+    case QLocale::SaintBarthelemy: return DOtherFrancophone;
+    case QLocale::SaintHelena: return DOtherCommonwealth;
+    case QLocale::SaintKittsAndNevis: return DOtherCommonwealth;
+    case QLocale::SaintLucia: return DOtherCommonwealth;
+    case QLocale::SaintMartin: return DOtherFrancophone;
+    case QLocale::SaintPierreAndMiquelon: return DOtherFrancophone;
+    case QLocale::SaintVincentAndGrenadines: return DOtherCommonwealth;
+    case QLocale::Samoa: return DOceanaian;
+    case QLocale::SanMarino: return DItalian;
+    case QLocale::SaoTomeAndPrincipe: return DOtherLatino;
+    case QLocale::SaudiArabia: return DArabic;
+    case QLocale::Senegal: return DOtherFrancophone;
+    case QLocale::Serbia: return DYugoslavian;
+    case QLocale::Seychelles: return DOtherFrancophone;
+    case QLocale::SierraLeone: return DOtherCommonwealth;
+    case QLocale::Singapore: return DSingaporean;
+    case QLocale::SintMaarten: return DDutchSpeakingAmericas;
+    case QLocale::Slovakia: return DOtherEuropean;
+    case QLocale::Slovenia: return DYugoslavian;
+    case QLocale::SolomonIslands: return DOceanaian;
+    case QLocale::Somalia: return DEastAfrican;
+    case QLocale::SouthAfrica: return DSouthAfricanOrNamibian;
+    case QLocale::SouthGeorgiaAndSouthSandwichIslands: return DOtherCommonwealth;
+    case QLocale::SouthKorea: return DSouthKorean;
+    case QLocale::SouthSudan: return DOtherCommonwealth;
+    case QLocale::Spain: return DSpanish;
+    case QLocale::SriLanka: return DOtherCommonwealth;
+    case QLocale::Sudan: return DOtherCommonwealth;
+    case QLocale::Suriname: return DDutchSpeakingAmericas;
+    case QLocale::SvalbardAndJanMayen: return DNorwegian;
+    case QLocale::Sweden: return DSwedish;
+    case QLocale::Switzerland: return DOtherEuropean;
+    case QLocale::Syria: return DArabic;
+    case QLocale::Taiwan: return DChineseNationalist;
+    case QLocale::Tajikistan: return DCIS;
+    case QLocale::Tanzania: return DOtherCommonwealth;
+    case QLocale::Thailand: return DThai;
+    case QLocale::TimorLeste: return DOtherLatino;
+    case QLocale::Togo: return DOtherFrancophone;
+    case QLocale::TokelauTerritory: return DOceanaian;
+    case QLocale::Tonga: return DOceanaian;
+    case QLocale::TrinidadAndTobago: return DOtherLatino;
+    case QLocale::TristanDaCunha: return DOtherCommonwealth;
+    case QLocale::Tunisia: return DTunisian;
+    case QLocale::Turkey: return DTurkish;
+    case QLocale::Turkmenistan: return DCIS;
+    case QLocale::TurksAndCaicosIslands: return DOtherCommonwealth;
+    case QLocale::TuvaluTerritory: return DOceanaian;
+    case QLocale::Uganda: return DOtherCommonwealth;
+    case QLocale::Ukraine: return DUkrainian;
+    case QLocale::UnitedArabEmirates: return DArabic;
+    case QLocale::UnitedKingdom: return DBritish;
+    case QLocale::UnitedStates: return DAmerican;
+    case QLocale::UnitedStatesOutlyingIslands: return DAmericanAssociates;
+    case QLocale::UnitedStatesVirginIslands: return DAmericanAssociates;
+    case QLocale::Uruguay: return DOtherLatino;
+    case QLocale::Uzbekistan: return DCIS;
+    case QLocale::Vanuatu: return DOceanaian;
+    case QLocale::VaticanCity: return DOtherEuropean;
+    case QLocale::Venezuela: return DVenezuelan;
+    case QLocale::Vietnam: return DIndochinese;
+    case QLocale::WallisAndFutuna: return DOtherFrancophone;
+    case QLocale::WesternSahara: return DOtherLatino;
+    case QLocale::World: return DUnknownNation;
+    case QLocale::Yemen: return DArabic;
+    case QLocale::Zambia: return DOtherCommonwealth;
+    case QLocale::Zimbabwe: return DOtherCommonwealth;
+
+    }
+}
+
+KP::ShipNationalityGroup KP::generalNationalityTable(QLocale::Territory ter) {
+    return static_cast<KP::ShipNationalityGroup>(nationalityTable(ter) / 0x10);
 }

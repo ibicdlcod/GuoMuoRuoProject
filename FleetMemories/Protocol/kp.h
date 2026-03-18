@@ -14,6 +14,7 @@
 #include <QJsonObject>
 #include <QCborValue>
 #include <QDateTime>
+#include <QLocale>
 #include "steam/steamtypes.h"
 
 #pragma message(NOT_M_CONST)
@@ -287,7 +288,7 @@ enum ConsoleCommandType{
 };
 Q_ENUM_NS(ConsoleCommandType)
 
-enum ShipNationality{
+enum ShipNationalityGroup{
     UnknownNation = 0,
     Japanese = 1,
     German = 2,
@@ -305,32 +306,41 @@ enum ShipNationality{
     MinorAsian = 0xE,
     Fantasy = 0xF
 };
-Q_ENUM_NS(ShipNationality)
+Q_ENUM_NS(ShipNationalityGroup)
 
-enum ShipNationalityDetailed{
+enum ShipNationalitySubGroup{
     DUnknownNation = 0x00,
     DJapanese = 0x10,
     DGerman = 0x20,
     DItalian = 0x30,
     DAlbanian = 0x3A,
-    DItalianEastAfrican = 0x3E,
+    DEastAfrican = 0x3E,
     DLibyan = 0x3F,
     DAmerican = 0x40,
+    DAmericanAssociates = 0x4E, /* American unincorporated territories and COFA as well as Liberia goes here */
     DFilipino = 0x4F,
     DBritish = 0x50,
     DFrench = 0x60,
-    DFrenchIndochinese = 0x6E,
+    DAlgerian = 0x6A,
+    DMoroccoan = 0x6B,
+    DTunisian = 0x6C,
+    DMauritanian = 0x6D,
+    DIndochinese = 0x6E,
     DOtherFrancophone = 0x6F,
-    DSovietRussian = 0x70,
+    DSovietOrRussian = 0x70,
     DUkrainian = 0x7C,
-    DSovietNonRussian = 0x7E,
-    DChineseNationalist = 0x80,
-    DChineseModern = 0x88,
-    DDutchEastIndian = 0x90,
+    DCIS = 0x7E, /* Aside from Russian and Ukrainian above, all founding members of CIS is included ignoring any later withdrawal */
+    DChineseNationalist = 0x80, /* Nanjing/Taipei regime goes here */
+    DChineseMonarchical = 0x86, /* Qing/"Manchukuo" goes here */
+    DMongolian = 0x87,
+    DChineseModern = 0x88, /* Beijing regime goes here */
+    DChineseOther = 0x8F, /* Hong Kong and Macau before 1997/1999 goes here */
+    DIndonesian = 0x90,
     DDutch = 0x98,
-    DDutchAmerican = 0x9A,
+    DDutchSpeakingAmericas = 0x9A,
     DBelgian = 0x9B,
-    DDRCongolese = 0x9D,
+    DCentralAfrican = 0x9D, /* Belgian colonies and subsequent independent counties; not French Central Africa */
+    DBeneluxOther = 0x9F,
     DSwedish = 0xA0,
     DDanish = 0xA4,
     DNorwegian = 0xA8,
@@ -338,16 +348,17 @@ enum ShipNationalityDetailed{
     DFinnish = 0xAC,
     DAustralian = 0xB0,
     DNewZealander = 0xB2,
-    DOceanaian = 0xB3,
-    DSouthAfrican = 0xB4,
+    DOceanaian = 0xB3, /* A lot of this is/was external territories of Australia/New Zealand */
+    DSouthAfricanOrNamibian = 0xB4,
     DIrish = 0xB5,
-    DMalaysian = 0xB6,
+    DMalaysianOrBruneian = 0xB6,
     DSingaporean = 0xB7,
     DIndian = 0xB8,
     DPakistani = 0xBA,
     DBangladeshi = 0xBB,
     DCanadian = 0xBC,
-    DOtherCommonwealth = 0xBE,
+    DEgyptian = 0xBF,
+    DOtherCommonwealth = 0xBF, /* British control in WWII, not actual membership in current Commonwealth */
     DSpanish = 0xC0,
     DPortuguese = 0xC2,
     DBrazilian = 0xC4,
@@ -358,7 +369,7 @@ enum ShipNationalityDetailed{
     DColumbianOrEcuadoran = 0xCC,
     DVenezuelan = 0xCD,
     DCuban = 0xCE,
-    DOtherLatino = 0xCF,
+    DOtherLatino = 0xCF, /* include spanish and portuguese speaking territories outside Latin America */
     DYugoslavian = 0xD0,
     DPolish = 0xD2,
     DBulgarian = 0xD4,
@@ -366,16 +377,17 @@ enum ShipNationalityDetailed{
     DRomanian = 0xD8,
     DTurkish = 0xDA,
     DBaltic = 0xDC,
-    DOtherEuropean = 0xDE,
+    DIsraeli = 0xDE,
+    DOtherEuropean = 0xDF,
     DThai = 0xE0,
     DIranian = 0xE2,
-    DArabic = 0xE4,
+    DArabic = 0xE4, /* does not include non-asian countries */
     DSouthKorean = 0xE8,
     DNorthKorean = 0xEA,
     DOtherAsian = 0xEC,
     DFantasy = 0xF0,
 };
-Q_ENUM_NS(ShipNationalityDetailed)
+Q_ENUM_NS(ShipNationalitySubGroup)
 
 Q_GLOBAL_STATIC(QStringList,
                 nationLiteral,
@@ -562,7 +574,7 @@ QByteArray clientFactoryRefresh();
 QByteArray clientFetch(int factoryID = -1, bool forced = false);
 QByteArray clientFleetData(const QJsonArray &);
 QByteArray clientHello();
-QByteArray clientHomePort(ShipNationality);
+QByteArray clientHomePort(ShipNationalityGroup);
 QByteArray clientMigrate(const QJsonObject &);
 QByteArray clientQueryNextNode(int, int);
 QByteArray clientSortie(int, int, bool);
@@ -619,6 +631,10 @@ QByteArray serverSuccess();
 QByteArray serverTestMessages(int);
 QByteArray serverVerifyComplete();
 QByteArray weighAnchor();
+
+/* detailed nationality table */
+static ShipNationalitySubGroup nationalityTable(QLocale::Territory territory);
+static ShipNationalityGroup generalNationalityTable(QLocale::Territory territory);
 
 };
 

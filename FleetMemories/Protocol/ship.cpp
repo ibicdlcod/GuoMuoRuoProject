@@ -192,8 +192,8 @@ QList<int> Ship::getPreviousModels(const QMap<int, Ship *> &registry) const {
     return result;
 }
 
-KP::ShipNationality Ship::getNationality() const {
-    return static_cast<KP::ShipNationality>((shipRegId & 0x00F00000) >> 20);
+KP::ShipNationalityGroup Ship::getNationality() const {
+    return static_cast<KP::ShipNationalityGroup>((shipRegId & 0x00F00000) >> 20);
 }
 
 QList<int> Ship::getStartingEquip() const {

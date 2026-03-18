@@ -5021,7 +5021,7 @@ void Server::receivedReq(const QJsonObject &djson,
         break;
 home_port:
     case KP::CommandType::SelectHomePort: {
-        KP::ShipNationality nation = static_cast<KP::ShipNationality>(
+        KP::ShipNationalityGroup nation = static_cast<KP::ShipNationalityGroup>(
                     djson["nation"].toInt());
         int shipId = 0;
         int mapId = 0;

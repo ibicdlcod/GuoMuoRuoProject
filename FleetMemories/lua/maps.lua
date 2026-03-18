@@ -8,8 +8,9 @@ maps.Battle_type = {
     EMPTY = 3,
     DISASTER = 4,
     NIGHT = 5,
-    AIR = 6,
-    TRANSPORT = 7,
+    NIGHTBOSS = 6,
+    AIR = 7,
+    TRANSPORT = 8,
 }
 
 return maps

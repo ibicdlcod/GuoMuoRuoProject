@@ -15,8 +15,8 @@ namespace User {
 
 bool addShipBP(const CSteamID &, int, bool reverse = false);
 void addSkillPoints(const CSteamID &, int, int64);
-KP::ShipNationality checkHomePort(const CSteamID &);
-void decideHomePort(const CSteamID &, KP::ShipNationality);
+KP::ShipNationalityGroup checkHomePort(const CSteamID &);
+void decideHomePort(const CSteamID &, KP::ShipNationalityGroup);
 int getCurrentFactoryParallel(const CSteamID &, int);
 ResOrd getCurrentResources(const CSteamID &);
 int getEquipAmount(const CSteamID &, int);

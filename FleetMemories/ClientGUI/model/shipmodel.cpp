@@ -45,7 +45,7 @@ void ShipModel::switchShipDisplayType(const QString &nationality,
     QStringList typePasses = {qtTrId("all-shiptypes")};
     //% "All ship classes"
     QStringList classPasses = {qtTrId("all-shipclasses")};;
-    static auto meta = QMetaEnum::fromType<KP::ShipNationality>();
+    static auto meta = QMetaEnum::fromType<KP::ShipNationalityGroup>();
     for(auto iter = clientShips.keyValueBegin();
          iter != clientShips.keyValueEnd();
          ++iter) {

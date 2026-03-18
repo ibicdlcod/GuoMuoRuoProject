@@ -84,7 +84,7 @@ void User::addSkillPoints(const CSteamID &uid, int equipId, int64 skillPoints) {
     }
 }
 
-KP::ShipNationality User::checkHomePort(const CSteamID &uid) {
+KP::ShipNationalityGroup User::checkHomePort(const CSteamID &uid) {
     QSqlDatabase db = QSqlDatabase::database();
     QSqlQuery query;
     query.prepare("SELECT Intvalue "
@@ -96,11 +96,11 @@ KP::ShipNationality User::checkHomePort(const CSteamID &uid) {
         return KP::UnknownNation;
     }
     else {
-        return static_cast<KP::ShipNationality>(query.value(0).toInt());
+        return static_cast<KP::ShipNationalityGroup>(query.value(0).toInt());
     }
 }
 
-void User::decideHomePort(const CSteamID &uid, KP::ShipNationality nation) {
+void User::decideHomePort(const CSteamID &uid, KP::ShipNationalityGroup nation) {
     QSqlDatabase db = QSqlDatabase::database();
 
     QSqlQuery query2;

@@ -9,7 +9,11 @@
 |               0x??4???00-0x??4???EF               |                           American                           |
 |               0x??4???F0-0x??4???FF               |                          Filipino*                           |
 |               0x??5???00-0x??5???FF               |                           British                            |
-|               0x??6???00-0x??6???DF               |                            French                            |
+|               0x??6???00-0x??6???9F               |                            French                            |
+|               0x??6???A0-0x??6???AF               |                   (Reserved for Algerian)                    |
+|               0x??6???B0-0x??6???BF               |                   (Reserved for Moroccoan)                   |
+|               0x??6???C0-0x??6???CF               |                   (Reserved for Tunisian)                    |
+|               0x??6???D0-0x??6???DF               |                  (Reserved for Mauritanian)                  |
 |               0x??6???E0-0x??6???EF               |          French Indochinese*->Vietnamese/Cambodian           |
 |               0x??6???F0-0x??6???FF               |            (Reserved for Francophone countries)*             |
 |               0x??7???00-0x??7???BF               |                        Soviet/Russian                        |
@@ -29,7 +33,7 @@
 |               0x??B???00-0x??B???1F               |                          Australian                          |
 |               0x??B???20-0x??B???2F               |                        New Zealander                         |
 |               0x??B???30-0x??B???3F               | (Reserved for Papua New Guinean and other Oceanian countries) |
-|               0x??B???40-0x??B???4F               |                 (Reserved for South African)                 |
+|               0x??B???40-0x??B???4F               |            (Reserved for South African/Namibian)             |
 |               0x??B???50-0x??B???5F               |                     (Reserved for Irish)                     |
 |               0x??B???60-0x??B???6F               |                  (Reserved for Malaysian*)                   |
 |               0x??B???70-0x??B???7F               |                 (Reserved for Singaporean*)                  |
@@ -37,7 +41,8 @@
 |               0x??B???A0-0x??B???AF               |                   (Reserved for Pakistani)                   |
 |               0x??B???B0-0x??B???BF               |                  (Reserved for Bangladeshi)                  |
 |               0x??B???C0-0x??B???DF               |                           Canadian                           |
-|               0x??B???E0-0x??B???FF               |         (Reserved for other Commonwealth countries)          |
+|               0x??B???E0-0x??B???EF               |                           Egyptian                           |
+|               0x??B???F0-0x??B???FF               |         (Reserved for other Commonwealth countries)          |
 |               0x??C???00-0x??C???1F               |                    (Reserved for Spanish)                    |
 |               0x??C???20-0x??C???3F               |                  (Reserved for Portuguese)                   |
 |               0x??C???40-0x??C???5F               |                          Brazilian                           |
