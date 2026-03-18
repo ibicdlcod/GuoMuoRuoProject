@@ -752,13 +752,13 @@ KP::ShipNationalitySubGroup KP::nationalityTable(QLocale::Territory ter) {
      * If a great power's ship is primarily deployed to colonies during WWII, its nationality will count as that of said colony here.
      * An example is De Ruyter, who is regarded as Dutch East Indian and dedicated to Indonesian people in this game, rather than Dutch.
      *
-     * The below "nationality sub-groups" is primarily determined by status during WWII rather than modern status. Exceptions are made,
-     * such as South Korea having a significant navy in modern times, so Korea's space is not lumped with Japan's, which also have a
-     * large navy, despite Korea is Japan's colony during WWII. In paticular, the first hex digit "nationality group" is even more
-     * heavily based on WWII, regardless of how little these countries are connected in modern times.
+     * The below "nationality sub-groups" is primarily determined by status during WWII rather than modern status. In paticular, the
+     * first hex digit "nationality group" is even more heavily based on WWII, regardless of how little these countries are connected
+     * in modern times. Exceptions are made, such as South Korea having a significant navy in modern times, so Korea's space (0xE8-0xEB)
+     * is not lumped with Japan's (0x10-0x1F), which also have a large navy, despite the fact Korea was Japan's colony during WWII.
      *
-     * It's useless to pretend that no political points are made in this function; disagreers should fork this project instead of
-     * complaining. */
+     * It's useless to pretend that no political points are made in this function; disagreers are encouraged to fork this project
+     * instead of complaining. */
 
     switch(ter) {
     case QLocale::AnyTerritory: return KP::DUnknownNation;
@@ -777,7 +777,7 @@ KP::ShipNationalitySubGroup KP::nationalityTable(QLocale::Territory ter) {
     case QLocale::Aruba: return KP::DDutchSpeakingAmericas;
     case QLocale::AscensionIsland: return KP::DOtherCommonwealth;
     case QLocale::Australia: return KP::DAustralian;
-    case QLocale::Austria: return KP::DGerman; /* the primary focus is WWII */
+    case QLocale::Austria: return KP::DAustrian;
     case QLocale::Azerbaijan: return KP::DCIS;
     case QLocale::Bahamas: return KP::DOtherCommonwealth;
     case QLocale::Bahrain: return KP::DArabicAsian;

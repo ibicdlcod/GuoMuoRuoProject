@@ -289,20 +289,20 @@ enum ConsoleCommandType{
 Q_ENUM_NS(ConsoleCommandType)
 
 enum ShipNationalityGroup{
-    UnknownNation = 0,
-    Japanese = 1,
-    German = 2,
-    Italian = 3,
-    American = 4,
-    British = 5,
-    French = 6,
-    Soviet = 7, // includes any non-Baltic Soviet Republic
-    Chinese = 8,
-    Benelux = 9,
+    UnknownNation = 0x0,
+    Japanese = 0x1,
+    German = 0x2,
+    Italian = 0x3,
+    American = 0x4,
+    British = 0x5,
+    French = 0x6,
+    Soviet = 0x7, // includes any non-Baltic Soviet Republic
+    Chinese = 0x8,
+    Benelux = 0x9,
     Nordic = 0xA,
-    Commonwealth = 0xB,
-    Latino = 0xC, // Iberian or Latin American
-    EasternEuropean = 0xD, // Some Western European countries get lumped here, but all are landlocked
+    Commonwealth = 0xB, /* British control in WWII, not actual membership in current Commonwealth */
+    Latino = 0xC, // Iberian or Latin American, or Spanish and Portuguese controlled territories in WWII elsewhere
+    EasternEuropean = 0xD, // Some Western/Central European countries such as Switzerland get lumped here, but all are landlocked
     MinorAsian = 0xE,
     Fantasy = 0xF
 };
@@ -311,7 +311,14 @@ Q_ENUM_NS(ShipNationalityGroup)
 enum ShipNationalitySubGroup{
     DUnknownNation = 0x00,
     DJapanese = 0x10,
+    DJapaneseOutlying = 0x1D, /* Islands that have huge distance to Japanese mainland belongs here */
+    /* Japanese ships that are named after places in Southern Kuril Islands, Southern Kùyè(Sakhalin), occupied territories (like
+     * Shounan, where 0xB7 is inappropriate) belongs here; Japanese LBAS that have connection to Taiwan/Korea but actual said people's
+     * role is close to nonexistent that 0x8? / 0xE8 is inappropriate belongs here. */
+    DJapaneseExterior = 0x1E,
+    DRyukyuan = 0x1F,
     DGerman = 0x20,
+    DAustrian = 0x2C, /* Austria-connected LBAS or WWI Austro-Hungarian navy might go here */
     DItalian = 0x30,
     DAlbanian = 0x3A,
     DEastAfrican = 0x3E, /* Italian colonies and subsequent independent counties; not other East African countries */
@@ -319,7 +326,7 @@ enum ShipNationalitySubGroup{
     DAmerican = 0x40,
     DAmericanAssociates = 0x4E, /* American unincorporated territories, states that have COFA with USA, as well as Liberia goes here */
     DFilipino = 0x4F,
-    DBritish = 0x50,
+    DBritish = 0x50, /* have a whole 0xB? space for British Empire territories in WWII */
     DFrench = 0x60,
     DAlgerian = 0x6A,
     DMoroccoan = 0x6B,
@@ -351,7 +358,7 @@ enum ShipNationalitySubGroup{
     DNewZealander = 0xB2,
     DOceanaian = 0xB3, /* A lot of this is/was external territories of Australia/New Zealand */
     DSouthAfricanOrNamibian = 0xB4,
-    DIrish = 0xB5,
+    DIrish = 0xB5, /* for linguistic reasons */
     DMalaysianOrBruneian = 0xB6,
     DSingaporean = 0xB7,
     DIndian = 0xB8,
