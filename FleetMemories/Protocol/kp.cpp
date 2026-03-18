@@ -764,7 +764,7 @@ KP::ShipNationalitySubGroup KP::nationalityTable(QLocale::Territory ter) {
     case QLocale::Austria: return KP::DGerman; /* the primary focus is WWII */
     case QLocale::Azerbaijan: return KP::DCIS;
     case QLocale::Bahamas: return KP::DOtherCommonwealth;
-    case QLocale::Bahrain: return KP::DArabic;
+    case QLocale::Bahrain: return KP::DArabicAsian;
     case QLocale::Bangladesh: return KP::DBangladeshi;
     case QLocale::Barbados: return KP::DOtherCommonwealth;
     case QLocale::Belarus: return KP::DCIS;
@@ -858,7 +858,7 @@ KP::ShipNationalitySubGroup KP::nationalityTable(QLocale::Territory ter) {
     case QLocale::India: return DIndian;
     case QLocale::Indonesia: return DIndonesian;
     case QLocale::Iran: return DIranian;
-    case QLocale::Iraq: return DArabic;
+    case QLocale::Iraq: return DArabicAsian;
     case QLocale::Ireland: return DIrish;
     case QLocale::IsleOfMan: return DOtherCommonwealth;
     case QLocale::Israel: return DIsraeli;
@@ -867,17 +867,17 @@ KP::ShipNationalitySubGroup KP::nationalityTable(QLocale::Territory ter) {
     case QLocale::Jamaica: return DOtherCommonwealth;
     case QLocale::Japan: return DJapanese;
     case QLocale::Jersey: return DOtherCommonwealth;
-    case QLocale::Jordan: return DArabic;
+    case QLocale::Jordan: return DArabicAsian;
     case QLocale::Kazakhstan: return DCIS;
     case QLocale::Kenya: return DOtherCommonwealth;
     case QLocale::Kiribati: return DOceanaian;
     case QLocale::Kosovo: return DYugoslavian;
-    case QLocale::Kuwait: return DArabic;
+    case QLocale::Kuwait: return DArabicAsian;
     case QLocale::Kyrgyzstan: return DCIS;
     case QLocale::Laos: return DIndochinese;
     case QLocale::LatinAmerica: return DOtherLatino;
     case QLocale::Latvia: return DBaltic;
-    case QLocale::Lebanon: return DArabic;
+    case QLocale::Lebanon: return DArabicAsian;
     case QLocale::Lesotho: return DOtherCommonwealth;
     case QLocale::Liberia: return DAmericanAssociates;
     case QLocale::Libya: return DLibyan;
@@ -921,11 +921,11 @@ KP::ShipNationalitySubGroup KP::nationalityTable(QLocale::Territory ter) {
     case QLocale::NorthernMarianaIslands: return DAmericanAssociates;
     case QLocale::NorthKorea: return DNorthKorean;
     case QLocale::Norway: return DNorwegian;
-    case QLocale::Oman: return DArabic;
+    case QLocale::Oman: return DArabicAsian;
     case QLocale::OutlyingOceania: return DOceanaian;
     case QLocale::Pakistan: return DPakistani;
     case QLocale::Palau: return DAmericanAssociates; //(COFA)
-    case QLocale::PalestinianTerritories: return DArabic;
+    case QLocale::PalestinianTerritories: return DArabicAsian;
     case QLocale::Panama: return DOtherLatino;
     case QLocale::PapuaNewGuinea: return DOceanaian;
     case QLocale::Paraguay: return DOtherLatino;
@@ -935,7 +935,7 @@ KP::ShipNationalitySubGroup KP::nationalityTable(QLocale::Territory ter) {
     case QLocale::Poland: return DPolish;
     case QLocale::Portugal: return DPortuguese;
     case QLocale::PuertoRico: return DAmericanAssociates;
-    case QLocale::Qatar: return DArabic;
+    case QLocale::Qatar: return DArabicAsian;
     case QLocale::Reunion: return DFrench;
     case QLocale::Romania: return DRomanian;
     case QLocale::Russia: return DSovietOrRussian;
@@ -950,7 +950,7 @@ KP::ShipNationalitySubGroup KP::nationalityTable(QLocale::Territory ter) {
     case QLocale::Samoa: return DOceanaian;
     case QLocale::SanMarino: return DItalian;
     case QLocale::SaoTomeAndPrincipe: return DOtherLatino;
-    case QLocale::SaudiArabia: return DArabic;
+    case QLocale::SaudiArabia: return DArabicAsian;
     case QLocale::Senegal: return DOtherFrancophone;
     case QLocale::Serbia: return DYugoslavian;
     case QLocale::Seychelles: return DOtherFrancophone;
@@ -972,7 +972,7 @@ KP::ShipNationalitySubGroup KP::nationalityTable(QLocale::Territory ter) {
     case QLocale::SvalbardAndJanMayen: return DNorwegian;
     case QLocale::Sweden: return DSwedish;
     case QLocale::Switzerland: return DOtherEuropean;
-    case QLocale::Syria: return DArabic;
+    case QLocale::Syria: return DArabicAsian;
     case QLocale::Taiwan: return DChineseNationalist;
     case QLocale::Tajikistan: return DCIS;
     case QLocale::Tanzania: return DOtherCommonwealth;
@@ -990,7 +990,7 @@ KP::ShipNationalitySubGroup KP::nationalityTable(QLocale::Territory ter) {
     case QLocale::TuvaluTerritory: return DOceanaian;
     case QLocale::Uganda: return DOtherCommonwealth;
     case QLocale::Ukraine: return DUkrainian;
-    case QLocale::UnitedArabEmirates: return DArabic;
+    case QLocale::UnitedArabEmirates: return DArabicAsian;
     case QLocale::UnitedKingdom: return DBritish;
     case QLocale::UnitedStates: return DAmerican;
     case QLocale::UnitedStatesOutlyingIslands: return DAmericanAssociates;
@@ -1004,7 +1004,7 @@ KP::ShipNationalitySubGroup KP::nationalityTable(QLocale::Territory ter) {
     case QLocale::WallisAndFutuna: return DOtherFrancophone;
     case QLocale::WesternSahara: return DOtherLatino;
     case QLocale::World: return DUnknownNation;
-    case QLocale::Yemen: return DArabic;
+    case QLocale::Yemen: return DArabicAsian;
     case QLocale::Zambia: return DOtherCommonwealth;
     case QLocale::Zimbabwe: return DOtherCommonwealth;
 

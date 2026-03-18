@@ -369,7 +369,7 @@ enum ShipNationalitySubGroup{
     DColumbianOrEcuadoran = 0xCC,
     DVenezuelan = 0xCD,
     DCuban = 0xCE,
-    DOtherLatino = 0xCF, /* include spanish and portuguese speaking territories outside Latin America */
+    DOtherLatino = 0xCF, /* include Spanish and Portuguese speaking territories outside Latin America */
     DYugoslavian = 0xD0,
     DPolish = 0xD2,
     DBulgarian = 0xD4,
@@ -381,7 +381,7 @@ enum ShipNationalitySubGroup{
     DOtherEuropean = 0xDF,
     DThai = 0xE0,
     DIranian = 0xE2,
-    DArabic = 0xE4, /* does not include non-asian countries */
+    DArabicAsian = 0xE4,
     DSouthKorean = 0xE8,
     DNorthKorean = 0xEA,
     DOtherAsian = 0xEC,
