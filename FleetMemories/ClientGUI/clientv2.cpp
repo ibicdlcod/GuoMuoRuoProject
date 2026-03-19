@@ -311,14 +311,14 @@ bool Clientv2::parseSpec(const QStringList &cmdParts) {
     }
 }
 
-void Clientv2::queryNextNode(int mapId, int prevNode) {
+void Clientv2::queryNextNode(int mapId, int prevNode, bool retreat) {
     if(!isInBattle()) {
         //% "You can't enter a sortie map illegally!"
         qWarning() << qtTrId("illegal-map-progress");
         return;
     }
     else {
-        QByteArray msg = KP::clientQueryNextNode(mapId, prevNode);
+        QByteArray msg = KP::clientQueryNextNode(mapId, prevNode, retreat);
         sender->enqueue(msg);
         socket.flush();
     }

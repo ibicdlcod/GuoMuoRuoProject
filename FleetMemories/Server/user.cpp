@@ -122,6 +122,40 @@ void User::decideHomePort(const CSteamID &uid, KP::ShipNationalityGroup nation) 
     }
 }
 
+bool User::decreaseGauge(const CSteamID &uid, int mapId,  // relative id
+                         KP::Difficulty diff, int amount) {
+    QString diffStr = (*KP::diffEnumtoStr)[diff];
+    QSqlDatabase db = QSqlDatabase::database();
+    QSqlQuery query;
+    query.prepare("UPDATE UserMapState "
+                  "SET Gauge"
+                  +diffStr
+                  +" = max(-2147483647, Gauge"
+                  +diffStr
+                  +" - :amount) "
+                    "WHERE User = :id AND MapDef = :def;");
+    query.bindValue(":id", uid.ConvertToUint64());
+    query.bindValue(":def", mapId);
+    query.bindValue(":amount", amount);
+    if(Q_UNLIKELY(!query.exec())){
+        qCritical() << query.lastQuery();
+        //% "User ID %1: DB failure when decreasing gauge of map %2!"
+        throw DBError(qtTrId("dbfail-when-decreasing-map-hp")
+                          .arg(uid.ConvertToUint64()).arg(mapId),
+                      query.lastError());
+        return false;
+    }
+    else {
+        if(diff <= 0) {
+            return true;
+        }
+        else {
+            return decreaseGauge(uid, mapId,
+                                 static_cast<KP::Difficulty>(diff-1), amount);
+        }
+    }
+}
+
 int User::getCurrentFactoryParallel(const CSteamID &uid, int equipId) {
     QSqlDatabase db = QSqlDatabase::database();
     QSqlQuery query;
@@ -416,6 +450,62 @@ std::tuple<bool, int> User::isFactoryFinished(const CSteamID &uid, int factoryID
     }
 }
 
+bool User::isGaugeFinished(const CSteamID &uid, int mapId,  // relative id
+                           KP::Difficulty diff) {
+    QString diffStr = (*KP::diffEnumtoStr)[diff];
+    QSqlDatabase db = QSqlDatabase::database();
+    QSqlQuery query;
+    query.prepare("SELECT 1 FROM UserMapState "
+                  "WHERE User = :id AND MapDef = :def AND Gauge" + diffStr + " <= 0;");
+    query.bindValue(":id", uid.ConvertToUint64());
+    query.bindValue(":def", mapId);
+    if(Q_UNLIKELY(!query.exec() || !query.isSelect())){
+        qCritical() << query.lastQuery();
+        //% "User ID %1: DB failure when decreasing gauge of map %2!"
+        throw DBError(qtTrId("dbfail-when-opening-map")
+                          .arg(uid.ConvertToUint64()).arg(mapId),
+                      query.lastError());
+        return false;
+    }
+    else {
+        return query.first();
+    }
+}
+
+bool User::isMapUnlocked(const CSteamID &uid, int mapId,  // relative id
+                         KP::Difficulty diff) {
+    QSqlDatabase db = QSqlDatabase::database();
+    QSqlQuery query;
+    query.prepare("SELECT Supremacy FROM UserMapState "
+                  "WHERE User = :id AND MapDef = :def;");
+    query.bindValue(":id", uid.ConvertToUint64());
+    query.bindValue(":def", mapId);
+    if(Q_UNLIKELY(!query.exec() || !query.isSelect() || !query.first())){
+        qCritical() << query.lastQuery();
+        //% "User ID %1: DB failure when querying open status of map %2!"
+        throw DBError(qtTrId("dbfail-when-opening-map")
+                          .arg(uid.ConvertToUint64()).arg(mapId),
+                      query.lastError());
+        return false;
+    }
+    else {
+        double supre = query.value(0).toDouble();
+        switch(diff) {
+        case KP::EarlyWar: return supre >= 0;
+        case KP::MidWar: return supre >= 90.0;
+        case KP::LateWar: return supre >= 180.0;
+        case KP::Historical: {
+            if(mapId == KP::hiddenMap) {
+                return supre >= 0; // TODO: this should be modified
+            }
+            else
+                return supre >= 270.0;
+        }
+        default: return false;
+        }
+    }
+}
+
 bool User::isSuperUser(const CSteamID &uid) {
     QSqlDatabase db = QSqlDatabase::database();
     QSqlQuery query;
@@ -540,6 +630,35 @@ void User::refreshFactory(Server *server, const CSteamID &uid) {
 
 void User::refreshPort(Server *server, const CSteamID &uid) {
     server->naturalRegen(uid);
+}
+
+bool User::setMapSupremacy(const CSteamID &uid, int mapId,  // relative id
+                           double amount, double retention = 0) {
+    if((retention < 0) || (retention > 1)) {
+        //% "Map supremacy retention %1 is incorrect!"
+        qCritical() << qtTrId("map-supremacy-retention-incorrect").arg(retention);
+        return false;
+    }
+    QSqlDatabase db = QSqlDatabase::database();
+    QSqlQuery query;
+    query.prepare("UPDATE UserMapState "
+                  "SET Supremacy = max(Supremacy, "
+                  "Supremacy * :retention + :amount) "
+                  "WHERE User = :id AND MapDef = :def");
+    query.bindValue(":id", uid.ConvertToUint64());
+    query.bindValue(":def", mapId);
+    query.bindValue(":retention", retention);
+    query.bindValue(":amount", amount);
+    if(Q_UNLIKELY(!query.exec())){
+        //% "User ID %1: DB failure when setting supremacy of map %2!"
+        throw DBError(qtTrId("dbfail-when-opening-map")
+                          .arg(uid.ConvertToUint64()).arg(mapId),
+                      query.lastError());
+        return false;
+    }
+    else {
+        return true;
+    }
 }
 
 void User::setResources(const CSteamID &uid, ResOrd goal) {

@@ -32,3 +32,7 @@ KP::Difficulty MapWithDiff::getDiff(int mapId) {
 int MapWithDiff::getUnionId(int mapId) {
     return (mapId & (~(KP::mapIDDifficultyMask * 0xF)));
 }
+
+int MapWithDiff::getAbsoluteId() const {
+    return id + KP::mapIDDifficultyMask * diff;
+}

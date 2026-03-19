@@ -277,12 +277,13 @@ QByteArray KP::clientMigrate(const QJsonObject &input) {
     return QCborValue::fromJsonValue(result).toCbor();
 }
 
-QByteArray KP::clientQueryNextNode(int mapId, int prevNode) {
+QByteArray KP::clientQueryNextNode(int mapId, int prevNode, bool retreat) {
     QJsonObject result;
     result["type"] = DgramType::Request;
     result["command"] = CommandType::ProgressMap;
     result["mapid"] = mapId; // absolute id
     result["prevnode"] = prevNode;
+    result["retreat"] = retreat;
     return QCborValue::fromJsonValue(result).toCbor();
 }
 
@@ -609,7 +610,7 @@ QByteArray KP::serverMapStart(int mapId, int startNode) {
     QJsonObject result;
     result["type"] = DgramType::Info;
     result["infotype"] = InfoType::MapStart;
-    result["mapid"] = mapId; // relative id
+    result["mapid"] = mapId; // absolute id
     result["start"] = startNode;
     return QCborValue::fromJsonValue(result).toCbor();
 }

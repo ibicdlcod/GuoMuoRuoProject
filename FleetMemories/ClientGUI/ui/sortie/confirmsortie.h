@@ -6,6 +6,7 @@
 #include "ui_confirmsortie.h"
 #include <QString>
 #include "../fleet/fleetview.h"
+#include "sortie.h"
 
 class ConfirmSortie : public QDialog
 {
@@ -18,6 +19,7 @@ public:
     ~ConfirmSortie();
 
     int getFleetIndex() const;
+    friend void Sortie::battleEnd();
 
 private:
     Ui::ConfirmSortie *ui;

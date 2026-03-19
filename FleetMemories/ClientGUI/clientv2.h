@@ -115,7 +115,7 @@ public slots:
     void parseDisconnectReq();
     void parseQuit();
     bool parseSpec(const QStringList &);
-    void queryNextNode(int mapId, int prevNode);
+    void queryNextNode(int mapId, int prevNode, bool retreat = false);
     void sendEncryptedAppTicket(uint8 [], uint32);
     void sendFleetData(const QJsonArray &);
     void serverResponse(const QString &, const QByteArray &);

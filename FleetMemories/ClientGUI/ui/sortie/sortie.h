@@ -12,6 +12,7 @@
 #include "mapdetail.h"
 #include "mapviewwidget.h"
 #include "opengl/battlewidget.h"
+#include "../../../Protocol/mapwithdiff.h"
 
 namespace Ui {
 class Sortie;
@@ -30,6 +31,7 @@ public:
 
 public slots:
     void dealWithNode(const MapNode &node, int nodeId);
+    void battleEnd();
 
 protected:
     void resizeEvent(QResizeEvent *event) override;
@@ -39,7 +41,6 @@ private slots:
     void confirmSortieStart();
     void sortieStart(const QJsonObject &djson);
     void battleProcess(const QJsonObject &djson);
-    void battleEnd();
     void sortieEnd();
 
 private:
@@ -52,7 +53,7 @@ private:
     KP::SortieState sortieState = KP::MapView;
     int mapIndex = 0;
     QString mapStr;
-    Map *currentMap;
+    MapWithDiff *currentMap;
     int currentNodeId = 0;
     QJsonObject currentBattleProcess;
 };

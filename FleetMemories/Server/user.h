@@ -17,6 +17,7 @@ bool addShipBP(const CSteamID &, int, bool reverse = false);
 void addSkillPoints(const CSteamID &, int, int64);
 KP::ShipNationalityGroup checkHomePort(const CSteamID &);
 void decideHomePort(const CSteamID &, KP::ShipNationalityGroup);
+bool decreaseGauge(const CSteamID &, int, KP::Difficulty, int);
 int getCurrentFactoryParallel(const CSteamID &, int);
 ResOrd getCurrentResources(const CSteamID &);
 int getEquipAmount(const CSteamID &, int);
@@ -31,12 +32,15 @@ std::tuple<bool, int, int64> haveMotherSP(const CSteamID &,
 Q_DECL_DEPRECATED void init(const CSteamID &);
 bool isFactoryBusy(const CSteamID &, int);
 std::tuple<bool, int> isFactoryFinished(const CSteamID &, int);
+bool isGaugeFinished(const CSteamID &, int, KP::Difficulty);
+bool isMapUnlocked(const CSteamID &, int, KP::Difficulty);
 bool isSuperUser(const CSteamID &);
 QUuid newEquip(const CSteamID &, int);
 QUuid newShip(const CSteamID &, int, int);
 bool openMap(const CSteamID &, int);
 void refreshFactory(Server *server, const CSteamID &);
 void refreshPort(Server *server, const CSteamID &);
+bool setMapSupremacy(const CSteamID &, int, double, double);
 void setResources(const CSteamID &, ResOrd);
 
 }

@@ -221,9 +221,17 @@ void Sortie::battleEnd() {
     Clientv2 &engine = Clientv2::getInstance();
     /* TODO: display battle result */
     currentBattleProcess;
-    /* TODO: a dialog for attack or retreat */
     switchToState(KP::MapDetail);
-    engine.queryNextNode(currentMap->id, currentNodeId);
+    /* TODO: skip this dialog for end nodes */
+    ask_for_retreat:
+    ConfirmSortie *conf = new ConfirmSortie(this, currentMap->toString(),
+                                            ui->diffChoice->currentText());
+    //% "Do you want to continue map progress?"
+    conf->setWindowTitle(qtTrId("continue-map"));
+    conf->fv->setEnabled(false);
+    engine.queryNextNode(currentMap->getAbsoluteId(), currentNodeId,
+                         !conf->exec() == QDialog::Accepted);
+    delete conf;
 }
 
 void Sortie::sortieEnd() {
@@ -243,7 +251,7 @@ void Sortie::dealWithNode(const MapNode &node, int nodeId) {
     detail->changeCurrentNode(node);
     switch(node.type) {
     case KP::STARTING:
-        engine.queryNextNode(currentMap->id, nodeId);
+        engine.queryNextNode(currentMap->getAbsoluteId(), nodeId);
         break;
     case KP::NORMAL:
         [[fallthrough]];

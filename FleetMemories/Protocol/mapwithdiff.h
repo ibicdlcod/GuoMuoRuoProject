@@ -19,6 +19,7 @@ public:
 
     static KP::Difficulty getDiff(int mapId);
     static int getUnionId(int mapId);
+    int getAbsoluteId() const;
 };
 
 #endif // MAPWITHDIFF_H

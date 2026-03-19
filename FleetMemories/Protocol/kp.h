@@ -316,7 +316,8 @@ enum ShipNationalitySubGroup{
     DJapaneseOutlying = 0x1D,
     /* Ships named after places that are not controlled by modern Japan */
     DJapaneseExterior = 0x1E,
-    /* Ships named after places in Okinawa Pref. or Southernmost islands Kagoshima Pref. */
+    /* Ships named after places in Okinawa Pref. or southernmost islands in Kagoshima Pref.
+     * Does not prevent said ships being counted as Japanese anywhere in game rules */
     DRyukyuan = 0x1F,
     DGerman = 0x20,
     DAustrian = 0x2C, /* Austria-connected LBAS or WWI Austro-Hungarian navy might go here */
@@ -329,12 +330,12 @@ enum ShipNationalitySubGroup{
     DFilipino = 0x4F,
     DBritish = 0x50, /* have a whole 0xB? space for British Empire territories in WWII */
     DFrench = 0x60,
+    DIndochinese = 0x68,
     DAlgerian = 0x6A,
     DMoroccoan = 0x6B,
     DTunisian = 0x6C,
     DMauritanian = 0x6D,
-    DIndochinese = 0x6E,
-    DOtherFrancophone = 0x6F,
+    DOtherFrancophone = 0x6E,
     DSovietOrRussian = 0x70,
     DUkrainian = 0x7C,
     DCIS = 0x7E, /* Aside from Russian and Ukrainian above, all founding members of CIS is included ignoring any later withdrawal */
@@ -502,8 +503,9 @@ enum NodeType {
     EMPTY = 3,
     DISASTER = 4,
     NIGHT = 5,
-    AIR = 6,
-    TRANSPORT = 7,
+    NIGHTBOSS = 6,
+    AIR = 7,
+    TRANSPORT = 8,
 };
 Q_ENUM_NS(NodeType)
 
@@ -586,7 +588,7 @@ QByteArray clientFleetData(const QJsonArray &);
 QByteArray clientHello();
 QByteArray clientHomePort(ShipNationalityGroup);
 QByteArray clientMigrate(const QJsonObject &);
-QByteArray clientQueryNextNode(int, int);
+QByteArray clientQueryNextNode(int, int, bool retreat = false);
 QByteArray clientSortie(int, int, bool);
 QByteArray clientStateChange(GameState);
 QByteArray clientSteamAuth(uint8 [], uint32);

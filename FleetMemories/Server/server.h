@@ -116,7 +116,7 @@ private:
     void processExpGain(const CSteamID &, int fleetIndex,
                         double baseExpGained, KP::BattleAssessment assm);
     const QJsonObject processBattleCore(const CSteamID &, int, int, int, const QJsonObject &);
-    void progressMap(const CSteamID &, QSslSocket *, int, int);
+    void progressMap(const CSteamID &, QSslSocket *, int, int, bool retreat = false);
     std::optional<QList<int>> queryMapProgress(const CSteamID &, QSslSocket *,
                                                KP::BattleState,
                                                int map = 0, int node = 0);

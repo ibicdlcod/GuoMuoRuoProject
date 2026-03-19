@@ -323,7 +323,7 @@ Q_GLOBAL_STATIC(QString,
                     "MapDef INTEGER NOT NULL, "
                     "Supremacy FLOAT NOT NULL DEFAULT -1, "
                     /* gauge remaining can be negative which makes DLC maps easier,
-                                                                                                     * you still need to defeat boss flagship to win */
+                                                                                                                                                                                     * you still need to defeat boss flagship to win */
                     "GaugeC INTEGER NOT NULL DEFAULT 0, "
                     "GaugeB INTEGER NOT NULL DEFAULT 0, "
                     "GaugeA INTEGER NOT NULL DEFAULT 0, "
@@ -3497,7 +3497,6 @@ new_ship_as_imported:
 }
 
 void Server::minutePulse() {
-    qCritical() << QDateTime::currentDateTimeUtc();
     QSqlQuery query;
     query.prepare("UPDATE UserMapState "
                   "SET Supremacy = (1.0 - 1.0 / :decay) * Supremacy "
@@ -4103,6 +4102,7 @@ void Server::processBattle(const CSteamID &uid, QSslSocket *connection,
     case KP::NORMAL: [[fallthrough]];
     case KP::BOSS: [[fallthrough]];
     case KP::NIGHT: [[fallthrough]];
+    case KP::NIGHTBOSS: [[fallthrough]];
     case KP::AIR: {
         QSqlQuery query;
         query.prepare("UPDATE UserAttr SET Intvalue = :type "
@@ -4127,7 +4127,8 @@ void Server::processBattle(const CSteamID &uid, QSslSocket *connection,
         senderM.sendMessage(connection, msg);
         QTimer::singleShot(battleProcess["time"].toInt(),
                 this, [this, uid, connection, result,
-                battleProcess, mapId, unionId, nodeId](){
+                battleProcess, mapId, unionId, nodeId, type](){
+after_battle:
             QSqlQuery query;
             query.prepare("UPDATE UserAttr SET Intvalue = :type "
                           "WHERE Attribute = 'InBattle' "
@@ -4171,6 +4172,39 @@ add_exp:
                 return;
             }
             processExpGain(uid, result.value()[3], exp, assm);
+after_boss:
+            if(type == KP::BOSS || type == KP::NIGHTBOSS) {
+gain_supremacy:
+                double baseSupremacy;
+                switch(diff) {
+                case KP::EarlyWar: baseSupremacy = 100; break;
+                case KP::MidWar: baseSupremacy = 200; break;
+                case KP::LateWar: baseSupremacy = 300; break;
+                case KP::Historical: baseSupremacy = 400; break;
+                default: baseSupremacy = 0; break;
+                }
+                double factor;
+                switch(assm) {
+                case KP::SVictory: factor = 1.0; break;
+                case KP::AVictory: factor = 0.8; break;
+                case KP::BVictory: factor = 0.5; break;
+                default: factor = 0.0; break;
+                }
+                double supremacyValue = baseSupremacy * factor;
+                if(supremacyValue > 0) {
+                    User::setMapSupremacy(uid, unionId, supremacyValue, 0); // no retention
+                }
+deal_with_gauge:
+                /* TODO: write the below function */
+                int amount = 1; // int amount = getBossDamage(battleProcess)
+                User::decreaseGauge(uid, unionId, diff, amount);
+                /* TODO: write the below function */
+                bool isBossSunk = true; // bool isBossSunk = getBossSunk(battleProcess)
+                if(isBossSunk && User::isGaugeFinished(uid, unionId, diff)) {
+                    /* clear map */
+                    qCritical() << QStringLiteral("Map %1 clear").arg(unionId);
+                }
+            }
         }
         );
     }
@@ -4337,7 +4371,7 @@ const QJsonObject Server::processBattleCore(const CSteamID &uid,
 }
 
 void Server::progressMap(const CSteamID &uid, QSslSocket *connection,
-                         int mapId, int prevNode) {
+                         int mapId, int prevNode, bool retreat) {
     try{
         /* we want battle finished to continue progress */
         auto result = queryMapProgress(uid, connection, KP::AfterBattle, mapId, prevNode);
@@ -4345,7 +4379,13 @@ void Server::progressMap(const CSteamID &uid, QSslSocket *connection,
             return;
         }
         /* 3 means activefleet */
-        int nNode = nextNode(uid, connection, mapId, prevNode, result.value()[3]);
+        int nNode;
+        if(!retreat) {
+            nNode = nextNode(uid, connection, mapId, prevNode, result.value()[3]);
+        }
+        else {
+            nNode = 0;
+        }
         /* nNode != 0: next node battle yet started */
         /* nNode == 0: switch to no battle */
         QSqlQuery query;
@@ -5070,7 +5110,7 @@ void Server::receivedReq(const QJsonObject &djson,
     case KP::CommandType::ProgressMap: {
         int mapId = djson["mapid"].toInt();
         int prevNode = djson["prevnode"].toInt();
-        progressMap(uid, connection, mapId, prevNode);
+        progressMap(uid, connection, mapId, prevNode, djson["retreat"].toBool());
     }
         break;
     case KP::CommandType::EnterBattleNode: {
@@ -5589,22 +5629,23 @@ void Server::startSortie(const CSteamID &uid, QSslSocket *connection,
     QString diffStr = (*KP::diffEnumtoStr)[diff];
     QByteArray diffStrBytes = diffStr.toUtf8();
     const char *diffStrC = diffStrBytes;
-    mapId = MapWithDiff::getUnionId(mapId);
+    int unionId = MapWithDiff::getUnionId(mapId);
     if(expedition) {
         return;//TODO: add expedition
     }
-    if(lua["maps"][mapId] == sol::nil
-            || lua["maps"][mapId]["branch_rule"] == sol::nil
-            || lua["maps"][mapId]["branch_rule"][diffStrC]
+    if(!User::isMapUnlocked(uid, unionId, diff)
+            || lua["maps"][unionId] == sol::nil
+            || lua["maps"][unionId]["branch_rule"] == sol::nil
+            || lua["maps"][unionId]["branch_rule"][diffStrC]
             == sol::nil) {
-        QByteArray msg = KP::serverMapNotOpen(mapId);
+        QByteArray msg = KP::serverMapNotOpen(unionId);
         senderM.sendMessage(connection, msg);
     }
     else {
         FleetInfo info;
         /* TODO: populate fleetinfo */
         sol::protected_function luaChooseStartingNode
-                = lua["maps"][mapId]["branch_rule"][diffStrC];
+                = lua["maps"][unionId]["branch_rule"][diffStrC];
         auto result = luaChooseStartingNode(info.ships,
                                             info.los(),
                                             info.type,
@@ -5685,12 +5726,13 @@ void Server::startSortie(const CSteamID &uid, QSslSocket *connection,
             sol::error err = result;
             qCritical()
                     //% "Map %1 lua file has failed to run: %2"
-                    << qtTrId("lua-error-branch").arg(mapId)
+                    << qtTrId("lua-error-branch").arg(unionId)
                        .arg(err.what());
             return;
         }
     }
 }
+
 void Server::switchCert(const QStringList &input) {
     if(listening) {
         //% "Switch certificate when connected have no effect."

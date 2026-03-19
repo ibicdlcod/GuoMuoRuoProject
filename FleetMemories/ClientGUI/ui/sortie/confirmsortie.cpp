@@ -30,6 +30,7 @@ ConfirmSortie::~ConfirmSortie() {
             mainWindowM->getFleetAreaWidget()->addWidget(fv);
             mainWindowM->fleetArea = fv;
             fv->simplify(false);
+            fv->setEnabled(true);
         }
     }
     delete ui;
