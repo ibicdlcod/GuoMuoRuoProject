@@ -323,7 +323,7 @@ Q_GLOBAL_STATIC(QString,
                     "MapDef INTEGER NOT NULL, "
                     "Supremacy FLOAT NOT NULL DEFAULT -1, "
                     /* gauge remaining can be negative which makes DLC maps easier,
-                                                                                                                                                                                                         * you still need to defeat boss flagship to win */
+                                                                                                                                                                                                                                                 * you still need to defeat boss flagship to win */
                     "GaugeC INTEGER NOT NULL DEFAULT 0, "
                     "GaugeB INTEGER NOT NULL DEFAULT 0, "
                     "GaugeA INTEGER NOT NULL DEFAULT 0, "
@@ -1487,6 +1487,84 @@ bool Server::addEquipStar(const QUuid &equipUid, int amount = 1) {
     return false;
 }
 
+/* return whether new map is opened */
+bool Server::clearMap(const CSteamID &uid, int mapUnionId) {
+    bool result = false;
+    QSet<KP::AllegianceGroup> rules;
+get_ship_clear_rule: {
+        QSqlQuery query;
+        QString queryStr = QStringLiteral("SELECT ShipDef FROM UserShip "
+                                          "INNER JOIN UserAttr "
+                                          "ON UserShip.User = UserAttr.UserID "
+                                          "AND UserAttr.Attribute = 'ActiveFleet' "
+                                          "AND UserAttr.Intvalue = UserShip.FleetIndex "
+                                          "AND UserShip.FleetFled = 0 "
+                                          "WHERE User = :uid;");
+        query.prepare(queryStr);
+        query.bindValue(":uid", uid.ConvertToUint64());
+        if(Q_LIKELY(query.exec() && query.isSelect())) {
+            while(query.next()) {
+                rules.insert(shipRegistry[query.value(0).toInt()]->mapOpenRule());
+            }
+        }
+        else {
+            //% "Database failed when getting ships of current fleet!"
+            throw DBError(qtTrId("dbfail-current-fleet"),
+                          query.lastError());
+            return false;
+        }
+    }
+get_map_to_open:
+    QSet<int> mapToOpen;
+    for(const auto rule: rules) {
+        QString reltype;
+        switch(rule) {
+        case KP::UnknownNation: continue;
+        case KP::Japanese: reltype = "JP"; break;
+        case KP::German: reltype = "DE"; break;
+        case KP::Italian: reltype = "IT"; break;
+        case KP::American: reltype = "US"; break;
+        case KP::British: reltype = "GB"; break;
+        case KP::Soviet: reltype = "SU"; break;
+        case KP::Commonwealth: reltype = "AU"; break;
+            //% "Unknown map rule: "
+        default: qCritical() << qtTrId("unknown-map-rule") << rule; continue;
+        }
+        QSqlQuery query;
+        QString queryStr = QStringLiteral("SELECT Node2 as Other FROM MapRelation "
+                                          "WHERE Type = :reltype AND Node1 = :mapid "
+                                          "UNION ALL "
+                                          "SELECT Node1 FROM MapRelation "
+                                          "WHERE Type = :reltype AND Node2 = :mapid;");
+        query.prepare(queryStr);
+        query.bindValue(":mapid", mapUnionId);
+        query.bindValue(":reltype", reltype);
+        if(Q_LIKELY(query.exec() && query.isSelect())) {
+            while(query.next()) {
+                mapToOpen.insert(query.value(0).toInt());
+            }
+        }
+        else {
+            //% "Database failed when querying map relations!"
+            throw DBError(qtTrId("dbfail-map-relations"),
+                          query.lastError());
+            return false;
+        }
+    }
+    for(const auto map: mapToOpen) {
+        if(User::isMapUnlocked(uid, map, KP::EarlyWar)) {
+            continue;
+        }
+        if(!User::openMap(uid, map)) {
+            break;
+        }
+        else {
+            result = true;
+        }
+    }
+    return result;
+}
+
 void Server::clearNegativeSkillPoints(const CSteamID &uid) {
     QSqlDatabase db = QSqlDatabase::database();
     QSqlQuery query;
@@ -2489,6 +2567,62 @@ void Server::generateTestShip(const CSteamID &uid) {
     }
 }
 
+int Server::getBossDamage(const QJsonObject &battleResult) {
+    if(!battleResult.contains("before")) {
+        return 0;
+    }
+    QJsonObject before = battleResult["before"].toObject();
+    if(!before.contains("enemy")) {
+        return 0;
+    }
+    QJsonObject enemyBefore = before["enemy"].toObject();
+    if(!enemyBefore.contains("hp")) {
+        return 0;
+    }
+    QJsonArray enemyHPBefore = enemyBefore["hp"].toArray();
+    if(enemyHPBefore.size() <= 0) {
+        return 0;
+    }
+    int bossHPBefore = enemyHPBefore.at(0).toInt();
+    if(!battleResult.contains("after")) {
+        return 0;
+    }
+    QJsonObject after = battleResult["after"].toObject();
+    if(!after.contains("enemy")) {
+        return 0;
+    }
+    QJsonObject enemyAfter = after["enemy"].toObject();
+    if(!enemyAfter.contains("hp")) {
+        return 0;
+    }
+    QJsonArray enemyHPAfter = enemyAfter["hp"].toArray();
+    if(enemyHPAfter.size() <= 0) {
+        return 0;
+    }
+    int bossHPAfter = enemyHPAfter.at(0).toInt();
+    return bossHPBefore - bossHPAfter;
+}
+
+bool Server::getBossSunk(const QJsonObject &battleResult) {
+    if(!battleResult.contains("after")) {
+        return false;
+    }
+    QJsonObject after = battleResult["after"].toObject();
+    if(!after.contains("enemy")) {
+        return false;
+    }
+    QJsonObject enemyAfter = after["enemy"].toObject();
+    if(!enemyAfter.contains("hp")) {
+        return false;
+    }
+    QJsonArray enemyHPAfter = enemyAfter["hp"].toArray();
+    if(enemyHPAfter.size() <= 0) {
+        return false;
+    }
+    int bossHPAfter = enemyHPAfter.at(0).toInt();
+    return bossHPAfter <= 0;
+}
+
 double Server::getEquipSkillPointEffect(const CSteamID &uid,
                                         const QUuid &equipUuid) {
     return 1 - std::sqrt(0.5)
@@ -2580,7 +2714,7 @@ bool Server::importEquipFromCSV() {
                 int type = EquipType::strToIntRep(lineParts[3]);
                 if(type == 0 && !lineParts[1].isEmpty()) {
                     qWarning() << lineParts[0]
-                                  << "\tUnsupported type: " << lineParts[3];
+                            << "\tUnsupported type: " << lineParts[3];
                 }
                 QSqlQuery query;
                 query.prepare(
@@ -2936,8 +3070,7 @@ bool Server::importShipFromCSV() {
                     }
                     else if(!indicatorParts[i].isEmpty()
                             && indicatorParts[i].compare(
-                                "id", Qt::CaseInsensitive) != 0){
-                        /* TODO: change to set */
+                                "id", Qt::CaseInsensitive) != 0) {
                         QString lang = titleParts[i];
                         QString content = lineParts[i];
                         QString textattr = indicatorParts[i];
@@ -3741,7 +3874,7 @@ bool Server::modifyShip(const CSteamID &uid, QUuid prevShip, int newDef) {
         int levelDesired = (shipRegistry[newDef]->getId()
                             & 0xF0000000) >> 7;
         int levelOriginal = (shipRegistry[query.value(0).toInt()]->getId()
-                             & 0xF0000000) >> 7;
+                & 0xF0000000) >> 7;
         if(levelDesired == levelOriginal) {
             stars = query.value(1).toInt();
         }
@@ -3905,14 +4038,11 @@ int64 Server::newEquipHasMotherCal(int equipId) {
     if(!mother || mother->isInvalid())
         return 0;
     double s = equip->skillPointsStd();
-    double ta = pow(equip->getTech(), settings->value("rule/motherspscale",
-                                                      0.2).toDouble());
     double b = settings->value("rule/maxskillpointsamplifier",
-                               5.0).toDouble();
-    /* TODO: this is not tested */
+                               3.0).toDouble();
     double sonSkillPoints;
     if(equip->disallowProduction()) {
-        sonSkillPoints = s * ta * b;
+        sonSkillPoints = s * b;
     }
     else if(equip->disallowMassProduction()) {
         double x = equip->attr["Disallowmassproduction"];
@@ -3921,11 +4051,11 @@ int64 Server::newEquipHasMotherCal(int equipId) {
         }
         x = std::log(x);
         double c = std::log(settings->value("rule/normalproductionstockpile",
-                                   30.0).toDouble());
-        sonSkillPoints = s * ta * b * c / std::sqrt(c * c + (b * b - 1) * x * x);
+                                            30.0).toDouble());
+        sonSkillPoints = s * b * c / std::sqrt(c * c + (b * b - 1) * x * x);
     }
     else {
-        sonSkillPoints = s * ta;
+        sonSkillPoints = s;
     }
     return sonSkillPoints;
 }
@@ -4126,13 +4256,14 @@ void Server::processBattle(const CSteamID &uid, QSslSocket *connection,
                                     mapId,
                                     nodeId,
                                     result.value()[3], // activefleet
-                                    battlePlan);
+                battlePlan);
         QByteArray msg = KP::serverBattleProcess(battleProcess);
         senderM.sendMessage(connection, msg);
-        QTimer::singleShot(battleProcess["time"].toInt(),
-                           this, [this, uid, connection, result,
-                           battleProcess, mapId, unionId, nodeId, type](){
 after_battle:
+        QTimer::singleShot(battleProcess["time"].toInt(),
+                this, [this, uid, connection, result,
+                battleProcess, mapId, unionId, nodeId, type](){
+set_battle_state:
             QSqlQuery query;
             query.prepare("UPDATE UserAttr SET Intvalue = :type "
                           "WHERE Attribute = 'InBattle' "
@@ -4152,7 +4283,7 @@ after_battle:
 
 drop:
             int dropShip = drop(uid, result.value()[0], result.value()[1],
-                                assm);
+                    assm);
             if(dropShip == -1) {
                 QByteArray msg = KP::serverBattleError(KP::DropError);
                 senderM.sendMessage(connection, msg);
@@ -4199,14 +4330,14 @@ gain_supremacy:
                     User::setMapSupremacy(uid, unionId, supremacyValue, 0); // no retention
                 }
 deal_with_gauge:
-                /* TODO: write the below function */
-                int amount = 1; // int amount = getBossDamage(battleProcess)
+                int amount = getBossDamage(battleProcess);
                 User::decreaseGauge(uid, unionId, diff, amount);
-                /* TODO: write the below function */
-                bool isBossSunk = true; // bool isBossSunk = getBossSunk(battleProcess)
+                bool isBossSunk = getBossSunk(battleProcess);
                 if(isBossSunk && User::isGaugeFinished(uid, unionId, diff)) {
                     /* clear map */
-                    qCritical() << QStringLiteral("Map %1 clear").arg(unionId);
+                    if(clearMap(uid, unionId)) {
+                        offerMapInfoUser(uid, connection);
+                    }
                 }
             }
         }
@@ -4371,6 +4502,21 @@ const QJsonObject Server::processBattleCore(const CSteamID &uid,
     QJsonObject result;
     result["time"] = 5000; // in milliseconds;
     result["assm"] = KP::SVictory; // assessment
+
+    QJsonObject before;
+    QJsonObject enemyBefore;
+    QJsonArray bHP = {1,};
+    enemyBefore["hp"] = bHP;
+    before["enemy"] = enemyBefore;
+    result["before"] = before;
+
+    QJsonObject after;
+    QJsonObject enemyAfter;
+    QJsonArray aHP = {0,};
+    enemyAfter["hp"] = aHP;
+    after["enemy"] = enemyAfter;
+    result["after"] = after;
+
     return result;
 }
 
@@ -5124,7 +5270,7 @@ void Server::receivedReq(const QJsonObject &djson,
         break;
 home_port:
     case KP::CommandType::SelectHomePort: {
-        KP::ShipNationalityGroup nation = static_cast<KP::ShipNationalityGroup>(
+        KP::AllegianceGroup nation = static_cast<KP::AllegianceGroup>(
                     djson["nation"].toInt());
         int shipId = 0;
         int mapId = 0;
@@ -5164,33 +5310,10 @@ void Server::sendTestMessages() {
     if(!listening) {
         qWarning() << "Server isn't listening, abort.";
     }
-    else {// 1. Read the source file (map2.lua)
-        QFile sourceFile("lua/map2.lua");
-        if (!sourceFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
-            qDebug() << "Could not open source file!";
-            return;
-        }
-
-        QString content = sourceFile.readAll();
-        sourceFile.close();
-
-        // 2. Loop from 3 to 86
-        for (int i = 3; i <= 86; ++i) {
-            QString newFileName = QString("lua/map%1.lua").arg(i);
-
-            // Replace "map[2]" with "map[i]"
-            // Using .arg(i) ensures the integer is converted to a string correctly
-            QString newContent = content;
-            newContent.replace("maps[2]", QString("maps[%1]").arg(i));
-
-            // 3. Write to the new file
-            QFile outFile(newFileName);
-            if (outFile.open(QIODevice::WriteOnly | QIODevice::Text)) {
-                QTextStream out(&outFile);
-                out << newContent;
-                outFile.close();
-                qDebug() << "Generated:" << newFileName;
-            }
+    else {
+        for(auto ship: shipRegistry) {
+            qInfo() << ship->toString() << "\t" << ship->getAllegiance()
+                    << "\t" << ship->mapOpenRule();
         }
     }
 }
@@ -5916,9 +6039,9 @@ KP::FleetFailType Server::updateFleet(const CSteamID &uid, const QJsonArray &inp
                       "FleetPosIndex = :fpid "
                       "WHERE ShipUuid = :uuid");
         query.bindValue(":fid", shipDataObj["pos"].toInt()
-                        / KP::fleetRepSize);
+                / KP::fleetRepSize);
         query.bindValue(":fpid", shipDataObj["pos"].toInt()
-                        % KP::fleetRepSize);
+                % KP::fleetRepSize);
         query.bindValue(":uuid", shipDataObj["uuid"].toString());
         if(Q_UNLIKELY(!query.exec())) {
             qCritical() << query.lastQuery();
@@ -5958,11 +6081,11 @@ KP::FleetFailType Server::updateFleet(const CSteamID &uid, const QJsonArray &inp
         {
             Equipment *equip = equipRegistry.value(
                         User::getEquipDef(QUuid(shipDataObj["equip"].toArray()
-                                                [KP::maxEquipSlots].toString())), nullptr);
+                                          [KP::maxEquipSlots].toString())), nullptr);
             if(ship && equip) {
                 int shipLv = Ship::getLevel(shipExps[
                                             QUuid(shipDataObj["uuid"].toString())
-                                            ]);
+                        ]);
                 if(shipLv < KP::levelUnlockExSlot || !equip->canEquipEX(ship, lua)) {
                     //% "Ship %1 can't equip %2 in extra slot!"
                     qWarning()
@@ -5977,7 +6100,7 @@ KP::FleetFailType Server::updateFleet(const CSteamID &uid, const QJsonArray &inp
                           "WHERE ShipUuid = :uuid");
             query.bindValue(":euuid",
                             shipDataObj["equip"].toArray()
-                            [KP::maxEquipSlots].toString());
+                    [KP::maxEquipSlots].toString());
             query.bindValue(":uuid", shipDataObj["uuid"].toString());
             if(Q_UNLIKELY(!query.exec())) {
                 qCritical() << query.lastQuery();

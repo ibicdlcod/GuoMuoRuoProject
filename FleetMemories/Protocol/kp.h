@@ -289,7 +289,7 @@ enum ConsoleCommandType{
 };
 Q_ENUM_NS(ConsoleCommandType)
 
-enum ShipNationalityGroup{
+enum AllegianceGroup{
     UnknownNation = 0x0,
     Japanese = 0x1,
     German = 0x2,
@@ -307,17 +307,17 @@ enum ShipNationalityGroup{
     MinorAsian = 0xE,
     Fantasy = 0xF
 };
-Q_ENUM_NS(ShipNationalityGroup)
+Q_ENUM_NS(AllegianceGroup)
 
-enum ShipNationalitySubGroup{
+enum AllegianceSubGroup{
     DUnknownNation = 0x00,
     DJapanese = 0x10,
     /* Ships named after islands that have huge distance to Japanese mainland */
     DJapaneseOutlying = 0x1D,
-    /* Ships named after places that are not controlled by modern Japan */
+    /* Ships named after places that are not treated as Japanese by Allied nations */
     DJapaneseExterior = 0x1E,
     /* Ships named after places in Okinawa Pref. or southernmost islands in Kagoshima Pref.
-     * Does not prevent said ships being counted as Japanese anywhere in game rules */
+     * (Does not prevent said ships being counted as Japanese anywhere in game rules) */
     DRyukyuan = 0x1F,
     DGerman = 0x20,
     DAustrian = 0x2C, /* Austria-connected LBAS or WWI Austro-Hungarian navy might go here */
@@ -376,10 +376,11 @@ enum ShipNationalitySubGroup{
     DPeruvian = 0xC8,
     DChilean = 0xC9,
     DMexican = 0xCA,
+    DCuban = 0xCB,
     DColumbianOrEcuadoran = 0xCC,
     DVenezuelan = 0xCD,
-    DCuban = 0xCE,
-    DOtherLatino = 0xCF, /* includes Spanish and Portuguese controlled territories in WWII outside Latin America */
+    DOtherLatinAmerican = 0xCE,
+    DOtherLatino = 0xCF, /* Spanish and Portuguese controlled territories in WWII outside Latin America */
     DYugoslavian = 0xD0,
     DPolish = 0xD2,
     DBulgarian = 0xD4,
@@ -397,7 +398,7 @@ enum ShipNationalitySubGroup{
     DOtherAsian = 0xEC,
     DFantasy = 0xF0,
 };
-Q_ENUM_NS(ShipNationalitySubGroup)
+Q_ENUM_NS(AllegianceSubGroup)
 
 Q_GLOBAL_STATIC(QStringList,
                 nationLiteral,
@@ -586,7 +587,7 @@ QByteArray clientFactoryRefresh();
 QByteArray clientFetch(int factoryID = -1, bool forced = false);
 QByteArray clientFleetData(const QJsonArray &);
 QByteArray clientHello();
-QByteArray clientHomePort(ShipNationalityGroup);
+QByteArray clientHomePort(AllegianceGroup);
 QByteArray clientMigrate(const QJsonObject &);
 QByteArray clientQueryNextNode(int, int, bool retreat = false);
 QByteArray clientSortie(int, int, bool);
@@ -644,10 +645,6 @@ QByteArray serverSuccess();
 QByteArray serverTestMessages(int);
 QByteArray serverVerifyComplete();
 QByteArray weighAnchor();
-
-/* detailed nationality table */
-static ShipNationalitySubGroup nationalityTable(QLocale::Territory territory);
-static ShipNationalityGroup generalNationalityTable(QLocale::Territory territory);
 
 };
 

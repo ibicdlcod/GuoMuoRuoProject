@@ -20,7 +20,7 @@ public:
     ~ChooseHomePort();
 
 signals:
-    void portChosen(KP::ShipNationalityGroup);
+    void portChosen(KP::AllegianceGroup);
 
 public slots:
     void finishChoice(int status);

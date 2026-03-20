@@ -92,7 +92,7 @@ public slots:
     void autoPassword();
     void backToNavalBase();
     void catbomb();
-    void chooseHomePort(KP::ShipNationalityGroup);
+    void chooseHomePort(KP::AllegianceGroup);
     void demandEquipCache();
     void demandEquipSkillPoints(int);
     void demandMapCache();

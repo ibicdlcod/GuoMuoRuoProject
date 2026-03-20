@@ -21,24 +21,29 @@ public:
     explicit Ship(const QJsonObject &, QObject *parent = nullptr);
 
     int operator<=>(const Ship &) const;
-    bool isNotEqual(const Ship &) const;
-    QString toString(QString lang = settings->value("client/language", "ja_JP")
-                           .toString()) const;
-
     const ResOrd consRes() const;
     const int consTimeInSec() const;
+    QLocale::Territory getAllegiance() const;
+    KP::AllegianceGroup getAllegianceGroup() const;
+    KP::AllegianceSubGroup getAllegianceSubGroup() const;
     int getId() const;
     QList<int> getLaterModels(const QMap<int, Ship *> &) const;
+    KP::AllegianceGroup getNationality() const;
     QList<int> getPreviousModels(const QMap<int, Ship *> &) const;
-    KP::ShipNationalityGroup getNationality() const;
     QList<int> getStartingEquip() const;
-    double getTech() const;
     ShipType getType() const;
+    double getTech() const;
     QList<std::tuple<int, int>> getVisibleBonuses() const;
     bool isAmnesiac() const;
+    bool isNotEqual(const Ship &) const;
+    KP::AllegianceGroup mapOpenRule() const;
+    QString toString(QString lang = settings->value("client/language", "ja_JP")
+                                        .toString()) const;
 
-    static int getLevel(int);
+    static KP::AllegianceGroup allegianceGroup(QLocale::Territory territory);
+    static KP::AllegianceSubGroup allegianceSubGroup(QLocale::Territory territory);
     static int expCap(int numberOfRings);
+    static int getLevel(int);
 
     QMap<QString, QString> localNames;
     QMap<QString, QString> shipClassText;

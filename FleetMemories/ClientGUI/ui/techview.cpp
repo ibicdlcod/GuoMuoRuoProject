@@ -52,9 +52,9 @@ TechView::TechView(QWidget *parent) :
     //% "All equipments"
     ui->localListType1->addItem(qtTrId("all-equipments"));
 
-    auto meta = QMetaEnum::fromType<KP::ShipNationalityGroup>();
+    auto meta = QMetaEnum::fromType<KP::AllegianceGroup>();
     for(int i = 0; i < meta.keyCount(); ++i) {
-        if(meta.value(i) == KP::ShipNationalityGroup::UnknownNation) {
+        if(meta.value(i) == KP::AllegianceGroup::UnknownNation) {
             //% "All nationalities"
             ui->localListNation->addItem(qtTrId("all-nationality"));
         }
@@ -445,7 +445,7 @@ void TechView::resetLocalListName() {
     }
     else {
         ui->localListShip->clear();
-        auto meta = QMetaEnum::fromType<KP::ShipNationalityGroup>();
+        auto meta = QMetaEnum::fromType<KP::AllegianceGroup>();
         bool pass;
         auto sender = QObject::sender();
         QString classText;

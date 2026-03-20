@@ -170,7 +170,7 @@ void Clientv2::catbomb() {
     displayPrompt();
 }
 
-void Clientv2::chooseHomePort(KP::ShipNationalityGroup nation)
+void Clientv2::chooseHomePort(KP::AllegianceGroup nation)
 {
     QByteArray msg = KP::clientHomePort(nation);
     sender->enqueue(msg);

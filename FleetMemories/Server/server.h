@@ -68,6 +68,7 @@ private slots:
 
 private:
     bool addEquipStar(const QUuid &, int);
+    bool clearMap(const CSteamID &, int);
     void clearNegativeSkillPoints(const CSteamID &);
     void decideHomePort(const CSteamID &, QSslSocket *);
     void decryptDatagram(QSslSocket *, const QByteArray &);
@@ -84,6 +85,8 @@ private:
     void generateEquipChilds(int, int);
     void generateTestEquip(const CSteamID &);
     void generateTestShip(const CSteamID &);
+    static int getBossDamage(const QJsonObject &);
+    static bool getBossSunk(const QJsonObject &);
     double getEquipSkillPointEffect(const CSteamID &, const QUuid &);
     double getImprovementFactor(const QUuid &);
     const QStringList getCommandsSpec() const override;

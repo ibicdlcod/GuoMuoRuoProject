@@ -90,7 +90,7 @@ void ConstructWindow::switchDisplay(int) {
     //% "All ship classes"
     QStringList classPasses = {qtTrId("all-shipclasses")};;
     QList<int> namePasses = {};
-    static auto meta = QMetaEnum::fromType<KP::ShipNationalityGroup>();
+    static auto meta = QMetaEnum::fromType<KP::AllegianceGroup>();
     for(auto iter = engine.shipBPModel.clientShipBPs.keyBegin();
          iter != engine.shipBPModel.clientShipBPs.keyEnd();
          ++iter) {
@@ -198,9 +198,9 @@ void ConstructWindow::switchDisplay(int) {
 }
 
 void ConstructWindow::initialize() {
-    auto meta = QMetaEnum::fromType<KP::ShipNationalityGroup>();
+    auto meta = QMetaEnum::fromType<KP::AllegianceGroup>();
     for(int i = 0; i < meta.keyCount(); ++i) {
-        if(meta.value(i) == KP::ShipNationalityGroup::UnknownNation) {
+        if(meta.value(i) == KP::AllegianceGroup::UnknownNation) {
             ui->shipnation->addItem(qtTrId("all-nationality"));
         }
         else {
