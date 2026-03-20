@@ -43,7 +43,7 @@ We will deal with skill points later.
 
 When developing equipment the success rate would be:
 $$
-\text{Successrate}=\int_{t_{\text{wanted}}-t_{\text{current}}}^{\infty}\frac{1}{\sigma\sqrt{2\pi}}e^{-\frac{1}{2}(\frac{x}{\sigma})^2}dx
+\text{Success rate}=\int_{t_{\text{wanted}}-t_{\text{current}}}^{\infty}\frac{1}{\sigma\sqrt{2\pi}}e^{-\frac{1}{2}(\frac{x}{\sigma})^2}dx
 $$
 
 $σ$: [rule/sigmaconstant](settings.md)

@@ -31,21 +31,21 @@
   * Enemies (Amnesiac Fleet) [NOTYETIMPLEMENTED]
 * [Sortie Map](6-sortie.md)
   * [Normal map and map relations](6.1-map.md) [PARTIAL]
-  * [Naval Supremacy and Normal expedition](6.2-supremacy.md) [NOTYETIMPLEMENTED]
+  * [Naval Supremacy and Normal expedition](6.2-supremacy.md) [PARTIAL]
   * Map gauge [NOTYETIMPLEMENTED]
   * Retreat rule [NOTYETIMPLEMENTED]
   * Historical Mode (DLC) [NOTYETIMPLEMENTED]
   * Quests and Achievements [NOTYETIMPLEMENTED]
-  * Expedition quests
-* Drill
+  * Expedition quests [NOTYETIMPLEMENTED]
+* Drill [NOTIMPLEMENTED]
 
   * vs AI
   * vs Player
-* Maintenance
+* Maintenance [NOTIMPLEMENTED]
 
   * [Supply](8.1-supply.md)
   * [Repair](8.2-repair.md)
-* Battle mechanic
+* Battle mechanic [NOTIMPLEMENTED]
 
   * Tactical Goal (for friend fleet)
   * Tactical Goal (for enemy fleet)

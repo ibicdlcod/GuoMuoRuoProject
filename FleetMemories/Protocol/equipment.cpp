@@ -162,22 +162,21 @@ const ResOrd Equipment::devRes() const {
         std::pair(A, 0),
         std::pair(W, 0),
         std::pair(C, 0),};
-    if(isRocketPlane()) // Rocket aircrafts
+    if(isRocketPlane()) // Temp solution: Rocket aircrafts
     {
         result[W] += 20;
     }
     ResOrd result2 = ResOrd(result);
     result2 += type.devResBase();
-    qint64 devResScale = settings->value("rule/devresscale", 10).toLongLong();
-    return result2 * (qint64)std::round((getTech() + 1.0)
-                                         * devResScale);
+    double devResScale = settings->value("rule/devresscale", 10).toDouble();
+    return result2 * (getTech() + 1.0) * devResScale;
 }
 
 /* 4.3-Development.md#Development time */
 const int Equipment::devTimeInSec() const {
-    qint64 devTimebase = settings->value("rule/devtimebase", 6).toLongLong();
-    qint64 devResScale = settings->value("rule/devresscale", 10).toLongLong();
-    return devTimebase * (qint64)std::round((getTech() + 1.0) * devResScale);
+    double devTimebase = settings->value("rule/devtimebase", 6).toDouble();
+    double devResScale = settings->value("rule/devresscale", 10).toDouble();
+    return devTimebase * (getTech() + 1.0) * devResScale;
 }
 
 /* under new doctrine this should always return true */

@@ -323,7 +323,7 @@ Q_GLOBAL_STATIC(QString,
                     "MapDef INTEGER NOT NULL, "
                     "Supremacy FLOAT NOT NULL DEFAULT -1, "
                     /* gauge remaining can be negative which makes DLC maps easier,
-                                                                                                                                                                                     * you still need to defeat boss flagship to win */
+                                                                                                                                                                                                         * you still need to defeat boss flagship to win */
                     "GaugeC INTEGER NOT NULL DEFAULT 0, "
                     "GaugeB INTEGER NOT NULL DEFAULT 0, "
                     "GaugeA INTEGER NOT NULL DEFAULT 0, "
@@ -2580,7 +2580,7 @@ bool Server::importEquipFromCSV() {
                 int type = EquipType::strToIntRep(lineParts[3]);
                 if(type == 0 && !lineParts[1].isEmpty()) {
                     qWarning() << lineParts[0]
-                            << "\tUnsupported type: " << lineParts[3];
+                                  << "\tUnsupported type: " << lineParts[3];
                 }
                 QSqlQuery query;
                 query.prepare(
@@ -3741,7 +3741,7 @@ bool Server::modifyShip(const CSteamID &uid, QUuid prevShip, int newDef) {
         int levelDesired = (shipRegistry[newDef]->getId()
                             & 0xF0000000) >> 7;
         int levelOriginal = (shipRegistry[query.value(0).toInt()]->getId()
-                & 0xF0000000) >> 7;
+                             & 0xF0000000) >> 7;
         if(levelDesired == levelOriginal) {
             stars = query.value(1).toInt();
         }
@@ -3904,24 +3904,28 @@ int64 Server::newEquipHasMotherCal(int equipId) {
     Equipment *mother = equipRegistry.value(equip->attr["Mother"]);
     if(!mother || mother->isInvalid())
         return 0;
-    uint64 sonSkillPoints
-            = equip->skillPointsStd()
-            * pow(equip->getTech(),
-                  settings
-                  ->value("rule/motherspscale", 0.2).toDouble());
-    if(equip->disallowMassProduction()
-            && equip->attr["Disallowmassproduction"] < 30) {
+    double s = equip->skillPointsStd();
+    double ta = pow(equip->getTech(), settings->value("rule/motherspscale",
+                                                      0.2).toDouble());
+    double b = settings->value("rule/maxskillpointsamplifier",
+                               5.0).toDouble();
+    /* TODO: this is not tested */
+    double sonSkillPoints;
+    if(equip->disallowProduction()) {
+        sonSkillPoints = s * ta * b;
+    }
+    else if(equip->disallowMassProduction()) {
         double x = equip->attr["Disallowmassproduction"];
-        double skillPointsAmplifier
-                = 1.0
-                + settings->value("rule/maxskillpointsamplifier",
-                                  5.0).toDouble()
-                * (atan(sqrt(
-                            settings->value("rule/normalproductionstockpile",
-                                            30.0).toDouble()
-                            / x))
-                   - atan(1.0));
-        sonSkillPoints *= skillPointsAmplifier;
+        if(x < 1) {
+            x = 1;
+        }
+        x = std::log(x);
+        double c = std::log(settings->value("rule/normalproductionstockpile",
+                                   30.0).toDouble());
+        sonSkillPoints = s * ta * b * c / std::sqrt(c * c + (b * b - 1) * x * x);
+    }
+    else {
+        sonSkillPoints = s * ta;
     }
     return sonSkillPoints;
 }
@@ -4122,12 +4126,12 @@ void Server::processBattle(const CSteamID &uid, QSslSocket *connection,
                                     mapId,
                                     nodeId,
                                     result.value()[3], // activefleet
-                battlePlan);
+                                    battlePlan);
         QByteArray msg = KP::serverBattleProcess(battleProcess);
         senderM.sendMessage(connection, msg);
         QTimer::singleShot(battleProcess["time"].toInt(),
-                this, [this, uid, connection, result,
-                battleProcess, mapId, unionId, nodeId, type](){
+                           this, [this, uid, connection, result,
+                           battleProcess, mapId, unionId, nodeId, type](){
 after_battle:
             QSqlQuery query;
             query.prepare("UPDATE UserAttr SET Intvalue = :type "
@@ -4148,7 +4152,7 @@ after_battle:
 
 drop:
             int dropShip = drop(uid, result.value()[0], result.value()[1],
-                    assm);
+                                assm);
             if(dropShip == -1) {
                 QByteArray msg = KP::serverBattleError(KP::DropError);
                 senderM.sendMessage(connection, msg);
@@ -4345,7 +4349,7 @@ create_temp_table:
 update_exp:
             QSqlQuery query;
             query.prepare("UPDATE UserEquipSP "
-                          "SET Intvalue = Intvalue + temp.e.cnt * temp.e.amount / sqrt(temp.e.amount + Intvalue) "
+                          "SET Intvalue = Intvalue + temp.e.cnt / sqrt(temp.e.amount + Intvalue) "
                           "FROM temp.e "
                           "WHERE UserEquipSP.EquipDef = temp.e.EquipDef "
                           "AND UserEquipSP.User = temp.e.User; ");
@@ -5912,9 +5916,9 @@ KP::FleetFailType Server::updateFleet(const CSteamID &uid, const QJsonArray &inp
                       "FleetPosIndex = :fpid "
                       "WHERE ShipUuid = :uuid");
         query.bindValue(":fid", shipDataObj["pos"].toInt()
-                / KP::fleetRepSize);
+                        / KP::fleetRepSize);
         query.bindValue(":fpid", shipDataObj["pos"].toInt()
-                % KP::fleetRepSize);
+                        % KP::fleetRepSize);
         query.bindValue(":uuid", shipDataObj["uuid"].toString());
         if(Q_UNLIKELY(!query.exec())) {
             qCritical() << query.lastQuery();
@@ -5954,11 +5958,11 @@ KP::FleetFailType Server::updateFleet(const CSteamID &uid, const QJsonArray &inp
         {
             Equipment *equip = equipRegistry.value(
                         User::getEquipDef(QUuid(shipDataObj["equip"].toArray()
-                                          [KP::maxEquipSlots].toString())), nullptr);
+                                                [KP::maxEquipSlots].toString())), nullptr);
             if(ship && equip) {
                 int shipLv = Ship::getLevel(shipExps[
                                             QUuid(shipDataObj["uuid"].toString())
-                        ]);
+                                            ]);
                 if(shipLv < KP::levelUnlockExSlot || !equip->canEquipEX(ship, lua)) {
                     //% "Ship %1 can't equip %2 in extra slot!"
                     qWarning()
@@ -5973,7 +5977,7 @@ KP::FleetFailType Server::updateFleet(const CSteamID &uid, const QJsonArray &inp
                           "WHERE ShipUuid = :uuid");
             query.bindValue(":euuid",
                             shipDataObj["equip"].toArray()
-                    [KP::maxEquipSlots].toString());
+                            [KP::maxEquipSlots].toString());
             query.bindValue(":uuid", shipDataObj["uuid"].toString());
             if(Q_UNLIKELY(!query.exec())) {
                 qCritical() << query.lastQuery();
