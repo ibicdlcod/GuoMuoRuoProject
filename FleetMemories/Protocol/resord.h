@@ -59,6 +59,17 @@ struct ResOrd
             std::round(c * amount)
             );
     }
+    const ResOrd operator/(double amount) const {
+        return ResOrd(
+            std::round(o / amount),
+            std::round(e / amount),
+            std::round(s / amount),
+            std::round(r / amount),
+            std::round(a / amount),
+            std::round(w / amount),
+            std::round(c / amount)
+            );
+    }
     constexpr ResOrd& operator*=(qint64 amount) {
         o *= amount;
         e *= amount;
