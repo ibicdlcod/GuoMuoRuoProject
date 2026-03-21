@@ -567,6 +567,7 @@ void FleetView::receivedShipInfo(const QJsonObject &info) {
     }
     ui->waitLabel->hide();
     ui->FleetMenu->show();
+    ready = true;
     scrollArea->show();
 }
 

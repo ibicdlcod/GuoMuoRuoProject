@@ -178,6 +178,17 @@ void Sortie::confirmSortieStart() {
         return;
     }
     int mapIndexSpec = selected * KP::mapIDDifficultyMask + mapIndex;
+    for(auto *widget: QApplication::topLevelWidgets()) {
+        if(qobject_cast<MainWindow *>(widget)) {
+            MainWindow *mainWindowM = qobject_cast<MainWindow *>(widget);
+            auto fv = mainWindowM->getFleetArea();
+            if(!fv->isReady()) {
+                //% "Please prepare your fleet in fleet view!"
+                qWarning() << qtTrId("fleet-not-ready");
+                return;
+            }
+        }
+    }
     ConfirmSortie *conf = new ConfirmSortie(this, mapStr, ui->diffChoice->currentText());
     if(conf->exec() == QDialog::Accepted) {
         int fi = conf->getFleetIndex();
@@ -243,6 +254,7 @@ void Sortie::sortieEnd() {
     //% "This sortie ended successfully."
     qInfo() << qtTrId("sortie-end");
     switchToState(KP::MapView);
+    ui->selectDisplay->setText(qtTrId("selected-map-id"));
 }
 
 void Sortie::dealWithNode(const MapNode &node, int nodeId) {

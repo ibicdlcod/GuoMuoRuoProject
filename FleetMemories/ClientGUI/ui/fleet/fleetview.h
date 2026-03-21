@@ -45,6 +45,7 @@ public:
     bool isCurrentFleetEmpty() const;
     void simplify(bool positive = true);
     EquipView equipView;
+    bool isReady() { return ready; }
 
 signals:
     void planeCountInfo(int shipPosIndex, int equipSlotIndex,
@@ -87,6 +88,8 @@ private:
     int lvColumn = 2;
     int shipIconColumn = 3;
     int equipSlotsColumn = 4;
+
+    bool ready = false;
 };
 
 #endif // FLEETVIEW_H

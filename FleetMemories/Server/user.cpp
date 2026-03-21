@@ -104,7 +104,7 @@ void User::decideHomePort(const CSteamID &uid, KP::AllegianceGroup nation) {
     QSqlDatabase db = QSqlDatabase::database();
 
     QSqlQuery query2;
-    query2.prepare("INSERT INTO UserAttr (UserID, Attribute, Intvalue) "
+    query2.prepare("REPLACE INTO UserAttr (UserID, Attribute, Intvalue) "
                    "VALUES (:id, 'HomePort', :nation);");
     query2.bindValue(":id", uid.ConvertToUint64());
     query2.bindValue(":nation", nation);
@@ -180,6 +180,25 @@ int User::getCurrentFactoryParallel(const CSteamID &uid, int equipId) {
     }
 }
 
+int User::getCurrentMapOpened(const CSteamID &uid) {
+    QSqlDatabase db = QSqlDatabase::database();
+    QSqlQuery query;
+
+    query.prepare("SELECT COUNT(*) FROM UserMapState "
+                  "WHERE User = :id AND Supremacy >= 0");
+    query.bindValue(":id", uid.ConvertToUint64());
+    if(Q_UNLIKELY(!query.exec() || !query.isSelect() || !query.first())) {
+        //% "User %1: get num of current opened maps failed!"
+        throw DBError(qtTrId("user-get-map-opened-failed")
+                          .arg(uid.ConvertToUint64()),
+                      query.lastError());
+        return 0;
+    }
+    else {
+        return query.value(0).toInt();
+    }
+}
+
 ResOrd User::getCurrentResources(const CSteamID &uid) {
     QSqlDatabase db = QSqlDatabase::database();
     QSqlQuery query;
@@ -220,6 +239,96 @@ ResOrd User::getCurrentResources(const CSteamID &uid) {
         } while (query.next());
         return ResOrd(current);
     }
+}
+
+std::tuple<int, int> User::getCurrentSlots(const CSteamID &uid) {
+    int factorySize = 0;
+    int dockSize = 0;
+    QSqlDatabase db = QSqlDatabase::database();
+    QSqlQuery query;
+    query.prepare("SELECT Attribute, Intvalue"
+                  " FROM UserAttr WHERE UserID = :id AND ("
+                  "Attribute = 'FactorySize' "
+                  "OR Attribute = 'DockSize');");
+    query.bindValue(":id", uid.ConvertToUint64());
+    if(Q_UNLIKELY(!query.exec() || !query.isSelect() || !query.first())) {
+        //% "User %1: check slots failed!"
+        qWarning() << qtTrId("user-check-slots-failed")
+                          .arg(uid.ConvertToUint64());
+        return {0, 0};
+    }
+    else {
+        do { // query.first is already called once
+            if(query.value(0).toString() == QStringLiteral("FactorySize")) {
+                factorySize = query.value(1).toInt();
+            }
+            else { // dockSize
+                dockSize = query.value(1).toInt();
+            }
+        } while (query.next());
+        return {factorySize, dockSize};
+    }
+}
+
+std::tuple<int, int> User::getDesiredSlots(int mapsOpened) {
+    if(mapsOpened < 0) {
+        return {0, 0};
+    }
+    static QMap<int, int> fact
+        = { std::pair(0, 4),
+            std::pair(4, 5),
+            std::pair(6, 6),
+            std::pair(8, 7),
+            std::pair(10, 8),
+            std::pair(12, 9),
+            std::pair(15, 10),
+            std::pair(19, 11),
+            std::pair(23, 12),
+            std::pair(27, 13),
+            std::pair(32, 14),
+            std::pair(37, 15),
+            std::pair(42, 16),
+            std::pair(47, 17),
+            std::pair(52, 18),
+            std::pair(57, 19),
+            std::pair(62, 20),
+            std::pair(68, 21),
+            std::pair(74, 22),
+            std::pair(80, 23),
+            std::pair(86, 24)
+        };
+    static QMap<int, int> repair
+        = { std::pair(0, 2),
+            std::pair(4, 3),
+            std::pair(8, 4),
+            std::pair(15, 5),
+            std::pair(23, 6),
+            std::pair(42, 7),
+            std::pair(86, 8)
+        };
+cal_factory:
+    int factoryResult = 0;
+    {
+        int tempa = mapsOpened;
+        do {
+            if(fact.contains(tempa)) {
+                factoryResult = fact[tempa];
+                break;
+            }
+        } while(tempa--);
+    }
+cal_repair:
+    int repairResult = 0;
+    {
+        int tempa = mapsOpened;
+        do {
+            if(repair.contains(tempa)) {
+                repairResult = repair[tempa];
+                break;
+            }
+        } while(tempa--);
+    }
+    return {factoryResult, repairResult};
 }
 
 int User::getEquipAmount(const CSteamID &uid, int equipId) {
@@ -393,8 +502,8 @@ Q_DECL_DEPRECATED void User::init(const CSteamID &uid) {
     /* 4.1-Factoryslot.md */
     for(int i = 0; i < KP::initFactory; ++i) {
         QSqlQuery query;
-        query.prepare("INSERT INTO Factories (User,FactoryID)"
-                      " VALUES (:id,:count)");
+        query.prepare("INSERT INTO Factories (User, FactoryID)"
+                      " VALUES (:id, :count)");
         query.bindValue(":id", uid.ConvertToUint64());
         query.bindValue(":count", i);
         if(Q_UNLIKELY(!query.exec())) {
@@ -594,11 +703,12 @@ QUuid User::newShip(const CSteamID &uid, int shipDid, int startingHP) {
 }
 
 bool User::openMap(const CSteamID &uid, int mapId) { // relative id
+    try {
     QSqlDatabase db = QSqlDatabase::database();
     QSqlQuery query;
     query.prepare("UPDATE UserMapState "
                   "SET Supremacy = 0.0 "
-                  "WHERE User = :id AND MapDef = :def");
+                  "WHERE User = :id AND MapDef = :def;");
     query.bindValue(":id", uid.ConvertToUint64());
     query.bindValue(":def", mapId);
     if(Q_UNLIKELY(!query.exec())){
@@ -609,8 +719,67 @@ bool User::openMap(const CSteamID &uid, int mapId) { // relative id
         return false;
     }
     else {
+        auto [factory, repair] = getCurrentSlots(uid);
+        auto [factory1, repair1] = getDesiredSlots(getCurrentMapOpened(uid));
+    add_factory:
+        if(factory1 > factory) {
+            QSqlQuery query;
+            query.prepare("UPDATE UserAttr "
+                          "SET Intvalue = :factory "
+                          "WHERE UserID = :id AND Attribute = 'FactorySize';");
+            query.bindValue(":id", uid.ConvertToUint64());
+            query.bindValue(":factory", factory1);
+            if(Q_UNLIKELY(!query.exec())){
+                qCritical() << query.lastQuery();
+                //% "User ID %1: DB failure when increasing factory count!"
+                throw DBError(qtTrId("dbfail-when-increasing-factory")
+                                  .arg(uid.ConvertToUint64()),
+                              query.lastError());
+                return false;
+            }
+            for(int i = factory; i < factory1; ++i) {
+                QSqlQuery query;
+                query.prepare("INSERT INTO Factories (UserID, FactoryID)"
+                              " VALUES (:id, :count)");
+                query.bindValue(":id", uid.ConvertToUint64());
+                query.bindValue(":count", i);
+                if(Q_UNLIKELY(!query.exec())) {
+                    qCritical() << query.lastQuery();
+                    //% "Set User Factory Up failed!"
+                    throw DBError(qtTrId("init-userfactory-failed"),
+                                  query.lastError());
+                    return false;
+                }
+            }
+        }
+    add_repair:
+        if(repair1 > repair) {
+            QSqlQuery query;
+            query.prepare("UPDATE UserAttr "
+                          "SET Intvalue = :repair "
+                          "WHERE UserID = :id AND Attribute = 'DockSize';");
+            query.bindValue(":id", uid.ConvertToUint64());
+            query.bindValue(":repair", repair1);
+            if(Q_UNLIKELY(!query.exec())){
+                qCritical() << query.lastQuery();
+                //% "User ID %1: DB failure when increasing dock count!"
+                throw DBError(qtTrId("dbfail-when-increasing-dock")
+                                  .arg(uid.ConvertToUint64()),
+                              query.lastError());
+                return false;
+            }
+            /* TODO: add actual repair slot */
+        }
         return true;
     }
+    } catch (DBError &e) {
+        for(QString &i : e.whats()) {
+            qCritical() << i;
+        }
+    } catch (std::exception &e) {
+        qCritical() << e.what();
+    }
+    return false;
 }
 
 void User::refreshFactory(Server *server, const CSteamID &uid) {

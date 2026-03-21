@@ -323,7 +323,7 @@ Q_GLOBAL_STATIC(QString,
                     "MapDef INTEGER NOT NULL, "
                     "Supremacy FLOAT NOT NULL DEFAULT -1, "
                     /* gauge remaining can be negative which makes DLC maps easier,
-                                                                                                                                                                                                                                                 * you still need to defeat boss flagship to win */
+                                                                                                                                                                                                                                                                     * you still need to defeat boss flagship to win */
                     "GaugeC INTEGER NOT NULL DEFAULT 0, "
                     "GaugeB INTEGER NOT NULL DEFAULT 0, "
                     "GaugeA INTEGER NOT NULL DEFAULT 0, "
@@ -1488,6 +1488,7 @@ bool Server::addEquipStar(const QUuid &equipUid, int amount = 1) {
 }
 
 /* return whether new map is opened */
+/* 6.1-map.md#Map relations */
 bool Server::clearMap(const CSteamID &uid, int mapUnionId) {
     bool result = false;
     QSet<KP::AllegianceGroup> rules;
@@ -2000,6 +2001,12 @@ delete_bp:
 void Server::doDevelop(const CSteamID &uid, int equipid,
                        int factoryid, QSslSocket *connection) {
     try{
+        if(factoryid >= std::get<0>(User::getCurrentSlots(uid))) {
+            QByteArray msg =
+                    KP::serverDevelopFailed(KP::FactoryNotOpen);
+            senderM.sendMessage(connection, msg);
+            return;
+        }
         if(!equipRegistry.contains(equipid)) {
             QByteArray msg =
                     KP::serverDevelopFailed(KP::DevelopNotExist);
@@ -3267,6 +3274,10 @@ void Server::luaInitMap() {
     }
     QSet<int> normalMapUnions;
     for(auto map: std::as_const(normalMaps)) {
+        /* TODO: Hidden map use entirely different logic */
+        if(MapWithDiff::getUnionId(map->id) == KP::hiddenMap) {
+            continue;
+        }
         normalMapUnions.insert(MapWithDiff::getUnionId(map->id));
     }
     for(auto map: normalMapUnions) {
@@ -4210,145 +4221,153 @@ void Server::parseUnlisten() {
 
 void Server::processBattle(const CSteamID &uid, QSslSocket *connection,
                            const QJsonObject &battlePlan) {
-    /* map, node, inbattle(0/1), activefleetindex */
-    auto result = queryMapProgress(uid, connection, KP::BeforeBattle);
-    if(!result.has_value()) {
-        return;
-    }
-
-    int mapId = result.value()[0]; // absolute id
-    int nodeId = result.value()[1];
-    int unionId = MapWithDiff::getUnionId(mapId);
-    KP::NodeType type = KP::EMPTY;
-    if(lua["maps"] != sol::nil
-            && lua["maps"][unionId] != sol::nil
-            && lua["maps"][unionId][nodeId] != sol::nil) {
-        int typeInt = lua["maps"][unionId][nodeId]["battle_type"];
-        type = static_cast<KP::NodeType>(typeInt);
-    }
-    else {
-        //% "Map info: query mapid %1 nodeid %2 failed!"
-        qCritical() << qtTrId("map-info-failure").arg(mapId).arg(nodeId);
-        return;
-    }
-
-    switch(type) {
-    case KP::NORMAL: [[fallthrough]];
-    case KP::BOSS: [[fallthrough]];
-    case KP::NIGHT: [[fallthrough]];
-    case KP::NIGHTBOSS: [[fallthrough]];
-    case KP::AIR: {
-        QSqlQuery query;
-        query.prepare("UPDATE UserAttr SET Intvalue = :type "
-                      "WHERE Attribute = 'InBattle' "
-                      "AND UserID = :uid");
-        query.bindValue(":uid", uid.ConvertToUint64());
-        query.bindValue(":type", KP::DuringBattle);
-        if(Q_UNLIKELY(!query.exec())) {
-            qCritical() << query.lastQuery();
-            //% "User %1: start node battle failure!"
-            throw DBError(qtTrId("sortie-node-battle-failure").arg(uid.ConvertToUint64()),
-                          query.lastError());
+    try {
+        /* map, node, inbattle(0/1), activefleetindex */
+        auto result = queryMapProgress(uid, connection, KP::BeforeBattle);
+        if(!result.has_value()) {
             return;
         }
-        QJsonObject battleProcess
-                = processBattleCore(uid,
-                                    mapId,
-                                    nodeId,
-                                    result.value()[3], // activefleet
-                battlePlan);
-        QByteArray msg = KP::serverBattleProcess(battleProcess);
-        senderM.sendMessage(connection, msg);
-after_battle:
-        QTimer::singleShot(battleProcess["time"].toInt(),
-                this, [this, uid, connection, result,
-                battleProcess, mapId, unionId, nodeId, type](){
-set_battle_state:
+
+        int mapId = result.value()[0]; // absolute id
+        int nodeId = result.value()[1];
+        int unionId = MapWithDiff::getUnionId(mapId);
+        KP::NodeType type = KP::EMPTY;
+        if(lua["maps"] != sol::nil
+                && lua["maps"][unionId] != sol::nil
+                && lua["maps"][unionId][nodeId] != sol::nil) {
+            int typeInt = lua["maps"][unionId][nodeId]["battle_type"];
+            type = static_cast<KP::NodeType>(typeInt);
+        }
+        else {
+            //% "Map info: query mapid %1 nodeid %2 failed!"
+            qCritical() << qtTrId("map-info-failure").arg(mapId).arg(nodeId);
+            return;
+        }
+
+        switch(type) {
+        case KP::NORMAL: [[fallthrough]];
+        case KP::BOSS: [[fallthrough]];
+        case KP::NIGHT: [[fallthrough]];
+        case KP::NIGHTBOSS: [[fallthrough]];
+        case KP::AIR: {
             QSqlQuery query;
             query.prepare("UPDATE UserAttr SET Intvalue = :type "
                           "WHERE Attribute = 'InBattle' "
                           "AND UserID = :uid");
             query.bindValue(":uid", uid.ConvertToUint64());
-            query.bindValue(":type", KP::AfterBattle);
+            query.bindValue(":type", KP::DuringBattle);
             if(Q_UNLIKELY(!query.exec())) {
                 qCritical() << query.lastQuery();
-                //% "User %1: end node battle failure!"
-                throw DBError(qtTrId("sortie-node-battle-failure-end").arg(uid.ConvertToUint64()),
+                //% "User %1: start node battle failure!"
+                throw DBError(qtTrId("sortie-node-battle-failure").arg(uid.ConvertToUint64()),
                               query.lastError());
                 return;
             }
-            QByteArray msg = KP::serverBattleEnd();
+            QJsonObject battleProcess
+                    = processBattleCore(uid,
+                                        mapId,
+                                        nodeId,
+                                        result.value()[3], // activefleet
+                    battlePlan);
+            QByteArray msg = KP::serverBattleProcess(battleProcess);
             senderM.sendMessage(connection, msg);
-            auto assm = static_cast<KP::BattleAssessment>(battleProcess["assm"].toInt());
+after_battle:
+            QTimer::singleShot(battleProcess["time"].toInt(),
+                    this, [this, uid, connection, result,
+                    battleProcess, mapId, unionId, nodeId, type](){
+set_battle_state:
+                QSqlQuery query;
+                query.prepare("UPDATE UserAttr SET Intvalue = :type "
+                              "WHERE Attribute = 'InBattle' "
+                              "AND UserID = :uid");
+                query.bindValue(":uid", uid.ConvertToUint64());
+                query.bindValue(":type", KP::AfterBattle);
+                if(Q_UNLIKELY(!query.exec())) {
+                    qCritical() << query.lastQuery();
+                    //% "User %1: end node battle failure!"
+                    throw DBError(qtTrId("sortie-node-battle-failure-end").arg(uid.ConvertToUint64()),
+                                  query.lastError());
+                    return;
+                }
+                QByteArray msg = KP::serverBattleEnd();
+                senderM.sendMessage(connection, msg);
+                auto assm = static_cast<KP::BattleAssessment>(battleProcess["assm"].toInt());
 
 drop:
-            int dropShip = drop(uid, result.value()[0], result.value()[1],
-                    assm);
-            if(dropShip == -1) {
-                QByteArray msg = KP::serverBattleError(KP::DropError);
-                senderM.sendMessage(connection, msg);
-            }
-            else if(dropShip != 0) {
-                processDrop(uid, connection, dropShip);
-            }
+                int dropShip = drop(uid, result.value()[0], result.value()[1],
+                        assm);
+                if(dropShip == -1) {
+                    QByteArray msg = KP::serverBattleError(KP::DropError);
+                    senderM.sendMessage(connection, msg);
+                }
+                else if(dropShip != 0) {
+                    processDrop(uid, connection, dropShip);
+                }
 
 add_exp:
-            KP::Difficulty diff = MapWithDiff::getDiff(mapId);
-            QString diffStr = (*KP::diffEnumtoStr)[diff];
-            QByteArray diffStrBytes = diffStr.toUtf8();
-            const char *diffStrC = diffStrBytes;
-            int exp = 0;
-            if(lua["maps"][unionId][nodeId]["expr"] != sol::nil) {
-                exp = lua["maps"][unionId][nodeId]["expr"][diffStrC];
-            }
-            else {
-                //% "Map info: query mapid %1 nodeid %2 exp failed!"
-                qCritical() << qtTrId("map-info-failure-exp").arg(mapId).arg(nodeId);
-                return;
-            }
-            processExpGain(uid, result.value()[3], exp, assm);
+                KP::Difficulty diff = MapWithDiff::getDiff(mapId);
+                QString diffStr = (*KP::diffEnumtoStr)[diff];
+                QByteArray diffStrBytes = diffStr.toUtf8();
+                const char *diffStrC = diffStrBytes;
+                int exp = 0;
+                if(lua["maps"][unionId][nodeId]["expr"] != sol::nil) {
+                    exp = lua["maps"][unionId][nodeId]["expr"][diffStrC];
+                }
+                else {
+                    //% "Map info: query mapid %1 nodeid %2 exp failed!"
+                    qCritical() << qtTrId("map-info-failure-exp").arg(mapId).arg(nodeId);
+                    return;
+                }
+                processExpGain(uid, result.value()[3], exp, assm);
 after_boss:
-            if(type == KP::BOSS || type == KP::NIGHTBOSS) {
+                if(type == KP::BOSS || type == KP::NIGHTBOSS) {
 gain_supremacy:
-                double baseSupremacy;
-                switch(diff) {
-                case KP::EarlyWar: baseSupremacy = 100; break;
-                case KP::MidWar: baseSupremacy = 200; break;
-                case KP::LateWar: baseSupremacy = 300; break;
-                case KP::Historical: baseSupremacy = 400; break;
-                default: baseSupremacy = 0; break;
-                }
-                double factor;
-                switch(assm) {
-                case KP::SVictory: factor = 1.0; break;
-                case KP::AVictory: factor = 0.8; break;
-                case KP::BVictory: factor = 0.5; break;
-                default: factor = 0.0; break;
-                }
-                double supremacyValue = baseSupremacy * factor;
-                if(supremacyValue > 0) {
-                    User::setMapSupremacy(uid, unionId, supremacyValue, 0); // no retention
-                }
+                    double baseSupremacy;
+                    switch(diff) {
+                    case KP::EarlyWar: baseSupremacy = 100; break;
+                    case KP::MidWar: baseSupremacy = 200; break;
+                    case KP::LateWar: baseSupremacy = 300; break;
+                    case KP::Historical: baseSupremacy = 400; break;
+                    default: baseSupremacy = 0; break;
+                    }
+                    double factor;
+                    switch(assm) {
+                    case KP::SVictory: factor = 1.0; break;
+                    case KP::AVictory: factor = 0.8; break;
+                    case KP::BVictory: factor = 0.5; break;
+                    default: factor = 0.0; break;
+                    }
+                    double supremacyValue = baseSupremacy * factor;
+                    if(supremacyValue > 0) {
+                        User::setMapSupremacy(uid, unionId, supremacyValue, 0); // no retention
+                    }
 deal_with_gauge:
-                int amount = getBossDamage(battleProcess);
-                User::decreaseGauge(uid, unionId, diff, amount);
-                bool isBossSunk = getBossSunk(battleProcess);
-                if(isBossSunk && User::isGaugeFinished(uid, unionId, diff)) {
-                    /* clear map */
-                    if(clearMap(uid, unionId)) {
-                        offerMapInfoUser(uid, connection);
+                    int amount = getBossDamage(battleProcess);
+                    User::decreaseGauge(uid, unionId, diff, amount);
+                    bool isBossSunk = getBossSunk(battleProcess);
+                    if(isBossSunk && User::isGaugeFinished(uid, unionId, diff)) {
+                        /* clear map */
+                        if(clearMap(uid, unionId)) {
+                            offerMapInfoUser(uid, connection);
+                        }
                     }
                 }
             }
+            );
         }
-        );
-    }
-        break;
-    case KP::STARTING:
-    case KP::EMPTY:
-    case KP::DISASTER:
-    case KP::TRANSPORT:
-    default: break;
+            break;
+        case KP::STARTING:
+        case KP::EMPTY:
+        case KP::DISASTER:
+        case KP::TRANSPORT:
+        default: break;
+        }
+    } catch (DBError &e) {
+        for(QString &i : e.whats()) {
+            qCritical() << i;
+        }
+    } catch (std::exception &e) {
+        qCritical() << e.what();
     }
 }
 
@@ -4958,7 +4977,8 @@ void Server::receivedReq(const QJsonObject &djson,
         auto state = djson["state"].toInt();
         switch(state) {
         case KP::GameState::Port: {
-            if(User::checkHomePort(uid) == KP::UnknownNation) {
+            if(User::checkHomePort(uid) == KP::UnknownNation
+                    || User::getCurrentMapOpened(uid) == 0) {
                 decideHomePort(uid, connection);
             }
             User::refreshPort(this, uid);
@@ -5311,9 +5331,8 @@ void Server::sendTestMessages() {
         qWarning() << "Server isn't listening, abort.";
     }
     else {
-        for(auto ship: shipRegistry) {
-            qInfo() << ship->toString() << "\t" << ship->getAllegiance()
-                    << "\t" << ship->mapOpenRule();
+        for(int i = 0; i < 87; ++i) {
+            qCritical() << User::getDesiredSlots(i);
         }
     }
 }
@@ -6138,7 +6157,7 @@ void Server::userInit(const CSteamID &uid) {
             = {
         std::pair(QStringLiteral("FleetSize"), 1),
         std::pair(QStringLiteral("FactorySize"), KP::initFactory),
-        std::pair(QStringLiteral("Docksize"), KP::initDock),
+        std::pair(QStringLiteral("DockSize"), KP::initDock),
         std::pair(QStringLiteral("O"), 10000), // oil
         std::pair(QStringLiteral("E"), 10000), // explosives
         std::pair(QStringLiteral("S"), 10000), // steel

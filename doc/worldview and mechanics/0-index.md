@@ -30,7 +30,7 @@
   * Decoration [NOTYETIMPLEMENTED]
   * Enemies (Amnesiac Fleet) [NOTYETIMPLEMENTED]
 * [Sortie Map](6-sortie.md)
-  * [Normal map and map relations](6.1-map.md) [PARTIAL]
+  * [Normal map and map relations](6.1-map.md)
   * [Naval Supremacy and Normal expedition](6.2-supremacy.md) [PARTIAL]
   * Map gauge [NOTYETIMPLEMENTED]
   * Retreat rule [NOTYETIMPLEMENTED]

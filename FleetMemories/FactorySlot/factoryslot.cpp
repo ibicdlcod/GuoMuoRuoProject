@@ -84,7 +84,7 @@ void FactorySlot::setStatus() {
             }
         } else {
             //% "Factory %1"
-            this->setText(qtTrId("factory-num-label").arg(slotnum));
+            this->setText(qtTrId("factory-num-label").arg(slotnum+1));
         }
     }
 }

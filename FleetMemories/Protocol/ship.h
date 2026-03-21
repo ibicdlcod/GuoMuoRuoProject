@@ -28,7 +28,7 @@ public:
     KP::AllegianceSubGroup getAllegianceSubGroup() const;
     int getId() const;
     QList<int> getLaterModels(const QMap<int, Ship *> &) const;
-    KP::AllegianceGroup getNationality() const;
+    Q_DECL_DEPRECATED KP::AllegianceGroup getNationality() const;
     QList<int> getPreviousModels(const QMap<int, Ship *> &) const;
     QList<int> getStartingEquip() const;
     ShipType getType() const;

@@ -1353,6 +1353,10 @@ void Clientv2::receivedMsg(const QJsonObject &djson) {
             }
         }
         break;
+        case KP::FactoryNotOpen:
+            //% "This factory/dock is closed."
+            qWarning() << qtTrId("factory-not-open");
+            break;
         case KP::FactoryBusy:
             //% "You have not selected an available factory slot."
             qInfo() << qtTrId("factory-busy");

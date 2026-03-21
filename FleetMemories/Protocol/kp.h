@@ -199,6 +199,7 @@ enum GameError{
     ResourceLack,
     DevelopNotOption,
     DevelopNotExist,
+    FactoryNotOpen,
     FactoryBusy,
     MassProductionDisallowed,
     ProductionDisallowed,
@@ -496,6 +497,7 @@ enum Difficulty {
 };
 Q_ENUM_NS(Difficulty)
 
+/* 6.1-maps.md#Battle node types */
 /* must ensure consistency with maps.lua */
 enum NodeType {
     STARTING = 0,

@@ -1,5 +1,6 @@
 local maps = {}
 
+--6.1-maps.md#Battle node types
 --Must be consistent with kp.h
 maps.Battle_type = {
     STARTING = 0,

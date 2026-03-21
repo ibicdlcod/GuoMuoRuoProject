@@ -104,6 +104,9 @@ set(CLIENT_SOURCES
     ClientGUI/ui/fleet/shipequip.ui
     ClientGUI/ui/keyenterreceiver.cpp
     ClientGUI/ui/keyenterreceiver.h
+    ClientGUI/ui/maintenance/repair.cpp
+    ClientGUI/ui/maintenance/repair.h
+    ClientGUI/ui/maintenance/repair.ui
     ClientGUI/ui/mainwindow.cpp
     ClientGUI/ui/mainwindow.h
     ClientGUI/ui/mainwindow.ui
@@ -238,7 +241,6 @@ qt_add_executable(CFClient
     ${CLIENT_SOURCES}
     common.qrc
     ${app_icon_resource_windows}
-
 )
 qt_add_executable(CFServer
     MANUAL_FINALIZATION

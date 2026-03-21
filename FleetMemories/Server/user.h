@@ -19,7 +19,11 @@ KP::AllegianceGroup checkHomePort(const CSteamID &);
 void decideHomePort(const CSteamID &, KP::AllegianceGroup);
 bool decreaseGauge(const CSteamID &, int, KP::Difficulty, int);
 int getCurrentFactoryParallel(const CSteamID &, int);
+int getCurrentMapOpened(const CSteamID &);
 ResOrd getCurrentResources(const CSteamID &);
+/* factoryslot, repairslot */
+std::tuple<int, int> getCurrentSlots(const CSteamID &);
+std::tuple<int, int> getDesiredSlots(int);
 int getEquipAmount(const CSteamID &, int);
 int getEquipDef(QUuid);
 int getShipDef(QUuid);

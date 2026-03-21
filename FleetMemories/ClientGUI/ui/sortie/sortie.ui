@@ -111,7 +111,7 @@
         <item>
          <widget class="QLabel" name="selectDisplay">
           <property name="text">
-           <string extracomment="selected-map-id">None</string>
+           <string id="selected-map-id">None</string>
           </property>
          </widget>
         </item>
