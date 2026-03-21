@@ -122,6 +122,7 @@ MainWindow::MainWindow(QWidget *parent, int argc, char ** argv)
     techArea = new TechView(this);
     battleArea = new Sortie(this);
     fleetArea = new FleetView(this);
+    repairArea = new Repair(this);
 
     lay->addWidget(portArea);
     lay->addWidget(licenseArea);
@@ -130,6 +131,7 @@ MainWindow::MainWindow(QWidget *parent, int argc, char ** argv)
     lay->addWidget(techArea);
     lay->addWidget(battleArea);
     lay->addWidget(fleetArea);
+    lay->addWidget(repairArea);
 
     ui->MainArea->setLayout(lay);
     lay->setContentsMargins(0,0,0,0);
@@ -227,6 +229,8 @@ void MainWindow::unlockBattle() {
             &engine, &Clientv2::backToNavalBase);
     connect(ui->actionView_Tech, &QAction::triggered,
             &engine, &Clientv2::switchToTech);
+    connect(ui->actionRepair, &QAction::triggered,
+            &engine, &Clientv2::switchToRepairView);
     connect(ui->actionDevelop_Equipment, &QAction::triggered,
             &engine, &Clientv2::switchToFactory);
     connect(ui->actionDevelop_Equipment, &QAction::triggered,
@@ -309,6 +313,7 @@ void MainWindow::gamestateChanged(KP::GameState state) {
     case KP::SortieMapView: lay->setCurrentWidget(battleArea);
         battleArea->switchToState(KP::MapView); break;
     case KP::FleetView: lay->setCurrentWidget(fleetArea); break;
+    case KP::RepairView: lay->setCurrentWidget(repairArea); break;
     }
     adjustArea(lay->currentWidget(), ui->MainArea->frameSize());
 }

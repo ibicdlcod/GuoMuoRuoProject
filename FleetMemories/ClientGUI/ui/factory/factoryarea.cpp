@@ -39,6 +39,8 @@ FactoryArea::FactoryArea(QWidget *parent) :
         for(int j = 0; j < KP::factorySlotRows; ++j) {
             FactorySlot *facto = new FactorySlot();
             facto->setSlotnum(j + i * KP::factorySlotRows);
+            facto->setMinimumWidth(120);
+            facto->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
             slotfs.append(facto);
             layV->addWidget(facto);
         }
@@ -51,7 +53,6 @@ FactoryArea::FactoryArea(QWidget *parent) :
     for(auto iter = slotfs.begin(); iter < slotfs.end(); ++iter) {
         connect((*iter), &FactorySlot::clickedSpec,
                 this, &FactoryArea::developClicked);
-        //(*iter)->setSlotnum(iter - slotfs.begin());
         (*iter)->setStatus();
     }
     dev.setAttribute(Qt::WA_DeleteOnClose, false);

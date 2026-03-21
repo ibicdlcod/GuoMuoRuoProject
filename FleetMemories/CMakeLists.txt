@@ -45,8 +45,10 @@ find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS
     UiPlugin LinguistTools Sql SvgWidgets Network HttpServer OpenGL OpenGLWidgets)
 
 include_directories(${root_SOURCE_DIR}/FactorySlot)
+include_directories(${root_SOURCE_DIR}/RepairSlot)
 
 add_subdirectory(FactorySlot)
+add_subdirectory(RepairSlot)
 
 set(TS_FILES
     Translations/FleetMemories_en_US.ts
@@ -308,8 +310,10 @@ target_link_libraries(CFClient PRIVATE Qt${QT_VERSION_MAJOR}::OpenGLWidgets)
 target_link_libraries(CFClient PRIVATE CFProtocol)
 if (${CMAKE_SYSTEM_NAME} MATCHES "Windows")
     target_link_libraries(CFClient PRIVATE factoryslot/FactorySlot)
+    target_link_libraries(CFClient PRIVATE repairslot/RepairSlot)
 else ()
     target_link_libraries(CFClient PRIVATE ${CMAKE_BINARY_DIR}/FactorySlot/libFactorySlot.so)
+    target_link_libraries(CFClient PRIVATE ${CMAKE_BINARY_DIR}/RepairSlot/libRepairSlot.so)
 endif()
 target_link_libraries(CFClient PRIVATE ${STEAM_LIBRARY})
 target_link_libraries(CFClient PRIVATE ${STEAM_APPENCRYPT_LIBRARY})
@@ -369,9 +373,17 @@ if (${CMAKE_SYSTEM_NAME} MATCHES "Windows")
         COMMAND ${CMAKE_COMMAND} -E copy_if_different
         "${CMAKE_CURRENT_BINARY_DIR}/FactorySlot/FactorySlot.dll"
         $<TARGET_FILE_DIR:CFClient>)
+    add_custom_command(TARGET CFClient POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        "${CMAKE_CURRENT_BINARY_DIR}/RepairSlot/RepairSlot.dll"
+        $<TARGET_FILE_DIR:CFClient>)
     add_custom_command(TARGET CFServer POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy_if_different
         "${CMAKE_CURRENT_BINARY_DIR}/FactorySlot/FactorySlot.dll"
+        $<TARGET_FILE_DIR:CFServer>)
+    add_custom_command(TARGET CFServer POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        "${CMAKE_CURRENT_BINARY_DIR}/RepairSlot/RepairSlot.dll"
         $<TARGET_FILE_DIR:CFServer>)
     add_custom_command(TARGET CFClient POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy_if_different

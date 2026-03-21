@@ -470,6 +470,19 @@ void Clientv2::switchToFleetView() {
     }
 }
 
+void Clientv2::switchToRepairView() {
+    if(!loggedIn()) {
+        emit qout(qtTrId("access-denied-login-first"));
+        return;
+    }
+    if(gameState == KP::RepairView) {
+        return;
+    } else {
+        gameState = KP::RepairView;
+        emit gamestateChanged(KP::RepairView);
+    }
+}
+
 void Clientv2::switchToTech() {
     if(!loggedIn()) {
         emit qout(qtTrId("access-denied-login-first"));
@@ -867,6 +880,12 @@ void Clientv2::doForceFetch(int slotnum) {
     sender->enqueue(msg);
 }
 
+void Clientv2::doForceRepair(int slotnum) {
+    QByteArray msg = KP::clientDemandRepair(QUuid(), slotnum, false, true);
+    sender->enqueue(msg);
+    socket.flush();
+}
+
 void Clientv2::doImproveEquip(const QList<QUuid> &candidates) {
     if(candidates.empty())
         return;
@@ -885,6 +904,12 @@ void Clientv2::doModernizeShip(const QList<QUuid> &candidates) {
     }
 }
 
+void Clientv2::doRefreshDock() {
+    QByteArray msg = KP::clientDockRefresh();
+    sender->enqueue(msg);
+    socket.flush();
+}
+
 /* Request current factory state to server */
 void Clientv2::doRefreshFactory() {
     QByteArray msg = KP::clientFactoryRefresh();
@@ -900,6 +925,12 @@ void Clientv2::doRefreshFactoryAnchorage() {
 
 void Clientv2::doRefreshFactoryArsenal() {
     QByteArray msg = KP::clientDemandEquipInfoUser();
+    sender->enqueue(msg);
+    socket.flush();
+}
+
+void Clientv2::doRepair(const QUuid &uuid, int slotnum) {
+    QByteArray msg = KP::clientDemandRepair(uuid, slotnum, false, false);
     sender->enqueue(msg);
     socket.flush();
 }
@@ -1183,6 +1214,9 @@ void Clientv2::receivedInfo(const QJsonObject &djson) {
     case KP::InfoType::FactoryInfo:
         emit receivedFactoryRefresh(djson);
         break;
+    case KP::InfoType::DockInfo:
+        emit receivedRepairRefresh(djson);
+        break;
     case KP::InfoType::EquipInfo:
         updateEquipCache(djson);
         break;
@@ -1358,7 +1392,7 @@ void Clientv2::receivedMsg(const QJsonObject &djson) {
             qWarning() << qtTrId("factory-not-open");
             break;
         case KP::FactoryBusy:
-            //% "You have not selected an available factory slot."
+            //% "You have not selected an available factory/dock slot."
             qInfo() << qtTrId("factory-busy");
             break;
         case KP::ResourceLack:
@@ -1384,6 +1418,10 @@ void Clientv2::receivedMsg(const QJsonObject &djson) {
         case KP::ShipisDisabled:
             //% "Ship is disabled!"
             qWarning() << qtTrId("ship-is-disabled");
+            break;
+        case KP::ShipisUnderRepair:
+            //% "This operation involves ship under repair!"
+            qWarning() << qtTrId("ship-is-repairing");
             break;
         default:
             //% "Equipment development failed."
@@ -1657,6 +1695,9 @@ void Clientv2::receivedMsg(const QJsonObject &djson) {
             //% "Fleet don't fit this map."
             qWarning() << qtTrId("fleet-dont-fit-map");
             break;
+        case KP::FleetShipisUnderRepair:
+            qWarning() << qtTrId("ship-is-repairing");
+            break;
         case KP::FleetBusyInBattle:
             qWarning() << qtTrId("fleet-is-busy");
             break;
@@ -1707,6 +1748,10 @@ void Clientv2::receivedNewLogin(const QJsonObject &djson) {
                        .arg(SteamFriends()->GetPersonaName(), reas);
     }
     attemptMode = false;
+}
+
+void Clientv2::stopRepair(int slotnum) {
+    qCritical() << slotnum;
 }
 
 /* CLI */

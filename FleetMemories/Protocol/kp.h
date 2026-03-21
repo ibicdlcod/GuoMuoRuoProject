@@ -69,6 +69,7 @@ static constexpr int equipIdMax = 0x10000;
 static constexpr int conditionMax = 480;
 static constexpr int factorySlotRows = 6;
 static constexpr int factorySlotColumns = 4;
+static constexpr int maxRepairSlots = 8;
 #pragma message(NOT_M_CONST)
 const int steamAppId = 2632870; // Go request your own steam appid if modding!
 Q_GLOBAL_STATIC(QStringList,
@@ -143,7 +144,8 @@ enum GameState{
     TechView,
     SortieMapView,
     FleetView,
-    BattleMapView
+    BattleMapView,
+    RepairView,
 };
 Q_ENUM_NS(GameState)
 
@@ -178,9 +180,10 @@ enum CommandType{
     DemandShipInfoUser,
     DemandMapInfo,
     DemandMapInfoUser,
-    DemandTech,
-    DemandSkillPoints,
+    Repair,
     DemandResourceUpdate,
+    DemandSkillPoints,
+    DemandTech,
     DestructEquip,
     Switch,
     MessageTest,
@@ -208,6 +211,7 @@ enum GameError{
     RemodelShipIncorrect,
     BlueprintNonexistent,
     ShipisDisabled,
+    ShipisUnderRepair,
     FleetBusy,
     FleetLost,
     ServerError,
@@ -242,6 +246,7 @@ Q_ENUM_NS(BattleState)
 
 enum InfoType{
     FactoryInfo,
+    DockInfo,
     EquipInfo,
     EquipInfoUser,
     GlobalTechInfo,
@@ -274,7 +279,8 @@ enum FleetFailType{
     EquipError,
     FleetContainsDisabled,
     FleetDontFitMap,
-    FleetBusyInBattle
+    FleetBusyInBattle,
+    FleetShipisUnderRepair,
 };
 Q_ENUM_NS(FleetFailType)
 
@@ -576,6 +582,8 @@ QByteArray clientDemandMapInfo(QDateTime timeUtc
                                            QTime(0, 0, 0)));
 QByteArray clientDemandMapInfoUser();
 QByteArray clientDemandModernize(const QList<QUuid> &, bool);
+QByteArray clientDemandRepair(const QUuid &, int,
+                              bool stop = false, bool forced = false);
 QByteArray clientDemandResourceUpdate();
 QByteArray clientDemandShipInfo(QDateTime timeUtc
                                 = QDateTime(QDate(1970, 1, 1),
@@ -585,6 +593,7 @@ QByteArray clientDemandSkillPoints(int);
 QByteArray clientDemandTech(int local = 0);
 QByteArray clientDevelop(int, bool convert = false, int factoryID = -1);
 QByteArray clientDoBattleNode(const QJsonObject &);
+QByteArray clientDockRefresh();
 QByteArray clientFactoryRefresh();
 QByteArray clientFetch(int factoryID = -1, bool forced = false);
 QByteArray clientFleetData(const QJsonArray &);

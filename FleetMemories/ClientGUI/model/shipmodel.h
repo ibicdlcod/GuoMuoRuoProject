@@ -15,6 +15,7 @@ public:
     explicit ShipModel(QObject *parent = nullptr, bool isInArsenal = true);
     std::tuple<Ship *, ShipDynamic *> getShip(QUuid);
     QHash<QUuid, Ship *> getAllShips();
+    bool isShipFullHP(const QUuid &);
 
 signals:
     void typeBoxHint(QStringList &types);

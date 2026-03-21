@@ -390,12 +390,12 @@ border-style: none;</string>
   </action>
   <action name="actionSupply">
    <property name="text">
-    <string>Supply</string>
+    <string id="ui-supply">Supply</string>
    </property>
   </action>
   <action name="actionRepair">
    <property name="text">
-    <string>Repair</string>
+    <string id="ui-repair">Repair</string>
    </property>
   </action>
  </widget>

@@ -34,6 +34,7 @@ std::tuple<bool, int, int64> haveMotherSP(const CSteamID &,
                                            int, QMap<int, Equipment *> &,
                                            int64);
 Q_DECL_DEPRECATED void init(const CSteamID &);
+bool isDockBusy(const CSteamID &, int);
 bool isFactoryBusy(const CSteamID &, int);
 std::tuple<bool, int> isFactoryFinished(const CSteamID &, int);
 bool isGaugeFinished(const CSteamID &, int, KP::Difficulty);

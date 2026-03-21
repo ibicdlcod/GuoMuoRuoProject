@@ -32,6 +32,14 @@ QHash<QUuid, Ship *> ShipModel::getAllShips() {
     return clientShips;
 }
 
+bool ShipModel::isShipFullHP(const QUuid &uuid) {
+    if(!clientShips.contains(uuid)) {
+        return false;
+    }
+    return clientShipDynamicAttrs[uuid]->currentHP
+           == clientShips[uuid]->attr["Hitpoints"];
+}
+
 void ShipModel::switchShipDisplayType(const QString &nationality,
                                       const QString &shiptype,
                                       const QString &shipclass,

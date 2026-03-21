@@ -14,6 +14,7 @@
 #include "techview.h"
 #include "sortie/sortie.h"
 #include "fleet/fleetview.h"
+#include "maintenance/repair.h"
 #include "settingswindow.h"
 
 QT_BEGIN_NAMESPACE
@@ -75,6 +76,7 @@ private:
     TechView *techArea;
     Sortie *battleArea;
     FleetView *fleetArea;
+    Repair *repairArea;
     SettingsWindow settingsWindow;
 
     QStackedLayout *lay;

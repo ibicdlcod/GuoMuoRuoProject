@@ -124,6 +124,9 @@ void User::decideHomePort(const CSteamID &uid, KP::AllegianceGroup nation) {
 
 bool User::decreaseGauge(const CSteamID &uid, int mapId,  // relative id
                          KP::Difficulty diff, int amount) {
+    if(mapId == KP::hiddenMap) {
+        return false; /* TODO: deal with hidden map */
+    }
     QString diffStr = (*KP::diffEnumtoStr)[diff];
     QSqlDatabase db = QSqlDatabase::database();
     QSqlQuery query;
@@ -514,6 +517,25 @@ Q_DECL_DEPRECATED void User::init(const CSteamID &uid) {
     }
 }
 
+bool User::isDockBusy(const CSteamID &uid, int dockID) {
+    QSqlDatabase db = QSqlDatabase::database();
+    QSqlQuery query;
+    query.prepare("SELECT Uuid "
+                  "FROM Docks "
+                  "WHERE UserID = :id AND DockID = :facto");
+    query.bindValue(":id", uid.ConvertToUint64());
+    query.bindValue(":facto", dockID);
+    if(Q_UNLIKELY(!query.exec() || !query.isSelect() || !query.first())) {
+        //% "User %1: dock %2 does not exist!"
+        qWarning() << qtTrId("user-nonexistent-dock")
+                          .arg(uid.ConvertToUint64()).arg(dockID);
+        return true;
+    }
+    else {
+        return !query.value(0).toUuid().isNull();
+    }
+}
+
 bool User::isFactoryBusy(const CSteamID &uid, int factoryID) {
     QSqlDatabase db = QSqlDatabase::database();
     QSqlQuery query;
@@ -522,12 +544,10 @@ bool User::isFactoryBusy(const CSteamID &uid, int factoryID) {
                   "WHERE UserID = :id AND FactoryID = :facto");
     query.bindValue(":id", uid.ConvertToUint64());
     query.bindValue(":facto", factoryID);
-    query.exec();
-    query.isSelect();
-    if(Q_UNLIKELY(!query.first())) {
-        //% "User ID %1 does not exist!"
-        qWarning() << qtTrId("user-nonexistent-uid")
-                          .arg(uid.ConvertToUint64());
+    if(Q_UNLIKELY(!query.exec() || !query.isSelect() || !query.first())) {
+        //% "User %1: factory %2 does not exist!"
+        qWarning() << qtTrId("user-nonexistent-factory")
+                          .arg(uid.ConvertToUint64()).arg(factoryID);
         return true;
     }
     else {
@@ -746,7 +766,7 @@ bool User::openMap(const CSteamID &uid, int mapId) { // relative id
                 if(Q_UNLIKELY(!query.exec())) {
                     qCritical() << query.lastQuery();
                     //% "Set User Factory Up failed!"
-                    throw DBError(qtTrId("init-userfactory-failed"),
+                    throw DBError(qtTrId("init-user-factory-failed"),
                                   query.lastError());
                     return false;
                 }
@@ -768,7 +788,20 @@ bool User::openMap(const CSteamID &uid, int mapId) { // relative id
                               query.lastError());
                 return false;
             }
-            /* TODO: add actual repair slot */
+            for(int i = repair; i < repair1; ++i) {
+                QSqlQuery query;
+                query.prepare("INSERT INTO Docks (UserID, DockID)"
+                              " VALUES (:id, :count)");
+                query.bindValue(":id", uid.ConvertToUint64());
+                query.bindValue(":count", i);
+                if(Q_UNLIKELY(!query.exec())) {
+                    qCritical() << query.lastQuery();
+                    //% "Set User Dock Up failed!"
+                    throw DBError(qtTrId("init-user-dock-failed"),
+                                  query.lastError());
+                    return false;
+                }
+            }
         }
         return true;
     }
@@ -867,7 +900,6 @@ void User::setResources(const CSteamID &uid, ResOrd goal) {
             return;
         }
     }
-    //% "User id %1: set resources"
-    qDebug() << qtTrId("set-resources").arg(uid.ConvertToUint64());
-    qDebug() << goal.toString();
+    //% "User id %1: set resources %2"
+    qDebug() << qtTrId("set-resources").arg(uid.ConvertToUint64()).arg(goal.toString());
 }

@@ -1,10 +1,3 @@
-#message("-- Linking FactorySlot --")
-#
-#cmake_minimum_required(VERSION 3.16)
-#project(FactorySlot LANGUAGES CXX)
-#
-#find_package(Qt6 REQUIRED COMPONENTS Core Gui UiPlugin Widgets)
-#
 message("-- Linking FactorySlot")
 qt_add_plugin(FactorySlot
 )

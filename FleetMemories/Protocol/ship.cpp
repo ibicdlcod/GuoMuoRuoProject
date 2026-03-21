@@ -152,6 +152,20 @@ const int Ship::consTimeInSec() const {
     return devTimebase * (qint64)std::round(techFactor  * devResScale);
 }
 
+/* 8.2-repair.md#Resource cost */
+const ResOrd Ship::repairRes() const {
+    double techFactor = (getTech() + 1.0) / std::hypot(5.0, (getTech() + 1.0));
+    return getType().repairResBase() * (qint64)std::round(techFactor * attr["Hitpoints"]);
+}
+
+/* 8.2-repair.md#Repair time */
+/* real repair time is hp * (this * lv) / (std::hypot(1, lv/25)) */
+double Ship::repairTimeInSecUnleveledPerhp() const {
+    double devTimebase = getType().repairTimeBase();
+    double techFactor = (getTech() + 1.0) / std::hypot(5.0, (getTech() + 1.0));
+    return devTimebase * techFactor;
+}
+
 QLocale::Territory Ship::getAllegiance() const {
     if(isAmnesiac()) {
         return QLocale::AnyTerritory;

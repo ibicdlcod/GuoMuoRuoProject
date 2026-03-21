@@ -173,6 +173,18 @@ QByteArray KP::clientDemandModernize(const QList<QUuid> &candidates, bool isEqui
     return QCborValue::fromJsonValue(result).toCbor();
 }
 
+QByteArray KP::clientDemandRepair(const QUuid &uuid, int slotnum,
+                                  bool stop, bool forced) {
+    QJsonObject result;
+    result["type"] = DgramType::Request;
+    result["command"] = CommandType::Repair;
+    result["shipuuid"] = uuid.toString();
+    result["slotnum"] = slotnum;
+    result["stop"] = stop;
+    result["forced"] = forced;
+    return QCborValue::fromJsonValue(result).toCbor();
+}
+
 QByteArray KP::clientDemandResourceUpdate() {
     QJsonObject result;
     result["type"] = DgramType::Request;
@@ -226,6 +238,14 @@ QByteArray KP::clientDoBattleNode(const QJsonObject &contents) {
     result["type"] = DgramType::Request;
     result["command"] = CommandType::EnterBattleNode;
     result["content"] = contents;
+    return QCborValue::fromJsonValue(result).toCbor();
+}
+
+QByteArray KP::clientDockRefresh() {
+    QJsonObject result;
+    result["type"] = DgramType::Request;
+    result["command"] = CommandType::Refresh;
+    result["view"] = GameState::RepairView;
     return QCborValue::fromJsonValue(result).toCbor();
 }
 

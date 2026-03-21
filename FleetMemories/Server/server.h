@@ -78,6 +78,8 @@ private:
     void doDevelop(const CSteamID &, int, int, QSslSocket *);
     void doFetch(const CSteamID &, int, QSslSocket *, bool forced = false);
     void doHandshake(QSslSocket *, const QByteArray &);
+    void doRepair(const CSteamID &, const QUuid &, int,
+                  QSslSocket *, bool stop = false, bool forced = false);
     int drop(const CSteamID &uid, int mapId, int nodeId, KP::BattleAssessment ass);
     [[nodiscard]] bool equipmentRefresh();
     void exitGraceSpec() override;
@@ -128,11 +130,13 @@ private:
     void receivedLogin(const CSteamID &, const PeerInfo &, QSslSocket *);
     void receivedLogout(const CSteamID &, const PeerInfo &, QSslSocket *);
     void receivedReq(const QJsonObject &, const PeerInfo &, QSslSocket *);
+    void refreshClientDock(const CSteamID &, QSslSocket *);
     void refreshClientFactory(const CSteamID &, QSslSocket *);
     QList<QUuid> retireEquip(const CSteamID &, const QList<QUuid> &);
     void sendTestMessages();
     [[nodiscard]] bool shipRefresh();
     void sqlinit() const;
+    void sqlinitDock() const;
     void sqlinitEquip() const;
     void sqlinitEquipName() const;
     void sqlinitEquipSP() const;

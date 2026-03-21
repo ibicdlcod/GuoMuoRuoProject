@@ -17,6 +17,8 @@ public:
 
     const ResOrd consResBase() const;
     int consTimeBase() const;
+    const ResOrd repairResBase() const;
+    double repairTimeBase() const;
     QString toString() const;
     QString toDetailedString() const;
     int toInt() const;

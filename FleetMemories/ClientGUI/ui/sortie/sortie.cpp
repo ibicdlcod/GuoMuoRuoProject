@@ -158,6 +158,7 @@ void Sortie::switchMap(int mapId) {
 }
 
 void Sortie::confirmSortieStart() {
+    Clientv2 &engine = Clientv2::getInstance();
     if(mapIndex == 0) {
         return;
     }
@@ -183,7 +184,6 @@ void Sortie::confirmSortieStart() {
             MainWindow *mainWindowM = qobject_cast<MainWindow *>(widget);
             auto fv = mainWindowM->getFleetArea();
             if(!fv->isReady()) {
-                //% "Please prepare your fleet in fleet view!"
                 qWarning() << qtTrId("fleet-not-ready");
                 return;
             }
@@ -205,7 +205,6 @@ void Sortie::confirmSortieStart() {
                 }
             }
         }
-        Clientv2 &engine = Clientv2::getInstance();
         engine.sortie(mapIndexSpec, fi, false);
     }
     else {

@@ -37,6 +37,8 @@ public:
     bool isAmnesiac() const;
     bool isNotEqual(const Ship &) const;
     KP::AllegianceGroup mapOpenRule() const;
+    const ResOrd repairRes() const;
+    double repairTimeInSecUnleveledPerhp() const;
     QString toString(QString lang = settings->value("client/language", "ja_JP")
                                         .toString()) const;
 

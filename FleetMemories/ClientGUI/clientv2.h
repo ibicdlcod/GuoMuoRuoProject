@@ -104,11 +104,14 @@ public slots:
                          QUuid shipToRemodel, int factoryID);
     void doDestructEquip(const QList<QUuid> &);
     void doForceFetch(int);
+    void doForceRepair(int);
     void doImproveEquip(const QList<QUuid> &);
     void doModernizeShip(const QList<QUuid> &);
+    void doRefreshDock();
     void doRefreshFactory();
     void doRefreshFactoryAnchorage();
     void doRefreshFactoryArsenal();
+    void doRepair(const QUuid &, int);
     Equipment * getEquipmentReg(int);
     Ship * getShipReg(int);
     bool parse(const QString &);
@@ -124,9 +127,11 @@ public slots:
     void setTicketCache(uint8 [], uint32);
     void showHelp(const QStringList &);
     void sortie(int, int, bool expedition = false);
+    void stopRepair(int);
     void switchToBattleView();
     void switchToFactory();
     void switchToFleetView();
+    void switchToRepairView();
     void switchToTech();
     void switchToTech2();
     void switchToTech3(int);
@@ -157,6 +162,7 @@ signals:
     void receivedLocalTechInfo(const QJsonObject &);
     void receivedLocalTechInfo2(const QJsonObject &);
     void receivedMapStart(const QJsonObject &);
+    void receivedRepairRefresh(const QJsonObject &);
     void receivedResourceInfo(const QJsonObject &);
     void receivedShipBlueprint(const QJsonObject &);
     void receivedSkillPointInfo(const QJsonObject &);
