@@ -68,6 +68,7 @@ Repair::Repair(QWidget *parent)
             break;
             case 4: {
                 QPushButton *button = new QPushButton(this);
+                //% "Stop repairing"
                 button->setText("stop-repair");
                 connect(button, &QPushButton::clicked,
                         this, [this, i](bool){

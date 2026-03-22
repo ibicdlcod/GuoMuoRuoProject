@@ -796,7 +796,7 @@ virtual_skill_point_effect:
             QSqlQuery query;
             query.prepare("SELECT UserShip.ShipDef, "
                           "UserShip.ShipUuid, "
-                          "UserShip.Exp+UserKCShip.Exp, "
+                          "UserShip.Exp+COALESCE(UserKCShip.Exp, 0), "
                           "ExpCap "
                           "FROM UserShip "
                           "LEFT JOIN UserKCShip "
@@ -2318,6 +2318,8 @@ process_info:
                     / (successTime - startTime);
             ResOrd currentRes = User::getCurrentResources(uid);
             qint64 desiredHP = std::floor(progress * (maxHP - curHP) + curHP);
+            ResOrd resRefunded = shipRegistry[shipDef]->repairRes()
+                    * (maxHP - desiredHP) / maxHP;
 force_repair:
             if(forced) {
 spend_resources:
@@ -2396,13 +2398,14 @@ stop_repair:
                         return;
                     }
                 }
+refund_resources:
+                currentRes.addResources(resRefunded);
+                User::setResources(uid, currentRes);
+                offerResourceInfo(connection, uid);
                 refreshClientDock(uid, connection);
                 return;
             }
-            else {
-                Q_UNREACHABLE();
-                return;
-            }
+            return;
         }
         else {
             QByteArray msg = KP::serverDevelopFailed(KP::FactoryBusy);
@@ -2421,7 +2424,7 @@ check_possession:
     ResOrd currentRes;
     {
         QSqlQuery query;
-        query.prepare("SELECT UserShip.Exp+UserKCShip.Exp, ExpCap, UserShip.ShipDef,"
+        query.prepare("SELECT UserShip.Exp+COALESCE(UserKCShip.Exp, 0), ExpCap, UserShip.ShipDef,"
                       "UserShip.CurrentHP "
                       "FROM UserShip "
                       "LEFT JOIN UserKCShip "
@@ -6334,7 +6337,7 @@ KP::FleetFailType Server::updateFleet(const CSteamID &uid, const QJsonArray &inp
                 (shipDataObj["fleettype"].toInt());
         QSqlQuery query;
         query.prepare("SELECT UserShip.ShipDef, UserShip.FleetIndex, "
-                      "UserShip.Exp+UserKCShip.Exp, ExpCap FROM UserShip "
+                      "UserShip.Exp+COALESCE(UserKCShip.Exp, 0), ExpCap FROM UserShip "
                       "LEFT JOIN UserKCShip "
                       "ON UserShip.ShipUuid = UserKCShip.ShipUuid "
                       "WHERE User = :user AND UserShip.ShipUuid = :uuid");
