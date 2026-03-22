@@ -46,9 +46,6 @@ Q_NAMESPACE
 /* this is deliberately not customized */
 /* do not modify as this is used in steam tickets */
 static constexpr int practicalBufferSize = 1024;
-
-static constexpr int initDock = 2;
-static constexpr int initFactory = 4;
 static constexpr int fleetsSize = 4;
 static constexpr int normalFleetSize = 7;
 static constexpr int combinedFleetSize = 14;
@@ -607,6 +604,76 @@ QByteArray clientSteamAuth(uint8 [], uint32);
 QByteArray clientSteamLogout();
 QByteArray clientTestMessages(int);
 
+/* factoryslot, repairslot */
+static constexpr std::tuple<int, int> getDesiredSlots(int mapsOpened) {
+    if(mapsOpened < 0) {
+        return {0, 0};
+    }
+    static QMap<int, int> fact
+        = { std::pair(0, 4),
+            std::pair(4, 5),
+            std::pair(6, 6),
+            std::pair(8, 7),
+            std::pair(10, 8),
+            std::pair(12, 9),
+            std::pair(15, 10),
+            std::pair(19, 11),
+            std::pair(23, 12),
+            std::pair(27, 13),
+            std::pair(32, 14),
+            std::pair(37, 15),
+            std::pair(42, 16),
+            std::pair(47, 17),
+            std::pair(52, 18),
+            std::pair(57, 19),
+            std::pair(62, 20),
+            std::pair(68, 21),
+            std::pair(74, 22),
+            std::pair(80, 23),
+            std::pair(86, 24)
+        };
+    static QMap<int, int> repair
+        = { std::pair(0, 2),
+            std::pair(4, 3),
+            std::pair(8, 4),
+            std::pair(15, 5),
+            std::pair(23, 6),
+            std::pair(42, 7),
+            std::pair(86, 8)
+        };
+cal_factory:
+    int factoryResult = 0;
+    {
+        int tempa = mapsOpened;
+        do {
+            if(fact.contains(tempa)) {
+                factoryResult = fact[tempa];
+                break;
+            }
+        } while(tempa--);
+    }
+cal_repair:
+    int repairResult = 0;
+    {
+        int tempa = mapsOpened;
+        do {
+            if(repair.contains(tempa)) {
+                repairResult = repair[tempa];
+                break;
+            }
+        } while(tempa--);
+    }
+    return {factoryResult, repairResult};
+}
+
+static constexpr int initFactory() {
+    return std::get<0>(getDesiredSlots(0));
+}
+
+static constexpr int initDock() {
+    return std::get<1>(getDesiredSlots(0));
+}
+
 QByteArray serverAskForHomePort();
 QByteArray serverBattleError(GameError);
 QByteArray serverBattleEnd();
@@ -657,6 +724,6 @@ QByteArray serverTestMessages(int);
 QByteArray serverVerifyComplete();
 QByteArray weighAnchor();
 
-};
+}
 
 #endif // KP_H

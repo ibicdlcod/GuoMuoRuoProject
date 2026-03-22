@@ -6689,8 +6689,8 @@ void Server::userInit(const CSteamID &uid) {
     static const QMap<QString, int> defaults
             = {
         std::pair(QStringLiteral("FleetSize"), 1),
-        std::pair(QStringLiteral("FactorySize"), KP::initFactory),
-        std::pair(QStringLiteral("DockSize"), KP::initDock),
+        std::pair(QStringLiteral("FactorySize"), KP::initFactory()),
+        std::pair(QStringLiteral("DockSize"), KP::initDock()),
         std::pair(QStringLiteral("O"), 10000), // oil
         std::pair(QStringLiteral("E"), 10000), // explosives
         std::pair(QStringLiteral("S"), 10000), // steel
@@ -6743,7 +6743,7 @@ void Server::userInit(const CSteamID &uid) {
         }
     }
 
-    for(int i = 0; i < KP::initFactory; ++i) {
+    for(int i = 0; i < KP::initFactory(); ++i) {
         QSqlQuery factoryNew;
         if(!factoryNew.prepare("INSERT INTO Factories "
                                "(UserID, FactoryID) "
@@ -6756,13 +6756,13 @@ void Server::userInit(const CSteamID &uid) {
             qCritical() << factoryNew.lastQuery();
             //% "Init %2 factory slots for user %1 failed!"
             throw DBError(qtTrId("user-factory-init-fail")
-                          .arg(uid.ConvertToUint64()).arg(KP::initFactory),
+                          .arg(uid.ConvertToUint64()).arg(KP::initFactory()),
                           factoryNew.lastError());
             return;
         }
     }
 
-    for(int i = 0; i < KP::initDock; ++i) {
+    for(int i = 0; i < KP::initDock(); ++i) {
         QSqlQuery factoryNew;
         if(!factoryNew.prepare("INSERT INTO Docks "
                                "(UserID, DockID) "
@@ -6775,7 +6775,7 @@ void Server::userInit(const CSteamID &uid) {
             qCritical() << factoryNew.lastQuery();
             //% "Init %2 dock slots for user %1 failed!"
             throw DBError(qtTrId("user-dock-init-fail")
-                          .arg(uid.ConvertToUint64()).arg(KP::initDock),
+                          .arg(uid.ConvertToUint64()).arg(KP::initDock()),
                           factoryNew.lastError());
             return;
         }

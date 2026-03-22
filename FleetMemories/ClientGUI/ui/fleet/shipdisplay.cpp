@@ -56,6 +56,7 @@ void ShipDisplay::setContent(int currentHP, int maxHP, int cond, int lv) {
     //% "Lv %1"
     ui->lvText->setText(qtTrId("lv-display").arg(lv));
 
+display_cond:
     /* cond */
     QString condImgStr = ":/resources/shipCond/";
     if(cond > 144) {

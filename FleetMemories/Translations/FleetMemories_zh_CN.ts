@@ -2586,60 +2586,60 @@ Great at battle and bad at politics--so cool!</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="user-get-equip-amount-failed">
-        <location filename="../Server/user.cpp" line="348"/>
+        <location filename="../Server/user.cpp" line="287"/>
         <source>User %1: get equipment amount of %2 failed!</source>
         <translation>用户%1：获取装备%2的数量失败！</translation>
     </message>
     <message id="user-get-equip-data-failed">
-        <location filename="../Server/user.cpp" line="371"/>
+        <location filename="../Server/user.cpp" line="310"/>
         <source>Get equipment data of %1 failed!</source>
         <translation>获取装备%1的数据失败！</translation>
     </message>
     <message id="user-get-ship-data-failed">
-        <location filename="../Server/user.cpp" line="393"/>
+        <location filename="../Server/user.cpp" line="332"/>
         <source>Get ship data of %1 failed!</source>
         <translation>获取舰船%1的数据失败！</translation>
     </message>
     <message id="user-get-skillpoint-failed">
-        <location filename="../Server/user.cpp" line="416"/>
+        <location filename="../Server/user.cpp" line="355"/>
         <source>User %1: get skill point of equipment %2 failed!</source>
         <oldsource>Get improvement factor of equipment %2 failed!</oldsource>
         <translation type="unfinished">用户%1：获取装备%2的技能点失败！</translation>
     </message>
     <message id="init-userfactory-failed">
-        <location filename="../Server/user.cpp" line="514"/>
+        <location filename="../Server/user.cpp" line="453"/>
         <source>Set User Factory Up failed!</source>
         <translation>初始化工厂槽失败！</translation>
     </message>
     <message id="user-nonexistent-dock">
-        <location filename="../Server/user.cpp" line="530"/>
+        <location filename="../Server/user.cpp" line="469"/>
         <source>User %1: dock %2 does not exist!</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="user-nonexistent-factory">
-        <location filename="../Server/user.cpp" line="549"/>
+        <location filename="../Server/user.cpp" line="488"/>
         <source>User %1: factory %2 does not exist!</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="user-nonexistent-uid">
-        <location filename="../Server/user.cpp" line="570"/>
-        <location filename="../Server/user.cpp" line="647"/>
+        <location filename="../Server/user.cpp" line="509"/>
+        <location filename="../Server/user.cpp" line="586"/>
         <source></source>
         <oldsource>User ID %1 does not exist!</oldsource>
         <translation type="unfinished">用户%1不存在！</translation>
     </message>
     <message id="new-ship-failed">
-        <location filename="../Server/user.cpp" line="712"/>
+        <location filename="../Server/user.cpp" line="651"/>
         <source>User id %1: new ship failed!</source>
         <translation>用户%1：建造舰船失败！</translation>
     </message>
     <message id="new-ship">
-        <location filename="../Server/user.cpp" line="719"/>
+        <location filename="../Server/user.cpp" line="658"/>
         <source>User id %1: new ship %2 definition %3</source>
         <translation>用户%1：建造舰船序列号%2，船名ID%3</translation>
     </message>
     <message id="new-equip-failed">
-        <location filename="../Server/user.cpp" line="676"/>
+        <location filename="../Server/user.cpp" line="615"/>
         <source>User id %1: new equipment failed!</source>
         <translation>用户%1：开发装备失败！</translation>
     </message>
@@ -2659,53 +2659,53 @@ Great at battle and bad at politics--so cool!</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="new-equip">
-        <location filename="../Server/user.cpp" line="683"/>
+        <location filename="../Server/user.cpp" line="622"/>
         <source>User id %1: new equipment %2 definition %3</source>
         <translation>用户%1：开发装备序列号%2，装备名ID%3</translation>
     </message>
     <message id="dbfail-when-opening-map">
-        <location filename="../Server/user.cpp" line="594"/>
+        <location filename="../Server/user.cpp" line="533"/>
         <source>User ID %1: DB failure when decreasing gauge of map %2!</source>
         <oldsource>User ID %1: DB failure when opening map %2!</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message id="dbfail-when-increasing-factory">
-        <location filename="../Server/user.cpp" line="755"/>
+        <location filename="../Server/user.cpp" line="694"/>
         <source>User ID %1: DB failure when increasing factory count!</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="init-user-factory-failed">
-        <location filename="../Server/user.cpp" line="769"/>
+        <location filename="../Server/user.cpp" line="708"/>
         <source>Set User Factory Up failed!</source>
         <translation type="unfinished">初始化工厂槽失败！</translation>
     </message>
     <message id="dbfail-when-increasing-dock">
-        <location filename="../Server/user.cpp" line="786"/>
+        <location filename="../Server/user.cpp" line="725"/>
         <source>User ID %1: DB failure when increasing dock count!</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="init-user-dock-failed">
-        <location filename="../Server/user.cpp" line="800"/>
+        <location filename="../Server/user.cpp" line="739"/>
         <source>Set User Dock Up failed!</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="dbfail-when-refresh-factory">
-        <location filename="../Server/user.cpp" line="828"/>
+        <location filename="../Server/user.cpp" line="767"/>
         <source>User ID %1: DB failure when refreshing factory</source>
         <translation>用户%1：更新工厂时发生数据库错误</translation>
     </message>
     <message id="map-supremacy-retention-incorrect">
-        <location filename="../Server/user.cpp" line="841"/>
+        <location filename="../Server/user.cpp" line="780"/>
         <source>Map supremacy retention %1 is incorrect!</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="set-resources-failed">
-        <location filename="../Server/user.cpp" line="898"/>
+        <location filename="../Server/user.cpp" line="837"/>
         <source>User id %1: set resources failed!</source>
         <translation>用户%1：更新资源失败！</translation>
     </message>
     <message id="set-resources">
-        <location filename="../Server/user.cpp" line="904"/>
+        <location filename="../Server/user.cpp" line="843"/>
         <source>User id %1: set resources %2</source>
         <oldsource>User id %1: set resources</oldsource>
         <translation type="unfinished">用户%1：更新资源</translation>
@@ -2928,7 +2928,7 @@ Great at battle and bad at politics--so cool!</source>
         <translation>获取舰船属性失败！</translation>
     </message>
     <message id="remodel-nonexistent">
-        <location filename="../Protocol/ship.cpp" line="369"/>
+        <location filename="../Protocol/ship.cpp" line="372"/>
         <source>Remodel target %1 does not exist!</source>
         <translation>改造标的%1不存在！</translation>
     </message>
@@ -3114,97 +3114,97 @@ Great at battle and bad at politics--so cool!</source>
         <translation type="obsolete">无</translation>
     </message>
     <message id="Japanese">
-        <location filename="../Protocol/kp.h" line="415"/>
+        <location filename="../Protocol/kp.h" line="412"/>
         <source>Japanese</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="German">
-        <location filename="../Protocol/kp.h" line="417"/>
+        <location filename="../Protocol/kp.h" line="414"/>
         <source>German</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="Italian">
-        <location filename="../Protocol/kp.h" line="419"/>
+        <location filename="../Protocol/kp.h" line="416"/>
         <source>Italian</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="American">
-        <location filename="../Protocol/kp.h" line="421"/>
+        <location filename="../Protocol/kp.h" line="418"/>
         <source>American</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="British">
-        <location filename="../Protocol/kp.h" line="423"/>
+        <location filename="../Protocol/kp.h" line="420"/>
         <source>British</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="French">
-        <location filename="../Protocol/kp.h" line="425"/>
+        <location filename="../Protocol/kp.h" line="422"/>
         <source>French</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="Soviet">
-        <location filename="../Protocol/kp.h" line="427"/>
+        <location filename="../Protocol/kp.h" line="424"/>
         <source>Soviet</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="Chinese">
-        <location filename="../Protocol/kp.h" line="429"/>
+        <location filename="../Protocol/kp.h" line="426"/>
         <source>Chinese</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="Benelux">
-        <location filename="../Protocol/kp.h" line="431"/>
+        <location filename="../Protocol/kp.h" line="428"/>
         <source>Benelux</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="Nordic">
-        <location filename="../Protocol/kp.h" line="433"/>
+        <location filename="../Protocol/kp.h" line="430"/>
         <source>Nordic</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="Commonwealth">
-        <location filename="../Protocol/kp.h" line="435"/>
+        <location filename="../Protocol/kp.h" line="432"/>
         <source>Commonwealth</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="Latin">
-        <location filename="../Protocol/kp.h" line="437"/>
+        <location filename="../Protocol/kp.h" line="434"/>
         <source>Iberian/Latin American</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="EasternEuropean">
-        <location filename="../Protocol/kp.h" line="439"/>
+        <location filename="../Protocol/kp.h" line="436"/>
         <source>Eastern European</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="MinorAsian">
-        <location filename="../Protocol/kp.h" line="441"/>
+        <location filename="../Protocol/kp.h" line="438"/>
         <source>Other Asian</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="Fantasy">
-        <location filename="../Protocol/kp.h" line="443"/>
+        <location filename="../Protocol/kp.h" line="440"/>
         <source>Fantasy ships</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="NormalFleet">
-        <location filename="../Protocol/kp.h" line="548"/>
+        <location filename="../Protocol/kp.h" line="545"/>
         <source>Normal</source>
         <translation>通常舰队</translation>
     </message>
     <message id="CarrierFleet">
-        <location filename="../Protocol/kp.h" line="550"/>
+        <location filename="../Protocol/kp.h" line="547"/>
         <source>Carrier</source>
         <translation>空母机动</translation>
     </message>
     <message id="SurfaceFleet">
-        <location filename="../Protocol/kp.h" line="552"/>
+        <location filename="../Protocol/kp.h" line="549"/>
         <source>Surface</source>
         <translation>水上打击</translation>
     </message>
     <message id="TransportFleet">
-        <location filename="../Protocol/kp.h" line="554"/>
+        <location filename="../Protocol/kp.h" line="551"/>
         <source>Transport</source>
         <translation>输送护卫</translation>
     </message>

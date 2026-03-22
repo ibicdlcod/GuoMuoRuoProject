@@ -7,7 +7,7 @@
   * [Ore Purifier (DLC)](3.1-orepurifier.md) [NOTYETIMPLEMENTED]
 * [Equipment](4-equipment.md)
 
-  * [Factory slot](4.1-factoryslot.md) [PARTIAL]
+  * [Factory slot](4.1-factoryslot.md)
   * [Attributes](4.2-attributes.md)
   * [Development](4.3-development.md)
   * [Normal/Special/Virtual preconditions](4.4-precondition.md) [Virtual preconditions: PARTIAL]
@@ -23,16 +23,16 @@
   * [Construction](5.4-construction.md)
   * [Equip slots](5.5-equipslots.md)
   * [Visible bonuses](5.6-visiblebonus.md) [NOTYETIMPLEMENTED]
-  * [Experience and modernization](5.7-experience.md) [Experience loss: NOTYETIMPLEMENTED]
+  * [Experience and modernization](5.7-experience.md)
   * [Remodel](5.8-remodel.md)
   * [Cloning Vats](5.9-cloning vats.md) [NOTYETIMPLEMENTED]
-  * [Labor condition](5.10-labor.md) [Gain and loss: NOTYETIMPLEMENTED]
+  * [Labor condition](5.10-labor.md)
   * Decoration [NOTYETIMPLEMENTED]
   * Enemies (Amnesiac Fleet) [NOTYETIMPLEMENTED]
 * [Sortie Map](6-sortie.md)
   * [Normal map and map relations](6.1-map.md)
   * [Naval Supremacy and Normal expedition](6.2-supremacy.md) [PARTIAL]
-  * Map gauge [NOTYETIMPLEMENTED]
+  * [Map gauge](6.3-gauge.md) [PARTIAL]
   * Retreat rule [NOTYETIMPLEMENTED]
   * Historical Mode (DLC) [NOTYETIMPLEMENTED]
   * Quests and Achievements [NOTYETIMPLEMENTED]

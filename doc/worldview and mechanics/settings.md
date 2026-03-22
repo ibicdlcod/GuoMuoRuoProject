@@ -3,7 +3,7 @@
 |               alias/*                |                                     |                     created by the user                      |
 |           client/language            |                ja_JP                |                  default value is temporary                  |
 |            client/logfile            |            ClientLog.log            |                                                              |
-|      client/licenseareapersist       |                5000                 |                                                              |
+|      client/licenseareapersist       |                5000                 |                       in milliseconds                        |
 |       client/equipdbtimestamp        |               dynamic               |                                                              |
 |         client/equipdbcache          |               dynamic               |                                                              |
 |        client/shipdbtimestamp        |               dynamic               |                                                              |
@@ -52,6 +52,7 @@
 |      rule/equipmentstandardstar      |                 10                  | the larger this value, the less effective improving equipment does |
 |          rule/shipexpscale           |                 100                 |     the larger this value, the harder ship can level up      |
 |       rule/navalsupremacydecay       |                2880                 | the larger this value, the easier it is to maintain naval supermacy in maps |
+|      rule/techfactorcontroller       |                  5                  | the larger this value, the ship construction time and repair time/resources is shorter/fewer |
 |            server/logfile            |            ServerLog.log            |                                                              |
 |           server/language            |                en_US                |                                                              |
 |      server/displaypromptdelay       |                 100                 |                                                              |

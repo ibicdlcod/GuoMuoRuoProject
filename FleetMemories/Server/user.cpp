@@ -273,67 +273,6 @@ std::tuple<int, int> User::getCurrentSlots(const CSteamID &uid) {
     }
 }
 
-std::tuple<int, int> User::getDesiredSlots(int mapsOpened) {
-    if(mapsOpened < 0) {
-        return {0, 0};
-    }
-    static QMap<int, int> fact
-        = { std::pair(0, 4),
-            std::pair(4, 5),
-            std::pair(6, 6),
-            std::pair(8, 7),
-            std::pair(10, 8),
-            std::pair(12, 9),
-            std::pair(15, 10),
-            std::pair(19, 11),
-            std::pair(23, 12),
-            std::pair(27, 13),
-            std::pair(32, 14),
-            std::pair(37, 15),
-            std::pair(42, 16),
-            std::pair(47, 17),
-            std::pair(52, 18),
-            std::pair(57, 19),
-            std::pair(62, 20),
-            std::pair(68, 21),
-            std::pair(74, 22),
-            std::pair(80, 23),
-            std::pair(86, 24)
-        };
-    static QMap<int, int> repair
-        = { std::pair(0, 2),
-            std::pair(4, 3),
-            std::pair(8, 4),
-            std::pair(15, 5),
-            std::pair(23, 6),
-            std::pair(42, 7),
-            std::pair(86, 8)
-        };
-cal_factory:
-    int factoryResult = 0;
-    {
-        int tempa = mapsOpened;
-        do {
-            if(fact.contains(tempa)) {
-                factoryResult = fact[tempa];
-                break;
-            }
-        } while(tempa--);
-    }
-cal_repair:
-    int repairResult = 0;
-    {
-        int tempa = mapsOpened;
-        do {
-            if(repair.contains(tempa)) {
-                repairResult = repair[tempa];
-                break;
-            }
-        } while(tempa--);
-    }
-    return {factoryResult, repairResult};
-}
-
 int User::getEquipAmount(const CSteamID &uid, int equipId) {
     QSqlDatabase db = QSqlDatabase::database();
     QSqlQuery query;
@@ -503,7 +442,7 @@ std::tuple<bool, int, int64> User::haveMotherSP(
 Q_DECL_DEPRECATED void User::init(const CSteamID &uid) {
     QSqlDatabase db = QSqlDatabase::database();
     /* 4.1-Factoryslot.md */
-    for(int i = 0; i < KP::initFactory; ++i) {
+    for(int i = 0; i < KP::initFactory(); ++i) {
         QSqlQuery query;
         query.prepare("INSERT INTO Factories (User, FactoryID)"
                       " VALUES (:id, :count)");
@@ -740,7 +679,7 @@ bool User::openMap(const CSteamID &uid, int mapId) { // relative id
     }
     else {
         auto [factory, repair] = getCurrentSlots(uid);
-        auto [factory1, repair1] = getDesiredSlots(getCurrentMapOpened(uid));
+        auto [factory1, repair1] = KP::getDesiredSlots(getCurrentMapOpened(uid));
     add_factory:
         if(factory1 > factory) {
             QSqlQuery query;

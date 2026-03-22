@@ -23,7 +23,6 @@ int getCurrentMapOpened(const CSteamID &);
 ResOrd getCurrentResources(const CSteamID &);
 /* factoryslot, repairslot */
 std::tuple<int, int> getCurrentSlots(const CSteamID &);
-std::tuple<int, int> getDesiredSlots(int);
 int getEquipAmount(const CSteamID &, int);
 int getEquipDef(QUuid);
 int getShipDef(QUuid);

@@ -46,6 +46,7 @@ public:
     static KP::AllegianceSubGroup allegianceSubGroup(QLocale::Territory territory);
     static int expCap(int numberOfRings);
     static int getLevel(int);
+    static double getEfficiency(int lv, int star);
 
     QMap<QString, QString> localNames;
     QMap<QString, QString> shipClassText;
@@ -55,6 +56,7 @@ public:
 
 private:
     int shipRegId;
+    static constexpr int ringLv = 100;
 
     Q_DISABLE_COPY_MOVE(Ship)
 };

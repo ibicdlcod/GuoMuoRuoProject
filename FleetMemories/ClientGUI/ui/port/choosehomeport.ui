@@ -60,7 +60,7 @@ border: 1px solid darkgray; border-radius: 6px; width: 10px; height: 10px; margi
        <item row="1" column="0">
         <widget class="QRadioButton" name="buttonGER">
          <property name="text">
-          <string id="home-germany">Kronborg</string>
+          <string id="home-germany">Øresund</string>
          </property>
         </widget>
        </item>

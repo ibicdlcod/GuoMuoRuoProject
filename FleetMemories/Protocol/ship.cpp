@@ -146,23 +146,26 @@ const ResOrd Ship::consRes() const {
 
 /* 5.4-construction.md#Construct time */
 const int Ship::consTimeInSec() const {
+    double ctrl = settings->value("rule/techfactorcontroller", 5.0).toDouble();
     qint64 devTimebase = getType().consTimeBase();
     qint64 devResScale = settings->value("rule/devresscale", 10).toLongLong();
-    double techFactor = getTech() * getTech() / std::hypot(5.0, getTech()) + 0.1;
+    double techFactor = getTech() * getTech() / std::hypot(ctrl, getTech()) + 0.1;
     return devTimebase * (qint64)std::round(techFactor  * devResScale);
 }
 
 /* 8.2-repair.md#Resource cost */
 const ResOrd Ship::repairRes() const {
-    double techFactor = (getTech() + 1.0) / std::hypot(5.0, (getTech() + 1.0));
+    double ctrl = settings->value("rule/techfactorcontroller", 5.0).toDouble();
+    double techFactor = (getTech() + 1.0) / std::hypot(ctrl, (getTech() + 1.0));
     return getType().repairResBase() * (qint64)std::round(techFactor * attr["Hitpoints"]);
 }
 
 /* 8.2-repair.md#Repair time */
 /* real repair time is hp * (this * lv) / (std::hypot(1, lv/25)) */
 double Ship::repairTimeInSecUnleveledPerhp() const {
+    double ctrl = settings->value("rule/techfactorcontroller", 5.0).toDouble();
     double devTimebase = getType().repairTimeBase();
-    double techFactor = (getTech() + 1.0) / std::hypot(5.0, (getTech() + 1.0));
+    double techFactor = (getTech() + 1.0) / std::hypot(ctrl, (getTech() + 1.0));
     return devTimebase * techFactor;
 }
 
@@ -193,6 +196,8 @@ KP::AllegianceSubGroup Ship::getAllegianceSubGroup() const {
 }
 
 KP::AllegianceGroup Ship::mapOpenRule() const {
+    /* The result is geographical approximation of map.svg,
+     * not ship's acutal allegiance */
     switch(getAllegianceGroup()) {
     case KP::UnknownNation: return KP::UnknownNation;
     case KP::Japanese: return KP::Japanese;
@@ -247,15 +252,12 @@ KP::AllegianceGroup Ship::mapOpenRule() const {
     }
     case KP::Nordic: {
         switch(getAllegianceSubGroup()) {
-        case KP::DSwedish: return KP::German;
-        case KP::DDanish: return KP::German;
         case KP::DDanishKingdom: return getAllegiance()
                            == QLocale::FaroeIslands ? KP::British
-                       : KP::American;
+                       : KP::American; // Greeland
         case KP::DNorwegian: return KP::British;
         case KP::DIcelandic: return KP::American;
-        case KP::DFinnish: return KP::German;
-        default: Q_UNREACHABLE();
+        default: return KP::German;
         }
     }
     case KP::Commonwealth: {
@@ -263,15 +265,9 @@ KP::AllegianceGroup Ship::mapOpenRule() const {
         case KP::DAustralian: [[fallthrough]];
         case KP::DNewZealander: [[fallthrough]];
         case KP::DOceanaian: return KP::Commonwealth;
-        case KP::DSouthAfricanOrNamibian: return KP::British;
-        case KP::DIrish: return KP::British;
         case KP::DMalaysianOrBruneian: return KP::Japanese;
         case KP::DSingaporean: return KP::Japanese;
-        case KP::DIndian: [[fallthrough]];
-        case KP::DPakistani: [[fallthrough]];
-        case KP::DBangladeshi: return KP::British;
         case KP::DCanadian: return KP::American;
-        case KP::DEgyptian: return KP::British;
         case KP::DOtherCommonwealth: {
             switch(getAllegiance()) {
             case QLocale::Anguilla: [[fallthrough]];
@@ -295,54 +291,36 @@ KP::AllegianceGroup Ship::mapOpenRule() const {
             default: return KP::British;
             }
         }
-        default: Q_UNREACHABLE();
+        default: return KP::British;
         }
     }
     case KP::Latino: {
         switch(getAllegianceSubGroup()) {
         case KP::DSpanish: [[fallthrough]];
         case KP::DPortuguese: return KP::British;
-        case KP::DBrazilian: [[fallthrough]];
-        case KP::DArgentinian: [[fallthrough]];
-        case KP::DPeruvian: [[fallthrough]];
-        case KP::DChilean: [[fallthrough]];
-        case KP::DMexican: [[fallthrough]];
-        case KP::DCuban: [[fallthrough]];
-        case KP::DColumbianOrEcuadoran: [[fallthrough]];
-        case KP::DVenezuelan: [[fallthrough]];
-        case KP::DOtherLatinAmerican: return KP::American;
         case KP::DOtherLatino: {
             switch(getAllegiance()) {
             case QLocale::TimorLeste: return KP::Commonwealth;
             default: return KP::British;
             }
         }
-        default: Q_UNREACHABLE();
+        default: return KP::American;
         }
     }
     case KP::EasternEuropean: {
         switch(getAllegianceSubGroup()) {
-        case KP::DYugoslavian: return KP::Italian;
         case KP::DPolish: return KP::German;
         case KP::DBulgarian: return KP::Soviet;
-        case KP::DGreekOrCypriot: return KP::Italian;
         case KP::DRomanian: return KP::Soviet;
-        case KP::DTurkish: return KP::Italian;
         case KP::DBaltic: return KP::German;
-        case KP::DIsraeli: return KP::Italian;
-        case KP::DOtherEuropean: return KP::Italian;
-        default: Q_UNREACHABLE();
+        default: return KP::Italian;
         }
     }
     case KP::MinorAsian: {
         switch(getAllegianceSubGroup()) {
-        case KP::DThai: return KP::Japanese;
         case KP::DIranian: return KP::Soviet;
         case KP::DArabicAsian: return KP::British;
-        case KP::DSouthKorean: [[fallthrough]];
-        case KP::DNorthKorean: return KP::Japanese;
-        case KP::DOtherAsian: return KP::Japanese;
-        default: Q_UNREACHABLE();
+        default: return KP::Japanese;
         }
     }
     case KP::Fantasy: return KP::UnknownNation;
@@ -430,12 +408,25 @@ bool Ship::isAmnesiac() const {
 
 int Ship::getLevel(int exp) {
     /* inverse of y / 100 = (x)(x-1)/2 */
-    return std::floor((1.0 + sqrt(1.0 + 8.0 * (exp / settings->value("rule/shipexpscale", 100.0).toDouble())))/ 2.0);
+    return std::floor(
+        (1.0 + sqrt(1.0 + 8.0 * (exp /
+                                 settings->value("rule/shipexpscale", 100.0)
+                                     .toDouble())))/ 2.0);
+}
+
+double Ship::getEfficiency(int lv, int star) {
+    double modernizationFactor =
+        star / std::hypot(settings->value("rule/equipmentstandardstar", 10.0)
+                              .toDouble(), star);
+    return 0.5 + std::sqrt(0.5) * ((double)lv / std::hypot(lv, ringLv))
+           + (1 - std::sqrt(0.5)) * modernizationFactor;
 }
 
 int Ship::expCap(int numberOfRings) {
-    int levelCap = 100 * (numberOfRings + 1);
-    return (100 + (levelCap - 1) * 100) / 2 * (levelCap - 1);
+    int levelCap = ringLv * (numberOfRings + 1);
+    return (settings->value("rule/shipexpscale", 100.0)
+            + (levelCap - 1) * settings->value("rule/shipexpscale", 100.0))
+           / 2 * (levelCap - 1);
 }
 
 KP::AllegianceSubGroup Ship::allegianceSubGroup(QLocale::Territory ter) {
