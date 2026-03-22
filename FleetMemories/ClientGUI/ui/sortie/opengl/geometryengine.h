@@ -1,5 +1,6 @@
 // Copyright (C) 2016 The Qt Company Ltd.
-// SPDX-License-Identifier: LicenseRef-Qt-Commercial OR BSD-3-Clause
+/* Copyright (C) 2026 Harusoft Ltd.
+ * SPDX-License-Identifier: BSD-3-Clause */
 
 #ifndef GEOMETRYENGINE_H
 #define GEOMETRYENGINE_H

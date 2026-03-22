@@ -101,6 +101,9 @@ set(CLIENT_SOURCES
     ClientGUI/ui/fleet/shipdisplay.h
     ClientGUI/ui/fleet/shipdisplay.cpp
     ClientGUI/ui/fleet/shipdisplay.ui
+    ClientGUI/ui/fleet/shipdisplayflat.h
+    ClientGUI/ui/fleet/shipdisplayflat.cpp
+    ClientGUI/ui/fleet/shipdisplayflat.ui
     ClientGUI/ui/fleet/shipequip.h
     ClientGUI/ui/fleet/shipequip.cpp
     ClientGUI/ui/fleet/shipequip.ui
@@ -243,6 +246,7 @@ qt_add_executable(CFClient
     ${CLIENT_SOURCES}
     common.qrc
     ${app_icon_resource_windows}
+
 )
 qt_add_executable(CFServer
     MANUAL_FINALIZATION

@@ -115,20 +115,22 @@ void CommandLine::customMessageHandler(QtMsgType type,
         std::cout << txt.toUtf8().constData();
 #endif
         std::cout << "\x1b[49;39m" << std::endl;
-    }
 
-    if(!logFile->isWritable()) {
-        qFatal("Log file cannot be written to.");
-    }
-    if(txt.contains(QChar('\0'))) {
-        qFatal("Log Error");
-    }
-    QTextStream textStream(logFile);
-    txt.remove(QChar('\r'), Qt::CaseInsensitive);
-    txt = QStringLiteral("[%1] %2\n").arg(dt, txt);
-    textStream << txt;
-    if(type == QtFatalMsg) {
-        abort();
+        if(!logFile->isWritable()) {
+            qFatal("Log file cannot be written to.");
+        }
+        if(txt.contains(QChar('\0'))) {
+            qFatal("Log Error");
+        }
+        QTextStream textStream(logFile);
+        txt.remove(QChar('\r'), Qt::CaseInsensitive);
+        if(!txt.isEmpty()) {
+            txt = QStringLiteral("[%1] %2\n").arg(dt, txt);
+            textStream << txt;
+        }
+        if(type == QtFatalMsg) {
+            abort();
+        }
     }
 }
 

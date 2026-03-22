@@ -15,8 +15,7 @@ Repair::Repair(QWidget *parent)
     , ui(new Ui::Repair)
 {
     ui->setupUi(this);
-    QVBoxLayout *layV = new QVBoxLayout();
-    QHBoxLayout *layH = new QHBoxLayout();
+    QGridLayout *lay = new QGridLayout();
     QLabel *uuid = new QLabel(this);
     uuid->setText(qtTrId("ship-uuid"));
     QLabel *name = new QLabel(this);
@@ -28,40 +27,32 @@ Repair::Repair(QWidget *parent)
     slot->setText(qtTrId("repair-slots"));
     QLabel *stop = new QLabel(this);
     stop->setText("");
-    layH->addWidget(uuid);
-    layH->addWidget(name);
-    layH->addWidget(hp);
-    layH->addWidget(slot);
-    layH->addWidget(stop);
-    for (int i = 0; i < layH->count(); ++i) {
-        // Get the layout item (which could be a widget item or another layout item)
-        QLayoutItem* item = layH->itemAt(i);
-        if (item->widget()) {
-            // Set the alignment for the individual widget
-            layH->setAlignment(item->widget(), Qt::AlignCenter);
-        }
-    }
-    layV->addLayout(layH);
+    lay->addWidget(uuid, 0, 0);
+    lay->addWidget(name, 0, 1);
+    lay->addWidget(hp, 0, 2);
+    lay->addWidget(slot, 0, 3);
+    lay->addWidget(stop, 0, 4);
     for(int i = 0; i < KP::maxRepairSlots; ++i) {
-        QHBoxLayout *layH = new QHBoxLayout();
         for(int j = 0; j < 5; ++j) {
             QWidget *w;
             switch(j) {
             case 0: {
                 QLabel *label = new QLabel(this);
                 label->setText("ship-uuid");
+                uuids.append(label);
                 w = label;
             }
             break;
             case 1: {
                 QLabel *label = new QLabel(this);
                 label->setText("ship-name");
+                names.append(label);
                 w = label;
             }
             break;
             case 2: {
-                QLabel *label = new QLabel(this);
-                label->setText("ship-hp");
+                ShipDisplayFlat *label = new ShipDisplayFlat(this);
+                hps.append(label);
                 w = label;
             }
             break;
@@ -78,30 +69,38 @@ Repair::Repair(QWidget *parent)
             case 4: {
                 QPushButton *button = new QPushButton(this);
                 button->setText("stop-repair");
+                connect(button, &QPushButton::clicked,
+                        this, [this, i](bool){
+                            if(!slotfs[i]->isOnJob()) {
+                                return;
+                            }
+                            emit shipStopRepair(i);
+                        });
                 w = button;
             }
             break;
             default: Q_UNREACHABLE();
             }
-            layH->addWidget(w);
+            lay->addWidget(w, i+1, j);
         }
-        for (int i = 0; i < layH->count(); ++i) {
-            // Get the layout item (which could be a widget item or another layout item)
-            QLayoutItem* item = layH->itemAt(i);
-            if (item->widget()) {
-                // Set the alignment for the individual widget
-                layH->setAlignment(item->widget(), Qt::AlignCenter);
-            }
-        }
-        layV->addLayout(layH);
     }
-    ui->RepairArea->setLayout(layV);
+    for (int i = 0; i < lay->count(); ++i) {
+        // Get the layout item (which could be a widget item or another layout item)
+        QLayoutItem* item = lay->itemAt(i);
+        if (item->widget()) {
+            // Set the alignment for the individual widget
+            lay->setAlignment(item->widget(), Qt::AlignCenter);
+        }
+    }
+    ui->RepairArea->setLayout(lay);
 
     Clientv2 &engine = Clientv2::getInstance();
     connect(&engine, &Clientv2::receivedRepairRefresh,
             this, &Repair::doRepairRefresh);
     connect(this, &Repair::shipToRepair,
             &engine, &Clientv2::doRepair);
+    connect(this, &Repair::shipStopRepair,
+            &engine, &Clientv2::doStopRepair);
 }
 
 Repair::~Repair()
@@ -111,10 +110,54 @@ Repair::~Repair()
 
 void Repair::doRepairRefresh(const QJsonObject &input) {
     qDebug("REPAIRREFRESH");
+    /*
+        item["dockid"] = query.value(0).toInt();
+        item["starttime"] = query.value(1).toInt();
+        item["completetime"] = query.value(2).toInt();
+        item["currenthp"] = query.value(3).toInt();
+        item["maxhp"] = query.value(4).toInt();
+        item["shipuuid"] = query.value(5).toUuid().toString();
+        */
+    Clientv2 &engine = Clientv2::getInstance();
     QJsonArray content = input["content"].toArray();
     for(int i = 0; i < content.size(); ++i) {
-        slotfs[i]->setOpen(true);
         QJsonObject item = content[i].toObject();
+        if(!item.contains("shipuuid")
+            || QUuid(item["shipuuid"].toString()).isNull()
+            || !engine.shipModel.isReady()) {
+            uuids[i]->setText("");
+            names[i]->setText("");
+            hps[i]->hide();
+        }
+        else {
+            uuids[i]->setText(item["shipuuid"].toString());
+            auto [ship, dynamic] = engine.shipModel.getShip(
+                QUuid(item["shipuuid"].toString()));
+            if(!ship || !dynamic) {
+                qCritical() << qtTrId("user-ship-dont-exist");
+            }
+            else {
+                names[i]->setText(ship->toString());
+                int startTime = item["starttime"].toInt();
+                int currentTime = QDateTime::currentSecsSinceEpoch();
+                int completeTime = item["completetime"].toInt();
+                double progress = (double)(currentTime - startTime)
+                                  / (completeTime - startTime);
+                int curHP = item["currenthp"].toInt();
+                int maxHP = item["maxhp"].toInt();
+                int desiredHP = std::floor(progress * (maxHP - curHP) + curHP);
+                hps[i]->setContent(desiredHP,
+                                   maxHP,
+                                   dynamic->condition,
+                                   Ship::getLevel(
+                                       std::min(dynamic->exp,
+                                                dynamic->expCap))
+                                   );
+                hps[i]->show();
+            }
+        }
+
+        slotfs[i]->setOpen(true);
         slotfs[i]->setComplete(false);
         if(!item.contains("completetime")
             || item["completetime"].toInt() == 0) {
@@ -126,6 +169,11 @@ void Repair::doRepairRefresh(const QJsonObject &input) {
                     item["completetime"].toInt(), QTimeZone::UTC));
         }
         slotfs[i]->setStatus();
+    }
+    for(int i = content.size(); i < KP::maxRepairSlots; ++i) {
+        uuids[i]->setText("");
+        names[i]->setText("");
+        hps[i]->hide();
     }
 }
 
@@ -178,15 +226,15 @@ void Repair::repairClicked(bool checked, int slotnum) {
         view->update();
         connect(view, &EquipView::shipSelected,
                 this, [this, slotnum, view](QUuid id){
-            Clientv2 &engine = Clientv2::getInstance();
-            if(engine.shipModel.isShipFullHP(id)) {
-                //% "Ship does not need repairs."
-                qWarning() << qtTrId("ship-at-full-health");
-                return;
-            }
-            emit shipToRepair(id, slotnum);
-            disconnect(view, nullptr, this, nullptr);
-        });
+                    Clientv2 &engine = Clientv2::getInstance();
+                    if(engine.shipModel.isShipFullHP(id)) {
+                        //% "Ship does not need repairs."
+                        qWarning() << qtTrId("ship-at-full-health");
+                        return;
+                    }
+                    emit shipToRepair(id, slotnum);
+                    disconnect(view, nullptr, this, nullptr);
+                });
     }
 }
 

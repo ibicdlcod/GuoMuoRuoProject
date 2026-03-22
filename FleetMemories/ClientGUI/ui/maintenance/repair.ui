@@ -38,9 +38,9 @@
    <item>
     <widget class="QWidget" name="RepairArea" native="true">
      <property name="sizePolicy">
-      <sizepolicy hsizetype="Expanding" vsizetype="Maximum">
+      <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
        <horstretch>255</horstretch>
-       <verstretch>1</verstretch>
+       <verstretch>4</verstretch>
       </sizepolicy>
      </property>
      <property name="styleSheet">

@@ -164,8 +164,8 @@ Q_GLOBAL_STATIC(QString,
                     "DockID INTEGER NOT NULL, "
                     /* ship to repair */
                     "Uuid TEXT, "
-                    "StartHP INTEGER, "
-                    "CurrentHP INTEGER, "
+                    "StartHP INTEGER, " // actually currentHP
+                    "CurrentHP INTEGER, " // not used
                     "MaxHP INTEGER, "
                     "StartTime INTEGER, "
                     "SuccessTime INTEGER, "
@@ -2279,46 +2279,47 @@ void Server::doRepair(const CSteamID &uid, const QUuid &shipUuid, int slotnum,
         return;
     }
 
-    if(!stop) {
 start_repair:
-        if(User::isDockBusy(uid, slotnum)) {
-            if(forced) {
-force_repair:
+    if(User::isDockBusy(uid, slotnum)) {
+        if(forced || stop) {
 get_info:
-                int shipDef = 0;
-                QSqlQuery query;
-                query.prepare("SELECT UserShip.ShipDef, "
-                              "Docks.StartHP, "
-                              "Docks.MaxHP, "
-                              "Docks.StartTime, "
-                              "Docks.SuccessTime FROM UserShip "
-                              "INNER JOIN Docks "
-                              "ON UserShip.ShipUuid = Docks.Uuid "
-                              "WHERE User = :uid AND Docks.DockID = :slotnum;");
-                query.bindValue(":uid", uid.ConvertToUint64());
-                query.bindValue(":slotnum", slotnum);
-                if(Q_UNLIKELY(!query.exec() || !query.isSelect())) {
-                    qCritical() << query.lastQuery();
-                    //% "User %1: dock is broken!"
-                    throw DBError(qtTrId("user-dock-broken")
-                                  .arg(uid.ConvertToUint64()),
-                                  query.lastError());
-                }
-                if(!query.first()) {
-                    return;
-                }
+            int shipDef = 0;
+            QSqlQuery query;
+            query.prepare("SELECT UserShip.ShipDef, "
+                          "Docks.StartHP, "
+                          "Docks.MaxHP, "
+                          "Docks.StartTime, "
+                          "Docks.SuccessTime FROM UserShip "
+                          "INNER JOIN Docks "
+                          "ON UserShip.ShipUuid = Docks.Uuid "
+                          "WHERE User = :uid AND Docks.DockID = :slotnum;");
+            query.bindValue(":uid", uid.ConvertToUint64());
+            query.bindValue(":slotnum", slotnum);
+            if(Q_UNLIKELY(!query.exec() || !query.isSelect())) {
+                qCritical() << query.lastQuery();
+                //% "User %1: dock is broken!"
+                throw DBError(qtTrId("user-dock-broken")
+                              .arg(uid.ConvertToUint64()),
+                              query.lastError());
+            }
+            if(!query.first()) {
+                return;
+            }
 process_info:
-                shipDef = query.value(0).toInt();
-                qint64 curHP = query.value(1).toInt();
-                qint64 maxHP = query.value(2).toInt();
-                qint64 startTime = query.value(3).toLongLong();
-                qint64 successTime = query.value(4).toLongLong();
-                ResOrd resRequired = shipRegistry[shipDef]->repairRes()
-                        * (maxHP - curHP) / maxHP;
-                qint64 currentTime = QDateTime::currentSecsSinceEpoch();
-                double progress = (double)(currentTime - startTime)
-                        / (successTime - startTime);
-                ResOrd currentRes = User::getCurrentResources(uid);
+            shipDef = query.value(0).toInt();
+            qint64 curHP = query.value(1).toInt();
+            qint64 maxHP = query.value(2).toInt();
+            qint64 startTime = query.value(3).toLongLong();
+            qint64 successTime = query.value(4).toLongLong();
+            ResOrd resRequired = shipRegistry[shipDef]->repairRes()
+                    * (maxHP - curHP) / maxHP;
+            qint64 currentTime = QDateTime::currentSecsSinceEpoch();
+            double progress = (double)(currentTime - startTime)
+                    / (successTime - startTime);
+            ResOrd currentRes = User::getCurrentResources(uid);
+            qint64 desiredHP = std::floor(progress * (maxHP - curHP) + curHP);
+force_repair:
+            if(forced) {
 spend_resources:
                 if(!currentRes.spendResources(resRequired * (1 - progress))){
                     connection->flush();
@@ -2353,118 +2354,164 @@ accel:
                 }
                 return;
             }
+            else if(stop) {
+regen_hp:
+                {
+                    QSqlQuery query;
+                    query.prepare("UPDATE UserShip "
+                                  "SET CurrentHP = :desired "
+                                  "FROM Docks "
+                                  "WHERE UserShip.ShipUuid = Docks.Uuid "
+                                  "AND DockID = :slotnum "
+                                  "AND User = :uid;");
+                    query.bindValue(":uid", uid.ConvertToUint64());
+                    query.bindValue(":desired", desiredHP);
+                    query.bindValue(":slotnum", slotnum);
+                    if(!query.exec()) {
+                        //% "Complete user %1's dock(stop)(updatehp) failed!"
+                        throw DBError(qtTrId("dock-state-error4")
+                                      .arg(uid.ConvertToUint64()),
+                                      query.lastError());
+                        return;
+                    }
+                }
+stop_repair:
+                {
+                    QSqlQuery query;
+                    query.prepare("UPDATE Docks "
+                                  "SET Uuid = NULL, "
+                                  "StartHP = NULL, "
+                                  "MaxHP = NULL, "
+                                  "StartTime = NULL, "
+                                  "SuccessTime = NULL "
+                                  "WHERE DockID = :slotnum "
+                                  "AND UserID = :uid;");
+                    query.bindValue(":uid", uid.ConvertToUint64());
+                    query.bindValue(":slotnum", slotnum);
+                    if(!query.exec()) {
+                        //% "Complete user %1's dock(stop) failed!"
+                        throw DBError(qtTrId("dock-state-error3")
+                                      .arg(uid.ConvertToUint64()),
+                                      query.lastError());
+                        return;
+                    }
+                }
+                refreshClientDock(uid, connection);
+                return;
+            }
+            else {
+                Q_UNREACHABLE();
+                return;
+            }
+        }
+        else {
             QByteArray msg = KP::serverDevelopFailed(KP::FactoryBusy);
             senderM.sendMessage(connection, msg);
             return;
         }
+    }
 normal_repair:
 check_possession:
-        int exp = 0;
-        int expCap = 0;
-        int lv = 0;
-        qint64 curHP = 0;
-        qint64 maxHP = 0;
-        int repairTimeRounded = 0;
-        ResOrd currentRes;
-        {
-            QSqlQuery query;
-            query.prepare("SELECT UserShip.Exp+UserKCShip.Exp, ExpCap, UserShip.ShipDef,"
-                          "UserShip.CurrentHP "
-                          "FROM UserShip "
-                          "LEFT JOIN UserKCShip "
-                          "ON UserShip.ShipUuid = UserKCShip.ShipUuid "
-                          "LEFT JOIN Docks "
-                          "ON UserShip.ShipUuid = Docks.Uuid "
-                          "WHERE User = :id AND UserShip.ShipUuid = :uuid "
-                          "AND UserShip.FleetIndex != :disable "
-                          "AND Docks.Uuid IS NULL;");
-            query.bindValue(":id", uid.ConvertToUint64());
-            query.bindValue(":uuid", shipUuid.toString());
-            query.bindValue(":disable", KP::disabledShip);
-            if(Q_UNLIKELY(!query.exec() || !query.isSelect())) {
-                qCritical() << query.lastQuery();
-                //% "User %1: ship %2 does not exist on account!"
-                throw DBError(qtTrId("user-ship-dont-exist").arg(uid.ConvertToUint64())
-                              .arg(shipUuid.toString()), query.lastError());
-            }
-            else if(!query.first()) {
-                QByteArray msg =
-                        KP::serverDevelopFailed(KP::ShipisUnderRepair);
-                senderM.sendMessage(connection, msg);
-                return;
-            }
-            else {
-                exp = query.value(0).toInt();
-                expCap = query.value(1).toInt();
-                lv = Ship::getLevel(std::min(exp, expCap));
-                Ship *ship = shipRegistry[query.value(2).toInt()];
+    int exp = 0;
+    int expCap = 0;
+    int lv = 0;
+    qint64 curHP = 0;
+    qint64 maxHP = 0;
+    int repairTimeRounded = 0;
+    ResOrd currentRes;
+    {
+        QSqlQuery query;
+        query.prepare("SELECT UserShip.Exp+UserKCShip.Exp, ExpCap, UserShip.ShipDef,"
+                      "UserShip.CurrentHP "
+                      "FROM UserShip "
+                      "LEFT JOIN UserKCShip "
+                      "ON UserShip.ShipUuid = UserKCShip.ShipUuid "
+                      "LEFT JOIN Docks "
+                      "ON UserShip.ShipUuid = Docks.Uuid "
+                      "WHERE User = :id AND UserShip.ShipUuid = :uuid "
+                      "AND UserShip.FleetIndex != :disable "
+                      "AND Docks.Uuid IS NULL;");
+        query.bindValue(":id", uid.ConvertToUint64());
+        query.bindValue(":uuid", shipUuid.toString());
+        query.bindValue(":disable", KP::disabledShip);
+        if(Q_UNLIKELY(!query.exec() || !query.isSelect())) {
+            qCritical() << query.lastQuery();
+            //% "User %1: ship %2 does not exist on account!"
+            throw DBError(qtTrId("user-ship-dont-exist").arg(uid.ConvertToUint64())
+                          .arg(shipUuid.toString()), query.lastError());
+        }
+        else if(!query.first()) {
+            QByteArray msg =
+                    KP::serverDevelopFailed(KP::ShipisUnderRepair);
+            senderM.sendMessage(connection, msg);
+            return;
+        }
+        else {
+            exp = query.value(0).toInt();
+            expCap = query.value(1).toInt();
+            lv = Ship::getLevel(std::min(exp, expCap));
+            Ship *ship = shipRegistry[query.value(2).toInt()];
 
 resource_required:
-                curHP = query.value(3).toInt();
-                maxHP = ship->attr["Hitpoints"];
-                ResOrd resRequired = ship->repairRes() * (maxHP - curHP) / maxHP;
-                QByteArray msg = resRequired.resourceDesired();
-                senderM.sendMessage(connection, msg);
-                currentRes = User::getCurrentResources(uid);
-                if(!currentRes.spendResources(resRequired)){
-                    connection->flush();
-                    QTimer::singleShot(100, this, [this, connection]{
-                        QByteArray msg =
-                                KP::serverDevelopFailed(KP::ResourceLack);
-                        senderM.sendMessage(connection, msg);
-                    });
-                    return;
-                }
-
-                double base = ship->repairTimeInSecUnleveledPerhp();
-                /* real repair time is hp * (this * lv) / (std::hypot(1, lv/25)) */
-                double repairTime =
-                        (base * lv) / std::hypot(1, lv / 25.0) * (maxHP - curHP);
-                repairTimeRounded = (int)std::ceil(repairTime);
+            curHP = query.value(3).toInt();
+            maxHP = ship->attr["Hitpoints"];
+            ResOrd resRequired = ship->repairRes() * (maxHP - curHP) / maxHP;
+            QByteArray msg = resRequired.resourceDesired();
+            senderM.sendMessage(connection, msg);
+            currentRes = User::getCurrentResources(uid);
+            if(!currentRes.spendResources(resRequired)){
+                connection->flush();
+                QTimer::singleShot(100, this, [this, connection]{
+                    QByteArray msg =
+                            KP::serverDevelopFailed(KP::ResourceLack);
+                    senderM.sendMessage(connection, msg);
+                });
+                return;
             }
+
+            double base = ship->repairTimeInSecUnleveledPerhp();
+            /* real repair time is hp * (this * lv) / (std::hypot(1, lv/25)) */
+            double repairTime =
+                    (base * lv) / std::hypot(1, lv / 25.0) * (maxHP - curHP);
+            repairTimeRounded = (int)std::ceil(repairTime);
         }
+    }
 put_in_repair:
-        if(curHP > 0 and maxHP > 0) {
-            qint64 startTime = QDateTime::currentSecsSinceEpoch();
-            qint64 successTime = startTime + repairTimeRounded;
+    if(curHP > 0 and maxHP > 0) {
+        qint64 startTime = QDateTime::currentSecsSinceEpoch();
+        qint64 successTime = startTime + repairTimeRounded;
 
-            QSqlDatabase db = QSqlDatabase::database();
-            QSqlQuery query;
-            query.prepare("UPDATE Docks "
-                          "SET StartTime = :st, "
-                          "SuccessTime = :succ, "
-                          "Uuid = :eqid, "
-                          "StartHP = :curr, "
-                          "MaxHP = :max "
-                          "WHERE UserID = :id AND DockID = :fid");
-            query.bindValue(":st", startTime);
-            query.bindValue(":succ", successTime);
-            query.bindValue(":eqid", shipUuid);
-            query.bindValue(":id", uid.ConvertToUint64());
-            query.bindValue(":fid", slotnum);
-            query.bindValue(":curr", curHP);
-            query.bindValue(":max", maxHP);
-            if(query.exec()) {
-                qDebug() << "REPAIR START";
-                /* only spend resources if database successfully register
+        QSqlDatabase db = QSqlDatabase::database();
+        QSqlQuery query;
+        query.prepare("UPDATE Docks "
+                      "SET StartTime = :st, "
+                      "SuccessTime = :succ, "
+                      "Uuid = :eqid, "
+                      "StartHP = :curr, "
+                      "MaxHP = :max "
+                      "WHERE UserID = :id AND DockID = :fid");
+        query.bindValue(":st", startTime);
+        query.bindValue(":succ", successTime);
+        query.bindValue(":eqid", shipUuid);
+        query.bindValue(":id", uid.ConvertToUint64());
+        query.bindValue(":fid", slotnum);
+        query.bindValue(":curr", curHP);
+        query.bindValue(":max", maxHP);
+        if(query.exec()) {
+            qDebug() << "REPAIR START";
+            /* only spend resources if database successfully register
                  * the operation */
-                User::setResources(uid, currentRes);
-                offerResourceInfo(connection, uid);
-            }
-            else {
-                qCritical() << query.lastQuery();
-                //% "Database failed when repairing."
-                throw DBError(qtTrId("dbfail-repair"),
-                              query.lastError());
-            }
+            User::setResources(uid, currentRes);
+            offerResourceInfo(connection, uid);
         }
-        refreshClientDock(uid, connection);
+        else {
+            qCritical() << query.lastQuery();
+            //% "Database failed when repairing."
+            throw DBError(qtTrId("dbfail-repair"),
+                          query.lastError());
+        }
     }
-    else {
-stop_repair:
-        qCritical() << "stop";
-        ;
-    }
+    refreshClientDock(uid, connection);
 }
 
 /* 5.3-blueprint.md#Drop rule */
@@ -5224,7 +5271,6 @@ void Server::receivedReq(const QJsonObject &djson,
             break;
         case KP::GameState::RepairView: {
             refreshClientDock(uid, connection);
-            offerShipInfoUser(uid, connection);
         }
             break;
         case KP::GameState::BattleMapView: {
@@ -5666,7 +5712,7 @@ send_updated_msg:
     query.prepare("SELECT DockID, "
                   "StartTime, "
                   "SuccessTime, "
-                  "CurrentHP, "
+                  "StartHP, "
                   "MaxHP, "
                   "Uuid "
                   "FROM Docks "
@@ -5696,6 +5742,7 @@ send_updated_msg:
     result["content"] = itemArray;
     QByteArray msg = QCborValue::fromJsonValue(result).toCbor();
     senderM.sendMessage(connection, msg);
+    offerShipInfoUser(uid, connection);
 }
 
 void Server::refreshClientFactory(const CSteamID &uid, QSslSocket *connection) {

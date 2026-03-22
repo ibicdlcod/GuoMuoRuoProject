@@ -935,6 +935,12 @@ void Clientv2::doRepair(const QUuid &uuid, int slotnum) {
     socket.flush();
 }
 
+void Clientv2::doStopRepair(int slotnum) {
+    QByteArray msg = KP::clientDemandRepair(QUuid(), slotnum, true, false);
+    sender->enqueue(msg);
+    socket.flush();
+}
+
 Equipment * Clientv2::getEquipmentReg(int equipid) {
     if(!equipRegistryCache.contains(equipid))
         return new Equipment(0, this);

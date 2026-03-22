@@ -1,23 +1,24 @@
 /* Copyright (C) 2026 Harusoft Ltd.
  * SPDX-License-Identifier: AGPL-3.0-or-later */
 
-#include "shipdisplay.h"
-#include "ui_shipdisplay.h"
+#include "shipdisplayflat.h"
+#include "ui_shipdisplayflat.h"
 #include <QStyleHints>
 
-ShipDisplay::ShipDisplay(QWidget *parent)
+ShipDisplayFlat::ShipDisplayFlat(QWidget *parent)
     : QWidget(parent)
-    , ui(new Ui::ShipDisplay)
+    , ui(new Ui::ShipDisplayFlat)
 {
     ui->setupUi(this);
 }
 
-ShipDisplay::~ShipDisplay()
+ShipDisplayFlat::~ShipDisplayFlat()
 {
     delete ui;
 }
 
-void ShipDisplay::setContent(int currentHP, int maxHP, int cond, int lv) {
+/* idential with shipdisplay */
+void ShipDisplayFlat::setContent(int currentHP, int maxHP, int cond, int lv) {
     if(maxHP < 50)
         maxHP = 50;
     ui->hpBar->setMinimum(0);

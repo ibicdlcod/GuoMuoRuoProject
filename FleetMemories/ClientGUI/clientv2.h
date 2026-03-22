@@ -112,6 +112,7 @@ public slots:
     void doRefreshFactoryAnchorage();
     void doRefreshFactoryArsenal();
     void doRepair(const QUuid &, int);
+    void doStopRepair(int);
     Equipment * getEquipmentReg(int);
     Ship * getShipReg(int);
     bool parse(const QString &);
