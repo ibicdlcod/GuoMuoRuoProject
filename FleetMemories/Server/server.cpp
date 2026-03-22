@@ -3961,7 +3961,7 @@ new_ship_as_imported:
 }
 
 void Server::minutePulse() {
-    decrease_supremacy:
+decrease_supremacy:
     QSqlQuery query;
     query.prepare("UPDATE UserMapState "
                   "SET Supremacy = (1.0 - 1.0 / :decay) * Supremacy "
@@ -3973,12 +3973,11 @@ void Server::minutePulse() {
         //% "Minute pulse: decrease supermacy failed!"
         throw DBError(qtTrId("decrease-supremacy-failed"), query.lastError());
     }
-    recover_condition:
+recover_condition:
     QDateTime lastRecoverTime
             = settings->value("server/lastrecvcondtime",
-                              QDateTime::fromSecsSinceEpoch(0))
+                              QDateTime::fromSecsSinceEpoch(0, Qt::UTC))
             .toDateTime();
-    qCritical() << lastRecoverTime;
     int lastRecoverTimeInt = lastRecoverTime.toSecsSinceEpoch();
     {
         QSqlQuery query;
@@ -3990,12 +3989,52 @@ void Server::minutePulse() {
         query.bindValue(":maxcond", KP::conditionMax);
         if(Q_UNLIKELY(!query.exec())) {
             qCritical() << query.lastQuery();
-            //% "Minute pulse: decrease supermacy failed!"
-            throw DBError(qtTrId("decrease-supremacy-failed"), query.lastError());
+            //% "Minute pulse: recover condition failed!"
+            throw DBError(qtTrId("recover-cond-failed"), query.lastError());
         }
     }
-
     settings->setValue("server/lastrecvcondtime", QDateTime::currentDateTimeUtc());
+negative_condition_penalty:
+add_kc_exp:
+    {
+        QSqlQuery query;
+        query.prepare("UPDATE UserShip "
+                      "SET Exp = UserShip.Exp + UserKCShip.Exp "
+                      "FROM UserKCShip "
+                      "WHERE UserShip.ShipUuid = UserKCShip.ShipUuid;");
+        if(Q_UNLIKELY(!query.exec())) {
+            qCritical() << query.lastQuery();
+            //% "Minute pulse: penalize condition failed!"
+            throw DBError(qtTrId("penalize-cond-failed"), query.lastError());
+        }
+    }
+penalize:
+    {
+        QSqlQuery query;
+        query.prepare("UPDATE UserShip "
+                      "SET Exp = floor(pow(1.001, t.c) * Exp) "
+                      "FROM (SELECT SUM(Condition) AS c, User FROM UserShip "
+                      "WHERE Condition < 0 "
+                      "GROUP BY User ) t;");
+        if(Q_UNLIKELY(!query.exec())) {
+            qCritical() << query.lastQuery();
+            //% "Minute pulse: penalize condition failed!"
+            throw DBError(qtTrId("penalize-cond-failed"), query.lastError());
+        }
+    }
+subtract_kc_exp:
+    {
+        QSqlQuery query;
+        query.prepare("UPDATE UserShip "
+                      "SET Exp = UserShip.Exp - UserKCShip.Exp "
+                      "FROM UserKCShip "
+                      "WHERE UserShip.ShipUuid = UserKCShip.ShipUuid;");
+        if(Q_UNLIKELY(!query.exec())) {
+            qCritical() << query.lastQuery();
+            //% "Minute pulse: penalize condition failed!"
+            throw DBError(qtTrId("penalize-cond-failed"), query.lastError());
+        }
+    }
 }
 
 QList<std::tuple<QUuid, int>> Server::modernize(
