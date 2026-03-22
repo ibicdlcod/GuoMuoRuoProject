@@ -58,10 +58,10 @@ void ShipDisplay::setContent(int currentHP, int maxHP, int cond, int lv) {
 
     /* cond */
     QString condImgStr = ":/resources/shipCond/";
-    if(cond > 60) {
+    if(cond > 144) {
         condImgStr = condImgStr + "good";
     }
-    else if (cond > 15) {
+    else if (cond > 36) {
         condImgStr = condImgStr + "warn";
     }
     else {

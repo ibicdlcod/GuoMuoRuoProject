@@ -264,7 +264,7 @@ Q_GLOBAL_STATIC(QString,
                     "ShipDef INTEGER NOT NULL, "
                     "Star INTEGER DEFAULT 0, "
                     "CurrentHP INTEGER DEFAULT 1, "
-                    "Condition INTEGER DEFAULT 480, "
+                    "Condition INTEGER DEFAULT 480, " // KP::conditionMax
                     "CondRecovTime INTEGER, "
                     "Exp INTEGER DEFAULT 0, "
                     // does not prevent gaining of more Exp but only its effects
@@ -1600,12 +1600,57 @@ void Server::clearNegativeSkillPoints(const CSteamID &uid) {
                   "ELSE Intvalue "
                   "END "
                   "WHERE User = :uid AND Intvalue < 0;");
-    query.bindValue(":uid", QString::number(uid.ConvertToUint64()));
+    query.bindValue(":uid", uid.ConvertToUint64());
     if(Q_UNLIKELY(!query.exec())) {
         //% "User %1: clear negative skill points failed!"
         throw DBError(qtTrId("clear-negative-skillpoints-failed")
                       .arg(uid.ConvertToUint64()),
                       query.lastError());
+    }
+}
+
+void Server::conditionDrop(const CSteamID &uid, int fleetIndex,
+                           int amount, bool expedition) {
+drop_condition:
+    QSqlDatabase db = QSqlDatabase::database();
+    QSqlQuery query;
+    query.prepare("UPDATE UserShip "
+                  "SET Condition = Condition - :amount "
+                  "WHERE User = :uid AND FleetIndex = :fleetindex;");
+    query.bindValue(":uid", uid.ConvertToUint64());
+    query.bindValue(":amount", amount);
+    query.bindValue(":fleetindex", fleetIndex);
+    if(Q_UNLIKELY(!query.exec())) {
+        qCritical() << query.lastQuery();
+        //% "User %1: decrease fleet condition failed!"
+        throw DBError(qtTrId("cond-drop-failed")
+                      .arg(uid.ConvertToUint64()),
+                      query.lastError());
+    }
+update_recov_time:
+    static int maxIntervalInSec = 3600; // 60 min
+    static int minIntervalInSec = 900; // 15 min
+    if(!expedition) {
+        QSqlQuery query;
+        query.prepare("UPDATE UserShip "
+                      "SET CondRecovTime = unixepoch() "
+                      "+ :maxinterval - :intervaldiff "
+                      "* (SELECT Intvalue FROM ShipReg "
+                      "WHERE ShipID = ShipDef "
+                      "AND Attribute = 'Hitpoints') "
+                      "/ CurrentHP "
+                      "WHERE User = :uid AND FleetIndex = :fleetindex;");
+        query.bindValue(":uid", uid.ConvertToUint64());
+        query.bindValue(":maxinterval", maxIntervalInSec);
+        query.bindValue(":intervaldiff", maxIntervalInSec - minIntervalInSec);
+        query.bindValue(":fleetindex", fleetIndex);
+        if(Q_UNLIKELY(!query.exec())) {
+            qCritical() << query.lastQuery();
+            //% "User %1: decrease fleet condition failed!"
+            throw DBError(qtTrId("cond-drop-failed")
+                          .arg(uid.ConvertToUint64()),
+                          query.lastError());
+        }
     }
 }
 
@@ -3877,7 +3922,9 @@ new_ship:
         if(fmShipDef != 0) {
             QSqlQuery query;
             query.prepare("UPDATE UserShip "
-                          "SET Shipdef = :newdef "
+                          "SET Shipdef = :newdef, "
+                          "Star = floor(Star / "
+                          "pow(2, max(((:newdef) >> 28) - ((:def) >> 28), 0))) "
                           "WHERE User = :id AND ShipDef = :def;");
             query.bindValue(":id", uid.ConvertToUint64());
             query.bindValue(":def", fmShipDef);
@@ -3914,6 +3961,7 @@ new_ship_as_imported:
 }
 
 void Server::minutePulse() {
+    decrease_supremacy:
     QSqlQuery query;
     query.prepare("UPDATE UserMapState "
                   "SET Supremacy = (1.0 - 1.0 / :decay) * Supremacy "
@@ -3925,6 +3973,29 @@ void Server::minutePulse() {
         //% "Minute pulse: decrease supermacy failed!"
         throw DBError(qtTrId("decrease-supremacy-failed"), query.lastError());
     }
+    recover_condition:
+    QDateTime lastRecoverTime
+            = settings->value("server/lastrecvcondtime",
+                              QDateTime::fromSecsSinceEpoch(0))
+            .toDateTime();
+    qCritical() << lastRecoverTime;
+    int lastRecoverTimeInt = lastRecoverTime.toSecsSinceEpoch();
+    {
+        QSqlQuery query;
+        query.prepare("UPDATE UserShip "
+                      "SET Condition = min(:maxcond, Condition "
+                      "+ max(0, (unixepoch() - max(CondRecovTime, :last)) "
+                      "/ 180));");
+        query.bindValue(":last", lastRecoverTimeInt);
+        query.bindValue(":maxcond", KP::conditionMax);
+        if(Q_UNLIKELY(!query.exec())) {
+            qCritical() << query.lastQuery();
+            //% "Minute pulse: decrease supermacy failed!"
+            throw DBError(qtTrId("decrease-supremacy-failed"), query.lastError());
+        }
+    }
+
+    settings->setValue("server/lastrecvcondtime", QDateTime::currentDateTimeUtc());
 }
 
 QList<std::tuple<QUuid, int>> Server::modernize(
@@ -4564,9 +4635,26 @@ set_battle_state:
                 }
                 QByteArray msg = KP::serverBattleEnd();
                 senderM.sendMessage(connection, msg);
+
                 auto assm = static_cast<KP::BattleAssessment>(battleProcess["assm"].toInt());
 
-drop:
+condition_drop:
+                /* night battle for daystart and day for nightstart */
+                auto extraStage = battleProcess["extrastage"].toBool();
+                int condDrop = 0;
+                switch(assm) {
+                /* would be lower for expedition */
+                case KP::SVictory: condDrop = 4; break;
+                case KP::AVictory: condDrop = 5; break;
+                case KP::BVictory: condDrop = 6; break;
+                case KP::CDefeat: condDrop = 7; break;
+                case KP::DDefeat: condDrop = 8; break;
+                case KP::EDefeat: condDrop = 9; break;
+                }
+                condDrop += (extraStage ? 1 : 0);
+                conditionDrop(uid, result.value()[3], condDrop);
+
+drop_ship:
                 int dropShip = drop(uid, result.value()[0], result.value()[1],
                         assm);
                 if(dropShip == -1) {
@@ -4625,8 +4713,8 @@ deal_with_gauge:
                         }
                     }
                 }
-            }
-            );
+                offerShipInfoUser(uid, connection);
+            });
         }
             break;
         case KP::STARTING:
@@ -4794,6 +4882,7 @@ const QJsonObject Server::processBattleCore(const CSteamID &uid,
     QJsonObject result;
     result["time"] = 5000; // in milliseconds;
     result["assm"] = KP::SVictory; // assessment
+    result["extrastage"] = false; // night battle occured for daystart, or reverse
 
     QJsonObject before;
     QJsonObject enemyBefore;

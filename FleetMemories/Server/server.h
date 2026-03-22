@@ -70,6 +70,7 @@ private:
     bool addEquipStar(const QUuid &, int);
     bool clearMap(const CSteamID &, int);
     void clearNegativeSkillPoints(const CSteamID &);
+    void conditionDrop(const CSteamID &, int, int, bool expedition = false);
     void decideHomePort(const CSteamID &, QSslSocket *);
     void decryptDatagram(QSslSocket *, const QByteArray &);
     void deleteTestEquip(const CSteamID &);
