@@ -3975,91 +3975,140 @@ new_ship_as_imported:
 }
 
 void Server::minutePulse() {
+    try{
 decrease_supremacy:
-    QSqlQuery query;
-    query.prepare("UPDATE UserMapState "
-                  "SET Supremacy = (1.0 - 1.0 / :decay) * Supremacy "
-                  "WHERE Supremacy > 0;");
-    query.bindValue(":decay", settings->value("rule/navalsupremacydecay",
-                                              2880).toDouble());
-    if(Q_UNLIKELY(!query.exec())) {
-        qCritical() << query.lastQuery();
-        //% "Minute pulse: decrease supermacy failed!"
-        throw DBError(qtTrId("decrease-supremacy-failed"), query.lastError());
-    }
-recover_condition:
-    QDateTime lastRecoverTime
-            = settings->value("server/lastrecvcondtime",
-                              QDateTime::fromSecsSinceEpoch(0, Qt::UTC))
-            .toDateTime();
-    int lastRecoverTimeInt = lastRecoverTime.toSecsSinceEpoch();
-    {
         QSqlQuery query;
-        query.prepare("UPDATE UserShip "
-                      "SET Condition = min(:maxcond, Condition "
-                      "+ max(0, (unixepoch() - max(CondRecovTime, :last)) "
-                      "/ 180));");
-        query.bindValue(":last", lastRecoverTimeInt);
-        query.bindValue(":maxcond", KP::conditionMax);
+        query.prepare("UPDATE UserMapState "
+                      "SET Supremacy = (1.0 - 1.0 / :decay) * Supremacy "
+                      "WHERE Supremacy > 0;");
+        query.bindValue(":decay", settings->value("rule/navalsupremacydecay",
+                                                  2880).toDouble());
         if(Q_UNLIKELY(!query.exec())) {
             qCritical() << query.lastQuery();
-            //% "Minute pulse: recover condition failed!"
-            throw DBError(qtTrId("recover-cond-failed"), query.lastError());
+            //% "Minute pulse: decrease supermacy failed!"
+            throw DBError(qtTrId("decrease-supremacy-failed"), query.lastError());
         }
-    }
-    settings->setValue("server/lastrecvcondtime", QDateTime::currentDateTimeUtc());
+recover_condition:
+        QDateTime lastRecoverTime
+                = settings->value("server/lastrecvcondtime",
+                                  QDateTime::fromSecsSinceEpoch(0, Qt::UTC))
+                .toDateTime();
+        int lastRecoverTimeInt = lastRecoverTime.toSecsSinceEpoch();
+        {
+            QSqlQuery query;
+            query.prepare("UPDATE UserShip "
+                          "SET Condition = min(:maxcond, Condition "
+                          "+ max(0, (unixepoch() - max(CondRecovTime, :last)) "
+                          "/ 180));");
+            query.bindValue(":last", lastRecoverTimeInt);
+            query.bindValue(":maxcond", KP::conditionMax);
+            if(Q_UNLIKELY(!query.exec())) {
+                qCritical() << query.lastQuery();
+                //% "Minute pulse: recover condition failed!"
+                throw DBError(qtTrId("recover-cond-failed"), query.lastError());
+            }
+        }
+        settings->setValue("server/lastrecvcondtime", QDateTime::currentDateTimeUtc());
 negative_condition_penalty:
 add_kc_exp:
-    {
-        QSqlQuery query;
-        query.prepare("UPDATE UserShip "
-                      "SET Exp = UserShip.Exp + UserKCShip.Exp "
-                      "FROM UserKCShip "
-                      "WHERE UserShip.ShipUuid = UserKCShip.ShipUuid;");
-        if(Q_UNLIKELY(!query.exec())) {
-            qCritical() << query.lastQuery();
-            //% "Minute pulse: penalize condition failed!"
-            throw DBError(qtTrId("penalize-cond-failed"), query.lastError());
+        {
+            QSqlQuery query;
+            query.prepare("UPDATE UserShip "
+                          "SET Exp = UserShip.Exp + UserKCShip.Exp "
+                          "FROM UserKCShip "
+                          "WHERE UserShip.ShipUuid = UserKCShip.ShipUuid;");
+            if(Q_UNLIKELY(!query.exec())) {
+                qCritical() << query.lastQuery();
+                //% "Minute pulse: penalize condition failed!"
+                throw DBError(qtTrId("penalize-cond-failed"), query.lastError());
+            }
         }
-    }
 penalize:
-    {
-        QSqlQuery query;
-        query.prepare("UPDATE UserShip "
-                      "SET Exp = floor(pow(1.001, t.c) * Exp) "
-                      "FROM (SELECT SUM(Condition) AS c, User FROM UserShip "
-                      "WHERE Condition < 0 "
-                      "GROUP BY User ) t;");
-        if(Q_UNLIKELY(!query.exec())) {
-            qCritical() << query.lastQuery();
-            //% "Minute pulse: penalize condition failed!"
-            throw DBError(qtTrId("penalize-cond-failed"), query.lastError());
+        {
+            QSqlQuery query;
+            query.prepare("UPDATE UserShip "
+                          "SET Exp = floor(pow(1.001, t.c) * Exp) "
+                          "FROM (SELECT SUM(Condition) AS c, User FROM UserShip "
+                          "WHERE Condition < 0 "
+                          "GROUP BY User ) t;");
+            if(Q_UNLIKELY(!query.exec())) {
+                qCritical() << query.lastQuery();
+                //% "Minute pulse: penalize condition failed!"
+                throw DBError(qtTrId("penalize-cond-failed"), query.lastError());
+            }
         }
-    }
 subtract_kc_exp:
-    {
-        QSqlQuery query;
-        query.prepare("UPDATE UserShip "
-                      "SET Exp = UserShip.Exp - UserKCShip.Exp "
-                      "FROM UserKCShip "
-                      "WHERE UserShip.ShipUuid = UserKCShip.ShipUuid;");
-        if(Q_UNLIKELY(!query.exec())) {
-            qCritical() << query.lastQuery();
-            //% "Minute pulse: penalize condition failed!"
-            throw DBError(qtTrId("penalize-cond-failed"), query.lastError());
+        {
+            QSqlQuery query;
+            query.prepare("UPDATE UserShip "
+                          "SET Exp = UserShip.Exp - UserKCShip.Exp "
+                          "FROM UserKCShip "
+                          "WHERE UserShip.ShipUuid = UserKCShip.ShipUuid;");
+            if(Q_UNLIKELY(!query.exec())) {
+                qCritical() << query.lastQuery();
+                //% "Minute pulse: penalize condition failed!"
+                throw DBError(qtTrId("penalize-cond-failed"), query.lastError());
+            }
         }
+award_industrial_points:
+        QDateTime lastSettleTime
+                = settings->value("server/nextsettleranktime",
+                                  QDateTime::fromSecsSinceEpoch(0, Qt::UTC))
+                .toDateTime();
+        lastSettleTime.setDate(QDate(lastSettleTime.date().year(),
+                                     lastSettleTime.date().month(),
+                                     1));
+        lastSettleTime.setTime(QTime(0, 0, 0));
+        qCritical() << lastSettleTime;
+        if(lastSettleTime < QDateTime::currentDateTimeUtc())
+        {
+            qWarning() << QDateTime::currentDateTimeUtc();
+            {
+                QSqlQuery query;
+                query.prepare("UPDATE UserRanking "
+                              "SET Industrial = Industrial + ( "
+                              "SELECT ln(COUNT(*)) "
+                              "FROM UserRanking) + ( "
+                              "SELECT COALESCE(COUNT(*)*ln(COUNT(*)),0) "
+                              "- (COUNT(*)+1)*ln(COUNT(*)+1) "
+                              "FROM UserRanking a "
+                              "WHERE a.CurrentVP > UserRanking.CurrentVP)+1;");
+                if(Q_UNLIKELY(!query.exec())) {
+                    qCritical() << query.lastQuery();
+                    //% "Minute pulse: reward ranking failed!"
+                    throw DBError(qtTrId("rank-reward-failed"), query.lastError());
+                }
+            }
+            {
+                QSqlQuery query;
+                query.prepare("UPDATE UserRanking "
+                              "SET PreviousVP = CurrentVP;");
+                if(Q_UNLIKELY(!query.exec())) {
+                    qCritical() << query.lastQuery();
+                    //% "Minute pulse: reward ranking failed!"
+                    throw DBError(qtTrId("rank-reward-failed"), query.lastError());
+                }
+            }
+            {
+                QSqlQuery query;
+                query.prepare("UPDATE UserRanking "
+                              "SET CurrentVP = CurrentVP / 10;");
+                if(Q_UNLIKELY(!query.exec())) {
+                    qCritical() << query.lastQuery();
+                    //% "Minute pulse: reward ranking failed!"
+                    throw DBError(qtTrId("rank-reward-failed"), query.lastError());
+                }
+            }
+        }
+        settings->setValue("server/nextsettleranktime",
+                           lastSettleTime.addSecs(1));
+    } catch (DBError &e) {
+        for(QString &i : e.whats()) {
+            qCritical() << i;
+        }
+    } catch (std::exception &e) {
+        qCritical() << e.what();
     }
-    award_industrial_points:
-    /*
-     * UPDATE UserRanking
-SET Industrial = (
-SELECT ln(COUNT(*))
-FROM UserRanking) + (
-SELECT COALESCE(COUNT(*)*ln(COUNT(*)),0)
-- (COUNT(*)+1)*ln(COUNT(*)+1)
-FROM UserRanking a
-WHERE a.CurrentVP > UserRanking.CurrentVP)+1
-*/
 }
 
 QList<std::tuple<QUuid, int>> Server::modernize(
@@ -6726,7 +6775,7 @@ KP::FleetFailType Server::updateFleet(const CSteamID &uid, const QJsonArray &inp
 }
 
 void Server::userInit(const CSteamID &uid) {
-    user_attr:
+user_attr:
     static const QMap<QString, int> defaults
             = {
         std::pair(QStringLiteral("FleetSize"), 1),
@@ -6744,7 +6793,7 @@ void Server::userInit(const CSteamID &uid) {
         std::pair(QStringLiteral("ActiveFleet"), 0),
         std::pair(QStringLiteral("InBattle"), KP::NoBattle)
     };
-    user_attr_sql:
+user_attr_sql:
     {
         QSqlQuery insert;
         for (auto i = defaults.cbegin(), end = defaults.cend();
@@ -6765,7 +6814,7 @@ void Server::userInit(const CSteamID &uid) {
             }
         }
     }
-    natural_regen_time:
+natural_regen_time:
     {
         QSqlQuery insertTime;
         if(!insertTime.prepare("INSERT INTO UserAttr "
@@ -6842,12 +6891,12 @@ fleet_status:
             return;
         }
     }
-    rank:
+rank:
     {
         QSqlQuery rankInfo;
         rankInfo.prepare("INSERT INTO UserRanking "
-                               "(User) "
-                               "VALUES (:uid);");
+                         "(User) "
+                         "VALUES (:uid);");
         rankInfo.bindValue(":uid", uid.ConvertToUint64());
         if(!rankInfo.exec()) {
             //% "%1: User rank init failure!"
