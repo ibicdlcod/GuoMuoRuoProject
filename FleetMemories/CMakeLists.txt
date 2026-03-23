@@ -12,7 +12,11 @@ set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 
-set(CMAKE_CXX_STANDARD 20)
+if (${CMAKE_SYSTEM_NAME} MATCHES "Windows")
+    set(CMAKE_CXX_STANDARD 20)
+else ()
+    set(CMAKE_CXX_STANDARD 23)
+endif()
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # Lua
@@ -337,9 +341,9 @@ set(shaders_resource_files
 
 qt6_add_resources(CFClient "shaders"
     PREFIX
-        "/"
+    "/"
     FILES
-        ${shaders_resource_files}
+    ${shaders_resource_files}
 )
 
 set_target_properties(CFClient PROPERTIES

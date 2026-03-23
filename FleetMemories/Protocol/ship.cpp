@@ -424,8 +424,8 @@ double Ship::getEfficiency(int lv, int star) {
 
 int Ship::expCap(int numberOfRings) {
     int levelCap = ringLv * (numberOfRings + 1);
-    return (settings->value("rule/shipexpscale", 100.0)
-            + (levelCap - 1) * settings->value("rule/shipexpscale", 100.0))
+    return (settings->value("rule/shipexpscale", 100.0).toDouble()
+            + (levelCap - 1) * settings->value("rule/shipexpscale", 100.0).toDouble())
            / 2 * (levelCap - 1);
 }
 

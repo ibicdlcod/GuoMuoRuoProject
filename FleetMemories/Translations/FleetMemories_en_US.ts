@@ -2934,7 +2934,7 @@ Great at battle and bad at politics--so cool!</translation>
         <translation type="unfinished"></translation>
     </message>
     <message id="remodel-nonexistent">
-        <location filename="../Protocol/ship.cpp" line="372"/>
+        <location filename="../Protocol/ship.cpp" line="347"/>
         <source>Remodel target %1 does not exist!</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3332,9 +3332,6 @@ Great at battle and bad at politics--so cool!</translation>
         <source>Repair (force-click to accelerate)</source>
         <translation type="unfinished"></translation>
     </message>
-</context>
-<context>
-    <name>BattlePlan</name>
     <message id="battle-plan">
         <location filename="../ClientGUI/ui/sortie/battleplan.ui" line="14"/>
         <source>Battle Plan</source>
@@ -3385,9 +3382,6 @@ Great at battle and bad at politics--so cool!</translation>
         <source>Strive for rank S</source>
         <translation type="unfinished"></translation>
     </message>
-</context>
-<context>
-    <name>ChooseHomePort</name>
     <message id="choose-home">
         <location filename="../ClientGUI/ui/port/choosehomeport.ui" line="37"/>
         <source>Choose your home port</source>
@@ -3405,7 +3399,8 @@ Great at battle and bad at politics--so cool!</translation>
     </message>
     <message id="home-germany">
         <location filename="../ClientGUI/ui/port/choosehomeport.ui" line="63"/>
-        <source>Kronborg</source>
+        <source>Øresund</source>
+        <oldsource>Kronborg</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message id="home-france">
@@ -3433,14 +3428,6 @@ Great at battle and bad at politics--so cool!</translation>
         <source>East Australia</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
-        <location filename="../ClientGUI/ui/port/choosehomeport.ui" line="14"/>
-        <source>Dialog</source>
-        <translation></translation>
-    </message>
-</context>
-<context>
-    <name>ConfirmSortie</name>
     <message id="confirm-sortie">
         <location filename="../ClientGUI/ui/sortie/confirmsortie.ui" line="14"/>
         <source>Confirm Sortie</source>
@@ -3466,9 +3453,6 @@ Great at battle and bad at politics--so cool!</translation>
         <source>Unknown</source>
         <translation type="unfinished">Unknown</translation>
     </message>
-</context>
-<context>
-    <name>ConstructWindow</name>
     <message id="select-ship-nation">
         <location filename="../ClientGUI/ui/factory/constructwindow.ui" line="34"/>
         <source>Select Ship Nationality:</source>
@@ -3554,9 +3538,6 @@ Great at battle and bad at politics--so cool!</translation>
         <oldsource>Consturct Ships</oldsource>
         <translation type="unfinished">Construct Ships</translation>
     </message>
-</context>
-<context>
-    <name>DevelopWindow</name>
     <message id="or-enter-equipment-id">
         <location filename="../ClientGUI/ui/factory/developwindow.ui" line="88"/>
         <source>Or Enter Equipment ID:</source>
@@ -3595,30 +3576,6 @@ Great at battle and bad at politics--so cool!</translation>
         <source>Develop Equipment</source>
         <translation type="unfinished">Develop Equipment</translation>
     </message>
-</context>
-<context>
-    <name>EquipView</name>
-    <message>
-        <location filename="../ClientGUI/ui/views/equipview.ui" line="14"/>
-        <source>Form</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>FactoryArea</name>
-    <message>
-        <location filename="../ClientGUI/ui/factory/factoryarea.ui" line="14"/>
-        <source>Frame</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../ClientGUI/ui/factory/factoryarea.ui" line="34"/>
-        <source>Equipment Development</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>FleetView</name>
     <message id="load-fleet-wait">
         <location filename="../ClientGUI/ui/fleet/fleetview.ui" line="235"/>
         <source>Loading Fleets, please wait...</source>
@@ -3659,36 +3616,6 @@ Great at battle and bad at politics--so cool!</translation>
         <source>Save</source>
         <translation type="unfinished"></translation>
     </message>
-    <message id="fleetview-fleetexp">
-        <source>Expedition Fleet:</source>
-        <translation type="obsolete">Expedition Fleet:</translation>
-    </message>
-    <message>
-        <location filename="../ClientGUI/ui/fleet/fleetview.ui" line="14"/>
-        <source>Form</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message id="switch-to-escort">
-        <source>Switch to escort</source>
-        <translation type="obsolete">Switch to escort</translation>
-    </message>
-</context>
-<context>
-    <name>LicenseArea</name>
-    <message>
-        <location filename="../ClientGUI/ui/port/licensearea.ui" line="20"/>
-        <source>Frame</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../ClientGUI/ui/port/licensearea.ui" line="115"/>
-        <source>Continue</source>
-        <extracomment>License Continue</extracomment>
-        <translation type="unfinished">Continue</translation>
-    </message>
-</context>
-<context>
-    <name>MainWindow</name>
     <message id="arsenal">
         <location filename="../ClientGUI/ui/mainwindow.ui" line="343"/>
         <location filename="../ClientGUI/ui/factory/factoryarea.cpp" line="178"/>
@@ -3715,10 +3642,6 @@ Great at battle and bad at politics--so cool!</translation>
         <location filename="../ClientGUI/ui/mainwindow.ui" line="259"/>
         <source>Fleet</source>
         <translation type="unfinished">Fleet</translation>
-    </message>
-    <message id="menu-dock">
-        <source>Dock</source>
-        <translation type="obsolete">Dock</translation>
     </message>
     <message id="menu-factory">
         <location filename="../ClientGUI/ui/mainwindow.ui" line="272"/>
@@ -3806,28 +3729,6 @@ Great at battle and bad at politics--so cool!</translation>
         <source>Repair</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
-        <source>CyberFleet GUI</source>
-        <translation type="vanished">CyberFleet GUI</translation>
-    </message>
-    <message>
-        <location filename="../ClientGUI/ui/mainwindow.ui" line="69"/>
-        <location filename="../ClientGUI/ui/mainwindow.ui" line="76"/>
-        <location filename="../ClientGUI/ui/mainwindow.ui" line="83"/>
-        <location filename="../ClientGUI/ui/mainwindow.ui" line="90"/>
-        <location filename="../ClientGUI/ui/mainwindow.ui" line="97"/>
-        <location filename="../ClientGUI/ui/mainwindow.ui" line="104"/>
-        <location filename="../ClientGUI/ui/mainwindow.ui" line="111"/>
-        <location filename="../ClientGUI/ui/mainwindow.ui" line="118"/>
-        <location filename="../ClientGUI/ui/mainwindow.ui" line="125"/>
-        <location filename="../ClientGUI/ui/mainwindow.ui" line="132"/>
-        <location filename="../ClientGUI/ui/mainwindow.ui" line="139"/>
-        <location filename="../ClientGUI/ui/mainwindow.ui" line="146"/>
-        <location filename="../ClientGUI/ui/mainwindow.ui" line="153"/>
-        <location filename="../ClientGUI/ui/mainwindow.ui" line="160"/>
-        <source>TextLabel</source>
-        <translation></translation>
-    </message>
     <message id="menu-maintenance">
         <location filename="../ClientGUI/ui/mainwindow.ui" line="265"/>
         <source>Maintenance</source>
@@ -3836,23 +3737,8 @@ Great at battle and bad at politics--so cool!</translation>
     <message id="ui-supply">
         <location filename="../ClientGUI/ui/mainwindow.ui" line="393"/>
         <source>Supply</source>
-        <translation>Supply</translation>
+        <translation type="unfinished">Supply</translation>
     </message>
-    <message id="menu-refit">
-        <source>Refit</source>
-        <translation type="vanished">Refit</translation>
-    </message>
-</context>
-<context>
-    <name>MapDetail</name>
-    <message>
-        <location filename="../ClientGUI/ui/sortie/mapdetail.ui" line="14"/>
-        <source>Form</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>NewLoginS</name>
     <message id="login-options-server">
         <location filename="../ClientGUI/ui/port/newlogins.ui" line="58"/>
         <source>Server:</source>
@@ -3868,41 +3754,6 @@ Great at battle and bad at politics--so cool!</translation>
         <source>Connect</source>
         <translation type="unfinished">Connect</translation>
     </message>
-    <message>
-        <location filename="../ClientGUI/ui/port/newlogins.ui" line="14"/>
-        <source>Frame</source>
-        <translation></translation>
-    </message>
-</context>
-<context>
-    <name>PortArea</name>
-    <message>
-        <location filename="../ClientGUI/ui/port/portarea.ui" line="23"/>
-        <source>PortArea</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../ClientGUI/ui/port/portarea.ui" line="49"/>
-        <source>Hello!</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>Repair</name>
-    <message>
-        <location filename="../ClientGUI/ui/maintenance/repair.ui" line="14"/>
-        <source>Form</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../ClientGUI/ui/maintenance/repair.ui" line="31"/>
-        <source>Repair Ships</source>
-        <extracomment>ui-repair</extracomment>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>SettingsWindow</name>
     <message id="language-label">
         <location filename="../ClientGUI/ui/settingswindow.ui" line="22"/>
         <source>Language (need restart):</source>
@@ -3913,74 +3764,12 @@ Great at battle and bad at politics--so cool!</translation>
         <source>Client settings registry</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
-        <location filename="../ClientGUI/ui/settingswindow.ui" line="14"/>
-        <source>Dialog</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>ShipDisplay</name>
-    <message>
-        <location filename="../ClientGUI/ui/fleet/shipdisplay.ui" line="14"/>
-        <source>Form</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../ClientGUI/ui/fleet/shipdisplay.ui" line="72"/>
-        <source>%v/%m</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../ClientGUI/ui/fleet/shipdisplay.ui" line="79"/>
-        <source>Te</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../ClientGUI/ui/fleet/shipdisplay.ui" line="96"/>
-        <source>Lv 0</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>ShipDisplayFlat</name>
-    <message>
-        <location filename="../ClientGUI/ui/fleet/shipdisplayflat.ui" line="26"/>
-        <source>Form</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../ClientGUI/ui/fleet/shipdisplayflat.ui" line="79"/>
-        <source>%v/%m</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../ClientGUI/ui/fleet/shipdisplayflat.ui" line="86"/>
-        <source>Te</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../ClientGUI/ui/fleet/shipdisplayflat.ui" line="101"/>
-        <source>Lv 0</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>ShipEquip</name>
     <message id="empty-equip-slot">
         <location filename="../ClientGUI/ui/fleet/shipequip.ui" line="93"/>
         <location filename="../ClientGUI/ui/fleet/shipequip.cpp" line="149"/>
         <source>Empty</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
-        <location filename="../ClientGUI/ui/fleet/shipequip.ui" line="14"/>
-        <source>Form</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>Sortie</name>
     <message id="selected-map">
         <location filename="../ClientGUI/ui/sortie/sortie.ui" line="107"/>
         <source>Selected Map:</source>
@@ -3991,26 +3780,12 @@ Great at battle and bad at politics--so cool!</translation>
         <source>Weigh Anchor!</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
-        <location filename="../ClientGUI/ui/sortie/sortie.ui" line="14"/>
-        <source>Form</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../ClientGUI/ui/sortie/sortie.ui" line="77"/>
-        <source>Difficulty:</source>
-        <extracomment>map-diff</extracomment>
-        <translation type="unfinished"></translation>
-    </message>
     <message id="selected-map-id">
         <location filename="../ClientGUI/ui/sortie/sortie.ui" line="114"/>
         <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="256"/>
         <source>None</source>
         <translation type="unfinished"></translation>
     </message>
-</context>
-<context>
-    <name>TechView</name>
     <message id="techview-globaltech">
         <location filename="../ClientGUI/ui/techview.ui" line="24"/>
         <source>GlobalTech:</source>
@@ -4086,6 +3861,220 @@ Great at battle and bad at politics--so cool!</translation>
         <source>Ship:</source>
         <translation type="unfinished">Ship:</translation>
     </message>
+</context>
+<context>
+    <name>ChooseHomePort</name>
+    <message>
+        <location filename="../ClientGUI/ui/port/choosehomeport.ui" line="14"/>
+        <source>Dialog</source>
+        <translation></translation>
+    </message>
+</context>
+<context>
+    <name>EquipView</name>
+    <message>
+        <location filename="../ClientGUI/ui/views/equipview.ui" line="14"/>
+        <source>Form</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>FactoryArea</name>
+    <message>
+        <location filename="../ClientGUI/ui/factory/factoryarea.ui" line="14"/>
+        <source>Frame</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ClientGUI/ui/factory/factoryarea.ui" line="34"/>
+        <source>Equipment Development</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>FleetView</name>
+    <message id="fleetview-fleetexp">
+        <source>Expedition Fleet:</source>
+        <translation type="obsolete">Expedition Fleet:</translation>
+    </message>
+    <message>
+        <location filename="../ClientGUI/ui/fleet/fleetview.ui" line="14"/>
+        <source>Form</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="switch-to-escort">
+        <source>Switch to escort</source>
+        <translation type="obsolete">Switch to escort</translation>
+    </message>
+</context>
+<context>
+    <name>LicenseArea</name>
+    <message>
+        <location filename="../ClientGUI/ui/port/licensearea.ui" line="20"/>
+        <source>Frame</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ClientGUI/ui/port/licensearea.ui" line="115"/>
+        <source>Continue</source>
+        <extracomment>License Continue</extracomment>
+        <translation type="unfinished">Continue</translation>
+    </message>
+</context>
+<context>
+    <name>MainWindow</name>
+    <message id="menu-dock">
+        <source>Dock</source>
+        <translation type="obsolete">Dock</translation>
+    </message>
+    <message>
+        <source>CyberFleet GUI</source>
+        <translation type="vanished">CyberFleet GUI</translation>
+    </message>
+    <message>
+        <location filename="../ClientGUI/ui/mainwindow.ui" line="69"/>
+        <location filename="../ClientGUI/ui/mainwindow.ui" line="76"/>
+        <location filename="../ClientGUI/ui/mainwindow.ui" line="83"/>
+        <location filename="../ClientGUI/ui/mainwindow.ui" line="90"/>
+        <location filename="../ClientGUI/ui/mainwindow.ui" line="97"/>
+        <location filename="../ClientGUI/ui/mainwindow.ui" line="104"/>
+        <location filename="../ClientGUI/ui/mainwindow.ui" line="111"/>
+        <location filename="../ClientGUI/ui/mainwindow.ui" line="118"/>
+        <location filename="../ClientGUI/ui/mainwindow.ui" line="125"/>
+        <location filename="../ClientGUI/ui/mainwindow.ui" line="132"/>
+        <location filename="../ClientGUI/ui/mainwindow.ui" line="139"/>
+        <location filename="../ClientGUI/ui/mainwindow.ui" line="146"/>
+        <location filename="../ClientGUI/ui/mainwindow.ui" line="153"/>
+        <location filename="../ClientGUI/ui/mainwindow.ui" line="160"/>
+        <source>TextLabel</source>
+        <translation></translation>
+    </message>
+    <message id="menu-refit">
+        <source>Refit</source>
+        <translation type="vanished">Refit</translation>
+    </message>
+</context>
+<context>
+    <name>MapDetail</name>
+    <message>
+        <location filename="../ClientGUI/ui/sortie/mapdetail.ui" line="14"/>
+        <source>Form</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>NewLoginS</name>
+    <message>
+        <location filename="../ClientGUI/ui/port/newlogins.ui" line="14"/>
+        <source>Frame</source>
+        <translation></translation>
+    </message>
+</context>
+<context>
+    <name>PortArea</name>
+    <message>
+        <location filename="../ClientGUI/ui/port/portarea.ui" line="23"/>
+        <source>PortArea</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ClientGUI/ui/port/portarea.ui" line="49"/>
+        <source>Hello!</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>Repair</name>
+    <message>
+        <location filename="../ClientGUI/ui/maintenance/repair.ui" line="14"/>
+        <source>Form</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ClientGUI/ui/maintenance/repair.ui" line="31"/>
+        <source>Repair Ships</source>
+        <extracomment>ui-repair</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>SettingsWindow</name>
+    <message>
+        <location filename="../ClientGUI/ui/settingswindow.ui" line="14"/>
+        <source>Dialog</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>ShipDisplay</name>
+    <message>
+        <location filename="../ClientGUI/ui/fleet/shipdisplay.ui" line="14"/>
+        <source>Form</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ClientGUI/ui/fleet/shipdisplay.ui" line="72"/>
+        <source>%v/%m</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ClientGUI/ui/fleet/shipdisplay.ui" line="79"/>
+        <source>Te</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ClientGUI/ui/fleet/shipdisplay.ui" line="96"/>
+        <source>Lv 0</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>ShipDisplayFlat</name>
+    <message>
+        <location filename="../ClientGUI/ui/fleet/shipdisplayflat.ui" line="26"/>
+        <source>Form</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ClientGUI/ui/fleet/shipdisplayflat.ui" line="79"/>
+        <source>%v/%m</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ClientGUI/ui/fleet/shipdisplayflat.ui" line="86"/>
+        <source>Te</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ClientGUI/ui/fleet/shipdisplayflat.ui" line="101"/>
+        <source>Lv 0</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>ShipEquip</name>
+    <message>
+        <location filename="../ClientGUI/ui/fleet/shipequip.ui" line="14"/>
+        <source>Form</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>Sortie</name>
+    <message>
+        <location filename="../ClientGUI/ui/sortie/sortie.ui" line="14"/>
+        <source>Form</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ClientGUI/ui/sortie/sortie.ui" line="77"/>
+        <source>Difficulty:</source>
+        <extracomment>map-diff</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>TechView</name>
     <message>
         <location filename="../ClientGUI/ui/techview.ui" line="14"/>
         <source>Frame</source>

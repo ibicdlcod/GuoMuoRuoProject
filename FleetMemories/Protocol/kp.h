@@ -9,6 +9,7 @@
 #define SALT_FISH __FILE__ QT_STRINGIFY(:__LINE__: This is a salt fish.)
 #define SECRET __FILE__ QT_STRINGIFY(:__LINE__: Go make your own steam app if modding!)
 #define USED_CXX17 __FILE__ QT_STRINGIFY(:__LINE__: This part uses C++ 17 features. Use macro "__cplusplus" to check whether your compiler supports it.)
+#define USED_CXX23 __FILE__ QT_STRINGIFY(:__LINE__: This part uses C++ 23 features. Use macro "__cplusplus" to check whether your compiler supports it.)
 
 #include <QObject>
 #include <QJsonObject>
@@ -605,6 +606,7 @@ QByteArray clientSteamLogout();
 QByteArray clientTestMessages(int);
 
 /* factoryslot, repairslot */
+#pragma message(USED_CXX23)
 static constexpr std::tuple<int, int> getDesiredSlots(int mapsOpened) {
     if(mapsOpened < 0) {
         return {0, 0};
