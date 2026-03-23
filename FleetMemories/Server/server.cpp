@@ -4059,10 +4059,8 @@ award_industrial_points:
                                      lastSettleTime.date().month(),
                                      1));
         lastSettleTime.setTime(QTime(0, 0, 0));
-        qCritical() << lastSettleTime;
         if(lastSettleTime < QDateTime::currentDateTimeUtc())
         {
-            qWarning() << QDateTime::currentDateTimeUtc();
             {
                 QSqlQuery query;
                 query.prepare("UPDATE UserRanking "
