@@ -334,7 +334,7 @@ Q_GLOBAL_STATIC(QString,
                     ");"
                     ))
 
-/* Drop info of users */
+/* Map state info of users */
 Q_GLOBAL_STATIC(QString,
                 userMapState,
                 QStringLiteral(
@@ -356,6 +356,19 @@ Q_GLOBAL_STATIC(QString,
                     "FOREIGN KEY(User) REFERENCES NewUsers(UserID), "
                     "FOREIGN KEY(MapDef) REFERENCES MapNode(MapID) "
                     "CONSTRAINT noduplicate UNIQUE(User, MapDef) "
+                    ");"
+                    ))
+
+/* Ranking info of users */
+Q_GLOBAL_STATIC(QString,
+                userRanking,
+                QStringLiteral(
+                    "CREATE TABLE UserRanking ("
+                    "User BLOB NOT NULL, "
+                    "CurrentVP FLOAT NOT NULL DEFAULT 0, " // Victory points
+                    "PreviousVP FLOAT NOT NULL DEFAULT 0, "
+                    "Industrial FLOAT NOT NULL DEFAULT 0, "
+                    "FOREIGN KEY(User) REFERENCES NewUsers(UserID) "
                     ");"
                     ))
 
@@ -2781,6 +2794,7 @@ void Server::exitGraceSpec() {
 
 bool Server::exportEquipToCSV() const {
     QString csvFileName = settings->value("server/equip_reg_csv", "Equip.csv").toString();
+    /* TODO: eliminate raw new/delete when possible */
     QFile *csvFile = new QFile(csvFileName);
     if(Q_UNLIKELY(!csvFile) || !csvFile->open(QIODevice::WriteOnly)) {
         //% "%1: CSV file cannot be opened"
@@ -4035,6 +4049,17 @@ subtract_kc_exp:
             throw DBError(qtTrId("penalize-cond-failed"), query.lastError());
         }
     }
+    award_industrial_points:
+    /*
+     * UPDATE UserRanking
+SET Industrial = (
+SELECT ln(COUNT(*))
+FROM UserRanking) + (
+SELECT COALESCE(COUNT(*)*ln(COUNT(*)),0)
+- (COUNT(*)+1)*ln(COUNT(*)+1)
+FROM UserRanking a
+WHERE a.CurrentVP > UserRanking.CurrentVP)+1
+*/
 }
 
 QList<std::tuple<QUuid, int>> Server::modernize(
@@ -6041,6 +6066,9 @@ void Server::sqlinit() const {
         if(!tables.contains("UserMapState")) {
             sqlinitUserM();
         }
+        if(!tables.contains("UserRanking")) {
+            sqlinitRank();
+        }
     }
 }
 
@@ -6161,6 +6189,18 @@ void Server::sqlinitMapResource() const {
     if(!query.exec()) {
         //% "Create Map resource database failed."
         throw DBError(qtTrId("map-resource-db-gen-failure"),
+                      query.lastError());
+    }
+}
+
+void Server::sqlinitRank() const {
+    //% "Ranking database does not exist, creating..."
+    qWarning() << qtTrId("ranking-lack");
+    QSqlQuery query;
+    query.prepare(*userRanking);
+    if(!query.exec()) {
+        //% "Create Ranking database failed."
+        throw DBError(qtTrId("ranking-db-gen-failure"),
                       query.lastError());
     }
 }
@@ -6686,6 +6726,7 @@ KP::FleetFailType Server::updateFleet(const CSteamID &uid, const QJsonArray &inp
 }
 
 void Server::userInit(const CSteamID &uid) {
+    user_attr:
     static const QMap<QString, int> defaults
             = {
         std::pair(QStringLiteral("FleetSize"), 1),
@@ -6703,6 +6744,7 @@ void Server::userInit(const CSteamID &uid) {
         std::pair(QStringLiteral("ActiveFleet"), 0),
         std::pair(QStringLiteral("InBattle"), KP::NoBattle)
     };
+    user_attr_sql:
     {
         QSqlQuery insert;
         for (auto i = defaults.cbegin(), end = defaults.cend();
@@ -6723,6 +6765,7 @@ void Server::userInit(const CSteamID &uid) {
             }
         }
     }
+    natural_regen_time:
     {
         QSqlQuery insertTime;
         if(!insertTime.prepare("INSERT INTO UserAttr "
@@ -6742,7 +6785,7 @@ void Server::userInit(const CSteamID &uid) {
             return;
         }
     }
-
+factory:
     for(int i = 0; i < KP::initFactory(); ++i) {
         QSqlQuery factoryNew;
         if(!factoryNew.prepare("INSERT INTO Factories "
@@ -6761,7 +6804,7 @@ void Server::userInit(const CSteamID &uid) {
             return;
         }
     }
-
+dock:
     for(int i = 0; i < KP::initDock(); ++i) {
         QSqlQuery factoryNew;
         if(!factoryNew.prepare("INSERT INTO Docks "
@@ -6780,7 +6823,7 @@ void Server::userInit(const CSteamID &uid) {
             return;
         }
     }
-
+fleet_status:
     for(int i = 0; i < KP::fleetsSize; ++i) {
         QSqlQuery insert;
         if(!insert.prepare("INSERT INTO UserAttr "
@@ -6796,6 +6839,21 @@ void Server::userInit(const CSteamID &uid) {
             //% "Set User Fleet Up failed!"
             throw DBError(qtTrId("init-userfleet-failed"),
                           insert.lastError());
+            return;
+        }
+    }
+    rank:
+    {
+        QSqlQuery rankInfo;
+        rankInfo.prepare("INSERT INTO UserRanking "
+                               "(User) "
+                               "VALUES (:uid);");
+        rankInfo.bindValue(":uid", uid.ConvertToUint64());
+        if(!rankInfo.exec()) {
+            //% "%1: User rank init failure!"
+            throw DBError(qtTrId("user-rank-init-fail").
+                          arg(uid.ConvertToUint64()),
+                          rankInfo.lastError());
             return;
         }
     }

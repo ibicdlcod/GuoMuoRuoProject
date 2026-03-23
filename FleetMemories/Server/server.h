@@ -147,6 +147,7 @@ private:
     void sqlinitMapNode() const;
     void sqlinitMapRelation() const;
     void sqlinitMapResource() const;
+    void sqlinitRank() const;
     void sqlinitShip() const;
     void sqlinitShipDrop() const;
     void sqlinitShipName() const;

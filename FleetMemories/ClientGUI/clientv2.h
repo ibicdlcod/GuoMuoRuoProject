@@ -251,7 +251,7 @@ public:
     QMap<int, double> mapSupremacies;
 private:
     QHttpServer migrateServer;
-    QTcpServer *tcpServer = new QTcpServer();
+    std::unique_ptr<QTcpServer> tcpServer = std::make_unique<QTcpServer>();
 
     ResourceFetch resourceFetcher;
     int downloadCompleted = 0;

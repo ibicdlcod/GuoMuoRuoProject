@@ -26,7 +26,8 @@ public:
     Ship * getCurrentShip(const QModelIndex &index) const;
 
 private:
-    QMap<int, Ship *> *ships;
+    std::unique_ptr<QMap<int, Ship *>> ships
+        = std::make_unique<QMap<int, Ship *>>();
 };
 
 #endif // SHIPDEFMODEL_H

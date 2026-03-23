@@ -15,7 +15,7 @@
 #include "../Protocol/kp.h"
 #include "ui/boxcenterfusionstyle.h"
 
-QFile *logFile;
+std::unique_ptr<QFile> logFile;
 std::unique_ptr<QSettings> settings;
 
 namespace {
@@ -50,12 +50,13 @@ int main(int argc, char *argv[]) {
     client.setOrganizationDomain("fleetmemories.moe"); // temp
     /* End Metadata */
 
-    settings = std::make_unique<QSettings>(new QSettings);
+    settings = std::make_unique<QSettings>();
 
     /* Display style */
-    BoxCenterFusionStyle *style = new BoxCenterFusionStyle();
+    std::unique_ptr<BoxCenterFusionStyle> style
+        = std::make_unique<BoxCenterFusionStyle>();
     style->setBaseStyle(QStyleFactory::create("Fusion"));
-    QApplication::setStyle(style);
+    QApplication::setStyle(style.get());
 
     /* Multilingual Support */
 #if defined(Q_OS_UNIX)

@@ -61,7 +61,7 @@ MainWindow::MainWindow(QWidget *parent, int argc, char ** argv)
     ui->TungstenCount->setText(QStringLiteral("0"));
     ui->ChromiumCount->setText(QStringLiteral("0"));
 
-    KeyEnterReceiver *key = new KeyEnterReceiver();
+    KeyEnterReceiver *key = new KeyEnterReceiver(this);
     ui->CommandPrompt->installEventFilter(key);
 
     Clientv2 &engine = Clientv2::getInstance();

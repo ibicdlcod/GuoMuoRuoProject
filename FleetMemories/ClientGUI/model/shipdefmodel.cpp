@@ -8,12 +8,10 @@
 ShipDefModel::ShipDefModel(QObject *parent)
     : QAbstractListModel(parent)
 {
-    ships = new QMap<int, Ship *>();
 }
 
 ShipDefModel::~ShipDefModel()
 {
-    delete ships;
 }
 
 int ShipDefModel::rowCount(const QModelIndex &parent) const

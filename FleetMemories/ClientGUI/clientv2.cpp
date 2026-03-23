@@ -11,7 +11,7 @@
 #include "networkerror.h"
 #include "steamauth.h"
 
-extern QFile *logFile;
+extern std::unique_ptr<QFile> logFile;
 extern std::unique_ptr<QSettings> settings;
 
 /* Initialize client and do necessary connections */
@@ -66,7 +66,8 @@ Clientv2::Clientv2(QObject *parent)
                                 responder.write("导出失败", "text/plain");
                             }
                         });
-    if(!tcpServer->listen(QHostAddress::LocalHost, 3411) || !migrateServer.bind(tcpServer)) {
+    if(!tcpServer->listen(QHostAddress::LocalHost, 3411)
+        || !migrateServer.bind(tcpServer.get())) {
         //% "Internal server initalize failed!"
         qCritical() << qtTrId("internal-server-fail");
     }
@@ -1852,7 +1853,7 @@ void customMessageHandler(QtMsgType type,
     if(txt.contains(QChar('\0'))) {
         qFatal("Log Error");
     }
-    QTextStream textStream(logFile);
+    QTextStream textStream(logFile.get());
     txt.remove(QChar('\r'), Qt::CaseInsensitive);
     txt = QStringLiteral("[%1] %2\n").arg(dt, txt);
     textStream << txt;

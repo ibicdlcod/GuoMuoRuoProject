@@ -284,12 +284,12 @@ void Sortie::dealWithNode(const MapNode &node, int nodeId) {
         if (timer.isActive()) {
             timer.stop();
             // Signal was received within the timeout
-            BattlePlan *plan = new BattlePlan();
+            std::unique_ptr<BattlePlan> plan
+                = std::make_unique<BattlePlan>();
             while(plan->exec() != QDialog::Accepted) {
                 ;
             }
             /* TODO: extract info from battleplan */
-            delete plan;
             QJsonObject planinfo;
             engine.doBattle(planinfo);
             break;
