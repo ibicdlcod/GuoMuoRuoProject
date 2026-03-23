@@ -4101,7 +4101,7 @@ award_industrial_points:
             }
         }
         settings->setValue("server/nextsettleranktime",
-                           lastSettleTime.addSecs(1));
+                           lastSettleTime.addMonths(1));
     } catch (DBError &e) {
         for(QString &i : e.whats()) {
             qCritical() << i;
