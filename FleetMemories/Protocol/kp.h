@@ -222,7 +222,8 @@ enum FactoryState{
     Construction,
     Arsenal,
     Anchorage,
-    BlueprintView
+    BlueprintView,
+    RankView,
 };
 Q_ENUM_NS(FactoryState)
 

@@ -12,6 +12,7 @@
 #include <QToolButton>
 #include <QWidget>
 #include <QLineEdit>
+#include <QStackedLayout>
 #include "../../model/equipmodel.h"
 #include "selectdelegate.h"
 #include "hpdelegate.h"
@@ -45,7 +46,8 @@ public:
     explicit EquipView(QWidget *parent = nullptr);
     ~EquipView();
 
-    void activate(bool arsenal = true, bool isEquip = true, bool isBP = false);
+    void activate(bool arsenal = true, bool isEquip = true,
+                  std::optional<KP::FactoryState> custom = std::nullopt);
     void enactPageNumChange(int currentPageNum, int totalPageNum);
 
 public slots:
@@ -82,11 +84,9 @@ private:
     QToolButton *lastButton;
     QPushButton *unselectButton;
 
-    /* equip */
     EquipSelect *equipSelect;
-
-    /* ship */
     ShipSelect *shipSelect;
+    QStackedLayout *lay;
 };
 
 #endif // EQUIPVIEW_H

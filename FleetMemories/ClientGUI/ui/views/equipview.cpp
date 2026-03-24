@@ -88,9 +88,11 @@ EquipView::EquipView(QWidget *parent)
     layout->addWidget(lastButton);
     layout->addWidget(unselectButton);
     layout->setContentsMargins(0,0,0,0);
+    lay = new QStackedLayout();
+    lay->addWidget(equipSelect);
+    lay->addWidget(shipSelect);
     QVBoxLayout *layout2 = ui->Navigator;
-    layout2->addWidget(equipSelect, 1, Qt::AlignHCenter);
-    layout2->addWidget(shipSelect, 1, Qt::AlignHCenter);
+    layout2->addLayout(lay, 1);
     layout2->addWidget(layoutWidget, 1, Qt::AlignHCenter);
     layout2->setContentsMargins(0,0,0,0);
     layout2->setSpacing(1);
@@ -127,7 +129,7 @@ EquipView::EquipView(QWidget *parent)
             shipSelect, &ShipSelect::typeBoxHinted);
     connect(&engine.shipBPModel, &ShipModel::classBoxHint,
             shipSelect, &ShipSelect::classBoxHinted);
-        /*
+    /*
     connect(&engine, &Clientv2::uiRefreshSig,
             this, &EquipView::recalculateArsenalRows);
 */
@@ -204,7 +206,8 @@ void EquipView::pageNumChangedLambda(int current, int total) {
     update();
 }
 
-void EquipView::activate(bool arsenal, bool isEquip, bool isBP) {
+void EquipView::activate(bool arsenal, bool isEquip,
+                         std::optional<KP::FactoryState> custom) {
     arsenalView->setItemDelegateForColumn(model->selectColumn(),
                                           new QStyledItemDelegate());
     arsenalView->setItemDelegateForColumn(model->hpColumn(),
@@ -236,49 +239,55 @@ void EquipView::activate(bool arsenal, bool isEquip, bool isBP) {
         unselectButton->hide();
     }
     if(isEquip) {
-        equip:
-        model = &engine.equipModel;
-        arsenalView->setModel(model);
-        if(!model->isReady()) {
-            pageLabel->setText(qtTrId("retrieving-please-wait"));
-            engine.doRefreshFactoryArsenal();
-            arsenalView->hide();
-        }
-        else {
-            arsenalView->show();
-        }
-        if(arsenal) {
-            model->filterByShip(nullptr, false);
-            model->setIsInArsenal(true);
-            model->unsetShip();
-            equipSelect->destructButton->show();
-            equipSelect->addStarButton->show();
-        }
-        else {
-            model->setIsInArsenal(false);
-            arsenalView->setItemDelegateForColumn(model->selectColumn(),
-                                                  delegate);
-            connect(delegate, &SelectDelegate::itemSelected,
-                    this, &EquipView::itemSelected);
+        if(custom == KP::RankView) {
             equipSelect->destructButton->hide();
             equipSelect->addStarButton->hide();
-            unselectButton->show();
-            connect(unselectButton, &QPushButton::clicked,
-                    this, [this]{emit equipSelected(QUuid());
-                                 hide();});
+            lay->setCurrentWidget(equipSelect);
         }
-        recalculateArsenalRows();
-        connect(model, SIGNAL(needReCalculateRows()),
-                this, SLOT(recalculateArsenalRows()),
-                Qt::UniqueConnection);
-        connect(this, SIGNAL(rowCountHint(int)),
-                model, SLOT(setRowsPerPageHint(int)),
-                Qt::UniqueConnection);
-        equipSelect->show();
-        shipSelect->hide();
+        else {
+        equip:
+            model = &engine.equipModel;
+            arsenalView->setModel(model);
+            if(!model->isReady()) {
+                pageLabel->setText(qtTrId("retrieving-please-wait"));
+                engine.doRefreshFactoryArsenal();
+                arsenalView->hide();
+            }
+            else {
+                arsenalView->show();
+            }
+            if(arsenal) {
+                model->filterByShip(nullptr, false);
+                model->setIsInArsenal(true);
+                model->unsetShip();
+                equipSelect->destructButton->show();
+                equipSelect->addStarButton->show();
+            }
+            else {
+                model->setIsInArsenal(false);
+                arsenalView->setItemDelegateForColumn(model->selectColumn(),
+                                                      delegate);
+                connect(delegate, &SelectDelegate::itemSelected,
+                        this, &EquipView::itemSelected);
+                equipSelect->destructButton->hide();
+                equipSelect->addStarButton->hide();
+                unselectButton->show();
+                connect(unselectButton, &QPushButton::clicked,
+                        this, [this]{emit equipSelected(QUuid());
+                                 hide();});
+            }
+            recalculateArsenalRows();
+            connect(model, SIGNAL(needReCalculateRows()),
+                    this, SLOT(recalculateArsenalRows()),
+                    Qt::UniqueConnection);
+            connect(this, SIGNAL(rowCountHint(int)),
+                    model, SLOT(setRowsPerPageHint(int)),
+                    Qt::UniqueConnection);
+            lay->setCurrentWidget(equipSelect);
+        }
     }
     else {
-        if(!isBP) {
+        if(custom != KP::BlueprintView) {
         ship:
             model = &engine.shipModel;
             arsenalView->setModel(model);
@@ -315,8 +324,7 @@ void EquipView::activate(bool arsenal, bool isEquip, bool isBP) {
             connect(this, SIGNAL(rowCountHint(int)),
                     model, SLOT(setRowsPerPageHint(int)),
                     Qt::UniqueConnection);
-            equipSelect->hide();
-            shipSelect->show();
+            lay->setCurrentWidget(shipSelect);
         }
         else {
         blueprint_view:
@@ -339,8 +347,7 @@ void EquipView::activate(bool arsenal, bool isEquip, bool isBP) {
             connect(this, SIGNAL(rowCountHint(int)),
                     model, SLOT(setRowsPerPageHint(int)),
                     Qt::UniqueConnection);
-            equipSelect->hide();
-            shipSelect->show();
+            lay->setCurrentWidget(shipSelect);
         }
     }
     connect(model, &EquipModel::pageNumChanged,

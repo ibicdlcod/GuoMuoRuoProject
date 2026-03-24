@@ -4983,6 +4983,25 @@ update_exp:
             }
         }
     }
+ranking_exp:
+    /* TODO: may changed to a more complicated method of offer points
+     * for ranking in each map in the future */
+    {
+        QSqlQuery query;
+        query.prepare("UPDATE UserRanking "
+                      "SET CurrentVP = CurrentVP + :amount "
+                      "WHERE User = :uid;");
+        query.bindValue(":uid", uid.ConvertToUint64());
+        query.bindValue(":amount", expGained);
+        if(Q_UNLIKELY(!query.exec())) {
+            qCritical() << query.lastQuery();
+            //% "User %1: add ranking exp failed!"
+            throw DBError(qtTrId("rank-add-exp-failed")
+                          .arg(uid.ConvertToUint64()),
+                          query.lastError());
+            return;
+        }
+    }
 }
 
 const QJsonObject Server::processBattleCore(const CSteamID &uid,

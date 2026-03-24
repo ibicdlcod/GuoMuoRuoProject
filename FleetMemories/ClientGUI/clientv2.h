@@ -48,7 +48,8 @@ public:
         registering,
         confirm
     };
-    Q_ENUM(Password);
+    Q_ENUM(Password)
+
     void enterBattle();
     bool isInBattle() const;
     bool isEquipRegistryCacheGood() const;

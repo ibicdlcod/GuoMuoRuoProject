@@ -400,6 +400,7 @@ void TechView::updateLocalTechViewTable(const QJsonObject &djson) {
 }
 
 void TechView::updateSkillPoints(const QJsonObject &djson) {
+    qWarning() << "FUCK" << djson;
     emit skillPointInfo(djson["equipid"].toInt(), djson["actualSP"].toInt());
     ui->skillPointsValue->setText(QString("%1/%2")
                                       .arg(djson["actualSP"].toInteger())

@@ -347,7 +347,8 @@ QVariant EquipModel::data(const QModelIndex &index, int role) const {
     Equipment *equipToDisplay = clientEquips[uidToDisplay];
     int starToDisplay = clientEquipStars[uidToDisplay];
     int additionalStar = 0;
-    if(skillPointReg.contains(equipToDisplay->getId())) {
+    if(index.column() == starCol
+        && skillPointReg.contains(equipToDisplay->getId())) {
         additionalStar =
             skillPointReg[equipToDisplay->getId()]
             / equipToDisplay->skillPointsStd();
@@ -774,7 +775,10 @@ void EquipModel::updateEquipmentList(const QJsonObject &input) {
 void EquipModel::wholeTableChanged() {
     if(isEquipModel) {
         QSet<int> defs;
-        for(auto equipId: sortedEquipIds) {
+        for(int realRowIndex = 0 + rowsPerPage * pageNum;
+             realRowIndex < rowCount() + rowsPerPage * pageNum;
+             realRowIndex++) {
+            const QUuid &equipId = sortedEquipIds[realRowIndex];
             int def = clientEquips[equipId]->getId();
             defs.insert(def);
         }
@@ -838,10 +842,11 @@ void EquipModel::filterByShip(Ship *ship, bool isSlotEX)
 
 void EquipModel::processSkillPointInfo(int equipDef, int skillPoint) {
     skillPointReg[equipDef] = skillPoint;
-    QModelIndex topleft = this->index(0, 0);
-    QModelIndex bottomright = this->index(rowCount() - 1, columnCount() - 1);
+    QModelIndex topleft = this->index(0, starCol);
+    QModelIndex bottomright = this->index(rowCount() - 1, starCol);
     if(rowCount() > 0 && columnCount() > 0) {
-        emit dataChanged(topleft, bottomright, QList<int>());
+        emit dataChanged(topleft, bottomright, {Qt::ToolTipRole,
+                                                Qt::DisplayRole});
     }
 }
 

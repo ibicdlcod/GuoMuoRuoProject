@@ -50,10 +50,13 @@ FactoryArea::FactoryArea(QWidget *parent) :
     lay->addWidget(slotControl);
     ui->ArsenalArea->setLayout(lay);
 
-    for(auto iter = slotfs.begin(); iter < slotfs.end(); ++iter) {
-        connect((*iter), &FactorySlot::clickedSpec,
+    rankView = new RankView();
+    lay->addWidget(rankView);
+
+    for(const auto &slot: slotfs) {
+        connect(slot, &FactorySlot::clickedSpec,
                 this, &FactoryArea::developClicked);
-        (*iter)->setStatus();
+        slot->setStatus();
     }
     dev.setAttribute(Qt::WA_DeleteOnClose, false);
     con.setAttribute(Qt::WA_DeleteOnClose, false);
@@ -79,6 +82,11 @@ void FactoryArea::stackResize(int) {
         ui->ArsenalArea->setMaximumHeight(200);
     }
     else if(lay->currentWidget() == equipview) {
+        size = 8;
+        policy.setVerticalPolicy(QSizePolicy::Expanding);
+        ui->ArsenalArea->setMaximumHeight(QWIDGETSIZE_MAX);
+    }
+    else if(lay->currentWidget() == rankView) {
         size = 8;
         policy.setVerticalPolicy(QSizePolicy::Expanding);
         ui->ArsenalArea->setMaximumHeight(QWIDGETSIZE_MAX);
@@ -203,10 +211,20 @@ void FactoryArea::switchToState() {
             initial = false;
         }
         equipview->recalculateArsenalRows();
-        equipview->activate(true, false, true);
+        equipview->activate(true, false, KP::BlueprintView);
+        break;
+    case KP::RankView:
+        //% "Ranking"
+        ui->FactoryLabel->setText(qtTrId("rankview"));
+        lay->setCurrentWidget(equipview);
+        if(initial) {
+            stackResize(0); // arg is useless
+            initial = false;
+        }
+        equipview->recalculateArsenalRows();
+        equipview->activate(true, true, KP::RankView);
         break;
     }
-    update();
 }
 
 void FactoryArea::resizeEvent(QResizeEvent *event) {

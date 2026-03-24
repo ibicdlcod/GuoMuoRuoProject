@@ -273,9 +273,13 @@ border-style: none;</string>
     </property>
     <addaction name="actionDevelop_Equipment"/>
     <addaction name="actionConstruct_Ships"/>
+    <addaction name="separator"/>
     <addaction name="actionArsenal"/>
     <addaction name="actionAnchorage"/>
+    <addaction name="separator"/>
     <addaction name="actionShip_Blueprints"/>
+    <addaction name="separator"/>
+    <addaction name="actionIndustrial_Plant"/>
    </widget>
    <widget class="QMenu" name="menuNaval_Base">
     <property name="title">
@@ -396,6 +400,11 @@ border-style: none;</string>
   <action name="actionRepair">
    <property name="text">
     <string id="ui-repair">Repair</string>
+   </property>
+  </action>
+  <action name="actionIndustrial_Plant">
+   <property name="text">
+    <string id="ra2-industrial-plant">Industrial Plant</string>
    </property>
   </action>
  </widget>

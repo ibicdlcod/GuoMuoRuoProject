@@ -60,6 +60,7 @@ private slots:
     void switchToConstruct();
     void switchToDevelop();
     void switchToFleet();
+    void switchToRank();
     void switchToSortie();
     void updateColorScheme(Qt::ColorScheme colorscheme);
     void updateResources(const QJsonObject &);
@@ -80,5 +81,7 @@ private:
     SettingsWindow settingsWindow;
 
     QStackedLayout *lay;
+
+    QList<QMetaObject::Connection> v; // volatile connections
 };
 #endif // MAINWINDOW_H

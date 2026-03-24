@@ -195,7 +195,7 @@ private:
                           "\x80\xe6\x9d\xa1\xe5\x92\xb8\xe9"
                           "\xb1\xbc");
 
-    Q_DISABLE_COPY(Server)
+    Q_DISABLE_COPY_MOVE(Server)
 };
 
 #endif // SERVER_H

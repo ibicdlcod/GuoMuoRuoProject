@@ -13,6 +13,7 @@
 #include "../../../FactorySlot/factoryslot.h"
 #include "../views/equipview.h"
 #include "../../../Protocol/kp.h"
+#include "rankview.h"
 
 namespace Ui {
 class FactoryArea;
@@ -48,6 +49,7 @@ private:
     QStackedLayout *lay;
     EquipView *equipview;
     QWidget *slotControl;
+    RankView *rankView;
     DevelopWindow dev;
     ConstructWindow con;
     QList<QUuid> defaultEquips;

@@ -188,6 +188,7 @@ void Clientv2::demandEquipCache() {
 
 void Clientv2::demandEquipSkillPoints(int equipDef) {
     socket.flush();
+    qCritical() << "FUCK1" << equipDef;
     QByteArray msg = KP::clientDemandSkillPoints(equipDef);
     const qint64 written = socket.write(msg);
     if (written <= 0) {

@@ -95,6 +95,9 @@ set(CLIENT_SOURCES
     ClientGUI/ui/factory/factoryarea.cpp
     ClientGUI/ui/factory/factoryarea.h
     ClientGUI/ui/factory/factoryarea.ui
+    ClientGUI/ui/factory/rankview.h
+    ClientGUI/ui/factory/rankview.cpp
+    ClientGUI/ui/factory/rankview.ui
     ClientGUI/ui/fleet/elidedlabel.h
     ClientGUI/ui/fleet/elidedlabel.cpp
     ClientGUI/ui/fleet/fleetview.h
