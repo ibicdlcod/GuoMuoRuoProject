@@ -24,34 +24,6 @@ EquipModel::EquipModel(QObject *parent, bool isInArsenal)
             this, &EquipModel::updateIllegalPage);
     connect(this, &EquipModel::pageNumChanged,
             this, [this](int, int){clearCheckBoxes();});
-
-    /* fix rowCount = 1 bug */
-    QTimer *timer = new QTimer(this);
-    connect(timer, &QTimer::timeout, this, [this]()
-            {
-                QString className = metaObject()->className();
-                if(className == "EquipModel"
-                    || className == "ShipModel"
-                    || className == "ShipBPModel") {
-                    if(rowCount() == 1) {
-                        /*
-                        for(auto *widget: QApplication::topLevelWidgets()) {
-                            if(qobject_cast<MainWindow *>(widget)) {
-                                mainWindow = widget;
-                                MainWindow *mainWindowM = qobject_cast<MainWindow *>(widget);
-                                auto geo = mainWindowM->geometry();
-                                auto tempGeo = geo;
-                                tempGeo.setRect(tempGeo.x(), tempGeo.y(),
-                                                tempGeo.width(), tempGeo.height()-1);
-                                mainWindowM->setGeometry(tempGeo);
-                                mainWindowM->setGeometry(geo);
-                            }
-                        }*/
-                    }
-                }
-            });
-    timer->start(1000);
-
 }
 
 std::tuple<Equipment *, int> EquipModel::getEquip(QUuid euid) {
@@ -793,7 +765,7 @@ void EquipModel::wholeTableChanged() {
     if(rowCount() > 0 && columnCount() > 0) {
         emit dataChanged(topleft, bottomright, QList<int>());
     }
-    emit headerDataChanged(Qt::Horizontal, 0, rowCount() - 1);
+    emit headerDataChanged(Qt::Vertical, 0, rowCount() - 1);
 }
 
 void EquipModel::setShipEquip(QUuid shipUID, int slotPos, QUuid equipUID) {

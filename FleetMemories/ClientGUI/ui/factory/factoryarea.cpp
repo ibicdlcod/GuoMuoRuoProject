@@ -18,7 +18,7 @@ FactoryArea::FactoryArea(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    equipview = new EquipView();
+    equipview = new EquipView(this);
     //ui->Slots->setObjectName("slotcontrol");
     //ui->Slots->setStyleSheet(
     //    "QFrame#slotcontrol { border-style: none; }");

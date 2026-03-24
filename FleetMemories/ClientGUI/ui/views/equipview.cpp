@@ -89,10 +89,10 @@ EquipView::EquipView(QWidget *parent)
     layout->addWidget(unselectButton);
     layout->setContentsMargins(0,0,0,0);
     lay = new QStackedLayout();
-    lay->addWidget(equipSelect);
-    lay->addWidget(shipSelect);
     QVBoxLayout *layout2 = ui->Navigator;
     layout2->addLayout(lay, 1);
+    lay->addWidget(equipSelect);
+    lay->addWidget(shipSelect);
     layout2->addWidget(layoutWidget, 1, Qt::AlignHCenter);
     layout2->setContentsMargins(0,0,0,0);
     layout2->setSpacing(1);
@@ -240,8 +240,17 @@ void EquipView::activate(bool arsenal, bool isEquip,
     }
     if(isEquip) {
         if(custom == KP::RankView) {
+            model = &engine.rankModel;
+            arsenalView->setModel(model);
             equipSelect->destructButton->hide();
             equipSelect->addStarButton->hide();
+            connect(model, SIGNAL(needReCalculateRows()),
+                    this, SLOT(recalculateArsenalRows()),
+                    Qt::UniqueConnection);
+            connect(this, SIGNAL(rowCountHint(int)),
+                    model, SLOT(setRowsPerPageHint(int)),
+                    Qt::UniqueConnection);
+            recalculateArsenalRows();
             lay->setCurrentWidget(equipSelect);
         }
         else {
@@ -276,13 +285,13 @@ void EquipView::activate(bool arsenal, bool isEquip,
                         this, [this]{emit equipSelected(QUuid());
                                  hide();});
             }
-            recalculateArsenalRows();
             connect(model, SIGNAL(needReCalculateRows()),
                     this, SLOT(recalculateArsenalRows()),
                     Qt::UniqueConnection);
             connect(this, SIGNAL(rowCountHint(int)),
                     model, SLOT(setRowsPerPageHint(int)),
                     Qt::UniqueConnection);
+            recalculateArsenalRows();
             lay->setCurrentWidget(equipSelect);
         }
     }
@@ -317,13 +326,13 @@ void EquipView::activate(bool arsenal, bool isEquip,
                         this, [this]{emit shipSelected(QUuid());
                                  hide();});
             }
-            recalculateArsenalRows();
             connect(model, SIGNAL(needReCalculateRows()),
                     this, SLOT(recalculateArsenalRows()),
                     Qt::UniqueConnection);
             connect(this, SIGNAL(rowCountHint(int)),
                     model, SLOT(setRowsPerPageHint(int)),
                     Qt::UniqueConnection);
+            recalculateArsenalRows();
             lay->setCurrentWidget(shipSelect);
         }
         else {
@@ -340,13 +349,13 @@ void EquipView::activate(bool arsenal, bool isEquip,
             }
             model->setIsInArsenal(true);
             arsenalView->setItemDelegateForColumn(model->hpColumn(), hpdelegate);
-            recalculateArsenalRows();
             connect(model, SIGNAL(needReCalculateRows()),
                     this, SLOT(recalculateArsenalRows()),
                     Qt::UniqueConnection);
             connect(this, SIGNAL(rowCountHint(int)),
                     model, SLOT(setRowsPerPageHint(int)),
                     Qt::UniqueConnection);
+            recalculateArsenalRows();
             lay->setCurrentWidget(shipSelect);
         }
     }
@@ -371,8 +380,9 @@ void EquipView::recalculateArsenalRows() {
     int rowSize = arsenalView->verticalHeader()->sectionSize(0);
     int rowSizeAvailable = ui->ArsenalControl->size().height()
                            - arsenalView->horizontalHeader()->size().height();
-    if(rowSize > 0)
+    if(rowSize > 0) {
         emit rowCountHint(std::max(rowSizeAvailable / rowSize - 1, 1));
+    }
     arsenalView
         ->setMinimumSize(QSize(tableSizeWhole(arsenalView,
                                               model).width(),

@@ -207,7 +207,7 @@ void Repair::repairClicked(bool checked, int slotnum) {
         }
     }
     if(parentView) {
-        EquipView *view = &(parentView->equipView);
+        EquipView *view = parentView->equipView;
         view->activate(false, false);
         view->setMinimumHeight(viewMinimumHeight);
         view->setAttribute(Qt::WA_DeleteOnClose, false);

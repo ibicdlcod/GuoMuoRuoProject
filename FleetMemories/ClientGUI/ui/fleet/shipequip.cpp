@@ -55,7 +55,7 @@ void ShipEquip::mouseReleaseEvent(QMouseEvent *event)
     static constexpr int viewMinimumHeight = 500;
     if (event->button() == Qt::LeftButton && mousePressedInside) {
         if (rect().contains(event->pos())) {
-            EquipView *view = &(parentView->equipView);
+            EquipView *view = parentView->equipView;
             view->activate(false, true);
             engine.equipModel.filterByShip(parentView->getShip(shipPosIndex),
                                            equipSlotIndex == KP::maxEquipSlots);
@@ -134,7 +134,7 @@ void ShipEquip::receivedNewPlaneCountInfo(int shipPosIndex, int maxCount)
 
 void ShipEquip::processEquipSelect(QUuid equipUid)
 {
-    EquipView *view = &(parentView->equipView);
+    EquipView *view = parentView->equipView;
     disconnect(view, &EquipView::equipSelected,
                this, &ShipEquip::processEquipSelect);
     emit equipSelected(shipPosIndex, equipSlotIndex, equipUid);
@@ -142,7 +142,7 @@ void ShipEquip::processEquipSelect(QUuid equipUid)
 
 void ShipEquip::updateEquipName(QUuid equipUid)
 {
-    EquipView *view = &(parentView->equipView);
+    EquipView *view = parentView->equipView;
     disconnect(view, &EquipView::equipSelected,
                this, &ShipEquip::updateEquipName);
     if(equipUid.isNull()) {

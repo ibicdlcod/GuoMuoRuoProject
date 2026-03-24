@@ -44,7 +44,7 @@ public:
     KP::FleetType getCurrentFleetType() const;
     bool isCurrentFleetEmpty() const;
     void simplify(bool positive = true);
-    EquipView equipView;
+    EquipView *equipView;
     bool isReady() { return ready; }
 
 signals:

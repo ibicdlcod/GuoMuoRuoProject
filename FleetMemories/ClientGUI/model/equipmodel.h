@@ -91,7 +91,7 @@ protected:
     bool ready = false;
     bool isEquipModel = true;
 
-    int numberOfEquip() const;
+    virtual int numberOfEquip() const;
     static const int attrCol = 3;
 
     QHash<QUuid, Equipment *> clientEquips;

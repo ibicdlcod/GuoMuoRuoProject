@@ -18,6 +18,7 @@
 #include "model/shipbpmodel.h"
 #include "model/shipdefmodel.h"
 #include "model/localeawaresort.h"
+#include "model/rankmodel.h"
 #include "../Protocol/kp.h"
 #include "../Protocol/receiver.h"
 #include "../Protocol/sender.h"
@@ -85,6 +86,7 @@ public:
     ShipDefModel shipDefModel;
     SpecShipModel *shipRemodelModel = new SpecShipModel(&shipModel);
     QSortFilterProxyModel *proxyModel = new LocaleAwareSort(this);
+    RankModel rankModel;
     QMap<int, double> techCache;
 
     sol::state lua;

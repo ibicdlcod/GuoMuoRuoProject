@@ -16,10 +16,9 @@ extern std::unique_ptr<QSettings> settings;
 
 FleetView::FleetView(QWidget *parent)
     : QFrame(parent)
-    , ui(new Ui::FleetView), equipView(nullptr)
+    , ui(new Ui::FleetView)
 {
     ui->setupUi(this);
-    equipView.hide();
 
     Clientv2 &engine = Clientv2::getInstance();
     connect(&engine, &Clientv2::receivedAnchorageShip,
@@ -190,6 +189,9 @@ equip_slots:
     ui->waitLabel->show();
     ui->FleetMenu->hide();
     scrollArea->hide();
+
+    equipView = new EquipView();
+    equipView->hide();
 }
 
 FleetView::~FleetView()

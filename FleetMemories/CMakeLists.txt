@@ -69,6 +69,8 @@ set(CLIENT_SOURCES
     ClientGUI/model/equipmodel.cpp
     ClientGUI/model/localeawaresort.h
     ClientGUI/model/localeawaresort.cpp
+    ClientGUI/model/rankmodel.h
+    ClientGUI/model/rankmodel.cpp
     ClientGUI/model/shipbpmodel.h
     ClientGUI/model/shipbpmodel.cpp
     ClientGUI/model/shipdefmodel.h
