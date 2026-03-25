@@ -1114,7 +1114,7 @@ void Server::offerRankInfo(const CSteamID &uid, QSslSocket *connection,
     int totalUsers = 0;
     {
         QSqlQuery query;
-        query.prepare("SELECT COUNT(*) FROM a;");
+        query.prepare("SELECT COUNT(*) FROM UserRanking;");
         if(!query.exec() || !query.isSelect()) {
             qCritical() << query.lastQuery();
             //% "User %1: rank info failed!"
@@ -1132,8 +1132,8 @@ void Server::offerRankInfo(const CSteamID &uid, QSslSocket *connection,
         QSqlQuery query;
         query.prepare("SELECT t.r FROM "
                       "(SELECT User, "
-                      "RANK() OVER (ORDER BY CVP DESC) AS r "
-                      "FROM a) AS t "
+                      "RANK() OVER (ORDER BY CurrentVP DESC) AS r "
+                      "FROM UserRanking) AS t "
                       "WHERE User = :id;");
         query.bindValue(":id", uid.ConvertToUint64());
         if(!query.exec() || !query.isSelect()) {
@@ -1154,14 +1154,14 @@ void Server::offerRankInfo(const CSteamID &uid, QSslSocket *connection,
     {
         QSqlQuery query;
         query.prepare("WITH RankedData AS ( "
-                 "SELECT "
-                 "User, CVP, PVP, IP, "
-                 "ROW_NUMBER() OVER (ORDER BY CVP DESC) AS rn "
-                 "FROM a "
-                 ") "
-                 "SELECT User, CVP, PVP, IP, rn "
-                 "FROM RankedData "
-                 "WHERE rn BETWEEN :start AND :finish;");
+                      "SELECT "
+                      "User, CurrentVP, PreviousVP, Industrial, "
+                      "ROW_NUMBER() OVER (ORDER BY CurrentVP DESC) AS rn "
+                      "FROM UserRanking "
+                      ") "
+                      "SELECT User, CurrentVP, PreviousVP, Industrial, rn "
+                      "FROM RankedData "
+                      "WHERE rn BETWEEN :start AND :finish;");
         query.bindValue(":start", userPosPage * rpp + 1);
         query.bindValue(":finish", (userPosPage + 1) * rpp);
         if(!query.exec() || !query.isSelect()) {
