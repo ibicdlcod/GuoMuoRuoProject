@@ -1,9 +1,13 @@
 #include "rankmodel.h"
+#include <QJsonArray>
+#include "../clientv2.h"
 
 RankModel::RankModel(QObject *parent)
     : EquipModel{parent}
 {
     isEquipModel = false;
+    connect(this, &RankModel::pageNumChanged,
+            this, &RankModel::pageNumChange);
 }
 
 int RankModel::numberOfEquip() const {
@@ -21,18 +25,72 @@ QVariant RankModel::data(const QModelIndex &index, int role) const {
         return QVariant();
     int realRowIndex = index.row() + rowsPerPage * pageNum;
     switch (role) {
-    case Qt::ToolTipRole:
-        [[fallthrough]];
+    case Qt::ToolTipRole: {
+        int section = index.column();
+        if(section == nameCol) {
+            //% "Admiral name"
+            return qtTrId("player-name");
+        }
+        else if(section == cvpCol) {
+            //% "Current VP"
+            return qtTrId("current-vp");
+        }
+        else if(section == pvpCol) {
+            //% "Previous VP"
+            return qtTrId("previous-vp");
+        }
+        else if(section == peCol) {
+            //% "Points expected"
+            return qtTrId("points-to-be-gained");
+        }
+        else
+            return QVariant();
+    }
     case Qt::StatusTipRole:
         [[fallthrough]];
     case Qt::AccessibleTextRole:
         [[fallthrough]];
     case Qt::DisplayRole: {
-        return "FUCK";
+        if(!currentDisplayed.contains(realRowIndex + 1)) {
+            return QVariant();
+        }
+        CSteamID uid = currentDisplayed[realRowIndex + 1];
+        int section = index.column();
+        if(section == nameCol) {
+            if(names.contains(uid)) {
+                return names[uid];
+            }
+            else {
+                bool needsToRetreiveInformationFromInternet =
+                    SteamFriends()->RequestUserInformation(uid, true);
+                if (!needsToRetreiveInformationFromInternet)
+                {
+                    return SteamFriends()->GetFriendPersonaName(uid);
+                }
+                else {
+                    return uid.ConvertToUint64();
+                }
+            }
+        }
+        else if(section == cvpCol) {
+            return QString::number(currentExp[uid], 'g', 6);
+        }
+        else if(section == pvpCol) {
+            return QString::number(previousExp[uid], 'g', 6);
+        }
+        else if(section == peCol) {
+            return QString::number(std::log(totalUsers)
+                                       + (realRowIndex == 0 ? 0 :
+                                              (realRowIndex * std::log(realRowIndex)))
+                                       - (realRowIndex + 1) * std::log(realRowIndex + 1)
+                                       + 1, 'g', 6);
+        }
+        else
+            return QVariant();
     }
     break;
     case Qt::DecorationRole: {
-            return QVariant();
+        return QVariant();
     }
     break;
     case Qt::EditRole:
@@ -72,7 +130,7 @@ QVariant RankModel::data(const QModelIndex &index, int role) const {
 }
 
 QVariant RankModel::headerData(int section, Qt::Orientation orientation,
-                                int role) const {
+                               int role) const {
     if(section >= rowCount() && orientation == Qt::Vertical)
         return QVariant();
     if(section >= columnCount() && orientation == Qt::Horizontal)
@@ -87,19 +145,19 @@ QVariant RankModel::headerData(int section, Qt::Orientation orientation,
             return QString::number(realRowIndex);
         }
         else {
-            if(section == 0) {
+            if(section == nameCol) {
                 //% "Admiral name"
                 return qtTrId("player-name");
             }
-            else if(section == 1) {
+            else if(section == cvpCol) {
                 //% "Current VP"
                 return qtTrId("current-vp");
             }
-            else if(section == 2) {
+            else if(section == pvpCol) {
                 //% "Previous VP"
                 return qtTrId("previous-vp");
             }
-            else if(section == 3) {
+            else if(section == peCol) {
                 //% "Points expected"
                 return qtTrId("points-to-be-gained");
             }
@@ -130,7 +188,61 @@ Qt::ItemFlags RankModel::flags(const QModelIndex &index) const {
 }
 
 bool RankModel::setData(const QModelIndex &index,
-                         const QVariant &value,
-                         int role) {
+                        const QVariant &value,
+                        int role) {
     return false;
+}
+
+void RankModel::updateList(const QJsonArray &input, int total) {
+    totalUsers = total;
+    int firstRowRank = -1;
+    for(const auto &u: input) {
+        const auto &user = u.toObject();
+        CSteamID uid(static_cast<uint64>(user["uid"].toInteger()));
+        currentExp[uid] = user["currentvp"].toDouble();
+        previousExp[uid] = user["previousvp"].toDouble();
+        currentDisplayed[user["rank"].toInt()] = uid;
+        if(firstRowRank == -1) {
+            firstRowRank = user["rank"].toInt();
+        }
+    }
+    if(!ready) {
+        ready = true;
+        emit equipReady();
+    }
+    pageNum = (firstRowRank - 1) / rowsPerPage;
+    emit pageNumChanged(pageNum, maximumPageNum());
+    emit wholeTableChanged();
+}
+
+void RankModel::pageNumChange(int currentPageNum, int totalPageNum) {
+    for(int i = currentPageNum * rowsPerPage;
+         i < (currentPageNum + 1) * rowsPerPage;
+         ++i) {
+        if(i >= totalUsers) {
+            break;
+        }
+        if(!currentDisplayed.contains(i+1)) {
+            Clientv2 &engine = Clientv2::getInstance();
+            engine.doRefreshRank(rowsPerPage, currentPageNum);
+            break;
+        }
+    }
+}
+
+void RankModel::OnPersonaStateChangeHandler(PersonaStateChange_t* PersonaStateChange)
+{
+    if (currentExp.contains(PersonaStateChange->m_ulSteamID))
+    {
+        CSteamID uid(PersonaStateChange->m_ulSteamID);
+        names[uid] = SteamFriends()->GetFriendPersonaName(uid);
+        for(int i = 0; i < rowCount(); ++i) {
+            int realRowIndex = i + rowsPerPage * pageNum;
+            if(uid == currentDisplayed[realRowIndex + 1]) {
+                QModelIndex topleft = this->index(i, nameCol);
+                QModelIndex bottomright = this->index(i, nameCol);
+                emit dataChanged(topleft, bottomright, {Qt::DisplayRole});
+            }
+        }
+    }
 }

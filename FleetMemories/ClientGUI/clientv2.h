@@ -114,6 +114,7 @@ public slots:
     void doRefreshFactory();
     void doRefreshFactoryAnchorage();
     void doRefreshFactoryArsenal();
+    void doRefreshRank(int, std::optional<int> pageNum = std::nullopt);
     void doRepair(const QUuid &, int);
     void doStopRepair(int);
     Equipment * getEquipmentReg(int);
@@ -166,6 +167,7 @@ signals:
     void receivedLocalTechInfo(const QJsonObject &);
     void receivedLocalTechInfo2(const QJsonObject &);
     void receivedMapStart(const QJsonObject &);
+    void receivedRankInfo(const QJsonArray &, int);
     void receivedRepairRefresh(const QJsonObject &);
     void receivedResourceInfo(const QJsonObject &);
     void receivedShipBlueprint(const QJsonObject &);

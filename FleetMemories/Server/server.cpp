@@ -364,7 +364,7 @@ Q_GLOBAL_STATIC(QString,
                 userRanking,
                 QStringLiteral(
                     "CREATE TABLE UserRanking ("
-                    "User BLOB NOT NULL, "
+                    "User BLOB PRIMARY KEY, "
                     "CurrentVP FLOAT NOT NULL DEFAULT 0, " // Victory points
                     "PreviousVP FLOAT NOT NULL DEFAULT 0, "
                     "Industrial FLOAT NOT NULL DEFAULT 0, "
@@ -1106,6 +1106,86 @@ void Server::offerMapInfoUser(const CSteamID &uid, QSslSocket *connection)
     }
     QByteArray msg = KP::serverMapInfoUser(mapSupremacies);
     senderM.sendMessage(connection, msg);
+}
+
+void Server::offerRankInfo(const CSteamID &uid, QSslSocket *connection,
+                           int rpp, std::optional<int> page)
+{
+    int totalUsers = 0;
+    {
+        QSqlQuery query;
+        query.prepare("SELECT COUNT(*) FROM a;");
+        if(!query.exec() || !query.isSelect()) {
+            qCritical() << query.lastQuery();
+            //% "User %1: rank info failed!"
+            throw DBError(qtTrId("user-rank-info-failed")
+                          .arg(uid.ConvertToUint64()),
+                          query.lastError());
+        }
+        else if(query.first()) {
+            totalUsers = query.value(0).toInt();
+        }
+    }
+    int userPosPage = 0;
+    if(!page.has_value()) {
+        int userPos = 0;
+        QSqlQuery query;
+        query.prepare("SELECT t.r FROM "
+                      "(SELECT User, "
+                      "RANK() OVER (ORDER BY CVP DESC) AS r "
+                      "FROM a) AS t "
+                      "WHERE User = :id;");
+        query.bindValue(":id", uid.ConvertToUint64());
+        if(!query.exec() || !query.isSelect()) {
+            qCritical() << query.lastQuery();
+            //% "User %1: rank info failed!"
+            throw DBError(qtTrId("user-rank-info-failed")
+                          .arg(uid.ConvertToUint64()),
+                          query.lastError());
+        }
+        else if(query.first()) {
+            userPos = query.value(0).toInt() - 1;
+        }
+        userPosPage = userPos / rpp;
+    }
+    else {
+        userPosPage = page.value();
+    }
+    {
+        QSqlQuery query;
+        query.prepare("WITH RankedData AS ( "
+                 "SELECT "
+                 "User, CVP, PVP, IP, "
+                 "ROW_NUMBER() OVER (ORDER BY CVP DESC) AS rn "
+                 "FROM a "
+                 ") "
+                 "SELECT User, CVP, PVP, IP, rn "
+                 "FROM RankedData "
+                 "WHERE rn BETWEEN :start AND :finish;");
+        query.bindValue(":start", userPosPage * rpp + 1);
+        query.bindValue(":finish", (userPosPage + 1) * rpp);
+        if(!query.exec() || !query.isSelect()) {
+            qCritical() << query.lastQuery();
+            //% "User %1: rank info failed!"
+            throw DBError(qtTrId("user-rank-info-failed")
+                          .arg(uid.ConvertToUint64()),
+                          query.lastError());
+        }
+        else {
+            QJsonArray arr;
+            while(query.next()) {
+                QJsonObject rec;
+                rec["uid"] = static_cast<qint64>(query.value(0).toULongLong());
+                rec["currentvp"] = query.value(1).toDouble();
+                rec["previousvp"] = query.value(2).toDouble();
+                rec["industrial"] = query.value(3).toDouble();
+                rec["rank"] = query.value(4).toInt();
+                arr.append(rec);
+            }
+            QByteArray msg = KP::serverRankInfo(arr, totalUsers);
+            senderM.sendMessage(connection, msg);
+        }
+    }
 }
 
 void Server::offerResourceInfo(QSslSocket *connection,
@@ -5718,6 +5798,16 @@ void Server::receivedReq(const QJsonObject &djson,
         {offerResourceInfo(
                         connection,
                         uid);});
+    }
+        break;
+    case KP::CommandType::DemandRankInfo: {
+        if(!djson.contains("page")) {
+            offerRankInfo(uid, connection, djson["rpp"].toInt());
+        }
+        else {
+            offerRankInfo(uid, connection, djson["rpp"].toInt(),
+                    djson["page"].toInt());
+        }
     }
         break;
     case KP::CommandType::DestructEquip: {

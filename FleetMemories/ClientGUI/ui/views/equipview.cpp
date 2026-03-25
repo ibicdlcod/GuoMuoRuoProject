@@ -166,9 +166,14 @@ void EquipView::enactPageNumChange(int currentPageNum, int totalPageNum) {
             //% "No suitable Equipment"
             pageLabel->setText(qtTrId("no-equip"));
         }
-        else {
+        else if(model == &engine.shipModel
+                   || model == &engine.shipBPModel) {
             //% "No suitable Ship"
             pageLabel->setText(qtTrId("no-ship"));
+        }
+        else {
+            //% "No suitable User"
+            pageLabel->setText(qtTrId("no-user"));
         }
         return;
     }
@@ -181,10 +186,12 @@ void EquipView::columnResized(int logicalIndex, int oldSize, int newSize) {
     Q_UNUSED(logicalIndex)
     Q_UNUSED(oldSize)
     Q_UNUSED(newSize)
+    QTimer::singleShot(100, this, [this](){
     arsenalView
         ->setMinimumSize(QSize(tableSizeWhole(arsenalView,
                                               model).width(),
                                ui->ArsenalControl->size().height()));
+    });
     arsenalView->hide();
     arsenalView->show();
 }
@@ -240,6 +247,7 @@ void EquipView::activate(bool arsenal, bool isEquip,
     }
     if(isEquip) {
         if(custom == KP::RankView) {
+        rank_view:
             model = &engine.rankModel;
             arsenalView->setModel(model);
             equipSelect->destructButton->hide();
@@ -251,6 +259,18 @@ void EquipView::activate(bool arsenal, bool isEquip,
                     model, SLOT(setRowsPerPageHint(int)),
                     Qt::UniqueConnection);
             recalculateArsenalRows();
+            if(!model->isReady()) {
+                pageLabel->setText(qtTrId("retrieving-please-wait"));
+                engine.doRefreshRank(rowCountHintVal);
+                arsenalView->hide();
+                connect(model, &EquipModel::equipReady,
+                        this, [this](){
+                    arsenalView->show();
+                });
+            }
+            else {
+                arsenalView->show();
+            }
             lay->setCurrentWidget(equipSelect);
         }
         else {
@@ -371,7 +391,7 @@ void EquipView::activate(bool arsenal, bool isEquip,
             model, &EquipModel::lastPage);
     connect(model, &EquipModel::pageNumChanged,
             this, &EquipView::enactPageNumChange);
-    if(model->isReady() && arsenal) {
+    if(model->isReady() && arsenal && custom != KP::RankView) {
         model->firstPage();
     }
 }
@@ -382,6 +402,7 @@ void EquipView::recalculateArsenalRows() {
                            - arsenalView->horizontalHeader()->size().height();
     if(rowSize > 0) {
         emit rowCountHint(std::max(rowSizeAvailable / rowSize - 1, 1));
+        rowCountHintVal = std::max(rowSizeAvailable / rowSize - 1, 1);
     }
     arsenalView
         ->setMinimumSize(QSize(tableSizeWhole(arsenalView,

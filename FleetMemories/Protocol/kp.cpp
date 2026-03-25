@@ -173,6 +173,18 @@ QByteArray KP::clientDemandModernize(const QList<QUuid> &candidates, bool isEqui
     return QCborValue::fromJsonValue(result).toCbor();
 }
 
+QByteArray KP::clientDemandRankInfo(int rowsPerPage,
+                                    std::optional<int> pageNum) {
+    QJsonObject result;
+    result["type"] = DgramType::Request;
+    result["command"] = CommandType::DemandRankInfo;
+    result["rpp"] = rowsPerPage;
+    if(pageNum.has_value()) {
+        result["page"] = pageNum.value();
+    }
+    return QCborValue::fromJsonValue(result).toCbor();
+}
+
 QByteArray KP::clientDemandRepair(const QUuid &uuid, int slotnum,
                                   bool stop, bool forced) {
     QJsonObject result;
@@ -678,6 +690,16 @@ QByteArray KP::serverPenguin() {
     QJsonObject result;
     result["type"] = DgramType::Message;
     result["msgtype"] = MsgType::Penguin;
+    return QCborValue::fromJsonValue(result).toCbor();
+}
+
+QByteArray KP::serverRankInfo(const QJsonArray &content,
+                              int totalUsers) {
+    QJsonObject result;
+    result["type"] = DgramType::Info;
+    result["infotype"] = InfoType::RankInfo;
+    result["content"] = content;
+    result["total"] = totalUsers;
     return QCborValue::fromJsonValue(result).toCbor();
 }
 

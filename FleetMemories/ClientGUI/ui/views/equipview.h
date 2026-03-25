@@ -87,6 +87,8 @@ private:
     EquipSelect *equipSelect;
     ShipSelect *shipSelect;
     QStackedLayout *lay;
+
+    int rowCountHintVal = 1;
 };
 
 #endif // EQUIPVIEW_H

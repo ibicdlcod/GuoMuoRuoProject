@@ -40,6 +40,8 @@ Clientv2::Clientv2(QObject *parent)
             &shipModel, &ShipModel::updateShipList);
     connect(this, &Clientv2::receivedShipBlueprint,
             &shipBPModel, &ShipBPModel::updateShipList);
+    connect(this, &Clientv2::receivedRankInfo,
+            &rankModel, &RankModel::updateList);
     connect(&equipModel, &EquipModel::destructRequest,
             this, &Clientv2::doDestructEquip);
     connect(&equipModel, &EquipModel::improveRequest,
@@ -930,6 +932,13 @@ void Clientv2::doRefreshFactoryArsenal() {
     socket.flush();
 }
 
+void Clientv2::doRefreshRank(int rowsPerPage,
+                             std::optional<int> pageNum) {
+    QByteArray msg = KP::clientDemandRankInfo(rowsPerPage, pageNum);
+    sender->enqueue(msg);
+    socket.flush();
+}
+
 void Clientv2::doRepair(const QUuid &uuid, int slotnum) {
     QByteArray msg = KP::clientDemandRepair(uuid, slotnum, false, false);
     sender->enqueue(msg);
@@ -1246,6 +1255,10 @@ void Clientv2::receivedInfo(const QJsonObject &djson) {
         break;
     case KP::InfoType::SkillPointInfo:
         emit receivedSkillPointInfo(djson);
+        break;
+    case KP::InfoType::RankInfo:
+        emit receivedRankInfo(djson["content"].toArray(),
+                              djson["total"].toInt());
         break;
     case KP::InfoType::ResourceInfo:
         emit receivedResourceInfo(djson);

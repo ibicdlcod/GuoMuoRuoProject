@@ -193,6 +193,7 @@ enum CommandType{
     RequestSortie,
     ProgressMap,
     EnterBattleNode,
+    DemandRankInfo,
 };
 Q_ENUM_NS(CommandType)
 
@@ -252,6 +253,7 @@ enum InfoType{
     LocalTechInfo,
     SkillPointInfo,
     ResourceInfo,
+    RankInfo,
     ShipInfo,
     ShipInfoUser,
     ShipInfoUserBP,
@@ -581,6 +583,7 @@ QByteArray clientDemandMapInfo(QDateTime timeUtc
                                            QTime(0, 0, 0)));
 QByteArray clientDemandMapInfoUser();
 QByteArray clientDemandModernize(const QList<QUuid> &, bool);
+QByteArray clientDemandRankInfo(int, std::optional<int> page = std::nullopt);
 QByteArray clientDemandRepair(const QUuid &, int,
                               bool stop = false, bool forced = false);
 QByteArray clientDemandResourceUpdate();
@@ -715,6 +718,7 @@ QByteArray serverNewShip(QUuid, int, int);
 QByteArray serverParseError(MsgType, const QString &,
                             const QString &);
 QByteArray serverPenguin();
+QByteArray serverRankInfo(const QJsonArray &, int);
 QByteArray serverResourceUpdate(ResOrd);
 QByteArray serverShipBPInfo(const QJsonObject &);
 QByteArray serverShipInfo(const QJsonArray &, bool user = false,

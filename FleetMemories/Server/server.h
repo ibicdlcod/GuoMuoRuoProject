@@ -57,6 +57,8 @@ private slots:
     void offerTechInfo(QSslSocket *, const CSteamID &, int jobID = 0);
     void offerTechInfoComponents(QSslSocket *, const QList<TechEntry> &,
                                  bool, bool);
+    void offerRankInfo(const CSteamID &, QSslSocket *, int rpp,
+                       std::optional<int> page = std::nullopt);
     void offerResourceInfo(QSslSocket *, const CSteamID &);
     void offerShipInfo(QSslSocket *, int);
     void offerShipInfoUser(const CSteamID &, QSslSocket *);
