@@ -530,7 +530,7 @@ bool User::isGaugeFinished(const CSteamID &uid, int mapId,  // relative id
     if(Q_UNLIKELY(!query.exec() || !query.isSelect())){
         qCritical() << query.lastQuery();
         //% "User ID %1: DB failure when decreasing gauge of map %2!"
-        throw DBError(qtTrId("dbfail-when-opening-map")
+        throw DBError(qtTrId("dbfail-when-decreasing-gauge")
                           .arg(uid.ConvertToUint64()).arg(mapId),
                       query.lastError());
         return false;
@@ -551,7 +551,7 @@ bool User::isMapUnlocked(const CSteamID &uid, int mapId,  // relative id
     if(Q_UNLIKELY(!query.exec() || !query.isSelect() || !query.first())){
         qCritical() << query.lastQuery();
         //% "User ID %1: DB failure when querying open status of map %2!"
-        throw DBError(qtTrId("dbfail-when-opening-map")
+        throw DBError(qtTrId("dbfail-when-query-map-unlocked")
                           .arg(uid.ConvertToUint64()).arg(mapId),
                       query.lastError());
         return false;
@@ -583,6 +583,7 @@ bool User::isSuperUser(const CSteamID &uid) {
     query.exec();
     query.isSelect();
     if(Q_UNLIKELY(!query.first())) {
+        //% "User id %1 does not exist!"
         qWarning() << qtTrId("user-nonexistent-uid")
                           .arg(uid.ConvertToUint64());
         return false;
@@ -792,7 +793,7 @@ bool User::setMapSupremacy(const CSteamID &uid, int mapId,  // relative id
     query.bindValue(":amount", amount);
     if(Q_UNLIKELY(!query.exec())){
         //% "User ID %1: DB failure when setting supremacy of map %2!"
-        throw DBError(qtTrId("dbfail-when-opening-map")
+        throw DBError(qtTrId("dbfail-when-supremacy-map")
                           .arg(uid.ConvertToUint64()).arg(mapId),
                       query.lastError());
         return false;

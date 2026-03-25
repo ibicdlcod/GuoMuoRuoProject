@@ -69,7 +69,7 @@ Repair::Repair(QWidget *parent)
             case 4: {
                 QPushButton *button = new QPushButton(this);
                 //% "Stop repairing"
-                button->setText("stop-repair");
+                button->setText(qtTrId("stop-repair"));
                 connect(button, &QPushButton::clicked,
                         this, [this, i](bool){
                             if(!slotfs[i]->isOnJob()) {

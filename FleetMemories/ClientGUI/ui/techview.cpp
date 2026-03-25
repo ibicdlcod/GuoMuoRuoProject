@@ -465,7 +465,7 @@ void TechView::resetLocalListName() {
 
             if(ui->localListNation->currentText().localeAwareCompare(
                     qtTrId("all-nationality")) != 0
-                && qtTrId(meta.key(shipReg->getNationality()))
+                && qtTrId(meta.key(shipReg->getAllegianceGroup()))
                            .localeAwareCompare(
                                ui->localListNation->currentText()) != 0) {
                 pass = false;

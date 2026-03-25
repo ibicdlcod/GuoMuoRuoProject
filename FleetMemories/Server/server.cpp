@@ -5905,7 +5905,7 @@ complete_repairs: {
         query.bindValue(":uid", uid.ConvertToUint64());
         if(!query.exec()) {
             //% "Complete user %1's dock failed!"
-            throw DBError(qtTrId("dock-state-error")
+            throw DBError(qtTrId("dock-state-complete-error")
                           .arg(uid.ConvertToUint64()),
                           query.lastError());
             return;
