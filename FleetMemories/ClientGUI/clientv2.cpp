@@ -11,7 +11,7 @@
 #include "networkerror.h"
 #include "steamauth.h"
 
-extern std::unique_ptr<QFile> logFile;
+extern QFile *logFile;
 extern std::unique_ptr<QSettings> settings;
 
 /* Initialize client and do necessary connections */
@@ -1886,7 +1886,7 @@ void customMessageHandler(QtMsgType type,
     if(txt.contains(QChar('\0'))) {
         qFatal("Log Error");
     }
-    QTextStream textStream(logFile.get());
+    QTextStream textStream(logFile);
     txt.remove(QChar('\r'), Qt::CaseInsensitive);
     txt = QStringLiteral("[%1] %2\n").arg(dt, txt);
     textStream << txt;

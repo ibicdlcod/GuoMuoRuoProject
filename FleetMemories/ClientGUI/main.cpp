@@ -15,7 +15,7 @@
 #include "../Protocol/kp.h"
 #include "ui/boxcenterfusionstyle.h"
 
-std::unique_ptr<QFile> logFile;
+QFile *logFile;
 std::unique_ptr<QSettings> settings;
 
 namespace {

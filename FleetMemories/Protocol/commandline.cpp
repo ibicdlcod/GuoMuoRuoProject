@@ -25,7 +25,7 @@
  *
  * (Outdated, see QT_TR_NOOP() and QT_TRANSLATE_NOOP())
  */
-extern std::unique_ptr<QFile> logFile;
+extern QFile *logFile;
 extern std::unique_ptr<QSettings> settings;
 
 CommandLine::CommandLine(int argc, char ** argv)
@@ -122,7 +122,7 @@ void CommandLine::customMessageHandler(QtMsgType type,
         if(txt.contains(QChar('\0'))) {
             qFatal("Log Error");
         }
-        QTextStream textStream(logFile.get());
+        QTextStream textStream(logFile);
         txt.remove(QChar('\r'), Qt::CaseInsensitive);
         if(!txt.isEmpty()) {
             txt = QStringLiteral("[%1] %2\n").arg(dt, txt);

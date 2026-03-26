@@ -7,7 +7,7 @@
 #include <QSettings>
 #include "resord.h"
 
-extern std::unique_ptr<QFile> logFile;
+extern QFile *logFile;
 extern std::unique_ptr<QSettings> settings;
 
 void KP::initLog(bool server) {
@@ -20,7 +20,7 @@ void KP::initLog(bool server) {
         logFileName = settings->value("client/logfile",
                                       "ClientLog.log").toString();
     }
-    logFile = std::make_unique<QFile>(logFileName);
+    logFile = new QFile(logFileName);
     if(Q_UNLIKELY(!logFile)
         || !logFile->open(QIODevice::WriteOnly | QIODevice::Append)) {
         qFatal("Log file cannot be opened");

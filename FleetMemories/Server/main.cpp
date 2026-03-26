@@ -14,7 +14,7 @@
 #include <netinet/in.h>
 #endif
 
-std::unique_ptr<QFile> logFile;
+QFile *logFile;
 std::unique_ptr<QSettings> settings;
 
 namespace {
