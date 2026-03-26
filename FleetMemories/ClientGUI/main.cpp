@@ -53,10 +53,9 @@ int main(int argc, char *argv[]) {
     settings = std::make_unique<QSettings>();
 
     /* Display style */
-    std::unique_ptr<BoxCenterFusionStyle> style
-        = std::make_unique<BoxCenterFusionStyle>();
+    BoxCenterFusionStyle *style = new BoxCenterFusionStyle();
     style->setBaseStyle(QStyleFactory::create("Fusion"));
-    QApplication::setStyle(style.get());
+    QApplication::setStyle(style);
 
     /* Multilingual Support */
 #if defined(Q_OS_UNIX)
