@@ -1349,6 +1349,11 @@ void Clientv2::receivedLogout(const QJsonObject &djson) {
             qCritical() << qtTrId("logout-forced")
                                .arg(djson["username"].toString());
         }
+        else if(djson["reason"] == KP::ViolatedRateLimit) {
+            //% "%1: Violated pack rate limit!"
+            qCritical() << qtTrId("catbomb-too-much-requests")
+                               .arg(djson["username"].toString());
+        }
         else {
             qWarning() << qtTrId("message-not-implemented");
             return;

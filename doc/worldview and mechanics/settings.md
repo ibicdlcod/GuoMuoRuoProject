@@ -53,6 +53,8 @@
 |          rule/shipexpscale           |                 100                 |     the larger this value, the harder ship can level up      |
 |       rule/navalsupremacydecay       |                2880                 | the larger this value, the easier it is to maintain naval supermacy in maps |
 |      rule/techfactorcontroller       |                  5                  | the larger this value, the ship construction time and repair time/resources is shorter/fewer |
+|       rule/badconditionpenalty       |                1.001                | the larger this value, the faster your ship exp decreases when any of them is in negative condition |
+|       rule/mapresourcecontrol        |                1000                 | the larger this value, the harder gaining naval supremacy in coastal maps would affect resource gain |
 |            server/logfile            |            ServerLog.log            |                                                              |
 |           server/language            |                en_US                |                                                              |
 |      server/displaypromptdelay       |                 100                 |                                                              |

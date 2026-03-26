@@ -98,7 +98,8 @@ Q_ENUM_NS(AuthMode)
 enum LogoutType{
     LoggedElsewhere,
     LogoutFailure,
-    LogoutSuccess
+    LogoutSuccess,
+    ViolatedRateLimit
 };
 Q_ENUM_NS(LogoutType)
 

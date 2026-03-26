@@ -171,6 +171,7 @@ private:
     QMap<CSteamID, QSslSocket *> connectedPeers;
     ServerMasterSender senderM;
     Receiver receiverM;
+    QMap<CSteamID, int> allowedPackets;
 
     QSet<int> openEquips;
     QMap<int, Equipment *> equipRegistry;

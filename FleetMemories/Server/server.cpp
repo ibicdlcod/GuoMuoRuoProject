@@ -3322,6 +3322,17 @@ bool Server::importMapNodeFromCSV() {
     QString title = textStream.readLine();
     QStringList titleParts = title.split(",");
 
+    {
+        QSqlQuery query;
+        query.prepare("DELETE FROM MapResource;");
+        if(!query.exec()) {
+            qCritical() << query.lastQuery();
+            //% "Import map node database failed!"
+            throw DBError(qtTrId("map-node-import-failed"),
+                          query.lastError());
+            return false;
+        }
+    }
     int importedMapNodes = 0;
     while(!textStream.atEnd()) {
         QString text = textStream.readLine();
@@ -3369,10 +3380,9 @@ bool Server::importMapNodeFromCSV() {
                         == 0) {
                     QString attr = titleParts[i];
                     int content = lineParts[i].toInt();
-
                     QSqlQuery query;
                     query.prepare(
-                                "REPLACE INTO MapResource "
+                                "INSERT INTO MapResource "
                                 "(MapID, Attribute, Intvalue) "
                                 "VALUES (:id, :attr, :value);");
                     query.bindValue(":id", mapNodeId);
@@ -3424,6 +3434,18 @@ bool Server::importMapRelationFromCSV() {
     QStringList titleParts = title.split(",");
     Q_UNUSED(titleParts)
 
+    {
+        QSqlQuery query;
+        query.prepare("DELETE FROM MapRelation;");
+        if(!query.exec()) {
+            qCritical() << query.lastQuery();
+            //% "Import map relation database failed!"
+            throw DBError(qtTrId("map-relation-import-failed"),
+                          query.lastError());
+            return false;
+        }
+    }
+
     int importedMapRelations = 0;
     while(!textStream.atEnd()) {
         QString text = textStream.readLine();
@@ -3444,8 +3466,8 @@ bool Server::importMapRelationFromCSV() {
             query.bindValue(":id2", node2);
             if(!query.exec()) {
                 qCritical() << query.lastQuery();
-                //% "Import map node database failed!"
-                throw DBError(qtTrId("map-node-import-failed"),
+                //% "Import map relation database failed!"
+                throw DBError(qtTrId("map-relation-import-failed"),
                               query.lastError());
                 return false;
             }
@@ -4124,6 +4146,10 @@ new_ship_as_imported:
 
 void Server::minutePulse() {
     try{
+anti_ddos_regen_allowed_packets:
+        for(const auto &[key, value]: allowedPackets.asKeyValueRange()) {
+            value += settings->value("server/packetallowedregen", 60).toInt();
+        }
 decrease_supremacy:
         QSqlQuery query;
         query.prepare("UPDATE UserMapState "
@@ -4175,10 +4201,12 @@ penalize:
         {
             QSqlQuery query;
             query.prepare("UPDATE UserShip "
-                          "SET Exp = floor(pow(1.001, t.c) * Exp) "
+                          "SET Exp = floor(pow(:penalty, t.c) * Exp) "
                           "FROM (SELECT SUM(Condition) AS c, User FROM UserShip "
                           "WHERE Condition < 0 "
                           "GROUP BY User ) t;");
+            query.bindValue(":penalty", settings->value("rule/badconditionpenalty",
+                                                        1.001).toDouble());
             if(Q_UNLIKELY(!query.exec())) {
                 qCritical() << query.lastQuery();
                 //% "Minute pulse: penalize condition failed!"
@@ -4248,6 +4276,37 @@ award_industrial_points:
         }
         settings->setValue("server/nextsettleranktime",
                            lastSettleTime.addMonths(1));
+regen_resources_based_on_supremacy:
+        {
+            QSqlQuery query;
+            query.prepare("UPDATE UserAttr "
+                          "SET Intvalue = Intvalue + g.f "
+                          "FROM "
+                          "(SELECT User, e.Attribute, SUM(e.d*max(0, Supremacy)/:ctrl) AS f FROM UserMapState "
+                          "INNER JOIN "
+                          "(SELECT Attribute, SUM(Intvalue*c.b) AS d, c.Node2 FROM MapResource "
+                          "INNER JOIN "
+                          "(SELECT MapRelation.Node1, MapRelation.Node2, a.b FROM MapRelation "
+                          "INNER JOIN (SELECT Node1, 1.0/COUNT(*) AS b FROM MapRelation "
+                          "WHERE Type = 'RS' "
+                          "GROUP BY Node1) a "
+                          "ON MapRelation.Node1 = a.Node1) c "
+                          "ON MapResource.MapID = c.Node1 "
+                          "AND Attribute != 'x' "
+                          "AND Attribute != 'y' "
+                          "GROUP BY Attribute, Node2) e "
+                          "ON UserMapState.MapDef = e.Node2 "
+                          "GROUP BY User, Attribute) g "
+                          "WHERE UserID = User "
+                          "AND UserAttr.Attribute = g.Attribute;");
+            query.bindValue(":ctrl", settings->value("rule/mapresourcecontrol",
+                                                     1000).toDouble());
+            if(Q_UNLIKELY(!query.exec())) {
+                qCritical() << query.lastQuery();
+                //% "Minute pulse: reward supremacy failed!"
+                throw DBError(qtTrId("supremacy-reward-failed"), query.lastError());
+            }
+        }
     } catch (DBError &e) {
         for(QString &i : e.whats()) {
             qCritical() << i;
@@ -4570,10 +4629,10 @@ void Server::naturalRegen(const CSteamID &uid) {
             qint64 regenMins = currentTimeInMinute - priorRecoverTime;
             regenMins = std::max(Q_INT64_C(0), regenMins); //stop timezone trap
             int regenPower = globalTechLevel /
-                    settings->value("rule/antiregenpower", 4.0).toDouble();
-            int normal = settings->value("rule/baseregennormal", 10).toInt();
-            int al = settings->value("rule/baseregenaluminum", 5).toInt();
-            int rare = settings->value("rule/baseregenrare", 2).toInt();
+                    settings->value("rule/antiregenpower", 1.0).toDouble();
+            int normal = settings->value("rule/baseregennormal", 36).toInt();
+            int al = settings->value("rule/baseregenaluminum", 20).toInt();
+            int rare = settings->value("rule/baseregenrare", 10).toInt();
             ResOrd regenAmount = ResOrd(normal + regenPower,
                                         normal + regenPower,
                                         normal + regenPower,
@@ -5450,6 +5509,11 @@ void Server::receivedAuth(const QJsonObject &djson,
                     }
                     */
                 }
+anti_ddos_initial_allowence:
+                if(!allowedPackets.contains(steamID)) {
+                    allowedPackets[steamID]
+                            = settings->value("server/packetallowed", 3600).toInt();
+                }
                 delete [] rgubTicket;
                 return;
             }
@@ -5612,6 +5676,19 @@ void Server::receivedReq(const QJsonObject &djson,
                       .arg(uid.ConvertToUint64());
         return;
     }
+anti_ddos:
+    allowedPackets[uid]--;
+    qCritical() << allowedPackets[uid];
+    if(allowedPackets[uid] < 0 && (!User::isSuperUser(uid))) {
+        QByteArray msg = KP::serverLogout(KP::LogoutType::ViolatedRateLimit);
+        senderM.sendMessage(connection, msg);
+        connection->disconnectFromHost();
+        connectedPeers.remove(uid);
+        connectedUsers.remove(connection);
+        senderM.removeSender(connection);
+        return;
+    }
+
     switch(djson["command"].toInt()) {
     case KP::CommandType::ChangeState: {
         auto state = djson["state"].toInt();
@@ -6971,7 +7048,7 @@ user_attr:
         std::pair(QStringLiteral("CurrentMap"), 0),
         std::pair(QStringLiteral("CurrentNode"), 0),
         std::pair(QStringLiteral("ActiveFleet"), 0),
-        std::pair(QStringLiteral("InBattle"), KP::NoBattle)
+        std::pair(QStringLiteral("InBattle"), KP::NoBattle),
     };
 user_attr_sql:
     {

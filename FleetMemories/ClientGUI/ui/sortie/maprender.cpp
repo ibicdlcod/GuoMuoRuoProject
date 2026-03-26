@@ -29,7 +29,7 @@ MapRender::MapRender(QWidget *parent)
     }
     pixmap = QPixmap::fromImage(image);
 
-    pen = Qt::NoPen;//QPen(Qt::blue, 0);
+    pen = QPen(QColor(128, 192, 255), 7);
     brushHovered = QBrush(Qt::blue);
 
     setBackgroundRole(QPalette::Base);
