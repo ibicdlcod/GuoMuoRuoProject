@@ -13,7 +13,6 @@
 #include "../../../FactorySlot/factoryslot.h"
 #include "../views/equipview.h"
 #include "../../../Protocol/kp.h"
-#include "rankview.h"
 
 namespace Ui {
 class FactoryArea;
@@ -36,6 +35,7 @@ protected:
     void resizeEvent(QResizeEvent *event) override;
 
 private slots:
+    void buyClicked(bool checked = false);
     void developClicked(bool checked = false, int slotnum = 0);
     void doDevelop(int result);
     void doConstruct(int result);
@@ -49,8 +49,8 @@ private:
     QStackedLayout *lay;
     EquipView *equipview;
     QWidget *slotControl;
-    RankView *rankView;
     DevelopWindow dev;
+    DevelopWindow buy;
     ConstructWindow con;
     QList<QUuid> defaultEquips;
     QUuid shipToRemodel = QUuid();

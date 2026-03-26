@@ -18,6 +18,7 @@
 #include "hpdelegate.h"
 #include "equipselect.h"
 #include "shipselect.h"
+#include "industrialselect.h"
 
 namespace Ui {
 class EquipView;
@@ -86,6 +87,7 @@ private:
 
     EquipSelect *equipSelect;
     ShipSelect *shipSelect;
+    IndustrialSelect *industrialSelect;
     QStackedLayout *lay;
 
     int rowCountHintVal = 1;

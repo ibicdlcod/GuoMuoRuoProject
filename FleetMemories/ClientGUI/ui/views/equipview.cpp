@@ -78,6 +78,7 @@ EquipView::EquipView(QWidget *parent)
 
     equipSelect = new EquipSelect(20);
     shipSelect = new ShipSelect(20);
+    industrialSelect = new IndustrialSelect(20);
 
     QWidget *layoutWidget = new QWidget(this);
     QHBoxLayout *layout = new QHBoxLayout(layoutWidget);
@@ -93,6 +94,7 @@ EquipView::EquipView(QWidget *parent)
     layout2->addLayout(lay, 1);
     lay->addWidget(equipSelect);
     lay->addWidget(shipSelect);
+    lay->addWidget(industrialSelect);
     layout2->addWidget(layoutWidget, 1, Qt::AlignHCenter);
     layout2->setContentsMargins(0,0,0,0);
     layout2->setSpacing(1);
@@ -101,6 +103,7 @@ EquipView::EquipView(QWidget *parent)
                                         QSizePolicy::Maximum);
     equipSelect->setSizePolicy(labelSize);
     shipSelect->setSizePolicy(labelSize);
+    industrialSelect->setSizePolicy(labelSize);
     layoutWidget->setSizePolicy(labelSize);
 
     connect(equipSelect, &EquipSelect::typeActivated,
@@ -129,6 +132,11 @@ EquipView::EquipView(QWidget *parent)
             shipSelect, &ShipSelect::typeBoxHinted);
     connect(&engine.shipBPModel, &ShipModel::classBoxHint,
             shipSelect, &ShipSelect::classBoxHinted);
+
+    connect(&engine, &Clientv2::receivedRankInfoUser,
+            industrialSelect, &IndustrialSelect::setIPValue);
+    connect(industrialSelect, &IndustrialSelect::buyActivated,
+            this, &EquipView::buyActivated);
     /*
     connect(&engine, &Clientv2::uiRefreshSig,
             this, &EquipView::recalculateArsenalRows);
@@ -167,7 +175,7 @@ void EquipView::enactPageNumChange(int currentPageNum, int totalPageNum) {
             pageLabel->setText(qtTrId("no-equip"));
         }
         else if(model == &engine.shipModel
-                   || model == &engine.shipBPModel) {
+                 || model == &engine.shipBPModel) {
             //% "No suitable Ship"
             pageLabel->setText(qtTrId("no-ship"));
         }
@@ -187,10 +195,10 @@ void EquipView::columnResized(int logicalIndex, int oldSize, int newSize) {
     Q_UNUSED(oldSize)
     Q_UNUSED(newSize)
     QTimer::singleShot(100, this, [this](){
-    arsenalView
-        ->setMinimumSize(QSize(tableSizeWhole(arsenalView,
-                                              model).width(),
-                               ui->ArsenalControl->size().height()));
+        arsenalView
+            ->setMinimumSize(QSize(tableSizeWhole(arsenalView,
+                                                  model).width(),
+                                   ui->ArsenalControl->size().height()));
     });
     arsenalView->hide();
     arsenalView->show();
@@ -250,8 +258,6 @@ void EquipView::activate(bool arsenal, bool isEquip,
         rank_view:
             model = &engine.rankModel;
             arsenalView->setModel(model);
-            equipSelect->destructButton->hide();
-            equipSelect->addStarButton->hide();
             connect(model, SIGNAL(needReCalculateRows()),
                     this, SLOT(recalculateArsenalRows()),
                     Qt::UniqueConnection);
@@ -265,13 +271,13 @@ void EquipView::activate(bool arsenal, bool isEquip,
                 arsenalView->hide();
                 connect(model, &EquipModel::equipReady,
                         this, [this](){
-                    arsenalView->show();
-                });
+                            arsenalView->show();
+                        });
             }
             else {
                 arsenalView->show();
             }
-            lay->setCurrentWidget(equipSelect);
+            lay->setCurrentWidget(industrialSelect);
         }
         else {
         equip:

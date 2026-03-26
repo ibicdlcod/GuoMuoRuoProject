@@ -50,14 +50,13 @@ FactoryArea::FactoryArea(QWidget *parent) :
     lay->addWidget(slotControl);
     ui->ArsenalArea->setLayout(lay);
 
-    rankView = new RankView();
-    lay->addWidget(rankView);
-
     for(const auto &slot: slotfs) {
         connect(slot, &FactorySlot::clickedSpec,
                 this, &FactoryArea::developClicked);
         slot->setStatus();
     }
+    connect(equipview, &EquipView::buyActivated,
+            this, &FactoryArea::buyClicked);
     dev.setAttribute(Qt::WA_DeleteOnClose, false);
     con.setAttribute(Qt::WA_DeleteOnClose, false);
     connect(&dev, &QDialog::finished,
@@ -86,14 +85,22 @@ void FactoryArea::stackResize(int) {
         policy.setVerticalPolicy(QSizePolicy::Expanding);
         ui->ArsenalArea->setMaximumHeight(QWIDGETSIZE_MAX);
     }
-    else if(lay->currentWidget() == rankView) {
-        size = 8;
-        policy.setVerticalPolicy(QSizePolicy::Expanding);
-        ui->ArsenalArea->setMaximumHeight(QWIDGETSIZE_MAX);
-    }
     policy.setVerticalStretch(size);
     ui->ArsenalArea->setSizePolicy(policy);
     ui->ArsenalArea->update();
+}
+
+void FactoryArea::buyClicked(bool checked) {
+    Q_UNUSED(checked)
+
+    Clientv2 &engine = Clientv2::getInstance();
+    buy.show();
+    static bool initial = true;
+    if(initial) {
+        buy.resetListName(Clientv2::getInstance().equipBigTypeIndex);
+        initial = false;
+    }
+    engine.doRefreshFactory();
 }
 
 void FactoryArea::developClicked(bool checked, int slotnum) {

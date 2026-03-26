@@ -718,7 +718,7 @@ QByteArray serverNewShip(QUuid, int, int);
 QByteArray serverParseError(MsgType, const QString &,
                             const QString &);
 QByteArray serverPenguin();
-QByteArray serverRankInfo(const QJsonArray &, int);
+QByteArray serverRankInfo(const QJsonArray &, int, std::optional<double>);
 QByteArray serverResourceUpdate(ResOrd);
 QByteArray serverShipBPInfo(const QJsonObject &);
 QByteArray serverShipInfo(const QJsonArray &, bool user = false,

@@ -694,12 +694,16 @@ QByteArray KP::serverPenguin() {
 }
 
 QByteArray KP::serverRankInfo(const QJsonArray &content,
-                              int totalUsers) {
+                              int totalUsers,
+                              std::optional<double> yourIP) {
     QJsonObject result;
     result["type"] = DgramType::Info;
     result["infotype"] = InfoType::RankInfo;
     result["content"] = content;
     result["total"] = totalUsers;
+    if(yourIP.has_value()) {
+        result["yourip"] = yourIP.value();
+    }
     return QCborValue::fromJsonValue(result).toCbor();
 }
 

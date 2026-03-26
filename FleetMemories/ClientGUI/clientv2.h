@@ -168,6 +168,7 @@ signals:
     void receivedLocalTechInfo2(const QJsonObject &);
     void receivedMapStart(const QJsonObject &);
     void receivedRankInfo(const QJsonArray &, int);
+    void receivedRankInfoUser(double);
     void receivedRepairRefresh(const QJsonObject &);
     void receivedResourceInfo(const QJsonObject &);
     void receivedShipBlueprint(const QJsonObject &);

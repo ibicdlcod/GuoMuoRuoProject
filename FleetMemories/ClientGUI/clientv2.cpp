@@ -1259,6 +1259,9 @@ void Clientv2::receivedInfo(const QJsonObject &djson) {
     case KP::InfoType::RankInfo:
         emit receivedRankInfo(djson["content"].toArray(),
                               djson["total"].toInt());
+        if(djson.contains("yourip")) {
+            emit receivedRankInfoUser(djson["yourip"].toDouble());
+        }
         break;
     case KP::InfoType::ResourceInfo:
         emit receivedResourceInfo(djson);
