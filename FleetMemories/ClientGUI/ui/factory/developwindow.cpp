@@ -146,14 +146,18 @@ void DevelopWindow::displaySuccessRate2() {
                     )*100) + "%");
         ui->resourceAmount->setText(
             engine.getEquipmentReg(equipId)->devRes().toString(true));
-        ui->price->setText(QString::number(
-            engine.getEquipmentReg(equipId)->getPrice(), 'g', 6));
     }
     else {
         //% "Unknown"
         ui->rateNumber->setText(qtTrId("develop-success-rate-unknown"));
         //% "Unknown"
         ui->resourceAmount->setText(qtTrId("develop-resource-amount-unknown"));
+    }
+    if(engine.isEquipRegistryCacheGood()) {
+        ui->price->setText(QString::number(
+            engine.getEquipmentReg(equipId)->getPrice(), 'g', 6));
+    }
+    else {
         //% "Unknown"
         ui->price->setText(qtTrId("buy-price-unknown"));
     }

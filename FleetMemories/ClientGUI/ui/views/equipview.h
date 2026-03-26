@@ -51,6 +51,8 @@ public:
                   std::optional<KP::FactoryState> custom = std::nullopt);
     void enactPageNumChange(int currentPageNum, int totalPageNum);
 
+    int getRowCountHintVal(){ return rowCountHintVal; }
+
 public slots:
     void recalculateArsenalRows();
     void pageNumChangedLambda(int, int);

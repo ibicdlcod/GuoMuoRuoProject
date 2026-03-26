@@ -36,7 +36,7 @@ private:
     QMap<CSteamID, double> currentExp;
     QHash<int, CSteamID> currentDisplayed;
 
-    int totalUsers = 10;
+    int totalUsers = 1;
 
     int nameCol = 0;
     int cvpCol = 1;

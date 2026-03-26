@@ -264,14 +264,14 @@ void EquipView::activate(bool arsenal, bool isEquip,
             connect(this, SIGNAL(rowCountHint(int)),
                     model, SLOT(setRowsPerPageHint(int)),
                     Qt::UniqueConnection);
-            recalculateArsenalRows();
+            engine.doRefreshRank(rowCountHintVal);
             if(!model->isReady()) {
                 pageLabel->setText(qtTrId("retrieving-please-wait"));
-                engine.doRefreshRank(rowCountHintVal);
                 arsenalView->hide();
                 connect(model, &EquipModel::equipReady,
                         this, [this](){
                             arsenalView->show();
+                            recalculateArsenalRows();
                         });
             }
             else {

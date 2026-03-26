@@ -3201,7 +3201,7 @@ bool Server::importEquipFromCSV() {
                 int type = EquipType::strToIntRep(lineParts[3]);
                 if(type == 0 && !lineParts[1].isEmpty()) {
                     qWarning() << lineParts[0]
-                                  << "\tUnsupported type: " << lineParts[3];
+                            << "\tUnsupported type: " << lineParts[3];
                 }
                 QSqlQuery query;
                 query.prepare(
@@ -4488,7 +4488,7 @@ bool Server::modifyShip(const CSteamID &uid, QUuid prevShip, int newDef) {
         int levelDesired = (shipRegistry[newDef]->getId()
                             & 0xF0000000) >> 7;
         int levelOriginal = (shipRegistry[query.value(0).toInt()]->getId()
-                             & 0xF0000000) >> 7;
+                & 0xF0000000) >> 7;
         if(levelDesired == levelOriginal) {
             stars = query.value(1).toInt();
         }
@@ -4871,13 +4871,13 @@ void Server::processBattle(const CSteamID &uid, QSslSocket *connection,
                                         mapId,
                                         nodeId,
                                         result.value()[3], // activefleet
-                                        battlePlan);
+                    battlePlan);
             QByteArray msg = KP::serverBattleProcess(battleProcess);
             senderM.sendMessage(connection, msg);
 after_battle:
             QTimer::singleShot(battleProcess["time"].toInt(),
-                               this, [this, uid, connection, result,
-                               battleProcess, mapId, unionId, nodeId, type](){
+                    this, [this, uid, connection, result,
+                    battleProcess, mapId, unionId, nodeId, type](){
 set_battle_state:
                 QSqlQuery query;
                 query.prepare("UPDATE UserAttr SET Intvalue = :type "
@@ -4915,7 +4915,7 @@ condition_drop:
 
 drop_ship:
                 int dropShip = drop(uid, result.value()[0], result.value()[1],
-                                    assm);
+                        assm);
                 if(dropShip == -1) {
                     QByteArray msg = KP::serverBattleError(KP::DropError);
                     senderM.sendMessage(connection, msg);
@@ -5711,14 +5711,15 @@ void Server::receivedReq(const QJsonObject &djson,
         }
     }
         break;
-    case KP::CommandType::Develop:
+    case KP::CommandType::Develop: {
+        int equipid = djson["equipid"].toInt();
         if(!djson.contains("industrial")) {
-            int equipid = djson["equipid"].toInt();
             doDevelop(uid, equipid, djson["factory"].toInt(), connection);
         }
         else {
-            ;
+            doBuy(uid, equipid, connection);
         }
+    }
         break;
     case KP::CommandType::Construct: {
         int shipDef = djson["shipdef"].toInt();
@@ -5750,7 +5751,7 @@ void Server::receivedReq(const QJsonObject &djson,
         break;
     case KP::CommandType::Repair:
         doRepair(uid, QUuid(djson["shipuuid"].toString()), djson["slotnum"].toInt(),
-                 connection, djson["stop"].toBool(), djson["forced"].toBool());
+                connection, djson["stop"].toBool(), djson["forced"].toBool());
         break;
     case KP::CommandType::DemandEquipInfo: {
         auto clientTime = QDateTime::fromString(djson["timestamp"].toString());
@@ -5878,7 +5879,7 @@ void Server::receivedReq(const QJsonObject &djson,
         }
         else {
             offerRankInfo(uid, connection, djson["rpp"].toInt(),
-                          djson["page"].toInt());
+                    djson["page"].toInt());
         }
     }
         break;
@@ -6859,9 +6860,9 @@ KP::FleetFailType Server::updateFleet(const CSteamID &uid, const QJsonArray &inp
                       "FleetPosIndex = :fpid "
                       "WHERE ShipUuid = :uuid");
         query.bindValue(":fid", shipDataObj["pos"].toInt()
-                        / KP::fleetRepSize);
+                / KP::fleetRepSize);
         query.bindValue(":fpid", shipDataObj["pos"].toInt()
-                        % KP::fleetRepSize);
+                % KP::fleetRepSize);
         query.bindValue(":uuid", shipDataObj["uuid"].toString());
         if(Q_UNLIKELY(!query.exec())) {
             qCritical() << query.lastQuery();
@@ -6901,11 +6902,11 @@ KP::FleetFailType Server::updateFleet(const CSteamID &uid, const QJsonArray &inp
         {
             Equipment *equip = equipRegistry.value(
                         User::getEquipDef(QUuid(shipDataObj["equip"].toArray()
-                                                [KP::maxEquipSlots].toString())), nullptr);
+                                          [KP::maxEquipSlots].toString())), nullptr);
             if(ship && equip) {
                 int shipLv = Ship::getLevel(shipExps[
                                             QUuid(shipDataObj["uuid"].toString())
-                                            ]);
+                        ]);
                 if(shipLv < KP::levelUnlockExSlot || !equip->canEquipEX(ship, lua)) {
                     //% "Ship %1 can't equip %2 in extra slot!"
                     qWarning()
@@ -6920,7 +6921,7 @@ KP::FleetFailType Server::updateFleet(const CSteamID &uid, const QJsonArray &inp
                           "WHERE ShipUuid = :uuid");
             query.bindValue(":euuid",
                             shipDataObj["equip"].toArray()
-                            [KP::maxEquipSlots].toString());
+                    [KP::maxEquipSlots].toString());
             query.bindValue(":uuid", shipDataObj["uuid"].toString());
             if(Q_UNLIKELY(!query.exec())) {
                 qCritical() << query.lastQuery();

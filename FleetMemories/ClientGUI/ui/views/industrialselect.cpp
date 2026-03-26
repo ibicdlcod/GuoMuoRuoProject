@@ -10,6 +10,9 @@ IndustrialSelect::IndustrialSelect(int height, QWidget *parent)
     iPValueLabel = new QLabel(this);
     //% "Calculating..."
     iPValueLabel->setText(qtTrId("ip-calculating"));
+    buyButton = new QPushButton(this);
+    //% "Buy Equip"
+    buyButton->setText(qtTrId("buy-equip-button"));
 
     QHBoxLayout *layout = new QHBoxLayout(this);
     layout->addWidget(iPLabel);
@@ -18,9 +21,6 @@ IndustrialSelect::IndustrialSelect(int height, QWidget *parent)
     layout->setContentsMargins(0,0,0,0);
     layout->setSpacing(6);
     layout->setAlignment(Qt::AlignCenter);
-
-    //% "Buy Equip"
-    buyButton->setText(qtTrId("buy-equip-button"));
 
     QSizePolicy labelSize = QSizePolicy(QSizePolicy::Maximum,
                                         QSizePolicy::Preferred,

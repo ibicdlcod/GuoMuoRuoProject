@@ -59,6 +59,7 @@ FactoryArea::FactoryArea(QWidget *parent) :
             this, &FactoryArea::buyClicked);
     dev.setAttribute(Qt::WA_DeleteOnClose, false);
     con.setAttribute(Qt::WA_DeleteOnClose, false);
+    buy.setAttribute(Qt::WA_DeleteOnClose, false);
     connect(&dev, &QDialog::finished,
             this, &FactoryArea::doDevelop);
     connect(&con, &QDialog::finished,
@@ -95,7 +96,6 @@ void FactoryArea::stackResize(int) {
 void FactoryArea::buyClicked(bool checked) {
     Q_UNUSED(checked)
 
-    Clientv2 &engine = Clientv2::getInstance();
     buy.show();
     buy.setBuyMode(true);
     static bool initial = true;
@@ -103,7 +103,6 @@ void FactoryArea::buyClicked(bool checked) {
         buy.resetListName(Clientv2::getInstance().equipBigTypeIndex);
         initial = false;
     }
-    engine.doRefreshFactory();
 }
 
 void FactoryArea::developClicked(bool checked, int slotnum) {
@@ -251,9 +250,10 @@ void FactoryArea::doBuy(int result) {
     }
     else if(result == QDialog::Accepted) {
         engine.doBuyEquip(buy.equipIdDesired());
-        QTimer::singleShot(1000, this, [this](){
+        QTimer::singleShot(1000, this, [this, &engine](){
             factoryState = KP::RankView;
             switchToState();
+            engine.doRefreshRank(equipview->getRowCountHintVal());
         });
     }
 }

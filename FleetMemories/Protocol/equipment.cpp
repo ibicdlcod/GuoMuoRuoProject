@@ -205,7 +205,7 @@ double Equipment::getPrice() const {
 
 bool Equipment::isInvalid() const {
     return equipRegId == 0;
-};
+}
 
 /* 4.5-Skillpoints.md#Standard skill points */
 int Equipment::skillPointsStd() const {
