@@ -199,6 +199,10 @@ double Equipment::getTech() const {
     return Tech::techYearToCompact(attr["Tech"]);
 }
 
+double Equipment::getPrice() const {
+    return std::sqrt(getTech() + 1.0) / 4.0;
+}
+
 bool Equipment::isInvalid() const {
     return equipRegId == 0;
 };

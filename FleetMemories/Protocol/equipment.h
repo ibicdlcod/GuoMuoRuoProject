@@ -102,6 +102,7 @@ public:
     bool isInvalid() const;
     int skillPointsStd() const;
     bool isRocketPlane() const;
+    double getPrice() const;
 
     bool canEquip(Ship *ship, sol::state &ts) const;
     bool canEquipEX(Ship *ship, sol::state &ts) const;

@@ -103,6 +103,7 @@ public slots:
     void demandShipCache();
     void displayPrompt();
     void doBattle(const QJsonObject &);
+    void doBuyEquip(int equipDef);
     void doConstructShip(int shipDef, const QList<QUuid> &defaultEquips,
                          QUuid shipToRemodel, int factoryID);
     void doDestructEquip(const QList<QUuid> &);

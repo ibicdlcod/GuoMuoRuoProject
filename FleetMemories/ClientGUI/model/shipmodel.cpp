@@ -76,7 +76,7 @@ void ShipModel::switchShipDisplayType(const QString &nationality,
         else {
             /* nationality check */
             if(!nationality.isEmpty() &&
-                qtTrId(meta.key(iter->second->getNationality()))
+                qtTrId(meta.key(iter->second->getAllegianceGroup()))
                         .localeAwareCompare(nationality) != 0) {
                 pass = false;
             }

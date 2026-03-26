@@ -115,7 +115,7 @@ void ConstructWindow::switchDisplay(int) {
             pass = pass1;
         }
         if(!nationality.isEmpty() &&
-            qtTrId(meta.key(ship->getNationality()))
+            qtTrId(meta.key(ship->getAllegianceGroup()))
                     .localeAwareCompare(nationality) != 0) {
             pass = false;
         }

@@ -856,6 +856,14 @@ void Clientv2::doBattle(const QJsonObject &contents) {
     sender->enqueue(msg);
 }
 
+void Clientv2::doBuyEquip(int equipDef) {
+    if(equipDef == 0) {
+        return;
+    }
+    QByteArray msg = KP::clientBuy(equipDef);
+    sender->enqueue(msg);
+}
+
 void Clientv2::doConstructShip(int shipDef, const QList<QUuid> &defaultEquips,
                                QUuid shipToRemodel,
                                int factoryID) {
@@ -1385,6 +1393,10 @@ void Clientv2::receivedMsg(const QJsonObject &djson) {
         case KP::BlueprintNonexistent:
             //% "You don't have the appropriate blueprints."
             qWarning() << qtTrId("blueprint-lack");
+            break;
+        case KP::IndustrialPointsLack:
+            //% "You don't have enough industrial points."
+            qWarning() << qtTrId("industrial-lack");
             break;
         case KP::DevelopNotOption: {
             Equipment *father = equipRegistryCache

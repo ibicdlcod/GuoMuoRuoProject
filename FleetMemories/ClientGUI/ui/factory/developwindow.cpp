@@ -46,6 +46,8 @@ DevelopWindow::DevelopWindow(QWidget *parent)
     connect(&engine, &Clientv2::receivedLocalTechInfo,
             this, [this]{QTimer::singleShot(100, this, [this]{displaySuccessRate2();});});
     displaySuccessRate2();
+
+    setBuyMode(false);
 }
 
 DevelopWindow::~DevelopWindow() {
@@ -101,6 +103,27 @@ void DevelopWindow::resetEquipName(int equipInt) {
     Clientv2::getInstance().equipIndex = equipInt;
 }
 
+void DevelopWindow::setBuyMode(bool buy) {
+    if(buy) {
+        ui->buyHint->show();
+        ui->price->show();
+        ui->rateHint->hide();
+        ui->rateNumber->hide();
+        ui->calButton->hide();
+        ui->resourceAmount->hide();
+        ui->resourceHint->hide();
+    }
+    else {
+        ui->buyHint->hide();
+        ui->price->hide();
+        ui->rateHint->show();
+        ui->rateNumber->show();
+        ui->calButton->show();
+        ui->resourceAmount->show();
+        ui->resourceHint->show();
+    }
+}
+
 void DevelopWindow::displaySuccessRate(int index) {
     Q_UNUSED(index);
     displaySuccessRate2();
@@ -123,12 +146,16 @@ void DevelopWindow::displaySuccessRate2() {
                     )*100) + "%");
         ui->resourceAmount->setText(
             engine.getEquipmentReg(equipId)->devRes().toString(true));
+        ui->price->setText(QString::number(
+            engine.getEquipmentReg(equipId)->getPrice(), 'g', 6));
     }
     else {
         //% "Unknown"
         ui->rateNumber->setText(qtTrId("develop-success-rate-unknown"));
         //% "Unknown"
         ui->resourceAmount->setText(qtTrId("develop-resource-amount-unknown"));
+        //% "Unknown"
+        ui->price->setText(qtTrId("buy-price-unknown"));
     }
     update();
 }

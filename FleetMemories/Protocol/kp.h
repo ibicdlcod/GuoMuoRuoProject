@@ -209,6 +209,7 @@ enum GameError{
     DefaultEquipIncorrect,
     RemodelShipIncorrect,
     BlueprintNonexistent,
+    IndustrialPointsLack,
     ShipisDisabled,
     ShipisUnderRepair,
     FleetBusy,
@@ -569,10 +570,11 @@ QByteArray clientAdminTestEquip();
 QByteArray clientAdminTestEquipRemove();
 QByteArray clientAdminTestShip();
 QByteArray clientAdminTestShipRemove();
-QByteArray clientConstruct(int shipDef,
-                           const QList<QUuid> &defaultEquips,
-                           QUuid &shipToRemodel,
-                           int factoryID);
+QByteArray clientBuy(int);
+QByteArray clientConstruct(int,
+                           const QList<QUuid> &,
+                           QUuid &,
+                           int);
 QByteArray clientDemandDestructEquip(const QList<QUuid> &);
 QByteArray clientDemandEquipInfo(QDateTime timeUtc
                                  = QDateTime(QDate(1970, 1, 1),

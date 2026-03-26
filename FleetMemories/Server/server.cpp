@@ -14,7 +14,6 @@
 #include "kerrors.h"
 #include "sslserver.h"
 #include "user.h"
-#include "../Protocol/utility.h"
 #include "../Protocol/lua.h"
 #include "rngesus.h"
 #include "fleetinfo.h"
@@ -1808,6 +1807,72 @@ void Server::deleteTestShip(const CSteamID &uid) {
     else {
         //% "User id %1: all ship deleted"
         qDebug() << qtTrId("delete-all-ship").arg(uid.ConvertToUint64());
+    }
+}
+
+void Server::doBuy(const CSteamID &uid, int equipid,
+                   QSslSocket *connection) {
+    try{
+        if(!equipRegistry.contains(equipid)) {
+            QByteArray msg =
+                    KP::serverDevelopFailed(KP::DevelopNotExist);
+            senderM.sendMessage(connection, msg);
+            return;
+        }
+        Equipment *equip = equipRegistry[equipid];
+
+        /* 4.3-Development.md#Possess limit */
+possess_limit:
+        if(equip->disallowMassProduction() && (
+                    User::getEquipAmount(uid, equipid)
+                    + User::getCurrentFactoryParallel(uid, equipid)
+                    >= std::max(static_cast<double>(equip->attr["Disallowmassproduction"]),
+                                settings->value("rule/normalproductionstockpile",
+                                                30.0).toDouble()))) {
+            QByteArray msg =
+                    KP::serverDevelopFailed(KP::MassProductionDisallowed);
+            senderM.sendMessage(connection, msg);
+            return;
+        }
+subtract_ip:
+        {
+            QSqlQuery query;
+            QString queryStr = QStringLiteral("UPDATE UserRanking "
+                                              "SET Industrial = Industrial - :amount "
+                                              "WHERE User = :uid AND Industrial >= :amount;");
+            query.prepare(queryStr);
+            query.bindValue(":uid", uid.ConvertToUint64());
+            query.bindValue(":amount", equipRegistry[equipid]->getPrice());
+            if(Q_LIKELY(query.exec())) {
+                if(Q_LIKELY(query.numRowsAffected() > 0)) { // points subtracted from 1 user
+                    ; // pass
+                }
+                else {
+                    QByteArray msg =
+                            KP::serverDevelopFailed(KP::IndustrialPointsLack);
+                    senderM.sendMessage(connection, msg);
+                    return;
+                }
+            }
+            else {
+                qCritical() << query.lastQuery();
+                //% "Database failed when buying: query existing industrial failed!"
+                throw DBError(qtTrId("dbfail-buying-query-ip"),
+                              query.lastError());
+            }
+        }
+award_equip:
+        QByteArray msg = KP::serverNewEquip(
+                    newEquip(uid, equipid), equipid);
+        senderM.sendMessage(connection, msg);
+    } catch (DBError &e) {
+        for(QString &i : e.whats()) {
+            qCritical() << i;
+        }
+        return;
+    } catch(std::exception &e) {
+        qCritical() << e.what();
+        return;
     }
 }
 
@@ -4074,7 +4139,7 @@ decrease_supremacy:
 recover_condition:
         QDateTime lastRecoverTime
                 = settings->value("server/lastrecvcondtime",
-                                  QDateTime::fromSecsSinceEpoch(0, Qt::UTC))
+                                  QDateTime::fromSecsSinceEpoch(0, QTimeZone(Qt::UTC)))
                 .toDateTime();
         int lastRecoverTimeInt = lastRecoverTime.toSecsSinceEpoch();
         {
@@ -4136,7 +4201,7 @@ subtract_kc_exp:
 award_industrial_points:
         QDateTime lastSettleTime
                 = settings->value("server/nextsettleranktime",
-                                  QDateTime::fromSecsSinceEpoch(0, Qt::UTC))
+                                  QDateTime::fromSecsSinceEpoch(0, QTimeZone(Qt::UTC)))
                 .toDateTime();
         lastSettleTime.setDate(QDate(lastSettleTime.date().year(),
                                      lastSettleTime.date().month(),
@@ -5646,10 +5711,14 @@ void Server::receivedReq(const QJsonObject &djson,
         }
     }
         break;
-    case KP::CommandType::Develop: {
-        int equipid = djson["equipid"].toInt();
-        doDevelop(uid, equipid, djson["factory"].toInt(), connection);
-    }
+    case KP::CommandType::Develop:
+        if(!djson.contains("industrial")) {
+            int equipid = djson["equipid"].toInt();
+            doDevelop(uid, equipid, djson["factory"].toInt(), connection);
+        }
+        else {
+            ;
+        }
         break;
     case KP::CommandType::Construct: {
         int shipDef = djson["shipdef"].toInt();

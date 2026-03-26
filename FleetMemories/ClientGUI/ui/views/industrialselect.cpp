@@ -20,8 +20,7 @@ IndustrialSelect::IndustrialSelect(int height, QWidget *parent)
     layout->setAlignment(Qt::AlignCenter);
 
     //% "Buy Equip"
-    buyButton->setText(qtTrId("add-star-button"));
-
+    buyButton->setText(qtTrId("buy-equip-button"));
 
     QSizePolicy labelSize = QSizePolicy(QSizePolicy::Maximum,
                                         QSizePolicy::Preferred,

@@ -28,6 +28,7 @@ signals:
 public slots:
     void resetListName(int);
     void resetEquipName(int);
+    void setBuyMode(bool);
 
 private slots:
     void displaySuccessRate(int);

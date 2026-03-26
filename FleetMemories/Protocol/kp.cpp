@@ -100,6 +100,15 @@ QByteArray KP::clientAdminTestShipRemove() {
     return QCborValue::fromJsonValue(result).toCbor();
 }
 
+QByteArray KP::clientBuy(int equipDef) {
+    QJsonObject result;
+    result["type"] = DgramType::Request;
+    result["command"] = CommandType::Develop;
+    result["equipid"] = equipDef;
+    result["industrial"] = true;
+    return QCborValue::fromJsonValue(result).toCbor();
+}
+
 QByteArray KP::clientConstruct(int shipDef,
                                const QList<QUuid> &defaultEquips,
                                QUuid &shipToRemodel,

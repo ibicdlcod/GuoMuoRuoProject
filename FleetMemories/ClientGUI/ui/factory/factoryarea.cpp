@@ -63,6 +63,8 @@ FactoryArea::FactoryArea(QWidget *parent) :
             this, &FactoryArea::doDevelop);
     connect(&con, &QDialog::finished,
             this, &FactoryArea::doConstruct);
+    connect(&buy, &QDialog::finished,
+            this, &FactoryArea::doBuy);
     connect(lay, &QStackedLayout::currentChanged,
             this, &FactoryArea::stackResize);
 }
@@ -95,6 +97,7 @@ void FactoryArea::buyClicked(bool checked) {
 
     Clientv2 &engine = Clientv2::getInstance();
     buy.show();
+    buy.setBuyMode(true);
     static bool initial = true;
     if(initial) {
         buy.resetListName(Clientv2::getInstance().equipBigTypeIndex);
@@ -239,6 +242,20 @@ void FactoryArea::resizeEvent(QResizeEvent *event) {
         equipview->recalculateArsenalRows();
     }
     QWidget::resizeEvent(event);
+}
+
+void FactoryArea::doBuy(int result) {
+    Clientv2 &engine = Clientv2::getInstance();
+    if(result == QDialog::Rejected) {
+        qDebug() << "NOBUY";
+    }
+    else if(result == QDialog::Accepted) {
+        engine.doBuyEquip(buy.equipIdDesired());
+        QTimer::singleShot(1000, this, [this](){
+            factoryState = KP::RankView;
+            switchToState();
+        });
+    }
 }
 
 void FactoryArea::doDevelop(int result) {

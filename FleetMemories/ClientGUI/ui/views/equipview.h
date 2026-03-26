@@ -59,6 +59,7 @@ signals:
     void rowCountHint(int);
     void equipSelected(QUuid id);
     void shipSelected(QUuid id);
+    void buyActivated(bool checked = false);
 
 protected:
     void resizeEvent(QResizeEvent *event) override;

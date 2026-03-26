@@ -285,7 +285,7 @@ void ShipBPModel::switchShipDisplayType(const QString &nationality,
         else {
             /* nationality check */
             if(!nationality.isEmpty() &&
-                qtTrId(meta.key(shipToDisplay->getNationality()))
+                qtTrId(meta.key(shipToDisplay->getAllegianceGroup()))
                         .localeAwareCompare(nationality) != 0) {
                 pass = false;
             }
