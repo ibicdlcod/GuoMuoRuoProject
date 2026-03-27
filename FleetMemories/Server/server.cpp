@@ -4718,7 +4718,7 @@ int64 Server::newEquipHasMotherCal(const CSteamID &uid, int equipId) {
     if(equip->attr.contains("Homeport") && equip->attr["Homeport"] != 0) {
         supremacy = User::checkMapSupremacy(uid, equip->attr["Homeport"]);
     }
-    double factor = pow(settings->value("rule/waivemotherconditon", 0.95).toDouble(),
+    double factor = pow(settings->value("rule/waivemotherconditon", 0.99).toDouble(),
                         supremacy);
 
     double s = equip->skillPointsStd() * factor;
