@@ -55,6 +55,7 @@
 |      rule/techfactorcontroller       |                  5                  | the larger this value, the ship construction time and repair time/resources is shorter/fewer |
 |       rule/badconditionpenalty       |                1.001                | the larger this value, the faster your ship exp decreases when any of them is in negative condition |
 |       rule/mapresourcecontrol        |                1000                 | the larger this value, the harder gaining naval supremacy in coastal maps would affect resource gain |
+|       rule/waivemotherconditon       |                0.95                 | the lower this value, the lower mother skill points is required when naval supremacy in appropriate map is high |
 |            server/logfile            |            ServerLog.log            |                                                              |
 |           server/language            |                en_US                |                                                              |
 |      server/displaypromptdelay       |                 100                 |                                                              |

@@ -100,6 +100,31 @@ KP::AllegianceGroup User::checkHomePort(const CSteamID &uid) {
     }
 }
 
+double User::checkMapSupremacy(const CSteamID &uid, int map) {
+    QSqlDatabase db = QSqlDatabase::database();
+    QSqlQuery query;
+    query.prepare("SELECT Supremacy "
+                  "FROM UserMapState WHERE User = :id "
+                  "AND MapDef = :map;");
+    query.bindValue(":id", uid.ConvertToUint64());
+    query.bindValue(":map", map);
+
+    if(Q_UNLIKELY(!query.exec() || !query.isSelect())) {
+        qCritical() << query.lastQuery();
+        //% "User %1: query map-supremacy failed!"
+        throw DBError(qtTrId("user-supremacy-failure")
+                          .arg(uid.ConvertToUint64()),
+                      query.lastError());
+        return 0;
+    }
+    else if(!query.first()) {
+        return 0;
+    }
+    else {
+        return query.value(0).toDouble();
+    }
+}
+
 void User::decideHomePort(const CSteamID &uid, KP::AllegianceGroup nation) {
     QSqlDatabase db = QSqlDatabase::database();
 
@@ -507,7 +532,7 @@ std::tuple<bool, int> User::isFactoryFinished(const CSteamID &uid, int factoryID
     query.isSelect();
     if(Q_UNLIKELY(!query.first())) {
         qWarning() << qtTrId("user-nonexistent-uid")
-                          .arg(uid.ConvertToUint64());
+        .arg(uid.ConvertToUint64());
         return {false, 0};
     }
     else {
@@ -664,87 +689,87 @@ QUuid User::newShip(const CSteamID &uid, int shipDid, int startingHP) {
 
 bool User::openMap(const CSteamID &uid, int mapId) { // relative id
     try {
-    QSqlDatabase db = QSqlDatabase::database();
-    QSqlQuery query;
-    query.prepare("UPDATE UserMapState "
-                  "SET Supremacy = 0.0 "
-                  "WHERE User = :id AND MapDef = :def;");
-    query.bindValue(":id", uid.ConvertToUint64());
-    query.bindValue(":def", mapId);
-    if(Q_UNLIKELY(!query.exec())){
-        //% "User ID %1: DB failure when opening map %2!"
-        throw DBError(qtTrId("dbfail-when-opening-map")
-                          .arg(uid.ConvertToUint64()).arg(mapId),
-                      query.lastError());
-        return false;
-    }
-    else {
-        auto [factory, repair] = getCurrentSlots(uid);
-        auto [factory1, repair1] = KP::getDesiredSlots(getCurrentMapOpened(uid));
-    add_factory:
-        if(factory1 > factory) {
-            QSqlQuery query;
-            query.prepare("UPDATE UserAttr "
-                          "SET Intvalue = :factory "
-                          "WHERE UserID = :id AND Attribute = 'FactorySize';");
-            query.bindValue(":id", uid.ConvertToUint64());
-            query.bindValue(":factory", factory1);
-            if(Q_UNLIKELY(!query.exec())){
-                qCritical() << query.lastQuery();
-                //% "User ID %1: DB failure when increasing factory count!"
-                throw DBError(qtTrId("dbfail-when-increasing-factory")
-                                  .arg(uid.ConvertToUint64()),
-                              query.lastError());
-                return false;
-            }
-            for(int i = factory; i < factory1; ++i) {
+        QSqlDatabase db = QSqlDatabase::database();
+        QSqlQuery query;
+        query.prepare("UPDATE UserMapState "
+                      "SET Supremacy = 0.0 "
+                      "WHERE User = :id AND MapDef = :def;");
+        query.bindValue(":id", uid.ConvertToUint64());
+        query.bindValue(":def", mapId);
+        if(Q_UNLIKELY(!query.exec())){
+            //% "User ID %1: DB failure when opening map %2!"
+            throw DBError(qtTrId("dbfail-when-opening-map")
+                              .arg(uid.ConvertToUint64()).arg(mapId),
+                          query.lastError());
+            return false;
+        }
+        else {
+            auto [factory, repair] = getCurrentSlots(uid);
+            auto [factory1, repair1] = KP::getDesiredSlots(getCurrentMapOpened(uid));
+        add_factory:
+            if(factory1 > factory) {
                 QSqlQuery query;
-                query.prepare("INSERT INTO Factories (UserID, FactoryID)"
-                              " VALUES (:id, :count)");
+                query.prepare("UPDATE UserAttr "
+                              "SET Intvalue = :factory "
+                              "WHERE UserID = :id AND Attribute = 'FactorySize';");
                 query.bindValue(":id", uid.ConvertToUint64());
-                query.bindValue(":count", i);
-                if(Q_UNLIKELY(!query.exec())) {
+                query.bindValue(":factory", factory1);
+                if(Q_UNLIKELY(!query.exec())){
                     qCritical() << query.lastQuery();
-                    //% "Set User Factory Up failed!"
-                    throw DBError(qtTrId("init-user-factory-failed"),
+                    //% "User ID %1: DB failure when increasing factory count!"
+                    throw DBError(qtTrId("dbfail-when-increasing-factory")
+                                      .arg(uid.ConvertToUint64()),
                                   query.lastError());
                     return false;
                 }
+                for(int i = factory; i < factory1; ++i) {
+                    QSqlQuery query;
+                    query.prepare("INSERT INTO Factories (UserID, FactoryID)"
+                                  " VALUES (:id, :count)");
+                    query.bindValue(":id", uid.ConvertToUint64());
+                    query.bindValue(":count", i);
+                    if(Q_UNLIKELY(!query.exec())) {
+                        qCritical() << query.lastQuery();
+                        //% "Set User Factory Up failed!"
+                        throw DBError(qtTrId("init-user-factory-failed"),
+                                      query.lastError());
+                        return false;
+                    }
+                }
             }
-        }
-    add_repair:
-        if(repair1 > repair) {
-            QSqlQuery query;
-            query.prepare("UPDATE UserAttr "
-                          "SET Intvalue = :repair "
-                          "WHERE UserID = :id AND Attribute = 'DockSize';");
-            query.bindValue(":id", uid.ConvertToUint64());
-            query.bindValue(":repair", repair1);
-            if(Q_UNLIKELY(!query.exec())){
-                qCritical() << query.lastQuery();
-                //% "User ID %1: DB failure when increasing dock count!"
-                throw DBError(qtTrId("dbfail-when-increasing-dock")
-                                  .arg(uid.ConvertToUint64()),
-                              query.lastError());
-                return false;
-            }
-            for(int i = repair; i < repair1; ++i) {
+        add_repair:
+            if(repair1 > repair) {
                 QSqlQuery query;
-                query.prepare("INSERT INTO Docks (UserID, DockID)"
-                              " VALUES (:id, :count)");
+                query.prepare("UPDATE UserAttr "
+                              "SET Intvalue = :repair "
+                              "WHERE UserID = :id AND Attribute = 'DockSize';");
                 query.bindValue(":id", uid.ConvertToUint64());
-                query.bindValue(":count", i);
-                if(Q_UNLIKELY(!query.exec())) {
+                query.bindValue(":repair", repair1);
+                if(Q_UNLIKELY(!query.exec())){
                     qCritical() << query.lastQuery();
-                    //% "Set User Dock Up failed!"
-                    throw DBError(qtTrId("init-user-dock-failed"),
+                    //% "User ID %1: DB failure when increasing dock count!"
+                    throw DBError(qtTrId("dbfail-when-increasing-dock")
+                                      .arg(uid.ConvertToUint64()),
                                   query.lastError());
                     return false;
                 }
+                for(int i = repair; i < repair1; ++i) {
+                    QSqlQuery query;
+                    query.prepare("INSERT INTO Docks (UserID, DockID)"
+                                  " VALUES (:id, :count)");
+                    query.bindValue(":id", uid.ConvertToUint64());
+                    query.bindValue(":count", i);
+                    if(Q_UNLIKELY(!query.exec())) {
+                        qCritical() << query.lastQuery();
+                        //% "Set User Dock Up failed!"
+                        throw DBError(qtTrId("init-user-dock-failed"),
+                                      query.lastError());
+                        return false;
+                    }
+                }
             }
+            return true;
         }
-        return true;
-    }
     } catch (DBError &e) {
         for(QString &i : e.whats()) {
             qCritical() << i;
