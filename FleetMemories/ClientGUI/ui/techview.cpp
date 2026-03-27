@@ -7,6 +7,8 @@
 #include "../networkerror.h"
 #include "../equipicon.h"
 
+using namespace std::chrono_literals;
+
 extern std::unique_ptr<QSettings> settings;
 
 TechView::TechView(QWidget *parent) :
@@ -301,7 +303,7 @@ void TechView::updateGlobalTechViewTable(const QJsonObject &djson) {
     ui->globalViewTable->sortByColumn(4, Qt::DescendingOrder);
     ui->globalViewTable->sortByColumn(2, Qt::DescendingOrder);
     ui->globalViewTable->hideColumn(4);
-    QTimer::singleShot(1, this, [this]{resizeColumns(true);});
+    QTimer::singleShot(1ms, this, [this]{resizeColumns(true);});
 }
 
 void TechView::updateLocalTech(const QJsonObject &djson) {
@@ -396,7 +398,7 @@ void TechView::updateLocalTechViewTable(const QJsonObject &djson) {
     ui->localViewTable->sortByColumn(4, Qt::DescendingOrder);
     ui->localViewTable->sortByColumn(2, Qt::DescendingOrder);
     ui->localViewTable->hideColumn(4);
-    QTimer::singleShot(1, this, [this]{resizeColumns(false);});
+    QTimer::singleShot(1ms, this, [this]{resizeColumns(false);});
 }
 
 void TechView::updateSkillPoints(const QJsonObject &djson) {

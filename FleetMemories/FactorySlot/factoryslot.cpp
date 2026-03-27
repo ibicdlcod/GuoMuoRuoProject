@@ -10,7 +10,8 @@ FactorySlot::FactorySlot(QWidget *parent) :
     connect(this, &FactorySlot::clicked, this, &FactorySlot::clickedHelper);
     timer = new QTimer(this);
     connect(timer, &QTimer::timeout, this, &FactorySlot::setStatus);
-    timer->start(1000);
+    using namespace std::chrono_literals;
+    timer->start(1000ms);
 }
 
 FactorySlot::~FactorySlot() noexcept {

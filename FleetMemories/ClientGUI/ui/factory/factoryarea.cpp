@@ -12,6 +12,8 @@
 #include "../views/equipview.h"
 #include "FactorySlot/factoryslot.h"
 
+using namespace std::chrono_literals;
+
 FactoryArea::FactoryArea(QWidget *parent) :
     QFrame(parent),
     ui(new Ui::FactoryArea)
@@ -250,7 +252,8 @@ void FactoryArea::doBuy(int result) {
     }
     else if(result == QDialog::Accepted) {
         engine.doBuyEquip(buy.equipIdDesired());
-        QTimer::singleShot(1000, this, [this, &engine](){
+        using namespace std::chrono_literals;
+        QTimer::singleShot(1000ms, this, [this, &engine](){
             factoryState = KP::RankView;
             switchToState();
             engine.doRefreshRank(equipview->getRowCountHintVal());
@@ -264,7 +267,7 @@ void FactoryArea::doDevelop(int result) {
         qDebug() << "NODEVELOP";
     }
     else if(result == QDialog::Accepted) {
-        QTimer::singleShot(100, &engine, &Clientv2::doRefreshFactory);
+        QTimer::singleShot(100ms, &engine, &Clientv2::doRefreshFactory);
         QString msg = QStringLiteral("develop %1 %2")
                           .arg(dev.equipIdDesired()).arg(currentSlotNum);
         qDebug() << msg;
@@ -278,7 +281,7 @@ void FactoryArea::doConstruct(int result) {
         qDebug() << "NOCONSTRUCT";
     }
     else if(result == QDialog::Accepted) {
-        QTimer::singleShot(100, &engine, &Clientv2::doRefreshFactory);
+        QTimer::singleShot(100ms, &engine, &Clientv2::doRefreshFactory);
         engine.doConstructShip(con.shipDefDesired(), con.defaultEquipsDesired(),
                                con.shipToRemodelDesired(),
                                currentSlotNum);

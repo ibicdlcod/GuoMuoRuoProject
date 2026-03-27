@@ -11,6 +11,8 @@
 #include "networkerror.h"
 #include "steamauth.h"
 
+using namespace std::chrono_literals;
+
 extern QFile *logFile;
 extern std::unique_ptr<QSettings> settings;
 
@@ -53,7 +55,8 @@ Clientv2::Clientv2(QObject *parent)
     // May cause issues?
     timer = new QTimer(this);
     connect(timer, &QTimer::timeout, this, &Clientv2::uiRefresh);
-    timer->start(1000);
+    using namespace std::chrono_literals;
+    timer->start(1000ms);
 
     /* 1-migrate.md */
     migrateServer.route("/", QHttpServerRequest::Method::Post, this,
@@ -571,7 +574,7 @@ void Clientv2::tsunkitAssets2() {
         }
         while(downloadStarted - downloadCompleted > 200) {
             QEventLoop loop;
-            QTimer::singleShot(100, &loop, &QEventLoop::quit);
+            QTimer::singleShot(100ms, &loop, &QEventLoop::quit);
             loop.exec();
         }
         ResourceFetch *resourceFetcher = new ResourceFetch();
@@ -827,7 +830,7 @@ void Clientv2::doSwitch(const QStringList &cmdParts) {
     }
     else {
         QString secondary = cmdParts[1].first(1).toUpper()
-                            + cmdParts[1].sliced(1).toLower();
+        + cmdParts[1].sliced(1).toLower();
 
         QMetaEnum info = QMetaEnum::fromType<KP::GameState>();
         int statevalue = info.keyToValue(secondary.toLatin1().constData());
@@ -981,7 +984,7 @@ void Clientv2::exitGracefully() {
     //% "Goodbye."
     emit qout(qtTrId("goodbye-gui"), QColor("black"), QColor(64,255,64));
     if(logFile) {
-    logFile->close();
+        logFile->close();
     }
     emit aboutToQuit();
 }
@@ -1080,7 +1083,8 @@ void Clientv2::parseConnectReq(const QStringList &cmdParts) {
         SteamAPI_RunCallbacks();
 
         QTimer::singleShot(
-            (settings->value("networkclient/autopasswordtime", 1000).toInt()),
+            std::chrono::milliseconds(settings->value("networkclient/autopasswordtime",
+                                                      1000).toInt()),
             this, &Clientv2::autoPassword);
         clientName = SteamFriends()->GetPersonaName();
 
@@ -1311,7 +1315,7 @@ void Clientv2::receivedInfo(const QJsonObject &djson) {
         }
         emit mapSupremacyChanged();
     }
-        break;
+    break;
     case KP::InfoType::MapStart:
         gameState = KP::SortieMapView;
         emit gamestateChanged(KP::SortieMapView);

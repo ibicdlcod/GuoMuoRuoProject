@@ -86,8 +86,9 @@ void Receiver::processGoodMsg(qint64 totalParts,
                     emit timeOut(msgId);
                 }
                 );
-        timers[msgId]->start(settings->value("networkshared/maxmsgdelayinms",
-                                             1000).toInt() * totalParts);
+        timers[msgId]->start(std::chrono::milliseconds(
+                                 settings->value("networkshared/maxmsgdelayinms",
+                                                 1000).toInt()) * totalParts);
     }
     else if(totalPartsMap[msgId] != totalParts) {
         //% "Message total parts is inconsistent!"

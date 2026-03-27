@@ -14,6 +14,8 @@
 #include "keyenterreceiver.h"
 #include "../clientv2.h"
 
+using namespace std::chrono_literals;
+
 extern std::unique_ptr<QSettings> settings;
 
 MainWindow::MainWindow(QWidget *parent, int argc, char ** argv)
@@ -136,7 +138,7 @@ MainWindow::MainWindow(QWidget *parent, int argc, char ** argv)
     ui->MainArea->setLayout(lay);
     lay->setContentsMargins(0,0,0,0);
 
-    QTimer::singleShot(100, this,
+    QTimer::singleShot(100ms, this,
                        [this]
                        {
                            lay->setCurrentWidget(licenseArea);
@@ -151,8 +153,9 @@ MainWindow::MainWindow(QWidget *parent, int argc, char ** argv)
             });
     connect(licenseArea, &LicenseArea::showLicenseComplete,
             this, &MainWindow::gamestateInit);
-    QTimer::singleShot(settings->value("client/licenseareapersist",
-                                       5000).toInt(), this,
+    QTimer::singleShot(std::chrono::milliseconds(
+                           settings->value("client/licenseareapersist",
+                                           5000).toInt()), this,
                        [this]{
                            this->licenseArea->complete();
                        });
@@ -196,50 +199,50 @@ void MainWindow::lockBattle() {
 void MainWindow::unlockBattle() {
     Clientv2 &engine = Clientv2::getInstance();
     v =
-    {
-        connect(ui->actionBack_to_naval_base, &QAction::triggered,
-                &engine, &Clientv2::backToNavalBase),
-        connect(ui->actionView_Tech, &QAction::triggered,
-                &engine, &Clientv2::switchToTech),
-        connect(ui->actionRepair, &QAction::triggered,
-                &engine, &Clientv2::switchToRepairView),
-        connect(ui->actionDevelop_Equipment, &QAction::triggered,
-                &engine, &Clientv2::switchToFactory),
-        connect(ui->actionDevelop_Equipment, &QAction::triggered,
-                this, &MainWindow::switchToDevelop),
-        connect(ui->actionConstruct_Ships, &QAction::triggered,
-                &engine, &Clientv2::switchToFactory),
-        connect(ui->actionConstruct_Ships, &QAction::triggered,
-                this, &MainWindow::switchToConstruct),
-        connect(ui->actionArsenal, &QAction::triggered,
-                &engine, &Clientv2::switchToFactory),
-        connect(ui->actionArsenal, &QAction::triggered,
-                this, &MainWindow::switchToArsenal),
-        connect(ui->actionAnchorage, &QAction::triggered,
-                &engine, &Clientv2::switchToFactory),
-        connect(ui->actionAnchorage, &QAction::triggered,
-                this, &MainWindow::switchToAnchorage),
-        connect(ui->actionShip_Blueprints, &QAction::triggered,
-                &engine, &Clientv2::switchToFactory),
-        connect(ui->actionShip_Blueprints, &QAction::triggered,
-                this, &MainWindow::switchToBlueprint),
-        connect(ui->actionBattle, &QAction::triggered,
-                &engine, &Clientv2::switchToBattleView),
-        connect(ui->actionBattle, &QAction::triggered,
-                this, &MainWindow::switchToSortie),
-        connect(ui->actionCompose, &QAction::triggered,
-                &engine, &Clientv2::switchToFleetView),
-        connect(ui->actionCompose, &QAction::triggered,
-                this, &MainWindow::switchToFleet),
-        connect(ui->actionIndustrial_Plant, &QAction::triggered,
-                &engine, &Clientv2::switchToFactory),
-        connect(ui->actionIndustrial_Plant, &QAction::triggered,
-                this, &MainWindow::switchToRank),
-    };
+        {
+            connect(ui->actionBack_to_naval_base, &QAction::triggered,
+                    &engine, &Clientv2::backToNavalBase),
+            connect(ui->actionView_Tech, &QAction::triggered,
+                    &engine, &Clientv2::switchToTech),
+            connect(ui->actionRepair, &QAction::triggered,
+                    &engine, &Clientv2::switchToRepairView),
+            connect(ui->actionDevelop_Equipment, &QAction::triggered,
+                    &engine, &Clientv2::switchToFactory),
+            connect(ui->actionDevelop_Equipment, &QAction::triggered,
+                    this, &MainWindow::switchToDevelop),
+            connect(ui->actionConstruct_Ships, &QAction::triggered,
+                    &engine, &Clientv2::switchToFactory),
+            connect(ui->actionConstruct_Ships, &QAction::triggered,
+                    this, &MainWindow::switchToConstruct),
+            connect(ui->actionArsenal, &QAction::triggered,
+                    &engine, &Clientv2::switchToFactory),
+            connect(ui->actionArsenal, &QAction::triggered,
+                    this, &MainWindow::switchToArsenal),
+            connect(ui->actionAnchorage, &QAction::triggered,
+                    &engine, &Clientv2::switchToFactory),
+            connect(ui->actionAnchorage, &QAction::triggered,
+                    this, &MainWindow::switchToAnchorage),
+            connect(ui->actionShip_Blueprints, &QAction::triggered,
+                    &engine, &Clientv2::switchToFactory),
+            connect(ui->actionShip_Blueprints, &QAction::triggered,
+                    this, &MainWindow::switchToBlueprint),
+            connect(ui->actionBattle, &QAction::triggered,
+                    &engine, &Clientv2::switchToBattleView),
+            connect(ui->actionBattle, &QAction::triggered,
+                    this, &MainWindow::switchToSortie),
+            connect(ui->actionCompose, &QAction::triggered,
+                    &engine, &Clientv2::switchToFleetView),
+            connect(ui->actionCompose, &QAction::triggered,
+                    this, &MainWindow::switchToFleet),
+            connect(ui->actionIndustrial_Plant, &QAction::triggered,
+                    &engine, &Clientv2::switchToFactory),
+            connect(ui->actionIndustrial_Plant, &QAction::triggered,
+                    this, &MainWindow::switchToRank),
+        };
 }
 
 void MainWindow::adjust(int) {
-    QTimer::singleShot(10, this,
+    QTimer::singleShot(10ms, this,
                        [this]
                        {
                            auto geo = geometry();

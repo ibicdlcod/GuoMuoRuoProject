@@ -20,6 +20,8 @@
 
 QT_BEGIN_NAMESPACE
 
+using namespace std::chrono_literals;
+
 extern std::unique_ptr<QSettings> settings;
 
 namespace {
@@ -400,7 +402,8 @@ Server::Server(int argc, char ** argv) : CommandLine(argc, argv) {
             this, [this](){
         minutePulse();
         clock->setSingleShot(false);
-        clock->start(KP::secsinMin * 1000);
+        using namespace std::chrono_literals;
+        clock->start(KP::secsinMin * 1000ms);
         QObject::disconnect(clock, &QTimer::timeout, nullptr, nullptr);
         connect(clock, &QTimer::timeout,
                 this, [this](){
@@ -994,7 +997,7 @@ void Server::offerEquipInfoUser(const CSteamID &uid,
             connection->flush();
             QByteArray msg =
                     KP::serverEquipInfo(userEquipInfos, true);
-            QTimer::singleShot(100, this,
+            QTimer::singleShot(100ms, this,
                                [=, this](){senderM.sendMessage(connection, msg);});
             connection->flush();
         }
@@ -1065,7 +1068,7 @@ void Server::offerMapInfo(const CSteamID &uid, QSslSocket *connection)
         }
         mapInfos.append(mapInfo);
     }
-    QTimer::singleShot(100, this, [=, this]{
+    QTimer::singleShot(100ms, this, [=, this]{
         connection->flush();
         QByteArray msg =
                 KP::serverMapInfo(mapInfos,
@@ -1409,7 +1412,7 @@ user_ship:
             }
             QByteArray msg =
                     KP::serverShipInfo(userShipInfos, true);
-            QTimer::singleShot(100, this,
+            QTimer::singleShot(100ms, this,
                                [=, this](){
                 connection->flush();
                 senderM.sendMessage(connection, msg);
@@ -1439,7 +1442,7 @@ user_ship_bp:
             }
             QByteArray msg =
                     KP::serverShipBPInfo(userShipBP);
-            QTimer::singleShot(1000, this,
+            QTimer::singleShot(1000ms, this,
                                [=, this](){
                 connection->flush();
                 senderM.sendMessage(connection, msg);
@@ -1978,7 +1981,7 @@ resource_required:
         ResOrd currentRes = User::getCurrentResources(uid);
         if(!currentRes.spendResources(resRequired)){
             connection->flush();
-            QTimer::singleShot(100, this, [this, connection]{
+            QTimer::singleShot(100ms, this, [this, connection]{
                 QByteArray msg =
                         KP::serverDevelopFailed(KP::ResourceLack);
                 senderM.sendMessage(connection, msg);
@@ -2305,7 +2308,7 @@ resource_required:
         ResOrd currentRes = User::getCurrentResources(uid);
         if(!currentRes.spendResources(resRequired)){
             connection->flush();
-            QTimer::singleShot(100, this, [this, connection]{
+            QTimer::singleShot(100ms, this, [this, connection]{
                 QByteArray msg =
                         KP::serverDevelopFailed(KP::ResourceLack);
                 senderM.sendMessage(connection, msg);
@@ -2400,7 +2403,7 @@ void Server::doFetch(const CSteamID &uid, int factoryid, QSslSocket *connection,
                 ResOrd currentRes = User::getCurrentResources(uid);
                 if(!currentRes.spendResources(resRequired)){
                     connection->flush();
-                    QTimer::singleShot(100, this, [this, connection]{
+                    QTimer::singleShot(100ms, this, [this, connection]{
                         QByteArray msg =
                                 KP::serverDevelopFailed(KP::ResourceLack);
                         senderM.sendMessage(connection, msg);
@@ -2532,7 +2535,7 @@ force_repair:
 spend_resources:
                 if(!currentRes.spendResources(resRequired * (1 - progress))){
                     connection->flush();
-                    QTimer::singleShot(100, this, [this, connection]{
+                    QTimer::singleShot(100ms, this, [this, connection]{
                         QByteArray msg =
                                 KP::serverDevelopFailed(KP::ResourceLack);
                         senderM.sendMessage(connection, msg);
@@ -2671,7 +2674,7 @@ resource_required:
             currentRes = User::getCurrentResources(uid);
             if(!currentRes.spendResources(resRequired)){
                 connection->flush();
-                QTimer::singleShot(100, this, [this, connection]{
+                QTimer::singleShot(100ms, this, [this, connection]{
                     QByteArray msg =
                             KP::serverDevelopFailed(KP::ResourceLack);
                     senderM.sendMessage(connection, msg);
@@ -4945,7 +4948,8 @@ void Server::processBattle(const CSteamID &uid, QSslSocket *connection,
             QByteArray msg = KP::serverBattleProcess(battleProcess);
             senderM.sendMessage(connection, msg);
 after_battle:
-            QTimer::singleShot(battleProcess["time"].toInt(),
+            QTimer::singleShot(std::chrono::milliseconds(
+                                   battleProcess["time"].toInt()),
                     this, [this, uid, connection, result,
                     battleProcess, mapId, unionId, nodeId, type](){
 set_battle_state:
@@ -5847,7 +5851,7 @@ anti_ddos:
         auto serverTime = settings->value("server/equipdbtimestamp").toDateTime();
         qint64 diff = clientTime.msecsTo(serverTime);
         if(diff > settings->value("server/cachetolerancemsec", 10000).toInt()) {
-            QTimer::singleShot(100,
+            QTimer::singleShot(100ms,
                                this,
                                [connection, this]{offerEquipInfo(connection);});
         }
@@ -5867,7 +5871,7 @@ anti_ddos:
     }
         break;
     case KP::CommandType::DemandEquipInfoUser: {
-        QTimer::singleShot(100,
+        QTimer::singleShot(100ms,
                            this,
                            [connection, uid, this]
         {offerEquipInfoUser(uid, connection);});
@@ -5878,7 +5882,7 @@ anti_ddos:
         auto serverTime = settings->value("server/shipdbtimestamp").toDateTime();
         qint64 diff = clientTime.msecsTo(serverTime);
         if(diff > settings->value("server/cachetolerancemsec", 10000).toInt()) {
-            QTimer::singleShot(100,
+            QTimer::singleShot(100ms,
                                this,
                                [connection, this]{offerShipInfo(connection);});
 
@@ -5899,7 +5903,7 @@ anti_ddos:
     }
         break;
     case KP::CommandType::DemandShipInfoUser: {
-        QTimer::singleShot(100,
+        QTimer::singleShot(100ms,
                            this,
                            [connection, uid, this]
         {offerShipInfoUser(uid, connection);});
@@ -5910,7 +5914,7 @@ anti_ddos:
         auto serverTime = settings->value("server/mapdbtimestamp").toDateTime();
         qint64 diff = clientTime.msecsTo(serverTime);
         if(diff > settings->value("server/cachetolerancemsec", 10000).toInt()) {
-            QTimer::singleShot(100,
+            QTimer::singleShot(100ms,
                                this,
                                [connection, uid, this]
             {offerMapInfo(uid, connection);});
@@ -5934,7 +5938,7 @@ anti_ddos:
     }
         break;
     case KP::CommandType::DemandTech: {
-        QTimer::singleShot(100,
+        QTimer::singleShot(100ms,
                            this,
                            [connection, uid, djson, this]
         {offerTechInfo(
@@ -5944,7 +5948,7 @@ anti_ddos:
     }
         break;
     case KP::CommandType::DemandSkillPoints: {
-        QTimer::singleShot(100,
+        QTimer::singleShot(100ms,
                            this,
                            [connection, uid, djson, this]
         {offerSPInfo(
@@ -5954,7 +5958,7 @@ anti_ddos:
     }
         break;
     case KP::CommandType::DemandResourceUpdate: {
-        QTimer::singleShot(100,
+        QTimer::singleShot(100ms,
                            this,
                            [connection, uid, this]
         {offerResourceInfo(

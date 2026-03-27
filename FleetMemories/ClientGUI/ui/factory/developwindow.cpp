@@ -7,6 +7,8 @@
 #include "Protocol/tech.h"
 #include "ClientGUI/clientv2.h"
 
+using namespace std::chrono_literals;
+
 extern std::unique_ptr<QSettings> settings;
 
 DevelopWindow::DevelopWindow(QWidget *parent)
@@ -42,9 +44,9 @@ DevelopWindow::DevelopWindow(QWidget *parent)
             this, &DevelopWindow::devDemandChance);
     Clientv2 &engine = Clientv2::getInstance();
     connect(&engine, &Clientv2::receivedGlobalTechInfo,
-            this, [this]{QTimer::singleShot(100, this, [this]{displaySuccessRate2();});});
+            this, [this]{QTimer::singleShot(100ms, this, [this]{displaySuccessRate2();});});
     connect(&engine, &Clientv2::receivedLocalTechInfo,
-            this, [this]{QTimer::singleShot(100, this, [this]{displaySuccessRate2();});});
+            this, [this]{QTimer::singleShot(100ms, this, [this]{displaySuccessRate2();});});
     displaySuccessRate2();
 
     setBuyMode(false);

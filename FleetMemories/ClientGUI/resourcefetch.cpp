@@ -7,6 +7,8 @@
 #include <QDir>
 #include <QTimer>
 
+using namespace std::chrono_literals;
+
 ResourceFetch::ResourceFetch(QObject *parent)
     : QObject{parent}
 {
@@ -69,7 +71,7 @@ void ResourceFetch::downloadFile(const QString &urlSpec,
         fileName.prepend(downloadDirectory + '/');
 
     if(QFile::exists(fileName)) {
-        QTimer::singleShot(1, this, [this]{emit finished();});
+        QTimer::singleShot(1ms, this, [this]{emit finished();});
         return;
     }
     file = openFileForWrite(fileName);
@@ -121,7 +123,7 @@ void ResourceFetch::httpFinished()
             //% "Download failed: %1"
             qCritical() << qtTrId("download-failed").arg(errorString);
         }
-        QTimer::singleShot(100, this, [this](){emit finished();});
+        QTimer::singleShot(100ms, this, [this](){emit finished();});
         return;
     }
     //! [networkreply-error-handling-2]
@@ -130,7 +132,7 @@ void ResourceFetch::httpFinished()
     qInfo() << qtTrId("download-success")
                    .arg(fi.size())
                    .arg(fi.fileName(), QDir::toNativeSeparators(fi.absolutePath()));
-    QTimer::singleShot(100, this, [this](){emit finished();});
+    QTimer::singleShot(100ms, this, [this](){emit finished();});
 }
 
 //! [networkreply-readyread-2]

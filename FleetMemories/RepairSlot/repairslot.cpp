@@ -10,7 +10,8 @@ RepairSlot::RepairSlot(QWidget *parent) :
     connect(this, &RepairSlot::clicked, this, &RepairSlot::clickedHelper);
     timer = new QTimer(this);
     connect(timer, &QTimer::timeout, this, &RepairSlot::setStatus);
-    timer->start(1000);
+    using namespace std::chrono_literals;
+    timer->start(1000ms);
 }
 
 RepairSlot::~RepairSlot() noexcept {

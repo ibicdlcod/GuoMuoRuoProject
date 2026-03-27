@@ -83,7 +83,7 @@ void MapDetail::changeCurrentNode(const MapNode &node) {
     }
     else {
         //animation->setEasingCurve(QEasingCurve::InBack);
-        animation->setDuration(1000);
+        animation->setDuration(1000); // in milliseconds
         animation->setStartValue(QPointF(currentNode.x,
                                          currentNode.y));
         animation->setEndValue(QPointF(node.x,

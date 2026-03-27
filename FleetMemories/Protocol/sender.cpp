@@ -91,15 +91,16 @@ void Sender::send() {
 
         m_partnum = 0;
         m_partnumtotal = 0;
-        QTimer::singleShot(settings->value(
-                                       "networkshared/mintimebetweenmsgsinms",
-                                       0).toInt(),
+        QTimer::singleShot(std::chrono::milliseconds(
+                               settings->value(
+                                           "networkshared/mintimebetweenmsgsinms",
+                                           0).toInt()),
                            this, &Sender::switchtoReady);
         return;
     }
     if(m_partnum == 0 && m_source->bytesAvailable()) {
         m_partnumtotal = (m_source->bytesAvailable() - 1)
-                             / KP::practicalBufferSize + 1;
+        / KP::practicalBufferSize + 1;
         messageId = QUuid::createUuid();
     }
     qint64 read = m_source->read(m_buffer.data(), m_buffer.size());

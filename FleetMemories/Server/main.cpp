@@ -106,8 +106,10 @@ int main(int argc, char *argv[]) {
         throw std::runtime_error("Connection with input parser failed!");
     }
     qInstallMessageHandler(server.customMessageHandler);
-    QTimer::singleShot(0, &server, &Server::openingwords);
-    QTimer::singleShot(settings->value("server/displaypromptdelay", 100).toInt(),
+    QTimer::singleShot(std::chrono::milliseconds(0), &server, &Server::openingwords);
+    QTimer::singleShot(std::chrono::milliseconds(
+                           settings->value(
+                                       "server/displaypromptdelay", 100).toInt()),
                        &server, &Server::displayPrompt);
 
     // ↓ Start event loop

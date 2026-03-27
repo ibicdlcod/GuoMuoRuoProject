@@ -9,6 +9,8 @@
 #include <QWheelEvent>
 #include "../../clientv2.h"
 
+using namespace std::chrono_literals;
+
 extern std::unique_ptr<QSettings> settings;
 
 EquipView::EquipView(QWidget *parent)
@@ -194,7 +196,7 @@ void EquipView::columnResized(int logicalIndex, int oldSize, int newSize) {
     Q_UNUSED(logicalIndex)
     Q_UNUSED(oldSize)
     Q_UNUSED(newSize)
-    QTimer::singleShot(100, this, [this](){
+    QTimer::singleShot(100ms, this, [this](){
         arsenalView
             ->setMinimumSize(QSize(tableSizeWhole(arsenalView,
                                                   model).width(),
