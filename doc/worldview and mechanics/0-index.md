@@ -25,7 +25,7 @@
   * [Visible bonuses](5.6-visiblebonus.md) [NOTYETIMPLEMENTED]
   * [Experience and modernization](5.7-experience.md)
   * [Remodel](5.8-remodel.md)
-  * [Cloning Vats](5.9-cloning vats.md) [NOTYETIMPLEMENTED]
+  * [Cloning Vats](5.9-cloning.md) [NOTYETIMPLEMENTED]
   * [Labor condition](5.10-labor.md)
   * Decoration [NOTYETIMPLEMENTED]
   * Enemies (Amnesiac Fleet) [NOTYETIMPLEMENTED]
