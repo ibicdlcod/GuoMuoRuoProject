@@ -115,7 +115,7 @@ private:
     QList<std::tuple<QUuid, int>> modernizeEquip(const CSteamID &, const QList<QUuid> &);
     QUuid newEquip(const CSteamID &, int, bool direct = false);
     void newEquipHasMother(const CSteamID &, int);
-    int64 newEquipHasMotherCal(int);
+    int64 newEquipHasMotherCal(const CSteamID &, int);
     QUuid newShip(const CSteamID &, int, bool direct = false);
     int nextNode(const CSteamID &, QSslSocket *, int mapId, int prevNode, int fleetIndex);
     void parseListen(const QStringList &);

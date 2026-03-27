@@ -1864,7 +1864,7 @@ subtract_ip:
         }
 award_equip:
         QByteArray msg = KP::serverNewEquip(
-                    newEquip(uid, equipid), equipid);
+                    newEquip(uid, equipid, true), equipid);
         senderM.sendMessage(connection, msg);
     } catch (DBError &e) {
         for(QString &i : e.whats()) {
@@ -2285,7 +2285,7 @@ father_required:
 
         /* 4.4-Precondition.md#Special preconditions (mother) */
 mother_required:
-        int64 sonSkillPointReq = newEquipHasMotherCal(equipid);
+        int64 sonSkillPointReq = newEquipHasMotherCal(uid, equipid);
         auto [motherSPSufficient, motherEquipId, skillPointsRemaining]
                 = User::haveMotherSP(uid, equipid, equipRegistry,
                                      sonSkillPointReq);
@@ -4698,12 +4698,12 @@ void Server::newEquipHasMother(const CSteamID &uid, int equipId) {
     Equipment *equip = equipRegistry.value(equipId);
     if(!equipRegistry.contains(equip->attr["Mother"]))
         return;
-    int64 sonSkillPoints = newEquipHasMotherCal(equipId);
+    int64 sonSkillPoints = newEquipHasMotherCal(uid, equipId);
     User::addSkillPoints(uid, equip->attr["Mother"], -sonSkillPoints);
 }
 
 /* 4.4-Precodition.md#Required skill points */
-int64 Server::newEquipHasMotherCal(int equipId) {
+int64 Server::newEquipHasMotherCal(const CSteamID &uid, int equipId) {
     if(!equipRegistry.contains(equipId))
         return 0;
     Equipment *equip = equipRegistry.value(equipId);

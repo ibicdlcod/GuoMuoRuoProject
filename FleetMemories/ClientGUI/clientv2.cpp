@@ -980,7 +980,9 @@ void Clientv2::exitGracefully() {
 #pragma message(NOT_M_CONST)
     //% "Goodbye."
     emit qout(qtTrId("goodbye-gui"), QColor("black"), QColor(64,255,64));
+    if(logFile) {
     logFile->close();
+    }
     emit aboutToQuit();
 }
 
@@ -1880,7 +1882,7 @@ void customMessageHandler(QtMsgType type,
         emit Clientv2::getInstance().qout(txt.remove("\n"),
                                           background, foreground);
 
-    if(!logFile->isWritable()) {
+    if(!logFile || !logFile->isWritable()) {
         qFatal("Log file cannot be written to.");
     }
     if(txt.contains(QChar('\0'))) {
