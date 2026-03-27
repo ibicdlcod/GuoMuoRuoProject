@@ -121,7 +121,7 @@ Ship::Ship(const QJsonObject &input, QObject *parent)
 
 int Ship::operator<=>(const Ship &other) const {
     int typeResult = this->getType().getTypeSort()
-                     - other.getType().getTypeSort();
+    - other.getType().getTypeSort();
     if(typeResult == 0)
         return shipRegId - other.shipRegId;
     else
@@ -197,7 +197,7 @@ KP::AllegianceSubGroup Ship::getAllegianceSubGroup() const {
 
 KP::AllegianceGroup Ship::mapOpenRule() const {
     /* The result is geographical approximation of map.svg,
-     * not ship's acutal allegiance */
+     * not ship's actual allegiance group */
     switch(getAllegianceGroup()) {
     case KP::UnknownNation: return KP::UnknownNation;
     case KP::Japanese: return KP::Japanese;
@@ -211,7 +211,15 @@ KP::AllegianceGroup Ship::mapOpenRule() const {
     case KP::British: return KP::British;
     case KP::French: {
         switch(getAllegianceSubGroup()) {
-        case KP::DFrench: return KP::French;
+        case KP::DFrench:
+            switch(getAllegiance()) {
+            case QLocale::FrenchGuiana: return KP::American;
+            case QLocale::Guadeloupe: return KP::American;
+            case QLocale::Martinique: return KP::American;
+            case QLocale::Mayotte: return KP::British;
+            case QLocale::Reunion: return KP::British;
+            default: return KP::French;
+            }
         case KP::DIndochinese: return KP::Japanese;
         case KP::DAlgerian: [[fallthrough]];
         case KP::DMoroccoan: [[fallthrough]];
@@ -234,7 +242,7 @@ KP::AllegianceGroup Ship::mapOpenRule() const {
             default: return KP::French;
             }
         }
-        default: Q_UNREACHABLE();
+        default: return KP::French;
         }
     }
     case KP::Soviet: return KP::Soviet;
@@ -242,19 +250,21 @@ KP::AllegianceGroup Ship::mapOpenRule() const {
     case KP::Benelux: {
         switch(getAllegianceSubGroup()) {
         case KP::DIndonesian: return KP::Commonwealth;
-        case KP::DDutch: return KP::British;
+        case KP::DDutch: return getAllegiance()
+                           == QLocale::CaribbeanNetherlands ? KP::American
+                       : KP::British;
         case KP::DDutchSpeakingAmericas: return KP::American;
         case KP::DBelgian: return KP::French;
         case KP::DCentralAfrican: return KP::French;
         case KP::DBeneluxOther: return KP::German;
-        default: Q_UNREACHABLE();
+        default: return KP::British;
         }
     }
     case KP::Nordic: {
         switch(getAllegianceSubGroup()) {
         case KP::DDanishKingdom: return getAllegiance()
-                           == QLocale::FaroeIslands ? KP::British
-                       : KP::American; // Greeland
+            == QLocale::FaroeIslands ? KP::British
+                                     : KP::American; // Greeland
         case KP::DNorwegian: return KP::British;
         case KP::DIcelandic: return KP::American;
         default: return KP::German;
@@ -324,9 +334,9 @@ KP::AllegianceGroup Ship::mapOpenRule() const {
         }
     }
     case KP::Fantasy: return KP::UnknownNation;
-    default: Q_UNREACHABLE();
+    default: return KP::UnknownNation;
     }
-    Q_UNREACHABLE();
+    return KP::UnknownNation;
 }
 
 int Ship::getId() const {
@@ -446,6 +456,7 @@ KP::AllegianceSubGroup Ship::allegianceSubGroup(QLocale::Territory ter) {
      * It's useless to pretend that no political points are made in this function; disagreers are encouraged to fork this project
      * instead of complaining. */
 
+    /* Dependencies are treated not part of its overlord unless fully incorporated; instances of that are noted below */
     switch(ter) {
     case QLocale::AnyTerritory: return KP::DUnknownNation;
     case QLocale::Afghanistan: return KP::DOtherAsian;
@@ -490,6 +501,7 @@ KP::AllegianceSubGroup Ship::allegianceSubGroup(QLocale::Territory ter) {
     case QLocale::Cameroon: return KP::DOtherFrancophone;
     case QLocale::Canada: return KP::DCanadian;
     case QLocale::CanaryIslands: return KP::DSpanish;
+    /* This is a fully integrated part of Netherlands */
     case QLocale::CaribbeanNetherlands: return KP::DDutch;
     case QLocale::CapeVerde: return KP::DOtherLatino;
     case QLocale::CaymanIslands: return KP::DOtherCommonwealth;
@@ -524,15 +536,18 @@ KP::AllegianceSubGroup Ship::allegianceSubGroup(QLocale::Territory ter) {
     case QLocale::Eritrea: return KP::DEastAfrican;
     case QLocale::Estonia: return KP::DBaltic;
     case QLocale::Eswatini: return KP::DOtherCommonwealth;
+    /* assigned this for our focus is WWII */
     case QLocale::Ethiopia: return KP::DEastAfrican;
     case QLocale::EuropeanUnion: return KP::DOtherEuropean;
     case QLocale::Europe: return KP::DOtherEuropean;
-    case QLocale::FalklandIslands: return KP::DArgentinian; // just use QLocale::UnitedKingdom->DBritish for actual British ships
+    /* just use QLocale::UnitedKingdom->DBritish for actual British ships that involved Falkland */
+    case QLocale::FalklandIslands: return KP::DArgentinian;
     case QLocale::FaroeIslands: return KP::DDanishKingdom;
     case QLocale::Fiji: return KP::DOceanaian;
     case QLocale::Finland: return KP::DFinnish;
     case QLocale::France: return KP::DFrench;
-    case QLocale::FrenchGuiana: return KP::DFrench; /* overseas departments (and not other dependencies of France) use DFrench */
+    /* This is a fully integrated overseas department of France */
+    case QLocale::FrenchGuiana: return KP::DFrench;
     case QLocale::FrenchPolynesia: return KP::DOtherFrancophone;
     case QLocale::FrenchSouthernTerritories: return KP::DOtherFrancophone;
     case QLocale::Gabon: return KP::DOtherFrancophone;
@@ -540,10 +555,12 @@ KP::AllegianceSubGroup Ship::allegianceSubGroup(QLocale::Territory ter) {
     case QLocale::Georgia: return KP::DCIS;
     case QLocale::Germany: return KP::DGerman;
     case QLocale::Ghana: return KP::DOtherCommonwealth;
-    case QLocale::Gibraltar: return KP::DOtherEuropean; // just use QLocale::UnitedKingdom->DBritish for actual British ships
+    /* just use QLocale::UnitedKingdom->DBritish for actual British ships that involved Gibraltar */
+    case QLocale::Gibraltar: return KP::DOtherEuropean;
     case QLocale::Greece: return KP::DGreekOrCypriot;
     case QLocale::Greenland: return KP::DDanishKingdom;
     case QLocale::Grenada: return KP::DOtherCommonwealth;
+    /* This is a fully integrated overseas department of France */
     case QLocale::Guadeloupe: return KP::DFrench;
     case QLocale::Guam: return KP::DAmericanAssociates;
     case QLocale::Guatemala: return KP::DOtherLatinAmerican;
@@ -554,7 +571,8 @@ KP::AllegianceSubGroup Ship::allegianceSubGroup(QLocale::Territory ter) {
     case QLocale::Haiti: return KP::DOtherLatinAmerican;
     case QLocale::HeardAndMcDonaldIslands: return KP::DOceanaian;
     case QLocale::Honduras: return KP::DOtherLatinAmerican;
-    case QLocale::HongKong: return KP::DChineseOther; // just use QLocale::China->DChineseModern after 1997
+    /* just use QLocale::China->DChineseModern after 1997 */
+    case QLocale::HongKong: return KP::DChineseOther;
     case QLocale::Hungary: return KP::DOtherEuropean;
     case QLocale::Iceland: return KP::DIcelandic;
     case QLocale::India: return KP::DIndian;
@@ -573,7 +591,7 @@ KP::AllegianceSubGroup Ship::allegianceSubGroup(QLocale::Territory ter) {
     case QLocale::Kazakhstan: return KP::DCIS;
     case QLocale::Kenya: return KP::DOtherCommonwealth;
     case QLocale::Kiribati: return KP::DOceanaian;
-    // Kosovo: see "S" section below
+    /* Kosovo: see "S" section below */
     case QLocale::Kuwait: return KP::DArabicAsian;
     case QLocale::Kyrgyzstan: return KP::DCIS;
     case QLocale::Laos: return KP::DIndochinese;
@@ -586,7 +604,8 @@ KP::AllegianceSubGroup Ship::allegianceSubGroup(QLocale::Territory ter) {
     case QLocale::Liechtenstein: return KP::DOtherEuropean;
     case QLocale::Lithuania: return KP::DBaltic;
     case QLocale::Luxembourg: return KP::DBeneluxOther;
-    case QLocale::Macao: return KP::DChineseOther; // just use QLocale::China->DChineseModern after 1999
+    /* just use QLocale::China->DChineseModern after 1999 */
+    case QLocale::Macao: return KP::DChineseOther;
     case QLocale::Macedonia: return KP::DYugoslavian;
     case QLocale::Madagascar: return KP::DOtherFrancophone;
     case QLocale::Malawi: return KP::DOtherCommonwealth;
@@ -594,13 +613,17 @@ KP::AllegianceSubGroup Ship::allegianceSubGroup(QLocale::Territory ter) {
     case QLocale::Maldives: return KP::DOtherCommonwealth;
     case QLocale::Mali: return KP::DOtherFrancophone;
     case QLocale::Malta: return KP::DOtherCommonwealth;
-    case QLocale::MarshallIslands: return KP::DAmericanAssociates; //(COFA)
+    /* This country have COFA with United States */
+    case QLocale::MarshallIslands: return KP::DAmericanAssociates;
+    /* This is a fully integrated overseas department of France */
     case QLocale::Martinique: return KP::DFrench;
     case QLocale::Mauritania: return KP::DMauritanian;
     case QLocale::Mauritius: return KP::DOtherCommonwealth;
+    /* This is a fully integrated overseas department of France */
     case QLocale::Mayotte: return KP::DFrench;
     case QLocale::Mexico: return KP::DMexican;
-    case QLocale::Micronesia: return KP::DAmericanAssociates; //(COFA)
+    /* This country have COFA with United States */
+    case QLocale::Micronesia: return KP::DAmericanAssociates;
     case QLocale::Moldova: return KP::DCIS;
     case QLocale::Monaco: return KP::DOtherFrancophone;
     case QLocale::Mongolia: return KP::DMongolian;
@@ -625,8 +648,9 @@ KP::AllegianceSubGroup Ship::allegianceSubGroup(QLocale::Territory ter) {
     case QLocale::Norway: return KP::DNorwegian;
     case QLocale::Oman: return KP::DArabicAsian;
     case QLocale::OutlyingOceania: return KP::DOceanaian;
-    case QLocale::Pakistan: return KP::DPakistani;
-    case QLocale::Palau: return KP::DAmericanAssociates; //(COFA)
+    case QLocale::Pakistan: return KP::DPakistani;        
+    /* This country have COFA with United States */
+    case QLocale::Palau: return KP::DAmericanAssociates;
     case QLocale::PalestinianTerritories: return KP::DArabicAsian;
     case QLocale::Panama: return KP::DOtherLatinAmerican;
     case QLocale::PapuaNewGuinea: return KP::DOceanaian;
@@ -638,6 +662,7 @@ KP::AllegianceSubGroup Ship::allegianceSubGroup(QLocale::Territory ter) {
     case QLocale::Portugal: return KP::DPortuguese;
     case QLocale::PuertoRico: return KP::DAmericanAssociates;
     case QLocale::Qatar: return KP::DArabicAsian;
+    /* This is a fully integrated overseas department of France */
     case QLocale::Reunion: return KP::DFrench;
     case QLocale::Romania: return KP::DRomanian;
     /* Soviet ships that are named after Baltic states cities also goes here,
@@ -652,7 +677,8 @@ KP::AllegianceSubGroup Ship::allegianceSubGroup(QLocale::Territory ter) {
     case QLocale::SaintPierreAndMiquelon: return KP::DOtherFrancophone;
     case QLocale::SaintVincentAndGrenadines: return KP::DOtherCommonwealth;
     case QLocale::Samoa: return KP::DOceanaian;
-    case QLocale::SanMarino: return KP::DItalian; // done for linguistic reasons
+    /* done for linguistic reasons */
+    case QLocale::SanMarino: return KP::DItalian;
     case QLocale::SaoTomeAndPrincipe: return KP::DOtherLatino;
     case QLocale::SaudiArabia: return KP::DArabicAsian;
     case QLocale::Senegal: return KP::DOtherFrancophone;

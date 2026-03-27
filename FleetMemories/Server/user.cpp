@@ -775,7 +775,7 @@ void User::refreshPort(Server *server, const CSteamID &uid) {
 }
 
 bool User::setMapSupremacy(const CSteamID &uid, int mapId,  // relative id
-                           double amount, double retention = 0) {
+                           double amount, double retention = 0) { // retention is for expedition
     if((retention < 0) || (retention > 1)) {
         //% "Map supremacy retention %1 is incorrect!"
         qCritical() << qtTrId("map-supremacy-retention-incorrect").arg(retention);

@@ -3,7 +3,7 @@
 - [Overview](1-overview.md)
 - [Technology](2-technology.md)
 
-* [Resources](3-resources.md) [PARTIAL]
+* [Resources](3-resources.md) [Exotic types: NOTYETIMPLEMENTED]
   * [Ore Purifier (DLC)](3.1-orepurifier.md) [NOTYETIMPLEMENTED]
 * [Equipment](4-equipment.md)
 
@@ -11,12 +11,12 @@
   * [Attributes](4.2-attributes.md)
   * [Development](4.3-development.md)
   * [Normal/Special/Virtual preconditions](4.4-precondition.md) [Virtual preconditions: PARTIAL]
-  * [Equipment skill points](4.5-skillpoints.md) [Special skilled and Loss: NOTIMPLEMENTED]
+  * [Equipment skill points](4.5-skillpoints.md) [Special skilled and Loss: NOTYETIMPLEMENTED]
   * [Destruct](4.6-destruct.md)
   * [Improvement](4.7-improve.md)
-  * [Industrial plant](4.8-industrial.md) [NOTYETIMPLEMENTED]
+  * [Industrial plant](4.8-industrial.md)
 * [Ships](5-ships.md)
-  * [Attributes](4.2-attributes.md) [See above]
+  * Attributes [See above]
   * [Capital-ness and fleet type](5.1-capitalness.md)
   * [Home port and initial ship](5.2-homeport.md)
   * [Ship blueprint and drop rule](5.3-blueprint.md)
@@ -30,22 +30,22 @@
   * Decoration [NOTYETIMPLEMENTED]
   * Enemies (Amnesiac Fleet) [NOTYETIMPLEMENTED]
 * [Sortie Map](6-sortie.md)
-  * [Normal map and map relations](6.1-map.md)
-  * [Naval Supremacy and Normal expedition](6.2-supremacy.md) [PARTIAL]
+  * [Normal map and map relations](6.1-map.md) [Some type of map nodes: NOTYETIMPLEMENTED]
+  * [Naval Supremacy and Normal expedition](6.2-supremacy.md) [Expedition: NOTYETIMPLEMENTED]
   * [Map gauge](6.3-gauge.md) [PARTIAL]
   * Retreat rule [NOTYETIMPLEMENTED]
   * Historical Mode (DLC) [NOTYETIMPLEMENTED]
   * Quests and Achievements [NOTYETIMPLEMENTED]
   * Expedition quests [NOTYETIMPLEMENTED]
-* Drill [NOTIMPLEMENTED]
+* Drill [NOTYETIMPLEMENTED]
 
   * vs AI
   * vs Player
-* Maintenance [NOTIMPLEMENTED]
+* Maintenance 
 
-  * [Supply](8.1-supply.md)
-  * [Repair](8.2-repair.md)
-* Battle mechanic [NOTIMPLEMENTED]
+  * [Supply](8.1-supply.md) [NOTYETIMPLEMENTED]
+  * [Repair](8.2-repair.md) [Anchorage repair: NOTIMPLMENTED]
+* Battle mechanic [NOTYETIMPLEMENTED]
 
   * Tactical Goal (for friend fleet)
   * Tactical Goal (for enemy fleet)
@@ -62,3 +62,5 @@
   * Night-battle-start node
   * Commander's abilities
   * LBAS
+* Shop
+  * Headquarters Coupon

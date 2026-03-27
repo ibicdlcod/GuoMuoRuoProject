@@ -142,7 +142,7 @@ QVariant RankModel::headerData(int section, Qt::Orientation orientation,
     case Qt::DisplayRole: {
         if(orientation == Qt::Vertical) {
             int realRowIndex = section + rowsPerPage * pageNum;
-            return QString::number(realRowIndex);
+            return QString::number(realRowIndex + 1);
         }
         else {
             if(section == nameCol) {

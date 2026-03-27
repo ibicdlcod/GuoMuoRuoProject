@@ -81,17 +81,16 @@ Q_GLOBAL_STATIC(QStringList,
 
 enum DgramType{
     Auth,
+    Info,
     Message,
     Request,
-    Info
 };
 Q_ENUM_NS(DgramType)
 
 enum AuthMode{
-    //Login,
-    Reg,
     Logout,
-    NewLogin
+    NewLogin, // Login
+    Reg, // Register
 };
 Q_ENUM_NS(AuthMode)
 
@@ -104,35 +103,35 @@ enum LogoutType{
 Q_ENUM_NS(LogoutType)
 
 enum MsgType{
-    JsonError,
-    Unsupported,
     AccessDenied,
-    DevelopFailed,
-    DevelopStart,
-    ConstructStart,
-    ResourceRequired,
-    FairyBusy,
-    Penguin,
-    NewEquip,
-    NewShip,
-    ShipRemodeled,
-    Hello,
-    LackPrivate,
     AllowClientStart,
     AllowClientFinish,
-    VerifyComplete,
-    EquipRetired,
-    Success,
-    MessageTestServer,
-    FleetFail,
     AskForHomePort,
-    ShipModernized,
-    EquipImproved,
-    ShipBPRetired,
-    ShipBPAdded,
-    DisableShip,
     BattleError,
     BattleProcess,
+    ConstructStart,
+    DevelopFailed,
+    DevelopStart,
+    DisableShip,
+    EquipImproved,
+    EquipRetired,
+    FairyBusy,
+    FleetFail,
+    Hello,
+    LackPrivate,
+    JsonError,
+    MessageTestServer,
+    NewEquip,
+    NewShip,
+    Penguin,
+    ResourceRequired,
+    ShipBPAdded,
+    ShipBPRetired,
+    ShipModernized,
+    ShipRemodeled,
+    Success,
+    Unsupported,
+    VerifyComplete,
 };
 Q_ENUM_NS(MsgType)
 
@@ -330,15 +329,19 @@ enum AllegianceSubGroup{
      * (Does not prevent said ships being counted as Japanese anywhere in game rules) */
     DRyukyuan = 0x1F,
     DGerman = 0x20,
-    DAustrian = 0x2C, /* Austria-connected LBAS or WWI Austro-Hungarian navy might go here */
+    /* Austria-connected LBAS or WWI Austro-Hungarian navy (that did not qualify for other subgroups) might go here */
+    DAustrian = 0x2C,
     DItalian = 0x30,
     DAlbanian = 0x3A,
-    DEastAfrican = 0x3E, /* Italian colonies and subsequent independent counties; not other East African countries */
+    /* Italian colonies and subsequent independent counties; not other East African countries */
+    DEastAfrican = 0x3E,
     DLibyan = 0x3F,
     DAmerican = 0x40,
-    DAmericanAssociates = 0x4E, /* American unincorporated territories, states that have COFA with USA, as well as Liberia goes here */
+    /* American unincorporated territories, states that have COFA with USA, as well as Liberia goes here */
+    DAmericanAssociates = 0x4E,
     DFilipino = 0x4F,
-    DBritish = 0x50, /* have a whole 0xB? space for British Empire territories in WWII */
+    /* have a whole 0xB? space for British Empire territories in WWII */
+    DBritish = 0x50,
     DFrench = 0x60,
     DIndochinese = 0x68,
     DAlgerian = 0x6A,
@@ -348,7 +351,8 @@ enum AllegianceSubGroup{
     DOtherFrancophone = 0x6E,
     DSovietOrRussian = 0x70,
     DUkrainian = 0x7C,
-    DCIS = 0x7E, /* Aside from Russian and Ukrainian above, all founding members of CIS is included ignoring any later withdrawal */
+    /* Except from Russian and Ukrainian above, all founding members of CIS is included ignoring any later withdrawal */
+    DCIS = 0x7E,
     DChineseNationalist = 0x80, /* Nanjing/Taipei regime goes here */
     DChineseMonarchical = 0x86, /* Qing/"Manchukuo" goes here */
     DMongolian = 0x87,
@@ -358,7 +362,8 @@ enum AllegianceSubGroup{
     DDutch = 0x98,
     DDutchSpeakingAmericas = 0x9A,
     DBelgian = 0x9B,
-    DCentralAfrican = 0x9D, /* Belgian colonies and subsequent independent counties; not French Central Africa */
+    /* Belgian colonies and subsequent independent counties; not other Central African contries */
+    DCentralAfrican = 0x9D,
     DBeneluxOther = 0x9F,
     DSwedish = 0xA0,
     DDanish = 0xA4,
@@ -368,7 +373,8 @@ enum AllegianceSubGroup{
     DFinnish = 0xAC,
     DAustralian = 0xB0,
     DNewZealander = 0xB2,
-    DOceanaian = 0xB3, /* A lot of this is/was external territories of Australia/New Zealand */
+    /* A lot of this is/was external territories of Australia/New Zealand */
+    DOceanaian = 0xB3,
     DSouthAfricanOrNamibian = 0xB4,
     DIrish = 0xB5, /* for linguistic reasons */
     DMalaysianOrBruneian = 0xB6,
@@ -378,7 +384,8 @@ enum AllegianceSubGroup{
     DBangladeshi = 0xBB,
     DCanadian = 0xBC,
     DEgyptian = 0xBE,
-    DOtherCommonwealth = 0xBF, /* British control in WWII, not actual membership in current Commonwealth */
+    /* British control in WWII, not actual membership in current Commonwealth */
+    DOtherCommonwealth = 0xBF,
     DSpanish = 0xC0,
     DPortuguese = 0xC2,
     DBrazilian = 0xC4,
@@ -390,7 +397,8 @@ enum AllegianceSubGroup{
     DColumbianOrEcuadoran = 0xCC,
     DVenezuelan = 0xCD,
     DOtherLatinAmerican = 0xCE,
-    DOtherLatino = 0xCF, /* Spanish and Portuguese controlled territories in WWII outside Latin America */
+    /* Spanish and Portuguese controlled territories at the time of WWII outside Latin America */
+    DOtherLatino = 0xCF,
     DYugoslavian = 0xD0,
     DPolish = 0xD2,
     DBulgarian = 0xD4,
@@ -398,6 +406,7 @@ enum AllegianceSubGroup{
     DRomanian = 0xD8,
     DTurkish = 0xDA,
     DBaltic = 0xDC,
+    /* Not 0xEC for it does not participate in many Asian organizations, like Armenia */
     DIsraeli = 0xDE,
     DOtherEuropean = 0xDF,
     DThai = 0xE0,

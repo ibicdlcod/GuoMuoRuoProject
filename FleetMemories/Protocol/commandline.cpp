@@ -116,7 +116,7 @@ void CommandLine::customMessageHandler(QtMsgType type,
 #endif
         std::cout << "\x1b[49;39m" << std::endl;
 
-        if(!logFile->isWritable()) {
+        if(!logFile || !logFile->isWritable()) {
             qFatal("Log file cannot be written to.");
         }
         if(txt.contains(QChar('\0'))) {

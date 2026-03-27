@@ -400,7 +400,7 @@ Server::Server(int argc, char ** argv) : CommandLine(argc, argv) {
             this, [this](){
         minutePulse();
         clock->setSingleShot(false);
-        clock->start(60 * 1000);
+        clock->start(KP::secsinMin * 1000);
         QObject::disconnect(clock, &QTimer::timeout, nullptr, nullptr);
         connect(clock, &QTimer::timeout,
                 this, [this](){
@@ -1723,8 +1723,8 @@ drop_condition:
                       query.lastError());
     }
 update_recov_time:
-    static int maxIntervalInSec = 3600; // 60 min
-    static int minIntervalInSec = 900; // 15 min
+    static int maxIntervalInSec = 60 * KP::secsinMin; // 60 min
+    static int minIntervalInSec = 15 * KP::secsinMin; // 15 min
     if(!expedition) {
         QSqlQuery query;
         query.prepare("UPDATE UserShip "
@@ -1810,6 +1810,7 @@ void Server::deleteTestShip(const CSteamID &uid) {
     }
 }
 
+/* 4.8-industrial.md#Usage */
 void Server::doBuy(const CSteamID &uid, int equipid,
                    QSslSocket *connection) {
     try{
@@ -1821,7 +1822,7 @@ void Server::doBuy(const CSteamID &uid, int equipid,
         }
         Equipment *equip = equipRegistry[equipid];
 
-        /* 4.3-Development.md#Possess limit */
+        /* 4.8-Industrial.md#Possess limit */
 possess_limit:
         if(equip->disallowMassProduction() && (
                     User::getEquipAmount(uid, equipid)
@@ -4239,6 +4240,7 @@ award_industrial_points:
         {
             {
                 QSqlQuery query;
+                /* TODO: This is probably not optimal */
                 query.prepare("UPDATE UserRanking "
                               "SET Industrial = Industrial + ( "
                               "SELECT ln(COUNT(*)) "
@@ -5678,8 +5680,9 @@ void Server::receivedReq(const QJsonObject &djson,
     }
 anti_ddos:
     allowedPackets[uid]--;
-    qCritical() << allowedPackets[uid];
     if(allowedPackets[uid] < 0 && (!User::isSuperUser(uid))) {
+        //% "User %1: packet rate exceeded!"
+        qCritical() << qtTrId("packet-rate-exceeded").arg(uid.ConvertToUint64());
         QByteArray msg = KP::serverLogout(KP::LogoutType::ViolatedRateLimit);
         senderM.sendMessage(connection, msg);
         connection->disconnectFromHost();
