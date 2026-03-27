@@ -4716,7 +4716,7 @@ int64 Server::newEquipHasMotherCal(const CSteamID &uid, int equipId) {
     waive_condition:
     double supremacy = 0;
     if(equip->attr.contains("Homeport") && equip->attr["Homeport"] != 0) {
-        supremacy = User::checkMapSupremacy(uid, equip->attr["Homeport"]);
+        supremacy = std::max(User::checkMapSupremacy(uid, equip->attr["Homeport"]), 0.0);
     }
     double factor = pow(settings->value("rule/waivemotherconditon", 0.99).toDouble(),
                         supremacy);
