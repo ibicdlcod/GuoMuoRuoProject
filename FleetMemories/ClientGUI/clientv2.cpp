@@ -2,8 +2,10 @@
  * SPDX-License-Identifier: AGPL-3.0-or-later */
 
 #include "clientv2.h"
+#include <QCoreApplication>
 #include <QSettings>
 #include <QPasswordDigestor>
+#include <QThread>
 #include "../steam/isteamfriends.h"
 #include "../Protocol/commandline.h"
 #include "../Protocol/kp.h"
@@ -57,6 +59,21 @@ Clientv2::Clientv2(QObject *parent)
     connect(timer, &QTimer::timeout, this, &Clientv2::uiRefresh);
     using namespace std::chrono_literals;
     timer->start(1000ms);
+
+    steamThread = QThread::create([this]() {
+        while (!QThread::currentThread()->isInterruptionRequested()) {
+            SteamAPI_RunCallbacks();
+            /* https://forum.qt.io/topic/155945/steam-overlay-in-qt-game/7 */
+            update();
+            QThread::sleep(50ms);
+        }
+    });
+    connect(QCoreApplication::instance(), &QCoreApplication::aboutToQuit,
+            this, [this]() {
+        steamThread->requestInterruption();
+        steamThread->wait(500);
+    });
+    steamThread->start();
 
     /* 1-migrate.md */
     migrateServer.route("/", QHttpServerRequest::Method::Post, this,
@@ -191,6 +208,31 @@ void Clientv2::chooseNode(int mapId, int chosenNodeId) {
     QByteArray msg = KP::clientChooseNode(mapId, chosenNodeId);
     sender->enqueue(msg);
     socket.flush();
+}
+
+void Clientv2::initARDPurchase(int packageId) {
+    if(!loggedIn()) {
+        return;
+    }
+    //% "Starting ARD coupon purchase..."
+    qInfo() << qtTrId("ard-purchase-start");
+    QByteArray msg = KP::clientInitARDPurchase(packageId);
+    sender->enqueue(msg);
+    socket.flush();
+}
+
+void Clientv2::onMicroTxnAuth(MicroTxnAuthorizationResponse_t *pParam) {
+    if(pParam->m_unAppID != (uint32)KP::steamAppId) {
+        return;
+    }
+    QByteArray msg = KP::clientARDPurchaseAuth(
+        pParam->m_ulOrderID,
+        pParam->m_bAuthorized != 0);
+    QMetaObject::invokeMethod(this, [this, msg]() {
+        if(sender == nullptr) return;
+        sender->enqueue(msg);
+        socket.flush();
+    }, Qt::QueuedConnection);
 }
 
 void Clientv2::demandEquipCache() {
@@ -612,12 +654,11 @@ void Clientv2::tsunkitAssets2() {
 void Clientv2::uiRefresh() {
     //qDebug("UIREFRESH");
     emit uiRefreshSig();
-    SteamAPI_RunCallbacks();
 }
 
 /* Update engine */
 void Clientv2::update() {
-    QCoreApplication::processEvents();
+    emit uiRefreshSig();
     QCoreApplication::processEvents();
 }
 
@@ -841,7 +882,7 @@ void Clientv2::doSwitch(const QStringList &cmdParts) {
     }
     else {
         QString secondary = cmdParts[1].first(1).toUpper()
-        + cmdParts[1].sliced(1).toLower();
+                            + cmdParts[1].sliced(1).toLower();
 
         QMetaEnum info = QMetaEnum::fromType<KP::GameState>();
         int statevalue = info.keyToValue(secondary.toLatin1().constData());
@@ -1767,6 +1808,29 @@ void Clientv2::receivedMsg(const QJsonObject &djson) {
     break;
     case KP::AskForHomePort: {
         emit askForHomePort(djson);
+    }
+    break;
+    case KP::ARDPurchaseFailed: {
+        //% "Purchase failed: %1"
+        qWarning() << qtTrId("ard-purchase-failed")
+                          .arg(djson["reason"].toString());
+    }
+    break;
+    case KP::ARDPurchasePending: {
+        //% "Awaiting Steam payment authorization..."
+        qInfo() << qtTrId("ard-purchase-pending");
+    }
+    break;
+    case KP::ARDPurchaseSuccess: {
+        //% "Purchase successful! %1 ARD Coupons added."
+        qInfo() << qtTrId("ard-purchase-success")
+                       .arg(djson["units"].toInt());
+    }
+    break;
+    case KP::ARDPurchaseClawback: {
+        //% "Notice: %1 ARD Coupons have been reclaimed due to a refund or chargeback."
+        qWarning() << qtTrId("ard-purchase-clawback")
+                          .arg(djson["units"].toInt());
     }
     break;
     default:

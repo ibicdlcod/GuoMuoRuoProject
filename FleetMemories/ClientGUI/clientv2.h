@@ -121,6 +121,7 @@ public slots:
     void doStopRepair(int);
     Equipment * getEquipmentReg(int);
     Ship * getShipReg(int);
+    void initARDPurchase(int packageId);
     bool parse(const QString &);
     void parseDisconnectReq();
     void parseQuit();
@@ -271,11 +272,14 @@ private:
                           "\x80\xe6\x9d\xa1\xe5\x92\xb8\xe9"
                           "\xb1\xbc");
 
+    STEAM_CALLBACK(Clientv2, onMicroTxnAuth, MicroTxnAuthorizationResponse_t);
+
     SteamAuth sauth;
     QByteArray authCache;
     bool authSent = false;
 
     QTimer *timer;
+    QThread *steamThread = nullptr;
 
     Q_DISABLE_COPY_MOVE(Clientv2)
 };

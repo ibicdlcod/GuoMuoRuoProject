@@ -6,6 +6,8 @@
 #include <QBuffer>
 #include <QFile>
 #include <QThread>
+#include <QUrlQuery>
+#include <limits>
 #include "../steam/steamencryptedappticket.h"
 #include "../Protocol/equiptype.h"
 #include "../Protocol/kp.h"
@@ -388,6 +390,19 @@ Q_GLOBAL_STATIC(QString,
                     ");"
                     ))
 
+/* ARD purchase order log for refund clawback */
+Q_GLOBAL_STATIC(QString,
+                ardOrders,
+                QStringLiteral(
+                    "CREATE TABLE ARDOrders ( "
+                    "OrderID INTEGER PRIMARY KEY, "
+                    "UserID BLOB NOT NULL, "
+                    "Units INTEGER NOT NULL, "
+                    "Status TEXT NOT NULL DEFAULT 'active', "
+                    "FOREIGN KEY(UserID) REFERENCES NewUsers(UserID) "
+                    ");"
+                    ))
+
 /* Not customized, since set this lesser than 60 creates problems */
 const int elapsedMaxTolerance = steamRateLimit;
 
@@ -541,6 +556,22 @@ bool Server::listen(const QHostAddress &address, quint16 port) {
     if (address != sslServer.serverAddress()
             || port != sslServer.serverPort()) {
         shutdown();
+
+#pragma message(SECRET)
+        QFile keyFile(settings->value("server/apikeylocation",
+                                      "APIPrivate").toString());
+        if(!keyFile.open(QIODevice::ReadOnly)) {
+            //% "Server lack an API key."
+            QString msg = qtTrId("no-api-key");
+            qCritical() << msg;
+            return false;
+        }
+        settings->setValue("steam/webkey", keyFile.readAll());
+        if(!settings->contains("steam/lastrefundpolltime")) {
+            settings->setValue("steam/lastrefundpolltime",
+                               QDateTime::currentDateTimeUtc().toSecsSinceEpoch());
+        }
+
         listening = sslServer.listen(address, port);
         if (!listening)
             qCritical () << sslServer.errorString();
@@ -720,6 +751,193 @@ void Server::update() {
 void Server::alertReceived(QSslSocket *socket, QSsl::AlertLevel level,
                            QSsl::AlertType type, const QString &description) {
     qDebug() << description;
+}
+
+void Server::handleARDPurchaseAuth(const CSteamID &uid,
+                                   QSslSocket *connection,
+                                   const QJsonObject &djson) {
+    quint64 orderId = djson["orderid"].toString().toULongLong();
+    bool authorized = djson["authorized"].toBool();
+    if(!authorized) {
+        pendingARDOrders.remove(orderId);
+        QByteArray msg = KP::serverARDPurchaseFailed(
+                    //% "Purchase was not authorized."
+                    qtTrId("ard-not-authorized"));
+        senderM.sendMessage(connection, msg);
+        return;
+    }
+    if(!pendingARDOrders.contains(orderId)) {
+        QByteArray msg = KP::serverARDPurchaseFailed(
+                    //% "Order not found."
+                    qtTrId("ard-order-not-found"));
+        senderM.sendMessage(connection, msg);
+        return;
+    }
+    auto [orderUid, packageId] = pendingARDOrders[orderId];
+    if(orderUid != uid) {
+        QByteArray msg = KP::serverARDPurchaseFailed(
+                    //% "Order mismatch."
+                    qtTrId("ard-order-mismatch"));
+        senderM.sendMessage(connection, msg);
+        pendingARDOrders.remove(orderId);
+        return;
+    }
+    const KP::ARDPackage *pkg = nullptr;
+    for(int i = 0; i < KP::ardPackageCount; ++i) {
+        if(KP::ardPackages[i].packageId == packageId) {
+            pkg = &KP::ardPackages[i];
+            break;
+        }
+    }
+    if(!pkg) {
+        QByteArray msg = KP::serverARDPurchaseFailed(
+                    //% "Invalid package."
+                    qtTrId("ard-invalid-package"));
+        senderM.sendMessage(connection, msg);
+        pendingARDOrders.remove(orderId);
+        return;
+    }
+    int unitsToAdd = pkg->ardUnits;
+    QNetworkRequest request(QUrl(QString(KP::microTxnBaseUrl)
+                                 + QStringLiteral("FinalizeTxn/v2/")));
+    request.setHeader(QNetworkRequest::ContentTypeHeader,
+                      "application/x-www-form-urlencoded");
+    QUrlQuery params;
+    params.addQueryItem(QStringLiteral("key"),
+                        settings->value("steam/webkey", "").toString());
+    params.addQueryItem(QStringLiteral("orderid"), QString::number(orderId));
+    params.addQueryItem(QStringLiteral("appid"),
+                        QString::number(KP::steamAppId));
+    QNetworkReply *reply = networkManager.post(
+                request,
+                params.toString(QUrl::FullyEncoded).toUtf8());
+    pendingARDOrders.remove(orderId);
+    connect(reply, &QNetworkReply::finished,
+            this, [this, reply, uid, unitsToAdd, orderId]() {
+        reply->deleteLater();
+        QByteArray responseData = reply->readAll();
+        QJsonDocument doc = QJsonDocument::fromJson(responseData);
+        QString result = doc.object()["response"]
+                .toObject()["result"].toString();
+        if(result == QStringLiteral("OK")) {
+            QSqlQuery query;
+            query.prepare(
+                        "UPDATE UserAttr SET Intvalue = Intvalue + :units "
+                        "WHERE Attribute = :attr AND UserID = :uid");
+            query.bindValue(":units", unitsToAdd);
+            query.bindValue(":attr", KP::attrARDCoupon);
+            query.bindValue(":uid", uid.ConvertToUint64());
+            if(Q_UNLIKELY(!query.exec())) {
+                qCritical() << query.lastError();
+                if(connectedPeers.contains(uid)) {
+                    QByteArray msg = KP::serverARDPurchaseFailed(
+                                //% "Database error while crediting purchase."
+                                qtTrId("ard-db-error"));
+                    senderM.sendMessage(connectedPeers[uid], msg);
+                }
+                return;
+            }
+            QSqlQuery orderRecord;
+            orderRecord.prepare(
+                        "INSERT OR IGNORE INTO ARDOrders "
+                        "(OrderID, UserID, Units, Status) "
+                        "VALUES (:oid, :uid, :units, 'active')");
+            orderRecord.bindValue(":oid", orderId);
+            orderRecord.bindValue(":uid", uid.ConvertToUint64());
+            orderRecord.bindValue(":units", unitsToAdd);
+            if(Q_UNLIKELY(!orderRecord.exec())) {
+                qCritical() << orderRecord.lastError();
+            }
+            if(connectedPeers.contains(uid)) {
+                QByteArray msg = KP::serverARDPurchaseSuccess(unitsToAdd);
+                senderM.sendMessage(connectedPeers[uid], msg);
+            }
+        }
+        else {
+            QString errDesc = doc.object()["response"]
+                    .toObject()["error"]
+                    .toObject()["errordesc"].toString();
+            if(connectedPeers.contains(uid)) {
+                QByteArray msg = KP::serverARDPurchaseFailed(errDesc);
+                senderM.sendMessage(connectedPeers[uid], msg);
+            }
+        }
+    });
+}
+
+void Server::handleInitARDPurchase(const CSteamID &uid,
+                                   QSslSocket *connection,
+                                   int packageId) {
+    const KP::ARDPackage *pkg = nullptr;
+    for(int i = 0; i < KP::ardPackageCount; ++i) {
+        if(KP::ardPackages[i].packageId == packageId) {
+            pkg = &KP::ardPackages[i];
+            break;
+        }
+    }
+    if(!pkg) {
+        QByteArray msg = KP::serverARDPurchaseFailed(
+                    //% "Invalid ARD package selected."
+                    qtTrId("ard-invalid-package"));
+        senderM.sendMessage(connection, msg);
+        return;
+    }
+    std::uniform_int_distribution<uint64_t> orderDist(
+                1, std::numeric_limits<uint64_t>::max());
+    quint64 orderId = orderDist(mt);
+    QNetworkRequest request(QUrl(QString(KP::microTxnBaseUrl)
+                                 + QStringLiteral("InitTxn/v3/")));
+    request.setHeader(QNetworkRequest::ContentTypeHeader,
+                      "application/x-www-form-urlencoded");
+    QUrlQuery params;
+    params.addQueryItem(QStringLiteral("key"),
+                        settings->value("steam/webkey", "").toString());
+    params.addQueryItem(QStringLiteral("orderid"), QString::number(orderId));
+    params.addQueryItem(QStringLiteral("steamid"),
+                        QString::number(uid.ConvertToUint64()));
+    params.addQueryItem(QStringLiteral("appid"),
+                        QString::number(KP::steamAppId));
+    params.addQueryItem(QStringLiteral("itemcount"), QStringLiteral("1"));
+    params.addQueryItem(QStringLiteral("language"), QStringLiteral("en"));
+    params.addQueryItem(QStringLiteral("currency"), QStringLiteral("HKD"));
+    params.addQueryItem(QStringLiteral("usersession"),
+                        QStringLiteral("client"));
+    params.addQueryItem(QStringLiteral("ipaddress"),
+                        connection->peerAddress().toString());
+    params.addQueryItem(QStringLiteral("itemid[0]"),
+                        QString::number(pkg->steamItemId));
+    params.addQueryItem(QStringLiteral("qty[0]"), QStringLiteral("1"));
+    params.addQueryItem(QStringLiteral("amount[0]"),
+                        QString::number(pkg->priceHKDCents));
+    params.addQueryItem(QStringLiteral("description[0]"),
+                        QString::fromLatin1(pkg->description));
+    QNetworkReply *reply = networkManager.post(
+                request,
+                params.toString(QUrl::FullyEncoded).toUtf8());
+    connect(reply, &QNetworkReply::finished,
+            this, [this, reply, uid, orderId, packageId]() {
+        reply->deleteLater();
+        QByteArray responseData = reply->readAll();
+        QJsonDocument doc = QJsonDocument::fromJson(responseData);
+        QString result = doc.object()["response"]
+                .toObject()["result"].toString();
+        if(result == QStringLiteral("OK")) {
+            pendingARDOrders[orderId] = {uid, packageId};
+            if(connectedPeers.contains(uid)) {
+                QByteArray msg = KP::serverARDPurchasePending(orderId);
+                senderM.sendMessage(connectedPeers[uid], msg);
+            }
+        }
+        else {
+            QString errDesc = doc.object()["response"]
+                    .toObject()["error"]
+                    .toObject()["errordesc"].toString();
+            if(connectedPeers.contains(uid)) {
+                QByteArray msg = KP::serverARDPurchaseFailed(errDesc);
+                senderM.sendMessage(connectedPeers[uid], msg);
+            }
+        }
+    });
 }
 
 void Server::handleNewConnection(){
@@ -4242,6 +4460,114 @@ new_ship_as_imported:
     qInfo() << qtTrId("import-kc-data-success").arg(uid.ConvertToUint64());
 }
 
+void Server::pollARDRefunds() {
+    QDateTime lastPollTime
+            = settings->value("steam/lastrefundpolltime",
+                              QDateTime::currentDateTimeUtc()).toDateTime();
+    QUrlQuery params;
+    params.addQueryItem(QStringLiteral("key"),
+                        settings->value("steam/webkey", "").toString());
+    params.addQueryItem(QStringLiteral("appid"),
+                        QString::number(KP::steamAppId));
+    params.addQueryItem(QStringLiteral("type"),
+                        QStringLiteral("SETTLEMENT"));
+    params.addQueryItem(QStringLiteral("time"),
+                        lastPollTime.toString(Qt::ISODate));
+    params.addQueryItem(QStringLiteral("maxresults"),
+                        QStringLiteral("100"));
+    QUrl url(QString(KP::microTxnBaseUrl)
+             + QStringLiteral("GetReport/v5/"));
+    url.setQuery(params);
+    QNetworkReply *reply = networkManager.get(QNetworkRequest(url));
+    settings->setValue("steam/lastrefundpolltime",
+                       QDateTime::currentDateTimeUtc());
+    connect(reply, &QNetworkReply::finished,
+            this, [this, reply]() {
+        reply->deleteLater();
+        try {
+check_response:
+            QByteArray responseData = reply->readAll();
+            QJsonDocument doc = QJsonDocument::fromJson(responseData);
+            QJsonObject resp = doc.object()["response"].toObject();
+            if(resp["result"].toString() != QStringLiteral("OK")) {
+                //% "ARD refund poll failed: %1"
+                qWarning() << qtTrId("ard-refund-poll-failed")
+                              .arg(resp["error"]
+                              .toObject()["errordesc"].toString());
+                return;
+            }
+process_transactions:
+            static const QSet<QString> reversedStatuses = {
+                QStringLiteral("Refunded"),
+                QStringLiteral("PartialRefund"),
+                QStringLiteral("Chargedback"),
+                QStringLiteral("RefundedSuspectedFraud"),
+                QStringLiteral("RefundedFriendlyFraud"),
+            };
+            QJsonArray transactions = resp["transactions"].toArray();
+            for(const QJsonValue &txVal : transactions) {
+                QJsonObject tx = txVal.toObject();
+                if(!reversedStatuses.contains(tx["status"].toString())) {
+                    continue;
+                }
+                quint64 orderId = tx["orderid"].toString().toULongLong();
+                QSqlQuery lookup;
+                lookup.prepare("SELECT UserID, Units FROM ARDOrders "
+                               "WHERE OrderID = :oid AND Status = 'active'");
+                lookup.bindValue(":oid", orderId);
+                if(Q_UNLIKELY(!lookup.exec())) {
+                    //% "ARD clawback: order lookup failed"
+                    throw DBError(qtTrId("ard-clawback-lookup-failed"),
+                                  lookup.lastError());
+                }
+                if(!lookup.next()) {
+                    continue; // not our order or already processed
+                }
+                quint64 rawUid = lookup.value(0).toULongLong();
+                int units = lookup.value(1).toInt();
+                CSteamID uid(rawUid);
+                QSqlQuery deduct;
+                deduct.prepare("UPDATE UserAttr "
+                               "SET Intvalue = Intvalue - :units " // can go below 0
+                               "WHERE UserID = :uid AND Attribute = :attr");
+                deduct.bindValue(":units", units);
+                deduct.bindValue(":uid", rawUid);
+                deduct.bindValue(":attr", KP::attrARDCoupon);
+                if(Q_UNLIKELY(!deduct.exec())) {
+                    qCritical() << deduct.lastQuery();
+                    //% "ARD clawback: deduct failed for order %1"
+                    throw DBError(qtTrId("ard-clawback-deduct-failed")
+                                  .arg(orderId), deduct.lastError());
+                }
+                QSqlQuery mark;
+                mark.prepare("UPDATE ARDOrders SET Status = 'clawedback' "
+                             "WHERE OrderID = :oid");
+                mark.bindValue(":oid", orderId);
+                if(Q_UNLIKELY(!mark.exec())) {
+                    qCritical() << mark.lastQuery();
+                    //% "ARD clawback: mark failed for order %1"
+                    throw DBError(qtTrId("ard-clawback-mark-failed")
+                                  .arg(orderId), mark.lastError());
+                }
+                qWarning() << "ARD clawback: order" << orderId
+                           << "user" << rawUid
+                           << "units" << units
+                           << "status" << tx["status"].toString();
+                if(connectedPeers.contains(uid)) {
+                    QByteArray msg = KP::serverARDPurchaseClawback(units);
+                    senderM.sendMessage(connectedPeers[uid], msg);
+                }
+            }
+        } catch (DBError &e) {
+            for(QString &i : e.whats()) {
+                qCritical() << i;
+            }
+        } catch (std::exception &e) {
+            qCritical() << e.what();
+        }
+    });
+}
+
 void Server::minutePulse() {
     try{
 anti_ddos_regen_allowed_packets:
@@ -4406,6 +4732,8 @@ regen_resources_based_on_supremacy:
                 throw DBError(qtTrId("supremacy-reward-failed"), query.lastError());
             }
         }
+poll_ard_refunds:
+        pollARDRefunds();
     } catch (DBError &e) {
         for(QString &i : e.whats()) {
             qCritical() << i;
@@ -6295,6 +6623,14 @@ anti_ddos:
         }
     }
         break;
+    case KP::CommandType::ARDPurchaseAuth: {
+        handleARDPurchaseAuth(uid, connection, djson);
+    }
+        break;
+    case KP::CommandType::InitARDPurchase: {
+        handleInitARDPurchase(uid, connection, djson["packageid"].toInt());
+    }
+        break;
 home_port:
     case KP::CommandType::SelectHomePort: {
         KP::AllegianceGroup nation = static_cast<KP::AllegianceGroup>(
@@ -6674,6 +7010,9 @@ void Server::sqlinit() const {
         if(!tables.contains("VirtualCondRelation")) {
             sqlinitVCR();
         }
+        if(!tables.contains("ARDOrders")) {
+            sqlinitARDOrders();
+        }
     }
 }
 
@@ -6917,6 +7256,18 @@ void Server::sqlinitUserM() const {
     if(!query.exec()) {
         //% "Create User map info database failed."
         throw DBError(qtTrId("user-db-map-gen-failure"),
+                      query.lastError());
+    }
+}
+
+void Server::sqlinitARDOrders() const {
+    //% "ARD orders database does not exist, creating..."
+    qWarning() << qtTrId("ard-orders-db-lack");
+    QSqlQuery query;
+    query.prepare(*ardOrders);
+    if(!query.exec()) {
+        //% "Create ARD orders database failed."
+        throw DBError(qtTrId("ard-orders-db-gen-failure"),
                       query.lastError());
     }
 }
@@ -7359,6 +7710,7 @@ user_attr:
         std::pair(QStringLiteral("CurrentMap"), 0),
         std::pair(QStringLiteral("CurrentNode"), 0),
         std::pair(QStringLiteral("ActiveFleet"), 0),
+        std::pair(KP::attrARDCoupon, 0),
         std::pair(QStringLiteral("InBattle"), KP::NoBattle),
     };
 user_attr_sql:

@@ -116,6 +116,8 @@ MainWindow::MainWindow(QWidget *parent, int argc, char ** argv)
             });
     connect(ui->actionAbout_Qt, &QAction::triggered,
             QApplication::instance(), &QApplication::aboutQt);
+    connect(ui->actionBuyARD, &QAction::triggered,
+            this, &MainWindow::buyARD);
 
     portArea = new PortArea(this);
     licenseArea = new LicenseArea(this);
@@ -175,6 +177,8 @@ MainWindow::MainWindow(QWidget *parent, int argc, char ** argv)
     connect(lay, &QStackedLayout::currentChanged,
             this, &MainWindow::adjust);
 
+    connect(&engine, &Clientv2::uiRefreshSig,
+            this, qOverload<>(&MainWindow::update));
 }
 
 MainWindow::~MainWindow()
@@ -258,6 +262,11 @@ void MainWindow::adjustArea(QWidget *input, const QSize &size) {
     input->move(0, 0);
     input->resize(size);
     update();
+}
+
+void MainWindow::buyARD() {
+    ARDCouponDialog dialog(this);
+    dialog.exec();
 }
 
 void MainWindow::factoryRefresh() {

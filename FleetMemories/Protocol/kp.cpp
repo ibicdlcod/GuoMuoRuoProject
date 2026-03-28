@@ -10,6 +10,14 @@
 extern QFile *logFile;
 extern std::unique_ptr<QSettings> settings;
 
+const KP::ARDPackage KP::ardPackages[] = {
+    {1,   1,  100,   100,   "100 ARD Coupons"},   // HK$1.00  — base
+    {5,   2,  450,   500,   "500 ARD Coupons"},   // HK$4.50  — 10% off
+    {20,  3,  1600,  2000,  "2000 ARD Coupons"},  // HK$16.00 — 20% off
+    {100, 4,  7000,  10000, "10000 ARD Coupons"}, // HK$70.00 — 30% off
+    {500, 5,  30000, 50000, "50000 ARD Coupons"}, // HK$300.00 — 40% off
+};
+
 void KP::initLog(bool server) {
     QString logFileName;
     if(server) {
@@ -89,6 +97,15 @@ QByteArray KP::clientAdminTestShip() {
     result["type"] = DgramType::Request;
     result["command"] = CommandType::Admingenerateships;
     result["remove"] = false;
+    return QCborValue::fromJsonValue(result).toCbor();
+}
+
+QByteArray KP::clientARDPurchaseAuth(quint64 orderId, bool authorized) {
+    QJsonObject result;
+    result["type"] = DgramType::Request;
+    result["command"] = CommandType::ARDPurchaseAuth;
+    result["orderid"] = QString::number(orderId);
+    result["authorized"] = authorized;
     return QCborValue::fromJsonValue(result).toCbor();
 }
 
@@ -319,6 +336,14 @@ QByteArray KP::clientHomePort(AllegianceGroup nation) {
     return QCborValue::fromJsonValue(result).toCbor();
 }
 
+QByteArray KP::clientInitARDPurchase(int packageId) {
+    QJsonObject result;
+    result["type"] = DgramType::Request;
+    result["command"] = CommandType::InitARDPurchase;
+    result["packageid"] = packageId;
+    return QCborValue::fromJsonValue(result).toCbor();
+}
+
 QByteArray KP::clientMigrate(const QJsonObject &input) {
     QJsonObject result;
     result["type"] = DgramType::Request;
@@ -380,6 +405,38 @@ QByteArray KP::clientTestMessages(int index) {
     result["type"] = DgramType::Request;
     result["command"] = CommandType::MessageTest;
     result["id"] = index;
+    return QCborValue::fromJsonValue(result).toCbor();
+}
+
+QByteArray KP::serverARDPurchaseClawback(int unitsDeducted) {
+    QJsonObject result;
+    result["type"] = DgramType::Message;
+    result["msgtype"] = MsgType::ARDPurchaseClawback;
+    result["units"] = unitsDeducted;
+    return QCborValue::fromJsonValue(result).toCbor();
+}
+
+QByteArray KP::serverARDPurchaseFailed(const QString &reason) {
+    QJsonObject result;
+    result["type"] = DgramType::Message;
+    result["msgtype"] = MsgType::ARDPurchaseFailed;
+    result["reason"] = reason;
+    return QCborValue::fromJsonValue(result).toCbor();
+}
+
+QByteArray KP::serverARDPurchasePending(quint64 orderId) {
+    QJsonObject result;
+    result["type"] = DgramType::Message;
+    result["msgtype"] = MsgType::ARDPurchasePending;
+    result["orderid"] = QString::number(orderId);
+    return QCborValue::fromJsonValue(result).toCbor();
+}
+
+QByteArray KP::serverARDPurchaseSuccess(int unitsAdded) {
+    QJsonObject result;
+    result["type"] = DgramType::Message;
+    result["msgtype"] = MsgType::ARDPurchaseSuccess;
+    result["units"] = unitsAdded;
     return QCborValue::fromJsonValue(result).toCbor();
 }
 

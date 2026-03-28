@@ -87,6 +87,8 @@ set(CLIENT_SOURCES
     ClientGUI/resourcefetch.h
     ClientGUI/steamauth.cpp
     ClientGUI/steamauth.h
+    ClientGUI/ui/ardcoupondialog.h
+    ClientGUI/ui/ardcoupondialog.cpp
     ClientGUI/ui/boxcenterfusionstyle.h
     ClientGUI/ui/factory/constructwindow.h
     ClientGUI/ui/factory/constructwindow.cpp

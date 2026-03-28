@@ -91,6 +91,9 @@ private:
     void generateEquipChilds(int, int);
     void generateTestEquip(const CSteamID &);
     void generateTestShip(const CSteamID &);
+    void handleARDPurchaseAuth(const CSteamID &, QSslSocket *, const QJsonObject &);
+    void handleInitARDPurchase(const CSteamID &, QSslSocket *, int packageId);
+    void pollARDRefunds();
     static int getBossDamage(const QJsonObject &);
     static bool getBossSunk(const QJsonObject &);
     const QStringList getCommandsSpec() const override;
@@ -163,6 +166,7 @@ private:
     void sqlinitUserA() const;
     void sqlinitUserM() const;
     void sqlinitUsers() const;
+    void sqlinitARDOrders() const;
     void sqlinitVCR() const;
     void startSortie(const CSteamID &, QSslSocket *, int, int, bool);
     void switchCert(const QStringList &);
@@ -176,6 +180,9 @@ private:
     ServerMasterSender senderM;
     Receiver receiverM;
     QMap<CSteamID, int> allowedPackets;
+    QMap<quint64, std::pair<CSteamID, int>> pendingARDOrders;
+
+    QNetworkAccessManager networkManager;
 
     QSet<int> openEquips;
     QMap<int, Equipment *> equipRegistry;

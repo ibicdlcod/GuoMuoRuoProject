@@ -69,6 +69,25 @@ static constexpr int conditionMax = 480;
 static constexpr int factorySlotRows = 6;
 static constexpr int factorySlotColumns = 4;
 static constexpr int maxRepairSlots = 8;
+/* ARD coupon stored as integer units; 1 unit = 0.01 HKD */
+static constexpr const char *attrARDCoupon = "ARDCoupon";
+static constexpr double ardCouponUnitHKD = 0.01;
+struct ARDPackage {
+    int packageId;       // matches dialog button group ID
+    int steamItemId;     // item ID for Steam InitTxn
+    int priceHKDCents;   // price in HKD cents for InitTxn
+    int ardUnits;        // units to credit (1 unit = 0.01 HKD)
+    const char *description;
+};
+extern const ARDPackage ardPackages[];
+static constexpr int ardPackageCount = 5;
+#if PRODUCTION_ENV
+static constexpr const char *microTxnBaseUrl =
+    "https://partner.steam-api.com/ISteamMicroTxn/";
+#else
+static constexpr const char *microTxnBaseUrl =
+    "https://partner.steam-api.com/ISteamMicroTxnSandbox/";
+#endif
 #pragma message(NOT_M_CONST)
 const int steamAppId = 2632870; // Go request your own steam appid if modding!
 Q_GLOBAL_STATIC(QStringList,
@@ -133,6 +152,10 @@ enum MsgType{
     Success,
     Unsupported,
     VerifyComplete,
+    ARDPurchaseClawback,
+    ARDPurchaseFailed,
+    ARDPurchasePending,
+    ARDPurchaseSuccess,
 };
 Q_ENUM_NS(MsgType)
 
@@ -196,6 +219,8 @@ enum CommandType{
     EnterBattleNode,
     ChooseNode,
     DemandRankInfo,
+    ARDPurchaseAuth,
+    InitARDPurchase,
 };
 Q_ENUM_NS(CommandType)
 
@@ -583,6 +608,7 @@ QByteArray clientAdminTestEquip();
 QByteArray clientAdminTestEquipRemove();
 QByteArray clientAdminTestShip();
 QByteArray clientAdminTestShipRemove();
+QByteArray clientARDPurchaseAuth(quint64 orderId, bool authorized);
 QByteArray clientBuy(int);
 QByteArray clientChooseNode(int mapId, int chosenNodeId);
 QByteArray clientConstruct(int,
@@ -617,6 +643,7 @@ QByteArray clientFetch(int factoryID = -1, bool forced = false);
 QByteArray clientFleetData(const QJsonArray &);
 QByteArray clientHello();
 QByteArray clientHomePort(AllegianceGroup);
+QByteArray clientInitARDPurchase(int packageId);
 QByteArray clientMigrate(const QJsonObject &);
 QByteArray clientQueryNextNode(int, int, bool retreat = false);
 QByteArray clientSortie(int, int, bool);
@@ -696,6 +723,10 @@ static constexpr int initDock() {
     return std::get<1>(getDesiredSlots(0));
 }
 
+QByteArray serverARDPurchaseClawback(int unitsDeducted);
+QByteArray serverARDPurchaseFailed(const QString &reason);
+QByteArray serverARDPurchasePending(quint64 orderId);
+QByteArray serverARDPurchaseSuccess(int unitsAdded);
 QByteArray serverAskForHomePort();
 QByteArray serverBattleEnd();
 QByteArray serverBattleError(GameError);

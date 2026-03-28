@@ -299,6 +299,7 @@ border-style: none;</string>
     <property name="title">
      <string id="menu-help">Help</string>
     </property>
+    <addaction name="actionBuyARD"/>
     <addaction name="actionSettings"/>
     <addaction name="actionLicense"/>
     <addaction name="actionAbout_Qt"/>
@@ -365,6 +366,11 @@ border-style: none;</string>
   <action name="actionShip_Blueprints">
    <property name="text">
     <string id="ship-blueprint-view">Ship Blueprints</string>
+   </property>
+  </action>
+  <action name="actionBuyARD">
+   <property name="text">
+    <string id="menu-buy-ard">Buy ARD Coupons</string>
    </property>
   </action>
   <action name="actionSettings">
