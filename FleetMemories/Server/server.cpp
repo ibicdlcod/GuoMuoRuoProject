@@ -2164,6 +2164,7 @@ award_equip:
         QByteArray msg = KP::serverNewEquip(
                     newEquip(uid, equipid, true), equipid);
         senderM.sendMessage(connection, msg);
+        offerResourceInfo(connection, uid);
     } catch (DBError &e) {
         for(QString &i : e.whats()) {
             qCritical() << i;
