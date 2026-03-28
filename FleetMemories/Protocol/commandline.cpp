@@ -124,7 +124,7 @@ void CommandLine::customMessageHandler(QtMsgType type,
         }
         QTextStream textStream(logFile);
         txt.remove(QChar('\r'), Qt::CaseInsensitive);
-        if(!txt.isEmpty()) {
+        if(!(txt.trimmed().isEmpty())) {
             txt = QStringLiteral("[%1] %2\n").arg(dt, txt);
             textStream << txt;
         }

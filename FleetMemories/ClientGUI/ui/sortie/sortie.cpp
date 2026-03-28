@@ -125,6 +125,13 @@ void Sortie::switchMap(int mapId) {
     if(!engine.mapRegistryCacheGood) {
         return;
     }
+    double supremacy = engine.mapSupremacies.value(mapId, -1);
+    if(supremacy >= 0) {
+        ui->supremacyValue->setText(QString::number(supremacy) + "%");
+    }
+    else {
+        ui->supremacyValue->setText(qtTrId("supremacy-value-na"));
+    }
     int index = ui->diffChoice->currentIndex();
     ui->diffChoice->clear();
     auto meta = QMetaEnum::fromType<KP::Difficulty>();
@@ -232,8 +239,8 @@ void Sortie::battleEnd() {
     /* TODO: display battle result */
     currentBattleProcess;
     switchToState(KP::MapDetail);
-    /* TODO: skip this dialog for end nodes */
-    ask_for_retreat:
+/* TODO: skip this dialog for end nodes */
+ask_for_retreat:
     ConfirmSortie *conf = new ConfirmSortie(this, currentMap->toString(),
                                             ui->diffChoice->currentText());
     //% "Do you want to continue map progress?"

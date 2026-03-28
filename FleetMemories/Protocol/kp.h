@@ -10,6 +10,7 @@
 #define SECRET __FILE__ QT_STRINGIFY(:__LINE__: Go make your own steam app if modding!)
 #define USED_CXX17 __FILE__ QT_STRINGIFY(:__LINE__: This part uses C++ 17 features. Use macro "__cplusplus" to check whether your compiler supports it.)
 #define USED_CXX23 __FILE__ QT_STRINGIFY(:__LINE__: This part uses C++ 23 features. Use macro "__cplusplus" to check whether your compiler supports it.)
+#define PRODUCTION_ENV 0
 
 #include <QObject>
 #include <QJsonObject>

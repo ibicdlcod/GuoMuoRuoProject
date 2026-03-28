@@ -102,6 +102,7 @@ private:
     bool importMapNodeFromCSV();
     bool importMapRelationFromCSV();
     bool importShipFromCSV();
+    bool importVCRFromCSV();
     void initUserDropInfo(const CSteamID &);
     void initUserEquipSPInfo(const CSteamID &);
     void initUserMapStatus(const CSteamID &);
@@ -123,6 +124,8 @@ private:
     void processBattle(const CSteamID &, QSslSocket *, const QJsonObject &);
     void processDrop(const CSteamID &, QSslSocket *, int shipId);
     void processExpGain(const CSteamID &, int fleetIndex,
+                        double baseExpGained, KP::BattleAssessment assm);
+    void processVirtualExpGain(const CSteamID &, int mapUnionId, KP::Difficulty diff,
                         double baseExpGained, KP::BattleAssessment assm);
     const QJsonObject processBattleCore(const CSteamID &, int, int, int, const QJsonObject &);
     void progressMap(const CSteamID &, QSslSocket *, int, int, bool retreat = false);
@@ -160,6 +163,7 @@ private:
     void sqlinitUsers() const;
     void sqlinitUserA() const;
     void sqlinitUserM() const;
+    void sqlinitVCR() const;
     void startSortie(const CSteamID &, QSslSocket *, int, int, bool);
     void switchCert(const QStringList &);
     KP::FleetFailType updateFleet(const CSteamID &, const QJsonArray &);

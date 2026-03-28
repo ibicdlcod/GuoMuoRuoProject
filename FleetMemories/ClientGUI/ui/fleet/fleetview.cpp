@@ -343,6 +343,9 @@ void FleetView::modifyFleetShip(int posIndex, QUuid uid) {
             oldPos = iter->first;
         }
     }
+    if(!shipModel->isReady()) {
+        return;
+    }
     if(oldPos != FleetPos({-1, -1}) && oldPos != newPos) {
         /* do switch */
         auto oldUid = ships.contains(newPos)

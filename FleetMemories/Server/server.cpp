@@ -17,6 +17,7 @@
 #include "../Protocol/lua.h"
 #include "rngesus.h"
 #include "fleetinfo.h"
+//#include "microtransaction/steam_microtxn.h"
 
 QT_BEGIN_NAMESPACE
 
@@ -370,6 +371,20 @@ Q_GLOBAL_STATIC(QString,
                     "PreviousVP FLOAT NOT NULL DEFAULT 0, "
                     "Industrial FLOAT NOT NULL DEFAULT 0, "
                     "FOREIGN KEY(User) REFERENCES NewUsers(UserID) "
+                    ");"
+                    ))
+
+/* Precondition relation */
+Q_GLOBAL_STATIC(QString,
+                virtualCondRelation,
+                QStringLiteral(
+                    "CREATE TABLE VirtualCondRelation ( "
+                    "EquipDef INTEGER NOT NULL, "
+                    "MapDef INTEGER NOT NULL, "
+                    "MinDiff INTEGER DEFAULT 1, " // 1 early 2 mid 3 late
+                    "Factor FLOAT DEFAULT 1, " // 1 early 2 mid 3 late
+                    "FOREIGN KEY(EquipDef) REFERENCES EquipName(EquipID), "
+                    "FOREIGN KEY(MapDef) REFERENCES MapNode(MapID) "
                     ");"
                     ))
 
@@ -3297,7 +3312,8 @@ bool Server::importEquipFromCSV() {
 
 bool Server::importMapFromCSV() {
     if(!(importMapNodeFromCSV()
-         && importMapRelationFromCSV())) {
+         && importMapRelationFromCSV()
+         && importVCRFromCSV())) {
         return false;
     }
     settings->setValue("server/mapdbtimestamp", QDateTime::currentDateTimeUtc());
@@ -3619,6 +3635,84 @@ bool Server::importShipFromCSV() {
     qInfo() << qtTrId("ship-import-good");
     settings->setValue("server/shipdbtimestamp", QDateTime::currentDateTimeUtc());
     return shipRefresh();
+}
+
+bool Server::importVCRFromCSV() {
+    QSqlDatabase db = QSqlDatabase::database();
+    if(!db.isValid()) {
+        throw DBError(qtTrId("database-uninit"));
+        return false;
+    }
+
+    QString csvFileName =
+            settings->value("server/vcr_reg_csv", "Precondition_relations.csv").toString();
+    QFile *csvFile = new QFile(csvFileName);
+    if(Q_UNLIKELY(!csvFile) || !csvFile->open(QIODevice::ReadOnly)) {
+        //% "%1: CSV file cannot be opened"
+        qCritical() << qtTrId("bad-csv").arg(csvFileName);
+        return false;
+    }
+
+    QTextStream textStream(csvFile);
+    QString titleIndicator = textStream.readLine();
+    QStringList indicatorParts = titleIndicator.split(",");
+    QString title = textStream.readLine();
+    QStringList titleParts = title.split(",");
+
+    QSqlQuery query;
+    query.prepare("DELETE FROM VirtualCondRelation;");
+    if(!query.exec()) {
+        qCritical () << query.lastQuery();
+        //% "Import vcr database failed!"
+        throw DBError(qtTrId("vcr-import-failed"),
+                      query.lastError());
+        return false;
+    }
+
+    int importedEquips = 0;
+    while(!textStream.atEnd()) {
+        QString text = textStream.readLine();
+        if(text.startsWith(","))
+            continue;
+        else {
+            QStringList lineParts = text.split(",");
+            int equipid = lineParts[indicatorParts.indexOf("id")].toInt();
+            for(int i = 0; i < titleParts.length(); ++i) {
+                if(indicatorParts[i].compare("id", Qt::CaseInsensitive)
+                        == 0) {
+                    continue;
+                }
+                if(indicatorParts[i].compare("name", Qt::CaseInsensitive)
+                        == 0) {
+                    continue;
+                }
+                int mapid = indicatorParts[i].toInt();
+                int diff = lineParts[i].toInt() - 1;
+                if(diff < 0)
+                    continue;
+                QSqlQuery query;
+                query.prepare("INSERT INTO VirtualCondRelation "
+                              "(EquipDef, MapDef, MinDiff) "
+                              "VALUES (:equip, :map, :diff);");
+                query.bindValue(":equip", equipid);
+                query.bindValue(":map", mapid);
+                query.bindValue(":diff", diff);
+                if(!query.exec()) {
+                    qCritical () << query.lastQuery();
+                    //% "Import vcr database failed!"
+                    throw DBError(qtTrId("vcr-import-failed"),
+                                  query.lastError());
+                    return false;
+                }
+            }
+        }
+    }
+    csvFile->close();
+    delete csvFile;
+    //% "Virtual condition relation registry success!"
+    qInfo() << qtTrId("vcr-import-good");
+    settings->setValue("server/equipdbtimestamp", QDateTime::currentDateTimeUtc());
+    return true;
 }
 
 void Server::initUserDropInfo(const CSteamID &uid) {
@@ -4157,7 +4251,7 @@ anti_ddos_regen_allowed_packets:
 decrease_supremacy:
         QSqlQuery query;
         query.prepare("UPDATE UserMapState "
-                      "SET Supremacy = (1.0 - 1.0 / :decay) * Supremacy "
+                      "SET Supremacy = Supremacy - Supremacy / :decay "
                       "WHERE Supremacy > 0;");
         query.bindValue(":decay", settings->value("rule/navalsupremacydecay",
                                                   2880).toDouble());
@@ -4716,10 +4810,43 @@ int64 Server::newEquipHasMotherCal(const CSteamID &uid, int equipId) {
     if(!mother || mother->isInvalid())
         return 0;
 
-    waive_condition:
+waive_condition:
+    switch(User::checkHomePort(uid)) {
+    case KP::Japanese:
+        if(mother->getId() == 16385) { // JP-0
+            return 0;
+        }
+    case KP::German:
+        if(mother->getId() == 16389) { // DE-0
+            return 0;
+        }
+    case KP::Italian:
+        if(mother->getId() == 16393) { // IT-0
+            return 0;
+        }
+    case KP::American:
+        if(mother->getId() == 16394) { // US-0
+            return 0;
+        }
+    case KP::Commonwealth: [[fallthrough]];
+    case KP::British:
+        if(mother->getId() == 16390) { // GB-0
+            return 0;
+        }
+    case KP::French:
+        if(mother->getId() == 16392) { // FR-0
+            return 0;
+        }
+    case KP::Soviet:
+        if(mother->getId() == 16391) { // SU-0
+            return 0;
+        }
+    }
+
+relax_condition:
     double supremacy = 0;
-    if(equip->attr.contains("Homeport") && equip->attr["Homeport"] != 0) {
-        supremacy = std::max(User::checkMapSupremacy(uid, equip->attr["Homeport"]), 0.0);
+    if(mother->attr.contains("Homeport") && mother->attr["Homeport"] != 0) {
+        supremacy = std::max(User::checkMapSupremacy(uid, mother->attr["Homeport"]), 0.0);
     }
     double factor = pow(settings->value("rule/waivemotherconditon", 0.99).toDouble(),
                         supremacy);
@@ -5013,6 +5140,7 @@ add_exp:
                     return;
                 }
                 processExpGain(uid, result.value()[3], exp, assm);
+                processVirtualExpGain(uid, unionId, diff, exp, assm);
 after_boss:
                 if(type == KP::BOSS || type == KP::NIGHTBOSS) {
 gain_supremacy:
@@ -5098,7 +5226,7 @@ void Server::processDrop(const CSteamID &uid, QSslSocket *connection,
 void Server::processExpGain(const CSteamID &uid, int fleetIndex,
                             double baseExpGained, KP::BattleAssessment assm) {
     using namespace KP;
-    double expGained = 0;;
+    double expGained = 0;
     switch(assm) {
     case SVictory: expGained = baseExpGained; break;
     case AVictory: expGained = baseExpGained * 0.8; break;
@@ -5226,6 +5354,48 @@ ranking_exp:
     }
 }
 
+void Server::processVirtualExpGain(const CSteamID &uid, int mapUnionId,
+                                   KP::Difficulty diff,
+                                   double baseExpGained,
+                                   KP::BattleAssessment assm) {
+    double expGained;
+    switch(assm) {
+    case KP::SVictory: [[fallthrough]];
+    case KP::AVictory: [[fallthrough]];
+    case KP::BVictory: expGained = baseExpGained; break;
+    case KP::CDefeat: expGained = baseExpGained * 0.6; break;
+    case KP::DDefeat: expGained = baseExpGained * 0.2; break;
+    default: expGained = 0; break;
+    }
+    try {
+        QSqlQuery query;
+        query.prepare("UPDATE UserEquipSP "
+                      "SET Intvalue = Intvalue + :amount * Factor "
+                      "FROM ( "
+                      "SELECT Factor, EquipDef FROM VirtualCondRelation "
+                      "WHERE MapDef = :map AND Mindiff >= :diff) a "
+                      "WHERE UserEquipSP.EquipDef = a.EquipDef "
+                      "AND UserEquipSP.User = :uid;");
+        query.bindValue(":uid", uid.ConvertToUint64());
+        query.bindValue(":map", mapUnionId);
+        query.bindValue(":amount", expGained);
+        query.bindValue(":diff", static_cast<int>(diff));
+        if(Q_UNLIKELY(!query.exec())) {
+            qCritical() << query.lastQuery();
+            //% "User %1: add virtual exp failed!"
+            throw DBError(qtTrId("virtual-add-exp-failed")
+                          .arg(uid.ConvertToUint64()),
+                          query.lastError());
+            return;
+        }
+    } catch (DBError &e) {
+        for(QString &i : e.whats()) {
+            qCritical() << i;
+        }
+    } catch (std::exception &e) {
+        qCritical() << e.what();
+    }
+}
 const QJsonObject Server::processBattleCore(const CSteamID &uid,
                                             int mapId,
                                             int nodeId,
@@ -6091,14 +6261,44 @@ void Server::sendTestMessages() {
         qWarning() << "Server isn't listening, abort.";
     }
     else {
-        for(auto ship: shipRegistry) {
-            if(ship->isAmnesiac()) {
-                continue;
+        /*
+        qDebug() << "=== Example 1: Basic Usage ===";
+
+        // Create the SteamMicroTxn instance
+        // Replace with your actual API key
+        SteamMicroTxn *microTxn = new SteamMicroTxn("API_KEY_PLACEHOLDER");
+
+        // Connect to the completion signal
+        QObject::connect(microTxn, &SteamMicroTxn::getUserInfoFinished,
+                         [](const SteamUserInfo &info) {
+            if (info.success) {
+                qDebug() << "Success!";
+                qDebug() << "  Country:" << info.country;
+                qDebug() << "  State:" << info.state;
+                qDebug() << "  Currency:" << info.currency;
+
+                switch (info.status) {
+                case SteamAccountStatus::Active:
+                    qDebug() << "  Status: Active (can make purchases)";
+                    break;
+                case SteamAccountStatus::Trusted:
+                    qDebug() << "  Status: Trusted (enhanced purchasing)";
+                    break;
+                case SteamAccountStatus::Locked:
+                    qDebug() << "  Status: Locked (cannot purchase)";
+                    break;
+                default:
+                    qDebug() << "  Status: Unknown";
+                }
+            } else {
+                qDebug() << "Error:" << info.errorCode << "-" << info.errorDesc;
             }
-            double factor = 1000;
-            qCritical() << ship->toString() << ship->consTimeInSec()
-                        << ship->repairTimeInSecUnleveledPerhp() * factor / std::hypot(1, factor/25);
-        }
+        });
+
+        // Make the API call
+        // Parameters: appId, steamId, ipAddress
+        microTxn->getUserInfo(12345, 76561198000000000, "192.168.1.1");
+        */
     }
 }
 
@@ -6391,6 +6591,12 @@ void Server::sqlinit() const {
         if(!tables.contains("UserRanking")) {
             sqlinitRank();
         }
+        if(!tables.contains("UserRanking")) {
+            sqlinitRank();
+        }
+        if(!tables.contains("VirtualCondRelation")) {
+            sqlinitVCR();
+        }
     }
 }
 
@@ -6634,6 +6840,18 @@ void Server::sqlinitUserM() const {
     if(!query.exec()) {
         //% "Create User map info database failed."
         throw DBError(qtTrId("user-db-map-gen-failure"),
+                      query.lastError());
+    }
+}
+
+void Server::sqlinitVCR() const {
+    //% "Virtual condition-map relation database does not exist, creating..."
+    qWarning() << qtTrId("user-db-vcr-lack");
+    QSqlQuery query;
+    query.prepare(*virtualCondRelation);
+    if(!query.exec()) {
+        //% "Create virtual condition-map relation info database failed."
+        throw DBError(qtTrId("user-db-vcr-gen-failure"),
                       query.lastError());
     }
 }

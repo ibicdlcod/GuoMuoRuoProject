@@ -153,20 +153,14 @@ void MapRender::paintEvent(QPaintEvent * /* event */)
         }
         double hueFactor = std::min(1.0, supremacy / expectedSupremacy);
 
-        /*
-        if(map->id == KP::hiddenMap) {
+        if(hueFactor < 0) { // map is not open
             continue;
-        }*/
+        }
         if(map->id == hoverMapID) {
             painter.setBrush(brushHovered);
         }
         else {
-            if(hueFactor < 0) {
-                brush = QBrush(Qt::black);
-            }
-            else {
-                brush = QBrush(QColor::fromHsv(hueFactor * 120.0, 255, 255));
-            }
+            brush = QBrush(QColor::fromHsv(hueFactor * 120.0, 255, 255));
             painter.setBrush(brush);
         }
         painter.drawEllipse(map->worldX - circleSize / 2,

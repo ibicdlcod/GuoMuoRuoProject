@@ -10,7 +10,7 @@
   * [Factory slot](4.1-factoryslot.md)
   * [Attributes](4.2-attributes.md)
   * [Development](4.3-development.md)
-  * [Normal/Special/Virtual preconditions](4.4-precondition.md) [Virtual preconditions: PARTIAL]
+  * [Normal/Special/Virtual preconditions](4.4-precondition.md) [Virtual preconditions: exotic conditions experience gain not implemented]
   * [Equipment skill points](4.5-skillpoints.md) [Special skilled and Loss: NOTYETIMPLEMENTED]
   * [Destruct](4.6-destruct.md)
   * [Improvement](4.7-improve.md)

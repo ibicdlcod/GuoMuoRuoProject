@@ -183,6 +183,8 @@ set(SERVER_SOURCES
     Server/kerrors.cpp
     Server/kerrors.h
     Server/main.cpp
+    Server/microtransaction/steam_microtxn.h
+    Server/microtransaction/steam_microtxn.cpp
     Server/qconsolelistener.cpp
     Server/qconsolelistener.h
     Server/rngesus.h
@@ -447,4 +449,8 @@ add_custom_command(TARGET CFServer POST_BUILD
 add_custom_command(TARGET CFServer POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_if_different
     "${PROJECT_SOURCE_DIR}/../doc/map/Map_relations.csv"
+    $<TARGET_FILE_DIR:CFServer>)
+add_custom_command(TARGET CFServer POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+    "${PROJECT_SOURCE_DIR}/../doc/map/Precondition_relations.csv"
     $<TARGET_FILE_DIR:CFServer>)

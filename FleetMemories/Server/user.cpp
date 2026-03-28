@@ -442,25 +442,11 @@ std::tuple<bool, int, int64> User::haveMotherSP(
         int motherEquipId = equipReg.value(sonEquipId)->attr.value("Mother", 0);
         if(motherEquipId == 0)
             return {true, 0, 0};
-        QSqlDatabase db = QSqlDatabase::database();
-        QSqlQuery query;
-        query.prepare("SELECT * "
-                      "FROM UserEquip "
-                      "WHERE User = :id AND EquipDef = :mother");
-        query.bindValue(":id", uid.ConvertToUint64());
-        query.bindValue(":mother", motherEquipId);
-        query.exec();
-        query.isSelect();
-        if(!query.first()) {
-            return {false, motherEquipId, sonSkillPointReq};
-        }
-        else {
-            uint64 motherSkillPoint = getSkillPoints(uid, motherEquipId);
-            if(motherSkillPoint >= sonSkillPointReq)
-                return {true, motherEquipId, 0};
-            else
-                return {false, motherEquipId, sonSkillPointReq - motherSkillPoint};
-        }
+        uint64 motherSkillPoint = getSkillPoints(uid, motherEquipId);
+        if(motherSkillPoint >= sonSkillPointReq)
+            return {true, motherEquipId, 0};
+        else
+            return {false, motherEquipId, sonSkillPointReq - motherSkillPoint};
     }
 }
 
@@ -532,7 +518,7 @@ std::tuple<bool, int> User::isFactoryFinished(const CSteamID &uid, int factoryID
     query.isSelect();
     if(Q_UNLIKELY(!query.first())) {
         qWarning() << qtTrId("user-nonexistent-uid")
-        .arg(uid.ConvertToUint64());
+                          .arg(uid.ConvertToUint64());
         return {false, 0};
     }
     else {

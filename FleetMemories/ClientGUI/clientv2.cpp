@@ -1429,7 +1429,7 @@ void Clientv2::receivedMsg(const QJsonObject &djson) {
                         .arg(mother->toString(
                             settings->value("client/language", "ja_JP")
                                 .toString())).arg(mother->getId())
-                        .arg(djson["sp"].toInteger());
+                        .arg(djson["skillpoint"].toInteger());
             }
         }
         break;
