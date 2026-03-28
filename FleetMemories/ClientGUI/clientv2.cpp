@@ -182,6 +182,17 @@ void Clientv2::chooseHomePort(KP::AllegianceGroup nation)
     sender->enqueue(msg);
 }
 
+void Clientv2::chooseNode(int mapId, int chosenNodeId) {
+    if(!isInBattle()) {
+        //% "You can't enter a sortie map illegally!"
+        qWarning() << qtTrId("illegal-map-progress");
+        return;
+    }
+    QByteArray msg = KP::clientChooseNode(mapId, chosenNodeId);
+    sender->enqueue(msg);
+    socket.flush();
+}
+
 void Clientv2::demandEquipCache() {
     QDateTime localCacheTimeStamp = settings->value("client/equipdbtimestamp",
                                                     QDateTime(QDate(1970,01,01),

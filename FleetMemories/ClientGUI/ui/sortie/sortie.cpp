@@ -239,6 +239,13 @@ void Sortie::battleEnd() {
     /* TODO: display battle result */
     currentBattleProcess;
     switchToState(KP::MapDetail);
+    if(currentMap->nodes[currentNodeId].type == KP::CHOICE) {
+        detail->setChoiceNodes(currentMap->nodes[currentNodeId].nextNodes);
+        connect(detail, &MapDetail::nodeClicked, this, [this, &engine](int nodeId) {
+            engine.chooseNode(currentMap->getAbsoluteId(), nodeId);
+        }, Qt::SingleShotConnection);
+        return;
+    }
 /* TODO: skip this dialog for end nodes */
 ask_for_retreat:
     ConfirmSortie *conf = new ConfirmSortie(this, currentMap->toString(),
@@ -271,6 +278,24 @@ void Sortie::dealWithNode(const MapNode &node, int nodeId) {
     case KP::STARTING:
         engine.queryNextNode(currentMap->getAbsoluteId(), nodeId);
         break;
+    case KP::EMPTY:
+        [[fallthrough]];
+    case KP::CHOICE: {
+        QEventLoop loop;
+        QObject::connect(detail, &MapDetail::moveFinished, &loop, &QEventLoop::quit);
+        QTimer timer;
+        timer.setSingleShot(true);
+        QObject::connect(&timer, &QTimer::timeout, &loop, &QEventLoop::quit);
+        timer.start(5000);
+        loop.exec();
+        timer.stop();
+        if(node.type == KP::EMPTY) {
+            //% "No enemies found. It's just my imagination."
+            qInfo() << qtTrId("empty-node-no-battle");
+        }
+        engine.doBattle(QJsonObject());
+        break;
+    }
     case KP::NORMAL:
         [[fallthrough]];
     case KP::BOSS:

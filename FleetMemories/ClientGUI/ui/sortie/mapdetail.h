@@ -28,6 +28,7 @@ public:
                            NOTIFY fleetCenterChanged)
     void displayDetailedMap(Map *map);
     void changeCurrentNode(const MapNode &node);
+    void setChoiceNodes(const QList<int> &nodeIds);
     static QPixmap recolorImage(const QString &filename, const QColor &color);
     QPointF getFleetCenter() const;
     void setFleetCenter(const QPointF &input);
@@ -35,9 +36,11 @@ public:
 signals:
     void fleetCenterChanged();
     void moveFinished();
+    void nodeClicked(int nodeId);
 
 private:
     virtual void paintEvent(QPaintEvent *event) override;
+    virtual void mousePressEvent(QMouseEvent *event) override;
 
 private:
     Ui::MapDetail *ui;
@@ -49,6 +52,9 @@ private:
     MapNode currentNode;
     bool uninitialized = true;
     KP::FleetType currentFleetType;
+
+    QList<int> choiceNodeIds;
+    bool awaitingChoice = false;
 
     QPixmap rudder;
     QPixmap carrierFleetIcon;

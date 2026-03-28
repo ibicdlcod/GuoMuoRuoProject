@@ -109,6 +109,15 @@ QByteArray KP::clientBuy(int equipDef) {
     return QCborValue::fromJsonValue(result).toCbor();
 }
 
+QByteArray KP::clientChooseNode(int mapId, int chosenNodeId) {
+    QJsonObject result;
+    result["type"] = DgramType::Request;
+    result["command"] = CommandType::ChooseNode;
+    result["mapid"] = mapId;
+    result["chosennode"] = chosenNodeId;
+    return QCborValue::fromJsonValue(result).toCbor();
+}
+
 QByteArray KP::clientConstruct(int shipDef,
                                const QList<QUuid> &defaultEquips,
                                QUuid &shipToRemodel,

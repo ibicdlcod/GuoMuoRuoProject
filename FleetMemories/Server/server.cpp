@@ -5178,8 +5178,25 @@ deal_with_gauge:
             });
         }
             break;
+        case KP::CHOICE: [[fallthrough]];
+        case KP::EMPTY: {
+            QSqlQuery query;
+            query.prepare("UPDATE UserAttr SET Intvalue = :type "
+                          "WHERE Attribute = 'InBattle' "
+                          "AND UserID = :uid");
+            query.bindValue(":uid", uid.ConvertToUint64());
+            query.bindValue(":type", KP::AfterBattle);
+            if(Q_UNLIKELY(!query.exec())) {
+                qCritical() << query.lastQuery();
+                throw DBError(qtTrId("sortie-node-battle-failure-end").arg(uid.ConvertToUint64()),
+                              query.lastError());
+                return;
+            }
+            QByteArray msg = KP::serverBattleEnd();
+            senderM.sendMessage(connection, msg);
+        }
+            break;
         case KP::STARTING:
-        case KP::EMPTY:
         case KP::DISASTER:
         case KP::TRANSPORT:
         default: break;
@@ -6216,6 +6233,66 @@ anti_ddos:
     case KP::CommandType::EnterBattleNode: {
         QJsonObject contents = djson["content"].toObject();
         processBattle(uid, connection, contents);
+    }
+        break;
+    case KP::CommandType::ChooseNode: {
+        int mapId = djson["mapid"].toInt();
+        int chosenNodeId = djson["chosennode"].toInt();
+        try {
+            auto result = queryMapProgress(uid, connection, KP::AfterBattle, mapId);
+            if(!result.has_value()) break;
+            int nodeId = result.value()[1];
+            int unionId = MapWithDiff::getUnionId(mapId);
+            if(lua["maps"] == sol::nil
+                    || lua["maps"][unionId] == sol::nil
+                    || lua["maps"][unionId][nodeId] == sol::nil) {
+                QByteArray msg = KP::serverBattleError(KP::FleetLost);
+                senderM.sendMessage(connection, msg);
+                break;
+            }
+            int typeInt = lua["maps"][unionId][nodeId]["battle_type"];
+            if(static_cast<KP::NodeType>(typeInt) != KP::CHOICE) {
+                QByteArray msg = KP::serverBattleError(KP::FleetLost);
+                senderM.sendMessage(connection, msg);
+                break;
+            }
+            sol::table nextNodes = lua["maps"][unionId][nodeId]["next_nodes"];
+            bool valid = false;
+            for(const auto &[k, v]: nextNodes) {
+                if(v.as<int>() == chosenNodeId) { valid = true; break; }
+            }
+            if(!valid) {
+                QByteArray msg = KP::serverBattleError(KP::FleetLost);
+                senderM.sendMessage(connection, msg);
+                break;
+            }
+            QSqlQuery query;
+            query.prepare("UPDATE UserAttr SET Intvalue = :val "
+                          "WHERE Attribute = 'CurrentNode' AND UserID = :uid");
+            query.bindValue(":uid", uid.ConvertToUint64());
+            query.bindValue(":val", chosenNodeId);
+            if(Q_UNLIKELY(!query.exec())) {
+                qCritical() << query.lastQuery();
+                throw DBError(qtTrId("sortie-progress-failure").arg(uid.ConvertToUint64())
+                              .arg(mapId), query.lastError());
+                break;
+            }
+            QSqlQuery query2;
+            query2.prepare("UPDATE UserAttr SET Intvalue = :val "
+                           "WHERE Attribute = 'InBattle' AND UserID = :uid");
+            query2.bindValue(":uid", uid.ConvertToUint64());
+            query2.bindValue(":val", KP::BeforeBattle);
+            if(Q_UNLIKELY(!query2.exec())) {
+                qCritical() << query2.lastQuery();
+                throw DBError(qtTrId("sortie-progress-failure").arg(uid.ConvertToUint64())
+                              .arg(mapId), query2.lastError());
+                break;
+            }
+            QByteArray msg = KP::serverMapProgress(mapId, chosenNodeId);
+            senderM.sendMessage(connection, msg);
+        } catch (DBError &e) {
+            for(QString &i : e.whats()) { qCritical() << i; }
+        }
     }
         break;
 home_port:

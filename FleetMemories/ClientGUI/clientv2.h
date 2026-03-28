@@ -96,6 +96,7 @@ public slots:
     void backToNavalBase();
     void catbomb();
     void chooseHomePort(KP::AllegianceGroup);
+    void chooseNode(int mapId, int chosenNodeId);
     void demandEquipCache();
     void demandEquipSkillPoints(int);
     void demandMapCache();

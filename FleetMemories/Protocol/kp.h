@@ -194,6 +194,7 @@ enum CommandType{
     RequestSortie,
     ProgressMap,
     EnterBattleNode,
+    ChooseNode,
     DemandRankInfo,
 };
 Q_ENUM_NS(CommandType)
@@ -583,6 +584,7 @@ QByteArray clientAdminTestEquipRemove();
 QByteArray clientAdminTestShip();
 QByteArray clientAdminTestShipRemove();
 QByteArray clientBuy(int);
+QByteArray clientChooseNode(int mapId, int chosenNodeId);
 QByteArray clientConstruct(int,
                            const QList<QUuid> &,
                            QUuid &,

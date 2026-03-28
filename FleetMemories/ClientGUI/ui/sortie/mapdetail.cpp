@@ -2,6 +2,7 @@
 #include "ui_mapdetail.h"
 #include "maprender.h"
 #include <QPainter>
+#include <QMouseEvent>
 #include <QStyleHints>
 #include "../mainwindow.h"
 #include "../../clientv2.h"
@@ -74,6 +75,32 @@ void MapDetail::displayDetailedMap(Map *map) {
     currentFleetType = KP::NormalFleet;
 }
 
+void MapDetail::setChoiceNodes(const QList<int> &nodeIds) {
+    choiceNodeIds = nodeIds;
+    awaitingChoice = true;
+    update();
+}
+
+void MapDetail::mousePressEvent(QMouseEvent *event) {
+    if(!awaitingChoice) {
+        QWidget::mousePressEvent(event);
+        return;
+    }
+    for(int nodeId: std::as_const(choiceNodeIds)) {
+        if(!mapPointer->nodes.contains(nodeId))
+            continue;
+        const MapNode &node = mapPointer->nodes[nodeId];
+        QPointF nodePos(node.x * width(), node.y * height());
+        if(QLineF(event->position(), nodePos).length() <= circleSize * 1.5) {
+            awaitingChoice = false;
+            choiceNodeIds.clear();
+            update();
+            emit nodeClicked(nodeId);
+            return;
+        }
+    }
+}
+
 void MapDetail::changeCurrentNode(const MapNode &node) {
     if(uninitialized) {
         currentNode = node;
@@ -129,7 +156,7 @@ void MapDetail::paintEvent(QPaintEvent *event) {
                              nextNodePos - delta * circleSize * 1.5);
         }
     }
-    qCritical() << mapPointer->nodes.size();
+
     for(const auto &[id, node]: mapPointer->nodes.asKeyValueRange()) {
         static QBrush redBrush = QBrush(QColor(255,128,128));
         painter.setBrush(redBrush);
@@ -155,13 +182,38 @@ void MapDetail::paintEvent(QPaintEvent *event) {
             painter.drawEllipse(node.x * width() - circleSize,
                                 node.y * height() - circleSize,
                                 circleSize * 2, circleSize * 2); break;
-        case KP::EMPTY:
-            pen.setWidth(circleBorderSize * 2);
+        case KP::EMPTY: {
             painter.setBrush(QBrush(Qt::cyan));
+            QPen pen(QColor(0, 128, 255));
+            pen.setWidth(circleBorderSize);
             painter.setPen(pen);
             painter.drawEllipse(node.x * width() - circleSize,
                                 node.y * height() - circleSize,
-                                circleSize * 2, circleSize * 2); break;
+                                circleSize * 2, circleSize * 2);
+        } break;
+        case KP::CHOICE: {
+            painter.setBrush(QBrush(QColor(255, 220, 0)));
+            QPen pen(QColor(200, 140, 0));
+            pen.setWidth(circleBorderSize);
+            painter.setPen(pen);
+            painter.drawEllipse(node.x * width() - circleSize,
+                                node.y * height() - circleSize,
+                                circleSize * 2, circleSize * 2);
+        } break;
+        }
+    }
+    if(awaitingChoice) {
+        for(int nodeId: std::as_const(choiceNodeIds)) {
+            if(!mapPointer->nodes.contains(nodeId))
+                continue;
+            const MapNode &n = mapPointer->nodes[nodeId];
+            QPen pen(QColor(255, 220, 0));
+            pen.setWidth(circleBorderSize * 2);
+            painter.setPen(pen);
+            painter.setBrush(Qt::NoBrush);
+            painter.drawEllipse(n.x * width() - circleSize * 1.5,
+                                n.y * height() - circleSize * 1.5,
+                                circleSize * 3, circleSize * 3);
         }
     }
     QPixmap *icon;
