@@ -11,7 +11,7 @@ IndustrialSelect::IndustrialSelect(int height, QWidget *parent)
     //% "Calculating..."
     iPValueLabel->setText(qtTrId("ip-calculating"));
     buyButton = new QPushButton(this);
-    //% "Buy Equip"
+    //% "Request Equip"
     buyButton->setText(qtTrId("buy-equip-button"));
 
     QHBoxLayout *layout = new QHBoxLayout(this);

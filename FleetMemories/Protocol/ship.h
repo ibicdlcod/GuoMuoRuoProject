@@ -45,6 +45,7 @@ public:
     static KP::AllegianceGroup allegianceGroup(QLocale::Territory territory);
     static KP::AllegianceSubGroup allegianceSubGroup(QLocale::Territory territory);
     static int expCap(int numberOfRings);
+    static int expCapNext(int expCap);
     static int getLevel(int);
     static double getEfficiency(int lv, int star);
     static int numberOfRings(int expCap);

@@ -204,6 +204,7 @@ void FactoryArea::switchToState() {
         equipview->activate(true, true);
         break;
     case KP::Anchorage:
+        //% "Anchorage"
         ui->FactoryLabel->setText(qtTrId("anchorage"));
         lay->setCurrentWidget(equipview);
         if(initial) {

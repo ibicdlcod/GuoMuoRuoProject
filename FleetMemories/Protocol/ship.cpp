@@ -439,6 +439,11 @@ int Ship::expCap(int numberOfRings) {
            / 2 * (levelCap - 1);
 }
 
+int Ship::expCapNext(int expCapPrev) {
+    return expCap(numberOfRings(expCapPrev) + 1);
+}
+
+
 int Ship::numberOfRings(int expCap) {
     int levelCap = getLevel(expCap);
     return levelCap / ringLv;

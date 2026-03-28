@@ -90,6 +90,7 @@ public:
 
     const QString attrPrimaryStr() const;
     const QString attrStr() const;
+    bool availableInStore() const;
     bool canEquip(Ship *ship, sol::state &ts) const;
     bool canEquipEX(Ship *ship, sol::state &ts) const;
     const ResOrd devRes() const;
@@ -98,6 +99,7 @@ public:
     bool disallowProduction() const;
     int getId() const;
     double getPrice() const;
+    double getStorePrice() const;
     double getTech() const;
     bool isInvalid() const;
     bool isNotEqual(const Equipment &) const;

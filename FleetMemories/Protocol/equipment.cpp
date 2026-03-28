@@ -119,7 +119,7 @@ const QString Equipment::attrStr() const {
         }
         else if(attrValue != 0) {
             QString toTranslate = QString("equip-attr-")
-            + attrName.toLower();
+                                  + attrName.toLower();
             result = result + qtTrId(toTranslate.toUtf8())
                      + " "
                      + (attrValue > 0 ? "+" : "")
@@ -152,6 +152,10 @@ const QString Equipment::attrPrimaryStr() const {
     return result;
 }
 
+bool Equipment::availableInStore() const {
+    return getStorePrice() > 0;
+}
+
 /* 4.3-Development.md#Resource cost */
 const ResOrd Equipment::devRes() const {
     using namespace KP;
@@ -182,13 +186,13 @@ const int Equipment::devTimeInSec() const {
 /* under new doctrine this should always return true */
 bool Equipment::disallowMassProduction() const {
     return attr.contains("Disallowmassproduction")
-    && attr.value("Disallowmassproduction") > 0;
+           && attr.value("Disallowmassproduction") > 0;
 }
 
 bool Equipment::disallowProduction() const {
     return type.isVirtual() || (
                attr.contains("Disallowmassproduction")
-               && attr.value("Disallowmassproduction") == -1);
+               && attr.value("Disallowmassproduction") < 0);
 }
 
 int Equipment::getId() const {
@@ -201,6 +205,10 @@ double Equipment::getTech() const {
 
 double Equipment::getPrice() const {
     return std::sqrt(getTech() + 1.0) / 4.0;
+}
+
+double Equipment::getStorePrice() const {
+    return attr.value("Storeprice");
 }
 
 bool Equipment::isInvalid() const {

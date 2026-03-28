@@ -9,6 +9,7 @@
 
 class SpecEquipModel : public EquipModel
 {
+    Q_OBJECT
 public:
     explicit SpecEquipModel(QObject *parent = nullptr);
 
