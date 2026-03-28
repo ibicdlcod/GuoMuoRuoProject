@@ -264,7 +264,10 @@ border-style: none;</string>
     <property name="title">
      <string id="menu-maintenance">Maintenance</string>
     </property>
-    <addaction name="actionSupply"/>
+    <addaction name="separator"/>
+    <addaction name="actionArsenal"/>
+    <addaction name="actionAnchorage"/>
+    <addaction name="separator"/>
     <addaction name="actionRepair"/>
    </widget>
    <widget class="QMenu" name="menuFactory">
@@ -273,9 +276,6 @@ border-style: none;</string>
     </property>
     <addaction name="actionDevelop_Equipment"/>
     <addaction name="actionConstruct_Ships"/>
-    <addaction name="separator"/>
-    <addaction name="actionArsenal"/>
-    <addaction name="actionAnchorage"/>
     <addaction name="separator"/>
     <addaction name="actionShip_Blueprints"/>
     <addaction name="separator"/>
@@ -299,10 +299,16 @@ border-style: none;</string>
     <property name="title">
      <string id="menu-help">Help</string>
     </property>
-    <addaction name="actionBuyARD"/>
     <addaction name="actionSettings"/>
     <addaction name="actionLicense"/>
     <addaction name="actionAbout_Qt"/>
+   </widget>
+   <widget class="QMenu" name="menuShop">
+    <property name="title">
+     <string id="menu-shop">Shop</string>
+    </property>
+    <addaction name="actionBuyEquip"/>
+    <addaction name="actionBuyARD"/>
    </widget>
    <addaction name="menuNaval_Base"/>
    <addaction name="menuTech"/>
@@ -310,6 +316,7 @@ border-style: none;</string>
    <addaction name="menuSortie"/>
    <addaction name="menuDock"/>
    <addaction name="menuFactory"/>
+   <addaction name="menuShop"/>
    <addaction name="menuHelp"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
@@ -355,7 +362,7 @@ border-style: none;</string>
   </action>
   <action name="actionAnchorage">
    <property name="text">
-    <string id="anchorage">Anchorage</string>
+    <string id="anchorage-supply">Anchorage/Supply</string>
    </property>
   </action>
   <action name="actionCompose">
@@ -371,6 +378,11 @@ border-style: none;</string>
   <action name="actionBuyARD">
    <property name="text">
     <string id="menu-buy-ard">Buy ARD Coupons</string>
+   </property>
+  </action>
+  <action name="actionBuyEquip">
+   <property name="text">
+    <string id="menu-buy-equip">Buy Equipment</string>
    </property>
   </action>
   <action name="actionSettings">

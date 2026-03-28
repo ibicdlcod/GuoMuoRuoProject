@@ -452,6 +452,9 @@ Server::~Server() noexcept {
     for(auto ship: std::as_const(shipRegistry)) {
         delete ship;
     }
+    for(auto map: std::as_const(normalMaps)) {
+        delete map;
+    }
     disconnect(&receiverM, &Receiver::jsonReceivedWithInfo,
                this, &Server::datagramReceivedStd);
     disconnect(&receiverM, &Receiver::nonStandardReceivedWithInfo,
@@ -761,23 +764,20 @@ void Server::handleARDPurchaseAuth(const CSteamID &uid,
     if(!authorized) {
         pendingARDOrders.remove(orderId);
         QByteArray msg = KP::serverARDPurchaseFailed(
-                    //% "Purchase was not authorized."
-                    qtTrId("ard-not-authorized"));
+                    KP::PurchaseNotAuthorized);
         senderM.sendMessage(connection, msg);
         return;
     }
     if(!pendingARDOrders.contains(orderId)) {
         QByteArray msg = KP::serverARDPurchaseFailed(
-                    //% "Order not found."
-                    qtTrId("ard-order-not-found"));
+                    KP::PurchaseOrderNotFound);
         senderM.sendMessage(connection, msg);
         return;
     }
     auto [orderUid, units] = pendingARDOrders[orderId];
     if(orderUid != uid) {
         QByteArray msg = KP::serverARDPurchaseFailed(
-                    //% "Order mismatch."
-                    qtTrId("ard-order-mismatch"));
+                    KP::PurchaseOrderMismatch);
         senderM.sendMessage(connection, msg);
         pendingARDOrders.remove(orderId);
         return;
@@ -816,8 +816,7 @@ void Server::handleARDPurchaseAuth(const CSteamID &uid,
                 qCritical() << query.lastError();
                 if(connectedPeers.contains(uid)) {
                     QByteArray msg = KP::serverARDPurchaseFailed(
-                                //% "Database error while crediting purchase."
-                                qtTrId("ard-db-error"));
+                                KP::PurchaseDatabaseError);
                     senderM.sendMessage(connectedPeers[uid], msg);
                 }
                 return;
@@ -847,8 +846,10 @@ void Server::handleARDPurchaseAuth(const CSteamID &uid,
             QString errDesc = doc.object()["response"]
                     .toObject()["error"]
                     .toObject()["errordesc"].toString();
+            qWarning() << "FinalizeTxn Steam error:" << errDesc;
             if(connectedPeers.contains(uid)) {
-                QByteArray msg = KP::serverARDPurchaseFailed(errDesc);
+                QByteArray msg = KP::serverARDPurchaseFailed(
+                            KP::PurchaseSteamError);
                 senderM.sendMessage(connectedPeers[uid], msg);
             }
         }
@@ -860,8 +861,7 @@ void Server::handleInitARDPurchase(const CSteamID &uid,
                                    int units) {
     if(units < 1 || units >= KP::ardCouponMaxUnits) {
         QByteArray msg = KP::serverARDPurchaseFailed(
-                    //% "Invalid ARD coupon amount."
-                    qtTrId("ard-invalid-amount"));
+                    KP::PurchaseInvalidAmount);
         senderM.sendMessage(connection, msg);
         return;
     }
@@ -917,8 +917,10 @@ void Server::handleInitARDPurchase(const CSteamID &uid,
             QString errDesc = doc.object()["response"]
                     .toObject()["error"]
                     .toObject()["errordesc"].toString();
+            qWarning() << "InitTxn Steam error:" << errDesc;
             if(connectedPeers.contains(uid)) {
-                QByteArray msg = KP::serverARDPurchaseFailed(errDesc);
+                QByteArray msg = KP::serverARDPurchaseFailed(
+                            KP::PurchaseSteamError);
                 senderM.sendMessage(connectedPeers[uid], msg);
             }
         }
@@ -1414,7 +1416,18 @@ void Server::offerRankInfo(const CSteamID &uid, QSslSocket *connection,
 void Server::offerResourceInfo(QSslSocket *connection,
                                const CSteamID &uid) {
     ResOrd ordinary = User::getCurrentResources(uid);
-    QByteArray msg = KP::serverResourceUpdate(ordinary);
+    int ardcoupon = 0;
+    {
+        QSqlQuery query;
+        query.prepare("SELECT Intvalue FROM UserAttr "
+                      "WHERE UserID = :uid AND Attribute = :attr");
+        query.bindValue(":uid", uid.ConvertToUint64());
+        query.bindValue(":attr", KP::attrARDCoupon);
+        if(Q_LIKELY(query.exec() && query.next())) {
+            ardcoupon = query.value(0).toInt();
+        }
+    }
+    QByteArray msg = KP::serverResourceUpdate(ordinary, ardcoupon);
     connection->flush();
     senderM.sendMessage(connection, msg);
     connection->flush();
@@ -2103,6 +2116,60 @@ award_equip:
     } catch(std::exception &e) {
         qCritical() << e.what();
         return;
+    }
+}
+
+void Server::doBuyFromStore(const CSteamID &uid, int equipid,
+                            QSslSocket *connection) {
+    try {
+check_equip_exists:
+        if(!equipRegistry.contains(equipid)) {
+            QByteArray msg = KP::serverARDPurchaseFailed(
+                        KP::PurchaseEquipNotExist);
+            senderM.sendMessage(connection, msg);
+            return;
+        }
+        Equipment *equip = equipRegistry[equipid];
+check_store_available:
+        if(!equip->availableInStore()) {
+            QByteArray msg = KP::serverARDPurchaseFailed(
+                        KP::PurchaseEquipNotAvailable);
+            senderM.sendMessage(connection, msg);
+            return;
+        }
+        int price = static_cast<int>(equip->getStorePrice());
+deduct_ard_coupons:
+        {
+            QSqlQuery query;
+            query.prepare("UPDATE UserAttr "
+                          "SET Intvalue = Intvalue - :price "
+                          "WHERE UserID = :uid AND Attribute = :attr "
+                          "AND Intvalue >= :price");
+            query.bindValue(":price", price);
+            query.bindValue(":uid", uid.ConvertToUint64());
+            query.bindValue(":attr", KP::attrARDCoupon);
+            if(Q_UNLIKELY(!query.exec())) {
+                qCritical() << query.lastQuery();
+                //% "Database failed when buying from store."
+                throw DBError(qtTrId("dbfail-store-buy"), query.lastError());
+            }
+            if(query.numRowsAffected() == 0) {
+                QByteArray msg = KP::serverARDPurchaseFailed(
+                            KP::PurchaseInsufficientCoupons);
+                senderM.sendMessage(connection, msg);
+                return;
+            }
+        }
+award_equip:
+        QByteArray msg = KP::serverNewEquip(
+                    newEquip(uid, equipid, true), equipid);
+        senderM.sendMessage(connection, msg);
+    } catch (DBError &e) {
+        for(QString &i : e.whats()) {
+            qCritical() << i;
+        }
+    } catch (std::exception &e) {
+        qCritical() << e.what();
     }
 }
 
@@ -6618,6 +6685,10 @@ anti_ddos:
         break;
     case KP::CommandType::ARDPurchaseAuth: {
         handleARDPurchaseAuth(uid, connection, djson);
+    }
+        break;
+    case KP::CommandType::BuyFromStore: {
+        doBuyFromStore(uid, djson["equipid"].toInt(), connection);
     }
         break;
     case KP::CommandType::InitARDPurchase: {

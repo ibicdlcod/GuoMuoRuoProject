@@ -78,6 +78,7 @@ private:
     void deleteTestEquip(const CSteamID &);
     void deleteTestShip(const CSteamID &);
     void doBuy(const CSteamID &, int, QSslSocket *);
+    void doBuyFromStore(const CSteamID &, int, QSslSocket *);
     void doConstruct(const CSteamID &, int, QList<QUuid> &, const QUuid &, int, QSslSocket *);
     void doDevelop(const CSteamID &, int, int, QSslSocket *);
     void doFetch(const CSteamID &, int, QSslSocket *, bool forced = false);

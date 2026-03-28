@@ -110,6 +110,16 @@ bool Clientv2::isInBattle() const {
     return gameState == KP::BattleMapView;
 }
 
+QList<Equipment *> Clientv2::getStoreEquipment() const {
+    QList<Equipment *> result;
+    for(Equipment *equip : std::as_const(equipRegistryCache)) {
+        if(equip->availableInStore()) {
+            result.append(equip);
+        }
+    }
+    return result;
+}
+
 bool Clientv2::isEquipRegistryCacheGood() const {
     return equipRegistryCacheGood;
 }
@@ -919,6 +929,14 @@ void Clientv2::doBuyEquip(int equipDef) {
     sender->enqueue(msg);
 }
 
+void Clientv2::doBuyFromStore(int equipDef) {
+    if(equipDef == 0) {
+        return;
+    }
+    QByteArray msg = KP::clientBuyFromStore(equipDef);
+    sender->enqueue(msg);
+}
+
 void Clientv2::doConstructShip(int shipDef, const QList<QUuid> &defaultEquips,
                                QUuid shipToRemodel,
                                int factoryID) {
@@ -1330,6 +1348,7 @@ void Clientv2::receivedInfo(const QJsonObject &djson) {
         }
         break;
     case KP::InfoType::ResourceInfo:
+        ardCouponCache = djson["ardcoupon"].toInt();
         emit receivedResourceInfo(djson);
         break;
     case KP::InfoType::ShipInfo:
@@ -1811,9 +1830,49 @@ void Clientv2::receivedMsg(const QJsonObject &djson) {
     }
     break;
     case KP::ARDPurchaseFailed: {
+        auto reason = static_cast<KP::PurchaseFailReason>(
+                    djson["reason"].toInt());
+        QString reasonStr;
+        switch(reason) {
+        case KP::PurchaseNotAuthorized:
+            //% "Purchase was not authorized."
+            reasonStr = qtTrId("ard-not-authorized");
+            break;
+        case KP::PurchaseOrderNotFound:
+            //% "Order not found."
+            reasonStr = qtTrId("ard-order-not-found");
+            break;
+        case KP::PurchaseOrderMismatch:
+            //% "Order mismatch."
+            reasonStr = qtTrId("ard-order-mismatch");
+            break;
+        case KP::PurchaseDatabaseError:
+            //% "Database error while processing purchase."
+            reasonStr = qtTrId("ard-db-error");
+            break;
+        case KP::PurchaseInvalidAmount:
+            //% "Invalid ARD coupon amount."
+            reasonStr = qtTrId("ard-invalid-amount");
+            break;
+        case KP::PurchaseSteamError:
+            //% "A Steam error occurred. Please try again later."
+            reasonStr = qtTrId("ard-steam-error");
+            break;
+        case KP::PurchaseEquipNotExist:
+            //% "Equipment does not exist."
+            reasonStr = qtTrId("store-equip-not-exist");
+            break;
+        case KP::PurchaseEquipNotAvailable:
+            //% "Equipment is not available in the store."
+            reasonStr = qtTrId("store-equip-not-available");
+            break;
+        case KP::PurchaseInsufficientCoupons:
+            //% "Insufficient ARD Coupons."
+            reasonStr = qtTrId("store-insufficient-coupons");
+            break;
+        }
         //% "Purchase failed: %1"
-        qWarning() << qtTrId("ard-purchase-failed")
-                          .arg(djson["reason"].toString());
+        qWarning() << qtTrId("ard-purchase-failed").arg(reasonStr);
     }
     break;
     case KP::ARDPurchasePending: {

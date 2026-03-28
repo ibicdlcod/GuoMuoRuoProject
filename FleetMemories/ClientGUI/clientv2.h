@@ -53,6 +53,7 @@ public:
 
     void doFetch(const QStringList &);
     void enterBattle();
+    QList<Equipment *> getStoreEquipment() const;
     bool isEquipRegistryCacheGood() const;
     bool isInBattle() const;
     bool isShipRegistryCacheGood() const;
@@ -88,6 +89,7 @@ public:
     QSortFilterProxyModel *proxyModel = new LocaleAwareSort(this);
     RankModel rankModel;
     QMap<int, double> techCache;
+    int ardCouponCache = 0;
 
     sol::state lua;
 
@@ -105,6 +107,7 @@ public slots:
     void displayPrompt();
     void doBattle(const QJsonObject &);
     void doBuyEquip(int equipDef);
+    void doBuyFromStore(int equipDef);
     void doConstructShip(int shipDef, const QList<QUuid> &defaultEquips,
                          QUuid shipToRemodel, int factoryID);
     void doDestructEquip(const QList<QUuid> &);

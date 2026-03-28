@@ -118,6 +118,8 @@ MainWindow::MainWindow(QWidget *parent, int argc, char ** argv)
             QApplication::instance(), &QApplication::aboutQt);
     connect(ui->actionBuyARD, &QAction::triggered,
             this, &MainWindow::buyARD);
+    connect(ui->actionBuyEquip, &QAction::triggered,
+            this, &MainWindow::buyEquip);
 
     portArea = new PortArea(this);
     licenseArea = new LicenseArea(this);
@@ -266,6 +268,11 @@ void MainWindow::adjustArea(QWidget *input, const QSize &size) {
 
 void MainWindow::buyARD() {
     ARDCouponDialog dialog(this);
+    dialog.exec();
+}
+
+void MainWindow::buyEquip() {
+    BuyEquipDialog dialog(this);
     dialog.exec();
 }
 

@@ -16,6 +16,7 @@
 #include "fleet/fleetview.h"
 #include "maintenance/repair.h"
 #include "ardcoupondialog.h"
+#include "buyequipdialog.h"
 #include "settingswindow.h"
 
 QT_BEGIN_NAMESPACE
@@ -50,6 +51,7 @@ private slots:
     void adjust(int dummy = 0);
     void adjustArea(QWidget *, const QSize &);
     void buyARD();
+    void buyEquip();
     void factoryRefresh();
     void gamestateChanged(KP::GameState);
     void gamestateInit();

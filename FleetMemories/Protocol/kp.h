@@ -216,6 +216,7 @@ enum CommandType{
     ChooseNode,
     DemandRankInfo,
     ARDPurchaseAuth,
+    BuyFromStore,
     InitARDPurchase,
 };
 Q_ENUM_NS(CommandType)
@@ -296,6 +297,19 @@ enum AuthFailType{
     SteamAuthFail
 };
 Q_ENUM_NS(AuthFailType)
+
+enum PurchaseFailReason{
+    PurchaseNotAuthorized,
+    PurchaseOrderNotFound,
+    PurchaseOrderMismatch,
+    PurchaseDatabaseError,
+    PurchaseInvalidAmount,
+    PurchaseSteamError,
+    PurchaseEquipNotExist,
+    PurchaseEquipNotAvailable,
+    PurchaseInsufficientCoupons,
+};
+Q_ENUM_NS(PurchaseFailReason)
 
 enum FleetFailType{
     ValidFleet,
@@ -606,6 +620,7 @@ QByteArray clientAdminTestShip();
 QByteArray clientAdminTestShipRemove();
 QByteArray clientARDPurchaseAuth(quint64 orderId, bool authorized);
 QByteArray clientBuy(int);
+QByteArray clientBuyFromStore(int equipDef);
 QByteArray clientChooseNode(int mapId, int chosenNodeId);
 QByteArray clientConstruct(int,
                            const QList<QUuid> &,
@@ -720,7 +735,7 @@ static constexpr int initDock() {
 }
 
 QByteArray serverARDPurchaseClawback(int unitsDeducted);
-QByteArray serverARDPurchaseFailed(const QString &reason);
+QByteArray serverARDPurchaseFailed(PurchaseFailReason reason);
 QByteArray serverARDPurchasePending(quint64 orderId);
 QByteArray serverARDPurchaseSuccess(int unitsAdded);
 QByteArray serverAskForHomePort();
@@ -762,7 +777,7 @@ QByteArray serverParseError(MsgType, const QString &,
                             const QString &);
 QByteArray serverPenguin();
 QByteArray serverRankInfo(const QJsonArray &, int, std::optional<double>);
-QByteArray serverResourceUpdate(ResOrd);
+QByteArray serverResourceUpdate(ResOrd, int ardcoupon);
 QByteArray serverShipBPInfo(const QJsonObject &);
 QByteArray serverShipInfo(const QJsonArray &, bool user = false,
                           QDateTime timeUtc = QDateTime::currentDateTimeUtc(),

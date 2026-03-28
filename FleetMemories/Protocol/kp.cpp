@@ -128,6 +128,14 @@ QByteArray KP::clientBuy(int equipDef) {
     return QCborValue::fromJsonValue(result).toCbor();
 }
 
+QByteArray KP::clientBuyFromStore(int equipDef) {
+    QJsonObject result;
+    result["type"] = DgramType::Request;
+    result["command"] = CommandType::BuyFromStore;
+    result["equipid"] = equipDef;
+    return QCborValue::fromJsonValue(result).toCbor();
+}
+
 QByteArray KP::clientChooseNode(int mapId, int chosenNodeId) {
     QJsonObject result;
     result["type"] = DgramType::Request;
@@ -418,11 +426,11 @@ QByteArray KP::serverARDPurchaseClawback(int unitsDeducted) {
     return QCborValue::fromJsonValue(result).toCbor();
 }
 
-QByteArray KP::serverARDPurchaseFailed(const QString &reason) {
+QByteArray KP::serverARDPurchaseFailed(PurchaseFailReason reason) {
     QJsonObject result;
     result["type"] = DgramType::Message;
     result["msgtype"] = MsgType::ARDPurchaseFailed;
-    result["reason"] = reason;
+    result["reason"] = static_cast<int>(reason);
     return QCborValue::fromJsonValue(result).toCbor();
 }
 
@@ -784,7 +792,7 @@ QByteArray KP::serverRankInfo(const QJsonArray &content,
     return QCborValue::fromJsonValue(result).toCbor();
 }
 
-QByteArray KP::serverResourceUpdate(ResOrd ordinary) {
+QByteArray KP::serverResourceUpdate(ResOrd ordinary, int ardcoupon) {
     QJsonObject result;
     result["type"] = DgramType::Info;
     result["infotype"] = InfoType::ResourceInfo;
@@ -795,6 +803,7 @@ QByteArray KP::serverResourceUpdate(ResOrd ordinary) {
     result["al"] = ordinary.a;
     result["w"] = ordinary.w;
     result["cr"] = ordinary.c;
+    result["ardcoupon"] = ardcoupon;
     return QCborValue::fromJsonValue(result).toCbor();
 }
 
