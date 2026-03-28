@@ -47,6 +47,7 @@ public:
     static int expCap(int numberOfRings);
     static int getLevel(int);
     static double getEfficiency(int lv, int star);
+    static int numberOfRings(int expCap);
 
     QMap<QString, QString> localNames;
     QMap<QString, QString> shipClassText;

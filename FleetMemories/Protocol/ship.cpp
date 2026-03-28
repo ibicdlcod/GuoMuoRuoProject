@@ -439,6 +439,11 @@ int Ship::expCap(int numberOfRings) {
            / 2 * (levelCap - 1);
 }
 
+int Ship::numberOfRings(int expCap) {
+    int levelCap = getLevel(expCap);
+    return levelCap / ringLv;
+}
+
 KP::AllegianceSubGroup Ship::allegianceSubGroup(QLocale::Territory ter) {
     /* The World War II involved not only the great powers but the people of subjugated colonies and practically subjugated countries.
      * The great contribution or struggle of them subsequently made the colonial system became generally unviable and mostly replaced
