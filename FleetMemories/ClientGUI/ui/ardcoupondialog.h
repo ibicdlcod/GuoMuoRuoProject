@@ -6,6 +6,8 @@
 
 #include <QButtonGroup>
 #include <QDialog>
+#include <QLabel>
+#include <QSpinBox>
 
 /* Advances resource dispatch coupon */
 class ARDCouponDialog : public QDialog {
@@ -15,12 +17,17 @@ public:
     explicit ARDCouponDialog(QWidget *parent = nullptr);
 
 private slots:
+    void onPackageSelected(int id);
     void purchase();
+    void updatePriceLabel(int units);
 
 private:
-    static double realPrice(double price);
+    static constexpr int presetTiers[] = {100, 500, 2000, 10000, 50000};
+    static constexpr int customTierId = 5;
 
     QButtonGroup *packageGroup;
+    QSpinBox *unitsBox;
+    QLabel *priceLabel;
 };
 
 #endif // ARDCOUPONDIALOG_H

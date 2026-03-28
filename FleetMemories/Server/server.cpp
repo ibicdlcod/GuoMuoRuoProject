@@ -773,7 +773,7 @@ void Server::handleARDPurchaseAuth(const CSteamID &uid,
         senderM.sendMessage(connection, msg);
         return;
     }
-    auto [orderUid, packageId] = pendingARDOrders[orderId];
+    auto [orderUid, units] = pendingARDOrders[orderId];
     if(orderUid != uid) {
         QByteArray msg = KP::serverARDPurchaseFailed(
                     //% "Order mismatch."
@@ -782,22 +782,7 @@ void Server::handleARDPurchaseAuth(const CSteamID &uid,
         pendingARDOrders.remove(orderId);
         return;
     }
-    const KP::ARDPackage *pkg = nullptr;
-    for(int i = 0; i < KP::ardPackageCount; ++i) {
-        if(KP::ardPackages[i].packageId == packageId) {
-            pkg = &KP::ardPackages[i];
-            break;
-        }
-    }
-    if(!pkg) {
-        QByteArray msg = KP::serverARDPurchaseFailed(
-                    //% "Invalid package."
-                    qtTrId("ard-invalid-package"));
-        senderM.sendMessage(connection, msg);
-        pendingARDOrders.remove(orderId);
-        return;
-    }
-    int unitsToAdd = pkg->ardUnits;
+    int unitsToAdd = units;
     QNetworkRequest request(QUrl(QString(KP::microTxnBaseUrl)
                                  + QStringLiteral("FinalizeTxn/v2/")));
     request.setHeader(QNetworkRequest::ContentTypeHeader,
@@ -843,10 +828,15 @@ void Server::handleARDPurchaseAuth(const CSteamID &uid,
                         "(OrderID, UserID, Units, Status) "
                         "VALUES (:oid, :uid, :units, 'active')");
             orderRecord.bindValue(":oid", orderId);
-            orderRecord.bindValue(":uid", uid.ConvertToUint64());
+            orderRecord.bindValue(":uid", QString::number(uid.ConvertToUint64()));
             orderRecord.bindValue(":units", unitsToAdd);
             if(Q_UNLIKELY(!orderRecord.exec())) {
-                qCritical() << orderRecord.lastError();
+                qCritical() << orderRecord.lastQuery();
+                //% "Store purchase info failed! User %1, orderid %2"
+                throw DBError(qtTrId("store-purchase-info-failed")
+                              .arg(uid.ConvertToUint64())
+                              .arg(orderId),
+                              query.lastError());
             }
             if(connectedPeers.contains(uid)) {
                 QByteArray msg = KP::serverARDPurchaseSuccess(unitsToAdd);
@@ -867,21 +857,15 @@ void Server::handleARDPurchaseAuth(const CSteamID &uid,
 
 void Server::handleInitARDPurchase(const CSteamID &uid,
                                    QSslSocket *connection,
-                                   int packageId) {
-    const KP::ARDPackage *pkg = nullptr;
-    for(int i = 0; i < KP::ardPackageCount; ++i) {
-        if(KP::ardPackages[i].packageId == packageId) {
-            pkg = &KP::ardPackages[i];
-            break;
-        }
-    }
-    if(!pkg) {
+                                   int units) {
+    if(units < 1 || units >= KP::ardCouponMaxUnits) {
         QByteArray msg = KP::serverARDPurchaseFailed(
-                    //% "Invalid ARD package selected."
-                    qtTrId("ard-invalid-package"));
+                    //% "Invalid ARD coupon amount."
+                    qtTrId("ard-invalid-amount"));
         senderM.sendMessage(connection, msg);
         return;
     }
+    int priceHKDCents = KP::ardRealPriceHKDCents(units);
     std::uniform_int_distribution<uint64_t> orderDist(
                 1, std::numeric_limits<uint64_t>::max());
     quint64 orderId = orderDist(mt);
@@ -905,24 +889,25 @@ void Server::handleInitARDPurchase(const CSteamID &uid,
     params.addQueryItem(QStringLiteral("ipaddress"),
                         connection->peerAddress().toString());
     params.addQueryItem(QStringLiteral("itemid[0]"),
-                        QString::number(pkg->steamItemId));
+                        QString::number(KP::ardCouponItemId));
     params.addQueryItem(QStringLiteral("qty[0]"), QStringLiteral("1"));
     params.addQueryItem(QStringLiteral("amount[0]"),
-                        QString::number(pkg->priceHKDCents));
+                        QString::number(priceHKDCents));
     params.addQueryItem(QStringLiteral("description[0]"),
-                        QString::fromLatin1(pkg->description));
+                        //% "%1 ARD Coupons"
+                        qtTrId("ard-coupon-description").arg(units));
     QNetworkReply *reply = networkManager.post(
                 request,
                 params.toString(QUrl::FullyEncoded).toUtf8());
     connect(reply, &QNetworkReply::finished,
-            this, [this, reply, uid, orderId, packageId]() {
+            this, [this, reply, uid, orderId, units]() {
         reply->deleteLater();
         QByteArray responseData = reply->readAll();
         QJsonDocument doc = QJsonDocument::fromJson(responseData);
         QString result = doc.object()["response"]
                 .toObject()["result"].toString();
         if(result == QStringLiteral("OK")) {
-            pendingARDOrders[orderId] = {uid, packageId};
+            pendingARDOrders[orderId] = {uid, units};
             if(connectedPeers.contains(uid)) {
                 QByteArray msg = KP::serverARDPurchasePending(orderId);
                 senderM.sendMessage(connectedPeers[uid], msg);
@@ -2057,6 +2042,14 @@ void Server::doBuy(const CSteamID &uid, int equipid,
             return;
         }
         Equipment *equip = equipRegistry[equipid];
+
+exec_production_ban:
+        if(equip->disallowProduction()) {
+            QByteArray msg =
+                    KP::serverDevelopFailed(KP::ProductionDisallowed);
+            senderM.sendMessage(connection, msg);
+            return;
+        }
 
         /* 4.8-Industrial.md#Possess limit */
 possess_limit:
@@ -6628,7 +6621,7 @@ anti_ddos:
     }
         break;
     case KP::CommandType::InitARDPurchase: {
-        handleInitARDPurchase(uid, connection, djson["packageid"].toInt());
+        handleInitARDPurchase(uid, connection, djson["units"].toInt());
     }
         break;
 home_port:

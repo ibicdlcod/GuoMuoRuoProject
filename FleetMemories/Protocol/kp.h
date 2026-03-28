@@ -72,15 +72,11 @@ static constexpr int maxRepairSlots = 8;
 /* ARD coupon stored as integer units; 1 unit = 0.01 HKD */
 static constexpr const char *attrARDCoupon = "ARDCoupon";
 static constexpr double ardCouponUnitHKD = 0.01;
-struct ARDPackage {
-    int packageId;       // matches dialog button group ID
-    int steamItemId;     // item ID for Steam InitTxn
-    int priceHKDCents;   // price in HKD cents for InitTxn
-    int ardUnits;        // units to credit (1 unit = 0.01 HKD)
-    const char *description;
-};
-extern const ARDPackage ardPackages[];
-static constexpr int ardPackageCount = 5;
+static constexpr int ardCouponMaxUnits = 65536;
+#pragma message(SECRET)
+static constexpr int ardCouponItemId = 6;
+/* Returns the real price in HKD cents after logarithmic volume discount */
+int ardRealPriceHKDCents(int units);
 #if PRODUCTION_ENV
 static constexpr const char *microTxnBaseUrl =
     "https://partner.steam-api.com/ISteamMicroTxn/";
@@ -643,7 +639,7 @@ QByteArray clientFetch(int factoryID = -1, bool forced = false);
 QByteArray clientFleetData(const QJsonArray &);
 QByteArray clientHello();
 QByteArray clientHomePort(AllegianceGroup);
-QByteArray clientInitARDPurchase(int packageId);
+QByteArray clientInitARDPurchase(int units);
 QByteArray clientMigrate(const QJsonObject &);
 QByteArray clientQueryNextNode(int, int, bool retreat = false);
 QByteArray clientSortie(int, int, bool);

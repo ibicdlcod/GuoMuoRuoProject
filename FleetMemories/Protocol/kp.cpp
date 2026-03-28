@@ -2,6 +2,7 @@
  * SPDX-License-Identifier: AGPL-3.0-or-later */
 
 #include "kp.h"
+#include <cmath>
 #include <QFile>
 #include <QJsonArray>
 #include <QSettings>
@@ -10,13 +11,14 @@
 extern QFile *logFile;
 extern std::unique_ptr<QSettings> settings;
 
-const KP::ARDPackage KP::ardPackages[] = {
-    {1,   1,  100,   100,   "100 ARD Coupons"},   // HK$1.00  — base
-    {5,   2,  450,   500,   "500 ARD Coupons"},   // HK$4.50  — 10% off
-    {20,  3,  1600,  2000,  "2000 ARD Coupons"},  // HK$16.00 — 20% off
-    {100, 4,  7000,  10000, "10000 ARD Coupons"}, // HK$70.00 — 30% off
-    {500, 5,  30000, 50000, "50000 ARD Coupons"}, // HK$300.00 — 40% off
-};
+int KP::ardRealPriceHKDCents(int units) {
+    static constexpr double factor = 65536.0;
+    double basePriceHKD = units * ardCouponUnitHKD;
+    double discounted = basePriceHKD
+                        / (std::log(factor * basePriceHKD + 1)
+                           / std::log(factor + 1));
+    return qRound(discounted * 100.0);
+}
 
 void KP::initLog(bool server) {
     QString logFileName;
@@ -336,11 +338,11 @@ QByteArray KP::clientHomePort(AllegianceGroup nation) {
     return QCborValue::fromJsonValue(result).toCbor();
 }
 
-QByteArray KP::clientInitARDPurchase(int packageId) {
+QByteArray KP::clientInitARDPurchase(int units) {
     QJsonObject result;
     result["type"] = DgramType::Request;
     result["command"] = CommandType::InitARDPurchase;
-    result["packageid"] = packageId;
+    result["units"] = units;
     return QCborValue::fromJsonValue(result).toCbor();
 }
 

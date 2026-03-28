@@ -3,10 +3,11 @@
 
 #include "ardcoupondialog.h"
 #include "../clientv2.h"
+#include "../../Protocol/kp.h"
 #include <QDialogButtonBox>
 #include <QGroupBox>
+#include <QHBoxLayout>
 #include <QLabel>
-#include <QMessageBox>
 #include <QPushButton>
 #include <QRadioButton>
 #include <QVBoxLayout>
@@ -18,7 +19,7 @@ ARDCouponDialog::ARDCouponDialog(QWidget *parent)
 
     auto *layout = new QVBoxLayout(this);
 
-    //% "Advanced Resource Dispatch (ARD) Coupons instantly replenish all resources at your naval base to maximum capacity. Use them to stay battle-ready without waiting for natural resource recovery."
+    //% "Useful for elite admirals, who may want to do risky attacks or decorate their ship"
     auto *desc = new QLabel(qtTrId("ard-dialog-desc"), this);
     desc->setWordWrap(true);
     layout->addWidget(desc);
@@ -29,51 +30,82 @@ ARDCouponDialog::ARDCouponDialog(QWidget *parent)
 
     packageGroup = new QButtonGroup(this);
 
-    //% "100 ARD Coupons — HK$1.00"
-    auto *r1 = new QRadioButton(qtTrId("ard-package-1"), this);
-    //% "500 ARD Coupons — HK$4.50 (10% off)"
-    auto *r5 = new QRadioButton(qtTrId("ard-package-5"), this);
-    //% "2000 ARD Coupons — HK$16.00 (20% off)"
-    auto *r20 = new QRadioButton(qtTrId("ard-package-20"), this);
-    //% "10000 ARD Coupons — HK$70.00 (30% off)"
-    auto *r100 = new QRadioButton(qtTrId("ard-package-100"), this);
-    //% "50000 ARD Coupons — HK$300.00 (40% off)"
-    auto *r500 = new QRadioButton(qtTrId("ard-package-500"), this);
-    r1->setChecked(true);
+    for(int i = 0; i < static_cast<int>(std::size(presetTiers)); ++i) {
+        int units = presetTiers[i];
+        double priceHKD = KP::ardRealPriceHKDCents(units) / 100.0;
+        //% "%1 ARD Coupons — HK$ %2"
+        auto *btn = new QRadioButton(
+            qtTrId("ard-package-option")
+                .arg(units)
+                .arg(priceHKD, 0, 'f', 2),
+            this);
+        packageGroup->addButton(btn, i);
+        groupLayout->addWidget(btn);
+    }
 
-    packageGroup->addButton(r1, 1);
-    packageGroup->addButton(r5, 5);
-    packageGroup->addButton(r20, 20);
-    packageGroup->addButton(r100, 100);
-    packageGroup->addButton(r500, 500);
+    auto *customRow = new QHBoxLayout();
+    //% "Custom:"
+    auto *customBtn = new QRadioButton(qtTrId("ard-custom-label"), this);
+    packageGroup->addButton(customBtn, customTierId);
+    customRow->addWidget(customBtn);
 
-    groupLayout->addWidget(r1);
-    groupLayout->addWidget(r5);
-    groupLayout->addWidget(r20);
-    groupLayout->addWidget(r100);
-    groupLayout->addWidget(r500);
+    unitsBox = new QSpinBox(this);
+    unitsBox->setMinimum(1);
+    unitsBox->setMaximum(KP::ardCouponMaxUnits - 1);
+    unitsBox->setValue(100);
+    unitsBox->setEnabled(false);
+    customRow->addWidget(unitsBox);
+    groupLayout->addLayout(customRow);
+
     layout->addWidget(groupBox);
+
+    auto *priceRow = new QHBoxLayout();
+    //% "Price:"
+    priceRow->addWidget(new QLabel(qtTrId("ard-price-label"), this));
+    priceLabel = new QLabel(this);
+    priceRow->addWidget(priceLabel);
+    priceRow->addStretch();
+    layout->addLayout(priceRow);
 
     auto *buttons = new QDialogButtonBox(this);
     //% "Purchase"
     auto *buyBtn = buttons->addButton(qtTrId("ard-purchase-btn"),
                                       QDialogButtonBox::AcceptRole);
     buttons->addButton(QDialogButtonBox::Cancel);
-
-    connect(buyBtn, &QPushButton::clicked, this, &ARDCouponDialog::purchase);
-    connect(buttons, &QDialogButtonBox::rejected, this, &QDialog::reject);
-
     layout->addWidget(buttons);
+
+    packageGroup->button(0)->setChecked(true);
+
+    connect(packageGroup, &QButtonGroup::idClicked,
+            this, &ARDCouponDialog::onPackageSelected);
+    connect(unitsBox, &QSpinBox::valueChanged,
+            this, &ARDCouponDialog::updatePriceLabel);
+    connect(buyBtn, &QPushButton::clicked,
+            this, &ARDCouponDialog::purchase);
+    connect(buttons, &QDialogButtonBox::rejected,
+            this, &QDialog::reject);
+
+    onPackageSelected(0);
+}
+
+void ARDCouponDialog::onPackageSelected(int id) {
+    bool isCustom = (id == customTierId);
+    unitsBox->setEnabled(isCustom);
+    int units = isCustom ? unitsBox->value() : presetTiers[id];
+    updatePriceLabel(units);
+}
+
+void ARDCouponDialog::updatePriceLabel(int units) {
+    double priceHKD = KP::ardRealPriceHKDCents(units) / 100.0;
+    //% "HK$ %1"
+    priceLabel->setText(qtTrId("ard-price-display")
+                        .arg(priceHKD, 0, 'f', 2));
 }
 
 void ARDCouponDialog::purchase() {
+    int id = packageGroup->checkedId();
+    int units = (id == customTierId) ? unitsBox->value() : presetTiers[id];
     Clientv2 &engine = Clientv2::getInstance();
-    engine.initARDPurchase(packageGroup->checkedId());
+    engine.initARDPurchase(units);
     accept();
-}
-
-double ARDCouponDialog::realPrice(double price) {
-    static double factor = 65536.0;
-    /* return price after discount */
-    return price / (std::log(factor*price+1) / std::log(factor+1));
 }
