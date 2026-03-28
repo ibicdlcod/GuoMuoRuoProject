@@ -528,6 +528,7 @@ enum NodeType {
     NIGHTBOSS = 6,
     AIR = 7,
     TRANSPORT = 8,
+    CHOICE = 9,
 };
 Q_ENUM_NS(NodeType)
 

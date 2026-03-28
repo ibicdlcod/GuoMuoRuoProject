@@ -129,6 +129,7 @@ void MapDetail::paintEvent(QPaintEvent *event) {
                              nextNodePos - delta * circleSize * 1.5);
         }
     }
+    qCritical() << mapPointer->nodes.size();
     for(const auto &[id, node]: mapPointer->nodes.asKeyValueRange()) {
         static QBrush redBrush = QBrush(QColor(255,128,128));
         painter.setBrush(redBrush);
@@ -150,6 +151,13 @@ void MapDetail::paintEvent(QPaintEvent *event) {
                                 circleSize, circleSize); break;
         case KP::BOSS:
             pen.setWidth(circleBorderSize * 2);
+            painter.setPen(pen);
+            painter.drawEllipse(node.x * width() - circleSize,
+                                node.y * height() - circleSize,
+                                circleSize * 2, circleSize * 2); break;
+        case KP::EMPTY:
+            pen.setWidth(circleBorderSize * 2);
+            painter.setBrush(QBrush(Qt::cyan));
             painter.setPen(pen);
             painter.drawEllipse(node.x * width() - circleSize,
                                 node.y * height() - circleSize,

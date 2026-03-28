@@ -12,6 +12,7 @@ maps.Battle_type = {
     NIGHTBOSS = 6,
     AIR = 7,
     TRANSPORT = 8,
+	CHOICE = 9,
 }
 
 return maps
