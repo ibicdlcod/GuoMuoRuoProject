@@ -51,13 +51,13 @@ public:
     };
     Q_ENUM(Password)
 
+    void doFetch(const QStringList &);
     void enterBattle();
-    bool isInBattle() const;
     bool isEquipRegistryCacheGood() const;
+    bool isInBattle() const;
     bool isShipRegistryCacheGood() const;
     void leaveBattle();
     bool loggedIn() const;
-    void doFetch(const QStringList &);
 
     /* ususally accesses equipregistryCache */
     friend void ConstructWindow::switchDisplay(int);
@@ -129,8 +129,8 @@ public slots:
     void sendEncryptedAppTicket(uint8 [], uint32);
     void sendFleetData(const QJsonArray &);
     void serverResponse(const QString &, const QByteArray &);
-    void serverResponseStd(const QJsonObject &);
     void serverResponseNonStd(const QByteArray &);
+    void serverResponseStd(const QJsonObject &);
     void setTicketCache(uint8 [], uint32);
     void showHelp(const QStringList &);
     void sortie(int, int, bool expedition = false);
@@ -194,9 +194,9 @@ private slots:
 
 private:
     void doAddEquip(const QStringList &);
-    void doDevelop(const QStringList &);
     void doDeleteTestEquip();
     void doDeleteTestShip();
+    void doDevelop(const QStringList &);
     void doGenerateTestEquip();
     void doGenerateTestShip();
     void doSwitch(const QStringList &);

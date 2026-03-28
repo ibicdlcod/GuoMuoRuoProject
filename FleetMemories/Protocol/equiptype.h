@@ -21,15 +21,15 @@ public:
     bool operator==(const EquipType &) const;
 
     const ResOrd devResBase() const;
-    static const QList<QString> getDisplayGroupsSorted();
     QString getDisplayGroup();
-    int getTypeSort() const;
+    static const QList<QString> getDisplayGroupsSorted();
     QString getPrimaryAttr() const;
+    int getTypeSort() const;
     int iconGroup() const;
     static const QString intToStrRep(int);
     static int strToIntRep(QString);
-    QString toString() const;
     int toInt() const;
+    QString toString() const;
 
     static int getSize(const int);
     static bool isMainGun(const int);

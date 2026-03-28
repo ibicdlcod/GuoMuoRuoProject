@@ -486,18 +486,6 @@ QByteArray KP::serverEquipLackMother(GameError error, int mother, int64 sp) {
     return QCborValue::fromJsonValue(result).toCbor();
 }
 
-QByteArray KP::serverEquipRetired(const QList<QUuid> &trash) {
-    QJsonObject result;
-    result["type"] = DgramType::Message;
-    result["msgtype"] = MsgType::EquipRetired;
-    QJsonArray trashList;
-    for(auto trashItem: trash) {
-        trashList.append(QJsonValue(trashItem.toString()));
-    }
-    result["equipids"] = trashList;
-    return QCborValue::fromJsonValue(result).toCbor();
-}
-
 QByteArray KP::serverEquipImproved(
     const QList<std::tuple<QUuid, int>> &equips) {
     QJsonObject result;
@@ -511,6 +499,18 @@ QByteArray KP::serverEquipImproved(
         equipList.append(item);
     }
     result["equipdata"] = equipList;
+    return QCborValue::fromJsonValue(result).toCbor();
+}
+
+QByteArray KP::serverEquipRetired(const QList<QUuid> &trash) {
+    QJsonObject result;
+    result["type"] = DgramType::Message;
+    result["msgtype"] = MsgType::EquipRetired;
+    QJsonArray trashList;
+    for(auto trashItem: trash) {
+        trashList.append(QJsonValue(trashItem.toString()));
+    }
+    result["equipids"] = trashList;
     return QCborValue::fromJsonValue(result).toCbor();
 }
 
@@ -674,20 +674,20 @@ QByteArray KP::serverNewEquip(QUuid serial, int equipDid) {
     return QCborValue::fromJsonValue(result).toCbor();
 }
 
-QByteArray KP::serverNewShip(QUuid serial, int shipDid, int initialHP) {
+QByteArray KP::serverNewmodelShip(QUuid serial, int shipDid, int initialHP) {
     QJsonObject result;
     result["type"] = DgramType::Message;
-    result["msgtype"] = MsgType::NewShip;
+    result["msgtype"] = MsgType::ShipRemodeled;
     result["serial"] = serial.toString();
     result["shipdef"] = shipDid;
     result["hp"] = initialHP;
     return QCborValue::fromJsonValue(result).toCbor();
 }
 
-QByteArray KP::serverNewmodelShip(QUuid serial, int shipDid, int initialHP) {
+QByteArray KP::serverNewShip(QUuid serial, int shipDid, int initialHP) {
     QJsonObject result;
     result["type"] = DgramType::Message;
-    result["msgtype"] = MsgType::ShipRemodeled;
+    result["msgtype"] = MsgType::NewShip;
     result["serial"] = serial.toString();
     result["shipdef"] = shipDid;
     result["hp"] = initialHP;

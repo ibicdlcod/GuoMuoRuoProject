@@ -31,8 +31,8 @@ public:
     Q_DECL_DEPRECATED KP::AllegianceGroup getNationality() const;
     QList<int> getPreviousModels(const QMap<int, Ship *> &) const;
     QList<int> getStartingEquip() const;
-    ShipType getType() const;
     double getTech() const;
+    ShipType getType() const;
     QList<std::tuple<int, int>> getVisibleBonuses() const;
     bool isAmnesiac() const;
     bool isNotEqual(const Ship &) const;

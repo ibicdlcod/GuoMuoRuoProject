@@ -26,22 +26,22 @@ public:
     explicit Sortie(QWidget *parent = nullptr);
     ~Sortie();
 
-    void switchToState(KP::SortieState);
     KP::FleetType getCurrentFleetType();
+    void switchToState(KP::SortieState);
 
 public slots:
-    void dealWithNode(const MapNode &node, int nodeId);
     void battleEnd();
+    void dealWithNode(const MapNode &node, int nodeId);
 
 protected:
     void resizeEvent(QResizeEvent *event) override;
 
 private slots:
-    void switchMap(int mapId);
-    void confirmSortieStart();
-    void sortieStart(const QJsonObject &djson);
     void battleProcess(const QJsonObject &djson);
+    void confirmSortieStart();
     void sortieEnd();
+    void sortieStart(const QJsonObject &djson);
+    void switchMap(int mapId);
 
 private:
     Ui::Sortie *ui;

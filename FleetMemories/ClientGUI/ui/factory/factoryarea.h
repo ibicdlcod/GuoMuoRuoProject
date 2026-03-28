@@ -38,8 +38,8 @@ private slots:
     void buyClicked(bool checked = false);
     void developClicked(bool checked = false, int slotnum = 0);
     void doBuy(int result);
-    void doDevelop(int result);
     void doConstruct(int result);
+    void doDevelop(int result);
     void doFactoryRefresh(const QJsonObject &);
     void stackResize(int);
 

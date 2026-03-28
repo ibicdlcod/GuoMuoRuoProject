@@ -87,25 +87,24 @@ public:
     explicit Equipment(const QJsonObject &, QObject *parent = nullptr);
 
     int operator<=>(const Equipment &) const;
-    bool isNotEqual(const Equipment &) const;
-    QString toString(QString lang = settings->value("client/language", "ja_JP")
-                                        .toString()) const;
 
-    const QString attrStr() const;
     const QString attrPrimaryStr() const;
+    const QString attrStr() const;
+    bool canEquip(Ship *ship, sol::state &ts) const;
+    bool canEquipEX(Ship *ship, sol::state &ts) const;
     const ResOrd devRes() const;
     const int devTimeInSec() const;
     bool disallowMassProduction() const;
     bool disallowProduction() const;
     int getId() const;
+    double getPrice() const;
     double getTech() const;
     bool isInvalid() const;
-    int skillPointsStd() const;
+    bool isNotEqual(const Equipment &) const;
     bool isRocketPlane() const;
-    double getPrice() const;
-
-    bool canEquip(Ship *ship, sol::state &ts) const;
-    bool canEquipEX(Ship *ship, sol::state &ts) const;
+    int skillPointsStd() const;
+    QString toString(QString lang = settings->value("client/language", "ja_JP")
+                                        .toString()) const;
 
     /* 4.2-Attributes.md */
     QMap<QString, QString> localNames;

@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git add:*)",
+      "WebFetch(domain:partner.steamgames.com)"
+    ]
+  }
+}

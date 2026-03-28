@@ -22,15 +22,14 @@ signals:
     void finished();
 
 public slots:
-    void networkReplyProgress(qint64 bytesRead, qint64 totalBytes);
-
+    void cancelDownload();
     void downloadFile(const QString &urlSpec =
                       "https://tsunkit.net/api/assets/images/equipTypeIcons/1",
                       const QString &fileInput = "1",
                       const QString &directory = "equipTypeIcons/");
-    void cancelDownload();
     void httpFinished();
     void httpReadyRead();
+    void networkReplyProgress(qint64 bytesRead, qint64 totalBytes);
     void sslErrors(const QList<QSslError> &errors);
 
 private:

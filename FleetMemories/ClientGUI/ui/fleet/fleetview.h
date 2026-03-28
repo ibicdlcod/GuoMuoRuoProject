@@ -36,12 +36,12 @@ public:
     explicit FleetView(QWidget *parent = nullptr);
     ~FleetView();
 
-    QUuid getShipUuid(int shipIndex) const;
+    int getActiveFleet() const;
+    KP::FleetType getCurrentFleetType() const;
     Ship * getShip(int shipIndex) const;
     ShipDynamic * getShipDynamic(int shipIndex) const;
     FleetPos getShipIndex(QUuid shipUuid) const;
-    int getActiveFleet() const;
-    KP::FleetType getCurrentFleetType() const;
+    QUuid getShipUuid(int shipIndex) const;
     bool isCurrentFleetEmpty() const;
     void simplify(bool positive = true);
     EquipView *equipView;
@@ -57,15 +57,15 @@ signals:
                      QUuid equipUid);
 
 public slots:
-    void modifyFleetShip(int posindex, QUuid uid);
-    void modifyPlaneCount(int shipPosIndex, int equipSlotIndex,
-                          int diff);
     void equipSelected(int shipPosIndex,
                        int equipSlotIndex,
                        QUuid equipUid);
     void equipSelectedPassive(QUuid shipUid,
                               int equipSlotIndex,
                               QUuid equipUid);
+    void modifyFleetShip(int posindex, QUuid uid);
+    void modifyPlaneCount(int shipPosIndex, int equipSlotIndex,
+                          int diff);
 
 private slots:
     void modifyFleetIndex(bool checked);

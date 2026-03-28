@@ -26,13 +26,13 @@ signals:
     void devDemandLocalTech(int);
 
 public slots:
-    void resetListName(int);
     void resetEquipName(int);
+    void resetListName(int);
     void setBuyMode(bool);
 
 private slots:
-    void displaySuccessRate(int);
     void devDemandChance(bool checked = false);
+    void displaySuccessRate(int);
 
 private:
     Ui::DevelopWindow *ui;

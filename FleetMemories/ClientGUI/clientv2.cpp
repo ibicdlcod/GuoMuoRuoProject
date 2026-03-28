@@ -101,14 +101,14 @@ bool Clientv2::isShipRegistryCacheGood() const {
     return shipRegistryCacheGood;
 }
 
-bool Clientv2::loggedIn() const {
-    return gameState != KP::Offline;
-}
-
 void Clientv2::leaveBattle() {
     gameState = KP::SortieMapView;
     emit gamestateChanged(KP::SortieMapView);
     emit unlockBattle();
+}
+
+bool Clientv2::loggedIn() const {
+    return gameState != KP::Offline;
 }
 
 /* public slots */
@@ -367,28 +367,6 @@ void Clientv2::serverResponse(const QString &clientInfo,
     return;
 }
 
-void Clientv2::serverResponseStd(const QJsonObject &djson) {
-#if defined(QT_DEBUG)
-    static const QString formatter = QStringLiteral("Received json: %1");
-    const QString html = formatter
-                             .arg(QJsonDocument(djson).toJson());
-    qDebug() << html;
-#endif
-    try{
-        switch(djson["type"].toInt()) {
-        case KP::DgramType::Auth: receivedAuth(djson); break;
-        case KP::DgramType::Info: receivedInfo(djson); break;
-        case KP::DgramType::Message: receivedMsg(djson); break;
-        default:
-            throw std::domain_error("datagram type not supported"); break;
-        }
-    } catch (const QJsonParseError &e) {
-        qWarning() << (serverName + ": JSONError -") << e.errorString();
-    } catch (const std::domain_error &e) {
-        qWarning() << (serverName + ":") << e.what();
-    }
-}
-
 void Clientv2::serverResponseNonStd(const QByteArray &plainText) {
     QJsonObject djson =
         QCborValue::fromCbor(plainText).toMap().toJsonObject();
@@ -405,6 +383,28 @@ void Clientv2::serverResponseNonStd(const QByteArray &plainText) {
                                  .arg(QJsonDocument(djson).toJson());
         qDebug() << html;
     }
+#endif
+    try{
+        switch(djson["type"].toInt()) {
+        case KP::DgramType::Auth: receivedAuth(djson); break;
+        case KP::DgramType::Info: receivedInfo(djson); break;
+        case KP::DgramType::Message: receivedMsg(djson); break;
+        default:
+            throw std::domain_error("datagram type not supported"); break;
+        }
+    } catch (const QJsonParseError &e) {
+        qWarning() << (serverName + ": JSONError -") << e.errorString();
+    } catch (const std::domain_error &e) {
+        qWarning() << (serverName + ":") << e.what();
+    }
+}
+
+void Clientv2::serverResponseStd(const QJsonObject &djson) {
+#if defined(QT_DEBUG)
+    static const QString formatter = QStringLiteral("Received json: %1");
+    const QString html = formatter
+                             .arg(QJsonDocument(djson).toJson());
+    qDebug() << html;
 #endif
     try{
         switch(djson["type"].toInt()) {

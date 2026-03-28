@@ -697,8 +697,8 @@ static constexpr int initDock() {
 }
 
 QByteArray serverAskForHomePort();
-QByteArray serverBattleError(GameError);
 QByteArray serverBattleEnd();
+QByteArray serverBattleError(GameError);
 QByteArray serverBattleProcess(const QJsonObject &);
 QByteArray serverBlueprintAdded(int);
 QByteArray serverBlueprintRetired(int);
@@ -707,8 +707,8 @@ QByteArray serverDevelopStart(bool construct = false);
 QByteArray serverDisableShip(QUuid);
 QByteArray serverEquipLackFather(GameError, int);
 QByteArray serverEquipLackMother(GameError, int, int64);
-QByteArray serverEquipRetired(const QList<QUuid> &);
 QByteArray serverEquipImproved(const QList<std::tuple<QUuid, int>> &);
+QByteArray serverEquipRetired(const QList<QUuid> &);
 QByteArray serverEquipInfo(const QJsonArray &, bool user = false,
                            QDateTime timeUtc = QDateTime::currentDateTimeUtc(),
                            bool cacheHit = false);

@@ -26,11 +26,11 @@ public:
                    READ getFleetCenter
                        WRITE setFleetCenter
                            NOTIFY fleetCenterChanged)
-    void displayDetailedMap(Map *map);
     void changeCurrentNode(const MapNode &node);
-    void setChoiceNodes(const QList<int> &nodeIds);
-    static QPixmap recolorImage(const QString &filename, const QColor &color);
+    void displayDetailedMap(Map *map);
     QPointF getFleetCenter() const;
+    static QPixmap recolorImage(const QString &filename, const QColor &color);
+    void setChoiceNodes(const QList<int> &nodeIds);
     void setFleetCenter(const QPointF &input);
 
 signals:

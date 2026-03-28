@@ -17,15 +17,15 @@ public:
 
     const ResOrd consResBase() const;
     int consTimeBase() const;
-    const ResOrd repairResBase() const;
-    double repairTimeBase() const;
-    QString toString() const;
-    QString toDetailedString() const;
-    int toInt() const;
-    QString iconGroup() const;
-    int getTypeSort() const;
     int getCapitalness() const;
     KP::CapitalType getCapitalType() const;
+    int getTypeSort() const;
+    QString iconGroup() const;
+    const ResOrd repairResBase() const;
+    double repairTimeBase() const;
+    QString toDetailedString() const;
+    int toInt() const;
+    QString toString() const;
 
 private:
     int iRep;

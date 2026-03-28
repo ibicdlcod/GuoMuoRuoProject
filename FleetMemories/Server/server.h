@@ -48,8 +48,8 @@ private slots:
                        QSsl::AlertType type, const QString &description);
     std::pair<double, QList<TechEntry>>
     calculateTech(const CSteamID &, int jobID = 0);
-    void handleNewConnection();
     double getBaseSkillPointEffect(const CSteamID &, int);
+    void handleNewConnection();
     void offerEquipInfo(QSslSocket *, int);
     void offerEquipInfoUser(const CSteamID &, QSslSocket *);
     void offerMapInfo(const CSteamID &, QSslSocket *);
@@ -93,9 +93,9 @@ private:
     void generateTestShip(const CSteamID &);
     static int getBossDamage(const QJsonObject &);
     static bool getBossSunk(const QJsonObject &);
+    const QStringList getCommandsSpec() const override;
     double getEquipSkillPointEffect(const CSteamID &, const QUuid &);
     double getImprovementFactor(const QUuid &);
-    const QStringList getCommandsSpec() const override;
     const QStringList getValidCommands() const override;
     bool importEquipFromCSV();
     bool importMapFromCSV();
@@ -122,12 +122,12 @@ private:
     void parseListen(const QStringList &);
     void parseUnlisten();
     void processBattle(const CSteamID &, QSslSocket *, const QJsonObject &);
+    const QJsonObject processBattleCore(const CSteamID &, int, int, int, const QJsonObject &);
     void processDrop(const CSteamID &, QSslSocket *, int shipId);
     void processExpGain(const CSteamID &, int fleetIndex,
                         double baseExpGained, KP::BattleAssessment assm);
     void processVirtualExpGain(const CSteamID &, int mapUnionId, KP::Difficulty diff,
                         double baseExpGained, KP::BattleAssessment assm);
-    const QJsonObject processBattleCore(const CSteamID &, int, int, int, const QJsonObject &);
     void progressMap(const CSteamID &, QSslSocket *, int, int, bool retreat = false);
     std::optional<QList<int>> queryMapProgress(const CSteamID &, QSslSocket *,
                                                KP::BattleState,
@@ -160,9 +160,9 @@ private:
     void sqlinitShipU() const;
     void sqlinitShipUBP() const;
     void sqlinitShipUKC() const;
-    void sqlinitUsers() const;
     void sqlinitUserA() const;
     void sqlinitUserM() const;
+    void sqlinitUsers() const;
     void sqlinitVCR() const;
     void startSortie(const CSteamID &, QSslSocket *, int, int, bool);
     void switchCert(const QStringList &);
