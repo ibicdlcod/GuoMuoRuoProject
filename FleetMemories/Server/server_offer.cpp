@@ -59,7 +59,6 @@ void Server::offerEquipInfo(QSslSocket *connection) {
 void Server::offerEquipInfoUser(const CSteamID &uid,
                                 QSslSocket *connection) {
     QJsonArray userEquipInfos;
-    try{
         QSqlDatabase db = QSqlDatabase::database();
         QSqlQuery query;
         query.prepare("SELECT UserEquip.EquipDef, "
@@ -72,11 +71,10 @@ void Server::offerEquipInfoUser(const CSteamID &uid,
                       "WHERE UserEquip.User = :id;");
         query.bindValue(":id", uid.ConvertToUint64());
         if(!query.exec() || !query.isSelect()) {
-            qCritical() << query.lastQuery();
             //% "Get user %1's equipment list failed!"
             throw DBError(qtTrId("user-get-equip-list-failed")
                           .arg(uid.ConvertToUint64()),
-                          query.lastError());
+                          query.lastError(), query.lastQuery());
         }
         else {
             QUuid serial;
@@ -103,13 +101,6 @@ void Server::offerEquipInfoUser(const CSteamID &uid,
                                });
             connection->flush();
         }
-    } catch (DBError &e) {
-        for(QString &i : e.whats()) {
-            qCritical() << i;
-        }
-    } catch (std::exception &e) {
-        qCritical() << e.what();
-    }
 }
 
 void Server::offerSPInfo(QSslSocket *connection,
@@ -196,10 +187,9 @@ void Server::offerShipInfoUser(const CSteamID &uid,
         }
         query.bindValue(":uid", uid.ConvertToUint64());
         if(!query.exec() || !query.isSelect()) {
-            qCritical() << query.lastQuery();
             //% "Set User Fleet Up failed!"
             throw DBError(qtTrId("init-userfleet-failed"),
-                          query.lastError());
+                          query.lastError(), query.lastQuery());
             return;
         }
         else {
@@ -219,7 +209,6 @@ void Server::offerShipInfoUser(const CSteamID &uid,
     }
 
     QJsonArray userShipInfos;
-    try {
 user_ship:
         QSqlDatabase db = QSqlDatabase::database();
         QSqlQuery query;
@@ -250,11 +239,10 @@ user_ship:
                       "WHERE User = :id;");
         query.bindValue(":id", uid.ConvertToUint64());
         if(!query.exec() || !query.isSelect()) {
-            qCritical() << query.lastQuery();
             //% "Get user %1's ship list failed!"
             throw DBError(qtTrId("user-get-ship-list-failed")
                           .arg(uid.ConvertToUint64()),
-                          query.lastError());
+                          query.lastError(), query.lastQuery());
         }
         else {
             QUuid serial;
@@ -356,11 +344,10 @@ user_ship_bp:
                        "WHERE User = :id;");
         query2.bindValue(":id", uid.ConvertToUint64());
         if(!query2.exec() || !query2.isSelect()) {
-            qCritical() << query2.lastQuery();
             //% "Get user %1's ship list failed!"
             throw DBError(qtTrId("user-get-ship-list-failed")
                           .arg(uid.ConvertToUint64()),
-                          query2.lastError());
+                          query2.lastError(), query2.lastQuery());
         }
         else {
             QSqlRecord rec = query2.record();
@@ -380,13 +367,6 @@ user_ship_bp:
                 connection->flush();
             });
         }
-    } catch (DBError &e) {
-        for(QString &i : e.whats()) {
-            qCritical() << i;
-        }
-    } catch (std::exception &e) {
-        qCritical() << e.what();
-    }
 }
 
 void Server::offerMapInfo(const CSteamID &uid, QSslSocket *connection)
@@ -471,11 +451,10 @@ void Server::offerMapInfoUser(const CSteamID &uid, QSslSocket *connection)
                   "WHERE User = :id;");
     query.bindValue(":id", uid.ConvertToUint64());
     if(!query.exec() || !query.isSelect()) {
-        qCritical() << query.lastQuery();
         //% "Get user %1's map supremacy failed!"
         throw DBError(qtTrId("user-get-map-supremacy-failed")
                       .arg(uid.ConvertToUint64()),
-                      query.lastError());
+                      query.lastError(), query.lastQuery());
     }
     else {
         while(query.next()) {
@@ -498,11 +477,10 @@ void Server::offerRankInfo(const CSteamID &uid, QSslSocket *connection,
         QSqlQuery query;
         query.prepare("SELECT COUNT(*) FROM UserRanking;");
         if(!query.exec() || !query.isSelect()) {
-            qCritical() << query.lastQuery();
             //% "User %1: rank info failed!"
             throw DBError(qtTrId("user-rank-info-failed")
                           .arg(uid.ConvertToUint64()),
-                          query.lastError());
+                          query.lastError(), query.lastQuery());
         }
         else if(query.first()) {
             totalUsers = query.value(0).toInt();
@@ -519,11 +497,10 @@ void Server::offerRankInfo(const CSteamID &uid, QSslSocket *connection,
                       "WHERE User = :id;");
         query.bindValue(":id", uid.ConvertToUint64());
         if(!query.exec() || !query.isSelect()) {
-            qCritical() << query.lastQuery();
             //% "User %1: rank info failed!"
             throw DBError(qtTrId("user-rank-info-failed")
                           .arg(uid.ConvertToUint64()),
-                          query.lastError());
+                          query.lastError(), query.lastQuery());
         }
         else if(query.first()) {
             userPos = query.value(0).toInt() - 1;
@@ -547,11 +524,10 @@ void Server::offerRankInfo(const CSteamID &uid, QSslSocket *connection,
         query.bindValue(":start", userPosPage * rpp + 1);
         query.bindValue(":finish", (userPosPage + 1) * rpp);
         if(!query.exec() || !query.isSelect()) {
-            qCritical() << query.lastQuery();
             //% "User %1: rank info failed!"
             throw DBError(qtTrId("user-rank-info-failed")
                           .arg(uid.ConvertToUint64()),
-                          query.lastError());
+                          query.lastError(), query.lastQuery());
         }
         else {
             std::optional<double> yourIP = std::nullopt;
@@ -642,7 +618,7 @@ complete_repairs: {
             //% "Complete user %1's dock failed!"
             throw DBError(qtTrId("dock-state-complete-error")
                           .arg(uid.ConvertToUint64()),
-                          query.lastError());
+                          query.lastError(), query.lastQuery());
             return;
         }
     }
@@ -660,7 +636,7 @@ complete_repairs: {
         if(!query.exec()) {
             throw DBError(qtTrId("dock-state-error")
                           .arg(uid.ConvertToUint64()),
-                          query.lastError());
+                          query.lastError(), query.lastQuery());
             return;
         }
     }
@@ -679,7 +655,7 @@ send_updated_msg:
         //% "Open user %1's dock failed!"
         throw DBError(qtTrId("dock-state-error")
                       .arg(uid.ConvertToUint64()),
-                      query.lastError());
+                      query.lastError(), query.lastQuery());
         return;
     }
     QJsonObject result;
@@ -717,7 +693,7 @@ void Server::refreshClientFactory(const CSteamID &uid, QSslSocket *connection) {
         //% "Open user %1's factory failed!"
         throw DBError(
             qtTrId("factory-state-error").arg(uid.ConvertToUint64()),
-            query.lastError());
+            query.lastError(), query.lastQuery());
         return;
     }
     QJsonObject result;

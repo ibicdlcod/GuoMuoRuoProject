@@ -113,11 +113,10 @@ drop_condition:
     query.bindValue(":amount", amount);
     query.bindValue(":fleetindex", fleetIndex);
     if(Q_UNLIKELY(!query.exec())) {
-        qCritical() << query.lastQuery();
         //% "User %1: decrease fleet condition failed!"
         throw DBError(qtTrId("cond-drop-failed")
                       .arg(uid.ConvertToUint64()),
-                      query.lastError());
+                      query.lastError(), query.lastQuery());
     }
 update_recov_time:
     static int maxIntervalInSec = 60 * KP::secsinMin; // 60 min
@@ -137,11 +136,10 @@ update_recov_time:
         query.bindValue(":intervaldiff", maxIntervalInSec - minIntervalInSec);
         query.bindValue(":fleetindex", fleetIndex);
         if(Q_UNLIKELY(!query.exec())) {
-            qCritical() << query.lastQuery();
             //% "User %1: decrease fleet condition failed!"
             throw DBError(qtTrId("cond-drop-failed")
                           .arg(uid.ConvertToUint64()),
-                          query.lastError());
+                          query.lastError(), query.lastQuery());
         }
     }
 }
@@ -213,11 +211,10 @@ reduce_retry_times:
             query.bindValue(":sid", shipId);
             query.bindValue(":value", amount);
             if(!query.exec()) {
-                qCritical () << query.lastQuery();
                 //% "Update drop progress for user %1 failed!"
                 throw DBError(qtTrId("update-drop-progress-failed")
                               .arg(uid.ConvertToUint64()),
-                              query.lastError());
+                              query.lastError(), query.lastQuery());
                 return -1;
             }
         }
@@ -231,10 +228,9 @@ reduce_retry_times:
             query.bindValue(":sid", shipId);
             query.bindValue(":value", amount);
             if(!query.exec()) {
-                qCritical () << query.lastQuery();
                 throw DBError(qtTrId("update-drop-progress-failed")
                               .arg(uid.ConvertToUint64()),
-                              query.lastError());
+                              query.lastError(), query.lastQuery());
                 return -1;
             }
         }
@@ -270,11 +266,10 @@ get_rare_drop:
                 query.bindValue(":id"+QString::number(i), *iter);
             }
             if(!query.exec()) {
-                qCritical () << query.lastQuery();
                 //% "Query drop candidate for user %1 failed!"
                 throw DBError(qtTrId("query-drop-candidate-failed")
                               .arg(uid.ConvertToUint64()),
-                              query.lastError());
+                              query.lastError(), query.lastQuery());
                 return -1;
             }
             else {
@@ -314,10 +309,9 @@ get_drop:
                 query.bindValue(":id"+QString::number(i), *iter);
             }
             if(!query.exec()) {
-                qCritical () << query.lastQuery();
                 throw DBError(qtTrId("query-drop-candidate-failed")
                               .arg(uid.ConvertToUint64()),
-                              query.lastError());
+                              query.lastError(), query.lastQuery());
                 return -1;
             }
             else {
@@ -515,7 +509,6 @@ int Server::nextNode(const CSteamID &uid, QSslSocket *connection,
 
 void Server::processBattle(const CSteamID &uid, QSslSocket *connection,
                            const QJsonObject &battlePlan) {
-    try {
         /* map, node, inbattle(0/1), activefleetindex */
         auto result = queryMapProgress(uid, connection, KP::BeforeBattle);
         if(!result.has_value()) {
@@ -551,12 +544,11 @@ void Server::processBattle(const CSteamID &uid, QSslSocket *connection,
             query.bindValue(":uid", uid.ConvertToUint64());
             query.bindValue(":type", KP::DuringBattle);
             if(Q_UNLIKELY(!query.exec())) {
-                qCritical() << query.lastQuery();
                 //% "User %1: start node battle failure!"
                 throw DBError(
                     qtTrId("sortie-node-battle-failure")
                         .arg(uid.ConvertToUint64()),
-                    query.lastError());
+                    query.lastError(), query.lastQuery());
                 return;
             }
             QJsonObject battleProcess
@@ -580,12 +572,11 @@ set_battle_state:
                 query.bindValue(":uid", uid.ConvertToUint64());
                 query.bindValue(":type", KP::AfterBattle);
                 if(Q_UNLIKELY(!query.exec())) {
-                    qCritical() << query.lastQuery();
                     //% "User %1: end node battle failure!"
                     throw DBError(
                         qtTrId("sortie-node-battle-failure-end")
                             .arg(uid.ConvertToUint64()),
-                        query.lastError());
+                        query.lastError(), query.lastQuery());
                     return;
                 }
                 QByteArray msg = KP::serverBattleEnd();
@@ -687,11 +678,10 @@ deal_with_gauge:
             query.bindValue(":uid", uid.ConvertToUint64());
             query.bindValue(":type", KP::AfterBattle);
             if(Q_UNLIKELY(!query.exec())) {
-                qCritical() << query.lastQuery();
                 throw DBError(
                     qtTrId("sortie-node-battle-failure-end")
                         .arg(uid.ConvertToUint64()),
-                    query.lastError());
+                    query.lastError(), query.lastQuery());
                 return;
             }
             QByteArray msg = KP::serverBattleEnd();
@@ -703,13 +693,6 @@ deal_with_gauge:
         case KP::TRANSPORT:
         default: break;
         }
-    } catch (DBError &e) {
-        for(QString &i : e.whats()) {
-            qCritical() << i;
-        }
-    } catch (std::exception &e) {
-        qCritical() << e.what();
-    }
 }
 
 const QJsonObject Server::processBattleCore(const CSteamID &uid,
@@ -756,11 +739,10 @@ void Server::processDrop(const CSteamID &uid, QSslSocket *connection,
     query.bindValue(":sid", shipId);
     query.bindValue(":amount", RNGesus::dropValue(ship->attr["Rarity"], mt));
     if(Q_UNLIKELY(!query.exec())) {
-        qCritical() << query.lastQuery();
         //% "User %1: refresh database failure when drop ship %2!"
         throw DBError(qtTrId("ship-drop-db-fail").arg(uid.ConvertToUint64())
                       .arg(shipId),
-                      query.lastError());
+                      query.lastError(), query.lastQuery());
         return;
     }
 
@@ -797,11 +779,10 @@ ship:
     query.bindValue(":expgain", (int)std::floor(expGained));
     query.bindValue(":fleet", fleetIndex);
     if(Q_UNLIKELY(!query.exec())) {
-        qCritical() << query.lastQuery();
         //% "User %1: add ship exp failure!"
         throw DBError(
             qtTrId("add-ship-exp-failre").arg(uid.ConvertToUint64()),
-            query.lastError());
+            query.lastError(), query.lastQuery());
         return;
     }
 
@@ -817,10 +798,9 @@ flagship_bonus:
         query.bindValue(":expgain", (int)std::floor(expGained));
         query.bindValue(":fleet", fleetIndex);
         if(Q_UNLIKELY(!query.exec())) {
-            qCritical() << query.lastQuery();
             throw DBError(
                 qtTrId("add-ship-exp-failre").arg(uid.ConvertToUint64()),
-                query.lastError());
+                query.lastError(), query.lastQuery());
             return;
         }
     }
@@ -832,10 +812,9 @@ drop_temp_table:
             QSqlQuery query;
             query.prepare("DROP TABLE IF EXISTS temp.e;");
             if(Q_UNLIKELY(!query.exec())) {
-                qCritical() << query.lastQuery();
                 throw DBError(
                     qtTrId("add-ship-exp-failre").arg(uid.ConvertToUint64()),
-                    query.lastError());
+                    query.lastError(), query.lastQuery());
                 return;
             }
         }
@@ -862,10 +841,9 @@ create_temp_table:
             query.bindValue(":expgain", (int)std::floor(expGained));
             query.bindValue(":fleet", fleetIndex);
             if(Q_UNLIKELY(!query.exec())) {
-                qCritical() << query.lastQuery();
                 throw DBError(
                     qtTrId("add-ship-exp-failre").arg(uid.ConvertToUint64()),
-                    query.lastError());
+                    query.lastError(), query.lastQuery());
                 return;
             }
         }
@@ -879,10 +857,9 @@ update_exp:
                           "WHERE UserEquipSP.EquipDef = temp.e.EquipDef "
                           "AND UserEquipSP.User = temp.e.User; ");
             if(Q_UNLIKELY(!query.exec())) {
-                qCritical() << query.lastQuery();
                 throw DBError(
                     qtTrId("add-ship-exp-failre").arg(uid.ConvertToUint64()),
-                    query.lastError());
+                    query.lastError(), query.lastQuery());
                 return;
             }
         }
@@ -898,11 +875,10 @@ ranking_exp:
         query.bindValue(":uid", uid.ConvertToUint64());
         query.bindValue(":amount", expGained);
         if(Q_UNLIKELY(!query.exec())) {
-            qCritical() << query.lastQuery();
             //% "User %1: add ranking exp failed!"
             throw DBError(qtTrId("rank-add-exp-failed")
                           .arg(uid.ConvertToUint64()),
-                          query.lastError());
+                          query.lastError(), query.lastQuery());
             return;
         }
     }
@@ -921,7 +897,6 @@ void Server::processVirtualExpGain(const CSteamID &uid, int mapUnionId,
     case KP::DDefeat: expGained = baseExpGained * 0.2; break;
     default: expGained = 0; break;
     }
-    try {
         QSqlQuery query;
         query.prepare("UPDATE UserEquipSP "
                       "SET Intvalue = Intvalue + :amount * Factor "
@@ -935,25 +910,16 @@ void Server::processVirtualExpGain(const CSteamID &uid, int mapUnionId,
         query.bindValue(":amount", expGained);
         query.bindValue(":diff", static_cast<int>(diff));
         if(Q_UNLIKELY(!query.exec())) {
-            qCritical() << query.lastQuery();
             //% "User %1: add virtual exp failed!"
             throw DBError(qtTrId("virtual-add-exp-failed")
                           .arg(uid.ConvertToUint64()),
-                          query.lastError());
+                          query.lastError(), query.lastQuery());
             return;
         }
-    } catch (DBError &e) {
-        for(QString &i : e.whats()) {
-            qCritical() << i;
-        }
-    } catch (std::exception &e) {
-        qCritical() << e.what();
-    }
 }
 
 void Server::progressMap(const CSteamID &uid, QSslSocket *connection,
                          int mapId, int prevNode, bool retreat) {
-    try{
         /* we want battle finished to continue progress */
         auto result = queryMapProgress(uid, connection, KP::AfterBattle,
                                        mapId, prevNode);
@@ -978,12 +944,11 @@ void Server::progressMap(const CSteamID &uid, QSslSocket *connection,
         query.bindValue(":uid", uid.ConvertToUint64());
         query.bindValue(":type", nNode == 0 ? KP::NoBattle : KP::BeforeBattle);
         if(Q_UNLIKELY(!query.exec())) {
-            qCritical() << query.lastQuery();
             //% "User %1: progress map %2 failure!"
             throw DBError(
                 qtTrId("sortie-progress-failure").arg(uid.ConvertToUint64())
                     .arg(mapId),
-                query.lastError());
+                query.lastError(), query.lastQuery());
             return;
         }
         {
@@ -994,24 +959,16 @@ void Server::progressMap(const CSteamID &uid, QSslSocket *connection,
             query.bindValue(":uid", uid.ConvertToUint64());
             query.bindValue(":type", nNode);
             if(Q_UNLIKELY(!query.exec())) {
-                qCritical() << query.lastQuery();
                 throw DBError(
                     qtTrId("sortie-progress-failure")
                         .arg(uid.ConvertToUint64()).arg(mapId),
-                    query.lastError());
+                    query.lastError(), query.lastQuery());
                 return;
             }
         }
         /* if nNode == 0 then client should end battle */
         QByteArray msg = KP::serverMapProgress(mapId, nNode);
         senderM.sendMessage(connection, msg);
-    } catch (DBError &e) {
-        for(QString &i : e.whats()) {
-            qCritical() << i;
-        }
-    } catch (std::exception &e) {
-        qCritical() << e.what();
-    }
 }
 
 void Server::startSortie(const CSteamID &uid, QSslSocket *connection,
@@ -1044,12 +1001,11 @@ void Server::startSortie(const CSteamID &uid, QSslSocket *connection,
         query.bindValue(":uid", uid.ConvertToUint64());
         query.bindValue(":fleetindex", fleetIndex);
         if(Q_UNLIKELY(!query.exec() || !query.isSelect())) {
-            qCritical() << query.lastQuery();
             //% "User %1: start map %2 failure due to uncertain docks!"
             throw DBError(
                 qtTrId("sortie-start-failure-dock")
                     .arg(uid.ConvertToUint64()).arg(mapId),
-                query.lastError());
+                query.lastError(), query.lastQuery());
             return;
         }
         else if(query.first()) {
@@ -1084,12 +1040,11 @@ void Server::startSortie(const CSteamID &uid, QSslSocket *connection,
                 query.bindValue(":uid", uid.ConvertToUint64());
                 query.bindValue(":type", mapId);
                 if(Q_UNLIKELY(!query.exec())) {
-                    qCritical() << query.lastQuery();
                     //% "User %1: start map %2 failure!"
                     throw DBError(
                         qtTrId("sortie-start-failure")
                             .arg(uid.ConvertToUint64()).arg(mapId),
-                        query.lastError());
+                        query.lastError(), query.lastQuery());
                     return;
                 }
                 QSqlQuery query2;
@@ -1099,13 +1054,12 @@ void Server::startSortie(const CSteamID &uid, QSslSocket *connection,
                 query2.bindValue(":uid", uid.ConvertToUint64());
                 query2.bindValue(":type", startNode);
                 if(Q_UNLIKELY(!query2.exec())) {
-                    qCritical() << query2.lastQuery();
                     //% "User %1: start map %2 node %3 failure!"
                     throw DBError(
                         qtTrId("sortie-start-failure-node")
                             .arg(uid.ConvertToUint64()).arg(mapId)
                             .arg(startNode),
-                        query2.lastError());
+                        query2.lastError(), query2.lastQuery());
                     return;
                 }
                 QSqlQuery query4;
@@ -1115,12 +1069,11 @@ void Server::startSortie(const CSteamID &uid, QSslSocket *connection,
                 query4.bindValue(":uid", uid.ConvertToUint64());
                 query4.bindValue(":type", fleetIndex);
                 if(Q_UNLIKELY(!query4.exec())) {
-                    qCritical() << query4.lastQuery();
                     //% "User %1: fleet index %2 start sortie failure!"
                     throw DBError(
                         qtTrId("sortie-start-failure-index")
                             .arg(uid.ConvertToUint64()).arg(fleetIndex),
-                        query4.lastError());
+                        query4.lastError(), query4.lastQuery());
                     return;
                 }
                 QSqlQuery query3;
@@ -1131,12 +1084,11 @@ void Server::startSortie(const CSteamID &uid, QSslSocket *connection,
                 /* the battle in starting node is always completed */
                 query3.bindValue(":type", KP::AfterBattle);
                 if(Q_UNLIKELY(!query3.exec())) {
-                    qCritical() << query3.lastQuery();
                     //% "User %1: start sortie failure!"
                     throw DBError(
                         qtTrId("sortie-start-failure-general")
                             .arg(uid.ConvertToUint64()),
-                        query3.lastError());
+                        query3.lastError(), query3.lastQuery());
                     return;
                 }
                 QByteArray msg = KP::serverMapStart(mapId, startNode);

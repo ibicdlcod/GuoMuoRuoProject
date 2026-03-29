@@ -18,7 +18,6 @@ QT_BEGIN_NAMESPACE
 void Server::handleARDPurchaseAuth(const CSteamID &uid,
                                    QSslSocket *connection,
                                    const QJsonObject &djson) {
-    try {
     quint64 orderId = djson["orderid"].toString().toULongLong();
     bool authorized = djson["authorized"].toBool();
     if(!authorized) {
@@ -60,6 +59,7 @@ void Server::handleARDPurchaseAuth(const CSteamID &uid,
     connect(reply, &QNetworkReply::finished,
             this, [this, reply, uid, unitsToAdd, orderId]() {
                 reply->deleteLater();
+                try {
                 QByteArray responseData = reply->readAll();
                 QJsonDocument doc = QJsonDocument::fromJson(responseData);
                 QString result = doc.object()["response"]
@@ -91,12 +91,11 @@ void Server::handleARDPurchaseAuth(const CSteamID &uid,
                                           QString::number(uid.ConvertToUint64()));
                     orderRecord.bindValue(":units", unitsToAdd);
                     if(Q_UNLIKELY(!orderRecord.exec())) {
-                        qCritical() << orderRecord.lastQuery();
                         //% "Store purchase info failed! User %1, orderid %2"
                         throw DBError(qtTrId("store-purchase-info-failed")
                                           .arg(uid.ConvertToUint64())
                                           .arg(orderId),
-                                      query.lastError());
+                                      query.lastError(), query.lastQuery());
                     }
                     if(connectedPeers.contains(uid)) {
                         QByteArray msg = KP::serverARDPurchaseSuccess(unitsToAdd);
@@ -114,14 +113,12 @@ void Server::handleARDPurchaseAuth(const CSteamID &uid,
                         senderM.sendMessage(connectedPeers[uid], msg);
                     }
                 }
+                } catch (DBError &e) {
+                    for(QString &i : e.whats()) {
+                        qCritical() << i;
+                    }
+                }
             });
-    } catch (DBError &e) {
-        for(QString &i : e.whats()) {
-            qCritical() << i;
-        }
-    } catch (std::exception &e) {
-        qCritical() << e.what();
-    }
 }
 
 void Server::handleInitARDPurchase(const CSteamID &uid,
@@ -254,7 +251,7 @@ void Server::pollARDRefunds() {
                         if(Q_UNLIKELY(!lookup.exec())) {
                             //% "ARD clawback: order lookup failed"
                             throw DBError(qtTrId("ard-clawback-lookup-failed"),
-                                          lookup.lastError());
+                                          lookup.lastError(), lookup.lastQuery());
                         }
                         if(!lookup.next()) {
                             continue; // not our order or already processed
@@ -271,7 +268,6 @@ void Server::pollARDRefunds() {
                         deduct.bindValue(":uid", rawUid);
                         deduct.bindValue(":attr", KP::attrARDCoupon);
                         if(Q_UNLIKELY(!deduct.exec())) {
-                            qCritical() << deduct.lastQuery();
                             //% "ARD clawback: deduct failed for order %1"
                             throw DBError(qtTrId("ard-clawback-deduct-failed")
                                               .arg(orderId), deduct.lastError());
@@ -281,7 +277,6 @@ void Server::pollARDRefunds() {
                                      "WHERE OrderID = :oid");
                         mark.bindValue(":oid", orderId);
                         if(Q_UNLIKELY(!mark.exec())) {
-                            qCritical() << mark.lastQuery();
                             //% "ARD clawback: mark failed for order %1"
                             throw DBError(qtTrId("ard-clawback-mark-failed")
                                               .arg(orderId), mark.lastError());

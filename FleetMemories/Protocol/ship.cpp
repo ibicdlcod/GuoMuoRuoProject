@@ -448,10 +448,9 @@ int Ship::expCapNext(int expCapPrev) {
     return expCap(numberOfRings(expCapPrev) + 1);
 }
 
-
 int Ship::numberOfRings(int expCap) {
     int levelCap = getLevel(expCap);
-    return levelCap / ringLv;
+    return (levelCap - 1) / ringLv;
 }
 
 KP::AllegianceSubGroup Ship::allegianceSubGroup(QLocale::Territory ter) {

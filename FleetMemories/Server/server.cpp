@@ -462,11 +462,10 @@ Server::calculateTech(const CSteamID &uid, int jobID) {
                           " FROM UserEquip WHERE User = :id;");
             query.bindValue(":id", uid.ConvertToUint64());
             if(!query.exec() || !query.isSelect()) {
-                qCritical() << query.lastQuery();
                 //% "Calculate technology for user %1 failed!"
                 throw DBError(qtTrId("user-calculate-tech-failed")
                               .arg(uid.ConvertToUint64()),
-                              query.lastError());
+                              query.lastError(), query.lastQuery());
             }
             else {
                 /* dump equip tech data into equips */
@@ -540,11 +539,10 @@ virtual_skill_point_effect:
                           "WHERE User = :id;");
             query.bindValue(":id", uid.ConvertToUint64());
             if(!query.exec() || !query.isSelect()) {
-                qCritical() << query.lastQuery();
                 //% "Calculate technology for user %1 failed!"
                 throw DBError(qtTrId("user-calculate-tech-failed")
                               .arg(uid.ConvertToUint64()),
-                              query.lastError());
+                              query.lastError(), query.lastQuery());
             }
             else {
                 /* dump ship tech data into ships */
@@ -894,10 +892,9 @@ subtract_ip:
                 }
             }
             else {
-                qCritical() << query.lastQuery();
                 //% "Database failed when buying: query existing industrial failed!"
                 throw DBError(qtTrId("dbfail-buying-query-ip"),
-                              query.lastError());
+                              query.lastError(), query.lastQuery());
             }
         }
 award_equip:
@@ -917,7 +914,6 @@ award_equip:
 
 void Server::doBuyFromStore(const CSteamID &uid, int equipid,
                             QSslSocket *connection) {
-    try {
 check_equip_exists:
         if(!equipRegistry.contains(equipid)) {
             QByteArray msg = KP::serverARDPurchaseFailed(
@@ -945,9 +941,8 @@ deduct_ard_coupons:
             query.bindValue(":uid", uid.ConvertToUint64());
             query.bindValue(":attr", KP::attrARDCoupon);
             if(Q_UNLIKELY(!query.exec())) {
-                qCritical() << query.lastQuery();
                 //% "Database failed when buying from store."
-                throw DBError(qtTrId("dbfail-store-buy"), query.lastError());
+                throw DBError(qtTrId("dbfail-store-buy"), query.lastError(), query.lastQuery());
             }
             if(query.numRowsAffected() == 0) {
                 QByteArray msg = KP::serverARDPurchaseFailed(
@@ -961,19 +956,11 @@ award_equip:
                     newEquip(uid, equipid, true), equipid);
         senderM.sendMessage(connection, msg);
         offerResourceInfo(connection, uid);
-    } catch (DBError &e) {
-        for(QString &i : e.whats()) {
-            qCritical() << i;
-        }
-    } catch (std::exception &e) {
-        qCritical() << e.what();
-    }
 }
 
 void Server::doBuyMedal(const CSteamID &uid,
                         int amount,
                         QSslSocket *connection) {
-    try {
         if(amount < 1) {
             QByteArray msg = KP::serverARDPurchaseFailed(
                 KP::PurchaseInvalidAmount);
@@ -993,10 +980,9 @@ void Server::doBuyMedal(const CSteamID &uid,
             query.bindValue(":uid", uid.ConvertToUint64());
             query.bindValue(":attr", KP::attrARDCoupon);
             if(Q_UNLIKELY(!query.exec())) {
-                qCritical() << query.lastQuery();
                 //% "Database failed when buying medals."
                 throw DBError(qtTrId("dbfail-medal-buy"),
-                              query.lastError());
+                              query.lastError(), query.lastQuery());
             }
             if(query.numRowsAffected() == 0) {
                 QByteArray msg = KP::serverARDPurchaseFailed(
@@ -1016,22 +1002,14 @@ void Server::doBuyMedal(const CSteamID &uid,
             query.bindValue(":uid", uid.ConvertToUint64());
             query.bindValue(":attr", KP::attrMedal);
             if(Q_UNLIKELY(!query.exec())) {
-                qCritical() << query.lastQuery();
                 //% "Database failed when awarding medals."
                 throw DBError(qtTrId("dbfail-medal-award"),
-                              query.lastError());
+                              query.lastError(), query.lastQuery());
             }
         }
         senderM.sendMessage(connection,
                             KP::serverMedalPurchased(amount));
         offerResourceInfo(connection, uid);
-    } catch (DBError &e) {
-        for(QString &i : e.whats()) {
-            qCritical() << i;
-        }
-    } catch (std::exception &e) {
-        qCritical() << e.what();
-    }
 }
 
 /* 5.4-construction.md */
@@ -1239,10 +1217,9 @@ disable_ship:
                     senderM.sendMessage(connection, msg);
                 }
                 else {
-                    qCritical() << query2.lastQuery();
                     //% "Database failed when modernizing (locking previous ship)."
                     throw DBError(qtTrId("dbfail-modernizing-prev-lock"),
-                                  query2.lastError());
+                                  query2.lastError(), query2.lastQuery());
                     return;
                 }
 
@@ -1275,10 +1252,9 @@ actual_remodel:
                     offerResourceInfo(connection, uid);
                 }
                 else {
-                    qCritical() << query.lastQuery();
                     //% "Database failed when modernizing."
                     throw DBError(qtTrId("dbfail-modernizing"),
-                                  query.lastError());
+                                  query.lastError(), query.lastQuery());
                     return;
                 }
             }
@@ -1674,11 +1650,10 @@ get_info:
             query.bindValue(":uid", uid.ConvertToUint64());
             query.bindValue(":slotnum", slotnum);
             if(Q_UNLIKELY(!query.exec() || !query.isSelect())) {
-                qCritical() << query.lastQuery();
                 //% "User %1: dock is broken!"
                 throw DBError(qtTrId("user-dock-broken")
                               .arg(uid.ConvertToUint64()),
-                              query.lastError());
+                              query.lastError(), query.lastQuery());
             }
             if(!query.first()) {
                 return;
@@ -1816,12 +1791,11 @@ check_possession:
         query.bindValue(":uuid", shipUuid.toString());
         query.bindValue(":disable", KP::disabledShip);
         if(Q_UNLIKELY(!query.exec() || !query.isSelect())) {
-            qCritical() << query.lastQuery();
             //% "User %1: ship %2 does not exist on account!"
             throw DBError(
                 qtTrId("user-ship-dont-exist").arg(uid.ConvertToUint64())
                     .arg(shipUuid.toString()),
-                query.lastError());
+                query.lastError(), query.lastQuery());
         }
         else if(!query.first()) {
             QByteArray msg =
@@ -1888,10 +1862,9 @@ put_in_repair:
             offerResourceInfo(connection, uid);
         }
         else {
-            qCritical() << query.lastQuery();
             //% "Database failed when repairing."
             throw DBError(qtTrId("dbfail-repair"),
-                          query.lastError());
+                          query.lastError(), query.lastQuery());
         }
     }
     refreshClientDock(uid, connection);
@@ -2062,11 +2035,10 @@ void Server::initUserDropInfo(const CSteamID &uid) {
             query2.bindValue(":value"+QString::number(i), value);
         }
         if(Q_UNLIKELY(!query2.exec())) {
-            qCritical() << query2.lastQuery();
             //% "User %1: add dropinfo of ship failed!"
             throw DBError(qtTrId("user-add-ship-dropinfo-failed")
                           .arg(uid.ConvertToUint64()),
-                          query2.lastError());
+                          query2.lastError(), query2.lastQuery());
         }
         else {
             //% "User %1: add dropinfo of ship success!"
@@ -2088,11 +2060,10 @@ void Server::initUserEquipSPInfo(const CSteamID &uid) {
         "WHERE EquipName.EquipID < 32768;");
     query2.bindValue(":uid", uid.ConvertToUint64());
     if(Q_UNLIKELY(!query2.exec())) {
-        qCritical() << query2.lastQuery();
         //% "User %1: add skillinfo of equip failed!"
         throw DBError(qtTrId("user-add-equip-sp-info-failed")
                       .arg(uid.ConvertToUint64()),
-                      query2.lastError());
+                      query2.lastError(), query2.lastQuery());
     }
     else {
         //% "User %1: add skillinfo of equip success!"
@@ -2123,11 +2094,10 @@ void Server::initUserMapStatus(const CSteamID &uid) {
         query2.bindValue(":amount3", amount);
         query2.bindValue(":amount4", amount);
         if(Q_UNLIKELY(!query2.exec())) {
-            qCritical() << query2.lastQuery();
             //% "User %1: init map status failed!"
             throw DBError(qtTrId("user-add-map-status-failed")
                           .arg(uid.ConvertToUint64()),
-                          query2.lastError());
+                          query2.lastError(), query2.lastQuery());
         }
         else {
             //% "User %1: init map status success!"
@@ -2312,10 +2282,9 @@ replace_existing_equip:
             query2.bindValue(":star", std::get<0>(*iter));
             query2.bindValue(":sp", std::get<1>(*iter) * 10000);
             if(!query2.exec()) {
-                qCritical() << query2.lastQuery();
                 //% "User %1: import equip from KC failed, error %2"
                 throw DBError(qtTrId("user-migrate-equip-failed")
-                              .arg(uid.ConvertToUint64()), query.lastError());
+                              .arg(uid.ConvertToUint64()), query.lastError(), query2.lastQuery());
             }
             iter++;
         }
@@ -2332,10 +2301,9 @@ new_equip:
             query2.bindValue(":star", std::get<0>(*iter));
             query2.bindValue(":sp", std::get<1>(*iter) * 10000);
             if(!query2.exec()) {
-                qCritical() << query2.lastQuery();
                 //% "User %1: import equip from KC failed, error %2"
                 throw DBError(qtTrId("user-migrate-equip-failed")
-                              .arg(uid.ConvertToUint64()), query.lastError());
+                              .arg(uid.ConvertToUint64()), query.lastError(), query2.lastQuery());
             }
             iter++;
         }
@@ -2357,10 +2325,9 @@ query_existing_imported_ship:
             query.bindValue(":id", uid.ConvertToUint64());
             query.bindValue(":def", fmShipIdCandidate);
             if(Q_UNLIKELY(!query.exec())) {
-                qCritical() << query.lastQuery();
                 //% "User %1: import ship from KC failed, error %2"
                 throw DBError(qtTrId("user-migrate-ship-failed")
-                              .arg(uid.ConvertToUint64()), query.lastError());
+                              .arg(uid.ConvertToUint64()), query.lastError(), query.lastQuery());
                 return;
             }
             query.isSelect();
@@ -2381,10 +2348,9 @@ new_ship:
             query.bindValue(":def", fmShipDef);
             query.bindValue(":newdef", kcShipId);
             if(Q_UNLIKELY(!query.exec())) {
-                qCritical() << query.lastQuery();
                 //% "User %1: import ship from KC failed, error %2"
                 throw DBError(qtTrId("user-migrate-ship-failed")
-                              .arg(uid.ConvertToUint64()), query.lastError());
+                              .arg(uid.ConvertToUint64()), query.lastError(), query.lastQuery());
                 return;
             }
         }
@@ -2400,10 +2366,9 @@ new_ship_as_imported:
         query.bindValue(":def", kcShipId);
         query.bindValue(":exp", shipData[*shipId]);
         if(Q_UNLIKELY(!query.exec())) {
-            qCritical() << query.lastQuery();
             //% "User %1: import ship from KC failed, error %2"
             throw DBError(qtTrId("user-migrate-ship-failed")
-                          .arg(uid.ConvertToUint64()), query.lastError());
+                          .arg(uid.ConvertToUint64()), query.lastError(), query.lastQuery());
         }
     }
 
@@ -2428,10 +2393,9 @@ decrease_supremacy:
         query.bindValue(":decay", settings->value("rule/navalsupremacydecay",
                                                   2880).toDouble());
         if(Q_UNLIKELY(!query.exec())) {
-            qCritical() << query.lastQuery();
             //% "Minute pulse: decrease supermacy failed!"
             throw DBError(qtTrId("decrease-supremacy-failed"),
-                          query.lastError());
+                          query.lastError(), query.lastQuery());
         }
 recover_condition:
         QDateTime lastRecoverTime
@@ -2448,9 +2412,8 @@ recover_condition:
             query.bindValue(":last", lastRecoverTimeInt);
             query.bindValue(":maxcond", KP::conditionMax);
             if(Q_UNLIKELY(!query.exec())) {
-                qCritical() << query.lastQuery();
                 //% "Minute pulse: recover condition failed!"
-                throw DBError(qtTrId("recover-cond-failed"), query.lastError());
+                throw DBError(qtTrId("recover-cond-failed"), query.lastError(), query.lastQuery());
             }
         }
         settings->setValue("server/lastrecvcondtime",
@@ -2464,10 +2427,9 @@ add_kc_exp:
                           "FROM UserKCShip "
                           "WHERE UserShip.ShipUuid = UserKCShip.ShipUuid;");
             if(Q_UNLIKELY(!query.exec())) {
-                qCritical() << query.lastQuery();
                 //% "Minute pulse: penalize condition failed!"
                 throw DBError(qtTrId("penalize-cond-failed"),
-                              query.lastError());
+                              query.lastError(), query.lastQuery());
             }
         }
 penalize:
@@ -2483,10 +2445,9 @@ penalize:
                 settings->value("rule/badconditionpenalty",
                                 1.001).toDouble());
             if(Q_UNLIKELY(!query.exec())) {
-                qCritical() << query.lastQuery();
                 //% "Minute pulse: penalize condition failed!"
                 throw DBError(qtTrId("penalize-cond-failed"),
-                              query.lastError());
+                              query.lastError(), query.lastQuery());
             }
         }
 subtract_kc_exp:
@@ -2497,10 +2458,9 @@ subtract_kc_exp:
                           "FROM UserKCShip "
                           "WHERE UserShip.ShipUuid = UserKCShip.ShipUuid;");
             if(Q_UNLIKELY(!query.exec())) {
-                qCritical() << query.lastQuery();
                 //% "Minute pulse: penalize condition failed!"
                 throw DBError(qtTrId("penalize-cond-failed"),
-                              query.lastError());
+                              query.lastError(), query.lastQuery());
             }
         }
 award_industrial_points:
@@ -2526,10 +2486,9 @@ award_industrial_points:
                               "FROM UserRanking a "
                               "WHERE a.CurrentVP > UserRanking.CurrentVP)+1;");
                 if(Q_UNLIKELY(!query.exec())) {
-                    qCritical() << query.lastQuery();
                     //% "Minute pulse: reward ranking failed!"
                     throw DBError(qtTrId("rank-reward-failed"),
-                                  query.lastError());
+                                  query.lastError(), query.lastQuery());
                 }
             }
             {
@@ -2537,10 +2496,9 @@ award_industrial_points:
                 query.prepare("UPDATE UserRanking "
                               "SET PreviousVP = CurrentVP;");
                 if(Q_UNLIKELY(!query.exec())) {
-                    qCritical() << query.lastQuery();
                     //% "Minute pulse: reward ranking failed!"
                     throw DBError(qtTrId("rank-reward-failed"),
-                                  query.lastError());
+                                  query.lastError(), query.lastQuery());
                 }
             }
             {
@@ -2548,10 +2506,9 @@ award_industrial_points:
                 query.prepare("UPDATE UserRanking "
                               "SET CurrentVP = CurrentVP / 10;");
                 if(Q_UNLIKELY(!query.exec())) {
-                    qCritical() << query.lastQuery();
                     //% "Minute pulse: reward ranking failed!"
                     throw DBError(qtTrId("rank-reward-failed"),
-                                  query.lastError());
+                                  query.lastError(), query.lastQuery());
                 }
             }
         }
@@ -2588,10 +2545,9 @@ regen_resources_based_on_supremacy:
             query.bindValue(":ctrl", settings->value("rule/mapresourcecontrol",
                                                      1000).toDouble());
             if(Q_UNLIKELY(!query.exec())) {
-                qCritical() << query.lastQuery();
                 //% "Minute pulse: reward supremacy failed!"
                 throw DBError(qtTrId("supremacy-reward-failed"),
-                              query.lastError());
+                              query.lastError(), query.lastQuery());
             }
         }
 poll_ard_refunds:
@@ -2718,11 +2674,10 @@ check_medals:
     medalQuery.bindValue(":uid", uid.ConvertToUint64());
     medalQuery.bindValue(":attr", KP::attrMedal);
     if(Q_UNLIKELY(!medalQuery.exec() || !medalQuery.isSelect())) {
-        qCritical() << medalQuery.lastQuery();
         //% "User id %1: reading medal balance failed when decorating!"
         throw DBError(qtTrId("decorate-ship-medal-failed")
                       .arg(uid.ConvertToUint64()),
-                      medalQuery.lastError());
+                      medalQuery.lastError(), medalQuery.lastQuery());
         return result;
     }
     if(!medalQuery.first()) {
@@ -2981,11 +2936,10 @@ bool Server::modifyShip(const CSteamID &uid, QUuid prevShip, int newDef) {
     query2.bindValue(":user", uid.ConvertToUint64());
     query2.bindValue(":suid", prevShip);
     if(Q_UNLIKELY(!query2.exec())) {
-        qCritical() << query2.lastQuery();
         //% "User id %1: remodel ship failed!"
         throw DBError(qtTrId("remodel-ship-failed")
                       .arg(uid.ConvertToUint64()),
-                      query2.lastError());
+                      query2.lastError(), query2.lastQuery());
         return false;
     }
     else {
@@ -3215,11 +3169,10 @@ std::optional<QList<int>> Server::queryMapProgress(const CSteamID &uid,
                       " AND Attribute = 'CurrentMap'");
         query.bindValue(":id", uid.ConvertToUint64());
         if(Q_UNLIKELY(!query.exec() || !query.isSelect() || !query.first())) {
-            qCritical() << query.lastQuery();
             //% "Query user map progress data for user %1 failed!"
             throw DBError(qtTrId("user-query-progress-fail")
                           .arg(uid.ConvertToUint64()),
-                          query.lastError());
+                          query.lastError(), query.lastQuery());
             return std::nullopt;
         }
         if(desiredId && Q_UNLIKELY(query.value(0).toInt() != desiredId)) {
@@ -3234,9 +3187,8 @@ std::optional<QList<int>> Server::queryMapProgress(const CSteamID &uid,
         query2.bindValue(":id", uid.ConvertToUint64());
         if(Q_UNLIKELY(!query2.exec() || !query2.isSelect()
                        || !query2.first())) {
-            qCritical() << query2.lastQuery();
             throw DBError(qtTrId("user-query-progress-fail")
-                          .arg(uid.ConvertToUint64()), query2.lastError());
+                          .arg(uid.ConvertToUint64()), query2.lastError(), query2.lastQuery());
             return std::nullopt;
         }
         if(desiredPrevNode
@@ -3252,9 +3204,8 @@ std::optional<QList<int>> Server::queryMapProgress(const CSteamID &uid,
         query3.bindValue(":id", uid.ConvertToUint64());
         if(Q_UNLIKELY(!query3.exec() || !query3.isSelect()
                        || !query3.first())) {
-            qCritical() << query3.lastQuery();
             throw DBError(qtTrId("user-query-progress-fail")
-                          .arg(uid.ConvertToUint64()), query3.lastError());
+                          .arg(uid.ConvertToUint64()), query3.lastError(), query3.lastQuery());
             return std::nullopt;
         }
         if(Q_UNLIKELY(query3.value(0).toInt()
@@ -3270,9 +3221,8 @@ std::optional<QList<int>> Server::queryMapProgress(const CSteamID &uid,
         query4.bindValue(":id", uid.ConvertToUint64());
         if(Q_UNLIKELY(!query4.exec() || !query4.isSelect()
                        || !query4.first())) {
-            qCritical() << query4.lastQuery();
             throw DBError(qtTrId("user-query-progress-fail")
-                          .arg(uid.ConvertToUint64()), query4.lastError());
+                          .arg(uid.ConvertToUint64()), query4.lastError(), query4.lastQuery());
             return std::nullopt;
         }
         return std::optional(QList<int>({
@@ -3296,6 +3246,7 @@ std::optional<QList<int>> Server::queryMapProgress(const CSteamID &uid,
 void Server::receivedAuth(const QJsonObject &djson,
                           const PeerInfo &peerInfo,
                           QSslSocket *connection) {
+    try {
     /* the following two should be moved to receivedAuth */
     if(djson["command"].toInt() == KP::CommandType::SteamAuth) {
         QJsonArray rgubArray = djson["rgubTicket"].toArray();
@@ -3515,12 +3466,11 @@ force_end_existing_battle:
             query.bindValue(":uid", uid.ConvertToUint64());
             query.bindValue(":type", KP::NoBattle);
             if(Q_UNLIKELY(!query.exec())) {
-                qCritical() << query.lastQuery();
                 //% "User %1: force end node battle failure!"
                 throw DBError(
                     qtTrId("sortie-node-battle-failure-end-force")
                         .arg(uid.ConvertToUint64()),
-                    query.lastError());
+                    query.lastError(), query.lastQuery());
                 return;
             }
         }
@@ -3534,12 +3484,11 @@ force_end_existing_sortie:
                           "AND UserID = :uid");
             query.bindValue(":uid", uid.ConvertToUint64());
             if(Q_UNLIKELY(!query.exec())) {
-                qCritical() << query.lastQuery();
                 //% "User %1: start node battle failure!"
                 throw DBError(
                     qtTrId("sortie-node-battle-failure")
                         .arg(uid.ConvertToUint64()),
-                    query.lastError());
+                    query.lastError(), query.lastQuery());
                 return;
             }
         }
@@ -3554,6 +3503,13 @@ map_status:
     connectedPeers[uid] = connection;
     connectedUsers[connection] = uid;
     senderM.addSender(connection);
+    } catch (DBError &e) {
+        for(QString &i : e.whats()) {
+            qCritical() << i;
+        }
+    } catch (std::exception &e) {
+        qCritical() << e.what();
+    }
 }
 
 void Server::receivedLogout(const CSteamID &uid,
@@ -3997,11 +3953,10 @@ anti_ddos:
             query.bindValue(":uid", uid.ConvertToUint64());
             query.bindValue(":val", chosenNodeId);
             if(Q_UNLIKELY(!query.exec())) {
-                qCritical() << query.lastQuery();
                 throw DBError(
                     qtTrId("sortie-progress-failure")
                         .arg(uid.ConvertToUint64()).arg(mapId),
-                    query.lastError());
+                    query.lastError(), query.lastQuery());
                 break;
             }
             QSqlQuery query2;
@@ -4010,11 +3965,10 @@ anti_ddos:
             query2.bindValue(":uid", uid.ConvertToUint64());
             query2.bindValue(":val", KP::BeforeBattle);
             if(Q_UNLIKELY(!query2.exec())) {
-                qCritical() << query2.lastQuery();
                 throw DBError(
                     qtTrId("sortie-progress-failure")
                         .arg(uid.ConvertToUint64()).arg(mapId),
-                    query2.lastError());
+                    query2.lastError(), query2.lastQuery());
                 break;
             }
             QByteArray msg = KP::serverMapProgress(mapId, chosenNodeId);
@@ -4204,11 +4158,10 @@ KP::FleetFailType Server::updateFleet(const CSteamID &uid,
                       "WHERE UserID = :user AND Attribute = 'InBattle'");
         query.bindValue(":user", uid.ConvertToUint64());
         if(Q_UNLIKELY(!query.exec() || !query.isSelect())) {
-            qCritical() << query.lastQuery();
             //% "Query in battle status failure for user %1!"
             throw DBError(qtTrId("inbattle-check-failure")
                           .arg(uid.ConvertToUint64()),
-                          query.lastError());
+                          query.lastError(), query.lastQuery());
             return KP::ValidFleet;
         }
         else {
@@ -4241,10 +4194,9 @@ KP::FleetFailType Server::updateFleet(const CSteamID &uid,
         query.bindValue(":user", uid.ConvertToUint64());
         query.bindValue(":uuid", shipDataObj["uuid"].toString());
         if(Q_UNLIKELY(!query.exec() || !query.isSelect())) {
-            qCritical() << query.lastQuery();
             //% "Update fleet failure!"
             throw DBError(qtTrId("update-fleet-failure"),
-                          query.lastError());
+                          query.lastError(), query.lastQuery());
             return KP::ValidFleet;
         }
         if(query.next()) {
@@ -4345,10 +4297,9 @@ KP::FleetFailType Server::updateFleet(const CSteamID &uid,
                   "WHERE User = :uid");
     query.bindValue(":uid", uid.ConvertToUint64());
     if(Q_UNLIKELY(!query.exec())) {
-        qCritical() << query.lastQuery();
         //% "Update fleet (clear fleet) failure!"
         throw DBError(qtTrId("update-fleet-clear-failure"),
-                      query.lastError());
+                      query.lastError(), query.lastQuery());
         return KP::ValidFleet;
     }
     for(const auto &shipData: input) {
@@ -4366,10 +4317,9 @@ KP::FleetFailType Server::updateFleet(const CSteamID &uid,
                 % KP::fleetRepSize);
         query.bindValue(":uuid", shipDataObj["uuid"].toString());
         if(Q_UNLIKELY(!query.exec())) {
-            qCritical() << query.lastQuery();
             //% "Update fleet failure!"
             throw DBError(qtTrId("update-fleet-failure"),
-                          query.lastError());
+                          query.lastError(), query.lastQuery());
             return KP::ValidFleet;
         }
         for(int i = 0; i < KP::maxEquipSlots; ++i) {
@@ -4395,10 +4345,9 @@ KP::FleetFailType Server::updateFleet(const CSteamID &uid,
                 shipDataObj["equip"].toArray()[i].toString());
             query.bindValue(":uuid", shipDataObj["uuid"].toString());
             if(Q_UNLIKELY(!query.exec())) {
-                qCritical() << query.lastQuery();
                 //% "Update fleet failure!"
                 throw DBError(qtTrId("update-fleet-failure"),
-                              query.lastError());
+                              query.lastError(), query.lastQuery());
                 return KP::ValidFleet;
             }
         }
@@ -4428,10 +4377,9 @@ KP::FleetFailType Server::updateFleet(const CSteamID &uid,
                     [KP::maxEquipSlots].toString());
             query.bindValue(":uuid", shipDataObj["uuid"].toString());
             if(Q_UNLIKELY(!query.exec())) {
-                qCritical() << query.lastQuery();
                 //% "Update fleet failure!"
                 throw DBError(qtTrId("update-fleet-failure"),
-                              query.lastError());
+                              query.lastError(), query.lastQuery());
                 return KP::ValidFleet;
             }
         }
@@ -4448,10 +4396,9 @@ KP::FleetFailType Server::updateFleet(const CSteamID &uid,
                         .arg(iter->first + 1));
         query.bindValue(":type", iter->second);
         if(Q_UNLIKELY(!query.exec())) {
-            qCritical() << query.lastQuery();
             //% "Update fleet failure!"
             throw DBError(qtTrId("update-fleet-failure"),
-                          query.lastError());
+                          query.lastError(), query.lastQuery());
             return KP::ValidFleet;
         }
     }
@@ -4532,11 +4479,10 @@ factory:
         factoryNew.bindValue(":uid", uid.ConvertToUint64());
         factoryNew.bindValue(":facto", i);
         if(!factoryNew.exec()) {
-            qCritical() << factoryNew.lastQuery();
             //% "Init %2 factory slots for user %1 failed!"
             throw DBError(qtTrId("user-factory-init-fail")
                           .arg(uid.ConvertToUint64()).arg(KP::initFactory()),
-                          factoryNew.lastError());
+                          factoryNew.lastError(), factoryNew.lastQuery());
             return;
         }
     }
@@ -4551,11 +4497,10 @@ dock:
         factoryNew.bindValue(":uid", uid.ConvertToUint64());
         factoryNew.bindValue(":facto", i);
         if(!factoryNew.exec()) {
-            qCritical() << factoryNew.lastQuery();
             //% "Init %2 dock slots for user %1 failed!"
             throw DBError(qtTrId("user-dock-init-fail")
                           .arg(uid.ConvertToUint64()).arg(KP::initDock()),
-                          factoryNew.lastError());
+                          factoryNew.lastError(), factoryNew.lastQuery());
             return;
         }
     }
@@ -4571,10 +4516,9 @@ fleet_status:
         insert.bindValue(":attr", QString("Fleet%1").arg(i+1));
         insert.bindValue(":value", KP::NormalFleet);
         if(!insert.exec()) {
-            qCritical() << insert.lastQuery();
             //% "Set User Fleet Up failed!"
             throw DBError(qtTrId("init-userfleet-failed"),
-                          insert.lastError());
+                          insert.lastError(), insert.lastQuery());
             return;
         }
     }

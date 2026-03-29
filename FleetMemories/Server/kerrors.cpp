@@ -9,6 +9,9 @@ QStringList DBError::whats()
     QStringList result;
     //% "Database Error: %1"
     result.append(qtTrId("db-error").arg(what()));
+    if(!q.isEmpty()) {
+        result.append("Query:" + q);
+    }
     if(e.isValid()) {
         result.append("Query(DB):" + e.databaseText());
         result.append("Query(Driver):" + e.driverText());

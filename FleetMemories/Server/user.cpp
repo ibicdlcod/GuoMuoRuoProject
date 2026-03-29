@@ -25,11 +25,10 @@ bool User::addShipBP(const CSteamID &uid, int shipDef, bool reverse) {
     query.bindValue(":def", shipDef);
 
     if(Q_UNLIKELY(!query.exec() || !query.isSelect())) {
-        qCritical() << query.lastQuery();
         //% "User %1: query blueprint of ship %2 failed!"
         throw DBError(qtTrId("user-query-ship-bp-failed")
                           .arg(uid.ConvertToUint64()).arg(shipDef),
-                      query.lastError());
+                      query.lastError(), query.lastQuery());
         return false;
     }
     else if(query.first()){
@@ -43,11 +42,10 @@ bool User::addShipBP(const CSteamID &uid, int shipDef, bool reverse) {
     query2.bindValue(":eid", shipDef);
     query2.bindValue(":sp", amount+(reverse ? -1 : 1));
     if(Q_UNLIKELY(!query2.exec())) {
-        qCritical() << query2.lastQuery();
         //% "User %1: add blueprint of ship %2 failed!"
         throw DBError(qtTrId("user-add-ship-bp-failed")
                           .arg(uid.ConvertToUint64()).arg(shipDef),
-                      query2.lastError());
+                      query2.lastError(), query2.lastQuery());
         return false;
     }
     else {
@@ -112,11 +110,10 @@ double User::checkMapSupremacy(const CSteamID &uid, int map) {
     query.bindValue(":map", map);
 
     if(Q_UNLIKELY(!query.exec() || !query.isSelect())) {
-        qCritical() << query.lastQuery();
         //% "User %1: query map-supremacy failed!"
         throw DBError(qtTrId("user-supremacy-failure")
                           .arg(uid.ConvertToUint64()),
-                      query.lastError());
+                      query.lastError(), query.lastQuery());
         return 0;
     }
     else if(!query.first()) {
@@ -136,11 +133,10 @@ void User::decideHomePort(const CSteamID &uid, KP::AllegianceGroup nation) {
     query2.bindValue(":id", uid.ConvertToUint64());
     query2.bindValue(":nation", nation);
     if(Q_UNLIKELY(!query2.exec())) {
-        qCritical() << query2.lastQuery();
         //% "User %1: set home port failed!"
         throw DBError(qtTrId("user-add-homeport-failure")
                           .arg(uid.ConvertToUint64()),
-                      query2.lastError());
+                      query2.lastError(), query2.lastQuery());
     }
     else {
         //% "User %1: set home port"
@@ -168,11 +164,10 @@ bool User::decreaseGauge(const CSteamID &uid, int mapId,  // relative id
     query.bindValue(":def", mapId);
     query.bindValue(":amount", amount);
     if(Q_UNLIKELY(!query.exec())){
-        qCritical() << query.lastQuery();
         //% "User ID %1: DB failure when decreasing gauge of map %2!"
         throw DBError(qtTrId("dbfail-when-decreasing-map-hp")
                           .arg(uid.ConvertToUint64()).arg(mapId),
-                      query.lastError());
+                      query.lastError(), query.lastQuery());
         return false;
     }
     else {
@@ -332,11 +327,10 @@ int User::getEquipDef(QUuid equipUuid) {
                   "FROM UserEquip WHERE EquipUuid = :euuid ");
     query.bindValue(":euuid", equipUuid);
     if(Q_UNLIKELY(!query.exec() || !query.isSelect())) {
-        qCritical() << query.lastQuery();
         //% "Get equipment data of %1 failed!"
         throw DBError(
             qtTrId("user-get-equip-data-failed").arg(equipUuid.toString()),
-            query.lastError());
+            query.lastError(), query.lastQuery());
         return 0;
     }
     else {
@@ -355,11 +349,10 @@ int User::getShipDef(QUuid shipUuid) {
                   "FROM UserShip WHERE ShipUuid = :suuid ");
     query.bindValue(":suuid", shipUuid);
     if(Q_UNLIKELY(!query.exec() || !query.isSelect())) {
-        qCritical() << query.lastQuery();
         //% "Get ship data of %1 failed!"
         throw DBError(
             qtTrId("user-get-ship-data-failed").arg(shipUuid.toString()),
-            query.lastError());
+            query.lastError(), query.lastQuery());
         return 0;
     }
     else {
@@ -546,11 +539,10 @@ bool User::isGaugeFinished(const CSteamID &uid, int mapId,  // relative id
     query.bindValue(":id", uid.ConvertToUint64());
     query.bindValue(":def", mapId);
     if(Q_UNLIKELY(!query.exec() || !query.isSelect())){
-        qCritical() << query.lastQuery();
         //% "User ID %1: DB failure when decreasing gauge of map %2!"
         throw DBError(qtTrId("dbfail-when-decreasing-gauge")
                           .arg(uid.ConvertToUint64()).arg(mapId),
-                      query.lastError());
+                      query.lastError(), query.lastQuery());
         return false;
     }
     else {
@@ -567,11 +559,10 @@ bool User::isMapUnlocked(const CSteamID &uid, int mapId,  // relative id
     query.bindValue(":id", uid.ConvertToUint64());
     query.bindValue(":def", mapId);
     if(Q_UNLIKELY(!query.exec() || !query.isSelect() || !query.first())){
-        qCritical() << query.lastQuery();
         //% "User ID %1: DB failure when querying open status of map %2!"
         throw DBError(qtTrId("dbfail-when-query-map-unlocked")
                           .arg(uid.ConvertToUint64()).arg(mapId),
-                      query.lastError());
+                      query.lastError(), query.lastQuery());
         return false;
     }
     else {
@@ -665,11 +656,10 @@ QUuid User::newShip(const CSteamID &uid, int shipDid, int startingHP) {
     query2.bindValue(":rectime", QDateTime::currentSecsSinceEpoch());
     query2.bindValue(":cap", Ship::expCap(0));
     if(Q_UNLIKELY(!query2.exec())) {
-        qCritical() << query2.lastQuery();
         //% "User id %1: new ship failed!"
         throw DBError(qtTrId("new-ship-failed")
                           .arg(uid.ConvertToUint64()),
-                      query2.lastError());
+                      query2.lastError(), query2.lastQuery());
         return QUuid();
     }
     else {
@@ -710,11 +700,10 @@ bool User::openMap(const CSteamID &uid, int mapId) { // relative id
                 query.bindValue(":id", uid.ConvertToUint64());
                 query.bindValue(":factory", factory1);
                 if(Q_UNLIKELY(!query.exec())){
-                    qCritical() << query.lastQuery();
                     //% "User ID %1: DB failure when increasing factory count!"
                     throw DBError(qtTrId("dbfail-when-increasing-factory")
                                       .arg(uid.ConvertToUint64()),
-                                  query.lastError());
+                                  query.lastError(), query.lastQuery());
                     return false;
                 }
                 for(int i = factory; i < factory1; ++i) {
@@ -724,10 +713,9 @@ bool User::openMap(const CSteamID &uid, int mapId) { // relative id
                     query.bindValue(":id", uid.ConvertToUint64());
                     query.bindValue(":count", i);
                     if(Q_UNLIKELY(!query.exec())) {
-                        qCritical() << query.lastQuery();
                         //% "Set User Factory Up failed!"
                         throw DBError(qtTrId("init-user-factory-failed"),
-                                      query.lastError());
+                                      query.lastError(), query.lastQuery());
                         return false;
                     }
                 }
@@ -741,11 +729,10 @@ bool User::openMap(const CSteamID &uid, int mapId) { // relative id
                 query.bindValue(":id", uid.ConvertToUint64());
                 query.bindValue(":repair", repair1);
                 if(Q_UNLIKELY(!query.exec())){
-                    qCritical() << query.lastQuery();
                     //% "User ID %1: DB failure when increasing dock count!"
                     throw DBError(qtTrId("dbfail-when-increasing-dock")
                                       .arg(uid.ConvertToUint64()),
-                                  query.lastError());
+                                  query.lastError(), query.lastQuery());
                     return false;
                 }
                 for(int i = repair; i < repair1; ++i) {
@@ -755,10 +742,9 @@ bool User::openMap(const CSteamID &uid, int mapId) { // relative id
                     query.bindValue(":id", uid.ConvertToUint64());
                     query.bindValue(":count", i);
                     if(Q_UNLIKELY(!query.exec())) {
-                        qCritical() << query.lastQuery();
                         //% "Set User Dock Up failed!"
                         throw DBError(qtTrId("init-user-dock-failed"),
-                                      query.lastError());
+                                      query.lastError(), query.lastQuery());
                         return false;
                     }
                 }

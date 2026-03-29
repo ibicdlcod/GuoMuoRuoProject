@@ -13,9 +13,10 @@ class DBError : public std::runtime_error {
     Q_DECLARE_TR_FUNCTIONS(DBError)
 
 public:
-    DBError(QString what, QSqlError e)
+    DBError(QString what, QSqlError e, QString query = {})
         : std::runtime_error(what.toStdString()),
-          e(e) {
+          e(e),
+          q(query) {
     }
     DBError(QString what)
         : std::runtime_error(what.toStdString()) {
@@ -25,6 +26,7 @@ public:
 
 private:
     QSqlError e; // holds error of the query
+    QString q;   // holds the last executed query string
 };
 
 #endif // KERRORS_H

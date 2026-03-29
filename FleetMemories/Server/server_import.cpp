@@ -61,10 +61,9 @@ bool Server::importEquipFromCSV() {
                             "VALUES (:id);");
                 query.bindValue(":id", equipid);
                 if(!query.exec()) {
-                    qCritical () << query.lastQuery();
                     //% "Import equipment database failed!"
                     throw DBError(qtTrId("equip-import-failed"),
-                                  query.lastError());
+                                  query.lastError(), query.lastQuery());
                     return false;
                 }
                 for(int i = 0; i < titleParts.length(); ++i) {
@@ -81,10 +80,9 @@ bool Server::importEquipFromCSV() {
                         query.bindValue(":id", equipid);
                         query.bindValue(":value", content);
                         if(!query.exec()) {
-                            qCritical () << query.lastQuery();
                             //% "Import equipment database failed!"
                             throw DBError(qtTrId("equip-import-failed"),
-                                          query.lastError());
+                                          query.lastError(), query.lastQuery());
                             return false;
                         }
                     }
@@ -102,7 +100,7 @@ bool Server::importEquipFromCSV() {
                                         EquipType::strToIntRep(lineParts[i]));
                         if(!query.exec()) {
                             throw DBError(qtTrId("equip-import-failed"),
-                                          query.lastError());
+                                          query.lastError(), query.lastQuery());
                             qCritical() << query.lastError();
                             return false;
                         }
@@ -119,7 +117,7 @@ bool Server::importEquipFromCSV() {
                         query.bindValue(":value", lineParts[i].toInt());
                         if(!query.exec()) {
                             throw DBError(qtTrId("equip-import-failed"),
-                                          query.lastError());
+                                          query.lastError(), query.lastQuery());
                             qCritical() << query.lastError();
                             return false;
                         }
@@ -189,10 +187,9 @@ bool Server::importShipFromCSV() {
                         query.bindValue(":value",
                             lineParts[i].toInt(nullptr, 16));
                         if(!query.exec()) {
-                            qCritical() << query.lastQuery();
                             //% "Import ship database failed!"
                             throw DBError(qtTrId("ship-import-failed"),
-                                          query.lastError());
+                                          query.lastError(), query.lastQuery());
                             return false;
                         }
                     }
@@ -207,9 +204,8 @@ bool Server::importShipFromCSV() {
                         query.bindValue(":attr", titleParts[i]);
                         query.bindValue(":value", lineParts[i].toInt());
                         if(!query.exec()) {
-                            qCritical() << query.lastQuery();
                             throw DBError(qtTrId("ship-import-failed"),
-                                          query.lastError());
+                                          query.lastError(), query.lastQuery());
                             return false;
                         }
                     }
@@ -227,9 +223,8 @@ bool Server::importShipFromCSV() {
                         query.bindValue(":attr", "CUSTOM"+titleParts[i]);
                         query.bindValue(":value", lineParts[i].toInt());
                         if(!query.exec()) {
-                            qCritical() << query.lastQuery();
                             throw DBError(qtTrId("ship-import-failed"),
-                                          query.lastError());
+                                          query.lastError(), query.lastQuery());
                             return false;
                         }
                     }
@@ -250,9 +245,8 @@ bool Server::importShipFromCSV() {
                         query.bindValue(":textattr", textattr);
                         query.bindValue(":value", content);
                         if(!query.exec()) {
-                            qCritical() << query.lastQuery();
                             throw DBError(qtTrId("ship-import-failed"),
-                                          query.lastError());
+                                          query.lastError(), query.lastQuery());
                             return false;
                         }
                     }
@@ -312,10 +306,9 @@ bool Server::importMapNodeFromCSV() {
         QSqlQuery query;
         query.prepare("DELETE FROM MapResource;");
         if(!query.exec()) {
-            qCritical() << query.lastQuery();
             //% "Import map node database failed!"
             throw DBError(qtTrId("map-node-import-failed"),
-                          query.lastError());
+                          query.lastError(), query.lastQuery());
             return false;
         }
     }
@@ -334,10 +327,9 @@ bool Server::importMapNodeFromCSV() {
                         "VALUES (:id);");
             query.bindValue(":id", mapNodeId);
             if(!query.exec()) {
-                qCritical() << query.lastQuery();
                 //% "Import map node database failed!"
                 throw DBError(qtTrId("map-node-import-failed"),
-                              query.lastError());
+                              query.lastError(), query.lastQuery());
                 return false;
             }
 
@@ -355,10 +347,9 @@ bool Server::importMapNodeFromCSV() {
                     query.bindValue(":id", mapNodeId);
                     query.bindValue(":value", content);
                     if(!query.exec()) {
-                        qCritical() << query.lastQuery();
                         //% "Import map node database failed!"
                         throw DBError(qtTrId("map-node-import-failed"),
-                                      query.lastError());
+                                      query.lastError(), query.lastQuery());
                         return false;
                     }
                 }
@@ -375,10 +366,9 @@ bool Server::importMapNodeFromCSV() {
                     query.bindValue(":attr", attr);
                     query.bindValue(":value", content);
                     if(!query.exec()) {
-                        qCritical() << query.lastQuery();
                         //% "Import map node database failed!"
                         throw DBError(qtTrId("map-node-import-failed"),
-                                      query.lastError());
+                                      query.lastError(), query.lastQuery());
                         return false;
                     }
                 }
@@ -426,10 +416,9 @@ bool Server::importMapRelationFromCSV() {
         QSqlQuery query;
         query.prepare("DELETE FROM MapRelation;");
         if(!query.exec()) {
-            qCritical() << query.lastQuery();
             //% "Import map relation database failed!"
             throw DBError(qtTrId("map-relation-import-failed"),
-                          query.lastError());
+                          query.lastError(), query.lastQuery());
             return false;
         }
     }
@@ -453,10 +442,9 @@ bool Server::importMapRelationFromCSV() {
             query.bindValue(":id1", node1);
             query.bindValue(":id2", node2);
             if(!query.exec()) {
-                qCritical() << query.lastQuery();
                 //% "Import map relation database failed!"
                 throw DBError(qtTrId("map-relation-import-failed"),
-                              query.lastError());
+                              query.lastError(), query.lastQuery());
                 return false;
             }
 
@@ -503,10 +491,9 @@ bool Server::importVCRFromCSV() {
     QSqlQuery query;
     query.prepare("DELETE FROM VirtualCondRelation;");
     if(!query.exec()) {
-        qCritical () << query.lastQuery();
         //% "Import vcr database failed!"
         throw DBError(qtTrId("vcr-import-failed"),
-                      query.lastError());
+                      query.lastError(), query.lastQuery());
         return false;
     }
 
@@ -539,10 +526,9 @@ bool Server::importVCRFromCSV() {
                 query.bindValue(":map", mapid);
                 query.bindValue(":diff", diff);
                 if(!query.exec()) {
-                    qCritical () << query.lastQuery();
                     //% "Import vcr database failed!"
                     throw DBError(qtTrId("vcr-import-failed"),
-                                  query.lastError());
+                                  query.lastError(), query.lastQuery());
                     return false;
                 }
             }
@@ -579,7 +565,7 @@ bool Server::exportEquipToCSV() const {
     if(!query.exec()) {
         //% "Load equipment table failed!"
         throw DBError(qtTrId("equip-refresh-failed"),
-                      query.lastError());
+                      query.lastError(), query.lastQuery());
         return false;
     }
     query.isSelect();
@@ -621,7 +607,7 @@ bool Server::equipmentRefresh() {
     if(!query.exec()) {
         //% "Load equipment table failed!"
         throw DBError(qtTrId("equip-refresh-failed"),
-                      query.lastError());
+                      query.lastError(), query.lastQuery());
         return false;
     }
     query.isSelect();
@@ -658,7 +644,7 @@ bool Server::shipRefresh() {
     if(!query.exec()) {
         //% "Load ship table failed!"
         throw DBError(qtTrId("ship-refresh-failed"),
-                      query.lastError());
+                      query.lastError(), query.lastQuery());
         return false;
     }
     query.isSelect();
@@ -706,7 +692,7 @@ bool Server::mapRefresh()
     if(!query.exec()) {
         //% "Load map table failed!"
         throw DBError(qtTrId("map-refresh-failed"),
-                      query.lastError());
+                      query.lastError(), query.lastQuery());
         return false;
     }
     query.isSelect();
@@ -720,10 +706,9 @@ bool Server::mapRefresh()
                           "WHERE MapID = :id;");
             query.bindValue(":id", mapID);
             if(!query.exec()) {
-                qCritical() << query.lastQuery();
                 //% "Load map table failed!"
                 throw DBError(qtTrId("map-refresh-failed"),
-                              query.lastError());
+                              query.lastError(), query.lastQuery());
                 return false;
             }
             query.isSelect();
@@ -768,10 +753,9 @@ bool Server::mapRefresh()
                               "AND (Attribute = 'x' OR Attribute = 'y');");
                 query.bindValue(":id", mapID);
                 if(!query.exec()) {
-                    qCritical() << query.lastQuery();
                     //% "Load map table failed!"
                     throw DBError(qtTrId("map-refresh-failed"),
-                                  query.lastError());
+                                  query.lastError(), query.lastQuery());
                     return false;
                 }
                 query.isSelect();
@@ -798,7 +782,7 @@ bool Server::mapRefresh()
                     if(!query.exec()) {
                         //% "Load map table failed!"
                         throw DBError(qtTrId("map-refresh-failed"),
-                                      query.lastError());
+                                      query.lastError(), query.lastQuery());
                         return false;
                     }
                     query.isSelect();

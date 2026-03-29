@@ -7,6 +7,7 @@
 #include "../steam/steam_gameserver.h"
 
 #include "../Protocol/kp.h"
+#include "kerrors.h"
 #include "qconsolelistener.h"
 #include "server.h"
 
@@ -22,6 +23,23 @@ const int STEAM_ERROR = 1;
 }
 
 int main(int argc, char *argv[]) {
+    std::set_terminate([]() {
+        auto eptr = std::current_exception();
+        if(eptr) {
+            try { std::rethrow_exception(eptr); }
+            catch(DBError &e) {
+                for(const QString &s : e.whats())
+                    qCritical() << s;
+            }
+            catch(std::exception &e) {
+                qCritical() << "Uncaught exception:" << e.what();
+            }
+            catch(...) {
+                qCritical() << "Uncaught unknown exception";
+            }
+        }
+        std::abort();
+    });
 
     SteamErrMsg err;
     /* doubt this will have actual effect */

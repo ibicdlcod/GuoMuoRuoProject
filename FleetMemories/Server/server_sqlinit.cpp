@@ -456,7 +456,7 @@ void Server::sqlinitDock() const {
     if(!query.exec()) {
         //% "Create Dock database failed."
         throw DBError(qtTrId("dock-db-gen-failure"),
-                      query.lastError());
+                      query.lastError(), query.lastQuery());
     }
 }
 
@@ -468,7 +468,7 @@ void Server::sqlinitEquip() const {
     if(!query.exec()) {
         //% "Create Equipment database failed."
         throw DBError(qtTrId("equip-db-gen-failure"),
-                      query.lastError());
+                      query.lastError(), query.lastQuery());
     }
 }
 
@@ -480,7 +480,7 @@ void Server::sqlinitEquipName() const {
     if(!query.exec()) {
         //% "Create Equipment name database failed."
         throw DBError(qtTrId("equip-name-db-gen-failure"),
-                      query.lastError());
+                      query.lastError(), query.lastQuery());
     }
 }
 
@@ -492,7 +492,7 @@ void Server::sqlinitEquipSP() const {
     if(!query.exec()) {
         //% "User equipment skillpoints fetch failure."
         throw DBError(qtTrId("equip-sp-db-gen-failure"),
-                      query.lastError());
+                      query.lastError(), query.lastQuery());
     }
 }
 
@@ -504,7 +504,7 @@ void Server::sqlinitEquipU() const {
     if(!query.exec()) {
         //% "Create Equipment database for user failed."
         throw DBError(qtTrId("equip-db-user-gen-failure"),
-                      query.lastError());
+                      query.lastError(), query.lastQuery());
     }
 }
 
@@ -514,10 +514,9 @@ void Server::sqlinitEquipUKC() const {
     QSqlQuery query;
     query.prepare(*userKCEquip);
     if(!query.exec()) {
-        qCritical() << query.lastQuery();
         //% "Create Equipment database (kancolle) for user failed."
         throw DBError(qtTrId("equip-db-kc-user-gen-failure"),
-                      query.lastError());
+                      query.lastError(), query.lastQuery());
     }
 }
 
@@ -529,7 +528,7 @@ void Server::sqlinitFacto() const {
     if(!query.exec()) {
         //% "Create Factory database failed."
         throw DBError(qtTrId("facto-db-gen-failure"),
-                      query.lastError());
+                      query.lastError(), query.lastQuery());
     }
 }
 
@@ -541,7 +540,7 @@ void Server::sqlinitMapNode() const {
     if(!query.exec()) {
         //% "Create Map node database failed."
         throw DBError(qtTrId("map-node-db-gen-failure"),
-                      query.lastError());
+                      query.lastError(), query.lastQuery());
     }
 }
 
@@ -553,7 +552,7 @@ void Server::sqlinitMapRelation() const {
     if(!query.exec()) {
         //% "Create Map relation database failed."
         throw DBError(qtTrId("map-relation-db-gen-failure"),
-                      query.lastError());
+                      query.lastError(), query.lastQuery());
     }
 }
 
@@ -565,7 +564,7 @@ void Server::sqlinitMapResource() const {
     if(!query.exec()) {
         //% "Create Map resource database failed."
         throw DBError(qtTrId("map-resource-db-gen-failure"),
-                      query.lastError());
+                      query.lastError(), query.lastQuery());
     }
 }
 
@@ -577,7 +576,7 @@ void Server::sqlinitRank() const {
     if(!query.exec()) {
         //% "Create Ranking database failed."
         throw DBError(qtTrId("ranking-db-gen-failure"),
-                      query.lastError());
+                      query.lastError(), query.lastQuery());
     }
 }
 
@@ -589,7 +588,7 @@ void Server::sqlinitShip() const {
     if(!query.exec()) {
         //% "Create Ship database failed."
         throw DBError(qtTrId("equip-ship-db-gen-failure"),
-                      query.lastError());
+                      query.lastError(), query.lastQuery());
     }
 }
 
@@ -601,7 +600,7 @@ void Server::sqlinitShipDrop() const {
     if(!query.exec()) {
         //% "Create Ship drop database failed."
         throw DBError(qtTrId("equip-ship-drop-db-gen-failure"),
-                      query.lastError());
+                      query.lastError(), query.lastQuery());
     }
 }
 
@@ -611,10 +610,9 @@ void Server::sqlinitShipName() const {
     QSqlQuery query;
     query.prepare(*shipName);
     if(!query.exec()) {
-        qCritical() << query.lastQuery();
         //% "Create Ship name failed."
         throw DBError(qtTrId("equip-ship-name-gen-failure"),
-                      query.lastError());
+                      query.lastError(), query.lastQuery());
     }
 }
 
@@ -626,7 +624,7 @@ void Server::sqlinitShipU() const {
     if(!query.exec()) {
         //% "Create Ship database for user failed."
         throw DBError(qtTrId("ship-db-user-gen-failure"),
-                      query.lastError());
+                      query.lastError(), query.lastQuery());
     }
 }
 
@@ -636,10 +634,9 @@ void Server::sqlinitShipUBP() const {
     QSqlQuery query;
     query.prepare(*userShipBP);
     if(!query.exec()) {
-        qCritical() << query.lastQuery();
         //% "Create Ship blueprint database for user failed."
         throw DBError(qtTrId("ship-db-bp-user-gen-failure"),
-                      query.lastError());
+                      query.lastError(), query.lastQuery());
     }
 }
 
@@ -649,10 +646,9 @@ void Server::sqlinitShipUKC() const {
     QSqlQuery query;
     query.prepare(*userKCShip);
     if(!query.exec()) {
-        qCritical() << query.lastQuery();
         //% "Create Ship database (kancolle) for user failed."
         throw DBError(qtTrId("ship-db-kc-user-gen-failure"),
-                      query.lastError());
+                      query.lastError(), query.lastQuery());
     }
 }
 
@@ -664,7 +660,7 @@ void Server::sqlinitUsers() const {
     if(!query.exec()) {
         //% "Create User database failed."
         throw DBError(qtTrId("user-db-gen-failure"),
-                      query.lastError());
+                      query.lastError(), query.lastQuery());
     }
 }
 
@@ -676,7 +672,7 @@ void Server::sqlinitUserA() const {
     if(!query.exec()) {
         //% "Create User attributes database failed."
         throw DBError(qtTrId("user-db-attr-gen-failure"),
-                      query.lastError());
+                      query.lastError(), query.lastQuery());
     }
 }
 
@@ -688,7 +684,7 @@ void Server::sqlinitUserM() const {
     if(!query.exec()) {
         //% "Create User map info database failed."
         throw DBError(qtTrId("user-db-map-gen-failure"),
-                      query.lastError());
+                      query.lastError(), query.lastQuery());
     }
 }
 
@@ -700,7 +696,7 @@ void Server::sqlinitARDOrders() const {
     if(!query.exec()) {
         //% "Create ARD orders database failed."
         throw DBError(qtTrId("ard-orders-db-gen-failure"),
-                      query.lastError());
+                      query.lastError(), query.lastQuery());
     }
 }
 
@@ -712,7 +708,7 @@ void Server::sqlinitVCR() const {
     if(!query.exec()) {
         //% "Create virtual condition-map relation info database failed."
         throw DBError(qtTrId("user-db-vcr-gen-failure"),
-                      query.lastError());
+                      query.lastError(), query.lastQuery());
     }
 }
 
