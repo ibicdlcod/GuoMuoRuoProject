@@ -16,7 +16,8 @@ namespace {
 using std::fmaf;
 
 /* source: https://stackoverflow.com/a/49743348, modified to suit c++ */
-/* alternative: https://live.boost.org/doc/libs/1_84_0/libs/math/doc/html/math_toolkit/sf_erf/error_inv.html */
+/* alternative: https://live.boost.org/doc/libs/1_84_0/libs/math/doc/html/
+ * math_toolkit/sf_erf/error_inv.html */
 float my_logf (float);
 
 /* compute inverse error functions with maximum error of 2.35793 ulp */

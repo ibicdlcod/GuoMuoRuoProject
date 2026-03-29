@@ -90,8 +90,10 @@ Server::Server(int argc, char ** argv) : CommandLine(argc, argv) {
             this, &Server::senderMErrorMessage);
 
     clock = new QTimer(this);
-    uint unixtime = QDateTime::currentDateTimeUtc().currentSecsSinceEpoch(); // current unix time
-    uint roundHour = unixtime + (60 - unixtime % 60); // round it up to an minute
+    // current unix time
+    uint unixtime = QDateTime::currentDateTimeUtc().currentSecsSinceEpoch();
+    // round it up to a minute
+    uint roundHour = unixtime + (60 - unixtime % 60);
     QDateTime start;
     start.setSecsSinceEpoch(roundHour);
     clock->setSingleShot(true);
@@ -240,7 +242,7 @@ bool Server::listen(const QHostAddress &address, quint16 port) {
         settings->setValue("steam/webkey", keyFile.readAll());
         if(!settings->contains("steam/lastrefundpolltime")) {
             settings->setValue("steam/lastrefundpolltime",
-                               QDateTime::currentDateTimeUtc().toSecsSinceEpoch());
+                QDateTime::currentDateTimeUtc().toSecsSinceEpoch());
         }
 
         listening = sslServer.listen(address, port);
@@ -857,9 +859,11 @@ possess_limit:
         if(equip->disallowMassProduction() && (
                     User::getEquipAmount(uid, equipid)
                     + User::getCurrentFactoryParallel(uid, equipid)
-                    >= std::max(static_cast<double>(equip->attr["Disallowmassproduction"]),
-                                settings->value("rule/normalproductionstockpile",
-                                                30.0).toDouble()))) {
+                    >= std::max(
+                        static_cast<double>(
+                            equip->attr["Disallowmassproduction"]),
+                        settings->value("rule/normalproductionstockpile",
+                                        30.0).toDouble()))) {
             QByteArray msg =
                     KP::serverDevelopFailed(KP::MassProductionDisallowed);
             senderM.sendMessage(connection, msg);
@@ -868,14 +872,17 @@ possess_limit:
 subtract_ip:
         {
             QSqlQuery query;
-            QString queryStr = QStringLiteral("UPDATE UserRanking "
-                                              "SET Industrial = Industrial - :amount "
-                                              "WHERE User = :uid AND Industrial >= :amount;");
+            QString queryStr =
+                QStringLiteral("UPDATE UserRanking "
+                               "SET Industrial = Industrial - :amount "
+                               "WHERE User = :uid "
+                               "AND Industrial >= :amount;");
             query.prepare(queryStr);
             query.bindValue(":uid", uid.ConvertToUint64());
             query.bindValue(":amount", equipRegistry[equipid]->getPrice());
             if(Q_LIKELY(query.exec())) {
-                if(Q_LIKELY(query.numRowsAffected() > 0)) { // points subtracted from 1 user
+                // points subtracted from 1 user
+                if(Q_LIKELY(query.numRowsAffected() > 0)) {
                     ; // pass
                 }
                 else {
@@ -984,7 +991,8 @@ bp: {
             QSqlQuery query;
             QString queryStr = QStringLiteral("SELECT Amount "
                                               "FROM UserShipBP "
-                                              "WHERE User = :uid AND ShipDef = :def");
+                                              "WHERE User = :uid "
+                                              "AND ShipDef = :def");
             query.prepare(queryStr);
             query.bindValue(":uid", uid.ConvertToUint64());
             query.bindValue(":def", shipDef);
@@ -1013,14 +1021,16 @@ possess_limit:
             int latestmodel = 0;
             auto latermodels = ship->getLaterModels(shipRegistry);
             if(!latermodels.empty()) {
-                latestmodel = *std::max_element(latermodels.constBegin(), latermodels.constEnd());
+                latestmodel = *std::max_element(
+                    latermodels.constBegin(), latermodels.constEnd());
             }
             QList<int> allModels = shipRemodelGroup.values(latestmodel);
 
             QSqlQuery query;
             QString queryStr = QStringLiteral("SELECT ShipUuid "
                                               "FROM UserShip "
-                                              "WHERE User = :uid AND ShipDef in (");
+                                              "WHERE User = :uid "
+                                              "AND ShipDef in (");
             for(int i = 0; i < allModels.size(); ++i) {
                 queryStr.append(":id");
                 queryStr.append(QString::number(i+1));
@@ -1044,8 +1054,9 @@ possess_limit:
             }
             else {
                 //% "Database failed when constructing: query existing models failed!"
-                throw DBError(qtTrId("dbfail-constructing-query-existing-models"),
-                              query.lastError());
+                throw DBError(
+                    qtTrId("dbfail-constructing-query-existing-models"),
+                    query.lastError());
             }
         }
         if(isCloning) {
@@ -1120,7 +1131,8 @@ remodel:
             QSqlQuery query;
             QString queryStr = QStringLiteral("SELECT ShipDef, FleetIndex "
                                               "FROM UserShip "
-                                              "WHERE User = :uid AND ShipUuid = :suid");
+                                              "WHERE User = :uid "
+                                              "AND ShipUuid = :suid");
             query.prepare(queryStr);
             query.bindValue(":uid", uid.ConvertToUint64());
             query.bindValue(":suid", prevShip.toString());
@@ -1131,8 +1143,9 @@ remodel:
             }
             else {
                 //% "Database failed when constructing: query existing ships failed!"
-                throw DBError(qtTrId("dbfail-constructing-query-existing-ships"),
-                              query.lastError());
+                throw DBError(
+                    qtTrId("dbfail-constructing-query-existing-ships"),
+                    query.lastError());
                 return;
             }
             if(Q_UNLIKELY(!remodelCandidate.contains(remodelDef))) {
@@ -1221,7 +1234,8 @@ restore_default_equip_converter_remodel:
                         }
                         else {
                             QByteArray msg = KP::serverNewEquip(
-                                        newEquip(uid, prevDefaultEquip), prevDefaultEquip);
+                                newEquip(uid, prevDefaultEquip),
+                                prevDefaultEquip);
                             senderM.sendMessage(connection, msg);
                         }
                     }
@@ -1242,7 +1256,8 @@ eat_default_equip:
             QSqlQuery query;
             QString queryStr = QStringLiteral("SELECT EquipDef "
                                               "FROM UserEquip "
-                                              "WHERE User = :uid AND EquipUuid = :euid");
+                                              "WHERE User = :uid "
+                                              "AND EquipUuid = :euid");
             query.prepare(queryStr);
             query.bindValue(":uid", uid.ConvertToUint64());
             query.bindValue(":euid", equips[i].toString());
@@ -1253,8 +1268,9 @@ eat_default_equip:
             }
             else {
                 //% "Database failed when constructing: query existing equips failed!"
-                throw DBError(qtTrId("dbfail-constructing-query-existing-equips"),
-                              query.lastError());
+                throw DBError(
+                    qtTrId("dbfail-constructing-query-existing-equips"),
+                    query.lastError());
             }
             QString de = QStringLiteral("Defaultequip");
             de.append(QString::number(i+1));
@@ -1288,7 +1304,8 @@ delete_bp:
             QSqlQuery query;
             QString queryStr = QStringLiteral("UPDATE UserShipBP "
                                               "SET Amount = Amount-1 "
-                                              "WHERE User = :uid AND ShipDef = :def");
+                                              "WHERE User = :uid "
+                                              "AND ShipDef = :def");
             query.prepare(queryStr);
             query.bindValue(":uid", uid.ConvertToUint64());
             query.bindValue(":def", shipDef);
@@ -1353,7 +1370,8 @@ possess_limit:
 
         /* 4.4-Precondition.md#Normal preconditions (father) */
 father_required:
-        auto [fatherExists, missingFatherId] = User::haveFather(uid, equipid, equipRegistry);
+        auto [fatherExists, missingFatherId] =
+            User::haveFather(uid, equipid, equipRegistry);
         if(!fatherExists) {
             QByteArray msg =
                     KP::serverEquipLackFather(KP::DevelopNotOption,
@@ -1517,9 +1535,10 @@ consolation_skill_point:
                                 10.0).toDouble();
                     double tEquipP1 = equipRegistry.value(jobID)->getTech() + 1;
                     double tCurrentP1 = calculateTech(uid, 0).first + 1;
-                    double techFactor = tCurrentP1 / std::hypot(tCurrentP1, tEquipP1);
+                    double techFactor =
+                        tCurrentP1 / std::hypot(tCurrentP1, tEquipP1);
                     User::addSkillPoints(uid, jobID,
-                                         (stdSkillPoints * techFactor) / difficultyFactor);
+                        (stdSkillPoints * techFactor) / difficultyFactor);
                 }
             }
             else if(isEquip) {
@@ -1532,14 +1551,16 @@ consolation_skill_point:
                 if(prevUuid.isNull()) {
 add_ship:
                     QByteArray msg = KP::serverNewShip(
-                                newShip(uid, jobID), jobID, shipRegistry[jobID]->attr["Hitpoints"]);
+                        newShip(uid, jobID), jobID,
+                        shipRegistry[jobID]->attr["Hitpoints"]);
                     senderM.sendMessage(connection, msg);
                 }
                 else {
 remodel_ship:
                     if(modifyShip(uid, prevUuid, jobID)) {
                         QByteArray msg = KP::serverNewmodelShip(
-                                    prevUuid, jobID, shipRegistry[jobID]->attr["Hitpoints"]);
+                            prevUuid, jobID,
+                            shipRegistry[jobID]->attr["Hitpoints"]);
                         senderM.sendMessage(connection, msg);
                     }
                 }
@@ -1716,8 +1737,8 @@ check_possession:
     ResOrd currentRes;
     {
         QSqlQuery query;
-        query.prepare("SELECT UserShip.Exp+COALESCE(UserKCShip.Exp, 0), ExpCap, UserShip.ShipDef,"
-                      "UserShip.CurrentHP "
+        query.prepare("SELECT UserShip.Exp+COALESCE(UserKCShip.Exp, 0), "
+                      "ExpCap, UserShip.ShipDef, UserShip.CurrentHP "
                       "FROM UserShip "
                       "LEFT JOIN UserKCShip "
                       "ON UserShip.ShipUuid = UserKCShip.ShipUuid "
@@ -1732,8 +1753,10 @@ check_possession:
         if(Q_UNLIKELY(!query.exec() || !query.isSelect())) {
             qCritical() << query.lastQuery();
             //% "User %1: ship %2 does not exist on account!"
-            throw DBError(qtTrId("user-ship-dont-exist").arg(uid.ConvertToUint64())
-                          .arg(shipUuid.toString()), query.lastError());
+            throw DBError(
+                qtTrId("user-ship-dont-exist").arg(uid.ConvertToUint64())
+                    .arg(shipUuid.toString()),
+                query.lastError());
         }
         else if(!query.first()) {
             QByteArray msg =
@@ -1955,7 +1978,10 @@ void Server::initUserDropInfo(const CSteamID &uid) {
             queryStr.append(":value"+QString::number(i)+" ");
         }
         queryStr.append(") AS s ");
-        queryStr.append("WHERE NOT EXISTS ( SELECT 1 FROM UserShipDrop t WHERE t.User = s.column1 AND t.ShipDef = s.column2);");
+        queryStr.append("WHERE NOT EXISTS "
+                        "( SELECT 1 FROM UserShipDrop t "
+                        "WHERE t.User = s.column1 "
+                        "AND t.ShipDef = s.column2);");
         QSqlQuery query2;
         query2.prepare(queryStr);
         query2.bindValue(":uid", uid.ConvertToUint64());
@@ -1989,11 +2015,12 @@ void Server::initUserDropInfo(const CSteamID &uid) {
 void Server::initUserEquipSPInfo(const CSteamID &uid) {
     QSqlDatabase db = QSqlDatabase::database();
     QSqlQuery query2;
-    query2.prepare("INSERT OR IGNORE INTO UserEquipSP (User, EquipDef, Intvalue) "
-                   "SELECT :uid, EquipName.EquipID, 0 "
-                   "FROM EquipName "
-                   /* temp solution: equipIdMax is 65536 and higher than 32768 is amnesiac equip */
-                   "WHERE EquipName.EquipID < 32768;");
+    query2.prepare(
+        "INSERT OR IGNORE INTO UserEquipSP (User, EquipDef, Intvalue) "
+        "SELECT :uid, EquipName.EquipID, 0 "
+        "FROM EquipName "
+        /* equipIdMax is 65536; higher than 32768 is amnesiac equip */
+        "WHERE EquipName.EquipID < 32768;");
     query2.bindValue(":uid", uid.ConvertToUint64());
     if(Q_UNLIKELY(!query2.exec())) {
         qCritical() << query2.lastQuery();
@@ -2015,7 +2042,8 @@ void Server::initUserMapStatus(const CSteamID &uid) {
         QSqlQuery query2;
         query2.prepare("INSERT OR IGNORE INTO UserMapState (User, MapDef, "
                        "GaugeC, GaugeB, GaugeA, GaugeH) "
-                       "VALUES (:uid, :map, :amount1, :amount2, :amount3, :amount4);");
+                       "VALUES (:uid, :map, "
+                       ":amount1, :amount2, :amount3, :amount4);");
         query2.bindValue(":uid", uid.ConvertToUint64());
         query2.bindValue(":map", map);
         int amount = 0;
@@ -2105,10 +2133,13 @@ void Server::luaInitMap() {
                 qDebug() << qtTrId("lua-map-success-spec").arg(map);
                 normalMapHasLua.append(map);
                 QFileInfo fileInfo(name);
-                QDateTime lastModifiedDate = fileInfo.lastModified(QTimeZone::UTC);
-                QDateTime mapDBTimeStamp = settings->value("server/mapdbtimestamp").toDateTime();
+                QDateTime lastModifiedDate =
+                    fileInfo.lastModified(QTimeZone::UTC);
+                QDateTime mapDBTimeStamp =
+                    settings->value("server/mapdbtimestamp").toDateTime();
                 if(lastModifiedDate > mapDBTimeStamp) {
-                    settings->setValue("server/mapdbtimestamp", lastModifiedDate);
+                    settings->setValue("server/mapdbtimestamp",
+                                       lastModifiedDate);
                 }
             }
         }
@@ -2133,7 +2164,8 @@ process_import_equip:
         }
         if(!equipRegistry.contains(equipObj["id"].toInt())) {
             //% "Equip id %1 don't exist!"
-            qWarning() << qtTrId("equipid-dont-exist").arg(equipObj["id"].toInt());
+            qWarning() << qtTrId("equipid-dont-exist")
+                          .arg(equipObj["id"].toInt());
             continue;
         }
         int equipExp = 0;
@@ -2174,8 +2206,8 @@ process_import_ships:
                 sourceModels[latestShipId] = fmShipId;
             }
             else {
-                sourceModels[latestShipId] = std::max(fmShipId,
-                                                      sourceModels[latestShipId]);
+                sourceModels[latestShipId] =
+                    std::max(fmShipId, sourceModels[latestShipId]);
             }
         }
     }
@@ -2197,7 +2229,8 @@ query_existing_imported_equip:
                       "FROM UserKCEquip "
                       "INNER JOIN UserEquip "
                       "ON UserEquip.EquipUuid = UserKCEquip.EquipUuid "
-                      "WHERE UserEquip.User = :id AND UserKCEquip.EquipDef = :def "
+                      "WHERE UserEquip.User = :id "
+                      "AND UserKCEquip.EquipDef = :def "
                       "ORDER BY UserKCEquip.star DESC");
         query.bindValue(":id", uid.ConvertToUint64());
         query.bindValue(":def", equipDef);
@@ -2329,12 +2362,13 @@ decrease_supremacy:
         if(Q_UNLIKELY(!query.exec())) {
             qCritical() << query.lastQuery();
             //% "Minute pulse: decrease supermacy failed!"
-            throw DBError(qtTrId("decrease-supremacy-failed"), query.lastError());
+            throw DBError(qtTrId("decrease-supremacy-failed"),
+                          query.lastError());
         }
 recover_condition:
         QDateTime lastRecoverTime
                 = settings->value("server/lastrecvcondtime",
-                                  QDateTime::fromSecsSinceEpoch(0, QTimeZone(Qt::UTC)))
+                      QDateTime::fromSecsSinceEpoch(0, QTimeZone(Qt::UTC)))
                 .toDateTime();
         int lastRecoverTimeInt = lastRecoverTime.toSecsSinceEpoch();
         {
@@ -2351,7 +2385,8 @@ recover_condition:
                 throw DBError(qtTrId("recover-cond-failed"), query.lastError());
             }
         }
-        settings->setValue("server/lastrecvcondtime", QDateTime::currentDateTimeUtc());
+        settings->setValue("server/lastrecvcondtime",
+                           QDateTime::currentDateTimeUtc());
 negative_condition_penalty:
 add_kc_exp:
         {
@@ -2363,7 +2398,8 @@ add_kc_exp:
             if(Q_UNLIKELY(!query.exec())) {
                 qCritical() << query.lastQuery();
                 //% "Minute pulse: penalize condition failed!"
-                throw DBError(qtTrId("penalize-cond-failed"), query.lastError());
+                throw DBError(qtTrId("penalize-cond-failed"),
+                              query.lastError());
             }
         }
 penalize:
@@ -2371,15 +2407,18 @@ penalize:
             QSqlQuery query;
             query.prepare("UPDATE UserShip "
                           "SET Exp = floor(pow(:penalty, t.c) * Exp) "
-                          "FROM (SELECT SUM(Condition) AS c, User FROM UserShip "
+                          "FROM (SELECT SUM(Condition) AS c, User "
+                          "FROM UserShip "
                           "WHERE Condition < 0 "
                           "GROUP BY User ) t;");
-            query.bindValue(":penalty", settings->value("rule/badconditionpenalty",
-                                                        1.001).toDouble());
+            query.bindValue(":penalty",
+                settings->value("rule/badconditionpenalty",
+                                1.001).toDouble());
             if(Q_UNLIKELY(!query.exec())) {
                 qCritical() << query.lastQuery();
                 //% "Minute pulse: penalize condition failed!"
-                throw DBError(qtTrId("penalize-cond-failed"), query.lastError());
+                throw DBError(qtTrId("penalize-cond-failed"),
+                              query.lastError());
             }
         }
 subtract_kc_exp:
@@ -2392,13 +2431,14 @@ subtract_kc_exp:
             if(Q_UNLIKELY(!query.exec())) {
                 qCritical() << query.lastQuery();
                 //% "Minute pulse: penalize condition failed!"
-                throw DBError(qtTrId("penalize-cond-failed"), query.lastError());
+                throw DBError(qtTrId("penalize-cond-failed"),
+                              query.lastError());
             }
         }
 award_industrial_points:
         QDateTime lastSettleTime
                 = settings->value("server/nextsettleranktime",
-                                  QDateTime::fromSecsSinceEpoch(0, QTimeZone(Qt::UTC)))
+                      QDateTime::fromSecsSinceEpoch(0, QTimeZone(Qt::UTC)))
                 .toDateTime();
         lastSettleTime.setDate(QDate(lastSettleTime.date().year(),
                                      lastSettleTime.date().month(),
@@ -2420,7 +2460,8 @@ award_industrial_points:
                 if(Q_UNLIKELY(!query.exec())) {
                     qCritical() << query.lastQuery();
                     //% "Minute pulse: reward ranking failed!"
-                    throw DBError(qtTrId("rank-reward-failed"), query.lastError());
+                    throw DBError(qtTrId("rank-reward-failed"),
+                                  query.lastError());
                 }
             }
             {
@@ -2430,7 +2471,8 @@ award_industrial_points:
                 if(Q_UNLIKELY(!query.exec())) {
                     qCritical() << query.lastQuery();
                     //% "Minute pulse: reward ranking failed!"
-                    throw DBError(qtTrId("rank-reward-failed"), query.lastError());
+                    throw DBError(qtTrId("rank-reward-failed"),
+                                  query.lastError());
                 }
             }
             {
@@ -2440,7 +2482,8 @@ award_industrial_points:
                 if(Q_UNLIKELY(!query.exec())) {
                     qCritical() << query.lastQuery();
                     //% "Minute pulse: reward ranking failed!"
-                    throw DBError(qtTrId("rank-reward-failed"), query.lastError());
+                    throw DBError(qtTrId("rank-reward-failed"),
+                                  query.lastError());
                 }
             }
         }
@@ -2452,12 +2495,17 @@ regen_resources_based_on_supremacy:
             query.prepare("UPDATE UserAttr "
                           "SET Intvalue = Intvalue + g.f "
                           "FROM "
-                          "(SELECT User, e.Attribute, SUM(e.d*max(0, Supremacy)/:ctrl) AS f FROM UserMapState "
+                          "(SELECT User, e.Attribute, "
+                          "SUM(e.d*max(0, Supremacy)/:ctrl) AS f "
+                          "FROM UserMapState "
                           "INNER JOIN "
-                          "(SELECT Attribute, SUM(Intvalue*c.b) AS d, c.Node2 FROM MapResource "
+                          "(SELECT Attribute, SUM(Intvalue*c.b) AS d, "
+                          "c.Node2 FROM MapResource "
                           "INNER JOIN "
-                          "(SELECT MapRelation.Node1, MapRelation.Node2, a.b FROM MapRelation "
-                          "INNER JOIN (SELECT Node1, 1.0/COUNT(*) AS b FROM MapRelation "
+                          "(SELECT MapRelation.Node1, MapRelation.Node2, "
+                          "a.b FROM MapRelation "
+                          "INNER JOIN (SELECT Node1, 1.0/COUNT(*) AS b "
+                          "FROM MapRelation "
                           "WHERE Type = 'RS' "
                           "GROUP BY Node1) a "
                           "ON MapRelation.Node1 = a.Node1) c "
@@ -2474,7 +2522,8 @@ regen_resources_based_on_supremacy:
             if(Q_UNLIKELY(!query.exec())) {
                 qCritical() << query.lastQuery();
                 //% "Minute pulse: reward supremacy failed!"
-                throw DBError(qtTrId("supremacy-reward-failed"), query.lastError());
+                throw DBError(qtTrId("supremacy-reward-failed"),
+                              query.lastError());
             }
         }
 poll_ard_refunds:
@@ -2841,10 +2890,13 @@ waive_condition:
 relax_condition:
     double supremacy = 0;
     if(mother->attr.contains("Homeport") && mother->attr["Homeport"] != 0) {
-        supremacy = std::max(User::checkMapSupremacy(uid, mother->attr["Homeport"]), 0.0);
+        supremacy = std::max(
+            User::checkMapSupremacy(uid, mother->attr["Homeport"]),
+            0.0);
     }
-    double factor = pow(settings->value("rule/waivemotherconditon", 0.99).toDouble(),
-                        supremacy);
+    double factor = pow(
+        settings->value("rule/waivemotherconditon", 0.99).toDouble(),
+        supremacy);
 
     double s = equip->skillPointsStd() * factor;
     double b = settings->value("rule/maxskillpointsamplifier",
@@ -3008,13 +3060,15 @@ std::optional<QList<int>> Server::queryMapProgress(const CSteamID &uid,
                        " FROM UserAttr WHERE UserID = :id"
                        " AND Attribute = 'CurrentNode'");
         query2.bindValue(":id", uid.ConvertToUint64());
-        if(Q_UNLIKELY(!query2.exec() || !query2.isSelect() || !query2.first())) {
+        if(Q_UNLIKELY(!query2.exec() || !query2.isSelect()
+                       || !query2.first())) {
             qCritical() << query2.lastQuery();
             throw DBError(qtTrId("user-query-progress-fail")
                           .arg(uid.ConvertToUint64()), query2.lastError());
             return std::nullopt;
         }
-        if(desiredPrevNode && Q_UNLIKELY(query2.value(0).toInt() != desiredPrevNode)) {
+        if(desiredPrevNode
+                && Q_UNLIKELY(query2.value(0).toInt() != desiredPrevNode)) {
             QByteArray msg = KP::serverBattleError(KP::FleetLost);
             senderM.sendMessage(connection, msg);
             return std::nullopt;
@@ -3024,13 +3078,15 @@ std::optional<QList<int>> Server::queryMapProgress(const CSteamID &uid,
                        " FROM UserAttr WHERE UserID = :id"
                        " AND Attribute = 'InBattle'");
         query3.bindValue(":id", uid.ConvertToUint64());
-        if(Q_UNLIKELY(!query3.exec() || !query3.isSelect() || !query3.first())) {
+        if(Q_UNLIKELY(!query3.exec() || !query3.isSelect()
+                       || !query3.first())) {
             qCritical() << query3.lastQuery();
             throw DBError(qtTrId("user-query-progress-fail")
                           .arg(uid.ConvertToUint64()), query3.lastError());
             return std::nullopt;
         }
-        if(Q_UNLIKELY(query3.value(0).toInt() != static_cast<int>(desiredState))) {
+        if(Q_UNLIKELY(query3.value(0).toInt()
+                       != static_cast<int>(desiredState))) {
             QByteArray msg = KP::serverBattleError(KP::FleetBusy);
             senderM.sendMessage(connection, msg);
             return std::nullopt;
@@ -3040,7 +3096,8 @@ std::optional<QList<int>> Server::queryMapProgress(const CSteamID &uid,
                        " FROM UserAttr WHERE UserID = :id"
                        " AND Attribute = 'ActiveFleet'");
         query4.bindValue(":id", uid.ConvertToUint64());
-        if(Q_UNLIKELY(!query4.exec() || !query4.isSelect() || !query4.first())) {
+        if(Q_UNLIKELY(!query4.exec() || !query4.isSelect()
+                       || !query4.first())) {
             qCritical() << query4.lastQuery();
             throw DBError(qtTrId("user-query-progress-fail")
                           .arg(uid.ConvertToUint64()), query4.lastError());
@@ -3190,8 +3247,8 @@ void Server::receivedAuth(const QJsonObject &djson,
                 }
 anti_ddos_initial_allowence:
                 if(!allowedPackets.contains(steamID)) {
-                    allowedPackets[steamID]
-                            = settings->value("server/packetallowed", 3600).toInt();
+                    allowedPackets[steamID] =
+                        settings->value("server/packetallowed", 3600).toInt();
                 }
                 delete [] rgubTicket;
                 return;
@@ -3288,8 +3345,10 @@ force_end_existing_battle:
             if(Q_UNLIKELY(!query.exec())) {
                 qCritical() << query.lastQuery();
                 //% "User %1: force end node battle failure!"
-                throw DBError(qtTrId("sortie-node-battle-failure-end-force").arg(uid.ConvertToUint64()),
-                              query.lastError());
+                throw DBError(
+                    qtTrId("sortie-node-battle-failure-end-force")
+                        .arg(uid.ConvertToUint64()),
+                    query.lastError());
                 return;
             }
         }
@@ -3305,8 +3364,10 @@ force_end_existing_sortie:
             if(Q_UNLIKELY(!query.exec())) {
                 qCritical() << query.lastQuery();
                 //% "User %1: start node battle failure!"
-                throw DBError(qtTrId("sortie-node-battle-failure").arg(uid.ConvertToUint64()),
-                              query.lastError());
+                throw DBError(
+                    qtTrId("sortie-node-battle-failure")
+                        .arg(uid.ConvertToUint64()),
+                    query.lastError());
                 return;
             }
         }
@@ -3359,7 +3420,8 @@ anti_ddos:
     allowedPackets[uid]--;
     if(allowedPackets[uid] < 0 && (!User::isSuperUser(uid))) {
         //% "User %1: packet rate exceeded!"
-        qCritical() << qtTrId("packet-rate-exceeded").arg(uid.ConvertToUint64());
+        qCritical() << qtTrId("packet-rate-exceeded")
+                       .arg(uid.ConvertToUint64());
         QByteArray msg = KP::serverLogout(KP::LogoutType::ViolatedRateLimit);
         senderM.sendMessage(connection, msg);
         connection->disconnectFromHost();
@@ -3487,11 +3549,13 @@ anti_ddos:
             defaultEquips.append(uid);
         }
         QUuid shipToRemodel = QUuid(djson["shiptoremodel"].toString());
-        doConstruct(uid, shipDef, defaultEquips, shipToRemodel, djson["factory"].toInt(), connection);
+        doConstruct(uid, shipDef, defaultEquips, shipToRemodel,
+                    djson["factory"].toInt(), connection);
     }
         break;
     case KP::CommandType::Fetch:
-        doFetch(uid, djson["factory"].toInt(), connection, djson["forced"].toBool());
+        doFetch(uid, djson["factory"].toInt(), connection,
+                djson["forced"].toBool());
         break;
     case KP::CommandType::Refresh:
         switch(djson["view"].toInt()) {
@@ -3507,12 +3571,14 @@ anti_ddos:
         }
         break;
     case KP::CommandType::Repair:
-        doRepair(uid, QUuid(djson["shipuuid"].toString()), djson["slotnum"].toInt(),
-                connection, djson["stop"].toBool(), djson["forced"].toBool());
+        doRepair(uid, QUuid(djson["shipuuid"].toString()),
+                 djson["slotnum"].toInt(), connection,
+                 djson["stop"].toBool(), djson["forced"].toBool());
         break;
     case KP::CommandType::DemandEquipInfo: {
         auto clientTime = QDateTime::fromString(djson["timestamp"].toString());
-        auto serverTime = settings->value("server/equipdbtimestamp").toDateTime();
+        auto serverTime =
+            settings->value("server/equipdbtimestamp").toDateTime();
         qint64 diff = clientTime.msecsTo(serverTime);
         if(diff > settings->value("server/cachetolerancemsec", 10000).toInt()) {
             QTimer::singleShot(100ms,
@@ -3523,12 +3589,10 @@ anti_ddos:
             connection->flush();
             QByteArray msg =
                     KP::serverEquipInfo(QJsonArray(),
-                                        false,
-                                        settings->value("server/equipdbtimestamp",
-                                                        QDateTime::currentDateTimeUtc()
-                                                        ).toDateTime(),
-                                        true
-                                        );
+                        false,
+                        settings->value("server/equipdbtimestamp",
+                            QDateTime::currentDateTimeUtc()).toDateTime(),
+                        true);
             senderM.sendMessage(connection, msg);
             connection->flush();
         }
@@ -3543,7 +3607,8 @@ anti_ddos:
         break;
     case KP::CommandType::DemandShipInfo: {
         auto clientTime = QDateTime::fromString(djson["timestamp"].toString());
-        auto serverTime = settings->value("server/shipdbtimestamp").toDateTime();
+        auto serverTime =
+            settings->value("server/shipdbtimestamp").toDateTime();
         qint64 diff = clientTime.msecsTo(serverTime);
         if(diff > settings->value("server/cachetolerancemsec", 10000).toInt()) {
             QTimer::singleShot(100ms,
@@ -3555,12 +3620,10 @@ anti_ddos:
             connection->flush();
             QByteArray msg =
                     KP::serverShipInfo(QJsonArray(),
-                                       false,
-                                       settings->value("server/shipdbtimestamp",
-                                                       QDateTime::currentDateTimeUtc()
-                                                       ).toDateTime(),
-                                       true
-                                       );
+                        false,
+                        settings->value("server/shipdbtimestamp",
+                            QDateTime::currentDateTimeUtc()).toDateTime(),
+                        true);
             senderM.sendMessage(connection, msg);
             connection->flush();
         }
@@ -3587,11 +3650,9 @@ anti_ddos:
             connection->flush();
             QByteArray msg =
                     KP::serverMapInfo(QJsonArray(),
-                                      settings->value("server/mapdbtimestamp",
-                                                      QDateTime::currentDateTimeUtc()
-                                                      ).toDateTime(),
-                                      true
-                                      );
+                        settings->value("server/mapdbtimestamp",
+                            QDateTime::currentDateTimeUtc()).toDateTime(),
+                        true);
             senderM.sendMessage(connection, msg);
             connection->flush();
         }
@@ -3658,7 +3719,8 @@ anti_ddos:
             for(auto equip: array) {
                 equips.append(QUuid(equip.toString()));
             }
-            QList<std::tuple<QUuid, int>> equipsReturned = modernizeEquip(uid, equips);
+            QList<std::tuple<QUuid, int>> equipsReturned =
+                modernizeEquip(uid, equips);
             QByteArray msg = KP::serverEquipImproved(equipsReturned);
             senderM.sendMessage(connection, msg);
         }
@@ -3704,7 +3766,8 @@ anti_ddos:
     case KP::CommandType::ProgressMap: {
         int mapId = djson["mapid"].toInt();
         int prevNode = djson["prevnode"].toInt();
-        progressMap(uid, connection, mapId, prevNode, djson["retreat"].toBool());
+        progressMap(uid, connection, mapId, prevNode,
+                    djson["retreat"].toBool());
     }
         break;
     case KP::CommandType::EnterBattleNode: {
@@ -3716,7 +3779,8 @@ anti_ddos:
         int mapId = djson["mapid"].toInt();
         int chosenNodeId = djson["chosennode"].toInt();
         try {
-            auto result = queryMapProgress(uid, connection, KP::AfterBattle, mapId);
+            auto result = queryMapProgress(uid, connection,
+                                           KP::AfterBattle, mapId);
             if(!result.has_value()) break;
             int nodeId = result.value()[1];
             int unionId = MapWithDiff::getUnionId(mapId);
@@ -3750,8 +3814,10 @@ anti_ddos:
             query.bindValue(":val", chosenNodeId);
             if(Q_UNLIKELY(!query.exec())) {
                 qCritical() << query.lastQuery();
-                throw DBError(qtTrId("sortie-progress-failure").arg(uid.ConvertToUint64())
-                              .arg(mapId), query.lastError());
+                throw DBError(
+                    qtTrId("sortie-progress-failure")
+                        .arg(uid.ConvertToUint64()).arg(mapId),
+                    query.lastError());
                 break;
             }
             QSqlQuery query2;
@@ -3761,8 +3827,10 @@ anti_ddos:
             query2.bindValue(":val", KP::BeforeBattle);
             if(Q_UNLIKELY(!query2.exec())) {
                 qCritical() << query2.lastQuery();
-                throw DBError(qtTrId("sortie-progress-failure").arg(uid.ConvertToUint64())
-                              .arg(mapId), query2.lastError());
+                throw DBError(
+                    qtTrId("sortie-progress-failure")
+                        .arg(uid.ConvertToUint64()).arg(mapId),
+                    query2.lastError());
                 break;
             }
             QByteArray msg = KP::serverMapProgress(mapId, chosenNodeId);
@@ -3869,7 +3937,8 @@ void Server::sendTestMessages() {
 }
 
 /* 4.6-Destruct.md */
-QList<QUuid> Server::retireEquip(const CSteamID &uid, const QList<QUuid> &trash) {
+QList<QUuid> Server::retireEquip(const CSteamID &uid,
+                                  const QList<QUuid> &trash) {
     QList<QUuid> result;
     QSqlDatabase db = QSqlDatabase::database();
     for(auto trashItem: trash) {
@@ -3937,7 +4006,8 @@ void Server::switchCert(const QStringList &input) {
                .arg(settings->value("networkserver/pem", "Default").toString());
 }
 
-KP::FleetFailType Server::updateFleet(const CSteamID &uid, const QJsonArray &input)
+KP::FleetFailType Server::updateFleet(const CSteamID &uid,
+                                      const QJsonArray &input)
 {
     QSqlDatabase db = QSqlDatabase::database();
     {
@@ -3975,7 +4045,8 @@ KP::FleetFailType Server::updateFleet(const CSteamID &uid, const QJsonArray &inp
                 (shipDataObj["fleettype"].toInt());
         QSqlQuery query;
         query.prepare("SELECT UserShip.ShipDef, UserShip.FleetIndex, "
-                      "UserShip.Exp+COALESCE(UserKCShip.Exp, 0), ExpCap FROM UserShip "
+                      "UserShip.Exp+COALESCE(UserKCShip.Exp, 0), "
+                      "ExpCap FROM UserShip "
                       "LEFT JOIN UserKCShip "
                       "ON UserShip.ShipUuid = UserKCShip.ShipUuid "
                       "WHERE User = :user AND UserShip.ShipUuid = :uuid");
@@ -4095,7 +4166,8 @@ KP::FleetFailType Server::updateFleet(const CSteamID &uid, const QJsonArray &inp
     for(const auto &shipData: input) {
         auto shipDataObj = shipData.toObject();
         Ship * ship = shipRegistry.value(
-                    User::getShipDef(QUuid(shipDataObj["uuid"].toString())), nullptr);
+                    User::getShipDef(
+                        QUuid(shipDataObj["uuid"].toString())), nullptr);
         QSqlQuery query;
         query.prepare("UPDATE UserShip SET FleetIndex = :fid, "
                       "FleetPosIndex = :fpid "
@@ -4114,8 +4186,9 @@ KP::FleetFailType Server::updateFleet(const CSteamID &uid, const QJsonArray &inp
         }
         for(int i = 0; i < KP::maxEquipSlots; ++i) {
             Equipment *equip = equipRegistry.value(
-                        User::getEquipDef(
-                            QUuid(shipDataObj["equip"].toArray()[i].toString())), nullptr);
+                        User::getEquipDef(QUuid(
+                            shipDataObj["equip"].toArray()[i].toString())),
+                        nullptr);
             if(ship && equip) {
                 if(!equip->canEquip(ship, lua)) {
                     //% "Ship %1 can't equip %2!"
@@ -4130,7 +4203,8 @@ KP::FleetFailType Server::updateFleet(const CSteamID &uid, const QJsonArray &inp
             query.prepare("UPDATE UserShip SET Slot"+QString::number(i+1)
                           +" = :euuid "
                            "WHERE ShipUuid = :uuid");
-            query.bindValue(":euuid", shipDataObj["equip"].toArray()[i].toString());
+            query.bindValue(":euuid",
+                shipDataObj["equip"].toArray()[i].toString());
             query.bindValue(":uuid", shipDataObj["uuid"].toString());
             if(Q_UNLIKELY(!query.exec())) {
                 qCritical() << query.lastQuery();
@@ -4142,13 +4216,14 @@ KP::FleetFailType Server::updateFleet(const CSteamID &uid, const QJsonArray &inp
         }
         {
             Equipment *equip = equipRegistry.value(
-                        User::getEquipDef(QUuid(shipDataObj["equip"].toArray()
-                                          [KP::maxEquipSlots].toString())), nullptr);
+                        User::getEquipDef(QUuid(
+                            shipDataObj["equip"].toArray()
+                            [KP::maxEquipSlots].toString())), nullptr);
             if(ship && equip) {
-                int shipLv = Ship::getLevel(shipExps[
-                                            QUuid(shipDataObj["uuid"].toString())
-                        ]);
-                if(shipLv < KP::levelUnlockExSlot || !equip->canEquipEX(ship, lua)) {
+                QUuid shipUuid = QUuid(shipDataObj["uuid"].toString());
+                int shipLv = Ship::getLevel(shipExps[shipUuid]);
+                if(shipLv < KP::levelUnlockExSlot
+                        || !equip->canEquipEX(ship, lua)) {
                     //% "Ship %1 can't equip %2 in extra slot!"
                     qWarning()
                             << qtTrId("ship-cant-equip-it-extra")
@@ -4221,8 +4296,9 @@ user_attr_sql:
         QSqlQuery insert;
         for (auto i = defaults.cbegin(), end = defaults.cend();
              i != end; ++i) {
-            if(!insert.prepare("INSERT INTO UserAttr (UserID, Attribute, Intvalue) "
-                               "VALUES (:uid, :attr, :value);")) {
+            if(!insert.prepare(
+                    "INSERT INTO UserAttr (UserID, Attribute, Intvalue) "
+                    "VALUES (:uid, :attr, :value);")) {
                 qWarning() << insert.lastError().databaseText();
             }
             insert.bindValue(":uid", uid.ConvertToUint64());

@@ -28,7 +28,7 @@ QVariant SpecEquipModel::data(const QModelIndex &index,
     Equipment *equipToDisplay = clientEquips[uidToDisplay];
     int starToDisplay = clientEquipStars[uidToDisplay];
 
-    Clientv2 &engine = Clientv2::getInstance();
+    Client &engine = Client::getInstance();
     bool ready = engine.isEquipRegistryCacheGood();
     if(!ready)
         return QVariant();
@@ -115,7 +115,8 @@ void SpecEquipModel::customSort() {
               [this](QUuid a, QUuid b)
               {
                   if(clientEquipStars[a] != clientEquipStars[b])
-                      /* as these equipments are to be eaten, lowest star first */
+                      /* as these equipments are to be eaten,
+                       * lowest star first */
                       return clientEquipStars[a] < clientEquipStars[b];
                   else
                       return a < b;

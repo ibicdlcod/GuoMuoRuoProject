@@ -17,7 +17,7 @@ BuyEquipDialog::BuyEquipDialog(QWidget *parent)
 
     auto *layout = new QVBoxLayout(this);
 
-    Clientv2 &engine = Clientv2::getInstance();
+    Client &engine = Client::getInstance();
     //% "ARD Coupons: %1"
     layout->addWidget(new QLabel(
         qtTrId("shop-ard-balance").arg(engine.ardCouponCache), this));
@@ -39,7 +39,8 @@ BuyEquipDialog::BuyEquipDialog(QWidget *parent)
                 .arg(equip->toString())
                 .arg(static_cast<int>(equip->getStorePrice())));
         item->setData(Qt::UserRole, equip->getId());
-        item->setData(Qt::UserRole + 1, static_cast<int>(equip->getStorePrice()));
+        item->setData(Qt::UserRole + 1,
+                      static_cast<int>(equip->getStorePrice()));
         equipList->addItem(item);
     }
     layout->addWidget(equipList);
@@ -82,7 +83,7 @@ void BuyEquipDialog::purchase() {
     QList<QListWidgetItem *> sel = equipList->selectedItems();
     if(sel.isEmpty()) return;
     int equipId = sel.first()->data(Qt::UserRole).toInt();
-    Clientv2 &engine = Clientv2::getInstance();
+    Client &engine = Client::getInstance();
     engine.doBuyFromStore(equipId);
     accept();
 }

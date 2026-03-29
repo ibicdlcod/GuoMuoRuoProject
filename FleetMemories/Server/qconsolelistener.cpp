@@ -38,7 +38,8 @@ QConsoleListener::QConsoleListener(bool consolemode)
     m_notifier = new QSocketNotifier(fileno(stdin), QSocketNotifier::Read);
 #endif
     // NOTE : move to thread because std::getline blocks,
-    //        then we sync with main thread using a QueuedConnection with finishedGetLine
+    //        then we sync with main thread using a QueuedConnection
+    //        with finishedGetLine
     m_notifier->moveToThread(&m_thread);
     connect(
         &m_thread , &QThread::finished,
@@ -51,7 +52,9 @@ QConsoleListener::QConsoleListener(bool consolemode)
     connect(m_notifier, &QSocketNotifier::activated, this,
 #endif
             [this]() {
-                /* the following is different from the original at https://github.com/juangburgos/QConsoleListener/blob/master/src/qconsolelistener.cpp
+                /* the following is different from the original at
+                 * https://github.com/juangburgos/QConsoleListener/
+                 * blob/master/src/qconsolelistener.cpp
                  * becase windows console can't handle unicode
                  */
                 QString res;
@@ -66,9 +69,11 @@ QConsoleListener::QConsoleListener(bool consolemode)
                                      buf, bufsize, &read, NULL);
                         res += QString::fromWCharArray(buf, read);
                     } while (read > 0 && res[res.length() - 1] != '\n');
-                    // could just do res.truncate(res.length() - 2), but better be safe
+                    // could just do res.truncate(res.length() - 2),
+                    // but better be safe
                     while (res.length() > 0
-                           && (res[res.length() - 1] == '\r' || res[res.length() - 1] == '\n'))
+                           && (res[res.length() - 1] == '\r'
+                               || res[res.length() - 1] == '\n'))
                         res.truncate(res.length() - 1);
                 }
                 else
@@ -101,7 +106,8 @@ void QConsoleListener::on_finishedGetLine(const QString &strNewLine)
 
 void QConsoleListener::exit()
 {
-    /* fuck my life, different COMPILERS (as opposed to operating systems) behaves differently */
+    /* fuck my life, different COMPILERS (as opposed to operating systems)
+     * behaves differently */
 #if defined(_MSC_VER)
     /* apparently nothing to do */
 #endif

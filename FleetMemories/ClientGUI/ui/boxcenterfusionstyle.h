@@ -8,7 +8,8 @@
 #include <QProxyStyle>
 #include <QStyleOptionViewItem>
 
-/* source: https://forum.qt.io/topic/94049/how-to-center-a-column-with-a-checkbox-in-qtableview/12 */
+/* source: https://forum.qt.io/topic/94049/
+ * how-to-center-a-column-with-a-checkbox-in-qtableview/12 */
 
 enum {
     CheckAlignmentRole = Qt::UserRole
@@ -22,7 +23,8 @@ public:
     QRect subElementRect(QStyle::SubElement element,
                          const QStyleOption *option,
                          const QWidget *widget) const override {
-        const QRect baseRes = QProxyStyle::subElementRect(element, option, widget);
+        const QRect baseRes =
+            QProxyStyle::subElementRect(element, option, widget);
         const QRect itemRect = option->rect;
         QRect retval = baseRes;
         QSize sz = baseRes.size();
@@ -36,7 +38,8 @@ public:
                 const uint alignFlag = alignData.toUInt();
                 if (alignFlag & Qt::AlignHCenter) {
                     if (element == SE_ItemViewItemCheckIndicator) {
-                        int x = itemRect.x() + (itemRect.width()/2) - (baseRes.width()/2);
+                        int x = itemRect.x() + (itemRect.width()/2)
+                                 - (baseRes.width()/2);
                         retval = QRect( QPoint(x, baseRes.y()), sz);
                     } else if (element == SE_ItemViewItemFocusRect) {
                         sz.setWidth(baseRes.width()+baseRes.x());

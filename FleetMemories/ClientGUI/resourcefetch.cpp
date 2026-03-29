@@ -32,13 +32,16 @@ void ResourceFetch::startRequest(const QUrl &requestedUrl)
     reply.reset(qnam.get(QNetworkRequest(url)));
     //! [qnam-download]
     //! [connecting-reply-to-slots]
-    connect(reply.get(), &QNetworkReply::finished, this, &ResourceFetch::httpFinished);
+    connect(reply.get(), &QNetworkReply::finished,
+            this, &ResourceFetch::httpFinished);
     //! [networkreply-readyread-1]
-    connect(reply.get(), &QIODevice::readyRead, this, &ResourceFetch::httpReadyRead);
+    connect(reply.get(), &QIODevice::readyRead,
+            this, &ResourceFetch::httpReadyRead);
     //! [networkreply-readyread-1]
 #if QT_CONFIG(ssl)
     //! [sslerrors-1]
-    connect(reply.get(), &QNetworkReply::sslErrors, this, &ResourceFetch::sslErrors);
+    connect(reply.get(), &QNetworkReply::sslErrors,
+            this, &ResourceFetch::sslErrors);
     //! [sslerrors-1]
 #endif
     //! [connecting-reply-to-slots]
@@ -66,7 +69,8 @@ void ResourceFetch::downloadFile(const QString &urlSpec,
     if(!QDir(directory).exists()) {
         QDir().mkdir(directory);
     }
-    bool useDirectory = !downloadDirectory.isEmpty() && QFileInfo(downloadDirectory).isDir();
+    bool useDirectory = !downloadDirectory.isEmpty()
+                        && QFileInfo(downloadDirectory).isDir();
     if (useDirectory)
         fileName.prepend(downloadDirectory + '/');
 
@@ -118,7 +122,8 @@ void ResourceFetch::httpFinished()
     //! [networkreply-error-handling-2]
     if (error != QNetworkReply::NoError) {
         QFile::remove(fi.absoluteFilePath());
-        // For "request aborted" we handle the label and button in cancelDownload()
+        // For "request aborted" we handle the label and button
+        // in cancelDownload()
         if (!httpRequestAborted) {
             //% "Download failed: %1"
             qCritical() << qtTrId("download-failed").arg(errorString);
@@ -131,7 +136,8 @@ void ResourceFetch::httpFinished()
     //% "Downloaded %1 bytes to %2 in %3"
     qInfo() << qtTrId("download-success")
                    .arg(fi.size())
-                   .arg(fi.fileName(), QDir::toNativeSeparators(fi.absolutePath()));
+                   .arg(fi.fileName(),
+                        QDir::toNativeSeparators(fi.absolutePath()));
     QTimer::singleShot(100ms, this, [this](){emit finished();});
 }
 

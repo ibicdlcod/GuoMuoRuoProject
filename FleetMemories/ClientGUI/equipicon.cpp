@@ -39,7 +39,8 @@ QIcon Icute::shipTypeIcon(int shipId, bool isRound = false) {
             for (int x = 0; x < image.width(); ++x) {
                 QColor color = image.pixelColor(x, y);
                 // Invert RGB components, keeping alpha channel as is
-                color.setRgb(255 - color.red(), 255 - color.green(), 255 - color.blue(), color.alpha());
+                color.setRgb(255 - color.red(), 255 - color.green(),
+                             255 - color.blue(), color.alpha());
                 image.setPixelColor(x, y, color);
             }
         }
@@ -67,8 +68,9 @@ QPixmap Icute::shipIcon(int oldInternalId) {
     for (int y = 0; y < image.height(); ++y) {
         for (int x = 0; x < image.width(); ++x) {
             QColor color = image.pixelColor(x, y);
-            int alpha = std::hypot(x - image.width() / 2.0, y - image.width() / 2.0)
-                                > image.width() / 2.0 ? 0 : color.alpha();
+            int alpha =
+                std::hypot(x - image.width() / 2.0, y - image.width() / 2.0)
+                > image.width() / 2.0 ? 0 : color.alpha();
             color.setRgb(color.red(), color.green(), color.blue(), alpha);
             image.setPixelColor(x, y, color);
         }

@@ -16,7 +16,8 @@ class ChooseHomePort : public QDialog
     Q_OBJECT
 
 public:
-    explicit ChooseHomePort(QWidget *parent = nullptr, const QJsonObject input = QJsonObject());
+    explicit ChooseHomePort(QWidget *parent = nullptr,
+                            const QJsonObject input = QJsonObject());
     ~ChooseHomePort();
 
 signals:

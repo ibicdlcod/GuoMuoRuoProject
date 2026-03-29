@@ -16,9 +16,11 @@ LicenseArea::LicenseArea(QWidget *parent) :
 
     /* this is done instead of in *.ui for it does not cascade */
     ui->LicenseText->setObjectName("licenseText");
-    ui->LicenseText->setStyleSheet("QTextBrowser#licenseText { border-style: none; }");
+    ui->LicenseText->setStyleSheet(
+        "QTextBrowser#licenseText { border-style: none; }");
     ui->BelowLicense->setObjectName("belowLicense");
-    ui->BelowLicense->setStyleSheet("QFrame#belowLicense { border-style: none }");
+    ui->BelowLicense->setStyleSheet(
+        "QFrame#belowLicense { border-style: none }");
     ui->Naganami->setObjectName("naganami");
     ui->Naganami->setStyleSheet("QTextBrowser#naganami { border-style: none }");
 

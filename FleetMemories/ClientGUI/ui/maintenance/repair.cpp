@@ -88,7 +88,7 @@ Repair::Repair(QWidget *parent)
         }
     }
     for (int i = 0; i < lay->count(); ++i) {
-        // Get the layout item (which could be a widget item or another layout item)
+        // Get the layout item (widget item or another layout item)
         QLayoutItem* item = lay->itemAt(i);
         if (item->widget()) {
             // Set the alignment for the individual widget
@@ -97,13 +97,13 @@ Repair::Repair(QWidget *parent)
     }
     ui->RepairArea->setLayout(lay);
 
-    Clientv2 &engine = Clientv2::getInstance();
-    connect(&engine, &Clientv2::receivedRepairRefresh,
+    Client &engine = Client::getInstance();
+    connect(&engine, &Client::receivedRepairRefresh,
             this, &Repair::doRepairRefresh);
     connect(this, &Repair::shipToRepair,
-            &engine, &Clientv2::doRepair);
+            &engine, &Client::doRepair);
     connect(this, &Repair::shipStopRepair,
-            &engine, &Clientv2::doStopRepair);
+            &engine, &Client::doStopRepair);
 }
 
 Repair::~Repair()
@@ -121,7 +121,7 @@ void Repair::doRepairRefresh(const QJsonObject &input) {
         item["maxhp"] = query.value(4).toInt();
         item["shipuuid"] = query.value(5).toUuid().toString();
         */
-    Clientv2 &engine = Clientv2::getInstance();
+    Client &engine = Client::getInstance();
     QJsonArray content = input["content"].toArray();
     for(int i = 0; i < content.size(); ++i) {
         QJsonObject item = content[i].toObject();
@@ -184,7 +184,7 @@ void Repair::repairClicked(bool checked, int slotnum) {
     Q_UNUSED(checked)
 
     static constexpr int viewMinimumHeight = 500;
-    Clientv2 &engine = Clientv2::getInstance();
+    Client &engine = Client::getInstance();
     if(slotfs[slotnum]->isComplete()) {
         engine.doRefreshDock();
         return;
@@ -229,7 +229,7 @@ void Repair::repairClicked(bool checked, int slotnum) {
         view->update();
         connect(view, &EquipView::shipSelected,
                 this, [this, slotnum, view](QUuid id){
-                    Clientv2 &engine = Clientv2::getInstance();
+                    Client &engine = Client::getInstance();
                     if(engine.shipModel.isShipFullHP(id)) {
                         //% "Ship does not need repairs."
                         qWarning() << qtTrId("ship-at-full-health");
@@ -249,7 +249,7 @@ void Repair::forceRepair(int slotnum) {
     msgBox.exec();
     int result = msgBox.result();
     if(result & QMessageBox::Ok) {
-        Clientv2 &engine = Clientv2::getInstance();
+        Client &engine = Client::getInstance();
         engine.doForceRepair(slotnum);
     }
 }

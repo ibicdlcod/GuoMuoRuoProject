@@ -168,17 +168,21 @@ void ShipSelect::typeBoxHinted(QStringList &types) {
     }
     if(factoryArea == nullptr)
         return;
-    if(factoryArea->getState() == KP::Anchorage && qobject_cast<ShipBPModel *>(QObject::sender())) {
+    if(factoryArea->getState() == KP::Anchorage
+       && qobject_cast<ShipBPModel *>(QObject::sender())) {
         return;
     }
-    if(fleetView && fleetView->isVisible() && qobject_cast<ShipBPModel *>(QObject::sender())) {
+    if(fleetView && fleetView->isVisible()
+       && qobject_cast<ShipBPModel *>(QObject::sender())) {
         return;
     }
-    if(factoryArea->getState() == KP::BlueprintView && !qobject_cast<ShipBPModel *>(QObject::sender())) {
+    if(factoryArea->getState() == KP::BlueprintView
+       && !qobject_cast<ShipBPModel *>(QObject::sender())) {
         return;
     }
     /* disconnect to eliminate infinite recursion */
-    disconnect(qobject_cast<ShipModel *>(QObject::sender()), &ShipModel::typeBoxHint,
+    disconnect(qobject_cast<ShipModel *>(QObject::sender()),
+               &ShipModel::typeBoxHint,
                this, &ShipSelect::typeBoxHinted);
     types.removeOne(qtTrId("all-shiptypes"));
     std::sort(types.begin(), types.end(), [](QString a, QString b)
@@ -188,8 +192,9 @@ void ShipSelect::typeBoxHinted(QStringList &types) {
     typeBox->addItems(types);
     classBox->clear();
     update();
-    connect(qobject_cast<ShipModel *>(QObject::sender()), &ShipModel::typeBoxHint,
-               this, &ShipSelect::typeBoxHinted);
+    connect(qobject_cast<ShipModel *>(QObject::sender()),
+            &ShipModel::typeBoxHint,
+            this, &ShipSelect::typeBoxHinted);
 }
 
 void ShipSelect::classBoxHinted(QStringList &classes) {
@@ -207,17 +212,21 @@ void ShipSelect::classBoxHinted(QStringList &classes) {
     }
     if(factoryArea == nullptr)
         return;
-    if(factoryArea->getState() == KP::Anchorage && qobject_cast<ShipBPModel *>(QObject::sender())) {
+    if(factoryArea->getState() == KP::Anchorage
+       && qobject_cast<ShipBPModel *>(QObject::sender())) {
         return;
     }
-    if(fleetView && fleetView->isVisible() && qobject_cast<ShipBPModel *>(QObject::sender())) {
+    if(fleetView && fleetView->isVisible()
+       && qobject_cast<ShipBPModel *>(QObject::sender())) {
         return;
     }
-    if(factoryArea->getState() == KP::BlueprintView && !qobject_cast<ShipBPModel *>(QObject::sender())) {
+    if(factoryArea->getState() == KP::BlueprintView
+       && !qobject_cast<ShipBPModel *>(QObject::sender())) {
         return;
     }
     /* disconnect to eliminate infinite recursion */
-    disconnect(qobject_cast<ShipModel *>(QObject::sender()), &ShipModel::classBoxHint,
+    disconnect(qobject_cast<ShipModel *>(QObject::sender()),
+               &ShipModel::classBoxHint,
                this, &ShipSelect::classBoxHinted);
     classes.removeOne(qtTrId("all-shipclasses"));
     std::sort(classes.begin(), classes.end(), [](QString a, QString b)
@@ -226,6 +235,7 @@ void ShipSelect::classBoxHinted(QStringList &classes) {
     classBox->addItem(qtTrId("all-shipclasses"));
     classBox->addItems(classes);
     update();
-    connect(qobject_cast<ShipModel *>(QObject::sender()), &ShipModel::classBoxHint,
+    connect(qobject_cast<ShipModel *>(QObject::sender()),
+            &ShipModel::classBoxHint,
             this, &ShipSelect::classBoxHinted);
 }

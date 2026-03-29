@@ -4,12 +4,20 @@
 #ifndef KP_H
 #define KP_H
 
-#define M_CONST __FILE__ QT_STRINGIFY(:__LINE__: MAGICCONSTANT UNDESIREABLE NO 1)
-#define NOT_M_CONST __FILE__ QT_STRINGIFY(:__LINE__: This is considered an integral part of the program rather than magic constants.)
+#define M_CONST \
+    __FILE__ QT_STRINGIFY(:__LINE__: MAGICCONSTANT UNDESIREABLE NO 1)
+#define NOT_M_CONST \
+    __FILE__ QT_STRINGIFY(:__LINE__: This is considered an integral \
+part of the program rather than magic constants.)
 #define SALT_FISH __FILE__ QT_STRINGIFY(:__LINE__: This is a salt fish.)
-#define SECRET __FILE__ QT_STRINGIFY(:__LINE__: Go make your own steam app if modding!)
-#define USED_CXX17 __FILE__ QT_STRINGIFY(:__LINE__: This part uses C++ 17 features. Use macro "__cplusplus" to check whether your compiler supports it.)
-#define USED_CXX23 __FILE__ QT_STRINGIFY(:__LINE__: This part uses C++ 23 features. Use macro "__cplusplus" to check whether your compiler supports it.)
+#define SECRET \
+    __FILE__ QT_STRINGIFY(:__LINE__: Go make your own steam app if modding!)
+#define USED_CXX17 \
+    __FILE__ QT_STRINGIFY(:__LINE__: This part uses C++ 17 features. \
+Use macro "__cplusplus" to check whether your compiler supports it.)
+#define USED_CXX23 \
+    __FILE__ QT_STRINGIFY(:__LINE__: This part uses C++ 23 features. \
+Use macro "__cplusplus" to check whether your compiler supports it.)
 #define PRODUCTION_ENV 0
 
 #include <QObject>
@@ -29,7 +37,8 @@ class ResOrd;
 
 /* OS Specific */
 #if defined (Q_OS_WIN)
-#define NOMINMAX // apparently some stupid win header <minwindef.h> interferes with std::max
+// apparently some stupid win header <minwindef.h> interferes with std::max
+#define NOMINMAX
 #include <windows.h>
 #ifndef ENABLE_VIRTUAL_TERMINAL_PROCESSING
 #define ENABLE_VIRTUAL_TERMINAL_PROCESSING 0x0004
@@ -348,9 +357,14 @@ enum AllegianceGroup{
     Chinese = 0x8,
     Benelux = 0x9,
     Nordic = 0xA,
-    Commonwealth = 0xB, /* British control in WWII, not actual membership in current Commonwealth */
-    Latino = 0xC, // Iberian or Latin American, or Spanish and Portuguese controlled territories in WWII elsewhere
-    EasternEuropean = 0xD, // Some Western/Central European countries such as Switzerland get lumped here, but all are landlocked
+    /* British control in WWII, not actual membership in current Commonwealth */
+    Commonwealth = 0xB,
+    // Iberian or Latin American, or Spanish and Portuguese controlled
+    // territories in WWII elsewhere
+    Latino = 0xC,
+    // Some Western/Central European countries such as Switzerland get
+    // lumped here, but all are landlocked
+    EasternEuropean = 0xD,
     MinorAsian = 0xE,
     Fantasy = 0xF
 };
@@ -361,21 +375,27 @@ enum AllegianceSubGroup{
     DJapanese = 0x10,
     /* Ships named after islands that have huge distance to Japanese mainland */
     DJapaneseOutlying = 0x1D,
-    /* Ships named after places that are not treated as Japanese by Allied nations */
+    /* Ships named after places that are not treated as Japanese
+     * by Allied nations */
     DJapaneseExterior = 0x1E,
-    /* Ships named after places in Okinawa Pref. or southernmost islands in Kagoshima Pref.
-     * (Does not prevent said ships being counted as Japanese anywhere in game rules) */
+    /* Ships named after places in Okinawa Pref. or southernmost
+     * islands in Kagoshima Pref.
+     * (Does not prevent said ships being counted as Japanese
+     * anywhere in game rules) */
     DRyukyuan = 0x1F,
     DGerman = 0x20,
-    /* Austria-connected LBAS or WWI Austro-Hungarian navy (that did not qualify for other subgroups) might go here */
+    /* Austria-connected LBAS or WWI Austro-Hungarian navy
+     * (that did not qualify for other subgroups) might go here */
     DAustrian = 0x2C,
     DItalian = 0x30,
     DAlbanian = 0x3A,
-    /* Italian colonies and subsequent independent counties; not other East African countries */
+    /* Italian colonies and subsequent independent counties;
+     * not other East African countries */
     DEastAfrican = 0x3E,
     DLibyan = 0x3F,
     DAmerican = 0x40,
-    /* American unincorporated territories, states that have COFA with USA, as well as Liberia goes here */
+    /* American unincorporated territories, states that have COFA with
+     * USA, as well as Liberia goes here */
     DAmericanAssociates = 0x4E,
     DFilipino = 0x4F,
     /* have a whole 0xB? space for British Empire territories in WWII */
@@ -389,7 +409,8 @@ enum AllegianceSubGroup{
     DOtherFrancophone = 0x6E,
     DSovietOrRussian = 0x70,
     DUkrainian = 0x7C,
-    /* Except from Russian and Ukrainian above, all founding members of CIS is included ignoring any later withdrawal */
+    /* Except from Russian and Ukrainian above, all founding members of
+     * CIS is included ignoring any later withdrawal */
     DCIS = 0x7E,
     DChineseNationalist = 0x80, /* Nanjing/Taipei regime goes here */
     DChineseMonarchical = 0x86, /* Qing/"Manchukuo" goes here */
@@ -400,7 +421,8 @@ enum AllegianceSubGroup{
     DDutch = 0x98,
     DDutchSpeakingAmericas = 0x9A,
     DBelgian = 0x9B,
-    /* Belgian colonies and subsequent independent counties; not other Central African contries */
+    /* Belgian colonies and subsequent independent counties;
+     * not other Central African contries */
     DCentralAfrican = 0x9D,
     DBeneluxOther = 0x9F,
     DSwedish = 0xA0,
@@ -435,7 +457,8 @@ enum AllegianceSubGroup{
     DColumbianOrEcuadoran = 0xCC,
     DVenezuelan = 0xCD,
     DOtherLatinAmerican = 0xCE,
-    /* Spanish and Portuguese controlled territories at the time of WWII outside Latin America */
+    /* Spanish and Portuguese controlled territories at the time of
+     * WWII outside Latin America */
     DOtherLatino = 0xCF,
     DYugoslavian = 0xD0,
     DPolish = 0xD2,
@@ -444,7 +467,8 @@ enum AllegianceSubGroup{
     DRomanian = 0xD8,
     DTurkish = 0xDA,
     DBaltic = 0xDC,
-    /* Not 0xEC for it does not participate in many Asian organizations, like Armenia */
+    /* Not 0xEC for it does not participate in many Asian
+     * organizations, like Armenia */
     DIsraeli = 0xDE,
     DOtherEuropean = 0xDF,
     DThai = 0xE0,

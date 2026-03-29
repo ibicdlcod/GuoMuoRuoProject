@@ -10,7 +10,8 @@
 extern std::unique_ptr<QSettings> settings;
 
 enum {
-    CheckAlignmentRole = Qt::UserRole + Qt::CheckStateRole + Qt::TextAlignmentRole
+    CheckAlignmentRole =
+        Qt::UserRole + Qt::CheckStateRole + Qt::TextAlignmentRole
 };
 
 ShipModel::ShipModel(QObject *parent, bool isInArsenal)
@@ -83,7 +84,8 @@ void ShipModel::switchShipDisplayType(const QString &nationality,
             if(shiptype.isEmpty() && shipclass.isEmpty()) {
                 if(pass) {
                     QString type = iter->second->getType().toString();
-                    if(!typePasses.contains(type) && true/*type != qtTrId("all-shiptypes")*/) {
+                    if(!typePasses.contains(type)
+                       && true/*type != qtTrId("all-shiptypes")*/) {
                         typePasses.append(type);
                     }
                 }
@@ -103,7 +105,8 @@ void ShipModel::switchShipDisplayType(const QString &nationality,
             }
             if(shipclass.isEmpty()) {
                 if(pass) {
-                    if(!classPasses.contains(classText) && true/*classText != qtTrId("all-shipclasses")*/) {
+                    if(!classPasses.contains(classText)
+                       && true/*classText != qtTrId("all-shipclasses")*/) {
                         classPasses.append(classText);
                     }
                 }
@@ -136,7 +139,7 @@ void ShipModel::switchShipDisplayType(const QString &nationality,
 void ShipModel::addShip(QUuid uid, int def, int hp) {
     bpCacheRefresh();
     int oldRowCount = rowCount();
-    Clientv2 &engine = Clientv2::getInstance();
+    Client &engine = Client::getInstance();
     clientShips[uid] = engine.getShipReg(def);
     clientShipDynamicAttrs[uid] = new ShipDynamic(hp, this);
     sortedShipIds.append(uid);
@@ -159,7 +162,8 @@ void ShipModel::enactModernize() {
     emit modernizeRequest(candidates);
 }
 
-void ShipModel::modernizedShips(const QList<std::tuple<QUuid, int>> &modernized) {
+void ShipModel::modernizedShips(
+    const QList<std::tuple<QUuid, int>> &modernized) {
     QList<std::tuple<int, int>> modernizedDiff;
     for(auto item: modernized) {
         auto shipUid = std::get<0>(item);
@@ -170,7 +174,7 @@ void ShipModel::modernizedShips(const QList<std::tuple<QUuid, int>> &modernized)
         int diffstar = newstar - oldstar;
         modernizedDiff.append(std::make_tuple(shipDef, diffstar));
     }
-    Clientv2::getInstance().shipBPModel.modernizedShips(modernizedDiff);
+    Client::getInstance().shipBPModel.modernizedShips(modernizedDiff);
     bpCacheRefresh();
     wholeTableChanged();
 }
@@ -178,7 +182,7 @@ void ShipModel::modernizedShips(const QList<std::tuple<QUuid, int>> &modernized)
 void ShipModel::modifyShip(QUuid uid, int def, int hp, bool disabling) {
     bpCacheRefresh();
     int oldRowCount = rowCount();
-    Clientv2 &engine = Clientv2::getInstance();
+    Client &engine = Client::getInstance();
     if(disabling && clientShipDynamicAttrs.contains(uid)) {
         clientShipDynamicAttrs[uid]->fleetIndex = KP::disabledShip;
     }
@@ -207,7 +211,7 @@ void ShipModel::updateShipList(const QJsonObject &input) {
     clientShips.clear();
     sortedShipIds.clear();
     int oldRowCount = rowCount();
-    Clientv2 &engine = Clientv2::getInstance();
+    Client &engine = Client::getInstance();
     if(engine.isShipRegistryCacheGood()) {
         QJsonArray inputArray = input["content"].toArray();
         for(const QJsonValueRef item: inputArray) {
@@ -261,7 +265,7 @@ QVariant ShipModel::data(const QModelIndex &index,
     Ship *shipToDisplay = clientShips[uidToDisplay];
     ShipDynamic *attr = clientShipDynamicAttrs[uidToDisplay];
 
-    Clientv2 &engine = Clientv2::getInstance();
+    Client &engine = Client::getInstance();
     bool ready = engine.isEquipRegistryCacheGood();
     if(!ready)
         return QVariant();
@@ -310,8 +314,8 @@ QVariant ShipModel::data(const QModelIndex &index,
             return attr->condition;
         }
         else if(index.column() == levelColumn()) {
-            int displayExp = std::min(attr->exp, attr->expCap);
-            return Ship::getLevel(displayExp);
+            return QString::number(Ship::getLevel(attr->exp))
+                   + "/" + QString::number(Ship::getLevel(attr->expCap));
         }
         else if(index.column() == fleetPosColumn()) {
             if(attr->fleetIndex == -1 && attr->fleetPosIndex == -1) {
@@ -369,7 +373,7 @@ QVariant ShipModel::data(const QModelIndex &index,
             return qtTrId("ship-cond");
         }
         else if(index.column() == levelColumn()) {
-            //% "Level"
+            //% "Level/MaxLv"
             return qtTrId("ship-lv");
         }
         else if(index.column() == fleetPosColumn()) {
@@ -532,20 +536,23 @@ Qt::ItemFlags ShipModel::flags(const QModelIndex &index) const {
         Ship *shipToDisplay = clientShips[uidToDisplay];
         int bpNum = bpCache[shipToDisplay->getId()];
         if(bpNum == 0) {
-            return static_cast<QFlags<Qt::ItemFlag>>
-                (QAbstractTableModel::flags(index) // clazy:exclude=skipped-base-method
-                 | Qt::ItemIsUserCheckable
-                       & (~Qt::ItemIsEnabled));
+            // clazy:exclude=skipped-base-method
+            return static_cast<QFlags<Qt::ItemFlag>>(
+                QAbstractTableModel::flags(index)
+                | Qt::ItemIsUserCheckable
+                      & (~Qt::ItemIsEnabled));
         }
         else {
-            return QAbstractTableModel::flags(index) // clazy:exclude=skipped-base-method
+            // clazy:exclude=skipped-base-method
+            return QAbstractTableModel::flags(index)
                    | Qt::ItemIsUserCheckable
                    | Qt::ItemIsEnabled;
 
         }
     }
     else {
-        return QAbstractTableModel::flags(index); // clazy:exclude=skipped-base-method
+        // clazy:exclude=skipped-base-method
+        return QAbstractTableModel::flags(index);
     }
 }
 
@@ -619,14 +626,17 @@ void ShipModel::customSort() {
 
 int ShipModel::numberOfColumns() const {
     if(isInArsenal) {
-        return 8; // ShipUuid Shipname Star CurrentHP Condition Level FleetPos Hiddensort
+        // ShipUuid Shipname Star CurrentHP Condition Level FleetPos Hiddensort
+        return 8;
     }
     else
-        return 9; // ShipUuid Shipname Star CurrentHP Condition Level FleetPos Select Hiddensort
+        // ShipUuid Shipname Star CurrentHP Condition Level FleetPos
+        // Select Hiddensort
+        return 9;
 }
 
 void ShipModel::bpCacheRefresh() {
-    Clientv2 &engine = Clientv2::getInstance();
+    Client &engine = Client::getInstance();
     bpCache = engine.shipBPModel.getClientShipBPs();
 }
 

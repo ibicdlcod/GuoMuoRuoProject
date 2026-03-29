@@ -28,7 +28,8 @@ void InteractiveLabel::mouseReleaseEvent(QMouseEvent *event)
 {
     static constexpr int viewMinimumHeight = 500;
     if (event->button() == Qt::LeftButton && mousePressedInside) {
-        if (rect().contains(event->pos())) { // Check if release occurred within widget
+        // Check if release occurred within widget
+        if (rect().contains(event->pos())) {
             EquipView *view = parentView->equipView;
             view->activate(false, false);
             view->setMinimumHeight(viewMinimumHeight);
@@ -62,7 +63,7 @@ void InteractiveLabel::paintEvent(QPaintEvent * /* event */)
         ; // remains 0
     }
     else {
-        Clientv2 &engine = Clientv2::getInstance();
+        Client &engine = Client::getInstance();
         auto [ship, shipattr] = engine.shipModel.getShip(shipUId);
         if(ship == nullptr
             || !ship->attr.contains("OldInternalNo.")) {

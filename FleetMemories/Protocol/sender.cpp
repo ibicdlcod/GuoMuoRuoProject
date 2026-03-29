@@ -93,11 +93,12 @@ void Sender::send() {
 
         m_partnum = 0;
         m_partnumtotal = 0;
-        QTimer::singleShot(std::chrono::milliseconds(
-                               settings->value(
-                                           "networkshared/mintimebetweenmsgsinms",
-                                           0).toInt()),
-                           this, &Sender::switchtoReady);
+        QTimer::singleShot(
+            std::chrono::milliseconds(
+                settings->value(
+                    "networkshared/mintimebetweenmsgsinms",
+                    0).toInt()),
+            this, &Sender::switchtoReady);
         return;
     }
     if(m_partnum == 0 && m_source->bytesAvailable()) {

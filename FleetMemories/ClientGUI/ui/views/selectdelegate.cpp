@@ -81,7 +81,8 @@ bool SelectDelegate::getDisabled(const QModelIndex &index) const {
     bool button_disabled = false;
     if(qobject_cast<const ShipModel *>(index.model())) {
         const ShipModel *model = qobject_cast<const ShipModel *>(index.model());
-        QString str = model->data(model->index(index.row(), model->fleetPosColumn()),
+        QString str = model->data(
+            model->index(index.row(), model->fleetPosColumn()),
                                   Qt::DisplayRole).toString();
         if(str == qtTrId("fleet-disabled")) {
             button_disabled = true;

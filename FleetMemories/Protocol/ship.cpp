@@ -37,7 +37,8 @@ Ship::Ship(int shipId, QObject *parent)
         QSqlQuery query;
         query.prepare(
             "SELECT value FROM ShipName "
-            "WHERE ShipID = :id AND lang = :lang AND textattr = 'shipclasstext'");
+            "WHERE ShipID = :id AND lang = :lang"
+            " AND textattr = 'shipclasstext'");
         query.bindValue(":id", shipId);
         query.bindValue(":lang", lang);
         if(!query.exec() || !query.isSelect()) {
@@ -54,7 +55,8 @@ Ship::Ship(int shipId, QObject *parent)
         QSqlQuery query;
         query.prepare(
             "SELECT value FROM ShipName "
-            "WHERE ShipID = :id AND lang = :lang AND textattr = 'shipordertext'");
+            "WHERE ShipID = :id AND lang = :lang"
+            " AND textattr = 'shipordertext'");
         query.bindValue(":id", shipId);
         query.bindValue(":lang", lang);
         if(!query.exec() || !query.isSelect()) {
@@ -151,7 +153,8 @@ const int Ship::consTimeInSec() const {
     double ctrl = settings->value("rule/techfactorcontroller", 5.0).toDouble();
     qint64 devTimebase = getType().consTimeBase();
     qint64 devResScale = settings->value("rule/devresscale", 10).toLongLong();
-    double techFactor = getTech() * getTech() / std::hypot(ctrl, getTech()) + 0.1;
+    double techFactor =
+        getTech() * getTech() / std::hypot(ctrl, getTech()) + 0.1;
     return devTimebase * (qint64)std::round(techFactor  * devResScale);
 }
 
@@ -159,7 +162,8 @@ const int Ship::consTimeInSec() const {
 const ResOrd Ship::repairRes() const {
     double ctrl = settings->value("rule/techfactorcontroller", 5.0).toDouble();
     double techFactor = (getTech() + 1.0) / std::hypot(ctrl, (getTech() + 1.0));
-    return getType().repairResBase() * (qint64)std::round(techFactor * attr["Hitpoints"]);
+    return getType().repairResBase()
+        * (qint64)std::round(techFactor * attr["Hitpoints"]);
 }
 
 /* 8.2-repair.md#Repair time */
@@ -436,9 +440,8 @@ double Ship::getEfficiency(int lv, int star) {
 
 int Ship::expCap(int numberOfRings) {
     int levelCap = ringLv * (numberOfRings + 1);
-    return (settings->value("rule/shipexpscale", 100.0).toDouble()
-            + (levelCap - 1) * settings->value("rule/shipexpscale", 100.0).toDouble())
-           / 2 * (levelCap - 1);
+    double scale = settings->value("rule/shipexpscale", 100.0).toDouble();
+    return (scale + (levelCap - 1) * scale) / 2 * (levelCap - 1);
 }
 
 int Ship::expCapNext(int expCapPrev) {
@@ -452,23 +455,35 @@ int Ship::numberOfRings(int expCap) {
 }
 
 KP::AllegianceSubGroup Ship::allegianceSubGroup(QLocale::Territory ter) {
-    /* The World War II involved not only the great powers but the people of subjugated colonies and practically subjugated countries.
-     * The great contribution or struggle of them subsequently made the colonial system became generally unviable and mostly replaced
-     * by international organizations based on lingua franca. To offer respect to them, all countries/territories (that Qt recognizes)
-     * is included in this function, even if they are landlocked, or not independent during WWII, or have no navy to speak of even today.
+    /* The World War II involved not only the great powers but the
+     * people of subjugated colonies and practically subjugated countries.
+     * The great contribution or struggle of them subsequently made the
+     * colonial system became generally unviable and mostly replaced
+     * by international organizations based on lingua franca. To offer
+     * respect to them, all countries/territories (that Qt recognizes)
+     * is included in this function, even if they are landlocked, or
+     * not independent during WWII, or have no navy to speak of even today.
      *
-     * If a great power's ship is primarily deployed to colonies during WWII, its nationality will count as that of said colony here.
-     * An example is De Ruyter, who is regarded as Dutch East Indian and dedicated to Indonesian people in this game, rather than Dutch.
+     * If a great power's ship is primarily deployed to colonies during
+     * WWII, its nationality will count as that of said colony here.
+     * An example is De Ruyter, who is regarded as Dutch East Indian and
+     * dedicated to Indonesian people in this game, rather than Dutch.
      *
-     * The below "nationality sub-groups" is primarily determined by status during WWII rather than modern status. In paticular, the
-     * first hex digit "nationality group" is even more heavily based on WWII, regardless of how little these countries are connected
-     * in modern times. Exceptions are made, such as South Korea having a significant navy in modern times, so Korea's space (0xE8-0xEB)
-     * is not lumped with Japan's (0x10-0x1F), which also have a large navy, despite the fact Korea was Japan's colony during WWII.
+     * The below "nationality sub-groups" is primarily determined by
+     * status during WWII rather than modern status. In paticular, the
+     * first hex digit "nationality group" is even more heavily based on
+     * WWII, regardless of how little these countries are connected
+     * in modern times. Exceptions are made, such as South Korea having
+     * a significant navy in modern times, so Korea's space (0xE8-0xEB)
+     * is not lumped with Japan's (0x10-0x1F), which also have a large
+     * navy, despite the fact Korea was Japan's colony during WWII.
      *
-     * It's useless to pretend that no political points are made in this function; disagreers are encouraged to fork this project
+     * It's useless to pretend that no political points are made in this
+     * function; disagreers are encouraged to fork this project
      * instead of complaining. */
 
-    /* Dependencies are treated not part of its overlord unless fully incorporated; instances of that are noted below */
+    /* Dependencies are treated not part of its overlord unless fully
+     * incorporated; instances of that are noted below */
     switch(ter) {
     case QLocale::AnyTerritory: return KP::DUnknownNation;
     case QLocale::Afghanistan: return KP::DOtherAsian;
@@ -552,7 +567,8 @@ KP::AllegianceSubGroup Ship::allegianceSubGroup(QLocale::Territory ter) {
     case QLocale::Ethiopia: return KP::DEastAfrican;
     case QLocale::EuropeanUnion: return KP::DOtherEuropean;
     case QLocale::Europe: return KP::DOtherEuropean;
-    /* just use QLocale::UnitedKingdom->DBritish for actual British ships that involved Falkland */
+    /* just use QLocale::UnitedKingdom->DBritish for actual British
+     * ships that involved Falkland */
     case QLocale::FalklandIslands: return KP::DArgentinian;
     case QLocale::FaroeIslands: return KP::DDanishKingdom;
     case QLocale::Fiji: return KP::DOceanaian;
@@ -567,7 +583,8 @@ KP::AllegianceSubGroup Ship::allegianceSubGroup(QLocale::Territory ter) {
     case QLocale::Georgia: return KP::DCIS;
     case QLocale::Germany: return KP::DGerman;
     case QLocale::Ghana: return KP::DOtherCommonwealth;
-    /* just use QLocale::UnitedKingdom->DBritish for actual British ships that involved Gibraltar */
+    /* just use QLocale::UnitedKingdom->DBritish for actual British
+     * ships that involved Gibraltar */
     case QLocale::Gibraltar: return KP::DOtherEuropean;
     case QLocale::Greece: return KP::DGreekOrCypriot;
     case QLocale::Greenland: return KP::DDanishKingdom;
@@ -705,7 +722,8 @@ KP::AllegianceSubGroup Ship::allegianceSubGroup(QLocale::Territory ter) {
     case QLocale::SolomonIslands: return KP::DOceanaian;
     case QLocale::Somalia: return KP::DEastAfrican;
     case QLocale::SouthAfrica: return KP::DSouthAfricanOrNamibian;
-    case QLocale::SouthGeorgiaAndSouthSandwichIslands: return KP::DOtherCommonwealth;
+    case QLocale::SouthGeorgiaAndSouthSandwichIslands:
+        return KP::DOtherCommonwealth;
     case QLocale::SouthKorea: return KP::DSouthKorean;
     case QLocale::SouthSudan: return KP::DOtherCommonwealth;
     case QLocale::Spain: return KP::DSpanish;

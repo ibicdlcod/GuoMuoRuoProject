@@ -26,7 +26,8 @@ void SteamAuth::RetrieveEncryptedAppTicket() {
         qWarning() << qtTrId("steam-60-sec");
     }
 
-    settings->setValue("networkclient/requestEATCall", QDateTime::currentDateTimeUtc());
+    settings->setValue("networkclient/requestEATCall",
+                       QDateTime::currentDateTimeUtc());
     SteamAPICall_t hSteamAPICall = SteamUser()->RequestEncryptedAppTicket(
         &k_unSecretData, sizeof(k_unSecretData));
     m_EncryptedAppTicketResponseCallResult.Set(
@@ -52,10 +53,12 @@ void SteamAuth::OnEncryptedAppTicketResponse(
         uint8 rgubTicket[KP::practicalBufferSize];
         uint32 cubTicket;
 
-        if(SteamUser()->GetEncryptedAppTicket(rgubTicket, sizeof(rgubTicket), &cubTicket)) {
+        if(SteamUser()->GetEncryptedAppTicket(
+               rgubTicket, sizeof(rgubTicket), &cubTicket)) {
             //% "GetEncryptedAppTicket success!"
             qDebug() << qtTrId("appticket-success");
-            Clientv2::getInstance().sendEncryptedAppTicket(rgubTicket, cubTicket);
+            Client::getInstance().sendEncryptedAppTicket(
+                rgubTicket, cubTicket);
         }
         else {
             //% "GetEncryptedAppTicket failed!"
@@ -68,7 +71,8 @@ void SteamAuth::OnEncryptedAppTicketResponse(
         //% "Calling RequestEncryptedAppTicket while not connected to steam results in this error."
         qWarning() << qtTrId("k_EResultNoConnection");
         //% "Steam ID: %1"
-        qInfo() << qtTrId("display-user-name").arg(SteamFriends()->GetPersonaName());
+        qInfo() << qtTrId("display-user-name")
+                       .arg(SteamFriends()->GetPersonaName());
         emit eATFailed();
         break;
     case k_EResultDuplicateRequest:

@@ -36,8 +36,8 @@ MapRender::MapRender(QWidget *parent)
     setAutoFillBackground(true);
     setMouseTracking(true);
 
-    Clientv2 &engine = Clientv2::getInstance();
-    connect(&engine, &Clientv2::mapSupremacyChanged,
+    Client &engine = Client::getInstance();
+    connect(&engine, &Client::mapSupremacyChanged,
             this, [this](){
                 update();
             });
@@ -70,8 +70,9 @@ void MapRender::setDiff(const QString &text) {
 void MapRender::mouseMoveEvent(QMouseEvent *event)
 {
     hoverMapID = 0;
-    if (rect().contains(event->pos())) { // Check if release occurred within widget
-        static Clientv2 &engine = Clientv2::getInstance();
+    // Check if release occurred within widget
+    if (rect().contains(event->pos())) {
+        static Client &engine = Client::getInstance();
         for(const auto map: std::as_const(engine.mapRegistryCache)) {
             /*
             if(map->id == KP::hiddenMap) {
@@ -98,8 +99,9 @@ void MapRender::mouseMoveEvent(QMouseEvent *event)
 void MapRender::mouseReleaseEvent(QMouseEvent *event)
 {
     if (event->button() == Qt::LeftButton && mousePressedInside) {
-        if (rect().contains(event->pos())) { // Check if release occurred within widget
-            static Clientv2 &engine = Clientv2::getInstance();
+        // Check if release occurred within widget
+        if (rect().contains(event->pos())) {
+            static Client &engine = Client::getInstance();
             for(const auto map: std::as_const(engine.mapRegistryCache)) {
                 /*
                 if(map->id == KP::hiddenMap) {
@@ -141,7 +143,7 @@ void MapRender::paintEvent(QPaintEvent * /* event */)
     if (antialiased)
         painter.setRenderHint(QPainter::Antialiasing, true);
 
-    static Clientv2 &engine = Clientv2::getInstance();
+    static Client &engine = Client::getInstance();
     for(const auto map: std::as_const(engine.mapRegistryCache)) {
         double supremacy = engine.mapSupremacies.value(map->id, -1);
         double expectedSupremacy = 1.0;

@@ -30,8 +30,8 @@ FactoryArea::FactoryArea(QWidget *parent) :
     lay->setAlignment(Qt::AlignCenter);
     lay->addWidget(equipview);
 
-    Clientv2 &engine = Clientv2::getInstance();
-    connect(&engine, &Clientv2::receivedFactoryRefresh,
+    Client &engine = Client::getInstance();
+    connect(&engine, &Client::receivedFactoryRefresh,
             this, &FactoryArea::doFactoryRefresh);
 
     slotControl = new QWidget();
@@ -102,7 +102,7 @@ void FactoryArea::buyClicked(bool checked) {
     buy.setBuyMode(true);
     static bool initial = true;
     if(initial) {
-        buy.resetListName(Clientv2::getInstance().equipBigTypeIndex);
+        buy.resetListName(Client::getInstance().equipBigTypeIndex);
         initial = false;
     }
 }
@@ -110,7 +110,7 @@ void FactoryArea::buyClicked(bool checked) {
 void FactoryArea::developClicked(bool checked, int slotnum) {
     Q_UNUSED(checked)
 
-    Clientv2 &engine = Clientv2::getInstance();
+    Client &engine = Client::getInstance();
     if(factoryState == KP::Development) {
         if(slotfs[slotnum]->isComplete()) {
             engine.doFetch({"fetch", QString::number(slotnum)});
@@ -124,7 +124,7 @@ void FactoryArea::developClicked(bool checked, int slotnum) {
             dev.show();
             static bool initial = true;
             if(initial) {
-                dev.resetListName(Clientv2::getInstance().equipBigTypeIndex);
+                dev.resetListName(Client::getInstance().equipBigTypeIndex);
                 initial = false;
             }
         }
@@ -247,7 +247,7 @@ void FactoryArea::resizeEvent(QResizeEvent *event) {
 }
 
 void FactoryArea::doBuy(int result) {
-    Clientv2 &engine = Clientv2::getInstance();
+    Client &engine = Client::getInstance();
     if(result == QDialog::Rejected) {
         qDebug() << "NOBUY";
     }
@@ -263,12 +263,12 @@ void FactoryArea::doBuy(int result) {
 }
 
 void FactoryArea::doDevelop(int result) {
-    Clientv2 &engine = Clientv2::getInstance();
+    Client &engine = Client::getInstance();
     if(result == QDialog::Rejected) {
         qDebug() << "NODEVELOP";
     }
     else if(result == QDialog::Accepted) {
-        QTimer::singleShot(100ms, &engine, &Clientv2::doRefreshFactory);
+        QTimer::singleShot(100ms, &engine, &Client::doRefreshFactory);
         QString msg = QStringLiteral("develop %1 %2")
                           .arg(dev.equipIdDesired()).arg(currentSlotNum);
         qDebug() << msg;
@@ -277,12 +277,12 @@ void FactoryArea::doDevelop(int result) {
 }
 
 void FactoryArea::doConstruct(int result) {
-    Clientv2 &engine = Clientv2::getInstance();
+    Client &engine = Client::getInstance();
     if(result == QDialog::Rejected) {
         qDebug() << "NOCONSTRUCT";
     }
     else if(result == QDialog::Accepted) {
-        QTimer::singleShot(100ms, &engine, &Clientv2::doRefreshFactory);
+        QTimer::singleShot(100ms, &engine, &Client::doRefreshFactory);
         engine.doConstructShip(con.shipDefDesired(), con.defaultEquipsDesired(),
                                con.shipToRemodelDesired(),
                                currentSlotNum);
@@ -298,7 +298,7 @@ void FactoryArea::forceFetch(int slotnum) {
     msgBox.exec();
     int result = msgBox.result();
     if(result & QMessageBox::Ok) {
-        Clientv2 &engine = Clientv2::getInstance();
+        Client &engine = Client::getInstance();
         engine.doForceFetch(slotnum);
     }
 }

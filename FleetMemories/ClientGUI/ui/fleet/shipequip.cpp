@@ -53,7 +53,7 @@ void ShipEquip::mousePressEvent(QMouseEvent *event)
 
 void ShipEquip::mouseReleaseEvent(QMouseEvent *event)
 {
-    Clientv2 &engine = Clientv2::getInstance();
+    Client &engine = Client::getInstance();
     static constexpr int viewMinimumHeight = 500;
     if (event->button() == Qt::LeftButton && mousePressedInside) {
         if (rect().contains(event->pos())) {
@@ -154,7 +154,7 @@ void ShipEquip::updateEquipName(QUuid equipUid)
         update();
         return;
     }
-    Clientv2 &engine = Clientv2::getInstance();
+    Client &engine = Client::getInstance();
     auto [equip, star] = engine.equipModel.getEquip(equipUid);
     if(equip == nullptr) {
         ui->equipText->setText(qtTrId("unknown"));

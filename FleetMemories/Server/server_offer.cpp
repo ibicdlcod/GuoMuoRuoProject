@@ -98,7 +98,9 @@ void Server::offerEquipInfoUser(const CSteamID &uid,
             QByteArray msg =
                     KP::serverEquipInfo(userEquipInfos, true);
             QTimer::singleShot(100ms, this,
-                               [=, this](){senderM.sendMessage(connection, msg);});
+                               [=, this]() {
+                                   senderM.sendMessage(connection, msg);
+                               });
             connection->flush();
         }
     } catch (DBError &e) {
@@ -116,7 +118,8 @@ void Server::offerSPInfo(QSslSocket *connection,
     QByteArray msg =
             KP::serverSkillPoints(equipId,
                                   User::getSkillPoints(uid, equipId),
-                                  equipRegistry.value(equipId)->skillPointsStd());
+                                  equipRegistry.value(equipId)
+                                      ->skillPointsStd());
     senderM.sendMessage(connection, msg);
     connection->flush();
 }
@@ -278,27 +281,36 @@ user_ship:
             int expKC;
             while(query.next()) {
                 QJsonObject output;
-                def = query.value(query.record().indexOf("UserShip.ShipDef")).toInt();
-                serial = query.value(query.record().indexOf("UserShip.ShipUuid")).toUuid();
-                star = query.value(query.record().indexOf("Star")).toInt();
-                currentHP = query.value(query.record().indexOf("CurrentHP")).toInt();
-                condition = query.value(query.record().indexOf("Condition")).toInt();
-                exp = query.value(query.record().indexOf("UserShip.Exp")).toInt();
-                expCap = query.value(query.record().indexOf("ExpCap")).toInt();
-                slot1 = query.value(query.record().indexOf("Slot1")).toUuid();
-                slot2 = query.value(query.record().indexOf("Slot2")).toUuid();
-                slot3 = query.value(query.record().indexOf("Slot3")).toUuid();
-                slot4 = query.value(query.record().indexOf("Slot4")).toUuid();
-                slot5 = query.value(query.record().indexOf("Slot5")).toUuid();
-                slotEX = query.value(query.record().indexOf("SlotEX")).toUuid();
-                slot1Planes = query.value(query.record().indexOf("Slot1Planes")).toInt();
-                slot2Planes = query.value(query.record().indexOf("Slot2Planes")).toInt();
-                slot3Planes = query.value(query.record().indexOf("Slot3Planes")).toInt();
-                slot4Planes = query.value(query.record().indexOf("Slot4Planes")).toInt();
-                slot5Planes = query.value(query.record().indexOf("Slot5Planes")).toInt();
-                fleetIndex = query.value(query.record().indexOf("FleetIndex")).toInt();
-                fleetPosIndex = query.value(query.record().indexOf("FleetPosIndex")).toInt();
-                expKC = query.value(query.record().indexOf("UserKCShip.Exp")).toInt();
+                auto rec = query.record();
+                def = query.value(rec.indexOf("UserShip.ShipDef")).toInt();
+                serial = query.value(
+                    rec.indexOf("UserShip.ShipUuid")).toUuid();
+                star = query.value(rec.indexOf("Star")).toInt();
+                currentHP = query.value(rec.indexOf("CurrentHP")).toInt();
+                condition = query.value(rec.indexOf("Condition")).toInt();
+                exp = query.value(rec.indexOf("UserShip.Exp")).toInt();
+                expCap = query.value(rec.indexOf("ExpCap")).toInt();
+                slot1 = query.value(rec.indexOf("Slot1")).toUuid();
+                slot2 = query.value(rec.indexOf("Slot2")).toUuid();
+                slot3 = query.value(rec.indexOf("Slot3")).toUuid();
+                slot4 = query.value(rec.indexOf("Slot4")).toUuid();
+                slot5 = query.value(rec.indexOf("Slot5")).toUuid();
+                slotEX = query.value(rec.indexOf("SlotEX")).toUuid();
+                slot1Planes = query.value(
+                    rec.indexOf("Slot1Planes")).toInt();
+                slot2Planes = query.value(
+                    rec.indexOf("Slot2Planes")).toInt();
+                slot3Planes = query.value(
+                    rec.indexOf("Slot3Planes")).toInt();
+                slot4Planes = query.value(
+                    rec.indexOf("Slot4Planes")).toInt();
+                slot5Planes = query.value(
+                    rec.indexOf("Slot5Planes")).toInt();
+                fleetIndex = query.value(rec.indexOf("FleetIndex")).toInt();
+                fleetPosIndex = query.value(
+                    rec.indexOf("FleetPosIndex")).toInt();
+                expKC = query.value(
+                    rec.indexOf("UserKCShip.Exp")).toInt();
 
                 output["def"] = def;
                 output["serial"] = serial.toString();
@@ -357,7 +369,8 @@ user_ship_bp:
             int countCol = rec.indexOf("Amount");
             QJsonObject userShipBP;
             while(query2.next()) {
-                userShipBP[query2.value(defCol).toString()] = query2.value(countCol).toInt();
+                userShipBP[query2.value(defCol).toString()] =
+                    query2.value(countCol).toInt();
             }
             QByteArray msg =
                     KP::serverShipBPInfo(userShipBP);
@@ -398,8 +411,8 @@ void Server::offerMapInfo(const CSteamID &uid, QSslSocket *connection)
         if(lua["maps"][unionId] != sol::nil) {
             QJsonArray startingNodes;
             sol::table tab = lua["maps"][unionId]["starting_nodes"];
-            tab.for_each(
-                        [&startingNodes](sol::object const& key, sol::object const& value) {
+            tab.for_each([&startingNodes](sol::object const& key,
+                                          sol::object const& value) {
                 if (value.is<int>()) {
                     startingNodes.append(QJsonValue(value.as<int>()));
                 }
@@ -422,11 +435,13 @@ void Server::offerMapInfo(const CSteamID &uid, QSslSocket *connection)
                     QJsonArray nextNodes;
                     sol::table nextNodeTable = info["next_nodes"];
                     nextNodeTable.for_each(
-                                [&nextNodes](sol::object const& key, sol::object const& value) {
-                        if (value.is<int>()) {
-                            nextNodes.append(QJsonValue(value.as<int>()));
-                        }
-                    });
+                        [&nextNodes](sol::object const& key,
+                                     sol::object const& value) {
+                            if (value.is<int>()) {
+                                nextNodes.append(
+                                    QJsonValue(value.as<int>()));
+                            }
+                        });
                     nodeInfo["next"] = nextNodes;
                     nodeInfos[QString::number(key.as<int>())] = nodeInfo;
                 }
@@ -439,10 +454,9 @@ void Server::offerMapInfo(const CSteamID &uid, QSslSocket *connection)
         connection->flush();
         QByteArray msg =
                 KP::serverMapInfo(mapInfos,
-                                  settings->value("server/mapdbtimestamp",
-                                                  QDateTime::currentDateTimeUtc()
-                                                  ).toDateTime()
-                                  );
+                    settings->value("server/mapdbtimestamp",
+                        QDateTime::currentDateTimeUtc()
+                    ).toDateTime());
         senderM.sendMessage(connection, msg);
         connection->flush();
     });
@@ -702,7 +716,9 @@ void Server::refreshClientFactory(const CSteamID &uid, QSslSocket *connection) {
     query.bindValue(":id", uid.ConvertToUint64());
     if(!query.exec() || !query.isSelect()) {
         //% "Open user %1's factory failed!"
-        throw DBError(qtTrId("factory-state-error").arg(uid.ConvertToUint64()), query.lastError());
+        throw DBError(
+            qtTrId("factory-state-error").arg(uid.ConvertToUint64()),
+            query.lastError());
         return;
     }
     QJsonObject result;

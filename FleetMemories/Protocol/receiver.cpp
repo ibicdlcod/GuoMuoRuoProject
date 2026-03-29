@@ -18,8 +18,9 @@ Receiver::Receiver(QObject *parent)
 void Receiver::processDgram(const QByteArray &input) {
     /* this somehow works in non-latin1 scenarios */
     QString inputString = QString::fromLatin1(input);
-    static QRegularExpression re("<start>(\\d+?)<mid>(\\d+?)<mid>(.+?)<mid>(.+?)<end>+",
-                                 QRegularExpression::DotMatchesEverythingOption);
+    static QRegularExpression re(
+        "<start>(\\d+?)<mid>(\\d+?)<mid>(.+?)<mid>(.+?)<end>+",
+        QRegularExpression::DotMatchesEverythingOption);
 
     QRegularExpressionMatchIterator i = re.globalMatch(inputString);
     while(i.hasNext()) {
@@ -43,8 +44,9 @@ void Receiver::processDgramWithInfo(const PeerInfo &peerInfo,
                                     QSslSocket *connection) {
     /* must ensure consistency with above function */
     QString inputString = QString::fromLatin1(input);
-    static QRegularExpression re("<start>(\\d+?)<mid>(\\d+?)<mid>(.+?)<mid>(.+?)<end>+",
-                                 QRegularExpression::DotMatchesEverythingOption);
+    static QRegularExpression re(
+        "<start>(\\d+?)<mid>(\\d+?)<mid>(.+?)<mid>(.+?)<end>+",
+        QRegularExpression::DotMatchesEverythingOption);
 
     QRegularExpressionMatchIterator i = re.globalMatch(inputString);
     while(i.hasNext()) {
@@ -80,16 +82,18 @@ void Receiver::processGoodMsg(qint64 totalParts,
         connect(timers[msgId], &QTimer::timeout, this,
                 [this, msgId]() {
                     //% "Message %1 timeouted when receiving!"
-                    qCritical() << qtTrId("receive-msg-timeout").arg(msgId.toString());
+                    qCritical() << qtTrId("receive-msg-timeout")
+                                       .arg(msgId.toString());
                     totalPartsMap.remove(msgId);
                     receivedPartsMap.remove(msgId);
                     receivedStatus.remove(msgId);
                     emit timeOut(msgId);
                 }
                 );
-        timers[msgId]->start(std::chrono::milliseconds(
-                                 settings->value("networkshared/maxmsgdelayinms",
-                                                 1000).toInt()) * totalParts);
+        timers[msgId]->start(
+            std::chrono::milliseconds(
+                settings->value("networkshared/maxmsgdelayinms",
+                                1000).toInt()) * totalParts);
     }
     else if(totalPartsMap[msgId] != totalParts) {
         //% "Message total parts is inconsistent!"
@@ -107,7 +111,8 @@ void Receiver::processGoodMsg(qint64 totalParts,
         timers[msgId]->stop();
 
         QJsonObject djson =
-            QCborValue::fromCbor(wholeMessage.toLatin1()).toMap().toJsonObject();
+            QCborValue::fromCbor(wholeMessage.toLatin1())
+            .toMap().toJsonObject();
         if(!djson.isEmpty()) {
             if(sslsockets.contains(msgId) && peerInfos.contains(msgId)) {
                 emit jsonReceivedWithInfo(djson,

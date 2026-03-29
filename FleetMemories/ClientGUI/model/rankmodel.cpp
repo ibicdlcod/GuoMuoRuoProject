@@ -81,11 +81,12 @@ QVariant RankModel::data(const QModelIndex &index, int role) const {
             return QString::number(previousExp[uid], 'g', 6);
         }
         else if(section == peCol) {
-            return QString::number(std::log(totalUsers)
-                                       + (realRowIndex == 0 ? 0 :
-                                              (realRowIndex * std::log(realRowIndex)))
-                                       - (realRowIndex + 1) * std::log(realRowIndex + 1)
-                                       + 1, 'g', 6);
+            return QString::number(
+                std::log(totalUsers)
+                + (realRowIndex == 0 ? 0 :
+                       (realRowIndex * std::log(realRowIndex)))
+                - (realRowIndex + 1) * std::log(realRowIndex + 1)
+                + 1, 'g', 6);
         }
         else
             return QVariant();
@@ -225,14 +226,15 @@ void RankModel::pageNumChange(int currentPageNum, int totalPageNum) {
             break;
         }
         if(!currentDisplayed.contains(i+1)) {
-            Clientv2 &engine = Clientv2::getInstance();
+            Client &engine = Client::getInstance();
             engine.doRefreshRank(rowsPerPage, currentPageNum);
             break;
         }
     }
 }
 
-void RankModel::OnPersonaStateChangeHandler(PersonaStateChange_t* PersonaStateChange)
+void RankModel::OnPersonaStateChangeHandler(
+    PersonaStateChange_t* PersonaStateChange)
 {
     if (currentExp.contains(PersonaStateChange->m_ulSteamID))
     {

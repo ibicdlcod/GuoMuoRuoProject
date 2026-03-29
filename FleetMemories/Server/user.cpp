@@ -334,8 +334,9 @@ int User::getEquipDef(QUuid equipUuid) {
     if(Q_UNLIKELY(!query.exec() || !query.isSelect())) {
         qCritical() << query.lastQuery();
         //% "Get equipment data of %1 failed!"
-        throw DBError(qtTrId("user-get-equip-data-failed").arg(equipUuid.toString()),
-                      query.lastError());
+        throw DBError(
+            qtTrId("user-get-equip-data-failed").arg(equipUuid.toString()),
+            query.lastError());
         return 0;
     }
     else {
@@ -356,8 +357,9 @@ int User::getShipDef(QUuid shipUuid) {
     if(Q_UNLIKELY(!query.exec() || !query.isSelect())) {
         qCritical() << query.lastQuery();
         //% "Get ship data of %1 failed!"
-        throw DBError(qtTrId("user-get-ship-data-failed").arg(shipUuid.toString()),
-                      query.lastError());
+        throw DBError(
+            qtTrId("user-get-ship-data-failed").arg(shipUuid.toString()),
+            query.lastError());
         return 0;
     }
     else {
@@ -413,7 +415,8 @@ std::pair<bool, int> User::haveFather(const CSteamID &uid, int sonEquipId,
             return {false, fatherEquipId};
         }
         else {
-            int father2EquipId = equipReg.value(sonEquipId)->attr.value("Father2", 0);
+            int father2EquipId =
+                equipReg.value(sonEquipId)->attr.value("Father2", 0);
             if(father2EquipId == 0)
                 return {true, fatherEquipId};
             QSqlQuery query;
@@ -508,7 +511,8 @@ bool User::isFactoryBusy(const CSteamID &uid, int factoryID) {
 }
 
 /* int is the result equip/shippart id, 0 means failure */
-std::tuple<bool, int> User::isFactoryFinished(const CSteamID &uid, int factoryID) {
+std::tuple<bool, int> User::isFactoryFinished(const CSteamID &uid,
+                                               int factoryID) {
     QSqlDatabase db = QSqlDatabase::database();
     QSqlQuery query;
     query.prepare("SELECT Done, Success, CurrentJob "
@@ -537,7 +541,8 @@ bool User::isGaugeFinished(const CSteamID &uid, int mapId,  // relative id
     QSqlDatabase db = QSqlDatabase::database();
     QSqlQuery query;
     query.prepare("SELECT 1 FROM UserMapState "
-                  "WHERE User = :id AND MapDef = :def AND Gauge" + diffStr + " <= 0;");
+                  "WHERE User = :id AND MapDef = :def AND Gauge"
+                  + diffStr + " <= 0;");
     query.bindValue(":id", uid.ConvertToUint64());
     query.bindValue(":def", mapId);
     if(Q_UNLIKELY(!query.exec() || !query.isSelect())){
@@ -693,13 +698,15 @@ bool User::openMap(const CSteamID &uid, int mapId) { // relative id
         }
         else {
             auto [factory, repair] = getCurrentSlots(uid);
-            auto [factory1, repair1] = KP::getDesiredSlots(getCurrentMapOpened(uid));
+            auto [factory1, repair1] =
+                KP::getDesiredSlots(getCurrentMapOpened(uid));
         add_factory:
             if(factory1 > factory) {
                 QSqlQuery query;
                 query.prepare("UPDATE UserAttr "
                               "SET Intvalue = :factory "
-                              "WHERE UserID = :id AND Attribute = 'FactorySize';");
+                              "WHERE UserID = :id "
+                              "AND Attribute = 'FactorySize';");
                 query.bindValue(":id", uid.ConvertToUint64());
                 query.bindValue(":factory", factory1);
                 if(Q_UNLIKELY(!query.exec())){
@@ -788,10 +795,12 @@ void User::refreshPort(Server *server, const CSteamID &uid) {
 }
 
 bool User::setMapSupremacy(const CSteamID &uid, int mapId,  // relative id
-                           double amount, double retention = 0) { // retention is for expedition
+                           double amount,
+                           double retention = 0) { // for expedition
     if((retention < 0) || (retention > 1)) {
         //% "Map supremacy retention %1 is incorrect!"
-        qCritical() << qtTrId("map-supremacy-retention-incorrect").arg(retention);
+        qCritical() << qtTrId("map-supremacy-retention-incorrect")
+                       .arg(retention);
         return false;
     }
     QSqlDatabase db = QSqlDatabase::database();
@@ -848,11 +857,13 @@ void User::setResources(const CSteamID &uid, ResOrd goal) {
         query.bindValue(":type", iter->first);
         if(Q_UNLIKELY(!query.exec())) {
             //% "User id %1: set resources failed!"
-            qWarning() << qtTrId("set-resources-failed").arg(uid.ConvertToUint64());
+            qWarning() << qtTrId("set-resources-failed")
+                          .arg(uid.ConvertToUint64());
             qWarning() << query.lastError();
             return;
         }
     }
     //% "User id %1: set resources %2"
-    qDebug() << qtTrId("set-resources").arg(uid.ConvertToUint64()).arg(goal.toString());
+    qDebug() << qtTrId("set-resources").arg(uid.ConvertToUint64())
+                .arg(goal.toString());
 }

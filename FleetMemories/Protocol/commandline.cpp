@@ -53,8 +53,9 @@ void CommandLine::customMessageHandler(QtMsgType type,
     bool msg_off = false;
 
 #if defined(QT_DEBUG)
-    QString txt2 = QStringLiteral("%1 (%2:%3, %4)").
-                   arg(localMsg, file, QString::number(context.line), function);
+    QString txt2 = QStringLiteral("%1 (%2:%3, %4)")
+                   .arg(localMsg, file,
+                        QString::number(context.line), function);
 #else
     Q_UNUSED(file)
     Q_UNUSED(function)
@@ -86,7 +87,8 @@ void CommandLine::customMessageHandler(QtMsgType type,
         msg_off = settings->value("msg_disabled/fatal", false).toBool();
         break;
     }
-    /* consider use QT_NO_DEBUG_OUTPUT, QT_NO_INFO_OUTPUT, QT_NO_WARNING_OUTPUT */
+    /* consider use QT_NO_DEBUG_OUTPUT, QT_NO_INFO_OUTPUT,
+     * QT_NO_WARNING_OUTPUT */
 
     const char * color;
     switch(type) {
@@ -156,7 +158,8 @@ void CommandLine::openingwords() {
         qout.printLine(notice, Ecma(255,255,255,true), Ecma(0,0,255));
         qout.printLine("");
         //% "What? Admiral Tanaka? He's the real deal, isn't he?\nGreat at battle and bad at politics--so cool!"
-        qout.printLine(qtTrId("naganami"), Ecma(192,255,192,true), Ecma(64,64,64));
+        qout.printLine(qtTrId("naganami"),
+                       Ecma(192,255,192,true), Ecma(64,64,64));
     }
     qout.setFieldAlignment(QTextStream::AlignLeft);
 }
@@ -393,7 +396,8 @@ void CommandLine::exitGracefully() {
     exitGraceSpec();
 #pragma message(NOT_M_CONST)
     //% "Goodbye, press ENTER to quit."
-    qout.printLine(qtTrId("goodbye"), Ecma(64,255,64), Ecma(EcmaSetter::BlinkOn));
+    qout.printLine(qtTrId("goodbye"),
+                   Ecma(64,255,64), Ecma(EcmaSetter::BlinkOn));
     qout.reset();
     logFile->close();
     quit();

@@ -21,7 +21,7 @@ extern QFile *logFile;
 extern std::unique_ptr<QSettings> settings;
 
 /* Initialize client and do necessary connections */
-Clientv2::Clientv2(QObject *parent)
+Client::Client(QObject *parent)
     : QObject{parent},
     recv(nullptr),
     attemptMode(false),
@@ -31,34 +31,34 @@ Clientv2::Clientv2(QObject *parent)
     LuaInit::init(lua);
 
     connect(&socket, &QSslSocket::preSharedKeyAuthenticationRequired,
-            this, &Clientv2::pskRequired);
+            this, &Client::pskRequired);
     connect(&socket, &QSslSocket::encrypted,
-            this, &Clientv2::encrypted);
+            this, &Client::encrypted);
 
     connect(&recv, &Receiver::jsonReceived,
-            this, &Clientv2::serverResponseStd);
+            this, &Client::serverResponseStd);
     connect(&recv, &Receiver::nonStandardReceived,
-            this, &Clientv2::serverResponseNonStd);
+            this, &Client::serverResponseNonStd);
 
-    connect(this, &Clientv2::receivedArsenalEquip,
+    connect(this, &Client::receivedArsenalEquip,
             &equipModel, &EquipModel::updateEquipmentList);
-    connect(this, &Clientv2::receivedAnchorageShip,
+    connect(this, &Client::receivedAnchorageShip,
             &shipModel, &ShipModel::updateShipList);
-    connect(this, &Clientv2::receivedShipBlueprint,
+    connect(this, &Client::receivedShipBlueprint,
             &shipBPModel, &ShipBPModel::updateShipList);
-    connect(this, &Clientv2::receivedRankInfo,
+    connect(this, &Client::receivedRankInfo,
             &rankModel, &RankModel::updateList);
     connect(&equipModel, &EquipModel::destructRequest,
-            this, &Clientv2::doDestructEquip);
+            this, &Client::doDestructEquip);
     connect(&equipModel, &EquipModel::improveRequest,
-            this, &Clientv2::doImproveEquip);
+            this, &Client::doImproveEquip);
     connect(&shipModel, &ShipModel::modernizeRequest,
-            this, &Clientv2::doModernizeShip);
-    connect(this, &Clientv2::gamestateChanged,
-            this, &Clientv2::changeGameState);
+            this, &Client::doModernizeShip);
+    connect(this, &Client::gamestateChanged,
+            this, &Client::changeGameState);
     // May cause issues?
     timer = new QTimer(this);
-    connect(timer, &QTimer::timeout, this, &Clientv2::uiRefresh);
+    connect(timer, &QTimer::timeout, this, &Client::uiRefresh);
     using namespace std::chrono_literals;
     timer->start(1000ms);
 
@@ -79,8 +79,10 @@ Clientv2::Clientv2(QObject *parent)
 
     /* 1-migrate.md */
     migrateServer.route("/", QHttpServerRequest::Method::Post, this,
-                        [this] (const QHttpServerRequest &request, QHttpServerResponder &responder) {
-                            QJsonDocument doc = QJsonDocument::fromJson(request.body());
+                        [this] (const QHttpServerRequest &request,
+                                QHttpServerResponder &responder) {
+                            QJsonDocument doc =
+                                QJsonDocument::fromJson(request.body());
                             if(!doc.isNull() && loginCheck()) {
                                 QJsonObject obj = doc.object();
                                 migrate(obj);
@@ -97,51 +99,51 @@ Clientv2::Clientv2(QObject *parent)
     }
 }
 
-Clientv2::~Clientv2() noexcept {
+Client::~Client() noexcept {
     shutdown();
 }
 
 /* public */
-void Clientv2::enterBattle() {
+void Client::enterBattle() {
     gameState = KP::BattleMapView;
     emit gamestateChanged(KP::BattleMapView);
     emit lockBattle();
 }
 
-bool Clientv2::isInBattle() const {
+bool Client::isInBattle() const {
     return gameState == KP::BattleMapView;
 }
 
-bool Clientv2::isEquipRegistryCacheGood() const {
+bool Client::isEquipRegistryCacheGood() const {
     return equipRegistryCacheGood;
 }
 
-bool Clientv2::isShipRegistryCacheGood() const {
+bool Client::isShipRegistryCacheGood() const {
     return shipRegistryCacheGood;
 }
 
-void Clientv2::leaveBattle() {
+void Client::leaveBattle() {
     gameState = KP::SortieMapView;
     emit gamestateChanged(KP::SortieMapView);
     emit unlockBattle();
 }
 
-bool Clientv2::loggedIn() const {
+bool Client::loggedIn() const {
     return gameState != KP::Offline;
 }
 
 /* public slots */
 /* Make actual connections */
-void Clientv2::autoPassword() {
+void Client::autoPassword() {
     connect(&socket, &QSslSocket::handshakeInterruptedOnError,
-            this, &Clientv2::handshakeInterrupted);
+            this, &Client::handshakeInterrupted);
     connect(&socket,
             &QSslSocket::preSharedKeyAuthenticationRequired,
-            this, &Clientv2::pskRequired);
+            this, &Client::pskRequired);
     connect(&socket, &QAbstractSocket::disconnected,
-            this, &Clientv2::catbomb);
+            this, &Client::catbomb);
     connect(&socket, &QAbstractSocket::errorOccurred,
-            this, &Clientv2::errorOccurred);
+            this, &Client::errorOccurred);
     /* FUCK, aliyun server don't offer TlsV1_3 */
     socket.setProtocol(QSsl::TlsV1_2OrLater);
     socket.connectToHostEncrypted(address.toString(), port);
@@ -155,13 +157,13 @@ void Clientv2::autoPassword() {
         return;
     }
     connect(&socket, &QSslSocket::readyRead,
-            this, &Clientv2::readyRead);
+            this, &Client::readyRead);
 
     SteamAPI_RunCallbacks();
 }
 
 /* Back to port */
-void Clientv2::backToNavalBase() {
+void Client::backToNavalBase() {
     if(!loginCheck() || gameState == KP::Port) {
         return;
     } else {
@@ -171,7 +173,7 @@ void Clientv2::backToNavalBase() {
 }
 
 /* Connection is lost */
-void Clientv2::catbomb() {
+void Client::catbomb() {
     if(loggedIn()) {
         /* should make a cat GUI */
         //% "You have been bombarded by a cute cat."
@@ -196,7 +198,7 @@ void Clientv2::catbomb() {
 }
 
 /* Originally used in CLI */
-void Clientv2::displayPrompt() {
+void Client::displayPrompt() {
     uiRefresh();
 #if defined(NOBODY_PLAYS_KANCOLLE_ANYMORE) /* this is for non-ASCII test */
     //% "田中飞妈"
@@ -205,11 +207,11 @@ void Clientv2::displayPrompt() {
 }
 
 /* Part of steam verification */
-void Clientv2::sendEncryptedAppTicket(uint8 rgubTicket [], uint32 cubTicket) {
+void Client::sendEncryptedAppTicket(uint8 rgubTicket [], uint32 cubTicket) {
     try {
         authCache = KP::clientSteamAuth(rgubTicket, cubTicket);
         connect(&socket, &QSslSocket::encrypted,
-                this, &Clientv2::sendEATActual);
+                this, &Client::sendEATActual);
     }  catch (NetworkError &e) {
         qCritical("Network error when sending Encrypted Ticket");
         qCritical() << e.what();
@@ -218,13 +220,13 @@ void Clientv2::sendEncryptedAppTicket(uint8 rgubTicket [], uint32 cubTicket) {
 }
 
 /* Parse server JSON response */
-void Clientv2::serverResponse(const QString &clientInfo,
+void Client::serverResponse(const QString &clientInfo,
                               const QByteArray &plainText) {
     recv.processDgram(plainText);
     return;
 }
 
-void Clientv2::serverResponseNonStd(const QByteArray &plainText) {
+void Client::serverResponseNonStd(const QByteArray &plainText) {
     QJsonObject djson =
         QCborValue::fromCbor(plainText).toMap().toJsonObject();
 #if defined(QT_DEBUG)
@@ -256,7 +258,7 @@ void Clientv2::serverResponseNonStd(const QByteArray &plainText) {
     }
 }
 
-void Clientv2::serverResponseStd(const QJsonObject &djson) {
+void Client::serverResponseStd(const QJsonObject &djson) {
 #if defined(QT_DEBUG)
     static const QString formatter = QStringLiteral("Received json: %1");
     const QString html = formatter
@@ -278,23 +280,23 @@ void Clientv2::serverResponseStd(const QJsonObject &djson) {
     }
 }
 
-void Clientv2::setTicketCache(uint8 rgubTicket [], uint32 cubTicket) {
+void Client::setTicketCache(uint8 rgubTicket [], uint32 cubTicket) {
 }
 
 /* Refresh UI? */
-void Clientv2::uiRefresh() {
+void Client::uiRefresh() {
     //qDebug("UIREFRESH");
     emit uiRefreshSig();
 }
 
 /* Update engine */
-void Clientv2::update() {
+void Client::update() {
     emit uiRefreshSig();
     QCoreApplication::processEvents();
 }
 
 /* private slots */
-void Clientv2::changeGameState(KP::GameState state)
+void Client::changeGameState(KP::GameState state)
 {
     QByteArray msg = KP::clientStateChange(state);
     switch(socket.state()) {
@@ -312,23 +314,23 @@ void Clientv2::changeGameState(KP::GameState state)
 }
 
 /* Called when encrypted() signal is emitted */
-void Clientv2::encrypted() {
+void Client::encrypted() {
     retransmitTimes = 0;
 }
 
 /* Network */
-void Clientv2::errorOccurred(QAbstractSocket::SocketError error) {
+void Client::errorOccurred(QAbstractSocket::SocketError error) {
     Q_UNUSED(error)
     //% "Network error: %1"
     qWarning() << qtTrId("network-error").arg(socket.errorString());
 }
 
-void Clientv2::errorOccurredStr(const QString &input) {
+void Client::errorOccurredStr(const QString &input) {
     qWarning() << input;
 }
 
 /* Network */
-void Clientv2::handshakeInterrupted(const QSslError &error) {
+void Client::handshakeInterrupted(const QSslError &error) {
     maxRetransmit = settings->value("networkclient/retransmitmax",
                                     2).toInt();
     qWarning() << qtTrId("network-error").arg(error.errorString());
@@ -344,7 +346,7 @@ void Clientv2::handshakeInterrupted(const QSslError &error) {
 }
 
 /* 1-migrate.md */
-void Clientv2::migrate(const QJsonObject &content) {
+void Client::migrate(const QJsonObject &content) {
     socket.flush();
     QByteArray msg = KP::clientMigrate(content);
     sender->enqueue(msg);
@@ -352,7 +354,7 @@ void Clientv2::migrate(const QJsonObject &content) {
 }
 
 /* Network */
-void Clientv2::pskRequired(QSslPreSharedKeyAuthenticator *auth) {
+void Client::pskRequired(QSslPreSharedKeyAuthenticator *auth) {
     Q_ASSERT(auth);
     qDebug() << clientName << ": providing pre-shared key ...";
     serverName = QString(auth->identityHint());
@@ -361,7 +363,7 @@ void Clientv2::pskRequired(QSslPreSharedKeyAuthenticator *auth) {
 }
 
 /* Network */
-void Clientv2::readyRead() {
+void Client::readyRead() {
     if(socket.bytesAvailable() <= 0) {
         qDebug() << clientName << ": spurious read notification?";
     }
@@ -386,7 +388,7 @@ void Clientv2::readyRead() {
     }
 }
 
-void Clientv2::sendEATActual() {
+void Client::sendEATActual() {
     /* still have bugs */
     const qint64 written = socket.write(authCache);
     if (written <= 0) {
@@ -399,7 +401,7 @@ void Clientv2::sendEATActual() {
 }
 
 /* Shutdown connections */
-void Clientv2::shutdown() {
+void Client::shutdown() {
     switch(socket.state()) {
     case QAbstractSocket::UnconnectedState: break;
     case QAbstractSocket::HostLookupState: [[fallthrough]];
@@ -408,26 +410,27 @@ void Clientv2::shutdown() {
     default: break;
     }
     QObject::disconnect(&socket, &QSslSocket::readyRead,
-                        this, &Clientv2::readyRead);
+                        this, &Client::readyRead);
     QObject::disconnect(&socket, &QSslSocket::handshakeInterruptedOnError,
-                        this, &Clientv2::handshakeInterrupted);
-    QObject::disconnect(&socket, &QSslSocket::preSharedKeyAuthenticationRequired,
-                        this, &Clientv2::pskRequired);
+                        this, &Client::handshakeInterrupted);
+    QObject::disconnect(
+        &socket, &QSslSocket::preSharedKeyAuthenticationRequired,
+        this, &Client::pskRequired);
     QObject::disconnect(&socket, &QAbstractSocket::disconnected,
-                        this, &Clientv2::catbomb);
+                        this, &Client::catbomb);
     QObject::disconnect(&socket, &QAbstractSocket::errorOccurred,
-                        this, &Clientv2::errorOccurred);
+                        this, &Client::errorOccurred);
 }
 
 /* Enum -> String */
-inline QString Clientv2::gameStateString() const {
+inline QString Client::gameStateString() const {
     QVariant str;
     str.setValue(gameState);
     return str.toString();
 }
 
 /* Read server datagrams */
-void Clientv2::readWhenConnected(const QByteArray &dgram) {
+void Client::readWhenConnected(const QByteArray &dgram) {
 #if defined(QT_DEBUG)
     /*
     static const QString formatter = QStringLiteral("From Server text: %1");
@@ -470,13 +473,13 @@ void Clientv2::readWhenConnected(const QByteArray &dgram) {
 }
 
 /* Should not trigger this */
-void Clientv2::readWhenUnConnected(const QByteArray &dgram) {
+void Client::readWhenUnConnected(const QByteArray &dgram) {
     Q_UNUSED(dgram)
     qDebug() << "Unexpected data when unconnected";
 }
 
 /* Part of parser */
-void Clientv2::receivedAuth(const QJsonObject &djson) {
+void Client::receivedAuth(const QJsonObject &djson) {
     if(!djson.contains("mode")) // filter empty messages
         return;
     switch(djson["mode"].toInt()) {
@@ -487,7 +490,7 @@ void Clientv2::receivedAuth(const QJsonObject &djson) {
 }
 
 /* Part of parser */
-void Clientv2::receivedInfo(const QJsonObject &djson) {
+void Client::receivedInfo(const QJsonObject &djson) {
     switch(djson["infotype"].toInt()) {
     case KP::InfoType::FactoryInfo:
         emit receivedFactoryRefresh(djson);
@@ -588,7 +591,7 @@ void Clientv2::receivedInfo(const QJsonObject &djson) {
 }
 
 /* Part of parser */
-void Clientv2::receivedLogout(const QJsonObject &djson) {
+void Client::receivedLogout(const QJsonObject &djson) {
     if(djson["success"].toBool()) {
         if(!djson.contains("reason")) {
             //% "Message not implemented"
@@ -630,7 +633,7 @@ void Clientv2::receivedLogout(const QJsonObject &djson) {
 }
 
 /* Part of parser */
-void Clientv2::receivedMsg(const QJsonObject &djson) {
+void Client::receivedMsg(const QJsonObject &djson) {
     switch(djson["msgtype"].toInt()) {
     case KP::JsonError:
         //% "Client sent a bad JSON."
@@ -876,7 +879,7 @@ void Clientv2::receivedMsg(const QJsonObject &djson) {
         sender = new Sender(&socket);
         // disconnect when sender destoryed
         connect(sender, &Sender::errorOccurred,
-                this, &Clientv2::errorOccurredStr);
+                this, &Client::errorOccurredStr);
         //% "You can now play the game."
         qInfo() << qtTrId("client-start");
         emit gamestateChanged(KP::Port);
@@ -888,12 +891,12 @@ void Clientv2::receivedMsg(const QJsonObject &djson) {
         }
         luaInitEquipable();
         demandEquipCache();
-        connect(this, &Clientv2::equipRegistryComplete,
-                this, &Clientv2::demandShipCache);
-        connect(this, &Clientv2::shipRegistryComplete,
-                this, &Clientv2::demandMapCache);
-        connect(this, &Clientv2::mapRegistryComplete,
-                this, &Clientv2::tsunkitAssets);
+        connect(this, &Client::equipRegistryComplete,
+                this, &Client::demandShipCache);
+        connect(this, &Client::shipRegistryComplete,
+                this, &Client::demandMapCache);
+        connect(this, &Client::mapRegistryComplete,
+                this, &Client::tsunkitAssets);
         break;
     case KP::AllowClientFinish:
         gameState = KP::Offline;
@@ -1077,7 +1080,7 @@ void Clientv2::receivedMsg(const QJsonObject &djson) {
 }
 
 /* Parse server login messages */
-void Clientv2::receivedNewLogin(const QJsonObject &djson) {
+void Client::receivedNewLogin(const QJsonObject &djson) {
     if(djson["success"].toBool()) {
         //% "%1: login success"
         qInfo() << qtTrId("login-success")
@@ -1090,9 +1093,11 @@ void Clientv2::receivedNewLogin(const QJsonObject &djson) {
         QString reas;
         switch(djson["reason"].toInt()) {
             //% "Login failed: cannot decrypt ticket."
-        case KP::TicketFailedToDecrypt: reas = qtTrId("ticket-decrypt-fail"); break;
+        case KP::TicketFailedToDecrypt:
+            reas = qtTrId("ticket-decrypt-fail"); break;
             //% "Login failed: ticket is from incorrect app id."
-        case KP::TicketIsntFromCorrectAppID: reas = qtTrId("ticket-incorrect-appid"); break;
+        case KP::TicketIsntFromCorrectAppID:
+            reas = qtTrId("ticket-incorrect-appid"); break;
             //% "Login failed: ticket timeouted."
         case KP::RequestTimeout: reas = qtTrId("ticket-timeout"); break;
             //% "Login failed: steam id is invalid."
@@ -1159,7 +1164,8 @@ void customMessageHandler(QtMsgType type,
         msg_off = settings->value("msg_disabled/fatal", false).toBool();
         break;
     }
-    /* consider use QT_NO_DEBUG_OUTPUT, QT_NO_INFO_OUTPUT, QT_NO_WARNING_OUTPUT */
+    /* consider use QT_NO_DEBUG_OUTPUT, QT_NO_INFO_OUTPUT,
+     * QT_NO_WARNING_OUTPUT */
 
     QColor background, foreground;
     switch(type) {
@@ -1187,7 +1193,7 @@ void customMessageHandler(QtMsgType type,
 
     txt = txt.sliced(1);
     if(!msg_off)
-        emit Clientv2::getInstance().qout(txt.remove("\n"),
+        emit Client::getInstance().qout(txt.remove("\n"),
                                           background, foreground);
 
     if(!logFile || !logFile->isWritable()) {
@@ -1206,7 +1212,7 @@ void customMessageHandler(QtMsgType type,
 }
 
 /* Guard against unauthorized entry */
-bool Clientv2::loginCheck() {
+bool Client::loginCheck() {
     if(!loggedIn()) {
         qCritical() << qtTrId("access-denied-login-first");
         return false;
@@ -1214,7 +1220,7 @@ bool Clientv2::loginCheck() {
     return true;
 }
 
-void Clientv2::luaInitEquipable() {
+void Client::luaInitEquipable() {
     auto value = lua.safe_script_file("lua/canequip.lua",
                                       sol::script_pass_on_error);
     if(!value.valid()) {
@@ -1230,7 +1236,7 @@ void Clientv2::luaInitEquipable() {
     }
 }
 
-void Clientv2::switchCert(const QStringList &input) {
+void Client::switchCert(const QStringList &input) {
     if(loggedIn()) {
         //% "Switch certificate when connected have no effect."
         qWarning() << qtTrId("switch-cert-when-connecting");
@@ -1245,5 +1251,6 @@ void Clientv2::switchCert(const QStringList &input) {
     }
     //% "Client PEM is now %1."
     qInfo() << qtTrId("client-pem")
-                   .arg(settings->value("networkclient/pem", "Default").toString());
+                   .arg(settings->value(
+                       "networkclient/pem", "Default").toString());
 }

@@ -10,9 +10,9 @@ void init(sol::state &lua) {
 
     lua.open_libraries(sol::lib::base, sol::lib::package, sol::lib::math);
     lua.set_function("checkmask", &Utility::checkMask);
+    // we don't need to construct Ship in lua
     sol::usertype<Ship> ship_type
-        = lua.new_usertype<Ship>("Ship",
-                                 sol::constructors<>()); // we don't need to construct in lua
+        = lua.new_usertype<Ship>("Ship", sol::constructors<>());
     ship_type["getId"] = &Ship::getId;
     ship_type.set("customFlags", sol::readonly(&Ship::customFlags));
     ship_type.set("attr", sol::readonly(&Ship::attr));

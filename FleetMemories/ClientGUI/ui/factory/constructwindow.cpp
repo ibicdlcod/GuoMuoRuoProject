@@ -31,7 +31,7 @@ ConstructWindow::ConstructWindow(QWidget *parent)
         ));
     connect(ui->shipname, &QComboBox::currentIndexChanged,
             this, &ConstructWindow::shipNameChanged);
-    Clientv2 &engine = Clientv2::getInstance();
+    Client &engine = Client::getInstance();
     equipBoxes = {ui->equip1, ui->equip2, ui->equip3, ui->equip4, ui->equip5};
     assert(equipBoxes.size() == KP::maxEquipSlots);
     for(int i = 0; i < KP::maxEquipSlots; ++i) {
@@ -58,7 +58,7 @@ void ConstructWindow::switchDisplay(int) {
                   localeAwareCompare(qtTrId("all-shipclasses")) == 0
               ? QLatin1String("") : ui->shipclass->currentText();
     const QString searchTerm = ui->searchBox->toPlainText();
-    Clientv2 &engine = Clientv2::getInstance();
+    Client &engine = Client::getInstance();
 
     if(!engine.shipBPModel.isReady()) {
         QMessageBox msgBox(this);
@@ -67,9 +67,11 @@ void ConstructWindow::switchDisplay(int) {
         engine.doRefreshFactoryAnchorage();
         QTimer timer;
         timer.setSingleShot(true);
-        connect(&engine.shipBPModel, &ShipBPModel::bpReady, &msgBox, &QMessageBox::close);
+        connect(&engine.shipBPModel, &ShipBPModel::bpReady,
+                &msgBox, &QMessageBox::close);
         connect(&timer, &QTimer::timeout, &msgBox, &QMessageBox::close);
-        timer.start(settings->value("networkclient/downloadwaittimemsec", 80000).toInt());
+        timer.start(settings->value(
+            "networkclient/downloadwaittimemsec", 80000).toInt());
         msgBox.exec();
     }
     if(!engine.equipModel.isReady()) {
@@ -79,9 +81,11 @@ void ConstructWindow::switchDisplay(int) {
         engine.doRefreshFactoryArsenal();
         QTimer timer;
         timer.setSingleShot(true);
-        connect(&engine.equipModel, &EquipModel::equipReady, &msgBox, &QMessageBox::close);
+        connect(&engine.equipModel, &EquipModel::equipReady,
+                &msgBox, &QMessageBox::close);
         connect(&timer, &QTimer::timeout, &msgBox, &QMessageBox::close);
-        timer.start(settings->value("networkclient/downloadwaittimemsec", 80000).toInt());
+        timer.start(settings->value(
+            "networkclient/downloadwaittimemsec", 80000).toInt());
         msgBox.exec();
     }
 
@@ -178,7 +182,8 @@ void ConstructWindow::switchDisplay(int) {
     else if(searchTerm.isEmpty() && shipclass.isEmpty()) {
         disconnect(ui->shipclass, &QComboBox::currentIndexChanged,
                    this, &ConstructWindow::switchDisplay);
-        std::sort(classPasses.begin(), classPasses.end(), [](QString a, QString b)
+        std::sort(classPasses.begin(), classPasses.end(),
+                  [](QString a, QString b)
                   { return a.localeAwareCompare(b) < 0; });
         ui->shipclass->clear();
         ui->shipclass->addItem(qtTrId("all-shipclasses"));
@@ -212,8 +217,9 @@ void ConstructWindow::initialize() {
 }
 
 void ConstructWindow::shipNameChanged(int) {
-    Clientv2 &engine = Clientv2::getInstance();
-    auto index = engine.proxyModel->mapToSource(engine.proxyModel->index(ui->shipname->currentIndex(), 0));
+    Client &engine = Client::getInstance();
+    auto index = engine.proxyModel->mapToSource(
+        engine.proxyModel->index(ui->shipname->currentIndex(), 0));
     if(!index.isValid()) {
         for(int i = 0; i < KP::maxEquipSlots; ++i) {
             engine.specModels[i]->setEquip(0);
@@ -237,11 +243,13 @@ void ConstructWindow::shipNameChanged(int) {
         engine.specModels[i]->setEquip(equip);
         auto *box = equipBoxes[i];
         auto *label = ui->gridLayout->itemAtPosition(i, 2)->widget();
-        auto *equipText = qobject_cast<QLabel *>(ui->gridLayout->itemAtPosition(i, 3)->widget());
+        auto *equipText = qobject_cast<QLabel *>(
+            ui->gridLayout->itemAtPosition(i, 3)->widget());
 
         if(equipText) {
             if(equip != 0) {
-                equipText->setText(engine.equipRegistryCache[equip]->toString());
+                equipText->setText(
+                    engine.equipRegistryCache[equip]->toString());
             }
             else {
                 //% "(Not required)"
@@ -296,7 +304,7 @@ int ConstructWindow::shipDefDesired() {
 
 QList<QUuid> ConstructWindow::defaultEquipsDesired() {
     QList<QUuid> result(KP::maxEquipSlots, QUuid());
-    Clientv2 &engine = Clientv2::getInstance();
+    Client &engine = Client::getInstance();
     for(int i = 0; i < KP::maxEquipSlots; ++i) {
         SpecEquipModel *model = engine.specModels[i];
         auto uid = model->data(
@@ -307,9 +315,10 @@ QList<QUuid> ConstructWindow::defaultEquipsDesired() {
 }
 
 QUuid ConstructWindow::shipToRemodelDesired() {
-    Clientv2 &engine = Clientv2::getInstance();
+    Client &engine = Client::getInstance();
     SpecShipModel *model = engine.shipRemodelModel;
     auto uid = model->data(
-        model->index(ui->shipnameToRemodel->currentIndex(), 0), Qt::ToolTipRole);
+        model->index(ui->shipnameToRemodel->currentIndex(), 0),
+        Qt::ToolTipRole);
     return uid.isValid() ? uid.toUuid() : QUuid();
 }

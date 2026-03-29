@@ -66,28 +66,28 @@ MainWindow::MainWindow(QWidget *parent, int argc, char ** argv)
     KeyEnterReceiver *key = new KeyEnterReceiver(this);
     ui->CommandPrompt->installEventFilter(key);
 
-    Clientv2 &engine = Clientv2::getInstance();
+    Client &engine = Client::getInstance();
 
     unlockBattle();
-    connect(&engine, &Clientv2::lockBattle,
+    connect(&engine, &Client::lockBattle,
             this, &MainWindow::lockBattle);
-    connect(&engine, &Clientv2::unlockBattle,
+    connect(&engine, &Client::unlockBattle,
             this, &MainWindow::unlockBattle);
     connect(this, &MainWindow::cmdMessage,
-            &engine, &Clientv2::parse);
-    connect(&engine, &Clientv2::qout,
+            &engine, &Client::parse);
+    connect(&engine, &Client::qout,
             this, &MainWindow::printMessage);
-    connect(&engine, &Clientv2::aboutToQuit,
+    connect(&engine, &Client::aboutToQuit,
             this, &MainWindow::close);
     connect(key, &KeyEnterReceiver::enterPressed,
             this, &MainWindow::processCmd);
-    connect(&engine, &Clientv2::gamestateChanged,
+    connect(&engine, &Client::gamestateChanged,
             this, &MainWindow::gamestateChanged);
     connect(ui->actionLogout, &QAction::triggered,
-            &engine, &Clientv2::parseDisconnectReq);
+            &engine, &Client::parseDisconnectReq);
     connect(ui->actionExit, &QAction::triggered,
-            &engine, &Clientv2::parseQuit);
-    connect(&engine, &Clientv2::receivedResourceInfo,
+            &engine, &Client::parseQuit);
+    connect(&engine, &Client::receivedResourceInfo,
             this, &MainWindow::updateResources);
     connect(ui->actionSettings, &QAction::triggered,
             &settingsWindow, &QDialog::show);
@@ -96,10 +96,11 @@ MainWindow::MainWindow(QWidget *parent, int argc, char ** argv)
                 QMessageBox box(this);
                 QString notice;
                 QDir currentDir = QDir::current();
-                QString openingwords = settings->value("license_notice",
-                                                       ":/openingwords.txt").toString();
+                QString openingwords = settings->value(
+                    "license_notice", ":/openingwords.txt").toString();
                 QFile licenseFile(currentDir.filePath(openingwords));
-                if(Q_UNLIKELY(!licenseFile.open(QIODevice::ReadOnly | QIODevice::Text))) {
+                if(Q_UNLIKELY(!licenseFile.open(
+                        QIODevice::ReadOnly | QIODevice::Text))) {
                     //% "Can't find license file, exiting."
                     qFatal() << qtTrId("licence-not-found").toUtf8();
                 }
@@ -108,7 +109,8 @@ MainWindow::MainWindow(QWidget *parent, int argc, char ** argv)
                     notice = instream1.readAll();
                 }
                 notice.replace("<https://www.gnu.org/licenses/>",
-                               "<a href=\"https://www.gnu.org/licenses\">the GNU.org page</a>");
+                               "<a href=\"https://www.gnu.org/licenses\">"
+                               "the GNU.org page</a>");
                 notice.replace("\n", "<br>");
                 notice = "<p align='center'>" + notice + "</p>";
                 box.setText(notice);
@@ -163,23 +165,23 @@ MainWindow::MainWindow(QWidget *parent, int argc, char ** argv)
                        [this]{
                            this->licenseArea->complete();
                        });
-    connect(&engine, &Clientv2::equipRegistryComplete,
+    connect(&engine, &Client::equipRegistryComplete,
             portArea, &PortArea::equipRegistryComplete);
-    connect(&engine, &Clientv2::shipRegistryComplete,
+    connect(&engine, &Client::shipRegistryComplete,
             portArea, &PortArea::shipRegistryComplete);
-    connect(&engine, &Clientv2::mapRegistryComplete,
+    connect(&engine, &Client::mapRegistryComplete,
             portArea, &PortArea::mapRegistryComplete);
-    connect(&engine, &Clientv2::tsunkitAssetsComplete,
+    connect(&engine, &Client::tsunkitAssetsComplete,
             lay, [this](){
                 lay->setCurrentWidget(portArea);
             });
-    connect(&engine, &Clientv2::tsunkitAssetsComplete,
+    connect(&engine, &Client::tsunkitAssetsComplete,
             portArea, &PortArea::hello);
 
     connect(lay, &QStackedLayout::currentChanged,
             this, &MainWindow::adjust);
 
-    connect(&engine, &Clientv2::uiRefreshSig,
+    connect(&engine, &Client::uiRefreshSig,
             this, qOverload<>(&MainWindow::update));
 }
 
@@ -203,45 +205,45 @@ void MainWindow::lockBattle() {
 }
 
 void MainWindow::unlockBattle() {
-    Clientv2 &engine = Clientv2::getInstance();
+    Client &engine = Client::getInstance();
     v =
         {
             connect(ui->actionBack_to_naval_base, &QAction::triggered,
-                    &engine, &Clientv2::backToNavalBase),
+                    &engine, &Client::backToNavalBase),
             connect(ui->actionView_Tech, &QAction::triggered,
-                    &engine, &Clientv2::switchToTech),
+                    &engine, &Client::switchToTech),
             connect(ui->actionRepair, &QAction::triggered,
-                    &engine, &Clientv2::switchToRepairView),
+                    &engine, &Client::switchToRepairView),
             connect(ui->actionDevelop_Equipment, &QAction::triggered,
-                    &engine, &Clientv2::switchToFactory),
+                    &engine, &Client::switchToFactory),
             connect(ui->actionDevelop_Equipment, &QAction::triggered,
                     this, &MainWindow::switchToDevelop),
             connect(ui->actionConstruct_Ships, &QAction::triggered,
-                    &engine, &Clientv2::switchToFactory),
+                    &engine, &Client::switchToFactory),
             connect(ui->actionConstruct_Ships, &QAction::triggered,
                     this, &MainWindow::switchToConstruct),
             connect(ui->actionArsenal, &QAction::triggered,
-                    &engine, &Clientv2::switchToFactory),
+                    &engine, &Client::switchToFactory),
             connect(ui->actionArsenal, &QAction::triggered,
                     this, &MainWindow::switchToArsenal),
             connect(ui->actionAnchorage, &QAction::triggered,
-                    &engine, &Clientv2::switchToFactory),
+                    &engine, &Client::switchToFactory),
             connect(ui->actionAnchorage, &QAction::triggered,
                     this, &MainWindow::switchToAnchorage),
             connect(ui->actionShip_Blueprints, &QAction::triggered,
-                    &engine, &Clientv2::switchToFactory),
+                    &engine, &Client::switchToFactory),
             connect(ui->actionShip_Blueprints, &QAction::triggered,
                     this, &MainWindow::switchToBlueprint),
             connect(ui->actionBattle, &QAction::triggered,
-                    &engine, &Clientv2::switchToBattleView),
+                    &engine, &Client::switchToBattleView),
             connect(ui->actionBattle, &QAction::triggered,
                     this, &MainWindow::switchToSortie),
             connect(ui->actionCompose, &QAction::triggered,
-                    &engine, &Clientv2::switchToFleetView),
+                    &engine, &Client::switchToFleetView),
             connect(ui->actionCompose, &QAction::triggered,
                     this, &MainWindow::switchToFleet),
             connect(ui->actionIndustrial_Plant, &QAction::triggered,
-                    &engine, &Clientv2::switchToFactory),
+                    &engine, &Client::switchToFactory),
             connect(ui->actionIndustrial_Plant, &QAction::triggered,
                     this, &MainWindow::switchToRank),
         };
@@ -278,7 +280,7 @@ void MainWindow::buyEquip() {
 
 void MainWindow::factoryRefresh() {
     QString cmd1 = QStringLiteral("refresh Factory");
-    Clientv2 &engine = Clientv2::getInstance();
+    Client &engine = Client::getInstance();
     engine.parse(cmd1);
 }
 
@@ -292,7 +294,7 @@ void MainWindow::gamestateInit() {
 }
 
 void MainWindow::gamestateChanged(KP::GameState state) {
-    Clientv2 &engine = Clientv2::getInstance();
+    Client &engine = Client::getInstance();
     if(engine.isInBattle() ^ (state == KP::BattleMapView)) {
         /* lock */
         return;
@@ -330,7 +332,7 @@ void MainWindow::processCmd() {
 }
 
 void MainWindow::switchToAnchorage() {
-    Clientv2 &engine = Clientv2::getInstance();
+    Client &engine = Client::getInstance();
     if(!engine.loggedIn()) {
         return;
     }
@@ -340,7 +342,7 @@ void MainWindow::switchToAnchorage() {
 }
 
 void MainWindow::switchToArsenal() {
-    Clientv2 &engine = Clientv2::getInstance();
+    Client &engine = Client::getInstance();
     if(!engine.loggedIn()) {
         return;
     }
@@ -350,7 +352,7 @@ void MainWindow::switchToArsenal() {
 }
 
 void MainWindow::switchToBlueprint() {
-    Clientv2 &engine = Clientv2::getInstance();
+    Client &engine = Client::getInstance();
     if(!engine.loggedIn()) {
         return;
     }
@@ -360,7 +362,7 @@ void MainWindow::switchToBlueprint() {
 }
 
 void MainWindow::switchToConstruct() {
-    Clientv2 &engine = Clientv2::getInstance();
+    Client &engine = Client::getInstance();
     if(!engine.loggedIn()) {
         return;
     }
@@ -370,7 +372,7 @@ void MainWindow::switchToConstruct() {
 }
 
 void MainWindow::switchToDevelop() {
-    Clientv2 &engine = Clientv2::getInstance();
+    Client &engine = Client::getInstance();
     if(!engine.loggedIn()) {
         return;
     }
@@ -380,7 +382,7 @@ void MainWindow::switchToDevelop() {
 }
 
 void MainWindow::switchToFleet() {
-    Clientv2 &engine = Clientv2::getInstance();
+    Client &engine = Client::getInstance();
     if(!engine.loggedIn()) {
         return;
     }
@@ -389,7 +391,7 @@ void MainWindow::switchToFleet() {
 }
 
 void MainWindow::switchToRank() {
-    Clientv2 &engine = Clientv2::getInstance();
+    Client &engine = Client::getInstance();
     if(!engine.loggedIn()) {
         return;
     }
@@ -399,7 +401,7 @@ void MainWindow::switchToRank() {
 }
 
 void MainWindow::switchToSortie() {
-    Clientv2 &engine = Clientv2::getInstance();
+    Client &engine = Client::getInstance();
     if(!engine.loggedIn()) {
         return;
     }

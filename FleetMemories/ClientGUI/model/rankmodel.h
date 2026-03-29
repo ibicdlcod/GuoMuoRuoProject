@@ -43,7 +43,8 @@ private:
     int pvpCol = 2;
     int peCol = 3;
 
-    STEAM_CALLBACK(RankModel, OnPersonaStateChangeHandler, PersonaStateChange_t);
+    STEAM_CALLBACK(RankModel,
+                   OnPersonaStateChangeHandler, PersonaStateChange_t);
 };
 
 #endif // RANKMODEL_H

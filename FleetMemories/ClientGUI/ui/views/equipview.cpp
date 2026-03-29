@@ -21,7 +21,7 @@ EquipView::EquipView(QWidget *parent)
 {
     ui->setupUi(this);
 
-    Clientv2 &engine = Clientv2::getInstance();
+    Client &engine = Client::getInstance();
     model = &engine.equipModel;
 
     arsenalView = new QTableView(ui->ArsenalControl);
@@ -36,7 +36,8 @@ EquipView::EquipView(QWidget *parent)
     arsenalView->setMinimumSize(QSize(100,100));
 
     arsenalView->verticalHeader()->setSectionResizeMode(QHeaderView::Fixed);
-    arsenalView->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
+    arsenalView->horizontalHeader()->setSectionResizeMode(
+        QHeaderView::ResizeToContents);
     connect(arsenalView->horizontalHeader(), &QHeaderView::sectionResized,
             this, &EquipView::columnResized);
 
@@ -137,7 +138,7 @@ EquipView::EquipView(QWidget *parent)
     connect(&engine.shipBPModel, &ShipModel::classBoxHint,
             shipSelect, &ShipSelect::classBoxHinted);
 
-    connect(&engine, &Clientv2::receivedRankInfoUser,
+    connect(&engine, &Client::receivedRankInfoUser,
             industrialSelect, &IndustrialSelect::setIPValue);
     connect(industrialSelect, &IndustrialSelect::buyActivated,
             this, &EquipView::buyActivated);
@@ -173,7 +174,7 @@ void EquipView::enactPageNumChange(int currentPageNum, int totalPageNum) {
         lastButton->setEnabled(true);
     }
     if(totalPageNum == 0) {
-        Clientv2 &engine = Clientv2::getInstance();
+        Client &engine = Client::getInstance();
         if(model == &engine.equipModel) {
             //% "No suitable Equipment"
             pageLabel->setText(qtTrId("no-equip"));
@@ -209,7 +210,7 @@ void EquipView::columnResized(int logicalIndex, int oldSize, int newSize) {
 }
 
 void EquipView::itemSelected(QUuid id) {
-    Clientv2 &engine = Clientv2::getInstance();
+    Client &engine = Client::getInstance();
     if(model == &engine.equipModel) {
         emit equipSelected(id);
     }
@@ -248,7 +249,7 @@ void EquipView::activate(bool arsenal, bool isEquip,
     disconnect(unselectButton, &QPushButton::clicked,
                nullptr, nullptr);
 
-    Clientv2 &engine = Clientv2::getInstance();
+    Client &engine = Client::getInstance();
     disconnect(model, SIGNAL(needReCalculateRows()),
                this, SLOT(recalculateArsenalRows()));
     disconnect(this, SIGNAL(rowCountHint(int)),
@@ -340,14 +341,16 @@ void EquipView::activate(bool arsenal, bool isEquip,
             }
             if(arsenal) {
                 model->setIsInArsenal(true);
-                arsenalView->setItemDelegateForColumn(model->hpColumn(), hpdelegate);
+                arsenalView->setItemDelegateForColumn(
+                    model->hpColumn(), hpdelegate);
                 shipSelect->addStarButton->show();
             }
             else {
                 model->setIsInArsenal(false);
                 arsenalView->setItemDelegateForColumn(model->selectColumn(),
                                                       delegate);
-                arsenalView->setItemDelegateForColumn(model->hpColumn(), hpdelegate);
+                arsenalView->setItemDelegateForColumn(
+                    model->hpColumn(), hpdelegate);
                 connect(delegate, &SelectDelegate::itemSelected,
                         this, &EquipView::itemSelected);
                 shipSelect->addStarButton->hide();
@@ -378,7 +381,8 @@ void EquipView::activate(bool arsenal, bool isEquip,
                 arsenalView->show();
             }
             model->setIsInArsenal(true);
-            arsenalView->setItemDelegateForColumn(model->hpColumn(), hpdelegate);
+            arsenalView->setItemDelegateForColumn(
+                model->hpColumn(), hpdelegate);
             connect(model, SIGNAL(needReCalculateRows()),
                     this, SLOT(recalculateArsenalRows()),
                     Qt::UniqueConnection);

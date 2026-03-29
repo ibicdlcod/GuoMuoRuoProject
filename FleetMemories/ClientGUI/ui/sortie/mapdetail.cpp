@@ -16,12 +16,17 @@ MapDetail::MapDetail(QWidget *parent)
     antialiased = true;
 
     rudder = recolorImage(":/Assets/Image/rudder.png", QColor(192, 192, 0));
-    carrierFleetIcon = recolorImage(":/Assets/Image/fleetIcons/carrier.png", QColor(0, 192, 0));
-    surfaceFleetIcon = recolorImage(":/Assets/Image/fleetIcons/battleship.png", QColor(0, 192, 0));
-    transportFleetIcon = recolorImage(":/Assets/Image/fleetIcons/transport.png", QColor(0, 192, 0));
-    normalFleetIcon = recolorImage(":/Assets/Image/fleetIcons/normal.png", QColor(0, 192, 0));
+    carrierFleetIcon = recolorImage(
+        ":/Assets/Image/fleetIcons/carrier.png", QColor(0, 192, 0));
+    surfaceFleetIcon = recolorImage(
+        ":/Assets/Image/fleetIcons/battleship.png", QColor(0, 192, 0));
+    transportFleetIcon = recolorImage(
+        ":/Assets/Image/fleetIcons/transport.png", QColor(0, 192, 0));
+    normalFleetIcon = recolorImage(
+        ":/Assets/Image/fleetIcons/normal.png", QColor(0, 192, 0));
 
-    /* https://stackoverflow.com/questions/43428627/applying-qpropertyanimation-to-qrect */
+    /* https://stackoverflow.com/questions/43428627/
+     * applying-qpropertyanimation-to-qrect */
     animation = new QPropertyAnimation(this, "fleetcenter");
     connect(animation, &QPropertyAnimation::valueChanged, this, [this](){
         update();
@@ -39,12 +44,15 @@ QPixmap MapDetail::recolorImage(const QString &filename, const QColor &color) {
     }
 
     QPixmap newImage(image.size()); // Create a new, empty pixmap
-    newImage.fill(Qt::transparent); // Ensure the new pixmap is transparent initially
+    // Ensure the new pixmap is transparent initially
+    newImage.fill(Qt::transparent);
 
     QPainter painter(&newImage);
-    painter.drawPixmap(0, 0, QPixmap::fromImage(image)); // Draw the source image to use its alpha channel
+    // Draw the source image to use its alpha channel
+    painter.drawPixmap(0, 0, QPixmap::fromImage(image));
     painter.setCompositionMode(QPainter::CompositionMode_SourceIn);
-    painter.fillRect(newImage.rect(), color); // Fill with yellow (R: 255, G: 255, B: 0)
+    // Fill with yellow (R: 255, G: 255, B: 0)
+    painter.fillRect(newImage.rect(), color);
     painter.end();
     return newImage;
 }
@@ -169,7 +177,8 @@ void MapDetail::paintEvent(QPaintEvent *event) {
             painter.setPen(pen);
             painter.drawPixmap(node.x * width() - circleSize,
                                node.y * height() - circleSize,
-                               rudder.scaled(QSize(circleSize * 2, circleSize * 2),
+                               rudder.scaled(
+                                   QSize(circleSize * 2, circleSize * 2),
                                              Qt::KeepAspectRatio,
                                              Qt::SmoothTransformation
                                              )); break;

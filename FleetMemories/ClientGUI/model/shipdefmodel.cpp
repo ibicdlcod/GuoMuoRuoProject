@@ -16,8 +16,9 @@ ShipDefModel::~ShipDefModel()
 
 int ShipDefModel::rowCount(const QModelIndex &parent) const
 {
-    // For list models only the root node (an invalid parent) should return the list's size. For all
-    // other (valid) parents, rowCount() should return 0 so that it does not become a tree model.
+    // For list models only the root node (an invalid parent) should return
+    // the list's size. For all other (valid) parents, rowCount() should
+    // return 0 so that it does not become a tree model.
     if (parent.isValid())
         return 0;
 
@@ -67,8 +68,9 @@ void ShipDefModel::addShips(QList<int> shipIds) {
     if(shipIds.empty()) {
         return;
     }
-    beginInsertRows(QModelIndex(), rowCount(), rowCount() + shipIds.length() - 1);
-    Clientv2 &engine = Clientv2::getInstance();
+    beginInsertRows(QModelIndex(), rowCount(),
+                    rowCount() + shipIds.length() - 1);
+    Client &engine = Client::getInstance();
     auto cache = engine.shipRegistryCache;
     for(auto shipId: shipIds) {
         (*ships)[shipId] = cache[shipId];
@@ -80,7 +82,8 @@ void ShipDefModel::removeShips(QList<int> shipIds) {
     if(shipIds.empty()) {
         return;
     }
-    beginRemoveRows(QModelIndex(), rowCount() - shipIds.length(), rowCount() - 1);
+    beginRemoveRows(QModelIndex(),
+                    rowCount() - shipIds.length(), rowCount() - 1);
     for(auto shipId: shipIds) {
         ships->remove(shipId);
     }

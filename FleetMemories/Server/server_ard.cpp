@@ -83,7 +83,8 @@ void Server::handleARDPurchaseAuth(const CSteamID &uid,
                         "(OrderID, UserID, Units, Status) "
                         "VALUES (:oid, :uid, :units, 'active')");
             orderRecord.bindValue(":oid", orderId);
-            orderRecord.bindValue(":uid", QString::number(uid.ConvertToUint64()));
+            orderRecord.bindValue(":uid",
+                QString::number(uid.ConvertToUint64()));
             orderRecord.bindValue(":units", unitsToAdd);
             if(Q_UNLIKELY(!orderRecord.exec())) {
                 qCritical() << orderRecord.lastQuery();
@@ -251,7 +252,8 @@ process_transactions:
                 CSteamID uid(rawUid);
                 QSqlQuery deduct;
                 deduct.prepare("UPDATE UserAttr "
-                               "SET Intvalue = Intvalue - :units " // can go below 0
+                               // can go below 0
+                               "SET Intvalue = Intvalue - :units "
                                "WHERE UserID = :uid AND Attribute = :attr");
                 deduct.bindValue(":units", units);
                 deduct.bindValue(":uid", rawUid);

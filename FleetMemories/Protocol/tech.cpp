@@ -53,7 +53,8 @@ double Tech::calExperimentRate(const double wantedTech,
                           const double globalTech,
                           const double localTech,
                           const double sigmaConstant) {
-    double techDiff = calCapable(globalTech, localTech, wantedTech) - wantedTech;
+    double techDiff =
+        calCapable(globalTech, localTech, wantedTech) - wantedTech;
     return std::erfc(-techDiff / (std::sqrt(2) * sigmaConstant) ) / 2;
 }
 
@@ -117,8 +118,9 @@ double Tech::calWeightShip(int level) {
 double Tech::calWeightEquip(double requiredSP, double actualSP) {
     double skillPointWeightContrib =
         settings->value("rule/skillpointweightcontrib", 9.0).toDouble();
-    return (skillPointWeightContrib * actualSP) / std::hypot(requiredSP, actualSP)
-    + 1.0;
+    return (skillPointWeightContrib * actualSP)
+        / std::hypot(requiredSP, actualSP)
+        + 1.0;
 }
 
 /* 2-Technology.md#How characteristic tech level are determined */

@@ -29,7 +29,7 @@ QVariant SpecShipModel::data(const QModelIndex &index,
     QUuid uidToDisplay = sortedShipIds[realRowIndex];
     Ship *shipToDisplay = clientShips[uidToDisplay];
 
-    Clientv2 &engine = Clientv2::getInstance();
+    Client &engine = Client::getInstance();
     bool ready = engine.isEquipRegistryCacheGood();
     if(!ready)
         return QVariant();

@@ -18,22 +18,22 @@ TechView::TechView(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    Clientv2 &engine = Clientv2::getInstance();
-    connect(&engine, &Clientv2::receivedGlobalTechInfo,
+    Client &engine = Client::getInstance();
+    connect(&engine, &Client::receivedGlobalTechInfo,
             this, &TechView::updateGlobalTech);
-    connect(&engine, &Clientv2::receivedGlobalTechInfo2,
+    connect(&engine, &Client::receivedGlobalTechInfo2,
             this, &TechView::updateGlobalTechViewTable);
-    connect(&engine, &Clientv2::receivedLocalTechInfo,
+    connect(&engine, &Client::receivedLocalTechInfo,
             this, &TechView::updateLocalTech);
-    connect(&engine, &Clientv2::receivedLocalTechInfo2,
+    connect(&engine, &Client::receivedLocalTechInfo2,
             this, &TechView::updateLocalTechViewTable);
-    connect(&engine, &Clientv2::equipRegistryComplete,
+    connect(&engine, &Client::equipRegistryComplete,
             this->ui->waitText, &QLabel::hide);
-    connect(&engine, &Clientv2::equipRegistryComplete,
+    connect(&engine, &Client::equipRegistryComplete,
             this, &TechView::resetLocalListName);
     connect(this->ui->updateGlobalButton, &QPushButton::clicked,
             this, &TechView::demandGlobalTech);
-    connect(&engine, &Clientv2::receivedSkillPointInfo,
+    connect(&engine, &Client::receivedSkillPointInfo,
             this, &TechView::updateSkillPoints);
     ui->globalViewTable->hide();
     ui->waitText->show();
@@ -101,7 +101,7 @@ TechView::~TechView()
 }
 
 void TechView::demandGlobalTech() {
-    Clientv2 &engine = Clientv2::getInstance();
+    Client &engine = Client::getInstance();
     if(!engine.isEquipRegistryCacheGood())
         return;
     else {
@@ -115,7 +115,7 @@ void TechView::demandLocalTech(int index) {
     ui->localViewTable->clear();
     ui->skillPointsValue->setText(qtTrId("techview-na"));
 
-    Clientv2 &engine = Clientv2::getInstance();
+    Client &engine = Client::getInstance();
     if(isEquipChoice) {
         for(auto &equipReg:
              engine.equipRegistryCache) {
@@ -156,14 +156,15 @@ void TechView::demandSkillPoints(int index) {
     Q_UNUSED(index)
 
     if(isEquipChoice) {
-        Clientv2 &engine = Clientv2::getInstance();
+        Client &engine = Client::getInstance();
         for(auto &equipReg:
              engine.equipRegistryCache) {
             for(auto &name: equipReg->localNames) {
                 if(name.compare(ui->localListEquip->currentText(),
                                  Qt::CaseInsensitive) == 0) {
                     engine.socket.flush();
-                    QByteArray msg = KP::clientDemandSkillPoints(equipReg->getId());
+                    QByteArray msg =
+                        KP::clientDemandSkillPoints(equipReg->getId());
                     const qint64 written = engine.socket.write(msg);
                     if (written <= 0) {
                         throw NetworkError(engine.socket.errorString());
@@ -196,12 +197,12 @@ void TechView::equipOrShip() {
 void TechView::updateGlobalTech(const QJsonObject &djson) {
     ui->globalTechValue->setText(
         QString::number(djson.value("value").toDouble()));
-    Clientv2 &engine = Clientv2::getInstance();
+    Client &engine = Client::getInstance();
     engine.techCache[0] = djson.value("value").toDouble();
 }
 
 void TechView::updateGlobalTechViewTable(const QJsonObject &djson) {
-    Clientv2 &engine = Clientv2::getInstance();
+    Client &engine = Client::getInstance();
 
     if(!engine.isEquipRegistryCacheGood()) {
         ui->globalViewTable->hide();
@@ -251,7 +252,8 @@ void TechView::updateGlobalTechViewTable(const QJsonObject &djson) {
         if(thisEquip && !thisEquip->isInvalid()) {
             QTableWidgetItem *newItem2;
             newItem2 = new QTableWidgetItem(
-                thisEquip->toString(settings->value("client/language", "ja_JP").toString()));
+                thisEquip->toString(settings->value(
+                    "client/language", "ja_JP").toString()));
             newItem2->setIcon(Icute::equipTypeIcon(thisEquip->type, false));
             newItem2->setFlags(newItem->flags() & ~Qt::ItemIsEditable);
             ui->globalViewTable->setItem(currentRowCount + i, 1, newItem2);
@@ -310,13 +312,13 @@ void TechView::updateGlobalTechViewTable(const QJsonObject &djson) {
 void TechView::updateLocalTech(const QJsonObject &djson) {
     ui->localTechValue->setText(
         QString::number(djson.value("value").toDouble()));
-    Clientv2 &engine = Clientv2::getInstance();
+    Client &engine = Client::getInstance();
     engine.techCache[djson["jobid"].toInt()]
         = djson.value("value").toDouble();
 }
 
 void TechView::updateLocalTechViewTable(const QJsonObject &djson) {
-    Clientv2 &engine = Clientv2::getInstance();
+    Client &engine = Client::getInstance();
 
     if(isEquipChoice && !engine.isEquipRegistryCacheGood()) {
         return;
@@ -357,7 +359,8 @@ void TechView::updateLocalTechViewTable(const QJsonObject &djson) {
             }
             else {
                 newItem2 = new QTableWidgetItem(
-                    thisEquip->toString(settings->value("client/language", "ja_JP").toString()));
+                    thisEquip->toString(settings->value(
+                        "client/language", "ja_JP").toString()));
                 newItem2->setIcon(Icute::equipTypeIcon(thisEquip->type, false));
             }
         }
@@ -369,7 +372,8 @@ void TechView::updateLocalTechViewTable(const QJsonObject &djson) {
             }
             else {
                 newItem2 = new QTableWidgetItem(thisShip->toString());
-                newItem2->setIcon(Icute::shipTypeIcon(thisShip->getId(), false));
+                newItem2->setIcon(
+                    Icute::shipTypeIcon(thisShip->getId(), false));
             }
         }
         newItem2->setFlags(newItem->flags() & ~Qt::ItemIsEditable);
@@ -427,7 +431,7 @@ void TechView::resetLocalListName() {
     if(isEquipChoice) {
         ui->localListEquip->clear();
         for(auto &equipReg:
-             Clientv2::getInstance().equipRegistryCache) {
+             Client::getInstance().equipRegistryCache) {
             if(
                 (ui->localListType1->currentText().
                      localeAwareCompare(qtTrId("all-equipments")) == 0
@@ -460,7 +464,7 @@ void TechView::resetLocalListName() {
             ui->localListClass->clear();
         }
         for(auto &shipReg:
-             Clientv2::getInstance().shipRegistryCache) {
+             Client::getInstance().shipRegistryCache) {
             if(shipReg->isAmnesiac()) {
                 continue;
             }

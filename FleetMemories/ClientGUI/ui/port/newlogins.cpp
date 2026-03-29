@@ -32,6 +32,6 @@ void NewLoginS::parseConnectReq() {
         ui->PortEdit->text()
     };
     QString cmd1Comb = cmd1.join(" ");
-    Clientv2 &engine = Clientv2::getInstance();
+    Client &engine = Client::getInstance();
     engine.parse(cmd1Comb);
 }

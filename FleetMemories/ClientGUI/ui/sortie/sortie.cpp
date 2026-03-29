@@ -36,16 +36,16 @@ Sortie::Sortie(QWidget *parent)
     ui->diffChoice->setSizeAdjustPolicy(QComboBox::AdjustToContents);
     connect(ui->sortieButton, &QPushButton::clicked,
             this, &Sortie::confirmSortieStart);
-    Clientv2 &engine = Clientv2::getInstance();
-    connect(&engine, &Clientv2::receivedMapStart,
+    Client &engine = Client::getInstance();
+    connect(&engine, &Client::receivedMapStart,
             this, &Sortie::sortieStart);
-    connect(&engine, &Clientv2::progressToNode,
+    connect(&engine, &Client::progressToNode,
             this, &Sortie::dealWithNode);
-    connect(&engine, &Clientv2::battleProcess,
+    connect(&engine, &Client::battleProcess,
             this, &Sortie::battleProcess);
-    connect(&engine, &Clientv2::battleEnd,
+    connect(&engine, &Client::battleEnd,
             this, &Sortie::battleEnd);
-    connect(&engine, &Clientv2::mapEnd,
+    connect(&engine, &Client::mapEnd,
             this, &Sortie::sortieEnd);
     connect(ui->diffChoice, &QComboBox::currentTextChanged,
             renderer, &MapRender::setDiff);
@@ -57,7 +57,7 @@ Sortie::~Sortie()
 }
 
 void Sortie::switchToState(KP::SortieState state) {
-    Clientv2 &engine = Clientv2::getInstance();
+    Client &engine = Client::getInstance();
     switch(state) {
     case KP::MapView:
         if(state != sortieState) {
@@ -87,7 +87,8 @@ void Sortie::switchToState(KP::SortieState state) {
                 item->widget()->hide();
             }
         }
-        //https://forum.qt.io/topic/12006/solved-background-color-in-stylesheet-not-taking-effect/2
+        // https://forum.qt.io/topic/12006/
+        // solved-background-color-in-stylesheet-not-taking-effect/2
         //detail->setAttribute(Qt::WA_StyledBackground, true);
         //detail->setStyleSheet("QWidget { background-color: #FF0000; }");
         detail->show();
@@ -123,7 +124,7 @@ void Sortie::resizeEvent(QResizeEvent *event) {
 
 void Sortie::switchMap(int mapId) {
     mapIndex = mapId;
-    Clientv2 &engine = Clientv2::getInstance();
+    Client &engine = Client::getInstance();
     if(!engine.mapRegistryCacheGood) {
         return;
     }
@@ -139,8 +140,10 @@ void Sortie::switchMap(int mapId) {
     auto meta = QMetaEnum::fromType<KP::Difficulty>();
     for(int i = 0; i < meta.keyCount(); ++i) {
         KP::Difficulty diff = static_cast<KP::Difficulty>(meta.value(i));
-        if(engine.mapRegistryCache.contains(mapId + diff * KP::mapIDDifficultyMask)) {
-            mapStr = engine.mapRegistryCache[mapId + diff * KP::mapIDDifficultyMask]
+        if(engine.mapRegistryCache.contains(
+               mapId + diff * KP::mapIDDifficultyMask)) {
+            mapStr = engine.mapRegistryCache[
+                         mapId + diff * KP::mapIDDifficultyMask]
                          ->toString();
             ui->selectDisplay->setText(mapStr);
             switch(diff)
@@ -167,7 +170,7 @@ void Sortie::switchMap(int mapId) {
 }
 
 void Sortie::confirmSortieStart() {
-    Clientv2 &engine = Clientv2::getInstance();
+    Client &engine = Client::getInstance();
     if(mapIndex == 0) {
         return;
     }
@@ -198,7 +201,8 @@ void Sortie::confirmSortieStart() {
             }
         }
     }
-    ConfirmSortie *conf = new ConfirmSortie(this, mapStr, ui->diffChoice->currentText());
+    ConfirmSortie *conf = new ConfirmSortie(
+        this, mapStr, ui->diffChoice->currentText());
     if(conf->exec() == QDialog::Accepted) {
         int fi = conf->getFleetIndex();
         /* check empty fleets */
@@ -222,28 +226,30 @@ void Sortie::confirmSortieStart() {
 }
 
 void Sortie::sortieStart(const QJsonObject &djson) {
-    Clientv2 &engine = Clientv2::getInstance();
+    Client &engine = Client::getInstance();
     engine.enterBattle();
     currentMap = engine.mapRegistryCache[djson["mapid"].toInt()];
     detail->displayDetailedMap(currentMap);
-    dealWithNode(currentMap->nodes[djson["start"].toInt()], djson["start"].toInt());
+    dealWithNode(currentMap->nodes[djson["start"].toInt()],
+                 djson["start"].toInt());
 }
 
 void Sortie::battleProcess(const QJsonObject &djson) {
-    Clientv2 &engine = Clientv2::getInstance();
+    Client &engine = Client::getInstance();
     switchToState(KP::BattleScreen);
     currentBattleProcess = djson;
     /* TODO: battle animation */
 }
 
 void Sortie::battleEnd() {
-    Clientv2 &engine = Clientv2::getInstance();
+    Client &engine = Client::getInstance();
     /* TODO: display battle result */
     currentBattleProcess;
     switchToState(KP::MapDetail);
     if(currentMap->nodes[currentNodeId].type == KP::CHOICE) {
         detail->setChoiceNodes(currentMap->nodes[currentNodeId].nextNodes);
-        connect(detail, &MapDetail::nodeClicked, this, [this, &engine](int nodeId) {
+        connect(detail, &MapDetail::nodeClicked,
+                this, [this, &engine](int nodeId) {
             engine.chooseNode(currentMap->getAbsoluteId(), nodeId);
         }, Qt::SingleShotConnection);
         return;
@@ -261,7 +267,7 @@ ask_for_retreat:
 }
 
 void Sortie::sortieEnd() {
-    Clientv2 &engine = Clientv2::getInstance();
+    Client &engine = Client::getInstance();
     currentBattleProcess = QJsonObject();
     mapIndex = 0;
     currentMap = nullptr;
@@ -274,7 +280,7 @@ void Sortie::sortieEnd() {
 
 void Sortie::dealWithNode(const MapNode &node, int nodeId) {
     currentNodeId = nodeId;
-    Clientv2 &engine = Clientv2::getInstance();
+    Client &engine = Client::getInstance();
     detail->changeCurrentNode(node);
     switch(node.type) {
     case KP::STARTING:
@@ -284,7 +290,8 @@ void Sortie::dealWithNode(const MapNode &node, int nodeId) {
         [[fallthrough]];
     case KP::CHOICE: {
         QEventLoop loop;
-        QObject::connect(detail, &MapDetail::moveFinished, &loop, &QEventLoop::quit);
+        QObject::connect(detail, &MapDetail::moveFinished,
+                         &loop, &QEventLoop::quit);
         QTimer timer;
         timer.setSingleShot(true);
         QObject::connect(&timer, &QTimer::timeout, &loop, &QEventLoop::quit);
@@ -303,7 +310,8 @@ void Sortie::dealWithNode(const MapNode &node, int nodeId) {
     case KP::BOSS:
         QEventLoop loop;
         // Connect the desired signal to the loop's quit() slot
-        QObject::connect(detail, &MapDetail::moveFinished, &loop, &QEventLoop::quit);
+        QObject::connect(detail, &MapDetail::moveFinished,
+                         &loop, &QEventLoop::quit);
 
         // Optional: Add a timeout using a QTimer
         QTimer timer;

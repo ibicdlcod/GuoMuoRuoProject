@@ -3,7 +3,9 @@
 
 #include "consoletextstream.h"
 
-ConsoleTextStream::ConsoleTextStream(FILE *fileHandle, QIODeviceBase::OpenMode openMode = QIODevice::ReadWrite)
+ConsoleTextStream::ConsoleTextStream(
+    FILE *fileHandle,
+    QIODeviceBase::OpenMode openMode = QIODevice::ReadWrite)
     :QTextStream(fileHandle, openMode) {
 
 }
@@ -19,9 +21,12 @@ ConsoleTextStream& ConsoleTextStream::operator<<(QString string) {
         int left_append = append_width / 2;
         QTextStream::FieldAlignment alignment = this->fieldAlignment();
         switch (alignment) {
-        case QTextStream::AlignLeft: string.append(QString(append_width, ' ')); break;
-        case QTextStream::AlignAccountingStyle: // this isn't supported in this program, default.
-        case QTextStream::AlignRight: string.prepend(QString(append_width, ' ')); break;
+        case QTextStream::AlignLeft:
+            string.append(QString(append_width, ' ')); break;
+        // this isn't supported in this program, default.
+        case QTextStream::AlignAccountingStyle:
+        case QTextStream::AlignRight:
+            string.prepend(QString(append_width, ' ')); break;
         case QTextStream::AlignCenter:
             string.prepend(QString(left_append, ' '));
             string.append(QString(append_width - left_append, ' ')); break;

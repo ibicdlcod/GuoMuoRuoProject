@@ -108,7 +108,7 @@ void ARDCouponDialog::updatePriceLabel(int units) {
 void ARDCouponDialog::purchase() {
     int id = packageGroup->checkedId();
     int units = (id == customTierId) ? unitsBox->value() : presetTiers[id];
-    Clientv2 &engine = Clientv2::getInstance();
+    Client &engine = Client::getInstance();
     engine.initARDPurchase(units);
     accept();
 }

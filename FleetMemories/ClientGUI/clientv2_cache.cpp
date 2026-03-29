@@ -10,7 +10,7 @@ using namespace std::chrono_literals;
 
 extern std::unique_ptr<QSettings> settings;
 
-void Clientv2::demandEquipCache() {
+void Client::demandEquipCache() {
     QDateTime localCacheTimeStamp = settings->value("client/equipdbtimestamp",
                                                     QDateTime(QDate(1970,01,01),
                                                               QTime(0, 0, 0))
@@ -19,7 +19,7 @@ void Clientv2::demandEquipCache() {
     sender->enqueue(msg);
 }
 
-void Clientv2::demandEquipSkillPoints(int equipDef) {
+void Client::demandEquipSkillPoints(int equipDef) {
     socket.flush();
     QByteArray msg = KP::clientDemandSkillPoints(equipDef);
     const qint64 written = socket.write(msg);
@@ -29,7 +29,7 @@ void Clientv2::demandEquipSkillPoints(int equipDef) {
     return;
 }
 
-void Clientv2::demandMapCache() {
+void Client::demandMapCache() {
     QDateTime localCacheTimeStamp = settings->value("client/mapdbtimestamp",
                                                     QDateTime(QDate(1970,01,01),
                                                               QTime(0, 0, 0))
@@ -38,12 +38,12 @@ void Clientv2::demandMapCache() {
     sender->enqueue(msg);
 }
 
-void Clientv2::demandMapSupremacy() {
+void Client::demandMapSupremacy() {
     QByteArray msg = KP::clientDemandMapInfoUser();
     sender->enqueue(msg);
 }
 
-void Clientv2::demandShipCache() {
+void Client::demandShipCache() {
     QDateTime localCacheTimeStamp = settings->value("client/shipdbtimestamp",
                                                     QDateTime(QDate(1970,01,01),
                                                               QTime(0, 0, 0))
@@ -52,7 +52,7 @@ void Clientv2::demandShipCache() {
     sender->enqueue(msg);
 }
 
-void Clientv2::updateEquipCache(const QJsonObject &input) {
+void Client::updateEquipCache(const QJsonObject &input) {
     QJsonObject cachedInput;
     if(!input.contains("content")) {
         cachedInput
@@ -75,14 +75,14 @@ void Clientv2::updateEquipCache(const QJsonObject &input) {
 
     //% "Equipment cache length: %1"
     qDebug() << qtTrId("equipment-cache-length")
-                    .arg(Clientv2::getInstance()
+                    .arg(Client::getInstance()
                              .equipRegistryCache.size());
 
     equipRegistryCacheGood = true;
     emit equipRegistryComplete();
 }
 
-void Clientv2::updateShipCache(const QJsonObject &input) {
+void Client::updateShipCache(const QJsonObject &input) {
     QJsonObject cachedInput;
     if(!input.contains("content")) {
         cachedInput
@@ -105,14 +105,14 @@ void Clientv2::updateShipCache(const QJsonObject &input) {
 
     //% "Ship cache length: %1"
     qDebug() << qtTrId("shipment-cache-length")
-                    .arg(Clientv2::getInstance()
+                    .arg(Client::getInstance()
                              .shipRegistryCache.size());
 
     shipRegistryCacheGood = true;
     emit shipRegistryComplete();
 }
 
-void Clientv2::updateMapCache(const QJsonObject &input) {
+void Client::updateMapCache(const QJsonObject &input) {
     QJsonObject cachedInput;
     if(!input.contains("content")) {
         cachedInput
@@ -136,7 +136,7 @@ void Clientv2::updateMapCache(const QJsonObject &input) {
 
     //% "Map cache length: %1"
     qDebug() << qtTrId("map-cache-length")
-                    .arg(Clientv2::getInstance()
+                    .arg(Client::getInstance()
                              .mapRegistryCache.size());
 
     mapRegistryCacheGood = true;
@@ -144,7 +144,7 @@ void Clientv2::updateMapCache(const QJsonObject &input) {
 }
 
 /* Not generalized because used as slots */
-void Clientv2::switchToFactory() {
+void Client::switchToFactory() {
     if(!loggedIn()) {
         emit qout(qtTrId("access-denied-login-first"));
         return;
@@ -163,7 +163,7 @@ void Clientv2::switchToFactory() {
     }
 }
 
-void Clientv2::switchToRepairView() {
+void Client::switchToRepairView() {
     if(!loggedIn()) {
         emit qout(qtTrId("access-denied-login-first"));
         return;
@@ -176,7 +176,7 @@ void Clientv2::switchToRepairView() {
     }
 }
 
-void Clientv2::switchToBattleView() {
+void Client::switchToBattleView() {
     if(!loggedIn()) {
         emit qout(qtTrId("access-denied-login-first"));
         return;
@@ -189,7 +189,7 @@ void Clientv2::switchToBattleView() {
     }
 }
 
-void Clientv2::switchToFleetView() {
+void Client::switchToFleetView() {
     if(!loggedIn()) {
         emit qout(qtTrId("access-denied-login-first"));
         return;
@@ -202,7 +202,7 @@ void Clientv2::switchToFleetView() {
     }
 }
 
-void Clientv2::switchToTech() {
+void Client::switchToTech() {
     if(!loggedIn()) {
         emit qout(qtTrId("access-denied-login-first"));
         return;
@@ -220,34 +220,34 @@ void Clientv2::switchToTech() {
         }
         else if(!equipRegistryCacheGood){
             demandEquipCache();
-            connect(this, &Clientv2::equipRegistryComplete,
-                    this, &Clientv2::demandShipCache);
-            connect(this, &Clientv2::shipRegistryComplete,
-                    this, &Clientv2::switchToTech2);
+            connect(this, &Client::equipRegistryComplete,
+                    this, &Client::demandShipCache);
+            connect(this, &Client::shipRegistryComplete,
+                    this, &Client::switchToTech2);
         }
         else{
             demandShipCache();
-            connect(this, &Clientv2::shipRegistryComplete,
-                    this, &Clientv2::switchToTech2);
+            connect(this, &Client::shipRegistryComplete,
+                    this, &Client::switchToTech2);
         }
     }
 }
 
-void Clientv2::switchToTech2() {
+void Client::switchToTech2() {
     socket.flush();
     QByteArray msg = KP::clientDemandTech(0);
     sender->enqueue(msg);
     socket.flush();
 }
 
-void Clientv2::switchToTech3(int techId) {
+void Client::switchToTech3(int techId) {
     socket.flush();
     QByteArray msg = KP::clientDemandTech(techId);
     sender->enqueue(msg);
     socket.flush();
 }
 
-void Clientv2::tsunkitAssets() {
+void Client::tsunkitAssets() {
     QSet<int> iconGroups;
     for(auto equip: std::as_const(equipRegistryCache)) {
         iconGroups.insert(equip->type.iconGroup());
@@ -256,7 +256,8 @@ void Clientv2::tsunkitAssets() {
     for(auto iconGroup: iconGroups)  {
         ResourceFetch *resourceFetcher = new ResourceFetch();
         resourceFetcher->downloadFile(
-            QString("https://tsunkit.net/api/assets/images/equipTypeIcons/%1").arg(iconGroup),
+            QString("https://tsunkit.net/api/assets/images/equipTypeIcons/%1")
+                .arg(iconGroup),
             QString("%1.png").arg(iconGroup),
             QStringLiteral("equipTypeIcons/"));
 
@@ -273,7 +274,7 @@ void Clientv2::tsunkitAssets() {
     }
 }
 
-void Clientv2::tsunkitAssets2() {
+void Client::tsunkitAssets2() {
     QSet<int> oldInternalIDs;
     for(auto ship: std::as_const(shipRegistryCache)) {
         oldInternalIDs.insert(ship->attr["OldInternalNo."]);
@@ -293,7 +294,8 @@ void Clientv2::tsunkitAssets2() {
         ResourceFetch *resourceFetcher = new ResourceFetch();
         downloadStarted += 1;
         resourceFetcher->downloadFile(
-            QString("https://tsunkit.net/api/assets/images/shipIcons/%1_100").arg(oldInternalID),
+            QString("https://tsunkit.net/api/assets/images/shipIcons/%1_100")
+                .arg(oldInternalID),
             QString("%1.png").arg(oldInternalID),
             QStringLiteral("shipIcons/"));
 
@@ -310,7 +312,7 @@ void Clientv2::tsunkitAssets2() {
     }
 }
 
-void Clientv2::sendTestMessages() {
+void Client::sendTestMessages() {
 #pragma message(NOT_M_CONST)
     /*
     constexpr int size = 20;
@@ -325,7 +327,8 @@ void Clientv2::sendTestMessages() {
     }
     for(auto iconGroup: iconGroups)  {
         resourceFetcher.downloadFile(
-            QString("https://tsunkit.net/api/assets/images/equipTypeIcons/%1").arg(iconGroup),
+            QString("https://tsunkit.net/api/assets/images/equipTypeIcons/%1")
+                .arg(iconGroup),
             QString("%1.png").arg(iconGroup),
             QStringLiteral("equipTypeIcons/"));
         QEventLoop loop;
@@ -333,9 +336,11 @@ void Clientv2::sendTestMessages() {
         timer.setSingleShot(true); // Ensure timer only fires once
 
         // Connect the signal you're waiting for to the QEventLoop::quit slot
-        connect(&resourceFetcher, &ResourceFetch::finished, &loop, &QEventLoop::quit);
+        connect(&resourceFetcher, &ResourceFetch::finished,
+                &loop, &QEventLoop::quit);
 
-        timer.start(settings->value("networkclient/downloadwaittimemsec", 80000).toInt());
+        timer.start(settings->value(
+            "networkclient/downloadwaittimemsec", 80000).toInt());
 
         loop.exec();
     }

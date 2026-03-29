@@ -137,7 +137,8 @@ bool Server::importEquipFromCSV() {
     delete csvFile;
     //% "Import equipment registry success!"
     qInfo() << qtTrId("equip-import-good");
-    settings->setValue("server/equipdbtimestamp", QDateTime::currentDateTimeUtc());
+    settings->setValue("server/equipdbtimestamp",
+                       QDateTime::currentDateTimeUtc());
     return equipmentRefresh();
 }
 
@@ -184,7 +185,8 @@ bool Server::importShipFromCSV() {
                                       "VALUES (:id, :attr, :value);");
                         query.bindValue(":id", shipid);
                         query.bindValue(":attr", titleParts[i]);
-                        query.bindValue(":value", lineParts[i].toInt(nullptr, 16));
+                        query.bindValue(":value",
+                            lineParts[i].toInt(nullptr, 16));
                         if(!query.exec()) {
                             qCritical() << query.lastQuery();
                             //% "Import ship database failed!"
@@ -266,7 +268,8 @@ bool Server::importShipFromCSV() {
     delete csvFile;
     //% "Import ship registry success!"
     qInfo() << qtTrId("ship-import-good");
-    settings->setValue("server/shipdbtimestamp", QDateTime::currentDateTimeUtc());
+    settings->setValue("server/shipdbtimestamp",
+                       QDateTime::currentDateTimeUtc());
     return shipRefresh();
 }
 
@@ -276,7 +279,8 @@ bool Server::importMapFromCSV() {
          && importVCRFromCSV())) {
         return false;
     }
-    settings->setValue("server/mapdbtimestamp", QDateTime::currentDateTimeUtc());
+    settings->setValue("server/mapdbtimestamp",
+                       QDateTime::currentDateTimeUtc());
     return mapRefresh();
 }
 
@@ -288,7 +292,8 @@ bool Server::importMapNodeFromCSV() {
     }
 
     QString csvFileName =
-            settings->value("server/map_node_reg_csv", "Map_nodes.csv").toString();
+            settings->value("server/map_node_reg_csv",
+                             "Map_nodes.csv").toString();
     QFile *csvFile = new QFile(csvFileName);
     if(Q_UNLIKELY(!csvFile) || !csvFile->open(QIODevice::ReadOnly)) {
         //% "%1: CSV file cannot be opened"
@@ -389,7 +394,8 @@ bool Server::importMapNodeFromCSV() {
     delete csvFile;
     //% "Import map node registry success!"
     qInfo() << qtTrId("map-node-import-good");
-    settings->setValue("server/mapdbtimestamp", QDateTime::currentDateTimeUtc());
+    settings->setValue("server/mapdbtimestamp",
+                       QDateTime::currentDateTimeUtc());
     return true;
 }
 
@@ -401,7 +407,8 @@ bool Server::importMapRelationFromCSV() {
     }
 
     QString csvFileName =
-            settings->value("server/map_relation_reg_csv", "Map_relations.csv").toString();
+            settings->value("server/map_relation_reg_csv",
+                             "Map_relations.csv").toString();
     QFile *csvFile = new QFile(csvFileName);
     if(Q_UNLIKELY(!csvFile) || !csvFile->open(QIODevice::ReadOnly)) {
         //% "%1: CSV file cannot be opened"
@@ -464,7 +471,8 @@ bool Server::importMapRelationFromCSV() {
     delete csvFile;
     //% "Import map relation registry success!"
     qInfo() << qtTrId("map-relation-import-good");
-    settings->setValue("server/mapdbtimestamp", QDateTime::currentDateTimeUtc());
+    settings->setValue("server/mapdbtimestamp",
+                       QDateTime::currentDateTimeUtc());
     return true;
 }
 
@@ -476,7 +484,8 @@ bool Server::importVCRFromCSV() {
     }
 
     QString csvFileName =
-            settings->value("server/vcr_reg_csv", "Precondition_relations.csv").toString();
+            settings->value("server/vcr_reg_csv",
+                             "Precondition_relations.csv").toString();
     QFile *csvFile = new QFile(csvFileName);
     if(Q_UNLIKELY(!csvFile) || !csvFile->open(QIODevice::ReadOnly)) {
         //% "%1: CSV file cannot be opened"
@@ -542,12 +551,14 @@ bool Server::importVCRFromCSV() {
     delete csvFile;
     //% "Virtual condition relation registry success!"
     qInfo() << qtTrId("vcr-import-good");
-    settings->setValue("server/equipdbtimestamp", QDateTime::currentDateTimeUtc());
+    settings->setValue("server/equipdbtimestamp",
+                       QDateTime::currentDateTimeUtc());
     return true;
 }
 
 bool Server::exportEquipToCSV() const {
-    QString csvFileName = settings->value("server/equip_reg_csv", "Equip.csv").toString();
+    QString csvFileName =
+        settings->value("server/equip_reg_csv", "Equip.csv").toString();
     /* TODO: eliminate raw new/delete when possible */
     QFile *csvFile = new QFile(csvFileName);
     if(Q_UNLIKELY(!csvFile) || !csvFile->open(QIODevice::WriteOnly)) {
@@ -668,7 +679,8 @@ bool Server::shipRefresh() {
         }
         auto latermodels = ship->getLaterModels(shipRegistry);
         if(!latermodels.empty()) {
-            auto latestmodel = *std::max_element(latermodels.constBegin(), latermodels.constEnd());
+            auto latestmodel = *std::max_element(
+                latermodels.constBegin(), latermodels.constEnd());
             shipRemodelGroup.insert(latestmodel, ship->getId());
         }
         shipOldIdToNewId[ship->attr["OldInternalNo."]] = ship->getId();
@@ -719,26 +731,28 @@ bool Server::mapRefresh()
             int valueCol = rec.indexOf("Intvalue");
             int O = 0, E = 0, S = 0, A = 0, R = 0, W = 0, C = 0;
             while(query.next()) {
-                if(query.value(attrCol).toString().compare("O", Qt::CaseInsensitive)) {
-                    O = query.value(valueCol).toInt();
+                QString attr = query.value(attrCol).toString();
+                int val = query.value(valueCol).toInt();
+                if(attr.compare("O", Qt::CaseInsensitive)) {
+                    O = val;
                 }
-                if(query.value(attrCol).toString().compare("E", Qt::CaseInsensitive)) {
-                    E = query.value(valueCol).toInt();
+                if(attr.compare("E", Qt::CaseInsensitive)) {
+                    E = val;
                 }
-                if(query.value(attrCol).toString().compare("S", Qt::CaseInsensitive)) {
-                    S = query.value(valueCol).toInt();
+                if(attr.compare("S", Qt::CaseInsensitive)) {
+                    S = val;
                 }
-                if(query.value(attrCol).toString().compare("R", Qt::CaseInsensitive)) {
-                    R = query.value(valueCol).toInt();
+                if(attr.compare("R", Qt::CaseInsensitive)) {
+                    R = val;
                 }
-                if(query.value(attrCol).toString().compare("A", Qt::CaseInsensitive)) {
-                    A = query.value(valueCol).toInt();
+                if(attr.compare("A", Qt::CaseInsensitive)) {
+                    A = val;
                 }
-                if(query.value(attrCol).toString().compare("W", Qt::CaseInsensitive)) {
-                    W = query.value(valueCol).toInt();
+                if(attr.compare("W", Qt::CaseInsensitive)) {
+                    W = val;
                 }
-                if(query.value(attrCol).toString().compare("C", Qt::CaseInsensitive)) {
-                    C = query.value(valueCol).toInt();
+                if(attr.compare("C", Qt::CaseInsensitive)) {
+                    C = val;
                 }
             }
             resourceMaps[mapID] = ResOrd(O, E, S, R, A, W, C);
@@ -749,7 +763,8 @@ bool Server::mapRefresh()
             {
                 QSqlQuery query;
                 query.prepare("SELECT Attribute, Intvalue FROM MapResource "
-                              "WHERE MapID = :id AND (Attribute = 'x' OR Attribute = 'y');");
+                              "WHERE MapID = :id "
+                              "AND (Attribute = 'x' OR Attribute = 'y');");
                 query.bindValue(":id", mapID);
                 if(!query.exec()) {
                     qCritical() << query.lastQuery();
@@ -763,10 +778,11 @@ bool Server::mapRefresh()
                 int attrCol = rec.indexOf("Attribute");
                 int valueCol = rec.indexOf("Intvalue");
                 while(query.next()) {
-                    if(query.value(attrCol).toString().compare("x", Qt::CaseInsensitive) == 0) {
+                    QString attr2 = query.value(attrCol).toString();
+                    if(attr2.compare("x", Qt::CaseInsensitive) == 0) {
                         x = query.value(valueCol).toInt();
                     }
-                    if(query.value(attrCol).toString().compare("y", Qt::CaseInsensitive) == 0) {
+                    if(attr2.compare("y", Qt::CaseInsensitive) == 0) {
                         y = query.value(valueCol).toInt();
                     }
                 }
@@ -791,17 +807,20 @@ bool Server::mapRefresh()
                 }
             }
             if(mapID == KP::hiddenMap) {
-                normalMaps.insert(mapID + KP::Historical * KP::mapIDDifficultyMask,
-                                  new MapWithDiff(m, KP::Historical));
+                normalMaps.insert(
+                    mapID + KP::Historical * KP::mapIDDifficultyMask,
+                    new MapWithDiff(m, KP::Historical));
             }
             else {
                 auto meta = QMetaEnum::fromType<KP::Difficulty>();
                 for(int i = 0; i < meta.keyCount(); ++i) {
-                    if(static_cast<KP::Difficulty>(meta.value(i)) == KP::Historical) {
+                    auto diff = static_cast<KP::Difficulty>(meta.value(i));
+                    if(diff == KP::Historical) {
                         continue;
                     }
-                    normalMaps.insert(mapID + meta.value(i) * KP::mapIDDifficultyMask,
-                                      new MapWithDiff(m, static_cast<KP::Difficulty>(meta.value(i))));
+                    normalMaps.insert(
+                        mapID + meta.value(i) * KP::mapIDDifficultyMask,
+                        new MapWithDiff(m, diff));
                 }
             }
         }

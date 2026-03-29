@@ -32,8 +32,10 @@ public:
     ~Server() noexcept override;
 
     void datagramReceived(const PeerInfo &, const QByteArray &, QSslSocket *);
-    void datagramReceivedNonStd(const QByteArray &, const PeerInfo &, QSslSocket *);
-    void datagramReceivedStd(const QJsonObject &, const PeerInfo &, QSslSocket *);
+    void datagramReceivedNonStd(const QByteArray &, const PeerInfo &,
+                                QSslSocket *);
+    void datagramReceivedStd(const QJsonObject &, const PeerInfo &,
+                             QSslSocket *);
     bool listen(const QHostAddress &, quint16);
     void naturalRegen(const CSteamID &);
 
@@ -79,20 +81,23 @@ private:
     void deleteTestShip(const CSteamID &);
     void doBuy(const CSteamID &, int, QSslSocket *);
     void doBuyFromStore(const CSteamID &, int, QSslSocket *);
-    void doConstruct(const CSteamID &, int, QList<QUuid> &, const QUuid &, int, QSslSocket *);
+    void doConstruct(const CSteamID &, int, QList<QUuid> &, const QUuid &,
+                     int, QSslSocket *);
     void doDevelop(const CSteamID &, int, int, QSslSocket *);
     void doFetch(const CSteamID &, int, QSslSocket *, bool forced = false);
     void doHandshake(QSslSocket *, const QByteArray &);
     void doRepair(const CSteamID &, const QUuid &, int,
                   QSslSocket *, bool stop = false, bool forced = false);
-    int drop(const CSteamID &uid, int mapId, int nodeId, KP::BattleAssessment ass);
+    int drop(const CSteamID &uid, int mapId, int nodeId,
+             KP::BattleAssessment ass);
     [[nodiscard]] bool equipmentRefresh();
     void exitGraceSpec() override;
     bool exportEquipToCSV() const;
     void generateEquipChilds(int, int);
     void generateTestEquip(const CSteamID &);
     void generateTestShip(const CSteamID &);
-    void handleARDPurchaseAuth(const CSteamID &, QSslSocket *, const QJsonObject &);
+    void handleARDPurchaseAuth(const CSteamID &, QSslSocket *,
+                               const QJsonObject &);
     void handleInitARDPurchase(const CSteamID &, QSslSocket *, int packageId);
     void pollARDRefunds();
     static int getBossDamage(const QJsonObject &);
@@ -116,23 +121,29 @@ private:
     void migrate(const CSteamID &, const QJsonObject &);
     void minutePulse();
     bool modifyShip(const CSteamID &, QUuid prevShip, int newDef);
-    QList<std::tuple<QUuid, int>> modernize(const CSteamID &, const QList<QUuid> &);
-    QList<std::tuple<QUuid, int>> modernizeEquip(const CSteamID &, const QList<QUuid> &);
+    QList<std::tuple<QUuid, int>> modernize(const CSteamID &,
+                                            const QList<QUuid> &);
+    QList<std::tuple<QUuid, int>> modernizeEquip(const CSteamID &,
+                                                 const QList<QUuid> &);
     QUuid newEquip(const CSteamID &, int, bool direct = false);
     void newEquipHasMother(const CSteamID &, int);
     int64 newEquipHasMotherCal(const CSteamID &, int);
     QUuid newShip(const CSteamID &, int, bool direct = false);
-    int nextNode(const CSteamID &, QSslSocket *, int mapId, int prevNode, int fleetIndex);
+    int nextNode(const CSteamID &, QSslSocket *, int mapId, int prevNode,
+                 int fleetIndex);
     void parseListen(const QStringList &);
     void parseUnlisten();
     void processBattle(const CSteamID &, QSslSocket *, const QJsonObject &);
-    const QJsonObject processBattleCore(const CSteamID &, int, int, int, const QJsonObject &);
+    const QJsonObject processBattleCore(const CSteamID &, int, int, int,
+                                        const QJsonObject &);
     void processDrop(const CSteamID &, QSslSocket *, int shipId);
     void processExpGain(const CSteamID &, int fleetIndex,
                         double baseExpGained, KP::BattleAssessment assm);
-    void processVirtualExpGain(const CSteamID &, int mapUnionId, KP::Difficulty diff,
-                        double baseExpGained, KP::BattleAssessment assm);
-    void progressMap(const CSteamID &, QSslSocket *, int, int, bool retreat = false);
+    void processVirtualExpGain(const CSteamID &, int mapUnionId,
+                               KP::Difficulty diff, double baseExpGained,
+                               KP::BattleAssessment assm);
+    void progressMap(const CSteamID &, QSslSocket *, int, int,
+                     bool retreat = false);
     std::optional<QList<int>> queryMapProgress(const CSteamID &, QSslSocket *,
                                                KP::BattleState,
                                                int map = 0, int node = 0);

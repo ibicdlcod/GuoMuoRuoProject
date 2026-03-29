@@ -26,7 +26,8 @@ MapViewWidget::MapViewWidget(QList<QWidget *> subWidgets,
 
 void MapViewWidget::resizeEvent(QResizeEvent *event)
 {
-    float thisAspectRatio = (float)event->size().width() / event->size().height();
+    float thisAspectRatio =
+        (float)event->size().width() / event->size().height();
     int widgetStretch, outerStretch;
 
     if (thisAspectRatio > (arWidth/arHeight)) // too wide

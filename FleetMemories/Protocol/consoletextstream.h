@@ -46,7 +46,8 @@ public:
     typename std::enable_if<(std::is_same<Args, Ecma>::value && ...), void>
     ::type printLine(const QString &input, Args&&... all)
     {
-        /* Braces here isn't trivial: https://en.cppreference.com/w/cpp/language/fold */
+        /* Braces here isn't trivial:
+         * https://en.cppreference.com/w/cpp/language/fold */
 #pragma message(USED_CXX17)
         (*this << ... << all);
         int width;
@@ -62,7 +63,8 @@ public:
 #pragma message(NOT_M_CONST)
         width = 80;
 #endif
-        /* Obviously, QString::SkipEmptyParts should not be used here, for a file may contain useful empty lines */
+        /* Obviously, QString::SkipEmptyParts should not be used here,
+         * for a file may contain useful empty lines */
         static QRegularExpression e = QRegularExpression("[\r\n]");
         const QStringList noticeLines = input.split(e);
         for(QStringList::const_iterator i = noticeLines.constBegin();
@@ -71,12 +73,15 @@ public:
         {
             int length = i->length();
             wchar_t *data;
-            data = reinterpret_cast<wchar_t *>(calloc(length, sizeof(wchar_t)));
+            data = reinterpret_cast<wchar_t *>(
+                calloc(length, sizeof(wchar_t)));
             i->toWCharArray(data);
             int raw_length = mk_wcswidth(data, i->size());
             free(data);
 
-            QTextStream::setFieldWidth(width * ((length - 1) / width + 1) - raw_length + length);
+            QTextStream::setFieldWidth(
+                width * ((length - 1) / width + 1)
+                - raw_length + length);
             *this << *i;
             QTextStream::setFieldWidth(0);
             *this << Qt::endl;

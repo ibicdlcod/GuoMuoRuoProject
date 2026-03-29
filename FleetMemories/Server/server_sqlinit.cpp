@@ -290,7 +290,9 @@ Q_GLOBAL_STATIC(QString,
                     "User BLOB NOT NULL, "
                     "MapDef INTEGER NOT NULL, "
                     "Supremacy FLOAT NOT NULL DEFAULT -1, "
-                    /* gauge remaining can be negative which makes DLC maps easier,                                                                                                                                                                                                            * you still need to defeat boss flagship to win */
+                    /* gauge remaining can be negative which makes DLC maps
+                     * easier, you still need to defeat boss flagship
+                     * to win */
                     "GaugeC INTEGER NOT NULL DEFAULT 0, "
                     "GaugeB INTEGER NOT NULL DEFAULT 0, "
                     "GaugeA INTEGER NOT NULL DEFAULT 0, "

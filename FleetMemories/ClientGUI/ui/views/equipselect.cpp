@@ -115,7 +115,7 @@ void EquipSelect::reCalculateAvailableEquips(int index) {
     Q_UNUSED(index);
     equipBox->clear();
     for(auto &equipReg:
-         Clientv2::getInstance().equipRegistryCache) {
+         Client::getInstance().equipRegistryCache) {
         if(
             (typeBox->currentText().compare("All equipments") == 0
              && equipReg->type.getDisplayGroup()

@@ -28,14 +28,19 @@ void ElidedLabel::paintEvent(QPaintEvent *event)
         int nextLineY = y + lineSpacing;
 
         if (height() >= nextLineY + lineSpacing) {
-            line.draw(&painter, QPoint(width() / 2.0 - line.naturalTextWidth() / 2.0, y));
+            line.draw(&painter,
+                      QPoint(width() / 2.0 - line.naturalTextWidth() / 2.0,
+                             y));
             y = nextLineY;
         } else {
             QString lastLine = text().mid(line.textStart());
-            QString elidedLastLine = fontMetrics.elidedText(lastLine, Qt::ElideRight, width());
-            painter.drawText(QPoint(width() / 2.0
-                                        - fontMetrics.boundingRect(elidedLastLine).width() / 2.0,
-                                    y + fontMetrics.ascent()), elidedLastLine);
+            QString elidedLastLine =
+                fontMetrics.elidedText(lastLine, Qt::ElideRight, width());
+            painter.drawText(
+                QPoint(width() / 2.0
+                       - fontMetrics.boundingRect(elidedLastLine).width()
+                       / 2.0,
+                       y + fontMetrics.ascent()), elidedLastLine);
             line = textLayout.createLine();
             break;
         }

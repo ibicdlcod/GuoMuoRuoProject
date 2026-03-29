@@ -25,10 +25,10 @@ DevelopWindow::DevelopWindow(QWidget *parent)
     }
     ui->listType->addItem(qtTrId("all-equipments"));
 
-    ui->listType->setCurrentIndex(Clientv2::getInstance().equipBigTypeIndex);
+    ui->listType->setCurrentIndex(Client::getInstance().equipBigTypeIndex);
 
-    resetListName(Clientv2::getInstance().equipBigTypeIndex);
-    ui->listName->setCurrentIndex(Clientv2::getInstance().equipIndex);
+    resetListName(Client::getInstance().equipBigTypeIndex);
+    ui->listName->setCurrentIndex(Client::getInstance().equipIndex);
 
     connect(ui->listType, &QComboBox::currentIndexChanged,
             this, &DevelopWindow::resetListName);
@@ -42,11 +42,11 @@ DevelopWindow::DevelopWindow(QWidget *parent)
             this, &DevelopWindow::displaySuccessRate2);
     connect(ui->calButton, &QPushButton::clicked,
             this, &DevelopWindow::devDemandChance);
-    Clientv2 &engine = Clientv2::getInstance();
-    connect(&engine, &Clientv2::receivedGlobalTechInfo,
-            this, [this]{QTimer::singleShot(100ms, this, [this]{displaySuccessRate2();});});
-    connect(&engine, &Clientv2::receivedLocalTechInfo,
-            this, [this]{QTimer::singleShot(100ms, this, [this]{displaySuccessRate2();});});
+    Client &engine = Client::getInstance();
+    connect(&engine, &Client::receivedGlobalTechInfo, this, [this]{
+        QTimer::singleShot(100ms, this, [this]{displaySuccessRate2();});});
+    connect(&engine, &Client::receivedLocalTechInfo, this, [this]{
+        QTimer::singleShot(100ms, this, [this]{displaySuccessRate2();});});
     displaySuccessRate2();
 
     setBuyMode(false);
@@ -61,7 +61,7 @@ int DevelopWindow::equipIdDesired() {
         return ui->idText->toPlainText().toInt(nullptr, 0);
     else {
         for(auto &equipReg:
-             Clientv2::getInstance().equipRegistryCache) {
+             Client::getInstance().equipRegistryCache) {
             for(auto &name: equipReg->localNames) {
                 if(name.compare(ui->listName->currentText(),
                                  Qt::CaseInsensitive) == 0) {
@@ -74,14 +74,14 @@ int DevelopWindow::equipIdDesired() {
 }
 
 void DevelopWindow::resetListName(int equiptypeInt) {
-    Clientv2::getInstance().equipBigTypeIndex = equiptypeInt;
+    Client::getInstance().equipBigTypeIndex = equiptypeInt;
     if(!initial)
-        Clientv2::getInstance().equipIndex = 0;
+        Client::getInstance().equipIndex = 0;
     initial = false;
 
     ui->listName->clear();
     for(auto &equipReg:
-         Clientv2::getInstance().equipRegistryCache) {
+         Client::getInstance().equipRegistryCache) {
         if(
             (ui->listType->currentText().
                  localeAwareCompare(qtTrId("all-equipments")) == 0
@@ -102,7 +102,7 @@ void DevelopWindow::resetListName(int equiptypeInt) {
 }
 
 void DevelopWindow::resetEquipName(int equipInt) {
-    Clientv2::getInstance().equipIndex = equipInt;
+    Client::getInstance().equipIndex = equipInt;
 }
 
 void DevelopWindow::setBuyMode(bool buy) {
@@ -132,7 +132,7 @@ void DevelopWindow::displaySuccessRate(int index) {
 }
 
 void DevelopWindow::displaySuccessRate2() {
-    Clientv2 &engine = Clientv2::getInstance();
+    Client &engine = Client::getInstance();
     auto cache = engine.techCache;
     auto equipId = equipIdDesired();
     if(cache.contains(0) && cache.contains(equipId)) {
@@ -168,7 +168,7 @@ void DevelopWindow::displaySuccessRate2() {
 
 void DevelopWindow::devDemandChance(bool checked)
 {
-    Clientv2 &engine = Clientv2::getInstance();
+    Client &engine = Client::getInstance();
     auto cache = engine.techCache;
     auto equipId = equipIdDesired();
     if(!cache.contains(0)) {

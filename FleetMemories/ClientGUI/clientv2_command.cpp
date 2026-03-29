@@ -15,7 +15,7 @@ extern QFile *logFile;
 extern std::unique_ptr<QSettings> settings;
 
 /* Parse CLI commands */
-bool Clientv2::parse(const QString &input) {
+bool Client::parse(const QString &input) {
     static QRegularExpression re("\\s+");
     QStringList cmdParts = input.split(re, Qt::SkipEmptyParts);
     if(cmdParts.length() > 0) {
@@ -55,7 +55,7 @@ bool Clientv2::parse(const QString &input) {
 }
 
 /* Parse CLI commands, continued */
-bool Clientv2::parseSpec(const QStringList &cmdParts) {
+bool Client::parseSpec(const QStringList &cmdParts) {
     try {
         if(cmdParts.length() > 0) {
 
@@ -99,7 +99,7 @@ bool Clientv2::parseSpec(const QStringList &cmdParts) {
 }
 
 /* Parse CLI commands actually related to game */
-bool Clientv2::parseGameCommands(const QString &primary,
+bool Client::parseGameCommands(const QString &primary,
                                  const QStringList &cmdParts) {
 
     auto meta = QMetaEnum::fromType<KP::CommandType>();
@@ -155,7 +155,7 @@ bool Clientv2::parseGameCommands(const QString &primary,
 }
 
 /* Parse connection request */
-void Clientv2::parseConnectReq(const QStringList &cmdParts) {
+void Client::parseConnectReq(const QStringList &cmdParts) {
 
     conf.addCaCertificates(settings->value("networkclient/pem",
                                            ":/harusoft.pem").toString());
@@ -193,14 +193,15 @@ void Clientv2::parseConnectReq(const QStringList &cmdParts) {
         }
         attemptMode = true;
 
-        QObject::connect(&sauth, &SteamAuth::eATFailed, this, &Clientv2::catbomb);
+        QObject::connect(&sauth, &SteamAuth::eATFailed,
+                         this, &Client::catbomb);
         sauth.RetrieveEncryptedAppTicket();
         SteamAPI_RunCallbacks();
 
         QTimer::singleShot(
-            std::chrono::milliseconds(settings->value("networkclient/autopasswordtime",
-                                                      1000).toInt()),
-            this, &Clientv2::autoPassword);
+            std::chrono::milliseconds(settings->value(
+                "networkclient/autopasswordtime", 1000).toInt()),
+            this, &Client::autoPassword);
         clientName = SteamFriends()->GetPersonaName();
 
         return;
@@ -208,7 +209,7 @@ void Clientv2::parseConnectReq(const QStringList &cmdParts) {
 }
 
 /* Parse disconnection request */
-void Clientv2::parseDisconnectReq() {
+void Client::parseDisconnectReq() {
     if(!socket.isEncrypted()) {
         //% "You are not online."
         qInfo() << qtTrId("disconnect-when-offline");
@@ -225,7 +226,7 @@ void Clientv2::parseDisconnectReq() {
 }
 
 /* Parse quit */
-void Clientv2::parseQuit() {
+void Client::parseQuit() {
     if(gameState != KP::Offline)
         parseDisconnectReq();
     authSent = false;
@@ -233,12 +234,12 @@ void Clientv2::parseQuit() {
 }
 
 /* Relic of CLI */
-void Clientv2::qls(const QStringList &input) {
+void Client::qls(const QStringList &input) {
     emit qout(input.join(" "));
 }
 
 /* Show help in command line */
-void Clientv2::showHelp(const QStringList &cmdParts) {
+void Client::showHelp(const QStringList &cmdParts) {
     if(cmdParts.isEmpty()) {
         //% "Use 'exit' to quit, 'help' to show help, "
         //% "'commands' to show available commands."
@@ -250,12 +251,13 @@ void Clientv2::showHelp(const QStringList &cmdParts) {
 }
 
 /* CLI */
-void Clientv2::showCommands(bool validOnly) {
+void Client::showCommands(bool validOnly) {
     //% "Use 'exit' to quit."
     emit qout(qtTrId("exit-helper"));
     if(validOnly) {
         //% "Available commands:"
-        emit qout(qtTrId("good-command"), QColor("black"), QColor("lightgreen"));
+        emit qout(qtTrId("good-command"),
+                  QColor("black"), QColor("lightgreen"));
         qls(getValidCommands());
     }
     else {
@@ -266,7 +268,7 @@ void Clientv2::showCommands(bool validOnly) {
 }
 
 /* Relic of CLI ui */
-const QStringList Clientv2::getCommandsSpec() const {
+const QStringList Client::getCommandsSpec() const {
     QStringList result = QStringList();
     result.append(getCommands());
     result.append({"disconnect",
@@ -281,7 +283,7 @@ const QStringList Clientv2::getCommandsSpec() const {
 }
 
 /* Relic of CLI ui */
-const QStringList Clientv2::getValidCommands() const {
+const QStringList Client::getValidCommands() const {
     QStringList result = QStringList();
     result.append(getCommands());
     if(socket.isEncrypted())
@@ -301,19 +303,19 @@ const QStringList Clientv2::getValidCommands() const {
 }
 
 /* CLI */
-const QStringList Clientv2::getCommands() {
+const QStringList Client::getCommands() {
     return CommandLine::getCommands();
 }
 
 /* Command that are not supported */
-inline void Clientv2::invalidCommand() {
+inline void Client::invalidCommand() {
     //% "Invalid Command, use 'commands' for valid commands, "
     //% "'help' for help, 'exit' to exit."
     emit qout(qtTrId("invalid-command"));
 }
 
 /* Switch view */
-void Clientv2::doSwitch(const QStringList &cmdParts) {
+void Client::doSwitch(const QStringList &cmdParts) {
     if(gameState == KP::BattleMapView) {
         //% "You can't leave battle without normal methods."
         qWarning() << qtTrId("gamestate-battle-leave");
@@ -351,9 +353,9 @@ void Clientv2::doSwitch(const QStringList &cmdParts) {
 }
 
 /* Exit */
-void Clientv2::exitGracefully() {
+void Client::exitGracefully() {
     exitGraceSpec();
-    disconnect(timer, &QTimer::timeout, this, &Clientv2::uiRefresh);
+    disconnect(timer, &QTimer::timeout, this, &Client::uiRefresh);
 #pragma message(NOT_M_CONST)
     //% "Goodbye."
     emit qout(qtTrId("goodbye-gui"), QColor("black"), QColor(64,255,64));
@@ -364,7 +366,7 @@ void Clientv2::exitGracefully() {
 }
 
 /* Exit */
-void Clientv2::exitGraceSpec() {
+void Client::exitGraceSpec() {
     if(socket.isEncrypted()) {
         parseDisconnectReq();
     }

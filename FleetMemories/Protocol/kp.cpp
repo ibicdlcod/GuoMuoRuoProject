@@ -205,7 +205,8 @@ QByteArray KP::clientDemandMapInfoUser() {
     return QCborValue::fromJsonValue(result).toCbor();
 }
 
-QByteArray KP::clientDemandModernize(const QList<QUuid> &candidates, bool isEquip) {
+QByteArray KP::clientDemandModernize(
+    const QList<QUuid> &candidates, bool isEquip) {
     QJsonObject result;
     result["type"] = DgramType::Request;
     result["command"] = CommandType::Modernize;
@@ -522,7 +523,8 @@ QByteArray KP::serverDevelopFailed(GameError error) {
 QByteArray KP::serverDevelopStart(bool construct) {
     QJsonObject result;
     result["type"] = DgramType::Message;
-    result["msgtype"] = construct ? MsgType::ConstructStart : MsgType::DevelopStart;
+    result["msgtype"] =
+        construct ? MsgType::ConstructStart : MsgType::DevelopStart;
     return QCborValue::fromJsonValue(result).toCbor();
 }
 

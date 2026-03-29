@@ -19,7 +19,8 @@ void HpDelegate::paint(QPainter *painter,
     int totalHP = std::max(list[1].toInt() , 50);
 
     QStyleOptionProgressBar progressBarOption;
-    progressBarOption.rect = QRect(option.rect.x(), option.rect.y(), option.rect.width(), option.rect.height());
+    progressBarOption.rect = QRect(option.rect.x(), option.rect.y(),
+                                   option.rect.width(), option.rect.height());
     progressBarOption.minimum = 0;
     progressBarOption.maximum = totalHP;
     progressBarOption.progress = currentHP;

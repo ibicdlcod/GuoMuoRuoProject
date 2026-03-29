@@ -12,7 +12,8 @@ MapWithDiff::MapWithDiff(const Map &map, KP::Difficulty diff)
 
 MapWithDiff::MapWithDiff(const QJsonObject &input)
     : diff(static_cast<KP::Difficulty>(input["diff"].toInt())),
-    Map(input["id"].toInt(), input["x"].toInt(), input["y"].toInt(), input["nodeinfo"].toObject())
+    Map(input["id"].toInt(), input["x"].toInt(), input["y"].toInt(),
+        input["nodeinfo"].toObject())
 {
     QJsonObject lNames = input["name"].toObject();
     for(auto &lang: lNames.keys()) {

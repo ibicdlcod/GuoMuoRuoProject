@@ -38,7 +38,8 @@ SettingsWindow::SettingsWindow(QWidget *parent)
     connect(ui->languageBox, &QComboBox::currentIndexChanged,
             this, [this](){
                 settings->setValue("client/language",
-                                   (*KP::supportedLangs)[ui->languageBox->currentIndex()]);
+                    (*KP::supportedLangs)[
+                        ui->languageBox->currentIndex()]);
             });
 }
 
@@ -58,7 +59,8 @@ void SettingsWindow::showEvent(QShowEvent *event) {
     for(auto &key : keys) {
         QTableWidgetItem *newItem = new QTableWidgetItem(key);
         ui->settingsTable->setItem(i, 0, newItem);
-        QTableWidgetItem *newItem2 = new QTableWidgetItem(settings->value(key).toString());
+        QTableWidgetItem *newItem2 =
+            new QTableWidgetItem(settings->value(key).toString());
         ui->settingsTable->setItem(i, 1, newItem2);
         ++i;
     }
@@ -71,7 +73,8 @@ void SettingsWindow::showEvent(QShowEvent *event) {
     int innerTableWidth = 0;
     for(int i = 0; i < 2; ++i)
         innerTableWidth += hH->sectionSize(hH->logicalIndex(i));
-    innerTableWidth += ui->settingsTable->verticalScrollBar()->minimumWidth()+14;
+    innerTableWidth +=
+        ui->settingsTable->verticalScrollBar()->minimumWidth() + 14;
     hH->setSectionResizeMode(QHeaderView::Interactive);
     hH->resizeSection(hH->logicalIndex(1),
                       hH->sectionSize(hH->logicalIndex(1))

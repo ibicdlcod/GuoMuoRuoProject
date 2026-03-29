@@ -8,7 +8,8 @@
 extern std::unique_ptr<QSettings> settings;
 
 enum {
-    CheckAlignmentRole = Qt::UserRole + Qt::CheckStateRole + Qt::TextAlignmentRole
+    CheckAlignmentRole =
+        Qt::UserRole + Qt::CheckStateRole + Qt::TextAlignmentRole
 };
 
 ShipBPModel::ShipBPModel(QObject *parent)
@@ -19,7 +20,7 @@ ShipBPModel::ShipBPModel(QObject *parent)
 void ShipBPModel::updateShipList(const QJsonObject &input) {
     clientShipBPs.clear();
     int oldRowCount = rowCount();
-    Clientv2 &engine = Clientv2::getInstance();
+    Client &engine = Client::getInstance();
     if(engine.isShipRegistryCacheGood()) {
         for(const auto &key: input.keys()) {
             if(input[key].toInt() <= 0) {
@@ -43,7 +44,8 @@ void ShipBPModel::updateShipList(const QJsonObject &input) {
     return;
 }
 
-void ShipBPModel::modernizedShips(const QList<std::tuple<int, int> > &modernized) {
+void ShipBPModel::modernizedShips(
+    const QList<std::tuple<int, int> > &modernized) {
     for(auto item: modernized) {
         auto shipDef = std::get<0>(item);
         int diffstar = std::get<1>(item);
@@ -112,7 +114,7 @@ QVariant ShipBPModel::data(const QModelIndex &index,
     Q_ASSERT(sortedShipBPIds.length() > realRowIndex);
     int defToDisplay = sortedShipBPIds[realRowIndex];
 
-    Clientv2 &engine = Clientv2::getInstance();
+    Client &engine = Client::getInstance();
     bool ready = engine.isEquipRegistryCacheGood();
     if(!ready)
         return QVariant();
@@ -252,7 +254,7 @@ void ShipBPModel::switchShipDisplayType(const QString &nationality,
                                         const QString &shiptype,
                                         const QString &shipclass,
                                         const QString &searchTerm) {
-    Clientv2 &engine = Clientv2::getInstance();
+    Client &engine = Client::getInstance();
     int oldRowCount = rowCount();
     sortedShipBPIds.clear();
     bool pass = true;
@@ -343,5 +345,6 @@ void ShipBPModel::switchShipDisplayType(const QString &nationality,
 }
 
 Qt::ItemFlags ShipBPModel::flags(const QModelIndex &index) const {
-    return QAbstractTableModel::flags(index); // clazy:exclude=skipped-base-method
+    // clazy:exclude=skipped-base-method
+    return QAbstractTableModel::flags(index);
 }

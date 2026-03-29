@@ -16,7 +16,8 @@
 extern std::unique_ptr<QSettings> settings;
 
 enum {
-    CheckAlignmentRole = Qt::UserRole + Qt::CheckStateRole + Qt::TextAlignmentRole
+    CheckAlignmentRole =
+        Qt::UserRole + Qt::CheckStateRole + Qt::TextAlignmentRole
 };
 
 EquipModel::EquipModel(QObject *parent, bool isInArsenal)
@@ -44,7 +45,7 @@ QHash<QUuid, int> & EquipModel::getClientEquipStars() {
 }
 
 void EquipModel::switchDisplayType(int index) {
-    Clientv2 &engine = Clientv2::getInstance();
+    Client &engine = Client::getInstance();
     int oldRowCount = rowCount();
     sortedEquipIds.clear();
     if(index == 0) {
@@ -72,7 +73,8 @@ void EquipModel::switchDisplayType(int index) {
              ++iter) {
             if(currentActiveShip != nullptr) {
                 if(currentActiveSlotEx) {
-                    if(!(iter->second->canEquipEX(currentActiveShip, engine.lua)))
+                    if(!(iter->second->canEquipEX(
+                            currentActiveShip, engine.lua)))
                         continue;
                 }
                 else {
@@ -95,7 +97,7 @@ void EquipModel::switchDisplayType(int index) {
 }
 
 void EquipModel::switchDisplayType2(const QString &equipName) {
-    Clientv2 &engine = Clientv2::getInstance();
+    Client &engine = Client::getInstance();
     int oldRowCount = rowCount();
     sortedEquipIds.clear();
     bool pass = false;
@@ -173,7 +175,7 @@ void EquipModel::lastPage() {
 
 void EquipModel::addEquipment(QUuid uid, int def) {
     int oldRowCount = rowCount();
-    Clientv2 &engine = Clientv2::getInstance();
+    Client &engine = Client::getInstance();
     clientEquips[uid] = engine.getEquipmentReg(def);
     clientEquipStars[uid] = 0;
     sortedEquipIds.append(uid);
@@ -329,7 +331,7 @@ QVariant EquipModel::data(const QModelIndex &index, int role) const {
             / equipToDisplay->skillPointsStd();
     }
 
-    Clientv2 &engine = Clientv2::getInstance();
+    Client &engine = Client::getInstance();
     bool ready = engine.isEquipRegistryCacheGood();
     if(!ready)
         return QVariant();
@@ -395,12 +397,16 @@ QVariant EquipModel::data(const QModelIndex &index, int role) const {
                     Ship *ship = std::get<0>(
                         engine.shipModel.getShip(shipUid));
                     QString shipStr = ship->toString();
-                    QString shipUidSimple = "("+shipUid.toString().first(9).last(8)+")";
-                    MainWindow *mainWindowM = qobject_cast<MainWindow *>(mainWindow);
+                    QString shipUidSimple =
+                        "("+shipUid.toString().first(9).last(8)+")";
+                    MainWindow *mainWindowM =
+                        qobject_cast<MainWindow *>(mainWindow);
                     QString posStr;
                     if(mainWindowM) {
-                        FleetPos pos = mainWindowM->getFleetArea()->getShipIndex(shipUid);
-                        posStr = QStringLiteral("%1-%2(%3)").arg(pos.fleetindex + 1)
+                        FleetPos pos =
+                            mainWindowM->getFleetArea()->getShipIndex(shipUid);
+                        posStr = QStringLiteral("%1-%2(%3)")
+                                     .arg(pos.fleetindex + 1)
                                      .arg(pos.posindex + 1)
                                      .arg(equipPos);
                         if(pos.fleetindex == -1 && pos.posindex == -1) {
@@ -410,7 +416,8 @@ QVariant EquipModel::data(const QModelIndex &index, int role) const {
                             posStr = qtTrId("fleet-disabled");
                         }
                     }
-                    return QStringList({shipStr, shipUidSimple, posStr}).join(" ");
+                    return QStringList(
+                        {shipStr, shipUidSimple, posStr}).join(" ");
                 }
             }
         }
@@ -605,13 +612,15 @@ Qt::ItemFlags EquipModel::flags(const QModelIndex &index) const {
                 / equipToDisplay->skillPointsStd();
         }
         if(additionalStar == 0) {
-            return static_cast<QFlags<Qt::ItemFlag>>
-                (QAbstractTableModel::flags(index) // clazy:exclude=skipped-base-method
-                 | Qt::ItemIsUserCheckable
-                       & (~Qt::ItemIsEnabled));
+            // clazy:exclude=skipped-base-method
+            return static_cast<QFlags<Qt::ItemFlag>>(
+                QAbstractTableModel::flags(index)
+                | Qt::ItemIsUserCheckable
+                      & (~Qt::ItemIsEnabled));
         }
         else {
-            return QAbstractTableModel::flags(index) // clazy:exclude=skipped-base-method
+            // clazy:exclude=skipped-base-method
+            return QAbstractTableModel::flags(index)
                    | Qt::ItemIsUserCheckable
                    | Qt::ItemIsEnabled;
 
@@ -720,7 +729,7 @@ void EquipModel::updateEquipmentList(const QJsonObject &input) {
     clientEquipStars.clear();
     sortedEquipIds.clear();
     int oldRowCount = rowCount();
-    Clientv2 &engine = Clientv2::getInstance();
+    Client &engine = Client::getInstance();
     if(engine.isEquipRegistryCacheGood()) {
         QJsonArray inputArray = input["content"].toArray();
         for(const QJsonValueRef item: inputArray) {
@@ -758,7 +767,7 @@ void EquipModel::wholeTableChanged() {
             defs.insert(def);
         }
         for(auto defNoduplicate: defs) {
-            Clientv2 &engine = Clientv2::getInstance();
+            Client &engine = Client::getInstance();
             engine.demandEquipSkillPoints(defNoduplicate);
         }
     }
@@ -825,7 +834,8 @@ void EquipModel::processSkillPointInfo(int equipDef, int skillPoint) {
     }
 }
 
-void EquipModel::modernizedEquips(const QList<std::tuple<QUuid, int>> &modernized) {
+void EquipModel::modernizedEquips(
+    const QList<std::tuple<QUuid, int>> &modernized) {
     for(auto item: modernized) {
         auto equipUid = std::get<0>(item);
         int equipDef = clientEquips[equipUid]->getId();

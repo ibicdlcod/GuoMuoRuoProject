@@ -32,14 +32,14 @@ void customMessageHandler(QtMsgType,
                           const QString &);
 
 
-class Clientv2 : public QObject {
+class Client : public QObject {
     Q_OBJECT
 
 public:
-    virtual ~Clientv2() noexcept;
+    virtual ~Client() noexcept;
 
-    static Clientv2 & getInstance() {
-        static Clientv2 instance;
+    static Client & getInstance() {
+        static Client instance;
         return instance;
     }
 
@@ -233,7 +233,7 @@ private:
     void updateMapCache(const QJsonObject &);
     void updateShipCache(const QJsonObject &);
 
-    explicit Clientv2(QObject * parent = nullptr);
+    explicit Client(QObject * parent = nullptr);
 
     QHostAddress address;
     quint16 port;
@@ -276,7 +276,7 @@ private:
                           "\x80\xe6\x9d\xa1\xe5\x92\xb8\xe9"
                           "\xb1\xbc");
 
-    STEAM_CALLBACK(Clientv2, onMicroTxnAuth, MicroTxnAuthorizationResponse_t);
+    STEAM_CALLBACK(Client, onMicroTxnAuth, MicroTxnAuthorizationResponse_t);
 
     SteamAuth sauth;
     QByteArray authCache;
