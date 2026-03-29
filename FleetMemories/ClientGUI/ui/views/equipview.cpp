@@ -38,6 +38,18 @@ EquipView::EquipView(QWidget *parent)
     arsenalView->verticalHeader()->setSectionResizeMode(QHeaderView::Fixed);
     arsenalView->horizontalHeader()->setSectionResizeMode(
         QHeaderView::ResizeToContents);
+
+    columnResizeDebounce = new QTimer(this);
+    columnResizeDebounce->setSingleShot(true);
+    columnResizeDebounce->setInterval(100ms);
+    connect(columnResizeDebounce, &QTimer::timeout,
+            this, [this]() {
+        arsenalView->setMinimumSize(
+            QSize(tableSizeWhole(arsenalView, model).width(),
+                  ui->ArsenalControl->size().height()));
+        arsenalView->hide();
+        arsenalView->show();
+    });
     connect(arsenalView->horizontalHeader(), &QHeaderView::sectionResized,
             this, &EquipView::columnResized);
 
@@ -199,14 +211,7 @@ void EquipView::columnResized(int logicalIndex, int oldSize, int newSize) {
     Q_UNUSED(logicalIndex)
     Q_UNUSED(oldSize)
     Q_UNUSED(newSize)
-    QTimer::singleShot(100ms, this, [this](){
-        arsenalView
-            ->setMinimumSize(QSize(tableSizeWhole(arsenalView,
-                                                  model).width(),
-                                   ui->ArsenalControl->size().height()));
-    });
-    arsenalView->hide();
-    arsenalView->show();
+    columnResizeDebounce->start(); // restarts if already running
 }
 
 void EquipView::itemSelected(QUuid id) {

@@ -9,6 +9,7 @@
 #include <QLabel>
 #include <QPushButton>
 #include <QTableView>
+#include <QTimer>
 #include <QToolButton>
 #include <QWidget>
 #include <QLineEdit>
@@ -94,6 +95,7 @@ private:
     QStackedLayout *lay;
 
     int rowCountHintVal = 1;
+    QTimer *columnResizeDebounce;
 };
 
 #endif // EQUIPVIEW_H

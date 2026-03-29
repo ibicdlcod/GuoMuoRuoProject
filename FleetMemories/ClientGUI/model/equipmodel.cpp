@@ -137,40 +137,22 @@ void EquipModel::switchDisplayType2(const QString &equipName) {
 }
 
 void EquipModel::firstPage() {
-    int oldRowCount = rowCount();
-    pageNum = 0;
-    int newRowCount = rowCount();
-    adjustRowCount(oldRowCount, newRowCount);
-    wholeTableChanged();
-    emit pageNumChanged(pageNum, maximumPageNum());
+    setPageNumHint(0);
 }
 void EquipModel::prevPage() {
-    int oldRowCount = rowCount();
     if(pageNum > 0)
-        pageNum--;
-    int newRowCount = rowCount();
-    adjustRowCount(oldRowCount, newRowCount);
-    wholeTableChanged();
-    emit pageNumChanged(pageNum, maximumPageNum());
+        setPageNumHint(pageNum - 1);
 }
 void EquipModel::nextPage() {
-    int oldRowCount = rowCount();
     if(pageNum < maximumPageNum() - 1)
-        pageNum++;
-    int newRowCount = rowCount();
-    adjustRowCount(oldRowCount, newRowCount);
-    wholeTableChanged();
-    emit pageNumChanged(pageNum, maximumPageNum());
+        setPageNumHint(pageNum + 1);
 }
 void EquipModel::lastPage() {
-    if(maximumPageNum() == 0)
+    if(maximumPageNum() == 0) {
         emit pageNumChanged(0, 0);
-    int oldRowCount = rowCount();
-    pageNum = maximumPageNum() - 1;
-    int newRowCount = rowCount();
-    adjustRowCount(oldRowCount, newRowCount);
-    wholeTableChanged();
-    emit pageNumChanged(pageNum, maximumPageNum());
+        return;
+    }
+    setPageNumHint(maximumPageNum() - 1);
 }
 
 void EquipModel::addEquipment(QUuid uid, int def) {
@@ -230,11 +212,32 @@ void EquipModel::destructedEquipment(const QList<QUuid> &destructed) {
     wholeTableChanged();
 }
 
-void EquipModel::setPageNumHint(int input) {
+void EquipModel::setPageNumHint(int newPage) {
+    /* Record row counts before and after the page change, keeping
+     * pageNum at the old value so rowCount() is valid for Qt's
+     * begin* index validation. */
+    int savedPage = pageNum;
     int oldRowCount = rowCount();
-    pageNum = input;
+    pageNum = newPage;
     int newRowCount = rowCount();
-    adjustRowCount(oldRowCount, newRowCount);
+    if(savedPage != newPage) {
+        pageNum = savedPage; // restore so begin* sees oldRowCount
+        if(newRowCount < oldRowCount) {
+            beginRemoveRows(QModelIndex(),
+                            newRowCount, oldRowCount - 1);
+            pageNum = newPage;
+            endRemoveRows();
+        }
+        else if(newRowCount > oldRowCount) {
+            beginInsertRows(QModelIndex(),
+                            oldRowCount, newRowCount - 1);
+            pageNum = newPage;
+            endInsertRows();
+        }
+        else {
+            pageNum = newPage;
+        }
+    }
     wholeTableChanged();
     emit pageNumChanged(pageNum, maximumPageNum());
 }
@@ -257,18 +260,9 @@ void EquipModel::setIsInArsenal(bool input) {
 }
 
 void EquipModel::adjustRowCount(int oldRowCount, int newRowCount) {
-    if(oldRowCount < newRowCount) {
-        beginInsertRows(QModelIndex(), 0,
-                        newRowCount - oldRowCount - 1);
-        endInsertRows();
-    }
-    else if(oldRowCount > newRowCount && newRowCount > 0) {
-        /* make index [newRowCount, oldRowCount-1] or when newRowCount == 0
-         * will crash for whatever reason */
-        beginRemoveRows(QModelIndex(), 0,
-                        0);
-        //oldRowCount - newRowCount - 1);
-        endRemoveRows();
+    if(oldRowCount != newRowCount) {
+        beginResetModel();
+        endResetModel();
     }
 }
 
@@ -302,8 +296,9 @@ int EquipModel::rowCount(const QModelIndex &parent) const {
     if(parent.isValid())
         return 0;
     else
-        return std::min(numberOfEquip() - rowsPerPage * pageNum,
-                        rowsPerPage);
+        return std::max(0,
+                        std::min(numberOfEquip() - rowsPerPage * pageNum,
+                                 rowsPerPage));
 }
 
 int EquipModel::columnCount(const QModelIndex &parent) const {

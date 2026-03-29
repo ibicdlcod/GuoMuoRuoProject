@@ -2346,6 +2346,9 @@ new_ship_as_imported:
 }
 
 void Server::minutePulse() {
+    if(!listening) {
+        return;
+    }
     try{
 anti_ddos_regen_allowed_packets:
         for(const auto &[key, value]: allowedPackets.asKeyValueRange()) {

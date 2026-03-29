@@ -11,7 +11,7 @@ extern std::unique_ptr<QSettings> settings;
 
 enum {
     CheckAlignmentRole =
-        Qt::UserRole + Qt::CheckStateRole + Qt::TextAlignmentRole
+    Qt::UserRole + Qt::CheckStateRole + Qt::TextAlignmentRole
 };
 
 ShipModel::ShipModel(QObject *parent, bool isInArsenal)
@@ -85,7 +85,7 @@ void ShipModel::switchShipDisplayType(const QString &nationality,
                 if(pass) {
                     QString type = iter->second->getType().toString();
                     if(!typePasses.contains(type)
-                       && true/*type != qtTrId("all-shiptypes")*/) {
+                        && true/*type != qtTrId("all-shiptypes")*/) {
                         typePasses.append(type);
                     }
                 }
@@ -106,7 +106,7 @@ void ShipModel::switchShipDisplayType(const QString &nationality,
             if(shipclass.isEmpty()) {
                 if(pass) {
                     if(!classPasses.contains(classText)
-                       && true/*classText != qtTrId("all-shipclasses")*/) {
+                        && true/*classText != qtTrId("all-shipclasses")*/) {
                         classPasses.append(classText);
                     }
                 }
@@ -242,8 +242,9 @@ int ShipModel::rowCount(const QModelIndex &parent) const {
     if(parent.isValid())
         return 0;
     else
-        return std::min(numberOfShip() - rowsPerPage * pageNum,
-                        rowsPerPage);
+        return std::max(0,
+                        std::min(numberOfShip() - rowsPerPage * pageNum,
+                                 rowsPerPage));
 }
 
 int ShipModel::columnCount(const QModelIndex &parent) const {
@@ -423,6 +424,23 @@ QVariant ShipModel::data(const QModelIndex &index,
             case Qt::ColorScheme::Light: [[fallthrough]];
             default:
                 color.setHsv(attr->condition / 4, 255, 128);
+                break;
+            }
+            QBrush brush = QBrush(color);
+            return brush;
+        }
+        else if(index.column() == levelColumn()) {
+            int hiddenLv = Ship::getLevel(attr->exp);
+            int lvCap = Ship::getLevel(attr->expCap);
+            double factor = std::min(1.0, (double)lvCap / (double)hiddenLv);
+            QColor color = QColor();
+            switch(QApplication::styleHints()->colorScheme()) {
+            case Qt::ColorScheme::Dark:
+                color.setHsv(factor * 120, 128, 255);
+                break;
+            case Qt::ColorScheme::Light: [[fallthrough]];
+            default:
+                color.setHsv(factor * 120, 255, 128);
                 break;
             }
             QBrush brush = QBrush(color);
