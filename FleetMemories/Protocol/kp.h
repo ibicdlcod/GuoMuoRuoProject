@@ -71,6 +71,7 @@ static constexpr int factorySlotColumns = 4;
 static constexpr int maxRepairSlots = 8;
 /* ARD coupon stored as integer units; 1 unit = 0.01 HKD */
 static constexpr const char *attrARDCoupon = "ARDCoupon";
+static constexpr const char *attrMedal = "Medal";
 static constexpr double ardCouponUnitHKD = 0.01;
 static constexpr int ardCouponMaxUnits = 65536;
 #pragma message(SECRET)
@@ -777,7 +778,7 @@ QByteArray serverParseError(MsgType, const QString &,
                             const QString &);
 QByteArray serverPenguin();
 QByteArray serverRankInfo(const QJsonArray &, int, std::optional<double>);
-QByteArray serverResourceUpdate(ResOrd, int ardcoupon);
+QByteArray serverResourceUpdate(ResOrd, int ardcoupon, int medal);
 QByteArray serverShipBPInfo(const QJsonObject &);
 QByteArray serverShipInfo(const QJsonArray &, bool user = false,
                           QDateTime timeUtc = QDateTime::currentDateTimeUtc(),

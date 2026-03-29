@@ -792,7 +792,7 @@ QByteArray KP::serverRankInfo(const QJsonArray &content,
     return QCborValue::fromJsonValue(result).toCbor();
 }
 
-QByteArray KP::serverResourceUpdate(ResOrd ordinary, int ardcoupon) {
+QByteArray KP::serverResourceUpdate(ResOrd ordinary, int ardcoupon, int medal) {
     QJsonObject result;
     result["type"] = DgramType::Info;
     result["infotype"] = InfoType::ResourceInfo;
@@ -804,6 +804,7 @@ QByteArray KP::serverResourceUpdate(ResOrd ordinary, int ardcoupon) {
     result["w"] = ordinary.w;
     result["cr"] = ordinary.c;
     result["ardcoupon"] = ardcoupon;
+    result["medal"] = medal;
     return QCborValue::fromJsonValue(result).toCbor();
 }
 

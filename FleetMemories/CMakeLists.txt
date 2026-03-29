@@ -62,6 +62,9 @@ set(TS_FILES
 set(CLIENT_SOURCES
     ClientGUI/clientv2.cpp
     ClientGUI/clientv2.h
+    ClientGUI/clientv2_actions.cpp
+    ClientGUI/clientv2_cache.cpp
+    ClientGUI/clientv2_command.cpp
     ClientGUI/equipicon.cpp
     ClientGUI/equipicon.h
     ClientGUI/main.cpp
@@ -194,6 +197,11 @@ set(SERVER_SOURCES
     Server/rngesus.h
     Server/server.cpp
     Server/server.h
+    Server/server_ard.cpp
+    Server/server_battle.cpp
+    Server/server_import.cpp
+    Server/server_offer.cpp
+    Server/server_sqlinit.cpp
     Server/servermastersender.cpp
     Server/servermastersender.h
     Server/sslserver.cpp
