@@ -2,7 +2,8 @@
  * SPDX-License-Identifier: AGPL-3.0-or-later */
 
 #include "buyequipdialog.h"
-#include "../clientv2.h"
+#include "../../clientv2.h"
+#include "../../equipicon.h"
 #include <QDialogButtonBox>
 #include <QLabel>
 #include <QVBoxLayout>
@@ -23,9 +24,15 @@ BuyEquipDialog::BuyEquipDialog(QWidget *parent)
     layout->addWidget(new QLabel(qtTrId("shop-equip-list-label"), this));
 
     equipList = new QListWidget(this);
+    equipList->setSizeAdjustPolicy(QAbstractScrollArea::AdjustToContents);
+    equipList->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
+    QFont listFont = equipList->font();
+    listFont.setPointSizeF(listFont.pointSizeF() * 1.4);
+    equipList->setFont(listFont);
     for(Equipment *equip : engine.getStoreEquipment()) {
         //% "%1 — %2 ARD Coupons"
         auto *item = new QListWidgetItem(
+            Icute::equipTypeIcon(equip->type, false),
             qtTrId("shop-equip-item")
                 .arg(equip->toString())
                 .arg(static_cast<int>(equip->getStorePrice())));
@@ -45,6 +52,8 @@ BuyEquipDialog::BuyEquipDialog(QWidget *parent)
     buyBtn->setEnabled(false);
     buttons->addButton(QDialogButtonBox::Cancel);
     layout->addWidget(buttons);
+
+    adjustSize();
 
     connect(equipList, &QListWidget::itemSelectionChanged,
             this, &BuyEquipDialog::selectionChanged);

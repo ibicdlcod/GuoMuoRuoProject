@@ -15,8 +15,8 @@
 #include "sortie/sortie.h"
 #include "fleet/fleetview.h"
 #include "maintenance/repair.h"
-#include "ardcoupondialog.h"
-#include "buyequipdialog.h"
+#include "shop/ardcoupondialog.h"
+#include "shop/buyequipdialog.h"
 #include "settingswindow.h"
 
 QT_BEGIN_NAMESPACE

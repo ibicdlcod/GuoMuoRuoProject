@@ -62,38 +62,34 @@ set(TS_FILES
 set(CLIENT_SOURCES
     ClientGUI/clientv2.cpp
     ClientGUI/clientv2.h
-    ClientGUI/equipicon.h
     ClientGUI/equipicon.cpp
+    ClientGUI/equipicon.h
     ClientGUI/main.cpp
-    ClientGUI/model/equipmodel.h
     ClientGUI/model/equipmodel.cpp
-    ClientGUI/model/localeawaresort.h
+    ClientGUI/model/equipmodel.h
     ClientGUI/model/localeawaresort.cpp
-    ClientGUI/model/rankmodel.h
+    ClientGUI/model/localeawaresort.h
     ClientGUI/model/rankmodel.cpp
-    ClientGUI/model/shipbpmodel.h
+    ClientGUI/model/rankmodel.h
     ClientGUI/model/shipbpmodel.cpp
-    ClientGUI/model/shipdefmodel.h
+    ClientGUI/model/shipbpmodel.h
     ClientGUI/model/shipdefmodel.cpp
+    ClientGUI/model/shipdefmodel.h
     ClientGUI/model/shipmodel.cpp
     ClientGUI/model/shipmodel.h
-    ClientGUI/model/specequipmodel.h
     ClientGUI/model/specequipmodel.cpp
-    ClientGUI/model/specshipmodel.h
+    ClientGUI/model/specequipmodel.h
     ClientGUI/model/specshipmodel.cpp
+    ClientGUI/model/specshipmodel.h
     ClientGUI/networkerror.cpp
     ClientGUI/networkerror.h
     ClientGUI/resourcefetch.cpp
     ClientGUI/resourcefetch.h
     ClientGUI/steamauth.cpp
     ClientGUI/steamauth.h
-    ClientGUI/ui/ardcoupondialog.h
-    ClientGUI/ui/ardcoupondialog.cpp
-    ClientGUI/ui/buyequipdialog.h
-    ClientGUI/ui/buyequipdialog.cpp
     ClientGUI/ui/boxcenterfusionstyle.h
-    ClientGUI/ui/factory/constructwindow.h
     ClientGUI/ui/factory/constructwindow.cpp
+    ClientGUI/ui/factory/constructwindow.h
     ClientGUI/ui/factory/constructwindow.ui
     ClientGUI/ui/factory/developwindow.cpp
     ClientGUI/ui/factory/developwindow.h
@@ -101,21 +97,21 @@ set(CLIENT_SOURCES
     ClientGUI/ui/factory/factoryarea.cpp
     ClientGUI/ui/factory/factoryarea.h
     ClientGUI/ui/factory/factoryarea.ui
-    ClientGUI/ui/fleet/elidedlabel.h
     ClientGUI/ui/fleet/elidedlabel.cpp
-    ClientGUI/ui/fleet/fleetview.h
+    ClientGUI/ui/fleet/elidedlabel.h
     ClientGUI/ui/fleet/fleetview.cpp
+    ClientGUI/ui/fleet/fleetview.h
     ClientGUI/ui/fleet/fleetview.ui
-    ClientGUI/ui/fleet/interactivelabel.h
     ClientGUI/ui/fleet/interactivelabel.cpp
-    ClientGUI/ui/fleet/shipdisplay.h
+    ClientGUI/ui/fleet/interactivelabel.h
     ClientGUI/ui/fleet/shipdisplay.cpp
+    ClientGUI/ui/fleet/shipdisplay.h
     ClientGUI/ui/fleet/shipdisplay.ui
-    ClientGUI/ui/fleet/shipdisplayflat.h
     ClientGUI/ui/fleet/shipdisplayflat.cpp
+    ClientGUI/ui/fleet/shipdisplayflat.h
     ClientGUI/ui/fleet/shipdisplayflat.ui
-    ClientGUI/ui/fleet/shipequip.h
     ClientGUI/ui/fleet/shipequip.cpp
+    ClientGUI/ui/fleet/shipequip.h
     ClientGUI/ui/fleet/shipequip.ui
     ClientGUI/ui/keyenterreceiver.cpp
     ClientGUI/ui/keyenterreceiver.h
@@ -127,8 +123,8 @@ set(CLIENT_SOURCES
     ClientGUI/ui/mainwindow.ui
     ClientGUI/ui/navigator.cpp
     ClientGUI/ui/navigator.h
-    ClientGUI/ui/port/choosehomeport.h
     ClientGUI/ui/port/choosehomeport.cpp
+    ClientGUI/ui/port/choosehomeport.h
     ClientGUI/ui/port/choosehomeport.ui
     ClientGUI/ui/port/licensearea.cpp
     ClientGUI/ui/port/licensearea.h
@@ -139,17 +135,21 @@ set(CLIENT_SOURCES
     ClientGUI/ui/port/portarea.cpp
     ClientGUI/ui/port/portarea.h
     ClientGUI/ui/port/portarea.ui
-    ClientGUI/ui/settingswindow.h
     ClientGUI/ui/settingswindow.cpp
+    ClientGUI/ui/settingswindow.h
     ClientGUI/ui/settingswindow.ui
-    ClientGUI/ui/sortie/battleplan.h
+    ClientGUI/ui/shop/ardcoupondialog.cpp
+    ClientGUI/ui/shop/ardcoupondialog.h
+    ClientGUI/ui/shop/buyequipdialog.cpp
+    ClientGUI/ui/shop/buyequipdialog.h
     ClientGUI/ui/sortie/battleplan.cpp
+    ClientGUI/ui/sortie/battleplan.h
     ClientGUI/ui/sortie/battleplan.ui
-    ClientGUI/ui/sortie/confirmsortie.h
     ClientGUI/ui/sortie/confirmsortie.cpp
+    ClientGUI/ui/sortie/confirmsortie.h
     ClientGUI/ui/sortie/confirmsortie.ui
-    ClientGUI/ui/sortie/mapdetail.h
     ClientGUI/ui/sortie/mapdetail.cpp
+    ClientGUI/ui/sortie/mapdetail.h
     ClientGUI/ui/sortie/mapdetail.ui
     ClientGUI/ui/sortie/maprender.cpp
     ClientGUI/ui/sortie/maprender.h
@@ -162,18 +162,18 @@ set(CLIENT_SOURCES
     ClientGUI/ui/sortie/sortie.cpp
     ClientGUI/ui/sortie/sortie.h
     ClientGUI/ui/sortie/sortie.ui
-    ClientGUI/ui/techview.h
     ClientGUI/ui/techview.cpp
+    ClientGUI/ui/techview.h
     ClientGUI/ui/techview.ui
     ClientGUI/ui/views/equipselect.cpp
     ClientGUI/ui/views/equipselect.h
-    ClientGUI/ui/views/equipview.h
     ClientGUI/ui/views/equipview.cpp
+    ClientGUI/ui/views/equipview.h
     ClientGUI/ui/views/equipview.ui
     ClientGUI/ui/views/hpdelegate.cpp
     ClientGUI/ui/views/hpdelegate.h
-    ClientGUI/ui/views/industrialselect.h
     ClientGUI/ui/views/industrialselect.cpp
+    ClientGUI/ui/views/industrialselect.h
     ClientGUI/ui/views/selectdelegate.cpp
     ClientGUI/ui/views/selectdelegate.h
     ClientGUI/ui/views/shipselect.cpp
@@ -182,8 +182,8 @@ set(CLIENT_SOURCES
 )
 set(SERVER_SOURCES
     Server/erfinv.h
-    Server/fleetinfo.h
     Server/fleetinfo.cpp
+    Server/fleetinfo.h
     Server/kerrors.cpp
     Server/kerrors.h
     Server/main.cpp
@@ -215,8 +215,8 @@ set(PROTOCOL_SOURCES
     Protocol/equiptype.h
     Protocol/kp.cpp
     Protocol/kp.h
-    Protocol/lua.h
     Protocol/lua.cpp
+    Protocol/lua.h
     Protocol/map.cpp
     Protocol/map.h
     Protocol/mapwithdiff.cpp

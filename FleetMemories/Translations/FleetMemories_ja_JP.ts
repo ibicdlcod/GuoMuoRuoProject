@@ -3596,8 +3596,8 @@ Great at battle and bad at politics--so cool!</source>
     </message>
     <message id="ard-dialog-desc">
         <location filename="../ClientGUI/ui/ardcoupondialog.cpp" line="23"/>
-        <source>Useful for elite admirals, who may want to do risky attacks or decorate their ship</source>
-        <oldsource>Advanced Resource Dispatch (ARD) Coupons instantly replenish all resources at your naval base to maximum capacity. Use them to stay battle-ready without waiting for natural resource recovery.</oldsource>
+        <source>Useful for elite admirals, who may want to do risky attacks or decorate their ship.</source>
+        <oldsource>Useful for elite admirals, who may want to do risky attacks or decorate their ship</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message id="ard-package-select">
@@ -3606,28 +3606,28 @@ Great at battle and bad at politics--so cool!</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="ard-package-option">
-        <location filename="../ClientGUI/ui/ardcoupondialog.cpp" line="38"/>
+        <location filename="../ClientGUI/ui/ardcoupondialog.cpp" line="39"/>
         <source>%1 ARD Coupons — HK$ %2</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="ard-custom-label">
-        <location filename="../ClientGUI/ui/ardcoupondialog.cpp" line="48"/>
+        <location filename="../ClientGUI/ui/ardcoupondialog.cpp" line="49"/>
         <source>Custom:</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="ard-price-label">
-        <location filename="../ClientGUI/ui/ardcoupondialog.cpp" line="64"/>
+        <location filename="../ClientGUI/ui/ardcoupondialog.cpp" line="65"/>
         <source>Price:</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="ard-price-display">
-        <location filename="../ClientGUI/ui/ardcoupondialog.cpp" line="101"/>
+        <location filename="../ClientGUI/ui/ardcoupondialog.cpp" line="102"/>
         <source>HK$ %1</source>
         <oldsource>HK$%1</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message id="ard-purchase-btn">
-        <location filename="../ClientGUI/ui/ardcoupondialog.cpp" line="72"/>
+        <location filename="../ClientGUI/ui/ardcoupondialog.cpp" line="73"/>
         <source>Purchase</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3637,32 +3637,32 @@ Great at battle and bad at politics--so cool!</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="shop-buy-equip-title">
-        <location filename="../ClientGUI/ui/buyequipdialog.cpp" line="13"/>
+        <location filename="../ClientGUI/ui/buyequipdialog.cpp" line="14"/>
         <source>Buy Equipment</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="shop-ard-balance">
-        <location filename="../ClientGUI/ui/buyequipdialog.cpp" line="20"/>
+        <location filename="../ClientGUI/ui/buyequipdialog.cpp" line="21"/>
         <source>ARD Coupons: %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="shop-equip-list-label">
-        <location filename="../ClientGUI/ui/buyequipdialog.cpp" line="23"/>
+        <location filename="../ClientGUI/ui/buyequipdialog.cpp" line="24"/>
         <source>Available equipment:</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="shop-equip-item">
-        <location filename="../ClientGUI/ui/buyequipdialog.cpp" line="29"/>
+        <location filename="../ClientGUI/ui/buyequipdialog.cpp" line="36"/>
         <source>%1 — %2 ARD Coupons</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="shop-buy-btn">
-        <location filename="../ClientGUI/ui/buyequipdialog.cpp" line="43"/>
+        <location filename="../ClientGUI/ui/buyequipdialog.cpp" line="50"/>
         <source>Buy</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="shop-equip-price">
-        <location filename="../ClientGUI/ui/buyequipdialog.cpp" line="66"/>
+        <location filename="../ClientGUI/ui/buyequipdialog.cpp" line="75"/>
         <source>Price: %1 ARD Coupons</source>
         <translation type="unfinished"></translation>
     </message>

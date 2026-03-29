@@ -2,8 +2,8 @@
  * SPDX-License-Identifier: AGPL-3.0-or-later */
 
 #include "ardcoupondialog.h"
-#include "../clientv2.h"
-#include "../../Protocol/kp.h"
+#include "../../clientv2.h"
+#include "../../../Protocol/kp.h"
 #include <QDialogButtonBox>
 #include <QGroupBox>
 #include <QHBoxLayout>
@@ -19,13 +19,14 @@ ARDCouponDialog::ARDCouponDialog(QWidget *parent)
 
     auto *layout = new QVBoxLayout(this);
 
-    //% "Useful for elite admirals, who may want to do risky attacks or decorate their ship"
+    //% "Useful for elite admirals, who may want to do risky attacks or decorate their ship."
     auto *desc = new QLabel(qtTrId("ard-dialog-desc"), this);
     desc->setWordWrap(true);
     layout->addWidget(desc);
 
     //% "Select a package"
     auto *groupBox = new QGroupBox(qtTrId("ard-package-select"), this);
+    groupBox->setAlignment(Qt::AlignCenter);
     auto *groupLayout = new QVBoxLayout(groupBox);
 
     packageGroup = new QButtonGroup(this);

@@ -299,6 +299,7 @@ void MainWindow::gamestateChanged(KP::GameState state) {
     }
     state == KP::Offline ? ui->ResourcesBar->hide()
                          : ui->ResourcesBar->show();
+    ui->menuShop->setEnabled(state != KP::Offline);
     switch(state) {
     case KP::Offline: lay->setCurrentWidget(newLoginScreen); break;
     case KP::Port: lay->setCurrentWidget(portArea); break;
