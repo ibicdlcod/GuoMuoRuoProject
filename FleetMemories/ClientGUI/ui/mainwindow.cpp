@@ -248,6 +248,10 @@ void MainWindow::unlockBattle() {
                     &engine, &Client::switchToFactory),
             connect(ui->actionIndustrial_Plant, &QAction::triggered,
                     this, &MainWindow::switchToRank),
+            connect(ui->actionCloning_Vats, &QAction::triggered,
+                    &engine, &Client::switchToFactory),
+            connect(ui->actionCloning_Vats, &QAction::triggered,
+                    this, &MainWindow::switchToCloningVats),
         };
 }
 
@@ -364,6 +368,16 @@ void MainWindow::switchToBlueprint() {
         return;
     }
     factoryArea->setState(KP::BlueprintView);
+    factoryArea->switchToState();
+    adjust();
+}
+
+void MainWindow::switchToCloningVats() {
+    Client &engine = Client::getInstance();
+    if(!engine.loggedIn()) {
+        return;
+    }
+    factoryArea->setState(KP::CloningVats);
     factoryArea->switchToState();
     adjust();
 }

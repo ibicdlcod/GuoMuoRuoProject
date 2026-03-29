@@ -657,6 +657,10 @@ void Client::receivedMsg(const QJsonObject &djson) {
             //% "You must use cloning vats to clone ships."
             qWarning() << qtTrId("cloning-disallowed");
             break;
+        case KP::CloningInexperiencdShip:
+            //% "Ship level is too low!."
+            qWarning() << qtTrId("cloning-inexperienced");
+            break;
         case KP::BlueprintNonexistent:
             //% "You don't have the appropriate blueprints."
             qWarning() << qtTrId("blueprint-lack");
@@ -1017,6 +1021,10 @@ void Client::receivedMsg(const QJsonObject &djson) {
             break;
         case KP::FleetBusyInBattle:
             qWarning() << qtTrId("fleet-is-busy");
+            break;
+        case KP::FleetDuplicateRemodelGroup:
+            //% "Fleet contains duplicate ships!"
+            qWarning() << qtTrId("fleet-contains-duplicate");
             break;
         case KP::ValidFleet:
             //% "Modify fleet success!"

@@ -125,7 +125,7 @@ SQLite, accessed via Qt SQL. All CREATE TABLE statements are at the top of `Serv
 | Table | Key columns | Purpose |
 |-------|-------------|---------|
 | `NewUsers` | `UserID` BLOB PK, `UserType` | User registry (`'commoner'` / `'admin'`) |
-| `UserAttr` | `UserID`, `Attribute`, `Intvalue` | General per-user key-value attributes (see below) |
+| `UserAttr` | `UserID`, `Attribute`, `Intvalue`, `Realvalue` | General per-user key-value attributes (see below); `Realvalue REAL DEFAULT NULL` stores double-valued attributes |
 | `UserShip` | `ShipUuid` PK, `User`, `ShipDef`, `CurrentHP`, `Condition`, `Exp`, `Slot1`–`Slot5`+`SlotEX`, `FleetIndex`, `FleetPosIndex`, `FleetFled` | Ship instances owned by user |
 | `UserKCShip` | `ShipUuid` PK, `ShipDef`, `Exp` | KC-variant extra exp; LEFT JOINed with `UserShip` |
 | `UserEquip` | `EquipUuid` PK, `User`, `EquipDef`, `Star` | Equipment instances owned by user |
@@ -145,6 +145,7 @@ SQLite, accessed via Qt SQL. All CREATE TABLE statements are at the top of `Serv
 | `O` / `E` / `S` / `R` / `A` / `W` / `C` | 10000 / 10000 / 10000 / 6000 / 8000 / 6000 / 6000 | Resources (Oil, Explosives, Steel, Rubber, Aluminum, Tungsten, Chromium) |
 | `ARDCoupon` | 0 | ARD coupon balance (1 unit = 0.01 HKD) |
 | `Medal` | 0 | Medal balance; purchasable at `KP::medalCostPerUnit = 999` ARD coupons each |
+| `Sanity` | 0.0 | Sanity balance (stored in `Realvalue`); regenerates at ship_count / (100 × 30 × 24 × 60) per minute via `Server::minutePulse` |
 | `FleetSize` | 1 | Number of unlocked fleets |
 | `FactorySize` | init value | Number of factory slots |
 | `DockSize` | init value | Number of repair dock slots |
@@ -164,6 +165,20 @@ Shop dialogs live in `ClientGUI/ui/shop/`. The Shop menu is disabled when offlin
 - **`medalbuydialog`** — Buy medals with ARD coupons (`CommandType::BuyMedal`); rate is `KP::medalCostPerUnit = 999` coupons per medal
 
 Both `ardCouponCache` and `medalCache` on `Client` are updated whenever `serverResourceUpdate` is received. The server sends these as part of `offerResourceInfo` after any purchase.
+
+### Factory states
+
+`FactoryArea` is a shared panel driven by `KP::FactoryState`. All states are routed through `FactoryArea::switchToState()`:
+
+| State | UI shown | Purpose |
+|-------|----------|---------|
+| `Development` | Factory slots | Develop equipment |
+| `Construction` | Factory slots | Build new ships or remodel existing ones |
+| `CloningVats` | Factory slots | Clone already-owned ships; costs sanity (regenerates with ship count) and requires the highest-levelled ship in the remodel group to exceed a level threshold; two ships from the same remodel group may not share a fleet |
+| `Arsenal` | `EquipView` | Browse and buy equipment from the store |
+| `Anchorage` | `EquipView` | Supply ships |
+| `BlueprintView` | `EquipView` | Browse ship blueprints |
+| `RankView` | `EquipView` | View equipment rankings |
 
 ### Paginated model (EquipModel / ShipModel)
 

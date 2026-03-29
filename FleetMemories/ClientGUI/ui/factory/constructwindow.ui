@@ -506,6 +506,43 @@
     </layout>
    </item>
    <item>
+    <widget class="QFrame" name="sanityFrame">
+     <property name="visible">
+      <bool>false</bool>
+     </property>
+     <layout class="QHBoxLayout">
+      <item>
+       <widget class="QLabel" name="sanityRemainingLabel">
+        <property name="text">
+         <string id="sanity-remaining">Sanity remaining:</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="sanityRemainingValue">
+        <property name="text">
+         <string id="dev-calculating">Calculating...</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="sanityRequiredLabel">
+        <property name="text">
+         <string id="sanity-required">Sanity required:</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="sanityRequiredValue">
+        <property name="text">
+         <string id="dev-calculating">Calculating...</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
     <spacer name="verticalSpacer">
      <property name="orientation">
       <enum>Qt::Vertical</enum>

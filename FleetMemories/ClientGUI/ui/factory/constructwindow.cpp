@@ -4,9 +4,12 @@
 #include "constructwindow.h"
 #include "ui_constructwindow.h"
 
+#include <QDialogButtonBox>
 #include <QMessageBox>
 #include <QMetaEnum>
 #include <QUuid>
+
+#include <cmath>
 
 #include "../../../Protocol/kp.h"
 #include "../../clientv2.h"
@@ -160,6 +163,11 @@ void ConstructWindow::switchDisplay(int) {
             pass = false;
         }
 
+        if(pass && cloningMode
+                && !ship->getPreviousModels(
+                       engine.shipRegistryCache).isEmpty()) {
+            pass = false;
+        }
         if(pass) {
             namePasses.append(ship->getId());
         }
@@ -296,6 +304,46 @@ shipToRemodel:
     else {
         ui->remodelLabel->setStyleSheet("color: red;");
     }
+    updateSanityDisplay();
+
+check_cloning_allowed:
+    if(!cloningMode) {
+        bool canProceed = true;
+        if(shipDef != 0 && ship != nullptr) {
+            auto latermodels =
+                ship->getLaterModels(engine.shipRegistryCache);
+            int latestmodel = shipDef;
+            if(!latermodels.empty()) {
+                latestmodel = *std::max_element(
+                    latermodels.constBegin(),
+                    latermodels.constEnd());
+            }
+            QList<int> groupDefs;
+            for(auto iter =
+                     engine.shipRegistryCache.keyValueBegin();
+                 iter !=
+                     engine.shipRegistryCache.keyValueEnd();
+                 ++iter) {
+                auto lm = iter->second->getLaterModels(
+                    engine.shipRegistryCache);
+                int lmId = lm.empty() ? iter->first
+                    : *std::max_element(
+                          lm.constBegin(), lm.constEnd());
+                if(lmId == latestmodel) {
+                    groupDefs.append(iter->first);
+                }
+            }
+            auto ownedShips = engine.shipModel.getAllShips();
+            int count = 0;
+            for(auto s: std::as_const(ownedShips)) {
+                if(groupDefs.contains(s->getId())) { ++count; }
+            }
+            canProceed = (count == 0)
+                || (ui->shipnameToRemodel->count() > 0);
+        }
+        ui->buttonBox->button(QDialogButtonBox::Ok)
+            ->setEnabled(canProceed);
+    }
 }
 
 int ConstructWindow::shipDefDesired() {
@@ -321,4 +369,71 @@ QUuid ConstructWindow::shipToRemodelDesired() {
         model->index(ui->shipnameToRemodel->currentIndex(), 0),
         Qt::ToolTipRole);
     return uid.isValid() ? uid.toUuid() : QUuid();
+}
+
+void ConstructWindow::setCloningMode(bool cloning) {
+    cloningMode = cloning;
+    if(cloning) {
+        //% "Cloning Vats"
+        setWindowTitle(qtTrId("cloning-vats"));
+    }
+    else {
+        //% "Construct Ships"
+        setWindowTitle(qtTrId("construct-ships"));
+    }
+    ui->sanityFrame->setVisible(cloning);
+    ui->remodelLabel->setVisible(!cloning);
+    ui->shipnameToRemodel->setVisible(!cloning);
+    updateSanityDisplay();
+}
+
+void ConstructWindow::updateSanityDisplay() {
+    if(!cloningMode) {
+        return;
+    }
+    Client &engine = Client::getInstance();
+    double remaining = engine.exoticCache.sanity;
+    double required = 0.0;
+    if(shipDef != 0) {
+        Ship *ship = engine.shipRegistryCache.value(shipDef);
+        if(ship) {
+            auto latermodels = ship->getLaterModels(
+                engine.shipRegistryCache);
+            int latestmodel = shipDef;
+            if(!latermodels.empty()) {
+                latestmodel = *std::max_element(
+                    latermodels.constBegin(),
+                    latermodels.constEnd());
+            }
+            QList<int> groupDefs;
+            for(auto iter =
+                     engine.shipRegistryCache.keyValueBegin();
+                 iter !=
+                     engine.shipRegistryCache.keyValueEnd();
+                 ++iter) {
+                auto lm = iter->second->getLaterModels(
+                    engine.shipRegistryCache);
+                int lmId = lm.empty() ? iter->first
+                    : *std::max_element(
+                          lm.constBegin(), lm.constEnd());
+                if(lmId == latestmodel) {
+                    groupDefs.append(iter->first);
+                }
+            }
+            auto ownedShips = engine.shipModel.getAllShips();
+            int count = 0;
+            for(auto s: std::as_const(ownedShips)) {
+                if(groupDefs.contains(s->getId())) {
+                    ++count;
+                }
+            }
+            if(count > 0) {
+                required = std::pow(2.0, count - 1);
+            }
+        }
+    }
+    ui->sanityRemainingValue->setText(
+        QString::number(remaining, 'f', 2));
+    ui->sanityRequiredValue->setText(
+        QString::number(required, 'f', 2));
 }

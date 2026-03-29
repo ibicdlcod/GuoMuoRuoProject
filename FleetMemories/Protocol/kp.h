@@ -82,6 +82,7 @@ static constexpr int maxRepairSlots = 8;
 /* ARD coupon stored as integer units; 1 unit = 0.01 HKD */
 static constexpr const char *attrARDCoupon = "ARDCoupon";
 static constexpr const char *attrMedal = "Medal";
+/* 5.9-cloning.md */
 static constexpr const char *attrSanity = "Sanity";
 static constexpr double ardCouponUnitHKD = 0.01;
 static constexpr int ardCouponMaxUnits = 65536;
@@ -247,6 +248,7 @@ enum GameError{
     MassProductionDisallowed,
     ProductionDisallowed,
     CloningDisallowed,
+    CloningInexperiencdShip,
     DefaultEquipIncorrect,
     RemodelShipIncorrect,
     BlueprintNonexistent,
@@ -263,6 +265,7 @@ Q_ENUM_NS(GameError)
 enum FactoryState{
     Development,
     Construction,
+    CloningVats,
     Arsenal,
     Anchorage,
     BlueprintView,
@@ -336,6 +339,7 @@ enum FleetFailType{
     FleetContainsDisabled,
     FleetDontFitMap,
     FleetBusyInBattle,
+    FleetDuplicateRemodelGroup,
     FleetShipisUnderRepair,
 };
 Q_ENUM_NS(FleetFailType)

@@ -23,11 +23,14 @@ Base resource type is Oil, Explosives (KC's Ammo), Steel, Rubber, Aluminum, Tung
 
 ### Exotic types
 
+[Implemented in ResExotic]
+
 | Type           | Function                                |
 | -------------- | --------------------------------------- |
 | Command points | TBD                                     |
 | ARD Coupon     | Buying certain equipment and medals     |
 | Medals         | Decorate ship, increasing her level cap |
+| Sanity         | Cost for cloning ships                  |
 
 ### Stockpile cap
 
@@ -49,6 +52,12 @@ Natural regeneration speed is the following per minute:
 + Power is your global tech level divided by [rule/antiregenpower](settings.md).
 + a is [rule/regenpertech](settings.md)
 + b is [rule/regenattech0](settings.md)
+
+### Sanity regeneration
+
+[Implemented in Server::minutePulse#regen_sanity]
+
+Sanity regenerates each minute. The amount gained per minute equals the user's total ship count divided by (100 × 30 × 24 × 60), so a user owning 100 ships gains 1 sanity per 30-day month.
 
 ### Naval Supremacy and Expedition
 

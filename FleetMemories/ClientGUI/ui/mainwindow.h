@@ -63,6 +63,7 @@ private slots:
     void switchToAnchorage();
     void switchToArsenal();
     void switchToBlueprint();
+    void switchToCloningVats();
     void switchToConstruct();
     void switchToDevelop();
     void switchToFleet();

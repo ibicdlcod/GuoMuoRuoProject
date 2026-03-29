@@ -129,7 +129,8 @@ void FactoryArea::developClicked(bool checked, int slotnum) {
             }
         }
     }
-    else if(factoryState == KP::Construction){
+    else if(factoryState == KP::Construction
+             || factoryState == KP::CloningVats){
         if(slotfs[slotnum]->isComplete()) {
             engine.doFetch({"fetch", QString::number(slotnum)});
         }
@@ -191,6 +192,14 @@ void FactoryArea::switchToState() {
     case KP::Construction:
         ui->FactoryLabel->setText(qtTrId("construct-ships"));
         lay->setCurrentWidget(slotControl);
+        con.setCloningMode(false);
+        con.switchDisplay();
+        break;
+    case KP::CloningVats:
+        //% "Cloning Vats"
+        ui->FactoryLabel->setText(qtTrId("cloning-vats"));
+        lay->setCurrentWidget(slotControl);
+        con.setCloningMode(true);
         con.switchDisplay();
         break;
     case KP::Arsenal:

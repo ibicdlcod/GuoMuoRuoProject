@@ -51,6 +51,8 @@ public:
     static double getEfficiency(int lv, int star);
     static int numberOfRings(int expCap);
 
+    static constexpr int ringLv = 100;
+
     QMap<QString, QString> localNames;
     QMap<QString, QString> shipClassText;
     QMap<QString, QString> shipOrderText;
@@ -59,7 +61,6 @@ public:
 
 private:
     int shipRegId;
-    static constexpr int ringLv = 100;
 
     Q_DISABLE_COPY_MOVE(Ship)
 };

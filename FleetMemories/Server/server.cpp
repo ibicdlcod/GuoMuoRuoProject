@@ -6,9 +6,11 @@
 
 #include <QBuffer>
 #include <QFile>
+#include <QSet>
 #include <QThread>
 #include <QUrlQuery>
 
+#include <cmath>
 #include <limits>
 
 #include "../steam/steamencryptedappticket.h"
@@ -1057,14 +1059,96 @@ bp: {
             }
         }
 
-        /* 5.4-construction.md#Possess limit */
-possess_limit:
-        bool isCloning = prevShip.isNull() && userOwnsRemodelGroup(uid, ship) > 0;
-        if(isCloning) {
+check_default_equip:
+    QList<QUuid> trash;
+    if(Q_UNLIKELY(equips.size() != KP::maxEquipSlots)) {
+        QByteArray msg =
+            KP::serverDevelopFailed(KP::DefaultEquipIncorrect);
+        senderM.sendMessage(connection, msg);
+        return;
+    }
+    for(int i = 0; i < KP::maxEquipSlots; ++i) {
+        int equipDef = 0;
+        QSqlQuery query;
+        QString queryStr = QStringLiteral("SELECT EquipDef "
+                                          "FROM UserEquip "
+                                          "WHERE User = :uid "
+                                          "AND EquipUuid = :euid");
+        query.prepare(queryStr);
+        query.bindValue(":uid", uid.ConvertToUint64());
+        query.bindValue(":euid", equips[i].toString());
+        if(Q_LIKELY(query.exec() && query.isSelect())) {
+            if(query.first()) {
+                equipDef = query.value(0).toInt();
+            }
+        }
+        else {
+            //% "Database failed when constructing: query existing equips failed!"
+            throw DBError(
+                qtTrId("dbfail-constructing-query-existing-equips"),
+                query.lastError());
+        }
+        QString de = QStringLiteral("Defaultequip");
+        de.append(QString::number(i+1));
+        if(Q_LIKELY(equipDef == ship->attr[de])) {
+            if(equipDef != 0) {
+                auto type = equipRegistry[equipDef]->type;
+                if(type.isCarrierPlane()
+                    || type.isSeaplane()) {
+                    ;
+                }
+                else {
+                    trash.append(equips[i]);
+                }
+            }
+        }
+        else {
             QByteArray msg =
-                    KP::serverDevelopFailed(KP::CloningDisallowed);
+                KP::serverDevelopFailed(KP::DefaultEquipIncorrect);
             senderM.sendMessage(connection, msg);
             return;
+        }
+    }
+        /* 5.4-construction.md#Possess limit */
+possess_limit:
+        int cloningCount = prevShip.isNull()
+            ? userOwnsRemodelGroup(uid, ship) : 0;
+        if(cloningCount > 0) {
+cloning_level_check:
+            int maxExp = userRemodelGroupMaxExp(uid, ship);
+            if(Ship::getLevel(maxExp)
+                    <= cloningCount * Ship::ringLv) {
+                QByteArray msg = KP::serverDevelopFailed(
+                    KP::CloningInexperiencdShip);
+                senderM.sendMessage(connection, msg);
+                return;
+            }
+            double sanityCost = std::pow(2.0, cloningCount - 1);
+cloning_sanity_check:
+            QSqlQuery sanityQuery;
+            sanityQuery.prepare(
+                "UPDATE UserAttr "
+                "SET Realvalue = Realvalue - :cost "
+                "WHERE UserID = :uid "
+                "AND Attribute = :attr "
+                "AND Realvalue >= :cost;");
+            sanityQuery.bindValue(":cost", sanityCost);
+            sanityQuery.bindValue(
+                ":uid", uid.ConvertToUint64());
+            sanityQuery.bindValue(":attr", KP::attrSanity);
+            if(Q_UNLIKELY(!sanityQuery.exec())) {
+                //% "Database failed when deducting sanity."
+                throw DBError(
+                    qtTrId("dbfail-cloning-sanity-deduct"),
+                    sanityQuery.lastError(),
+                    sanityQuery.lastQuery());
+            }
+            if(sanityQuery.numRowsAffected() == 0) {
+                QByteArray msg = KP::serverDevelopFailed(
+                    KP::ResourceLack);
+                senderM.sendMessage(connection, msg);
+                return;
+            }
         }
 
         /* 5.4-construction.md#Resource cost */
@@ -1243,55 +1327,6 @@ restore_default_equip_converter_remodel:
         }
 
 eat_default_equip:
-        QList<QUuid> trash;
-        if(Q_UNLIKELY(equips.size() != KP::maxEquipSlots)) {
-            QByteArray msg =
-                    KP::serverDevelopFailed(KP::DefaultEquipIncorrect);
-            senderM.sendMessage(connection, msg);
-            return;
-        }
-        for(int i = 0; i < KP::maxEquipSlots; ++i) {
-            int equipDef = 0;
-            QSqlQuery query;
-            QString queryStr = QStringLiteral("SELECT EquipDef "
-                                              "FROM UserEquip "
-                                              "WHERE User = :uid "
-                                              "AND EquipUuid = :euid");
-            query.prepare(queryStr);
-            query.bindValue(":uid", uid.ConvertToUint64());
-            query.bindValue(":euid", equips[i].toString());
-            if(Q_LIKELY(query.exec() && query.isSelect())) {
-                if(query.first()) {
-                    equipDef = query.value(0).toInt();
-                }
-            }
-            else {
-                //% "Database failed when constructing: query existing equips failed!"
-                throw DBError(
-                    qtTrId("dbfail-constructing-query-existing-equips"),
-                    query.lastError());
-            }
-            QString de = QStringLiteral("Defaultequip");
-            de.append(QString::number(i+1));
-            if(Q_LIKELY(equipDef == ship->attr[de])) {
-                if(equipDef != 0) {
-                    auto type = equipRegistry[equipDef]->type;
-                    if(type.isCarrierPlane()
-                            || type.isSeaplane()) {
-                        ;
-                    }
-                    else {
-                        trash.append(equips[i]);
-                    }
-                }
-            }
-            else {
-                QByteArray msg =
-                        KP::serverDevelopFailed(KP::DefaultEquipIncorrect);
-                senderM.sendMessage(connection, msg);
-                return;
-            }
-        }
         if(!trash.isEmpty()) {
             QList<QUuid> destructed = retireEquip(uid, trash);
             QByteArray msg2 = KP::serverEquipRetired(destructed);
@@ -1371,6 +1406,54 @@ int Server::userOwnsRemodelGroup(const CSteamID &uid, Ship *ship) {
         //% "Database failed when constructing: query existing models failed!"
         throw DBError(
             qtTrId("dbfail-constructing-query-existing-models"),
+            query.lastError());
+    }
+}
+
+/* 5.9-cloning.md */
+int Server::userRemodelGroupMaxExp(const CSteamID &uid, Ship *ship) {
+    int latestmodel = 0;
+    auto latermodels = ship->getLaterModels(shipRegistry);
+    if(!latermodels.empty()) {
+        latestmodel = *std::max_element(
+            latermodels.constBegin(), latermodels.constEnd());
+    }
+    QList<int> allModels = shipRemodelGroup.values(latestmodel);
+
+    QSqlQuery query;
+    QString queryStr = QStringLiteral(
+        "SELECT MAX(MIN(UserShip.Exp"
+        "+COALESCE(UserKCShip.Exp, 0), UserShip.ExpCap)) "
+        "FROM UserShip "
+        "LEFT JOIN UserKCShip "
+        "ON UserShip.ShipUuid = UserKCShip.ShipUuid "
+        "WHERE UserShip.User = :uid "
+        "AND UserShip.ShipDef IN (");
+    for(int i = 0; i < allModels.size(); ++i) {
+        queryStr.append(":id");
+        queryStr.append(QString::number(i+1));
+        if(i != allModels.size() - 1) {
+            queryStr.append(", ");
+        }
+    }
+    queryStr.append(");");
+    query.prepare(queryStr);
+    query.bindValue(":uid", uid.ConvertToUint64());
+    for(int i = 0; i < allModels.size(); ++i) {
+        QString idd = QStringLiteral(":id");
+        idd.append(QString::number(i+1));
+        query.bindValue(idd, allModels[i]);
+    }
+    if(Q_LIKELY(query.exec() && query.isSelect())) {
+        if(query.first()) {
+            return query.value(0).toInt();
+        }
+        return 0;
+    }
+    else {
+        //% "Database failed when constructing: query max exp failed!"
+        throw DBError(
+            qtTrId("dbfail-constructing-query-max-exp"),
             query.lastError());
     }
 }
@@ -2551,6 +2634,7 @@ regen_resources_based_on_supremacy:
                               query.lastError(), query.lastQuery());
             }
         }
+/* 3-resources.md#Sanity regeneration */
 regen_sanity:
         {
             QSqlQuery query;
@@ -4204,6 +4288,7 @@ KP::FleetFailType Server::updateFleet(const CSteamID &uid,
     QMap<int, int> battleShipSizes;
     QMap<int, int> carrierSizes;
     QMap<int, int> fleetShipNums;
+    QMap<int, QSet<int>> seenRemodelGroups;
     QMap<QUuid, int> shipExps;
     for(const auto &shipData: input) {
         auto shipDataObj = shipData.toObject();
@@ -4236,6 +4321,21 @@ KP::FleetFailType Server::updateFleet(const CSteamID &uid,
                 return KP::FleetContainsDisabled;
             }
             auto ship = shipRegistry[query.value(0).toInt()];
+check_duplicate_remodel_group:
+            {
+                auto latermodels =
+                    ship->getLaterModels(shipRegistry);
+                int groupKey = latermodels.empty()
+                    ? ship->getId()
+                    : *std::max_element(
+                          latermodels.constBegin(),
+                          latermodels.constEnd());
+                if(seenRemodelGroups[fleetIndex].contains(
+                       groupKey)) {
+                    return KP::FleetDuplicateRemodelGroup;
+                }
+                seenRemodelGroups[fleetIndex].insert(groupKey);
+            }
             if(!fleetSizes.contains(fleetIndex)) {
                 fleetSizes[fleetIndex] = 0;
                 screenSizes[fleetIndex] = 0;

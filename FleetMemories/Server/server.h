@@ -187,6 +187,7 @@ private:
     void switchCert(const QStringList &);
     KP::FleetFailType updateFleet(const CSteamID &, const QJsonArray &);
     int userOwnsRemodelGroup(const CSteamID &, Ship *);
+    int userRemodelGroupMaxExp(const CSteamID &, Ship *);
     void userInit(const CSteamID &);
 
     bool listening = false;

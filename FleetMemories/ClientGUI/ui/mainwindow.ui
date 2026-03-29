@@ -280,6 +280,7 @@ border-style: none;</string>
     <addaction name="actionShip_Blueprints"/>
     <addaction name="separator"/>
     <addaction name="actionIndustrial_Plant"/>
+    <addaction name="actionCloning_Vats"/>
    </widget>
    <widget class="QMenu" name="menuNaval_Base">
     <property name="title">
@@ -429,6 +430,11 @@ border-style: none;</string>
   <action name="actionIndustrial_Plant">
    <property name="text">
     <string id="ra2-industrial-plant">Industrial Plant</string>
+   </property>
+  </action>
+  <action name="actionCloning_Vats">
+   <property name="text">
+    <string id="cloning-vats">Cloning Vats</string>
    </property>
   </action>
  </widget>

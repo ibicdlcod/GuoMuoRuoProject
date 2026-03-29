@@ -21,9 +21,11 @@ public:
     ~ConstructWindow();
 
     void initialize();
+    void setCloningMode(bool);
     int shipDefDesired();
     QList<QUuid> defaultEquipsDesired();
     QUuid shipToRemodelDesired();
+    void updateSanityDisplay();
 
 public slots:
     void switchDisplay(int dummy = 0);
@@ -33,6 +35,7 @@ private:
     Ui::ConstructWindow *ui;
     QList<QComboBox *> equipBoxes;
 
+    bool cloningMode = false;
     int shipDef;
 };
 

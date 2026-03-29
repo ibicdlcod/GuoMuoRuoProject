@@ -64,6 +64,7 @@ public:
     /* ususally accesses equipregistryCache */
     friend void ConstructWindow::switchDisplay(int);
     friend void ConstructWindow::shipNameChanged(int);
+    friend void ConstructWindow::updateSanityDisplay();
     friend int DevelopWindow::equipIdDesired();
     friend void DevelopWindow::resetListName(int);
     friend void EquipSelect::reCalculateAvailableEquips(int);
