@@ -835,7 +835,8 @@ QByteArray KP::serverResourceUpdate(ResOrd ordinary, ResExotic exotic) {
     result["w"] = ordinary.w;
     result["cr"] = ordinary.c;
     result["ardcoupon"] = exotic.ard;
-    result["medal"] = exotic.medal;
+    result["medal"]     = exotic.medal;
+    result["sanity"]    = exotic.sanity;
     return QCborValue::fromJsonValue(result).toCbor();
 }
 

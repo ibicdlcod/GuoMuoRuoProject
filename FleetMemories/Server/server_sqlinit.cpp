@@ -32,6 +32,7 @@ Q_GLOBAL_STATIC(QString,
                     "UserID BLOB NOT NULL, "
                     "Attribute TEXT NOT NULL, "
                     "Intvalue INTEGER DEFAULT 0, "
+                    "Realvalue REAL DEFAULT NULL, "
                     "FOREIGN KEY(UserID) REFERENCES NewUsers(UserID)"
                     "CONSTRAINT noduplicate UNIQUE(UserID, Attribute)"
                     ");"
@@ -382,6 +383,28 @@ void Server::sqlinit() const {
         if(!tables.contains("UserAttr")) {
             sqlinitUserA();
         }
+        else {
+            /* Migration: add Realvalue column if absent (added for Sanity) */
+            QSqlQuery pragma;
+            pragma.exec("PRAGMA table_info(UserAttr)");
+            bool hasRealvalue = false;
+            while(pragma.next()) {
+                if(pragma.value(1).toString() == "Realvalue") {
+                    hasRealvalue = true;
+                    break;
+                }
+            }
+            if(!hasRealvalue) {
+                QSqlQuery alter;
+                alter.prepare(
+                    "ALTER TABLE UserAttr ADD COLUMN Realvalue REAL DEFAULT NULL");
+                if(!alter.exec()) {
+                    //% "Failed to migrate UserAttr: add Realvalue column."
+                    throw DBError(qtTrId("userattr-migrate-realvalue-failed"),
+                                  alter.lastError(), alter.lastQuery());
+                }
+            }
+        }
         if(!tables.contains("EquipReg")) {
             sqlinitEquip();
         }
@@ -432,9 +455,6 @@ void Server::sqlinit() const {
         }
         if(!tables.contains("UserMapState")) {
             sqlinitUserM();
-        }
-        if(!tables.contains("UserRanking")) {
-            sqlinitRank();
         }
         if(!tables.contains("UserRanking")) {
             sqlinitRank();

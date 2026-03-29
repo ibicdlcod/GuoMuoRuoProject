@@ -531,8 +531,9 @@ void Client::receivedInfo(const QJsonObject &djson) {
         }
         break;
     case KP::InfoType::ResourceInfo:
-        exoticCache.ard   = djson["ardcoupon"].toInt();
-        exoticCache.medal = djson["medal"].toInt();
+        exoticCache.ard    = djson["ardcoupon"].toInt();
+        exoticCache.medal  = djson["medal"].toInt();
+        exoticCache.sanity = djson["sanity"].toDouble();
         emit receivedResourceInfo(djson);
         break;
     case KP::InfoType::ShipInfo:

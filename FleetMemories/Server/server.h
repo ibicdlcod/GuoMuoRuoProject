@@ -186,6 +186,7 @@ private:
     void startSortie(const CSteamID &, QSslSocket *, int, int, bool);
     void switchCert(const QStringList &);
     KP::FleetFailType updateFleet(const CSteamID &, const QJsonArray &);
+    int userOwnsRemodelGroup(const CSteamID &, Ship *);
     void userInit(const CSteamID &);
 
     bool listening = false;

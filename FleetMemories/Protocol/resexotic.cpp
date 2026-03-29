@@ -16,5 +16,5 @@ bool ResExotic::spendResources(const ResExotic &amount) {
 }
 
 bool ResExotic::sufficient() const {
-    return !(ard < 0 || medal < 0);
+    return !(ard < 0 || medal < 0 || sanity < 0.0);
 }

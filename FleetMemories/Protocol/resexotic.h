@@ -8,24 +8,28 @@
 struct ResExotic
 {
     ResExotic() = default;
-    constexpr ResExotic(int ard, int medal) : ard(ard), medal(medal) {}
+    constexpr ResExotic(int ard, int medal, double sanity = 0.0)
+        : ard(ard), medal(medal), sanity(sanity) {}
 
     constexpr ResExotic& operator+=(const ResExotic& amount) {
-        ard   += amount.ard;
-        medal += amount.medal;
+        ard    += amount.ard;
+        medal  += amount.medal;
+        sanity += amount.sanity;
         return *this;
     }
     constexpr ResExotic& operator-=(const ResExotic& amount) {
-        ard   -= amount.ard;
-        medal -= amount.medal;
+        ard    -= amount.ard;
+        medal  -= amount.medal;
+        sanity -= amount.sanity;
         return *this;
     }
 
     bool spendResources(const ResExotic &);
     bool sufficient() const;
 
-    int ard   = 0; // ARD coupon
-    int medal = 0; // medal
+    int    ard    = 0;   // ARD coupon
+    int    medal  = 0;   // medal
+    double sanity = 0.0; // sanity
 };
 
 #endif // RESEXOTIC_H

@@ -556,17 +556,18 @@ void Server::offerResourceInfo(QSslSocket *connection,
     ResExotic exotic;
     {
         QSqlQuery query;
-        query.prepare("SELECT Attribute, Intvalue FROM UserAttr "
-                      "WHERE UserID = :uid AND Attribute IN (:ard, :medal)");
+        query.prepare("SELECT Attribute, Intvalue, Realvalue FROM UserAttr "
+                      "WHERE UserID = :uid AND Attribute IN (:ard, :medal, :sanity)");
         query.bindValue(":uid", uid.ConvertToUint64());
         query.bindValue(":ard", KP::attrARDCoupon);
         query.bindValue(":medal", KP::attrMedal);
+        query.bindValue(":sanity", KP::attrSanity);
         if(Q_LIKELY(query.exec())) {
             while(query.next()) {
                 QString attr = query.value(0).toString();
-                int val = query.value(1).toInt();
-                if(attr == KP::attrARDCoupon) exotic.ard   = val;
-                else if(attr == KP::attrMedal) exotic.medal = val;
+                if(attr == KP::attrARDCoupon) exotic.ard    = query.value(1).toInt();
+                else if(attr == KP::attrMedal) exotic.medal = query.value(1).toInt();
+                else if(attr == KP::attrSanity) exotic.sanity = query.value(2).toDouble();
             }
         }
     }

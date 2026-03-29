@@ -1059,49 +1059,7 @@ bp: {
 
         /* 5.4-construction.md#Possess limit */
 possess_limit:
-        bool isCloning = false;
-        if(prevShip.isNull()) {
-            int latestmodel = 0;
-            auto latermodels = ship->getLaterModels(shipRegistry);
-            if(!latermodels.empty()) {
-                latestmodel = *std::max_element(
-                    latermodels.constBegin(), latermodels.constEnd());
-            }
-            QList<int> allModels = shipRemodelGroup.values(latestmodel);
-
-            QSqlQuery query;
-            QString queryStr = QStringLiteral("SELECT ShipUuid "
-                                              "FROM UserShip "
-                                              "WHERE User = :uid "
-                                              "AND ShipDef in (");
-            for(int i = 0; i < allModels.size(); ++i) {
-                queryStr.append(":id");
-                queryStr.append(QString::number(i+1));
-                if(i != allModels.size() - 1) {
-                    queryStr.append(", ");
-                }
-            }
-            queryStr.append(");");
-            query.prepare(queryStr);
-            query.bindValue(":uid", uid.ConvertToUint64());
-            for(int i = 0; i < allModels.size(); ++i) {
-                QString idd = QStringLiteral(":id");
-                idd.append(QString::number(i+1));
-                query.bindValue(idd, allModels[i]);
-            }
-            if(Q_LIKELY(query.exec() && query.isSelect())) {
-                while(query.next()) {
-                    isCloning = true;
-                    break;
-                }
-            }
-            else {
-                //% "Database failed when constructing: query existing models failed!"
-                throw DBError(
-                    qtTrId("dbfail-constructing-query-existing-models"),
-                    query.lastError());
-            }
-        }
+        bool isCloning = prevShip.isNull() && userOwnsRemodelGroup(uid, ship) > 0;
         if(isCloning) {
             QByteArray msg =
                     KP::serverDevelopFailed(KP::CloningDisallowed);
@@ -1371,6 +1329,49 @@ delete_bp:
     } catch(std::exception &e) {
         qCritical() << e.what();
         return;
+    }
+}
+
+/* 5.4-construction.md#Possess limit */
+int Server::userOwnsRemodelGroup(const CSteamID &uid, Ship *ship) {
+    int latestmodel = 0;
+    auto latermodels = ship->getLaterModels(shipRegistry);
+    if(!latermodels.empty()) {
+        latestmodel = *std::max_element(
+            latermodels.constBegin(), latermodels.constEnd());
+    }
+    QList<int> allModels = shipRemodelGroup.values(latestmodel);
+
+    QSqlQuery query;
+    QString queryStr = QStringLiteral("SELECT ShipUuid "
+                                      "FROM UserShip "
+                                      "WHERE User = :uid "
+                                      "AND ShipDef in (");
+    for(int i = 0; i < allModels.size(); ++i) {
+        queryStr.append(":id");
+        queryStr.append(QString::number(i+1));
+        if(i != allModels.size() - 1) {
+            queryStr.append(", ");
+        }
+    }
+    queryStr.append(");");
+    query.prepare(queryStr);
+    query.bindValue(":uid", uid.ConvertToUint64());
+    for(int i = 0; i < allModels.size(); ++i) {
+        QString idd = QStringLiteral(":id");
+        idd.append(QString::number(i+1));
+        query.bindValue(idd, allModels[i]);
+    }
+    if(Q_LIKELY(query.exec() && query.isSelect())) {
+        int count = 0;
+        while(query.next()) { ++count; }
+        return count;
+    }
+    else {
+        //% "Database failed when constructing: query existing models failed!"
+        throw DBError(
+            qtTrId("dbfail-constructing-query-existing-models"),
+            query.lastError());
     }
 }
 
@@ -2548,6 +2549,25 @@ regen_resources_based_on_supremacy:
                 //% "Minute pulse: reward supremacy failed!"
                 throw DBError(qtTrId("supremacy-reward-failed"),
                               query.lastError(), query.lastQuery());
+            }
+        }
+regen_sanity:
+        {
+            QSqlQuery query;
+    /* When user have 100 ships, sanity will increase by 1 per month */
+            query.prepare(
+                "UPDATE UserAttr "
+                "SET Realvalue = Realvalue + ("
+                "SELECT CAST(COUNT(*) AS REAL) / (100 * 30 * 24 * 60) "
+                "FROM UserShip "
+                "WHERE User = UserAttr.UserID) "
+                "WHERE Attribute = :attr;");
+            query.bindValue(":attr", KP::attrSanity);
+            if(Q_UNLIKELY(!query.exec())) {
+                //% "Minute pulse: sanity regen failed!"
+                throw DBError(
+                    qtTrId("minutepulse-sanity-regen-failed"),
+                    query.lastError(), query.lastQuery());
             }
         }
 poll_ard_refunds:
@@ -4473,6 +4493,25 @@ natural_regen_time:
             throw DBError(qtTrId("user-data-init-fail").
                           arg(uid.ConvertToUint64()),
                           insertTime.lastError());
+            return;
+        }
+    }
+sanity_init:
+    {
+        QSqlQuery insertSanity;
+        if(!insertSanity.prepare(
+                "INSERT INTO UserAttr (UserID, Attribute, Realvalue) "
+                "VALUES (:uid, :attr, :value);")) {
+            qWarning() << insertSanity.lastError().databaseText();
+        }
+        insertSanity.bindValue(":uid", uid.ConvertToUint64());
+        insertSanity.bindValue(":attr", KP::attrSanity);
+        insertSanity.bindValue(":value", 0.0);
+        if(!insertSanity.exec()) {
+            //% "%1: User data init failure!"
+            throw DBError(qtTrId("user-data-init-fail").
+                          arg(uid.ConvertToUint64()),
+                          insertSanity.lastError());
             return;
         }
     }

@@ -82,6 +82,7 @@ static constexpr int maxRepairSlots = 8;
 /* ARD coupon stored as integer units; 1 unit = 0.01 HKD */
 static constexpr const char *attrARDCoupon = "ARDCoupon";
 static constexpr const char *attrMedal = "Medal";
+static constexpr const char *attrSanity = "Sanity";
 static constexpr double ardCouponUnitHKD = 0.01;
 static constexpr int ardCouponMaxUnits = 65536;
 static constexpr int medalCostPerUnit = 999;
