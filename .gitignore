@@ -95,3 +95,7 @@ static_build/
 !FleetMemories/steam/*
 !FleetMemories/steam/*/*
 !FleetMemories/steam/*/*/*
+
+# Claude Code
+.claude/settings.local.json
+.claude/worktrees/

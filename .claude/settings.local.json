@@ -2,7 +2,25 @@
   "permissions": {
     "allow": [
       "Bash(git add:*)",
-      "WebFetch(domain:partner.steamgames.com)"
+      "WebFetch(domain:partner.steamgames.com)",
+      "Bash(mkdir -p \"D:/GuoMuoRuoProject/FleetMemories/ClientGUI/ui/shop\")",
+      "Bash(mv \"D:/GuoMuoRuoProject/FleetMemories/ClientGUI/ui/ardcoupondialog.h\" \"D:/GuoMuoRuoProject/FleetMemories/ClientGUI/ui/shop/\")",
+      "Bash(mv \"D:/GuoMuoRuoProject/FleetMemories/ClientGUI/ui/ardcoupondialog.cpp\" \"D:/GuoMuoRuoProject/FleetMemories/ClientGUI/ui/shop/\")",
+      "Bash(mv \"D:/GuoMuoRuoProject/FleetMemories/ClientGUI/ui/buyequipdialog.h\" \"D:/GuoMuoRuoProject/FleetMemories/ClientGUI/ui/shop/\")",
+      "Bash(mv \"D:/GuoMuoRuoProject/FleetMemories/ClientGUI/ui/buyequipdialog.cpp\" \"D:/GuoMuoRuoProject/FleetMemories/ClientGUI/ui/shop/\")",
+      "Bash(git commit:*)",
+      "Bash(python3:*)",
+      "Bash(git -C D:GuoMuoRuoProject show HEAD:FleetMemories/Server/server.cpp)",
+      "Bash(find D:GuoMuoRuoProjectFleetMemories/Server -type f -name *.cpp)",
+      "Bash(grep -v '//% ')",
+      "Read(//tmp/**)",
+      "Bash(sort -t: -k1,1 -k2,2n)",
+      "Bash(for f:*)",
+      "Bash(do echo:*)",
+      "Read(//d/GuoMuoRuoProject/.claude/worktrees/agent-af46bb77/length > 80 && !/**)",
+      "Bash(done)",
+      "Bash(xargs awk:*)",
+      "Bash(grep -v '//%')"
     ]
   }
 }
