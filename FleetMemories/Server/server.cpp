@@ -3405,6 +3405,13 @@ anti_ddos_initial_allowence:
             connection->disconnectFromHost();
         }
     }
+    } catch (DBError &e) {
+        for(QString &i : e.whats()) {
+            qCritical() << i;
+        }
+    } catch (std::exception &e) {
+        qCritical() << e.what();
+    }
 }
 
 void Server::receivedForceLogout(const CSteamID &uid) {
@@ -3423,6 +3430,7 @@ void Server::receivedForceLogout(const CSteamID &uid) {
 void Server::receivedLogin(const CSteamID &uid,
                            const PeerInfo &peerInfo,
                            QSslSocket *connection) {
+    try {
     uint64 uidInt = uid.ConvertToUint64();
 
     Q_UNUSED(peerInfo)

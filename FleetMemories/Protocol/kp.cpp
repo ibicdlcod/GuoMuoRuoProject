@@ -6,6 +6,7 @@
 #include <QFile>
 #include <QJsonArray>
 #include <QSettings>
+#include "resexotic.h"
 #include "resord.h"
 
 extern QFile *logFile;
@@ -822,7 +823,7 @@ QByteArray KP::serverRankInfo(const QJsonArray &content,
     return QCborValue::fromJsonValue(result).toCbor();
 }
 
-QByteArray KP::serverResourceUpdate(ResOrd ordinary, int ardcoupon, int medal) {
+QByteArray KP::serverResourceUpdate(ResOrd ordinary, ResExotic exotic) {
     QJsonObject result;
     result["type"] = DgramType::Info;
     result["infotype"] = InfoType::ResourceInfo;
@@ -833,8 +834,8 @@ QByteArray KP::serverResourceUpdate(ResOrd ordinary, int ardcoupon, int medal) {
     result["al"] = ordinary.a;
     result["w"] = ordinary.w;
     result["cr"] = ordinary.c;
-    result["ardcoupon"] = ardcoupon;
-    result["medal"] = medal;
+    result["ardcoupon"] = exotic.ard;
+    result["medal"] = exotic.medal;
     return QCborValue::fromJsonValue(result).toCbor();
 }
 

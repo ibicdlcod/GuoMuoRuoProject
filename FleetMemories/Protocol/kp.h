@@ -34,6 +34,7 @@ const int steamRateLimit = 60; // see ClientGUI/steamauth.cpp
 using TechEntry = std::tuple<QUuid, int, double>;
 
 class ResOrd;
+struct ResExotic;
 
 /* OS Specific */
 #if defined (Q_OS_WIN)
@@ -810,7 +811,7 @@ QByteArray serverParseError(MsgType, const QString &,
                             const QString &);
 QByteArray serverPenguin();
 QByteArray serverRankInfo(const QJsonArray &, int, std::optional<double>);
-QByteArray serverResourceUpdate(ResOrd, int ardcoupon, int medal);
+QByteArray serverResourceUpdate(ResOrd, ResExotic);
 QByteArray serverShipBPInfo(const QJsonObject &);
 QByteArray serverShipInfo(const QJsonArray &, bool user = false,
                           QDateTime timeUtc = QDateTime::currentDateTimeUtc(),

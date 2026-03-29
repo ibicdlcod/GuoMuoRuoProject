@@ -20,7 +20,7 @@ BuyEquipDialog::BuyEquipDialog(QWidget *parent)
     Client &engine = Client::getInstance();
     //% "ARD Coupons: %1"
     layout->addWidget(new QLabel(
-        qtTrId("shop-ard-balance").arg(engine.ardCouponCache), this));
+        qtTrId("shop-ard-balance").arg(engine.exoticCache.ard), this));
 
     //% "Available equipment:"
     layout->addWidget(new QLabel(qtTrId("shop-equip-list-label"), this));

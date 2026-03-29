@@ -20,6 +20,7 @@
 #include "model/localeawaresort.h"
 #include "model/rankmodel.h"
 #include "../Protocol/kp.h"
+#include "../Protocol/resexotic.h"
 #include "../Protocol/receiver.h"
 #include "../Protocol/sender.h"
 #include "../Protocol/mapwithdiff.h"
@@ -89,8 +90,7 @@ public:
     QSortFilterProxyModel *proxyModel = new LocaleAwareSort(this);
     RankModel rankModel;
     QMap<int, double> techCache;
-    int ardCouponCache = 0;
-    int medalCache = 0;
+    ResExotic exoticCache;
 
     sol::state lua;
 

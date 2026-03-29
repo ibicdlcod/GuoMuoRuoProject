@@ -27,7 +27,7 @@
   * [Remodel](5.8-remodel.md)
   * [Cloning Vats](5.9-cloning.md) [NOTYETIMPLEMENTED]
   * [Labor condition](5.10-labor.md)
-  * Decoration [NOTYETIMPLEMENTED]
+  * [Decoration](5.11-decoration.md) [NOTYETIMPLEMENTED]
   * Enemies (Amnesiac Fleet) [NOTYETIMPLEMENTED]
 * [Sortie Map](6-sortie.md)
   * [Normal map and map relations](6.1-map.md) [Some type of map nodes: NOTYETIMPLEMENTED]

@@ -234,6 +234,8 @@ set(PROTOCOL_SOURCES
     Protocol/peerinfo.h
     Protocol/receiver.cpp
     Protocol/receiver.h
+    Protocol/resexotic.cpp
+    Protocol/resexotic.h
     Protocol/resord.cpp
     Protocol/resord.h
     Protocol/sender.cpp

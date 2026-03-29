@@ -22,12 +22,12 @@ MedalBuyDialog::MedalBuyDialog(QWidget *parent)
     //% "Current ARD Coupons: %1"
     auto *balanceLabel = new QLabel(
         qtTrId("medal-coupon-balance")
-            .arg(engine.ardCouponCache),
+            .arg(engine.exoticCache.ard),
         this);
     layout->addWidget(balanceLabel);
     //% "Current Medals: %1"
     auto *medalLabel = new QLabel(
-        qtTrId("medal-current-count").arg(engine.medalCache),
+        qtTrId("medal-current-count").arg(engine.exoticCache.medal),
         this);
     layout->addWidget(medalLabel);
 
@@ -37,7 +37,7 @@ MedalBuyDialog::MedalBuyDialog(QWidget *parent)
     amountBox->setMinimum(1);
     amountBox->setMaximum(
         std::max(1,
-                 engine.ardCouponCache / KP::medalCostPerUnit));
+                 engine.exoticCache.ard / KP::medalCostPerUnit));
     amountBox->setValue(1);
     //% "Amount:"
     form->addRow(qtTrId("medal-amount-label"), amountBox);
@@ -53,7 +53,7 @@ MedalBuyDialog::MedalBuyDialog(QWidget *parent)
         qtTrId("medal-purchase-btn"),
         QDialogButtonBox::AcceptRole);
     buyBtn->setEnabled(
-        engine.ardCouponCache >= KP::medalCostPerUnit);
+        engine.exoticCache.ard >= KP::medalCostPerUnit);
     buttons->addButton(QDialogButtonBox::Cancel);
     layout->addWidget(buttons);
 

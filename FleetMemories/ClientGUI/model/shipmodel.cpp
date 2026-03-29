@@ -612,7 +612,7 @@ Qt::ItemFlags ShipModel::flags(const QModelIndex &index) const {
             if(checked) ++checkedCount;
         }
         Client &engine = Client::getInstance();
-        bool canCheckMore = engine.medalCache
+        bool canCheckMore = engine.exoticCache.medal
                             >= KP::decorationCostMedal * (checkedCount + 1);
         if(alreadyChecked || canCheckMore) {
             // clazy:exclude=skipped-base-method
@@ -661,7 +661,7 @@ bool ShipModel::setData(const QModelIndex &index,
                 for(auto checked: std::as_const(isDecorationChecked)) {
                     if(checked) ++checkedCount;
                 }
-                if(engine.medalCache
+                if(engine.exoticCache.medal
                     >= KP::decorationCostMedal * (checkedCount + 1)) {
                     isDecorationChecked[sortedShipIds.value(realRowIndex)] = true;
                     emit dataChanged(index, index, {Qt::CheckStateRole});

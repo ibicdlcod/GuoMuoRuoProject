@@ -10,6 +10,7 @@
 #include <QTimer>
 
 #include "../Protocol/kp.h"
+#include "../Protocol/resexotic.h"
 #include "kerrors.h"
 #include "user.h"
 
@@ -552,29 +553,24 @@ void Server::offerRankInfo(const CSteamID &uid, QSslSocket *connection,
 void Server::offerResourceInfo(QSslSocket *connection,
                                const CSteamID &uid) {
     ResOrd ordinary = User::getCurrentResources(uid);
-    int ardcoupon = 0;
+    ResExotic exotic;
     {
         QSqlQuery query;
-        query.prepare("SELECT Intvalue FROM UserAttr "
-                      "WHERE UserID = :uid AND Attribute = :attr");
+        query.prepare("SELECT Attribute, Intvalue FROM UserAttr "
+                      "WHERE UserID = :uid AND Attribute IN (:ard, :medal)");
         query.bindValue(":uid", uid.ConvertToUint64());
-        query.bindValue(":attr", KP::attrARDCoupon);
-        if(Q_LIKELY(query.exec() && query.next())) {
-            ardcoupon = query.value(0).toInt();
+        query.bindValue(":ard", KP::attrARDCoupon);
+        query.bindValue(":medal", KP::attrMedal);
+        if(Q_LIKELY(query.exec())) {
+            while(query.next()) {
+                QString attr = query.value(0).toString();
+                int val = query.value(1).toInt();
+                if(attr == KP::attrARDCoupon) exotic.ard   = val;
+                else if(attr == KP::attrMedal) exotic.medal = val;
+            }
         }
     }
-    int medal = 0;
-    {
-        QSqlQuery query;
-        query.prepare("SELECT Intvalue FROM UserAttr "
-                      "WHERE UserID = :uid AND Attribute = :attr");
-        query.bindValue(":uid", uid.ConvertToUint64());
-        query.bindValue(":attr", KP::attrMedal);
-        if(Q_LIKELY(query.exec() && query.next())) {
-            medal = query.value(0).toInt();
-        }
-    }
-    QByteArray msg = KP::serverResourceUpdate(ordinary, ardcoupon, medal);
+    QByteArray msg = KP::serverResourceUpdate(ordinary, exotic);
     connection->flush();
     senderM.sendMessage(connection, msg);
     connection->flush();
