@@ -101,6 +101,8 @@ private:
     void handleARDPurchaseAuth(const CSteamID &, QSslSocket *,
                                const QJsonObject &);
     void handleInitARDPurchase(const CSteamID &, QSslSocket *, int packageId);
+    void handleSupplyShip(const CSteamID &, QSslSocket *,
+                          const QJsonArray &);
     void pollARDRefunds();
     static int getBossDamage(const QJsonObject &);
     static bool getBossSunk(const QJsonObject &);

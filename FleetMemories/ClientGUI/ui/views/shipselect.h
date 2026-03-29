@@ -17,13 +17,16 @@ public:
     explicit ShipSelect(int height, QWidget *parent = nullptr);
 
 signals:
+    void decorateActivated(bool checked = false);
+    void modernizeActivated(bool checked = false);
     void selectChanged(const QString &nationality,
                        const QString &shiptype,
                        const QString &shipclass,
                        const QString &searchTerm
                        = QLatin1String(""));
-    void modernizeActivated(bool checked = false);
-    void decorateActivated(bool checked = false);
+    void supplyAllActivated(bool checked = false);
+    void supplyAmmoActivated(bool checked = false);
+    void supplyFuelActivated(bool checked = false);
 
 public slots:
     void typeBoxHinted(QStringList &types);
@@ -41,6 +44,9 @@ public:
 
     QPushButton *addStarButton;
     QPushButton *decorateButton;
+    QPushButton *supplyAllButton;
+    QPushButton *supplyAmmoButton;
+    QPushButton *supplyFuelButton;
 
 private:
     int height;

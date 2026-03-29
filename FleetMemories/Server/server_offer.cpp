@@ -9,6 +9,8 @@
 #include <QSqlRecord>
 #include <QTimer>
 
+#include <cmath>
+
 #include "../Protocol/kp.h"
 #include "../Protocol/resexotic.h"
 #include "kerrors.h"
@@ -233,6 +235,8 @@ user_ship:
                       "Slot5Planes, "
                       "FleetIndex, "
                       "FleetPosIndex, "
+                      "Fuel, "
+                      "Ammo, "
                       "UserKCShip.Exp "
                       "FROM UserShip "
                       "LEFT JOIN UserKCShip "
@@ -266,6 +270,8 @@ user_ship:
             int slot5Planes;
             int fleetIndex;
             int fleetPosIndex;
+            double fuel;
+            double ammo;
             int expKC;
             while(query.next()) {
                 QJsonObject output;
@@ -297,6 +303,8 @@ user_ship:
                 fleetIndex = query.value(rec.indexOf("FleetIndex")).toInt();
                 fleetPosIndex = query.value(
                     rec.indexOf("FleetPosIndex")).toInt();
+                fuel = query.value(rec.indexOf("Fuel")).toDouble();
+                ammo = query.value(rec.indexOf("Ammo")).toDouble();
                 expKC = query.value(
                     rec.indexOf("UserKCShip.Exp")).toInt();
 
@@ -322,6 +330,8 @@ user_ship:
                                                   slot4Planes,
                                                   slot5Planes,
                                               });
+                output["fuel"] = fuel;
+                output["ammo"] = ammo;
                 output["fleetindex"] = fleetIndex;
                 output["fleetposindex"] = fleetPosIndex;
                 output["fleettype"] = fleetIndex == -1
@@ -793,6 +803,92 @@ void Server::refreshClientFactory(const CSteamID &uid, QSslSocket *connection) {
     result["content"] = itemArray;
     QByteArray msg = QCborValue::fromJsonValue(result).toCbor();
     senderM.sendMessage(connection, msg);
+}
+
+void Server::handleSupplyShip(const CSteamID &uid, QSslSocket *connection,
+                              const QJsonArray &ships) {
+    ResOrd res = User::getCurrentResources(uid);
+    for(const auto &entry: ships) {
+        QJsonObject shipEntry = entry.toObject();
+        QString uuidStr = shipEntry["uuid"].toString();
+        bool doFuel = shipEntry["fuel"].toBool();
+        bool doAmmo = shipEntry["ammo"].toBool();
+        if(!doFuel && !doAmmo)
+            continue;
+
+        QSqlQuery q;
+        q.prepare("SELECT UserShip.ShipDef, Fuel, Ammo, "
+                  "fc.Intvalue AS FuelCons, ac.Intvalue AS AmmoCons "
+                  "FROM UserShip "
+                  "LEFT JOIN ShipReg fc "
+                  "ON UserShip.ShipDef = fc.ShipID "
+                  "AND fc.Attribute = 'FuelConsumption' "
+                  "LEFT JOIN ShipReg ac "
+                  "ON UserShip.ShipDef = ac.ShipID "
+                  "AND ac.Attribute = 'AmmoConsumption' "
+                  "WHERE User = :uid AND ShipUuid = :uuid;");
+        q.bindValue(":uid", uid.ConvertToUint64());
+        q.bindValue(":uuid", uuidStr);
+        if(!q.exec() || !q.isSelect() || !q.first()) {
+            continue;
+        }
+
+        double shipFuel = q.value("Fuel").toDouble();
+        double shipAmmo = q.value("Ammo").toDouble();
+        int fuelCons = q.value("FuelCons").toInt();
+        int ammoCons = q.value("AmmoCons").toInt();
+
+        bool fuelChanged = false;
+        bool ammoChanged = false;
+
+        if(doFuel && shipFuel < 1.0) {
+            int oilCost = static_cast<int>(
+                std::ceil((1.0 - shipFuel) * fuelCons));
+            if(oilCost > 0 && res.o >= oilCost) {
+                res.o -= oilCost;
+                fuelChanged = true;
+            }
+        }
+        if(doAmmo && shipAmmo < 1.0) {
+            int exploCost = static_cast<int>(
+                std::ceil((1.0 - shipAmmo) * ammoCons));
+            if(exploCost > 0 && res.e >= exploCost) {
+                res.e -= exploCost;
+                ammoChanged = true;
+            }
+        }
+
+        if(!fuelChanged && !ammoChanged)
+            continue;
+
+        QSqlQuery upd;
+        if(fuelChanged && ammoChanged) {
+            upd.prepare("UPDATE UserShip SET Fuel = 1.0, Ammo = 1.0 "
+                        "WHERE User = :uid AND ShipUuid = :uuid;");
+        }
+        else if(fuelChanged) {
+            upd.prepare("UPDATE UserShip SET Fuel = 1.0 "
+                        "WHERE User = :uid AND ShipUuid = :uuid;");
+        }
+        else {
+            upd.prepare("UPDATE UserShip SET Ammo = 1.0 "
+                        "WHERE User = :uid AND ShipUuid = :uuid;");
+        }
+        upd.bindValue(":uid", uid.ConvertToUint64());
+        upd.bindValue(":uuid", uuidStr);
+        if(Q_UNLIKELY(!upd.exec())) {
+            //% "User %1: supply ship %2 failed!"
+            throw DBError(qtTrId("supply-ship-failed")
+                          .arg(uid.ConvertToUint64()).arg(uuidStr),
+                          upd.lastError(), upd.lastQuery());
+        }
+    }
+
+    User::setResources(uid, res);
+    offerResourceInfo(connection, uid);
+    QTimer::singleShot(100ms, this, [=, this]() {
+        offerShipInfoUser(uid, connection);
+    });
 }
 
 QT_END_NAMESPACE

@@ -347,22 +347,56 @@ void EquipView::activate(bool arsenal, bool isEquip,
                 arsenalView->show();
             }
             if(arsenal) {
+                ShipModel *sm =
+                    static_cast<ShipModel *>(model);
                 model->setIsInArsenal(true);
+                bool isAnchorage =
+                    custom == KP::Anchorage;
+                sm->setIsSupplyMode(isAnchorage);
                 arsenalView->setItemDelegateForColumn(
                     model->hpColumn(), hpdelegate);
-                shipSelect->addStarButton->show();
-                shipSelect->decorateButton->show();
+                shipSelect->addStarButton->setVisible(!isAnchorage);
+                shipSelect->decorateButton->setVisible(!isAnchorage);
+                shipSelect->supplyFuelButton->setVisible(isAnchorage);
+                shipSelect->supplyAmmoButton->setVisible(isAnchorage);
+                shipSelect->supplyAllButton->setVisible(isAnchorage);
+                if(isAnchorage) {
+                    connect(
+                        shipSelect,
+                        &ShipSelect::supplyFuelActivated,
+                        sm, &ShipModel::enactSupplyFuel,
+                        Qt::UniqueConnection);
+                    connect(
+                        shipSelect,
+                        &ShipSelect::supplyAmmoActivated,
+                        sm, &ShipModel::enactSupplyAmmo,
+                        Qt::UniqueConnection);
+                    connect(
+                        shipSelect,
+                        &ShipSelect::supplyAllActivated,
+                        sm, &ShipModel::enactSupplyAll,
+                        Qt::UniqueConnection);
+                    connect(
+                        sm, &ShipModel::supplyRequest,
+                        &engine, &Client::doSupplyShip,
+                        Qt::UniqueConnection);
+                }
             }
             else {
                 model->setIsInArsenal(false);
-                arsenalView->setItemDelegateForColumn(model->selectColumn(),
-                                                      delegate);
+                static_cast<ShipModel *>(model)
+                    ->setIsSupplyMode(false);
+                arsenalView->setItemDelegateForColumn(
+                    model->selectColumn(), delegate);
                 arsenalView->setItemDelegateForColumn(
                     model->hpColumn(), hpdelegate);
                 connect(delegate, &SelectDelegate::itemSelected,
                         this, &EquipView::itemSelected);
                 shipSelect->addStarButton->hide();
                 shipSelect->decorateButton->hide();
+                shipSelect->supplyFuelButton->hide();
+                shipSelect->supplyAmmoButton->hide();
+                shipSelect->supplyAllButton->hide();
                 unselectButton->show();
                 connect(unselectButton, &QPushButton::clicked,
                         this, [this]{emit shipSelected(QUuid());

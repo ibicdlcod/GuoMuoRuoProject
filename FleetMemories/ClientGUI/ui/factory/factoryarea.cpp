@@ -221,7 +221,7 @@ void FactoryArea::switchToState() {
             initial = false;
         }
         equipview->recalculateArsenalRows();
-        equipview->activate(true, false);
+        equipview->activate(true, false, KP::Anchorage);
         break;
     case KP::BlueprintView:
         //% "Blueprints"

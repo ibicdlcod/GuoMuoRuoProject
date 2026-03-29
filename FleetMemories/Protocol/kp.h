@@ -239,6 +239,7 @@ enum CommandType{
     DecorateShip,
     DemandResourceGain,
     InitARDPurchase,
+    SupplyShip,
 };
 Q_ENUM_NS(CommandType)
 
@@ -705,6 +706,7 @@ QByteArray clientSortie(int, int, bool);
 QByteArray clientStateChange(GameState);
 QByteArray clientSteamAuth(uint8 [], uint32);
 QByteArray clientSteamLogout();
+QByteArray clientSupplyShip(const QJsonArray &);
 QByteArray clientTestMessages(int);
 
 /* factoryslot, repairslot */
@@ -776,6 +778,38 @@ static constexpr int initFactory() {
 
 static constexpr int initDock() {
     return std::get<1>(getDesiredSlots(0));
+}
+
+static constexpr double defaultFuelUsage(NodeType type) {
+    switch(type) {
+    case KP::STARTING: return 0;
+    case KP::NORMAL: return 0.2;
+    case KP::BOSS: return 0.24;
+    case KP::EMPTY: return 0.04;
+    case KP::DISASTER: return 0; // will be handled elsewhere
+    case KP::NIGHT: return 0.16;
+    case KP::NIGHTBOSS: return 0.2;
+    case KP::AIR: return 0.08;
+    case KP::TRANSPORT: return 0;
+    case KP::CHOICE: return 0;
+    default: return 0;
+    }
+}
+
+static constexpr double defaultAmmoUsage(NodeType type) {
+    switch(type) {
+    case KP::STARTING: return 0;
+    case KP::NORMAL: return 0.24;
+    case KP::BOSS: return 0.28;
+    case KP::EMPTY: return 0;
+    case KP::DISASTER: return 0; // will be handled elsewhere
+    case KP::NIGHT: return 0.12;
+    case KP::NIGHTBOSS: return 0.16;
+    case KP::AIR: return 0.08;
+    case KP::TRANSPORT: return 0;
+    case KP::CHOICE: return 0;
+    default: return 0;
+    }
 }
 
 QByteArray serverARDPurchaseClawback(int unitsDeducted);

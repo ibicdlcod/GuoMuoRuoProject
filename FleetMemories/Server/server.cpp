@@ -4110,6 +4110,10 @@ anti_ddos:
         handleInitARDPurchase(uid, connection, djson["units"].toInt());
     }
         break;
+    case KP::CommandType::SupplyShip: {
+        handleSupplyShip(uid, connection, djson["ships"].toArray());
+    }
+        break;
 home_port:
     case KP::CommandType::SelectHomePort: {
         KP::AllegianceGroup nation = static_cast<KP::AllegianceGroup>(

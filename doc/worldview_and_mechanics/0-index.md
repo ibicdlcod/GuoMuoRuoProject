@@ -3,7 +3,7 @@
 - [Overview](1-overview.md)
 - [Technology](2-technology.md)
 
-* [Resources](3-resources.md) [Exotic types: NOTYETIMPLEMENTED]
+* [Resources](3-resources.md)
   * [Ore Purifier (DLC)](3.1-orepurifier.md) [NOTYETIMPLEMENTED]
 * [Equipment](4-equipment.md)
 
@@ -25,7 +25,7 @@
   * [Visible bonuses](5.6-visiblebonus.md) [NOTYETIMPLEMENTED]
   * [Experience and modernization](5.7-experience.md)
   * [Remodel](5.8-remodel.md)
-  * [Cloning Vats](5.9-cloning.md) [NOTYETIMPLEMENTED]
+  * [Cloning Vats](5.9-cloning.md)
   * [Labor condition](5.10-labor.md)
   * [Decoration](5.11-decoration.md)
   * Enemies (Amnesiac Fleet) [NOTYETIMPLEMENTED]
@@ -44,7 +44,7 @@
 * Maintenance 
 
   * [Supply](8.1-supply.md) [NOTYETIMPLEMENTED]
-  * [Repair](8.2-repair.md) [Anchorage repair: NOTIMPLMENTED]
+  * [Repair](8.2-repair.md)
 * Battle mechanic [NOTYETIMPLEMENTED]
 
   * Tactical Goal (for friend fleet)

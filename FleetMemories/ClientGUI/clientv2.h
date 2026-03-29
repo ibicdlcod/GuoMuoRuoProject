@@ -127,6 +127,7 @@ public slots:
     void doRefreshRank(int, std::optional<int> pageNum = std::nullopt);
     void doRepair(const QUuid &, int);
     void doStopRepair(int);
+    void doSupplyShip(const QJsonArray &);
     Equipment * getEquipmentReg(int);
     Ship * getShipReg(int);
     void initARDPurchase(int packageId);

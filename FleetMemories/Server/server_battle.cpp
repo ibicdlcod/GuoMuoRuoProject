@@ -10,6 +10,8 @@
 #include <QTimer>
 #include <QtTypes>
 
+#include <algorithm>
+
 #include "../Protocol/kp.h"
 #include "../Protocol/lua.h"
 
@@ -937,28 +939,80 @@ void Server::progressMap(const CSteamID &uid, QSslSocket *connection,
         }
         /* nNode != 0: next node battle yet started */
         /* nNode == 0: switch to no battle */
-        QSqlQuery query;
-        query.prepare("UPDATE UserAttr SET Intvalue = :type "
-                      "WHERE Attribute = 'InBattle' "
-                      "AND UserID = :uid");
-        query.bindValue(":uid", uid.ConvertToUint64());
-        query.bindValue(":type", nNode == 0 ? KP::NoBattle : KP::BeforeBattle);
-        if(Q_UNLIKELY(!query.exec())) {
-            //% "User %1: progress map %2 failure!"
-            throw DBError(
-                qtTrId("sortie-progress-failure").arg(uid.ConvertToUint64())
-                    .arg(mapId),
-                query.lastError(), query.lastQuery());
-            return;
+        if(nNode != 0) {
+            int unionId = MapWithDiff::getUnionId(mapId);
+            /* get node type for fuel/ammo consumption */
+            KP::NodeType nType = KP::EMPTY;
+            if(lua["maps"] != sol::nil
+                    && lua["maps"][unionId] != sol::nil
+                    && lua["maps"][unionId][nNode] != sol::nil) {
+                int typeInt = lua["maps"][unionId][nNode]["battle_type"];
+                nType = static_cast<KP::NodeType>(typeInt);
+            }
+            double fuelFrac = KP::defaultFuelUsage(nType);
+            double ammoFrac = KP::defaultAmmoUsage(nType);
+            /* lua per-node overrides */
+            if(lua["maps"] != sol::nil
+                    && lua["maps"][unionId] != sol::nil
+                    && lua["maps"][unionId][nNode] != sol::nil) {
+                sol::object fuelOverride =
+                    lua["maps"][unionId][nNode]["fuel"];
+                sol::object ammoOverride =
+                    lua["maps"][unionId][nNode]["ammo"];
+                if(fuelOverride.is<double>())
+                    fuelFrac = fuelOverride.as<double>();
+                if(ammoOverride.is<double>())
+                    ammoFrac = ammoOverride.as<double>();
+            }
+            int activeFleet = result.value()[3];
+            QSqlQuery consumeQuery;
+            consumeQuery.prepare(
+                "SELECT ShipUuid, Fuel, Ammo "
+                "FROM UserShip "
+                "WHERE User = :uid AND FleetIndex = :fi;");
+            consumeQuery.bindValue(":uid", uid.ConvertToUint64());
+            consumeQuery.bindValue(":fi", activeFleet);
+            if(Q_LIKELY(consumeQuery.exec()
+                        && consumeQuery.isSelect())) {
+                while(consumeQuery.next()) {
+                    QString sUuid =
+                        consumeQuery.value(0).toString();
+                    double sFuel =
+                        consumeQuery.value(1).toDouble();
+                    double sAmmo =
+                        consumeQuery.value(2).toDouble();
+                    double newFuel =
+                        std::max(0.0, sFuel - fuelFrac);
+                    double newAmmo =
+                        std::max(0.0, sAmmo - ammoFrac);
+                    QSqlQuery updQ;
+                    updQ.prepare(
+                        "UPDATE UserShip "
+                        "SET Fuel = :f, Ammo = :a "
+                        "WHERE ShipUuid = :uuid;");
+                    updQ.bindValue(":f", newFuel);
+                    updQ.bindValue(":a", newAmmo);
+                    updQ.bindValue(":uuid", sUuid);
+                    updQ.exec();
+                }
+            }
         }
         {
             QSqlQuery query;
-            query.prepare("UPDATE UserAttr SET Intvalue = :type "
-                          "WHERE Attribute = 'CurrentNode' "
-                          "AND UserID = :uid");
+            query.prepare(
+                "UPDATE UserAttr "
+                "SET Intvalue = CASE Attribute "
+                "WHEN 'InBattle' THEN :inbattle "
+                "WHEN 'CurrentNode' THEN :nnode END "
+                "WHERE UserID = :uid "
+                "AND Attribute IN ('InBattle', 'CurrentNode');");
+            query.bindValue(
+                ":inbattle",
+                nNode == 0 ? KP::NoBattle : KP::BeforeBattle);
+            query.bindValue(":nnode", nNode);
             query.bindValue(":uid", uid.ConvertToUint64());
-            query.bindValue(":type", nNode);
             if(Q_UNLIKELY(!query.exec())) {
+                //% "User %1: progress map %2 failure!"
                 throw DBError(
                     qtTrId("sortie-progress-failure")
                         .arg(uid.ConvertToUint64()).arg(mapId),

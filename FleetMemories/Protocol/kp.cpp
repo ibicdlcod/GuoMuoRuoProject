@@ -439,6 +439,14 @@ QByteArray KP::clientSteamLogout() {
     return QCborValue::fromJsonValue(result).toCbor();
 }
 
+QByteArray KP::clientSupplyShip(const QJsonArray &ships) {
+    QJsonObject result;
+    result["type"] = DgramType::Request;
+    result["command"] = CommandType::SupplyShip;
+    result["ships"] = ships;
+    return QCborValue::fromJsonValue(result).toCbor();
+}
+
 QByteArray KP::clientTestMessages(int index) {
     QJsonObject result;
     result["type"] = DgramType::Request;

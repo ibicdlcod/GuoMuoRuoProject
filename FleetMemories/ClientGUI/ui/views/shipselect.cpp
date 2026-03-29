@@ -37,6 +37,9 @@ ShipSelect::ShipSelect(int height, QWidget *parent)
 
     addStarButton = new QPushButton(this);
     decorateButton = new QPushButton(this);
+    supplyAllButton = new QPushButton(this);
+    supplyAmmoButton = new QPushButton(this);
+    supplyFuelButton = new QPushButton(this);
 
     QHBoxLayout *layout = new QHBoxLayout(this);
     layout->addWidget(searchLabel);
@@ -49,6 +52,9 @@ ShipSelect::ShipSelect(int height, QWidget *parent)
     layout->addWidget(classBox);
     layout->addWidget(addStarButton);
     layout->addWidget(decorateButton);
+    layout->addWidget(supplyFuelButton);
+    layout->addWidget(supplyAmmoButton);
+    layout->addWidget(supplyAllButton);
     layout->setContentsMargins(0,0,0,0);
     layout->setSpacing(6);
     layout->setAlignment(Qt::AlignCenter);
@@ -57,6 +63,12 @@ ShipSelect::ShipSelect(int height, QWidget *parent)
     addStarButton->setText(qtTrId("add-star-button-ship"));
     //% "Decorate"
     decorateButton->setText(qtTrId("decorate-button-ship"));
+    //% "Supply Fuel"
+    supplyFuelButton->setText(qtTrId("supply-fuel-button"));
+    //% "Supply Ammo"
+    supplyAmmoButton->setText(qtTrId("supply-ammo-button"));
+    //% "Supply All"
+    supplyAllButton->setText(qtTrId("supply-all-button"));
 
     QSizePolicy labelSize = QSizePolicy(QSizePolicy::Maximum,
                                         QSizePolicy::Preferred,
@@ -112,11 +124,32 @@ ShipSelect::ShipSelect(int height, QWidget *parent)
                                               QSizePolicy::Preferred,
                                               QSizePolicy::PushButton));
     decorateButton->resize(QSize(100, height));
+    supplyFuelButton->setSizePolicy(
+        QSizePolicy(QSizePolicy::Maximum,
+                    QSizePolicy::Preferred,
+                    QSizePolicy::PushButton));
+    supplyFuelButton->resize(QSize(100, height));
+    supplyAmmoButton->setSizePolicy(
+        QSizePolicy(QSizePolicy::Maximum,
+                    QSizePolicy::Preferred,
+                    QSizePolicy::PushButton));
+    supplyAmmoButton->resize(QSize(100, height));
+    supplyAllButton->setSizePolicy(
+        QSizePolicy(QSizePolicy::Maximum,
+                    QSizePolicy::Preferred,
+                    QSizePolicy::PushButton));
+    supplyAllButton->resize(QSize(100, height));
 
     connect(addStarButton, &QAbstractButton::clicked,
             this, &ShipSelect::modernizeActivated);
     connect(decorateButton, &QAbstractButton::clicked,
             this, &ShipSelect::decorateActivated);
+    connect(supplyFuelButton, &QAbstractButton::clicked,
+            this, &ShipSelect::supplyFuelActivated);
+    connect(supplyAmmoButton, &QAbstractButton::clicked,
+            this, &ShipSelect::supplyAmmoActivated);
+    connect(supplyAllButton, &QAbstractButton::clicked,
+            this, &ShipSelect::supplyAllActivated);
 
     connect(nationBox, &QComboBox::activated,
             this, [this]{

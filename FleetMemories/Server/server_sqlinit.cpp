@@ -234,6 +234,8 @@ Q_GLOBAL_STATIC(QString,
                     "FleetIndex INTEGER DEFAULT -1, "
                     "FleetPosIndex INTEGER DEFAULT -1, "
                     "FleetFled INTEGER DEFAULT 0, "
+                    "Fuel REAL DEFAULT 1.0, "
+                    "Ammo REAL DEFAULT 1.0, "
                     "FOREIGN KEY(User) REFERENCES NewUsers(UserID), "
                     "FOREIGN KEY(ShipDef) REFERENCES ShipName(ShipID), "
                     "FOREIGN KEY(Slot1) REFERENCES UserEquip(EquipUuid), "

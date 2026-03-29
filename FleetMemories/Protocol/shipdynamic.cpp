@@ -28,6 +28,8 @@ ShipDynamic::ShipDynamic(const QJsonObject &input, QObject *parent)
     for(auto &planenum: std::as_const(planenums)) {
         slotPlanes.append(planenum.toInt());
     };
+    fuel = input["fuel"].toDouble(1.0);
+    ammo = input["ammo"].toDouble(1.0);
     fleetIndex = input["fleetindex"].toInt();
     fleetPosIndex = input["fleetposindex"].toInt();
 }
@@ -43,6 +45,8 @@ ShipDynamic::ShipDynamic(int hp, QObject *parent)
     slotEquip = QList<QUuid>(5, QUuid());
     slotEquipEx = QUuid();
     slotPlanes = QList<int>(5, 0);
+    fuel = 1.0;
+    ammo = 1.0;
     fleetIndex = -1;
     fleetPosIndex = -1;
 }

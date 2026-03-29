@@ -4,6 +4,8 @@
 #ifndef SHIPMODEL_H
 #define SHIPMODEL_H
 
+#include <QJsonArray>
+
 #include "equipmodel.h"
 #include "../../Protocol/ship.h"
 #include "../../Protocol/shipdynamic.h"
@@ -18,10 +20,11 @@ public:
     bool isShipFullHP(const QUuid &);
 
 signals:
-    void typeBoxHint(QStringList &types);
     void classBoxHint(QStringList &types);
-    void modernizeRequest(const QList<QUuid> &ships);
     void decorateRequest(const QList<QUuid> &ships);
+    void modernizeRequest(const QList<QUuid> &ships);
+    void supplyRequest(const QJsonArray &ships);
+    void typeBoxHint(QStringList &types);
 
 public slots:
     virtual void switchShipDisplayType(const QString &nationality,
@@ -31,11 +34,15 @@ public slots:
                                        = QLatin1String(""));
 
     virtual void addShip(QUuid, int, int) final;
-    virtual void enactModernize() override;
     virtual void enactDecorate();
+    virtual void enactModernize() override;
+    virtual void enactSupplyAll();
+    virtual void enactSupplyAmmo();
+    virtual void enactSupplyFuel();
     virtual void modernizedShips(const QList<std::tuple<QUuid, int>> &);
     virtual void decoratedShips(const QList<std::tuple<QUuid, int>> &);
     virtual void modifyShip(QUuid, int, int, bool disabling = false) final;
+    void setIsSupplyMode(bool);
     virtual void updateShipList(const QJsonObject &);
 
 public:
@@ -54,9 +61,11 @@ public:
     virtual int hiddenSortColumn() const override;
     virtual int selectColumn() const override;
     virtual int fleetPosColumn() const override;
-    int levelColumn() const;
+    int ammoColumn() const;
     int conditionColumn() const;
+    int fuelColumn() const;
     virtual int hpColumn() const override;
+    int levelColumn() const;
     static const int uidCol = 0;
     static const int equipCol = 1;
     static const int starCol = 2;
@@ -68,8 +77,11 @@ protected:
     virtual void customSort() override;
     virtual int numberOfColumns() const override;
     virtual int numberOfShip() const;
+    bool isSupplyMode = false;
     QHash<int, int> bpCache;
+    QHash<QUuid, bool> isAmmoSupplyChecked;
     QHash<QUuid, bool> isDecorationChecked;
+    QHash<QUuid, bool> isFuelSupplyChecked;
 
     virtual void clearCheckBoxes() override;
     void clearShipCheckBoxes();

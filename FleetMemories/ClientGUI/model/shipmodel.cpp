@@ -3,6 +3,7 @@
 
 #include "shipmodel.h"
 #include <QApplication>
+#include <QJsonObject>
 #include <QStyleHints>
 #include "../clientv2.h"
 #include "../equipicon.h"
@@ -357,6 +358,14 @@ QVariant ShipModel::data(const QModelIndex &index,
             return QStringLiteral("%1-%2").arg(attr->fleetIndex + 1)
                 .arg(attr->fleetPosIndex + 1);
         }
+        else if(index.column() == fuelColumn()) {
+            return QString::number(
+                static_cast<int>(attr->fuel * 100)) + "%";
+        }
+        else if(index.column() == ammoColumn()) {
+            return QString::number(
+                static_cast<int>(attr->ammo * 100)) + "%";
+        }
         else {
             Q_UNREACHABLE();
             return "";
@@ -407,6 +416,12 @@ QVariant ShipModel::data(const QModelIndex &index,
         else if(index.column() == fleetPosColumn()) {
             //% "Position"
             return qtTrId("ship-pos");
+        }
+        else if(index.column() == fuelColumn()) {
+            return qtTrId("ship-fuel");
+        }
+        else if(index.column() == ammoColumn()) {
+            return qtTrId("ship-ammo");
         }
         else
             return QVariant();
@@ -478,15 +493,29 @@ QVariant ShipModel::data(const QModelIndex &index,
         if(!isInArsenal)
             return QVariant();
         if(index.column() == starCol) {
-            if(isModernizationChecked.value(sortedShipIds.value(realRowIndex),
-                                             false))
+            if(isModernizationChecked.value(
+                    sortedShipIds.value(realRowIndex), false))
                 return Qt::Checked;
             else
                 return Qt::Unchecked;
         }
         else if(index.column() == levelColumn()) {
-            if(isDecorationChecked.value(sortedShipIds.value(realRowIndex),
-                                          false))
+            if(isDecorationChecked.value(
+                    sortedShipIds.value(realRowIndex), false))
+                return Qt::Checked;
+            else
+                return Qt::Unchecked;
+        }
+        else if(index.column() == fuelColumn() && isSupplyMode) {
+            if(isFuelSupplyChecked.value(
+                    sortedShipIds.value(realRowIndex), false))
+                return Qt::Checked;
+            else
+                return Qt::Unchecked;
+        }
+        else if(index.column() == ammoColumn() && isSupplyMode) {
+            if(isAmmoSupplyChecked.value(
+                    sortedShipIds.value(realRowIndex), false))
                 return Qt::Checked;
             else
                 return Qt::Unchecked;
@@ -503,7 +532,10 @@ QVariant ShipModel::data(const QModelIndex &index,
     }
     break;
     case CheckAlignmentRole: {
-        if(index.column() == starCol || index.column() == levelColumn())
+        if(index.column() == starCol
+            || index.column() == levelColumn()
+            || index.column() == fuelColumn()
+            || index.column() == ammoColumn())
             return static_cast<QVariant>(Qt::AlignVCenter | Qt::AlignLeft);
         else
             return QVariant();
@@ -561,6 +593,14 @@ QVariant ShipModel::headerData(int section, Qt::Orientation orientation,
             }
             else if(section == fleetPosColumn()) {
                 return qtTrId("ship-pos");
+            }
+            else if(section == fuelColumn()) {
+                //% "Fuel"
+                return qtTrId("ship-fuel");
+            }
+            else if(section == ammoColumn()) {
+                //% "Ammo"
+                return qtTrId("ship-ammo");
             }
             else
                 return QVariant();
@@ -628,6 +668,14 @@ Qt::ItemFlags ShipModel::flags(const QModelIndex &index) const {
                       & (~Qt::ItemIsEnabled));
         }
     }
+    else if((index.column() == fuelColumn()
+              || index.column() == ammoColumn())
+             && isSupplyMode) {
+        // clazy:exclude=skipped-base-method
+        return QAbstractTableModel::flags(index)
+               | Qt::ItemIsUserCheckable
+               | Qt::ItemIsEnabled;
+    }
     else {
         // clazy:exclude=skipped-base-method
         return QAbstractTableModel::flags(index);
@@ -663,43 +711,65 @@ bool ShipModel::setData(const QModelIndex &index,
                 }
                 if(engine.exoticCache.medal
                     >= KP::decorationCostMedal * (checkedCount + 1)) {
-                    isDecorationChecked[sortedShipIds.value(realRowIndex)] = true;
+                    isDecorationChecked[sortedShipIds.value(
+                        realRowIndex)] = true;
                     emit dataChanged(index, index, {Qt::CheckStateRole});
                     return true;
                 }
             }
             else if(value.toInt() == Qt::Unchecked) {
-                isDecorationChecked[sortedShipIds.value(realRowIndex)] = false;
+                isDecorationChecked[sortedShipIds.value(realRowIndex)] =
+                    false;
                 emit dataChanged(index, index, {Qt::CheckStateRole});
                 return true;
             }
+        }
+        else if(index.column() == fuelColumn() && isSupplyMode) {
+            isFuelSupplyChecked[sortedShipIds.value(realRowIndex)] =
+                (value.toInt() == Qt::Checked);
+            emit dataChanged(index, index, {Qt::CheckStateRole});
+            return true;
+        }
+        else if(index.column() == ammoColumn() && isSupplyMode) {
+            isAmmoSupplyChecked[sortedShipIds.value(realRowIndex)] =
+                (value.toInt() == Qt::Checked);
+            emit dataChanged(index, index, {Qt::CheckStateRole});
+            return true;
         }
     }
     return false;
 }
 
 int ShipModel::hiddenSortColumn() const {
-    return isInArsenal ? 7 : 8;
+    return isInArsenal ? 9 : 10;
 }
 
 int ShipModel::selectColumn() const {
-    return isInArsenal ? -1 : 7;
+    return isInArsenal ? -1 : 9;
 }
 
 int ShipModel::fleetPosColumn() const {
-    return isInArsenal ? 6 : 6;
+    return 6;
+}
+
+int ShipModel::ammoColumn() const {
+    return 8;
+}
+
+int ShipModel::fuelColumn() const {
+    return 7;
 }
 
 int ShipModel::levelColumn() const {
-    return isInArsenal ? 5 : 5;
+    return 5;
 }
 
 int ShipModel::conditionColumn() const {
-    return isInArsenal ? 4 : 4;
+    return 4;
 }
 
 int ShipModel::hpColumn() const {
-    return isInArsenal ? 3 : 3;
+    return 3;
 }
 
 int ShipModel::maximumPageNum() const {
@@ -726,13 +796,13 @@ void ShipModel::customSort() {
 
 int ShipModel::numberOfColumns() const {
     if(isInArsenal) {
-        // ShipUuid Shipname Star CurrentHP Condition Level FleetPos Hiddensort
-        return 8;
+        // UUID Name Star HP Cond Level FleetPos Fuel Ammo HiddenSort
+        return 10;
     }
-    else
-        // ShipUuid Shipname Star CurrentHP Condition Level FleetPos
-        // Select Hiddensort
-        return 9;
+    else {
+        // UUID Name Star HP Cond Level FleetPos Fuel Ammo Select HiddenSort
+        return 11;
+    }
 }
 
 void ShipModel::bpCacheRefresh() {
@@ -745,8 +815,63 @@ void ShipModel::clearCheckBoxes() {
 }
 
 void ShipModel::clearShipCheckBoxes() {
-    isModernizationChecked.clear();
+    isAmmoSupplyChecked.clear();
     isDecorationChecked.clear();
+    isFuelSupplyChecked.clear();
+    isModernizationChecked.clear();
+}
+
+void ShipModel::setIsSupplyMode(bool supply) {
+    isSupplyMode = supply;
+    wholeTableChanged();
+}
+
+void ShipModel::enactSupplyFuel() {
+    QJsonArray ships;
+    for(auto iter = isFuelSupplyChecked.keyValueBegin();
+         iter != isFuelSupplyChecked.keyValueEnd(); ++iter) {
+        if(iter->second) {
+            QJsonObject entry;
+            entry["uuid"] = iter->first.toString();
+            entry["fuel"] = true;
+            entry["ammo"] = false;
+            ships.append(entry);
+        }
+    }
+    if(!ships.isEmpty())
+        emit supplyRequest(ships);
+}
+
+void ShipModel::enactSupplyAmmo() {
+    QJsonArray ships;
+    for(auto iter = isAmmoSupplyChecked.keyValueBegin();
+         iter != isAmmoSupplyChecked.keyValueEnd(); ++iter) {
+        if(iter->second) {
+            QJsonObject entry;
+            entry["uuid"] = iter->first.toString();
+            entry["fuel"] = false;
+            entry["ammo"] = true;
+            ships.append(entry);
+        }
+    }
+    if(!ships.isEmpty())
+        emit supplyRequest(ships);
+}
+
+void ShipModel::enactSupplyAll() {
+    QJsonArray ships;
+    int startRow = rowsPerPage * pageNum;
+    int endRow = std::min(startRow + rowsPerPage,
+                          static_cast<int>(sortedShipIds.size()));
+    for(int i = startRow; i < endRow; ++i) {
+        QJsonObject entry;
+        entry["uuid"] = sortedShipIds[i].toString();
+        entry["fuel"] = true;
+        entry["ammo"] = true;
+        ships.append(entry);
+    }
+    if(!ships.isEmpty())
+        emit supplyRequest(ships);
 }
 
 int ShipModel::numberOfShip() const {

@@ -72,6 +72,7 @@ private slots:
     void modifyFleetType(int fleetTypeIndex);
     void receivedShipInfo(const QJsonObject &info);
     void sendFleetData(bool checked);
+    void supplyFleet(bool checked);
 
 private:
     Ui::FleetView *ui;

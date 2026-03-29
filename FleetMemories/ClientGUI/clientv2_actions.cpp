@@ -266,6 +266,12 @@ void Client::stopRepair(int slotnum) {
     qCritical() << slotnum;
 }
 
+void Client::doSupplyShip(const QJsonArray &ships) {
+    QByteArray msg = KP::clientSupplyShip(ships);
+    sender->enqueue(msg);
+    socket.flush();
+}
+
 /* Admin delete all equips */
 void Client::doDeleteTestEquip() {
     QByteArray msg = KP::clientAdminTestEquipRemove();

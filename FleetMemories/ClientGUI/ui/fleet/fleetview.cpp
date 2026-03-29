@@ -180,6 +180,8 @@ equip_slots:
     }
     connect(ui->saveButton, &QPushButton::clicked,
             this, &FleetView::sendFleetData);
+    connect(ui->supplyFleetButton, &QPushButton::clicked,
+            this, &FleetView::supplyFleet);
 
     for(int i = 0; i < KP::fleetsSize; ++i) {
         for(int j = 0; j < KP::combinedFleetSize; ++j) {
@@ -622,6 +624,28 @@ void FleetView::sendFleetData(bool checked) {
         content.append(ship);
     }
     engine.sendFleetData(content);
+}
+
+void FleetView::supplyFleet(bool checked) {
+    Q_UNUSED(checked)
+    QJsonArray shipsToSupply;
+    for(auto iter = ships.constKeyValueBegin();
+         iter != ships.constKeyValueEnd();
+         ++iter) {
+        if(iter->first.fleetindex != currentActiveFleet)
+            continue;
+        if(iter->second.isNull())
+            continue;
+        QJsonObject entry;
+        entry["uuid"] = iter->second.toString();
+        entry["fuel"] = true;
+        entry["ammo"] = true;
+        shipsToSupply.append(entry);
+    }
+    if(!shipsToSupply.isEmpty()) {
+        Client &engine = Client::getInstance();
+        engine.doSupplyShip(shipsToSupply);
+    }
 }
 
 void FleetView::modifyPlaneCount(
