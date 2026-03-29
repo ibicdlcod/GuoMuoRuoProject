@@ -135,6 +135,14 @@ void Client::doBuyFromStore(int equipDef) {
     sender->enqueue(msg);
 }
 
+void Client::doBuyMedal(int amount) {
+    if(amount < 1) {
+        return;
+    }
+    QByteArray msg = KP::clientBuyMedal(amount);
+    sender->enqueue(msg);
+}
+
 void Client::doConstructShip(int shipDef, const QList<QUuid> &defaultEquips,
                                QUuid shipToRemodel,
                                int factoryID) {

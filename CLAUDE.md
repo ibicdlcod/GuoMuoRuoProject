@@ -42,7 +42,7 @@ Post-build steps automatically copy CSV data files from `doc/` and Steam DLLs in
 The client and server are separate executables that communicate over SSL/TLS sockets using JSON/CBOR messages. The protocol is defined entirely in `Protocol/kp.h` — all message type enums (`CommandType`, `InfoType`, `MsgType`), game constants, and builder functions (`KP::clientFoo()` / `KP::serverFoo()`) live there, with implementations in `Protocol/kp.cpp`.
 
 **Message flow for a typical action:**
-1. Client calls a `KP::client*()` builder → enqueues bytes via `Clientv2` → `Sender`
+1. Client calls a `KP::client*()` builder → enqueues bytes via `Client` → `Sender`
 2. Server's `receivedInfo()` / `receivedAuth()` dispatch on `CommandType`
 3. Server calls a `KP::server*()` builder → sends reply via `SenderManager`
 4. Client's `receivedInfo()` dispatches on `InfoType` → emits Qt signal
@@ -50,8 +50,31 @@ The client and server are separate executables that communicate over SSL/TLS soc
 
 ### Key singletons
 
-- **`Clientv2`** (`ClientGUI/clientv2.h`) — client-side god object: holds the `sol::state lua`, game state (`KP::GameState`), and all network send/receive logic. Emits signals consumed by UI widgets.
-- **`Server`** (`Server/server.h`) — server-side god object: holds the `sol::state lua`, all game logic, DB queries, and the `SenderManager`. `server.cpp` is ~6000 lines; the large `receivedInfo()` switch near the bottom dispatches every incoming command.
+- **`Client`** (`ClientGUI/clientv2.h`) — client-side god object: holds the `sol::state lua`, game state (`KP::GameState`), and all network send/receive logic. Accessed via `Client::getInstance()`. Emits signals consumed by UI widgets.
+- **`Server`** (`Server/server.h`) — server-side god object: holds the `sol::state lua`, all game logic, DB queries, and the `SenderManager`. The large `receivedInfo()` switch near the bottom of `server.cpp` dispatches every incoming command.
+
+### Code organization: Client
+
+The client implementation is split across multiple files:
+
+- **`ClientGUI/clientv2.h`** — Class definition and public interface of `Client` singleton
+- **`ClientGUI/clientv2.cpp`** — Core network and message handling, `receivedInfo()` dispatch
+- **`ClientGUI/clientv2_actions.cpp`** — User action handlers (commands sent to server, e.g. `doBuyMedal`, `doBuyFromStore`, `doRefreshDock`, `doRefreshFactory`)
+- **`ClientGUI/clientv2_cache.cpp`** — Local cache updates from server responses
+- **`ClientGUI/clientv2_command.cpp`** — Incoming command/info message dispatch helpers
+
+### Code organization: Server
+
+The server implementation is split across multiple files:
+
+- **`Server/server.h`** — Class definition and public interface
+- **`Server/server.cpp`** — Core network, `receivedInfo()` / `receivedAuth()` dispatch (~6000 lines)
+- **`Server/server_ard.cpp`** — ARD coupon purchase flow (`handleInitARDPurchase`, `handleARDPurchaseAuth`, `pollARDRefunds`)
+- **`Server/server_battle.cpp`** — Battle processing and combat resolution
+- **`Server/server_import.cpp`** — CSV data import (`importEquipFromCSV`, `importShipFromCSV`, etc.)
+- **`Server/server_offer.cpp`** — Resource/equipment offer generation (`offerResourceInfo`, `doBuyFromStore`, `doBuyMedal`)
+- **`Server/server_sqlinit.cpp`** — SQL schema creation and database initialization
+- **`Server/user.cpp`** — User account management and queries
 
 ### Sortie/battle node flow
 
@@ -64,7 +87,7 @@ The client and server are separate executables that communicate over SSL/TLS soc
 
 The server loads `lua/*.lua` at startup. Maps are defined in `lua/map1.lua`–`lua/map86.lua`; each node has a `battle_type`, `next_nodes`, and per-difficulty `branch_rule` functions. The server calls these Lua functions in `Server::nextNode()` to determine routing. Equipment restriction rules live in `lua/canequip.lua`.
 
-The `sol::state lua` instance is owned separately by both `Clientv2` (client) and `Server` (server), initialized via `luaInitMap()` and `luaInitEquipable()`.
+The `sol::state lua` instance is owned separately by both `Client` (client) and `Server` (server), initialized via `luaInitMap()` and `luaInitEquipable()`.
 
 ### Map IDs
 
@@ -72,7 +95,7 @@ Map IDs encode difficulty: `absoluteId = unionId + (difficulty × 4096)` (mask c
 
 ### Data import
 
-The server imports game data from CSV files at startup (`importEquipFromCSV()`, `importShipFromCSV()`, etc.). Source CSVs live in `doc/equip/`, `doc/ship/`, `doc/map/`. CMake copies them next to the server binary on each build.
+The server imports game data from CSV files at startup via functions in `Server/server_import.cpp` (`importEquipFromCSV()`, `importShipFromCSV()`, etc.). Source CSVs live in `doc/equip/`, `doc/ship/`, `doc/map/`. CMake copies them next to the server binary on each build.
 
 ### i18n
 
@@ -120,6 +143,8 @@ SQLite, accessed via Qt SQL. All CREATE TABLE statements are at the top of `Serv
 | Attribute | Default | Purpose |
 |-----------|---------|---------|
 | `O` / `E` / `S` / `R` / `A` / `W` / `C` | 10000 / 10000 / 10000 / 6000 / 8000 / 6000 / 6000 | Resources (Oil, Explosives, Steel, Rubber, Aluminum, Tungsten, Chromium) |
+| `ARDCoupon` | 0 | ARD coupon balance (1 unit = 0.01 HKD) |
+| `Medal` | 0 | Medal balance; purchasable at `KP::medalCostPerUnit = 999` ARD coupons each |
 | `FleetSize` | 1 | Number of unlocked fleets |
 | `FactorySize` | init value | Number of factory slots |
 | `DockSize` | init value | Number of repair dock slots |
@@ -129,6 +154,25 @@ SQLite, accessed via Qt SQL. All CREATE TABLE statements are at the top of `Serv
 | `InBattle` | `KP::NoBattle` | Battle state machine (`NoBattle`/`BeforeBattle`/`DuringBattle`/`AfterBattle`) |
 | `ActiveFleet` | 0 | Fleet index in sortie |
 | `RecoverTime` | timestamp | Condition/HP natural recovery reference time |
+
+### Shop system
+
+Shop dialogs live in `ClientGUI/ui/shop/`. The Shop menu is disabled when offline.
+
+- **`ardcoupondialog`** — Buy ARD coupons via Steam microtransaction (`CommandType::InitARDPurchase`)
+- **`buyequipdialog`** — Buy equipment from the store with ARD coupons (`CommandType::BuyFromStore`)
+- **`medalbuydialog`** — Buy medals with ARD coupons (`CommandType::BuyMedal`); rate is `KP::medalCostPerUnit = 999` coupons per medal
+
+Both `ardCouponCache` and `medalCache` on `Client` are updated whenever `serverResourceUpdate` is received. The server sends these as part of `offerResourceInfo` after any purchase.
+
+### Paginated model (EquipModel / ShipModel)
+
+`EquipModel` and its subclass `ShipModel` are paginated `QAbstractTableModel`s used in `EquipView`.
+
+- **Page navigation** (`firstPage`, `prevPage`, `nextPage`, `lastPage`) all delegate to `setPageNumHint(int)`, which properly sequences `beginRemoveRows`/`endRemoveRows` or `beginInsertRows`/`endInsertRows` around the `pageNum` change so Qt's index validation passes without a full model reset.
+- **Structural data changes** (add/remove items, full list refresh) call `adjustRowCount`, which uses `beginResetModel()`/`endResetModel()`.
+- `rowCount()` is clamped to `max(0, …)` to prevent negative values when the backing list is cleared while on a non-zero page.
+- `EquipView` debounces `sectionResized` → `hide()/show()` via `columnResizeDebounce` (a `QTimer`) to avoid header blink on `ResizeToContents` column width changes.
 
 ### Qt plugins
 

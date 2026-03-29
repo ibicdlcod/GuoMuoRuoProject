@@ -136,6 +136,14 @@ QByteArray KP::clientBuyFromStore(int equipDef) {
     return QCborValue::fromJsonValue(result).toCbor();
 }
 
+QByteArray KP::clientBuyMedal(int amount) {
+    QJsonObject result;
+    result["type"] = DgramType::Request;
+    result["command"] = CommandType::BuyMedal;
+    result["amount"] = amount;
+    return QCborValue::fromJsonValue(result).toCbor();
+}
+
 QByteArray KP::clientChooseNode(int mapId, int chosenNodeId) {
     QJsonObject result;
     result["type"] = DgramType::Request;
@@ -731,6 +739,14 @@ QByteArray KP::serverMapStart(int mapId, int startNode) {
     result["infotype"] = InfoType::MapStart;
     result["mapid"] = mapId; // absolute id
     result["start"] = startNode;
+    return QCborValue::fromJsonValue(result).toCbor();
+}
+
+QByteArray KP::serverMedalPurchased(int amount) {
+    QJsonObject result;
+    result["type"] = DgramType::Message;
+    result["msgtype"] = MsgType::MedalPurchased;
+    result["amount"] = amount;
     return QCborValue::fromJsonValue(result).toCbor();
 }
 

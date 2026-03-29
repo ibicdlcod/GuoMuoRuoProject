@@ -17,6 +17,7 @@
 #include "maintenance/repair.h"
 #include "shop/ardcoupondialog.h"
 #include "shop/buyequipdialog.h"
+#include "shop/medalbuydialog.h"
 #include "settingswindow.h"
 
 QT_BEGIN_NAMESPACE
@@ -52,6 +53,7 @@ private slots:
     void adjustArea(QWidget *, const QSize &);
     void buyARD();
     void buyEquip();
+    void buyMedal();
     void factoryRefresh();
     void gamestateChanged(KP::GameState);
     void gamestateInit();

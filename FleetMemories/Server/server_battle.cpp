@@ -405,7 +405,8 @@ void Server::naturalRegen(const CSteamID &uid) {
             return;
         }
         else {
-            qint64 priorRecoverTime = query.value(0).toInt() / KP::secsinMin;
+            qint64 priorRecoverTime = query.value(0).toLongLong()
+                                      / KP::secsinMin;
             qint64 currentTimeInt =
                     QDateTime::currentDateTime(QTimeZone::UTC)
                         .toSecsSinceEpoch();

@@ -31,13 +31,19 @@ BuyEquipDialog::BuyEquipDialog(QWidget *parent)
     QFont listFont = equipList->font();
     listFont.setPointSizeF(listFont.pointSizeF() * 1.4);
     equipList->setFont(listFont);
+    const auto &ownedEquips = engine.equipModel.getClientEquips();
     for(Equipment *equip : engine.getStoreEquipment()) {
-        //% "%1 — %2 ARD Coupons"
+        int ownedCount = 0;
+        for(Equipment *e : std::as_const(ownedEquips)) {
+            if(e->getId() == equip->getId()) ++ownedCount;
+        }
+        //% "%1 — %2 ARD Coupons (Owned: %3)"
         auto *item = new QListWidgetItem(
             Icute::equipTypeIcon(equip->type, false),
             qtTrId("shop-equip-item")
                 .arg(equip->toString())
-                .arg(static_cast<int>(equip->getStorePrice())));
+                .arg(static_cast<int>(equip->getStorePrice()))
+                .arg(ownedCount));
         item->setData(Qt::UserRole, equip->getId());
         item->setData(Qt::UserRole + 1,
                       static_cast<int>(equip->getStorePrice()));

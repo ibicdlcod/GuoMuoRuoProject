@@ -10,9 +10,24 @@ Base resource type is 7 compared to 4 in KC. However other resource types are si
 
 Base resource type is Oil, Explosives (KC's Ammo), Steel, Rubber, Aluminum, Tungsten, and Chromium. They function similarly to Hearts of Iron IV (Explosives represent industrial capacity). Beware that you should perceive 1 ordinary resource in KC as 10 resources in this game!
 
-### Exotic types[NOTIMPLEMENTED]
+#### Usage
 
-Command points (TBD)
+- Develop equipment (explosives, steel, possibly oil, possibly aluminum, possibly rubber, possibly chromium, possibly tungsten)
+- Improve equipment (same as above)
+- Construct ships (steel, chromium, possibly aluminum)
+- Remodel ships (same as above)
+- Supply ships (oil, explosives)
+- Maintenance of planes on ships, including LBAS (same as development, which means oil, explosives, rubber, aluminum, chromium for jet planes, tungsten for rocket planes)
+- Repair ships (same as construct ships)
+- Sending LBAS (oil, explosives)
+
+### Exotic types
+
+| Type           | Function                                |
+| -------------- | --------------------------------------- |
+| Command points | TBD                                     |
+| ARD Coupon     | Buying certain equipment and medals     |
+| Medals         | Decorate ship, increasing her level cap |
 
 ### Stockpile cap
 
@@ -46,15 +61,4 @@ Naval supremacy is explained [here](6.2-supremacy.md)
 ### Supply chain and attrition
 
 Explained [here](8.1-supply.md)
-
-## Usage
-
-- Develop equipment (explosives, steel, possibly oil, possibly aluminum, possibly rubber, possibly chromium, possibly tungsten)
-- Improve equipment (same as above)
-- Construct ships (steel, chromium, possibly aluminum)
-- Remodel ships (same as above)
-- Supply ships (oil, explosives)
-- Maintenance of planes on ships, including LBAS (same as development, which means oil, explosives, rubber, aluminum, chromium for jet planes, tungsten for rocket planes)
-- Repair ships (same as construct ships)
-- Sending LBAS (oil, explosives)
 

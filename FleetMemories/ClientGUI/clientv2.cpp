@@ -1074,6 +1074,13 @@ void Client::receivedMsg(const QJsonObject &djson) {
                           .arg(djson["units"].toInt());
     }
     break;
+    case KP::MedalPurchased: {
+        int amount = djson["amount"].toInt();
+        //% "Purchase successful! %1 medal(s) added."
+        qInfo() << qtTrId("medal-purchase-success").arg(amount);
+        emit receivedMedalPurchased(amount);
+    }
+    break;
     default:
         qWarning() << qtTrId("message-not-implemented"); break;
     }

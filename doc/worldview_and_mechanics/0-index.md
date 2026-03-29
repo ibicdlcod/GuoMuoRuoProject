@@ -62,5 +62,4 @@
   * Night-battle-start node
   * Commander's abilities
   * LBAS
-* Shop
-  * Headquarters Coupon
+* [Shop](10-shop.md)

@@ -6,11 +6,9 @@
 #include "server.h"
 
 #include <QNetworkReply>
+#include <QRandomGenerator>
 #include <QSqlQuery>
 #include <QUrlQuery>
-#include <cstdint>
-#include <limits>
-#include <random>
 
 #include "../Protocol/kp.h"
 #include "kerrors.h"
@@ -20,6 +18,7 @@ QT_BEGIN_NAMESPACE
 void Server::handleARDPurchaseAuth(const CSteamID &uid,
                                    QSslSocket *connection,
                                    const QJsonObject &djson) {
+    try {
     quint64 orderId = djson["orderid"].toString().toULongLong();
     bool authorized = djson["authorized"].toBool();
     if(!authorized) {
@@ -116,6 +115,13 @@ void Server::handleARDPurchaseAuth(const CSteamID &uid,
                     }
                 }
             });
+    } catch (DBError &e) {
+        for(QString &i : e.whats()) {
+            qCritical() << i;
+        }
+    } catch (std::exception &e) {
+        qCritical() << e.what();
+    }
 }
 
 void Server::handleInitARDPurchase(const CSteamID &uid,
@@ -128,9 +134,10 @@ void Server::handleInitARDPurchase(const CSteamID &uid,
         return;
     }
     int priceHKDCents = KP::ardRealPriceHKDCents(units);
-    auto orderDist = std::uniform_int_distribution<uint64_t>(
-        1, std::numeric_limits<uint64_t>::max());
-    quint64 orderId = orderDist(mt);
+    quint64 orderId;
+    do {
+        orderId = QRandomGenerator::global()->generate64();
+    } while(orderId == 0 || pendingARDOrders.contains(orderId));
     QNetworkRequest request(QUrl(QString(KP::microTxnBaseUrl)
                                  + QStringLiteral("InitTxn/v3/")));
     request.setHeader(QNetworkRequest::ContentTypeHeader,

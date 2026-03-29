@@ -308,6 +308,7 @@ border-style: none;</string>
      <string id="menu-shop">Shop</string>
     </property>
     <addaction name="actionBuyEquip"/>
+    <addaction name="actionBuyMedal"/>
     <addaction name="actionBuyARD"/>
    </widget>
    <addaction name="menuNaval_Base"/>
@@ -378,6 +379,11 @@ border-style: none;</string>
   <action name="actionBuyARD">
    <property name="text">
     <string id="menu-buy-ard">Buy ARD Coupons</string>
+   </property>
+  </action>
+  <action name="actionBuyMedal">
+   <property name="text">
+    <string id="menu-buy-medal">Buy Medals</string>
    </property>
   </action>
   <action name="actionBuyEquip">

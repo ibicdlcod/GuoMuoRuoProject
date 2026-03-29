@@ -141,9 +141,9 @@ void Repair::doRepairRefresh(const QJsonObject &input) {
             }
             else {
                 names[i]->setText(ship->toString());
-                int startTime = item["starttime"].toInt();
-                int currentTime = QDateTime::currentSecsSinceEpoch();
-                int completeTime = item["completetime"].toInt();
+                qint64 startTime = item["starttime"].toInteger();
+                qint64 currentTime = QDateTime::currentSecsSinceEpoch();
+                qint64 completeTime = item["completetime"].toInteger();
                 double progress = (double)(currentTime - startTime)
                                   / (completeTime - startTime);
                 int curHP = item["currenthp"].toInt();
@@ -163,13 +163,13 @@ void Repair::doRepairRefresh(const QJsonObject &input) {
         slotfs[i]->setOpen(true);
         slotfs[i]->setComplete(false);
         if(!item.contains("completetime")
-            || item["completetime"].toInt() == 0) {
+            || item["completetime"].toInteger() == 0) {
             slotfs[i]->setCompleteTime(QDateTime());
         }
         else {
             slotfs[i]->setCompleteTime(
                 QDateTime::fromSecsSinceEpoch(
-                    item["completetime"].toInt(), QTimeZone::UTC));
+                    item["completetime"].toInteger(), QTimeZone::UTC));
         }
         slotfs[i]->setStatus();
     }

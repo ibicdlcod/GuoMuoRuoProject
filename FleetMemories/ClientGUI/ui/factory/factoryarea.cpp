@@ -159,13 +159,13 @@ void FactoryArea::doFactoryRefresh(const QJsonObject &input) {
         if(!item["done"].toBool()) {
             slotfs[i]->setComplete(false);
             if(!item.contains("completetime")
-                || item["completetime"].toInt() == 0) {
+                || item["completetime"].toInteger() == 0) {
                 slotfs[i]->setCompleteTime(QDateTime());
             }
             else {
                 slotfs[i]->setCompleteTime(
                     QDateTime::fromSecsSinceEpoch(
-                        item["completetime"].toInt(), QTimeZone::UTC));
+                        item["completetime"].toInteger(), QTimeZone::UTC));
             }
         } else {
             slotfs[i]->setComplete(true);

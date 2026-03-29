@@ -109,6 +109,7 @@ public slots:
     void doBattle(const QJsonObject &);
     void doBuyEquip(int equipDef);
     void doBuyFromStore(int equipDef);
+    void doBuyMedal(int amount);
     void doConstructShip(int shipDef, const QList<QUuid> &defaultEquips,
                          QUuid shipToRemodel, int factoryID);
     void doDestructEquip(const QList<QUuid> &);
@@ -176,6 +177,7 @@ signals:
     void receivedMapStart(const QJsonObject &);
     void receivedRankInfo(const QJsonArray &, int);
     void receivedRankInfoUser(double);
+    void receivedMedalPurchased(int amount);
     void receivedRepairRefresh(const QJsonObject &);
     void receivedResourceInfo(const QJsonObject &);
     void receivedShipBlueprint(const QJsonObject &);

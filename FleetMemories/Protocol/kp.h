@@ -83,6 +83,7 @@ static constexpr const char *attrARDCoupon = "ARDCoupon";
 static constexpr const char *attrMedal = "Medal";
 static constexpr double ardCouponUnitHKD = 0.01;
 static constexpr int ardCouponMaxUnits = 65536;
+static constexpr int medalCostPerUnit = 999;
 #pragma message(SECRET)
 static constexpr int ardCouponItemId = 6;
 /* Returns the real price in HKD cents after logarithmic volume discount */
@@ -162,6 +163,7 @@ enum MsgType{
     ARDPurchaseFailed,
     ARDPurchasePending,
     ARDPurchaseSuccess,
+    MedalPurchased,
 };
 Q_ENUM_NS(MsgType)
 
@@ -227,6 +229,7 @@ enum CommandType{
     DemandRankInfo,
     ARDPurchaseAuth,
     BuyFromStore,
+    BuyMedal,
     InitARDPurchase,
 };
 Q_ENUM_NS(CommandType)
@@ -646,6 +649,7 @@ QByteArray clientAdminTestShipRemove();
 QByteArray clientARDPurchaseAuth(quint64 orderId, bool authorized);
 QByteArray clientBuy(int);
 QByteArray clientBuyFromStore(int equipDef);
+QByteArray clientBuyMedal(int amount);
 QByteArray clientChooseNode(int mapId, int chosenNodeId);
 QByteArray clientConstruct(int,
                            const QList<QUuid> &,
@@ -795,6 +799,7 @@ QByteArray serverMapInfoUser(const QJsonObject &);
 QByteArray serverMapNotOpen(int mapId);
 QByteArray serverMapProgress(int mapId, int nextNode);
 QByteArray serverMapStart(int mapId, int startNode);
+QByteArray serverMedalPurchased(int amount);
 QByteArray serverNewEquip(QUuid, int);
 QByteArray serverNewmodelShip(QUuid, int, int);
 QByteArray serverNewShip(QUuid, int, int);

@@ -122,6 +122,8 @@ MainWindow::MainWindow(QWidget *parent, int argc, char ** argv)
             this, &MainWindow::buyARD);
     connect(ui->actionBuyEquip, &QAction::triggered,
             this, &MainWindow::buyEquip);
+    connect(ui->actionBuyMedal, &QAction::triggered,
+            this, &MainWindow::buyMedal);
 
     portArea = new PortArea(this);
     licenseArea = new LicenseArea(this);
@@ -275,6 +277,11 @@ void MainWindow::buyARD() {
 
 void MainWindow::buyEquip() {
     BuyEquipDialog dialog(this);
+    dialog.exec();
+}
+
+void MainWindow::buyMedal() {
+    MedalBuyDialog dialog(this);
     dialog.exec();
 }
 

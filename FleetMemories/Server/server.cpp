@@ -77,7 +77,9 @@ const int elapsedMaxTolerance = steamRateLimit;
 
 Server::Server(int argc, char ** argv) : CommandLine(argc, argv) {
     /* no *settings could be used here */
-    mt = std::mt19937(random());
+    std::random_device rd;
+    std::seed_seq seq{rd(), rd(), rd(), rd(), rd(), rd(), rd(), rd()};
+    mt = std::mt19937(seq);
 
     LuaInit::init(lua);
 
@@ -90,9 +92,9 @@ Server::Server(int argc, char ** argv) : CommandLine(argc, argv) {
 
     clock = new QTimer(this);
     // current unix time
-    uint unixtime = QDateTime::currentDateTimeUtc().currentSecsSinceEpoch();
+    qint64 unixtime = QDateTime::currentDateTimeUtc().currentSecsSinceEpoch();
     // round it up to a minute
-    uint roundHour = unixtime + (60 - unixtime % 60);
+    qint64 roundHour = unixtime + (60 - unixtime % 60);
     QDateTime start;
     start.setSecsSinceEpoch(roundHour);
     clock->setSingleShot(true);
@@ -958,6 +960,70 @@ award_equip:
         QByteArray msg = KP::serverNewEquip(
                     newEquip(uid, equipid, true), equipid);
         senderM.sendMessage(connection, msg);
+        offerResourceInfo(connection, uid);
+    } catch (DBError &e) {
+        for(QString &i : e.whats()) {
+            qCritical() << i;
+        }
+    } catch (std::exception &e) {
+        qCritical() << e.what();
+    }
+}
+
+void Server::doBuyMedal(const CSteamID &uid,
+                        int amount,
+                        QSslSocket *connection) {
+    try {
+        if(amount < 1) {
+            QByteArray msg = KP::serverARDPurchaseFailed(
+                KP::PurchaseInvalidAmount);
+            senderM.sendMessage(connection, msg);
+            return;
+        }
+        int cost = amount * KP::medalCostPerUnit;
+        {
+            QSqlQuery query;
+            query.prepare(
+                "UPDATE UserAttr "
+                "SET Intvalue = Intvalue - :cost "
+                "WHERE UserID = :uid "
+                "AND Attribute = :attr "
+                "AND Intvalue >= :cost");
+            query.bindValue(":cost", cost);
+            query.bindValue(":uid", uid.ConvertToUint64());
+            query.bindValue(":attr", KP::attrARDCoupon);
+            if(Q_UNLIKELY(!query.exec())) {
+                qCritical() << query.lastQuery();
+                //% "Database failed when buying medals."
+                throw DBError(qtTrId("dbfail-medal-buy"),
+                              query.lastError());
+            }
+            if(query.numRowsAffected() == 0) {
+                QByteArray msg = KP::serverARDPurchaseFailed(
+                    KP::PurchaseInsufficientCoupons);
+                senderM.sendMessage(connection, msg);
+                return;
+            }
+        }
+        {
+            QSqlQuery query;
+            query.prepare(
+                "UPDATE UserAttr "
+                "SET Intvalue = Intvalue + :amount "
+                "WHERE UserID = :uid "
+                "AND Attribute = :attr");
+            query.bindValue(":amount", amount);
+            query.bindValue(":uid", uid.ConvertToUint64());
+            query.bindValue(":attr", KP::attrMedal);
+            if(Q_UNLIKELY(!query.exec())) {
+                qCritical() << query.lastQuery();
+                //% "Database failed when awarding medals."
+                throw DBError(qtTrId("dbfail-medal-award"),
+                              query.lastError());
+            }
+        }
+        senderM.sendMessage(connection,
+                            KP::serverMedalPurchased(amount));
         offerResourceInfo(connection, uid);
     } catch (DBError &e) {
         for(QString &i : e.whats()) {
@@ -2372,7 +2438,7 @@ recover_condition:
                 = settings->value("server/lastrecvcondtime",
                       QDateTime::fromSecsSinceEpoch(0, QTimeZone(Qt::UTC)))
                 .toDateTime();
-        int lastRecoverTimeInt = lastRecoverTime.toSecsSinceEpoch();
+        qint64 lastRecoverTimeInt = lastRecoverTime.toSecsSinceEpoch();
         {
             QSqlQuery query;
             query.prepare("UPDATE UserShip "
@@ -3848,6 +3914,10 @@ anti_ddos:
         break;
     case KP::CommandType::BuyFromStore: {
         doBuyFromStore(uid, djson["equipid"].toInt(), connection);
+    }
+        break;
+    case KP::CommandType::BuyMedal: {
+        doBuyMedal(uid, djson["amount"].toInt(), connection);
     }
         break;
     case KP::CommandType::InitARDPurchase: {

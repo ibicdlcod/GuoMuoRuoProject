@@ -687,8 +687,8 @@ send_updated_msg:
     while(query.next()) {
         QJsonObject item;
         item["dockid"] = query.value(0).toInt();
-        item["starttime"] = query.value(1).toInt();
-        item["completetime"] = query.value(2).toInt();
+        item["starttime"] = query.value(1).toLongLong();
+        item["completetime"] = query.value(2).toLongLong();
         item["currenthp"] = query.value(3).toInt();
         item["maxhp"] = query.value(4).toInt();
         item["shipuuid"] = query.value(5).toUuid().toString();
@@ -725,8 +725,8 @@ void Server::refreshClientFactory(const CSteamID &uid, QSslSocket *connection) {
     while(query.next()) {
         QJsonObject item;
         item["factoryid"] = query.value(0).toInt();
-        item["starttime"] = query.value(1).toInt();
-        item["completetime"] = query.value(2).toInt();
+        item["starttime"] = query.value(1).toLongLong();
+        item["completetime"] = query.value(2).toLongLong();
         item["done"] = query.value(3).toBool();
         item["success"] = query.value(4).toBool();
         itemArray.append(item);
