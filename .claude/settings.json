@@ -1,6 +1,7 @@
 {
   "enabledPlugins": {
     "clangd-lsp@claude-plugins-official": true,
-    "lua-lsp@claude-plugins-official": true
+    "lua-lsp@claude-plugins-official": true,
+    "claude-reflect@claude-reflect-marketplace": true
   }
 }

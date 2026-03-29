@@ -20,7 +20,15 @@
       "Read(//d/GuoMuoRuoProject/.claude/worktrees/agent-af46bb77/length > 80 && !/**)",
       "Bash(done)",
       "Bash(xargs awk:*)",
-      "Bash(grep -v '//%')"
+      "Bash(grep -v '//%')",
+      "Bash(sed -n '3718,3726p' FleetMemories/Translations/FleetMemories_en_US.ts)",
+      "Bash(sed -n '3738,3760p' FleetMemories/Translations/FleetMemories_en_US.ts)",
+      "Bash(sed -n '3722,3730p' FleetMemories/Translations/FleetMemories_zh_CN.ts)",
+      "Bash(sed -n '3665,3673p' FleetMemories/Translations/FleetMemories_ja_JP.ts)",
+      "Bash(sed -n '3742,3748p' FleetMemories/Translations/FleetMemories_zh_CN.ts)",
+      "Bash(sed -n '3685,3691p' FleetMemories/Translations/FleetMemories_ja_JP.ts)",
+      "Skill(claude-reflect:reflect)",
+      "Bash(while read:*)"
     ]
   }
 }
