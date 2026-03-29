@@ -3,14 +3,16 @@
 
 #include "fleetview.h"
 #include "ui_fleetview.h"
-#include <QScrollArea>
+
 #include <QMetaEnum>
+#include <QScrollArea>
 #include <QStyleHints>
-#include "interactivelabel.h"
-#include "shipequip.h"
-#include "shipdisplay.h"
-#include "../../clientv2.h"
+
 #include "../../../Protocol/kp.h"
+#include "../../clientv2.h"
+#include "interactivelabel.h"
+#include "shipdisplay.h"
+#include "shipequip.h"
 
 extern std::unique_ptr<QSettings> settings;
 

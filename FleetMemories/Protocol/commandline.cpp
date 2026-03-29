@@ -6,6 +6,7 @@
 #include <QDir>
 #include <QRegularExpression>
 #include <QSettings>
+
 #include <iostream>
 
 #if defined (Q_OS_WIN)

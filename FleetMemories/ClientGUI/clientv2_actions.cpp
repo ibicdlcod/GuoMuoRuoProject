@@ -201,6 +201,12 @@ void Clientv2::doModernizeShip(const QList<QUuid> &candidates) {
     }
 }
 
+void Clientv2::doRefreshDock() {
+    QByteArray msg = KP::clientDockRefresh();
+    sender->enqueue(msg);
+    socket.flush();
+}
+
 /* Request current factory state to server */
 void Clientv2::doRefreshFactory() {
     QByteArray msg = KP::clientFactoryRefresh();

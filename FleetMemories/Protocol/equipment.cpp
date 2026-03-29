@@ -2,11 +2,13 @@
  * SPDX-License-Identifier: AGPL-3.0-or-later */
 
 #include "equipment.h"
-#include <QRegularExpression>
-#include <QVariant>
+
 #include <QMetaEnum>
-#include <QSqlQuery>
+#include <QRegularExpression>
 #include <QSettings>
+#include <QSqlQuery>
+#include <QVariant>
+
 #include "../Server/kerrors.h"
 #include "tech.h"
 #include "utility.h"

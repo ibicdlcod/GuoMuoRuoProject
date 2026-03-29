@@ -2,9 +2,10 @@
  * SPDX-License-Identifier: AGPL-3.0-or-later */
 
 #include "receiver.h"
-#include <QRegularExpression>
-#include <QJsonObject>
+
 #include <QCborMap>
+#include <QJsonObject>
+#include <QRegularExpression>
 #include <QSettings>
 
 extern std::unique_ptr<QSettings> settings;

@@ -2,12 +2,14 @@
  * SPDX-License-Identifier: AGPL-3.0-or-later */
 
 #include "shipselect.h"
+
+#include <QApplication>
 #include <QHBoxLayout>
 #include <QMetaEnum>
-#include <QApplication>
+
 #include "../../../Protocol/kp.h"
-#include "../../model/shipmodel.h"
 #include "../../model/shipbpmodel.h"
+#include "../../model/shipmodel.h"
 #include "../factory/factoryarea.h"
 #include "../fleet/fleetview.h"
 

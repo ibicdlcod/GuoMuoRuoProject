@@ -2,10 +2,12 @@
  * SPDX-License-Identifier: AGPL-3.0-or-later */
 
 #include "newlogins.h"
-#include "../../clientv2.h"
 #include "ui_newlogins.h"
+
 #include <QDir>
 #include <QSettings>
+
+#include "../../clientv2.h"
 
 extern std::unique_ptr<QSettings> settings;
 

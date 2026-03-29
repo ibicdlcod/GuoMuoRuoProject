@@ -3,6 +3,7 @@
 
 #define NOMINMAX
 #include "server.h"
+
 #include <QSqlDatabase>
 #include <QSqlQuery>
 #include <QSqlRecord>

@@ -2,11 +2,13 @@
  * SPDX-License-Identifier: AGPL-3.0-or-later */
 
 #include "user.h"
+
+#include <QSettings>
 #include <QSqlDatabase>
 #include <QSqlError>
 #include <QSqlQuery>
 #include <QTimeZone>
-#include <QSettings>
+
 #include "../Protocol/resord.h"
 #include "kerrors.h"
 

@@ -3,9 +3,11 @@
 
 #include "shipequip.h"
 #include "ui_shipequip.h"
+
 #include <QMouseEvent>
-#include <QStyleHints>
 #include <QPainter>
+#include <QStyleHints>
+
 #include "../../clientv2.h"
 #include "../../equipicon.h"
 

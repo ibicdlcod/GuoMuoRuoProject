@@ -2,8 +2,10 @@
  * SPDX-License-Identifier: AGPL-3.0-or-later */
 
 #include "tech.h"
+
 #include <QDebug>
 #include <QSettings>
+
 #include "kp.h"
 
 extern std::unique_ptr<QSettings> settings;

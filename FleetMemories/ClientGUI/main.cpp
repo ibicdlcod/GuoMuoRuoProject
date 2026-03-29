@@ -6,13 +6,14 @@
 #include <QApplication>
 #include <QFile>
 #include <QSettings>
-#include <QTranslator>
 #include <QStyleFactory>
 #include <QSurfaceFormat>
+#include <QTranslator>
+
 #include "../steam/steam_api.h"
 
-#include "clientv2.h"
 #include "../Protocol/kp.h"
+#include "clientv2.h"
 #include "ui/boxcenterfusionstyle.h"
 
 QFile *logFile;

@@ -2,7 +2,9 @@
  * SPDX-License-Identifier: AGPL-3.0-or-later */
 
 #include "equipselect.h"
+
 #include <QHBoxLayout>
+
 #include "../../../Protocol/equiptype.h"
 #include "../../clientv2.h"
 

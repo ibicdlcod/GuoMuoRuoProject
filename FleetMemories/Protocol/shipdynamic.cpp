@@ -2,8 +2,10 @@
  * SPDX-License-Identifier: AGPL-3.0-or-later */
 
 #include "shipdynamic.h"
-#include <QJsonObject>
+
 #include <QJsonArray>
+#include <QJsonObject>
+
 #include "ship.h"
 
 ShipDynamic::ShipDynamic(QObject *parent)

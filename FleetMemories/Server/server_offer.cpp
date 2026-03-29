@@ -3,10 +3,12 @@
 
 #define NOMINMAX
 #include "server.h"
+
 #include <QSqlDatabase>
 #include <QSqlQuery>
 #include <QSqlRecord>
 #include <QTimer>
+
 #include "../Protocol/kp.h"
 #include "user.h"
 

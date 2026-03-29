@@ -90,6 +90,7 @@ public:
     RankModel rankModel;
     QMap<int, double> techCache;
     int ardCouponCache = 0;
+    int medalCache = 0;
 
     sol::state lua;
 

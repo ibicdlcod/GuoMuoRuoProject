@@ -2,8 +2,7 @@
  * SPDX-License-Identifier: AGPL-3.0-or-later */
 
 #include "ardcoupondialog.h"
-#include "../../clientv2.h"
-#include "../../../Protocol/kp.h"
+
 #include <QDialogButtonBox>
 #include <QGroupBox>
 #include <QHBoxLayout>
@@ -11,6 +10,9 @@
 #include <QPushButton>
 #include <QRadioButton>
 #include <QVBoxLayout>
+
+#include "../../../Protocol/kp.h"
+#include "../../clientv2.h"
 
 ARDCouponDialog::ARDCouponDialog(QWidget *parent)
     : QDialog(parent) {

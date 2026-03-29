@@ -1,11 +1,13 @@
 #include "mapdetail.h"
 #include "ui_mapdetail.h"
-#include "maprender.h"
-#include <QPainter>
+
 #include <QMouseEvent>
+#include <QPainter>
 #include <QStyleHints>
-#include "../mainwindow.h"
+
 #include "../../clientv2.h"
+#include "../mainwindow.h"
+#include "maprender.h"
 
 MapDetail::MapDetail(QWidget *parent)
     : QWidget(parent)

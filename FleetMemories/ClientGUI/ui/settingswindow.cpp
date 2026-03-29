@@ -1,8 +1,10 @@
 #include "settingswindow.h"
 #include "ui_settingswindow.h"
+
 #include <QLocale>
-#include <QSettings>
 #include <QScrollBar>
+#include <QSettings>
+
 #include "../../Protocol/kp.h"
 
 extern std::unique_ptr<QSettings> settings;

@@ -2,12 +2,14 @@
  * SPDX-License-Identifier: AGPL-3.0-or-later */
 
 #include "clientv2.h"
+
 #include <QSettings>
+
+#include "../steam/isteamfriends.h"
 #include "../Protocol/commandline.h"
 #include "../Protocol/utility.h"
 #include "networkerror.h"
 #include "steamauth.h"
-#include "../steam/isteamfriends.h"
 
 extern QFile *logFile;
 extern std::unique_ptr<QSettings> settings;

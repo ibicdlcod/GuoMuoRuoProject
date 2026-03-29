@@ -3,9 +3,10 @@
 
 #include "techview.h"
 #include "ui_techview.h"
+
 #include "../clientv2.h"
-#include "../networkerror.h"
 #include "../equipicon.h"
+#include "../networkerror.h"
 
 using namespace std::chrono_literals;
 

@@ -2,11 +2,13 @@
  * SPDX-License-Identifier: AGPL-3.0-or-later */
 
 #include "buyequipdialog.h"
-#include "../../clientv2.h"
-#include "../../equipicon.h"
+
 #include <QDialogButtonBox>
 #include <QLabel>
 #include <QVBoxLayout>
+
+#include "../../clientv2.h"
+#include "../../equipicon.h"
 
 BuyEquipDialog::BuyEquipDialog(QWidget *parent)
     : QDialog(parent) {

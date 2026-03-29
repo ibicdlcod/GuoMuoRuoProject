@@ -3,8 +3,8 @@
 
 #include "elidedlabel.h"
 
-#include <QPainter>
 #include <QFontMetrics>
+#include <QPainter>
 #include <QTextLine>
 
 void ElidedLabel::paintEvent(QPaintEvent *event)

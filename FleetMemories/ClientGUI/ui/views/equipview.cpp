@@ -2,11 +2,13 @@
  * SPDX-License-Identifier: AGPL-3.0-or-later */
 
 #include "equipview.h"
-#include "ClientGUI/ui/ui_equipview.h"
-#include <QToolButton>
+#include "ui_equipview.h"
+
 #include <QStyleHints>
 #include <QStyledItemDelegate>
+#include <QToolButton>
 #include <QWheelEvent>
+
 #include "../../clientv2.h"
 
 using namespace std::chrono_literals;

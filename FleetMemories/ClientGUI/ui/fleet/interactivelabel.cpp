@@ -2,11 +2,13 @@
  * SPDX-License-Identifier: AGPL-3.0-or-later */
 
 #include "interactivelabel.h"
+
 #include <QMouseEvent>
 #include <QPainter>
-#include "../views/equipview.h"
+
 #include "../../clientv2.h"
 #include "../../equipicon.h"
+#include "../views/equipview.h"
 
 InteractiveLabel::InteractiveLabel(int index,
                                    FleetView* parent,

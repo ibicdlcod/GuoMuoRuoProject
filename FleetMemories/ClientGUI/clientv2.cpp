@@ -2,10 +2,12 @@
  * SPDX-License-Identifier: AGPL-3.0-or-later */
 
 #include "clientv2.h"
+
 #include <QCoreApplication>
-#include <QSettings>
 #include <QPasswordDigestor>
+#include <QSettings>
 #include <QThread>
+
 #include "../steam/isteamfriends.h"
 #include "../Protocol/commandline.h"
 #include "../Protocol/kp.h"
@@ -415,12 +417,6 @@ void Clientv2::shutdown() {
                         this, &Clientv2::catbomb);
     QObject::disconnect(&socket, &QAbstractSocket::errorOccurred,
                         this, &Clientv2::errorOccurred);
-}
-
-void Clientv2::doRefreshDock() {
-    QByteArray msg = KP::clientDockRefresh();
-    sender->enqueue(msg);
-    socket.flush();
 }
 
 /* Enum -> String */

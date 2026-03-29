@@ -1,5 +1,7 @@
 #include "rankmodel.h"
+
 #include <QJsonArray>
+
 #include "../clientv2.h"
 
 RankModel::RankModel(QObject *parent)

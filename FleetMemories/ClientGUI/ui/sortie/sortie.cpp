@@ -3,15 +3,17 @@
 
 #include "sortie.h"
 #include "ui_sortie.h"
-#include <QTimer>
+
 #include <QLabel>
-#include <QResizeEvent>
-#include <QPainter>
 #include <QMessageBox>
+#include <QPainter>
+#include <QResizeEvent>
+#include <QTimer>
+
 #include "../../clientv2.h"
-#include "confirmsortie.h"
 #include "../mainwindow.h"
 #include "battleplan.h"
+#include "confirmsortie.h"
 
 extern std::unique_ptr<QSettings> settings;
 

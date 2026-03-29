@@ -3,22 +3,25 @@
 
 #define NOMINMAX
 #include "server.h"
+
 #include <QBuffer>
 #include <QFile>
 #include <QThread>
 #include <QUrlQuery>
+
 #include <limits>
+
 #include "../steam/steamencryptedappticket.h"
 #include "../Protocol/equiptype.h"
 #include "../Protocol/kp.h"
-#include "../Protocol/tech.h"
+#include "../Protocol/lua.h"
 #include "../Protocol/peerinfo.h"
+#include "../Protocol/tech.h"
+#include "fleetinfo.h"
 #include "kerrors.h"
+#include "rngesus.h"
 #include "sslserver.h"
 #include "user.h"
-#include "../Protocol/lua.h"
-#include "rngesus.h"
-#include "fleetinfo.h"
 //#include "microtransaction/steam_microtxn.h"
 
 QT_BEGIN_NAMESPACE

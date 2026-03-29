@@ -2,10 +2,12 @@
  * SPDX-License-Identifier: AGPL-3.0-or-later */
 
 #include "ship.h"
+
 #include <QSettings>
 #include <QSqlQuery>
-#include "tech.h"
+
 #include "../Server/kerrors.h"
+#include "tech.h"
 #include "utility.h"
 
 Ship::Ship(int shipId, QObject *parent)

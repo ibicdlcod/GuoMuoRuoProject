@@ -8,7 +8,6 @@
 #include <QUrlQuery>
 
 #include "../Protocol/kp.h"
-
 #include "kerrors.h"
 
 QT_BEGIN_NAMESPACE

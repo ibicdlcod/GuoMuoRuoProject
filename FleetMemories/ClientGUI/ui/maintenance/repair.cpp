@@ -1,14 +1,16 @@
 #include "repair.h"
 #include "ui_repair.h"
+
 #include <QJsonArray>
-#include <QTimeZone>
-#include <QScreen>
 #include <QMessageBox>
+#include <QScreen>
+#include <QTimeZone>
+
 #include "../../Protocol/kp.h"
 #include "../../clientv2.h"
-#include "../views/equipview.h"
 #include "../fleet/fleetview.h"
 #include "../mainwindow.h"
+#include "../views/equipview.h"
 
 Repair::Repair(QWidget *parent)
     : QWidget(parent)

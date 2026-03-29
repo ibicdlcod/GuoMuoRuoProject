@@ -3,10 +3,12 @@
 
 #define NOMINMAX
 #include "server.h"
+
 #include <QFile>
 #include <QSqlDatabase>
 #include <QSqlQuery>
 #include <QSqlRecord>
+
 #include "../Protocol/equiptype.h"
 
 QT_BEGIN_NAMESPACE

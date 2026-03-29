@@ -2,10 +2,13 @@
  * SPDX-License-Identifier: AGPL-3.0-or-later */
 
 #include "equipmodel.h"
-#include <QJsonArray>
-#include <algorithm>
+
 #include <QApplication>
+#include <QJsonArray>
 #include <QStyleHints>
+
+#include <algorithm>
+
 #include "../clientv2.h"
 #include "../equipicon.h"
 #include "../ui/mainwindow.h"

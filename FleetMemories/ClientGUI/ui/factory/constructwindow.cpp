@@ -2,12 +2,14 @@
  * SPDX-License-Identifier: AGPL-3.0-or-later */
 
 #include "constructwindow.h"
-#include "../../clientv2.h"
 #include "ui_constructwindow.h"
-#include "../../../Protocol/kp.h"
-#include <QMetaEnum>
+
 #include <QMessageBox>
+#include <QMetaEnum>
 #include <QUuid>
+
+#include "../../../Protocol/kp.h"
+#include "../../clientv2.h"
 
 extern std::unique_ptr<QSettings> settings;
 

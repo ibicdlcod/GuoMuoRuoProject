@@ -2,7 +2,9 @@
  * SPDX-License-Identifier: AGPL-3.0-or-later */
 
 #include "resord.h"
+
 #include <QSettings>
+
 #include "kp.h"
 
 extern std::unique_ptr<QSettings> settings;
