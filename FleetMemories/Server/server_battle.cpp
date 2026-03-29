@@ -1,11 +1,14 @@
 /* Copyright (C) 2026 Harusoft Ltd.
  * SPDX-License-Identifier: AGPL-3.0-or-later */
 
+#define NOMINMAX
+
 #include "server.h"
 
 #include <QSqlDatabase>
 #include <QSqlQuery>
 #include <QTimer>
+#include <QtTypes>
 
 #include "../Protocol/kp.h"
 #include "../Protocol/lua.h"

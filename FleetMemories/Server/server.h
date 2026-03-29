@@ -52,7 +52,7 @@ private slots:
     calculateTech(const CSteamID &, int jobID = 0);
     double getBaseSkillPointEffect(const CSteamID &, int);
     void handleNewConnection();
-    void offerEquipInfo(QSslSocket *, int);
+    void offerEquipInfo(QSslSocket *);
     void offerEquipInfoUser(const CSteamID &, QSslSocket *);
     void offerMapInfo(const CSteamID &, QSslSocket *);
     void offerMapInfoUser(const CSteamID &, QSslSocket *);
@@ -62,7 +62,7 @@ private slots:
     void offerRankInfo(const CSteamID &, QSslSocket *, int rpp,
                        std::optional<int> page = std::nullopt);
     void offerResourceInfo(QSslSocket *, const CSteamID &);
-    void offerShipInfo(QSslSocket *, int);
+    void offerShipInfo(QSslSocket *);
     void offerShipInfoUser(const CSteamID &, QSslSocket *);
     void offerSPInfo(QSslSocket *, const CSteamID &, int);
     void pskRequired(QSslSocket *, QSslPreSharedKeyAuthenticator *);

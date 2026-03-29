@@ -10,6 +10,7 @@
 #include <QSqlRecord>
 
 #include "../Protocol/equiptype.h"
+#include "kerrors.h"
 
 QT_BEGIN_NAMESPACE
 

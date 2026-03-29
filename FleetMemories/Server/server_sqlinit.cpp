@@ -8,6 +8,8 @@
 #include <QSqlQuery>
 #include <QSqlRecord>
 
+#include "kerrors.h"
+
 QT_BEGIN_NAMESPACE
 
 namespace {

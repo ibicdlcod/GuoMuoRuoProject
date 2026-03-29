@@ -5,6 +5,7 @@
 #include <QSettings>
 #include <QEventLoop>
 #include <QTimer>
+#include "networkerror.h"
 
 using namespace std::chrono_literals;
 

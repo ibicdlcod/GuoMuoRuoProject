@@ -314,8 +314,11 @@ QVariant ShipModel::data(const QModelIndex &index,
             return attr->condition;
         }
         else if(index.column() == levelColumn()) {
-            return QString::number(Ship::getLevel(attr->exp))
-                   + "/" + QString::number(Ship::getLevel(attr->expCap));
+            int hiddenLv = Ship::getLevel(attr->exp);
+            int lvCap = Ship::getLevel(attr->expCap);
+            int displayLv = std::min(hiddenLv, lvCap);
+            return QString::number(displayLv)
+                   + "/" + QString::number(lvCap);
         }
         else if(index.column() == fleetPosColumn()) {
             if(attr->fleetIndex == -1 && attr->fleetPosIndex == -1) {

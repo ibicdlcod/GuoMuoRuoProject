@@ -10,14 +10,14 @@
 #include <QTimer>
 
 #include "../Protocol/kp.h"
+#include "kerrors.h"
 #include "user.h"
 
 QT_BEGIN_NAMESPACE
 
 using namespace std::chrono_literals;
 
-void Server::offerEquipInfo(QSslSocket *connection, int index) {
-    Q_UNUSED(index)
+void Server::offerEquipInfo(QSslSocket *connection) {
     QJsonArray equipInfos;
     int i = 0;
     for(auto equipIdIter = equipRegistry.keyBegin();
@@ -124,8 +124,7 @@ void Server::offerSPInfo(QSslSocket *connection,
     connection->flush();
 }
 
-void Server::offerShipInfo(QSslSocket *connection, int index) {
-    Q_UNUSED(index)
+void Server::offerShipInfo(QSslSocket *connection) {
     QJsonArray shipInfos;
     int i = 0;
     for(auto shipIdIter = shipRegistry.keyBegin();

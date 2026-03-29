@@ -190,10 +190,9 @@ set(SERVER_SOURCES
     Server/kerrors.cpp
     Server/kerrors.h
     Server/main.cpp
-    #Server/microtransaction/steam_microtxn.h
-    #Server/microtransaction/steam_microtxn.cpp
     Server/qconsolelistener.cpp
     Server/qconsolelistener.h
+    Server/rngesus.cpp
     Server/rngesus.h
     Server/server.cpp
     Server/server.h

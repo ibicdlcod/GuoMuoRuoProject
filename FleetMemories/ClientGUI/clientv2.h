@@ -285,7 +285,7 @@ private:
     QTimer *timer;
     QThread *steamThread = nullptr;
 
-    Q_DISABLE_COPY_MOVE(Clientv2)
+    Q_DISABLE_COPY_MOVE(Client)
 };
 
 #endif // CLIENTV2_H

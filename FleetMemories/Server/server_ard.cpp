@@ -1,11 +1,16 @@
 /* Copyright (C) 2026 Harusoft Ltd.
  * SPDX-License-Identifier: AGPL-3.0-or-later */
 
+#define NOMINMAX
+
 #include "server.h"
 
 #include <QNetworkReply>
 #include <QSqlQuery>
 #include <QUrlQuery>
+#include <cstdint>
+#include <limits>
+#include <random>
 
 #include "../Protocol/kp.h"
 #include "kerrors.h"
@@ -20,20 +25,20 @@ void Server::handleARDPurchaseAuth(const CSteamID &uid,
     if(!authorized) {
         pendingARDOrders.remove(orderId);
         QByteArray msg = KP::serverARDPurchaseFailed(
-                    KP::PurchaseNotAuthorized);
+            KP::PurchaseNotAuthorized);
         senderM.sendMessage(connection, msg);
         return;
     }
     if(!pendingARDOrders.contains(orderId)) {
         QByteArray msg = KP::serverARDPurchaseFailed(
-                    KP::PurchaseOrderNotFound);
+            KP::PurchaseOrderNotFound);
         senderM.sendMessage(connection, msg);
         return;
     }
     auto [orderUid, units] = pendingARDOrders[orderId];
     if(orderUid != uid) {
         QByteArray msg = KP::serverARDPurchaseFailed(
-                    KP::PurchaseOrderMismatch);
+            KP::PurchaseOrderMismatch);
         senderM.sendMessage(connection, msg);
         pendingARDOrders.remove(orderId);
         return;
@@ -50,67 +55,67 @@ void Server::handleARDPurchaseAuth(const CSteamID &uid,
     params.addQueryItem(QStringLiteral("appid"),
                         QString::number(KP::steamAppId));
     QNetworkReply *reply = networkManager.post(
-                request,
-                params.toString(QUrl::FullyEncoded).toUtf8());
+        request,
+        params.toString(QUrl::FullyEncoded).toUtf8());
     pendingARDOrders.remove(orderId);
     connect(reply, &QNetworkReply::finished,
             this, [this, reply, uid, unitsToAdd, orderId]() {
-        reply->deleteLater();
-        QByteArray responseData = reply->readAll();
-        QJsonDocument doc = QJsonDocument::fromJson(responseData);
-        QString result = doc.object()["response"]
-                .toObject()["result"].toString();
-        if(result == QStringLiteral("OK")) {
-            QSqlQuery query;
-            query.prepare(
+                reply->deleteLater();
+                QByteArray responseData = reply->readAll();
+                QJsonDocument doc = QJsonDocument::fromJson(responseData);
+                QString result = doc.object()["response"]
+                                     .toObject()["result"].toString();
+                if(result == QStringLiteral("OK")) {
+                    QSqlQuery query;
+                    query.prepare(
                         "UPDATE UserAttr SET Intvalue = Intvalue + :units "
                         "WHERE Attribute = :attr AND UserID = :uid");
-            query.bindValue(":units", unitsToAdd);
-            query.bindValue(":attr", KP::attrARDCoupon);
-            query.bindValue(":uid", uid.ConvertToUint64());
-            if(Q_UNLIKELY(!query.exec())) {
-                qCritical() << query.lastError();
-                if(connectedPeers.contains(uid)) {
-                    QByteArray msg = KP::serverARDPurchaseFailed(
+                    query.bindValue(":units", unitsToAdd);
+                    query.bindValue(":attr", KP::attrARDCoupon);
+                    query.bindValue(":uid", uid.ConvertToUint64());
+                    if(Q_UNLIKELY(!query.exec())) {
+                        qCritical() << query.lastError();
+                        if(connectedPeers.contains(uid)) {
+                            QByteArray msg = KP::serverARDPurchaseFailed(
                                 KP::PurchaseDatabaseError);
-                    senderM.sendMessage(connectedPeers[uid], msg);
-                }
-                return;
-            }
-            QSqlQuery orderRecord;
-            orderRecord.prepare(
+                            senderM.sendMessage(connectedPeers[uid], msg);
+                        }
+                        return;
+                    }
+                    QSqlQuery orderRecord;
+                    orderRecord.prepare(
                         "INSERT OR IGNORE INTO ARDOrders "
                         "(OrderID, UserID, Units, Status) "
                         "VALUES (:oid, :uid, :units, 'active')");
-            orderRecord.bindValue(":oid", orderId);
-            orderRecord.bindValue(":uid",
-                QString::number(uid.ConvertToUint64()));
-            orderRecord.bindValue(":units", unitsToAdd);
-            if(Q_UNLIKELY(!orderRecord.exec())) {
-                qCritical() << orderRecord.lastQuery();
-                //% "Store purchase info failed! User %1, orderid %2"
-                throw DBError(qtTrId("store-purchase-info-failed")
-                              .arg(uid.ConvertToUint64())
-                              .arg(orderId),
-                              query.lastError());
-            }
-            if(connectedPeers.contains(uid)) {
-                QByteArray msg = KP::serverARDPurchaseSuccess(unitsToAdd);
-                senderM.sendMessage(connectedPeers[uid], msg);
-            }
-        }
-        else {
-            QString errDesc = doc.object()["response"]
-                    .toObject()["error"]
-                    .toObject()["errordesc"].toString();
-            qWarning() << "FinalizeTxn Steam error:" << errDesc;
-            if(connectedPeers.contains(uid)) {
-                QByteArray msg = KP::serverARDPurchaseFailed(
+                    orderRecord.bindValue(":oid", orderId);
+                    orderRecord.bindValue(":uid",
+                                          QString::number(uid.ConvertToUint64()));
+                    orderRecord.bindValue(":units", unitsToAdd);
+                    if(Q_UNLIKELY(!orderRecord.exec())) {
+                        qCritical() << orderRecord.lastQuery();
+                        //% "Store purchase info failed! User %1, orderid %2"
+                        throw DBError(qtTrId("store-purchase-info-failed")
+                                          .arg(uid.ConvertToUint64())
+                                          .arg(orderId),
+                                      query.lastError());
+                    }
+                    if(connectedPeers.contains(uid)) {
+                        QByteArray msg = KP::serverARDPurchaseSuccess(unitsToAdd);
+                        senderM.sendMessage(connectedPeers[uid], msg);
+                    }
+                }
+                else {
+                    QString errDesc = doc.object()["response"]
+                                          .toObject()["error"]
+                                          .toObject()["errordesc"].toString();
+                    qWarning() << "FinalizeTxn Steam error:" << errDesc;
+                    if(connectedPeers.contains(uid)) {
+                        QByteArray msg = KP::serverARDPurchaseFailed(
                             KP::PurchaseSteamError);
-                senderM.sendMessage(connectedPeers[uid], msg);
-            }
-        }
-    });
+                        senderM.sendMessage(connectedPeers[uid], msg);
+                    }
+                }
+            });
 }
 
 void Server::handleInitARDPurchase(const CSteamID &uid,
@@ -118,13 +123,13 @@ void Server::handleInitARDPurchase(const CSteamID &uid,
                                    int units) {
     if(units < 1 || units >= KP::ardCouponMaxUnits) {
         QByteArray msg = KP::serverARDPurchaseFailed(
-                    KP::PurchaseInvalidAmount);
+            KP::PurchaseInvalidAmount);
         senderM.sendMessage(connection, msg);
         return;
     }
     int priceHKDCents = KP::ardRealPriceHKDCents(units);
-    std::uniform_int_distribution<uint64_t> orderDist(
-                1, std::numeric_limits<uint64_t>::max());
+    auto orderDist = std::uniform_int_distribution<uint64_t>(
+        1, std::numeric_limits<uint64_t>::max());
     quint64 orderId = orderDist(mt);
     QNetworkRequest request(QUrl(QString(KP::microTxnBaseUrl)
                                  + QStringLiteral("InitTxn/v3/")));
@@ -154,40 +159,40 @@ void Server::handleInitARDPurchase(const CSteamID &uid,
                         //% "%1 ARD Coupons"
                         qtTrId("ard-coupon-description").arg(units));
     QNetworkReply *reply = networkManager.post(
-                request,
-                params.toString(QUrl::FullyEncoded).toUtf8());
+        request,
+        params.toString(QUrl::FullyEncoded).toUtf8());
     connect(reply, &QNetworkReply::finished,
             this, [this, reply, uid, orderId, units]() {
-        reply->deleteLater();
-        QByteArray responseData = reply->readAll();
-        QJsonDocument doc = QJsonDocument::fromJson(responseData);
-        QString result = doc.object()["response"]
-                .toObject()["result"].toString();
-        if(result == QStringLiteral("OK")) {
-            pendingARDOrders[orderId] = {uid, units};
-            if(connectedPeers.contains(uid)) {
-                QByteArray msg = KP::serverARDPurchasePending(orderId);
-                senderM.sendMessage(connectedPeers[uid], msg);
-            }
-        }
-        else {
-            QString errDesc = doc.object()["response"]
-                    .toObject()["error"]
-                    .toObject()["errordesc"].toString();
-            qWarning() << "InitTxn Steam error:" << errDesc;
-            if(connectedPeers.contains(uid)) {
-                QByteArray msg = KP::serverARDPurchaseFailed(
+                reply->deleteLater();
+                QByteArray responseData = reply->readAll();
+                QJsonDocument doc = QJsonDocument::fromJson(responseData);
+                QString result = doc.object()["response"]
+                                     .toObject()["result"].toString();
+                if(result == QStringLiteral("OK")) {
+                    pendingARDOrders[orderId] = {uid, units};
+                    if(connectedPeers.contains(uid)) {
+                        QByteArray msg = KP::serverARDPurchasePending(orderId);
+                        senderM.sendMessage(connectedPeers[uid], msg);
+                    }
+                }
+                else {
+                    QString errDesc = doc.object()["response"]
+                                          .toObject()["error"]
+                                          .toObject()["errordesc"].toString();
+                    qWarning() << "InitTxn Steam error:" << errDesc;
+                    if(connectedPeers.contains(uid)) {
+                        QByteArray msg = KP::serverARDPurchaseFailed(
                             KP::PurchaseSteamError);
-                senderM.sendMessage(connectedPeers[uid], msg);
-            }
-        }
-    });
+                        senderM.sendMessage(connectedPeers[uid], msg);
+                    }
+                }
+            });
 }
 
 void Server::pollARDRefunds() {
     QDateTime lastPollTime
-            = settings->value("steam/lastrefundpolltime",
-                              QDateTime::currentDateTimeUtc()).toDateTime();
+        = settings->value("steam/lastrefundpolltime",
+                          QDateTime::currentDateTimeUtc()).toDateTime();
     QUrlQuery params;
     params.addQueryItem(QStringLiteral("key"),
                         settings->value("steam/webkey", "").toString());
@@ -207,90 +212,90 @@ void Server::pollARDRefunds() {
                        QDateTime::currentDateTimeUtc());
     connect(reply, &QNetworkReply::finished,
             this, [this, reply]() {
-        reply->deleteLater();
-        try {
-check_response:
-            QByteArray responseData = reply->readAll();
-            QJsonDocument doc = QJsonDocument::fromJson(responseData);
-            QJsonObject resp = doc.object()["response"].toObject();
-            if(resp["result"].toString() != QStringLiteral("OK")) {
-                //% "ARD refund poll failed: %1"
-                qWarning() << qtTrId("ard-refund-poll-failed")
-                              .arg(resp["error"]
-                              .toObject()["errordesc"].toString());
-                return;
-            }
-process_transactions:
-            static const QSet<QString> reversedStatuses = {
-                QStringLiteral("Refunded"),
-                QStringLiteral("PartialRefund"),
-                QStringLiteral("Chargedback"),
-                QStringLiteral("RefundedSuspectedFraud"),
-                QStringLiteral("RefundedFriendlyFraud"),
-            };
-            QJsonArray transactions = resp["transactions"].toArray();
-            for(const QJsonValue &txVal : transactions) {
-                QJsonObject tx = txVal.toObject();
-                if(!reversedStatuses.contains(tx["status"].toString())) {
-                    continue;
+                reply->deleteLater();
+                try {
+                check_response:
+                    QByteArray responseData = reply->readAll();
+                    QJsonDocument doc = QJsonDocument::fromJson(responseData);
+                    QJsonObject resp = doc.object()["response"].toObject();
+                    if(resp["result"].toString() != QStringLiteral("OK")) {
+                        //% "ARD refund poll failed: %1"
+                        qWarning() << qtTrId("ard-refund-poll-failed")
+                                          .arg(resp["error"]
+                                                   .toObject()["errordesc"].toString());
+                        return;
+                    }
+                process_transactions:
+                    static const QSet<QString> reversedStatuses = {
+                        QStringLiteral("Refunded"),
+                        QStringLiteral("PartialRefund"),
+                        QStringLiteral("Chargedback"),
+                        QStringLiteral("RefundedSuspectedFraud"),
+                        QStringLiteral("RefundedFriendlyFraud"),
+                    };
+                    QJsonArray transactions = resp["transactions"].toArray();
+                    for(const QJsonValue &txVal : transactions) {
+                        QJsonObject tx = txVal.toObject();
+                        if(!reversedStatuses.contains(tx["status"].toString())) {
+                            continue;
+                        }
+                        quint64 orderId = tx["orderid"].toString().toULongLong();
+                        QSqlQuery lookup;
+                        lookup.prepare("SELECT UserID, Units FROM ARDOrders "
+                                       "WHERE OrderID = :oid AND Status = 'active'");
+                        lookup.bindValue(":oid", orderId);
+                        if(Q_UNLIKELY(!lookup.exec())) {
+                            //% "ARD clawback: order lookup failed"
+                            throw DBError(qtTrId("ard-clawback-lookup-failed"),
+                                          lookup.lastError());
+                        }
+                        if(!lookup.next()) {
+                            continue; // not our order or already processed
+                        }
+                        quint64 rawUid = lookup.value(0).toULongLong();
+                        int units = lookup.value(1).toInt();
+                        CSteamID uid(rawUid);
+                        QSqlQuery deduct;
+                        deduct.prepare("UPDATE UserAttr "
+                                       // can go below 0
+                                       "SET Intvalue = Intvalue - :units "
+                                       "WHERE UserID = :uid AND Attribute = :attr");
+                        deduct.bindValue(":units", units);
+                        deduct.bindValue(":uid", rawUid);
+                        deduct.bindValue(":attr", KP::attrARDCoupon);
+                        if(Q_UNLIKELY(!deduct.exec())) {
+                            qCritical() << deduct.lastQuery();
+                            //% "ARD clawback: deduct failed for order %1"
+                            throw DBError(qtTrId("ard-clawback-deduct-failed")
+                                              .arg(orderId), deduct.lastError());
+                        }
+                        QSqlQuery mark;
+                        mark.prepare("UPDATE ARDOrders SET Status = 'clawedback' "
+                                     "WHERE OrderID = :oid");
+                        mark.bindValue(":oid", orderId);
+                        if(Q_UNLIKELY(!mark.exec())) {
+                            qCritical() << mark.lastQuery();
+                            //% "ARD clawback: mark failed for order %1"
+                            throw DBError(qtTrId("ard-clawback-mark-failed")
+                                              .arg(orderId), mark.lastError());
+                        }
+                        qWarning() << "ARD clawback: order" << orderId
+                                   << "user" << rawUid
+                                   << "units" << units
+                                   << "status" << tx["status"].toString();
+                        if(connectedPeers.contains(uid)) {
+                            QByteArray msg = KP::serverARDPurchaseClawback(units);
+                            senderM.sendMessage(connectedPeers[uid], msg);
+                        }
+                    }
+                } catch (DBError &e) {
+                    for(QString &i : e.whats()) {
+                        qCritical() << i;
+                    }
+                } catch (std::exception &e) {
+                    qCritical() << e.what();
                 }
-                quint64 orderId = tx["orderid"].toString().toULongLong();
-                QSqlQuery lookup;
-                lookup.prepare("SELECT UserID, Units FROM ARDOrders "
-                               "WHERE OrderID = :oid AND Status = 'active'");
-                lookup.bindValue(":oid", orderId);
-                if(Q_UNLIKELY(!lookup.exec())) {
-                    //% "ARD clawback: order lookup failed"
-                    throw DBError(qtTrId("ard-clawback-lookup-failed"),
-                                  lookup.lastError());
-                }
-                if(!lookup.next()) {
-                    continue; // not our order or already processed
-                }
-                quint64 rawUid = lookup.value(0).toULongLong();
-                int units = lookup.value(1).toInt();
-                CSteamID uid(rawUid);
-                QSqlQuery deduct;
-                deduct.prepare("UPDATE UserAttr "
-                               // can go below 0
-                               "SET Intvalue = Intvalue - :units "
-                               "WHERE UserID = :uid AND Attribute = :attr");
-                deduct.bindValue(":units", units);
-                deduct.bindValue(":uid", rawUid);
-                deduct.bindValue(":attr", KP::attrARDCoupon);
-                if(Q_UNLIKELY(!deduct.exec())) {
-                    qCritical() << deduct.lastQuery();
-                    //% "ARD clawback: deduct failed for order %1"
-                    throw DBError(qtTrId("ard-clawback-deduct-failed")
-                                  .arg(orderId), deduct.lastError());
-                }
-                QSqlQuery mark;
-                mark.prepare("UPDATE ARDOrders SET Status = 'clawedback' "
-                             "WHERE OrderID = :oid");
-                mark.bindValue(":oid", orderId);
-                if(Q_UNLIKELY(!mark.exec())) {
-                    qCritical() << mark.lastQuery();
-                    //% "ARD clawback: mark failed for order %1"
-                    throw DBError(qtTrId("ard-clawback-mark-failed")
-                                  .arg(orderId), mark.lastError());
-                }
-                qWarning() << "ARD clawback: order" << orderId
-                           << "user" << rawUid
-                           << "units" << units
-                           << "status" << tx["status"].toString();
-                if(connectedPeers.contains(uid)) {
-                    QByteArray msg = KP::serverARDPurchaseClawback(units);
-                    senderM.sendMessage(connectedPeers[uid], msg);
-                }
-            }
-        } catch (DBError &e) {
-            for(QString &i : e.whats()) {
-                qCritical() << i;
-            }
-        } catch (std::exception &e) {
-            qCritical() << e.what();
-        }
-    });
+            });
 }
 
 QT_END_NAMESPACE

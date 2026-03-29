@@ -22,7 +22,6 @@
 #include "rngesus.h"
 #include "sslserver.h"
 #include "user.h"
-//#include "microtransaction/steam_microtxn.h"
 
 QT_BEGIN_NAMESPACE
 
