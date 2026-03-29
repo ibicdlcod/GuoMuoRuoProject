@@ -116,6 +116,7 @@ public slots:
     void doForceFetch(int);
     void doForceRepair(int);
     void doImproveEquip(const QList<QUuid> &);
+    void doDecorateShip(const QList<QUuid> &);
     void doModernizeShip(const QList<QUuid> &);
     void doRefreshDock();
     void doRefreshFactory();

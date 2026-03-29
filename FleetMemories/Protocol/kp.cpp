@@ -213,6 +213,18 @@ QByteArray KP::clientDemandMapInfoUser() {
     return QCborValue::fromJsonValue(result).toCbor();
 }
 
+QByteArray KP::clientDemandDecorate(const QList<QUuid> &candidates) {
+    QJsonObject result;
+    result["type"] = DgramType::Request;
+    result["command"] = CommandType::DecorateShip;
+    QJsonArray candidatesList;
+    for(auto candidate: candidates) {
+        candidatesList.append(QJsonValue(candidate.toString()));
+    }
+    result["shipids"] = candidatesList;
+    return QCborValue::fromJsonValue(result).toCbor();
+}
+
 QByteArray KP::clientDemandModernize(
     const QList<QUuid> &candidates, bool isEquip) {
     QJsonObject result;
@@ -847,6 +859,22 @@ QByteArray KP::serverShipInfo(const QJsonArray &input, bool user,
     if(!cacheHit) {
         result["content"] = input;
     }
+    return QCborValue::fromJsonValue(result).toCbor();
+}
+
+QByteArray KP::serverShipDecorated(
+    const QList<std::tuple<QUuid, int>> &ships) {
+    QJsonObject result;
+    result["type"] = DgramType::Message;
+    result["msgtype"] = MsgType::ShipDecorated;
+    QJsonArray shipList;
+    for(auto shipTuple: ships) {
+        QJsonObject item;
+        item["shipid"] = QJsonValue(std::get<0>(shipTuple).toString());
+        item["newexpcap"] = std::get<1>(shipTuple);
+        shipList.append(item);
+    }
+    result["shipdata"] = shipList;
     return QCborValue::fromJsonValue(result).toCbor();
 }
 

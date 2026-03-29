@@ -23,6 +23,7 @@ signals:
                        const QString &searchTerm
                        = QLatin1String(""));
     void modernizeActivated(bool checked = false);
+    void decorateActivated(bool checked = false);
 
 public slots:
     void typeBoxHinted(QStringList &types);
@@ -39,6 +40,7 @@ public:
     QComboBox *classBox;
 
     QPushButton *addStarButton;
+    QPushButton *decorateButton;
 
 private:
     int height;

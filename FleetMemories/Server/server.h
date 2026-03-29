@@ -122,6 +122,8 @@ private:
     void migrate(const CSteamID &, const QJsonObject &);
     void minutePulse();
     bool modifyShip(const CSteamID &, QUuid prevShip, int newDef);
+    QList<std::tuple<QUuid, int>> decorateShip(const CSteamID &,
+                                               const QList<QUuid> &);
     QList<std::tuple<QUuid, int>> modernize(const CSteamID &,
                                             const QList<QUuid> &);
     QList<std::tuple<QUuid, int>> modernizeEquip(const CSteamID &,

@@ -84,7 +84,7 @@ static constexpr const char *attrMedal = "Medal";
 static constexpr double ardCouponUnitHKD = 0.01;
 static constexpr int ardCouponMaxUnits = 65536;
 static constexpr int medalCostPerUnit = 999;
-#pragma message(SECRET)
+static constexpr int decorationCostMedal = 1;
 static constexpr int ardCouponItemId = 6;
 /* Returns the real price in HKD cents after logarithmic volume discount */
 int ardRealPriceHKDCents(int units);
@@ -154,6 +154,7 @@ enum MsgType{
     ResourceRequired,
     ShipBPAdded,
     ShipBPRetired,
+    ShipDecorated,
     ShipModernized,
     ShipRemodeled,
     Success,
@@ -230,6 +231,7 @@ enum CommandType{
     ARDPurchaseAuth,
     BuyFromStore,
     BuyMedal,
+    DecorateShip,
     InitARDPurchase,
 };
 Q_ENUM_NS(CommandType)
@@ -664,6 +666,7 @@ QByteArray clientDemandMapInfo(QDateTime timeUtc
                                = QDateTime(QDate(1970, 1, 1),
                                            QTime(0, 0, 0)));
 QByteArray clientDemandMapInfoUser();
+QByteArray clientDemandDecorate(const QList<QUuid> &);
 QByteArray clientDemandModernize(const QList<QUuid> &, bool);
 QByteArray clientDemandRankInfo(int, std::optional<int> page = std::nullopt);
 QByteArray clientDemandRepair(const QUuid &, int,
@@ -812,6 +815,7 @@ QByteArray serverShipBPInfo(const QJsonObject &);
 QByteArray serverShipInfo(const QJsonArray &, bool user = false,
                           QDateTime timeUtc = QDateTime::currentDateTimeUtc(),
                           bool cacheHit = false);
+QByteArray serverShipDecorated(const QList<std::tuple<QUuid, int>> &);
 QByteArray serverShipModernized(const QList<std::tuple<QUuid, int>> &);
 QByteArray serverSkillPoints(int, int64, int64);
 QByteArray serverSuccess();

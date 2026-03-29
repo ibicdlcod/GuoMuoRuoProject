@@ -36,6 +36,7 @@ ShipSelect::ShipSelect(int height, QWidget *parent)
     classBox = new QComboBox(this);
 
     addStarButton = new QPushButton(this);
+    decorateButton = new QPushButton(this);
 
     QHBoxLayout *layout = new QHBoxLayout(this);
     layout->addWidget(searchLabel);
@@ -47,12 +48,15 @@ ShipSelect::ShipSelect(int height, QWidget *parent)
     layout->addWidget(classLabel);
     layout->addWidget(classBox);
     layout->addWidget(addStarButton);
+    layout->addWidget(decorateButton);
     layout->setContentsMargins(0,0,0,0);
     layout->setSpacing(6);
     layout->setAlignment(Qt::AlignCenter);
 
     //% "Modernize"
     addStarButton->setText(qtTrId("add-star-button-ship"));
+    //% "Decorate"
+    decorateButton->setText(qtTrId("decorate-button-ship"));
 
     QSizePolicy labelSize = QSizePolicy(QSizePolicy::Maximum,
                                         QSizePolicy::Preferred,
@@ -104,9 +108,15 @@ ShipSelect::ShipSelect(int height, QWidget *parent)
                                              QSizePolicy::Preferred,
                                              QSizePolicy::PushButton));
     addStarButton->resize(QSize(100, height));
+    decorateButton->setSizePolicy(QSizePolicy(QSizePolicy::Maximum,
+                                              QSizePolicy::Preferred,
+                                              QSizePolicy::PushButton));
+    decorateButton->resize(QSize(100, height));
 
     connect(addStarButton, &QAbstractButton::clicked,
             this, &ShipSelect::modernizeActivated);
+    connect(decorateButton, &QAbstractButton::clicked,
+            this, &ShipSelect::decorateActivated);
 
     connect(nationBox, &QComboBox::activated,
             this, [this]{

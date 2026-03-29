@@ -54,6 +54,8 @@ Client::Client(QObject *parent)
             this, &Client::doImproveEquip);
     connect(&shipModel, &ShipModel::modernizeRequest,
             this, &Client::doModernizeShip);
+    connect(&shipModel, &ShipModel::decorateRequest,
+            this, &Client::doDecorateShip);
     connect(this, &Client::gamestateChanged,
             this, &Client::changeGameState);
     // May cause issues?
@@ -946,6 +948,21 @@ void Client::receivedMsg(const QJsonObject &djson) {
         //% "The following equipments are improved: %1"
         qInfo() << qtTrId("modernize-equip-list").arg(strList.join(","));
         equipModel.modernizedEquips(equipList);
+    }
+    break;
+    case KP::ShipDecorated: {
+        QJsonArray array = djson["shipdata"].toArray();
+        QList<std::tuple<QUuid, int>> shipList;
+        QStringList strList;
+        for(auto item: array) {
+            QUuid uid = QUuid(item.toObject()["shipid"].toString());
+            strList.append(item.toObject()["shipid"].toString());
+            int newExpCap = item.toObject()["newexpcap"].toInt();
+            shipList.append(std::make_tuple(uid, newExpCap));
+        }
+        //% "The following ships are decorated: %1"
+        qInfo() << qtTrId("decorate-ship-list").arg(strList.join(","));
+        shipModel.decoratedShips(shipList);
     }
     break;
     case KP::ShipModernized: {

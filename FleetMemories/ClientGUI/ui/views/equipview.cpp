@@ -142,6 +142,8 @@ EquipView::EquipView(QWidget *parent)
             shipSelect, &ShipSelect::classBoxHinted);
     connect(shipSelect, &ShipSelect::modernizeActivated,
             &engine.shipModel, &ShipModel::enactModernize);
+    connect(shipSelect, &ShipSelect::decorateActivated,
+            &engine.shipModel, &ShipModel::enactDecorate);
 
     connect(shipSelect, &ShipSelect::selectChanged,
             &engine.shipBPModel, &ShipModel::switchShipDisplayType);
@@ -349,6 +351,7 @@ void EquipView::activate(bool arsenal, bool isEquip,
                 arsenalView->setItemDelegateForColumn(
                     model->hpColumn(), hpdelegate);
                 shipSelect->addStarButton->show();
+                shipSelect->decorateButton->show();
             }
             else {
                 model->setIsInArsenal(false);
@@ -359,6 +362,7 @@ void EquipView::activate(bool arsenal, bool isEquip,
                 connect(delegate, &SelectDelegate::itemSelected,
                         this, &EquipView::itemSelected);
                 shipSelect->addStarButton->hide();
+                shipSelect->decorateButton->hide();
                 unselectButton->show();
                 connect(unselectButton, &QPushButton::clicked,
                         this, [this]{emit shipSelected(QUuid());

@@ -21,6 +21,7 @@ signals:
     void typeBoxHint(QStringList &types);
     void classBoxHint(QStringList &types);
     void modernizeRequest(const QList<QUuid> &ships);
+    void decorateRequest(const QList<QUuid> &ships);
 
 public slots:
     virtual void switchShipDisplayType(const QString &nationality,
@@ -31,7 +32,9 @@ public slots:
 
     virtual void addShip(QUuid, int, int) final;
     virtual void enactModernize() override;
+    virtual void enactDecorate();
     virtual void modernizedShips(const QList<std::tuple<QUuid, int>> &);
+    virtual void decoratedShips(const QList<std::tuple<QUuid, int>> &);
     virtual void modifyShip(QUuid, int, int, bool disabling = false) final;
     virtual void updateShipList(const QJsonObject &);
 
@@ -66,6 +69,7 @@ protected:
     virtual int numberOfColumns() const override;
     virtual int numberOfShip() const;
     QHash<int, int> bpCache;
+    QHash<QUuid, bool> isDecorationChecked;
 
     virtual void clearCheckBoxes() override;
     void clearShipCheckBoxes();

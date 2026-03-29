@@ -200,6 +200,15 @@ void Client::doImproveEquip(const QList<QUuid> &candidates) {
     }
 }
 
+void Client::doDecorateShip(const QList<QUuid> &candidates) {
+    if(candidates.empty())
+        return;
+    else {
+        QByteArray msg = KP::clientDemandDecorate(candidates);
+        sender->enqueue(msg);
+    }
+}
+
 void Client::doModernizeShip(const QList<QUuid> &candidates) {
     if(candidates.empty())
         return;

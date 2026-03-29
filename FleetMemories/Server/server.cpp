@@ -2705,6 +2705,110 @@ add_star:
     return result;
 }
 
+QList<std::tuple<QUuid, int>> Server::decorateShip(
+        const CSteamID &uid, const QList<QUuid> &ships) {
+    QList<std::tuple<QUuid, int>> result;
+
+    QSqlDatabase db = QSqlDatabase::database();
+
+check_medals:
+    QSqlQuery medalQuery;
+    medalQuery.prepare("SELECT Intvalue FROM UserAttr "
+                       "WHERE UserID = :uid AND Attribute = :attr;");
+    medalQuery.bindValue(":uid", uid.ConvertToUint64());
+    medalQuery.bindValue(":attr", KP::attrMedal);
+    if(Q_UNLIKELY(!medalQuery.exec() || !medalQuery.isSelect())) {
+        qCritical() << medalQuery.lastQuery();
+        //% "User id %1: reading medal balance failed when decorating!"
+        throw DBError(qtTrId("decorate-ship-medal-failed")
+                      .arg(uid.ConvertToUint64()),
+                      medalQuery.lastError());
+        return result;
+    }
+    if(!medalQuery.first()) {
+        return result;
+    }
+    int medalBalance = medalQuery.value(0).toInt();
+    if(medalBalance < KP::decorationCostMedal * ships.size()) {
+        //% "User id %1: insufficient medals to decorate ships!"
+        qWarning() << qtTrId("decorate-ship-medal-insufficient")
+                      .arg(uid.ConvertToUint64());
+        return result;
+    }
+
+    for(auto ship: ships) {
+        int expCap = 0;
+
+query_ship_expcap:
+        QSqlQuery query;
+        query.prepare("SELECT ExpCap FROM UserShip "
+                      "WHERE User = :uid AND ShipUuid = :sid;");
+        query.bindValue(":uid", uid.ConvertToUint64());
+        query.bindValue(":sid", ship.toString());
+        query.exec();
+        query.isSelect();
+        if(Q_UNLIKELY(!query.first())) {
+            //% "User id %1: ship %2 does not exist when decorating!"
+            qWarning() << qtTrId("decorate-ship-nonexistent")
+                          .arg(uid.ConvertToUint64())
+                          .arg(ship.toString());
+            break;
+        }
+        expCap = query.value(0).toInt();
+
+consume_medal:
+        QSqlQuery medalDeductQuery;
+        medalDeductQuery.prepare(
+            "UPDATE UserAttr SET Intvalue = Intvalue - :amount "
+            "WHERE UserID = :uid AND Attribute = :attr "
+            "AND Intvalue >= :amount;");
+        medalDeductQuery.bindValue(":amount", KP::decorationCostMedal);
+        medalDeductQuery.bindValue(":uid", uid.ConvertToUint64());
+        medalDeductQuery.bindValue(":attr", KP::attrMedal);
+        if(Q_UNLIKELY(!medalDeductQuery.exec())) {
+            //% "User id %1: deducting medal failed when decorating ship %2!"
+            throw DBError(qtTrId("decorate-ship-medal-deduct-failed")
+                          .arg(uid.ConvertToUint64())
+                          .arg(ship.toString()),
+                          medalDeductQuery.lastError());
+            break;
+        }
+        if(medalDeductQuery.numRowsAffected() == 0) {
+            //% "User id %1: insufficient medals when decorating ship %2!"
+            qWarning() << qtTrId("decorate-ship-medal-ran-out")
+                          .arg(uid.ConvertToUint64())
+                          .arg(ship.toString());
+            break;
+        }
+
+raise_expcap:
+        int newExpCap = Ship::expCapNext(expCap);
+        QSqlQuery updateQuery;
+        updateQuery.prepare("UPDATE UserShip SET ExpCap = :newexpcap "
+                            "WHERE User = :uid AND ShipUuid = :sid;");
+        updateQuery.bindValue(":newexpcap", newExpCap);
+        updateQuery.bindValue(":uid", uid.ConvertToUint64());
+        updateQuery.bindValue(":sid", ship.toString());
+        if(Q_UNLIKELY(!updateQuery.exec())) {
+            //% "User id %1: updating ExpCap of ship %2 failed when decorating!"
+            throw DBError(qtTrId("decorate-ship-expcap-failed")
+                          .arg(uid.ConvertToUint64())
+                          .arg(ship.toString()),
+                          updateQuery.lastError());
+            break;
+        }
+        else {
+            //% "User id %1: decorated ship %2, new ExpCap %3"
+            qDebug() << qtTrId("decorate-ship")
+                        .arg(uid.ConvertToUint64())
+                        .arg(ship.toString())
+                        .arg(newExpCap);
+            result.append(std::make_tuple(ship, newExpCap));
+        }
+    }
+    return result;
+}
+
 /* 4.7-improve.md */
 QList<std::tuple<QUuid, int>> Server::modernizeEquip(
         const CSteamID &uid, const QList<QUuid> &equips) {
@@ -3802,6 +3906,18 @@ anti_ddos:
             QByteArray msg = KP::serverShipModernized(shipsReturned);
             senderM.sendMessage(connection, msg);
         }
+    }
+        break;
+    case KP::CommandType::DecorateShip: {
+        QList<QUuid> ships;
+        QJsonArray array = djson["shipids"].toArray();
+        for(auto ship: array) {
+            ships.append(QUuid(ship.toString()));
+        }
+        QList<std::tuple<QUuid, int>> shipsReturned = decorateShip(uid, ships);
+        QByteArray msg = KP::serverShipDecorated(shipsReturned);
+        senderM.sendMessage(connection, msg);
+        offerResourceInfo(connection, uid);
     }
         break;
     case KP::CommandType::MessageTest: {

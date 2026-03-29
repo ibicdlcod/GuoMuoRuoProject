@@ -179,6 +179,30 @@ void ShipModel::modernizedShips(
     wholeTableChanged();
 }
 
+void ShipModel::enactDecorate() {
+    QList<QUuid> candidates;
+    for(auto iter = isDecorationChecked.keyValueBegin();
+         iter != isDecorationChecked.keyValueEnd();
+         ++iter) {
+        if(iter->second) {
+            candidates.append(iter->first);
+        }
+    }
+    emit decorateRequest(candidates);
+}
+
+void ShipModel::decoratedShips(
+    const QList<std::tuple<QUuid, int>> &decorated) {
+    for(auto item: decorated) {
+        auto shipUid = std::get<0>(item);
+        int newExpCap = std::get<1>(item);
+        if(clientShipDynamicAttrs.contains(shipUid)) {
+            clientShipDynamicAttrs[shipUid]->expCap = newExpCap;
+        }
+    }
+    wholeTableChanged();
+}
+
 void ShipModel::modifyShip(QUuid uid, int def, int hp, bool disabling) {
     bpCacheRefresh();
     int oldRowCount = rowCount();
@@ -451,9 +475,18 @@ QVariant ShipModel::data(const QModelIndex &index,
     }
     break;
     case Qt::CheckStateRole: {
+        if(!isInArsenal)
+            return QVariant();
         if(index.column() == starCol) {
             if(isModernizationChecked.value(sortedShipIds.value(realRowIndex),
                                              false))
+                return Qt::Checked;
+            else
+                return Qt::Unchecked;
+        }
+        else if(index.column() == levelColumn()) {
+            if(isDecorationChecked.value(sortedShipIds.value(realRowIndex),
+                                          false))
                 return Qt::Checked;
             else
                 return Qt::Unchecked;
@@ -470,7 +503,7 @@ QVariant ShipModel::data(const QModelIndex &index,
     }
     break;
     case CheckAlignmentRole: {
-        if(index.column() == starCol)
+        if(index.column() == starCol || index.column() == levelColumn())
             return static_cast<QVariant>(Qt::AlignVCenter | Qt::AlignLeft);
         else
             return QVariant();
@@ -568,7 +601,31 @@ Qt::ItemFlags ShipModel::flags(const QModelIndex &index) const {
             return QAbstractTableModel::flags(index)
                    | Qt::ItemIsUserCheckable
                    | Qt::ItemIsEnabled;
-
+        }
+    }
+    else if(index.column() == levelColumn()) {
+        int realRowIndex = index.row() + rowsPerPage * pageNum;
+        QUuid uidToDisplay = sortedShipIds[realRowIndex];
+        bool alreadyChecked = isDecorationChecked.value(uidToDisplay, false);
+        int checkedCount = 0;
+        for(auto checked: std::as_const(isDecorationChecked)) {
+            if(checked) ++checkedCount;
+        }
+        Client &engine = Client::getInstance();
+        bool canCheckMore = engine.medalCache
+                            >= KP::decorationCostMedal * (checkedCount + 1);
+        if(alreadyChecked || canCheckMore) {
+            // clazy:exclude=skipped-base-method
+            return QAbstractTableModel::flags(index)
+                   | Qt::ItemIsUserCheckable
+                   | Qt::ItemIsEnabled;
+        }
+        else {
+            // clazy:exclude=skipped-base-method
+            return static_cast<QFlags<Qt::ItemFlag>>(
+                QAbstractTableModel::flags(index)
+                | Qt::ItemIsUserCheckable
+                      & (~Qt::ItemIsEnabled));
         }
     }
     else {
@@ -585,15 +642,37 @@ bool ShipModel::setData(const QModelIndex &index,
     Ship *shipToDisplay = clientShips[uidToDisplay];
     int bpNum = bpCache[shipToDisplay->getId()];
     if(role == Qt::CheckStateRole) {
-        if(value.toInt() == Qt::Checked && bpNum != 0) {
-            isModernizationChecked[sortedShipIds.value(realRowIndex)] = true;
-            emit dataChanged(index, index, {Qt::CheckStateRole});
-            return true;
+        if(index.column() == starCol) {
+            if(value.toInt() == Qt::Checked && bpNum != 0) {
+                isModernizationChecked[sortedShipIds.value(realRowIndex)] = true;
+                emit dataChanged(index, index, {Qt::CheckStateRole});
+                return true;
+            }
+            else if(value.toInt() == Qt::Unchecked) {
+                isModernizationChecked[sortedShipIds.value(realRowIndex)] = false;
+                emit dataChanged(index, index, {Qt::CheckStateRole});
+                return true;
+            }
         }
-        else if(value.toInt() == Qt::Unchecked) {
-            isModernizationChecked[sortedShipIds.value(realRowIndex)] = false;
-            emit dataChanged(index, index, {Qt::CheckStateRole});
-            return true;
+        else if(index.column() == levelColumn()) {
+            Client &engine = Client::getInstance();
+            if(value.toInt() == Qt::Checked) {
+                int checkedCount = 0;
+                for(auto checked: std::as_const(isDecorationChecked)) {
+                    if(checked) ++checkedCount;
+                }
+                if(engine.medalCache
+                    >= KP::decorationCostMedal * (checkedCount + 1)) {
+                    isDecorationChecked[sortedShipIds.value(realRowIndex)] = true;
+                    emit dataChanged(index, index, {Qt::CheckStateRole});
+                    return true;
+                }
+            }
+            else if(value.toInt() == Qt::Unchecked) {
+                isDecorationChecked[sortedShipIds.value(realRowIndex)] = false;
+                emit dataChanged(index, index, {Qt::CheckStateRole});
+                return true;
+            }
         }
     }
     return false;
@@ -667,6 +746,7 @@ void ShipModel::clearCheckBoxes() {
 
 void ShipModel::clearShipCheckBoxes() {
     isModernizationChecked.clear();
+    isDecorationChecked.clear();
 }
 
 int ShipModel::numberOfShip() const {

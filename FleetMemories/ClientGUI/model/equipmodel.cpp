@@ -500,6 +500,8 @@ QVariant EquipModel::data(const QModelIndex &index, int role) const {
     }
     break;
     case Qt::CheckStateRole: {
+        if(!isInArsenal)
+            return QVariant();
         if(index.column() == destructColumn()) {
             if(isDestructChecked.value(sortedEquipIds.value(realRowIndex),
                                         false))
