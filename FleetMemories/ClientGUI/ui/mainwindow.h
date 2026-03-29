@@ -66,6 +66,7 @@ private slots:
     void switchToCloningVats();
     void switchToConstruct();
     void switchToDevelop();
+    void showResourceGain();
     void switchToFleet();
     void switchToRank();
     void switchToSortie();

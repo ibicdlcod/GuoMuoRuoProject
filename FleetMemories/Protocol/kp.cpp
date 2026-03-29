@@ -264,6 +264,13 @@ QByteArray KP::clientDemandRepair(const QUuid &uuid, int slotnum,
     return QCborValue::fromJsonValue(result).toCbor();
 }
 
+QByteArray KP::clientDemandResourceGain() {
+    QJsonObject result;
+    result["type"] = DgramType::Request;
+    result["command"] = CommandType::DemandResourceGain;
+    return QCborValue::fromJsonValue(result).toCbor();
+}
+
 QByteArray KP::clientDemandResourceUpdate() {
     QJsonObject result;
     result["type"] = DgramType::Request;
@@ -717,6 +724,14 @@ QByteArray KP::serverMapInfo(const QJsonArray &input,
     if(!cacheHit) {
         result["content"] = input;
     }
+    return QCborValue::fromJsonValue(result).toCbor();
+}
+
+QByteArray KP::serverResourceGainInfo(const QJsonObject &input) {
+    QJsonObject result;
+    result["type"] = DgramType::Info;
+    result["infotype"] = InfoType::ResourceGainInfo;
+    result["content"] = input;
     return QCborValue::fromJsonValue(result).toCbor();
 }
 

@@ -44,6 +44,11 @@ void Client::demandMapSupremacy() {
     sender->enqueue(msg);
 }
 
+void Client::demandResourceGain() {
+    QByteArray msg = KP::clientDemandResourceGain();
+    sender->enqueue(msg);
+}
+
 void Client::demandShipCache() {
     QDateTime localCacheTimeStamp = settings->value("client/shipdbtimestamp",
                                                     QDateTime(QDate(1970,01,01),

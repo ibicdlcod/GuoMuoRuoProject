@@ -61,6 +61,7 @@ private slots:
                                  bool, bool);
     void offerRankInfo(const CSteamID &, QSslSocket *, int rpp,
                        std::optional<int> page = std::nullopt);
+    void offerResourceGainInfo(const CSteamID &, QSslSocket *);
     void offerResourceInfo(QSslSocket *, const CSteamID &);
     void offerShipInfo(QSslSocket *);
     void offerShipInfoUser(const CSteamID &, QSslSocket *);

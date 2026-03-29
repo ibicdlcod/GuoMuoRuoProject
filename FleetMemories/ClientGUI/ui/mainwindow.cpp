@@ -240,6 +240,10 @@ void MainWindow::unlockBattle() {
                     &engine, &Client::switchToBattleView),
             connect(ui->actionBattle, &QAction::triggered,
                     this, &MainWindow::switchToSortie),
+            connect(ui->actionResource_status, &QAction::triggered,
+                    &engine, &Client::switchToBattleView),
+            connect(ui->actionResource_status, &QAction::triggered,
+                    this, &MainWindow::showResourceGain),
             connect(ui->actionCompose, &QAction::triggered,
                     &engine, &Client::switchToFleetView),
             connect(ui->actionCompose, &QAction::triggered,
@@ -418,6 +422,15 @@ void MainWindow::switchToRank() {
     }
     factoryArea->setState(KP::RankView);
     factoryArea->switchToState();
+    adjust();
+}
+
+void MainWindow::showResourceGain() {
+    Client &engine = Client::getInstance();
+    if(!engine.loggedIn()) {
+        return;
+    }
+    battleArea->switchToState(KP::ResourceGainView);
     adjust();
 }
 

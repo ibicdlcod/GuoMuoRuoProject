@@ -41,6 +41,8 @@ Post-build steps automatically copy CSV data files from `doc/` and Steam DLLs in
 
 The client and server are separate executables that communicate over SSL/TLS sockets using JSON/CBOR messages. The protocol is defined entirely in `Protocol/kp.h` — all message type enums (`CommandType`, `InfoType`, `MsgType`), game constants, and builder functions (`KP::clientFoo()` / `KP::serverFoo()`) live there, with implementations in `Protocol/kp.cpp`.
 
+The server never sends user-visible strings — it returns enum values (`KP::GameError`, `KP::FleetFailType`, etc.) and the client localises them. The server language is not guaranteed to match the client.
+
 **Message flow for a typical action:**
 1. Client calls a `KP::client*()` builder → enqueues bytes via `Client` → `Sender`
 2. Server's `receivedInfo()` / `receivedAuth()` dispatch on `CommandType`

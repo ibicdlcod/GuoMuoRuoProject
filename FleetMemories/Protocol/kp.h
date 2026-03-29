@@ -72,6 +72,8 @@ static constexpr int transportFleetMaxCapitalness = 25;
 static constexpr int resourceMapIDStart = 1024;
 static constexpr int resourceMapIDEnd = 2048;
 static constexpr int mapIDDifficultyMask = 4096;
+/* 6.2-supremacy.md#resource_gain */
+static constexpr int mapResourceControlDefault = 1000;
 static constexpr int hiddenMap = 99;
 static constexpr qint64 secsinMin = 60;
 static constexpr int equipIdMax = 0x10000;
@@ -235,6 +237,7 @@ enum CommandType{
     BuyFromStore,
     BuyMedal,
     DecorateShip,
+    DemandResourceGain,
     InitARDPurchase,
 };
 Q_ENUM_NS(CommandType)
@@ -277,7 +280,8 @@ enum SortieState{
     MapView,
     MapDetail,
     DrillView,
-    BattleScreen
+    BattleScreen,
+    ResourceGainView
 };
 Q_ENUM_NS(SortieState)
 
@@ -306,6 +310,7 @@ enum InfoType{
     MapInfoUser,
     MapStart,
     MapProgress,
+    ResourceGainInfo,
 };
 Q_ENUM_NS(InfoType)
 
@@ -677,6 +682,7 @@ QByteArray clientDemandModernize(const QList<QUuid> &, bool);
 QByteArray clientDemandRankInfo(int, std::optional<int> page = std::nullopt);
 QByteArray clientDemandRepair(const QUuid &, int,
                               bool stop = false, bool forced = false);
+QByteArray clientDemandResourceGain();
 QByteArray clientDemandResourceUpdate();
 QByteArray clientDemandShipInfo(QDateTime timeUtc
                                 = QDateTime(QDate(1970, 1, 1),
@@ -816,6 +822,7 @@ QByteArray serverParseError(MsgType, const QString &,
                             const QString &);
 QByteArray serverPenguin();
 QByteArray serverRankInfo(const QJsonArray &, int, std::optional<double>);
+QByteArray serverResourceGainInfo(const QJsonObject &);
 QByteArray serverResourceUpdate(ResOrd, ResExotic);
 QByteArray serverShipBPInfo(const QJsonObject &);
 QByteArray serverShipInfo(const QJsonArray &, bool user = false,

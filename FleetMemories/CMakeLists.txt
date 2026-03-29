@@ -160,6 +160,8 @@ set(CLIENT_SOURCES
     ClientGUI/ui/sortie/maprender.h
     ClientGUI/ui/sortie/mapviewwidget.cpp
     ClientGUI/ui/sortie/mapviewwidget.h
+    ClientGUI/ui/sortie/resourcegainview.cpp
+    ClientGUI/ui/sortie/resourcegainview.h
     ClientGUI/ui/sortie/opengl/battlewidget.cpp
     ClientGUI/ui/sortie/opengl/battlewidget.h
     ClientGUI/ui/sortie/opengl/geometryengine.cpp

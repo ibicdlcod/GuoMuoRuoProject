@@ -26,11 +26,13 @@ Sortie::Sortie(QWidget *parent)
     renderer = new MapRender(this);
     detail = new MapDetail(this);
     battleW = new BattleWidget(this);
+    resourceGainW = new ResourceGainView(this);
 
-    globeFrame = new MapViewWidget({renderer, detail, battleW},
-                                   MapRender::globeMapWidth,
-                                   MapRender::globeMapHeight,
-                                   ui->MapView);
+    globeFrame = new MapViewWidget(
+        {renderer, detail, battleW, resourceGainW},
+        MapRender::globeMapWidth,
+        MapRender::globeMapHeight,
+        ui->MapView);
     connect(renderer, &MapRender::mapSelected,
             this, &Sortie::switchMap);
     ui->diffChoice->setSizeAdjustPolicy(QComboBox::AdjustToContents);
@@ -47,6 +49,8 @@ Sortie::Sortie(QWidget *parent)
             this, &Sortie::battleEnd);
     connect(&engine, &Client::mapEnd,
             this, &Sortie::sortieEnd);
+    connect(&engine, &Client::receivedResourceGainInfo,
+            resourceGainW, &ResourceGainView::populate);
     connect(ui->diffChoice, &QComboBox::currentTextChanged,
             renderer, &MapRender::setDiff);
 }
@@ -97,6 +101,19 @@ void Sortie::switchToState(KP::SortieState state) {
     case KP::BattleScreen:
         globeFrame->setCurrentWidget(battleW);
         update();
+        break;
+    case KP::ResourceGainView: {
+        globeFrame->setCurrentWidget(resourceGainW);
+        for(int i = 0; i < ui->mapSelectBar->count(); ++i) {
+            QLayoutItem *item = ui->mapSelectBar->itemAt(i);
+            if(item->widget()) {
+                item->widget()->hide();
+            }
+        }
+        Client::getInstance().demandResourceGain();
+        update();
+        break;
+    }
     default:
         break;
     }

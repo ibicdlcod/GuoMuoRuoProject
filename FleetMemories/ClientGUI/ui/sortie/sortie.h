@@ -8,10 +8,11 @@
 #include <QLabel>
 #include <QJsonObject>
 #include "../../../Protocol/kp.h"
-#include "maprender.h"
 #include "mapdetail.h"
+#include "maprender.h"
 #include "mapviewwidget.h"
 #include "opengl/battlewidget.h"
+#include "resourcegainview.h"
 #include "../../../Protocol/mapwithdiff.h"
 
 namespace Ui {
@@ -48,6 +49,7 @@ private:
     MapRender *renderer;
     MapDetail *detail;
     BattleWidget *battleW;
+    ResourceGainView *resourceGainW;
     MapViewWidget *globeFrame;
 
     KP::SortieState sortieState = KP::MapView;

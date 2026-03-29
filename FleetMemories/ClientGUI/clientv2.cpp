@@ -589,6 +589,9 @@ void Client::receivedInfo(const QJsonObject &djson) {
         emit progressToNode(node, nextNodeId);
         break;
     }
+    case KP::InfoType::ResourceGainInfo:
+        emit receivedResourceGainInfo(djson["content"].toObject());
+        break;
     default: throw std::domain_error("info type not supported"); break;
     }
 }

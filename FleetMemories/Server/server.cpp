@@ -4102,6 +4102,10 @@ anti_ddos:
         doBuyMedal(uid, djson["amount"].toInt(), connection);
     }
         break;
+    case KP::CommandType::DemandResourceGain: {
+        offerResourceGainInfo(uid, connection);
+    }
+        break;
     case KP::CommandType::InitARDPurchase: {
         handleInitARDPurchase(uid, connection, djson["units"].toInt());
     }

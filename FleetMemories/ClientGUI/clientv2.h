@@ -105,6 +105,7 @@ public slots:
     void demandEquipSkillPoints(int);
     void demandMapCache();
     void demandMapSupremacy();
+    void demandResourceGain();
     void demandShipCache();
     void displayPrompt();
     void doBattle(const QJsonObject &);
@@ -181,6 +182,7 @@ signals:
     void receivedRankInfoUser(double);
     void receivedMedalPurchased(int amount);
     void receivedRepairRefresh(const QJsonObject &);
+    void receivedResourceGainInfo(const QJsonObject &);
     void receivedResourceInfo(const QJsonObject &);
     void receivedShipBlueprint(const QJsonObject &);
     void receivedSkillPointInfo(const QJsonObject &);
