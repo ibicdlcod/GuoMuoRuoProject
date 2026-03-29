@@ -671,10 +671,25 @@ Qt::ItemFlags ShipModel::flags(const QModelIndex &index) const {
     else if((index.column() == fuelColumn()
               || index.column() == ammoColumn())
              && isSupplyMode) {
-        // clazy:exclude=skipped-base-method
-        return QAbstractTableModel::flags(index)
-               | Qt::ItemIsUserCheckable
-               | Qt::ItemIsEnabled;
+        int realRowIndex = index.row() + rowsPerPage * pageNum;
+        QUuid uidToDisplay = sortedShipIds[realRowIndex];
+        ShipDynamic *attr = clientShipDynamicAttrs[uidToDisplay];
+        bool isFull = (index.column() == fuelColumn())
+                      ? attr->fuel >= 1.0
+                      : attr->ammo >= 1.0;
+        if(isFull) {
+            // clazy:exclude=skipped-base-method
+            return static_cast<QFlags<Qt::ItemFlag>>(
+                QAbstractTableModel::flags(index)
+                | Qt::ItemIsUserCheckable
+                      & (~Qt::ItemIsEnabled));
+        }
+        else {
+            // clazy:exclude=skipped-base-method
+            return QAbstractTableModel::flags(index)
+                   | Qt::ItemIsUserCheckable
+                   | Qt::ItemIsEnabled;
+        }
     }
     else {
         // clazy:exclude=skipped-base-method
@@ -725,12 +740,18 @@ bool ShipModel::setData(const QModelIndex &index,
             }
         }
         else if(index.column() == fuelColumn() && isSupplyMode) {
+            if(value.toInt() == Qt::Checked
+                && clientShipDynamicAttrs[uidToDisplay]->fuel >= 1.0)
+                return false;
             isFuelSupplyChecked[sortedShipIds.value(realRowIndex)] =
                 (value.toInt() == Qt::Checked);
             emit dataChanged(index, index, {Qt::CheckStateRole});
             return true;
         }
         else if(index.column() == ammoColumn() && isSupplyMode) {
+            if(value.toInt() == Qt::Checked
+                && clientShipDynamicAttrs[uidToDisplay]->ammo >= 1.0)
+                return false;
             isAmmoSupplyChecked[sortedShipIds.value(realRowIndex)] =
                 (value.toInt() == Qt::Checked);
             emit dataChanged(index, index, {Qt::CheckStateRole});
@@ -826,31 +847,16 @@ void ShipModel::setIsSupplyMode(bool supply) {
     wholeTableChanged();
 }
 
-void ShipModel::enactSupplyFuel() {
+void ShipModel::enactSupply() {
     QJsonArray ships;
-    for(auto iter = isFuelSupplyChecked.keyValueBegin();
-         iter != isFuelSupplyChecked.keyValueEnd(); ++iter) {
-        if(iter->second) {
+    for(const QUuid &uuid: std::as_const(sortedShipIds)) {
+        bool fuel = isFuelSupplyChecked.value(uuid, false);
+        bool ammo = isAmmoSupplyChecked.value(uuid, false);
+        if(fuel || ammo) {
             QJsonObject entry;
-            entry["uuid"] = iter->first.toString();
-            entry["fuel"] = true;
-            entry["ammo"] = false;
-            ships.append(entry);
-        }
-    }
-    if(!ships.isEmpty())
-        emit supplyRequest(ships);
-}
-
-void ShipModel::enactSupplyAmmo() {
-    QJsonArray ships;
-    for(auto iter = isAmmoSupplyChecked.keyValueBegin();
-         iter != isAmmoSupplyChecked.keyValueEnd(); ++iter) {
-        if(iter->second) {
-            QJsonObject entry;
-            entry["uuid"] = iter->first.toString();
-            entry["fuel"] = false;
-            entry["ammo"] = true;
+            entry["uuid"] = uuid.toString();
+            entry["fuel"] = fuel;
+            entry["ammo"] = ammo;
             ships.append(entry);
         }
     }

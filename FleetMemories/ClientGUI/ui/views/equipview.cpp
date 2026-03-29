@@ -356,20 +356,14 @@ void EquipView::activate(bool arsenal, bool isEquip,
                 arsenalView->setItemDelegateForColumn(
                     model->hpColumn(), hpdelegate);
                 shipSelect->addStarButton->setVisible(!isAnchorage);
-                shipSelect->decorateButton->setVisible(!isAnchorage);
-                shipSelect->supplyFuelButton->setVisible(isAnchorage);
-                shipSelect->supplyAmmoButton->setVisible(isAnchorage);
+                shipSelect->decorateButton->show();
+                shipSelect->supplyButton->setVisible(isAnchorage);
                 shipSelect->supplyAllButton->setVisible(isAnchorage);
                 if(isAnchorage) {
                     connect(
                         shipSelect,
-                        &ShipSelect::supplyFuelActivated,
-                        sm, &ShipModel::enactSupplyFuel,
-                        Qt::UniqueConnection);
-                    connect(
-                        shipSelect,
-                        &ShipSelect::supplyAmmoActivated,
-                        sm, &ShipModel::enactSupplyAmmo,
+                        &ShipSelect::supplyActivated,
+                        sm, &ShipModel::enactSupply,
                         Qt::UniqueConnection);
                     connect(
                         shipSelect,
@@ -394,8 +388,7 @@ void EquipView::activate(bool arsenal, bool isEquip,
                         this, &EquipView::itemSelected);
                 shipSelect->addStarButton->hide();
                 shipSelect->decorateButton->hide();
-                shipSelect->supplyFuelButton->hide();
-                shipSelect->supplyAmmoButton->hide();
+                shipSelect->supplyButton->hide();
                 shipSelect->supplyAllButton->hide();
                 unselectButton->show();
                 connect(unselectButton, &QPushButton::clicked,

@@ -24,9 +24,8 @@ signals:
                        const QString &shipclass,
                        const QString &searchTerm
                        = QLatin1String(""));
+    void supplyActivated(bool checked = false);
     void supplyAllActivated(bool checked = false);
-    void supplyAmmoActivated(bool checked = false);
-    void supplyFuelActivated(bool checked = false);
 
 public slots:
     void typeBoxHinted(QStringList &types);
@@ -45,8 +44,7 @@ public:
     QPushButton *addStarButton;
     QPushButton *decorateButton;
     QPushButton *supplyAllButton;
-    QPushButton *supplyAmmoButton;
-    QPushButton *supplyFuelButton;
+    QPushButton *supplyButton;
 
 private:
     int height;

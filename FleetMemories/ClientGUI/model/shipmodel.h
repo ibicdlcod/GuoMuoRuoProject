@@ -36,9 +36,8 @@ public slots:
     virtual void addShip(QUuid, int, int) final;
     virtual void enactDecorate();
     virtual void enactModernize() override;
+    virtual void enactSupply();
     virtual void enactSupplyAll();
-    virtual void enactSupplyAmmo();
-    virtual void enactSupplyFuel();
     virtual void modernizedShips(const QList<std::tuple<QUuid, int>> &);
     virtual void decoratedShips(const QList<std::tuple<QUuid, int>> &);
     virtual void modifyShip(QUuid, int, int, bool disabling = false) final;

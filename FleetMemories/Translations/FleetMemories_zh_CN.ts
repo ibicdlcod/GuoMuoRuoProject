@@ -1331,7 +1331,7 @@ Great at battle and bad at politics--so cool!</source>
         <location filename="../ClientGUI/ui/views/equipview.cpp" line="281"/>
         <location filename="../ClientGUI/ui/views/equipview.cpp" line="299"/>
         <location filename="../ClientGUI/ui/views/equipview.cpp" line="342"/>
-        <location filename="../ClientGUI/ui/views/equipview.cpp" line="419"/>
+        <location filename="../ClientGUI/ui/views/equipview.cpp" line="412"/>
         <source>Retrieving data, please wait...</source>
         <translation>获取数据中，请等待……</translation>
     </message>
@@ -1439,12 +1439,12 @@ Great at battle and bad at politics--so cool!</source>
         <translation>舰级：</translation>
     </message>
     <message id="add-star-button-ship">
-        <location filename="../ClientGUI/ui/views/shipselect.cpp" line="63"/>
+        <location filename="../ClientGUI/ui/views/shipselect.cpp" line="61"/>
         <source>Modernize</source>
         <translation>近代化改造</translation>
     </message>
     <message id="decorate-button-ship">
-        <location filename="../ClientGUI/ui/views/shipselect.cpp" line="65"/>
+        <location filename="../ClientGUI/ui/views/shipselect.cpp" line="63"/>
         <source>Decorate</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1453,10 +1453,10 @@ Great at battle and bad at politics--so cool!</source>
         <location filename="../ClientGUI/ui/factory/constructwindow.cpp" line="219"/>
         <location filename="../ClientGUI/ui/techview.cpp" line="62"/>
         <location filename="../ClientGUI/ui/techview.cpp" line="474"/>
-        <location filename="../ClientGUI/ui/views/shipselect.cpp" line="98"/>
-        <location filename="../ClientGUI/ui/views/shipselect.cpp" line="158"/>
-        <location filename="../ClientGUI/ui/views/shipselect.cpp" line="168"/>
-        <location filename="../ClientGUI/ui/views/shipselect.cpp" line="180"/>
+        <location filename="../ClientGUI/ui/views/shipselect.cpp" line="94"/>
+        <location filename="../ClientGUI/ui/views/shipselect.cpp" line="147"/>
+        <location filename="../ClientGUI/ui/views/shipselect.cpp" line="157"/>
+        <location filename="../ClientGUI/ui/views/shipselect.cpp" line="169"/>
         <source>All nationalities</source>
         <oldsource>All nationality</oldsource>
         <translation>所有国籍</translation>
@@ -3297,10 +3297,10 @@ Great at battle and bad at politics--so cool!</source>
         <location filename="../ClientGUI/ui/factory/constructwindow.cpp" line="98"/>
         <location filename="../ClientGUI/ui/factory/constructwindow.cpp" line="135"/>
         <location filename="../ClientGUI/ui/factory/constructwindow.cpp" line="183"/>
-        <location filename="../ClientGUI/ui/views/shipselect.cpp" line="171"/>
-        <location filename="../ClientGUI/ui/views/shipselect.cpp" line="183"/>
-        <location filename="../ClientGUI/ui/views/shipselect.cpp" line="230"/>
-        <location filename="../ClientGUI/ui/views/shipselect.cpp" line="234"/>
+        <location filename="../ClientGUI/ui/views/shipselect.cpp" line="160"/>
+        <location filename="../ClientGUI/ui/views/shipselect.cpp" line="172"/>
+        <location filename="../ClientGUI/ui/views/shipselect.cpp" line="219"/>
+        <location filename="../ClientGUI/ui/views/shipselect.cpp" line="223"/>
         <source>All ship types</source>
         <translation>所有舰船</translation>
     </message>
@@ -3311,9 +3311,9 @@ Great at battle and bad at politics--so cool!</source>
         <location filename="../ClientGUI/ui/factory/constructwindow.cpp" line="100"/>
         <location filename="../ClientGUI/ui/factory/constructwindow.cpp" line="155"/>
         <location filename="../ClientGUI/ui/factory/constructwindow.cpp" line="197"/>
-        <location filename="../ClientGUI/ui/views/shipselect.cpp" line="186"/>
-        <location filename="../ClientGUI/ui/views/shipselect.cpp" line="274"/>
-        <location filename="../ClientGUI/ui/views/shipselect.cpp" line="278"/>
+        <location filename="../ClientGUI/ui/views/shipselect.cpp" line="175"/>
+        <location filename="../ClientGUI/ui/views/shipselect.cpp" line="263"/>
+        <location filename="../ClientGUI/ui/views/shipselect.cpp" line="267"/>
         <source>All ship classes</source>
         <translation>所有舰级</translation>
     </message>
@@ -3414,18 +3414,13 @@ Great at battle and bad at politics--so cool!</source>
         <source>Ammo</source>
         <translation>弹药</translation>
     </message>
-    <message id="supply-fuel-button">
-        <location filename="../ClientGUI/ui/views/shipselect.cpp" line="67"/>
-        <source>Supply Fuel</source>
-        <translation>补给燃料</translation>
-    </message>
-    <message id="supply-ammo-button">
-        <location filename="../ClientGUI/ui/views/shipselect.cpp" line="69"/>
-        <source>Supply Ammo</source>
-        <translation>补给弹药</translation>
+    <message id="supply-button">
+        <location filename="../ClientGUI/ui/views/shipselect.cpp" line="65"/>
+        <source>Supply</source>
+        <translation>补给</translation>
     </message>
     <message id="supply-all-button">
-        <location filename="../ClientGUI/ui/views/shipselect.cpp" line="71"/>
+        <location filename="../ClientGUI/ui/views/shipselect.cpp" line="67"/>
         <source>Supply All</source>
         <translation>全部补给</translation>
     </message>
@@ -4413,7 +4408,7 @@ Great at battle and bad at politics--so cool!</source>
     <message id="ui-supply">
         <location filename="../ClientGUI/ui/mainwindow.ui" line="422"/>
         <source>Supply</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">补给</translation>
     </message>
     <message id="ui-repair">
         <location filename="../ClientGUI/ui/mainwindow.ui" line="427"/>
