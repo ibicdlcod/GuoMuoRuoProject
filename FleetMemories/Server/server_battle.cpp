@@ -1068,6 +1068,29 @@ void Server::startSortie(const CSteamID &uid, QSslSocket *connection,
             return;
         }
 
+        /* supply_check */
+        QSqlQuery supplyQuery;
+        supplyQuery.prepare("SELECT 1 FROM UserShip "
+                            "WHERE User = :uid "
+                            "AND FleetIndex = :fleetindex "
+                            "AND (Fuel <= 0.0 OR Ammo <= 0.0) "
+                            "LIMIT 1;");
+        supplyQuery.bindValue(":uid", uid.ConvertToUint64());
+        supplyQuery.bindValue(":fleetindex", fleetIndex);
+        if(Q_UNLIKELY(!supplyQuery.exec() || !supplyQuery.isSelect())) {
+            //% "User %1: start map %2 failure due to uncertain supply!"
+            throw DBError(
+                qtTrId("sortie-start-failure-supply")
+                    .arg(uid.ConvertToUint64()).arg(mapId),
+                supplyQuery.lastError(), supplyQuery.lastQuery());
+            return;
+        }
+        else if(supplyQuery.first()) {
+            QByteArray msg = KP::serverFleetFailure(KP::FleetShipNotSupplied);
+            senderM.sendMessage(connection, msg);
+            return;
+        }
+
         FleetInfo info;
         /* TODO: populate fleetinfo */
         sol::protected_function luaChooseStartingNode

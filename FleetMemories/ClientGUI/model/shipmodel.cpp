@@ -359,12 +359,16 @@ QVariant ShipModel::data(const QModelIndex &index,
                 .arg(attr->fleetPosIndex + 1);
         }
         else if(index.column() == fuelColumn()) {
-            return QString::number(
-                static_cast<int>(attr->fuel * 100)) + "%";
+            int cons = shipToDisplay->attr["FuelConsumption"];
+            return QStringLiteral("%1/%2")
+                .arg(static_cast<int>(attr->fuel * cons))
+                .arg(cons);
         }
         else if(index.column() == ammoColumn()) {
-            return QString::number(
-                static_cast<int>(attr->ammo * 100)) + "%";
+            int cons = shipToDisplay->attr["AmmoConsumption"];
+            return QStringLiteral("%1/%2")
+                .arg(static_cast<int>(attr->ammo * cons))
+                .arg(cons);
         }
         else {
             Q_UNREACHABLE();

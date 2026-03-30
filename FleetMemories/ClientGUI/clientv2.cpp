@@ -1022,6 +1022,10 @@ void Client::receivedMsg(const QJsonObject &djson) {
         case KP::FleetShipisUnderRepair:
             qWarning() << qtTrId("ship-is-repairing");
             break;
+        case KP::FleetShipNotSupplied:
+            //% "One or more ships are out of fuel or ammo."
+            qWarning() << qtTrId("fleet-ship-not-supplied");
+            break;
         case KP::FleetBusyInBattle:
             qWarning() << qtTrId("fleet-is-busy");
             break;

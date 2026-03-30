@@ -10,6 +10,7 @@
 #include <QWheelEvent>
 
 #include "../../clientv2.h"
+#include "../../model/shipmodel.h"
 
 using namespace std::chrono_literals;
 
@@ -239,6 +240,12 @@ void EquipView::activate(bool arsenal, bool isEquip,
                                           new QStyledItemDelegate());
     arsenalView->setItemDelegateForColumn(model->hpColumn(),
                                           new QStyledItemDelegate());
+    if(ShipModel *sm = qobject_cast<ShipModel *>(model)) {
+        arsenalView->setItemDelegateForColumn(sm->fuelColumn(),
+                                              new QStyledItemDelegate());
+        arsenalView->setItemDelegateForColumn(sm->ammoColumn(),
+                                              new QStyledItemDelegate());
+    }
     disconnect(model, &EquipModel::pageNumChanged,
                this, &EquipView::pageNumChangedLambda);
     disconnect(firstButton, &QAbstractButton::clicked,
@@ -348,14 +355,18 @@ void EquipView::activate(bool arsenal, bool isEquip,
             }
             if(arsenal) {
                 ShipModel *sm =
-                    static_cast<ShipModel *>(model);
+                    qobject_cast<ShipModel *>(model);
                 model->setIsInArsenal(true);
                 bool isAnchorage =
                     custom == KP::Anchorage;
                 sm->setIsSupplyMode(isAnchorage);
                 arsenalView->setItemDelegateForColumn(
                     model->hpColumn(), hpdelegate);
-                shipSelect->addStarButton->setVisible(!isAnchorage);
+                arsenalView->setItemDelegateForColumn(
+                    sm->fuelColumn(), hpdelegate);
+                arsenalView->setItemDelegateForColumn(
+                    sm->ammoColumn(), hpdelegate);
+                shipSelect->addStarButton->show();
                 shipSelect->decorateButton->show();
                 shipSelect->supplyButton->setVisible(isAnchorage);
                 shipSelect->supplyAllButton->setVisible(isAnchorage);
@@ -378,7 +389,7 @@ void EquipView::activate(bool arsenal, bool isEquip,
             }
             else {
                 model->setIsInArsenal(false);
-                static_cast<ShipModel *>(model)
+                qobject_cast<ShipModel *>(model)
                     ->setIsSupplyMode(false);
                 arsenalView->setItemDelegateForColumn(
                     model->selectColumn(), delegate);

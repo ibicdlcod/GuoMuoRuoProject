@@ -59,34 +59,64 @@ void InteractiveLabel::mouseReleaseEvent(QMouseEvent *event)
 void InteractiveLabel::paintEvent(QPaintEvent * /* event */)
 {
     int oldInternalId = 0;
-    if(shipUId.isNull()) {
-        ; // remains 0
-    }
-    else {
+    double fuel = 1.0;
+    double ammo = 1.0;
+    bool hasShip = false;
+
+    if(!shipUId.isNull()) {
         Client &engine = Client::getInstance();
         auto [ship, shipattr] = engine.shipModel.getShip(shipUId);
-        if(ship == nullptr
-            || !ship->attr.contains("OldInternalNo.")) {
-            ; // remains 0
-        }
-        else {
+        if(ship != nullptr && ship->attr.contains("OldInternalNo.")) {
             oldInternalId = ship->attr["OldInternalNo."];
+        }
+        if(shipattr != nullptr) {
+            fuel = shipattr->fuel;
+            ammo = shipattr->ammo;
+            hasShip = true;
         }
     }
 
     QPixmap pixmap = Icute::shipIcon(oldInternalId);
 
     int size = std::min(this->width(), this->height());
+    int iconX = (this->width() - size) / 2;
+    int iconY = (this->height() - size) / 2;
+
     QPainter painter(this);
-    painter.drawPixmap(QRect(this->width() / 2.0 - size / 2.0,
-                             this->height() / 2.0 - size / 2.0,
-                             size,
-                             size),
+    painter.drawPixmap(QRect(iconX, iconY, size, size),
                        pixmap.scaled(QSize(size, size),
                                      Qt::KeepAspectRatio,
-                                     Qt::SmoothTransformation
-                                     )
-                       );
+                                     Qt::SmoothTransformation));
+
+    if(hasShip && (fuel < 1.0 || ammo < 1.0)) {
+        bool critical = (fuel < 0.5 || ammo < 0.5);
+        QColor fillColor = critical ? QColor(220, 30, 30) : QColor(255, 200, 0);
+
+        int base = std::max(size / 3, 12);
+        /* equilateral: height = base * sqrt(3)/2 ≈ base * 866/1000 */
+        int triH = base * 866 / 1000;
+        int warnX = iconX + size - base;
+        int warnY = iconY + size - triH;
+
+        QPolygon triangle;
+        triangle << QPoint(warnX + base / 2, warnY)
+                 << QPoint(warnX + base,      warnY + triH)
+                 << QPoint(warnX,             warnY + triH);
+
+        painter.setRenderHint(QPainter::Antialiasing);
+        painter.setBrush(fillColor);
+        painter.setPen(Qt::NoPen);
+        painter.drawPolygon(triangle);
+
+        painter.setPen(Qt::black);
+        QFont f = painter.font();
+        f.setPixelSize(std::max(base * 2 / 3, 8));
+        f.setBold(true);
+        painter.setFont(f);
+        painter.drawText(QRect(warnX, warnY + triH / 3,
+                               base, triH * 2 / 3),
+                         Qt::AlignCenter, "!");
+    }
 }
 
 void InteractiveLabel::shipSelected(QUuid id) {

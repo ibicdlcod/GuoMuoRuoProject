@@ -82,7 +82,7 @@ The server implementation is split across multiple files:
 
 1. `Sortie::dealWithNode()` (`ClientGUI/ui/sortie/sortie.cpp`) drives the client-side node state machine via a `switch(node.type)`.
 2. Reaching a battle node → client calls `engine.doBattle()` → server `processBattle()` runs the combat, sets `InBattle = DuringBattle`, fires a timer, then sets `InBattle = AfterBattle` and sends `serverBattleEnd()`.
-3. Client `battleEnd()` shows the continue/retreat dialog → calls `engine.queryNextNode()` → server `progressMap()` runs Lua branch rules via `nextNode()` → sends `serverMapProgress()` with the next node ID.
+3. Client `battleEnd()` shows the continue/retreat dialog → calls `engine.queryNextNode()` → server `progressMap()` runs Lua branch rules via `nextNode()`, consumes fuel/ammo on node entry (using `KP::defaultFuelUsage(NodeType)` / `KP::defaultAmmoUsage(NodeType)` with optional per-node Lua overrides), and sends `serverMapProgress()` with the next node ID.
 4. `STARTING` and `EMPTY` nodes skip the battle plan dialog; `EMPTY` still sends `doBattle({})` to let the server advance its `InBattle` state machine through `BeforeBattle → AfterBattle`.
 
 ### Lua scripting
@@ -128,7 +128,7 @@ SQLite, accessed via Qt SQL. All CREATE TABLE statements are at the top of `Serv
 |-------|-------------|---------|
 | `NewUsers` | `UserID` BLOB PK, `UserType` | User registry (`'commoner'` / `'admin'`) |
 | `UserAttr` | `UserID`, `Attribute`, `Intvalue`, `Realvalue` | General per-user key-value attributes (see below); `Realvalue REAL DEFAULT NULL` stores double-valued attributes |
-| `UserShip` | `ShipUuid` PK, `User`, `ShipDef`, `CurrentHP`, `Condition`, `Exp`, `Slot1`–`Slot5`+`SlotEX`, `FleetIndex`, `FleetPosIndex`, `FleetFled` | Ship instances owned by user |
+| `UserShip` | `ShipUuid` PK, `User`, `ShipDef`, `CurrentHP`, `Condition`, `Exp`, `Slot1`–`Slot5`+`SlotEX`, `FleetIndex`, `FleetPosIndex`, `FleetFled`, `Fuel`, `Ammo` | Ship instances owned by user; `Fuel`/`Ammo` are fractions (0.0–1.0, defaults 1.0) representing current supply levels |
 | `UserKCShip` | `ShipUuid` PK, `ShipDef`, `Exp` | KC-variant extra exp; LEFT JOINed with `UserShip` |
 | `UserEquip` | `EquipUuid` PK, `User`, `EquipDef`, `Star` | Equipment instances owned by user |
 | `UserKCEquip` | `EquipUuid` PK, `EquipDef`, `Star`, `SkillPoints` | KC-variant equipment; LEFT JOINed with `UserEquip` |
@@ -168,6 +168,10 @@ Shop dialogs live in `ClientGUI/ui/shop/`. The Shop menu is disabled when offlin
 
 Both `ardCouponCache` and `medalCache` on `Client` are updated whenever `serverResourceUpdate` is received. The server sends these as part of `offerResourceInfo` after any purchase.
 
+### Ship supply system
+
+Ships carry fuel (costs Oil) and ammo (costs Explosives) as fractional resources (0.0–1.0). The **Anchorage** factory mode lets players replenish both via the `SupplyShip` command. The server deducts Oil/Explosives greedily per ship based on attributes `FuelConsumption` / `AmmoConsumption` from `ShipReg`. Fuel and ammo are also automatically consumed during sorties: `progressMap()` deducts them on node entry using node type defaults or optional per-node Lua overrides. Ships are rendered inoperable when either fuel or ammo reach zero.
+
 ### Factory states
 
 `FactoryArea` is a shared panel driven by `KP::FactoryState`. All states are routed through `FactoryArea::switchToState()`:
@@ -178,7 +182,7 @@ Both `ardCouponCache` and `medalCache` on `Client` are updated whenever `serverR
 | `Construction` | Factory slots | Build new ships or remodel existing ones |
 | `CloningVats` | Factory slots | Clone already-owned ships; costs sanity (regenerates with ship count) and requires the highest-levelled ship in the remodel group to exceed a level threshold; two ships from the same remodel group may not share a fleet |
 | `Arsenal` | `EquipView` | Browse and buy equipment from the store |
-| `Anchorage` | `EquipView` | Supply ships |
+| `Anchorage` | `EquipView` | Supply ships with fuel (costs Oil; deduction based on `FuelConsumption`) and ammo (costs Explosives; deduction based on `AmmoConsumption`); `ShipModel` checkboxes enable per-ship selection, with "Supply" and "Supply All" buttons; `FleetView` offers a "Supply Fleet" shortcut |
 | `BlueprintView` | `EquipView` | Browse ship blueprints |
 | `RankView` | `EquipView` | View equipment rankings |
 

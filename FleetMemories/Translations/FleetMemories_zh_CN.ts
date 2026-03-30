@@ -656,7 +656,7 @@ Great at battle and bad at politics--so cool!</source>
     </message>
     <message id="access-denied-login-first">
         <location filename="../ClientGUI/clientv2.cpp" line="652"/>
-        <location filename="../ClientGUI/clientv2.cpp" line="1253"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="1257"/>
         <location filename="../ClientGUI/clientv2_cache.cpp" line="155"/>
         <location filename="../ClientGUI/clientv2_cache.cpp" line="174"/>
         <location filename="../ClientGUI/clientv2_cache.cpp" line="187"/>
@@ -795,8 +795,8 @@ Great at battle and bad at politics--so cool!</source>
     <message id="message-not-implemented">
         <location filename="../ClientGUI/clientv2.cpp" line="604"/>
         <location filename="../ClientGUI/clientv2.cpp" line="623"/>
-        <location filename="../ClientGUI/clientv2.cpp" line="1114"/>
-        <location filename="../ClientGUI/clientv2.cpp" line="1144"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="1118"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="1148"/>
         <source>Message not implemented</source>
         <translation type="unfinished"></translation>
     </message>
@@ -913,6 +913,11 @@ Great at battle and bad at politics--so cool!</source>
         <source>This operation involves ship under repair!</source>
         <translation type="unfinished"></translation>
     </message>
+    <message id="fleet-ship-not-supplied">
+        <location filename="../ClientGUI/clientv2.cpp" line="1027"/>
+        <source>One or more ships are out of fuel or ammo.</source>
+        <translation>舰队中有舰船燃料或弹药耗尽。</translation>
+    </message>
     <message id="equip-develop-failed">
         <location filename="../ClientGUI/clientv2.cpp" line="737"/>
         <source>Equipment development failed.</source>
@@ -920,7 +925,7 @@ Great at battle and bad at politics--so cool!</source>
     </message>
     <message id="fleet-is-busy">
         <location filename="../ClientGUI/clientv2.cpp" line="745"/>
-        <location filename="../ClientGUI/clientv2.cpp" line="1026"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="1030"/>
         <source>Fleet is busy!</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1084,103 +1089,103 @@ Great at battle and bad at politics--so cool!</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="fleet-contains-duplicate">
-        <location filename="../ClientGUI/clientv2.cpp" line="1030"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="1034"/>
         <source>Fleet contains duplicate ships!</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="valid-fleet">
-        <location filename="../ClientGUI/clientv2.cpp" line="1034"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="1038"/>
         <source>Modify fleet success!</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="ard-steam-error">
-        <location filename="../ClientGUI/clientv2.cpp" line="1070"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="1074"/>
         <source>A Steam error occurred. Please try again later.</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="store-equip-not-exist">
-        <location filename="../ClientGUI/clientv2.cpp" line="1074"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="1078"/>
         <source>Equipment does not exist.</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="store-equip-not-available">
-        <location filename="../ClientGUI/clientv2.cpp" line="1078"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="1082"/>
         <source>Equipment is not available in the store.</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="store-insufficient-coupons">
-        <location filename="../ClientGUI/clientv2.cpp" line="1082"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="1086"/>
         <source>Insufficient ARD Coupons.</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="ard-purchase-failed">
-        <location filename="../ClientGUI/clientv2.cpp" line="1086"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="1090"/>
         <source>Purchase failed: %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="ard-purchase-pending">
-        <location filename="../ClientGUI/clientv2.cpp" line="1091"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="1095"/>
         <source>Awaiting Steam payment authorization...</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="ard-purchase-success">
-        <location filename="../ClientGUI/clientv2.cpp" line="1096"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="1100"/>
         <source>Purchase successful! %1 ARD Coupons added.</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="ard-purchase-clawback">
-        <location filename="../ClientGUI/clientv2.cpp" line="1102"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="1106"/>
         <source>Notice: %1 ARD Coupons have been reclaimed due to a refund or chargeback.</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="medal-purchase-success">
-        <location filename="../ClientGUI/clientv2.cpp" line="1109"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="1113"/>
         <source>Purchase successful! %1 medal(s) added.</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="login-success">
-        <location filename="../ClientGUI/clientv2.cpp" line="1122"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="1126"/>
         <source>%1: login success</source>
         <translation>%1：登录成功</translation>
     </message>
     <message id="ticket-decrypt-fail">
-        <location filename="../ClientGUI/clientv2.cpp" line="1133"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="1137"/>
         <source>Login failed: cannot decrypt ticket.</source>
         <translation>登录失败：无法解密票据。</translation>
     </message>
     <message id="ticket-incorrect-appid">
-        <location filename="../ClientGUI/clientv2.cpp" line="1136"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="1140"/>
         <source>Login failed: ticket is from incorrect app id.</source>
         <translation>登录失败：票据源APPID不对。</translation>
     </message>
     <message id="ticket-timeout">
-        <location filename="../ClientGUI/clientv2.cpp" line="1138"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="1142"/>
         <source>Login failed: ticket timeouted.</source>
         <translation>登录失败：票据超时。</translation>
     </message>
     <message id="steam-id-invalid">
-        <location filename="../ClientGUI/clientv2.cpp" line="1140"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="1144"/>
         <source>Login failed: steam id is invalid.</source>
         <translation>登录失败：Steam ID不合理。</translation>
     </message>
     <message id="steam-auth-fail">
-        <location filename="../ClientGUI/clientv2.cpp" line="1142"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="1146"/>
         <source>Login failed: steam authentication failed.</source>
         <translation>登录失败：Steam验证失败。</translation>
     </message>
     <message id="login-failed">
-        <location filename="../ClientGUI/clientv2.cpp" line="1147"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="1151"/>
         <source>%1: login failure, reason: %2</source>
         <translation>%1：登录失败，原因：%2</translation>
     </message>
     <message id="switch-cert-when-connecting">
-        <location filename="../ClientGUI/clientv2.cpp" line="1278"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="1282"/>
         <location filename="../Server/server.cpp" line="4256"/>
         <source>Switch certificate when connected have no effect.</source>
         <translation>在线时转换证书没有效果。</translation>
     </message>
     <message id="client-pem">
-        <location filename="../ClientGUI/clientv2.cpp" line="1289"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="1293"/>
         <source>Client PEM is now %1.</source>
         <translation>客户端PEM现在是%1。</translation>
     </message>
@@ -1327,26 +1332,26 @@ Great at battle and bad at politics--so cool!</source>
     </message>
     <message id="retrieving-please-wait">
         <location filename="../ClientGUI/ui/navigator.cpp" line="19"/>
-        <location filename="../ClientGUI/ui/views/equipview.cpp" line="78"/>
-        <location filename="../ClientGUI/ui/views/equipview.cpp" line="281"/>
-        <location filename="../ClientGUI/ui/views/equipview.cpp" line="299"/>
-        <location filename="../ClientGUI/ui/views/equipview.cpp" line="342"/>
-        <location filename="../ClientGUI/ui/views/equipview.cpp" line="412"/>
+        <location filename="../ClientGUI/ui/views/equipview.cpp" line="79"/>
+        <location filename="../ClientGUI/ui/views/equipview.cpp" line="288"/>
+        <location filename="../ClientGUI/ui/views/equipview.cpp" line="306"/>
+        <location filename="../ClientGUI/ui/views/equipview.cpp" line="349"/>
+        <location filename="../ClientGUI/ui/views/equipview.cpp" line="423"/>
         <source>Retrieving data, please wait...</source>
         <translation>获取数据中，请等待……</translation>
     </message>
     <message id="equipview-unselect">
-        <location filename="../ClientGUI/ui/views/equipview.cpp" line="88"/>
+        <location filename="../ClientGUI/ui/views/equipview.cpp" line="89"/>
         <source>Unselect</source>
         <translation>取消选择</translation>
     </message>
     <message id="no-ship">
-        <location filename="../ClientGUI/ui/views/equipview.cpp" line="199"/>
+        <location filename="../ClientGUI/ui/views/equipview.cpp" line="200"/>
         <source>No suitable Ship</source>
         <translation>没有符合的舰船</translation>
     </message>
     <message id="no-user">
-        <location filename="../ClientGUI/ui/views/equipview.cpp" line="203"/>
+        <location filename="../ClientGUI/ui/views/equipview.cpp" line="204"/>
         <source>No suitable User</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1382,7 +1387,7 @@ Great at battle and bad at politics--so cool!</source>
     </message>
     <message id="no-equip">
         <location filename="../ClientGUI/ui/navigator.cpp" line="80"/>
-        <location filename="../ClientGUI/ui/views/equipview.cpp" line="194"/>
+        <location filename="../ClientGUI/ui/views/equipview.cpp" line="195"/>
         <source>No suitable Equipment</source>
         <translation>没有符合的装备</translation>
     </message>
@@ -1581,28 +1586,28 @@ Great at battle and bad at politics--so cool!</source>
         <translation>%1：突然断开连接。</translation>
     </message>
     <message id="ard-not-authorized">
-        <location filename="../ClientGUI/clientv2.cpp" line="1050"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="1054"/>
         <source>Purchase was not authorized.</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="ard-order-not-found">
-        <location filename="../ClientGUI/clientv2.cpp" line="1054"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="1058"/>
         <source>Order not found.</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="ard-order-mismatch">
-        <location filename="../ClientGUI/clientv2.cpp" line="1058"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="1062"/>
         <source>Order mismatch.</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="ard-db-error">
-        <location filename="../ClientGUI/clientv2.cpp" line="1062"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="1066"/>
         <source>Database error while processing purchase.</source>
         <oldsource>Database error while crediting purchase.</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message id="ard-invalid-amount">
-        <location filename="../ClientGUI/clientv2.cpp" line="1066"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="1070"/>
         <source>Invalid ARD coupon amount.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1923,13 +1928,13 @@ Great at battle and bad at politics--so cool!</source>
         <translation>导入舰船数据库成功！</translation>
     </message>
     <message id="lua-canequip-error">
-        <location filename="../ClientGUI/clientv2.cpp" line="1266"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="1270"/>
         <location filename="../Server/server.cpp" line="2201"/>
         <source>The code from the file %1 has failed to run: %2</source>
         <translation type="unfinished">无</translation>
     </message>
     <message id="lua-canequip-success">
-        <location filename="../ClientGUI/clientv2.cpp" line="1271"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="1275"/>
         <location filename="../Server/server.cpp" line="2206"/>
         <source>Load equipability table success!</source>
         <translation type="unfinished"></translation>
@@ -2744,28 +2749,33 @@ Great at battle and bad at politics--so cool!</source>
         <source>User %1: start map %2 failure due to uncertain docks!</source>
         <translation type="unfinished"></translation>
     </message>
+    <message id="sortie-start-failure-supply">
+        <location filename="../Server/server_battle.cpp" line="1083"/>
+        <source>User %1: start map %2 failure due to uncertain supply!</source>
+        <translation type="unfinished"></translation>
+    </message>
     <message id="sortie-start-failure">
-        <location filename="../Server/server_battle.cpp" line="1099"/>
+        <location filename="../Server/server_battle.cpp" line="1122"/>
         <source>User %1: start map %2 failure!</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="sortie-start-failure-node">
-        <location filename="../Server/server_battle.cpp" line="1113"/>
+        <location filename="../Server/server_battle.cpp" line="1136"/>
         <source>User %1: start map %2 node %3 failure!</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="sortie-start-failure-index">
-        <location filename="../Server/server_battle.cpp" line="1128"/>
+        <location filename="../Server/server_battle.cpp" line="1151"/>
         <source>User %1: fleet index %2 start sortie failure!</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="sortie-start-failure-general">
-        <location filename="../Server/server_battle.cpp" line="1143"/>
+        <location filename="../Server/server_battle.cpp" line="1166"/>
         <source>User %1: start sortie failure!</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="lua-error-branch">
-        <location filename="../Server/server_battle.cpp" line="1156"/>
+        <location filename="../Server/server_battle.cpp" line="1179"/>
         <source>Map %1 lua file has failed to run: %2</source>
         <translation type="unfinished">无</translation>
     </message>
@@ -3324,8 +3334,8 @@ Great at battle and bad at politics--so cool!</source>
         <translation>空闲</translation>
     </message>
     <message id="ship-uuid">
-        <location filename="../ClientGUI/model/shipmodel.cpp" line="390"/>
-        <location filename="../ClientGUI/model/shipmodel.cpp" line="573"/>
+        <location filename="../ClientGUI/model/shipmodel.cpp" line="394"/>
+        <location filename="../ClientGUI/model/shipmodel.cpp" line="577"/>
         <location filename="../ClientGUI/model/specshipmodel.cpp" line="59"/>
         <location filename="../ClientGUI/ui/maintenance/repair.cpp" line="22"/>
         <source>UUID</source>
@@ -3335,8 +3345,8 @@ Great at battle and bad at politics--so cool!</source>
         <location filename="../ClientGUI/model/shipbpmodel.cpp" line="159"/>
         <location filename="../ClientGUI/model/shipbpmodel.cpp" line="220"/>
         <location filename="../ClientGUI/model/shipdefmodel.cpp" line="53"/>
-        <location filename="../ClientGUI/model/shipmodel.cpp" line="394"/>
-        <location filename="../ClientGUI/model/shipmodel.cpp" line="576"/>
+        <location filename="../ClientGUI/model/shipmodel.cpp" line="398"/>
+        <location filename="../ClientGUI/model/shipmodel.cpp" line="580"/>
         <location filename="../ClientGUI/ui/maintenance/repair.cpp" line="24"/>
         <source>Name</source>
         <translation>舰船名</translation>
@@ -3360,8 +3370,8 @@ Great at battle and bad at politics--so cool!</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="ship-star">
-        <location filename="../ClientGUI/model/shipmodel.cpp" line="398"/>
-        <location filename="../ClientGUI/model/shipmodel.cpp" line="580"/>
+        <location filename="../ClientGUI/model/shipmodel.cpp" line="402"/>
+        <location filename="../ClientGUI/model/shipmodel.cpp" line="584"/>
         <source>Modernization</source>
         <translation type="unfinished">近代化星级</translation>
     </message>
@@ -3370,47 +3380,47 @@ Great at battle and bad at politics--so cool!</source>
         <translation type="vanished">近代化改造</translation>
     </message>
     <message id="ship-select">
-        <location filename="../ClientGUI/model/shipmodel.cpp" line="402"/>
-        <location filename="../ClientGUI/model/shipmodel.cpp" line="583"/>
+        <location filename="../ClientGUI/model/shipmodel.cpp" line="406"/>
+        <location filename="../ClientGUI/model/shipmodel.cpp" line="587"/>
         <source>Select this</source>
         <oldsource>Select</oldsource>
         <translation>选择此船</translation>
     </message>
     <message id="ship-hp">
-        <location filename="../ClientGUI/model/shipmodel.cpp" line="406"/>
-        <location filename="../ClientGUI/model/shipmodel.cpp" line="586"/>
+        <location filename="../ClientGUI/model/shipmodel.cpp" line="410"/>
+        <location filename="../ClientGUI/model/shipmodel.cpp" line="590"/>
         <location filename="../ClientGUI/ui/maintenance/repair.cpp" line="26"/>
         <source>HP</source>
         <translation>耐久</translation>
     </message>
     <message id="ship-cond">
-        <location filename="../ClientGUI/model/shipmodel.cpp" line="410"/>
-        <location filename="../ClientGUI/model/shipmodel.cpp" line="589"/>
+        <location filename="../ClientGUI/model/shipmodel.cpp" line="414"/>
+        <location filename="../ClientGUI/model/shipmodel.cpp" line="593"/>
         <source>Cond.</source>
         <translation>状态</translation>
     </message>
     <message id="ship-lv">
-        <location filename="../ClientGUI/model/shipmodel.cpp" line="414"/>
-        <location filename="../ClientGUI/model/shipmodel.cpp" line="592"/>
+        <location filename="../ClientGUI/model/shipmodel.cpp" line="418"/>
+        <location filename="../ClientGUI/model/shipmodel.cpp" line="596"/>
         <source>Level/MaxLv</source>
         <oldsource>Level</oldsource>
         <translation type="unfinished">等级</translation>
     </message>
     <message id="ship-pos">
-        <location filename="../ClientGUI/model/shipmodel.cpp" line="418"/>
-        <location filename="../ClientGUI/model/shipmodel.cpp" line="595"/>
+        <location filename="../ClientGUI/model/shipmodel.cpp" line="422"/>
+        <location filename="../ClientGUI/model/shipmodel.cpp" line="599"/>
         <source>Position</source>
         <translation>舰队位置</translation>
     </message>
     <message id="ship-fuel">
-        <location filename="../ClientGUI/model/shipmodel.cpp" line="421"/>
-        <location filename="../ClientGUI/model/shipmodel.cpp" line="599"/>
+        <location filename="../ClientGUI/model/shipmodel.cpp" line="425"/>
+        <location filename="../ClientGUI/model/shipmodel.cpp" line="603"/>
         <source>Fuel</source>
         <translation>燃料</translation>
     </message>
     <message id="ship-ammo">
-        <location filename="../ClientGUI/model/shipmodel.cpp" line="424"/>
-        <location filename="../ClientGUI/model/shipmodel.cpp" line="603"/>
+        <location filename="../ClientGUI/model/shipmodel.cpp" line="428"/>
+        <location filename="../ClientGUI/model/shipmodel.cpp" line="607"/>
         <source>Ammo</source>
         <translation>弹药</translation>
     </message>
@@ -3430,7 +3440,7 @@ Great at battle and bad at politics--so cool!</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="ship-star-whatsthis">
-        <location filename="../ClientGUI/model/shipmodel.cpp" line="561"/>
+        <location filename="../ClientGUI/model/shipmodel.cpp" line="565"/>
         <source>Modernization/Maximum Modernization</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3500,97 +3510,97 @@ Great at battle and bad at politics--so cool!</source>
         <translation type="obsolete">无</translation>
     </message>
     <message id="Japanese">
-        <location filename="../Protocol/kp.h" line="506"/>
+        <location filename="../Protocol/kp.h" line="507"/>
         <source>Japanese</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="German">
-        <location filename="../Protocol/kp.h" line="508"/>
+        <location filename="../Protocol/kp.h" line="509"/>
         <source>German</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="Italian">
-        <location filename="../Protocol/kp.h" line="510"/>
+        <location filename="../Protocol/kp.h" line="511"/>
         <source>Italian</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="American">
-        <location filename="../Protocol/kp.h" line="512"/>
+        <location filename="../Protocol/kp.h" line="513"/>
         <source>American</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="British">
-        <location filename="../Protocol/kp.h" line="514"/>
+        <location filename="../Protocol/kp.h" line="515"/>
         <source>British</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="French">
-        <location filename="../Protocol/kp.h" line="516"/>
+        <location filename="../Protocol/kp.h" line="517"/>
         <source>French</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="Soviet">
-        <location filename="../Protocol/kp.h" line="518"/>
+        <location filename="../Protocol/kp.h" line="519"/>
         <source>Soviet</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="Chinese">
-        <location filename="../Protocol/kp.h" line="520"/>
+        <location filename="../Protocol/kp.h" line="521"/>
         <source>Chinese</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="Benelux">
-        <location filename="../Protocol/kp.h" line="522"/>
+        <location filename="../Protocol/kp.h" line="523"/>
         <source>Benelux</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="Nordic">
-        <location filename="../Protocol/kp.h" line="524"/>
+        <location filename="../Protocol/kp.h" line="525"/>
         <source>Nordic</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="Commonwealth">
-        <location filename="../Protocol/kp.h" line="526"/>
+        <location filename="../Protocol/kp.h" line="527"/>
         <source>Commonwealth</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="Latin">
-        <location filename="../Protocol/kp.h" line="528"/>
+        <location filename="../Protocol/kp.h" line="529"/>
         <source>Iberian/Latin American</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="EasternEuropean">
-        <location filename="../Protocol/kp.h" line="530"/>
+        <location filename="../Protocol/kp.h" line="531"/>
         <source>Eastern European</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="MinorAsian">
-        <location filename="../Protocol/kp.h" line="532"/>
+        <location filename="../Protocol/kp.h" line="533"/>
         <source>Other Asian</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="Fantasy">
-        <location filename="../Protocol/kp.h" line="534"/>
+        <location filename="../Protocol/kp.h" line="535"/>
         <source>Fantasy ships</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="NormalFleet">
-        <location filename="../Protocol/kp.h" line="640"/>
+        <location filename="../Protocol/kp.h" line="641"/>
         <source>Normal</source>
         <translation>通常舰队</translation>
     </message>
     <message id="CarrierFleet">
-        <location filename="../Protocol/kp.h" line="642"/>
+        <location filename="../Protocol/kp.h" line="643"/>
         <source>Carrier</source>
         <translation>空母机动</translation>
     </message>
     <message id="SurfaceFleet">
-        <location filename="../Protocol/kp.h" line="644"/>
+        <location filename="../Protocol/kp.h" line="645"/>
         <source>Surface</source>
         <translation>水上打击</translation>
     </message>
     <message id="TransportFleet">
-        <location filename="../Protocol/kp.h" line="646"/>
+        <location filename="../Protocol/kp.h" line="647"/>
         <source>Transport</source>
         <translation>输送护卫</translation>
     </message>

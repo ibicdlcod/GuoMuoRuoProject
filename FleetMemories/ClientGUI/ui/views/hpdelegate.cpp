@@ -13,14 +13,32 @@ void HpDelegate::paint(QPainter *painter,
                        const QStyleOptionViewItem &option,
                        const QModelIndex &index) const
 {
+    QRect barRect = option.rect;
+
+    QVariant checkState = index.model()->data(index, Qt::CheckStateRole);
+    if((index.flags() & Qt::ItemIsUserCheckable) && checkState.isValid()) {
+        QStyle *style = QApplication::style();
+        int cbW = style->pixelMetric(QStyle::PM_IndicatorWidth, &option);
+        int cbH = style->pixelMetric(QStyle::PM_IndicatorHeight, &option);
+        int cbY = option.rect.y() + (option.rect.height() - cbH) / 2;
+        QRect cbRect(option.rect.x(), cbY, cbW, cbH);
+        QStyleOptionButton cbOption;
+        cbOption.rect = cbRect;
+        cbOption.state = (index.flags() & Qt::ItemIsEnabled)
+                         ? QStyle::State_Enabled : QStyle::State_None;
+        cbOption.state |= (checkState.toInt() == Qt::Checked)
+                          ? QStyle::State_On : QStyle::State_Off;
+        style->drawPrimitive(QStyle::PE_IndicatorCheckBox, &cbOption, painter);
+        barRect = option.rect.adjusted(cbW, 0, 0, 0);
+    }
+
     QString str = index.model()->data(index, Qt::DisplayRole).toString();
     QStringList list = str.split("/");
     int currentHP = list[0].toInt();
     int totalHP = std::max(list[1].toInt() , 50);
 
     QStyleOptionProgressBar progressBarOption;
-    progressBarOption.rect = QRect(option.rect.x(), option.rect.y(),
-                                   option.rect.width(), option.rect.height());
+    progressBarOption.rect = barRect;
     progressBarOption.minimum = 0;
     progressBarOption.maximum = totalHP;
     progressBarOption.progress = currentHP;
