@@ -16,6 +16,8 @@ MapDetail::MapDetail(QWidget *parent)
     antialiased = true;
 
     rudder = recolorImage(":/Assets/Image/rudder.png", QColor(192, 192, 0));
+    airNodeIcon = recolorImage(":/Assets/Image/fleetIcons/carrier.png",
+                               QColor(180, 0, 0));
     carrierFleetIcon = recolorImage(
         ":/Assets/Image/fleetIcons/carrier.png", QColor(0, 192, 0));
     surfaceFleetIcon = recolorImage(
@@ -211,6 +213,40 @@ void MapDetail::paintEvent(QPaintEvent *event) {
                                 node.y * height() - circleSize,
                                 circleSize * 2, circleSize * 2);
         } break;
+        case KP::AIR: {
+            painter.setBrush(redBrush);
+            QPen pen(Qt::red);
+            pen.setWidth(circleBorderSize);
+            painter.setPen(pen);
+            painter.drawEllipse(node.x * width() - circleSize / 2,
+                                node.y * height() - circleSize / 2,
+                                circleSize, circleSize);
+            painter.drawPixmap(node.x * width() - circleSize / 2,
+                               node.y * height() - circleSize / 2,
+                               airNodeIcon.scaled(
+                                   QSize(circleSize, circleSize),
+                                   Qt::KeepAspectRatio,
+                                   Qt::SmoothTransformation));
+        } break;
+        case KP::NIGHT: {
+            painter.setBrush(QBrush(QColor(210, 128, 255)));
+            QPen pen(QColor(128, 0, 200));
+            pen.setWidth(circleBorderSize);
+            painter.setPen(pen);
+            painter.drawEllipse(node.x * width() - circleSize / 2,
+                                node.y * height() - circleSize / 2,
+                                circleSize, circleSize);
+        } break;
+        case KP::NIGHTBOSS: {
+            painter.setBrush(QBrush(QColor(210, 128, 255)));
+            QPen pen(QColor(128, 0, 200));
+            pen.setWidth(circleBorderSize * 2);
+            painter.setPen(pen);
+            painter.drawEllipse(node.x * width() - circleSize,
+                                node.y * height() - circleSize,
+                                circleSize * 2, circleSize * 2);
+        } break;
+        default: break;
         }
     }
     if(awaitingChoice) {

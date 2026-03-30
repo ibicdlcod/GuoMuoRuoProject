@@ -69,29 +69,29 @@
     </widget>
    </item>
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout_3">
+    <layout class="QHBoxLayout" name="extraBattleLayout">
      <property name="spacing">
       <number>0</number>
      </property>
      <item>
-      <widget class="QLabel" name="eflabel_2">
+      <widget class="QLabel" name="extraBattleLabel">
        <property name="text">
         <string id="night-battle-plan">Night battle:</string>
        </property>
       </widget>
      </item>
      <item>
-      <layout class="QVBoxLayout" name="verticalLayout">
+      <layout class="QVBoxLayout" name="extraBattleOptionsLayout">
        <property name="spacing">
         <number>0</number>
        </property>
        <item>
-        <layout class="QHBoxLayout" name="horizontalLayout">
+        <layout class="QHBoxLayout" name="extraBattleBasicLayout">
          <property name="spacing">
           <number>0</number>
          </property>
          <item>
-          <widget class="QCheckBox" name="smokeBox_2">
+          <widget class="QCheckBox" name="extraBattleCheck">
            <property name="maximumSize">
             <size>
              <width>16777215</width>
@@ -102,12 +102,12 @@
             <enum>Qt::LayoutDirection::LeftToRight</enum>
            </property>
            <property name="text">
-            <string id="nb">NB</string>
+            <string id="nb">Night Battle</string>
            </property>
           </widget>
          </item>
          <item>
-          <widget class="QCheckBox" name="smokeBox_3">
+          <widget class="QCheckBox" name="extraBattleWhenLosingCheck">
            <property name="maximumSize">
             <size>
              <width>16777215</width>
@@ -118,14 +118,14 @@
             <enum>Qt::LayoutDirection::LeftToRight</enum>
            </property>
            <property name="text">
-            <string id="nb-b">NB when losing</string>
+            <string id="nb-b">Night Battle when losing</string>
            </property>
           </widget>
          </item>
         </layout>
        </item>
        <item>
-        <widget class="QCheckBox" name="smokeBox_4">
+        <widget class="QCheckBox" name="extraBattleWhenFlagshipCheck">
          <property name="maximumSize">
           <size>
            <width>16777215</width>
@@ -136,17 +136,17 @@
           <enum>Qt::LayoutDirection::LeftToRight</enum>
          </property>
          <property name="text">
-          <string id="nb-flagship">NB when flagship remains</string>
+          <string id="nb-flagship">Night Battle when flagship remains</string>
          </property>
         </widget>
        </item>
        <item>
-        <layout class="QHBoxLayout" name="horizontalLayout_2">
+        <layout class="QHBoxLayout" name="extraBattleRankLayout">
          <property name="spacing">
           <number>0</number>
          </property>
          <item>
-          <widget class="QCheckBox" name="smokeBox_5">
+          <widget class="QCheckBox" name="striveARankCheck">
            <property name="maximumSize">
             <size>
              <width>16777215</width>
@@ -162,7 +162,7 @@
           </widget>
          </item>
          <item>
-          <widget class="QCheckBox" name="smokeBox_6">
+          <widget class="QCheckBox" name="striveSRankCheck">
            <property name="maximumSize">
             <size>
              <width>16777215</width>

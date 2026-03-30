@@ -390,42 +390,42 @@ void Sortie::dealWithNode(const MapNode &node, int nodeId) {
         engine.doBattle(QJsonObject());
         break;
     }
+    case KP::AIR:
+        [[fallthrough]];
+    case KP::NIGHT:
+        [[fallthrough]];
+    case KP::NIGHTBOSS:
+        [[fallthrough]];
     case KP::NORMAL:
         [[fallthrough]];
-    case KP::BOSS:
+    case KP::BOSS: {
         QEventLoop loop;
-        // Connect the desired signal to the loop's quit() slot
         QObject::connect(detail, &MapDetail::moveFinished,
                          &loop, &QEventLoop::quit);
-
-        // Optional: Add a timeout using a QTimer
         QTimer timer;
         timer.setSingleShot(true);
         QObject::connect(&timer, &QTimer::timeout, &loop, &QEventLoop::quit);
-        timer.start(5000); // 5 second timeout
-
-        // Execute the event loop here; it blocks until loop.quit() is called
+        timer.start(5000);
         loop.exec();
-
-        // Check if a timeout occurred
         if (timer.isActive()) {
             timer.stop();
-            // Signal was received within the timeout
+            bool isNightNode = (node.type == KP::NIGHT
+                                || node.type == KP::NIGHTBOSS);
+            bool isAirNode = (node.type == KP::AIR);
             std::unique_ptr<BattlePlan> plan
-                = std::make_unique<BattlePlan>();
+                = std::make_unique<BattlePlan>(nullptr, isNightNode, isAirNode);
             while(plan->exec() != QDialog::Accepted) {
                 ;
             }
             /* TODO: extract info from battleplan */
             QJsonObject planinfo;
             engine.doBattle(planinfo);
-            break;
         } else {
-            // Timeout occurred
             //% "Fleet move failed!"
             qCritical() << qtTrId("fleet-move-error");
             /* TODO: leave battle */
-            break;
         }
+        break;
+    }
     }
 }

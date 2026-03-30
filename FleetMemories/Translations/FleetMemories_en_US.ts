@@ -4093,19 +4093,39 @@ Great at battle and bad at politics--so cool!</translation>
         <source>Night battle:</source>
         <translation type="unfinished"></translation>
     </message>
+    <message id="day-battle-plan">
+        <location filename="../ClientGUI/ui/sortie/battleplan.cpp" line="11"/>
+        <source>Day battle:</source>
+        <translation type="unfinished"></translation>
+    </message>
     <message id="nb">
         <location filename="../ClientGUI/ui/sortie/battleplan.ui" line="105"/>
-        <source>NB</source>
+        <source>Night Battle</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="nb-b">
         <location filename="../ClientGUI/ui/sortie/battleplan.ui" line="121"/>
-        <source>NB when losing</source>
+        <source>Night Battle when losing</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="db">
+        <location filename="../ClientGUI/ui/sortie/battleplan.cpp" line="12"/>
+        <source>Day Battle</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="db-b">
+        <location filename="../ClientGUI/ui/sortie/battleplan.cpp" line="14"/>
+        <source>Day Battle when losing</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="nb-flagship">
         <location filename="../ClientGUI/ui/sortie/battleplan.ui" line="139"/>
-        <source>NB when flagship remains</source>
+        <source>Night Battle when flagship remains</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="db-flagship">
+        <location filename="../ClientGUI/ui/sortie/battleplan.cpp" line="16"/>
+        <source>Day Battle when flagship remains</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="nb-a">

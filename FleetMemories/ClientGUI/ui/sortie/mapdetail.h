@@ -57,6 +57,7 @@ private:
     bool awaitingChoice = false;
 
     QPixmap rudder;
+    QPixmap airNodeIcon;
     QPixmap carrierFleetIcon;
     QPixmap surfaceFleetIcon;
     QPixmap transportFleetIcon;

@@ -15,7 +15,8 @@ class BattlePlan : public QDialog
     Q_OBJECT
 
 public:
-    explicit BattlePlan(QWidget *parent = nullptr);
+    explicit BattlePlan(QWidget *parent = nullptr, bool isNightNode = false,
+                        bool isAirNode = false);
     ~BattlePlan();
 
 private:
