@@ -10,6 +10,7 @@ class FleetInfo
 {
 public:
     FleetInfo();
+    ~FleetInfo();
     double los();
     LuaMap capitalness();//"Total"/"Surface"/"Carrier"/"Screens"
     std::vector<int> shipSpeeds();
@@ -17,7 +18,7 @@ public:
     KP::FleetType type;
     std::vector<Ship *> ships;
     std::vector<ShipDynamic *> shipDynamics;
-    std::vector<Ship *> shipTags;
+    std::vector<int> shipTags;
     std::vector<std::vector<Equipment *>> equipList;
     std::vector<std::vector<int>> planeCounts;
     std::vector<std::vector<int>> equipEffectiveness;

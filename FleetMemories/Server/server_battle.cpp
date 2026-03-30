@@ -23,6 +23,179 @@
 
 QT_BEGIN_NAMESPACE
 
+FleetInfo Server::queryFleetInfo(const CSteamID &uid, int fleetIndex) {
+    FleetInfo info;
+
+fleet_type: {
+        QSqlQuery query;
+        query.prepare("SELECT Intvalue FROM UserAttr "
+                      "WHERE UserID = :uid "
+                      "AND Attribute = :attr");
+        query.bindValue(":uid", uid.ConvertToUint64());
+        query.bindValue(":attr",
+                        QStringLiteral("Fleet")
+                            + QString::number(fleetIndex + 1));
+        if(Q_LIKELY(query.exec() && query.isSelect() && query.next())) {
+            info.type =
+                static_cast<KP::FleetType>(query.value(0).toInt());
+        }
+    }
+
+    /* Collect ship rows ordered by fleet position */
+    struct ShipRow {
+        int def;
+        int star, currentHP, condition, exp, expCap;
+        QList<QUuid> slots; /* Slot1–Slot5 */
+        QUuid slotEx;
+        QList<int> planes;  /* Slot1Planes–Slot5Planes */
+        int fleetPosIndex;
+        double fuel, ammo;
+    };
+    QList<ShipRow> rows;
+
+ships: {
+        QSqlQuery query;
+        query.prepare(
+            "SELECT ShipDef, "
+            "Star, CurrentHP, Condition, "
+            "UserShip.Exp + COALESCE(UserKCShip.Exp, 0) AS Exp, ExpCap, "
+            "Slot1, Slot2, Slot3, Slot4, Slot5, SlotEX, "
+            "Slot1Planes, Slot2Planes, Slot3Planes, Slot4Planes, Slot5Planes, "
+            "FleetPosIndex, Fuel, Ammo "
+            "FROM UserShip "
+            "LEFT JOIN UserKCShip "
+            "ON UserShip.ShipUuid = UserKCShip.ShipUuid "
+            "WHERE User = :uid AND FleetIndex = :fleet AND FleetFled = 0 "
+            "ORDER BY FleetPosIndex");
+        query.bindValue(":uid", uid.ConvertToUint64());
+        query.bindValue(":fleet", fleetIndex);
+        if(Q_UNLIKELY(!query.exec() || !query.isSelect())) {
+            //% "User %1: query fleet %2 failed!"
+            throw DBError(
+                qtTrId("query-fleet-info-failed")
+                    .arg(uid.ConvertToUint64()).arg(fleetIndex),
+                query.lastError(), query.lastQuery());
+        }
+        while(query.next()) {
+            auto rec = query.record();
+            ShipRow row;
+            row.def = query.value(rec.indexOf("ShipDef")).toInt();
+            row.star = query.value(rec.indexOf("Star")).toInt();
+            row.currentHP = query.value(rec.indexOf("CurrentHP")).toInt();
+            row.condition = query.value(rec.indexOf("Condition")).toInt();
+            row.exp = query.value(rec.indexOf("Exp")).toInt();
+            row.expCap = query.value(rec.indexOf("ExpCap")).toInt();
+            for(int i = 1; i <= 5; ++i) {
+                row.slots.append(query.value(
+                    rec.indexOf(QStringLiteral("Slot")
+                                + QString::number(i))).toUuid());
+                row.planes.append(query.value(
+                    rec.indexOf(QStringLiteral("Slot")
+                                + QString::number(i)
+                                + QStringLiteral("Planes"))).toInt());
+            }
+            row.slotEx =
+                query.value(rec.indexOf("SlotEX")).toUuid();
+            row.fleetPosIndex =
+                query.value(rec.indexOf("FleetPosIndex")).toInt();
+            row.fuel = query.value(rec.indexOf("Fuel")).toDouble();
+            row.ammo = query.value(rec.indexOf("Ammo")).toDouble();
+            rows.append(row);
+        }
+    }
+
+    /* Batch-resolve all slot UUIDs → EquipDef in one query */
+    QHash<QUuid, int> uuidToEquipDef;
+equip_defs: {
+        QList<QUuid> allUuids;
+        for(const ShipRow &row : std::as_const(rows)) {
+            for(const QUuid &uuid : row.slots) {
+                if(!uuid.isNull())
+                    allUuids.append(uuid);
+            }
+            if(!row.slotEx.isNull())
+                allUuids.append(row.slotEx);
+        }
+        if(!allUuids.isEmpty()) {
+            QStringList placeholders;
+            for(int i = 0; i < allUuids.size(); ++i) {
+                placeholders.append(
+                    QStringLiteral(":u") + QString::number(i));
+            }
+            QSqlQuery query;
+            query.prepare(
+                "SELECT EquipUuid, EquipDef FROM UserEquip "
+                "WHERE EquipUuid IN ("
+                + placeholders.join(QStringLiteral(", "))
+                + QStringLiteral(")"));
+            for(int i = 0; i < allUuids.size(); ++i) {
+                query.bindValue(
+                    QStringLiteral(":u") + QString::number(i),
+                    allUuids[i].toString());
+            }
+            if(Q_LIKELY(query.exec() && query.isSelect())) {
+                while(query.next()) {
+                    uuidToEquipDef.insert(
+                        query.value(0).toUuid(),
+                        query.value(1).toInt());
+                }
+            }
+        }
+    }
+
+    /* Populate FleetInfo vectors, one entry per ship */
+    for(const ShipRow &row : std::as_const(rows)) {
+        if(Q_UNLIKELY(!shipRegistry.contains(row.def)))
+            continue;
+        info.ships.push_back(shipRegistry[row.def]);
+
+        auto *dyn = new ShipDynamic();
+        dyn->star = row.star;
+        dyn->currentHP = row.currentHP;
+        dyn->condition = row.condition;
+        dyn->exp = row.exp;
+        dyn->expCap = row.expCap;
+        dyn->slotEquip = row.slots;
+        dyn->slotEquipEx = row.slotEx;
+        dyn->slotPlanes = row.planes;
+        dyn->fuel = row.fuel;
+        dyn->ammo = row.ammo;
+        dyn->fleetIndex = fleetIndex;
+        dyn->fleetPosIndex = row.fleetPosIndex;
+        info.shipDynamics.push_back(dyn);
+
+        std::vector<Equipment *> shipEquips;
+        std::vector<int> shipPlanes;
+        for(int i = 0; i < row.slots.size(); ++i) {
+            const QUuid &uuid = row.slots[i];
+            if(uuid.isNull())
+                continue;
+            auto it = uuidToEquipDef.find(uuid);
+            if(it == uuidToEquipDef.end())
+                continue;
+            if(!equipRegistry.contains(it.value()))
+                continue;
+            shipEquips.push_back(equipRegistry[it.value()]);
+            shipPlanes.push_back(row.planes[i]);
+        }
+        if(!row.slotEx.isNull()) {
+            auto it = uuidToEquipDef.find(row.slotEx);
+            if(it != uuidToEquipDef.end()
+               && equipRegistry.contains(it.value())) {
+                shipEquips.push_back(equipRegistry[it.value()]);
+                shipPlanes.push_back(0);
+            }
+        }
+        info.equipList.push_back(shipEquips);
+        info.planeCounts.push_back(shipPlanes);
+        info.equipEffectiveness.push_back(
+            std::vector<int>(shipEquips.size(), 1));
+        info.shipTags.push_back(0);
+    }
+
+    return info;
+}
+
 /* 6.1-map.md#Map relations */
 bool Server::clearMap(const CSteamID &uid, int mapUnionId) {
     bool result = false;

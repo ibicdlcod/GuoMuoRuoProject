@@ -2,6 +2,12 @@
 
 FleetInfo::FleetInfo() {}
 
+FleetInfo::~FleetInfo() {
+    for(ShipDynamic *dyn : shipDynamics) {
+        delete dyn;
+    }
+}
+
 double FleetInfo::los() {
     /* TODO: incomplete */
     return 0;

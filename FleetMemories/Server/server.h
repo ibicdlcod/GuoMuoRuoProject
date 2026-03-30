@@ -17,6 +17,7 @@
 
 #include "../Protocol/commandline.h"
 #include "../Protocol/equipment.h"
+#include "fleetinfo.h"
 #include "../Protocol/peerinfo.h"
 #include "../Protocol/receiver.h"
 #include "../Protocol/ship.h"
@@ -154,6 +155,7 @@ private:
                                KP::BattleAssessment assm);
     void progressMap(const CSteamID &, QSslSocket *, int, int,
                      bool retreat = false);
+    FleetInfo queryFleetInfo(const CSteamID &, int fleetIndex);
     std::optional<QList<int>> queryMapProgress(const CSteamID &, QSslSocket *,
                                                KP::BattleState,
                                                int map = 0, int node = 0);
