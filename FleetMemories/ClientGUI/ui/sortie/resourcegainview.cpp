@@ -15,6 +15,22 @@
 
 namespace {
 
+/* Proxy that keeps source row 0 (the Total row) pinned to position 0
+ * regardless of sort column or direction. */
+class PinnedRowSortProxy : public QSortFilterProxyModel {
+public:
+    using QSortFilterProxyModel::QSortFilterProxyModel;
+protected:
+    bool lessThan(const QModelIndex &left,
+                  const QModelIndex &right) const override {
+        if(left.row() == 0 && right.row() != 0)
+            return sortOrder() == Qt::AscendingOrder;
+        if(right.row() == 0 && left.row() != 0)
+            return sortOrder() == Qt::DescendingOrder;
+        return QSortFilterProxyModel::lessThan(left, right);
+    }
+};
+
 /* 6.2-supremacy.md#resource_gain */
 const QList<QString> resAttrs = {
     QStringLiteral("O"),
@@ -76,7 +92,7 @@ ResourceGainView::ResourceGainView(QWidget *parent)
     }
 
     table = new QTableView(this);
-    proxyModel = new QSortFilterProxyModel(this);
+    proxyModel = new PinnedRowSortProxy(this);
     proxyModel->setSourceModel(model);
     proxyModel->setSortRole(Qt::UserRole);
     table->setModel(proxyModel);
@@ -101,7 +117,24 @@ ResourceGainView::ResourceGainView(QWidget *parent)
 void ResourceGainView::populate(const QJsonObject &content) {
     model->removeRows(0, model->rowCount());
     Client &engine = Client::getInstance();
-    int row = 0;
+
+    /* Row 0 is the pinned Total row; insert it first so territory rows
+     * start at 1 and the proxy always keeps row 0 at the top. */
+    model->insertRow(0);
+    //% "Total"
+    model->setVerticalHeaderItem(
+        0, new QStandardItem(qtTrId("res-gain-total")));
+    auto *supTotalItem = new QStandardItem(QStringLiteral("-"));
+    supTotalItem->setData(0.0, Qt::UserRole);
+    supTotalItem->setTextAlignment(Qt::AlignRight | Qt::AlignVCenter);
+    model->setItem(0, 0, supTotalItem);
+
+    QMap<QString, double> totals;
+    for(const QString &attr : resAttrs) {
+        totals[attr] = 0.0;
+    }
+
+    int row = 1;
     for(auto it = content.constBegin();
         it != content.constEnd();
         ++it, ++row) {
@@ -126,6 +159,7 @@ void ResourceGainView::populate(const QJsonObject &content) {
         model->setItem(row, 0, supItem);
         for(int col = 0; col < resAttrs.size(); ++col) {
             double gain = resources.value(resAttrs[col]).toDouble();
+            totals[resAttrs[col]] += gain;
             auto *item = new QStandardItem(
                 QString::number(gain, 'f', 2));
             item->setData(gain, Qt::UserRole);
@@ -133,6 +167,16 @@ void ResourceGainView::populate(const QJsonObject &content) {
             model->setItem(row, col + 1, item);
         }
     }
+
+    for(int col = 0; col < resAttrs.size(); ++col) {
+        double total = totals[resAttrs[col]];
+        auto *item = new QStandardItem(
+            QString::number(total, 'f', 2));
+        item->setData(total, Qt::UserRole);
+        item->setTextAlignment(Qt::AlignRight | Qt::AlignVCenter);
+        model->setItem(0, col + 1, item);
+    }
+
     table->updateGeometry();
 }
 

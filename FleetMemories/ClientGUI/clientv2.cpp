@@ -99,6 +99,8 @@ Client::Client(QObject *parent)
         //% "Internal server initalize failed!"
         qCritical() << qtTrId("internal-server-fail");
     }
+    loadSupplyChain();
+    loadResourceMaps();
 }
 
 Client::~Client() noexcept {
@@ -563,6 +565,8 @@ void Client::receivedInfo(const QJsonObject &djson) {
         }
         break;
     case KP::InfoType::MapInfoUser: {
+        homeNation = static_cast<KP::AllegianceGroup>(
+            djson["homeport"].toInt());
         QJsonObject supremacies = djson["content"].toObject();
         for(QJsonObject::const_iterator iter = supremacies.constBegin();
              iter != supremacies.constEnd();
@@ -589,9 +593,6 @@ void Client::receivedInfo(const QJsonObject &djson) {
         emit progressToNode(node, nextNodeId);
         break;
     }
-    case KP::InfoType::ResourceGainInfo:
-        emit receivedResourceGainInfo(djson["content"].toObject());
-        break;
     default: throw std::domain_error("info type not supported"); break;
     }
 }
@@ -998,45 +999,48 @@ void Client::receivedMsg(const QJsonObject &djson) {
     }
     break;
     case KP::FleetFail: {
-        switch(djson["reason"].toInt()) {
-        case KP::FleetSizeError:
-            //% "Fleet is oversized or undersized."
-            qWarning() << qtTrId("fleet-size-error");
-            break;
-        case KP::FleetTypeError:
-            //% "Fleet does not suit its type."
-            qWarning() << qtTrId("fleet-type-error");
-            break;
-        case KP::FleetContainsDisabled:
-            //% "Fleet contains ships unavailable for battle."
-            qWarning() << qtTrId("fleet-disabled-error");
-            break;
-        case KP::EquipError:
-            //% "Fleet contains equipment unavailable for battle."
-            qWarning() << qtTrId("fleet-equip-error");
-            break;
-        case KP::FleetDontFitMap:
-            //% "Fleet don't fit this map."
-            qWarning() << qtTrId("fleet-dont-fit-map");
-            break;
-        case KP::FleetShipisUnderRepair:
-            qWarning() << qtTrId("ship-is-repairing");
-            break;
-        case KP::FleetShipNotSupplied:
-            //% "One or more ships are out of fuel or ammo."
-            qWarning() << qtTrId("fleet-ship-not-supplied");
-            break;
-        case KP::FleetBusyInBattle:
-            qWarning() << qtTrId("fleet-is-busy");
-            break;
-        case KP::FleetDuplicateRemodelGroup:
-            //% "Fleet contains duplicate ships!"
-            qWarning() << qtTrId("fleet-contains-duplicate");
-            break;
-        case KP::ValidFleet:
+        int reason = djson["reason"].toInt();
+        int fleetIndex = djson["fleetindex"].toInt(-1);
+        if(reason == KP::ValidFleet) {
             //% "Modify fleet success!"
             qInfo() << qtTrId("valid-fleet");
             break;
+        }
+        {
+            auto warn = qWarning();
+            switch(reason) {
+            case KP::FleetSizeError:
+                //% "Fleet is oversized or undersized."
+                warn << qtTrId("fleet-size-error"); break;
+            case KP::FleetTypeError:
+                //% "Fleet does not suit its type."
+                warn << qtTrId("fleet-type-error"); break;
+            case KP::FleetContainsDisabled:
+                //% "Fleet contains ships unavailable for battle."
+                warn << qtTrId("fleet-disabled-error"); break;
+            case KP::EquipError:
+                //% "Fleet contains equipment unavailable for battle."
+                warn << qtTrId("fleet-equip-error"); break;
+            case KP::FleetDontFitMap:
+                //% "Fleet don't fit this map."
+                warn << qtTrId("fleet-dont-fit-map"); break;
+            case KP::FleetShipisUnderRepair:
+                warn << qtTrId("ship-is-repairing"); break;
+            case KP::FleetShipNotSupplied:
+                //% "One or more ships are out of fuel or ammo."
+                warn << qtTrId("fleet-ship-not-supplied"); break;
+            case KP::FleetBusyInBattle:
+                warn << qtTrId("fleet-is-busy"); break;
+            case KP::FleetDuplicateRemodelGroup:
+                //% "Fleet contains duplicate ships!"
+                warn << qtTrId("fleet-contains-duplicate"); break;
+            case KP::FleetInsufficientResources:
+                //% "Insufficient Oil or Explosives for this sortie."
+                warn << qtTrId("fleet-insufficient-resources"); break;
+            }
+            if(fleetIndex >= 0)
+                //% "(fleet %1)"
+                warn << qtTrId("fleet-index-info").arg(fleetIndex + 1);
         }
     }
     break;

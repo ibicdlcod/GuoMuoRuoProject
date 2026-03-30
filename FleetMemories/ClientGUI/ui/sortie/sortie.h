@@ -40,6 +40,7 @@ protected:
 private slots:
     void battleProcess(const QJsonObject &djson);
     void confirmSortieStart();
+    void recalculateAttrition();
     void sortieEnd();
     void sortieStart(const QJsonObject &djson);
     void switchMap(int mapId);

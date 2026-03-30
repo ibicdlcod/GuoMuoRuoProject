@@ -264,13 +264,6 @@ QByteArray KP::clientDemandRepair(const QUuid &uuid, int slotnum,
     return QCborValue::fromJsonValue(result).toCbor();
 }
 
-QByteArray KP::clientDemandResourceGain() {
-    QJsonObject result;
-    result["type"] = DgramType::Request;
-    result["command"] = CommandType::DemandResourceGain;
-    return QCborValue::fromJsonValue(result).toCbor();
-}
-
 QByteArray KP::clientDemandResourceUpdate() {
     QJsonObject result;
     result["type"] = DgramType::Request;
@@ -643,11 +636,13 @@ QByteArray KP::serverFairyBusy(int jobID) {
     return QCborValue::fromJsonValue(result).toCbor();
 }
 
-QByteArray KP::serverFleetFailure(FleetFailType type) {
+QByteArray KP::serverFleetFailure(FleetFailType type, int fleetIndex) {
     QJsonObject result;
     result["type"] = DgramType::Message;
     result["msgtype"] = MsgType::FleetFail;
     result["reason"] = type;
+    if(fleetIndex >= 0)
+        result["fleetindex"] = fleetIndex;
     return QCborValue::fromJsonValue(result).toCbor();
 }
 
@@ -735,18 +730,12 @@ QByteArray KP::serverMapInfo(const QJsonArray &input,
     return QCborValue::fromJsonValue(result).toCbor();
 }
 
-QByteArray KP::serverResourceGainInfo(const QJsonObject &input) {
-    QJsonObject result;
-    result["type"] = DgramType::Info;
-    result["infotype"] = InfoType::ResourceGainInfo;
-    result["content"] = input;
-    return QCborValue::fromJsonValue(result).toCbor();
-}
-
-QByteArray KP::serverMapInfoUser(const QJsonObject &input) {
+QByteArray KP::serverMapInfoUser(const QJsonObject &input,
+                                  AllegianceGroup homePort) {
     QJsonObject result;
     result["type"] = DgramType::Info;
     result["infotype"] = InfoType::MapInfoUser;
+    result["homeport"] = static_cast<int>(homePort);
     result["content"] = input;
     return QCborValue::fromJsonValue(result).toCbor();
 }

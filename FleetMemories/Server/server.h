@@ -11,6 +11,7 @@
 #include <QSslConfiguration>
 #include <QtNetwork>
 #include <random>
+#include <tuple>
 #include <sol/sol.hpp>
 #include "steam/steamclientpublic.h"
 
@@ -61,7 +62,6 @@ private slots:
                                  bool, bool);
     void offerRankInfo(const CSteamID &, QSslSocket *, int rpp,
                        std::optional<int> page = std::nullopt);
-    void offerResourceGainInfo(const CSteamID &, QSslSocket *);
     void offerResourceInfo(QSslSocket *, const CSteamID &);
     void offerShipInfo(QSslSocket *);
     void offerShipInfoUser(const CSteamID &, QSslSocket *);
@@ -75,6 +75,8 @@ private:
     bool addEquipStar(const QUuid &, int);
     bool clearMap(const CSteamID &, int);
     void clearNegativeSkillPoints(const CSteamID &);
+    std::tuple<bool, bool, double> computeSupplyAttrition(
+        const CSteamID &, int mapUnionId, KP::Difficulty);
     void conditionDrop(const CSteamID &, int, int, bool expedition = false);
     void decideHomePort(const CSteamID &, QSslSocket *);
     void decryptDatagram(QSslSocket *, const QByteArray &);
@@ -188,7 +190,8 @@ private:
     void sqlinitVCR() const;
     void startSortie(const CSteamID &, QSslSocket *, int, int, bool);
     void switchCert(const QStringList &);
-    KP::FleetFailType updateFleet(const CSteamID &, const QJsonArray &);
+    std::pair<KP::FleetFailType, int> updateFleet(const CSteamID &,
+                                                  const QJsonArray &);
     int userOwnsRemodelGroup(const CSteamID &, Ship *);
     int userRemodelGroupMaxExp(const CSteamID &, Ship *);
     void userInit(const CSteamID &);

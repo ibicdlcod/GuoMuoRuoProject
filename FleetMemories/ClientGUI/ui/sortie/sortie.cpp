@@ -7,13 +7,16 @@
 #include <QLabel>
 #include <QMessageBox>
 #include <QPainter>
+#include <QQueue>
 #include <QResizeEvent>
+#include <QSet>
 #include <QTimer>
 
 #include "../../clientv2.h"
 #include "../mainwindow.h"
 #include "battleplan.h"
 #include "confirmsortie.h"
+#include "../../../Protocol/utility.h"
 
 extern std::unique_ptr<QSettings> settings;
 
@@ -53,6 +56,12 @@ Sortie::Sortie(QWidget *parent)
             resourceGainW, &ResourceGainView::populate);
     connect(ui->diffChoice, &QComboBox::currentTextChanged,
             renderer, &MapRender::setDiff);
+    connect(ui->diffChoice, &QComboBox::currentTextChanged,
+            this, [this](const QString &) {
+        recalculateAttrition();
+    });
+    connect(&engine, &Client::mapSupremacyChanged,
+            this, &Sortie::recalculateAttrition);
 }
 
 Sortie::~Sortie()
@@ -139,6 +148,64 @@ void Sortie::resizeEvent(QResizeEvent *event) {
     QWidget::resizeEvent(event);
 }
 
+/* 8.1-supply.md#Supply_chain_and_attrition
+ * Attrition = exp(Σ max(0,-log(sᵢ))) - 1 along the
+ * minimum-cost path from any unlocked home port.
+ * Uses multi-source Dijkstra (see computeAttrition). */
+void Sortie::recalculateAttrition() {
+    Client &engine = Client::getInstance();
+    if(mapIndex == 0) {
+        ui->attritionValue->setText(
+            qtTrId("supply-attrition-na"));
+        return;
+    }
+
+    double expectedSupremacy = 100.0;
+    QString diffText = ui->diffChoice->currentText();
+    if(diffText == qtTrId("diff-b")) {
+        expectedSupremacy = 200.0;
+    }
+    else if(diffText == qtTrId("diff-a")
+            || diffText == qtTrId("diff-s")) {
+        expectedSupremacy = 300.0;
+    }
+    expectedSupremacy *= KP::expeditionSupremacyMaxFactor;
+
+    QHash<int, QSet<int>> adj =
+        Utility::buildSupplyAdjacency(engine.supplyChainEdges,
+                                      engine.mapSupremacies);
+
+    auto [reachable, finiteRoute, attrition] =
+        Utility::computeAttrition(adj, engine.mapSupremacies,
+                                  mapIndex, expectedSupremacy);
+
+    if(!reachable) {
+        //% "N/A (no route)"
+        ui->attritionValue->setText(
+            qtTrId("supply-attrition-no-route"));
+        return;
+    }
+    if(!finiteRoute) {
+        //% "∞ (supply line broken)"
+        ui->attritionValue->setText(
+            qtTrId("supply-attrition-broken"));
+        return;
+    }
+    if(attrition <= 0.0) {
+        if(mapIndex == KP::homePortMap(engine.homeNation)) {
+            //% "0% (home port)"
+            ui->attritionValue->setText(
+                qtTrId("supply-attrition-home"));
+        } else {
+            ui->attritionValue->setText(
+                QStringLiteral("0%"));
+        }
+        return;
+    }
+    ui->attritionValue->setText(
+        QString::number(attrition * 100.0, 'f', 1) + "%");
+}
+
 void Sortie::switchMap(int mapId) {
     mapIndex = mapId;
     Client &engine = Client::getInstance();
@@ -184,6 +251,7 @@ void Sortie::switchMap(int mapId) {
     if(index < ui->diffChoice->count()) {
         ui->diffChoice->setCurrentIndex(index);
     }
+    recalculateAttrition();
 }
 
 void Sortie::confirmSortieStart() {

@@ -14,6 +14,7 @@
 
 #include "../Protocol/kp.h"
 #include "../Protocol/lua.h"
+#include "../Protocol/utility.h"
 
 #include "fleetinfo.h"
 #include "kerrors.h"
@@ -996,6 +997,59 @@ void Server::progressMap(const CSteamID &uid, QSslSocket *connection,
                     updQ.exec();
                 }
             }
+
+            /* 8.1-supply.md#Supply_chain_and_attrition — per-node attrition
+             * cost: sum of (effective fraction used × FuelConsumption /
+             * AmmoConsumption) across the fleet, multiplied by the sortie
+             * attrition stored at sortie start. */
+            QSqlQuery attrValQ;
+            attrValQ.prepare(
+                "SELECT Realvalue FROM UserAttr "
+                "WHERE UserID = :uid AND Attribute = :attr;");
+            attrValQ.bindValue(":uid", uid.ConvertToUint64());
+            attrValQ.bindValue(":attr", KP::attrAttrition);
+            if(Q_LIKELY(attrValQ.exec() && attrValQ.isSelect()
+                        && attrValQ.first())) {
+                double attrition = attrValQ.value(0).toDouble();
+                if(attrition > 0.0) {
+                    QSqlQuery costQ;
+                    costQ.prepare(
+                        "SELECT "
+                        "  SUM(MIN(Fuel,  :fuelFrac) "
+                        "      * COALESCE(fc.Intvalue, 0)), "
+                        "  SUM(MIN(Ammo,  :ammoFrac) "
+                        "      * COALESCE(ac.Intvalue, 0)) "
+                        "FROM UserShip "
+                        "LEFT JOIN ShipReg fc "
+                        "  ON UserShip.ShipDef = fc.ShipID "
+                        "  AND fc.Attribute = 'FuelConsumption' "
+                        "LEFT JOIN ShipReg ac "
+                        "  ON UserShip.ShipDef = ac.ShipID "
+                        "  AND ac.Attribute = 'AmmoConsumption' "
+                        "WHERE User = :uid AND FleetIndex = :fi;");
+                    costQ.bindValue(":fuelFrac", fuelFrac);
+                    costQ.bindValue(":ammoFrac", ammoFrac);
+                    costQ.bindValue(":uid", uid.ConvertToUint64());
+                    costQ.bindValue(":fi", activeFleet);
+                    if(Q_LIKELY(costQ.exec() && costQ.isSelect()
+                                && costQ.first())) {
+                        double oilCost  = costQ.value(0).toDouble() * attrition;
+                        double exploCost = costQ.value(1).toDouble() * attrition;
+                        QSqlQuery deductQ;
+                        deductQ.prepare(
+                            "UPDATE UserAttr "
+                            "SET Intvalue = CASE Attribute "
+                            "WHEN 'O' THEN Intvalue - :oil "
+                            "WHEN 'E' THEN Intvalue - :explo END "
+                            "WHERE UserID = :uid "
+                            "AND Attribute IN ('O', 'E');");
+                        deductQ.bindValue(":oil",   oilCost);
+                        deductQ.bindValue(":explo", exploCost);
+                        deductQ.bindValue(":uid",   uid.ConvertToUint64());
+                        deductQ.exec();
+                    }
+                }
+            }
         }
         {
             QSqlQuery query;
@@ -1063,7 +1117,8 @@ void Server::startSortie(const CSteamID &uid, QSslSocket *connection,
             return;
         }
         else if(query.first()) {
-            QByteArray msg = KP::serverFleetFailure(KP::FleetShipisUnderRepair);
+            QByteArray msg = KP::serverFleetFailure(KP::FleetShipisUnderRepair,
+                                                     fleetIndex);
             senderM.sendMessage(connection, msg);
             return;
         }
@@ -1086,9 +1141,70 @@ void Server::startSortie(const CSteamID &uid, QSslSocket *connection,
             return;
         }
         else if(supplyQuery.first()) {
-            QByteArray msg = KP::serverFleetFailure(KP::FleetShipNotSupplied);
+            QByteArray msg = KP::serverFleetFailure(KP::FleetShipNotSupplied,
+                                                     fleetIndex);
             senderM.sendMessage(connection, msg);
             return;
+        }
+
+        /* 8.1-supply.md#Supply_chain_and_attrition — resource sufficiency check.
+         * Total max consumption is multiplied by the attrition factor and
+         * compared against the user's current Oil and Explosives.
+         * Infinite attrition (broken or unreachable supply line) is rejected
+         * outright. The computed attrition is stored in UserAttr for the
+         * duration of this sortie. */
+        double sortieAttrition = 0.0;
+        {
+            auto [reachable, finiteRoute, attrition] =
+                computeSupplyAttrition(uid, unionId, diff);
+            if(!finiteRoute) {
+                QByteArray msg = KP::serverFleetFailure(
+                    KP::FleetInsufficientResources, fleetIndex);
+                senderM.sendMessage(connection, msg);
+                return;
+            }
+            sortieAttrition = attrition;
+
+            if(attrition > 0.0) {
+                QSqlQuery consQuery;
+                consQuery.prepare(
+                    "SELECT "
+                    "  COALESCE(SUM(fc.Intvalue), 0) AS TotalFuel, "
+                    "  COALESCE(SUM(ac.Intvalue), 0) AS TotalAmmo "
+                    "FROM UserShip "
+                    "LEFT JOIN ShipReg fc "
+                    "  ON UserShip.ShipDef = fc.ShipID "
+                    "  AND fc.Attribute = 'FuelConsumption' "
+                    "LEFT JOIN ShipReg ac "
+                    "  ON UserShip.ShipDef = ac.ShipID "
+                    "  AND ac.Attribute = 'AmmoConsumption' "
+                    "WHERE User = :uid "
+                    "  AND FleetIndex = :fleetindex "
+                    "  AND FleetFled = 0;");
+                consQuery.bindValue(":uid", uid.ConvertToUint64());
+                consQuery.bindValue(":fleetindex", fleetIndex);
+                if(Q_UNLIKELY(!consQuery.exec() || !consQuery.isSelect())) {
+                    //% "User %1: start map %2 failure due to resource check!"
+                    throw DBError(
+                        qtTrId("sortie-start-failure-rescheck")
+                            .arg(uid.ConvertToUint64()).arg(mapId),
+                        consQuery.lastError(), consQuery.lastQuery());
+                    return;
+                }
+                consQuery.first();
+                int oilNeeded = static_cast<int>(
+                    std::ceil(consQuery.value(0).toInt() * attrition));
+                int exploNeeded = static_cast<int>(
+                    std::ceil(consQuery.value(1).toInt() * attrition));
+
+                ResOrd res = User::getCurrentResources(uid);
+                if(res.o < oilNeeded || res.e < exploNeeded) {
+                    QByteArray msg = KP::serverFleetFailure(
+                        KP::FleetInsufficientResources, fleetIndex);
+                    senderM.sendMessage(connection, msg);
+                    return;
+                }
+            }
         }
 
         FleetInfo info;
@@ -1106,7 +1222,8 @@ void Server::startSortie(const CSteamID &uid, QSslSocket *connection,
         if(result.valid()) {
             int startNode = result;
             if(startNode == 0) { // not valid
-                QByteArray msg = KP::serverFleetFailure(KP::FleetDontFitMap);
+                QByteArray msg = KP::serverFleetFailure(KP::FleetDontFitMap,
+                                                         fleetIndex);
                 senderM.sendMessage(connection, msg);
             }
             else {
@@ -1168,6 +1285,23 @@ void Server::startSortie(const CSteamID &uid, QSslSocket *connection,
                         query3.lastError(), query3.lastQuery());
                     return;
                 }
+                QSqlQuery attrQuery;
+                attrQuery.prepare(
+                    "INSERT INTO UserAttr (UserID, Attribute, Realvalue) "
+                    "VALUES (:uid, :attr, :value) "
+                    "ON CONFLICT(UserID, Attribute) "
+                    "DO UPDATE SET Realvalue = excluded.Realvalue;");
+                attrQuery.bindValue(":uid", uid.ConvertToUint64());
+                attrQuery.bindValue(":attr", KP::attrAttrition);
+                attrQuery.bindValue(":value", sortieAttrition);
+                if(Q_UNLIKELY(!attrQuery.exec())) {
+                    //% "User %1: start sortie failure!"
+                    throw DBError(
+                        qtTrId("sortie-start-failure-general")
+                            .arg(uid.ConvertToUint64()),
+                        attrQuery.lastError(), attrQuery.lastQuery());
+                    return;
+                }
                 QByteArray msg = KP::serverMapStart(mapId, startNode);
                 senderM.sendMessage(connection, msg);
             }
@@ -1181,6 +1315,66 @@ void Server::startSortie(const CSteamID &uid, QSslSocket *connection,
             return;
         }
     }
+}
+
+/* 8.1-supply.md#Supply_chain_and_attrition
+ * Server-side attrition query: reads supremacies and supply chain
+ * edges directly from the database then delegates to Utility. */
+std::tuple<bool, bool, double>
+Server::computeSupplyAttrition(const CSteamID &uid,
+                               int mapUnionId,
+                               KP::Difficulty diff)
+{
+    QMap<int, double> supremacies;
+    {
+        QSqlQuery query;
+        query.prepare("SELECT MapDef, Supremacy FROM UserMapState "
+                      "WHERE User = :uid");
+        query.bindValue(":uid", uid.ConvertToUint64());
+        if(Q_LIKELY(query.exec() && query.isSelect())) {
+            while(query.next()) {
+                supremacies.insert(query.value(0).toInt(),
+                                   query.value(1).toDouble());
+            }
+        }
+        else {
+            //% "Database failed when reading map supremacies!"
+            throw DBError(qtTrId("dbfail-map-supremacies"),
+                          query.lastError());
+        }
+    }
+
+    QList<QPair<int, int>> edges;
+    {
+        QSqlQuery query;
+        query.prepare("SELECT Node1, Node2 FROM MapRelation "
+                      "WHERE Type != 'RS'");
+        if(Q_LIKELY(query.exec() && query.isSelect())) {
+            while(query.next()) {
+                edges.append({query.value(0).toInt(),
+                              query.value(1).toInt()});
+            }
+        }
+        else {
+            //% "Database failed when reading map relations!"
+            throw DBError(qtTrId("dbfail-map-relations"),
+                          query.lastError());
+        }
+    }
+
+    double expectedSupremacy = 100.0;
+    if(diff == KP::MidWar) {
+        expectedSupremacy = 200.0;
+    }
+    else if(diff == KP::LateWar || diff == KP::Historical) {
+        expectedSupremacy = 300.0;
+    }
+    expectedSupremacy *= KP::expeditionSupremacyMaxFactor;
+
+    QHash<int, QSet<int>> adj =
+        Utility::buildSupplyAdjacency(edges, supremacies);
+    return Utility::computeAttrition(adj, supremacies,
+                                     mapUnionId, expectedSupremacy);
 }
 
 QT_END_NAMESPACE

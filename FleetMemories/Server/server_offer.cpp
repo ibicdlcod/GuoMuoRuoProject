@@ -505,7 +505,8 @@ void Server::offerMapInfoUser(const CSteamID &uid, QSslSocket *connection)
     for(const auto [mapId, supremacy]: supremacies.asKeyValueRange()) {
         mapSupremacies[QString::number(mapId)] = supremacy;
     }
-    QByteArray msg = KP::serverMapInfoUser(mapSupremacies);
+    KP::AllegianceGroup homePort = User::checkHomePort(uid);
+    QByteArray msg = KP::serverMapInfoUser(mapSupremacies, homePort);
     senderM.sendMessage(connection, msg);
 }
 
@@ -614,61 +615,6 @@ void Server::offerResourceInfo(QSslSocket *connection,
     connection->flush();
     senderM.sendMessage(connection, msg);
     connection->flush();
-}
-
-void Server::offerResourceGainInfo(const CSteamID &uid,
-                                   QSslSocket *connection) {
-    QSqlQuery query;
-    query.prepare("SELECT e.LandMap, "
-                  "e.Attribute, "
-                  "SUM(e.d * max(0.0, Supremacy) / :ctrl) AS gain, "
-                  "SUM(max(0.0, Supremacy) * e.b) AS avg_supremacy "
-                  "FROM UserMapState "
-                  "INNER JOIN "
-                  "(SELECT MapResource.MapID AS LandMap, "
-                  "MapResource.Attribute, "
-                  "MapResource.Intvalue * c.b AS d, c.b AS b, c.Node2 "
-                  "FROM MapResource "
-                  "INNER JOIN "
-                  "(SELECT MapRelation.Node1, MapRelation.Node2, a.b "
-                  "FROM MapRelation "
-                  "INNER JOIN "
-                  "(SELECT Node1, 1.0/COUNT(*) AS b "
-                  "FROM MapRelation "
-                  "WHERE Type = 'RS' "
-                  "GROUP BY Node1) a "
-                  "ON MapRelation.Node1 = a.Node1) c "
-                  "ON MapResource.MapID = c.Node1 "
-                  "WHERE MapResource.Attribute != 'x' "
-                  "AND MapResource.Attribute != 'y') e "
-                  "ON UserMapState.MapDef = e.Node2 "
-                  "WHERE UserMapState.User = :uid "
-                  "GROUP BY e.LandMap, e.Attribute "
-                  "ORDER BY e.LandMap, e.Attribute;");
-    query.bindValue(":ctrl", settings->value("rule/mapresourcecontrol",
-                                             1000).toDouble());
-    query.bindValue(":uid", uid.ConvertToUint64());
-    if(!query.exec() || !query.isSelect()) {
-        //% "Get user %1's resource gain failed!"
-        throw DBError(qtTrId("user-get-resource-gain-failed")
-                      .arg(uid.ConvertToUint64()),
-                      query.lastError(), query.lastQuery());
-    }
-    QJsonObject content;
-    while(query.next()) {
-        QString landMap = QString::number(query.value(0).toInt());
-        QString attr    = query.value(1).toString();
-        double gain     = query.value(2).toDouble();
-        double avgSup   = query.value(3).toDouble();
-        QJsonObject mapObj = content[landMap].toObject();
-        if(!mapObj.contains(QStringLiteral("supremacy"))) {
-            mapObj[QStringLiteral("supremacy")] = avgSup;
-        }
-        mapObj[attr] = gain;
-        content[landMap] = mapObj;
-    }
-    QByteArray msg = KP::serverResourceGainInfo(content);
-    senderM.sendMessage(connection, msg);
 }
 
 void Server::offerTechInfo(QSslSocket *connection, const CSteamID &uid,

@@ -86,11 +86,15 @@ static constexpr const char *attrARDCoupon = "ARDCoupon";
 static constexpr const char *attrMedal = "Medal";
 /* 5.9-cloning.md */
 static constexpr const char *attrSanity = "Sanity";
+/* 8.1-supply.md#Supply_chain_and_attrition */
+static constexpr const char *attrAttrition = "Attrition";
 static constexpr double ardCouponUnitHKD = 0.01;
 static constexpr int ardCouponMaxUnits = 65536;
 static constexpr int medalCostPerUnit = 999;
 static constexpr int decorationCostMedal = 1;
 static constexpr int ardCouponItemId = 6;
+static constexpr double expeditionSupremacyMaxFactor = 0.8;
+
 /* Returns the real price in HKD cents after logarithmic volume discount */
 int ardRealPriceHKDCents(int units);
 #if PRODUCTION_ENV
@@ -237,7 +241,6 @@ enum CommandType{
     BuyFromStore,
     BuyMedal,
     DecorateShip,
-    DemandResourceGain,
     InitARDPurchase,
     SupplyShip,
 };
@@ -311,7 +314,6 @@ enum InfoType{
     MapInfoUser,
     MapStart,
     MapProgress,
-    ResourceGainInfo,
 };
 Q_ENUM_NS(InfoType)
 
@@ -348,6 +350,7 @@ enum FleetFailType{
     FleetDuplicateRemodelGroup,
     FleetShipisUnderRepair,
     FleetShipNotSupplied,
+    FleetInsufficientResources,
 };
 Q_ENUM_NS(FleetFailType)
 
@@ -387,6 +390,21 @@ enum AllegianceGroup{
     Fantasy = 0xF
 };
 Q_ENUM_NS(AllegianceGroup)
+
+/* 5.2-homeport.md — home port map union ID for each nation */
+constexpr int homePortMap(AllegianceGroup nation) {
+    switch(nation) {
+    case Japanese:     return 1;
+    case German:       return 52;
+    case Italian:      return 71;
+    case American:     return 67;
+    case British:      return 57;
+    case French:       return 58;
+    case Soviet:       return 46;
+    case Commonwealth: return 35;
+    default:           return 0;
+    }
+}
 
 enum AllegianceSubGroup{
     DUnknownNation = 0x00,
@@ -684,7 +702,6 @@ QByteArray clientDemandModernize(const QList<QUuid> &, bool);
 QByteArray clientDemandRankInfo(int, std::optional<int> page = std::nullopt);
 QByteArray clientDemandRepair(const QUuid &, int,
                               bool stop = false, bool forced = false);
-QByteArray clientDemandResourceGain();
 QByteArray clientDemandResourceUpdate();
 QByteArray clientDemandShipInfo(QDateTime timeUtc
                                 = QDateTime(QDate(1970, 1, 1),
@@ -834,7 +851,7 @@ QByteArray serverEquipInfo(const QJsonArray &, bool user = false,
                            QDateTime timeUtc = QDateTime::currentDateTimeUtc(),
                            bool cacheHit = false);
 QByteArray serverFairyBusy(int);
-QByteArray serverFleetFailure(FleetFailType);
+QByteArray serverFleetFailure(FleetFailType, int fleetIndex = -1);
 QByteArray serverGlobalTech(double, int);
 QByteArray serverGlobalTech(const QList<TechEntry> &, bool);
 QByteArray serverHello();
@@ -845,7 +862,8 @@ QByteArray serverLogout(LogoutType);
 QByteArray serverMapInfo(const QJsonArray &,
                          QDateTime timeUtc = QDateTime::currentDateTimeUtc(),
                          bool cacheHit = false);
-QByteArray serverMapInfoUser(const QJsonObject &);
+QByteArray serverMapInfoUser(const QJsonObject &,
+                             AllegianceGroup homePort);
 QByteArray serverMapNotOpen(int mapId);
 QByteArray serverMapProgress(int mapId, int nextNode);
 QByteArray serverMapStart(int mapId, int startNode);
@@ -857,7 +875,6 @@ QByteArray serverParseError(MsgType, const QString &,
                             const QString &);
 QByteArray serverPenguin();
 QByteArray serverRankInfo(const QJsonArray &, int, std::optional<double>);
-QByteArray serverResourceGainInfo(const QJsonObject &);
 QByteArray serverResourceUpdate(ResOrd, ResExotic);
 QByteArray serverShipBPInfo(const QJsonObject &);
 QByteArray serverShipInfo(const QJsonArray &, bool user = false,

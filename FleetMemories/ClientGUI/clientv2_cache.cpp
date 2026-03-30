@@ -2,9 +2,14 @@
  * SPDX-License-Identifier: AGPL-3.0-or-later */
 
 #include "clientv2.h"
-#include <QSettings>
+
+#include <QCoreApplication>
 #include <QEventLoop>
+#include <QFile>
+#include <QSettings>
+#include <QTextStream>
 #include <QTimer>
+
 #include "networkerror.h"
 
 using namespace std::chrono_literals;
@@ -44,9 +49,38 @@ void Client::demandMapSupremacy() {
     sender->enqueue(msg);
 }
 
+/* 6.2-supremacy.md#Resource_gain
+ * Compute resource gain client-side using Map_nodes.csv base values,
+ * Map_relations.csv RS edges (loaded at startup into resourceMapBases /
+ * resourceMapLinks), and cached mapSupremacies.
+ * WARNING: displayed values may be nonsensical if the client-side CSV
+ * files differ from the server's copies. */
 void Client::demandResourceGain() {
-    QByteArray msg = KP::clientDemandResourceGain();
-    sender->enqueue(msg);
+    QJsonObject result;
+    for(auto it = resourceMapBases.constBegin();
+        it != resourceMapBases.constEnd(); ++it) {
+        int resMapId = it.key();
+        const QMap<QString, double> &bases = it.value();
+        QList<int> seaMaps = resourceMapLinks.values(resMapId);
+        int count = seaMaps.size();
+        double totalSup = 0.0;
+        for(int seaId : seaMaps) {
+            double sup = mapSupremacies.value(seaId, 0.0);
+            if(sup > 0.0) {
+                totalSup += sup;
+            }
+        }
+        double avgSup = (count > 0) ? totalSup / count : 0.0;
+        QJsonObject entry;
+        entry[QStringLiteral("supremacy")] = avgSup;
+        for(auto rit = bases.constBegin(); rit != bases.constEnd(); ++rit) {
+            /* avgSup is in percentage units (0–300), not a fraction;
+             * matches server: SUM(base * (1/count) * supremacy_i / ctrl) */
+            entry[rit.key()] = avgSup * rit.value() / 1000.0;
+        }
+        result[QString::number(resMapId)] = entry;
+    }
+    emit receivedResourceGainInfo(result);
 }
 
 void Client::demandShipCache() {
@@ -147,6 +181,128 @@ void Client::updateMapCache(const QJsonObject &input) {
 
     mapRegistryCacheGood = true;
     emit mapRegistryComplete();
+}
+
+/* 8.1-supply.md#Supply_chain_and_attrition
+ * Load undirected supply chain edges from Map_relations.csv.
+ * Only rows whose Type is not "RS" are supply chain edges.
+ * RS rows link resource virtual maps to coastal maps and
+ * are not part of the supply routing graph. */
+void Client::loadSupplyChain() {
+    QString path = QCoreApplication::applicationDirPath()
+                   + "/Map_relations.csv";
+    QFile file(path);
+    if(!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        //% "Map_relations.csv not found: %1"
+        qWarning() << qtTrId("map-relations-not-found")
+                          .arg(file.errorString());
+        return;
+    }
+    QTextStream in(&file);
+    QString header = in.readLine(); /* skip header row */
+    Q_UNUSED(header)
+    while(!in.atEnd()) {
+        QString line = in.readLine().trimmed();
+        if(line.isEmpty()) {
+            continue;
+        }
+        QStringList parts = line.split(',');
+        if(parts.size() < 3) {
+            continue;
+        }
+        QString type = parts[0].trimmed();
+        if(type == "RS") {
+            continue; /* resource-map links, not supply routes */
+        }
+        bool okA = false, okB = false;
+        int a = parts[1].trimmed().toInt(&okA);
+        int b = parts[2].trimmed().toInt(&okB);
+        if(okA && okB) {
+            supplyChainEdges.append({a, b});
+        }
+    }
+}
+
+/* 6.2-supremacy.md#Resource_gain
+ * Load resource base values from Map_nodes.csv (rows with ID > 1024)
+ * and RS edges from Map_relations.csv into resourceMapBases /
+ * resourceMapLinks for client-side resource gain display. */
+void Client::loadResourceMaps() {
+    /* --- Map_nodes.csv ------------------------------------------ */
+    static const QStringList csvAttrs = {
+        QStringLiteral("O"), QStringLiteral("E"), QStringLiteral("S"),
+        QStringLiteral("A"), QStringLiteral("R"), QStringLiteral("W"),
+        QStringLiteral("C")
+    };
+    QString nodesPath = QCoreApplication::applicationDirPath()
+                        + "/Map_nodes.csv";
+    QFile nodesFile(nodesPath);
+    if(!nodesFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        //% "Map_nodes.csv not found: %1"
+        qWarning() << qtTrId("map-nodes-not-found")
+                          .arg(nodesFile.errorString());
+    } else {
+        QTextStream in(&nodesFile);
+        in.readLine(); /* descriptive header row  */
+        in.readLine(); /* column-name header row  */
+        while(!in.atEnd()) {
+            QString line = in.readLine().trimmed();
+            if(line.isEmpty()) {
+                continue;
+            }
+            QStringList parts = line.split(',');
+            if(parts.size() < 13) {
+                continue;
+            }
+            bool ok = false;
+            int id = parts[0].trimmed().toInt(&ok);
+            if(!ok || id <= 1024) {
+                continue; /* regular sea maps have no resource columns */
+            }
+            QMap<QString, double> bases;
+            for(int i = 0; i < csvAttrs.size(); ++i) {
+                QString val = parts[6 + i].trimmed();
+                if(!val.isEmpty()) {
+                    bases[csvAttrs[i]] = val.toDouble();
+                }
+            }
+            if(!bases.isEmpty()) {
+                resourceMapBases[id] = bases;
+            }
+        }
+    }
+
+    /* --- Map_relations.csv (RS entries only) -------------------- */
+    QString relPath = QCoreApplication::applicationDirPath()
+                      + "/Map_relations.csv";
+    QFile relFile(relPath);
+    if(!relFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        return; /* already warned in loadSupplyChain() */
+    }
+    QTextStream rin(&relFile);
+    rin.readLine(); /* skip header */
+    while(!rin.atEnd()) {
+        QString line = rin.readLine().trimmed();
+        if(line.isEmpty()) {
+            continue;
+        }
+        QStringList parts = line.split(',');
+        if(parts.size() < 3 || parts[0].trimmed() != QStringLiteral("RS")) {
+            continue;
+        }
+        bool okA = false, okB = false;
+        int a = parts[1].trimmed().toInt(&okA);
+        int b = parts[2].trimmed().toInt(&okB);
+        if(!okA || !okB) {
+            continue;
+        }
+        /* node1 is the resource map (>1024), node2 the sea map */
+        if(a > 1024) {
+            resourceMapLinks.insert(a, b);
+        } else {
+            resourceMapLinks.insert(b, a);
+        }
+    }
 }
 
 /* Not generalized because used as slots */

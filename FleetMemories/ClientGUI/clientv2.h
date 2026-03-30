@@ -236,6 +236,8 @@ private:
     void sendTestMessages();
     void showCommands(bool);
     void switchCert(const QStringList &);
+    void loadResourceMaps();
+    void loadSupplyChain();
     void updateEquipCache(const QJsonObject &);
     void updateMapCache(const QJsonObject &);
     void updateShipCache(const QJsonObject &);
@@ -269,6 +271,17 @@ public:
     QMap<int, MapWithDiff *> mapRegistryCache;
     bool mapRegistryCacheGood = false;
     QMap<int, double> mapSupremacies;
+    KP::AllegianceGroup homeNation = KP::UnknownNation;
+    /* 8.1-supply.md#Supply_chain_and_attrition:
+     * undirected edges loaded from Map_relations.csv */
+    QList<QPair<int,int>> supplyChainEdges;
+    /* 6.2-supremacy.md#Resource_gain:
+     * RS edges and base values loaded from Map_relations.csv /
+     * Map_nodes.csv for client-side resource gain display.
+     * WARNING: display may be nonsensical if CSV files differ from
+     * the server's copies. */
+    QMultiMap<int,int> resourceMapLinks;        /* resource_map_id → sea_map_id */
+    QMap<int, QMap<QString,double>> resourceMapBases; /* resource_map_id → {attr → base} */
 private:
     QHttpServer migrateServer;
     std::unique_ptr<QTcpServer> tcpServer = std::make_unique<QTcpServer>();
