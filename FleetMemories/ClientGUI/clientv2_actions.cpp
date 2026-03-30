@@ -143,6 +143,14 @@ void Client::doBuyMedal(int amount) {
     sender->enqueue(msg);
 }
 
+void Client::doBuyOrdinaryResources(const QString &attr, int coupons) {
+    if(coupons < 1 || KP::ordResRate(attr) == 0) {
+        return;
+    }
+    QByteArray msg = KP::clientBuyOrdinaryResources(attr, coupons);
+    sender->enqueue(msg);
+}
+
 void Client::doConstructShip(int shipDef, const QList<QUuid> &defaultEquips,
                                QUuid shipToRemodel,
                                int factoryID) {

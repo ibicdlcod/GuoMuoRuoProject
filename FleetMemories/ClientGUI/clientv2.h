@@ -112,6 +112,7 @@ public slots:
     void doBuyEquip(int equipDef);
     void doBuyFromStore(int equipDef);
     void doBuyMedal(int amount);
+    void doBuyOrdinaryResources(const QString &attr, int coupons);
     void doConstructShip(int shipDef, const QList<QUuid> &defaultEquips,
                          QUuid shipToRemodel, int factoryID);
     void doDestructEquip(const QList<QUuid> &);

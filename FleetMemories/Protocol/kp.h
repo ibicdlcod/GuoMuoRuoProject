@@ -91,6 +91,17 @@ static constexpr const char *attrAttrition = "Attrition";
 static constexpr double ardCouponUnitHKD = 0.01;
 static constexpr int ardCouponMaxUnits = 65536;
 static constexpr int medalCostPerUnit = 999;
+/* Ordinary resource exchange rate: units received per ARD Coupon spent */
+inline int ordResRate(const QString &attr) {
+    if(attr == QStringLiteral("O")
+        || attr == QStringLiteral("E")
+        || attr == QStringLiteral("S")) return 10;
+    if(attr == QStringLiteral("A")) return 6;
+    if(attr == QStringLiteral("R")
+        || attr == QStringLiteral("W")
+        || attr == QStringLiteral("C")) return 4;
+    return 0; /* invalid attr */
+}
 static constexpr int decorationCostMedal = 1;
 static constexpr int ardCouponItemId = 6;
 static constexpr double expeditionSupremacyMaxFactor = 0.8;
@@ -243,6 +254,7 @@ enum CommandType{
     DecorateShip,
     InitARDPurchase,
     SupplyShip,
+    BuyOrdinaryResources,
 };
 Q_ENUM_NS(CommandType)
 
@@ -683,6 +695,7 @@ QByteArray clientARDPurchaseAuth(quint64 orderId, bool authorized);
 QByteArray clientBuy(int);
 QByteArray clientBuyFromStore(int equipDef);
 QByteArray clientBuyMedal(int amount);
+QByteArray clientBuyOrdinaryResources(const QString &attr, int coupons);
 QByteArray clientChooseNode(int mapId, int chosenNodeId);
 QByteArray clientConstruct(int,
                            const QList<QUuid> &,

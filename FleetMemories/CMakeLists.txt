@@ -145,6 +145,8 @@ set(CLIENT_SOURCES
     ClientGUI/ui/shop/ardcoupondialog.h
     ClientGUI/ui/shop/buyequipdialog.cpp
     ClientGUI/ui/shop/buyequipdialog.h
+    ClientGUI/ui/shop/buyordresourcesdialog.cpp
+    ClientGUI/ui/shop/buyordresourcesdialog.h
     ClientGUI/ui/shop/medalbuydialog.cpp
     ClientGUI/ui/shop/medalbuydialog.h
     ClientGUI/ui/sortie/battleplan.cpp

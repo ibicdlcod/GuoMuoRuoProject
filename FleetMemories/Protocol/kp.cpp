@@ -145,6 +145,15 @@ QByteArray KP::clientBuyMedal(int amount) {
     return QCborValue::fromJsonValue(result).toCbor();
 }
 
+QByteArray KP::clientBuyOrdinaryResources(const QString &attr, int coupons) {
+    QJsonObject result;
+    result["type"] = DgramType::Request;
+    result["command"] = CommandType::BuyOrdinaryResources;
+    result["attr"] = attr;
+    result["coupons"] = coupons;
+    return QCborValue::fromJsonValue(result).toCbor();
+}
+
 QByteArray KP::clientChooseNode(int mapId, int chosenNodeId) {
     QJsonObject result;
     result["type"] = DgramType::Request;

@@ -1014,6 +1014,57 @@ void Server::doBuyMedal(const CSteamID &uid,
         offerResourceInfo(connection, uid);
 }
 
+void Server::doBuyOrdinaryResources(const CSteamID &uid,
+                                    const QString &attr, int coupons,
+                                    QSslSocket *connection) {
+    int rate = KP::ordResRate(attr);
+    if(coupons < 1 || rate == 0) {
+        senderM.sendMessage(connection,
+            KP::serverARDPurchaseFailed(KP::PurchaseInvalidAmount));
+        return;
+    }
+    int amount = coupons * rate;
+    {
+        QSqlQuery query;
+        query.prepare(
+            "UPDATE UserAttr "
+            "SET Intvalue = Intvalue - :cost "
+            "WHERE UserID = :uid "
+            "AND Attribute = :attr "
+            "AND Intvalue >= :cost");
+        query.bindValue(":cost", coupons);
+        query.bindValue(":uid", uid.ConvertToUint64());
+        query.bindValue(":attr", KP::attrARDCoupon);
+        if(Q_UNLIKELY(!query.exec())) {
+            //% "Database failed when buying resources."
+            throw DBError(qtTrId("dbfail-ord-res-buy"),
+                          query.lastError(), query.lastQuery());
+        }
+        if(query.numRowsAffected() == 0) {
+            senderM.sendMessage(connection,
+                KP::serverARDPurchaseFailed(KP::PurchaseInsufficientCoupons));
+            return;
+        }
+    }
+    {
+        QSqlQuery query;
+        query.prepare(
+            "UPDATE UserAttr "
+            "SET Intvalue = Intvalue + :amount "
+            "WHERE UserID = :uid "
+            "AND Attribute = :attr");
+        query.bindValue(":amount", amount);
+        query.bindValue(":uid", uid.ConvertToUint64());
+        query.bindValue(":attr", attr);
+        if(Q_UNLIKELY(!query.exec())) {
+            //% "Database failed when adding resources."
+            throw DBError(qtTrId("dbfail-ord-res-add"),
+                          query.lastError(), query.lastQuery());
+        }
+    }
+    offerResourceInfo(connection, uid);
+}
+
 /* 5.4-construction.md */
 void Server::doConstruct(const CSteamID &uid,
                          int shipDef,
@@ -4108,6 +4159,11 @@ anti_ddos:
         break;
     case KP::CommandType::SupplyShip: {
         handleSupplyShip(uid, connection, djson["ships"].toArray());
+    }
+        break;
+    case KP::CommandType::BuyOrdinaryResources: {
+        doBuyOrdinaryResources(uid, djson["attr"].toString(),
+                               djson["coupons"].toInt(), connection);
     }
         break;
 home_port:

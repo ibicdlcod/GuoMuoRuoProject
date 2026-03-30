@@ -310,6 +310,8 @@ border-style: none;</string>
     </property>
     <addaction name="actionBuyEquip"/>
     <addaction name="actionBuyMedal"/>
+    <addaction name="actionBuyOrdResources"/>
+    <addaction name="separator"/>
     <addaction name="actionBuyARD"/>
    </widget>
    <addaction name="menuNaval_Base"/>
@@ -375,6 +377,11 @@ border-style: none;</string>
   <action name="actionShip_Blueprints">
    <property name="text">
     <string id="ship-blueprint-view">Ship Blueprints</string>
+   </property>
+  </action>
+  <action name="actionBuyOrdResources">
+   <property name="text">
+    <string id="menu-buy-ord-resources">Buy Resources</string>
    </property>
   </action>
   <action name="actionBuyARD">

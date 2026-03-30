@@ -17,6 +17,7 @@
 #include "maintenance/repair.h"
 #include "shop/ardcoupondialog.h"
 #include "shop/buyequipdialog.h"
+#include "shop/buyordresourcesdialog.h"
 #include "shop/medalbuydialog.h"
 #include "settingswindow.h"
 
@@ -54,6 +55,7 @@ private slots:
     void buyARD();
     void buyEquip();
     void buyMedal();
+    void buyOrdResources();
     void factoryRefresh();
     void gamestateChanged(KP::GameState);
     void gamestateInit();

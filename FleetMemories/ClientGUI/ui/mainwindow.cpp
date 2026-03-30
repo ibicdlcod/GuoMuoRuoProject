@@ -118,6 +118,8 @@ MainWindow::MainWindow(QWidget *parent, int argc, char ** argv)
             });
     connect(ui->actionAbout_Qt, &QAction::triggered,
             QApplication::instance(), &QApplication::aboutQt);
+    connect(ui->actionBuyOrdResources, &QAction::triggered,
+            this, &MainWindow::buyOrdResources);
     connect(ui->actionBuyARD, &QAction::triggered,
             this, &MainWindow::buyARD);
     connect(ui->actionBuyEquip, &QAction::triggered,
@@ -276,6 +278,11 @@ void MainWindow::adjustArea(QWidget *input, const QSize &size) {
     input->move(0, 0);
     input->resize(size);
     update();
+}
+
+void MainWindow::buyOrdResources() {
+    BuyOrdResourcesDialog dialog(this);
+    dialog.exec();
 }
 
 void MainWindow::buyARD() {

@@ -100,6 +100,7 @@ void Server::handleARDPurchaseAuth(const CSteamID &uid,
                     if(connectedPeers.contains(uid)) {
                         QByteArray msg = KP::serverARDPurchaseSuccess(unitsToAdd);
                         senderM.sendMessage(connectedPeers[uid], msg);
+                        offerResourceInfo(connectedPeers[uid], uid);
                     }
                 }
                 else {
@@ -288,6 +289,7 @@ void Server::pollARDRefunds() {
                         if(connectedPeers.contains(uid)) {
                             QByteArray msg = KP::serverARDPurchaseClawback(units);
                             senderM.sendMessage(connectedPeers[uid], msg);
+                            offerResourceInfo(connectedPeers[uid], uid);
                         }
                     }
                 } catch (DBError &e) {

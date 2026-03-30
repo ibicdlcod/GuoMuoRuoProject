@@ -85,6 +85,8 @@ private:
     void doBuy(const CSteamID &, int, QSslSocket *);
     void doBuyFromStore(const CSteamID &, int, QSslSocket *);
     void doBuyMedal(const CSteamID &, int, QSslSocket *);
+    void doBuyOrdinaryResources(const CSteamID &, const QString &, int,
+                                QSslSocket *);
     void doConstruct(const CSteamID &, int, QList<QUuid> &, const QUuid &,
                      int, QSslSocket *);
     void doDevelop(const CSteamID &, int, int, QSslSocket *);
