@@ -267,17 +267,95 @@ void EquipModel::adjustRowCount(int oldRowCount, int newRowCount) {
 }
 
 void EquipModel::customSort() {
-    std::sort(sortedEquipIds.begin(),
-              sortedEquipIds.end(),
-              [this](QUuid a, QUuid b)
-              {
-                  if((*clientEquips[a]).isNotEqual(*clientEquips[b]))
-                      return (*clientEquips[a]) < (*clientEquips[b]);
-                  else if(clientEquipStars[a] != clientEquipStars[b])
-                      return clientEquipStars[a] > clientEquipStars[b];
-                  else
+    switch(sortMode) {
+    case SortByUuid:
+        std::sort(sortedEquipIds.begin(), sortedEquipIds.end());
+        break;
+    case SortByName:
+        std::sort(sortedEquipIds.begin(), sortedEquipIds.end(),
+                  [this](QUuid a, QUuid b) {
+                      int cmp = clientEquips[a]->toString()
+                                    .localeAwareCompare(clientEquips[b]->toString());
+                      return cmp != 0 ? cmp < 0 : a < b;
+                  });
+        break;
+    case SortByStar:
+        std::sort(sortedEquipIds.begin(), sortedEquipIds.end(),
+                  [this](QUuid a, QUuid b) {
+                      if(clientEquipStars[a] != clientEquipStars[b])
+                          return clientEquipStars[a] < clientEquipStars[b];
+                      if((*clientEquips[a]).isNotEqual(*clientEquips[b]))
+                          return (*clientEquips[a]) < (*clientEquips[b]);
                       return a < b;
-              });
+                  });
+        break;
+    case SortByPrimAttr:
+        std::sort(sortedEquipIds.begin(), sortedEquipIds.end(),
+                  [this](QUuid a, QUuid b) {
+                      int va = clientEquips[a]->attr.value(
+                                   clientEquips[a]->type.getPrimaryAttr(), 0);
+                      int vb = clientEquips[b]->attr.value(
+                                   clientEquips[b]->type.getPrimaryAttr(), 0);
+                      return va != vb ? va < vb : a < b;
+                  });
+        break;
+    case SortBySkill:
+        std::sort(sortedEquipIds.begin(), sortedEquipIds.end(),
+                  [this](QUuid a, QUuid b) {
+                      int stdA = clientEquips[a]->skillPointsStd();
+                      int stdB = clientEquips[b]->skillPointsStd();
+                      double ratioA = stdA > 0
+                                      ? static_cast<double>(
+                                          skillPointReg.value(clientEquips[a]->getId(), 0))
+                                        / stdA
+                                      : 0.0;
+                      double ratioB = stdB > 0
+                                      ? static_cast<double>(
+                                          skillPointReg.value(clientEquips[b]->getId(), 0))
+                                        / stdB
+                                      : 0.0;
+                      return ratioA != ratioB ? ratioA < ratioB : a < b;
+                  });
+        break;
+    default: // SortByEquipDef
+        std::sort(sortedEquipIds.begin(), sortedEquipIds.end(),
+                  [this](QUuid a, QUuid b) {
+                      if((*clientEquips[a]).isNotEqual(*clientEquips[b]))
+                          return (*clientEquips[a]) < (*clientEquips[b]);
+                      else if(clientEquipStars[a] != clientEquipStars[b])
+                          return clientEquipStars[a] < clientEquipStars[b];
+                      else
+                          return a < b;
+                  });
+        break;
+    }
+    if(sortReversed)
+        std::reverse(sortedEquipIds.begin(), sortedEquipIds.end());
+}
+
+bool EquipModel::defaultDescending(int mode) const {
+    switch(mode) {
+    case SortByStar:
+    case SortByPrimAttr:
+    case SortBySkill:
+        return true;
+    default:
+        return false;
+    }
+}
+
+void EquipModel::setSortMode(int mode) {
+    sortMode = mode;
+    sortReversed = defaultDescending(mode);
+    emit sortReversedChanged(sortReversed);
+    customSort();
+    firstPage();
+}
+
+void EquipModel::setSortReversed(bool reversed) {
+    sortReversed = reversed;
+    customSort();
+    firstPage();
 }
 
 int EquipModel::numberOfColumns() const {
@@ -768,11 +846,10 @@ void EquipModel::wholeTableChanged() {
             engine.demandEquipSkillPoints(defNoduplicate);
         }
     }
-    QModelIndex topleft = this->index(0, 0);
-    QModelIndex bottomright = this->index(rowCount() - 1, columnCount() - 1);
     clearCheckBoxes();
-    if(rowCount() > 0 && columnCount() > 0) {
-        emit dataChanged(topleft, bottomright, QList<int>());
+    if(rowCount() > 0) {
+        emit dataChanged(index(0, 0), index(rowCount() - 1, columnCount() - 1),
+                         QList<int>());
     }
     emit headerDataChanged(Qt::Vertical, 0, rowCount() - 1);
 }
@@ -823,16 +900,25 @@ void EquipModel::filterByShip(Ship *ship, bool isSlotEX)
 
 void EquipModel::processSkillPointInfo(int equipDef, int skillPoint) {
     skillPointReg[equipDef] = skillPoint;
-    QModelIndex topleft = this->index(0, starCol);
-    QModelIndex bottomright = this->index(rowCount() - 1, starCol);
-    if(rowCount() > 0 && columnCount() > 0) {
-        emit dataChanged(topleft, bottomright, {Qt::ToolTipRole,
-                                                Qt::DisplayRole});
+    if(rowCount() == 0)
+        return;
+    int minRow = rowCount(), maxRow = -1;
+    for(int row = 0; row < rowCount(); ++row) {
+        int realIdx = row + rowsPerPage * pageNum;
+        if(clientEquips[sortedEquipIds[realIdx]]->getId() == equipDef) {
+            minRow = std::min(minRow, row);
+            maxRow = std::max(maxRow, row);
+        }
+    }
+    if(maxRow >= 0) {
+        emit dataChanged(index(minRow, starCol), index(maxRow, starCol),
+                         {Qt::ToolTipRole, Qt::DisplayRole, Qt::ForegroundRole});
     }
 }
 
 void EquipModel::modernizedEquips(
     const QList<std::tuple<QUuid, int>> &modernized) {
+    QSet<int> affectedDefs;
     for(auto item: modernized) {
         auto equipUid = std::get<0>(item);
         int equipDef = clientEquips[equipUid]->getId();
@@ -842,6 +928,18 @@ void EquipModel::modernizedEquips(
             skillPointReg[equipDef] = 0;
         }
         skillPointReg[equipDef] -= clientEquips[equipUid]->skillPointsStd();
+        affectedDefs.insert(equipDef);
     }
-    wholeTableChanged();
+    if(isEquipModel) {
+        Client &engine = Client::getInstance();
+        for(int def: affectedDefs) {
+            engine.demandEquipSkillPoints(def);
+        }
+    }
+    clearCheckBoxes();
+    if(rowCount() > 0) {
+        emit dataChanged(index(0, starCol), index(rowCount() - 1, starCol),
+                         {Qt::DisplayRole, Qt::ToolTipRole,
+                          Qt::ForegroundRole, Qt::CheckStateRole});
+    }
 }

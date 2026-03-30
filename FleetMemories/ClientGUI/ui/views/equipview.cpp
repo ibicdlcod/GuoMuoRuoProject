@@ -72,6 +72,14 @@ EquipView::EquipView(QWidget *parent)
         break;
     }
 
+    sortBox = new QComboBox(this);
+    sortBox->setSizePolicy(QSizePolicy(QSizePolicy::Maximum,
+                                       QSizePolicy::Preferred,
+                                       QSizePolicy::ComboBox));
+    sortBox->setSizeAdjustPolicy(QComboBox::AdjustToContents);
+    reverseCheck = new QCheckBox(this);
+    //% "Desc."
+    reverseCheck->setText(qtTrId("sort-order-desc"));
     firstButton = new QToolButton(this);
     prevButton = new QToolButton(this);
     pageLabel = new QLabel(this);
@@ -100,6 +108,8 @@ EquipView::EquipView(QWidget *parent)
 
     QWidget *layoutWidget = new QWidget(this);
     QHBoxLayout *layout = new QHBoxLayout(layoutWidget);
+    layout->addWidget(sortBox);
+    layout->addWidget(reverseCheck);
     layout->addWidget(firstButton);
     layout->addWidget(prevButton);
     layout->addWidget(pageLabel);
@@ -262,6 +272,12 @@ void EquipView::activate(bool arsenal, bool isEquip,
                this, &EquipView::itemSelected);
     disconnect(unselectButton, &QPushButton::clicked,
                nullptr, nullptr);
+    disconnect(sortBox, &QComboBox::currentIndexChanged,
+               nullptr, nullptr);
+    disconnect(reverseCheck, &QCheckBox::toggled,
+               nullptr, nullptr);
+    disconnect(model, &EquipModel::sortReversedChanged,
+               this, nullptr);
 
     Client &engine = Client::getInstance();
     disconnect(model, SIGNAL(needReCalculateRows()),
@@ -296,6 +312,8 @@ void EquipView::activate(bool arsenal, bool isEquip,
             else {
                 arsenalView->show();
             }
+            sortBox->hide();
+            reverseCheck->hide();
             lay->setCurrentWidget(industrialSelect);
         }
         else {
@@ -337,6 +355,39 @@ void EquipView::activate(bool arsenal, bool isEquip,
                     model, SLOT(setRowsPerPageHint(int)),
                     Qt::UniqueConnection);
             recalculateArsenalRows();
+            sortBox->show();
+            sortBox->blockSignals(true);
+            sortBox->clear();
+            //% "Equipment type"
+            sortBox->addItem(qtTrId("sort-equip-def"));
+            //% "UUID"
+            sortBox->addItem(qtTrId("sort-uuid"));
+            //% "Name"
+            sortBox->addItem(qtTrId("sort-name"));
+            //% "Improvement"
+            sortBox->addItem(qtTrId("sort-equip-star"));
+            //% "Primary attribute"
+            sortBox->addItem(qtTrId("sort-equip-prim-attr"));
+            //% "Skill points"
+            sortBox->addItem(qtTrId("sort-equip-skill"));
+            sortBox->setCurrentIndex(0);
+            sortBox->blockSignals(false);
+            model->setSortMode(0);
+            connect(sortBox, &QComboBox::currentIndexChanged,
+                    model, &EquipModel::setSortMode);
+            reverseCheck->show();
+            reverseCheck->blockSignals(true);
+            reverseCheck->setChecked(false);
+            reverseCheck->blockSignals(false);
+            model->setSortReversed(false);
+            connect(reverseCheck, &QCheckBox::toggled,
+                    model, &EquipModel::setSortReversed);
+            connect(model, &EquipModel::sortReversedChanged,
+                    this, [this](bool val) {
+                        reverseCheck->blockSignals(true);
+                        reverseCheck->setChecked(val);
+                        reverseCheck->blockSignals(false);
+                    });
             lay->setCurrentWidget(equipSelect);
         }
     }
@@ -413,6 +464,47 @@ void EquipView::activate(bool arsenal, bool isEquip,
                     model, SLOT(setRowsPerPageHint(int)),
                     Qt::UniqueConnection);
             recalculateArsenalRows();
+            sortBox->show();
+            sortBox->blockSignals(true);
+            sortBox->clear();
+            //% "Ship type"
+            sortBox->addItem(qtTrId("sort-ship-def"));
+            //% "UUID"
+            sortBox->addItem(qtTrId("sort-uuid"));
+            //% "Name"
+            sortBox->addItem(qtTrId("sort-name"));
+            //% "Modernization"
+            sortBox->addItem(qtTrId("sort-ship-modernization"));
+            //% "HP%"
+            sortBox->addItem(qtTrId("sort-hp-pct"));
+            //% "Condition"
+            sortBox->addItem(qtTrId("sort-cond"));
+            //% "Level"
+            sortBox->addItem(qtTrId("sort-level"));
+            //% "Position"
+            sortBox->addItem(qtTrId("sort-position"));
+            //% "Fuel%"
+            sortBox->addItem(qtTrId("sort-fuel-pct"));
+            //% "Ammo%"
+            sortBox->addItem(qtTrId("sort-ammo-pct"));
+            sortBox->setCurrentIndex(0);
+            sortBox->blockSignals(false);
+            model->setSortMode(0);
+            connect(sortBox, &QComboBox::currentIndexChanged,
+                    model, &EquipModel::setSortMode);
+            reverseCheck->show();
+            reverseCheck->blockSignals(true);
+            reverseCheck->setChecked(false);
+            reverseCheck->blockSignals(false);
+            model->setSortReversed(false);
+            connect(reverseCheck, &QCheckBox::toggled,
+                    model, &EquipModel::setSortReversed);
+            connect(model, &EquipModel::sortReversedChanged,
+                    this, [this](bool val) {
+                        reverseCheck->blockSignals(true);
+                        reverseCheck->setChecked(val);
+                        reverseCheck->blockSignals(false);
+                    });
             lay->setCurrentWidget(shipSelect);
         }
         else {
@@ -437,6 +529,8 @@ void EquipView::activate(bool arsenal, bool isEquip,
                     model, SLOT(setRowsPerPageHint(int)),
                     Qt::UniqueConnection);
             recalculateArsenalRows();
+            sortBox->hide();
+            reverseCheck->hide();
             lay->setCurrentWidget(shipSelect);
         }
     }

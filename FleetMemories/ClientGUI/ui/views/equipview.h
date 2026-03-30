@@ -4,6 +4,7 @@
 #ifndef EQUIPVIEW_H
 #define EQUIPVIEW_H
 
+#include <QCheckBox>
 #include <QComboBox>
 #include <QHeaderView>
 #include <QLabel>
@@ -82,6 +83,8 @@ private:
     HpDelegate *hpdelegate;
 
     /* shared */
+    QComboBox *sortBox;
+    QCheckBox *reverseCheck;
     QToolButton *firstButton;
     QToolButton *prevButton;
     QLabel *pageLabel;

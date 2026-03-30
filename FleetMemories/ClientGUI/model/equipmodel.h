@@ -20,6 +20,7 @@ public:
     QHash<QUuid, int> & getClientEquipStars();
 
 signals:
+    void sortReversedChanged(bool);
     void destructRequest(const QList<QUuid> &);
     void needReCalculateRows();
     void needReCalculatePages();
@@ -38,6 +39,8 @@ public slots:
     virtual void prevPage();
     virtual void nextPage();
     virtual void lastPage();
+    virtual void setSortMode(int);
+    virtual void setSortReversed(bool);
     virtual void addEquipment(QUuid, int) final;
     virtual void enactDestruct() final;
     virtual void enactModernize();
@@ -70,6 +73,12 @@ public:
     static const int uidCol = 0;
     static const int equipCol = 1;
     static const int starCol = 2;
+    static const int SortByEquipDef = 0;
+    static const int SortByUuid     = 1;
+    static const int SortByName     = 2;
+    static const int SortByStar     = 3;
+    static const int SortByPrimAttr = 4;
+    static const int SortBySkill    = 5;
     virtual int destructColumn() const final;
     virtual int hiddenSortColumn() const;
     virtual int selectColumn() const;
@@ -81,6 +90,7 @@ public:
     virtual void unsetShip() final;
 
 protected:
+    virtual bool defaultDescending(int mode) const;
     virtual void adjustRowCount(int oldRowCount, int newRowCount);
     virtual void customSort();
     virtual int numberOfColumns() const;
@@ -88,6 +98,8 @@ protected:
 
     int rowsPerPage = 1;
     int pageNum = 0;
+    int sortMode = SortByEquipDef;
+    bool sortReversed = false;
     bool ready = false;
     bool isEquipModel = true;
 

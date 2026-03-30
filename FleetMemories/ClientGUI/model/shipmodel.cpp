@@ -5,6 +5,7 @@
 #include <QApplication>
 #include <QJsonObject>
 #include <QStyleHints>
+#include <limits>
 #include "../clientv2.h"
 #include "../equipicon.h"
 
@@ -177,7 +178,12 @@ void ShipModel::modernizedShips(
     }
     Client::getInstance().shipBPModel.modernizedShips(modernizedDiff);
     bpCacheRefresh();
-    wholeTableChanged();
+    clearCheckBoxes();
+    if(rowCount() > 0) {
+        emit dataChanged(index(0, starCol), index(rowCount() - 1, starCol),
+                         {Qt::DisplayRole, Qt::ToolTipRole,
+                          Qt::ForegroundRole, Qt::CheckStateRole});
+    }
 }
 
 void ShipModel::enactDecorate() {
@@ -201,7 +207,12 @@ void ShipModel::decoratedShips(
             clientShipDynamicAttrs[shipUid]->expCap = newExpCap;
         }
     }
-    wholeTableChanged();
+    clearCheckBoxes();
+    if(rowCount() > 0) {
+        emit dataChanged(index(0, levelColumn()), index(rowCount() - 1, levelColumn()),
+                         {Qt::DisplayRole, Qt::ToolTipRole,
+                          Qt::ForegroundRole, Qt::CheckStateRole});
+    }
 }
 
 void ShipModel::modifyShip(QUuid uid, int def, int hp, bool disabling) {
@@ -803,20 +814,120 @@ int ShipModel::maximumPageNum() const {
     return (numberOfShip() - 1) / rowsPerPage + 1;
 }
 
+bool ShipModel::defaultDescending(int mode) const {
+    switch(mode) {
+    case SortByModernization:
+    case SortByHP:
+    case SortByCond:
+    case SortByLevel:
+        return true;
+    default:
+        return false;
+    }
+}
+
 void ShipModel::customSort() {
-    std::sort(sortedShipIds.begin(),
-              sortedShipIds.end(),
-              [this](QUuid a, QUuid b)
-              {
-                  if((*clientShips[a]).isNotEqual(*clientShips[b]))
-                      return (*clientShips[a]) < (*clientShips[b]);
-                  else if(clientShipDynamicAttrs[a]->star
-                           != clientShipDynamicAttrs[b]->star)
-                      return clientShipDynamicAttrs[a]->star >
-                             clientShipDynamicAttrs[b]->star;
-                  else
+    switch(sortMode) {
+    case SortByUuid:
+        std::sort(sortedShipIds.begin(), sortedShipIds.end());
+        break;
+    case SortByName:
+        std::sort(sortedShipIds.begin(), sortedShipIds.end(),
+                  [this](QUuid a, QUuid b) {
+                      int cmp = clientShips[a]->toString()
+                                    .localeAwareCompare(clientShips[b]->toString());
+                      return cmp != 0 ? cmp < 0 : a < b;
+                  });
+        break;
+    case SortByModernization:
+        std::sort(sortedShipIds.begin(), sortedShipIds.end(),
+                  [this](QUuid a, QUuid b) {
+                      if(clientShipDynamicAttrs[a]->star != clientShipDynamicAttrs[b]->star)
+                          return clientShipDynamicAttrs[a]->star < clientShipDynamicAttrs[b]->star;
+                      if((*clientShips[a]).isNotEqual(*clientShips[b]))
+                          return (*clientShips[a]) < (*clientShips[b]);
                       return a < b;
-              });
+                  });
+        break;
+    case SortByHP:
+        std::sort(sortedShipIds.begin(), sortedShipIds.end(),
+                  [this](QUuid a, QUuid b) {
+                      int maxA = clientShips[a]->attr["Hitpoints"];
+                      int maxB = clientShips[b]->attr["Hitpoints"];
+                      double pctA = maxA > 0
+                                    ? static_cast<double>(
+                                        clientShipDynamicAttrs[a]->currentHP) / maxA
+                                    : 0.0;
+                      double pctB = maxB > 0
+                                    ? static_cast<double>(
+                                        clientShipDynamicAttrs[b]->currentHP) / maxB
+                                    : 0.0;
+                      return pctA != pctB ? pctA < pctB : a < b;
+                  });
+        break;
+    case SortByCond:
+        std::sort(sortedShipIds.begin(), sortedShipIds.end(),
+                  [this](QUuid a, QUuid b) {
+                      if(clientShipDynamicAttrs[a]->condition
+                          != clientShipDynamicAttrs[b]->condition)
+                          return clientShipDynamicAttrs[a]->condition
+                                 < clientShipDynamicAttrs[b]->condition;
+                      return a < b;
+                  });
+        break;
+    case SortByLevel:
+        std::sort(sortedShipIds.begin(), sortedShipIds.end(),
+                  [this](QUuid a, QUuid b) {
+                      int lvA = Ship::getLevel(clientShipDynamicAttrs[a]->exp);
+                      int lvB = Ship::getLevel(clientShipDynamicAttrs[b]->exp);
+                      return lvA != lvB ? lvA < lvB : a < b;
+                  });
+        break;
+    case SortByPosition:
+        std::sort(sortedShipIds.begin(), sortedShipIds.end(),
+                  [this](QUuid a, QUuid b) {
+                      int fiA = clientShipDynamicAttrs[a]->fleetIndex;
+                      int fiB = clientShipDynamicAttrs[b]->fleetIndex;
+                      int keyA = fiA >= 0 ? fiA : std::numeric_limits<int>::max();
+                      int keyB = fiB >= 0 ? fiB : std::numeric_limits<int>::max();
+                      if(keyA != keyB) return keyA < keyB;
+                      int piA = clientShipDynamicAttrs[a]->fleetPosIndex;
+                      int piB = clientShipDynamicAttrs[b]->fleetPosIndex;
+                      return piA != piB ? piA < piB : a < b;
+                  });
+        break;
+    case SortByFuel:
+        std::sort(sortedShipIds.begin(), sortedShipIds.end(),
+                  [this](QUuid a, QUuid b) {
+                      double fA = clientShipDynamicAttrs[a]->fuel;
+                      double fB = clientShipDynamicAttrs[b]->fuel;
+                      return fA != fB ? fA < fB : a < b;
+                  });
+        break;
+    case SortByAmmo:
+        std::sort(sortedShipIds.begin(), sortedShipIds.end(),
+                  [this](QUuid a, QUuid b) {
+                      double aA = clientShipDynamicAttrs[a]->ammo;
+                      double aB = clientShipDynamicAttrs[b]->ammo;
+                      return aA != aB ? aA < aB : a < b;
+                  });
+        break;
+    default: // SortByShipDef
+        std::sort(sortedShipIds.begin(), sortedShipIds.end(),
+                  [this](QUuid a, QUuid b) {
+                      if((*clientShips[a]).isNotEqual(*clientShips[b]))
+                          return (*clientShips[a]) < (*clientShips[b]);
+                      else if(clientShipDynamicAttrs[a]->star
+                               != clientShipDynamicAttrs[b]->star)
+                          return clientShipDynamicAttrs[a]->star
+                                 < clientShipDynamicAttrs[b]->star;
+                      else
+                          return a < b;
+                  });
+        break;
+    }
+    if(sortReversed)
+        std::reverse(sortedShipIds.begin(), sortedShipIds.end());
 }
 
 int ShipModel::numberOfColumns() const {
@@ -848,7 +959,10 @@ void ShipModel::clearShipCheckBoxes() {
 
 void ShipModel::setIsSupplyMode(bool supply) {
     isSupplyMode = supply;
-    wholeTableChanged();
+    if(rowCount() > 0) {
+        emit dataChanged(index(0, fuelColumn()), index(rowCount() - 1, ammoColumn()),
+                         {Qt::CheckStateRole});
+    }
 }
 
 void ShipModel::enactSupply() {

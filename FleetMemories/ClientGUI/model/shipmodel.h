@@ -68,11 +68,22 @@ public:
     static const int uidCol = 0;
     static const int equipCol = 1;
     static const int starCol = 2;
+    static const int SortByShipDef       = 0;
+    static const int SortByUuid          = 1;
+    static const int SortByName          = 2;
+    static const int SortByModernization = 3;
+    static const int SortByHP            = 4;
+    static const int SortByCond          = 5;
+    static const int SortByLevel         = 6;
+    static const int SortByPosition      = 7;
+    static const int SortByFuel          = 8;
+    static const int SortByAmmo          = 9;
 
     virtual int maximumPageNum() const override;
     void bpCacheRefresh();
 
 protected:
+    virtual bool defaultDescending(int mode) const override;
     virtual void customSort() override;
     virtual int numberOfColumns() const override;
     virtual int numberOfShip() const;

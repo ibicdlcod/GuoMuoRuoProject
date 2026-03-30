@@ -41,7 +41,7 @@ Post-build steps automatically copy CSV data files from `doc/` and Steam DLLs in
 
 The client and server are separate executables that communicate over SSL/TLS sockets using JSON/CBOR messages. The protocol is defined entirely in `Protocol/kp.h` — all message type enums (`CommandType`, `InfoType`, `MsgType`), game constants, and builder functions (`KP::clientFoo()` / `KP::serverFoo()`) live there, with implementations in `Protocol/kp.cpp`.
 
-The server never sends user-visible strings — it returns enum values (`KP::GameError`, `KP::FleetFailType`, etc.) and the client localises them. The server language is not guaranteed to match the client.
+The server never sends user-visible strings — it returns enum values (`KP::GameError`, `KP::FleetFailType` including `FleetInsufficientResources` for supply failures, etc.) and the client localises them. The server language is not guaranteed to match the client. `serverFleetFailure` carries an optional fleet index to identify which fleet in the active group failed.
 
 **Message flow for a typical action:**
 1. Client calls a `KP::client*()` builder → enqueues bytes via `Client` → `Sender`
@@ -65,6 +65,12 @@ The client implementation is split across multiple files:
 - **`ClientGUI/clientv2_cache.cpp`** — Local cache updates from server responses
 - **`ClientGUI/clientv2_command.cpp`** — Incoming command/info message dispatch helpers
 
+### Code organization: Protocol
+
+Shared code between client and server:
+
+- **`Protocol/utility.cpp`** — Shared utility functions (`buildSupplyAdjacency`, `computeAttrition`) for resource supply chain attrition calculation via Dijkstra's algorithm on map routes
+
 ### Code organization: Server
 
 The server implementation is split across multiple files:
@@ -74,7 +80,7 @@ The server implementation is split across multiple files:
 - **`Server/server_ard.cpp`** — ARD coupon purchase flow (`handleInitARDPurchase`, `handleARDPurchaseAuth`, `pollARDRefunds`)
 - **`Server/server_battle.cpp`** — Battle processing and combat resolution
 - **`Server/server_import.cpp`** — CSV data import (`importEquipFromCSV`, `importShipFromCSV`, etc.)
-- **`Server/server_offer.cpp`** — Resource/equipment offer generation (`offerResourceInfo`, `doBuyFromStore`, `doBuyMedal`)
+- **`Server/server_offer.cpp`** — Resource/equipment offer generation (`offerResourceInfo`, `doBuyFromStore`, `doBuyMedal`) and shop system logic
 - **`Server/server_sqlinit.cpp`** — SQL schema creation and database initialization
 - **`Server/user.cpp`** — User account management and queries
 
@@ -157,6 +163,7 @@ SQLite, accessed via Qt SQL. All CREATE TABLE statements are at the top of `Serv
 | `InBattle` | `KP::NoBattle` | Battle state machine (`NoBattle`/`BeforeBattle`/`DuringBattle`/`AfterBattle`) |
 | `ActiveFleet` | 0 | Fleet index in sortie |
 | `RecoverTime` | timestamp | Condition/HP natural recovery reference time |
+| `Attrition` | (unset) | Resource supply attrition multiplier (stored in `Realvalue`); computed at sortie start via supply chain Dijkstra and used during sortie |
 
 ### Shop system
 

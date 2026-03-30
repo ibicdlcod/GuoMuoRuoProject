@@ -1225,46 +1225,46 @@ Great at battle and bad at politics--so cool!</source>
         <translation>舰船缓存长度：%1</translation>
     </message>
     <message id="equip-star-tooltip">
-        <location filename="../ClientGUI/model/equipmodel.cpp" line="343"/>
+        <location filename="../ClientGUI/model/equipmodel.cpp" line="406"/>
         <source>Current Star %1, maximum star %2</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="equip-idle">
-        <location filename="../ClientGUI/model/equipmodel.cpp" line="384"/>
-        <location filename="../ClientGUI/model/equipmodel.cpp" line="389"/>
+        <location filename="../ClientGUI/model/equipmodel.cpp" line="447"/>
+        <location filename="../ClientGUI/model/equipmodel.cpp" line="452"/>
         <source>Idle</source>
         <translation type="unfinished">空闲</translation>
     </message>
     <message id="equip-uuid">
-        <location filename="../ClientGUI/model/equipmodel.cpp" line="440"/>
-        <location filename="../ClientGUI/model/equipmodel.cpp" line="560"/>
+        <location filename="../ClientGUI/model/equipmodel.cpp" line="503"/>
+        <location filename="../ClientGUI/model/equipmodel.cpp" line="623"/>
         <location filename="../ClientGUI/model/specequipmodel.cpp" line="59"/>
         <source>Equipment UUID</source>
         <translation>装备序列号</translation>
     </message>
     <message id="equip-name">
-        <location filename="../ClientGUI/model/equipmodel.cpp" line="444"/>
-        <location filename="../ClientGUI/model/equipmodel.cpp" line="562"/>
+        <location filename="../ClientGUI/model/equipmodel.cpp" line="507"/>
+        <location filename="../ClientGUI/model/equipmodel.cpp" line="625"/>
         <source>Equipment name</source>
         <translation>装备名</translation>
     </message>
     <message id="equip-star">
-        <location filename="../ClientGUI/model/equipmodel.cpp" line="448"/>
-        <location filename="../ClientGUI/model/equipmodel.cpp" line="564"/>
+        <location filename="../ClientGUI/model/equipmodel.cpp" line="511"/>
+        <location filename="../ClientGUI/model/equipmodel.cpp" line="627"/>
         <source>Improvement level</source>
         <oldsource>Equipment improvement level</oldsource>
         <translation type="unfinished">装备改修度</translation>
     </message>
     <message id="equip-attr">
-        <location filename="../ClientGUI/model/equipmodel.cpp" line="452"/>
-        <location filename="../ClientGUI/model/equipmodel.cpp" line="566"/>
+        <location filename="../ClientGUI/model/equipmodel.cpp" line="515"/>
+        <location filename="../ClientGUI/model/equipmodel.cpp" line="629"/>
         <source>Attributes</source>
         <oldsource>Equipment attributes</oldsource>
         <translation type="unfinished">装备属性</translation>
     </message>
     <message id="destruct">
-        <location filename="../ClientGUI/model/equipmodel.cpp" line="456"/>
-        <location filename="../ClientGUI/model/equipmodel.cpp" line="568"/>
+        <location filename="../ClientGUI/model/equipmodel.cpp" line="519"/>
+        <location filename="../ClientGUI/model/equipmodel.cpp" line="631"/>
         <source>Destruct</source>
         <oldsource>Destruct this equipment</oldsource>
         <translation type="unfinished">废弃该装备</translation>
@@ -1275,15 +1275,15 @@ Great at battle and bad at politics--so cool!</source>
         <translation type="obsolete">改修该装备</translation>
     </message>
     <message id="equip-select">
-        <location filename="../ClientGUI/model/equipmodel.cpp" line="460"/>
-        <location filename="../ClientGUI/model/equipmodel.cpp" line="570"/>
+        <location filename="../ClientGUI/model/equipmodel.cpp" line="523"/>
+        <location filename="../ClientGUI/model/equipmodel.cpp" line="633"/>
         <source>Select</source>
         <oldsource>Select this equipment</oldsource>
         <translation type="unfinished">选择该装备</translation>
     </message>
     <message id="equip-pos">
-        <location filename="../ClientGUI/model/equipmodel.cpp" line="464"/>
-        <location filename="../ClientGUI/model/equipmodel.cpp" line="572"/>
+        <location filename="../ClientGUI/model/equipmodel.cpp" line="527"/>
+        <location filename="../ClientGUI/model/equipmodel.cpp" line="635"/>
         <source>Position</source>
         <translation type="unfinished">装备位置</translation>
     </message>
@@ -1352,28 +1352,105 @@ Great at battle and bad at politics--so cool!</source>
     </message>
     <message id="retrieving-please-wait">
         <location filename="../ClientGUI/ui/navigator.cpp" line="19"/>
-        <location filename="../ClientGUI/ui/views/equipview.cpp" line="79"/>
-        <location filename="../ClientGUI/ui/views/equipview.cpp" line="288"/>
-        <location filename="../ClientGUI/ui/views/equipview.cpp" line="306"/>
-        <location filename="../ClientGUI/ui/views/equipview.cpp" line="349"/>
-        <location filename="../ClientGUI/ui/views/equipview.cpp" line="423"/>
+        <location filename="../ClientGUI/ui/views/equipview.cpp" line="87"/>
+        <location filename="../ClientGUI/ui/views/equipview.cpp" line="302"/>
+        <location filename="../ClientGUI/ui/views/equipview.cpp" line="322"/>
+        <location filename="../ClientGUI/ui/views/equipview.cpp" line="392"/>
+        <location filename="../ClientGUI/ui/views/equipview.cpp" line="501"/>
         <source>Retrieving data, please wait...</source>
         <translation>获取数据中，请等待……</translation>
     </message>
     <message id="equipview-unselect">
-        <location filename="../ClientGUI/ui/views/equipview.cpp" line="89"/>
+        <location filename="../ClientGUI/ui/views/equipview.cpp" line="97"/>
         <source>Unselect</source>
         <translation>取消选择</translation>
     </message>
     <message id="no-ship">
-        <location filename="../ClientGUI/ui/views/equipview.cpp" line="200"/>
+        <location filename="../ClientGUI/ui/views/equipview.cpp" line="210"/>
         <source>No suitable Ship</source>
         <translation>没有符合的舰船</translation>
     </message>
     <message id="no-user">
-        <location filename="../ClientGUI/ui/views/equipview.cpp" line="204"/>
+        <location filename="../ClientGUI/ui/views/equipview.cpp" line="214"/>
         <source>No suitable User</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message id="sort-order-desc">
+        <location filename="../ClientGUI/ui/views/equipview.cpp" line="82"/>
+        <source>Desc.</source>
+        <translation>降序</translation>
+    </message>
+    <message id="sort-equip-def">
+        <location filename="../ClientGUI/ui/views/equipview.cpp" line="360"/>
+        <source>Equipment type</source>
+        <translation>装备类型</translation>
+    </message>
+    <message id="sort-uuid">
+        <location filename="../ClientGUI/ui/views/equipview.cpp" line="362"/>
+        <location filename="../ClientGUI/ui/views/equipview.cpp" line="465"/>
+        <source>UUID</source>
+        <translation>UUID</translation>
+    </message>
+    <message id="sort-name">
+        <location filename="../ClientGUI/ui/views/equipview.cpp" line="364"/>
+        <location filename="../ClientGUI/ui/views/equipview.cpp" line="467"/>
+        <source>Name</source>
+        <translation>名称</translation>
+    </message>
+    <message id="sort-equip-star">
+        <location filename="../ClientGUI/ui/views/equipview.cpp" line="366"/>
+        <source>Improvement</source>
+        <translation>改修</translation>
+    </message>
+    <message id="sort-equip-prim-attr">
+        <location filename="../ClientGUI/ui/views/equipview.cpp" line="368"/>
+        <source>Primary attribute</source>
+        <translation>主要属性</translation>
+    </message>
+    <message id="sort-equip-skill">
+        <location filename="../ClientGUI/ui/views/equipview.cpp" line="370"/>
+        <source>Skill points</source>
+        <translation>技能点</translation>
+    </message>
+    <message id="sort-ship-def">
+        <location filename="../ClientGUI/ui/views/equipview.cpp" line="463"/>
+        <source>Ship type</source>
+        <translation>舰种</translation>
+    </message>
+    <message id="sort-ship-modernization">
+        <location filename="../ClientGUI/ui/views/equipview.cpp" line="469"/>
+        <source>Modernization</source>
+        <translation>近代化改装</translation>
+    </message>
+    <message id="sort-hp-pct">
+        <location filename="../ClientGUI/ui/views/equipview.cpp" line="471"/>
+        <source>HP%</source>
+        <translation>耐久%</translation>
+    </message>
+    <message id="sort-cond">
+        <location filename="../ClientGUI/ui/views/equipview.cpp" line="473"/>
+        <source>Condition</source>
+        <translation>疲劳度</translation>
+    </message>
+    <message id="sort-level">
+        <location filename="../ClientGUI/ui/views/equipview.cpp" line="475"/>
+        <source>Level</source>
+        <translation>等级</translation>
+    </message>
+    <message id="sort-position">
+        <location filename="../ClientGUI/ui/views/equipview.cpp" line="477"/>
+        <source>Position</source>
+        <translation>位置</translation>
+    </message>
+    <message id="sort-fuel-pct">
+        <location filename="../ClientGUI/ui/views/equipview.cpp" line="479"/>
+        <source>Fuel%</source>
+        <translation>燃料%</translation>
+    </message>
+    <message id="sort-ammo-pct">
+        <location filename="../ClientGUI/ui/views/equipview.cpp" line="481"/>
+        <source>Ammo%</source>
+        <translation>弹药%</translation>
     </message>
     <message id="destruct-button">
         <location filename="../ClientGUI/ui/views/equipselect.cpp" line="53"/>
@@ -1407,7 +1484,7 @@ Great at battle and bad at politics--so cool!</source>
     </message>
     <message id="no-equip">
         <location filename="../ClientGUI/ui/navigator.cpp" line="80"/>
-        <location filename="../ClientGUI/ui/views/equipview.cpp" line="195"/>
+        <location filename="../ClientGUI/ui/views/equipview.cpp" line="205"/>
         <source>No suitable Equipment</source>
         <translation>没有符合的装备</translation>
     </message>
@@ -3346,7 +3423,7 @@ Great at battle and bad at politics--so cool!</source>
     </message>
     <message id="all-shiptypes">
         <location filename="../ClientGUI/model/shipbpmodel.cpp" line="263"/>
-        <location filename="../ClientGUI/model/shipmodel.cpp" line="55"/>
+        <location filename="../ClientGUI/model/shipmodel.cpp" line="56"/>
         <location filename="../ClientGUI/ui/factory/constructwindow.cpp" line="57"/>
         <location filename="../ClientGUI/ui/factory/constructwindow.cpp" line="98"/>
         <location filename="../ClientGUI/ui/factory/constructwindow.cpp" line="135"/>
@@ -3360,7 +3437,7 @@ Great at battle and bad at politics--so cool!</source>
     </message>
     <message id="all-shipclasses">
         <location filename="../ClientGUI/model/shipbpmodel.cpp" line="265"/>
-        <location filename="../ClientGUI/model/shipmodel.cpp" line="57"/>
+        <location filename="../ClientGUI/model/shipmodel.cpp" line="58"/>
         <location filename="../ClientGUI/ui/factory/constructwindow.cpp" line="61"/>
         <location filename="../ClientGUI/ui/factory/constructwindow.cpp" line="100"/>
         <location filename="../ClientGUI/ui/factory/constructwindow.cpp" line="155"/>
@@ -3372,14 +3449,14 @@ Great at battle and bad at politics--so cool!</source>
         <translation>所有舰级</translation>
     </message>
     <message id="fleet-idle">
-        <location filename="../ClientGUI/model/equipmodel.cpp" line="408"/>
-        <location filename="../ClientGUI/model/shipmodel.cpp" line="352"/>
+        <location filename="../ClientGUI/model/equipmodel.cpp" line="471"/>
+        <location filename="../ClientGUI/model/shipmodel.cpp" line="363"/>
         <source>Idle</source>
         <translation>空闲</translation>
     </message>
     <message id="ship-uuid">
-        <location filename="../ClientGUI/model/shipmodel.cpp" line="394"/>
-        <location filename="../ClientGUI/model/shipmodel.cpp" line="577"/>
+        <location filename="../ClientGUI/model/shipmodel.cpp" line="405"/>
+        <location filename="../ClientGUI/model/shipmodel.cpp" line="588"/>
         <location filename="../ClientGUI/model/specshipmodel.cpp" line="59"/>
         <location filename="../ClientGUI/ui/maintenance/repair.cpp" line="22"/>
         <source>UUID</source>
@@ -3389,8 +3466,8 @@ Great at battle and bad at politics--so cool!</source>
         <location filename="../ClientGUI/model/shipbpmodel.cpp" line="159"/>
         <location filename="../ClientGUI/model/shipbpmodel.cpp" line="220"/>
         <location filename="../ClientGUI/model/shipdefmodel.cpp" line="53"/>
-        <location filename="../ClientGUI/model/shipmodel.cpp" line="398"/>
-        <location filename="../ClientGUI/model/shipmodel.cpp" line="580"/>
+        <location filename="../ClientGUI/model/shipmodel.cpp" line="409"/>
+        <location filename="../ClientGUI/model/shipmodel.cpp" line="591"/>
         <location filename="../ClientGUI/ui/maintenance/repair.cpp" line="24"/>
         <source>Name</source>
         <translation>舰船名</translation>
@@ -3402,20 +3479,20 @@ Great at battle and bad at politics--so cool!</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="ship-star-tooltip">
-        <location filename="../ClientGUI/model/shipmodel.cpp" line="308"/>
+        <location filename="../ClientGUI/model/shipmodel.cpp" line="319"/>
         <source>Current Star %1, maximum star %2</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="fleet-disabled">
-        <location filename="../ClientGUI/model/equipmodel.cpp" line="411"/>
-        <location filename="../ClientGUI/model/shipmodel.cpp" line="356"/>
+        <location filename="../ClientGUI/model/equipmodel.cpp" line="474"/>
+        <location filename="../ClientGUI/model/shipmodel.cpp" line="367"/>
         <location filename="../ClientGUI/ui/views/selectdelegate.cpp" line="87"/>
         <source>Disabled</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="ship-star">
-        <location filename="../ClientGUI/model/shipmodel.cpp" line="402"/>
-        <location filename="../ClientGUI/model/shipmodel.cpp" line="584"/>
+        <location filename="../ClientGUI/model/shipmodel.cpp" line="413"/>
+        <location filename="../ClientGUI/model/shipmodel.cpp" line="595"/>
         <source>Modernization</source>
         <translation type="unfinished">近代化星级</translation>
     </message>
@@ -3424,47 +3501,47 @@ Great at battle and bad at politics--so cool!</source>
         <translation type="vanished">近代化改造</translation>
     </message>
     <message id="ship-select">
-        <location filename="../ClientGUI/model/shipmodel.cpp" line="406"/>
-        <location filename="../ClientGUI/model/shipmodel.cpp" line="587"/>
+        <location filename="../ClientGUI/model/shipmodel.cpp" line="417"/>
+        <location filename="../ClientGUI/model/shipmodel.cpp" line="598"/>
         <source>Select this</source>
         <oldsource>Select</oldsource>
         <translation>选择此船</translation>
     </message>
     <message id="ship-hp">
-        <location filename="../ClientGUI/model/shipmodel.cpp" line="410"/>
-        <location filename="../ClientGUI/model/shipmodel.cpp" line="590"/>
+        <location filename="../ClientGUI/model/shipmodel.cpp" line="421"/>
+        <location filename="../ClientGUI/model/shipmodel.cpp" line="601"/>
         <location filename="../ClientGUI/ui/maintenance/repair.cpp" line="26"/>
         <source>HP</source>
         <translation>耐久</translation>
     </message>
     <message id="ship-cond">
-        <location filename="../ClientGUI/model/shipmodel.cpp" line="414"/>
-        <location filename="../ClientGUI/model/shipmodel.cpp" line="593"/>
+        <location filename="../ClientGUI/model/shipmodel.cpp" line="425"/>
+        <location filename="../ClientGUI/model/shipmodel.cpp" line="604"/>
         <source>Cond.</source>
         <translation>状态</translation>
     </message>
     <message id="ship-lv">
-        <location filename="../ClientGUI/model/shipmodel.cpp" line="418"/>
-        <location filename="../ClientGUI/model/shipmodel.cpp" line="596"/>
+        <location filename="../ClientGUI/model/shipmodel.cpp" line="429"/>
+        <location filename="../ClientGUI/model/shipmodel.cpp" line="607"/>
         <source>Level/MaxLv</source>
         <oldsource>Level</oldsource>
         <translation type="unfinished">等级</translation>
     </message>
     <message id="ship-pos">
-        <location filename="../ClientGUI/model/shipmodel.cpp" line="422"/>
-        <location filename="../ClientGUI/model/shipmodel.cpp" line="599"/>
+        <location filename="../ClientGUI/model/shipmodel.cpp" line="433"/>
+        <location filename="../ClientGUI/model/shipmodel.cpp" line="610"/>
         <source>Position</source>
         <translation>舰队位置</translation>
     </message>
     <message id="ship-fuel">
-        <location filename="../ClientGUI/model/shipmodel.cpp" line="425"/>
-        <location filename="../ClientGUI/model/shipmodel.cpp" line="603"/>
+        <location filename="../ClientGUI/model/shipmodel.cpp" line="436"/>
+        <location filename="../ClientGUI/model/shipmodel.cpp" line="614"/>
         <source>Fuel</source>
         <translation>燃料</translation>
     </message>
     <message id="ship-ammo">
-        <location filename="../ClientGUI/model/shipmodel.cpp" line="428"/>
-        <location filename="../ClientGUI/model/shipmodel.cpp" line="607"/>
+        <location filename="../ClientGUI/model/shipmodel.cpp" line="439"/>
+        <location filename="../ClientGUI/model/shipmodel.cpp" line="618"/>
         <source>Ammo</source>
         <translation>弹药</translation>
     </message>
@@ -3484,7 +3561,7 @@ Great at battle and bad at politics--so cool!</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="ship-star-whatsthis">
-        <location filename="../ClientGUI/model/shipmodel.cpp" line="565"/>
+        <location filename="../ClientGUI/model/shipmodel.cpp" line="576"/>
         <source>Modernization/Maximum Modernization</source>
         <translation type="unfinished"></translation>
     </message>

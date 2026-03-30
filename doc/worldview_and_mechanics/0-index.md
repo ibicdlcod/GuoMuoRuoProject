@@ -43,7 +43,7 @@
   * vs Player
 * Maintenance 
 
-  * [Supply](8.1-supply.md) [NOTYETIMPLEMENTED]
+  * [Supply](8.1-supply.md) [Maintenance of planes: NOTYETIMPLEMENTED]
   * [Repair](8.2-repair.md)
 * Battle mechanic [NOTYETIMPLEMENTED]
 
