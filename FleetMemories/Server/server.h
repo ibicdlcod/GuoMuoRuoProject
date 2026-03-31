@@ -194,8 +194,11 @@ private:
     void sqlinitVCR() const;
     void startSortie(const CSteamID &, QSslSocket *, int, int, bool);
     void switchCert(const QStringList &);
+    void testFleetInfoEffectiveAttr();
     std::pair<KP::FleetFailType, int> updateFleet(const CSteamID &,
                                                   const QJsonArray &);
+    void updateFleetIntoDatabase(const CSteamID &,
+                                 const FleetInfo &fleetinfo, int fleetIndex);
     int userOwnsRemodelGroup(const CSteamID &, Ship *);
     int userRemodelGroupMaxExp(const CSteamID &, Ship *);
     void userInit(const CSteamID &);
@@ -204,6 +207,7 @@ private:
     SslServer sslServer;
     QHash<QSslSocket *, CSteamID> connectedUsers;
     QMap<CSteamID, QSslSocket *> connectedPeers;
+    QMap<CSteamID, FleetInfo *> sortieFleets;
     ServerMasterSender senderM;
     Receiver receiverM;
     QMap<CSteamID, int> allowedPackets;

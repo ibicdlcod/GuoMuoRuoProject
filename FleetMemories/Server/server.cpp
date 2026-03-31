@@ -128,6 +128,9 @@ Server::~Server() noexcept {
     for(auto map: std::as_const(normalMaps)) {
         delete map;
     }
+    for(auto fi: std::as_const(sortieFleets)) {
+        delete fi;
+    }
     disconnect(&receiverM, &Receiver::jsonReceivedWithInfo,
                this, &Server::datagramReceivedStd);
     disconnect(&receiverM, &Receiver::nonStandardReceivedWithInfo,
@@ -345,6 +348,12 @@ bool Server::parseSpec(const QStringList &cmdParts) {
                 return true;
             }
             else if(primary.compare("test", Qt::CaseInsensitive) == 0) {
+                if(cmdParts.length() > 1
+                        && cmdParts[1].compare(
+                            "effective", Qt::CaseInsensitive) == 0) {
+                    testFleetInfoEffectiveAttr();
+                    return true;
+                }
                 sendTestMessages();
                 return true;
             }

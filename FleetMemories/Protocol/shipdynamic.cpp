@@ -32,6 +32,7 @@ ShipDynamic::ShipDynamic(const QJsonObject &input, QObject *parent)
     ammo = input["ammo"].toDouble(1.0);
     fleetIndex = input["fleetindex"].toInt();
     fleetPosIndex = input["fleetposindex"].toInt();
+    fleetFled = input["fleetfled"].toBool(false);
 }
 
 ShipDynamic::ShipDynamic(int hp, QObject *parent)
@@ -49,4 +50,5 @@ ShipDynamic::ShipDynamic(int hp, QObject *parent)
     ammo = 1.0;
     fleetIndex = -1;
     fleetPosIndex = -1;
+    fleetFled = false;
 }

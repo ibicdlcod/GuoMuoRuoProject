@@ -27,6 +27,7 @@ public:
     double ammo;
     int fleetIndex;
     int fleetPosIndex;
+    bool fleetFled;
 };
 
 #endif // SHIPDYNAMIC_H

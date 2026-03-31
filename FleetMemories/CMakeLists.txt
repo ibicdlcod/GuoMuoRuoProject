@@ -207,6 +207,7 @@ set(SERVER_SOURCES
     Server/server_import.cpp
     Server/server_offer.cpp
     Server/server_sqlinit.cpp
+    Server/server_test.cpp
     Server/servermastersender.cpp
     Server/servermastersender.h
     Server/sslserver.cpp
