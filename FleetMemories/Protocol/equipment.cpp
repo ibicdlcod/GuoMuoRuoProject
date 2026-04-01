@@ -227,6 +227,13 @@ int Equipment::skillPointsStd() const {
                        * skillPointBase);
 }
 
+bool Equipment::isPlane() const {
+    return type.isFighter() || type.isTorpBomber() || type.isDiveBomber()
+           || type.isRecon() || type.isSeaplane() || type.isPatrol()
+           || type.isLb()
+           || type.toString() == QLatin1String("Flyingboat");
+}
+
 bool Equipment::isRocketPlane() const {
     /* TODO:temp solution */
     return equipRegId == 350 || equipRegId == 351 || equipRegId == 352;

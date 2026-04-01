@@ -71,15 +71,17 @@ bool Server::importEquipFromCSV() {
         else {
             QStringList lineParts = text.split(",");
             int equipid = lineParts[indicatorParts.indexOf("id")].toInt();
-            if(lineParts.size() < 7) {
+            if(lineParts.size() < 8) {
                 //% "incomplete equip type definition"
                 qCritical() << qtTrId("equip-def-incomplete");
             }
             else {
-                int type = EquipType::strToIntRep(lineParts[3]);
+                int type = EquipType::strToIntRep(
+                    lineParts[indicatorParts.indexOf("type")]);
                 if(type == 0 && !lineParts[1].isEmpty()) {
                     qWarning() << lineParts[0]
-                            << "\tUnsupported type: " << lineParts[3];
+                            << "\tUnsupported type: "
+                               << lineParts[indicatorParts.indexOf("type")];
                 }
                 insertEquipName.bindValue(":id", equipid);
                 if(!insertEquipName.exec()) {

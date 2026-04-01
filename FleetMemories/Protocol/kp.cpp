@@ -362,6 +362,19 @@ QByteArray KP::clientFleetData(const QJsonArray &input) {
     return QCborValue::fromJsonValue(result).toCbor();
 }
 
+QByteArray KP::clientRequestVisibleBonus(const QUuid &shipUuid,
+                                          const QList<QUuid> &equips) {
+    QJsonObject result;
+    result["type"]    = DgramType::Request;
+    result["command"] = CommandType::RequestVisibleBonus;
+    result["uuid"]    = shipUuid.toString();
+    QJsonArray equipArray;
+    for(const QUuid &u : equips)
+        equipArray.append(u.toString());
+    result["equip"] = equipArray;
+    return QCborValue::fromJsonValue(result).toCbor();
+}
+
 QByteArray KP::clientHello() {
     QJsonObject result;
     result["type"] = DgramType::Auth;
@@ -652,6 +665,16 @@ QByteArray KP::serverFleetFailure(FleetFailType type, int fleetIndex) {
     result["reason"] = type;
     if(fleetIndex >= 0)
         result["fleetindex"] = fleetIndex;
+    return QCborValue::fromJsonValue(result).toCbor();
+}
+
+/* content must contain a "ships" array; each element has "uuid",
+ * "bonuses" (first type, per slot), and "bonuses2" (second type, LuaMap). */
+QByteArray KP::serverVisibleBonusInfo(const QJsonObject &content) {
+    QJsonObject result;
+    result["type"]     = DgramType::Info;
+    result["infotype"] = InfoType::VisibleBonusInfo;
+    result["ships"]    = content["ships"];
     return QCborValue::fromJsonValue(result).toCbor();
 }
 

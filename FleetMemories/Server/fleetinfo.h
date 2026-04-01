@@ -35,6 +35,25 @@ public:
     /* Returns the per-ship equipment grid suitable for Lua branch-rule calls. */
     std::vector<std::vector<Equipment *>> getEquipGrid() const;
 
+    /* effectiveAttr helpers – exposed as statics for external testing. */
+    static LuaMap attrFromShip(const Ship *ship, const ShipDynamic *dyn);
+    static LuaMap attrFromEquipment(const Ship *ship, const ShipDynamic *dyn,
+                                    const QHash<QUuid, Equipment *> &equipMap,
+                                    const QHash<QUuid, double> &skillEffects);
+
+    /* Returns the first-type visible bonus multiplier for one equip slot.
+     * Always 1.0 for now; future implementations may depend on ship
+     * definition, dynamic state, and slot position. */
+    static double getVisibleBonusFirstType(const Ship *ship,
+                                           const ShipDynamic *dyn,
+                                           int equipPos);
+
+    /* Returns the second-type (virtual-equipment) visible bonus addend.
+     * Always an empty map for now; future implementations may add
+     * bonus attributes from virtual equipment. */
+    static LuaMap getVisibleBonusSecondType(const Ship *ship,
+                                            const ShipDynamic *dyn);
+
     KP::FleetType type;
     std::vector<Ship *> ships;
     std::vector<ShipDynamic *> shipDynamics;

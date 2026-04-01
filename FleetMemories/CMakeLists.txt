@@ -113,6 +113,8 @@ set(CLIENT_SOURCES
     ClientGUI/ui/fleet/shipdisplayflat.cpp
     ClientGUI/ui/fleet/shipdisplayflat.h
     ClientGUI/ui/fleet/shipdisplayflat.ui
+    ClientGUI/ui/fleet/shipattrdialog.cpp
+    ClientGUI/ui/fleet/shipattrdialog.h
     ClientGUI/ui/fleet/shipequip.cpp
     ClientGUI/ui/fleet/shipequip.h
     ClientGUI/ui/fleet/shipequip.ui
@@ -323,7 +325,10 @@ add_custom_target(copy_assets
     "${PROJECT_BINARY_DIR}/lua"
     COMMENT "Copying lua files"
 )
-# frequently error but not always
+# Ensure lrelease runs after lupdate so .qm files pick up new IDs.
+# release_translations is created by qt_add_translations via deferred calls,
+# so we use cmake_language(DEFER) to add the dependency after it exists.
+cmake_language(DEFER CALL add_dependencies release_translations update_translations)
 add_dependencies(CFProtocol update_translations)
 add_dependencies(CFClient update_translations)
 add_dependencies(CFServer update_translations)

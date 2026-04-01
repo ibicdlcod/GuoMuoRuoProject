@@ -21,6 +21,8 @@ public:
                        FleetView *parent = nullptr);
     ~ShipEquip();
 
+    void setFlatMode();
+
 public slots:
     void updateEquipName(QUuid equipUid);
     void updatePlaneCountDirect(ShipDynamic *dynamic);

@@ -4064,8 +4064,32 @@ anti_ddos:
         break;
     case KP::CommandType::FleetData: {
         auto [error, fleetIdx] = updateFleet(uid, djson["content"].toArray());
-        QByteArray msg = KP::serverFleetFailure(error, fleetIdx);
-        senderM.sendMessage(connection, msg);
+        senderM.sendMessage(connection, KP::serverFleetFailure(error, fleetIdx));
+    }
+        break;
+    case KP::CommandType::RequestVisibleBonus: {
+        QUuid shipUuid = QUuid(djson["uuid"].toString());
+        Ship *ship = shipRegistry.value(User::getShipDef(shipUuid), nullptr);
+        const QJsonArray &equips = djson["equip"].toArray();
+        QJsonArray bonuses;
+        /* ShipDynamic not fetched here; pass nullptr until
+         * the visible bonus functions gain real logic */
+        for(int slot = 0; slot < equips.size(); ++slot)
+            bonuses.append(
+                FleetInfo::getVisibleBonusFirstType(ship, nullptr, slot));
+        LuaMap c = FleetInfo::getVisibleBonusSecondType(ship, nullptr);
+        QJsonObject bonuses2;
+        for(auto it = c.cbegin(); it != c.cend(); ++it)
+            bonuses2[it.key()] = it.value();
+        QJsonObject entry;
+        entry["uuid"]     = shipUuid.toString();
+        entry["bonuses"]  = bonuses;
+        entry["bonuses2"] = bonuses2;
+        QJsonArray shipBonuses;
+        shipBonuses.append(entry);
+        QJsonObject bonusData;
+        bonusData["ships"] = shipBonuses;
+        senderM.sendMessage(connection, KP::serverVisibleBonusInfo(bonusData));
     }
         break;
     case KP::CommandType::RequestSortie: {

@@ -44,6 +44,10 @@ QHash<QUuid, int> & EquipModel::getClientEquipStars() {
     return clientEquipStars;
 }
 
+int EquipModel::getSkillPoints(int equipDef) const {
+    return skillPointReg.value(equipDef, 0);
+}
+
 void EquipModel::switchDisplayType(int index) {
     Client &engine = Client::getInstance();
     int oldRowCount = rowCount();

@@ -116,35 +116,53 @@ std::vector<std::vector<Equipment *>> FleetInfo::getEquipGrid() const {
 /* ---- effectiveAttr helpers ---- */
 
 /* a: ship base attrs scaled by efficiency at current level/star */
-static LuaMap attrFromShip(const Ship *ship, const ShipDynamic *dyn) {
+LuaMap FleetInfo::attrFromShip(const Ship *ship, const ShipDynamic *dyn) {
     int lv = Ship::getLevel(dyn->exp);
     double eff = Ship::getEfficiency(lv, dyn->star);
     LuaMap result;
     for(auto it = ship->attr.cbegin(); it != ship->attr.cend(); ++it) {
-        result[it.key()] = static_cast<int>(std::round(it.value() * eff));
+        if (it.key() == QLatin1String("Hitpoints")
+            || it.key() == QLatin1String("Speed"))
+            result[it.key()] = it.value();
+        else
+            result[it.key()] = static_cast<int>(std::round(it.value() * eff));
     }
     return result;
 }
 
-/* b: sum of equipment attr contributions scaled by skill-point effect */
-static LuaMap attrFromEquipment(const ShipDynamic *dyn,
-                                const QHash<QUuid, Equipment *> &equipMap,
-                                const QHash<QUuid, double> &skillEffects) {
+/* b: equipment attr contributions, each slot scaled by skillEff × visBonus */
+LuaMap FleetInfo::attrFromEquipment(const Ship *ship, const ShipDynamic *dyn,
+                                    const QHash<QUuid, Equipment *> &equipMap,
+                                    const QHash<QUuid, double> &skillEffects) {
     LuaMap result;
-    auto addEquip = [&](const QUuid &uuid) {
+    auto addEquip = [&](const QUuid &uuid, int equipPos) {
         Equipment *eq = equipMap.value(uuid, nullptr);
         if(!eq)
             return;
-        double skillEff = skillEffects.value(uuid, 1.0);
+        double skillEff  = skillEffects.value(uuid, 1.0);
+        double visBonus  = getVisibleBonusFirstType(ship, dyn, equipPos);
         for(auto it = eq->attr.cbegin(); it != eq->attr.cend(); ++it) {
             result[it.key()] +=
-                static_cast<int>(std::round(it.value() * skillEff));
+                static_cast<int>(std::round(it.value() * skillEff * visBonus));
         }
     };
-    for(const QUuid &uuid : dyn->slotEquip)
-        addEquip(uuid);
-    addEquip(dyn->slotEquipEx);
+    for(int i = 0; i < dyn->slotEquip.size(); ++i)
+        addEquip(dyn->slotEquip[i], i);
+    addEquip(dyn->slotEquipEx, dyn->slotEquip.size()); /* EX slot */
     return result;
+}
+
+double FleetInfo::getVisibleBonusFirstType(const Ship * /* ship */,
+                                           const ShipDynamic * /* dyn */,
+                                           int /* equipPos */) {
+    /* TODO: implement actual visible bonus logic */
+    return 1.0;
+}
+
+LuaMap FleetInfo::getVisibleBonusSecondType(const Ship * /* ship */,
+                                            const ShipDynamic * /* dyn */) {
+    /* TODO: implement actual virtual-equipment bonus logic */
+    return {};
 }
 
 LuaMap FleetInfo::effectiveAttr(const CSteamID & /* uid */, int fleetPosIndex) {
@@ -154,10 +172,15 @@ LuaMap FleetInfo::effectiveAttr(const CSteamID & /* uid */, int fleetPosIndex) {
     LuaMap result = attrFromShip(ships[fleetPosIndex],
                                  shipDynamics[fleetPosIndex]);
     /* b */
-    LuaMap b = attrFromEquipment(shipDynamics[fleetPosIndex],
+    LuaMap b = attrFromEquipment(ships[fleetPosIndex],
+                                 shipDynamics[fleetPosIndex],
                                  equipMap, equipSkillEffects);
     for(auto it = b.cbegin(); it != b.cend(); ++it)
         result[it.key()] += it.value();
-    /* c: virtual-equipment bonus – zero for now */
+    /* c: visible bonus second type (virtual-equipment addend) */
+    LuaMap c = getVisibleBonusSecondType(ships[fleetPosIndex],
+                                         shipDynamics[fleetPosIndex]);
+    for(auto it = c.cbegin(); it != c.cend(); ++it)
+        result[it.key()] += it.value();
     return result;
 }

@@ -255,6 +255,7 @@ enum CommandType{
     InitARDPurchase,
     SupplyShip,
     BuyOrdinaryResources,
+    RequestVisibleBonus,
 };
 Q_ENUM_NS(CommandType)
 
@@ -326,6 +327,7 @@ enum InfoType{
     MapInfoUser,
     MapStart,
     MapProgress,
+    VisibleBonusInfo,
 };
 Q_ENUM_NS(InfoType)
 
@@ -728,6 +730,8 @@ QByteArray clientDockRefresh();
 QByteArray clientFactoryRefresh();
 QByteArray clientFetch(int factoryID = -1, bool forced = false);
 QByteArray clientFleetData(const QJsonArray &);
+QByteArray clientRequestVisibleBonus(const QUuid &shipUuid,
+                                     const QList<QUuid> &equips);
 QByteArray clientHello();
 QByteArray clientHomePort(AllegianceGroup);
 QByteArray clientInitARDPurchase(int units);
@@ -865,6 +869,7 @@ QByteArray serverEquipInfo(const QJsonArray &, bool user = false,
                            bool cacheHit = false);
 QByteArray serverFairyBusy(int);
 QByteArray serverFleetFailure(FleetFailType, int fleetIndex = -1);
+QByteArray serverVisibleBonusInfo(const QJsonObject &);
 QByteArray serverGlobalTech(double, int);
 QByteArray serverGlobalTech(const QList<TechEntry> &, bool);
 QByteArray serverHello();

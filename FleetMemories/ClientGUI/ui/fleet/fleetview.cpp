@@ -11,6 +11,7 @@
 #include "../../../Protocol/kp.h"
 #include "../../clientv2.h"
 #include "interactivelabel.h"
+#include "shipattrdialog.h"
 #include "shipdisplay.h"
 #include "shipequip.h"
 
@@ -123,6 +124,15 @@ equip_slots:
                         equipSlotsColumn + 1 + KP::maxEquipSlots);
         //% "Attributes"
         attrButton->setText(qtTrId("fleetview-view-ship-attr"));
+        attrButton->hide();
+        connect(attrButton, &QPushButton::clicked, this, [this, i]() {
+            Ship *ship = getShip(i);
+            ShipDynamic *dyn = getShipDynamic(i);
+            if (!ship || !dyn)
+                return;
+            ShipAttrDialog dlg(ship, dyn, getShipUuid(i), i, this, this);
+            dlg.exec();
+        });
     }
 
     QVBoxLayout *greatLayout = new QVBoxLayout(this);
@@ -380,6 +390,10 @@ void FleetView::modifyFleetShip(int posIndex, QUuid uid) {
                     oldPos.posindex + 1, nameColumn)->widget());
             auto oldLvText = qobject_cast<ShipDisplay *>
                 (grid->itemAtPosition(oldPos.posindex + 1, lvColumn)->widget());
+            auto *oldAttrBtn = qobject_cast<QPushButton *>(
+                grid->itemAtPosition(oldPos.posindex + 1,
+                                     equipSlotsColumn + 1
+                                         + KP::maxEquipSlots)->widget());
             if(!oldUid.isNull()) {
                 QString oldName = ship->toString();
                 oldText->setText(oldName);
@@ -388,10 +402,12 @@ void FleetView::modifyFleetShip(int posIndex, QUuid uid) {
                                       shipD->condition,
                                       Ship::getLevel(
                                           std::min(shipD->exp, shipD->expCap)));
+                if (oldAttrBtn) oldAttrBtn->show();
             }
             else {
                 oldText->setText("");
                 oldLvText->hide();
+                if (oldAttrBtn) oldAttrBtn->hide();
             }
             for(int j = 0; j < slotNum; ++j) {
                 grid->itemAtPosition(oldPos.posindex + 1,
@@ -437,6 +453,7 @@ void FleetView::modifyFleetShip(int posIndex, QUuid uid) {
             = -1;
     }
     ships[newPos] = uid;
+    Client::getInstance().requestVisibleBonus(uid);
     qobject_cast<InteractiveLabel *>
         (grid->itemAtPosition(newPos.posindex + 1, shipIconColumn)->widget())
             ->updateShipUId(uid);
@@ -445,6 +462,9 @@ void FleetView::modifyFleetShip(int posIndex, QUuid uid) {
     auto newLvText = qobject_cast<ShipDisplay *>
         (grid->itemAtPosition(newPos.posindex + 1, lvColumn)->widget());
     auto [ship, shipD] = shipModel->getShip(uid);
+    auto *newAttrBtn = qobject_cast<QPushButton *>(
+        grid->itemAtPosition(newPos.posindex + 1,
+                             equipSlotsColumn + 1 + KP::maxEquipSlots)->widget());
     int slotNum = 0;
     bool slotExEnabled = false;
     if(!uid.isNull()) {
@@ -478,10 +498,12 @@ void FleetView::modifyFleetShip(int posIndex, QUuid uid) {
             >= KP::levelUnlockExSlot) {
             slotExEnabled = true;
         }
+        if (newAttrBtn) newAttrBtn->show();
     }
     else {
         newText->setText("");
         newLvText->hide();
+        if (newAttrBtn) newAttrBtn->hide();
     }
     for(int j = 0; j < slotNum; ++j) {
         grid->itemAtPosition(newPos.posindex + 1,
@@ -666,6 +688,7 @@ void FleetView::equipSelected(int shipPosIndex,
                               int equipSlotIndex,
                               QUuid equipUid) {
     emit modifyEquip(getShipUuid(shipPosIndex), equipSlotIndex, equipUid);
+    Client::getInstance().requestVisibleBonus(getShipUuid(shipPosIndex));
 }
 
 void FleetView::equipSelectedPassive(QUuid shipUid,
@@ -680,4 +703,5 @@ void FleetView::equipSelectedPassive(QUuid shipUid,
                 ->updateEquipName(equipUid);
         }
     }
+    Client::getInstance().requestVisibleBonus(shipUid);
 }

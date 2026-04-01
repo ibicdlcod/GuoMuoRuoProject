@@ -73,6 +73,16 @@ void Client::doBattle(const QJsonObject &contents) {
     sender->enqueue(msg);
 }
 
+void Client::requestVisibleBonus(const QUuid &shipUuid) {
+    if(shipUuid.isNull())
+        return;
+    QList<QUuid> equips;
+    for(int i = 0; i <= KP::maxEquipSlots; ++i)
+        equips.append(equipModel.getShipEquip(shipUuid, i));
+    sender->enqueue(KP::clientRequestVisibleBonus(shipUuid, equips));
+    socket.flush();
+}
+
 void Client::sendFleetData(const QJsonArray &content) {
     QByteArray msg = KP::clientFleetData(content);
     sender->enqueue(msg);

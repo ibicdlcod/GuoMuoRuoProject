@@ -4,6 +4,7 @@
 #include "shipequip.h"
 #include "ui_shipequip.h"
 
+#include <QBoxLayout>
 #include <QMouseEvent>
 #include <QPainter>
 #include <QStyleHints>
@@ -22,9 +23,9 @@ ShipEquip::ShipEquip(int shipPosIndex,
     QWidget(parent), ui(new Ui::ShipEquip)
 {
     ui->setupUi(this);
-    if(equipSlotIndex == KP::maxEquipSlots) {
-        ui->planeCountBox->hide();
-    }
+    ui->horizontalLayout->insertStretch(0);
+    ui->horizontalLayout->addStretch();
+    ui->planeCountBox->hide();
 
     connect(ui->planeCountBox, &QSpinBox::valueChanged,
             this, &ShipEquip::updatePlaneCount);
@@ -75,6 +76,8 @@ void ShipEquip::mouseReleaseEvent(QMouseEvent *event)
             view->setGeometry(windowGeometry);
             view->update();
             view->show();
+            view->raise();
+            view->activateWindow();
             view->recalculateArsenalRows();
             view->update();
             connect(view, &EquipView::equipSelected,
@@ -151,6 +154,9 @@ void ShipEquip::updateEquipName(QUuid equipUid)
         ui->equipText->setText(qtTrId("empty-equip-slot"));
         ui->starText->setText("");
         ui->typeIcon->hide();
+        ui->planeCountBox->hide();
+        if (planeCount != 0)
+            updatePlaneCount(0);
         update();
         return;
     }
@@ -160,7 +166,17 @@ void ShipEquip::updateEquipName(QUuid equipUid)
         ui->equipText->setText(qtTrId("unknown"));
         ui->starText->setText("");
         ui->typeIcon->clear();
+        ui->planeCountBox->hide();
+        if (planeCount != 0)
+            updatePlaneCount(0);
         return;
+    }
+    if (equipSlotIndex != KP::maxEquipSlots && equip->isPlane()) {
+        ui->planeCountBox->show();
+    } else {
+        ui->planeCountBox->hide();
+        if (planeCount != 0)
+            updatePlaneCount(0);
     }
     QString localName = equip->toString(
         settings->value("client/language", "ja_JP").toString());
@@ -191,4 +207,36 @@ void ShipEquip::updateEquipName(QUuid equipUid)
 void ShipEquip::updatePlaneCountDirect(ShipDynamic *dynamic)
 {
     ui->planeCountBox->setValue(dynamic->slotPlanes[equipSlotIndex]);
+}
+
+void ShipEquip::setFlatMode()
+{
+    /* Remove all widgets from existing layouts */
+    ui->horizontalLayout->removeWidget(ui->planeCountBox);
+    ui->horizontalLayout->removeWidget(ui->typeIcon);
+    ui->horizontalLayout->removeWidget(ui->starText);
+    ui->verticalLayout->removeItem(ui->horizontalLayout);
+    ui->verticalLayout->removeWidget(ui->equipText);
+    delete ui->horizontalLayout;
+
+    /* Rebuild as single horizontal row */
+    QSizePolicy spRetain = ui->planeCountBox->sizePolicy();
+    spRetain.setRetainSizeWhenHidden(true);
+    ui->planeCountBox->setSizePolicy(spRetain);
+    ui->verticalLayout->addWidget(ui->planeCountBox);
+    ui->verticalLayout->addWidget(ui->typeIcon);
+    ui->verticalLayout->addWidget(ui->starText);
+    ui->verticalLayout->addWidget(ui->equipText);
+    ui->verticalLayout->addStretch();
+    static_cast<QVBoxLayout *>(ui->verticalLayout)
+        ->setDirection(QBoxLayout::LeftToRight);
+
+    ui->equipText->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
+    ui->equipText->setWordWrap(false);
+    ui->equipText->setSizePolicy(QSizePolicy::Preferred,
+                                  QSizePolicy::Preferred);
+    ui->starText->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
+    setMinimumSize(QSize(0, 0));
+    setMaximumSize(QSize(QWIDGETSIZE_MAX, QWIDGETSIZE_MAX));
+    setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
 }

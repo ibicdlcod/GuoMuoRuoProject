@@ -35,7 +35,7 @@ void HpDelegate::paint(QPainter *painter,
     QString str = index.model()->data(index, Qt::DisplayRole).toString();
     QStringList list = str.split("/");
     int currentHP = list[0].toInt();
-    int totalHP = std::max(list[1].toInt() , 50);
+    int totalHP = std::max(list[1].toInt() , 1);
 
     QStyleOptionProgressBar progressBarOption;
     progressBarOption.rect = barRect;

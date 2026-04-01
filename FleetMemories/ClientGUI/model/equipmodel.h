@@ -18,6 +18,7 @@ public:
     std::tuple<Equipment *, int> getEquip(QUuid);
     QHash<QUuid, Equipment *> & getClientEquips();
     QHash<QUuid, int> & getClientEquipStars();
+    int getSkillPoints(int equipDef) const;
 
 signals:
     void sortReversedChanged(bool);

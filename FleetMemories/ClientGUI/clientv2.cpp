@@ -581,6 +581,24 @@ void Client::receivedInfo(const QJsonObject &djson) {
         emit gamestateChanged(KP::SortieMapView);
         emit receivedMapStart(djson);
         break;
+    case KP::InfoType::VisibleBonusInfo: {
+        for(const auto &entry : djson["ships"].toArray()) {
+            auto obj   = entry.toObject();
+            QUuid uuid = QUuid(obj["uuid"].toString());
+            QList<double> bonuses;
+            for(const auto &v : obj["bonuses"].toArray())
+                bonuses.append(v.toDouble(1.0));
+            visibleBonusFirstTypeCache[uuid] = bonuses;
+            LuaMap bonuses2;
+            const QJsonObject bonuses2Obj = obj["bonuses2"].toObject();
+            for(auto it = bonuses2Obj.constBegin();
+                 it != bonuses2Obj.constEnd(); ++it)
+                bonuses2[it.key()] = it.value().toInt(0);
+            visibleBonusSecondTypeCache[uuid] = bonuses2;
+        }
+        emit visibleBonusUpdated();
+        break;
+    }
     case KP::InfoType::MapProgress: {
         int mapId = djson["mapid"].toInt();
         int nextNodeId = djson["next"].toInt();

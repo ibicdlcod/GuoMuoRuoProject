@@ -31,8 +31,12 @@ Q_GLOBAL_STATIC(QStringList,
                         QT_TRID_NOOP("equip-attr-mother"),
                         //% "Possessing limit"
                         QT_TRID_NOOP("equip-attr-disallowmassproduction"),
+                        //% "Planes"
+                        QT_TRID_NOOP("equip-attr-planes"),
                         //% "Hitpoints"
                         QT_TRID_NOOP("equip-attr-hitpoints"),
+                        //% "DPM"
+                        QT_TRID_NOOP("equip-attr-dpm"),
                         //% "Firepower"
                         QT_TRID_NOOP("equip-attr-firepower"),
                         //% "Armor"
@@ -103,6 +107,7 @@ public:
     double getTech() const;
     bool isInvalid() const;
     bool isNotEqual(const Equipment &) const;
+    bool isPlane() const;
     bool isRocketPlane() const;
     int skillPointsStd() const;
     QString toString(QString lang = settings->value("client/language", "ja_JP")

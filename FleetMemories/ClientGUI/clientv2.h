@@ -138,6 +138,7 @@ public slots:
     bool parseSpec(const QStringList &);
     void queryNextNode(int mapId, int prevNode, bool retreat = false);
     void sendEncryptedAppTicket(uint8 [], uint32);
+    void requestVisibleBonus(const QUuid &shipUuid);
     void sendFleetData(const QJsonArray &);
     void serverResponse(const QString &, const QByteArray &);
     void serverResponseNonStd(const QByteArray &);
@@ -192,6 +193,7 @@ signals:
     void tsunkitAssetsComplete();
     void uiRefreshSig();
     void unlockBattle();
+    void visibleBonusUpdated();
 
 private slots:
     void changeGameState(KP::GameState);
@@ -271,6 +273,12 @@ private:
 public:
     QMap<int, MapWithDiff *> mapRegistryCache;
     bool mapRegistryCacheGood = false;
+    /* Per ship-instance UUID: one entry per equip slot (0..maxEquipSlots).
+     * Populated by serverVisibleBonusInfo after each successful FleetData. */
+    QHash<QUuid, QList<double>> visibleBonusFirstTypeCache;
+    /* Per ship-instance UUID: additive virtual-equipment bonus attributes.
+     * Populated alongside visibleBonusFirstTypeCache. */
+    QHash<QUuid, LuaMap> visibleBonusSecondTypeCache;
     QMap<int, double> mapSupremacies;
     KP::AllegianceGroup homeNation = KP::UnknownNation;
     /* 8.1-supply.md#Supply_chain_and_attrition:

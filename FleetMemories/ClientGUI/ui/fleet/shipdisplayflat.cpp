@@ -19,8 +19,8 @@ ShipDisplayFlat::~ShipDisplayFlat()
 
 /* idential with shipdisplay */
 void ShipDisplayFlat::setContent(int currentHP, int maxHP, int cond, int lv) {
-    if(maxHP < 50)
-        maxHP = 50;
+    if(maxHP < 1)
+        maxHP = 1;
     ui->hpBar->setMinimum(0);
     ui->hpBar->setMaximum(maxHP);
     ui->hpBar->setValue(currentHP);
