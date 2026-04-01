@@ -262,16 +262,9 @@ void MainWindow::unlockBattle() {
 }
 
 void MainWindow::adjust(int) {
-    QTimer::singleShot(10ms, this,
-                       [this]
-                       {
-                           auto geo = geometry();
-                           auto tempGeo = geo;
-                           tempGeo.setRect(tempGeo.x(), tempGeo.y(),
-                                           tempGeo.width(), tempGeo.height()-1);
-                           setGeometry(tempGeo);
-                           setGeometry(geo);
-                       });
+    QTimer::singleShot(0, this, [this]() {
+        adjustArea(lay->currentWidget(), ui->MainArea->frameSize());
+    });
 }
 
 void MainWindow::adjustArea(QWidget *input, const QSize &size) {

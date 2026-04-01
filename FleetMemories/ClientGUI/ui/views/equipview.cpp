@@ -389,6 +389,9 @@ void EquipView::activate(bool arsenal, bool isEquip,
                         reverseCheck->blockSignals(false);
                     });
             lay->setCurrentWidget(equipSelect);
+            // Re-apply the saved Equiptype/Equip filter so the model reflects
+            // the user's previous selection even after filterByShip() reset it.
+            model->switchDisplayType(equipSelect->typeBox->currentIndex());
         }
     }
     else {

@@ -70,6 +70,7 @@ Sortie::~Sortie()
 }
 
 void Sortie::switchToState(KP::SortieState state) {
+    globeFrame->resize(ui->MapView->size());
     Client &engine = Client::getInstance();
     switch(state) {
     case KP::MapView:

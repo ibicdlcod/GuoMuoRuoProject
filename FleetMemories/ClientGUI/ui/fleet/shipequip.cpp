@@ -58,9 +58,9 @@ void ShipEquip::mouseReleaseEvent(QMouseEvent *event)
     if (event->button() == Qt::LeftButton && mousePressedInside) {
         if (rect().contains(event->pos())) {
             EquipView *view = parentView->equipView;
-            view->activate(false, true);
             engine.equipModel.filterByShip(parentView->getShip(shipPosIndex),
                                            equipSlotIndex == KP::maxEquipSlots);
+            view->activate(false, true);
             view->setMinimumHeight(viewMinimumHeight);
             view->setAttribute(Qt::WA_DeleteOnClose, false);
             QScreen *screen = view->screen();

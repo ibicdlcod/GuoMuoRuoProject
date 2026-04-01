@@ -272,14 +272,14 @@ private:
     };
 
     inline static const QHash<QString, QString> primaryAttr = {
-        std::pair("Small-gun-flat",         "Firepower"),
-        std::pair("Small-gun-flak",         "Firepower"),
-        std::pair("Mid-gun-flat",           "Firepower"),
-        std::pair("Mid-gun-flat-ca",        "Firepower"),
-        std::pair("Mid-gun-flak",           "Firepower"),
-        std::pair("Big-gun",                "Firepower"),
-        std::pair("Superbig-gun",           "Firepower"),
-        std::pair("Supremebig-gun",         "Firepower"),
+        std::pair("Small-gun-flat",         "DPM"),
+        std::pair("Small-gun-flak",         "DPM"),
+        std::pair("Mid-gun-flat",           "DPM"),
+        std::pair("Mid-gun-flat-ca",        "DPM"),
+        std::pair("Mid-gun-flak",           "DPM"),
+        std::pair("Big-gun",                "DPM"),
+        std::pair("Superbig-gun",           "DPM"),
+        std::pair("Supremebig-gun",         "DPM"),
         std::pair("Second-gun-flat",        "Accuracy"),
         std::pair("Second-gun-flak",        "Antiair"),
         std::pair("Second-gun-flak-big",    "Antiair"),
