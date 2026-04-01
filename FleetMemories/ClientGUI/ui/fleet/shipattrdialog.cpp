@@ -3,10 +3,17 @@
 
 #include "shipattrdialog.h"
 
+#include <algorithm>
 #include <cmath>
+
+#include <QApplication>
 #include <QDialogButtonBox>
-#include <QHeaderView>
-#include <QTableWidget>
+#include <QGridLayout>
+#include <QHBoxLayout>
+#include <QLabel>
+#include <QPainter>
+#include <QProgressBar>
+#include <QStyleHints>
 #include <QVBoxLayout>
 
 #include "../../clientv2.h"
@@ -32,10 +39,7 @@ static LuaMap shipContrib(const Ship *ship, const ShipDynamic *dyn) {
     return out;
 }
 
-/* b: equipment attrs scaled by skillEff × visibleBonusFirstType.
- * Reads current equip assignments from EquipModel (the local UI state),
- * not from ShipDynamic::slotEquip, so changes made before saving the fleet
- * are immediately reflected. */
+/* b: equipment attrs scaled by skillEff × visibleBonusFirstType. */
 static LuaMap equipContrib(const QUuid &shipUuid) {
     Client &engine = Client::getInstance();
     auto &equipMap   = engine.equipModel.getClientEquips();
@@ -67,17 +71,47 @@ static LuaMap equipContrib(const QUuid &shipUuid) {
     return out;
 }
 
+/* ---- CardPlaceholder ---- */
+
+CardPlaceholder::CardPlaceholder(const QPixmap &icon, QWidget *parent)
+    : QFrame(parent), icon_(icon)
+{
+    setFrameShape(QFrame::Box);
+    setFrameShadow(QFrame::Sunken);
+    setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
+}
+
+void CardPlaceholder::paintEvent(QPaintEvent *event)
+{
+    QPainter painter(this);
+    painter.fillRect(rect(), palette().base());
+    if (!icon_.isNull()) {
+        int iconSize = width() * 2 / 5;
+        QPixmap scaled = icon_.scaled(iconSize, iconSize,
+                                       Qt::KeepAspectRatio,
+                                       Qt::SmoothTransformation);
+        int x = (width()  - scaled.width())  / 2;
+        int y = (height() - scaled.height()) / 2;
+        painter.setOpacity(0.35);
+        painter.drawPixmap(x, y, scaled);
+    }
+    QFrame::paintEvent(event);
+}
+
+/* ---- ShipAttrDialog ---- */
+
 ShipAttrDialog::ShipAttrDialog(Ship *ship, ShipDynamic *dyn,
                                const QUuid &shipUuid, QWidget *parent)
     : QDialog(parent)
 {
     setWindowTitle(ship->toString());
+    setMinimumSize(500, 350);
 
+    /* Compute total effective attributes */
     LuaMap total = shipContrib(ship, dyn);
     LuaMap b     = equipContrib(shipUuid);
     for (auto it = b.cbegin(); it != b.cend(); ++it)
         total[it.key()] += it.value();
-    /* c: visible bonus second type (virtual-equipment addend) */
     const LuaMap &c = Client::getInstance().visibleBonusSecondTypeCache
                           .value(shipUuid);
     for (auto it = c.cbegin(); it != c.cend(); ++it)
@@ -91,31 +125,130 @@ ShipAttrDialog::ShipAttrDialog(Ship *ship, ShipDynamic *dyn,
             rows.append({key, val});
     }
 
-    auto *table = new QTableWidget(rows.size(), 2, this);
-    //% "Attribute"
-    table->setHorizontalHeaderItem(0, new QTableWidgetItem(
-                                          qtTrId("shipattr-dialog-col-attr")));
-    //% "Value"
-    table->setHorizontalHeaderItem(1, new QTableWidgetItem(
-                                          qtTrId("shipattr-dialog-col-value")));
-    table->horizontalHeader()->setSectionResizeMode(
-        0, QHeaderView::ResizeToContents);
-    table->horizontalHeader()->setSectionResizeMode(
-        1, QHeaderView::ResizeToContents);
-    table->verticalHeader()->hide();
-    table->setEditTriggers(QAbstractItemView::NoEditTriggers);
-    table->setSelectionMode(QAbstractItemView::NoSelection);
+    /* ---- Header ---- */
+    QString typeStr = ship->getType().toString();
+    QPixmap typeIconPx(":/resources/shiptype/" + typeStr + ".png");
 
-    for (int r = 0; r < rows.size(); ++r) {
-        table->setItem(r, 0, new QTableWidgetItem(rows[r].first));
-        table->setItem(r, 1, new QTableWidgetItem(
-                                  QString::number(rows[r].second)));
+    auto *typeIconLabel = new QLabel;
+    typeIconLabel->setPixmap(typeIconPx.scaled(32, 32,
+                                               Qt::KeepAspectRatio,
+                                               Qt::SmoothTransformation));
+
+    auto *nameLabel = new QLabel(ship->toString());
+    QFont nameFont = nameLabel->font();
+    nameFont.setPointSize(14);
+    nameFont.setBold(true);
+    nameLabel->setFont(nameFont);
+
+    int lv = Ship::getLevel(std::min(dyn->exp, dyn->expCap));
+    //% "Lv %1"
+    auto *lvLabel = new QLabel(qtTrId("lv-display").arg(lv));
+
+    auto *nameRow = new QHBoxLayout;
+    nameRow->addWidget(typeIconLabel);
+    nameRow->addSpacing(6);
+    nameRow->addWidget(nameLabel);
+    nameRow->addStretch();
+    nameRow->addWidget(lvLabel);
+
+    /* HP bar */
+    int maxHP = std::max(total.value("Hitpoints", 50), 50);
+    auto *hpBar = new QProgressBar;
+    hpBar->setRange(0, maxHP);
+    hpBar->setValue(dyn->currentHP);
+    hpBar->setTextVisible(false);
+    {
+        QPalette pal = QApplication::palette();
+        double ratio = dyn->currentHP / static_cast<double>(maxHP);
+        QColor hpCol;
+        switch (QApplication::styleHints()->colorScheme()) {
+        case Qt::ColorScheme::Dark:
+            hpCol = QColor::fromHsv(static_cast<int>(ratio * 120.0), 255, 128);
+            break;
+        default:
+            hpCol = QColor::fromHsv(static_cast<int>(ratio * 120.0), 128, 255);
+            break;
+        }
+        pal.setColor(QPalette::Highlight, hpCol);
+        pal.setColor(QPalette::HighlightedText,
+            QApplication::styleHints()->colorScheme() == Qt::ColorScheme::Dark
+                ? Qt::white : Qt::black);
+        hpBar->setPalette(pal);
     }
 
-    auto *buttons = new QDialogButtonBox(QDialogButtonBox::Ok, this);
+    /* Condition icon */
+    QString condStr = ":/resources/shipCond/";
+    if (dyn->condition > 144)       condStr += "good";
+    else if (dyn->condition > 36)   condStr += "warn";
+    else                            condStr += "bad";
+    if (QApplication::styleHints()->colorScheme() != Qt::ColorScheme::Dark)
+        condStr += "dark";
+    condStr += ".svg";
+    auto *condIconLabel = new QLabel;
+    condIconLabel->setPixmap(QIcon(condStr).pixmap(20, 20));
+
+    auto *starsLabel = new QLabel(QString("★").repeated(dyn->star));
+
+    auto *hpNumbers = new QLabel(
+        QString::number(dyn->currentHP) + " / " + QString::number(maxHP));
+
+    auto *condRow = new QHBoxLayout;
+    condRow->addWidget(condIconLabel);
+    condRow->addSpacing(4);
+    condRow->addWidget(starsLabel);
+    condRow->addStretch();
+    condRow->addWidget(hpNumbers);
+
+    auto *headerLayout = new QVBoxLayout;
+    headerLayout->setSpacing(4);
+    headerLayout->addLayout(nameRow);
+    headerLayout->addWidget(hpBar);
+    headerLayout->addLayout(condRow);
+
+    /* ---- Separator ---- */
+    auto *separator = new QFrame;
+    separator->setFrameShape(QFrame::HLine);
+    separator->setFrameShadow(QFrame::Sunken);
+
+    /* ---- Attribute grid ---- */
+    auto *attrsGrid = new QGridLayout;
+    attrsGrid->setHorizontalSpacing(12);
+    attrsGrid->setVerticalSpacing(4);
+    for (int i = 0; i < rows.size(); ++i) {
+        int col = (i % 2) * 3;
+        int row = i / 2;
+        QString trKey = "equip-attr-" + rows[i].first.toLower();
+        auto *kLabel = new QLabel(qtTrId(trKey.toUtf8()));
+        auto *vLabel = new QLabel(QString::number(rows[i].second));
+        vLabel->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
+        attrsGrid->addWidget(kLabel, row, col,     Qt::AlignLeft);
+        attrsGrid->addWidget(vLabel, row, col + 1, Qt::AlignRight);
+    }
+    attrsGrid->setColumnStretch(2, 1);
+
+    /* ---- OK button ---- */
+    auto *buttons = new QDialogButtonBox(QDialogButtonBox::Ok);
     connect(buttons, &QDialogButtonBox::accepted, this, &QDialog::accept);
 
-    auto *layout = new QVBoxLayout(this);
-    layout->addWidget(table);
-    layout->addWidget(buttons);
+    /* ---- Left panel ---- */
+    auto *leftLayout = new QVBoxLayout;
+    leftLayout->setSpacing(6);
+    leftLayout->addLayout(headerLayout);
+    leftLayout->addWidget(separator);
+    leftLayout->addLayout(attrsGrid);
+    leftLayout->addStretch();
+    leftLayout->addWidget(buttons, 0, Qt::AlignRight);
+
+    auto *leftWidget = new QWidget;
+    leftWidget->setLayout(leftLayout);
+
+    /* ---- Card placeholder ---- */
+    auto *card = new CardPlaceholder(typeIconPx);
+
+    /* ---- Main layout ---- */
+    auto *mainLayout = new QHBoxLayout(this);
+    mainLayout->setContentsMargins(8, 8, 8, 8);
+    mainLayout->setSpacing(12);
+    mainLayout->addWidget(leftWidget, 1);
+    mainLayout->addWidget(card);
 }
