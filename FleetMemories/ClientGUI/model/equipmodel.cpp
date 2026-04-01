@@ -882,6 +882,7 @@ void EquipModel::setShipEquip(QUuid shipUID, int slotPos, QUuid equipUID) {
     if(!equipUID.isNull()) {
         shipEquipReverse[equipUID] = {shipUID, slotPos};
     }
+    emit equipModified(shipUID, slotPos, equipUID);
 }
 
 QUuid EquipModel::getShipEquip(QUuid shipUID, int slotPos) {
