@@ -91,7 +91,6 @@ CardPlaceholder::CardPlaceholder(QWidget *parent)
 {
     setFrameShape(QFrame::Box);
     setFrameShadow(QFrame::Sunken);
-    setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
 }
 
 void CardPlaceholder::paintEvent(QPaintEvent *event)
@@ -210,12 +209,14 @@ ShipAttrDialog::ShipAttrDialog(Ship *ship, ShipDynamic *dyn,
         QString::number(dyn->currentHP) + " / " + QString::number(maxHP));
 
     /* HP + condition row */
+    hpBar->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+
     auto *hpRow = new QHBoxLayout;
     hpRow->addWidget(condIconLabel);
     hpRow->addSpacing(2);
     hpRow->addWidget(condValueLabel);
     hpRow->addSpacing(4);
-    hpRow->addWidget(hpBar, 1);
+    hpRow->addWidget(hpBar);
     hpRow->addSpacing(4);
     hpRow->addWidget(hpNumbers);
 
@@ -359,17 +360,21 @@ ShipAttrDialog::ShipAttrDialog(Ship *ship, ShipDynamic *dyn,
                       + QString::number(expCurrent) + "/"
                       + QString::number(expRange) + ")");
 
+    card->setFixedSize(300, 450);
+
     auto *rightLayout = new QVBoxLayout;
     rightLayout->setSpacing(6);
-    rightLayout->addWidget(card, 1);
+    rightLayout->addStretch(1);
+    rightLayout->addWidget(card, 0, Qt::AlignHCenter);
+    rightLayout->addStretch(1);
     rightLayout->addWidget(expBar);
 
     /* ---- Main layout ---- */
     auto *mainLayout = new QHBoxLayout(this);
     mainLayout->setContentsMargins(8, 8, 8, 8);
     mainLayout->setSpacing(12);
-    mainLayout->addWidget(leftWidget, 1);
-    mainLayout->addLayout(rightLayout);
+    mainLayout->addWidget(leftWidget);
+    mainLayout->addLayout(rightLayout, 1);
 
     /* Initial attribute population */
     refreshAttrs();

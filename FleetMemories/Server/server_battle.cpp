@@ -57,7 +57,7 @@ fleet_type: {
 ships: {
         QSqlQuery query;
         query.prepare(
-            "SELECT ShipDef, "
+            "SELECT UserShip.ShipDef, "
             "Star, CurrentHP, Condition, "
             "UserShip.Exp + COALESCE(UserKCShip.Exp, 0) AS Exp, ExpCap, "
             "Slot1, Slot2, Slot3, Slot4, Slot5, SlotEX, "

@@ -1,9 +1,14 @@
 /* Copyright (C) 2026 Harusoft Ltd.
  * SPDX-License-Identifier: AGPL-3.0-or-later */
 
+#include <algorithm>
 #include <cmath>
 
+#include <QSettings>
+
 #include "fleetinfo.h"
+
+extern std::unique_ptr<QSettings> settings;
 
 FleetInfo::FleetInfo() {}
 
@@ -14,8 +19,31 @@ FleetInfo::~FleetInfo() {
 }
 
 double FleetInfo::los() {
-    /* TODO: incomplete */
-    return 0;
+    double a = settings->value("rule/loscontrol", 0.9).toDouble();
+
+    std::vector<double> losValues;
+    losValues.reserve(ships.size());
+    for(int i = 0; i < static_cast<int>(ships.size()); ++i) {
+        LuaMap attrs = attrFromShip(ships[i], shipDynamics[i]);
+        LuaMap b = attrFromEquipment(ships[i], shipDynamics[i],
+                                     equipMap, equipSkillEffects);
+        for(auto it = b.cbegin(); it != b.cend(); ++it)
+            attrs[it.key()] += it.value();
+        LuaMap c = getVisibleBonusSecondType(ships[i], shipDynamics[i]);
+        for(auto it = c.cbegin(); it != c.cend(); ++it)
+            attrs[it.key()] += it.value();
+        losValues.push_back(attrs.value(QStringLiteral("Los"), 0));
+    }
+
+    std::sort(losValues.begin(), losValues.end(), std::greater<double>());
+
+    double result = 0.0;
+    double weight = 1.0;
+    for(double v : losValues) {
+        result += weight * v;
+        weight *= a;
+    }
+    return result;
 }
 
 LuaMap FleetInfo::capitalness() {

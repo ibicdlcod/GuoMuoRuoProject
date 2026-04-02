@@ -40,9 +40,7 @@ int main(int argc, char *argv[]) {
     }
     /* End Steam initialization */
     QApplication client(argc, argv);
-#if defined(Q_OS_UNIX)
     client.setWindowIcon(QIcon(":/resources/icon.ico"));
-#endif
 #pragma message(NOT_M_CONST)
     /* Metadata */
     client.setApplicationName("FleetMemories");

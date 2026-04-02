@@ -38,7 +38,7 @@ MainWindow::MainWindow(QWidget *parent, int argc, char ** argv)
     ui->MainArea->setStyleSheet("QWidget#mainArea { border-style: none }");
     lay = new QStackedLayout();
 
-    move(screen()->geometry().center() - frameGeometry().center());
+    move(screen()->availableGeometry().center() - rect().center());
 
     ui->ResourcesBar->hide();
     ui->OilLabel->setPixmap(QPixmap(QStringLiteral(

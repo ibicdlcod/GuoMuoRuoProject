@@ -265,6 +265,9 @@ set(PROTOCOL_SOURCES
 if (${CMAKE_SYSTEM_NAME} MATCHES "Windows")
     enable_language("RC")
     set(app_icon_resource_windows "${CMAKE_CURRENT_SOURCE_DIR}/resources/icon.rc")
+    set_source_files_properties(${app_icon_resource_windows} PROPERTIES
+        COMPILE_FLAGS "/I\"${CMAKE_CURRENT_SOURCE_DIR}/resources\""
+    )
 endif()
 
 qt_add_library(CFProtocol

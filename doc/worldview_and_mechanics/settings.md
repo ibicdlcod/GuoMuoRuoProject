@@ -52,6 +52,7 @@
 |      rule/equipmentstandardstar      |                 10                  | the larger this value, the less effective improving equipment does |
 |          rule/shipexpscale           |                 100                 |     the larger this value, the harder ship can level up      |
 |       rule/navalsupremacydecay       |                2880                 | the larger this value, the easier it is to maintain naval supermacy in maps |
+|           rule/loscontrol            |                 0.9                 | geometric decay factor for fleet LoS: the nth highest-LoS ship contributes a^(n-1) × its LoS value; lower values make top-LoS ships dominate more |
 |      rule/techfactorcontroller       |                  5                  | the larger this value, the ship construction time and repair time/resources is shorter/fewer |
 |       rule/badconditionpenalty       |                1.001                | the larger this value, the faster your ship exp decreases when any of them is in negative condition |
 |       rule/mapresourcecontrol        |                1000                 | the larger this value, the harder gaining naval supremacy in coastal maps would affect resource gain |
@@ -59,6 +60,18 @@
 |            server/logfile            |            ServerLog.log            |                                                              |
 |           server/language            |                en_US                |                                                              |
 |      server/displaypromptdelay       |                 100                 |                                                              |
+|        server/apikeylocation         |             APIPrivate              | path to the SSL private key file loaded at listen-start      |
+|           server/servername          |               Alice                 | TLS PSK identity hint broadcast to connecting clients        |
+|          server/packetallowed        |                3600                 | initial anti-DDoS packet budget assigned to each authenticated connection |
+|       server/packetallowedregen      |                 60                  | anti-DDoS packet budget regenerated per minute per connection |
+|       server/cachetolerancemsec      |                10000                | ms tolerance before the server considers its DB cache stale and resends timestamps to the client |
+|        server/lastrecvcondtime       |               dynamic               | last condition-recovery pulse timestamp; written by server, do not edit manually |
+|       server/nextsettleranktime      |               dynamic               | next ranking-settlement timestamp; written by server, do not edit manually |
+|         server/equip_reg_csv         |             Equip.csv               | filename of the equipment definition CSV loaded at startup   |
+|          server/ship_reg_csv         |              Ship.csv               | filename of the ship definition CSV loaded at startup        |
+|       server/map_node_reg_csv        |           Map_nodes.csv             | filename of the map node definition CSV loaded at startup    |
+|     server/map_relation_reg_csv      |         Map_relations.csv           | filename of the map relation CSV loaded at startup           |
+|          server/vcr_reg_csv          |   Precondition_relations.csv        | filename of the virtual-condition-relation CSV loaded at startup |
 |              sql/driver              |               QSQLITE               |                                                              |
 |             sql/hostname             |            SpearofTanaka            |                                                              |
 |              sql/dbname              |                ocean                |                                                              |
@@ -67,3 +80,7 @@
 |       server/equipdbtimestamp        |               dynamic               |                                                              |
 |        server/shipdbtimestamp        |               dynamic               |                                                              |
 |        server/mapdbtimestamp         |               dynamic               |                                                              |
+|            steam/webkey              |               (empty)               | Steam Web API key; required for ARD coupon purchases and refund polling |
+|        steam/lastrefundpolltime      |               dynamic               | last Steam refund poll timestamp; written by server, do not edit manually |
+|           license_notice             |       :/openingwords.txt            | path to the opening/license text shown at client startup and in the server CLI |
+|        connect_wait_time_msec        |                8000                 | server-side timeout in ms when waiting for a client to disconnect during shutdown |

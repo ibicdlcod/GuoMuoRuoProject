@@ -206,6 +206,8 @@ void ShipEquip::updateEquipName(QUuid equipUid)
 
 void ShipEquip::updatePlaneCountDirect(ShipDynamic *dynamic)
 {
+    if (equipSlotIndex == KP::maxEquipSlots)
+        return;
     ui->planeCountBox->setValue(dynamic->slotPlanes[equipSlotIndex]);
 }
 

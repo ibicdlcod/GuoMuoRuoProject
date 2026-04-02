@@ -2393,6 +2393,12 @@ process_import_ships:
 
 add_equip:
     QSqlDatabase db = QSqlDatabase::database();
+    db.transaction();
+
+    QSqlQuery kcEquipStmt;
+    kcEquipStmt.prepare("REPLACE INTO UserKCEquip "
+                        "(EquipUuid, EquipDef, Star, Skillpoints) "
+                        "VALUES (:id, :def, :star, :sp)");
     for(auto equipDef: equipData.uniqueKeys()) {
         auto dat = equipData.values(equipDef);
         std::sort(dat.begin(), dat.end(), [](std::tuple<int, int> a,
@@ -2413,71 +2419,78 @@ query_existing_imported_equip:
                       "ORDER BY UserKCEquip.star DESC");
         query.bindValue(":id", uid.ConvertToUint64());
         query.bindValue(":def", equipDef);
-        query.exec();
-        query.isSelect();
+        if(Q_UNLIKELY(!query.exec() || !query.isSelect())) {
+            db.rollback();
+            //% "User %1: import equip from KC failed, error %2"
+            throw DBError(qtTrId("user-migrate-equip-failed")
+                          .arg(uid.ConvertToUint64()), query.lastError(), query.lastQuery());
+        }
         while(query.next() && iter != dat.end()) {
 replace_existing_equip:
-            QSqlQuery query2;
-            query2.prepare("REPLACE INTO UserKCEquip "
-                           "(EquipUuid, EquipDef, Star, Skillpoints) "
-                           "VALUES (:id, :def, :star, :sp);");
-            query2.bindValue(":id", query.value(0).toString());
-            query2.bindValue(":def", equipDef);
-            query2.bindValue(":star", std::get<0>(*iter));
-            query2.bindValue(":sp", std::get<1>(*iter) * 10000);
-            if(!query2.exec()) {
+            kcEquipStmt.bindValue(":id", query.value(0).toString());
+            kcEquipStmt.bindValue(":def", equipDef);
+            kcEquipStmt.bindValue(":star", std::get<0>(*iter));
+            kcEquipStmt.bindValue(":sp", std::get<1>(*iter) * 10000);
+            if(Q_UNLIKELY(!kcEquipStmt.exec())) {
+                db.rollback();
                 //% "User %1: import equip from KC failed, error %2"
                 throw DBError(qtTrId("user-migrate-equip-failed")
-                              .arg(uid.ConvertToUint64()), query.lastError(), query2.lastQuery());
+                              .arg(uid.ConvertToUint64()), kcEquipStmt.lastError(), kcEquipStmt.lastQuery());
             }
             iter++;
         }
 new_equip:
         while(iter != dat.end()) {
             QUuid newUid = newEquip(uid, equipDef, true);
-
-            QSqlQuery query2;
-            query2.prepare("REPLACE INTO UserKCEquip "
-                           "(EquipUuid, EquipDef, Star, Skillpoints) "
-                           "VALUES (:id, :def, :star, :sp);");
-            query2.bindValue(":id", newUid);
-            query2.bindValue(":def", equipDef);
-            query2.bindValue(":star", std::get<0>(*iter));
-            query2.bindValue(":sp", std::get<1>(*iter) * 10000);
-            if(!query2.exec()) {
+            kcEquipStmt.bindValue(":id", newUid);
+            kcEquipStmt.bindValue(":def", equipDef);
+            kcEquipStmt.bindValue(":star", std::get<0>(*iter));
+            kcEquipStmt.bindValue(":sp", std::get<1>(*iter) * 10000);
+            if(Q_UNLIKELY(!kcEquipStmt.exec())) {
+                db.rollback();
                 //% "User %1: import equip from KC failed, error %2"
                 throw DBError(qtTrId("user-migrate-equip-failed")
-                              .arg(uid.ConvertToUint64()), query.lastError(), query2.lastQuery());
+                              .arg(uid.ConvertToUint64()), kcEquipStmt.lastError(), kcEquipStmt.lastQuery());
             }
             iter++;
         }
     }
 
 add_ship:
+    QSqlQuery kcShipStmt;
+    kcShipStmt.prepare("REPLACE INTO UserKCShip "
+                       "(ShipUuid, ShipDef, Exp) "
+                       "VALUES(:id, :def, :exp)");
     for(auto shipId = shipData.keyBegin(); shipId != shipData.keyEnd();
         ++shipId) {
         auto kcShipId = sourceModels[*shipId];
         auto fmShipUid = QUuid();
         auto fmShipDef = 0;
 query_existing_imported_ship:
-        for(auto fmShipIdCandidate: shipRemodelGroup.values(*shipId)) {
+        {
+            const auto candidates = shipRemodelGroup.values(*shipId);
+            QStringList placeholders;
+            placeholders.reserve(candidates.size());
+            for(int i = 0; i < candidates.size(); ++i)
+                placeholders << QStringLiteral("?");
             QSqlQuery query;
-            query.prepare("SELECT ShipUuid "
-                          "FROM UserShip "
-                          "WHERE User = :id AND ShipDef = :def "
-                          "ORDER BY Exp DESC");
-            query.bindValue(":id", uid.ConvertToUint64());
-            query.bindValue(":def", fmShipIdCandidate);
+            query.prepare(QStringLiteral("SELECT ShipUuid, ShipDef "
+                                         "FROM UserShip "
+                                         "WHERE User = ? AND ShipDef IN (")
+                          + placeholders.join(QLatin1Char(','))
+                          + QStringLiteral(") ORDER BY Exp DESC LIMIT 1"));
+            query.addBindValue(uid.ConvertToUint64());
+            for(auto candidate : candidates)
+                query.addBindValue(candidate);
             if(Q_UNLIKELY(!query.exec())) {
+                db.rollback();
                 //% "User %1: import ship from KC failed, error %2"
                 throw DBError(qtTrId("user-migrate-ship-failed")
                               .arg(uid.ConvertToUint64()), query.lastError(), query.lastQuery());
-                return;
             }
-            query.isSelect();
             if(query.next()) {
                 fmShipUid = query.value(0).toUuid();
-                fmShipDef = fmShipIdCandidate;
+                fmShipDef = query.value(1).toInt();
             }
         }
 new_ship:
@@ -2492,29 +2505,27 @@ new_ship:
             query.bindValue(":def", fmShipDef);
             query.bindValue(":newdef", kcShipId);
             if(Q_UNLIKELY(!query.exec())) {
+                db.rollback();
                 //% "User %1: import ship from KC failed, error %2"
                 throw DBError(qtTrId("user-migrate-ship-failed")
                               .arg(uid.ConvertToUint64()), query.lastError(), query.lastQuery());
-                return;
             }
         }
         else {
             fmShipUid = newShip(uid, kcShipId, true);
         }
 new_ship_as_imported:
-        QSqlQuery query;
-        query.prepare("REPLACE INTO UserKCShip "
-                      "(ShipUuid, ShipDef, Exp) "
-                      "VALUES(:id, :def, :exp);");
-        query.bindValue(":id", fmShipUid);
-        query.bindValue(":def", kcShipId);
-        query.bindValue(":exp", shipData[*shipId]);
-        if(Q_UNLIKELY(!query.exec())) {
+        kcShipStmt.bindValue(":id", fmShipUid);
+        kcShipStmt.bindValue(":def", kcShipId);
+        kcShipStmt.bindValue(":exp", shipData[*shipId]);
+        if(Q_UNLIKELY(!kcShipStmt.exec())) {
+            db.rollback();
             //% "User %1: import ship from KC failed, error %2"
             throw DBError(qtTrId("user-migrate-ship-failed")
-                          .arg(uid.ConvertToUint64()), query.lastError(), query.lastQuery());
+                          .arg(uid.ConvertToUint64()), kcShipStmt.lastError(), kcShipStmt.lastQuery());
         }
     }
+    db.commit();
 
     //% "User %1: import from KC data success!"
     qInfo() << qtTrId("import-kc-data-success").arg(uid.ConvertToUint64());
