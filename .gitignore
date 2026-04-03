@@ -103,3 +103,4 @@ temp/
 .claude/settings.local.json
 .claude/worktrees/
 .worktrees/
+.superpowers/

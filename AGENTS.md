@@ -156,6 +156,10 @@ When about to claim work is complete:
 ## Git Workflow
 
 - **Never commit secrets/keys**
-- **Only commit when explicitly asked** – avoid proactive commits
+- **Only commit when explicitly asked** – avoid proactive commits (do NOT apply this rule when in Windows subsystem for Linux!)
 - Follow existing commit message style (concise, focused on "why")
 - When creating new branch, use descriptive names
+
+## Translations
+
+- **Do not bother to update non-en_US translations unless specifically asked to**
