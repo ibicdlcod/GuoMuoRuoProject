@@ -848,10 +848,11 @@ deal_with_gauge:
                                           "'CurrentFreightTransported'");
                     freightQuery.bindValue(":uid", uid.ConvertToUint64());
                     if(Q_UNLIKELY(!freightQuery.exec())) {
-                        throw DBError(
-                            qtTrId("sortie-node-battle-failure-transport-read")
-                                .arg(uid.ConvertToUint64()),
-                            freightQuery.lastError(), freightQuery.lastQuery());
+                         throw DBError(
+                             //% "User %1: transport node read failure!"
+                             qtTrId("sortie-node-battle-failure-transport-read")
+                                 .arg(uid.ConvertToUint64()),
+                             freightQuery.lastError(), freightQuery.lastQuery());
                         return;
                     }
                     int currentFreight = 0;
@@ -875,11 +876,12 @@ deal_with_gauge:
                                                "'CurrentFreightTransported'");
                         freightQuery.bindValue(":uid", uid.ConvertToUint64());
                         if(Q_UNLIKELY(!freightQuery.exec())) {
-                            throw DBError(
-                             qtTrId("sortie-node-battle-failure-transport-clear")
-                                 .arg(uid.ConvertToUint64()),
-                                 freightQuery.lastError(),
-                                 freightQuery.lastQuery());
+                             throw DBError(
+                              //% "User %1: transport node clear failure!"
+                              qtTrId("sortie-node-battle-failure-transport-clear")
+                                  .arg(uid.ConvertToUint64()),
+                                  freightQuery.lastError(),
+                                  freightQuery.lastQuery());
                             return;
                         }
                     }
@@ -914,10 +916,11 @@ deal_with_gauge:
                           "AND Attribute = 'CurrentFreightTransported'");
             query.bindValue(":uid", uid.ConvertToUint64());
             if(Q_UNLIKELY(!query.exec())) {
-                throw DBError(
-                    qtTrId("sortie-node-battle-failure-transport-read")
-                        .arg(uid.ConvertToUint64()),
-                    query.lastError(), query.lastQuery());
+                 throw DBError(
+                     //% "User %1: transport node read failure!"
+                     qtTrId("sortie-node-battle-failure-transport-read")
+                         .arg(uid.ConvertToUint64()),
+                     query.lastError(), query.lastQuery());
                 return;
             }
             int currentFreight = 0;
@@ -934,10 +937,11 @@ deal_with_gauge:
             query.bindValue(":uid", uid.ConvertToUint64());
             query.bindValue(":newValue", newFreight);
             if(Q_UNLIKELY(!query.exec())) {
-                throw DBError(
-                    qtTrId("sortie-node-battle-failure-transport-update")
-                        .arg(uid.ConvertToUint64()),
-                    query.lastError(), query.lastQuery());
+                 throw DBError(
+                     //% "User %1: transport node update failure!"
+                     qtTrId("sortie-node-battle-failure-transport-update")
+                         .arg(uid.ConvertToUint64()),
+                     query.lastError(), query.lastQuery());
                 return;
             }
             
