@@ -163,3 +163,7 @@ When about to claim work is complete:
 ## Translations
 
 - **Do not bother to update non-en_US translations unless specifically asked to**
+
+## Superpowers Skills
+
+- **Do not offer visual companion in WSL** - When using the brainstorming skill in WSL environment, skip the "Offer visual companion" step as WSL lacks browser support for local URLs.
