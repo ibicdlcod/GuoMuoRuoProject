@@ -6,6 +6,7 @@
 #include <QJsonObject>
 #include <QStyleHints>
 #include <limits>
+#include "../../Protocol/kp.h"
 #include "../clientv2.h"
 #include "../equipicon.h"
 
@@ -65,6 +66,20 @@ void ShipModel::switchShipDisplayType(const QString &nationality,
          iter != clientShips.keyValueEnd();
          ++iter) {
         pass = true;
+        // Apply fleet filter if set
+        if(currentFleetFilter.has_value()) {
+            int filterValue = currentFleetFilter.value();
+            ShipDynamic *attr = clientShipDynamicAttrs[iter->first];
+            if(filterValue == -1) { // Unassigned
+                if(attr->fleetIndex != -1) pass = false;
+            } else if(filterValue >= 0 && filterValue <= 3) { // Fleet 1-4
+                if(attr->fleetIndex != filterValue) pass = false;
+            }
+            // Disabled ships filtered out when any fleet filter is active
+            if(attr->fleetIndex == KP::disabledShip) {
+                pass = false;
+            }
+        }
         /* search text */
         if(!searchTerm.isEmpty()) {
             pass1 = false;
