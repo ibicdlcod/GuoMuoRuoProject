@@ -16,7 +16,15 @@ MapDetail::MapDetail(QWidget *parent)
     antialiased = true;
 
     rudder = recolorImage(":/Assets/Image/rudder.png", QColor(192, 192, 0));
-    airNodeIcon = generatePlanePixmap(QColor(180, 0, 0));
+    switch(QApplication::styleHints()->colorScheme()) {
+    case Qt::ColorScheme::Dark:
+        airNodeIcon = generatePlanePixmap(QColor(255, 255, 255));
+        break;
+    case Qt::ColorScheme::Light: [[fallthrough]];
+    default:
+        airNodeIcon = generatePlanePixmap(QColor(0, 0, 0));
+        break;
+    }
     carrierFleetIcon = recolorImage(
         ":/Assets/Image/fleetIcons/carrier.png", QColor(0, 192, 0));
     surfaceFleetIcon = recolorImage(
@@ -254,7 +262,7 @@ void MapDetail::paintEvent(QPaintEvent *event) {
                                 node.y * height() - circleSize / 2,
                                 circleSize, circleSize);
             painter.drawPixmap(node.x * width() - circleSize / 2,
-                               node.y * height() - circleSize,
+                               node.y * height() - 3 * circleSize / 2,
                                airNodeIcon.scaled(
                                    QSize(circleSize, circleSize),
                                    Qt::KeepAspectRatio,
