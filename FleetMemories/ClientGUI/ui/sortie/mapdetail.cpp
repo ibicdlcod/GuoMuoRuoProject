@@ -21,6 +21,14 @@ static QColor getIconColor() {
     }
 }
 
+static QColor getRudderColor() {
+    if(QApplication::styleHints()->colorScheme() == Qt::ColorScheme::Dark) {
+        return QColor(255, 255, 128); // bright yellow for dark mode
+    } else {
+        return QColor(128, 128, 0);   // dark yellow for light mode
+    }
+}
+
 MapDetail::MapDetail(QWidget *parent)
     : QWidget(parent)
     , ui(new Ui::MapDetail) {
@@ -28,7 +36,7 @@ MapDetail::MapDetail(QWidget *parent)
     antialiased = true;
 
     QColor iconColor = getIconColor();
-    rudder = recolorImage(":/Assets/Image/rudder.png", iconColor);
+    rudder = recolorImage(":/Assets/Image/rudder.png", getRudderColor());
     airNodeIcon = recolorImage(":/Assets/Image/plane.png", iconColor);
     carrierFleetIcon = recolorImage(
         ":/Assets/Image/fleetIcons/carrier.png", QColor(0, 192, 0));
