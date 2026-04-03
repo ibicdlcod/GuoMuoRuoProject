@@ -790,6 +790,21 @@ QByteArray KP::serverMapProgress(int mapId, int nextNode) {
     return QCborValue::fromJsonValue(result).toCbor();
 }
 
+QByteArray KP::serverDisasterLOSInfo(double requiredLOS, double fleetLOS,
+                                     double chanceToAvoid, double fuelFrac,
+                                     double ammoFrac, bool deductionOccurred) {
+    QJsonObject result;
+    result["type"] = DgramType::Info;
+    result["infotype"] = InfoType::DisasterLOSInfo;
+    result["requiredLOS"] = requiredLOS;
+    result["fleetLOS"] = fleetLOS;
+    result["chanceToAvoid"] = chanceToAvoid;
+    result["fuelFrac"] = fuelFrac;
+    result["ammoFrac"] = ammoFrac;
+    result["deductionOccurred"] = deductionOccurred;
+    return QCborValue::fromJsonValue(result).toCbor();
+}
+
 QByteArray KP::serverMapStart(int mapId, int startNode) {
     QJsonObject result;
     result["type"] = DgramType::Info;

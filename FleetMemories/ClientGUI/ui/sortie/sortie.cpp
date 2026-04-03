@@ -54,6 +54,8 @@ Sortie::Sortie(QWidget *parent)
             this, &Sortie::sortieEnd);
     connect(&engine, &Client::receivedResourceGainInfo,
             resourceGainW, &ResourceGainView::populate);
+    connect(&engine, &Client::receivedDisasterLOSInfo,
+            this, &Sortie::disasterLOSInfo);
     connect(ui->diffChoice, &QComboBox::currentTextChanged,
             renderer, &MapRender::setDiff);
     connect(ui->diffChoice, &QComboBox::currentTextChanged,
@@ -327,6 +329,27 @@ void Sortie::battleProcess(const QJsonObject &djson) {
     /* TODO: battle animation */
 }
 
+void Sortie::disasterLOSInfo(const QJsonObject &djson) {
+    double requiredLOS = djson["requiredLOS"].toDouble(-1.0);
+    double fleetLOS = djson["fleetLOS"].toDouble();
+    double chanceToAvoid = djson["chanceToAvoid"].toDouble();
+    double fuelFrac = djson["fuelFrac"].toDouble();
+    double ammoFrac = djson["ammoFrac"].toDouble();
+    bool deductionOccurred = djson["deductionOccurred"].toBool();
+    //% "LOS check: required %1, fleet %2, chance to avoid %3%"
+    qInfo() << qtTrId("disaster-los-check")
+               .arg(requiredLOS).arg(fleetLOS).arg(chanceToAvoid * 100.0);
+    if(deductionOccurred) {
+        //% "Fuel/ammo deducted: %1% fuel, %2% ammo"
+        qInfo() << qtTrId("disaster-deduction-occurred")
+                   .arg(fuelFrac * 100.0).arg(ammoFrac * 100.0);
+        // TODO: compute absolute resource costs using ShipRegistry data
+    } else {
+        //% "LOS check succeeded! No resources deducted."
+        qInfo() << qtTrId("disaster-deduction-avoided");
+    }
+}
+
 void Sortie::battleEnd() {
     Client &engine = Client::getInstance();
     /* TODO: display battle result */
@@ -372,6 +395,8 @@ void Sortie::dealWithNode(const MapNode &node, int nodeId) {
     case KP::STARTING:
         engine.queryNextNode(currentMap->getAbsoluteId(), nodeId);
         break;
+    case KP::DISASTER:
+        [[fallthrough]];
     case KP::EMPTY:
         [[fallthrough]];
     case KP::CHOICE: {

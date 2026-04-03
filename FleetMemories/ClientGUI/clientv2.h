@@ -175,6 +175,7 @@ signals:
               QColor foreground = QColor("black"));
     void receivedAnchorageShip(const QJsonObject &);
     void receivedArsenalEquip(const QJsonObject &);
+    void receivedDisasterLOSInfo(const QJsonObject &);
     void receivedFactoryRefresh(const QJsonObject &);
     void receivedGlobalTechInfo(const QJsonObject &);
     void receivedGlobalTechInfo2(const QJsonObject &);

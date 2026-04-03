@@ -851,6 +851,7 @@ deal_with_gauge:
             });
         }
             break;
+        case KP::DISASTER: [[fallthrough]];
         case KP::CHOICE: [[fallthrough]];
         case KP::EMPTY: {
             QSqlQuery query;
@@ -871,7 +872,6 @@ deal_with_gauge:
         }
             break;
         case KP::STARTING:
-        case KP::DISASTER:
         case KP::TRANSPORT:
         default: break;
         }
@@ -1143,6 +1143,45 @@ void Server::progressMap(const CSteamID &uid, QSslSocket *connection,
                     fuelFrac = fuelOverride.as<double>();
                 if(ammoOverride.is<double>())
                     ammoFrac = ammoOverride.as<double>();
+            }
+            /* LOS check for DISASTER nodes */
+            double requiredLOS = -1.0;
+            double fleetLOS = 0.0;
+            double chanceToAvoid = 0.0;
+            bool deductionOccurred = true;
+            if(nType == KP::DISASTER) {
+                KP::Difficulty diff = MapWithDiff::getDiff(mapId);
+                QString diffStr = (*KP::diffEnumtoStr)[diff];
+                QByteArray diffStrBytes = diffStr.toUtf8();
+                const char *diffStrC = diffStrBytes;
+                FleetInfo *fi = sortieFleets.value(uid, nullptr);
+                if(fi) {
+                    fleetLOS = fi->los();
+                }
+                if(lua["maps"] != sol::nil
+                        && lua["maps"][unionId] != sol::nil
+                        && lua["maps"][unionId][nNode] != sol::nil
+                        && lua["maps"][unionId][nNode]["los"] != sol::nil
+                        && lua["maps"][unionId][nNode]["los"][diffStrC]
+                        != sol::nil) {
+                    requiredLOS = lua["maps"][unionId][nNode]["los"][diffStrC];
+                    if(requiredLOS <= 0.0) {
+                        // zero or negative LOS requirement means guaranteed avoid
+                        chanceToAvoid = 1.0;
+                        deductionOccurred = false;
+                    } else {
+                        chanceToAvoid = std::min(1.0, fleetLOS / requiredLOS);
+                        std::uniform_real_distribution<double> dist(0.0, 1.0);
+                        deductionOccurred = dist(mt) > chanceToAvoid;
+                    }
+                }
+                QByteArray msg = KP::serverDisasterLOSInfo(requiredLOS, fleetLOS,
+                    chanceToAvoid, fuelFrac, ammoFrac, deductionOccurred);
+                senderM.sendMessage(connection, msg);
+                if(!deductionOccurred) {
+                    fuelFrac = 0.0;
+                    ammoFrac = 0.0;
+                }
             }
             int activeFleet = result.value()[3];
             if(FleetInfo *fi = sortieFleets.value(uid, nullptr)) {

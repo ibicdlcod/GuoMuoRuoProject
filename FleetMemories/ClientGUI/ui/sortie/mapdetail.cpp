@@ -226,6 +226,15 @@ void MapDetail::paintEvent(QPaintEvent *event) {
                                 node.y * height() - circleSize,
                                 circleSize * 2, circleSize * 2);
         } break;
+        case KP::DISASTER: {
+            painter.setBrush(QBrush(Qt::gray));
+            QPen pen(QColor(96, 96, 96));
+            pen.setWidth(circleBorderSize);
+            painter.setPen(pen);
+            painter.drawEllipse(node.x * width() - circleSize,
+                                node.y * height() - circleSize,
+                                circleSize * 2, circleSize * 2);
+        } break;
         case KP::CHOICE: {
             painter.setBrush(QBrush(QColor(255, 220, 0)));
             QPen pen(QColor(200, 140, 0));
