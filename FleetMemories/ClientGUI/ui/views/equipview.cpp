@@ -96,6 +96,31 @@ EquipView::EquipView(QWidget *parent)
     //% "Unselect"
     unselectButton->setText(qtTrId("equipview-unselect"));
 
+    // Fleet filter radio buttons
+    fleetFilterGroup = new QButtonGroup(this);
+    fleetRadioAll = new QRadioButton("All", this);
+    fleetRadio1 = new QRadioButton("1", this);
+    fleetRadio2 = new QRadioButton("2", this);
+    fleetRadio3 = new QRadioButton("3", this);
+    fleetRadio4 = new QRadioButton("4", this);
+    fleetRadioUnassigned = new QRadioButton("U", this);
+    
+    // Set tooltips
+    fleetRadioAll->setToolTip("All ships (including disabled)");
+    fleetRadio1->setToolTip("Fleet 1");
+    fleetRadio2->setToolTip("Fleet 2");
+    fleetRadio3->setToolTip("Fleet 3");
+    fleetRadio4->setToolTip("Fleet 4");
+    fleetRadioUnassigned->setToolTip("Unassigned ships");
+    
+    // Add to button group with IDs
+    fleetFilterGroup->addButton(fleetRadioAll, -100);
+    fleetFilterGroup->addButton(fleetRadioUnassigned, -1);
+    fleetFilterGroup->addButton(fleetRadio1, 0);
+    fleetFilterGroup->addButton(fleetRadio2, 1);
+    fleetFilterGroup->addButton(fleetRadio3, 2);
+    fleetFilterGroup->addButton(fleetRadio4, 3);
+
     pageLabel->setAlignment(Qt::AlignCenter);
     pageLabel->setSizePolicy(QSizePolicy(QSizePolicy::Maximum,
                                          QSizePolicy::Preferred,
@@ -108,6 +133,12 @@ EquipView::EquipView(QWidget *parent)
 
     QWidget *layoutWidget = new QWidget(this);
     QHBoxLayout *layout = new QHBoxLayout(layoutWidget);
+    layout->addWidget(fleetRadioAll);
+    layout->addWidget(fleetRadio1);
+    layout->addWidget(fleetRadio2);
+    layout->addWidget(fleetRadio3);
+    layout->addWidget(fleetRadio4);
+    layout->addWidget(fleetRadioUnassigned);
     layout->addWidget(sortBox);
     layout->addWidget(reverseCheck);
     layout->addWidget(firstButton);

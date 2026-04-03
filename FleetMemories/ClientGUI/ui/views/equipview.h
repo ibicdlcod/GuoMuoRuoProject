@@ -14,6 +14,8 @@
 #include <QToolButton>
 #include <QWidget>
 #include <QLineEdit>
+#include <QButtonGroup>
+#include <QRadioButton>
 #include <QStackedLayout>
 #include "../../model/equipmodel.h"
 #include "selectdelegate.h"
@@ -96,6 +98,14 @@ private:
     ShipSelect *shipSelect;
     IndustrialSelect *industrialSelect;
     QStackedLayout *lay;
+
+    QButtonGroup *fleetFilterGroup;
+    QRadioButton *fleetRadioAll;
+    QRadioButton *fleetRadio1;
+    QRadioButton *fleetRadio2;
+    QRadioButton *fleetRadio3;
+    QRadioButton *fleetRadio4;
+    QRadioButton *fleetRadioUnassigned;
 
     int rowCountHintVal = 1;
     QTimer *columnResizeDebounce;
