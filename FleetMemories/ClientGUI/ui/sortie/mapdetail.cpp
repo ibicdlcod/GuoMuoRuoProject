@@ -1,6 +1,7 @@
 #include "mapdetail.h"
 #include "ui_mapdetail.h"
 
+#include <QApplication>
 #include <QColor>
 #include <QGuiApplication>
 #include <QMouseEvent>
@@ -13,7 +14,7 @@
 #include "maprender.h"
 
 static QColor getIconColor() {
-    if(QGuiApplication::styleHints()->colorScheme() == Qt::ColorScheme::Dark) {
+    if(QApplication::styleHints()->colorScheme() == Qt::ColorScheme::Dark) {
         return Qt::white;
     } else {
         return Qt::black;
@@ -235,7 +236,7 @@ void MapDetail::paintEvent(QPaintEvent *event) {
                                 node.y * height() - circleSize / 2,
                                 circleSize, circleSize);
             painter.drawPixmap(node.x * width() - circleSize / 2,
-                               node.y * height() - circleSize,
+                               node.y * height() - 3 * circleSize / 2,
                                airNodeIcon.scaled(
                                    QSize(circleSize, circleSize),
                                    Qt::KeepAspectRatio,

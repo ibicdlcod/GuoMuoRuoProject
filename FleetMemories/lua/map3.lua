@@ -86,9 +86,91 @@ maps[3][1] = {
 maps[3][2] = {
 	x = 0.500,
 	y = 0.500,
-	battle_type = maps.Battle_type.CHOICE,
+	battle_type = maps.Battle_type.AIR,
 	lb_distance = 99,
 	next_nodes = {3, 4, 5},
+	branch_rule = {
+		C = function(
+			ships,
+			los,
+			fleet_type,
+			capitalness, --[0]total/[1]surface/[2]carrier/[3]screens
+			ship_tags,
+			ship_speeds,
+			equipment_list, --list of lists
+			user_state)
+			return 4
+		end,
+		B = function(
+			ships,
+			los,
+			fleet_type,
+			capitalness,
+			ship_tags,
+			ship_speeds,
+			equipment_list,
+			user_state)
+			return 4
+		end,
+		A = function(
+			ships,
+			los,
+			fleet_type,
+			capitalness,
+			ship_tags,
+			ship_speeds,
+			equipment_list,
+			user_state)
+			return 4
+		end,
+	},
+	enemy = {
+		C = function()
+			choice = math.random(1, 4)
+			if choice == 1 then
+				return {0x7F010100, 0x7F011100}
+			elseif choice == 2 then
+				return {0x7F020100}
+			elseif choice == 3 then
+				return {0x7F020200}
+			elseif choice == 4 then
+				return {0x7F020300}
+			else
+				return {}
+			end
+		end,
+		B = function()
+			return {}
+		end,
+		A = function()
+			return {}
+		end,
+	},
+	droptable = {
+		C = {
+			[0x10120202] = 1,
+			[0x10120203] = 1,
+			[0x10120204] = 1,
+			[0x10120205] = 1,
+			[0x10120303] = 1,
+			[0x10120304] = 1,
+			[0x10120305] = 1,
+			[0x10120306] = 1,
+			[0x10120307] = 1,
+			[0x10120308] = 1,
+		},
+		B = {},
+		A = {},
+	},
+	raredroptable = {
+		C = {
+			[0x10120201] = 1,
+			[0x10120301] = 1,
+			[0x10120302] = 1,
+		},
+		B = {},
+		A = {},
+	},
 	exec = {
 		C = function(battleresult, user_state)
 			return false --user state not modified
@@ -106,6 +188,7 @@ maps[3][2] = {
 		A = 250,
 	},
 }
+
 
 maps[3][3] = {
 	x = 0.700,
