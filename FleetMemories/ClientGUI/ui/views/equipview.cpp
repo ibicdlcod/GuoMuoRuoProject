@@ -9,6 +9,8 @@
 #include <QToolButton>
 #include <QWheelEvent>
 
+#include <optional>
+
 #include "../../clientv2.h"
 #include "../../model/shipmodel.h"
 
@@ -121,6 +123,17 @@ EquipView::EquipView(QWidget *parent)
     fleetFilterGroup->addButton(fleetRadio3, 2);
     fleetFilterGroup->addButton(fleetRadio4, 3);
 
+    // Load saved fleet filter
+    int savedFilter = settings->value("AnchorageFleetFilter", -100).toInt();
+    if(savedFilter == -100) {
+        fleetRadioAll->setChecked(true);
+    } else if(savedFilter == -1) {
+        fleetRadioUnassigned->setChecked(true);
+    } else if(savedFilter >= 0 && savedFilter <= 3) {
+        QAbstractButton *button = fleetFilterGroup->button(savedFilter);
+        if(button) button->setChecked(true);
+    }
+
     pageLabel->setAlignment(Qt::AlignCenter);
     pageLabel->setSizePolicy(QSizePolicy(QSizePolicy::Maximum,
                                          QSizePolicy::Preferred,
@@ -198,6 +211,22 @@ EquipView::EquipView(QWidget *parent)
             industrialSelect, &IndustrialSelect::setIPValue);
     connect(industrialSelect, &IndustrialSelect::buyActivated,
             this, &EquipView::buyActivated);
+    connect(fleetFilterGroup, &QButtonGroup::buttonClicked,
+            this, [this](QAbstractButton *button) {
+        int id = fleetFilterGroup->id(button);
+        std::optional<int> filterValue;
+        if(id == -100) {
+            filterValue = std::nullopt;
+        } else {
+            filterValue = id;
+        }
+        Client &engine = Client::getInstance();
+        engine.shipModel.setFleetFilter(filterValue);
+        
+        // Save to settings
+        settings->setValue("AnchorageFleetFilter", id);
+        settings->sync();
+    });
     /*
     connect(&engine, &Clientv2::uiRefreshSig,
             this, &EquipView::recalculateArsenalRows);
@@ -455,6 +484,12 @@ void EquipView::activate(bool arsenal, bool isEquip,
                 shipSelect->decorateButton->show();
                 shipSelect->supplyButton->setVisible(isAnchorage);
                 shipSelect->supplyAllButton->setVisible(isAnchorage);
+                fleetRadioAll->setVisible(isAnchorage);
+                fleetRadio1->setVisible(isAnchorage);
+                fleetRadio2->setVisible(isAnchorage);
+                fleetRadio3->setVisible(isAnchorage);
+                fleetRadio4->setVisible(isAnchorage);
+                fleetRadioUnassigned->setVisible(isAnchorage);
                 if(isAnchorage) {
                     connect(
                         shipSelect,
