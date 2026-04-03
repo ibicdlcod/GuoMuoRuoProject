@@ -67,7 +67,7 @@ void ResourceFetch::downloadFile(const QString &urlSpec,
     QString fileName = fileInput;
     QString downloadDirectory = directory;
     if(!QDir(directory).exists()) {
-        QDir().mkdir(directory);
+        QDir().mkpath(directory);
     }
     bool useDirectory = !downloadDirectory.isEmpty()
                         && QFileInfo(downloadDirectory).isDir();

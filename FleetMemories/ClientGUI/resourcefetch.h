@@ -26,7 +26,7 @@ public slots:
     void downloadFile(const QString &urlSpec =
                       "https://tsunkit.net/api/assets/images/equipTypeIcons/1",
                       const QString &fileInput = "1",
-                      const QString &directory = "equipTypeIcons/");
+                       const QString &directory = "TsunkitMode/equipTypeIcons/");
     void httpFinished();
     void httpReadyRead();
     void networkReplyProgress(qint64 bytesRead, qint64 totalBytes);

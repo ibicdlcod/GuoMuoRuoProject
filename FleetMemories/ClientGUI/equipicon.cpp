@@ -7,10 +7,10 @@
 #include <QApplication>
 #include <QStyleHints>
 
+
 QIcon Icute::equipTypeIcon(EquipType type, bool isRound = false) {
     int iconName = type.iconGroup();
-    return QIcon("equipTypeIcons/"
-                 + QString::number(iconName) + ".png");
+    return QIcon("TsunkitMode/equipTypeIcons/" + QString::number(iconName) + ".png");
 }
 
 QIcon Icute::shipTypeIcon(int shipId, bool isRound = false) {
@@ -58,7 +58,7 @@ QPixmap Icute::shipIcon(int oldInternalId) {
         image = QImage(":/resources/shipIcons/0.png");
     }
     else {
-        image = QImage(QString("shipIcons/%1.png").arg(oldInternalId));
+        image = QImage(QString("TsunkitMode/shipIcons/%1.png").arg(oldInternalId));
     }
 
     if (image.format() != QImage::Format_ARGB32) {

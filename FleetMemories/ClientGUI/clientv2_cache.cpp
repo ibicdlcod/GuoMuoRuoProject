@@ -421,7 +421,7 @@ void Client::tsunkitAssets() {
             QString("https://tsunkit.net/api/assets/images/equipTypeIcons/%1")
                 .arg(iconGroup),
             QString("%1.png").arg(iconGroup),
-            QStringLiteral("equipTypeIcons/"));
+            QStringLiteral("TsunkitMode/equipTypeIcons/"));
 
         // Connect the signal you're waiting for to the QEventLoop::quit slot
         connect(resourceFetcher, &ResourceFetch::finished, this, [this]()
@@ -459,7 +459,7 @@ void Client::tsunkitAssets2() {
             QString("https://tsunkit.net/api/assets/images/shipIcons/%1_100")
                 .arg(oldInternalID),
             QString("%1.png").arg(oldInternalID),
-            QStringLiteral("shipIcons/"));
+            QStringLiteral("TsunkitMode/shipIcons/"));
 
         connect(resourceFetcher, &ResourceFetch::finished, this, [this]()
                 {
@@ -492,7 +492,7 @@ void Client::sendTestMessages() {
             QString("https://tsunkit.net/api/assets/images/equipTypeIcons/%1")
                 .arg(iconGroup),
             QString("%1.png").arg(iconGroup),
-            QStringLiteral("equipTypeIcons/"));
+            QStringLiteral("TsunkitMode/equipTypeIcons/"));
         QEventLoop loop;
         QTimer timer; // Optional: for timeout
         timer.setSingleShot(true); // Ensure timer only fires once
