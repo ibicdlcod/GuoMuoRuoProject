@@ -177,7 +177,5 @@ Enemy ship count and HP values reflect the Lua `enemy` function result for the s
 - Check that `FleetInfo` methods work with enemy data (e.g., `effectiveAttr()`)
 
 ## Future Extensions
-- Battle damage calculation using enemy `FleetInfo`
+- Battle damage calculation using player's `FleetInfo` and enemy `FleetInfo`
 - Enemy equipment with plane counts
-- Enemy skill effects and bonuses
-- Different enemy configurations per difficulty level
