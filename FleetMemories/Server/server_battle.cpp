@@ -860,14 +860,14 @@ deal_with_gauge:
                     if(freightQuery.isSelect() && freightQuery.next()) {
                         currentFreight = freightQuery.value(0).toInt();
                     }
-                    
+
                     int amount = getBossDamage(battleProcess);
                     // Add freight contribution
                     int freightContribution = qRound(currentFreight * factor);
                     amount += freightContribution;
-                    
+
                     User::decreaseGauge(uid, unionId, diff, amount);
-                    
+
                     // Clear freight after consumption
                     if(currentFreight > 0) {
                           freightQuery.prepare("UPDATE UserAttr "
@@ -886,7 +886,7 @@ deal_with_gauge:
                             return;
                         }
                     }
-                    
+
                     bool isBossSunk = getBossSunk(battleProcess);
                      // Always clear map if boss sunk and gauge finished,
                      // regardless of freight
@@ -906,10 +906,9 @@ deal_with_gauge:
         case KP::CHOICE: [[fallthrough]];
         case KP::TRANSPORT: {
             /* Freight transport logic */
-            int fleetIndex = result.value()[3]; // active fleet
-            FleetInfo fleetInfo = queryFleetInfo(uid, fleetIndex);
+            FleetInfo fleetInfo = sortieFleets.value(uid, nullptr);
             int capacity = fleetInfo.transportCapacity(uid);
-            
+
             // Read current freight transported
             QSqlQuery query;
             query.prepare("SELECT Intvalue FROM UserAttr "
@@ -928,7 +927,7 @@ deal_with_gauge:
             if(query.isSelect() && query.next()) {
                 currentFreight = query.value(0).toInt();
             }
-            
+
             // Update with added capacity
             int newFreight = currentFreight + capacity;
              query.prepare("INSERT OR REPLACE INTO UserAttr "
@@ -945,13 +944,13 @@ deal_with_gauge:
                      query.lastError(), query.lastQuery());
                 return;
             }
-            
+
             // Notify client
              QByteArray msg = KP::serverTransportFreightInfo(newFreight,
                                                              capacity,
                                                              capacity);
             senderM.sendMessage(connection, msg);
-            
+
             [[fallthrough]];
         }
         case KP::EMPTY: {
