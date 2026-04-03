@@ -977,6 +977,75 @@ deal_with_gauge:
         }
 }
 
+/* Enemy fleet creation - see docs/superpowers/specs/2026-04-03-enemy-fleetinfo-design.md */
+FleetInfo Server::createEnemyFleetInfo(int mapId, int nodeId,
+                                       KP::Difficulty diff) {
+    FleetInfo info;
+    Q_UNUSED(diff);
+    KP::Difficulty diffCleaned = static_cast<KP::Difficulty>(
+                MapWithDiff::getDiff(mapId));
+    QString diffStr = (*KP::diffEnumtoStr)[diffCleaned];
+    QByteArray diffStrBytes = diffStr.toUtf8();
+    const char *diffStrC = diffStrBytes;
+    int unionId = MapWithDiff::getUnionId(mapId);
+
+    if(lua["maps"] == sol::nil || lua["maps"][unionId] == sol::nil ||
+       lua["maps"][unionId][nodeId] == sol::nil ||
+       lua["maps"][unionId][nodeId]["enemy"] == sol::nil ||
+       lua["maps"][unionId][nodeId]["enemy"][diffStrC] == sol::nil) {
+        qWarning() << "Enemy definition missing for map" << unionId
+                   << "node" << nodeId << "diff" << diffStr;
+        return info;
+    }
+
+    sol::protected_function enemyFunc =
+        lua["maps"][unionId][nodeId]["enemy"][diffStrC];
+    auto result = enemyFunc();
+    if(!result.valid()) {
+        sol::error err = result;
+        qWarning() << "Enemy Lua function failed:" << err.what();
+        return info;
+    }
+    sol::table enemyShips = result;
+    enemyShips.for_each([&](sol::object const& key, sol::object const& value) {
+        if(!value.is<int>()) return;
+        int shipId = value.as<int>();
+        if(!shipRegistry.contains(shipId)) {
+            qWarning() << "Enemy ship ID" << shipId << "not found in registry";
+            return;
+        }
+        Ship *ship = shipRegistry[shipId];
+        ShipDynamic *dyn = new ShipDynamic(shipId);
+        dyn->currentHP = ship->attr.value("Hitpoints", 1);
+        dyn->condition = 480;
+        dyn->exp = Ship::expCap(0);
+        dyn->expCap = Ship::expCap(0);
+        dyn->star = 0;
+        dyn->fuel = 1.0;
+        dyn->ammo = 1.0;
+        dyn->fleetIndex = -1;
+        dyn->fleetPosIndex = info.ships.size();
+        dyn->fleetFled = false;
+        QList<int> startingEquip = ship->getStartingEquip();
+        for(int equipId : startingEquip) {
+            if(!equipRegistry.contains(equipId)) {
+                qWarning() << "Equipment ID" << equipId << "not found";
+                continue;
+            }
+            QUuid uuid = QUuid::createUuid();
+            info.equipMap.insert(uuid, equipRegistry[equipId]);
+            info.equipSkillEffects.insert(uuid, 1.0);
+            dyn->slotEquip.append(uuid);
+        }
+        dyn->slotEquipEx = QUuid(); // empty UUID
+        dyn->slotPlanes = QList<int>(5, 0); // five slots, zero planes
+        info.ships.push_back(ship);
+        info.shipDynamics.push_back(dyn);
+    });
+    info.shipTags.resize(info.ships.size(), 0);
+    return info;
+}
+
 const QJsonObject Server::processBattleCore(const CSteamID &uid,
                                             int mapId,
                                             int nodeId,
@@ -990,14 +1059,29 @@ const QJsonObject Server::processBattleCore(const CSteamID &uid,
 
     QJsonObject before;
     QJsonObject enemyBefore;
-    QJsonArray bHP = {1,};
+    QJsonArray bHP;
+    KP::Difficulty diff = static_cast<KP::Difficulty>(
+                MapWithDiff::getDiff(mapId));
+    FleetInfo enemyFleet = createEnemyFleetInfo(mapId, nodeId, diff);
+    for(const ShipDynamic *dyn : enemyFleet.shipDynamics) {
+        bHP.append(dyn->currentHP);
+    }
+    if(bHP.isEmpty()) {
+        bHP.append(1); // fallback dummy
+    }
     enemyBefore["hp"] = bHP;
     before["enemy"] = enemyBefore;
     result["before"] = before;
 
     QJsonObject after;
     QJsonObject enemyAfter;
-    QJsonArray aHP = {0,};
+    QJsonArray aHP;
+    for(int i = 0; i < enemyFleet.shipDynamics.size(); ++i) {
+        aHP.append(0); // all enemy ships defeated
+    }
+    if(aHP.isEmpty()) {
+        aHP.append(0); // fallback dummy
+    }
     enemyAfter["hp"] = aHP;
     after["enemy"] = enemyAfter;
     result["after"] = after;
