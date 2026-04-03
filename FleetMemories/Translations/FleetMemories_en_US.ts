@@ -3757,7 +3757,7 @@ Great at battle and bad at politics--so cool!</translation>
     <message id="lv-display">
         <location filename="../ClientGUI/ui/fleet/shipdisplay.cpp" line="57"/>
         <location filename="../ClientGUI/ui/fleet/shipdisplayflat.cpp" line="58"/>
-        <location filename="../ClientGUI/ui/fleet/shipattrdialog.cpp" line="148"/>
+        <location filename="../ClientGUI/ui/fleet/shipattrdialog.cpp" line="164"/>
         <source>Lv %1</source>
         <translation type="unfinished">Lv %1</translation>
     </message>
@@ -4116,17 +4116,17 @@ Great at battle and bad at politics--so cool!</translation>
         <translation type="unfinished">Day Battle when flagship remains</translation>
     </message>
     <message id="mod-star-display">
-        <location filename="../ClientGUI/ui/fleet/shipattrdialog.cpp" line="153"/>
+        <location filename="../ClientGUI/ui/fleet/shipattrdialog.cpp" line="169"/>
         <source>★+%1/%2</source>
         <translation>★+%1/%2</translation>
     </message>
     <message id="eff-display">
-        <location filename="../ClientGUI/ui/fleet/shipattrdialog.cpp" line="156"/>
+        <location filename="../ClientGUI/ui/fleet/shipattrdialog.cpp" line="172"/>
         <source>Eff %1%</source>
         <translation>Eff %1%</translation>
     </message>
     <message id="lv-progress">
-        <location filename="../ClientGUI/ui/fleet/shipattrdialog.cpp" line="359"/>
+        <location filename="../ClientGUI/ui/fleet/shipattrdialog.cpp" line="380"/>
         <source>Lv Progress</source>
         <translation>Lv Progress</translation>
     </message>

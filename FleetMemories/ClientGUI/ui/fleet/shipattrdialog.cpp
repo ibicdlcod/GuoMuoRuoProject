@@ -119,7 +119,6 @@ void CardPlaceholder::paintEvent(QPaintEvent *event)
                                        Qt::SmoothTransformation);
         int x = (width()  - scaled.width())  / 2;
         int y = (height() - scaled.height()) / 2;
-        painter.setOpacity(0.35);
         painter.drawPixmap(x, y, scaled);
     }
     QFrame::paintEvent(event);
