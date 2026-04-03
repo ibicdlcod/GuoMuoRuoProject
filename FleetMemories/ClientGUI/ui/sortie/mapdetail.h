@@ -41,6 +41,7 @@ signals:
 private:
     virtual void paintEvent(QPaintEvent *event) override;
     virtual void mousePressEvent(QMouseEvent *event) override;
+    static QPixmap generatePlanePixmap(const QColor &color = Qt::white);
 
 private:
     Ui::MapDetail *ui;

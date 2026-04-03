@@ -16,8 +16,7 @@ MapDetail::MapDetail(QWidget *parent)
     antialiased = true;
 
     rudder = recolorImage(":/Assets/Image/rudder.png", QColor(192, 192, 0));
-    airNodeIcon = recolorImage(":/Assets/Image/fleetIcons/carrier.png",
-                               QColor(180, 0, 0));
+    airNodeIcon = generatePlanePixmap(QColor(180, 0, 0));
     carrierFleetIcon = recolorImage(
         ":/Assets/Image/fleetIcons/carrier.png", QColor(0, 192, 0));
     surfaceFleetIcon = recolorImage(
@@ -57,6 +56,39 @@ QPixmap MapDetail::recolorImage(const QString &filename, const QColor &color) {
     painter.fillRect(newImage.rect(), color);
     painter.end();
     return newImage;
+}
+
+QPixmap MapDetail::generatePlanePixmap(const QColor &color) {
+    const int size = 32;
+    QPixmap pixmap(size, size);
+    pixmap.fill(Qt::transparent);
+    
+    QPainter painter(&pixmap);
+    painter.setRenderHint(QPainter::Antialiasing);
+    painter.setPen(Qt::NoPen);
+    painter.setBrush(color);
+    
+    // Fuselage: horizontal rectangle
+    QRectF fuselage(8, 14, 16, 4);
+    painter.drawRect(fuselage);
+    
+    // Nose: triangle at front
+    QPolygonF nose;
+    nose << QPointF(24, 16) << QPointF(28, 14) << QPointF(28, 18);
+    painter.drawPolygon(nose);
+    
+    // Wings: two rectangles
+    QRectF leftWing(12, 10, 8, 2);
+    painter.drawRect(leftWing);
+    QRectF rightWing(12, 20, 8, 2);
+    painter.drawRect(rightWing);
+    
+    // Tail fin: small vertical rectangle
+    QRectF tail(6, 12, 2, 8);
+    painter.drawRect(tail);
+    
+    painter.end();
+    return pixmap;
 }
 
 QPointF MapDetail::getFleetCenter() const {
@@ -222,7 +254,7 @@ void MapDetail::paintEvent(QPaintEvent *event) {
                                 node.y * height() - circleSize / 2,
                                 circleSize, circleSize);
             painter.drawPixmap(node.x * width() - circleSize / 2,
-                               node.y * height() - circleSize / 2,
+                               node.y * height() - circleSize,
                                airNodeIcon.scaled(
                                    QSize(circleSize, circleSize),
                                    Qt::KeepAspectRatio,
