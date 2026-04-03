@@ -6,6 +6,8 @@
 
 #include <QJsonArray>
 
+#include <optional>
+
 #include "equipmodel.h"
 #include "../../Protocol/ship.h"
 #include "../../Protocol/shipdynamic.h"
@@ -42,6 +44,7 @@ public slots:
     virtual void decoratedShips(const QList<std::tuple<QUuid, int>> &);
     virtual void modifyShip(QUuid, int, int, bool disabling = false) final;
     void setIsSupplyMode(bool);
+    void setFleetFilter(std::optional<int> fleetFilter);
     virtual void updateShipList(const QJsonObject &);
 
 public:
@@ -92,6 +95,7 @@ protected:
     QString currentTypeFilter;
     QString currentClassFilter;
     QString currentSearchFilter;
+    std::optional<int> currentFleetFilter = std::nullopt;
     QHash<int, int> bpCache;
     QHash<QUuid, bool> isAmmoSupplyChecked;
     QHash<QUuid, bool> isDecorationChecked;

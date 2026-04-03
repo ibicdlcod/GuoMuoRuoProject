@@ -974,6 +974,13 @@ void ShipModel::setIsSupplyMode(bool supply) {
     }
 }
 
+void ShipModel::setFleetFilter(std::optional<int> fleetFilter) {
+    if(currentFleetFilter == fleetFilter)
+        return;
+    currentFleetFilter = fleetFilter;
+    refilter();
+}
+
 void ShipModel::enactSupply() {
     QJsonArray ships;
     for(const QUuid &uuid: std::as_const(sortedShipIds)) {
