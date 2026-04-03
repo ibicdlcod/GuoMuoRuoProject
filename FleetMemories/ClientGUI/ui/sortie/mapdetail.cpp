@@ -1,13 +1,24 @@
 #include "mapdetail.h"
 #include "ui_mapdetail.h"
 
+#include <QColor>
+#include <QGuiApplication>
 #include <QMouseEvent>
 #include <QPainter>
 #include <QStyleHints>
+#include <Qt>
 
 #include "../../clientv2.h"
 #include "../mainwindow.h"
 #include "maprender.h"
+
+static QColor getIconColor() {
+    if(QGuiApplication::styleHints()->colorScheme() == Qt::ColorScheme::Dark) {
+        return Qt::white;
+    } else {
+        return Qt::black;
+    }
+}
 
 MapDetail::MapDetail(QWidget *parent)
     : QWidget(parent)
@@ -15,8 +26,9 @@ MapDetail::MapDetail(QWidget *parent)
     ui->setupUi(this);
     antialiased = true;
 
-    rudder = recolorImage(":/Assets/Image/rudder.png", QColor(192, 192, 0));
-    airNodeIcon = generatePlanePixmap(QColor(180, 0, 0));
+    QColor iconColor = getIconColor();
+    rudder = recolorImage(":/Assets/Image/rudder.png", iconColor);
+    airNodeIcon = recolorImage(":/Assets/Image/planes.png", iconColor);
     carrierFleetIcon = recolorImage(
         ":/Assets/Image/fleetIcons/carrier.png", QColor(0, 192, 0));
     surfaceFleetIcon = recolorImage(
@@ -58,38 +70,7 @@ QPixmap MapDetail::recolorImage(const QString &filename, const QColor &color) {
     return newImage;
 }
 
-QPixmap MapDetail::generatePlanePixmap(const QColor &color) {
-    const int size = 32;
-    QPixmap pixmap(size, size);
-    pixmap.fill(Qt::transparent);
-    
-    QPainter painter(&pixmap);
-    painter.setRenderHint(QPainter::Antialiasing);
-    painter.setPen(Qt::NoPen);
-    painter.setBrush(color);
-    
-    // Fuselage: horizontal rectangle
-    QRectF fuselage(8, 14, 16, 4);
-    painter.drawRect(fuselage);
-    
-    // Nose: triangle at front
-    QPolygonF nose;
-    nose << QPointF(24, 16) << QPointF(28, 14) << QPointF(28, 18);
-    painter.drawPolygon(nose);
-    
-    // Wings: two rectangles
-    QRectF leftWing(12, 10, 8, 2);
-    painter.drawRect(leftWing);
-    QRectF rightWing(12, 20, 8, 2);
-    painter.drawRect(rightWing);
-    
-    // Tail fin: small vertical rectangle
-    QRectF tail(6, 12, 2, 8);
-    painter.drawRect(tail);
-    
-    painter.end();
-    return pixmap;
-}
+
 
 QPointF MapDetail::getFleetCenter() const {
     return fleetCenter;
