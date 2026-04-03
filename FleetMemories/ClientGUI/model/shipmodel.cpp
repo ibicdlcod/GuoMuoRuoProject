@@ -47,6 +47,10 @@ void ShipModel::switchShipDisplayType(const QString &nationality,
                                       const QString &shiptype,
                                       const QString &shipclass,
                                       const QString &searchTerm) {
+    currentNationalityFilter = nationality;
+    currentTypeFilter = shiptype;
+    currentClassFilter = shipclass;
+    currentSearchFilter = searchTerm;
     bpCacheRefresh();
     int oldRowCount = rowCount();
     sortedShipIds.clear();
@@ -136,6 +140,11 @@ void ShipModel::switchShipDisplayType(const QString &nationality,
     adjustRowCount(oldRowCount, newRowCount);
     firstPage();
     wholeTableChanged();
+}
+
+void ShipModel::refilter() {
+    switchShipDisplayType(currentNationalityFilter, currentTypeFilter,
+                          currentClassFilter, currentSearchFilter);
 }
 
 void ShipModel::addShip(QUuid uid, int def, int hp) {

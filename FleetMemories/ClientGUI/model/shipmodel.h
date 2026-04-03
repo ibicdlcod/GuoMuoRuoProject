@@ -88,6 +88,10 @@ protected:
     virtual int numberOfColumns() const override;
     virtual int numberOfShip() const;
     bool isSupplyMode = false;
+    QString currentNationalityFilter;
+    QString currentTypeFilter;
+    QString currentClassFilter;
+    QString currentSearchFilter;
     QHash<int, int> bpCache;
     QHash<QUuid, bool> isAmmoSupplyChecked;
     QHash<QUuid, bool> isDecorationChecked;
@@ -99,6 +103,9 @@ protected:
     QHash<QUuid, Ship *> clientShips;
     QHash<QUuid, ShipDynamic *> clientShipDynamicAttrs;
     QList<QUuid> sortedShipIds;
+
+private:
+    void refilter();
 };
 
 #endif // SHIPMODEL_H
