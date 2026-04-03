@@ -848,11 +848,12 @@ deal_with_gauge:
                                           "'CurrentFreightTransported'");
                     freightQuery.bindValue(":uid", uid.ConvertToUint64());
                     if(Q_UNLIKELY(!freightQuery.exec())) {
-                         throw DBError(
-                             //% "User %1: transport node read failure!"
-                             qtTrId("sortie-node-battle-failure-transport-read")
-                                 .arg(uid.ConvertToUint64()),
-                             freightQuery.lastError(), freightQuery.lastQuery());
+                          throw DBError(
+                              //% "User %1: transport node read failure!"
+                              qtTrId("sortie-node-battle-failure-transport-read")
+                                  .arg(uid.ConvertToUint64()),
+                              freightQuery.lastError(),
+                              freightQuery.lastQuery());
                         return;
                     }
                     int currentFreight = 0;

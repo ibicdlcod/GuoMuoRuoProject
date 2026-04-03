@@ -53,7 +53,8 @@ double FleetInfo::los() {
 
 int FleetInfo::transportCapacity(const CSteamID &uid, TransportMode mode) {
     if(mode != Default) {
-        qWarning() << "FleetInfo::transportCapacity: unknown mode" << static_cast<int>(mode);
+         qWarning() << "FleetInfo::transportCapacity: unknown mode"
+                    << static_cast<int>(mode);
         return 0;
     }
     
