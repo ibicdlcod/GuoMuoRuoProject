@@ -12,14 +12,20 @@
 class FleetInfo
 {
 public:
-    FleetInfo();
-    ~FleetInfo();
-    double los();
-    LuaMap capitalness();//"Total"/"Surface"/"Carrier"/"Screens"
-    std::vector<int> shipSpeeds();
     enum TransportMode {
         Default
     };
+    enum CapitalType {
+        Any,
+        Screen,
+        Surface,
+        Carrier,
+    };
+    FleetInfo();
+    ~FleetInfo();
+    double los();
+    QMap<CapitalType, int> capitalness();
+    std::vector<int> shipSpeeds();
     int transportCapacity(const CSteamID &uid, TransportMode mode = Default);
 
     /* Returns the sum of:

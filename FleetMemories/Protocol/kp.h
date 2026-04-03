@@ -578,10 +578,11 @@ enum FleetType {
 Q_ENUM_NS(FleetType);
 
 enum CapitalType {
-    Screen = 0,
-    BattleShip = 1,
-    Carrier = 2,
-    OtherShip = 3
+    AnyCapitalType = 0,
+    Screen = 1,
+    SurfaceShip = 2,
+    CarrierShip = 3,
+    OtherCapitalType = 4,
 };
 
 /* must be consistent with canequip.lua */

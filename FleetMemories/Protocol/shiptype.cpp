@@ -443,7 +443,7 @@ int ShipType::getCapitalness() const {
 KP::CapitalType ShipType::getCapitalType() const {
     switch((iRep & 0xf0) >> 4) {
     case 1:
-        return KP::OtherShip;
+        [[fallthrough]];
     case 2:
         [[fallthrough]];
     case 3:
@@ -451,10 +451,12 @@ KP::CapitalType ShipType::getCapitalType() const {
     case 4:
         [[fallthrough]];
     case 5:
-        return KP::BattleShip;
+        return KP::SurfaceShip;
+    case 8:
+        [[fallthrough]];
     case 6:
-        return KP::Carrier;
+        return KP::CarrierShip;
     default:
-        return KP::OtherShip;
+        return KP::OtherCapitalType;
     }
 }
