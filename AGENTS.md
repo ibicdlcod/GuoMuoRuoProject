@@ -14,30 +14,9 @@ All source lives under `FleetMemories/`. C++20 is required on Windows; C++23 on 
 
 ## Build Commands
 
-### Initial Setup
-```bash
-# Initialize git submodules (lua-cmake, sol2, tinygltf)
-git submodule update --init --recursive
+In Linux and Windows: refer to CMakeList.txt.user for Qt Creator settings.
 
-# Configure from repo root
-cmake -S FleetMemories -B build -DCMAKE_BUILD_TYPE=Debug
-# or Release
-cmake -S FleetMemories -B build -DCMAKE_BUILD_TYPE=Release
-```
-
-### Building
-```bash
-# Build all targets
-cmake --build build
-
-# Build specific target
-cmake --build build --target CFClient
-cmake --build build --target CFServer  
-cmake --build build --target CFProtocol
-```
-
-### Post-Build
-CMake automatically copies CSV data files from `doc/` and Steam DLLs into target output directories. No manual copying needed.
+In WSL: don't build. You are not operating in a build environment (which is another directory in Windows filesystem)
 
 ## Lint & Test Commands
 
