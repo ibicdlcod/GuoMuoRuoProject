@@ -16,7 +16,7 @@ class CardPlaceholder : public QFrame
 {
     Q_OBJECT
 public:
-    explicit CardPlaceholder(QWidget *parent = nullptr);
+    explicit CardPlaceholder(QWidget *parent = nullptr, int oldInternalId = 0);
     bool hasHeightForWidth() const override { return true; }
     int  heightForWidth(int w) const override { return w * 7 / 5; }
     QSize sizeHint() const override { return QSize(160, 224); }

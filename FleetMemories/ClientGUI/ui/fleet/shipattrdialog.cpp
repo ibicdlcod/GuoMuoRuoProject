@@ -8,6 +8,8 @@
 
 #include <QApplication>
 #include <QDialogButtonBox>
+#include <QDir>
+#include <QDirIterator>
 #include <QGridLayout>
 #include <QHBoxLayout>
 #include <QLabel>
@@ -85,12 +87,27 @@ static LuaMap equipContrib(const QUuid &shipUuid) {
 
 /* ---- CardPlaceholder ---- */
 
-CardPlaceholder::CardPlaceholder(QWidget *parent)
+CardPlaceholder::CardPlaceholder(QWidget *parent, int oldInternalId)
     : QFrame(parent)
     , icon_(QPixmap(":/Assets/Image/Sea.jpg"))
 {
     setFrameShape(QFrame::Box);
     setFrameShadow(QFrame::Sunken);
+
+    if (oldInternalId > 0) {
+        QString paddedId = QString::number(oldInternalId)
+                               .rightJustified(4, '0');
+        QDirIterator it("TsunkitMode/shipCards/",
+                        QStringList() << paddedId + "_*.png",
+                        QDir::Files);
+        if (it.hasNext()) {
+            QString cardPath = it.next();
+            QPixmap cardPixmap(cardPath);
+            if (!cardPixmap.isNull()) {
+                icon_ = cardPixmap;
+            }
+        }
+    }
 }
 
 void CardPlaceholder::paintEvent(QPaintEvent *event)
@@ -210,6 +227,7 @@ ShipAttrDialog::ShipAttrDialog(Ship *ship, ShipDynamic *dyn,
 
     /* HP + condition row */
     hpBar->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+    hpBar->setMaximumWidth(250);
 
     auto *hpRow = new QHBoxLayout;
     hpRow->addWidget(condIconLabel);
@@ -324,7 +342,7 @@ ShipAttrDialog::ShipAttrDialog(Ship *ship, ShipDynamic *dyn,
         attrValueLabels_.append(vLabel);
         attrBonusLabels_.append(bonusLabel);
     }
-    attrsGrid_->setColumnStretch(3, 1);
+    attrsGrid_->setColumnStretch(3, 0);
 
     /* ---- OK button ---- */
     auto *buttons = new QDialogButtonBox(QDialogButtonBox::Ok);
@@ -343,7 +361,11 @@ ShipAttrDialog::ShipAttrDialog(Ship *ship, ShipDynamic *dyn,
     leftWidget->setLayout(leftLayout);
 
     /* ---- Card placeholder + exp bar ---- */
-    auto *card = new CardPlaceholder;
+    int oldInternalId = 0;
+    if (ship_->attr.contains("OldInternalNo.")) {
+        oldInternalId = ship_->attr["OldInternalNo."];
+    }
+    auto *card = new CardPlaceholder(this, oldInternalId);
 
     double scale = settings->value("rule/shipexpscale", 100.0).toDouble();
     int expThisLv = static_cast<int>(scale * lv * (lv - 1) / 2.0);
