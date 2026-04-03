@@ -4,6 +4,7 @@
 #include <algorithm>
 #include <cmath>
 
+#include <QDebug>
 #include <QSettings>
 
 #include "fleetinfo.h"
@@ -44,6 +45,20 @@ double FleetInfo::los() {
         weight *= a;
     }
     return result;
+}
+
+int FleetInfo::transportCapacity(const CSteamID &uid, TransportMode mode) {
+    if(mode != Default) {
+        qWarning() << "FleetInfo::transportCapacity: unknown mode" << static_cast<int>(mode);
+        return 0;
+    }
+    
+    int total = 0;
+    for(int i = 0; i < static_cast<int>(ships.size()); ++i) {
+        LuaMap attrs = effectiveAttr(uid, i);
+        total += attrs.value(QStringLiteral("Transport"), 0);
+    }
+    return total;
 }
 
 LuaMap FleetInfo::capitalness() {

@@ -56,6 +56,8 @@ Sortie::Sortie(QWidget *parent)
             resourceGainW, &ResourceGainView::populate);
     connect(&engine, &Client::receivedDisasterLOSInfo,
             this, &Sortie::disasterLOSInfo);
+    connect(&engine, &Client::receivedTransportFreightInfo,
+            this, &Sortie::transportFreightInfo);
     connect(ui->diffChoice, &QComboBox::currentTextChanged,
             renderer, &MapRender::setDiff);
     connect(ui->diffChoice, &QComboBox::currentTextChanged,
@@ -348,6 +350,15 @@ void Sortie::disasterLOSInfo(const QJsonObject &djson) {
         //% "LOS check succeeded! No resources deducted."
         qInfo() << qtTrId("disaster-deduction-avoided");
     }
+}
+
+void Sortie::transportFreightInfo(const QJsonObject &djson) {
+    int currentFreight = djson["currentFreight"].toInt();
+    int capacity = djson["capacity"].toInt();
+    int added = djson["added"].toInt();
+    //% "Freight transport: current %1, capacity %2, added %3"
+    qInfo() << qtTrId("transport-freight-info")
+               .arg(currentFreight).arg(capacity).arg(added);
 }
 
 void Sortie::battleEnd() {
