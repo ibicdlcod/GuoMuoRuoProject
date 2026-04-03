@@ -341,7 +341,7 @@ void Sortie::disasterLOSInfo(const QJsonObject &djson) {
                .arg(requiredLOS).arg(fleetLOS).arg(chanceToAvoid * 100.0);
     if(deductionOccurred) {
         //% "Fuel/ammo deducted: %1% fuel, %2% ammo"
-        qInfo() << qtTrId("disaster-deduction-occurred")
+        qWarning() << qtTrId("disaster-deduction-occurred")
                    .arg(fuelFrac * 100.0).arg(ammoFrac * 100.0);
         // TODO: compute absolute resource costs using ShipRegistry data
     } else {

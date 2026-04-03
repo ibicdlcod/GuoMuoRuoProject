@@ -86,7 +86,14 @@ maps[3][1] = {
 maps[3][2] = {
 	x = 0.500,
 	y = 0.500,
-	battle_type = maps.Battle_type.AIR,
+	battle_type = maps.Battle_type.DISASTER,
+	fuel = 0.5,
+	ammo = 0.5,
+	los = {
+		C = 400,
+		B = 600,
+		A = 1000,
+	},
 	lb_distance = 99,
 	next_nodes = {3, 4, 5},
 	branch_rule = {
