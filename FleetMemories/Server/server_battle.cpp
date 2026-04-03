@@ -750,153 +750,9 @@ void Server::processBattle(const CSteamID &uid, QSslSocket *connection,
                                battleProcess["time"].toInt()),
                            this, [this, uid, connection, result,
                             battleProcess, mapId, unionId, nodeId, type](){
-                               set_battle_state:
-                                   QSqlQuery query;
-                                   query.prepare("UPDATE UserAttr SET Intvalue = :type "
-                                                 "WHERE Attribute = 'InBattle' "
-                                                 "AND UserID = :uid");
-                                   query.bindValue(":uid", uid.ConvertToUint64());
-                                   query.bindValue(":type", KP::AfterBattle);
-                                   if(Q_UNLIKELY(!query.exec())) {
-                                       //% "User %1: end node battle failure!"
-                                       throw DBError(
-                                           qtTrId("sortie-node-battle-failure-end")
-                                               .arg(uid.ConvertToUint64()),
-                                           query.lastError(), query.lastQuery());
-                                       return;
-                                   }
-                                   QByteArray msg = KP::serverBattleEnd();
-                                   senderM.sendMessage(connection, msg);
-
-                                   auto assm = static_cast<KP::BattleAssessment>(
-                                       battleProcess["assm"].toInt());
-
-                               condition_drop:
-                                   /* night battle for daystart and day for nightstart */
-                                   auto extraStage = battleProcess["extrastage"].toBool();
-                                   int condDrop = 0;
-                                   switch(assm) {
-                                   /* would be lower for expedition */
-                                   case KP::SVictory: condDrop = 4; break;
-                                   case KP::AVictory: condDrop = 5; break;
-                                   case KP::BVictory: condDrop = 6; break;
-                                   case KP::CDefeat: condDrop = 7; break;
-                                   case KP::DDefeat: condDrop = 8; break;
-                                   case KP::EDefeat: condDrop = 9; break;
-                                   }
-                                   condDrop += (extraStage ? 1 : 0);
-                                   conditionDrop(uid, result.value()[3], condDrop);
-
-                               drop_ship:
-                                   int dropShip = drop(uid, result.value()[0], result.value()[1],
-                                                       assm);
-                                   if(dropShip == -1) {
-                                       QByteArray msg = KP::serverBattleError(KP::DropError);
-                                       senderM.sendMessage(connection, msg);
-                                   }
-                                   else if(dropShip != 0) {
-                                       processDrop(uid, connection, dropShip);
-                                   }
-
-                               add_exp:
-                                   KP::Difficulty diff = MapWithDiff::getDiff(mapId);
-                                   QString diffStr = (*KP::diffEnumtoStr)[diff];
-                                   QByteArray diffStrBytes = diffStr.toUtf8();
-                                   const char *diffStrC = diffStrBytes;
-                                   int exp = 0;
-                                   if(lua["maps"][unionId][nodeId]["expr"] != sol::nil) {
-                                       exp = lua["maps"][unionId][nodeId]["expr"][diffStrC];
-                                   }
-                                   else {
-                                       //% "Map info: query mapid %1 nodeid %2 exp failed!"
-                                       qCritical() << qtTrId("map-info-failure-exp")
-                                                          .arg(mapId).arg(nodeId);
-                                       return;
-                                   }
-                                   processExpGain(uid, result.value()[3], exp, assm);
-                                   processVirtualExpGain(uid, unionId, diff, exp, assm);
-                               after_boss:
-                                   if(type == KP::BOSS || type == KP::NIGHTBOSS) {
-                                   gain_supremacy:
-                                       double baseSupremacy;
-                                       switch(diff) {
-                                       case KP::EarlyWar: baseSupremacy = 100; break;
-                                       case KP::MidWar: baseSupremacy = 200; break;
-                                       case KP::LateWar: baseSupremacy = 300; break;
-                                       case KP::Historical: baseSupremacy = 400; break;
-                                       default: baseSupremacy = 0; break;
-                                       }
-                                       double factor;
-                                       switch(assm) {
-                                       case KP::SVictory: factor = 1.0; break;
-                                       case KP::AVictory: factor = 0.8; break;
-                                       case KP::BVictory: factor = 0.5; break;
-                                       default: factor = 0.0; break;
-                                       }
-                                       double supremacyValue = baseSupremacy * factor;
-                                       if(supremacyValue > 0) {
-                                           // no retention
-                                           User::setMapSupremacy(uid, unionId, supremacyValue,
-                                                                 0);
-                                       }
-                                   deal_with_gauge:
-                                       // Read current freight transported
-                                       QSqlQuery freightQuery;
-                                       freightQuery.prepare("SELECT Intvalue FROM UserAttr "
-                                                            "WHERE UserID = :uid "
-                                                            "AND Attribute = "
-                                                            "'CurrentFreightTransported'");
-                                       freightQuery.bindValue(":uid", uid.ConvertToUint64());
-                                       if(Q_UNLIKELY(!freightQuery.exec())) {
-                                           throw DBError(
-                                               //% "User %1: transport node read failure!"
-                                               qtTrId("sortie-node-battle-failure-transport-read")
-                                                   .arg(uid.ConvertToUint64()),
-                                               freightQuery.lastError(),
-                                               freightQuery.lastQuery());
-                                           return;
-                                       }
-                                       int currentFreight = 0;
-                                       if(freightQuery.isSelect() && freightQuery.next()) {
-                                           currentFreight = freightQuery.value(0).toInt();
-                                       }
-
-                                       int amount = getBossDamage(battleProcess);
-                                       // Add freight contribution
-                                       int freightContribution = qRound(currentFreight * factor);
-                                       amount += freightContribution;
-
-                                       User::decreaseGauge(uid, unionId, diff, amount);
-
-                                       // Clear freight after consumption
-                                       if(currentFreight > 0) {
-                                           freightQuery.prepare("UPDATE UserAttr "
-                                                                "SET Intvalue = 0 "
-                                                                "WHERE UserID = :uid "
-                                                                "AND Attribute = "
-                                                                "'CurrentFreightTransported'");
-                                           freightQuery.bindValue(":uid", uid.ConvertToUint64());
-                                           if(Q_UNLIKELY(!freightQuery.exec())) {
-                                               throw DBError(
-                                                   //% "User %1: transport node clear failure!"
-                                                   qtTrId("sortie-node-battle-failure-transport-clear")
-                                                       .arg(uid.ConvertToUint64()),
-                                                   freightQuery.lastError(),
-                                                   freightQuery.lastQuery());
-                                               return;
-                                           }
-                                       }
-
-                                       bool isBossSunk = getBossSunk(battleProcess) || currentFreight > 0;
-                                       if(isBossSunk
-                                           && User::isGaugeFinished(uid, unionId, diff)) {
-                                           /* clear map */
-                                           if(clearMap(uid, unionId)) {
-                                               offerMapInfoUser(uid, connection);
-                                           }
-                                       }
-                                   }
-                                   offerShipInfoUser(uid, connection);
+                               handleBattleAftermath(uid, connection, battleProcess,
+                                                     mapId, unionId, nodeId, type,
+                                                     result.value()[3]);
                            });
     }
     break;
@@ -1086,6 +942,163 @@ const QJsonObject Server::processBattleCore(const CSteamID &uid,
     result["after"] = after;
 
     return result;
+}
+
+void Server::handleBattleAftermath(const CSteamID &uid,
+                                   QSslSocket *connection,
+                                   const QJsonObject &battleProcess,
+                                   int mapId,
+                                   int unionId,
+                                   int nodeId,
+                                   KP::NodeType type,
+                                   int activeFleetIndex) {
+    // set_battle_state:
+    QSqlQuery query;
+    query.prepare("UPDATE UserAttr SET Intvalue = :type "
+                  "WHERE Attribute = 'InBattle' "
+                  "AND UserID = :uid");
+    query.bindValue(":uid", uid.ConvertToUint64());
+    query.bindValue(":type", KP::AfterBattle);
+    if(Q_UNLIKELY(!query.exec())) {
+        //% "User %1: end node battle failure!"
+        throw DBError(
+            qtTrId("sortie-node-battle-failure-end")
+                .arg(uid.ConvertToUint64()),
+            query.lastError(), query.lastQuery());
+        return;
+    }
+    QByteArray msg = KP::serverBattleEnd();
+    senderM.sendMessage(connection, msg);
+
+    auto assm = static_cast<KP::BattleAssessment>(
+        battleProcess["assm"].toInt());
+
+    // condition_drop:
+    /* night battle for daystart and day for nightstart */
+    auto extraStage = battleProcess["extrastage"].toBool();
+    int condDrop = 0;
+    switch(assm) {
+    /* would be lower for expedition */
+    case KP::SVictory: condDrop = 4; break;
+    case KP::AVictory: condDrop = 5; break;
+    case KP::BVictory: condDrop = 6; break;
+    case KP::CDefeat: condDrop = 7; break;
+    case KP::DDefeat: condDrop = 8; break;
+    case KP::EDefeat: condDrop = 9; break;
+    }
+    condDrop += (extraStage ? 1 : 0);
+    conditionDrop(uid, activeFleetIndex, condDrop);
+
+    // drop_ship:
+    int dropShip = drop(uid, mapId, nodeId, assm);
+    if(dropShip == -1) {
+        QByteArray msg = KP::serverBattleError(KP::DropError);
+        senderM.sendMessage(connection, msg);
+    }
+    else if(dropShip != 0) {
+        processDrop(uid, connection, dropShip);
+    }
+
+    // add_exp:
+    KP::Difficulty diff = MapWithDiff::getDiff(mapId);
+    QString diffStr = (*KP::diffEnumtoStr)[diff];
+    QByteArray diffStrBytes = diffStr.toUtf8();
+    const char *diffStrC = diffStrBytes;
+    int exp = 0;
+    if(lua["maps"][unionId][nodeId]["expr"] != sol::nil) {
+        exp = lua["maps"][unionId][nodeId]["expr"][diffStrC];
+    }
+    else {
+        //% "Map info: query mapid %1 nodeid %2 exp failed!"
+        qCritical() << qtTrId("map-info-failure-exp")
+                           .arg(mapId).arg(nodeId);
+        return;
+    }
+    processExpGain(uid, activeFleetIndex, exp, assm);
+    processVirtualExpGain(uid, unionId, diff, exp, assm);
+
+    // after_boss:
+    if(type == KP::BOSS || type == KP::NIGHTBOSS) {
+        // gain_supremacy:
+        double baseSupremacy;
+        switch(diff) {
+        case KP::EarlyWar: baseSupremacy = 100; break;
+        case KP::MidWar: baseSupremacy = 200; break;
+        case KP::LateWar: baseSupremacy = 300; break;
+        case KP::Historical: baseSupremacy = 400; break;
+        default: baseSupremacy = 0; break;
+        }
+        double factor;
+        switch(assm) {
+        case KP::SVictory: factor = 1.0; break;
+        case KP::AVictory: factor = 0.8; break;
+        case KP::BVictory: factor = 0.5; break;
+        default: factor = 0.0; break;
+        }
+        double supremacyValue = baseSupremacy * factor;
+        if(supremacyValue > 0) {
+            // no retention
+            User::setMapSupremacy(uid, unionId, supremacyValue, 0);
+        }
+
+        // deal_with_gauge:
+        // Read current freight transported
+        QSqlQuery freightQuery;
+        freightQuery.prepare("SELECT Intvalue FROM UserAttr "
+                             "WHERE UserID = :uid "
+                             "AND Attribute = "
+                             "'CurrentFreightTransported'");
+        freightQuery.bindValue(":uid", uid.ConvertToUint64());
+        if(Q_UNLIKELY(!freightQuery.exec())) {
+            throw DBError(
+                //% "User %1: transport node read failure!"
+                qtTrId("sortie-node-battle-failure-transport-read")
+                    .arg(uid.ConvertToUint64()),
+                freightQuery.lastError(),
+                freightQuery.lastQuery());
+            return;
+        }
+        int currentFreight = 0;
+        if(freightQuery.isSelect() && freightQuery.next()) {
+            currentFreight = freightQuery.value(0).toInt();
+        }
+
+        int amount = getBossDamage(battleProcess);
+        // Add freight contribution
+        int freightContribution = qRound(currentFreight * factor);
+        amount += freightContribution;
+
+        User::decreaseGauge(uid, unionId, diff, amount);
+
+        // Clear freight after consumption
+        if(currentFreight > 0) {
+            freightQuery.prepare("UPDATE UserAttr "
+                                 "SET Intvalue = 0 "
+                                 "WHERE UserID = :uid "
+                                 "AND Attribute = "
+                                 "'CurrentFreightTransported'");
+            freightQuery.bindValue(":uid", uid.ConvertToUint64());
+            if(Q_UNLIKELY(!freightQuery.exec())) {
+                throw DBError(
+                    //% "User %1: transport node clear failure!"
+                    qtTrId("sortie-node-battle-failure-transport-clear")
+                        .arg(uid.ConvertToUint64()),
+                    freightQuery.lastError(),
+                    freightQuery.lastQuery());
+                return;
+            }
+        }
+
+        bool isBossSunk = getBossSunk(battleProcess) || currentFreight > 0;
+        if(isBossSunk
+            && User::isGaugeFinished(uid, unionId, diff)) {
+            /* clear map */
+            if(clearMap(uid, unionId)) {
+                offerMapInfoUser(uid, connection);
+            }
+        }
+    }
+    offerShipInfoUser(uid, connection);
 }
 
 void Server::processDrop(const CSteamID &uid, QSslSocket *connection,

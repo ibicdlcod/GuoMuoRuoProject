@@ -105,6 +105,8 @@ private:
     void generateTestShip(const CSteamID &);
     void handleARDPurchaseAuth(const CSteamID &, QSslSocket *,
                                const QJsonObject &);
+    void handleBattleAftermath(const CSteamID &, QSslSocket *, const QJsonObject &,
+                               int, int, int, KP::NodeType, int);
     void handleInitARDPurchase(const CSteamID &, QSslSocket *, int packageId);
     void handleSupplyShip(const CSteamID &, QSslSocket *,
                           const QJsonArray &);
