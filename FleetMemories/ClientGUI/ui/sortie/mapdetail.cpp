@@ -29,7 +29,7 @@ MapDetail::MapDetail(QWidget *parent)
 
     QColor iconColor = getIconColor();
     rudder = recolorImage(":/Assets/Image/rudder.png", iconColor);
-    airNodeIcon = recolorImage(":/Assets/Image/planes.png", iconColor);
+    airNodeIcon = recolorImage(":/Assets/Image/plane.png", iconColor);
     carrierFleetIcon = recolorImage(
         ":/Assets/Image/fleetIcons/carrier.png", QColor(0, 192, 0));
     surfaceFleetIcon = recolorImage(
