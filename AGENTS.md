@@ -16,7 +16,7 @@ All source lives under `FleetMemories/`. C++20 is required on Windows; C++23 on 
 
 In Linux and Windows: refer to CMakeList.txt.user for Qt Creator settings.
 
-In WSL: don't build. You are not operating in a build environment (which is another directory in Windows filesystem)
+In WSL: don't build. You are not operating in a build environment (which is another directory in Windows filesystem). Even many compilation errors can be ignored, since you don't natively have MSVC or Qt SDK.`
 
 ## Lint & Test Commands
 
