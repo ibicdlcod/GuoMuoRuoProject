@@ -4462,10 +4462,10 @@ check_duplicate_remodel_group:
             case KP::Screen:
                 screenSizes[fleetIndex] += ship->getType().getCapitalness();
                 break;
-            case KP::BattleShip:
+            case KP::SurfaceShip:
                 battleShipSizes[fleetIndex] += ship->getType().getCapitalness();
                 break;
-            case KP::Carrier:
+            case KP::CarrierShip:
                 carrierSizes[fleetIndex] += ship->getType().getCapitalness();
                 break;
             default: break;
