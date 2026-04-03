@@ -387,6 +387,9 @@ void Sortie::dealWithNode(const MapNode &node, int nodeId) {
         if(node.type == KP::EMPTY) {
             //% "No enemies found. It's just my imagination."
             qInfo() << qtTrId("empty-node-no-battle");
+        } else if(node.type == KP::CHOICE) {
+            //% "Admiral, please can choose your next step freely."
+            qInfo() << qtTrId("choice-node-prompt");
         }
         engine.doBattle(QJsonObject());
         break;

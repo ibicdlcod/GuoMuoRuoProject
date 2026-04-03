@@ -3426,6 +3426,11 @@ Great at battle and bad at politics--so cool!</translation>
         <source>No enemies found. It&apos;s just my imagination.</source>
         <translation type="unfinished">No enemies found. It&apos;s just my imagination.</translation>
     </message>
+    <message id="choice-node-prompt">
+        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="392"/>
+        <source>Admiral, please can choose your next step freely.</source>
+        <translation type="unfinished">Admiral, please can choose your next step freely.</translation>
+    </message>
     <message id="fleet-move-error">
         <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="426"/>
         <source>Fleet move failed!</source>
