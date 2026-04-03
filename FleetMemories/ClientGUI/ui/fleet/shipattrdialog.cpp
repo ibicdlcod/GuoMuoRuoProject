@@ -117,7 +117,7 @@ ShipAttrDialog::ShipAttrDialog(Ship *ship, ShipDynamic *dyn,
 {
     setWindowTitle(ship->toString());
     setWindowModality(Qt::WindowModal);
-    setMinimumSize(600, 550);
+    setMinimumSize(627, 550);
 
     /* Build display row keys (static for this ship type). */
     int typeGroup = ship->getType().toInt() >> 4;
@@ -360,7 +360,7 @@ ShipAttrDialog::ShipAttrDialog(Ship *ship, ShipDynamic *dyn,
                       + QString::number(expCurrent) + "/"
                       + QString::number(expRange) + ")");
 
-    card->setFixedSize(300, 450);
+    card->setFixedSize(327, 450);
 
     auto *rightLayout = new QVBoxLayout;
     rightLayout->setSpacing(6);
