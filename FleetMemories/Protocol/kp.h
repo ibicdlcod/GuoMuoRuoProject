@@ -328,6 +328,7 @@ enum InfoType{
     MapStart,
     MapProgress,
     VisibleBonusInfo,
+    DisasterLOSInfo,
 };
 Q_ENUM_NS(InfoType)
 
@@ -884,6 +885,9 @@ QByteArray serverMapInfoUser(const QJsonObject &,
                              AllegianceGroup homePort);
 QByteArray serverMapNotOpen(int mapId);
 QByteArray serverMapProgress(int mapId, int nextNode);
+QByteArray serverDisasterLOSInfo(double requiredLOS, double fleetLOS,
+                                 double chanceToAvoid, double fuelFrac,
+                                 double ammoFrac, bool deductionOccurred);
 QByteArray serverMapStart(int mapId, int startNode);
 QByteArray serverMedalPurchased(int amount);
 QByteArray serverNewEquip(QUuid, int);
