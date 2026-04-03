@@ -805,6 +805,17 @@ QByteArray KP::serverDisasterLOSInfo(double requiredLOS, double fleetLOS,
     return QCborValue::fromJsonValue(result).toCbor();
 }
 
+QByteArray KP::serverTransportFreightInfo(int currentFreight, int capacity,
+                                     int added) {
+    QJsonObject result;
+    result["type"] = DgramType::Info;
+    result["infotype"] = InfoType::TransportFreightInfo;
+    result["currentFreight"] = currentFreight;
+    result["capacity"] = capacity;
+    result["added"] = added;
+    return QCborValue::fromJsonValue(result).toCbor();
+}
+
 QByteArray KP::serverMapStart(int mapId, int startNode) {
     QJsonObject result;
     result["type"] = DgramType::Info;

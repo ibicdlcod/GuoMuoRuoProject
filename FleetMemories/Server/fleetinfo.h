@@ -17,6 +17,10 @@ public:
     double los();
     LuaMap capitalness();//"Total"/"Surface"/"Carrier"/"Screens"
     std::vector<int> shipSpeeds();
+    enum TransportMode {
+        Default
+    };
+    int transportCapacity(const CSteamID &uid, TransportMode mode = Default);
 
     /* Returns the sum of:
      *   a – ship base attrs scaled by efficiency at current level/star

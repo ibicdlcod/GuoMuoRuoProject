@@ -602,6 +602,9 @@ void Client::receivedInfo(const QJsonObject &djson) {
     case KP::InfoType::DisasterLOSInfo:
         emit receivedDisasterLOSInfo(djson);
         break;
+    case KP::InfoType::TransportFreightInfo:
+        emit receivedTransportFreightInfo(djson);
+        break;
     case KP::InfoType::MapProgress: {
         int mapId = djson["mapid"].toInt();
         int nextNodeId = djson["next"].toInt();

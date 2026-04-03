@@ -41,6 +41,7 @@ private slots:
     void battleProcess(const QJsonObject &djson);
     void confirmSortieStart();
     void disasterLOSInfo(const QJsonObject &djson);
+    void transportFreightInfo(const QJsonObject &djson);
     void recalculateAttrition();
     void sortieEnd();
     void sortieStart(const QJsonObject &djson);

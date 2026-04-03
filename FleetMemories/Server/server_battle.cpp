@@ -1,6 +1,10 @@
 /* Copyright (C) 2026 Harusoft Ltd.
  * SPDX-License-Identifier: AGPL-3.0-or-later */
 
+/* TRANSPORT node mechanics - see doc/worldview_and_mechanics/6.1-map.md
+ * [Implemented in Server::progressMap#TRANSPORT]
+ */
+
 #define NOMINMAX
 
 #include "server.h"
@@ -836,9 +840,55 @@ gain_supremacy:
                                               0);
                     }
 deal_with_gauge:
+                    // Read current freight transported
+                    QSqlQuery freightQuery;
+                     freightQuery.prepare("SELECT Intvalue FROM UserAttr "
+                                          "WHERE UserID = :uid "
+                                          "AND Attribute = "
+                                          "'CurrentFreightTransported'");
+                    freightQuery.bindValue(":uid", uid.ConvertToUint64());
+                    if(Q_UNLIKELY(!freightQuery.exec())) {
+                         throw DBError(
+                             //% "User %1: transport node read failure!"
+                             qtTrId("sortie-node-battle-failure-transport-read")
+                                 .arg(uid.ConvertToUint64()),
+                             freightQuery.lastError(), freightQuery.lastQuery());
+                        return;
+                    }
+                    int currentFreight = 0;
+                    if(freightQuery.isSelect() && freightQuery.next()) {
+                        currentFreight = freightQuery.value(0).toInt();
+                    }
+                    
                     int amount = getBossDamage(battleProcess);
+                    // Add freight contribution
+                    int freightContribution = qRound(currentFreight * factor);
+                    amount += freightContribution;
+                    
                     User::decreaseGauge(uid, unionId, diff, amount);
+                    
+                    // Clear freight after consumption
+                    if(currentFreight > 0) {
+                          freightQuery.prepare("UPDATE UserAttr "
+                                               "SET Intvalue = 0 "
+                                               "WHERE UserID = :uid "
+                                               "AND Attribute = "
+                                               "'CurrentFreightTransported'");
+                        freightQuery.bindValue(":uid", uid.ConvertToUint64());
+                        if(Q_UNLIKELY(!freightQuery.exec())) {
+                             throw DBError(
+                              //% "User %1: transport node clear failure!"
+                              qtTrId("sortie-node-battle-failure-transport-clear")
+                                  .arg(uid.ConvertToUint64()),
+                                  freightQuery.lastError(),
+                                  freightQuery.lastQuery());
+                            return;
+                        }
+                    }
+                    
                     bool isBossSunk = getBossSunk(battleProcess);
+                     // Always clear map if boss sunk and gauge finished,
+                     // regardless of freight
                     if(isBossSunk
                         && User::isGaugeFinished(uid, unionId, diff)) {
                         /* clear map */
@@ -853,6 +903,56 @@ deal_with_gauge:
             break;
         case KP::DISASTER: [[fallthrough]];
         case KP::CHOICE: [[fallthrough]];
+        case KP::TRANSPORT: {
+            /* Freight transport logic */
+            int fleetIndex = result.value()[3]; // active fleet
+            FleetInfo fleetInfo = queryFleetInfo(uid, fleetIndex);
+            int capacity = fleetInfo.transportCapacity(uid);
+            
+            // Read current freight transported
+            QSqlQuery query;
+            query.prepare("SELECT Intvalue FROM UserAttr "
+                          "WHERE UserID = :uid "
+                          "AND Attribute = 'CurrentFreightTransported'");
+            query.bindValue(":uid", uid.ConvertToUint64());
+            if(Q_UNLIKELY(!query.exec())) {
+                 throw DBError(
+                     //% "User %1: transport node read failure!"
+                     qtTrId("sortie-node-battle-failure-transport-read")
+                         .arg(uid.ConvertToUint64()),
+                     query.lastError(), query.lastQuery());
+                return;
+            }
+            int currentFreight = 0;
+            if(query.isSelect() && query.next()) {
+                currentFreight = query.value(0).toInt();
+            }
+            
+            // Update with added capacity
+            int newFreight = currentFreight + capacity;
+             query.prepare("INSERT OR REPLACE INTO UserAttr "
+                           "(UserID, Attribute, Intvalue) "
+                           "VALUES (:uid, 'CurrentFreightTransported', "
+                           ":newValue)");
+            query.bindValue(":uid", uid.ConvertToUint64());
+            query.bindValue(":newValue", newFreight);
+            if(Q_UNLIKELY(!query.exec())) {
+                 throw DBError(
+                     //% "User %1: transport node update failure!"
+                     qtTrId("sortie-node-battle-failure-transport-update")
+                         .arg(uid.ConvertToUint64()),
+                     query.lastError(), query.lastQuery());
+                return;
+            }
+            
+            // Notify client
+             QByteArray msg = KP::serverTransportFreightInfo(newFreight,
+                                                             capacity,
+                                                             capacity);
+            senderM.sendMessage(connection, msg);
+            
+            [[fallthrough]];
+        }
         case KP::EMPTY: {
             QSqlQuery query;
             query.prepare("UPDATE UserAttr SET Intvalue = :type "
@@ -872,7 +972,6 @@ deal_with_gauge:
         }
             break;
         case KP::STARTING:
-        case KP::TRANSPORT:
         default: break;
         }
 }
@@ -1277,6 +1376,20 @@ void Server::progressMap(const CSteamID &uid, QSslSocket *connection,
                 delete fi;
                 sortieFleets.remove(uid);
             }
+            // Clear freight transported when map ends/retreats
+            QSqlQuery freightQuery;
+            freightQuery.prepare("UPDATE UserAttr SET Intvalue = 0 "
+                                 "WHERE UserID = :uid "
+                                 "AND Attribute = 'CurrentFreightTransported'");
+            freightQuery.bindValue(":uid", uid.ConvertToUint64());
+            if(Q_UNLIKELY(!freightQuery.exec())) {
+                //% "User %1: clear freight at map end failure!"
+                throw DBError(
+                    qtTrId("sortie-end-failure-freight-clear")
+                        .arg(uid.ConvertToUint64()),
+                    freightQuery.lastError(), freightQuery.lastQuery());
+                return;
+            }
         }
         /* if nNode == 0 then client should end battle */
         QByteArray msg = KP::serverMapProgress(mapId, nNode);
@@ -1505,6 +1618,22 @@ void Server::startSortie(const CSteamID &uid, QSslSocket *connection,
                         qtTrId("sortie-start-failure-general")
                             .arg(uid.ConvertToUint64()),
                         attrQuery.lastError(), attrQuery.lastQuery());
+                    return;
+                }
+                // Clear freight transported at sortie start
+                QSqlQuery freightQuery;
+                 freightQuery.prepare("INSERT OR REPLACE INTO "
+                                      "UserAttr "
+                                      "(UserID, Attribute, Intvalue) "
+                                      "VALUES (:uid, 'CurrentFreightTransported', "
+                                      "0)");
+                freightQuery.bindValue(":uid", uid.ConvertToUint64());
+                if(Q_UNLIKELY(!freightQuery.exec())) {
+                    //% "User %1: clear freight at sortie start failure!"
+                    throw DBError(
+                        qtTrId("sortie-start-failure-freight-clear")
+                            .arg(uid.ConvertToUint64()),
+                        freightQuery.lastError(), freightQuery.lastQuery());
                     return;
                 }
                 QByteArray msg = KP::serverMapStart(mapId, startNode);
