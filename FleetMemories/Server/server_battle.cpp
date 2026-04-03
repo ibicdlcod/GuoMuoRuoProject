@@ -1,6 +1,10 @@
 /* Copyright (C) 2026 Harusoft Ltd.
  * SPDX-License-Identifier: AGPL-3.0-or-later */
 
+/* TRANSPORT node mechanics - see doc/worldview_and_mechanics/6.1-map.md
+ * [Implemented in Server::progressMap#TRANSPORT]
+ */
+
 #define NOMINMAX
 
 #include "server.h"
@@ -838,9 +842,10 @@ gain_supremacy:
 deal_with_gauge:
                     // Read current freight transported
                     QSqlQuery freightQuery;
-                    freightQuery.prepare("SELECT Intvalue FROM UserAttr "
-                                         "WHERE UserID = :uid "
-                                         "AND Attribute = 'CurrentFreightTransported'");
+                     freightQuery.prepare("SELECT Intvalue FROM UserAttr "
+                                          "WHERE UserID = :uid "
+                                          "AND Attribute = "
+                                          "'CurrentFreightTransported'");
                     freightQuery.bindValue(":uid", uid.ConvertToUint64());
                     if(Q_UNLIKELY(!freightQuery.exec())) {
                         throw DBError(
@@ -863,21 +868,25 @@ deal_with_gauge:
                     
                     // Clear freight after consumption
                     if(currentFreight > 0) {
-                         freightQuery.prepare("UPDATE UserAttr SET Intvalue = 0 "
-                                              "WHERE UserID = :uid "
-                                              "AND Attribute = 'CurrentFreightTransported'");
+                          freightQuery.prepare("UPDATE UserAttr "
+                                               "SET Intvalue = 0 "
+                                               "WHERE UserID = :uid "
+                                               "AND Attribute = "
+                                               "'CurrentFreightTransported'");
                         freightQuery.bindValue(":uid", uid.ConvertToUint64());
                         if(Q_UNLIKELY(!freightQuery.exec())) {
                             throw DBError(
-                                qtTrId("sortie-node-battle-failure-transport-clear")
-                                    .arg(uid.ConvertToUint64()),
-                                freightQuery.lastError(), freightQuery.lastQuery());
+                             qtTrId("sortie-node-battle-failure-transport-clear")
+                                 .arg(uid.ConvertToUint64()),
+                                 freightQuery.lastError(),
+                                 freightQuery.lastQuery());
                             return;
                         }
                     }
                     
                     bool isBossSunk = getBossSunk(battleProcess);
-                    // Always clear map if boss sunk and gauge finished, regardless of freight
+                     // Always clear map if boss sunk and gauge finished,
+                     // regardless of freight
                     if(isBossSunk
                         && User::isGaugeFinished(uid, unionId, diff)) {
                         /* clear map */
@@ -918,9 +927,10 @@ deal_with_gauge:
             
             // Update with added capacity
             int newFreight = currentFreight + capacity;
-            query.prepare("INSERT OR REPLACE INTO UserAttr "
-                          "(UserID, Attribute, Intvalue) "
-                          "VALUES (:uid, 'CurrentFreightTransported', :newValue)");
+             query.prepare("INSERT OR REPLACE INTO UserAttr "
+                           "(UserID, Attribute, Intvalue) "
+                           "VALUES (:uid, 'CurrentFreightTransported', "
+                           ":newValue)");
             query.bindValue(":uid", uid.ConvertToUint64());
             query.bindValue(":newValue", newFreight);
             if(Q_UNLIKELY(!query.exec())) {
@@ -932,8 +942,9 @@ deal_with_gauge:
             }
             
             // Notify client
-            QByteArray msg = KP::serverTransportFreightInfo(newFreight, capacity,
-                                                            capacity);
+             QByteArray msg = KP::serverTransportFreightInfo(newFreight,
+                                                             capacity,
+                                                             capacity);
             senderM.sendMessage(connection, msg);
             
             [[fallthrough]];
@@ -1607,9 +1618,11 @@ void Server::startSortie(const CSteamID &uid, QSslSocket *connection,
                 }
                 // Clear freight transported at sortie start
                 QSqlQuery freightQuery;
-                freightQuery.prepare("INSERT OR REPLACE INTO UserAttr "
-                                     "(UserID, Attribute, Intvalue) "
-                                     "VALUES (:uid, 'CurrentFreightTransported', 0)");
+                 freightQuery.prepare("INSERT OR REPLACE INTO "
+                                      "UserAttr "
+                                      "(UserID, Attribute, Intvalue) "
+                                      "VALUES (:uid, 'CurrentFreightTransported', "
+                                      "0)");
                 freightQuery.bindValue(":uid", uid.ConvertToUint64());
                 if(Q_UNLIKELY(!freightQuery.exec())) {
                     //% "User %1: clear freight at sortie start failure!"
