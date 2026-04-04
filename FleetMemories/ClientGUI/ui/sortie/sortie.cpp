@@ -389,7 +389,6 @@ ask_for_retreat:
         //% "Do you want to continue map progress?"
         conf->setWindowTitle(qtTrId("continue-map"));
     }
-    conf->fv->setEnabled(false);
     engine.queryNextNode(currentMap->getAbsoluteId(), currentNodeId,
                          !conf->exec() == QDialog::Accepted);
     delete conf;

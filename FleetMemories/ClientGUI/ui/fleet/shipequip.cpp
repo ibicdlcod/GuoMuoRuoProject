@@ -140,14 +140,12 @@ void ShipEquip::receivedPlaneCountInfo(int shipPosIndex,
 
 void ShipEquip::receivedNewPlaneCountInfo(int shipPosIndex, int maxCount)
 {
-    if(shipPosIndex != this->shipPosIndex) {
+    if (shipPosIndex != this->shipPosIndex)
         return;
-    }
-    int cachedValue = ui->planeCountBox->value();
-    ui->planeCountBox->setValue(0);
-    if(cachedValue != 0)
-        updatePlaneCount(cachedValue);
+    ui->planeCountBox->blockSignals(true);
     ui->planeCountBox->setMaximum(maxCount);
+    planeCount = ui->planeCountBox->value();
+    ui->planeCountBox->blockSignals(false);
 }
 
 void ShipEquip::processEquipSelect(QUuid equipUid)

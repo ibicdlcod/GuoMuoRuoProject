@@ -8,13 +8,16 @@
 #include <QLabel>
 #include <QMessageBox>
 #include <QPushButton>
-#include <QScrollArea>
 #include <QSplitter>
 #include <QVBoxLayout>
 #include <QVector>
 #include <algorithm>
 
+#include <QSettings>
+
 #include "../fleet/fleetview.h"
+
+extern std::unique_ptr<QSettings> settings;
 #include "../fleet/segmentedhpbar.h"
 #include "../../Protocol/ship.h"
 #include "../../clientv2.h"
@@ -28,8 +31,6 @@ ConfirmSortie::ConfirmSortie(QWidget *parent, QString mapText, QString diffText)
     , fv(nullptr)
     , m_battleResultMode(false)
     , m_battleSplitter(nullptr)
-    , m_playerScroll(nullptr)
-    , m_enemyScroll(nullptr)
     , m_playerContainer(nullptr)
     , m_enemyContainer(nullptr)
     , m_playerLayout(nullptr)
@@ -85,10 +86,9 @@ void ConfirmSortie::showBattleResult(const QJsonObject &battleProcess)
     populateBattleResult(battleProcess);
     //% "Battle Results"
     setWindowTitle(qtTrId("battle-result-title"));
-    // icon(40) + hpBar(100) fixed per panel; name col gets remaining space.
-    // 2 panels × (margins(8) + spacing(18) + 40 + 100 + buttonHint(80)) + splitter(8)
     const int panelFixedW = 8 + 3 * 6 + 40 + 100 + 80; // ~266
-    setMinimumSize(2 * panelFixedW + 8, 480);
+    setMinimumWidth(2 * panelFixedW + 8);
+    adjustSize();
 }
 
 void ConfirmSortie::clearBattleResultLayout()
@@ -103,8 +103,6 @@ void ConfirmSortie::clearBattleResultLayout()
         delete m_battleSplitter;
         m_battleSplitter = nullptr;
     }
-    m_playerScroll = nullptr;
-    m_enemyScroll = nullptr;
     m_playerContainer = nullptr;
     m_enemyContainer = nullptr;
     m_playerLayout = nullptr;
@@ -135,30 +133,17 @@ void ConfirmSortie::createBattleResultLayout()
     ui->fleetLayout->addWidget(m_assessmentLabel);
     
     m_battleSplitter = new QSplitter(Qt::Horizontal, this);
-    
-    m_playerScroll = new QScrollArea(this);
+
     m_playerContainer = new QWidget(this);
     m_playerLayout = new QGridLayout(m_playerContainer);
     m_playerLayout->setColumnStretch(1, 1);
-    m_playerScroll->setWidget(m_playerContainer);
-    m_playerScroll->setWidgetResizable(true);
-    m_playerScroll->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
-    //% "Player Fleet"
-    m_playerScroll->setWindowTitle(qtTrId("battle-result-player-fleet"));
 
-    m_enemyScroll = new QScrollArea(this);
     m_enemyContainer = new QWidget(this);
     m_enemyLayout = new QGridLayout(m_enemyContainer);
     m_enemyLayout->setColumnStretch(1, 1);
-    m_enemyScroll->setWidget(m_enemyContainer);
-    m_enemyScroll->setWidgetResizable(true);
-    m_enemyScroll->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
-    //% "Enemy Fleet"
-    m_enemyScroll->setWindowTitle(qtTrId("battle-result-enemy-fleet"));
-    
-    m_battleSplitter->addWidget(m_playerScroll);
-    m_battleSplitter->addWidget(m_enemyScroll);
-    m_battleSplitter->setSizes({400, 400});
+
+    m_battleSplitter->addWidget(m_playerContainer);
+    m_battleSplitter->addWidget(m_enemyContainer);
     
     ui->fleetLayout->addWidget(m_battleSplitter);
 
@@ -254,7 +239,8 @@ void ConfirmSortie::populateBattleResult(const QJsonObject &battleProcess)
                           int row, const QString &shipName, int shipLevel,
                           int shipIconId, int hpBefore, int hpAfter, int totalHP,
                           const QVector<int> &planesBefore, const QVector<int> &planesAfter,
-                          bool inverted) {
+                          bool inverted, int maxPlanes,
+                          const QStringList &equipNames) {
         QLabel *iconLabel = new QLabel(container);
         QPixmap icon = Icute::shipIcon(shipIconId);
         if (!icon.isNull())
@@ -288,20 +274,30 @@ void ConfirmSortie::populateBattleResult(const QJsonObject &battleProcess)
         QString trSlotCount  = qtTrId("battle-result-plane-slot-count");
         //% "Plane Details"
         QString trTitle      = qtTrId("battle-result-plane-details-title");
+        if (maxPlanes == 0)
+            planeButton->hide();
+        QStringList capturedEquipNames = equipNames;
         QObject::connect(planeButton, &QPushButton::clicked,
                          planeButton, [capturedName, capturedBefore, capturedAfter,
+                                       capturedEquipNames,
                                        trCountsFor, trSlotCount, trTitle, planeButton]() {
             QString msg = trCountsFor.arg(capturedName);
             int slotCount = std::max(capturedBefore.size(), capturedAfter.size());
             for (int s = 0; s < slotCount; ++s) {
                 int before = s < capturedBefore.size() ? capturedBefore[s] : 0;
                 int after  = s < capturedAfter.size()  ? capturedAfter[s]  : 0;
-                msg += "\n" + trSlotCount.arg(s + 1).arg(after).arg(before);
+                QString slotLabel = QString::number(s + 1);
+                if (s < capturedEquipNames.size() && !capturedEquipNames[s].isEmpty())
+                    slotLabel += QString(" (%1)").arg(capturedEquipNames[s]);
+                msg += "\n" + trSlotCount.arg(slotLabel).arg(after).arg(before);
             }
             QMessageBox::information(planeButton, trTitle, msg);
         });
         grid->addWidget(planeButton, row, 3);
     };
+
+    Client &engine = Client::getInstance();
+    const QString lang = settings->value("client/language", "ja_JP").toString();
 
     // Player ships
     int playerRows = playerHPBefore.size();
@@ -312,11 +308,13 @@ void ConfirmSortie::populateBattleResult(const QJsonObject &battleProcess)
         QString shipName;
         int shipLevel  = 1;
         int shipIconId = 0;
+        int maxPlanes = 0;
         if (fleetView) {
             if (Ship *ship = fleetView->getShip(i)) {
                 shipName   = ship->toString();
                 totalHP    = ship->attr.value("Hitpoints", hpBefore);
                 shipIconId = ship->attr.value("OldInternalNo.", 0);
+                maxPlanes  = ship->attr.value("Planes", 0);
                 if (ShipDynamic *dyn = fleetView->getShipDynamic(i))
                     shipLevel = Ship::getLevel(std::min(dyn->exp, dyn->expCap));
             } else {
@@ -328,6 +326,22 @@ void ConfirmSortie::populateBattleResult(const QJsonObject &battleProcess)
             shipName = qtTrId("battle-result-player-ship").arg(i + 1);
         }
 
+        QStringList equipNames;
+        if (fleetView) {
+            QUuid shipUuid = fleetView->getShipUuid(i);
+            for (int s = 0; s < KP::maxEquipSlots; ++s) {
+                QUuid equipUuid = engine.equipModel.getShipEquip(shipUuid, s);
+                auto [equip, star] = engine.equipModel.getEquip(equipUuid);
+                if (equip) {
+                    QString name = equip->toString(lang);
+                    if (name.isEmpty()) name = equip->toString("ja_JP");
+                    equipNames.append(name);
+                } else {
+                    equipNames.append(QString());
+                }
+            }
+        }
+
         QJsonArray pb = playerPlanesBefore[i].toArray();
         QJsonArray pa = playerPlanesAfter[i].toArray();
         QVector<int> planesBefore(pb.size()), planesAfter(pa.size());
@@ -336,12 +350,10 @@ void ConfirmSortie::populateBattleResult(const QJsonObject &battleProcess)
 
         addShipRow(m_playerLayout, m_playerContainer, i,
                    shipName, shipLevel, shipIconId, hpBefore, hpAfter, totalHP,
-                   planesBefore, planesAfter, true);
+                   planesBefore, planesAfter, true, maxPlanes, equipNames);
     }
-    m_playerLayout->setRowStretch(playerRows, 1);
 
     // Enemy ships
-    Client &engine = Client::getInstance();
     int enemyRows = enemyHPBefore.size();
     for (int i = 0; i < enemyRows; ++i) {
         int hpBefore  = enemyHPBefore[i].toInt(1);
@@ -349,12 +361,14 @@ void ConfirmSortie::populateBattleResult(const QJsonObject &battleProcess)
         int totalHP   = hpBefore;
         QString enemyName;
         int shipIconId = 0;
+        int maxPlanes  = 0;
         if (i < enemyShipIds.size()) {
             int enemyShipId = enemyShipIds[i].toInt();
             if (Ship *s = engine.getShipReg(enemyShipId)) {
                 enemyName  = s->toString();
                 totalHP    = s->attr.value("Hitpoints", hpBefore);
                 shipIconId = s->attr.value("OldInternalNo.", 0);
+                maxPlanes  = s->attr.value("Planes", 0);
             } else {
                 //% "Enemy Ship #%1"
                 enemyName = qtTrId("battle-result-enemy-ship-id").arg(enemyShipId);
@@ -372,7 +386,6 @@ void ConfirmSortie::populateBattleResult(const QJsonObject &battleProcess)
 
         addShipRow(m_enemyLayout, m_enemyContainer, i,
                    enemyName, 0, shipIconId, hpBefore, hpAfter, totalHP,
-                   planesBefore, planesAfter, false);
+                   planesBefore, planesAfter, false, maxPlanes, QStringList{});
     }
-    m_enemyLayout->setRowStretch(enemyRows, 1);
 }

@@ -438,8 +438,14 @@ void FleetView::modifyFleetShip(int posIndex, QUuid uid) {
                                      equipSlotsColumn + KP::maxEquipSlots)
                     ->widget()->hide();
             }
-            shipPlaneCount[FleetPos{currentActiveFleet, oldPos.posindex}]
-                .fill(0, KP::maxEquipSlots);
+            {
+                auto &counts = shipPlaneCount[FleetPos{currentActiveFleet, oldPos.posindex}];
+                if (shipD)
+                    for (int j = 0; j < KP::maxEquipSlots && j < shipD->slotPlanes.size(); ++j)
+                        counts[j] = shipD->slotPlanes[j];
+                else
+                    counts.fill(0, KP::maxEquipSlots);
+            }
             emit newPlaneCountInfo(oldPos.posindex,
                                    ship ? ship->attr["Planes"] : 0);
         }
@@ -535,8 +541,14 @@ void FleetView::modifyFleetShip(int posIndex, QUuid uid) {
                              equipSlotsColumn + KP::maxEquipSlots)
             ->widget()->hide();
     }
-    shipPlaneCount[FleetPos{currentActiveFleet, newPos.posindex}]
-        .fill(0, KP::maxEquipSlots);
+    {
+        auto &counts = shipPlaneCount[FleetPos{currentActiveFleet, newPos.posindex}];
+        if (shipD)
+            for (int j = 0; j < KP::maxEquipSlots && j < shipD->slotPlanes.size(); ++j)
+                counts[j] = shipD->slotPlanes[j];
+        else
+            counts.fill(0, KP::maxEquipSlots);
+    }
     emit newPlaneCountInfo(newPos.posindex, ship ? ship->attr["Planes"] : 0);
 }
 

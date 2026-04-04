@@ -24,7 +24,6 @@ void ShipDisplay::setContent(int currentHP, int maxHP, int cond, int lv) {
     ui->hpBar->setMaximum(maxHP);
     ui->hpBar->setValue(currentHP);
 
-    QPalette pal = QApplication::palette();
     QColor col = QColor(0,255,0);
     QColor textCol = QColor();
 
@@ -38,7 +37,6 @@ void ShipDisplay::setContent(int currentHP, int maxHP, int cond, int lv) {
         break;
     }
 
-    pal.setColor(QPalette::Highlight, col);
     switch(QApplication::styleHints()->colorScheme()) {
     case Qt::ColorScheme::Dark:
         textCol = QColor(255, 255, 255);
@@ -48,9 +46,10 @@ void ShipDisplay::setContent(int currentHP, int maxHP, int cond, int lv) {
         textCol = QColor(0, 0, 0);
         break;
     }
-    //pal.setColor(QPalette::Text, anotherCol);
-    pal.setColor(QPalette::HighlightedText, textCol);
-    ui->hpBar->setPalette(pal);
+    ui->hpBar->setStyleSheet(
+        QString("QProgressBar::chunk { background-color: %1; }"
+                "QProgressBar { color: %2; }")
+            .arg(col.name(), textCol.name()));
 
     /* lv */
     //% "Lv %1"

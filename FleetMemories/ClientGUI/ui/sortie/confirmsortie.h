@@ -14,7 +14,6 @@
 #include <QLabel>
 
 class QSplitter;
-class QScrollArea;
 class QGridLayout;
 class QLabel;
 
@@ -46,8 +45,6 @@ private:
     bool m_battleResultMode;
     QJsonObject m_battleProcess;
     QSplitter *m_battleSplitter;
-    QScrollArea *m_playerScroll;
-    QScrollArea *m_enemyScroll;
     QWidget *m_playerContainer;
     QWidget *m_enemyContainer;
     QGridLayout *m_playerLayout;
