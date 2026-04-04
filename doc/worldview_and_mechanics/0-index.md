@@ -28,7 +28,7 @@
   * [Cloning Vats](5.9-cloning.md)
   * [Labor condition](5.10-labor.md)
   * [Decoration](5.11-decoration.md)
-  * Enemies (Amnesiac Fleet) [NOTYETIMPLEMENTED]
+  * [Enemies (Amnesiac Fleet)](5.12-enemyvessels.md) [PARTIAL]
 * [Sortie Map](6-sortie.md)
   * [Normal map and map relations](6.1-map.md)
   * [Naval Supremacy and Normal expedition](6.2-supremacy.md) [Expedition: NOTYETIMPLEMENTED]
