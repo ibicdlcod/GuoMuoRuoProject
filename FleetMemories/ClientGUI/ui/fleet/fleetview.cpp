@@ -52,8 +52,6 @@ FleetView::FleetView(QWidget *parent)
     shipNameHeader->setObjectName(QStringLiteral("shipName-Head"));
     shipNameHeader->setAlignment(Qt::AlignCenter);
     grid->addWidget(shipNameHeader, 0, nameColumn);
-    //% ""
-    //shipNameHeader->setText(qtTrId("ship-name-head"));
     for(int i = 0; i < KP::combinedFleetSize; ++i) {
         QLabel *shipName = new QLabel(this);
         shipName->setObjectName(QString("shipName-%1").arg(i+1));
@@ -66,8 +64,6 @@ FleetView::FleetView(QWidget *parent)
         font.setPointSize(40);
         shipName->setFont(font);
         grid->addWidget(shipName, i+1, nameColumn);
-        //% ""
-        //shipName->setText(qtTrId("fleet-no-ship"));
     }
     for(int i = 0; i < KP::combinedFleetSize; ++i) {
         ShipDisplay *shipInfoDisplay = new ShipDisplay(this);
