@@ -456,18 +456,36 @@ void EquipView::activate(bool arsenal, bool isEquip,
             sortBox->addItem(qtTrId("sort-equip-prim-attr"));
             //% "Skill points"
             sortBox->addItem(qtTrId("sort-equip-skill"));
-            sortBox->setCurrentIndex(0);
+            // Load saved sort settings for equipment mode
+            int savedSortMode = settings->value("SortModeEquip", 0).toInt();
+            if(savedSortMode < 0 || savedSortMode >= sortBox->count()) {
+                savedSortMode = 0;
+            }
+            sortBox->setCurrentIndex(savedSortMode);
             sortBox->blockSignals(false);
-            model->setSortMode(0);
+            model->setSortMode(savedSortMode);
             connect(sortBox, &QComboBox::currentIndexChanged,
                     model, &EquipModel::setSortMode);
+            // Save sort mode when changed
+            connect(sortBox, &QComboBox::currentIndexChanged,
+                    this, [](int index) {
+                        settings->setValue("SortModeEquip", index);
+                        settings->sync();
+                    });
             reverseCheck->show();
             reverseCheck->blockSignals(true);
-            reverseCheck->setChecked(false);
+            bool savedReverse = settings->value("SortReversedEquip", false).toBool();
+            reverseCheck->setChecked(savedReverse);
             reverseCheck->blockSignals(false);
-            model->setSortReversed(false);
+            model->setSortReversed(savedReverse);
             connect(reverseCheck, &QCheckBox::toggled,
                     model, &EquipModel::setSortReversed);
+            // Save reverse setting when changed
+            connect(reverseCheck, &QCheckBox::toggled,
+                    this, [](bool checked) {
+                        settings->setValue("SortReversedEquip", checked);
+                        settings->sync();
+                    });
             connect(model, &EquipModel::sortReversedChanged,
                     this, [this](bool val) {
                         reverseCheck->blockSignals(true);
@@ -576,18 +594,36 @@ void EquipView::activate(bool arsenal, bool isEquip,
             sortBox->addItem(qtTrId("sort-fuel-pct"));
             //% "Ammo%"
             sortBox->addItem(qtTrId("sort-ammo-pct"));
-            sortBox->setCurrentIndex(0);
+            // Load saved sort settings for ship mode
+            int savedSortMode = settings->value("SortModeShip", 0).toInt();
+            if(savedSortMode < 0 || savedSortMode >= sortBox->count()) {
+                savedSortMode = 0;
+            }
+            sortBox->setCurrentIndex(savedSortMode);
             sortBox->blockSignals(false);
-            model->setSortMode(0);
+            model->setSortMode(savedSortMode);
             connect(sortBox, &QComboBox::currentIndexChanged,
                     model, &EquipModel::setSortMode);
+            // Save sort mode when changed
+            connect(sortBox, &QComboBox::currentIndexChanged,
+                    this, [](int index) {
+                        settings->setValue("SortModeShip", index);
+                        settings->sync();
+                    });
             reverseCheck->show();
             reverseCheck->blockSignals(true);
-            reverseCheck->setChecked(false);
+            bool savedReverse = settings->value("SortReversedShip", false).toBool();
+            reverseCheck->setChecked(savedReverse);
             reverseCheck->blockSignals(false);
-            model->setSortReversed(false);
+            model->setSortReversed(savedReverse);
             connect(reverseCheck, &QCheckBox::toggled,
                     model, &EquipModel::setSortReversed);
+            // Save reverse setting when changed
+            connect(reverseCheck, &QCheckBox::toggled,
+                    this, [](bool checked) {
+                        settings->setValue("SortReversedShip", checked);
+                        settings->sync();
+                    });
             connect(model, &EquipModel::sortReversedChanged,
                     this, [this](bool val) {
                         reverseCheck->blockSignals(true);

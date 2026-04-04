@@ -140,6 +140,9 @@ void ConfirmSortie::createBattleResultLayout()
     m_playerLayout = new QVBoxLayout(m_playerContainer);
     m_playerScroll->setWidget(m_playerContainer);
     m_playerScroll->setWidgetResizable(true);
+    m_playerScroll->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    m_playerScroll->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
+    m_playerContainer->setMinimumWidth(0);
     //% "Player Fleet"
     m_playerScroll->setWindowTitle(qtTrId("battle-result-player-fleet"));
     
@@ -148,6 +151,9 @@ void ConfirmSortie::createBattleResultLayout()
     m_enemyLayout = new QVBoxLayout(m_enemyContainer);
     m_enemyScroll->setWidget(m_enemyContainer);
     m_enemyScroll->setWidgetResizable(true);
+    m_enemyScroll->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    m_enemyScroll->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
+    m_enemyContainer->setMinimumWidth(0);
     //% "Enemy Fleet"
     m_enemyScroll->setWindowTitle(qtTrId("battle-result-enemy-fleet"));
     

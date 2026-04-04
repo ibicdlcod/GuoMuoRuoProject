@@ -4,10 +4,10 @@
 #ifndef BATTLERESULTSHIPDISPLAY_H
 #define BATTLERESULTSHIPDISPLAY_H
 
+#include <QUuid>
 #include <QString>
 #include <QVector>
 #include <QWidget>
-#include <QUuid>
 
 class SegmentedHPBar;
 class QLabel;

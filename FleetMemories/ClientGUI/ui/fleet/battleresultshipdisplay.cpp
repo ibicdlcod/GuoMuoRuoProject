@@ -9,6 +9,7 @@
 #include <QMessageBox>
 #include <QPushButton>
 #include <QPixmap>
+#include <QSizePolicy>
 
 #include "../../equipicon.h"
 #include "segmentedhpbar.h"
@@ -41,7 +42,9 @@ BattleResultShipDisplay::BattleResultShipDisplay(QWidget *parent,
     m_iconLabel = new QLabel(this);
     QPixmap icon = Icute::shipIcon(shipIconId);
     if(!icon.isNull()) {
-        m_iconLabel->setPixmap(icon.scaled(40, 40, Qt::KeepAspectRatio, Qt::SmoothTransformation));
+        m_iconLabel->setPixmap(icon.scaled(40, 40,
+                                            Qt::KeepAspectRatio,
+                                            Qt::SmoothTransformation));
     }
     layout->addWidget(m_iconLabel);
     
@@ -51,6 +54,8 @@ BattleResultShipDisplay::BattleResultShipDisplay(QWidget *parent,
         nameWithLevel += QString(" (Lv %1)").arg(shipLevel);
     }
     QLabel *nameLabel = new QLabel(nameWithLevel, this);
+    nameLabel->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
+    nameLabel->setMinimumWidth(0);
     layout->addWidget(nameLabel);
     
     m_hpBar->setValues(totalHP, hpBefore, hpAfter);

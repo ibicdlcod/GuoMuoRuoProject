@@ -6,8 +6,15 @@
 #include <QApplication>
 #include <QPainter>
 #include <QPainterPath>
+#include <QPixmap>
+#include <QImage>
+#include <QFont>
+#include <QFontMetrics>
 #include <QSizePolicy>
 #include <QStyleHints>
+#include <QPalette>
+#include <QtGlobal>
+#include <algorithm>
 
 SegmentedHPBar::SegmentedHPBar(QWidget *parent)
     : QWidget(parent)
@@ -15,6 +22,8 @@ SegmentedHPBar::SegmentedHPBar(QWidget *parent)
     setMinimumSize(200, 20);
     setMaximumSize(200, 20);
     setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+    setAutoFillBackground(true);
+    setBackgroundRole(QPalette::Base);
 }
 
 void SegmentedHPBar::setValues(int totalHP, int previousHP, int currentHP)
@@ -27,6 +36,8 @@ void SegmentedHPBar::setValues(int totalHP, int previousHP, int currentHP)
 
 void SegmentedHPBar::paintEvent(QPaintEvent *event)
 {
+    Q_UNUSED(event);
+    
     QPainter painter(this);
     painter.setRenderHint(QPainter::Antialiasing);
     
@@ -41,53 +52,45 @@ void SegmentedHPBar::paintEvent(QPaintEvent *event)
     if(m_previousHP > m_totalHP) m_previousHP = m_totalHP;
     if(m_currentHP > m_totalHP) m_currentHP = m_totalHP;
     
-    // Calculate segment widths
+    // Calculate segment widths (ensure non-negative)
     double scale = static_cast<double>(width) / m_totalHP;
-    int currentWidth = static_cast<int>(m_currentHP * scale);
-    int damageWidth = static_cast<int>((m_previousHP - m_currentHP) * scale);
-    int missingWidth = static_cast<int>((m_totalHP - m_previousHP) * scale);
+    int currentWidth = std::max(0, static_cast<int>(m_currentHP * scale));
+    int damageWidth = std::max(0,
+        static_cast<int>((m_previousHP - m_currentHP) * scale));
+    int missingWidth = std::max(0,
+        static_cast<int>((m_totalHP - m_previousHP) * scale));
     
     // Ensure total width matches (rounding errors)
     int totalWidth = currentWidth + damageWidth + missingWidth;
     if(totalWidth < width) {
         missingWidth += width - totalWidth;
+    } else if(totalWidth > width) {
+        // Distribute excess proportionally (should not happen with proper clamping)
+        double adjust = static_cast<double>(width) / totalWidth;
+        currentWidth = static_cast<int>(currentWidth * adjust);
+        damageWidth = static_cast<int>(damageWidth * adjust);
+        missingWidth = width - currentWidth - damageWidth;
     }
     
-    // Draw background rounded rectangle (for missing HP area)
-    QPainterPath backgroundPath;
-    backgroundPath.addRoundedRect(0, 0, width, height, radius, radius);
-    painter.fillPath(backgroundPath, palette().color(QPalette::Base));
+    // Create pixmap for the bar
+    QPixmap barPixmap(width, height);
+    barPixmap.fill(Qt::transparent);
+    QPainter barPainter(&barPixmap);
+    barPainter.setRenderHint(QPainter::Antialiasing);
     
-    // Draw current HP segment (colored based on ratio) with right-side rounded corners if it's the only segment
+    // Draw missing HP segment (background color)
+    barPainter.fillRect(0, 0, missingWidth, height,
+                        palette().color(QPalette::Base));
+    
+    // Draw damage segment (purple)
+    if(damageWidth > 0) {
+        barPainter.fillRect(missingWidth, 0, damageWidth, height,
+                            QColor(128, 0, 128));
+    }
+    
+    // Draw current HP segment (colored based on ratio)
     if(currentWidth > 0) {
-        QPainterPath currentPath;
         int currentStart = missingWidth + damageWidth;
-        if(currentStart == 0 && currentWidth == width) {
-            // Full width - draw with all corners rounded
-            currentPath.addRoundedRect(0, 0, currentWidth, height, radius, radius);
-        } else if(currentStart == 0) {
-            // Starts at left edge - left corners rounded
-            currentPath.moveTo(0, radius);
-            currentPath.arcTo(0, 0, 2*radius, 2*radius, 180, -90);
-            currentPath.lineTo(currentWidth, 0);
-            currentPath.lineTo(currentWidth, height);
-            currentPath.lineTo(radius, height);
-            currentPath.arcTo(0, height-2*radius, 2*radius, 2*radius, 90, -90);
-            currentPath.closeSubpath();
-        } else if(currentStart + currentWidth == width) {
-            // Ends at right edge - right corners rounded
-            currentPath.moveTo(currentStart, 0);
-            currentPath.lineTo(width - radius, 0);
-            currentPath.arcTo(width-2*radius, 0, 2*radius, 2*radius, 90, 90);
-            currentPath.lineTo(width, height-radius);
-            currentPath.arcTo(width-2*radius, height-2*radius, 2*radius, 2*radius, 0, 90);
-            currentPath.lineTo(currentStart, height);
-            currentPath.closeSubpath();
-        } else {
-            // Middle segment - no rounded corners
-            currentPath.addRect(currentStart, 0, currentWidth, height);
-        }
-        
         double ratio = static_cast<double>(m_currentHP) / m_totalHP;
         QColor hpCol;
         switch (QApplication::styleHints()->colorScheme()) {
@@ -98,12 +101,87 @@ void SegmentedHPBar::paintEvent(QPaintEvent *event)
             hpCol = QColor::fromHsv(static_cast<int>(ratio * 120.0), 128, 255);
             break;
         }
-        painter.fillPath(currentPath, hpCol);
+        barPainter.fillRect(currentStart, 0, currentWidth, height, hpCol);
     }
     
-    // Draw damage segment (purple) - typically middle segment, no rounded corners
-    if(damageWidth > 0) {
-        QRect damageRect(missingWidth, 0, damageWidth, height);
-        painter.fillRect(damageRect, QColor(128, 0, 128)); // purple
+    // Apply rounded corners by setting corner pixel alpha to 0
+    QImage barImage = barPixmap.toImage();
+    for (int y = 0; y < height; ++y) {
+        for (int x = 0; x < width; ++x) {
+            bool inCorner = false;
+            // Top-left corner
+            if (x < radius && y < radius) {
+                int dx = radius - x;
+                int dy = radius - y;
+                if (dx * dx + dy * dy > radius * radius) {
+                    inCorner = true;
+                }
+            }
+            // Top-right corner
+            if (x >= width - radius && y < radius) {
+                int dx = x - (width - radius);
+                int dy = radius - y;
+                if (dx * dx + dy * dy > radius * radius) {
+                    inCorner = true;
+                }
+            }
+            // Bottom-left corner
+            if (x < radius && y >= height - radius) {
+                int dx = radius - x;
+                int dy = y - (height - radius);
+                if (dx * dx + dy * dy > radius * radius) {
+                    inCorner = true;
+                }
+            }
+            // Bottom-right corner
+            if (x >= width - radius && y >= height - radius) {
+                int dx = x - (width - radius);
+                int dy = y - (height - radius);
+                if (dx * dx + dy * dy > radius * radius) {
+                    inCorner = true;
+                }
+            }
+            if (inCorner) {
+                barImage.setPixelColor(x, y, Qt::transparent);
+            }
+        }
     }
+    barPixmap = QPixmap::fromImage(barImage);
+    
+    // Draw the bar pixmap
+    painter.drawPixmap(0, 0, barPixmap);
+    
+    // Draw currentHP/maxHP text with same color as ShipDisplay::setContent->textCol
+    QString hpText = QString("%1/%2").arg(m_currentHP).arg(m_totalHP);
+    QFont font = painter.font();
+    font.setPointSize(9);
+    painter.setFont(font);
+    
+    QColor textCol;
+    switch(QApplication::styleHints()->colorScheme()) {
+    case Qt::ColorScheme::Dark:
+        textCol = QColor(255, 255, 255);
+        break;
+    case Qt::ColorScheme::Light: [[fallthrough]];
+    default:
+        textCol = QColor(0, 0, 0);
+        break;
+    }
+    
+    // Center text in the bar
+    QFontMetrics metrics(font);
+    int textWidth = metrics.horizontalAdvance(hpText);
+    int textHeight = metrics.height();
+    int textX = (width - textWidth) / 2;
+    int textY = (height - textHeight) / 2 + metrics.ascent();
+    
+    // Draw text shadow for better contrast (1px offset) - inverted color
+    painter.setPen(QColor(textCol.red() ^ 0xFF,
+                          textCol.green() ^ 0xFF,
+                          textCol.blue() ^ 0xFF));
+    painter.drawText(textX + 1, textY + 1, hpText);
+    
+    // Draw main text
+    painter.setPen(textCol);
+    painter.drawText(textX, textY, hpText);
 }

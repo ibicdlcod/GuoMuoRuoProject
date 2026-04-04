@@ -6,6 +6,8 @@
 
 #include <QWidget>
 
+class QPaintEvent;
+
 class SegmentedHPBar : public QWidget
 {
     Q_OBJECT
