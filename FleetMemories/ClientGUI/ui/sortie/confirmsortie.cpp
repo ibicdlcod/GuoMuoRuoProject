@@ -228,9 +228,7 @@ void ConfirmSortie::populateBattleResult(const QJsonObject &battleProcess)
         m_assessmentLabel->setText(assessmentText);
     }
     
-    // Use embedded fleet view for player ship names and max HP
-    FleetView *fleetView = fv;
-    
+
     // Player ships
     int playerRows = playerHPBefore.size();
     for(int i = 0; i < playerRows; ++i) {
@@ -240,14 +238,14 @@ void ConfirmSortie::populateBattleResult(const QJsonObject &battleProcess)
         QString shipName;
         int shipLevel = 1;
         int shipIconId = 0;
-        if(fleetView) {
-            if(Ship *ship = fleetView->getShip(i)) {
+        if(fv) {
+            if(Ship *ship = fv->getShip(i)) {
                 shipName = ship->toString();
-                totalHP = ship->attr["Hitpoints"].toInt(hpBefore);
+                totalHP = ship->attr.value("Hitpoints", hpBefore);
                 // Get icon ID
-                shipIconId = ship->attr.value("OldInternalNo.").toInt();
+                shipIconId = ship->attr.value("OldInternalNo.", 0);
                 // Get level from ship dynamic
-                if(ShipDynamic *shipDyn = fleetView->getShipDynamic(i)) {
+                if(ShipDynamic *shipDyn = fv->getShipDynamic(i)) {
                     shipLevel = Ship::getLevel(std::min(shipDyn->exp, shipDyn->expCap));
                 }
             } else {
@@ -271,7 +269,8 @@ void ConfirmSortie::populateBattleResult(const QJsonObject &battleProcess)
             if(loss < 0) loss = 0;
             planeLosses[slot] = loss;
         }
-        
+
+        qCritical() << shipIconId << hpBefore << hpAfter << totalHP;
         BattleResultShipDisplay *display = new BattleResultShipDisplay(m_playerContainer,
                                                                        i, shipName,
                                                                        hpBefore, hpAfter,
@@ -295,9 +294,9 @@ void ConfirmSortie::populateBattleResult(const QJsonObject &battleProcess)
             if(Ship *enemyShip = engine.getShipReg(enemyShipId)) {
                 enemyName = enemyShip->toString();
                 // Try to get total HP from ship definition
-                totalHP = enemyShip->attr.value("Hitpoints").toInt(hpBefore);
+                totalHP = enemyShip->attr.value("Hitpoints", hpBefore);
                 // Get icon ID
-                shipIconId = enemyShip->attr.value("OldInternalNo.").toInt();
+                shipIconId = enemyShip->attr.value("OldInternalNo.", 0);
             } else {
                 //% "Enemy Ship #%1"
                 enemyName = qtTrId("battle-result-enemy-ship-id")

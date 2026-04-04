@@ -3677,18 +3677,18 @@ Great at battle and bad at politics--so cool!</source>
         <translation>位置</translation>
     </message>
     <message id="fleetview-equip-slot-ex">
-        <location filename="../ClientGUI/ui/fleet/fleetview.cpp" line="99"/>
+        <location filename="../ClientGUI/ui/fleet/fleetview.cpp" line="95"/>
         <source>Equip Ex</source>
         <translation>补强装备栏</translation>
     </message>
     <message id="fleetview-equip-slot">
-        <location filename="../ClientGUI/ui/fleet/fleetview.cpp" line="103"/>
+        <location filename="../ClientGUI/ui/fleet/fleetview.cpp" line="99"/>
         <source>Equip %1</source>
         <oldsource>Equip Ex</oldsource>
         <translation>装备栏%1</translation>
     </message>
     <message id="fleetview-view-ship-attr">
-        <location filename="../ClientGUI/ui/fleet/fleetview.cpp" line="126"/>
+        <location filename="../ClientGUI/ui/fleet/fleetview.cpp" line="122"/>
         <source>Attributes</source>
         <translation>属性</translation>
     </message>
@@ -4214,60 +4214,95 @@ Great at battle and bad at politics--so cool!</source>
         <translation>等级进度</translation>
     </message>
     <message id="battle-result-player-fleet">
-        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="140"/>
+        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="142"/>
         <source>Player Fleet</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="battle-result-enemy-fleet">
-        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="148"/>
+        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="150"/>
         <source>Enemy Fleet</source>
         <translation type="unfinished"></translation>
     </message>
-    <message id="battle-result-player-ship">
+    <message id="battle-assm-s-victory">
+        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="201"/>
+        <source>S Victory</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="battle-assm-a-victory">
+        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="205"/>
+        <source>A Victory</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="battle-assm-b-victory">
+        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="209"/>
+        <source>B Victory</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="battle-assm-c-defeat">
         <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="213"/>
+        <source>C Defeat</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="battle-assm-d-defeat">
         <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="217"/>
+        <source>D Defeat</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="battle-assm-e-defeat">
+        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="221"/>
+        <source>E Defeat</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="battle-assm-unknown">
+        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="225"/>
+        <source>Unknown Result</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="battle-result-player-ship">
+        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="256"/>
+        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="261"/>
         <source>Player Ship %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="battle-result-enemy-ship-id">
-        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="248"/>
+        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="306"/>
         <source>Enemy Ship #%1</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="battle-result-enemy-ship-generic">
-        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="252"/>
+        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="311"/>
         <source>Enemy Ship %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="battle-result-title">
-        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="86"/>
+        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="88"/>
         <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="386"/>
         <source>Battle Results</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="battle-result-plane-button">
-        <location filename="../ClientGUI/ui/fleet/battleresultshipdisplay.cpp" line="39"/>
+        <location filename="../ClientGUI/ui/fleet/battleresultshipdisplay.cpp" line="61"/>
         <source>Planes</source>
         <translation type="unfinished">搭载</translation>
     </message>
     <message id="battle-result-plane-losses-for">
-        <location filename="../ClientGUI/ui/fleet/battleresultshipdisplay.cpp" line="51"/>
-        <location filename="../ClientGUI/ui/fleet/battleresultshipdisplay.cpp" line="59"/>
+        <location filename="../ClientGUI/ui/fleet/battleresultshipdisplay.cpp" line="73"/>
+        <location filename="../ClientGUI/ui/fleet/battleresultshipdisplay.cpp" line="81"/>
         <source>Plane losses for %1:</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="battle-result-plane-slot-loss">
-        <location filename="../ClientGUI/ui/fleet/battleresultshipdisplay.cpp" line="55"/>
+        <location filename="../ClientGUI/ui/fleet/battleresultshipdisplay.cpp" line="77"/>
         <source>Slot %1: %2 planes lost</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="battle-result-no-plane-losses">
-        <location filename="../ClientGUI/ui/fleet/battleresultshipdisplay.cpp" line="61"/>
+        <location filename="../ClientGUI/ui/fleet/battleresultshipdisplay.cpp" line="83"/>
         <source>No plane losses.</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="battle-result-plane-details-title">
-        <location filename="../ClientGUI/ui/fleet/battleresultshipdisplay.cpp" line="65"/>
+        <location filename="../ClientGUI/ui/fleet/battleresultshipdisplay.cpp" line="87"/>
         <source>Plane Loss Details</source>
         <translation type="unfinished"></translation>
     </message>
