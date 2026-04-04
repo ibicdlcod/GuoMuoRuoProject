@@ -365,12 +365,7 @@ void Sortie::transportFreightInfo(const QJsonObject &djson) {
 void Sortie::battleEnd() {
     Client &engine = Client::getInstance();
     /* Show battle result dialog if we have stored results */
-    if (!currentBattleProcess.isEmpty()) {
-        BattleResultDialog *dialog = new BattleResultDialog(this);
-        dialog->populate(currentBattleProcess);
-        dialog->exec();  // modal – blocks until OK clicked
-        delete dialog;
-    }
+    bool hasBattleResults = !currentBattleProcess.isEmpty();
     
     // Existing battle‑end logic */
     switchToState(KP::MapDetail);
@@ -386,8 +381,15 @@ void Sortie::battleEnd() {
 ask_for_retreat:
     ConfirmSortie *conf = new ConfirmSortie(this, currentMap->toString(),
                                             ui->diffChoice->currentText());
-    //% "Do you want to continue map progress?"
-    conf->setWindowTitle(qtTrId("continue-map"));
+    if(hasBattleResults) {
+        conf->showBattleResult(currentBattleProcess);
+        //% "Battle Results"
+        conf->setWindowTitle(qtTrId("battle-result-title"));
+        currentBattleProcess = QJsonObject(); // clear after showing
+    } else {
+        //% "Do you want to continue map progress?"
+        conf->setWindowTitle(qtTrId("continue-map"));
+    }
     conf->fv->setEnabled(false);
     engine.queryNextNode(currentMap->getAbsoluteId(), currentNodeId,
                          !conf->exec() == QDialog::Accepted);

@@ -4,10 +4,17 @@
 #ifndef CONFIRMSORTIE_H
 #define CONFIRMSORTIE_H
 
-#include <QDialog>
-#include <QObject>
 #include "ui_confirmsortie.h"
+
+#include <QDialog>
+#include <QJsonObject>
+#include <QObject>
 #include <QString>
+
+class QSplitter;
+class QScrollArea;
+class QVBoxLayout;
+
 #include "../fleet/fleetview.h"
 #include "sortie.h"
 
@@ -22,11 +29,27 @@ public:
     ~ConfirmSortie();
 
     int getFleetIndex() const;
+    void showBattleResult(const QJsonObject &battleProcess);
     friend void Sortie::battleEnd();
+
+private:
+    void clearBattleResultLayout();
+    void populateBattleResult(const QJsonObject &battleProcess);
+    void createBattleResultLayout();
 
 private:
     Ui::ConfirmSortie *ui;
     FleetView *fv;
+    bool m_battleResultMode;
+    QJsonObject m_battleProcess;
+    QSplitter *m_battleSplitter;
+    QScrollArea *m_playerScroll;
+    QScrollArea *m_enemyScroll;
+    QWidget *m_playerContainer;
+    QWidget *m_enemyContainer;
+    QVBoxLayout *m_playerLayout;
+    QVBoxLayout *m_enemyLayout;
+    QLabel *m_assessmentLabel;
 };
 
 #endif // CONFIRMSORTIE_H
