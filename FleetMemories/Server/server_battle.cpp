@@ -1004,10 +1004,10 @@ const QJsonObject Server::processBattleCore(const CSteamID &uid,
         // Clamp to reasonable range (0-1)
         playerLossFactor = std::clamp(playerLossFactor, 0.0, 1.0);
         enemyLossFactor = std::clamp(enemyLossFactor, 0.0, 1.0);
-        // If enemy capitalness zero, losses zero (a = 0)
+        // If enemy capitalness zero, player takes no damage, all enemy ships sunk
         if(enemyTotal == 0) {
             playerLossFactor = 0.0;
-            enemyLossFactor = 0.0;
+            enemyLossFactor = 1.0;
         }
 
         // Compute total HP for each fleet
