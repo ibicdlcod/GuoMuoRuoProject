@@ -8,7 +8,9 @@
 #include <QLabel>
 #include <QMessageBox>
 #include <QPushButton>
+#include <QPixmap>
 
+#include "../../equipicon.h"
 #include "segmentedhpbar.h"
 
 BattleResultShipDisplay::BattleResultShipDisplay(QWidget *parent,
@@ -17,7 +19,9 @@ BattleResultShipDisplay::BattleResultShipDisplay(QWidget *parent,
                                                  int hpBefore,
                                                  int hpAfter,
                                                  int totalHP,
-                                                 const QVector<int> &planeLosses)
+                                                 const QVector<int> &planeLosses,
+                                                 int shipLevel,
+                                                 int shipIconId)
     : QWidget(parent)
     , m_shipIndex(shipIndex)
     , m_shipName(shipName)
@@ -25,11 +29,28 @@ BattleResultShipDisplay::BattleResultShipDisplay(QWidget *parent,
     , m_hpAfter(hpAfter)
     , m_totalHP(totalHP)
     , m_planeLosses(planeLosses)
+    , m_shipLevel(shipLevel)
+    , m_shipIconId(shipIconId)
     , m_hpBar(new SegmentedHPBar(this))
+    , m_iconLabel(nullptr)
+    , m_levelLabel(nullptr)
 {
     QHBoxLayout *layout = new QHBoxLayout(this);
     
-    QLabel *nameLabel = new QLabel(shipName, this);
+    // Ship icon (always show, Icute::shipIcon handles oldInternalId == 0)
+    m_iconLabel = new QLabel(this);
+    QPixmap icon = Icute::shipIcon(shipIconId);
+    if(!icon.isNull()) {
+        m_iconLabel->setPixmap(icon.scaled(40, 40, Qt::KeepAspectRatio, Qt::SmoothTransformation));
+    }
+    layout->addWidget(m_iconLabel);
+    
+    // Ship name with level
+    QString nameWithLevel = shipName;
+    if(shipLevel > 0) {
+        nameWithLevel += QString(" (Lv %1)").arg(shipLevel);
+    }
+    QLabel *nameLabel = new QLabel(nameWithLevel, this);
     layout->addWidget(nameLabel);
     
     m_hpBar->setValues(totalHP, hpBefore, hpAfter);

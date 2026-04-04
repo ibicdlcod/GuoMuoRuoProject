@@ -13,6 +13,7 @@
 #include <QTableWidget>
 #include <QVBoxLayout>
 #include <QVector>
+#include <algorithm>
 
 #include "../fleet/battleresultshipdisplay.h"
 #include "../fleet/fleetview.h"
@@ -243,10 +244,18 @@ void ConfirmSortie::populateBattleResult(const QJsonObject &battleProcess)
         int hpAfter = playerHPAfter[i].toInt(1);
         int totalHP = hpBefore; // default, will try to get from Ship
         QString shipName;
+        int shipLevel = 1;
+        int shipIconId = 0;
         if(fleetView) {
             if(Ship *ship = fleetView->getShip(i)) {
                 shipName = ship->toString();
-                totalHP = ship->attr["Hitpoints"];
+                totalHP = ship->attr["Hitpoints"].toInt(hpBefore);
+                // Get icon ID
+                shipIconId = ship->attr.value("OldInternalNo.").toInt();
+                // Get level from ship dynamic
+                if(ShipDynamic *shipDyn = fleetView->getShipDynamic(i)) {
+                    shipLevel = Ship::getLevel(std::min(shipDyn->exp, shipDyn->expCap));
+                }
             } else {
                 //% "Player Ship %1"
                 shipName = qtTrId("battle-result-player-ship").arg(i+1);
@@ -272,7 +281,8 @@ void ConfirmSortie::populateBattleResult(const QJsonObject &battleProcess)
         BattleResultShipDisplay *display = new BattleResultShipDisplay(m_playerContainer,
                                                                        i, shipName,
                                                                        hpBefore, hpAfter,
-                                                                       totalHP, planeLosses);
+                                                                       totalHP, planeLosses,
+                                                                       shipLevel, shipIconId);
         m_playerLayout->addWidget(display);
     }
     
@@ -284,12 +294,16 @@ void ConfirmSortie::populateBattleResult(const QJsonObject &battleProcess)
         int hpAfter = enemyHPAfter[i].toInt(1);
         int totalHP = hpBefore; // enemy ships start at full HP
         QString enemyName;
+        int shipLevel = 1;
+        int shipIconId = 0;
         if(i < enemyShipIds.size()) {
             int enemyShipId = enemyShipIds[i].toInt();
             if(Ship *enemyShip = engine.getShipReg(enemyShipId)) {
                 enemyName = enemyShip->toString();
                 // Try to get total HP from ship definition
-                totalHP = enemyShip->attr.value("Hitpoints", hpBefore);
+                totalHP = enemyShip->attr.value("Hitpoints").toInt(hpBefore);
+                // Get icon ID
+                shipIconId = enemyShip->attr.value("OldInternalNo.").toInt();
             } else {
                 //% "Enemy Ship #%1"
                 enemyName = qtTrId("battle-result-enemy-ship-id")
@@ -316,7 +330,8 @@ void ConfirmSortie::populateBattleResult(const QJsonObject &battleProcess)
         BattleResultShipDisplay *display = new BattleResultShipDisplay(m_enemyContainer,
                                                                        i, enemyName,
                                                                        hpBefore, hpAfter,
-                                                                       totalHP, planeLosses);
+                                                                       totalHP, planeLosses,
+                                                                       shipLevel, shipIconId);
         m_enemyLayout->addWidget(display);
     }
     

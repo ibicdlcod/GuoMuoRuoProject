@@ -7,8 +7,10 @@
 #include <QString>
 #include <QVector>
 #include <QWidget>
+#include <QUuid>
 
 class SegmentedHPBar;
+class QLabel;
 
 class BattleResultShipDisplay : public QWidget
 {
@@ -21,7 +23,9 @@ public:
                                      int hpBefore = 1,
                                      int hpAfter = 1,
                                      int totalHP = 1,
-                                     const QVector<int> &planeLosses = QVector<int>());
+                                     const QVector<int> &planeLosses = QVector<int>(),
+                                     int shipLevel = 1,
+                                     int shipIconId = 0);
 
 private slots:
     void showPlaneLosses();
@@ -33,7 +37,11 @@ private:
     int m_hpAfter;
     int m_totalHP;
     QVector<int> m_planeLosses;
+    int m_shipLevel;
+    int m_shipIconId;
     SegmentedHPBar *m_hpBar;
+    QLabel *m_iconLabel;
+    QLabel *m_levelLabel;
 };
 
 #endif // BATTLERESULTSHIPDISPLAY_H

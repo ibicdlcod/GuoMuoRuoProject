@@ -10,10 +10,13 @@
 #include <QJsonObject>
 #include <QObject>
 #include <QString>
+#include <QWidget>
+#include <QLabel>
 
 class QSplitter;
 class QScrollArea;
 class QVBoxLayout;
+class QLabel;
 
 #include "../fleet/fleetview.h"
 #include "sortie.h"
