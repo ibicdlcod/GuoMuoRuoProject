@@ -912,28 +912,72 @@ const QJsonObject Server::processBattleCore(const CSteamID &uid,
     // night battle occured for daystart, or reverse
     result["extrastage"] = false;
 
-    QJsonObject before;
-    QJsonObject enemyBefore;
-    QJsonArray bHP;
     KP::Difficulty diff = static_cast<KP::Difficulty>(
         MapWithDiff::getDiff(mapId));
     FleetInfo enemyFleet = createEnemyFleetInfo(mapId, nodeId, diff);
-    for(const ShipDynamic *dyn : enemyFleet.shipDynamics) {
-        bHP.append(dyn->currentHP);
-    }
-    if(bHP.isEmpty()) {
-        bHP.append(1); // fallback dummy
-    }
-    enemyBefore["hp"] = bHP;
-    before["enemy"] = enemyBefore;
-    result["before"] = before;
-
-    QJsonObject after;
-    QJsonObject enemyAfter;
-    QJsonArray aHP;
-
+    
     // Retrieve player fleet
     FleetInfo *playerFleet = sortieFleets.value({uid, fleetIndex}, nullptr);
+    
+    // Helper lambda to extract HP array from a fleet
+    auto hpArray = [](const FleetInfo &fleet) -> QJsonArray {
+        QJsonArray arr;
+        for(const ShipDynamic *dyn : fleet.shipDynamics) {
+            arr.append(dyn->currentHP);
+        }
+        if(arr.isEmpty()) {
+            arr.append(1); // fallback dummy
+        }
+        return arr;
+    };
+    
+    // Helper lambda to extract plane arrays from a fleet
+    auto planeArrays = [](const FleetInfo &fleet) -> QJsonArray {
+        QJsonArray shipPlanesArray;
+        for(const ShipDynamic *dyn : fleet.shipDynamics) {
+            QJsonArray slotArray;
+            for(int planes : dyn->slotPlanes) {
+                slotArray.append(planes);
+            }
+            shipPlanesArray.append(slotArray);
+        }
+        if(shipPlanesArray.isEmpty()) {
+            // Add dummy entry if empty
+            QJsonArray dummySlots;
+            for(int i = 0; i < 5; ++i) dummySlots.append(0);
+            shipPlanesArray.append(dummySlots);
+        }
+        return shipPlanesArray;
+    };
+    
+    // Build "before" state
+    QJsonObject before;
+    QJsonObject playerBefore;
+    QJsonObject enemyBefore;
+    
+    if(playerFleet) {
+        playerBefore["hp"] = hpArray(*playerFleet);
+        playerBefore["planes"] = planeArrays(*playerFleet);
+    } else {
+        qWarning() << "Player fleet not found in sortieFleets, using dummy";
+        QJsonArray dummyHP;
+        dummyHP.append(1);
+        playerBefore["hp"] = dummyHP;
+        QJsonArray dummyPlanes;
+        QJsonArray dummySlots;
+        for(int i = 0; i < 5; ++i) dummySlots.append(0);
+        dummyPlanes.append(dummySlots);
+        playerBefore["planes"] = dummyPlanes;
+    }
+    
+    enemyBefore["hp"] = hpArray(enemyFleet);
+    enemyBefore["planes"] = planeArrays(enemyFleet);
+    
+    before["player"] = playerBefore;
+    before["enemy"] = enemyBefore;
+    result["before"] = before;
+    
+    // Now compute losses and update fleets
     if(playerFleet) {
         // Compute capitalness ratio a = enemy / player
         QMap<KP::CapitalType, int> playerCap = playerFleet->capitalness();
@@ -1044,7 +1088,6 @@ const QJsonObject Server::processBattleCore(const CSteamID &uid,
                 static_cast<int>(enemyLossHP *
                     (static_cast<double>(currentHP) / totalEnemyHP)) : 0;
             int newHP = std::max(0, currentHP - lossThisShip);
-            aHP.append(newHP);
             dyn->currentHP = newHP;
 
             // Plane loss for enemy
@@ -1056,17 +1099,32 @@ const QJsonObject Server::processBattleCore(const CSteamID &uid,
                 dyn->slotPlanes[slot] = newPlanes;
             }
         }
+    } // if(playerFleet)
+    
+    // Build "after" state with updated HP and planes
+    QJsonObject after;
+    QJsonObject playerAfter;
+    QJsonObject enemyAfter;
+    
+    if(playerFleet) {
+        playerAfter["hp"] = hpArray(*playerFleet);
+        playerAfter["planes"] = planeArrays(*playerFleet);
     } else {
-        qWarning() << "Player fleet not found in sortieFleets, using dummy";
-        for(int i = 0; i < enemyFleet.shipDynamics.size(); ++i) {
-            aHP.append(0); // all enemy ships defeated
-        }
+        // Use same dummy data as before
+        QJsonArray dummyHP;
+        dummyHP.append(1);
+        playerAfter["hp"] = dummyHP;
+        QJsonArray dummyPlanes;
+        QJsonArray dummySlots;
+        for(int i = 0; i < 5; ++i) dummySlots.append(0);
+        dummyPlanes.append(dummySlots);
+        playerAfter["planes"] = dummyPlanes;
     }
-
-    if(aHP.isEmpty()) {
-        aHP.append(0); // fallback dummy
-    }
-    enemyAfter["hp"] = aHP;
+    
+    enemyAfter["hp"] = hpArray(enemyFleet);
+    enemyAfter["planes"] = planeArrays(enemyFleet);
+    
+    after["player"] = playerAfter;
     after["enemy"] = enemyAfter;
     result["after"] = after;
 
