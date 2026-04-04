@@ -81,10 +81,10 @@ QMap<KP::CapitalType, int> FleetInfo::capitalness() {
         }
     }
     return {
-            {KP::AnyCapitalType, any},
-            {KP::Screen, screen},
-            {KP::SurfaceShip, surface},
-            {KP::CarrierShip, carrier},
+            {KP::AnyCapitalType, std::max(any, 0)},
+            {KP::Screen, std::max(screen, 0)},
+            {KP::SurfaceShip, std::max(surface, 0)},
+            {KP::CarrierShip, std::max(carrier, 0)},
             };
 }
 
