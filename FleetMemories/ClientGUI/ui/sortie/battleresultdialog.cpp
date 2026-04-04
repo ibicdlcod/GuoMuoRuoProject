@@ -148,4 +148,51 @@ void BattleResultDialog::populate(const QJsonObject &battleProcess)
                 new QTableWidgetItem(QString::number(planeLoss)));
         }
     }
+
+    /* Enemy fleet */
+    QJsonObject enemyBefore = before["enemy"].toObject();
+    QJsonObject enemyAfter = after["enemy"].toObject();
+    QJsonArray enemyHPBefore = enemyBefore["hp"].toArray();
+    QJsonArray enemyHPAfter = enemyAfter["hp"].toArray();
+    QJsonArray enemyPlanesBefore = enemyBefore["planes"].toArray();
+    QJsonArray enemyPlanesAfter = enemyAfter["planes"].toArray();
+    QJsonArray enemyShipIds = battleProcess["enemyShipIds"].toArray();
+
+    int enemyRows = enemyHPBefore.size();
+    ui->enemyTable->setRowCount(enemyRows);
+    for(int i = 0; i < enemyRows; ++i) {
+        int hpBefore = enemyHPBefore[i].toInt(1);
+        int hpAfter = enemyHPAfter[i].toInt(1);
+        int hpChange = hpBefore - hpAfter;
+        /* Use enemy ship ID if available, else generic label */
+        QString enemyIdStr;
+        if(i < enemyShipIds.size()) {
+            //% "Enemy Ship #%1"
+            enemyIdStr = qtTrId("battle-result-enemy-ship-id")
+                         .arg(enemyShipIds[i].toInt());
+        } else {
+            //% "Enemy Ship %1"
+            enemyIdStr = qtTrId("battle-result-enemy-ship-generic").arg(i+1);
+        }
+        ui->enemyTable->setItem(i, 0,
+            new QTableWidgetItem(enemyIdStr));
+        ui->enemyTable->setItem(i, 1,
+            new QTableWidgetItem(QString::number(hpBefore)));
+        ui->enemyTable->setItem(i, 2,
+            new QTableWidgetItem(QString::number(hpAfter)));
+        ui->enemyTable->setItem(i, 3,
+            new QTableWidgetItem(QString::number(hpChange)));
+
+        /* Enemy plane losses */
+        QJsonArray planesBefore = enemyPlanesBefore[i].toArray();
+        QJsonArray planesAfter = enemyPlanesAfter[i].toArray();
+        for(int planeSlot = 0; planeSlot < PLANE_SLOTS; ++planeSlot) {
+            int planesBeforeSlot = planesBefore[planeSlot].toInt(0);
+            int planesAfterSlot = planesAfter[planeSlot].toInt(0);
+            int planeLoss = planesBeforeSlot - planesAfterSlot;
+            if(planeLoss < 0) planeLoss = 0;
+            ui->enemyTable->setItem(i, FIRST_PLANE_COLUMN + planeSlot,
+                new QTableWidgetItem(QString::number(planeLoss)));
+        }
+    }
 }
