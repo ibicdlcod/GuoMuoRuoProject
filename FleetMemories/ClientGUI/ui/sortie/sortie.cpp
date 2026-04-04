@@ -15,7 +15,6 @@
 #include "../../clientv2.h"
 #include "../mainwindow.h"
 #include "battleplan.h"
-#include "battleresultdialog.h"
 #include "confirmsortie.h"
 #include "../../../Protocol/utility.h"
 
