@@ -109,6 +109,8 @@ set(CLIENT_SOURCES
     ClientGUI/ui/fleet/interactivelabel.h
     ClientGUI/ui/fleet/segmentedhpbar.cpp
     ClientGUI/ui/fleet/segmentedhpbar.h
+    ClientGUI/ui/fleet/battleresultshipdisplay.cpp
+    ClientGUI/ui/fleet/battleresultshipdisplay.h
     ClientGUI/ui/fleet/shipdisplay.cpp
     ClientGUI/ui/fleet/shipdisplay.h
     ClientGUI/ui/fleet/shipdisplay.ui
