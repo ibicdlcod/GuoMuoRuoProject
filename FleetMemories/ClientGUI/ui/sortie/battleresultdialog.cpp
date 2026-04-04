@@ -6,6 +6,7 @@
 
 #include <QHeaderView>
 #include <QJsonArray>
+#include <QJsonObject>
 #include <QTableWidget>
 
 #include "../../../Protocol/kp.h"
@@ -68,4 +69,80 @@ BattleResultDialog::BattleResultDialog(QWidget *parent) :
 BattleResultDialog::~BattleResultDialog()
 {
     delete ui;
+}
+
+void BattleResultDialog::populate(const QJsonObject &battleProcess)
+{
+    /* Clear tables */
+    ui->playerTable->setRowCount(0);
+    ui->enemyTable->setRowCount(0);
+
+    /* Set assessment label */
+    int assmInt = battleProcess["assm"].toInt(0);
+    KP::BattleAssessment assm = static_cast<KP::BattleAssessment>(assmInt);
+    QString assmText;
+    switch(assm) {
+    case KP::SVictory:
+        //% "S Victory"
+        assmText = qtTrId("battle-assm-s-victory"); break;
+    case KP::AVictory:
+        //% "A Victory"
+        assmText = qtTrId("battle-assm-a-victory"); break;
+    case KP::BVictory:
+        //% "B Victory"
+        assmText = qtTrId("battle-assm-b-victory"); break;
+    case KP::CDefeat:
+        //% "C Defeat"
+        assmText = qtTrId("battle-assm-c-defeat"); break;
+    case KP::DDefeat:
+        //% "D Defeat"
+        assmText = qtTrId("battle-assm-d-defeat"); break;
+    case KP::EDefeat:
+        //% "E Defeat"
+        assmText = qtTrId("battle-assm-e-defeat"); break;
+    default:
+        //% "Unknown Result"
+        assmText = qtTrId("battle-assm-unknown"); break;
+    }
+    ui->assessmentLabel->setText(assmText);
+
+    /* Extract player HP and plane arrays */
+    QJsonObject before = battleProcess["before"].toObject();
+    QJsonObject after = battleProcess["after"].toObject();
+    QJsonObject playerBefore = before["player"].toObject();
+    QJsonObject playerAfter = after["player"].toObject();
+    QJsonArray playerHPBefore = playerBefore["hp"].toArray();
+    QJsonArray playerHPAfter = playerAfter["hp"].toArray();
+    QJsonArray playerPlanesBefore = playerBefore["planes"].toArray();
+    QJsonArray playerPlanesAfter = playerAfter["planes"].toArray();
+
+    /* For now, fill player table with placeholder data.
+     * Task 6 will connect to real fleet info. */
+    int playerRows = playerHPBefore.size();
+    if(playerRows == 0) playerRows = 1;
+    ui->playerTable->setRowCount(playerRows);
+    for(int i = 0; i < playerRows; ++i) {
+        int hpBefore = playerHPBefore[i].toInt(1);
+        int hpAfter = playerHPAfter[i].toInt(1);
+        int hpChange = hpBefore - hpAfter;
+        ui->playerTable->setItem(i, 0,
+            new QTableWidgetItem(tr("Player Ship %1").arg(i+1)));
+        ui->playerTable->setItem(i, 1,
+            new QTableWidgetItem(QString::number(hpBefore)));
+        ui->playerTable->setItem(i, 2,
+            new QTableWidgetItem(QString::number(hpAfter)));
+        ui->playerTable->setItem(i, 3,
+            new QTableWidgetItem(QString::number(hpChange)));
+
+        /* Plane losses */
+        QJsonArray planesBefore = playerPlanesBefore[i].toArray();
+        QJsonArray planesAfter = playerPlanesAfter[i].toArray();
+        for(int slot = 0; slot < 5; ++slot) {
+            int planesBeforeSlot = planesBefore[slot].toInt(0);
+            int planesAfterSlot = planesAfter[slot].toInt(0);
+            int planeLoss = planesBeforeSlot - planesAfterSlot;
+            ui->playerTable->setItem(i, 4 + slot,
+                new QTableWidgetItem(QString::number(planeLoss)));
+        }
+    }
 }
