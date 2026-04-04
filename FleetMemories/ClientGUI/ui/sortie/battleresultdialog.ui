@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ui version="4.0">
+<ui version="4.0" idbasedtr="true">
  <class>BattleResultDialog</class>
  <widget class="QDialog" name="BattleResultDialog">
   <property name="windowTitle">
-   <string>Battle Results</string>
+    <string id="battle-result-title">Battle Results</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
     <widget class="QLabel" name="assessmentLabel">
      <property name="text">
-      <string>S Victory</string>
+       <string id="battle-result-assessment-default">S Victory</string>
      </property>
      <property name="alignment">
       <set>Qt::AlignCenter</set>
