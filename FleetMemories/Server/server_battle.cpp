@@ -1231,6 +1231,12 @@ const QJsonObject Server::processBattleCore(const CSteamID &uid,
     after["enemy"] = enemyAfter;
     result["after"] = after;
 
+    QJsonArray enemyShipIds;
+    for (const Ship* ship : enemyFleet.ships) {
+        enemyShipIds.append(ship->getId());
+    }
+    result["enemyShipIds"] = enemyShipIds;
+
     return result;
 }
 

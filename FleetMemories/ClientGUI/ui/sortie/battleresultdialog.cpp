@@ -4,12 +4,15 @@
 #include "battleresultdialog.h"
 #include "ui_battleresultdialog.h"
 
+#include <QApplication>
 #include <QHeaderView>
 #include <QJsonArray>
 #include <QJsonObject>
 #include <QTableWidget>
 
 #include "../../../Protocol/kp.h"
+#include "../mainwindow.h"
+#include "../fleet/fleetview.h"
 
 BattleResultDialog::BattleResultDialog(QWidget *parent) :
     QDialog(parent),
@@ -118,17 +121,36 @@ void BattleResultDialog::populate(const QJsonObject &battleProcess)
     QJsonArray playerPlanesBefore = playerBefore["planes"].toArray();
     QJsonArray playerPlanesAfter = playerAfter["planes"].toArray();
 
-    /* For now, fill player table with placeholder data.
-     * Task 6 will connect to real fleet info. */
+    /* Connect to real fleet info */
+    FleetView *fleetView = nullptr;
+    for(auto *widget: QApplication::topLevelWidgets()) {
+        if(auto *mainWindow = qobject_cast<MainWindow *>(widget)) {
+            fleetView = mainWindow->getFleetArea();
+            break;
+        }
+    }
+
     int playerRows = playerHPBefore.size();
     ui->playerTable->setRowCount(playerRows);
     for(int i = 0; i < playerRows; ++i) {
         int hpBefore = playerHPBefore[i].toInt(1);
         int hpAfter = playerHPAfter[i].toInt(1);
         int hpChange = hpBefore - hpAfter;
-        //% "Player Ship %1"
+
+        QString shipName;
+        if(fleetView) {
+            if(Ship *ship = fleetView->getShip(i)) {
+                shipName = ship->toString();
+            } else {
+                //% "Player Ship %1"
+                shipName = qtTrId("battle-result-player-ship").arg(i+1);
+            }
+        } else {
+            //% "Player Ship %1"
+            shipName = qtTrId("battle-result-player-ship").arg(i+1);
+        }
         ui->playerTable->setItem(i, 0,
-            new QTableWidgetItem(qtTrId("battle-result-player-ship").arg(i+1)));
+            new QTableWidgetItem(shipName));
         ui->playerTable->setItem(i, 1,
             new QTableWidgetItem(QString::number(hpBefore)));
         ui->playerTable->setItem(i, 2,

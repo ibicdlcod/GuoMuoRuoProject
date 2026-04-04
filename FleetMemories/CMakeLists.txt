@@ -154,6 +154,9 @@ set(CLIENT_SOURCES
     ClientGUI/ui/sortie/battleplan.cpp
     ClientGUI/ui/sortie/battleplan.h
     ClientGUI/ui/sortie/battleplan.ui
+    ClientGUI/ui/sortie/battleresultdialog.cpp
+    ClientGUI/ui/sortie/battleresultdialog.h
+    ClientGUI/ui/sortie/battleresultdialog.ui
     ClientGUI/ui/sortie/confirmsortie.cpp
     ClientGUI/ui/sortie/confirmsortie.h
     ClientGUI/ui/sortie/confirmsortie.ui

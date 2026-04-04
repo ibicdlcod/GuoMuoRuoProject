@@ -15,6 +15,7 @@
 #include "../../clientv2.h"
 #include "../mainwindow.h"
 #include "battleplan.h"
+#include "battleresultdialog.h"
 #include "confirmsortie.h"
 #include "../../../Protocol/utility.h"
 
@@ -363,8 +364,15 @@ void Sortie::transportFreightInfo(const QJsonObject &djson) {
 
 void Sortie::battleEnd() {
     Client &engine = Client::getInstance();
-    /* TODO: display battle result */
-    currentBattleProcess;
+    /* Show battle result dialog if we have stored results */
+    if (!currentBattleProcess.isEmpty()) {
+        BattleResultDialog *dialog = new BattleResultDialog(this);
+        dialog->populate(currentBattleProcess);
+        dialog->exec();  // modal – blocks until OK clicked
+        delete dialog;
+    }
+    
+    // Existing battle‑end logic */
     switchToState(KP::MapDetail);
     if(currentMap->nodes[currentNodeId].type == KP::CHOICE) {
         detail->setChoiceNodes(currentMap->nodes[currentNodeId].nextNodes);
