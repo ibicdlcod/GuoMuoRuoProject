@@ -12,6 +12,7 @@
 #include <QtNetwork>
 #include <random>
 #include <tuple>
+#include <utility>
 #include <sol/sol.hpp>
 #include "steam/steamclientpublic.h"
 
@@ -210,7 +211,7 @@ private:
     SslServer sslServer;
     QHash<QSslSocket *, CSteamID> connectedUsers;
     QMap<CSteamID, QSslSocket *> connectedPeers;
-    QMap<CSteamID, FleetInfo *> sortieFleets;
+    QMap<std::pair<CSteamID, int>, FleetInfo *> sortieFleets;
     ServerMasterSender senderM;
     Receiver receiverM;
     QMap<CSteamID, int> allowedPackets;

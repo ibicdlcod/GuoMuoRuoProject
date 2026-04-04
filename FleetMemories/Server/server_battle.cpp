@@ -665,7 +665,7 @@ int Server::nextNode(const CSteamID &uid, QSslSocket *connection,
         return 0;
     }
     else {
-        FleetInfo *fiPtr = sortieFleets.value(uid, nullptr);
+        FleetInfo *fiPtr = sortieFleets.value({uid, fleetIndex}, nullptr);
         if(!fiPtr) {
             QByteArray msg = KP::serverBattleError(KP::FleetLost);
             senderM.sendMessage(connection, msg);
@@ -758,7 +758,7 @@ void Server::processBattle(const CSteamID &uid, QSslSocket *connection,
     break;
     case KP::TRANSPORT: {
         /* Freight transport logic */
-        FleetInfo *fleetInfo = sortieFleets.value(uid, nullptr);
+        FleetInfo *fleetInfo = sortieFleets.value({uid, result.value()[3]}, nullptr);
         int capacity = 0;
         if(fleetInfo) {
             capacity = fleetInfo->transportCapacity(uid);
@@ -1350,7 +1350,7 @@ void Server::progressMap(const CSteamID &uid, QSslSocket *connection,
             QString diffStr = (*KP::diffEnumtoStr)[diff];
             QByteArray diffStrBytes = diffStr.toUtf8();
             const char *diffStrC = diffStrBytes;
-            FleetInfo *fi = sortieFleets.value(uid, nullptr);
+            FleetInfo *fi = sortieFleets.value({uid, result.value()[3]}, nullptr);
             if(fi) {
                 fleetLOS = fi->los();
             }
@@ -1380,7 +1380,7 @@ void Server::progressMap(const CSteamID &uid, QSslSocket *connection,
             }
         }
         int activeFleet = result.value()[3];
-        if(FleetInfo *fi = sortieFleets.value(uid, nullptr)) {
+        if(FleetInfo *fi = sortieFleets.value({uid, activeFleet}, nullptr)) {
             for(ShipDynamic *dyn : fi->shipDynamics) {
                 dyn->fuel = std::max(0.0, dyn->fuel - fuelFrac);
                 dyn->ammo = std::max(0.0, dyn->ammo - ammoFrac);
@@ -1465,13 +1465,13 @@ void Server::progressMap(const CSteamID &uid, QSslSocket *connection,
         }
     }
     if(nNode == 0) {
-        if(FleetInfo *fi = sortieFleets.value(uid, nullptr)) {
+        if(FleetInfo *fi = sortieFleets.value({uid, result.value()[3]}, nullptr)) {
             for(ShipDynamic *dyn : fi->shipDynamics)
                 dyn->fleetFled = false;
             updateFleetIntoDatabase(uid, *fi,
                                     result.value()[3]);
             delete fi;
-            sortieFleets.remove(uid);
+            sortieFleets.remove({uid, result.value()[3]});
         }
         // Clear freight transported when map ends/retreats
         QSqlQuery freightQuery;
@@ -1621,9 +1621,9 @@ void Server::startSortie(const CSteamID &uid, QSslSocket *connection,
             }
         }
 
-        delete sortieFleets.value(uid, nullptr);
-        sortieFleets[uid] = new FleetInfo(queryFleetInfo(uid, fleetIndex));
-        FleetInfo &info = *sortieFleets[uid];
+        delete sortieFleets.value({uid, fleetIndex}, nullptr);
+        sortieFleets[{uid, fleetIndex}] = new FleetInfo(queryFleetInfo(uid, fleetIndex));
+        FleetInfo &info = *sortieFleets[{uid, fleetIndex}];
         sol::protected_function luaChooseStartingNode
             = lua["maps"][unionId]["branch_rule"][diffStrC];
         auto result = luaChooseStartingNode(info.ships,
