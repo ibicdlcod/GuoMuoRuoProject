@@ -14,13 +14,12 @@
 #include <QVBoxLayout>
 #include <QVector>
 
+#include "../fleet/battleresultshipdisplay.h"
 #include "../fleet/fleetview.h"
 #include "../fleet/segmentedhpbar.h"
-#include "../fleet/ship.h"
+#include "../../Protocol/ship.h"
 #include "../mainwindow.h"
 #include "../../../Protocol/kp.h"
-
-#include "../fleet/battleresultshipdisplay.h"
 
 ConfirmSortie::ConfirmSortie(QWidget *parent, QString mapText, QString diffText)
     : QDialog(parent)
@@ -208,7 +207,7 @@ void ConfirmSortie::populateBattleResult(const QJsonObject &battleProcess)
         if(fleetView) {
             if(Ship *ship = fleetView->getShip(i)) {
                 shipName = ship->toString();
-                totalHP = ship->getMaxHP();
+                totalHP = ship->attr["Hitpoints"];
             } else {
                 //% "Player Ship %1"
                 shipName = qtTrId("battle-result-player-ship").arg(i+1);
