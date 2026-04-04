@@ -979,6 +979,10 @@ const QJsonObject Server::processBattleCore(const CSteamID &uid,
         // Compute HP loss amounts
         int playerLossHP = static_cast<int>(playerLossFactor * totalPlayerHP);
         int enemyLossHP = static_cast<int>(enemyLossFactor * totalEnemyHP);
+        qInfo() << "Battle capitalness: player" << playerTotal << "enemy"
+                << enemyTotal << "a=" << a << "playerLossFactor"
+                << playerLossFactor << "enemyLossFactor" << enemyLossFactor
+                << "HP loss player" << playerLossHP << "enemy" << enemyLossHP;
 
         // Database connection
         QSqlDatabase db = QSqlDatabase::database();
