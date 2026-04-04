@@ -74,6 +74,8 @@ BattleResultDialog::~BattleResultDialog()
 void BattleResultDialog::populate(const QJsonObject &battleProcess)
 {
     /* Clear tables */
+    const int PLANE_SLOTS = 5;
+    const int FIRST_PLANE_COLUMN = 4;
     ui->playerTable->setRowCount(0);
     ui->enemyTable->setRowCount(0);
 
@@ -119,14 +121,14 @@ void BattleResultDialog::populate(const QJsonObject &battleProcess)
     /* For now, fill player table with placeholder data.
      * Task 6 will connect to real fleet info. */
     int playerRows = playerHPBefore.size();
-    if(playerRows == 0) playerRows = 1;
     ui->playerTable->setRowCount(playerRows);
     for(int i = 0; i < playerRows; ++i) {
         int hpBefore = playerHPBefore[i].toInt(1);
         int hpAfter = playerHPAfter[i].toInt(1);
         int hpChange = hpBefore - hpAfter;
+        //% "Player Ship %1"
         ui->playerTable->setItem(i, 0,
-            new QTableWidgetItem(tr("Player Ship %1").arg(i+1)));
+            new QTableWidgetItem(qtTrId("battle-result-player-ship").arg(i+1)));
         ui->playerTable->setItem(i, 1,
             new QTableWidgetItem(QString::number(hpBefore)));
         ui->playerTable->setItem(i, 2,
@@ -137,11 +139,12 @@ void BattleResultDialog::populate(const QJsonObject &battleProcess)
         /* Plane losses */
         QJsonArray planesBefore = playerPlanesBefore[i].toArray();
         QJsonArray planesAfter = playerPlanesAfter[i].toArray();
-        for(int slot = 0; slot < 5; ++slot) {
+        for(int slot = 0; slot < PLANE_SLOTS; ++slot) {
             int planesBeforeSlot = planesBefore[slot].toInt(0);
             int planesAfterSlot = planesAfter[slot].toInt(0);
             int planeLoss = planesBeforeSlot - planesAfterSlot;
-            ui->playerTable->setItem(i, 4 + slot,
+            if(planeLoss < 0) planeLoss = 0;
+            ui->playerTable->setItem(i, FIRST_PLANE_COLUMN + slot,
                 new QTableWidgetItem(QString::number(planeLoss)));
         }
     }
