@@ -228,7 +228,17 @@ void ConfirmSortie::populateBattleResult(const QJsonObject &battleProcess)
         m_assessmentLabel->setText(assessmentText);
     }
     
-
+    // Try to get fleet view (fv might be null if main window not found in constructor)
+    FleetView* fleetView = fv;
+    if(!fleetView) {
+        for(auto *widget: QApplication::topLevelWidgets()) {
+            if(auto *mainWindow = qobject_cast<MainWindow *>(widget)) {
+                fleetView = mainWindow->getFleetArea();
+                break;
+            }
+        }
+    }
+    
     // Player ships
     int playerRows = playerHPBefore.size();
     for(int i = 0; i < playerRows; ++i) {
@@ -238,14 +248,14 @@ void ConfirmSortie::populateBattleResult(const QJsonObject &battleProcess)
         QString shipName;
         int shipLevel = 1;
         int shipIconId = 0;
-        if(fv) {
-            if(Ship *ship = fv->getShip(i)) {
+        if(fleetView) {
+            if(Ship *ship = fleetView->getShip(i)) {
                 shipName = ship->toString();
                 totalHP = ship->attr.value("Hitpoints", hpBefore);
                 // Get icon ID
                 shipIconId = ship->attr.value("OldInternalNo.", 0);
                 // Get level from ship dynamic
-                if(ShipDynamic *shipDyn = fv->getShipDynamic(i)) {
+                if(ShipDynamic *shipDyn = fleetView->getShipDynamic(i)) {
                     shipLevel = Ship::getLevel(std::min(shipDyn->exp, shipDyn->expCap));
                 }
             } else {
