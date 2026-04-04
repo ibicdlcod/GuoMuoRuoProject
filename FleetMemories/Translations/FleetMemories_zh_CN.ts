@@ -2244,7 +2244,7 @@ Great at battle and bad at politics--so cool!</source>
     <message id="sortie-progress-failure">
         <location filename="../Server/server.cpp" line="4164"/>
         <location filename="../Server/server.cpp" line="4176"/>
-        <location filename="../Server/server_battle.cpp" line="1751"/>
+        <location filename="../Server/server_battle.cpp" line="1757"/>
         <source>User %1: progress map %2 failure!</source>
         <translation type="unfinished">用户%1：推进海域%2失败！</translation>
     </message>
@@ -2460,12 +2460,12 @@ Great at battle and bad at politics--so cool!</source>
         <translation type="unfinished">用户%1：查询舰队%2失败！</translation>
     </message>
     <message id="sortie-end-failure-freight-clear">
-        <location filename="../Server/server_battle.cpp" line="1775"/>
+        <location filename="../Server/server_battle.cpp" line="1781"/>
         <source>User %1: clear freight at map end failure!</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="update-fleet-db-failed">
-        <location filename="../Server/server_battle.cpp" line="2137"/>
+        <location filename="../Server/server_battle.cpp" line="2143"/>
         <source>User %1: update fleet %2 pos %3 in database failed!</source>
         <translation type="unfinished">用户%1：更新数据库中舰队%2位置%3失败！</translation>
     </message>
@@ -2477,23 +2477,23 @@ Great at battle and bad at politics--so cool!</source>
     </message>
     <message id="sortie-node-battle-failure-end">
         <location filename="../Server/server_battle.cpp" line="821"/>
-        <location filename="../Server/server_battle.cpp" line="1255"/>
+        <location filename="../Server/server_battle.cpp" line="1261"/>
         <source>User %1: end node battle failure!</source>
         <translation type="unfinished">用户%1：结束节点战斗失败！</translation>
     </message>
     <message id="map-info-failure-exp">
-        <location filename="../Server/server_battle.cpp" line="1303"/>
+        <location filename="../Server/server_battle.cpp" line="1309"/>
         <source>Map info: query mapid %1 nodeid %2 exp failed!</source>
         <translation type="unfinished">海域信息：查询海域ID%1节点ID%2经验值失败！</translation>
     </message>
     <message id="sortie-node-battle-failure-transport-read">
         <location filename="../Server/server_battle.cpp" line="775"/>
-        <location filename="../Server/server_battle.cpp" line="1345"/>
+        <location filename="../Server/server_battle.cpp" line="1351"/>
         <source>User %1: transport node read failure!</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="sortie-node-battle-failure-transport-clear">
-        <location filename="../Server/server_battle.cpp" line="1374"/>
+        <location filename="../Server/server_battle.cpp" line="1380"/>
         <source>User %1: transport node clear failure!</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2503,31 +2503,31 @@ Great at battle and bad at politics--so cool!</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="ship-drop-illegal">
-        <location filename="../Server/server_battle.cpp" line="1398"/>
+        <location filename="../Server/server_battle.cpp" line="1404"/>
         <source>Attempt to drop invalid ship %1!</source>
         <translation type="unfinished">试图掉落无效舰船%1！</translation>
     </message>
     <message id="ship-drop-db-fail">
-        <location filename="../Server/server_battle.cpp" line="1411"/>
+        <location filename="../Server/server_battle.cpp" line="1417"/>
         <source>User %1: refresh database failure when drop ship %2!</source>
         <translation type="unfinished">用户%1：掉落舰船%2时刷新数据库失败！</translation>
     </message>
     <message id="add-ship-exp-failre">
-        <location filename="../Server/server_battle.cpp" line="1452"/>
-        <location filename="../Server/server_battle.cpp" line="1470"/>
-        <location filename="../Server/server_battle.cpp" line="1484"/>
-        <location filename="../Server/server_battle.cpp" line="1513"/>
-        <location filename="../Server/server_battle.cpp" line="1529"/>
+        <location filename="../Server/server_battle.cpp" line="1458"/>
+        <location filename="../Server/server_battle.cpp" line="1476"/>
+        <location filename="../Server/server_battle.cpp" line="1490"/>
+        <location filename="../Server/server_battle.cpp" line="1519"/>
+        <location filename="../Server/server_battle.cpp" line="1535"/>
         <source>User %1: add ship exp failure!</source>
         <translation type="unfinished">用户%1：添加舰船经验失败！</translation>
     </message>
     <message id="rank-add-exp-failed">
-        <location filename="../Server/server_battle.cpp" line="1547"/>
+        <location filename="../Server/server_battle.cpp" line="1553"/>
         <source>User %1: add ranking exp failed!</source>
         <translation type="unfinished">用户%1：添加排名经验失败！</translation>
     </message>
     <message id="virtual-add-exp-failed">
-        <location filename="../Server/server_battle.cpp" line="1582"/>
+        <location filename="../Server/server_battle.cpp" line="1588"/>
         <source>User %1: add virtual exp failed!</source>
         <translation type="unfinished">用户%1：添加虚拟经验失败！</translation>
     </message>
@@ -2884,53 +2884,53 @@ Great at battle and bad at politics--so cool!</source>
         <translation type="unfinished">创建rARD订单数据库失败。</translation>
     </message>
     <message id="sortie-start-failure-dock">
-        <location filename="../Server/server_battle.cpp" line="1818"/>
+        <location filename="../Server/server_battle.cpp" line="1824"/>
         <source>User %1: start map %2 failure due to uncertain docks!</source>
         <translation type="unfinished">用户%1：出击海域%2失败，船坞状态不确定！</translation>
     </message>
     <message id="sortie-start-failure-supply">
-        <location filename="../Server/server_battle.cpp" line="1842"/>
+        <location filename="../Server/server_battle.cpp" line="1848"/>
         <source>User %1: start map %2 failure due to uncertain supply!</source>
         <translation type="unfinished">用户%1：出击海域%2失败，补给状态不确定！</translation>
     </message>
     <message id="sortie-start-failure-rescheck">
-        <location filename="../Server/server_battle.cpp" line="1893"/>
+        <location filename="../Server/server_battle.cpp" line="1899"/>
         <source>User %1: start map %2 failure due to resource check!</source>
         <translation type="unfinished">用户%1：出击海域%2失败，资源检查未通过！</translation>
     </message>
     <message id="sortie-start-failure">
-        <location filename="../Server/server_battle.cpp" line="1944"/>
+        <location filename="../Server/server_battle.cpp" line="1950"/>
         <source>User %1: start map %2 failure!</source>
         <translation type="unfinished">用户%1：出击海域%2失败！</translation>
     </message>
     <message id="sortie-start-failure-node">
-        <location filename="../Server/server_battle.cpp" line="1958"/>
+        <location filename="../Server/server_battle.cpp" line="1964"/>
         <source>User %1: start map %2 node %3 failure!</source>
         <translation type="unfinished">用户%1：出击海域%2节点%3失败！</translation>
     </message>
     <message id="sortie-start-failure-index">
-        <location filename="../Server/server_battle.cpp" line="1973"/>
+        <location filename="../Server/server_battle.cpp" line="1979"/>
         <source>User %1: fleet index %2 start sortie failure!</source>
         <translation type="unfinished">用户%1：第%2舰队出击失败！</translation>
     </message>
     <message id="sortie-start-failure-general">
-        <location filename="../Server/server_battle.cpp" line="1988"/>
-        <location filename="../Server/server_battle.cpp" line="2005"/>
+        <location filename="../Server/server_battle.cpp" line="1994"/>
+        <location filename="../Server/server_battle.cpp" line="2011"/>
         <source>User %1: start sortie failure!</source>
         <translation type="unfinished">用户%1：出击失败！</translation>
     </message>
     <message id="sortie-start-failure-freight-clear">
-        <location filename="../Server/server_battle.cpp" line="2021"/>
+        <location filename="../Server/server_battle.cpp" line="2027"/>
         <source>User %1: clear freight at sortie start failure!</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="lua-error-branch">
-        <location filename="../Server/server_battle.cpp" line="2034"/>
+        <location filename="../Server/server_battle.cpp" line="2040"/>
         <source>Map %1 lua file has failed to run: %2</source>
         <translation type="unfinished">无</translation>
     </message>
     <message id="dbfail-map-supremacies">
-        <location filename="../Server/server_battle.cpp" line="2063"/>
+        <location filename="../Server/server_battle.cpp" line="2069"/>
         <source>Database failed when reading map supremacies!</source>
         <translation type="unfinished">读取海域制海权时数据库出错！</translation>
     </message>
@@ -3378,35 +3378,35 @@ Great at battle and bad at politics--so cool!</source>
     </message>
     <message id="diff-c">
         <location filename="../ClientGUI/ui/sortie/maprender.cpp" line="56"/>
-        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="87"/>
-        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="241"/>
-        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="268"/>
+        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="88"/>
+        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="242"/>
+        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="269"/>
         <source>Early</source>
         <translation>丙</translation>
     </message>
     <message id="diff-b">
         <location filename="../ClientGUI/ui/sortie/maprender.cpp" line="59"/>
-        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="89"/>
-        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="170"/>
-        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="244"/>
-        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="271"/>
+        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="90"/>
+        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="171"/>
+        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="245"/>
+        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="272"/>
         <source>Medium</source>
         <translation>乙</translation>
     </message>
     <message id="diff-a">
         <location filename="../ClientGUI/ui/sortie/maprender.cpp" line="62"/>
-        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="91"/>
-        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="173"/>
-        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="247"/>
-        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="274"/>
+        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="92"/>
+        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="174"/>
+        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="248"/>
+        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="275"/>
         <source>Late</source>
         <translation>甲</translation>
     </message>
     <message id="diff-s">
         <location filename="../ClientGUI/ui/sortie/maprender.cpp" line="65"/>
-        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="174"/>
-        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="251"/>
-        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="277"/>
+        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="175"/>
+        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="252"/>
+        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="278"/>
         <source>Historical</source>
         <translation type="unfinished">史</translation>
     </message>
@@ -3417,7 +3417,7 @@ Great at battle and bad at politics--so cool!</source>
     </message>
     <message id="fleet-not-ready">
         <location filename="../ClientGUI/ui/maintenance/repair.cpp" line="203"/>
-        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="289"/>
+        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="290"/>
         <source>Please prepare your fleet in fleet view!</source>
         <translation type="unfinished">请先在编成页面准备你的舰队！</translation>
     </message>
@@ -3427,52 +3427,52 @@ Great at battle and bad at politics--so cool!</source>
         <translation type="unfinished">舰船无需修理。</translation>
     </message>
     <message id="fleet-empty">
-        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="306"/>
+        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="307"/>
         <source>Fleet is empty.</source>
         <translation type="unfinished">舰队为空。</translation>
     </message>
     <message id="disaster-los-check">
-        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="342"/>
+        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="343"/>
         <source>LOS check: required %1, fleet %2, chance to avoid %3%</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="disaster-deduction-occurred">
-        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="346"/>
+        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="347"/>
         <source>Fuel/ammo deducted: %1% fuel, %2% ammo</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="disaster-deduction-avoided">
-        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="351"/>
+        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="352"/>
         <source>LOS check succeeded! No resources deducted.</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="transport-freight-info">
-        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="360"/>
+        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="361"/>
         <source>Freight transport: current %1, capacity %2, added %3</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="continue-map">
-        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="382"/>
+        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="390"/>
         <source>Do you want to continue map progress?</source>
         <translation type="unfinished">是否继续推进海域？</translation>
     </message>
     <message id="sortie-end">
-        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="396"/>
+        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="404"/>
         <source>This sortie ended successfully.</source>
         <translation type="unfinished">本次出击圆满结束。</translation>
     </message>
     <message id="empty-node-no-battle">
-        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="427"/>
+        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="435"/>
         <source>No enemies found. It&apos;s just my imagination.</source>
         <translation type="unfinished">未发现敌人。只是我的错觉罢了。</translation>
     </message>
     <message id="choice-node-prompt">
-        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="430"/>
+        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="438"/>
         <source>Admiral, please can choose your next step freely.</source>
         <translation type="unfinished">提督，请自由选择下一步行动。</translation>
     </message>
     <message id="fleet-move-error">
-        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="467"/>
+        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="475"/>
         <source>Fleet move failed!</source>
         <translation type="unfinished">舰队移动失败！</translation>
     </message>
@@ -4164,17 +4164,17 @@ Great at battle and bad at politics--so cool!</source>
         <translation type="unfinished">各海域制海权每分钟资源收入明细</translation>
     </message>
     <message id="supply-attrition-home">
-        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="203"/>
+        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="204"/>
         <source>0% (home port)</source>
         <translation type="unfinished">0%（母港）</translation>
     </message>
     <message id="supply-attrition-no-route">
-        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="190"/>
+        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="191"/>
         <source>N/A (no route)</source>
         <translation type="unfinished">N/A（无路线）</translation>
     </message>
     <message id="supply-attrition-broken">
-        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="196"/>
+        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="197"/>
         <source>∞ (supply line broken)</source>
         <translation type="unfinished">∞（补给线断绝）</translation>
     </message>
@@ -4212,6 +4212,115 @@ Great at battle and bad at politics--so cool!</source>
         <location filename="../ClientGUI/ui/fleet/shipattrdialog.cpp" line="380"/>
         <source>Lv Progress</source>
         <translation>等级进度</translation>
+    </message>
+    <message id="battle-result-ship">
+        <location filename="../ClientGUI/ui/sortie/battleresultdialog.cpp" line="25"/>
+        <source>Ship</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="battle-result-hp-before">
+        <location filename="../ClientGUI/ui/sortie/battleresultdialog.cpp" line="27"/>
+        <location filename="../ClientGUI/ui/sortie/battleresultdialog.cpp" line="51"/>
+        <source>HP Before</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="battle-result-hp-after">
+        <location filename="../ClientGUI/ui/sortie/battleresultdialog.cpp" line="29"/>
+        <location filename="../ClientGUI/ui/sortie/battleresultdialog.cpp" line="53"/>
+        <source>HP After</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="battle-result-hp-change">
+        <location filename="../ClientGUI/ui/sortie/battleresultdialog.cpp" line="31"/>
+        <location filename="../ClientGUI/ui/sortie/battleresultdialog.cpp" line="55"/>
+        <source>HP Change</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="battle-result-plane-loss-1">
+        <location filename="../ClientGUI/ui/sortie/battleresultdialog.cpp" line="33"/>
+        <location filename="../ClientGUI/ui/sortie/battleresultdialog.cpp" line="57"/>
+        <source>Plane Loss Slot 1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="battle-result-plane-loss-2">
+        <location filename="../ClientGUI/ui/sortie/battleresultdialog.cpp" line="35"/>
+        <location filename="../ClientGUI/ui/sortie/battleresultdialog.cpp" line="59"/>
+        <source>Plane Loss Slot 2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="battle-result-plane-loss-3">
+        <location filename="../ClientGUI/ui/sortie/battleresultdialog.cpp" line="37"/>
+        <location filename="../ClientGUI/ui/sortie/battleresultdialog.cpp" line="61"/>
+        <source>Plane Loss Slot 3</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="battle-result-plane-loss-4">
+        <location filename="../ClientGUI/ui/sortie/battleresultdialog.cpp" line="39"/>
+        <location filename="../ClientGUI/ui/sortie/battleresultdialog.cpp" line="63"/>
+        <source>Plane Loss Slot 4</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="battle-result-plane-loss-5">
+        <location filename="../ClientGUI/ui/sortie/battleresultdialog.cpp" line="41"/>
+        <location filename="../ClientGUI/ui/sortie/battleresultdialog.cpp" line="65"/>
+        <source>Plane Loss Slot 5</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="battle-result-enemy-id">
+        <location filename="../ClientGUI/ui/sortie/battleresultdialog.cpp" line="49"/>
+        <source>Enemy Ship ID</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="battle-assm-s-victory">
+        <location filename="../ClientGUI/ui/sortie/battleresultdialog.cpp" line="92"/>
+        <source>S Victory</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="battle-assm-a-victory">
+        <location filename="../ClientGUI/ui/sortie/battleresultdialog.cpp" line="95"/>
+        <source>A Victory</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="battle-assm-b-victory">
+        <location filename="../ClientGUI/ui/sortie/battleresultdialog.cpp" line="98"/>
+        <source>B Victory</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="battle-assm-c-defeat">
+        <location filename="../ClientGUI/ui/sortie/battleresultdialog.cpp" line="101"/>
+        <source>C Defeat</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="battle-assm-d-defeat">
+        <location filename="../ClientGUI/ui/sortie/battleresultdialog.cpp" line="104"/>
+        <source>D Defeat</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="battle-assm-e-defeat">
+        <location filename="../ClientGUI/ui/sortie/battleresultdialog.cpp" line="107"/>
+        <source>E Defeat</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="battle-assm-unknown">
+        <location filename="../ClientGUI/ui/sortie/battleresultdialog.cpp" line="110"/>
+        <source>Unknown Result</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="battle-result-player-ship">
+        <location filename="../ClientGUI/ui/sortie/battleresultdialog.cpp" line="146"/>
+        <location filename="../ClientGUI/ui/sortie/battleresultdialog.cpp" line="150"/>
+        <source>Player Ship %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="battle-result-enemy-ship-id">
+        <location filename="../ClientGUI/ui/sortie/battleresultdialog.cpp" line="193"/>
+        <source>Enemy Ship #%1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="battle-result-enemy-ship-generic">
+        <location filename="../ClientGUI/ui/sortie/battleresultdialog.cpp" line="197"/>
+        <source>Enemy Ship %1</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4265,6 +4374,19 @@ Great at battle and bad at politics--so cool!</source>
         <location filename="../ClientGUI/ui/sortie/battleplan.ui" line="176"/>
         <source>Strive for rank S</source>
         <translation type="unfinished">争取S胜</translation>
+    </message>
+</context>
+<context>
+    <name>BattleResultDialog</name>
+    <message id="battle-result-title">
+        <location filename="../ClientGUI/ui/sortie/battleresultdialog.ui" line="6"/>
+        <source>Battle Results</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="battle-result-assessment-default">
+        <location filename="../ClientGUI/ui/sortie/battleresultdialog.ui" line="12"/>
+        <source>S Victory</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4927,7 +5049,7 @@ Great at battle and bad at politics--so cool!</source>
     </message>
     <message id="supremacy-value-na">
         <location filename="../ClientGUI/ui/sortie/sortie.ui" line="126"/>
-        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="225"/>
+        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="226"/>
         <source>N/A</source>
         <translation type="unfinished">不适用</translation>
     </message>
@@ -4938,7 +5060,7 @@ Great at battle and bad at politics--so cool!</source>
     </message>
     <message id="supply-attrition-na">
         <location filename="../ClientGUI/ui/sortie/sortie.ui" line="153"/>
-        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="164"/>
+        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="165"/>
         <source>N/A</source>
         <translation type="unfinished">N/A</translation>
     </message>
@@ -4949,7 +5071,7 @@ Great at battle and bad at politics--so cool!</source>
     </message>
     <message id="selected-map-id">
         <location filename="../ClientGUI/ui/sortie/sortie.ui" line="99"/>
-        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="398"/>
+        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="406"/>
         <source>None</source>
         <translation type="unfinished">无</translation>
     </message>
