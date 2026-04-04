@@ -18,6 +18,7 @@
 #include "../fleet/fleetview.h"
 #include "../fleet/segmentedhpbar.h"
 #include "../../Protocol/ship.h"
+#include "../../clientv2.h"
 #include "../mainwindow.h"
 #include "../../../Protocol/kp.h"
 
@@ -188,6 +189,44 @@ void ConfirmSortie::populateBattleResult(const QJsonObject &battleProcess)
     QJsonArray enemyPlanesAfter = enemyAfter["planes"].toArray();
     QJsonArray enemyShipIds = battleProcess["enemyShipIds"].toArray();
     
+    // Set assessment label
+    if(m_assessmentLabel) {
+        int assmValue = battleProcess["assm"].toInt(0);
+        KP::BattleAssessment assm = static_cast<KP::BattleAssessment>(assmValue);
+        QString assessmentText;
+        switch(assm) {
+        case KP::SVictory:
+            //% "S Victory"
+            assessmentText = qtTrId("battle-assm-s-victory");
+            break;
+        case KP::AVictory:
+            //% "A Victory"
+            assessmentText = qtTrId("battle-assm-a-victory");
+            break;
+        case KP::BVictory:
+            //% "B Victory"
+            assessmentText = qtTrId("battle-assm-b-victory");
+            break;
+        case KP::CDefeat:
+            //% "C Defeat"
+            assessmentText = qtTrId("battle-assm-c-defeat");
+            break;
+        case KP::DDefeat:
+            //% "D Defeat"
+            assessmentText = qtTrId("battle-assm-d-defeat");
+            break;
+        case KP::EDefeat:
+            //% "E Defeat"
+            assessmentText = qtTrId("battle-assm-e-defeat");
+            break;
+        default:
+            //% "Unknown Result"
+            assessmentText = qtTrId("battle-assm-unknown");
+            break;
+        }
+        m_assessmentLabel->setText(assessmentText);
+    }
+    
     // Get fleet view for player ship names and max HP
     FleetView *fleetView = nullptr;
     for(auto *widget: QApplication::topLevelWidgets()) {
@@ -218,10 +257,11 @@ void ConfirmSortie::populateBattleResult(const QJsonObject &battleProcess)
         }
         
         // Plane losses
-        QVector<int> planeLosses(5, 0);
+        QVector<int> planeLosses(KP::maxEquipSlots, 0);
         QJsonArray planesBefore = playerPlanesBefore[i].toArray();
         QJsonArray planesAfter = playerPlanesAfter[i].toArray();
-        for(int slot = 0; slot < 5 && slot < planesBefore.size() && slot < planesAfter.size(); ++slot) {
+        for(int slot = 0; slot < KP::maxEquipSlots && slot < planesBefore.size()
+             && slot < planesAfter.size(); ++slot) {
             int beforeSlot = planesBefore[slot].toInt(0);
             int afterSlot = planesAfter[slot].toInt(0);
             int loss = beforeSlot - afterSlot;
@@ -237,26 +277,35 @@ void ConfirmSortie::populateBattleResult(const QJsonObject &battleProcess)
     }
     
     // Enemy ships
+    Client &engine = Client::getInstance();
     int enemyRows = enemyHPBefore.size();
     for(int i = 0; i < enemyRows; ++i) {
         int hpBefore = enemyHPBefore[i].toInt(1);
         int hpAfter = enemyHPAfter[i].toInt(1);
         int totalHP = hpBefore; // enemy ships start at full HP
-        QString enemyIdStr;
+        QString enemyName;
         if(i < enemyShipIds.size()) {
-            //% "Enemy Ship #%1"
-            enemyIdStr = qtTrId("battle-result-enemy-ship-id")
-                         .arg(enemyShipIds[i].toInt());
+            int enemyShipId = enemyShipIds[i].toInt();
+            if(Ship *enemyShip = engine.getShipReg(enemyShipId)) {
+                enemyName = enemyShip->toString();
+                // Try to get total HP from ship definition
+                totalHP = enemyShip->attr.value("Hitpoints", hpBefore);
+            } else {
+                //% "Enemy Ship #%1"
+                enemyName = qtTrId("battle-result-enemy-ship-id")
+                             .arg(enemyShipId);
+            }
         } else {
             //% "Enemy Ship %1"
-            enemyIdStr = qtTrId("battle-result-enemy-ship-generic").arg(i+1);
+            enemyName = qtTrId("battle-result-enemy-ship-generic").arg(i+1);
         }
         
         // Plane losses
-        QVector<int> planeLosses(5, 0);
+        QVector<int> planeLosses(KP::maxEquipSlots, 0);
         QJsonArray planesBefore = enemyPlanesBefore[i].toArray();
         QJsonArray planesAfter = enemyPlanesAfter[i].toArray();
-        for(int slot = 0; slot < 5 && slot < planesBefore.size() && slot < planesAfter.size(); ++slot) {
+        for(int slot = 0; slot < KP::maxEquipSlots && slot < planesBefore.size()
+             && slot < planesAfter.size(); ++slot) {
             int beforeSlot = planesBefore[slot].toInt(0);
             int afterSlot = planesAfter[slot].toInt(0);
             int loss = beforeSlot - afterSlot;
@@ -265,7 +314,7 @@ void ConfirmSortie::populateBattleResult(const QJsonObject &battleProcess)
         }
         
         BattleResultShipDisplay *display = new BattleResultShipDisplay(m_enemyContainer,
-                                                                       i, enemyIdStr,
+                                                                       i, enemyName,
                                                                        hpBefore, hpAfter,
                                                                        totalHP, planeLosses);
         m_enemyLayout->addWidget(display);
