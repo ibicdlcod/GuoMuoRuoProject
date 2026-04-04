@@ -340,6 +340,32 @@ void EquipView::activate(bool arsenal, bool isEquip,
                this, nullptr);
 
     Client &engine = Client::getInstance();
+    
+    // Clear or apply fleet filter based on view
+    bool isAnchorage = (custom == KP::Anchorage);
+    if(isAnchorage) {
+        // Apply saved fleet filter when entering anchorage view
+        int savedFilter = settings->value("AnchorageFleetFilter", -100).toInt();
+        std::optional<int> filterValue;
+        if(savedFilter == -100) {
+            filterValue = std::nullopt;
+        } else {
+            filterValue = savedFilter;
+        }
+        engine.shipModel.setFleetFilter(filterValue);
+    } else {
+        // Clear fleet filter when leaving anchorage view
+        engine.shipModel.setFleetFilter(std::nullopt);
+    }
+    
+    // Set fleet filter button visibility
+    fleetRadioAll->setVisible(isAnchorage);
+    fleetRadio1->setVisible(isAnchorage);
+    fleetRadio2->setVisible(isAnchorage);
+    fleetRadio3->setVisible(isAnchorage);
+    fleetRadio4->setVisible(isAnchorage);
+    fleetRadioUnassigned->setVisible(isAnchorage);
+    
     disconnect(model, SIGNAL(needReCalculateRows()),
                this, SLOT(recalculateArsenalRows()));
     disconnect(this, SIGNAL(rowCountHint(int)),
@@ -484,12 +510,6 @@ void EquipView::activate(bool arsenal, bool isEquip,
                 shipSelect->decorateButton->show();
                 shipSelect->supplyButton->setVisible(isAnchorage);
                 shipSelect->supplyAllButton->setVisible(isAnchorage);
-                fleetRadioAll->setVisible(isAnchorage);
-                fleetRadio1->setVisible(isAnchorage);
-                fleetRadio2->setVisible(isAnchorage);
-                fleetRadio3->setVisible(isAnchorage);
-                fleetRadio4->setVisible(isAnchorage);
-                fleetRadioUnassigned->setVisible(isAnchorage);
                 if(isAnchorage) {
                     connect(
                         shipSelect,
