@@ -1101,6 +1101,109 @@ const QJsonObject Server::processBattleCore(const CSteamID &uid,
         }
     } // if(playerFleet)
     
+    // Compute battle assessment
+    KP::BattleAssessment assessment = KP::SVictory; // default
+    
+    // Extract before HP arrays
+    QJsonArray playerHPBefore = playerBefore["hp"].toArray();
+    QJsonArray enemyHPBefore = enemyBefore["hp"].toArray();
+    
+    // Get after HP arrays from updated fleets
+    QJsonArray playerHPAfter;
+    QJsonArray enemyHPAfter;
+    if(playerFleet) {
+        playerHPAfter = hpArray(*playerFleet);
+    } else {
+        playerHPAfter = playerHPBefore; // dummy unchanged
+    }
+    enemyHPAfter = hpArray(enemyFleet);
+    
+    // Compute totals
+    double totalPlayerHPBefore = 0.0;
+    for(const auto &hp : playerHPBefore) {
+        totalPlayerHPBefore += hp.toDouble();
+    }
+    double totalPlayerHPAfter = 0.0;
+    for(const auto &hp : playerHPAfter) {
+        totalPlayerHPAfter += hp.toDouble();
+    }
+    double totalEnemyHPBefore = 0.0;
+    for(const auto &hp : enemyHPBefore) {
+        totalEnemyHPBefore += hp.toDouble();
+    }
+    double totalEnemyHPAfter = 0.0;
+    for(const auto &hp : enemyHPAfter) {
+        totalEnemyHPAfter += hp.toDouble();
+    }
+    
+    // Compute damage
+    double playerDamage = std::max(0.0, totalPlayerHPBefore
+                                    - totalPlayerHPAfter);
+    double enemyDamage = std::max(0.0, totalEnemyHPBefore
+                                  - totalEnemyHPAfter);
+    
+    // Compute damage percentages (avoid division by zero)
+    double playerDamagePercentage = 0.0;
+    if(totalPlayerHPBefore > 0.0) {
+        playerDamagePercentage = (playerDamage / totalPlayerHPBefore) * 100.0;
+    }
+    double enemyDamagePercentage = 0.0;
+    if(totalEnemyHPBefore > 0.0) {
+        enemyDamagePercentage = (enemyDamage / totalEnemyHPBefore) * 100.0;
+    }
+    
+    // Count enemy ships sunk (HP <= 0)
+    int enemyShipsSunk = 0;
+    int totalEnemyShips = enemyHPAfter.size();
+    for(const auto &hp : enemyHPAfter) {
+        if(hp.toDouble() <= 0.0) {
+            ++enemyShipsSunk;
+        }
+    }
+    
+    // Check flagship sunk (position 0)
+    bool flagshipSunk = false;
+    if(totalEnemyShips > 0 && enemyHPAfter[0].toDouble() <= 0.0) {
+        flagshipSunk = true;
+    }
+    
+    // Special case: some nodes lack enemies (dummy HP 1)
+    // If enemy fleet is dummy (size 1 with HP 1), treat as all sunk
+    bool enemyIsDummy = (totalEnemyShips == 1 && totalEnemyHPBefore == 1.0);
+    
+    // Apply assessment rules
+    if(enemyIsDummy || enemyShipsSunk == totalEnemyShips) {
+        // All enemy sunk (or dummy enemy)
+        assessment = KP::SVictory;
+    } else if(enemyShipsSunk > totalEnemyShips / 2) {
+        // More than 50% enemy ships sunk
+        assessment = KP::AVictory;
+    } else if(flagshipSunk
+              || enemyDamagePercentage > 2.5 * playerDamagePercentage) {
+        // Flagship sunk OR enemy damage percentage > 2.5× player's
+        assessment = KP::BVictory;
+    } else if(playerDamage == 0.0 && enemyDamage == 0.0) {
+        // Special case: both damages zero
+        assessment = KP::CDefeat;
+    } else if(enemyDamagePercentage > 1.0 * playerDamagePercentage) {
+        // 2.5× player's >= enemy damage > 1× player's
+        assessment = KP::CDefeat;
+    } else if(enemyDamagePercentage > 0.4 * playerDamagePercentage) {
+        // 1× player's >= enemy damage > 0.4× player's
+        assessment = KP::DDefeat;
+    } else {
+        // enemy damage <= 0.4× player's
+        assessment = KP::EDefeat;
+    }
+    
+    // Set assessment in result
+    result["assm"] = static_cast<int>(assessment);
+    qInfo() << "Battle assessment:" << assessment
+             << "playerDamage%" << playerDamagePercentage
+             << "enemyDamage%" << enemyDamagePercentage
+             << "enemyShipsSunk" << enemyShipsSunk
+             << "/" << totalEnemyShips << "flagshipSunk" << flagshipSunk;
+    
     // Build "after" state with updated HP and planes
     QJsonObject after;
     QJsonObject playerAfter;
