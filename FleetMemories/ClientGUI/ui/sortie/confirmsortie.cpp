@@ -86,6 +86,8 @@ void ConfirmSortie::showBattleResult(const QJsonObject &battleProcess)
     populateBattleResult(battleProcess);
     //% "Battle Results"
     setWindowTitle(qtTrId("battle-result-title"));
+    // Ensure window is large enough to display at least 7 ships
+    setMinimumSize(800, 600);
 }
 
 void ConfirmSortie::clearBattleResultLayout()
@@ -280,7 +282,7 @@ void ConfirmSortie::populateBattleResult(const QJsonObject &battleProcess)
             planeLosses[slot] = loss;
         }
 
-        qCritical() << shipIconId << hpBefore << hpAfter << totalHP;
+
         BattleResultShipDisplay *display = new BattleResultShipDisplay(m_playerContainer,
                                                                        i, shipName,
                                                                        hpBefore, hpAfter,
@@ -297,7 +299,7 @@ void ConfirmSortie::populateBattleResult(const QJsonObject &battleProcess)
         int hpAfter = enemyHPAfter[i].toInt(1);
         int totalHP = hpBefore; // enemy ships start at full HP
         QString enemyName;
-        int shipLevel = 1;
+        int shipLevel = 0; // Don't show level for enemies
         int shipIconId = 0;
         if(i < enemyShipIds.size()) {
             int enemyShipId = enemyShipIds[i].toInt();

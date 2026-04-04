@@ -2,20 +2,20 @@
 <ui version="4.0" idbasedtr="true">
  <class>ConfirmSortie</class>
  <widget class="QDialog" name="ConfirmSortie">
-  <property name="geometry">
-   <rect>
-    <x>0</x>
-    <y>0</y>
-    <width>600</width>
-    <height>600</height>
-   </rect>
-  </property>
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>900</width>
+     <height>700</height>
+    </rect>
+   </property>
   <property name="windowTitle">
    <string id="confirm-sortie">Confirm Sortie</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_3">
-   <item>
-    <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,0,0,0,0,0">
+    <item stretch="0">
+     <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,0,0,0,0,0">
      <item>
       <spacer name="horizontalSpacer">
        <property name="orientation">
@@ -78,11 +78,11 @@
      </item>
     </layout>
    </item>
-   <item>
-    <layout class="QVBoxLayout" name="fleetLayout"/>
+    <item stretch="1">
+     <layout class="QVBoxLayout" name="fleetLayout"/>
    </item>
-   <item>
-    <widget class="QDialogButtonBox" name="buttonBox">
+    <item stretch="0">
+     <widget class="QDialogButtonBox" name="buttonBox">
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
      </property>

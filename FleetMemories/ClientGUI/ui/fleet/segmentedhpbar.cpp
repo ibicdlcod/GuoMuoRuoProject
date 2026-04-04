@@ -5,11 +5,16 @@
 
 #include <QApplication>
 #include <QPainter>
+#include <QPainterPath>
+#include <QSizePolicy>
 #include <QStyleHints>
 
 SegmentedHPBar::SegmentedHPBar(QWidget *parent)
     : QWidget(parent)
 {
+    setMinimumSize(200, 20);
+    setMaximumSize(400, 30);
+    setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
 }
 
 void SegmentedHPBar::setValues(int totalHP, int previousHP, int currentHP)
@@ -27,6 +32,7 @@ void SegmentedHPBar::paintEvent(QPaintEvent *event)
     
     int width = this->width();
     int height = this->height();
+    int radius = 4; // Slightly rounded corners
     
     // Ensure valid values
     if(m_totalHP <= 0) m_totalHP = 1;
@@ -47,29 +53,57 @@ void SegmentedHPBar::paintEvent(QPaintEvent *event)
         missingWidth += width - totalWidth;
     }
     
-    // Draw missing HP segment (empty, background)
-    QRect missingRect(0, 0, missingWidth, height);
-    painter.fillRect(missingRect, palette().color(QPalette::Base));
+    // Draw background rounded rectangle (for missing HP area)
+    QPainterPath backgroundPath;
+    backgroundPath.addRoundedRect(0, 0, width, height, radius, radius);
+    painter.fillPath(backgroundPath, palette().color(QPalette::Base));
     
-    // Draw damage segment (purple)
-    QRect damageRect(missingWidth, 0, damageWidth, height);
-    painter.fillRect(damageRect, QColor(128, 0, 128)); // purple
-    
-    // Draw current HP segment (colored based on ratio)
-    QRect currentRect(missingWidth + damageWidth, 0, currentWidth, height);
-    double ratio = static_cast<double>(m_currentHP) / m_totalHP;
-    QColor hpCol;
-    switch (QApplication::styleHints()->colorScheme()) {
-    case Qt::ColorScheme::Dark:
-        hpCol = QColor::fromHsv(static_cast<int>(ratio * 120.0), 255, 128);
-        break;
-    default:
-        hpCol = QColor::fromHsv(static_cast<int>(ratio * 120.0), 128, 255);
-        break;
+    // Draw current HP segment (colored based on ratio) with right-side rounded corners if it's the only segment
+    if(currentWidth > 0) {
+        QPainterPath currentPath;
+        int currentStart = missingWidth + damageWidth;
+        if(currentStart == 0 && currentWidth == width) {
+            // Full width - draw with all corners rounded
+            currentPath.addRoundedRect(0, 0, currentWidth, height, radius, radius);
+        } else if(currentStart == 0) {
+            // Starts at left edge - left corners rounded
+            currentPath.moveTo(0, radius);
+            currentPath.arcTo(0, 0, 2*radius, 2*radius, 180, -90);
+            currentPath.lineTo(currentWidth, 0);
+            currentPath.lineTo(currentWidth, height);
+            currentPath.lineTo(radius, height);
+            currentPath.arcTo(0, height-2*radius, 2*radius, 2*radius, 90, -90);
+            currentPath.closeSubpath();
+        } else if(currentStart + currentWidth == width) {
+            // Ends at right edge - right corners rounded
+            currentPath.moveTo(currentStart, 0);
+            currentPath.lineTo(width - radius, 0);
+            currentPath.arcTo(width-2*radius, 0, 2*radius, 2*radius, 90, 90);
+            currentPath.lineTo(width, height-radius);
+            currentPath.arcTo(width-2*radius, height-2*radius, 2*radius, 2*radius, 0, 90);
+            currentPath.lineTo(currentStart, height);
+            currentPath.closeSubpath();
+        } else {
+            // Middle segment - no rounded corners
+            currentPath.addRect(currentStart, 0, currentWidth, height);
+        }
+        
+        double ratio = static_cast<double>(m_currentHP) / m_totalHP;
+        QColor hpCol;
+        switch (QApplication::styleHints()->colorScheme()) {
+        case Qt::ColorScheme::Dark:
+            hpCol = QColor::fromHsv(static_cast<int>(ratio * 120.0), 255, 128);
+            break;
+        default:
+            hpCol = QColor::fromHsv(static_cast<int>(ratio * 120.0), 128, 255);
+            break;
+        }
+        painter.fillPath(currentPath, hpCol);
     }
-    painter.fillRect(currentRect, hpCol);
     
-    // Draw border
-    painter.setPen(palette().color(QPalette::Text));
-    painter.drawRect(0, 0, width - 1, height - 1);
+    // Draw damage segment (purple) - typically middle segment, no rounded corners
+    if(damageWidth > 0) {
+        QRect damageRect(missingWidth, 0, damageWidth, height);
+        painter.fillRect(damageRect, QColor(128, 0, 128)); // purple
+    }
 }
