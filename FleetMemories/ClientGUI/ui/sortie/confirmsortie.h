@@ -15,7 +15,7 @@
 
 class QSplitter;
 class QScrollArea;
-class QVBoxLayout;
+class QGridLayout;
 class QLabel;
 
 #include "../fleet/fleetview.h"
@@ -50,8 +50,8 @@ private:
     QScrollArea *m_enemyScroll;
     QWidget *m_playerContainer;
     QWidget *m_enemyContainer;
-    QVBoxLayout *m_playerLayout;
-    QVBoxLayout *m_enemyLayout;
+    QGridLayout *m_playerLayout;
+    QGridLayout *m_enemyLayout;
     QLabel *m_assessmentLabel;
 };
 

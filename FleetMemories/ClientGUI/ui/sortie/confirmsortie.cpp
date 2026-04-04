@@ -1,7 +1,7 @@
 #include "confirmsortie.h"
 
 #include <QApplication>
-#include <QHeaderView>
+#include <QGridLayout>
 #include <QHBoxLayout>
 #include <QJsonArray>
 #include <QJsonObject>
@@ -10,16 +10,15 @@
 #include <QPushButton>
 #include <QScrollArea>
 #include <QSplitter>
-#include <QTableWidget>
 #include <QVBoxLayout>
 #include <QVector>
 #include <algorithm>
 
-#include "../fleet/battleresultshipdisplay.h"
 #include "../fleet/fleetview.h"
 #include "../fleet/segmentedhpbar.h"
 #include "../../Protocol/ship.h"
 #include "../../clientv2.h"
+#include "../../equipicon.h"
 #include "../mainwindow.h"
 #include "../../../Protocol/kp.h"
 
@@ -86,8 +85,10 @@ void ConfirmSortie::showBattleResult(const QJsonObject &battleProcess)
     populateBattleResult(battleProcess);
     //% "Battle Results"
     setWindowTitle(qtTrId("battle-result-title"));
-    // Ensure window is large enough to display at least 7 ships
-    setMinimumSize(800, 600);
+    // icon(40) + hpBar(100) fixed per panel; name col gets remaining space.
+    // 2 panels × (margins(8) + spacing(18) + 40 + 100 + buttonHint(80)) + splitter(8)
+    const int panelFixedW = 8 + 3 * 6 + 40 + 100 + 80; // ~266
+    setMinimumSize(2 * panelFixedW + 8, 480);
 }
 
 void ConfirmSortie::clearBattleResultLayout()
@@ -137,23 +138,21 @@ void ConfirmSortie::createBattleResultLayout()
     
     m_playerScroll = new QScrollArea(this);
     m_playerContainer = new QWidget(this);
-    m_playerLayout = new QVBoxLayout(m_playerContainer);
+    m_playerLayout = new QGridLayout(m_playerContainer);
+    m_playerLayout->setColumnStretch(1, 1);
     m_playerScroll->setWidget(m_playerContainer);
     m_playerScroll->setWidgetResizable(true);
-    m_playerScroll->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     m_playerScroll->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
-    m_playerContainer->setMinimumWidth(0);
     //% "Player Fleet"
     m_playerScroll->setWindowTitle(qtTrId("battle-result-player-fleet"));
-    
+
     m_enemyScroll = new QScrollArea(this);
     m_enemyContainer = new QWidget(this);
-    m_enemyLayout = new QVBoxLayout(m_enemyContainer);
+    m_enemyLayout = new QGridLayout(m_enemyContainer);
+    m_enemyLayout->setColumnStretch(1, 1);
     m_enemyScroll->setWidget(m_enemyContainer);
     m_enemyScroll->setWidgetResizable(true);
-    m_enemyScroll->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     m_enemyScroll->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
-    m_enemyContainer->setMinimumWidth(0);
     //% "Enemy Fleet"
     m_enemyScroll->setWindowTitle(qtTrId("battle-result-enemy-fleet"));
     
@@ -165,7 +164,7 @@ void ConfirmSortie::createBattleResultLayout()
 
     ui->fleetLayout->setStretch(0, 0);
     ui->fleetLayout->setStretch(1, 1);
-    ui->fleetLayout->setSpacing(0);
+    ui->fleetLayout->setSpacing(6);
 }
 
 void ConfirmSortie::populateBattleResult(const QJsonObject &battleProcess)
@@ -175,11 +174,11 @@ void ConfirmSortie::populateBattleResult(const QJsonObject &battleProcess)
     }
     
     // Clear existing widgets
-    while(QLayoutItem *item = m_playerLayout->takeAt(0)) {
+    while (QLayoutItem *item = m_playerLayout->takeAt(0)) {
         delete item->widget();
         delete item;
     }
-    while(QLayoutItem *item = m_enemyLayout->takeAt(0)) {
+    while (QLayoutItem *item = m_enemyLayout->takeAt(0)) {
         delete item->widget();
         delete item;
     }
@@ -251,106 +250,129 @@ void ConfirmSortie::populateBattleResult(const QJsonObject &battleProcess)
         }
     }
     
+    auto addShipRow = [](QGridLayout *grid, QWidget *container,
+                          int row, const QString &shipName, int shipLevel,
+                          int shipIconId, int hpBefore, int hpAfter, int totalHP,
+                          const QVector<int> &planesBefore, const QVector<int> &planesAfter,
+                          bool inverted) {
+        QLabel *iconLabel = new QLabel(container);
+        QPixmap icon = Icute::shipIcon(shipIconId);
+        if (!icon.isNull())
+            iconLabel->setPixmap(icon.scaled(40, 40,
+                                             Qt::KeepAspectRatio,
+                                             Qt::SmoothTransformation));
+        iconLabel->setFixedSize(40, 40);
+        grid->addWidget(iconLabel, row, 0);
+
+        QString nameText = shipName;
+        if (shipLevel > 0)
+            nameText += QString(" (Lv %1)").arg(shipLevel);
+        QLabel *nameLabel = new QLabel(nameText, container);
+        nameLabel->setMinimumWidth(0);
+        grid->addWidget(nameLabel, row, 1);
+
+        SegmentedHPBar *hpBar = new SegmentedHPBar(container);
+        hpBar->setValues(totalHP, hpBefore, hpAfter);
+        hpBar->setInverted(inverted);
+        grid->addWidget(hpBar, row, 2, Qt::AlignVCenter);
+
+        QPushButton *planeButton = new QPushButton(container);
+        //% "Planes"
+        planeButton->setText(qtTrId("battle-result-plane-button"));
+        QString capturedName   = shipName;
+        QVector<int> capturedBefore = planesBefore;
+        QVector<int> capturedAfter  = planesAfter;
+        //% "Plane counts for %1:"
+        QString trCountsFor  = qtTrId("battle-result-plane-counts-for");
+        //% "Slot %1: %2/%3"
+        QString trSlotCount  = qtTrId("battle-result-plane-slot-count");
+        //% "Plane Details"
+        QString trTitle      = qtTrId("battle-result-plane-details-title");
+        QObject::connect(planeButton, &QPushButton::clicked,
+                         planeButton, [capturedName, capturedBefore, capturedAfter,
+                                       trCountsFor, trSlotCount, trTitle, planeButton]() {
+            QString msg = trCountsFor.arg(capturedName);
+            int slotCount = std::max(capturedBefore.size(), capturedAfter.size());
+            for (int s = 0; s < slotCount; ++s) {
+                int before = s < capturedBefore.size() ? capturedBefore[s] : 0;
+                int after  = s < capturedAfter.size()  ? capturedAfter[s]  : 0;
+                msg += "\n" + trSlotCount.arg(s + 1).arg(after).arg(before);
+            }
+            QMessageBox::information(planeButton, trTitle, msg);
+        });
+        grid->addWidget(planeButton, row, 3);
+    };
+
     // Player ships
     int playerRows = playerHPBefore.size();
-    for(int i = 0; i < playerRows; ++i) {
+    for (int i = 0; i < playerRows; ++i) {
         int hpBefore = playerHPBefore[i].toInt(1);
-        int hpAfter = playerHPAfter[i].toInt(1);
-        int totalHP = hpBefore; // default, will try to get from Ship
+        int hpAfter  = playerHPAfter[i].toInt(1);
+        int totalHP  = hpBefore;
         QString shipName;
-        int shipLevel = 1;
+        int shipLevel  = 1;
         int shipIconId = 0;
-        if(fleetView) {
-            if(Ship *ship = fleetView->getShip(i)) {
-                shipName = ship->toString();
-                totalHP = ship->attr.value("Hitpoints", hpBefore);
-                // Get icon ID
+        if (fleetView) {
+            if (Ship *ship = fleetView->getShip(i)) {
+                shipName   = ship->toString();
+                totalHP    = ship->attr.value("Hitpoints", hpBefore);
                 shipIconId = ship->attr.value("OldInternalNo.", 0);
-                // Get level from ship dynamic
-                if(ShipDynamic *shipDyn = fleetView->getShipDynamic(i)) {
-                    shipLevel = Ship::getLevel(std::min(shipDyn->exp, shipDyn->expCap));
-                }
+                if (ShipDynamic *dyn = fleetView->getShipDynamic(i))
+                    shipLevel = Ship::getLevel(std::min(dyn->exp, dyn->expCap));
             } else {
                 //% "Player Ship %1"
-                shipName = qtTrId("battle-result-player-ship").arg(i+1);
+                shipName = qtTrId("battle-result-player-ship").arg(i + 1);
             }
         } else {
             //% "Player Ship %1"
-            shipName = qtTrId("battle-result-player-ship").arg(i+1);
-        }
-        
-        // Plane losses
-        QVector<int> planeLosses(KP::maxEquipSlots, 0);
-        QJsonArray planesBefore = playerPlanesBefore[i].toArray();
-        QJsonArray planesAfter = playerPlanesAfter[i].toArray();
-        for(int slot = 0; slot < KP::maxEquipSlots && slot < planesBefore.size()
-             && slot < planesAfter.size(); ++slot) {
-            int beforeSlot = planesBefore[slot].toInt(0);
-            int afterSlot = planesAfter[slot].toInt(0);
-            int loss = beforeSlot - afterSlot;
-            if(loss < 0) loss = 0;
-            planeLosses[slot] = loss;
+            shipName = qtTrId("battle-result-player-ship").arg(i + 1);
         }
 
+        QJsonArray pb = playerPlanesBefore[i].toArray();
+        QJsonArray pa = playerPlanesAfter[i].toArray();
+        QVector<int> planesBefore(pb.size()), planesAfter(pa.size());
+        for (int s = 0; s < pb.size(); ++s) planesBefore[s] = pb[s].toInt(0);
+        for (int s = 0; s < pa.size(); ++s) planesAfter[s]  = pa[s].toInt(0);
 
-        BattleResultShipDisplay *display = new BattleResultShipDisplay(m_playerContainer,
-                                                                       i, shipName,
-                                                                       hpBefore, hpAfter,
-                                                                       totalHP, planeLosses,
-                                                                       shipLevel, shipIconId);
-        m_playerLayout->addWidget(display);
+        addShipRow(m_playerLayout, m_playerContainer, i,
+                   shipName, shipLevel, shipIconId, hpBefore, hpAfter, totalHP,
+                   planesBefore, planesAfter, true);
     }
-    
+    m_playerLayout->setRowStretch(playerRows, 1);
+
     // Enemy ships
     Client &engine = Client::getInstance();
     int enemyRows = enemyHPBefore.size();
-    for(int i = 0; i < enemyRows; ++i) {
-        int hpBefore = enemyHPBefore[i].toInt(1);
-        int hpAfter = enemyHPAfter[i].toInt(1);
-        int totalHP = hpBefore; // enemy ships start at full HP
+    for (int i = 0; i < enemyRows; ++i) {
+        int hpBefore  = enemyHPBefore[i].toInt(1);
+        int hpAfter   = enemyHPAfter[i].toInt(1);
+        int totalHP   = hpBefore;
         QString enemyName;
-        int shipLevel = 0; // Don't show level for enemies
         int shipIconId = 0;
-        if(i < enemyShipIds.size()) {
+        if (i < enemyShipIds.size()) {
             int enemyShipId = enemyShipIds[i].toInt();
-            if(Ship *enemyShip = engine.getShipReg(enemyShipId)) {
-                enemyName = enemyShip->toString();
-                // Try to get total HP from ship definition
-                totalHP = enemyShip->attr.value("Hitpoints", hpBefore);
-                // Get icon ID
-                shipIconId = enemyShip->attr.value("OldInternalNo.", 0);
+            if (Ship *s = engine.getShipReg(enemyShipId)) {
+                enemyName  = s->toString();
+                totalHP    = s->attr.value("Hitpoints", hpBefore);
+                shipIconId = s->attr.value("OldInternalNo.", 0);
             } else {
                 //% "Enemy Ship #%1"
-                enemyName = qtTrId("battle-result-enemy-ship-id")
-                             .arg(enemyShipId);
+                enemyName = qtTrId("battle-result-enemy-ship-id").arg(enemyShipId);
             }
         } else {
             //% "Enemy Ship %1"
-            enemyName = qtTrId("battle-result-enemy-ship-generic").arg(i+1);
+            enemyName = qtTrId("battle-result-enemy-ship-generic").arg(i + 1);
         }
-        
-        // Plane losses
-        QVector<int> planeLosses(KP::maxEquipSlots, 0);
-        QJsonArray planesBefore = enemyPlanesBefore[i].toArray();
-        QJsonArray planesAfter = enemyPlanesAfter[i].toArray();
-        for(int slot = 0; slot < KP::maxEquipSlots && slot < planesBefore.size()
-             && slot < planesAfter.size(); ++slot) {
-            int beforeSlot = planesBefore[slot].toInt(0);
-            int afterSlot = planesAfter[slot].toInt(0);
-            int loss = beforeSlot - afterSlot;
-            if(loss < 0) loss = 0;
-            planeLosses[slot] = loss;
-        }
-        
-        BattleResultShipDisplay *display = new BattleResultShipDisplay(m_enemyContainer,
-                                                                       i, enemyName,
-                                                                       hpBefore, hpAfter,
-                                                                       totalHP, planeLosses,
-                                                                       shipLevel, shipIconId);
-        m_enemyLayout->addWidget(display);
+
+        QJsonArray pb = enemyPlanesBefore[i].toArray();
+        QJsonArray pa = enemyPlanesAfter[i].toArray();
+        QVector<int> planesBefore(pb.size()), planesAfter(pa.size());
+        for (int s = 0; s < pb.size(); ++s) planesBefore[s] = pb[s].toInt(0);
+        for (int s = 0; s < pa.size(); ++s) planesAfter[s]  = pa[s].toInt(0);
+
+        addShipRow(m_enemyLayout, m_enemyContainer, i,
+                   enemyName, 0, shipIconId, hpBefore, hpAfter, totalHP,
+                   planesBefore, planesAfter, false);
     }
-    
-    // Add stretch
-    m_playerLayout->addStretch();
-    m_enemyLayout->addStretch();
+    m_enemyLayout->setRowStretch(enemyRows, 1);
 }

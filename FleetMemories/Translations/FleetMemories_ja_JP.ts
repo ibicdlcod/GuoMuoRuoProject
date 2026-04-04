@@ -272,7 +272,7 @@ Great at battle and bad at politics--so cool!</source>
     </message>
     <message id="unknown">
         <location filename="../Protocol/equiptype.cpp" line="201"/>
-        <location filename="../ClientGUI/ui/fleet/shipequip.cpp" line="166"/>
+        <location filename="../ClientGUI/ui/fleet/shipequip.cpp" line="179"/>
         <source>Unknown</source>
         <translation type="unfinished">その他</translation>
     </message>
@@ -2917,12 +2917,12 @@ Great at battle and bad at politics--so cool!</source>
         <translation type="unfinished">ユーザー%1の戦闘ステータスの照会に失敗しました！</translation>
     </message>
     <message id="user-dock-init-fail">
-        <location filename="../Server/server.cpp" line="4744"/>
+        <location filename="../Server/server.cpp" line="4763"/>
         <source>Init %2 dock slots for user %1 failed!</source>
         <translation type="unfinished">艦隊更新（艦隊クリア）に失敗しました！</translation>
     </message>
     <message id="user-rank-init-fail">
-        <location filename="../Server/server.cpp" line="4777"/>
+        <location filename="../Server/server.cpp" line="4796"/>
         <source>%1: User rank init failure!</source>
         <translation type="unfinished">ユーザー%1の%2ドックスロットの初期化に失敗しました！</translation>
     </message>
@@ -2932,6 +2932,7 @@ Great at battle and bad at politics--so cool!</source>
         <location filename="../Server/server.cpp" line="4573"/>
         <location filename="../Server/server.cpp" line="4605"/>
         <location filename="../Server/server.cpp" line="4624"/>
+        <location filename="../Server/server.cpp" line="4643"/>
         <source>Update fleet failure!</source>
         <translation type="unfinished">%1：ユーザーランキングの初期化に失敗しました！</translation>
     </message>
@@ -2977,20 +2978,20 @@ Great at battle and bad at politics--so cool!</source>
         <translation type="unfinished">艦船%1は装備%2を装備できません！</translation>
     </message>
     <message id="user-data-init-fail">
-        <location filename="../Server/server.cpp" line="4668"/>
-        <location filename="../Server/server.cpp" line="4689"/>
+        <location filename="../Server/server.cpp" line="4687"/>
         <location filename="../Server/server.cpp" line="4708"/>
+        <location filename="../Server/server.cpp" line="4727"/>
         <source>%1: User data init failure!</source>
         <translation type="unfinished">艦船%1は増設スロットに装備%2を装備できません！</translation>
     </message>
     <message id="user-factory-init-fail">
-        <location filename="../Server/server.cpp" line="4726"/>
+        <location filename="../Server/server.cpp" line="4745"/>
         <source>Init %2 factory slots for user %1 failed!</source>
         <oldsource>Init 4 factory slots for user %1 failed!</oldsource>
         <translation type="unfinished">%1：ユーザーデータの初期化に失敗しました！</translation>
     </message>
     <message id="init-userfleet-failed">
-        <location filename="../Server/server.cpp" line="4763"/>
+        <location filename="../Server/server.cpp" line="4782"/>
         <location filename="../Server/server_offer.cpp" line="194"/>
         <source>Set User Fleet Up failed!</source>
         <translation type="unfinished">ユーザー%1の%2工廠スロットの初期化に失敗しました！</translation>
@@ -4164,92 +4165,86 @@ Great at battle and bad at politics--so cool!</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="battle-result-enemy-fleet">
-        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="158"/>
+        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="157"/>
         <source>Enemy Fleet</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="battle-assm-s-victory">
-        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="213"/>
+        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="212"/>
         <source>S Victory</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="battle-assm-a-victory">
-        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="217"/>
+        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="216"/>
         <source>A Victory</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="battle-assm-b-victory">
-        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="221"/>
+        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="220"/>
         <source>B Victory</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="battle-assm-c-defeat">
-        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="225"/>
+        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="224"/>
         <source>C Defeat</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="battle-assm-d-defeat">
-        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="229"/>
+        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="228"/>
         <source>D Defeat</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="battle-assm-e-defeat">
-        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="233"/>
+        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="232"/>
         <source>E Defeat</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="battle-assm-unknown">
-        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="237"/>
+        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="236"/>
         <source>Unknown Result</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="battle-result-player-ship">
-        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="275"/>
-        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="279"/>
+        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="324"/>
+        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="328"/>
         <source>Player Ship %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="battle-result-enemy-ship-id">
-        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="324"/>
+        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="360"/>
         <source>Enemy Ship #%1</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="battle-result-enemy-ship-generic">
-        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="329"/>
+        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="364"/>
         <source>Enemy Ship %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="battle-result-title">
-        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="88"/>
+        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="87"/>
         <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="386"/>
         <source>Battle Results</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="battle-result-plane-button">
-        <location filename="../ClientGUI/ui/fleet/battleresultshipdisplay.cpp" line="66"/>
+        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="281"/>
         <source>Planes</source>
         <translation type="unfinished">搭載</translation>
     </message>
-    <message id="battle-result-plane-losses-for">
-        <location filename="../ClientGUI/ui/fleet/battleresultshipdisplay.cpp" line="78"/>
-        <location filename="../ClientGUI/ui/fleet/battleresultshipdisplay.cpp" line="86"/>
-        <source>Plane losses for %1:</source>
-        <translation type="unfinished"></translation>
+    <message id="battle-result-plane-counts-for">
+        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="286"/>
+        <source>Plane counts for %1:</source>
+        <translation type="unfinished">%1の搭載数：</translation>
     </message>
-    <message id="battle-result-plane-slot-loss">
-        <location filename="../ClientGUI/ui/fleet/battleresultshipdisplay.cpp" line="82"/>
-        <source>Slot %1: %2 planes lost</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message id="battle-result-no-plane-losses">
-        <location filename="../ClientGUI/ui/fleet/battleresultshipdisplay.cpp" line="88"/>
-        <source>No plane losses.</source>
-        <translation type="unfinished"></translation>
+    <message id="battle-result-plane-slot-count">
+        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="288"/>
+        <source>Slot %1: %2/%3</source>
+        <translation type="unfinished">スロット%1：%2/%3</translation>
     </message>
     <message id="battle-result-plane-details-title">
-        <location filename="../ClientGUI/ui/fleet/battleresultshipdisplay.cpp" line="92"/>
-        <source>Plane Loss Details</source>
-        <translation type="unfinished"></translation>
+        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="290"/>
+        <source>Plane Details</source>
+        <translation type="unfinished">搭載詳細</translation>
     </message>
 </context>
 <context>
@@ -4933,7 +4928,7 @@ Great at battle and bad at politics--so cool!</source>
     <name>ShipEquip</name>
     <message id="empty-equip-slot">
         <location filename="../ClientGUI/ui/fleet/shipequip.ui" line="93"/>
-        <location filename="../ClientGUI/ui/fleet/shipequip.cpp" line="154"/>
+        <location filename="../ClientGUI/ui/fleet/shipequip.cpp" line="167"/>
         <source>Empty</source>
         <translation type="unfinished">空</translation>
     </message>

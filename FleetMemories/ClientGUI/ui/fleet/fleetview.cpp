@@ -191,7 +191,7 @@ equip_slots:
 
     for(int i = 0; i < KP::fleetsSize; ++i) {
         for(int j = 0; j < KP::combinedFleetSize; ++j) {
-            shipPlaneCount[FleetPos{i, j}] = 0;
+            shipPlaneCount[FleetPos{i, j}] = QVector<int>(KP::maxEquipSlots, 0);
         }
     }
 
@@ -438,6 +438,8 @@ void FleetView::modifyFleetShip(int posIndex, QUuid uid) {
                                      equipSlotsColumn + KP::maxEquipSlots)
                     ->widget()->hide();
             }
+            shipPlaneCount[FleetPos{currentActiveFleet, oldPos.posindex}]
+                .fill(0, KP::maxEquipSlots);
             emit newPlaneCountInfo(oldPos.posindex,
                                    ship ? ship->attr["Planes"] : 0);
         }
@@ -533,6 +535,8 @@ void FleetView::modifyFleetShip(int posIndex, QUuid uid) {
                              equipSlotsColumn + KP::maxEquipSlots)
             ->widget()->hide();
     }
+    shipPlaneCount[FleetPos{currentActiveFleet, newPos.posindex}]
+        .fill(0, KP::maxEquipSlots);
     emit newPlaneCountInfo(newPos.posindex, ship ? ship->attr["Planes"] : 0);
 }
 
@@ -582,6 +586,8 @@ void FleetView::receivedShipInfo(const QJsonObject &info) {
         }
         engine.equipModel.setShipEquip(uid, KP::maxEquipSlots,
                                         attr->slotEquipEx);
+        if(auto [ship, dyn] = engine.shipModel.getShip(uid); dyn)
+            dyn->slotPlanes = attr->slotPlanes;
         delete attr;
     }
     ui->fleetTypeSelect->setCurrentIndex(fleetTypes[currentActiveFleet]);
@@ -635,8 +641,9 @@ void FleetView::sendFleetData(bool checked) {
         }
         ship["equip"] = equips;
         QJsonArray planes;
+        const auto &counts = shipPlaneCount[iter->first];
         for(int i = 0; i < KP::maxEquipSlots; ++i) {
-            planes.append(shipPlaneCount[iter->first]);
+            planes.append(i < counts.size() ? counts[i] : 0);
         }
         ship["plane"] = planes;
         content.append(ship);
@@ -668,16 +675,15 @@ void FleetView::supplyFleet(bool checked) {
 
 void FleetView::modifyPlaneCount(
     int shipPosIndex, int equipSlotIndex, int diff) {
-    shipPlaneCount[FleetPos{currentActiveFleet, shipPosIndex}] += diff;
+    auto &counts = shipPlaneCount[FleetPos{currentActiveFleet, shipPosIndex}];
+    if(equipSlotIndex >= 0 && equipSlotIndex < counts.size())
+        counts[equipSlotIndex] += diff;
+    int total = 0;
+    for(int c : counts) total += c;
     int shipPlanes = 0;
-    if(getShip(shipPosIndex) && getShip(shipPosIndex)
-                                     ->attr.contains("Planes")) {
+    if(getShip(shipPosIndex) && getShip(shipPosIndex)->attr.contains("Planes"))
         shipPlanes = getShip(shipPosIndex)->attr["Planes"];
-    }
-    emit planeCountInfo(shipPosIndex, equipSlotIndex,
-                        shipPlaneCount[FleetPos{currentActiveFleet,
-                                                shipPosIndex}],
-                        shipPlanes);
+    emit planeCountInfo(shipPosIndex, equipSlotIndex, total, shipPlanes);
 }
 
 void FleetView::equipSelected(int shipPosIndex,

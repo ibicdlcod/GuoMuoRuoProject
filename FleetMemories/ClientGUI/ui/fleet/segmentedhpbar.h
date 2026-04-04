@@ -16,6 +16,7 @@ public:
     explicit SegmentedHPBar(QWidget *parent = nullptr);
 
     void setValues(int totalHP, int previousHP, int currentHP);
+    void setInverted(bool inverted);
 
 protected:
     void paintEvent(QPaintEvent *event) override;
@@ -24,6 +25,7 @@ private:
     int m_totalHP = 1;
     int m_previousHP = 1;
     int m_currentHP = 1;
+    bool m_inverted = false;
 };
 
 #endif // SEGMENTEDHPBAR_H

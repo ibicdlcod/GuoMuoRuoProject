@@ -4607,6 +4607,25 @@ check_duplicate_remodel_group:
                 return {KP::ValidFleet, -1};
             }
         }
+        {
+            const QJsonArray planeArr = shipDataObj["plane"].toArray();
+            QSqlQuery query;
+            query.prepare("UPDATE UserShip SET "
+                          "Slot1Planes = :p1, Slot2Planes = :p2, "
+                          "Slot3Planes = :p3, Slot4Planes = :p4, "
+                          "Slot5Planes = :p5 "
+                          "WHERE ShipUuid = :uuid");
+            for(int i = 0; i < KP::maxEquipSlots; ++i)
+                query.bindValue(QString(":p%1").arg(i + 1),
+                                planeArr[i].toInt(0));
+            query.bindValue(":uuid", shipDataObj["uuid"].toString());
+            if(Q_UNLIKELY(!query.exec())) {
+                //% "Update fleet failure!"
+                throw DBError(qtTrId("update-fleet-failure"),
+                              query.lastError(), query.lastQuery());
+                return {KP::ValidFleet, -1};
+            }
+        }
     }
     for(auto iter = fleetTypes.keyValueBegin();
         iter != fleetTypes.keyValueEnd();

@@ -77,7 +77,7 @@ private slots:
 private:
     Ui::FleetView *ui;
     QMap<FleetPos, QUuid> ships;
-    QMap<FleetPos, int> shipPlaneCount;
+    QMap<FleetPos, QVector<int>> shipPlaneCount;
     int currentActiveFleet = 0;
     QMap<int, KP::FleetType> fleetTypes;
     QGridLayout *grid;

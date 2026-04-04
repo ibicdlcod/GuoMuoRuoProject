@@ -8,6 +8,7 @@
 #include <QMouseEvent>
 #include <QPainter>
 #include <QStyleHints>
+#include <algorithm>
 
 #include "../../clientv2.h"
 #include "../../equipicon.h"
@@ -110,19 +111,31 @@ void ShipEquip::receivedPlaneCountInfo(int shipPosIndex,
                                        int currentCount,
                                        int maxCount)
 {
-    if(shipPosIndex != this->shipPosIndex) {
+    if(shipPosIndex != this->shipPosIndex)
         return;
-    }
-    if(equipSlotIndex == this->equipSlotIndex
-        && currentCount > maxCount) {
-        ui->planeCountBox->setValue(maxCount - currentCount
-                                    + ui->planeCountBox->value());
-    }
-    if(currentCount > maxCount) {
+    if(currentCount > maxCount)
         currentCount = maxCount;
+
+    int newMax = std::max(0, maxCount - currentCount + ui->planeCountBox->value());
+
+    if(equipSlotIndex == this->equipSlotIndex) {
+        // Originating slot: let setValue fire updatePlaneCount normally
+        if(ui->planeCountBox->value() > newMax)
+            ui->planeCountBox->setValue(newMax);
+        ui->planeCountBox->setMaximum(newMax);
+    } else {
+        // Non-originating slot: block signals so Qt's internal clamp inside
+        // setMaximum does not re-trigger updatePlaneCount and cascade
+        ui->planeCountBox->blockSignals(true);
+        ui->planeCountBox->setMaximum(newMax);
+        int newValue = ui->planeCountBox->value();
+        ui->planeCountBox->blockSignals(false);
+        if(newValue != planeCount) {
+            int diff = newValue - planeCount;
+            planeCount = newValue;
+            emit modifyPlaneCount(shipPosIndex, this->equipSlotIndex, diff);
+        }
     }
-    ui->planeCountBox->setMaximum(maxCount - currentCount
-                                  + ui->planeCountBox->value());
 }
 
 void ShipEquip::receivedNewPlaneCountInfo(int shipPosIndex, int maxCount)
