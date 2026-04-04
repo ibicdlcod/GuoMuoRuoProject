@@ -14,8 +14,8 @@
    <string id="confirm-sortie">Confirm Sortie</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_3">
-    <item stretch="0">
-     <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,0,0,0,0,0">
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,0,0,0,0,0">
      <item>
       <spacer name="horizontalSpacer">
        <property name="orientation">
@@ -77,12 +77,12 @@
       </spacer>
      </item>
     </layout>
+    </item>
+   <item>
+    <layout class="QVBoxLayout" name="fleetLayout"/>
    </item>
-    <item stretch="1">
-     <layout class="QVBoxLayout" name="fleetLayout"/>
-   </item>
-    <item stretch="0">
-     <widget class="QDialogButtonBox" name="buttonBox">
+   <item>
+    <widget class="QDialogButtonBox" name="buttonBox">
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
      </property>
