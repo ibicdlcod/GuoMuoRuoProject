@@ -228,14 +228,8 @@ void ConfirmSortie::populateBattleResult(const QJsonObject &battleProcess)
         m_assessmentLabel->setText(assessmentText);
     }
     
-    // Get fleet view for player ship names and max HP
-    FleetView *fleetView = nullptr;
-    for(auto *widget: QApplication::topLevelWidgets()) {
-        if(auto *mainWindow = qobject_cast<MainWindow *>(widget)) {
-            fleetView = mainWindow->getFleetArea();
-            break;
-        }
-    }
+    // Use embedded fleet view for player ship names and max HP
+    FleetView *fleetView = fv;
     
     // Player ships
     int playerRows = playerHPBefore.size();
