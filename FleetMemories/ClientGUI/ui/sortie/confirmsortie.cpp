@@ -156,11 +156,10 @@ void ConfirmSortie::createBattleResultLayout()
     m_battleSplitter->setSizes({400, 400});
     
     ui->fleetLayout->addWidget(m_battleSplitter);
-    
-    // Set stretch factors for vertical layout: map info (0), battle result (1), buttons (0)
-    ui->verticalLayout_3->setStretch(0, 0);
-    ui->verticalLayout_3->setStretch(1, 1);
-    ui->verticalLayout_3->setStretch(2, 0);
+
+    ui->fleetLayout->setStretch(0, 0);
+    ui->fleetLayout->setStretch(1, 1);
+    ui->fleetLayout->setSpacing(0);
 }
 
 void ConfirmSortie::populateBattleResult(const QJsonObject &battleProcess)

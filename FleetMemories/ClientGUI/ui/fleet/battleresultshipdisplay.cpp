@@ -87,5 +87,3 @@ void BattleResultShipDisplay::showPlaneLosses()
                              qtTrId("battle-result-plane-details-title"),
                              message);
 }
-
-#include "battleresultshipdisplay.moc"

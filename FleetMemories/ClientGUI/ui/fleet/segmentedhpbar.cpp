@@ -13,8 +13,8 @@ SegmentedHPBar::SegmentedHPBar(QWidget *parent)
     : QWidget(parent)
 {
     setMinimumSize(200, 20);
-    setMaximumSize(400, 30);
-    setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+    setMaximumSize(200, 20);
+    setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
 }
 
 void SegmentedHPBar::setValues(int totalHP, int previousHP, int currentHP)

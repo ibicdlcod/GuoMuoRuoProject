@@ -4214,63 +4214,63 @@ Great at battle and bad at politics--so cool!</source>
         <translation>等级进度</translation>
     </message>
     <message id="battle-result-player-fleet">
-        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="142"/>
+        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="144"/>
         <source>Player Fleet</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="battle-result-enemy-fleet">
-        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="150"/>
+        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="152"/>
         <source>Enemy Fleet</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="battle-assm-s-victory">
-        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="201"/>
+        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="206"/>
         <source>S Victory</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="battle-assm-a-victory">
-        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="205"/>
+        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="210"/>
         <source>A Victory</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="battle-assm-b-victory">
-        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="209"/>
+        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="214"/>
         <source>B Victory</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="battle-assm-c-defeat">
-        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="213"/>
+        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="218"/>
         <source>C Defeat</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="battle-assm-d-defeat">
-        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="217"/>
+        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="222"/>
         <source>D Defeat</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="battle-assm-e-defeat">
-        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="221"/>
+        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="226"/>
         <source>E Defeat</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="battle-assm-unknown">
-        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="225"/>
+        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="230"/>
         <source>Unknown Result</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="battle-result-player-ship">
-        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="256"/>
-        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="261"/>
+        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="268"/>
+        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="272"/>
         <source>Player Ship %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="battle-result-enemy-ship-id">
-        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="306"/>
+        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="317"/>
         <source>Enemy Ship #%1</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="battle-result-enemy-ship-generic">
-        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="311"/>
+        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="322"/>
         <source>Enemy Ship %1</source>
         <translation type="unfinished"></translation>
     </message>
