@@ -3,6 +3,7 @@
 
 #include "battleresultshipdisplay.h"
 
+#include <QApplication>
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QMessageBox>
