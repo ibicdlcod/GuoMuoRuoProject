@@ -952,7 +952,7 @@ void Server::handleBattleAftermath(const CSteamID &uid,
                                    int nodeId,
                                    KP::NodeType type,
                                    int activeFleetIndex) {
-    // set_battle_state:
+set_battle_state:
     QSqlQuery query;
     query.prepare("UPDATE UserAttr SET Intvalue = :type "
                   "WHERE Attribute = 'InBattle' "
@@ -973,7 +973,7 @@ void Server::handleBattleAftermath(const CSteamID &uid,
     auto assm = static_cast<KP::BattleAssessment>(
         battleProcess["assm"].toInt());
 
-    // condition_drop:
+condition_drop:
     /* night battle for daystart and day for nightstart */
     auto extraStage = battleProcess["extrastage"].toBool();
     int condDrop = 0;
@@ -989,7 +989,7 @@ void Server::handleBattleAftermath(const CSteamID &uid,
     condDrop += (extraStage ? 1 : 0);
     conditionDrop(uid, activeFleetIndex, condDrop);
 
-    // drop_ship:
+drop_ship:
     int dropShip = drop(uid, mapId, nodeId, assm);
     if(dropShip == -1) {
         QByteArray msg = KP::serverBattleError(KP::DropError);
@@ -999,7 +999,7 @@ void Server::handleBattleAftermath(const CSteamID &uid,
         processDrop(uid, connection, dropShip);
     }
 
-    // add_exp:
+add_exp:
     KP::Difficulty diff = MapWithDiff::getDiff(mapId);
     QString diffStr = (*KP::diffEnumtoStr)[diff];
     QByteArray diffStrBytes = diffStr.toUtf8();
@@ -1017,7 +1017,7 @@ void Server::handleBattleAftermath(const CSteamID &uid,
     processExpGain(uid, activeFleetIndex, exp, assm);
     processVirtualExpGain(uid, unionId, diff, exp, assm);
 
-    // after_boss:
+after_boss:
     if(type == KP::BOSS || type == KP::NIGHTBOSS) {
         // gain_supremacy:
         double baseSupremacy;
@@ -1041,7 +1041,7 @@ void Server::handleBattleAftermath(const CSteamID &uid,
             User::setMapSupremacy(uid, unionId, supremacyValue, 0);
         }
 
-        // deal_with_gauge:
+    deal_with_gauge:
         // Read current freight transported
         QSqlQuery freightQuery;
         freightQuery.prepare("SELECT Intvalue FROM UserAttr "

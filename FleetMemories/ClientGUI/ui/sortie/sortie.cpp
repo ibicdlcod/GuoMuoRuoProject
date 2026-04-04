@@ -406,6 +406,8 @@ void Sortie::dealWithNode(const MapNode &node, int nodeId) {
     case KP::STARTING:
         engine.queryNextNode(currentMap->getAbsoluteId(), nodeId);
         break;
+    case KP::TRANSPORT:
+        [[fallthrough]];
     case KP::DISASTER:
         [[fallthrough]];
     case KP::EMPTY:
