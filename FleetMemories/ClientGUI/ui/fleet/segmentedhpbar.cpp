@@ -38,11 +38,26 @@ void SegmentedHPBar::paintEvent(QPaintEvent *event)
 {
     Q_UNUSED(event);
     
-    QPainter painter(this);
-    painter.setRenderHint(QPainter::Antialiasing);
+    // Safety checks
+    if (!QApplication::instance()) {
+        return;
+    }
     
     int width = this->width();
     int height = this->height();
+    
+    if (width <= 0 || height <= 0) {
+        return;
+    }
+    
+    QStyleHints *styleHints = QApplication::styleHints();
+    if (!styleHints) {
+        return;
+    }
+    
+    QPainter painter(this);
+    painter.setRenderHint(QPainter::Antialiasing);
+    
     int radius = 4; // Slightly rounded corners
     
     // Ensure valid values
@@ -65,7 +80,8 @@ void SegmentedHPBar::paintEvent(QPaintEvent *event)
     if(totalWidth < width) {
         missingWidth += width - totalWidth;
     } else if(totalWidth > width) {
-        // Distribute excess proportionally (should not happen with proper clamping)
+        // Distribute excess proportionally (should not happen with proper
+        // clamping)
         double adjust = static_cast<double>(width) / totalWidth;
         currentWidth = static_cast<int>(currentWidth * adjust);
         damageWidth = static_cast<int>(damageWidth * adjust);
@@ -74,6 +90,9 @@ void SegmentedHPBar::paintEvent(QPaintEvent *event)
     
     // Create pixmap for the bar
     QPixmap barPixmap(width, height);
+    if (barPixmap.isNull()) {
+        return;
+    }
     barPixmap.fill(Qt::transparent);
     QPainter barPainter(&barPixmap);
     barPainter.setRenderHint(QPainter::Antialiasing);
@@ -93,7 +112,7 @@ void SegmentedHPBar::paintEvent(QPaintEvent *event)
         int currentStart = missingWidth + damageWidth;
         double ratio = static_cast<double>(m_currentHP) / m_totalHP;
         QColor hpCol;
-        switch (QApplication::styleHints()->colorScheme()) {
+        switch (styleHints->colorScheme()) {
         case Qt::ColorScheme::Dark:
             hpCol = QColor::fromHsv(static_cast<int>(ratio * 120.0), 255, 128);
             break;
@@ -106,6 +125,9 @@ void SegmentedHPBar::paintEvent(QPaintEvent *event)
     
     // Apply rounded corners by setting corner pixel alpha to 0
     QImage barImage = barPixmap.toImage();
+    if (barImage.isNull()) {
+        return;
+    }
     for (int y = 0; y < height; ++y) {
         for (int x = 0; x < width; ++x) {
             bool inCorner = false;
@@ -151,14 +173,15 @@ void SegmentedHPBar::paintEvent(QPaintEvent *event)
     // Draw the bar pixmap
     painter.drawPixmap(0, 0, barPixmap);
     
-    // Draw currentHP/maxHP text with same color as ShipDisplay::setContent->textCol
+    // Draw currentHP/maxHP text with same color as
+    // ShipDisplay::setContent->textCol
     QString hpText = QString("%1/%2").arg(m_currentHP).arg(m_totalHP);
     QFont font = painter.font();
     font.setPointSize(9);
     painter.setFont(font);
     
     QColor textCol;
-    switch(QApplication::styleHints()->colorScheme()) {
+    switch(styleHints->colorScheme()) {
     case Qt::ColorScheme::Dark:
         textCol = QColor(255, 255, 255);
         break;
