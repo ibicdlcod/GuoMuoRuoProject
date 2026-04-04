@@ -931,9 +931,134 @@ const QJsonObject Server::processBattleCore(const CSteamID &uid,
     QJsonObject after;
     QJsonObject enemyAfter;
     QJsonArray aHP;
-    for(int i = 0; i < enemyFleet.shipDynamics.size(); ++i) {
-        aHP.append(0); // all enemy ships defeated
+
+    // Retrieve player fleet
+    FleetInfo *playerFleet = sortieFleets.value({uid, fleetIndex}, nullptr);
+    if(playerFleet) {
+        // Compute capitalness ratio a = enemy / player
+        QMap<KP::CapitalType, int> playerCap = playerFleet->capitalness();
+        QMap<KP::CapitalType, int> enemyCap = enemyFleet.capitalness();
+        int playerTotal = playerCap.value(KP::AnyCapitalType, 0);
+        int enemyTotal = enemyCap.value(KP::AnyCapitalType, 0);
+        double a = 0.0;
+        if(playerTotal == 0) {
+            // Avoid division by zero, treat denominator as 1
+            a = static_cast<double>(enemyTotal);
+        } else {
+            a = static_cast<double>(enemyTotal) /
+                static_cast<double>(playerTotal);
+        }
+
+        // Random number generator
+        std::random_device rd;
+        std::mt19937 gen(rd());
+        std::uniform_real_distribution<> lossDis(0.0, 0.5);
+
+        // Compute loss factors influenced by capitalness ratio
+        double playerLossFactor = lossDis(gen) * a;
+        double enemyLossFactor = lossDis(gen) * (a > 0.0 ? 1.0 / a : 0.0);
+        // Clamp to reasonable range (0-1)
+        playerLossFactor = std::clamp(playerLossFactor, 0.0, 1.0);
+        enemyLossFactor = std::clamp(enemyLossFactor, 0.0, 1.0);
+        // If enemy capitalness zero, losses zero (a = 0)
+        if(enemyTotal == 0) {
+            playerLossFactor = 0.0;
+            enemyLossFactor = 0.0;
+        }
+
+        // Compute total HP for each fleet
+        int totalPlayerHP = 0;
+        for(const ShipDynamic *dyn : playerFleet->shipDynamics) {
+            totalPlayerHP += dyn->currentHP;
+        }
+        int totalEnemyHP = 0;
+        for(const ShipDynamic *dyn : enemyFleet.shipDynamics) {
+            totalEnemyHP += dyn->currentHP;
+        }
+
+        // Compute HP loss amounts
+        int playerLossHP = static_cast<int>(playerLossFactor * totalPlayerHP);
+        int enemyLossHP = static_cast<int>(enemyLossFactor * totalEnemyHP);
+
+        // Database connection
+        QSqlDatabase db = QSqlDatabase::database();
+        QSqlQuery query;
+
+        // Process player fleet: apply HP loss and plane loss
+        for(size_t i = 0; i < playerFleet->shipDynamics.size(); ++i) {
+            ShipDynamic *dyn = playerFleet->shipDynamics[i];
+            int currentHP = dyn->currentHP;
+            // Distribute loss proportionally to current HP
+            int lossThisShip = (totalPlayerHP > 0) ?
+                static_cast<int>(playerLossHP *
+                    (static_cast<double>(currentHP) / totalPlayerHP)) : 0;
+            int newHP = std::max(0, currentHP - lossThisShip);
+            dyn->currentHP = newHP;
+
+            // Update database
+            query.prepare("UPDATE UserShip SET CurrentHP = :hp "
+                          "WHERE User = :uid AND FleetIndex = :fleet "
+                          "AND FleetPosIndex = :pos");
+            query.bindValue(":hp", newHP);
+            query.bindValue(":uid", uid.ConvertToUint64());
+            query.bindValue(":fleet", fleetIndex);
+            query.bindValue(":pos", static_cast<int>(i));
+            if(!query.exec()) {
+                qWarning() << "Failed to update player ship HP:"
+                           << query.lastError();
+            }
+
+            // Plane loss (same factor)
+            for(int slot = 0; slot < dyn->slotPlanes.size(); ++slot) {
+                int currentPlanes = dyn->slotPlanes[slot];
+                int lossPlanes = static_cast<int>(playerLossFactor *
+                                                  currentPlanes);
+                int newPlanes = std::max(0, currentPlanes - lossPlanes);
+                dyn->slotPlanes[slot] = newPlanes;
+                // Update database
+                query.prepare("UPDATE UserShip SET Slot"
+                              + QString::number(slot + 1)
+                              + "Planes = :planes WHERE User = :uid "
+                              "AND FleetIndex = :fleet "
+                              "AND FleetPosIndex = :pos");
+                query.bindValue(":planes", newPlanes);
+                query.bindValue(":uid", uid.ConvertToUint64());
+                query.bindValue(":fleet", fleetIndex);
+                query.bindValue(":pos", static_cast<int>(i));
+                if(!query.exec()) {
+                    qWarning() << "Failed to update plane count:"
+                               << query.lastError();
+                }
+            }
+        }
+
+        // Process enemy fleet: apply HP loss and plane loss (no DB update)
+        for(size_t i = 0; i < enemyFleet.shipDynamics.size(); ++i) {
+            ShipDynamic *dyn = enemyFleet.shipDynamics[i];
+            int currentHP = dyn->currentHP;
+            int lossThisShip = (totalEnemyHP > 0) ?
+                static_cast<int>(enemyLossHP *
+                    (static_cast<double>(currentHP) / totalEnemyHP)) : 0;
+            int newHP = std::max(0, currentHP - lossThisShip);
+            aHP.append(newHP);
+            dyn->currentHP = newHP;
+
+            // Plane loss for enemy
+            for(int slot = 0; slot < dyn->slotPlanes.size(); ++slot) {
+                int currentPlanes = dyn->slotPlanes[slot];
+                int lossPlanes = static_cast<int>(enemyLossFactor *
+                                                  currentPlanes);
+                int newPlanes = std::max(0, currentPlanes - lossPlanes);
+                dyn->slotPlanes[slot] = newPlanes;
+            }
+        }
+    } else {
+        qWarning() << "Player fleet not found in sortieFleets, using dummy";
+        for(int i = 0; i < enemyFleet.shipDynamics.size(); ++i) {
+            aHP.append(0); // all enemy ships defeated
+        }
     }
+
     if(aHP.isEmpty()) {
         aHP.append(0); // fallback dummy
     }
