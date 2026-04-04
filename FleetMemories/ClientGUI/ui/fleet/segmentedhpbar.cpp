@@ -19,8 +19,8 @@
 SegmentedHPBar::SegmentedHPBar(QWidget *parent)
     : QWidget(parent)
 {
-    setMinimumSize(200, 20);
-    setMaximumSize(200, 20);
+    setMinimumSize(100, 20);
+    setMaximumSize(100, 20);
     setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
     setAutoFillBackground(true);
     setBackgroundRole(QPalette::Base);
@@ -36,8 +36,6 @@ void SegmentedHPBar::setValues(int totalHP, int previousHP, int currentHP)
 
 void SegmentedHPBar::paintEvent(QPaintEvent *event)
 {
-    Q_UNUSED(event);
-    
     QPainter painter(this);
     painter.setRenderHint(QPainter::Antialiasing);
     
