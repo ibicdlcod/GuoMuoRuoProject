@@ -22,12 +22,10 @@ bool PlaneReplenish::replenishAfterBattle(const CSteamID &uid, int fleetIndex) {
 
 void PlaneReplenish::storePlaneLosses(const CSteamID &uid, const QString &shipUuid,
                                       int slot, int equipDef, int lossCount, int remainingCount) {
-    if(lossCount <= 0) return;
-    
     QSqlDatabase db = QSqlDatabase::database();
     QSqlQuery query;
     
-    // Upsert plane losses
+    // Always store plane state (even with 0 losses) for abnormal exit recovery
     query.prepare("INSERT OR REPLACE INTO UserPlaneLosses "
                   "(User, ShipUuid, Slot, EquipDef, LossCount, RemainingCount, Timestamp) "
                   "VALUES (:uid, :ship, :slot, :equip, :loss, :remaining, :time)");

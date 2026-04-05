@@ -1081,9 +1081,31 @@ const QJsonObject Server::processBattleCore(const CSteamID &uid,
                 dyn->slotPlanes[slot] = newPlanes;
                 
                 // Store plane losses for abnormal exit recovery
-                if(!shipUuid.isEmpty() && lossPlanes > 0) {
-                    // TODO: Get equipment definition ID for this slot
-                    int equipDef = 0; // Placeholder - need to query from UserEquip
+                if(!shipUuid.isEmpty()) {
+                    // Get equipment UUID for this slot
+                    QSqlQuery equipUuidQuery;
+                    equipUuidQuery.prepare("SELECT Slot" + QString::number(slot + 1) + 
+                                           " FROM UserShip WHERE User = :uid "
+                                           "AND FleetIndex = :fleet AND FleetPosIndex = :pos");
+                    equipUuidQuery.bindValue(":uid", uid.ConvertToUint64());
+                    equipUuidQuery.bindValue(":fleet", fleetIndex);
+                    equipUuidQuery.bindValue(":pos", static_cast<int>(i));
+                    
+                    int equipDef = 0;
+                    if(equipUuidQuery.exec() && equipUuidQuery.next()) {
+                        QString equipUuid = equipUuidQuery.value(0).toString();
+                        if(!equipUuid.isEmpty()) {
+                            // Get equipment definition ID
+                            QSqlQuery equipDefQuery;
+                            equipDefQuery.prepare("SELECT EquipDef FROM UserEquip "
+                                                  "WHERE EquipUuid = :uuid");
+                            equipDefQuery.bindValue(":uuid", equipUuid);
+                            if(equipDefQuery.exec() && equipDefQuery.next()) {
+                                equipDef = equipDefQuery.value("EquipDef").toInt();
+                            }
+                        }
+                    }
+                    
                     this->planeReplenish.storePlaneLosses(uid, shipUuid,
                                                           slot + 1, equipDef,
                                                           lossPlanes, newPlanes);
