@@ -113,12 +113,12 @@ ResOrd PlaneReplenish::calculateReplenishCost(const CSteamID &uid,
     if(!server) {
         qWarning() << "PlaneReplenish: server pointer is null "
                       "in cost calculation";
-        return ResOrd();
+        return ResOrd(0,0,0,0,0,0,0);
     }
     
     QSqlDatabase db = QSqlDatabase::database();
     QSqlQuery query;
-    ResOrd totalCost;
+    ResOrd totalCost(0,0,0,0,0,0,0);
     
     // Get all ships in fleet with plane losses
     query.prepare("SELECT us.ShipUuid, us.Slot1Planes, us.Slot2Planes, "
