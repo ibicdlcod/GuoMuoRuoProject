@@ -98,6 +98,7 @@ public:
     bool canEquip(Ship *ship, sol::state &ts) const;
     bool canEquipEX(Ship *ship, sol::state &ts) const;
     const ResOrd devRes() const;
+    const ResOrd replenishCostPer100Planes() const;
     const int devTimeInSec() const;
     bool disallowMassProduction() const;
     bool disallowProduction() const;

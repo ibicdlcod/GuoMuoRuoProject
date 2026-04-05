@@ -178,6 +178,13 @@ const ResOrd Equipment::devRes() const {
     return result2 * (getTech() + 1.0) * devResScale;
 }
 
+/* Plane replenishment cost per 100 planes */
+const ResOrd Equipment::replenishCostPer100Planes() const {
+    // Cost per 100 planes = development cost
+    ResOrd devCost = devRes();
+    return devCost;
+}
+
 /* 4.3-Development.md#Development time */
 const int Equipment::devTimeInSec() const {
     double devTimebase = settings->value("rule/devtimebase", 6).toDouble();
