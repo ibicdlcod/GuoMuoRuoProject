@@ -2,7 +2,7 @@
  * SPDX-License-Identifier: AGPL-3.0-or-later */
 
 #include "clientv2.h"
-#include <QGuiApplication>
+#include <QApplication>
 #include <QScreen>
 #include <QSettings>
 
@@ -58,8 +58,27 @@ void Client::onScreenshotRequested(ScreenshotRequested_t *) {
 }
 
 void Client::takeAndSubmitScreenshot() {
+    /* Compute the bounding rect of all visible top-level widgets so that
+     * both the main window and any active QDialog are included. */
+    QRect captureRect;
     QScreen *screen = QGuiApplication::primaryScreen();
-    QPixmap pixmap = screen->grabWindow(0);
+    for(QWidget *w : QApplication::topLevelWidgets()) {
+        if(!w->isVisible())
+            continue;
+        if(captureRect.isNull())
+            captureRect = w->frameGeometry();
+        else
+            captureRect = captureRect.united(w->frameGeometry());
+        screen = w->screen();
+    }
+
+    QPixmap pixmap;
+    if(captureRect.isValid())
+        pixmap = screen->grabWindow(0, captureRect.x(), captureRect.y(),
+                                    captureRect.width(), captureRect.height());
+    else
+        pixmap = screen->grabWindow(0);
+
     QImage image = pixmap.toImage().convertToFormat(QImage::Format_RGB888);
     if(SteamScreenshots()) {
         SteamScreenshots()->WriteScreenshot(
