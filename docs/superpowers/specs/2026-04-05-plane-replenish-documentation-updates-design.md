@@ -2,7 +2,8 @@
 
 ## Project Overview
 Update the game documentation  
-to reflect that automatic plane replenishment and maintenance mechanics have been implemented.
+to reflect that automatic plane replenishment
+and maintenance mechanics have been implemented.
 Remove `NOTYETIMPLEMENTED` tags  
 and add detailed descriptions of the new mechanics,  
 following the existing `[Implemented in …]` annotation pattern.
@@ -55,7 +56,8 @@ and before the final paragraph about resources dropping below zero.
 
 ### 3. Adjust the existing paragraph  
 about automatic resource decrease
-Update the sentence that begins “Since the game have no means to differentiate planes…”  
+Update the sentence that begins “Since the game have no means to differentiate
+planes…”  
 (lines 29‑33) to clarify that
 automatic resource decrease now occurs  
 as part of the post‑battle replenishment process (including maintenance).
