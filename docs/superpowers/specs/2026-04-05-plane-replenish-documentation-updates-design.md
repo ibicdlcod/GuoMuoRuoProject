@@ -14,7 +14,7 @@ The index entry will then read:
 ## Changes to `doc/worldview_and_mechanics/8.1-supply.md`
 
 ### 1. Update the “Maintenance of planes” section
-Replace the current `[NOTYETIMPLEMENTED]` block with a detailed description:
+Remove the `[NOTYETIMPLEMENTED]` suffix from the heading `### Maintenance of planes[NOTYETIMPLEMENTED]` and replace the following paragraph with the detailed description below:
 
 - Planes that survive a sortie have a chance to require maintenance.  
   The number of planes needing maintenance is calculated as  
@@ -37,10 +37,12 @@ Replace the current `[NOTYETIMPLEMENTED]` block with a detailed description:
 
 - **Implementation references:**  
   – `PlaneReplenish::replenishAfterBattle()`  
-  – Called from `Server::server_battle.cpp` line 1309.
+  – Called from `Server::server_battle.cpp` line 1309.  
+
+Place this new subsection after the updated Maintenance section and before the final paragraph about resources dropping below zero.
 
 ### 3. Adjust the existing paragraph about automatic resource decrease
-Update the sentence that begins “your resources will automatically decrease…” to clarify that this now happens as part of the post‑battle replenishment process (including maintenance).
+Update the sentence that begins “Since the game have no means to differentiate planes…” (lines 29‑33) to clarify that automatic resource decrease now occurs as part of the post‑battle replenishment process (including maintenance).
 
 ## Style Guidelines
 - Keep the existing `[Implemented in …]` annotation pattern.  
