@@ -1836,8 +1836,12 @@ void Server::progressMap(const CSteamID &uid, QSslSocket *connection,
     }
     if(nNode == 0) {
         if(FleetInfo *fi = sortieFleets.value({uid, result.value()[3]}, nullptr)) {
-            for(ShipDynamic *dyn : fi->shipDynamics)
+            for(ShipDynamic *dyn : fi->shipDynamics) {
+                if(!dyn) {
+                    continue;
+                }
                 dyn->fleetFled = false;
+            }
             updateFleetIntoDatabase(uid, *fi,
                                     result.value()[3]);
             delete fi;
