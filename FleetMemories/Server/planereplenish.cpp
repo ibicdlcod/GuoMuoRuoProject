@@ -7,16 +7,22 @@
 #include "user.h"
 #include "kerrors.h"
 #include "../Protocol/kp.h"
-#include <QSqlDatabase>
-#include <QSqlQuery>
-#include <QSqlError>
-#include <QTimer>
 #include <QDateTime>
+#include <QDebug>
+#include <QSqlDatabase>
+#include <QSqlError>
+#include <QSqlQuery>
+#include <QTimer>
 
 PlaneReplenish::PlaneReplenish(Server *parent)
     : QObject(parent), server(parent) {}
 
 bool PlaneReplenish::replenishAfterBattle(const CSteamID &uid, int fleetIndex) {
+    if(!server) {
+        qWarning() << "PlaneReplenish: server pointer is null";
+        return false;
+    }
+    
     ResOrd cost = calculateReplenishCost(uid, fleetIndex);
     
     if(cost.o == 0 && cost.e == 0 && cost.s == 0 && 
@@ -24,7 +30,8 @@ bool PlaneReplenish::replenishAfterBattle(const CSteamID &uid, int fleetIndex) {
         // No planes need replenishment
         return true;
     }
-    
+
+
     bool success = applyReplenishment(uid, fleetIndex, cost);
     
     // Send notification to client
@@ -73,7 +80,8 @@ bool PlaneReplenish::recoverPlaneLosses(const CSteamID &uid) {
     QSqlQuery query;
     
     query.prepare("SELECT DISTINCT us.FleetIndex FROM UserPlaneLosses upl "
-                  "JOIN UserShip us ON upl.User = us.User AND upl.ShipUuid = us.ShipUuid "
+                  "JOIN UserShip us ON upl.User = us.User "
+                  "AND upl.ShipUuid = us.ShipUuid "
                   "WHERE upl.User = :uid");
     query.bindValue(":uid", uid.ConvertToUint64());
     
@@ -81,7 +89,6 @@ bool PlaneReplenish::recoverPlaneLosses(const CSteamID &uid) {
         //% "Failed to query plane losses for recovery."
         throw DBError(qtTrId("plane-recover-query-failed"),
                       query.lastError(), query.lastQuery());
-        return false;
     }
     
     bool anyLosses = false;
@@ -100,7 +107,14 @@ bool PlaneReplenish::recoverPlaneLosses(const CSteamID &uid) {
     return true;
 }
 
-ResOrd PlaneReplenish::calculateReplenishCost(const CSteamID &uid, int fleetIndex) {
+ResOrd PlaneReplenish::calculateReplenishCost(const CSteamID &uid,
+                                              int fleetIndex) {
+    if(!server) {
+        qWarning() << "PlaneReplenish: server pointer is null "
+                      "in cost calculation";
+        return ResOrd();
+    }
+    
     QSqlDatabase db = QSqlDatabase::database();
     QSqlQuery query;
     ResOrd totalCost;
@@ -138,7 +152,8 @@ ResOrd PlaneReplenish::calculateReplenishCost(const CSteamID &uid, int fleetInde
             equipQuery.prepare("SELECT ue.EquipDef, e.Intvalue "
                               "FROM UserEquip ue "
                               "JOIN EquipReg e ON ue.EquipDef = e.EquipID "
-                              "WHERE ue.EquipUuid = :uuid AND e.Attribute = 'Planes'");
+                              "WHERE ue.EquipUuid = :uuid "
+                              "AND e.Attribute = 'Planes'");
             equipQuery.bindValue(":uuid", equipUuid);
             
             if(equipQuery.exec() && equipQuery.next()) {
@@ -148,13 +163,15 @@ ResOrd PlaneReplenish::calculateReplenishCost(const CSteamID &uid, int fleetInde
                 if(maxPlanes > 0 && currentPlanes < maxPlanes) {
                     int planesNeeded = maxPlanes - currentPlanes;
                     // Maintenance placeholder (0 for now)
-                    planesNeeded += 0; // maintenanceCount(currentPlanes, equipDef) placeholder
+                    planesNeeded += maintenanceCount(currentPlanes, equipDef);
                     
                     // Get equipment and calculate cost
-                    Equipment *equip = server->equipRegistry.value(equipDef);
+                     Equipment *equip =
+                         server->equipRegistry.value(equipDef);
                     if(equip) {
-                        ResOrd per100PlaneCost = equip->replenishCostPer100Planes();
-                        totalCost += per100PlaneCost * planesNeeded / 100;
+                         ResOrd per100PlaneCost =
+                             equip->replenishCostPer100Planes();
+                         totalCost += scaleCost(per100PlaneCost, planesNeeded);
                     }
                 }
             }
@@ -166,48 +183,60 @@ ResOrd PlaneReplenish::calculateReplenishCost(const CSteamID &uid, int fleetInde
 
 bool PlaneReplenish::applyReplenishment(const CSteamID &uid, int fleetIndex,
                                         const ResOrd &cost) {
-    // Do not check if user has sufficient resources, just allow negative resources in this case
+    // Do not check if user has sufficient resources,
+    // just allow negative resources in this case
     
     QSqlDatabase db = QSqlDatabase::database();
+    if(!db.transaction()) {
+        //% "Failed to start database transaction for plane replenishment."
+        throw DBError(qtTrId("plane-replenish-transaction-failed"),
+                      db.lastError(), QString());
+    }
+    
     QSqlQuery query;
     
     // Update all plane slots to max capacity for fleet
+    // Use COALESCE to handle equipment without 'Planes' attribute (set to 0)
     query.prepare("UPDATE UserShip us "
-                  "SET Slot1Planes = (SELECT e.Intvalue FROM EquipReg e "
-                  "                   JOIN UserEquip ue ON ue.EquipUuid = us.Slot1 "
-                  "                   WHERE e.EquipID = ue.EquipDef "
-                  "                   AND e.Attribute = 'Planes' "
-                  "                   LIMIT 1), "
-                  "    Slot2Planes = (SELECT e.Intvalue FROM EquipReg e "
-                  "                   JOIN UserEquip ue ON ue.EquipUuid = us.Slot2 "
-                  "                   WHERE e.EquipID = ue.EquipDef "
-                  "                   AND e.Attribute = 'Planes' "
-                  "                   LIMIT 1), "
-                  "    Slot3Planes = (SELECT e.Intvalue FROM EquipReg e "
-                  "                   JOIN UserEquip ue ON ue.EquipUuid = us.Slot3 "
-                  "                   WHERE e.EquipID = ue.EquipDef "
-                  "                   AND e.Attribute = 'Planes' "
-                  "                   LIMIT 1), "
-                  "    Slot4Planes = (SELECT e.Intvalue FROM EquipReg e "
-                  "                   JOIN UserEquip ue ON ue.EquipUuid = us.Slot4 "
-                  "                   WHERE e.EquipID = ue.EquipDef "
-                  "                   AND e.Attribute = 'Planes' "
-                  "                   LIMIT 1), "
-                  "    Slot5Planes = (SELECT e.Intvalue FROM EquipReg e "
-                  "                   JOIN UserEquip ue ON ue.EquipUuid = us.Slot5 "
-                  "                   WHERE e.EquipID = ue.EquipDef "
-                  "                   AND e.Attribute = 'Planes' "
-                  "                   LIMIT 1) "
+                  "SET Slot1Planes = COALESCE((SELECT e.Intvalue "
+                  "FROM EquipReg e "
+                  "JOIN UserEquip ue ON ue.EquipUuid = us.Slot1 "
+                  "WHERE e.EquipID = ue.EquipDef "
+                  "AND e.Attribute = 'Planes' "
+                  "LIMIT 1), 0), "
+                  "    Slot2Planes = COALESCE((SELECT e.Intvalue "
+                  "FROM EquipReg e "
+                  "JOIN UserEquip ue ON ue.EquipUuid = us.Slot2 "
+                  "WHERE e.EquipID = ue.EquipDef "
+                  "AND e.Attribute = 'Planes' "
+                  "LIMIT 1), 0), "
+                  "    Slot3Planes = COALESCE((SELECT e.Intvalue "
+                  "FROM EquipReg e "
+                  "JOIN UserEquip ue ON ue.EquipUuid = us.Slot3 "
+                  "WHERE e.EquipID = ue.EquipDef "
+                  "AND e.Attribute = 'Planes' "
+                  "LIMIT 1), 0), "
+                  "    Slot4Planes = COALESCE((SELECT e.Intvalue "
+                  "FROM EquipReg e "
+                  "JOIN UserEquip ue ON ue.EquipUuid = us.Slot4 "
+                  "WHERE e.EquipID = ue.EquipDef "
+                  "AND e.Attribute = 'Planes' "
+                  "LIMIT 1), 0), "
+                  "    Slot5Planes = COALESCE((SELECT e.Intvalue "
+                  "FROM EquipReg e "
+                  "JOIN UserEquip ue ON ue.EquipUuid = us.Slot5 "
+                  "WHERE e.EquipID = ue.EquipDef "
+                  "AND e.Attribute = 'Planes' "
+                  "LIMIT 1), 0) "
                   "WHERE us.User = :uid AND us.FleetIndex = :fleet");
     query.bindValue(":uid", uid.ConvertToUint64());
     query.bindValue(":fleet", fleetIndex);
     
     if(!query.exec()) {
         //% "Failed to replenish planes."
+        db.rollback();
         throw DBError(qtTrId("plane-replenish-update-failed"),
                       query.lastError(), query.lastQuery());
-        // Refund resources?
-        return false;
     }
     
     // Deduct resources (allow negative)
@@ -230,10 +259,9 @@ bool PlaneReplenish::applyReplenishment(const CSteamID &uid, int fleetIndex,
     
     if(!resourceQuery.exec()) {
         //% "Failed to deduct plane replenishment resources."
+        db.rollback();
         throw DBError(qtTrId("plane-replenish-resource-deduct-failed"),
                       resourceQuery.lastError(), resourceQuery.lastQuery());
-        // Note: planes already replenished, can't rollback easily
-        return false;
     }
     
     // Clear plane losses for this fleet
@@ -245,5 +273,33 @@ bool PlaneReplenish::applyReplenishment(const CSteamID &uid, int fleetIndex,
     clearQuery.bindValue(":fleet", fleetIndex);
     clearQuery.exec(); // Ignore errors - table might be empty
     
+    // Commit transaction
+    if(!db.commit()) {
+        db.rollback();
+        //% "Failed to commit plane replenishment transaction."
+        throw DBError(qtTrId("plane-replenish-commit-failed"),
+                      db.lastError(), QString());
+    }
+    
     return true;
+}
+
+int PlaneReplenish::maintenanceCount(int currentPlanes, int equipDef) {
+    // Maintenance placeholder - returns 0 for now
+    Q_UNUSED(currentPlanes);
+    Q_UNUSED(equipDef);
+    return 0;
+}
+
+ResOrd PlaneReplenish::scaleCost(const ResOrd &costPer100, int planesNeeded) {
+    // Scale cost per 100 planes to actual planes needed with rounding up
+    ResOrd multiplied = costPer100 * planesNeeded;
+    // Round up each component: (value + 99) / 100
+    return ResOrd((multiplied.o + 99) / 100,
+                  (multiplied.e + 99) / 100,
+                  (multiplied.s + 99) / 100,
+                  (multiplied.r + 99) / 100,
+                  (multiplied.a + 99) / 100,
+                  (multiplied.w + 99) / 100,
+                  (multiplied.c + 99) / 100);
 }

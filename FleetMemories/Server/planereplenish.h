@@ -2,7 +2,7 @@
  * SPDX-License-Identifier: AGPL-3.0-or-later */
 
 #ifndef PLANEREPLENISH_H
-#define SERVER_PLANE_REPLENISH_H
+#define PLANEREPLENISH_H
 
 #include <QObject>
 #include <QSqlQuery>
@@ -37,6 +37,12 @@ private:
     // Apply plane replenishment to database
     bool applyReplenishment(const CSteamID &uid, int fleetIndex,
                             const ResOrd &cost);
+    
+    // Calculate maintenance planes (placeholder - returns 0)
+    int maintenanceCount(int currentPlanes, int equipDef);
+    
+    // Scale cost per 100 planes to actual planes needed with rounding up
+    ResOrd scaleCost(const ResOrd &costPer100, int planesNeeded);
 };
 
 #endif // PLANEREPLENISH_H
