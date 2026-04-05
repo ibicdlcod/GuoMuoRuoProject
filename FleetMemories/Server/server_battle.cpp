@@ -277,7 +277,12 @@ get_map_to_open:
         if(User::isMapUnlocked(uid, map, KP::EarlyWar)) {
             continue;
         }
-        if(!User::openMap(uid, map)) {
+        int gauge = 0;
+        if(lua["maps"] != sol::nil && lua["maps"][map] != sol::nil
+            && lua["maps"][map]["gauge"] != sol::nil) {
+            gauge = lua["maps"][map]["gauge"];
+        }
+        if(!User::openMap(uid, map, gauge)) {
             break;
         }
         else {

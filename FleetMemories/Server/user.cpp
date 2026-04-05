@@ -670,7 +670,7 @@ QUuid User::newShip(const CSteamID &uid, int shipDid, int startingHP) {
     }
 }
 
-bool User::openMap(const CSteamID &uid, int mapId) { // relative id
+bool User::openMap(const CSteamID &uid, int mapId, int gauge) { // relative id
     try {
         QSqlDatabase db = QSqlDatabase::database();
         if(!db.transaction()) {
@@ -679,10 +679,29 @@ bool User::openMap(const CSteamID &uid, int mapId) { // relative id
                               .arg(uid.ConvertToUint64()).arg(mapId),
                           db.lastError());
         }
+        /* Ensure the row exists before updating; this handles the case where
+         * a map was added after the user was first initialized. The gauge
+         * columns are set from the caller-supplied Lua value so that the
+         * player cannot clear the boss without actually depleting the gauge. */
+        QSqlQuery ensureRow;
+        ensureRow.prepare("INSERT OR IGNORE INTO UserMapState "
+                          "(User, MapDef, GaugeC, GaugeB, GaugeA, GaugeH) "
+                          "VALUES (:id, :def, :g, :g, :g, :g);");
+        ensureRow.bindValue(":id", uid.ConvertToUint64());
+        ensureRow.bindValue(":def", mapId);
+        ensureRow.bindValue(":g", gauge);
+        if(Q_UNLIKELY(!ensureRow.exec())) {
+            db.rollback();
+            //% "User ID %1: DB failure when ensuring row for map %2!"
+            throw DBError(qtTrId("dbfail-when-ensuring-map-row")
+                              .arg(uid.ConvertToUint64()).arg(mapId),
+                          ensureRow.lastError(), ensureRow.lastQuery());
+        }
         QSqlQuery query;
         query.prepare("UPDATE UserMapState "
                       "SET Supremacy = 0.0 "
-                      "WHERE User = :id AND MapDef = :def;");
+                      "WHERE User = :id AND MapDef = :def "
+                      "AND Supremacy < 0;");
         query.bindValue(":id", uid.ConvertToUint64());
         query.bindValue(":def", mapId);
         if(Q_UNLIKELY(!query.exec())){
@@ -690,7 +709,7 @@ bool User::openMap(const CSteamID &uid, int mapId) { // relative id
             //% "User ID %1: DB failure when opening map %2!"
             throw DBError(qtTrId("dbfail-when-opening-map")
                               .arg(uid.ConvertToUint64()).arg(mapId),
-                          query.lastError());
+                          query.lastError(), query.lastQuery());
             return false;
         }
         else {

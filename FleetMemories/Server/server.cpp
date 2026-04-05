@@ -4259,7 +4259,13 @@ home_port:
             QByteArray msg = KP::serverBlueprintAdded(shipId);
             senderM.sendMessage(connection, msg);
         }
-        if(mapId != 0 && User::openMap(uid, mapId)) {
+        int gauge = 0;
+        if(mapId != 0 && lua["maps"] != sol::nil
+            && lua["maps"][mapId] != sol::nil
+            && lua["maps"][mapId]["gauge"] != sol::nil) {
+            gauge = lua["maps"][mapId]["gauge"];
+        }
+        if(mapId != 0 && User::openMap(uid, mapId, gauge)) {
             offerMapInfo(uid, connection);
             offerMapInfoUser(uid, connection);
         }

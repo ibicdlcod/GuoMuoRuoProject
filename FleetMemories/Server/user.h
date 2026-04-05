@@ -42,7 +42,7 @@ bool isMapUnlocked(const CSteamID &, int, KP::Difficulty);
 bool isSuperUser(const CSteamID &);
 QUuid newEquip(const CSteamID &, int);
 QUuid newShip(const CSteamID &, int, int);
-bool openMap(const CSteamID &, int);
+bool openMap(const CSteamID &, int, int gauge = 0);
 void refreshFactory(Server *server, const CSteamID &);
 void refreshPort(Server *server, const CSteamID &);
 bool setMapSupremacy(const CSteamID &, int, double, double);
