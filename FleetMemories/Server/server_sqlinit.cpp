@@ -167,6 +167,25 @@ Q_GLOBAL_STATIC(QString,
                     ");"
                     ))
 
+/* Plane losses for abnormal exit recovery */
+Q_GLOBAL_STATIC(QString,
+                userPlaneLosses,
+                QStringLiteral(
+                    "CREATE TABLE UserPlaneLosses ("
+                    "User BLOB NOT NULL, "
+                    "ShipUuid TEXT NOT NULL, "
+                    "Slot INTEGER NOT NULL, "  // 1-5 for slot index
+                    "EquipDef INTEGER NOT NULL, "
+                    "LossCount INTEGER DEFAULT 0, "
+                    "RemainingCount INTEGER DEFAULT 0, "
+                    "Timestamp INTEGER DEFAULT 0, "
+                    "FOREIGN KEY(User) REFERENCES NewUsers(UserID), "
+                    "FOREIGN KEY(ShipUuid) REFERENCES UserShip(ShipUuid), "
+                    "FOREIGN KEY(EquipDef) REFERENCES EquipName(EquipID), "
+                    "CONSTRAINT noduplicate UNIQUE(User, ShipUuid, Slot) "
+                    ");"
+                    ))
+
 /* Map node table */
 Q_GLOBAL_STATIC(QString,
                 mapNode,
@@ -430,6 +449,17 @@ void Server::sqlinit() const {
         }
         if(!tables.contains("UserEquipSP")) {
             sqlinitEquipSP();
+        }
+        if(!tables.contains("UserPlaneLosses")) {
+            //% "User plane losses database does not exist, creating..."
+            qWarning() << qtTrId("plane-losses-db-lack");
+            QSqlQuery query;
+            query.prepare(*userPlaneLosses);
+            if(!query.exec()) {
+                //% "User plane losses table creation failure."
+                throw DBError(qtTrId("plane-losses-db-gen-failure"),
+                              query.lastError(), query.lastQuery());
+            }
         }
         if(!tables.contains("MapNode")) {
             sqlinitMapNode();
