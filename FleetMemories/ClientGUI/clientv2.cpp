@@ -78,6 +78,8 @@ Client::Client(QObject *parent)
                 steamThread->wait(500);
             });
     steamThread->start();
+    if(SteamScreenshots())
+        SteamScreenshots()->HookScreenshots(true);
 
     /* 1-migrate.md */
     migrateServer.route("/", QHttpServerRequest::Method::Post, this,

@@ -2,6 +2,8 @@
  * SPDX-License-Identifier: AGPL-3.0-or-later */
 
 #include "clientv2.h"
+#include <QGuiApplication>
+#include <QScreen>
 #include <QSettings>
 
 using namespace std::chrono_literals;
@@ -48,6 +50,23 @@ void Client::onMicroTxnAuth(MicroTxnAuthorizationResponse_t *pParam) {
         sender->enqueue(msg);
         socket.flush();
     }, Qt::QueuedConnection);
+}
+
+void Client::onScreenshotRequested(ScreenshotRequested_t *) {
+    QMetaObject::invokeMethod(this, &Client::takeAndSubmitScreenshot,
+                              Qt::BlockingQueuedConnection);
+}
+
+void Client::takeAndSubmitScreenshot() {
+    QScreen *screen = QGuiApplication::primaryScreen();
+    QPixmap pixmap = screen->grabWindow(0);
+    QImage image = pixmap.toImage().convertToFormat(QImage::Format_RGB888);
+    if(SteamScreenshots()) {
+        SteamScreenshots()->WriteScreenshot(
+            image.bits(),
+            static_cast<uint32>(image.sizeInBytes()),
+            image.width(), image.height());
+    }
 }
 
 void Client::sortie(int mapId, int fleetIndex, bool isExpedition) {

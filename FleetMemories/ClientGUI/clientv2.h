@@ -26,6 +26,7 @@
 #include "../Protocol/mapwithdiff.h"
 #include "resourcefetch.h"
 #include "steamauth.h"
+#include "../steam/isteamscreenshots.h"
 #include "../Protocol/lua.h"
 
 void customMessageHandler(QtMsgType,
@@ -309,6 +310,8 @@ private:
                           "\xb1\xbc");
 
     STEAM_CALLBACK(Client, onMicroTxnAuth, MicroTxnAuthorizationResponse_t);
+    STEAM_CALLBACK(Client, onScreenshotRequested, ScreenshotRequested_t);
+    Q_INVOKABLE void takeAndSubmitScreenshot();
 
     SteamAuth sauth;
     QByteArray authCache;
