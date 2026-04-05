@@ -1601,7 +1601,8 @@ ship:
             QSqlQuery query;
             query.prepare("UPDATE UserEquipSP "
                           "SET Intvalue = Intvalue "
-                          "+ temp.e.cnt / sqrt(temp.e.amount + Intvalue) "
+                          "+ temp.e.cnt * temp.e.amount "
+                          "/ sqrt(temp.e.amount + Intvalue) "
                           "FROM temp.e "
                           "WHERE UserEquipSP.EquipDef = temp.e.EquipDef "
                           "AND UserEquipSP.User = temp.e.User; ");

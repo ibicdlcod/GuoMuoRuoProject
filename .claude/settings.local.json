@@ -29,7 +29,8 @@
       "Bash(sed -n '3685,3691p' FleetMemories/Translations/FleetMemories_ja_JP.ts)",
       "Skill(claude-reflect:reflect)",
       "Bash(while read:*)",
-      "Bash(grep:*)"
+      "Bash(grep:*)",
+      "Bash(git push:*)"
     ]
   }
 }
