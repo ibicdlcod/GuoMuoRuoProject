@@ -950,14 +950,48 @@ const QJsonObject Server::processBattleCore(const CSteamID &uid,
         return shipPlanesArray;
     };
     
+    // Padded versions for player fleets (respect empty positions)
+    auto hpArrayPadded = [](const FleetInfo &fleet) -> QJsonArray {
+        QJsonArray arr;
+        for (int pos = 0; pos < KP::fleetRepSize; ++pos) {
+            int hp = 0;
+            for (const ShipDynamic *dyn : fleet.shipDynamics) {
+                if (dyn->fleetPosIndex == pos) {
+                    hp = dyn->currentHP;
+                    break;
+                }
+            }
+            arr.append(hp);
+        }
+        return arr;
+    };
+    auto planeArraysPadded = [](const FleetInfo &fleet) -> QJsonArray {
+        QJsonArray shipPlanesArray;
+        for (int pos = 0; pos < KP::fleetRepSize; ++pos) {
+            QJsonArray slotArray;
+            bool found = false;
+            for (const ShipDynamic *dyn : fleet.shipDynamics) {
+                if (dyn->fleetPosIndex == pos) {
+                    for (int planes : dyn->slotPlanes) {
+                        slotArray.append(planes);
+                    }
+                    found = true;
+                    break;
+                }
+            }
+            // If no ship at this position, slotArray remains empty
+            shipPlanesArray.append(slotArray);
+        }
+        return shipPlanesArray;
+    };
     // Build "before" state
     QJsonObject before;
     QJsonObject playerBefore;
     QJsonObject enemyBefore;
     
     if(playerFleet) {
-        playerBefore["hp"] = hpArray(*playerFleet);
-        playerBefore["planes"] = planeArrays(*playerFleet);
+        playerBefore["hp"] = hpArrayPadded(*playerFleet);
+        playerBefore["planes"] = planeArraysPadded(*playerFleet);
     } else {
         qWarning() << "Player fleet not found in sortieFleets, using dummy";
         QJsonArray dummyHP;
@@ -1156,7 +1190,7 @@ const QJsonObject Server::processBattleCore(const CSteamID &uid,
     QJsonArray playerHPAfter;
     QJsonArray enemyHPAfter;
     if(playerFleet) {
-        playerHPAfter = hpArray(*playerFleet);
+        playerHPAfter = hpArrayPadded(*playerFleet);
     } else {
         playerHPAfter = playerHPBefore; // dummy unchanged
     }
@@ -1249,8 +1283,8 @@ const QJsonObject Server::processBattleCore(const CSteamID &uid,
     QJsonObject enemyAfter;
     
     if(playerFleet) {
-        playerAfter["hp"] = hpArray(*playerFleet);
-        playerAfter["planes"] = planeArrays(*playerFleet);
+        playerAfter["hp"] = hpArrayPadded(*playerFleet);
+        playerAfter["planes"] = planeArraysPadded(*playerFleet);
     } else {
         // Use same dummy data as before
         QJsonArray dummyHP;
