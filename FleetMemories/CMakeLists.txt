@@ -201,6 +201,8 @@ set(SERVER_SOURCES
     Server/kerrors.cpp
     Server/kerrors.h
     Server/main.cpp
+    Server/planereplenish.cpp
+    Server/planereplenish.h
     Server/qconsolelistener.cpp
     Server/qconsolelistener.h
     Server/rngesus.cpp

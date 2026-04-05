@@ -25,7 +25,7 @@
 #include "../Protocol/map.h"
 #include "../Protocol/mapwithdiff.h"
 #include "servermastersender.h"
-#include "server_plane_replenish.h"
+#include "planereplenish.h"
 #include "sslserver.h"
 
 class Server : public CommandLine {

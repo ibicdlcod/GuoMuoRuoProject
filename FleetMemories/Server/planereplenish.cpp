@@ -1,7 +1,7 @@
 /* Copyright (C) 2026 Harusoft Ltd.
  * SPDX-License-Identifier: AGPL-3.0-or-later */
 
-#include "server_plane_replenish.h"
+#include "planereplenish.h"
 #include "server.h"
 #include "equipment.h"
 #include "user.h"
@@ -30,7 +30,9 @@ bool PlaneReplenish::replenishAfterBattle(const CSteamID &uid, int fleetIndex) {
     // Send notification to client
     if(success) {
         QByteArray msg = KP::serverPlaneReplenishResult(KP::Success, cost);
-        server->senderM.sendMessageToUser(uid, msg);
+        if(server->connectedPeers.contains(uid)) {
+            server->senderM.sendMessage(server->connectedPeers.value(uid), msg);
+        }
         qInfo() << "Planes replenished for user" << uid.ConvertToUint64()
                 << "fleet" << fleetIndex << "cost:" << cost.toString();
     }
@@ -38,15 +40,19 @@ bool PlaneReplenish::replenishAfterBattle(const CSteamID &uid, int fleetIndex) {
     return success;
 }
 
-void PlaneReplenish::storePlaneLosses(const CSteamID &uid, const QString &shipUuid,
-                                      int slot, int equipDef, int lossCount, int remainingCount) {
+void PlaneReplenish::storePlaneLosses(const CSteamID &uid,
+                                      const QString &shipUuid,
+                                      int slot, int equipDef,
+                                      int lossCount, int remainingCount) {
     QSqlDatabase db = QSqlDatabase::database();
     QSqlQuery query;
     
     // Always store plane state (even with 0 losses) for abnormal exit recovery
     query.prepare("INSERT OR REPLACE INTO UserPlaneLosses "
-                  "(User, ShipUuid, Slot, EquipDef, LossCount, RemainingCount, Timestamp) "
-                  "VALUES (:uid, :ship, :slot, :equip, :loss, :remaining, :time)");
+                  "(User, ShipUuid, Slot, EquipDef, LossCount, "
+                  "RemainingCount, Timestamp) "
+                  "VALUES (:uid, :ship, :slot, :equip, :loss, "
+                  ":remaining, :time)");
     query.bindValue(":uid", uid.ConvertToUint64());
     query.bindValue(":ship", shipUuid);
     query.bindValue(":slot", slot);

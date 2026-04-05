@@ -1,13 +1,14 @@
 /* Copyright (C) 2026 Harusoft Ltd.
  * SPDX-License-Identifier: AGPL-3.0-or-later */
 
-#ifndef SERVER_PLANE_REPLENISH_H
+#ifndef PLANEREPLENISH_H
 #define SERVER_PLANE_REPLENISH_H
 
 #include <QObject>
 #include <QSqlQuery>
-#include "steam/steamtypes.h"
+#include <QString>
 #include "resord.h"
+#include "steam/steamtypes.h"
 
 class Server;
 
@@ -38,4 +39,4 @@ private:
                             const ResOrd &cost);
 };
 
-#endif // SERVER_PLANE_REPLENISH_H
+#endif // PLANEREPLENISH_H
