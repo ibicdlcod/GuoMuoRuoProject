@@ -23,7 +23,6 @@ bool PlaneReplenish::replenishAfterBattle(const CSteamID &uid, int fleetIndex) {
         qWarning() << "PlaneReplenish: server pointer is null";
         return false;
     }
-    qCritical() << "FUCK";
     ResOrd cost = calculateReplenishCost(uid, fleetIndex);
     
     if(cost.o == 0 && cost.e == 0 && cost.s == 0 && 
@@ -41,8 +40,6 @@ bool PlaneReplenish::replenishAfterBattle(const CSteamID &uid, int fleetIndex) {
         if(server->connectedPeers.contains(uid)) {
             server->senderM.sendMessage(server->connectedPeers.value(uid), msg);
         }
-        qInfo() << "Planes replenished for user" << uid.ConvertToUint64()
-                << "fleet" << fleetIndex << "cost:" << cost.toString();
     }
     
     return success;
@@ -115,70 +112,37 @@ ResOrd PlaneReplenish::calculateReplenishCost(const CSteamID &uid,
                       "in cost calculation";
         return ResOrd(0,0,0,0,0,0,0);
     }
-    
-    QSqlDatabase db = QSqlDatabase::database();
+
     QSqlQuery query;
     ResOrd totalCost(0,0,0,0,0,0,0);
-    
-    // Get all ships in fleet with plane losses
-    query.prepare("SELECT us.ShipUuid, us.Slot1Planes, us.Slot2Planes, "
-                  "us.Slot3Planes, us.Slot4Planes, us.Slot5Planes, "
-                  "us.Slot1, us.Slot2, us.Slot3, us.Slot4, us.Slot5 "
-                  "FROM UserShip us "
-                  "WHERE us.User = :uid AND us.FleetIndex = :fleet");
+
+    query.prepare("SELECT upl.EquipDef, upl.LossCount, upl.RemainingCount "
+                  "FROM UserPlaneLosses upl "
+                  "JOIN UserShip us ON upl.ShipUuid = us.ShipUuid "
+                  "WHERE upl.User = :uid AND us.FleetIndex = :fleet "
+                  "AND upl.LossCount > 0");
     query.bindValue(":uid", uid.ConvertToUint64());
     query.bindValue(":fleet", fleetIndex);
-    
+
     if(!query.exec()) {
         //% "Failed to query fleet ships for plane replenishment."
         throw DBError(qtTrId("plane-replenish-query-fleet-failed"),
                       query.lastError(), query.lastQuery());
     }
-    
+
     while(query.next()) {
-        QString shipUuid = query.value("ShipUuid").toString();
-        
-        // Check each slot
-        for(int slot = 1; slot <= 5; slot++) {
-            QString planesCol = QString("Slot%1Planes").arg(slot);
-            QString equipCol = QString("Slot%1").arg(slot);
-            
-            int currentPlanes = query.value(planesCol).toInt();
-            QString equipUuid = query.value(equipCol).toString();
-            
-            if(equipUuid.isNull()) continue;
-            
-            // Get equipment definition and max planes
-            QSqlQuery equipQuery;
-            equipQuery.prepare("SELECT ue.EquipDef, e.Intvalue "
-                              "FROM UserEquip ue "
-                              "JOIN EquipReg e ON ue.EquipDef = e.EquipID "
-                              "WHERE ue.EquipUuid = :uuid "
-                              "AND e.Attribute = 'Planes'");
-            equipQuery.bindValue(":uuid", equipUuid);
-            
-            if(equipQuery.exec() && equipQuery.next()) {
-                int equipDef = equipQuery.value("EquipDef").toInt();
-                int maxPlanes = equipQuery.value("Intvalue").toInt();
-                
-                if(maxPlanes > 0 && currentPlanes < maxPlanes) {
-                    int planesNeeded = maxPlanes - currentPlanes;
-                    // Maintenance placeholder (0 for now)
-                    planesNeeded += maintenanceCount(currentPlanes, equipDef);
-                    
-                    // Get equipment and calculate cost
-                     Equipment *equip =
-                         server->equipRegistry.value(equipDef);
-                    if(equip) {
-                         ResOrd per100PlaneCost =
-                             equip->replenishCostPer100Planes();
-                         totalCost += scaleCost(per100PlaneCost, planesNeeded);
-                    }
-                }
-            }
+        int equipDef     = query.value("EquipDef").toInt();
+        int lossCount    = query.value("LossCount").toInt();
+        int remaining    = query.value("RemainingCount").toInt();
+        int planesNeeded = lossCount + maintenanceCount(remaining, equipDef);
+
+        Equipment *equip = server->equipRegistry.value(equipDef);
+        if(equip) {
+            ResOrd per100PlaneCost = equip->replenishCostPer100Planes();
+            totalCost += scaleCost(per100PlaneCost, planesNeeded);
         }
     }
-    
+
     return totalCost;
 }
 

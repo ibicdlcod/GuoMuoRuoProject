@@ -1073,7 +1073,7 @@ void Client::receivedMsg(const QJsonObject &djson) {
                 //% "Fleet contains duplicate ships!"
                 warn << qtTrId("fleet-contains-duplicate"); break;
             case KP::FleetInsufficientResources:
-                //% "Insufficient Oil or Explosives for this sortie."
+                //% "Insufficient ordinary resources for this sortie."
                 warn << qtTrId("fleet-insufficient-resources"); break;
             }
             if(fleetIndex >= 0)

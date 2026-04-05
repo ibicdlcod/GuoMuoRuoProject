@@ -1023,10 +1023,6 @@ const QJsonObject Server::processBattleCore(const CSteamID &uid,
         // Compute HP loss amounts
         int playerLossHP = static_cast<int>(playerLossFactor * totalPlayerHP);
         int enemyLossHP = static_cast<int>(enemyLossFactor * totalEnemyHP);
-        qInfo() << "Battle capitalness: player" << playerTotal << "enemy"
-                << enemyTotal << "a=" << a << "playerLossFactor"
-                << playerLossFactor << "enemyLossFactor" << enemyLossFactor
-                << "HP loss player" << playerLossHP << "enemy" << enemyLossHP;
 
         // Database connection
         QSqlDatabase db = QSqlDatabase::database();
@@ -1246,11 +1242,6 @@ const QJsonObject Server::processBattleCore(const CSteamID &uid,
     
     // Set assessment in result
     result["assm"] = static_cast<int>(assessment);
-    qInfo() << "Battle assessment:" << assessment
-             << "playerDamage%" << playerDamagePercentage
-             << "enemyDamage%" << enemyDamagePercentage
-             << "enemyShipsSunk" << enemyShipsSunk
-             << "/" << totalEnemyShips << "flagshipSunk" << flagshipSunk;
     
     // Build "after" state with updated HP and planes
     QJsonObject after;
@@ -1860,6 +1851,19 @@ void Server::startSortie(const CSteamID &uid, QSslSocket *connection,
         senderM.sendMessage(connection, msg);
     }
     else {
+        /* Reject sortie when any ordinary resource is negative — plane
+         * replenishment intentionally allows negative balances, so a
+         * player could arrive here with debt. */
+        {
+            ResOrd res = User::getCurrentResources(uid);
+            if(!res.sufficient()) {
+                QByteArray msg = KP::serverFleetFailure(
+                    KP::FleetInsufficientResources, fleetIndex);
+                senderM.sendMessage(connection, msg);
+                return;
+            }
+        }
+
         QSqlDatabase db = QSqlDatabase::database();
         QSqlQuery query;
         query.prepare("SELECT 1 FROM UserShip "
@@ -1959,7 +1963,8 @@ void Server::startSortie(const CSteamID &uid, QSslSocket *connection,
                     std::ceil(consQuery.value(1).toInt() * attrition));
 
                 ResOrd res = User::getCurrentResources(uid);
-                if(res.o < oilNeeded || res.e < exploNeeded) {
+                res -= ResOrd(oilNeeded, exploNeeded, 0, 0, 0, 0, 0);
+                if(!res.sufficient()) {
                     QByteArray msg = KP::serverFleetFailure(
                         KP::FleetInsufficientResources, fleetIndex);
                     senderM.sendMessage(connection, msg);

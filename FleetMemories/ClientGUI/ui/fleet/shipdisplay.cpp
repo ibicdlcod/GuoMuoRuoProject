@@ -46,12 +46,24 @@ void ShipDisplay::setContent(int currentHP, int maxHP, int cond, int lv) {
         textCol = QColor(0, 0, 0);
         break;
     }
+    QColor borderCol = (QApplication::styleHints()->colorScheme()
+                        == Qt::ColorScheme::Dark)
+                       ? QColor(180, 180, 180) : QColor(120, 120, 120);
+    QColor baseCol = QApplication::palette().color(QPalette::Base);
     ui->hpBar->setStyleSheet(
-        QString("QProgressBar::chunk { background-color: %1; "
-                "border-radius: 8px; }"
-                "QProgressBar { color: %2; "
-                "border-radius: 8px; }")
-            .arg(col.name(), textCol.name()));
+        QString("QProgressBar {"
+                " border: 1px solid %3;"
+                " border-radius: 3px;"
+                " background-color: %4;"
+                " color: %2;"
+                " text-align: center;"
+                "}"
+                "QProgressBar::chunk {"
+                " background-color: %1;"
+                " border-radius: 2px;"
+                "}")
+            .arg(col.name(), textCol.name(),
+                 borderCol.name(), baseCol.name()));
 
     /* lv */
     //% "Lv %1"
