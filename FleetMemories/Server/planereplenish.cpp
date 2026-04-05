@@ -7,6 +7,7 @@
 #include "user.h"
 #include "kerrors.h"
 #include "../Protocol/kp.h"
+#include <algorithm>
 #include <cmath>
 #include <QRandomGenerator>
 #include <QDateTime>
@@ -257,8 +258,8 @@ bool PlaneReplenish::applyReplenishment(const CSteamID &uid, int fleetIndex,
 }
 
 int PlaneReplenish::maintenanceCount(int remaining, const Equipment *equip) {
-    int x = equip->attr.value("Disallowmassproduction", 1);
-    double k = QRandomGenerator::global()->bounded(8, 32);
+    int x = std::max(1, equip->attr.value("Disallowmassproduction", 1));
+    double k = QRandomGenerator::global()->bounded(8, 33);
     return std::round(remaining / std::sqrt(k * x));
 }
 
