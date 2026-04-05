@@ -52,8 +52,67 @@ bool PlaneReplenish::recoverPlaneLosses(const CSteamID &uid) {
 }
 
 ResOrd PlaneReplenish::calculateReplenishCost(const CSteamID &uid, int fleetIndex) {
-    // Implementation in next steps
-    return ResOrd();
+    QSqlDatabase db = QSqlDatabase::database();
+    QSqlQuery query;
+    ResOrd totalCost;
+    
+    // Get all ships in fleet with plane losses
+    query.prepare("SELECT us.ShipUuid, us.Slot1Planes, us.Slot2Planes, "
+                  "us.Slot3Planes, us.Slot4Planes, us.Slot5Planes, "
+                  "us.Slot1, us.Slot2, us.Slot3, us.Slot4, us.Slot5 "
+                  "FROM UserShip us "
+                  "WHERE us.User = :uid AND us.FleetIndex = :fleet");
+    query.bindValue(":uid", uid.ConvertToUint64());
+    query.bindValue(":fleet", fleetIndex);
+    
+    if(!query.exec()) {
+        //% "Failed to query fleet ships for plane replenishment."
+        throw DBError(qtTrId("plane-replenish-query-fleet-failed"),
+                      query.lastError(), query.lastQuery());
+    }
+    
+    while(query.next()) {
+        QString shipUuid = query.value("ShipUuid").toString();
+        
+        // Check each slot
+        for(int slot = 1; slot <= 5; slot++) {
+            QString planesCol = QString("Slot%1Planes").arg(slot);
+            QString equipCol = QString("Slot%1").arg(slot);
+            
+            int currentPlanes = query.value(planesCol).toInt();
+            QString equipUuid = query.value(equipCol).toString();
+            
+            if(equipUuid.isNull()) continue;
+            
+            // Get equipment definition and max planes
+            QSqlQuery equipQuery;
+            equipQuery.prepare("SELECT ue.EquipDef, e.Intvalue "
+                              "FROM UserEquip ue "
+                              "JOIN EquipReg e ON ue.EquipDef = e.EquipID "
+                              "WHERE ue.EquipUuid = :uuid AND e.Attribute = 'Planes'");
+            equipQuery.bindValue(":uuid", equipUuid);
+            
+            if(equipQuery.exec() && equipQuery.next()) {
+                int equipDef = equipQuery.value("EquipDef").toInt();
+                int maxPlanes = equipQuery.value("Intvalue").toInt();
+                
+                if(maxPlanes > 0 && currentPlanes < maxPlanes) {
+                    int planesNeeded = maxPlanes - currentPlanes;
+                    // Maintenance placeholder (0 for now)
+                    planesNeeded += 0; // maintenanceCount(currentPlanes, equipDef) placeholder
+                    
+                    // Get equipment and calculate cost
+                    Equipment *equip = server->equipRegistry.value(equipDef);
+                    if(equip) {
+                        ResOrd per100PlaneCost = equip->replenishCostPer100Planes();
+                        totalCost += per100PlaneCost * planesNeeded / 100;
+                    }
+                }
+            }
+        }
+    }
+    
+    return totalCost;
 }
 
 bool PlaneReplenish::applyReplenishment(const CSteamID &uid, int fleetIndex,
