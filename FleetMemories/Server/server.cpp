@@ -1127,19 +1127,36 @@ check_default_equip:
         senderM.sendMessage(connection, msg);
         return;
     }
+    // Batch query equipment definitions for all slots
+    QList<QUuid> nonNullEquips;
+    QHash<QUuid, int> equipDefMap;
     for(int i = 0; i < KP::maxEquipSlots; ++i) {
-        int equipDef = 0;
+        if(!equips[i].isNull()) {
+            nonNullEquips.append(equips[i]);
+        }
+    }
+    if(!nonNullEquips.isEmpty()) {
         QSqlQuery query;
-        QString queryStr = QStringLiteral("SELECT EquipDef "
+        QString queryStr = QStringLiteral("SELECT EquipUuid, EquipDef "
                                           "FROM UserEquip "
                                           "WHERE User = :uid "
-                                          "AND EquipUuid = :euid");
+                                          "AND EquipUuid IN (");
+        QStringList placeholders;
+        for(int i = 0; i < nonNullEquips.size(); ++i) {
+            placeholders.append(QString(":euid%1").arg(i));
+        }
+        queryStr += placeholders.join(",") + ")";
         query.prepare(queryStr);
         query.bindValue(":uid", uid.ConvertToUint64());
-        query.bindValue(":euid", equips[i].toString());
+        for(int i = 0; i < nonNullEquips.size(); ++i) {
+            query.bindValue(QString(":euid%1").arg(i),
+                            nonNullEquips[i].toString());
+        }
         if(Q_LIKELY(query.exec() && query.isSelect())) {
-            if(query.first()) {
-                equipDef = query.value(0).toInt();
+            while(query.next()) {
+                equipDefMap.insert(QUuid::fromString(
+                    query.value("EquipUuid").toString()),
+                    query.value("EquipDef").toInt());
             }
         }
         else {
@@ -1147,6 +1164,14 @@ check_default_equip:
             throw DBError(
                 qtTrId("dbfail-constructing-query-existing-equips"),
                 query.lastError());
+        }
+    }
+    
+    // Process each slot with mapped equipment definitions
+    for(int i = 0; i < KP::maxEquipSlots; ++i) {
+        int equipDef = 0;
+        if(!equips[i].isNull()) {
+            equipDef = equipDefMap.value(equips[i], 0);
         }
         QString de = QStringLiteral("Defaultequip");
         de.append(QString::number(i+1));

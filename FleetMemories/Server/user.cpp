@@ -673,6 +673,12 @@ QUuid User::newShip(const CSteamID &uid, int shipDid, int startingHP) {
 bool User::openMap(const CSteamID &uid, int mapId) { // relative id
     try {
         QSqlDatabase db = QSqlDatabase::database();
+        if(!db.transaction()) {
+            //% "Failed to start transaction for opening map."
+            throw DBError(qtTrId("open-map-transaction-failed")
+                              .arg(uid.ConvertToUint64()).arg(mapId),
+                          db.lastError());
+        }
         QSqlQuery query;
         query.prepare("UPDATE UserMapState "
                       "SET Supremacy = 0.0 "
@@ -681,6 +687,7 @@ bool User::openMap(const CSteamID &uid, int mapId) { // relative id
         query.bindValue(":def", mapId);
         if(Q_UNLIKELY(!query.exec())){
             //% "User ID %1: DB failure when opening map %2!"
+            db.rollback();
             throw DBError(qtTrId("dbfail-when-opening-map")
                               .arg(uid.ConvertToUint64()).arg(mapId),
                           query.lastError());
@@ -701,19 +708,30 @@ bool User::openMap(const CSteamID &uid, int mapId) { // relative id
                 query.bindValue(":factory", factory1);
                 if(Q_UNLIKELY(!query.exec())){
                     //% "User ID %1: DB failure when increasing factory count!"
+                    db.rollback();
                     throw DBError(qtTrId("dbfail-when-increasing-factory")
                                       .arg(uid.ConvertToUint64()),
                                   query.lastError(), query.lastQuery());
                     return false;
                 }
-                for(int i = factory; i < factory1; ++i) {
+                // Batch insert factories
+                int factoryCount = factory1 - factory;
+                if(factoryCount > 0) {
+                    QStringList placeholders;
+                    for(int i = 0; i < factoryCount; ++i) {
+                        placeholders.append(QString("(:id, :count%1)").arg(i));
+                    }
                     QSqlQuery query;
-                    query.prepare("INSERT INTO Factories (UserID, FactoryID)"
-                                  " VALUES (:id, :count)");
+                    query.prepare("INSERT INTO Factories (UserID, FactoryID) "
+                                  "VALUES " + placeholders.join(","));
                     query.bindValue(":id", uid.ConvertToUint64());
-                    query.bindValue(":count", i);
+                    for(int i = 0; i < factoryCount; ++i) {
+                        query.bindValue(QString(":count%1").arg(i),
+                                        factory + i);
+                    }
                     if(Q_UNLIKELY(!query.exec())) {
                         //% "Set User Factory Up failed!"
+                        db.rollback();
                         throw DBError(qtTrId("init-user-factory-failed"),
                                       query.lastError(), query.lastQuery());
                         return false;
@@ -730,24 +748,43 @@ bool User::openMap(const CSteamID &uid, int mapId) { // relative id
                 query.bindValue(":repair", repair1);
                 if(Q_UNLIKELY(!query.exec())){
                     //% "User ID %1: DB failure when increasing dock count!"
+                    db.rollback();
                     throw DBError(qtTrId("dbfail-when-increasing-dock")
                                       .arg(uid.ConvertToUint64()),
                                   query.lastError(), query.lastQuery());
                     return false;
                 }
-                for(int i = repair; i < repair1; ++i) {
+                // Batch insert docks
+                int dockCount = repair1 - repair;
+                if(dockCount > 0) {
+                    QStringList placeholders;
+                    for(int i = 0; i < dockCount; ++i) {
+                        placeholders.append(QString("(:id, :count%1)").arg(i));
+                    }
                     QSqlQuery query;
-                    query.prepare("INSERT INTO Docks (UserID, DockID)"
-                                  " VALUES (:id, :count)");
+                    query.prepare("INSERT INTO Docks (UserID, DockID) "
+                                  "VALUES " + placeholders.join(","));
                     query.bindValue(":id", uid.ConvertToUint64());
-                    query.bindValue(":count", i);
+                    for(int i = 0; i < dockCount; ++i) {
+                        query.bindValue(QString(":count%1").arg(i),
+                                        repair + i);
+                    }
                     if(Q_UNLIKELY(!query.exec())) {
                         //% "Set User Dock Up failed!"
+                        db.rollback();
                         throw DBError(qtTrId("init-user-dock-failed"),
                                       query.lastError(), query.lastQuery());
                         return false;
                     }
                 }
+            }
+            if(!db.commit()) {
+                //% "Failed to commit transaction for opening map."
+                db.rollback();
+                throw DBError(qtTrId("open-map-commit-failed")
+                                  .arg(uid.ConvertToUint64()).arg(mapId),
+                              db.lastError());
+                return false;
             }
             return true;
         }
@@ -821,34 +858,52 @@ void User::setResources(const CSteamID &uid, ResOrd goal) {
                     maxRes,
                     maxRes,
                     maxRes));
-    QMap<QString, int> map = {
-        std::pair("O", goal.o),
-        std::pair("E", goal.e),
-        std::pair("S", goal.s),
-        std::pair("R", goal.r),
-        std::pair("A", goal.a),
-        std::pair("W", goal.w),
-        std::pair("C", goal.c)
-    };
     QSqlDatabase db = QSqlDatabase::database();
-    for(auto iter = map.keyValueBegin();
-         iter != map.keyValueEnd();
-         ++iter) {
-        QSqlQuery query;
-        query.prepare("UPDATE UserAttr "
-                      "SET Intvalue = :value "
-                      "WHERE UserID = :id AND Attribute = :type");
-        query.bindValue(":value", iter->second);
-        query.bindValue(":id", uid.ConvertToUint64());
-        query.bindValue(":type", iter->first);
-        if(Q_UNLIKELY(!query.exec())) {
-            //% "User id %1: set resources failed!"
-            qWarning() << qtTrId("set-resources-failed")
-                          .arg(uid.ConvertToUint64());
-            qWarning() << query.lastError();
-            return;
-        }
+    if(!db.transaction()) {
+        //% "Failed to start transaction for set resources."
+        qWarning() << qtTrId("set-resources-transaction-failed")
+                      .arg(uid.ConvertToUint64());
+        return;
     }
+    
+    QSqlQuery query;
+    query.prepare("UPDATE UserAttr "
+                  "SET Intvalue = CASE Attribute "
+                  "WHEN 'O' THEN :oil "
+                  "WHEN 'E' THEN :explosives "
+                  "WHEN 'S' THEN :steel "
+                  "WHEN 'R' THEN :rubber "
+                  "WHEN 'A' THEN :aluminum "
+                  "WHEN 'W' THEN :tungsten "
+                  "WHEN 'C' THEN :chromium END "
+                  "WHERE UserID = :id AND Attribute IN "
+                  "('O','E','S','R','A','W','C')");
+    query.bindValue(":oil", goal.o);
+    query.bindValue(":explosives", goal.e);
+    query.bindValue(":steel", goal.s);
+    query.bindValue(":rubber", goal.r);
+    query.bindValue(":aluminum", goal.a);
+    query.bindValue(":tungsten", goal.w);
+    query.bindValue(":chromium", goal.c);
+    query.bindValue(":id", uid.ConvertToUint64());
+    
+    if(Q_UNLIKELY(!query.exec())) {
+        //% "User id %1: set resources failed!"
+        db.rollback();
+        qWarning() << qtTrId("set-resources-failed")
+                      .arg(uid.ConvertToUint64());
+        qWarning() << query.lastError();
+        return;
+    }
+    
+    if(!db.commit()) {
+        //% "Failed to commit transaction for set resources."
+        db.rollback();
+        qWarning() << qtTrId("set-resources-commit-failed")
+                      .arg(uid.ConvertToUint64());
+        return;
+    }
+    
     //% "User id %1: set resources %2"
     qDebug() << qtTrId("set-resources").arg(uid.ConvertToUint64())
                 .arg(goal.toString());
