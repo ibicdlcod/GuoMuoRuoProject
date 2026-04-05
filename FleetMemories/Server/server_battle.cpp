@@ -1313,6 +1313,9 @@ set_battle_state:
     }
     QByteArray msg = KP::serverBattleEnd();
     senderM.sendMessage(connection, msg);
+    
+    // Automatic plane replenishment after battle
+    this->planeReplenish.replenishAfterBattle(uid, activeFleetIndex);
 
     auto assm = static_cast<KP::BattleAssessment>(
         battleProcess["assm"].toInt());
