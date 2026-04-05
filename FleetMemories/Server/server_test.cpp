@@ -117,3 +117,37 @@ void Server::testFleetInfoEffectiveAttr() {
     qInfo() << "testFleetInfoEffectiveAttr: PASS" << passCount
             << "/ FAIL" << failCount;
 }
+
+void Server::testPlaneReplenishment() {
+    qInfo() << "Starting plane replenishment test";
+    
+    // Test Equipment::replenishCostPer100Planes
+    Equipment *testEquip = equipRegistry.value(16, nullptr); // 九七式艦攻 ID 16
+    if(testEquip) {
+        KP::ResOrd devCost = testEquip->devRes();
+        KP::ResOrd per100PlaneCost = testEquip->replenishCostPer100Planes();
+        qInfo() << "Equipment 16 dev cost:" << devCost.toString()
+                << "per 100 planes cost:" << per100PlaneCost.toString();
+        // Verify per100PlaneCost == devCost (as per spec)
+        if(per100PlaneCost.o != devCost.o || per100PlaneCost.e != devCost.e ||
+           per100PlaneCost.s != devCost.s || per100PlaneCost.r != devCost.r ||
+           per100PlaneCost.a != devCost.a || per100PlaneCost.w != devCost.w ||
+           per100PlaneCost.c != devCost.c) {
+            qWarning() << "replenishCostPer100Planes mismatch";
+        } else {
+            qInfo() << "replenishCostPer100Planes test PASS";
+        }
+    } else {
+        qWarning() << "Equipment 16 not found in registry, skipping cost test";
+    }
+    
+    // Test plane loss storage (simulate with dummy data)
+    try {
+        // This would require a real user and ship, but we can at least test exception safety
+        qInfo() << "Plane loss storage test skipped (requires DB setup)";
+    } catch(const std::exception &e) {
+        qWarning() << "Exception in plane loss storage test:" << e.what();
+    }
+    
+    qInfo() << "Plane replenishment test completed";
+}

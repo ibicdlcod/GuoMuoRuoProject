@@ -6,6 +6,7 @@
 #include "equipment.h"
 #include "user.h"
 #include "kerrors.h"
+#include "../Protocol/kp.h"
 #include <QSqlDatabase>
 #include <QSqlQuery>
 #include <QSqlError>
@@ -28,9 +29,8 @@ bool PlaneReplenish::replenishAfterBattle(const CSteamID &uid, int fleetIndex) {
     
     // Send notification to client
     if(success) {
-        // TODO: Add serverPlaneReplenishResult builder function
-        // QByteArray msg = KP::serverPlaneReplenishResult(KP::Success, cost);
-        // server->senderM.sendMessageToUser(uid, msg);
+        QByteArray msg = KP::serverPlaneReplenishResult(KP::Success, cost);
+        server->senderM.sendMessageToUser(uid, msg);
         qInfo() << "Planes replenished for user" << uid.ConvertToUint64()
                 << "fleet" << fleetIndex << "cost:" << cost.toString();
     }

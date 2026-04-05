@@ -77,7 +77,7 @@ const int elapsedMaxTolerance = steamRateLimit;
 
 }
 
-Server::Server(int argc, char ** argv) : CommandLine(argc, argv) {
+Server::Server(int argc, char ** argv) : CommandLine(argc, argv), planeReplenish(this) {
     /* no *settings could be used here */
     std::random_device rd;
     std::seed_seq seq{rd(), rd(), rd(), rd(), rd(), rd(), rd(), rd()};
@@ -3686,6 +3686,7 @@ map_status:
     connectedPeers[uid] = connection;
     connectedUsers[connection] = uid;
     senderM.addSender(connection);
+    planeReplenish.recoverPlaneLosses(uid);
     } catch (DBError &e) {
         for(QString &i : e.whats()) {
             qCritical() << i;

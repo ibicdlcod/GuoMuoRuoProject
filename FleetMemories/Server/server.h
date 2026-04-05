@@ -75,6 +75,7 @@ private slots:
     void sslErrors(QSslSocket *, const QList<QSslError> &);
 
 private:
+    friend class PlaneReplenish;
     bool addEquipStar(const QUuid &, int);
     bool clearMap(const CSteamID &, int);
     void clearNegativeSkillPoints(const CSteamID &);
@@ -200,6 +201,7 @@ private:
     void startSortie(const CSteamID &, QSslSocket *, int, int, bool);
     void switchCert(const QStringList &);
     void testFleetInfoEffectiveAttr();
+    void testPlaneReplenishment();
     std::pair<KP::FleetFailType, int> updateFleet(const CSteamID &,
                                                   const QJsonArray &);
     void updateFleetIntoDatabase(const CSteamID &,

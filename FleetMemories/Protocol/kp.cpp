@@ -805,14 +805,29 @@ QByteArray KP::serverDisasterLOSInfo(double requiredLOS, double fleetLOS,
     return QCborValue::fromJsonValue(result).toCbor();
 }
 
-QByteArray KP::serverTransportFreightInfo(int currentFreight, int capacity,
-                                     int added) {
+ QByteArray KP::serverTransportFreightInfo(int currentFreight, int capacity,
+                                      int added) {
     QJsonObject result;
     result["type"] = DgramType::Info;
     result["infotype"] = InfoType::TransportFreightInfo;
     result["currentFreight"] = currentFreight;
     result["capacity"] = capacity;
     result["added"] = added;
+    return QCborValue::fromJsonValue(result).toCbor();
+}
+
+QByteArray KP::serverPlaneReplenishResult(GameError error, const ResOrd &cost) {
+    QJsonObject result;
+    result["type"] = DgramType::Info;
+    result["infotype"] = InfoType::PlaneReplenishResult;
+    result["error"] = static_cast<int>(error);
+    result["cost_o"] = cost.o;
+    result["cost_e"] = cost.e;
+    result["cost_s"] = cost.s;
+    result["cost_r"] = cost.r;
+    result["cost_a"] = cost.a;
+    result["cost_w"] = cost.w;
+    result["cost_c"] = cost.c;
     return QCborValue::fromJsonValue(result).toCbor();
 }
 

@@ -605,6 +605,20 @@ void Client::receivedInfo(const QJsonObject &djson) {
     case KP::InfoType::TransportFreightInfo:
         emit receivedTransportFreightInfo(djson);
         break;
+    case KP::InfoType::PlaneReplenishResult: {
+        KP::GameError error = static_cast<KP::GameError>(djson["error"].toInt());
+        KP::ResOrd cost(djson["cost_o"].toInt(), djson["cost_e"].toInt(),
+                        djson["cost_s"].toInt(), djson["cost_r"].toInt(),
+                        djson["cost_a"].toInt(), djson["cost_w"].toInt(),
+                        djson["cost_c"].toInt());
+        if(error == KP::Success) {
+            qInfo() << "Planes replenished, cost:" << cost.toString();
+            emit planeReplenished(cost);
+        } else {
+            qWarning() << "Plane replenishment failed:" << error;
+        }
+        break;
+    }
     case KP::InfoType::MapProgress: {
         int mapId = djson["mapid"].toInt();
         int nextNodeId = djson["next"].toInt();

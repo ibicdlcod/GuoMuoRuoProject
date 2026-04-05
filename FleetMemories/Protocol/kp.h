@@ -330,6 +330,7 @@ enum InfoType{
     VisibleBonusInfo,
     DisasterLOSInfo,
     TransportFreightInfo,
+    PlaneReplenishResult,
 };
 Q_ENUM_NS(InfoType)
 
@@ -891,7 +892,8 @@ QByteArray serverDisasterLOSInfo(double requiredLOS, double fleetLOS,
                                  double chanceToAvoid, double fuelFrac,
                                  double ammoFrac, bool deductionOccurred);
 QByteArray serverTransportFreightInfo(int currentFreight, int capacity,
-                                 int added);
+                                  int added);
+QByteArray serverPlaneReplenishResult(GameError, const ResOrd &cost);
 QByteArray serverMapStart(int mapId, int startNode);
 QByteArray serverMedalPurchased(int amount);
 QByteArray serverNewEquip(QUuid, int);
