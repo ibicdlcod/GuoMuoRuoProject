@@ -29,7 +29,7 @@ double FleetInfo::los() {
     std::vector<double> losValues;
     losValues.reserve(ships.size());
     for(int i = 0; i < static_cast<int>(ships.size()); ++i) {
-        if(!ships[i] || !shipDynamics[i])
+        if(!ships[i] || !shipDynamics[i] || shipDynamics[i]->fleetFled)
             continue;
         LuaMap attrs = attrFromShip(ships[i], shipDynamics[i]);
         LuaMap b = attrFromEquipment(ships[i], shipDynamics[i],
@@ -62,7 +62,7 @@ int FleetInfo::transportCapacity(const CSteamID &uid, TransportMode mode) {
     
     int total = 0;
     for(int i = 0; i < static_cast<int>(ships.size()); ++i) {
-        if(!ships[i] || !shipDynamics[i])
+        if(!ships[i] || !shipDynamics[i] || shipDynamics[i]->fleetFled)
             continue;
         LuaMap attrs = effectiveAttr(uid, i);
         total += attrs.value(QStringLiteral("Transport"), 0);
@@ -75,11 +75,12 @@ QMap<KP::CapitalType, int> FleetInfo::capitalness() {
     int screen = 0;
     int surface = 0;
     int carrier = 0;
-    for(const auto *ship: ships) {
-        if(!ship) continue;
-        int capi = ship->getType().getCapitalness();
+    for(int i = 0; i < static_cast<int>(ships.size()); ++i) {
+        if(!ships[i] || !shipDynamics[i] || shipDynamics[i]->fleetFled)
+            continue;
+        int capi = ships[i]->getType().getCapitalness();
         any += capi;
-        switch(ship->getType().getCapitalType()) {
+        switch(ships[i]->getType().getCapitalType()) {
         case KP::Screen: screen += capi; break;
         case KP::SurfaceShip: surface += capi; break;
         case KP::CarrierShip: carrier += capi; break;
@@ -95,8 +96,9 @@ QMap<KP::CapitalType, int> FleetInfo::capitalness() {
 
 std::vector<int> FleetInfo::shipSpeeds() {
     std::vector<int> result;
-    for(Ship *ship: ships) {
-        result.push_back(ship ? ship->attr["Speed"] : -1);
+    for(int i = 0; i < static_cast<int>(ships.size()); ++i) {
+        bool absent = !ships[i] || !shipDynamics[i] || shipDynamics[i]->fleetFled;
+        result.push_back(absent ? -1 : ships[i]->attr["Speed"]);
     }
     return result;
 }
@@ -105,7 +107,7 @@ Equipment *FleetInfo::getEquipAtPosAndSlot(int fleetPosIndex, int slot) {
     if(fleetPosIndex < 0
         || fleetPosIndex >= static_cast<int>(shipDynamics.size()))
         return nullptr;
-    if(!shipDynamics[fleetPosIndex])
+    if(!shipDynamics[fleetPosIndex] || shipDynamics[fleetPosIndex]->fleetFled)
         return nullptr;
     const QList<QUuid> &equipSlots = shipDynamics[fleetPosIndex]->slotEquip;
     if(slot < 0 || slot >= equipSlots.size())
@@ -117,7 +119,7 @@ Equipment *FleetInfo::getEquipAtPosAndEXSlot(int fleetPosIndex) {
     if(fleetPosIndex < 0
         || fleetPosIndex >= static_cast<int>(shipDynamics.size()))
         return nullptr;
-    if(!shipDynamics[fleetPosIndex])
+    if(!shipDynamics[fleetPosIndex] || shipDynamics[fleetPosIndex]->fleetFled)
         return nullptr;
     return equipMap.value(
         shipDynamics[fleetPosIndex]->slotEquipEx, nullptr);
@@ -128,12 +130,9 @@ QList<Equipment *> FleetInfo::getAllEquipAtPos(int fleetPosIndex) {
     if(fleetPosIndex < 0
         || fleetPosIndex >= static_cast<int>(shipDynamics.size()))
         return result;
-    if(!shipDynamics[fleetPosIndex])
+    if(!shipDynamics[fleetPosIndex] || shipDynamics[fleetPosIndex]->fleetFled)
         return result;
     ShipDynamic *dyn = shipDynamics[fleetPosIndex];
-    if(!dyn) {
-        return result;
-    }
     for(const QUuid &uuid : dyn->slotEquip) {
         if(Equipment *eq = equipMap.value(uuid, nullptr))
             result.append(eq);
@@ -147,7 +146,7 @@ int FleetInfo::getPlaneCountAtPosAndSlot(int fleetPosIndex, int slot) {
     if(fleetPosIndex < 0
         || fleetPosIndex >= static_cast<int>(shipDynamics.size()))
         return 0;
-    if(!shipDynamics[fleetPosIndex])
+    if(!shipDynamics[fleetPosIndex] || shipDynamics[fleetPosIndex]->fleetFled)
         return 0;
     const QList<int> &planes = shipDynamics[fleetPosIndex]->slotPlanes;
     if(slot < 0 || slot >= planes.size())
@@ -160,7 +159,7 @@ void FleetInfo::setPlaneCountAtPosAndSlot(int fleetPosIndex, int slot,
     if(fleetPosIndex < 0
         || fleetPosIndex >= static_cast<int>(shipDynamics.size()))
         return;
-    if(!shipDynamics[fleetPosIndex])
+    if(!shipDynamics[fleetPosIndex] || shipDynamics[fleetPosIndex]->fleetFled)
         return;
     QList<int> &planes = shipDynamics[fleetPosIndex]->slotPlanes;
     if(slot < 0 || slot >= planes.size())
@@ -172,7 +171,7 @@ void FleetInfo::setHPAtPos(int fleetPosIndex, int hp) {
     if(fleetPosIndex < 0
         || fleetPosIndex >= static_cast<int>(shipDynamics.size()))
         return;
-    if(!shipDynamics[fleetPosIndex])
+    if(!shipDynamics[fleetPosIndex] || shipDynamics[fleetPosIndex]->fleetFled)
         return;
     shipDynamics[fleetPosIndex]->currentHP = hp;
 }
@@ -181,7 +180,7 @@ std::vector<std::vector<Equipment *>> FleetInfo::getEquipGrid() const {
     std::vector<std::vector<Equipment *>> grid;
     grid.reserve(shipDynamics.size());
     for(const ShipDynamic *dyn : shipDynamics) {
-        if(!dyn) {
+        if(!dyn || dyn->fleetFled) {
             grid.push_back({});
             continue;
         }
@@ -259,7 +258,8 @@ LuaMap FleetInfo::effectiveAttr(const CSteamID & /* uid */, int fleetPosIndex) {
     if(fleetPosIndex < 0
         || fleetPosIndex >= static_cast<int>(ships.size()))
         return {};
-    if(!ships[fleetPosIndex] || !shipDynamics[fleetPosIndex])
+    if(!ships[fleetPosIndex] || !shipDynamics[fleetPosIndex]
+        || shipDynamics[fleetPosIndex]->fleetFled)
         return {};
     LuaMap result = attrFromShip(ships[fleetPosIndex],
                                  shipDynamics[fleetPosIndex]);

@@ -960,7 +960,7 @@ const QJsonObject Server::processBattleCore(const CSteamID &uid,
         QJsonArray arr;
         for(int pos = 0; pos < KP::fleetRepSize; ++pos) {
             const ShipDynamic *dyn = fleet.shipDynamics[pos];
-            arr.append(dyn ? dyn->currentHP : 0);
+            arr.append((dyn && !dyn->fleetFled) ? dyn->currentHP : 0);
         }
         return arr;
     };
@@ -969,11 +969,11 @@ const QJsonObject Server::processBattleCore(const CSteamID &uid,
         for(int pos = 0; pos < KP::fleetRepSize; ++pos) {
             QJsonArray slotArray;
             const ShipDynamic *dyn = fleet.shipDynamics[pos];
-            if(dyn) {
+            if(dyn && !dyn->fleetFled) {
                 for(int planes : dyn->slotPlanes)
                     slotArray.append(planes);
             }
-            // If no ship at this position, slotArray remains empty
+            // If no ship at this position (or fled), slotArray remains empty
             shipPlanesArray.append(slotArray);
         }
         return shipPlanesArray;
@@ -1041,11 +1041,11 @@ const QJsonObject Server::processBattleCore(const CSteamID &uid,
         // Compute total HP for each fleet
         int totalPlayerHP = 0;
         for(const ShipDynamic *dyn : playerFleet->shipDynamics) {
-            if(dyn) totalPlayerHP += dyn->currentHP;
+            if(dyn && !dyn->fleetFled) totalPlayerHP += dyn->currentHP;
         }
         int totalEnemyHP = 0;
         for(const ShipDynamic *dyn : enemyFleet.shipDynamics) {
-            if(dyn) totalEnemyHP += dyn->currentHP;
+            if(dyn && !dyn->fleetFled) totalEnemyHP += dyn->currentHP;
         }
 
         // Compute HP loss amounts
@@ -1059,7 +1059,7 @@ const QJsonObject Server::processBattleCore(const CSteamID &uid,
         // Process player fleet: apply HP loss and plane loss
         for(size_t i = 0; i < playerFleet->shipDynamics.size(); ++i) {
             ShipDynamic *dyn = playerFleet->shipDynamics[i];
-            if(!dyn) continue;
+            if(!dyn || dyn->fleetFled) continue;
             int currentHP = dyn->currentHP;
             // Distribute loss proportionally to current HP
             int lossThisShip = (totalPlayerHP > 0) ?
@@ -1156,7 +1156,7 @@ const QJsonObject Server::processBattleCore(const CSteamID &uid,
         // Process enemy fleet: apply HP loss and plane loss (no DB update)
         for(size_t i = 0; i < enemyFleet.shipDynamics.size(); ++i) {
             ShipDynamic *dyn = enemyFleet.shipDynamics[i];
-            if(!dyn) continue;
+            if(!dyn || dyn->fleetFled) continue;
             int currentHP = dyn->currentHP;
             int lossThisShip = (totalEnemyHP > 0) ?
                 static_cast<int>(enemyLossHP *
@@ -1301,8 +1301,10 @@ const QJsonObject Server::processBattleCore(const CSteamID &uid,
     result["after"] = after;
 
     QJsonArray enemyShipIds;
-    for(const Ship *ship : enemyFleet.ships) {
-        if(!ship) continue;
+    for(int i = 0; i < static_cast<int>(enemyFleet.ships.size()); ++i) {
+        const Ship *ship = enemyFleet.ships[i];
+        const ShipDynamic *dyn = enemyFleet.shipDynamics[i];
+        if(!ship || !dyn || dyn->fleetFled) continue;
         enemyShipIds.append(ship->getId());
     }
     result["enemyShipIds"] = enemyShipIds;
@@ -1751,7 +1753,7 @@ void Server::progressMap(const CSteamID &uid, QSslSocket *connection,
         int activeFleet = result.value()[3];
         if(FleetInfo *fi = sortieFleets.value({uid, activeFleet}, nullptr)) {
             for(ShipDynamic *dyn : fi->shipDynamics) {
-                if(!dyn) continue;
+                if(!dyn || dyn->fleetFled) continue;
                 dyn->fuel = std::max(0.0, dyn->fuel - fuelFrac);
                 dyn->ammo = std::max(0.0, dyn->ammo - ammoFrac);
             }
