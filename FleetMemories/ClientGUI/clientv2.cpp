@@ -74,15 +74,15 @@ Client::Client(QObject *parent)
     });
     connect(QCoreApplication::instance(), &QCoreApplication::aboutToQuit,
             this, [this]() {
-        steamThread->requestInterruption();
-        steamThread->wait(500);
-    });
+                steamThread->requestInterruption();
+                steamThread->wait(500);
+            });
     steamThread->start();
 
     /* 1-migrate.md */
     migrateServer.route("/", QHttpServerRequest::Method::Post, this,
                         [this] (const QHttpServerRequest &request,
-                                QHttpServerResponder &responder) {
+                               QHttpServerResponder &responder) {
                             QJsonDocument doc =
                                 QJsonDocument::fromJson(request.body());
                             if(!doc.isNull() && loginCheck()) {
@@ -225,7 +225,7 @@ void Client::sendEncryptedAppTicket(uint8 rgubTicket [], uint32 cubTicket) {
 
 /* Parse server JSON response */
 void Client::serverResponse(const QString &clientInfo,
-                              const QByteArray &plainText) {
+                            const QByteArray &plainText) {
     recv.processDgram(plainText);
     return;
 }
@@ -607,11 +607,11 @@ void Client::receivedInfo(const QJsonObject &djson) {
         break;
     case KP::InfoType::PlaneReplenishResult: {
         KP::GameError error = static_cast<KP::GameError>(djson["error"].toInt());
-        KP::ResOrd cost(djson["cost_o"].toInt(), djson["cost_e"].toInt(),
-                        djson["cost_s"].toInt(), djson["cost_r"].toInt(),
-                        djson["cost_a"].toInt(), djson["cost_w"].toInt(),
-                        djson["cost_c"].toInt());
-        if(error == KP::Success) {
+        ResOrd cost(djson["cost_o"].toInt(), djson["cost_e"].toInt(),
+                    djson["cost_s"].toInt(), djson["cost_r"].toInt(),
+                    djson["cost_a"].toInt(), djson["cost_w"].toInt(),
+                    djson["cost_c"].toInt());
+        if(error == KP::NoError) {
             qInfo() << "Planes replenished, cost:" << cost.toString();
             emit planeReplenished(cost);
         } else {
@@ -1088,7 +1088,7 @@ void Client::receivedMsg(const QJsonObject &djson) {
     break;
     case KP::ARDPurchaseFailed: {
         auto reason = static_cast<KP::PurchaseFailReason>(
-                    djson["reason"].toInt());
+            djson["reason"].toInt());
         QString reasonStr;
         switch(reason) {
         case KP::PurchaseNotAuthorized:
@@ -1276,7 +1276,7 @@ void customMessageHandler(QtMsgType type,
     txt = txt.sliced(1);
     if(!msg_off)
         emit Client::getInstance().qout(txt.remove("\n"),
-                                          background, foreground);
+                                        background, foreground);
 
     if(!logFile || !logFile->isWritable()) {
         qFatal("Log file cannot be written to.");
@@ -1334,5 +1334,5 @@ void Client::switchCert(const QStringList &input) {
     //% "Client PEM is now %1."
     qInfo() << qtTrId("client-pem")
                    .arg(settings->value(
-                       "networkclient/pem", "Default").toString());
+                                    "networkclient/pem", "Default").toString());
 }

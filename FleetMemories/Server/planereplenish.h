@@ -7,8 +7,8 @@
 #include <QObject>
 #include <QSqlQuery>
 #include <QString>
-#include "resord.h"
-#include "steam/steamtypes.h"
+#include "../Protocol/resord.h"
+#include "steam/steamclientpublic.h"
 
 class Server;
 

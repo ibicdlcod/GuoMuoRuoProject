@@ -260,6 +260,7 @@ enum CommandType{
 Q_ENUM_NS(CommandType)
 
 enum GameError{
+    NoError,
     ResourceLack,
     DevelopNotOption,
     DevelopNotExist,

@@ -3,7 +3,7 @@
 
 #include "planereplenish.h"
 #include "server.h"
-#include "equipment.h"
+#include "../Protocol/equipment.h"
 #include "user.h"
 #include "kerrors.h"
 #include "../Protocol/kp.h"
@@ -22,7 +22,7 @@ bool PlaneReplenish::replenishAfterBattle(const CSteamID &uid, int fleetIndex) {
         qWarning() << "PlaneReplenish: server pointer is null";
         return false;
     }
-    
+    qCritical() << "FUCK";
     ResOrd cost = calculateReplenishCost(uid, fleetIndex);
     
     if(cost.o == 0 && cost.e == 0 && cost.s == 0 && 
@@ -36,7 +36,7 @@ bool PlaneReplenish::replenishAfterBattle(const CSteamID &uid, int fleetIndex) {
     
     // Send notification to client
     if(success) {
-        QByteArray msg = KP::serverPlaneReplenishResult(KP::Success, cost);
+        QByteArray msg = KP::serverPlaneReplenishResult(KP::NoError, cost);
         if(server->connectedPeers.contains(uid)) {
             server->senderM.sendMessage(server->connectedPeers.value(uid), msg);
         }
@@ -197,7 +197,7 @@ bool PlaneReplenish::applyReplenishment(const CSteamID &uid, int fleetIndex,
     
     // Update all plane slots to max capacity for fleet
     // Use COALESCE to handle equipment without 'Planes' attribute (set to 0)
-    query.prepare("UPDATE UserShip us "
+    query.prepare("UPDATE UserShip AS us "
                   "SET Slot1Planes = COALESCE((SELECT e.Intvalue "
                   "FROM EquipReg e "
                   "JOIN UserEquip ue ON ue.EquipUuid = us.Slot1 "
@@ -241,12 +241,12 @@ bool PlaneReplenish::applyReplenishment(const CSteamID &uid, int fleetIndex,
     
     // Deduct resources (allow negative)
     QSqlQuery resourceQuery;
-    resourceQuery.prepare("UPDATE UserAttr SET Oil = Oil - :oil, "
-                          "Explosives = Explosives - :explosives, "
-                          "Steel = Steel - :steel, Rubber = Rubber - :rubber, "
-                          "Aluminum = Aluminum - :aluminum, "
-                          "Tungsten = Tungsten - :tungsten, "
-                          "Chromium = Chromium - :chromium "
+    resourceQuery.prepare("UPDATE UserAttr SET O = O - :oil, "
+                          "E = E - :explosives, "
+                          "S = S - :steel, R = R - :rubber, "
+                          "A = A - :aluminum, "
+                          "W = W - :tungsten, "
+                          "C = C - :chromium "
                           "WHERE User = :uid");
     resourceQuery.bindValue(":oil", cost.o);
     resourceQuery.bindValue(":explosives", cost.e);
@@ -293,7 +293,7 @@ int PlaneReplenish::maintenanceCount(int currentPlanes, int equipDef) {
 
 ResOrd PlaneReplenish::scaleCost(const ResOrd &costPer100, int planesNeeded) {
     // Scale cost per 100 planes to actual planes needed with rounding up
-    ResOrd multiplied = costPer100 * planesNeeded;
+    ResOrd multiplied = costPer100 * (qint64)planesNeeded;
     // Round up each component: (value + 99) / 100
     return ResOrd((multiplied.o + 99) / 100,
                   (multiplied.e + 99) / 100,

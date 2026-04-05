@@ -124,8 +124,8 @@ void Server::testPlaneReplenishment() {
     // Test Equipment::replenishCostPer100Planes
     Equipment *testEquip = equipRegistry.value(16, nullptr); // 九七式艦攻 ID 16
     if(testEquip) {
-        KP::ResOrd devCost = testEquip->devRes();
-        KP::ResOrd per100PlaneCost = testEquip->replenishCostPer100Planes();
+        ResOrd devCost = testEquip->devRes();
+        ResOrd per100PlaneCost = testEquip->replenishCostPer100Planes();
         qInfo() << "Equipment 16 dev cost:" << devCost.toString()
                 << "per 100 planes cost:" << per100PlaneCost.toString();
         // Verify per100PlaneCost == devCost (as per spec)
