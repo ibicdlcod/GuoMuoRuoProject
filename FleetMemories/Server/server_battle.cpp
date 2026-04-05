@@ -1833,6 +1833,7 @@ void Server::progressMap(const CSteamID &uid, QSslSocket *connection,
             }
         }
     }
+critical_damage_end:
     {
         QSqlQuery query;
         query.prepare(

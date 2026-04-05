@@ -11,7 +11,7 @@
   * [Attributes](4.2-attributes.md)
   * [Development](4.3-development.md)
   * [Normal/Special/Virtual preconditions](4.4-precondition.md) [Virtual preconditions: exotic conditions experience gain not implemented]
-  * [Equipment skill points](4.5-skillpoints.md) [Special skilled and Loss: NOTYETIMPLEMENTED]
+  * [Equipment skill points](4.5-skillpoints.md) [Loss: NOTYETIMPLEMENTED]
   * [Destruct](4.6-destruct.md)
   * [Improvement](4.7-improve.md)
   * [Industrial plant](4.8-industrial.md)
@@ -33,7 +33,7 @@
   * [Normal map and map relations](6.1-map.md)
   * [Naval Supremacy and Normal expedition](6.2-supremacy.md) [Expedition: NOTYETIMPLEMENTED]
   * [Map gauge](6.3-gauge.md) [PARTIAL]
-  * Retreat rule [NOTYETIMPLEMENTED]
+  * [Retreat rule](6.4-retreat.md) [PARTIAL]
   * Historical Mode (DLC) [NOTYETIMPLEMENTED]
   * Quests and Achievements [NOTYETIMPLEMENTED]
   * Expedition quests [NOTYETIMPLEMENTED]
