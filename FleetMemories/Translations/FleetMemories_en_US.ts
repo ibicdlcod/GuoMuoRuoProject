@@ -3192,37 +3192,37 @@ Great at battle and bad at politics--so cool!</translation>
     </message>
     <message id="dbfail-when-opening-map">
         <location filename="../Server/user.cpp" line="691"/>
-        <source></source>
+        <source>User ID %1: DB failure when opening map %2!</source>
         <oldsource>User ID %1: DB failure when opening map %2!</oldsource>
         <translation type="unfinished">User ID %1: DB failure when opening map %2!</translation>
     </message>
     <message id="dbfail-when-increasing-factory">
         <location filename="../Server/user.cpp" line="712"/>
-        <source></source>
+        <source>User ID %1: DB failure when increasing factory count!</source>
         <oldsource>User ID %1: DB failure when increasing factory count!</oldsource>
         <translation type="unfinished">User ID %1: DB failure when increasing factory count!</translation>
     </message>
     <message id="init-user-factory-failed">
         <location filename="../Server/user.cpp" line="735"/>
-        <source></source>
+        <source>Set User Factory Up failed!</source>
         <oldsource>Set User Factory Up failed!</oldsource>
         <translation type="unfinished">Set User Factory Up failed!</translation>
     </message>
     <message id="dbfail-when-increasing-dock">
         <location filename="../Server/user.cpp" line="752"/>
-        <source></source>
+        <source>User ID %1: DB failure when increasing dock count!</source>
         <oldsource>User ID %1: DB failure when increasing dock count!</oldsource>
         <translation type="unfinished">User ID %1: DB failure when increasing dock count!</translation>
     </message>
     <message id="init-user-dock-failed">
         <location filename="../Server/user.cpp" line="775"/>
-        <source></source>
+        <source>Set User Dock Up failed!</source>
         <oldsource>Set User Dock Up failed!</oldsource>
         <translation type="unfinished">Set User Dock Up failed!</translation>
     </message>
     <message id="open-map-commit-failed">
         <location filename="../Server/user.cpp" line="784"/>
-        <source></source>
+        <source>Failed to commit transaction for opening map.</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="dbfail-when-refresh-factory">
@@ -3247,13 +3247,13 @@ Great at battle and bad at politics--so cool!</translation>
     </message>
     <message id="set-resources-failed">
         <location filename="../Server/user.cpp" line="893"/>
-        <source></source>
+        <source>User id %1: set resources failed!</source>
         <oldsource>User id %1: set resources failed!</oldsource>
         <translation type="unfinished">User id %1: set resources failed!</translation>
     </message>
     <message id="set-resources-commit-failed">
         <location filename="../Server/user.cpp" line="902"/>
-        <source></source>
+        <source>Failed to commit transaction for set resources.</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="set-resources">
@@ -4316,12 +4316,12 @@ Great at battle and bad at politics--so cool!</translation>
     </message>
     <message id="plane-replenish-update-failed">
         <location filename="../Server/planereplenish.cpp" line="205"/>
-        <source></source>
+        <source>Failed to replenish planes.</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="plane-replenish-resource-deduct-failed">
         <location filename="../Server/planereplenish.cpp" line="235"/>
-        <source></source>
+        <source>Failed to deduct plane replenishment resources.</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="plane-replenish-commit-failed">

@@ -201,8 +201,8 @@ bool PlaneReplenish::applyReplenishment(const CSteamID &uid, int fleetIndex,
     query.bindValue(":fleet", fleetIndex);
     
     if(!query.exec()) {
-        //% "Failed to replenish planes."
         db.rollback();
+        //% "Failed to replenish planes."
         throw DBError(qtTrId("plane-replenish-update-failed"),
                       query.lastError(), query.lastQuery());
     }
@@ -231,8 +231,8 @@ bool PlaneReplenish::applyReplenishment(const CSteamID &uid, int fleetIndex,
     resourceQuery.bindValue(":uid", uid.ConvertToUint64());
     
     if(!resourceQuery.exec()) {
-        //% "Failed to deduct plane replenishment resources."
         db.rollback();
+        //% "Failed to deduct plane replenishment resources."
         throw DBError(qtTrId("plane-replenish-resource-deduct-failed"),
                       resourceQuery.lastError(), resourceQuery.lastQuery());
     }

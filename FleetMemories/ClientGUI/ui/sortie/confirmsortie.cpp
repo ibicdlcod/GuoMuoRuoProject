@@ -301,7 +301,12 @@ void ConfirmSortie::populateBattleResult(const QJsonObject &battleProcess)
 
     // Player ships
     int playerRows = playerHPBefore.size();
+    int displayRow = 0;
     for (int i = 0; i < playerRows; ++i) {
+        // Skip empty positions when fleetView is available
+        if (fleetView && !fleetView->getShip(i)) {
+            continue;
+        }
         int hpBefore = playerHPBefore[i].toInt(1);
         int hpAfter  = playerHPAfter[i].toInt(1);
         int totalHP  = hpBefore;
@@ -318,6 +323,7 @@ void ConfirmSortie::populateBattleResult(const QJsonObject &battleProcess)
                 if (ShipDynamic *dyn = fleetView->getShipDynamic(i))
                     shipLevel = Ship::getLevel(std::min(dyn->exp, dyn->expCap));
             } else {
+                // Should not happen due to earlier check, but keep fallback
                 //% "Player Ship %1"
                 shipName = qtTrId("battle-result-player-ship").arg(i + 1);
             }
@@ -348,9 +354,10 @@ void ConfirmSortie::populateBattleResult(const QJsonObject &battleProcess)
         for (int s = 0; s < pb.size(); ++s) planesBefore[s] = pb[s].toInt(0);
         for (int s = 0; s < pa.size(); ++s) planesAfter[s]  = pa[s].toInt(0);
 
-        addShipRow(m_playerLayout, m_playerContainer, i,
+        addShipRow(m_playerLayout, m_playerContainer, displayRow,
                    shipName, shipLevel, shipIconId, hpBefore, hpAfter, totalHP,
                    planesBefore, planesAfter, true, maxPlanes, equipNames);
+        ++displayRow;
     }
 
     // Enemy ships

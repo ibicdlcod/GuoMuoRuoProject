@@ -686,8 +686,8 @@ bool User::openMap(const CSteamID &uid, int mapId) { // relative id
         query.bindValue(":id", uid.ConvertToUint64());
         query.bindValue(":def", mapId);
         if(Q_UNLIKELY(!query.exec())){
-            //% "User ID %1: DB failure when opening map %2!"
             db.rollback();
+            //% "User ID %1: DB failure when opening map %2!"
             throw DBError(qtTrId("dbfail-when-opening-map")
                               .arg(uid.ConvertToUint64()).arg(mapId),
                           query.lastError());
@@ -707,8 +707,8 @@ bool User::openMap(const CSteamID &uid, int mapId) { // relative id
                 query.bindValue(":id", uid.ConvertToUint64());
                 query.bindValue(":factory", factory1);
                 if(Q_UNLIKELY(!query.exec())){
-                    //% "User ID %1: DB failure when increasing factory count!"
                     db.rollback();
+                    //% "User ID %1: DB failure when increasing factory count!"
                     throw DBError(qtTrId("dbfail-when-increasing-factory")
                                       .arg(uid.ConvertToUint64()),
                                   query.lastError(), query.lastQuery());
@@ -730,8 +730,8 @@ bool User::openMap(const CSteamID &uid, int mapId) { // relative id
                                         factory + i);
                     }
                     if(Q_UNLIKELY(!query.exec())) {
-                        //% "Set User Factory Up failed!"
                         db.rollback();
+                        //% "Set User Factory Up failed!"
                         throw DBError(qtTrId("init-user-factory-failed"),
                                       query.lastError(), query.lastQuery());
                         return false;
@@ -747,8 +747,8 @@ bool User::openMap(const CSteamID &uid, int mapId) { // relative id
                 query.bindValue(":id", uid.ConvertToUint64());
                 query.bindValue(":repair", repair1);
                 if(Q_UNLIKELY(!query.exec())){
-                    //% "User ID %1: DB failure when increasing dock count!"
                     db.rollback();
+                    //% "User ID %1: DB failure when increasing dock count!"
                     throw DBError(qtTrId("dbfail-when-increasing-dock")
                                       .arg(uid.ConvertToUint64()),
                                   query.lastError(), query.lastQuery());
@@ -770,8 +770,8 @@ bool User::openMap(const CSteamID &uid, int mapId) { // relative id
                                         repair + i);
                     }
                     if(Q_UNLIKELY(!query.exec())) {
-                        //% "Set User Dock Up failed!"
                         db.rollback();
+                        //% "Set User Dock Up failed!"
                         throw DBError(qtTrId("init-user-dock-failed"),
                                       query.lastError(), query.lastQuery());
                         return false;
@@ -779,8 +779,8 @@ bool User::openMap(const CSteamID &uid, int mapId) { // relative id
                 }
             }
             if(!db.commit()) {
-                //% "Failed to commit transaction for opening map."
                 db.rollback();
+                //% "Failed to commit transaction for opening map."
                 throw DBError(qtTrId("open-map-commit-failed")
                                   .arg(uid.ConvertToUint64()).arg(mapId),
                               db.lastError());
@@ -888,8 +888,8 @@ void User::setResources(const CSteamID &uid, ResOrd goal) {
     query.bindValue(":id", uid.ConvertToUint64());
     
     if(Q_UNLIKELY(!query.exec())) {
-        //% "User id %1: set resources failed!"
         db.rollback();
+        //% "User id %1: set resources failed!"
         qWarning() << qtTrId("set-resources-failed")
                       .arg(uid.ConvertToUint64());
         qWarning() << query.lastError();
@@ -897,8 +897,8 @@ void User::setResources(const CSteamID &uid, ResOrd goal) {
     }
     
     if(!db.commit()) {
-        //% "Failed to commit transaction for set resources."
         db.rollback();
+        //% "Failed to commit transaction for set resources."
         qWarning() << qtTrId("set-resources-commit-failed")
                       .arg(uid.ConvertToUint64());
         return;

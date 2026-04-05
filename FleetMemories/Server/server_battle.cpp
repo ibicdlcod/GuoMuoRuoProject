@@ -2173,7 +2173,7 @@ Server::computeSupplyAttrition(const CSteamID &uid,
             }
         }
         else {
-            //% "Database failed when reading map relations!"
+            //% "Database failed when querying map relations!"
             throw DBError(qtTrId("dbfail-map-relations"),
                           query.lastError());
         }
