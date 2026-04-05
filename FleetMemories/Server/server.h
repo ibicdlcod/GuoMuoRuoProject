@@ -25,6 +25,7 @@
 #include "../Protocol/map.h"
 #include "../Protocol/mapwithdiff.h"
 #include "servermastersender.h"
+#include "server_plane_replenish.h"
 #include "sslserver.h"
 
 class Server : public CommandLine {
@@ -218,6 +219,7 @@ private:
     QMap<quint64, std::pair<CSteamID, int>> pendingARDOrders;
 
     QNetworkAccessManager networkManager;
+    PlaneReplenish planeReplenish;
 
     QSet<int> openEquips;
     QMap<int, Equipment *> equipRegistry;
