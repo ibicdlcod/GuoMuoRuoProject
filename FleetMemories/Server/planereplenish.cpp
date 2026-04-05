@@ -101,10 +101,6 @@ bool PlaneReplenish::recoverPlaneLosses(const CSteamID &uid) {
         }
     }
     
-    if(anyLosses) {
-        qInfo() << "Recovered plane losses for user" << uid.ConvertToUint64();
-    }
-    
     return true;
 }
 

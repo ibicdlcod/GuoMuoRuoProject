@@ -34,19 +34,19 @@ BuyOrdResourcesDialog::BuyOrdResourcesDialog(QWidget *parent)
     struct ResEntry { const char *attr; const char *trId; const char *icon; };
     static const ResEntry entries[] = {
         //% "Oil"
-        { "O", "res-name-oil",      ":/resources/resord/oil.png"      },
+        { "O", QT_TRID_NOOP("res-name-oil"),      ":/resources/resord/oil.png"      },
         //% "Explosives"
-        { "E", "res-name-explo",    ":/resources/resord/explosive.png" },
+        { "E", QT_TRID_NOOP("res-name-explo"),    ":/resources/resord/explosive.png" },
         //% "Steel"
-        { "S", "res-name-steel",    ":/resources/resord/steel.png"    },
+        { "S", QT_TRID_NOOP("res-name-steel"),    ":/resources/resord/steel.png"    },
         //% "Rubber"
-        { "R", "res-name-rubber",   ":/resources/resord/rubber.png"   },
+        { "R", QT_TRID_NOOP("res-name-rubber"),   ":/resources/resord/rubber.png"   },
         //% "Aluminum"
-        { "A", "res-name-aluminum", ":/resources/resord/aluminum.png" },
+        { "A", QT_TRID_NOOP("res-name-aluminum"), ":/resources/resord/aluminum.png" },
         //% "Tungsten"
-        { "W", "res-name-tungsten", ":/resources/resord/tungsten.png" },
+        { "W", QT_TRID_NOOP("res-name-tungsten"), ":/resources/resord/tungsten.png" },
         //% "Chromium"
-        { "C", "res-name-chromium", ":/resources/resord/chromium.png" },
+        { "C", QT_TRID_NOOP("res-name-chromium"), ":/resources/resord/chromium.png" },
     };
     for(int i = 0; i < static_cast<int>(std::size(entries)); ++i) {
         auto *btn = new QRadioButton(qtTrId(entries[i].trId), groupBox);
