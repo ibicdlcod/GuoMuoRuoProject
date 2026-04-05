@@ -659,6 +659,10 @@ void EquipView::activate(bool arsenal, bool isEquip,
             sortBox->hide();
             reverseCheck->hide();
             lay->setCurrentWidget(shipSelect);
+            shipSelect->addStarButton->hide();
+            shipSelect->decorateButton->hide();
+            shipSelect->supplyButton->hide();
+            shipSelect->supplyAllButton->hide();
         }
     }
     connect(model, &EquipModel::pageNumChanged,
