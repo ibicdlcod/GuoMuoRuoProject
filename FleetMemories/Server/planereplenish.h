@@ -7,6 +7,7 @@
 #include <QObject>
 #include <QSqlQuery>
 #include <QString>
+#include "../Protocol/equipment.h"
 #include "../Protocol/resord.h"
 #include "steam/steamclientpublic.h"
 
@@ -38,8 +39,12 @@ private:
     bool applyReplenishment(const CSteamID &uid, int fleetIndex,
                             const ResOrd &cost);
     
-    // Calculate maintenance planes (placeholder - returns 0)
-    int maintenanceCount(int currentPlanes, int equipDef);
+public:
+    // Maintenance overhead: (25x+1)^-0.5 * remaining,
+    // x = max(1, equip Disallowmassproduction)
+    static int maintenanceCount(int remaining, const Equipment *equip);
+
+private:
     
     // Scale cost per 100 planes to actual planes needed with rounding up
     ResOrd scaleCost(const ResOrd &costPer100, int planesNeeded);

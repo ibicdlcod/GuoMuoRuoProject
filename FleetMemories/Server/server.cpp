@@ -4279,44 +4279,11 @@ void Server::sendTestMessages() {
         qWarning() << "Server isn't listening, abort.";
     }
     else {
-        /*
-        qDebug() << "=== Example 1: Basic Usage ===";
-
-        // Create the SteamMicroTxn instance
-        // Replace with your actual API key
-        SteamMicroTxn *microTxn = new SteamMicroTxn("API_KEY_PLACEHOLDER");
-
-        // Connect to the completion signal
-        QObject::connect(microTxn, &SteamMicroTxn::getUserInfoFinished,
-                         [](const SteamUserInfo &info) {
-            if (info.success) {
-                qDebug() << "Success!";
-                qDebug() << "  Country:" << info.country;
-                qDebug() << "  State:" << info.state;
-                qDebug() << "  Currency:" << info.currency;
-
-                switch (info.status) {
-                case SteamAccountStatus::Active:
-                    qDebug() << "  Status: Active (can make purchases)";
-                    break;
-                case SteamAccountStatus::Trusted:
-                    qDebug() << "  Status: Trusted (enhanced purchasing)";
-                    break;
-                case SteamAccountStatus::Locked:
-                    qDebug() << "  Status: Locked (cannot purchase)";
-                    break;
-                default:
-                    qDebug() << "  Status: Unknown";
-                }
-            } else {
-                qDebug() << "Error:" << info.errorCode << "-" << info.errorDesc;
+        for(auto equip: equipRegistry) {
+            if(equip->isPlane()) {
+                qCritical() << equip->toString() << PlaneReplenish::maintenanceCount(100, equip);
             }
-        });
-
-        // Make the API call
-        // Parameters: appId, steamId, ipAddress
-        microTxn->getUserInfo(12345, 76561198000000000, "192.168.1.1");
-        */
+        }
     }
 }
 

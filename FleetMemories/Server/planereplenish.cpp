@@ -7,6 +7,8 @@
 #include "user.h"
 #include "kerrors.h"
 #include "../Protocol/kp.h"
+#include <cmath>
+#include <QRandomGenerator>
 #include <QDateTime>
 #include <QDebug>
 #include <QMap>
@@ -131,13 +133,13 @@ ResOrd PlaneReplenish::calculateReplenishCost(const CSteamID &uid,
     }
 
     while(query.next()) {
-        int equipDef     = query.value("EquipDef").toInt();
-        int lossCount    = query.value("LossCount").toInt();
-        int remaining    = query.value("RemainingCount").toInt();
-        int planesNeeded = lossCount + maintenanceCount(remaining, equipDef);
+        int equipDef  = query.value("EquipDef").toInt();
+        int lossCount = query.value("LossCount").toInt();
+        int remaining = query.value("RemainingCount").toInt();
 
         Equipment *equip = server->equipRegistry.value(equipDef);
         if(equip) {
+            int planesNeeded = lossCount + maintenanceCount(remaining, equip);
             ResOrd per100PlaneCost = equip->replenishCostPer100Planes();
             totalCost += scaleCost(per100PlaneCost, planesNeeded);
         }
@@ -254,11 +256,10 @@ bool PlaneReplenish::applyReplenishment(const CSteamID &uid, int fleetIndex,
     return true;
 }
 
-int PlaneReplenish::maintenanceCount(int currentPlanes, int equipDef) {
-    // Maintenance placeholder - returns 0 for now
-    Q_UNUSED(currentPlanes);
-    Q_UNUSED(equipDef);
-    return 0;
+int PlaneReplenish::maintenanceCount(int remaining, const Equipment *equip) {
+    int x = equip->attr.value("Disallowmassproduction", 1);
+    double k = QRandomGenerator::global()->bounded(8, 32);
+    return std::round(remaining / std::sqrt(k * x));
 }
 
 ResOrd PlaneReplenish::scaleCost(const ResOrd &costPer100, int planesNeeded) {
