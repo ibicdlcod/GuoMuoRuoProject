@@ -37,6 +37,8 @@ private:
 
     bool cloningMode = false;
     int shipDef;
+    double sanityRemaining = 0.0;
+    double sanityRequired = 0.0;
 };
 
 #endif // CONSTRUCTWINDOW_H

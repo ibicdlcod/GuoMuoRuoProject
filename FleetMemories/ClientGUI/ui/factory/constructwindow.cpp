@@ -306,9 +306,9 @@ shipToRemodel:
     }
     updateSanityDisplay();
 
-check_cloning_allowed:
+check_construct_or_clone_allowed:
+    bool canProceed = true;
     if(!cloningMode) {
-        bool canProceed = true;
         if(shipDef != 0 && ship != nullptr) {
             auto latermodels =
                 ship->getLaterModels(engine.shipRegistryCache);
@@ -341,9 +341,14 @@ check_cloning_allowed:
             canProceed = (count == 0)
                 || (ui->shipnameToRemodel->count() > 0);
         }
-        ui->buttonBox->button(QDialogButtonBox::Ok)
-            ->setEnabled(canProceed);
     }
+    else {
+        if(sanityRequired > sanityRemaining) {
+            canProceed = false;
+        }
+    }
+    ui->buttonBox->button(QDialogButtonBox::Ok)
+        ->setEnabled(canProceed);
 }
 
 int ConstructWindow::shipDefDesired() {
@@ -392,8 +397,8 @@ void ConstructWindow::updateSanityDisplay() {
         return;
     }
     Client &engine = Client::getInstance();
-    double remaining = engine.exoticCache.sanity;
-    double required = 0.0;
+    sanityRemaining = engine.exoticCache.sanity;
+    sanityRequired = 0.0;
     if(shipDef != 0) {
         Ship *ship = engine.shipRegistryCache.value(shipDef);
         if(ship) {
@@ -428,12 +433,12 @@ void ConstructWindow::updateSanityDisplay() {
                 }
             }
             if(count > 0) {
-                required = std::pow(2.0, count - 1);
+                sanityRequired = std::pow(2.0, count - 1);
             }
         }
     }
     ui->sanityRemainingValue->setText(
-        QString::number(remaining, 'f', 2));
+        QString::number(sanityRemaining, 'f', 2));
     ui->sanityRequiredValue->setText(
-        QString::number(required, 'f', 2));
+        QString::number(sanityRequired, 'f', 2));
 }
