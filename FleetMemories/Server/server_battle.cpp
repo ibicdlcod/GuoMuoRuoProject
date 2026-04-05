@@ -936,7 +936,7 @@ const QJsonObject Server::processBattleCore(const CSteamID &uid,
             arr.append(dyn->currentHP);
         }
         if(arr.isEmpty()) {
-            arr.append(1); // fallback dummy
+            arr.append(0); // placeholder for empty enemy fleet — already sunk
         }
         return arr;
     };
@@ -1246,13 +1246,9 @@ const QJsonObject Server::processBattleCore(const CSteamID &uid,
         flagshipSunk = true;
     }
     
-    // Special case: some nodes lack enemies (dummy HP 1)
-    // If enemy fleet is dummy (size 1 with HP 1), treat as all sunk
-    bool enemyIsDummy = (totalEnemyShips == 1 && totalEnemyHPBefore == 1.0);
-    
     // Apply assessment rules
-    if(enemyIsDummy || enemyShipsSunk == totalEnemyShips) {
-        // All enemy sunk (or dummy enemy)
+    if(enemyShipsSunk == totalEnemyShips) {
+        // All enemy sunk (includes empty enemy fleet where placeholder HP is 0)
         assessment = KP::SVictory;
     } else if(enemyShipsSunk > totalEnemyShips / 2) {
         // More than 50% enemy ships sunk
