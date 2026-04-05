@@ -1057,12 +1057,38 @@ const QJsonObject Server::processBattleCore(const CSteamID &uid,
             }
 
             // Plane loss (same factor)
+            // Get ship UUID for plane loss tracking
+            QString shipUuid;
+            QSqlQuery uuidQuery;
+            uuidQuery.prepare("SELECT ShipUuid FROM UserShip WHERE User = :uid "
+                              "AND FleetIndex = :fleet AND FleetPosIndex = :pos");
+            uuidQuery.bindValue(":uid", uid.ConvertToUint64());
+            uuidQuery.bindValue(":fleet", fleetIndex);
+            uuidQuery.bindValue(":pos", static_cast<int>(i));
+            if(uuidQuery.exec() && uuidQuery.next()) {
+                shipUuid = uuidQuery.value("ShipUuid").toString();
+            } else {
+                qWarning() << "Failed to get ship UUID for plane loss tracking:"
+                           << uuidQuery.lastError();
+                // Continue without storing losses
+            }
+            
             for(int slot = 0; slot < dyn->slotPlanes.size(); ++slot) {
                 int currentPlanes = dyn->slotPlanes[slot];
                 int lossPlanes = static_cast<int>(playerLossFactor *
                                                   currentPlanes);
                 int newPlanes = std::max(0, currentPlanes - lossPlanes);
                 dyn->slotPlanes[slot] = newPlanes;
+                
+                // Store plane losses for abnormal exit recovery
+                if(!shipUuid.isEmpty() && lossPlanes > 0) {
+                    // TODO: Get equipment definition ID for this slot
+                    int equipDef = 0; // Placeholder - need to query from UserEquip
+                    this->planeReplenish.storePlaneLosses(uid, shipUuid,
+                                                          slot + 1, equipDef,
+                                                          lossPlanes, newPlanes);
+                }
+                
                 // Update database
                 query.prepare("UPDATE UserShip SET Slot"
                               + QString::number(slot + 1)

@@ -10,6 +10,7 @@
 #include <QSqlQuery>
 #include <QSqlError>
 #include <QTimer>
+#include <QDateTime>
 
 PlaneReplenish::PlaneReplenish(Server *parent)
     : QObject(parent), server(parent) {}
@@ -21,7 +22,28 @@ bool PlaneReplenish::replenishAfterBattle(const CSteamID &uid, int fleetIndex) {
 
 void PlaneReplenish::storePlaneLosses(const CSteamID &uid, const QString &shipUuid,
                                       int slot, int equipDef, int lossCount, int remainingCount) {
-    // Implementation in next steps
+    if(lossCount <= 0) return;
+    
+    QSqlDatabase db = QSqlDatabase::database();
+    QSqlQuery query;
+    
+    // Upsert plane losses
+    query.prepare("INSERT OR REPLACE INTO UserPlaneLosses "
+                  "(User, ShipUuid, Slot, EquipDef, LossCount, RemainingCount, Timestamp) "
+                  "VALUES (:uid, :ship, :slot, :equip, :loss, :remaining, :time)");
+    query.bindValue(":uid", uid.ConvertToUint64());
+    query.bindValue(":ship", shipUuid);
+    query.bindValue(":slot", slot);
+    query.bindValue(":equip", equipDef);
+    query.bindValue(":loss", lossCount);
+    query.bindValue(":remaining", remainingCount);
+    query.bindValue(":time", QDateTime::currentSecsSinceEpoch());
+    
+    if(!query.exec()) {
+        //% "Failed to store plane losses."
+        throw DBError(qtTrId("plane-losses-store-failure"),
+                      query.lastError(), query.lastQuery());
+    }
 }
 
 bool PlaneReplenish::recoverPlaneLosses(const CSteamID &uid) {
