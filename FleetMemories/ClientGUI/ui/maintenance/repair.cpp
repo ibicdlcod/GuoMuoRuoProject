@@ -210,7 +210,7 @@ void Repair::repairClicked(bool checked, int slotnum) {
     }
     if(parentView) {
         EquipView *view = parentView->equipView;
-        view->activate(false, false);
+        view->activate(false, false, std::nullopt, 4, false);
         view->setMinimumHeight(viewMinimumHeight);
         view->setAttribute(Qt::WA_DeleteOnClose, false);
         QScreen *screen = view->screen();

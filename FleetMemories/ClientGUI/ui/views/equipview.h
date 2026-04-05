@@ -52,7 +52,9 @@ public:
     ~EquipView();
 
     void activate(bool arsenal = true, bool isEquip = true,
-                  std::optional<KP::FactoryState> custom = std::nullopt);
+                  std::optional<KP::FactoryState> custom = std::nullopt,
+                  std::optional<int> sortMode = std::nullopt,
+                  std::optional<bool> sortReverse = std::nullopt);
     void enactPageNumChange(int currentPageNum, int totalPageNum);
 
     int getRowCountHintVal(){ return rowCountHintVal; }

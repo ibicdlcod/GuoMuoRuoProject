@@ -305,7 +305,9 @@ void EquipView::pageNumChangedLambda(int current, int total) {
 }
 
 void EquipView::activate(bool arsenal, bool isEquip,
-                         std::optional<KP::FactoryState> custom) {
+                         std::optional<KP::FactoryState> custom,
+                         std::optional<int> sortMode,
+                         std::optional<bool> sortReverse) {
     arsenalView->setItemDelegateForColumn(model->selectColumn(),
                                           new QStyledItemDelegate());
     arsenalView->setItemDelegateForColumn(model->hpColumn(),
@@ -457,7 +459,7 @@ void EquipView::activate(bool arsenal, bool isEquip,
             //% "Skill points"
             sortBox->addItem(qtTrId("sort-equip-skill"));
             // Load saved sort settings for equipment mode
-            int savedSortMode = settings->value("SortModeEquip", 0).toInt();
+            int savedSortMode = sortMode.has_value() ? sortMode.value() : settings->value("SortModeEquip", 0).toInt();
             if(savedSortMode < 0 || savedSortMode >= sortBox->count()) {
                 savedSortMode = 0;
             }
@@ -474,7 +476,7 @@ void EquipView::activate(bool arsenal, bool isEquip,
                     });
             reverseCheck->show();
             reverseCheck->blockSignals(true);
-            bool savedReverse = settings->value("SortReversedEquip", false).toBool();
+            bool savedReverse = sortReverse.has_value() ? sortReverse.value() : settings->value("SortReversedEquip", false).toBool();
             reverseCheck->setChecked(savedReverse);
             reverseCheck->blockSignals(false);
             model->setSortReversed(savedReverse);
@@ -595,7 +597,7 @@ void EquipView::activate(bool arsenal, bool isEquip,
             //% "Ammo%"
             sortBox->addItem(qtTrId("sort-ammo-pct"));
             // Load saved sort settings for ship mode
-            int savedSortMode = settings->value("SortModeShip", 0).toInt();
+            int savedSortMode = sortMode.has_value() ? sortMode.value() : settings->value("SortModeShip", 0).toInt();
             if(savedSortMode < 0 || savedSortMode >= sortBox->count()) {
                 savedSortMode = 0;
             }
@@ -612,7 +614,7 @@ void EquipView::activate(bool arsenal, bool isEquip,
                     });
             reverseCheck->show();
             reverseCheck->blockSignals(true);
-            bool savedReverse = settings->value("SortReversedShip", false).toBool();
+            bool savedReverse = sortReverse.has_value() ? sortReverse.value() : settings->value("SortReversedShip", false).toBool();
             reverseCheck->setChecked(savedReverse);
             reverseCheck->blockSignals(false);
             model->setSortReversed(savedReverse);
