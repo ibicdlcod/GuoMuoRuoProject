@@ -52,3 +52,11 @@ ShipDynamic::ShipDynamic(int hp, QObject *parent)
     fleetPosIndex = -1;
     fleetFled = false;
 }
+
+bool ShipDynamic::isCriticallyDamaged(const Ship* ship) const
+{
+    if (!ship) return false;
+    int maxHP = ship->attr.value("Hitpoints", 1);
+    // Critically damaged if current HP < 1/4 of max HP
+    return currentHP * 4 < maxHP;
+}

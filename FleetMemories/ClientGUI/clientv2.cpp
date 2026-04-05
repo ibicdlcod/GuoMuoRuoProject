@@ -1075,6 +1075,9 @@ void Client::receivedMsg(const QJsonObject &djson) {
             case KP::FleetInsufficientResources:
                 //% "Insufficient ordinary resources for this sortie."
                 warn << qtTrId("fleet-insufficient-resources"); break;
+            case KP::FleetCriticallyDamaged:
+                //% "One or more ships are critically damaged (HP < 25%%)."
+                warn << qtTrId("fleet-critically-damaged"); break;
             }
             if(fleetIndex >= 0)
                 //% "(fleet %1)"

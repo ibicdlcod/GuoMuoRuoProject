@@ -1595,8 +1595,9 @@ ship:
                     query.lastError(), query.lastQuery());
                 return;
             }
-        }
-        {
+    }
+critical_damage_end:
+    {
         update_exp:
             QSqlQuery query;
             query.prepare("UPDATE UserEquipSP "
@@ -1753,6 +1754,24 @@ void Server::progressMap(const CSteamID &uid, QSslSocket *connection,
         }
         int activeFleet = result.value()[3];
         if(FleetInfo *fi = sortieFleets.value({uid, activeFleet}, nullptr)) {
+            // Check for critically damaged ships
+            bool hasCriticallyDamaged = false;
+            for (int i = 0; i < static_cast<int>(fi->ships.size()); ++i) {
+                Ship* ship = fi->ships[i];
+                ShipDynamic* dyn = fi->shipDynamics[i];
+                if (ship && dyn && !dyn->fleetFled && dyn->isCriticallyDamaged(ship)) {
+                    hasCriticallyDamaged = true;
+                    break;
+                }
+            }
+            if (hasCriticallyDamaged) {
+                // Send fleet failure message
+                QByteArray msg = KP::serverFleetFailure(KP::FleetCriticallyDamaged, activeFleet);
+                senderM.sendMessage(connection, msg);
+                // End sortie
+                nNode = 0;
+                goto critical_damage_end;
+            }
             for(ShipDynamic *dyn : fi->shipDynamics) {
                 if(!dyn || dyn->fleetFled) continue;
                 dyn->fuel = std::max(0.0, dyn->fuel - fuelFrac);

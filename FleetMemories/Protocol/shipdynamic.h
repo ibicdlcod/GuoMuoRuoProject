@@ -7,6 +7,8 @@
 #include <QObject>
 #include <QUuid>
 
+class Ship;
+
 class ShipDynamic : public QObject
 {
     Q_OBJECT
@@ -14,6 +16,8 @@ public:
     explicit ShipDynamic(QObject *parent = nullptr);
     explicit ShipDynamic(const QJsonObject &, QObject *parent = nullptr);
     explicit ShipDynamic(int, QObject *parent = nullptr);
+
+    bool isCriticallyDamaged(const Ship* ship) const;
 
     int star;
     int currentHP;

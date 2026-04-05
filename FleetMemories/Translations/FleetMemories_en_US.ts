@@ -944,6 +944,11 @@ Great at battle and bad at politics--so cool!</translation>
         <source>Insufficient ordinary resources for this sortie.</source>
         <translation>Insufficient ordinary resources for this sortie.</translation>
     </message>
+    <message id="fleet-critically-damaged">
+        <location filename="../ClientGUI/clientv2.cpp" line="1080"/>
+        <source>One or more ships are critically damaged (HP &lt; 25%).</source>
+        <translation>One or more ships are critically damaged (HP &lt; 25%).</translation>
+    </message>
     <message id="equip-develop-failed">
         <location filename="../ClientGUI/clientv2.cpp" line="776"/>
         <source>Equipment development failed.</source>

@@ -369,6 +369,7 @@ enum FleetFailType{
     FleetShipisUnderRepair,
     FleetShipNotSupplied,
     FleetInsufficientResources,
+    FleetCriticallyDamaged,
 };
 Q_ENUM_NS(FleetFailType)
 
