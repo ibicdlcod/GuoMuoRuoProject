@@ -9,6 +9,7 @@
 #include "../Protocol/kp.h"
 #include <QDateTime>
 #include <QDebug>
+#include <QMap>
 #include <QSqlDatabase>
 #include <QSqlError>
 #include <QSqlQuery>
@@ -240,28 +241,34 @@ bool PlaneReplenish::applyReplenishment(const CSteamID &uid, int fleetIndex,
     }
     
     // Deduct resources (allow negative)
-    QSqlQuery resourceQuery;
-    resourceQuery.prepare("UPDATE UserAttr SET O = O - :oil, "
-                          "E = E - :explosives, "
-                          "S = S - :steel, R = R - :rubber, "
-                          "A = A - :aluminum, "
-                          "W = W - :tungsten, "
-                          "C = C - :chromium "
-                          "WHERE User = :uid");
-    resourceQuery.bindValue(":oil", cost.o);
-    resourceQuery.bindValue(":explosives", cost.e);
-    resourceQuery.bindValue(":steel", cost.s);
-    resourceQuery.bindValue(":rubber", cost.r);
-    resourceQuery.bindValue(":aluminum", cost.a);
-    resourceQuery.bindValue(":tungsten", cost.w);
-    resourceQuery.bindValue(":chromium", cost.c);
-    resourceQuery.bindValue(":uid", uid.ConvertToUint64());
+    // UserAttr stores resources as separate rows with Attribute values 'O','E','S','R','A','W','C'
+    QMap<QString, int> resourceMap = {
+        std::pair("O", cost.o),
+        std::pair("E", cost.e),
+        std::pair("S", cost.s),
+        std::pair("R", cost.r),
+        std::pair("A", cost.a),
+        std::pair("W", cost.w),
+        std::pair("C", cost.c)
+    };
     
-    if(!resourceQuery.exec()) {
-        //% "Failed to deduct plane replenishment resources."
-        db.rollback();
-        throw DBError(qtTrId("plane-replenish-resource-deduct-failed"),
-                      resourceQuery.lastError(), resourceQuery.lastQuery());
+    for(auto iter = resourceMap.keyValueBegin();
+         iter != resourceMap.keyValueEnd();
+         ++iter) {
+        QSqlQuery resourceQuery;
+        resourceQuery.prepare("UPDATE UserAttr "
+                              "SET Intvalue = Intvalue - :amount "
+                              "WHERE UserID = :uid AND Attribute = :type");
+        resourceQuery.bindValue(":amount", iter->second);
+        resourceQuery.bindValue(":uid", uid.ConvertToUint64());
+        resourceQuery.bindValue(":type", iter->first);
+        
+        if(!resourceQuery.exec()) {
+            //% "Failed to deduct plane replenishment resources."
+            db.rollback();
+            throw DBError(qtTrId("plane-replenish-resource-deduct-failed"),
+                          resourceQuery.lastError(), resourceQuery.lastQuery());
+        }
     }
     
     // Clear plane losses for this fleet
