@@ -16,7 +16,15 @@ All source lives under `FleetMemories/`. C++20 is required on Windows; C++23 on 
 
 In Linux and Windows: refer to CMakeList.txt.user for Qt Creator settings.
 
-In WSL: don't build. You are not operating in a build environment (which is another directory in Windows filesystem). Even many compilation errors can be ignored, since you don't natively have MSVC or Qt SDK.`
+**WSL Detection:** Agents should automatically detect WSL environments using system checks:
+- Check `/proc/version` for "Microsoft" or "WSL" strings
+- Check for Windows mount points (`/mnt/c/`, `/mnt/wsl/`)
+- Check for WSL-specific files (`/proc/sys/fs/binfmt_misc/WSLInterop`)
+- Use `systemd-detect-virt` if available
+
+**If in WSL:** Don't build unless you have confirmed Qt SDK and MSVC are properly installed. You may not be operating in a build environment (which could be in another directory in Windows filesystem). Compilation errors can often be ignored in WSL if Qt SDK or MSVC are missing.
+
+**In native Linux/Windows:** Build normally with build instructions from Qt Configuration CMakeList.txt.user.
 
 ## Lint & Test Commands
 
@@ -166,4 +174,4 @@ When about to claim work is complete:
 
 ## Superpowers Skills
 
-- **Do not offer visual companion in WSL** - When using the brainstorming skill in WSL environment, skip the "Offer visual companion" step as WSL lacks browser support for local URLs.
+- **Do not offer visual companion in WSL** - When using the brainstorming skill and WSL is detected, skip the "Offer visual companion" step as WSL lacks browser support for local URLs.
