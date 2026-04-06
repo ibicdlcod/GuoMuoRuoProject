@@ -77,7 +77,9 @@ const int elapsedMaxTolerance = steamRateLimit;
 
 }
 
-Server::Server(int argc, char ** argv) : CommandLine(argc, argv), planeReplenish(this) {
+Server::Server(int argc, char ** argv) : CommandLine(argc, argv),
+    equipmentDamageBaseChance(0.3), planeLossDeductionThreshold(100),
+    planeReplenish(this) {
     /* no *settings could be used here */
     std::random_device rd;
     std::seed_seq seq{rd(), rd(), rd(), rd(), rd(), rd(), rd(), rd()};
@@ -4659,12 +4661,17 @@ int Server::countSameTypeEquipmentInArsenal(const CSteamID &uid, int equipDef)
     if (query.exec() && query.first()) {
         return query.value(0).toInt();
     }
+    qWarning() << "Failed to count same-type equipment for user"
+               << uid.ConvertToUint64() << "equipDef" << equipDef
+               << "error:" << query.lastError().text();
     return 1; // At least the damaged equipment itself
 }
 
 int Server::calculateSkillPointDeduction(int currentSkillPoints, int sameTypeCount)
 {
-    if (currentSkillPoints <= 0 || sameTypeCount <= 0) return 0;
+    if (currentSkillPoints <= 0) return 0;
+    // Ensure at least one same-type equipment (the damaged equipment itself)
+    sameTypeCount = sameTypeCount <= 0 ? 1 : sameTypeCount;
     // Formula: max(currentSP, 0) × (1/a) ÷ 100
     double deduction = static_cast<double>(currentSkillPoints)
                        * (1.0 / sameTypeCount) / 100.0;
