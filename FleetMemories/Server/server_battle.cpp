@@ -1077,34 +1077,38 @@ const QJsonObject Server::processBattleCore(const CSteamID &uid,
             if (lossThisShip > 0) {
                 Ship *ship = playerFleet->ships[i];
                 if (ship) {
-                    double remainingHPRatio = static_cast<double>(newHP) 
-                        / ship->attr["Hitpoints"];
-                    
-                    // Check if equipment should be damaged
-                    if (shouldDamageEquipment(remainingHPRatio, mt)) {
-                        // Get random non-plane equipment from ship
-                        int damagedSlot = getRandomNonPlaneEquipmentSlot(
-                            dyn, mt);
-                        if (damagedSlot != -1) {
-                            QUuid equipUuid = getEquipUuidFromSlot(
-                                dyn, damagedSlot);
-                            int equipDef = User::getEquipDef(equipUuid);
-                            
-                            // Calculate skill point deduction
-                            int sameTypeCount = countSameTypeEquipmentInArsenal(
-                                uid, equipDef);
-                            int currentSP = User::getSkillPoints(
-                                uid, equipDef);
-                            int deduction = calculateSkillPointDeduction(
-                                currentSP, sameTypeCount);
-                            
-                            // Apply deduction
-                            if (deduction > 0) {
-                                User::addSkillPoints(uid, equipDef, -deduction);
-                                qInfo() << "Equipment damage:" << equipDef 
-                                        << "lost" << deduction << "skill points"
-                                        << "(same-type count:" << sameTypeCount 
-                                        << ")";
+                    int maxHP = ship->attr["Hitpoints"];
+                    if (maxHP > 0) {
+                        double remainingHPRatio = static_cast<double>(newHP) 
+                            / maxHP;
+                        remainingHPRatio = std::clamp(remainingHPRatio, 0.0, 1.0);
+                        
+                        // Check if equipment should be damaged
+                        if (shouldDamageEquipment(remainingHPRatio, mt)) {
+                            // Get random non-plane equipment from ship
+                            int damagedSlot = getRandomNonPlaneEquipmentSlot(
+                                dyn, mt);
+                            if (damagedSlot != -1) {
+                                QUuid equipUuid = getEquipUuidFromSlot(
+                                    dyn, damagedSlot);
+                                int equipDef = User::getEquipDef(equipUuid);
+                                
+                                // Calculate skill point deduction
+                                int sameTypeCount = countSameTypeEquipmentInArsenal(
+                                    uid, equipDef);
+                                int currentSP = User::getSkillPoints(
+                                    uid, equipDef);
+                                int deduction = calculateSkillPointDeduction(
+                                    currentSP, sameTypeCount);
+                                
+                                // Apply deduction
+                                if (deduction > 0) {
+                                    User::addSkillPoints(uid, equipDef, -deduction);
+                                    qInfo() << "Equipment damage:" << equipDef 
+                                            << "lost" << deduction << "skill points"
+                                            << "(same-type count:" << sameTypeCount 
+                                            << ")";
+                                }
                             }
                         }
                     }
