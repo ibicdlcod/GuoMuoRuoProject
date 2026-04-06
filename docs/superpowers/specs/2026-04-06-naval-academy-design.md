@@ -20,33 +20,39 @@ Horizontal layout with three sections:
 Horizontal Layout
 ├── Left Panel (Source)
 │   ├── Local tech display (identical to TechView right panel)
-│   ├── Equipment selection combo boxes
+│   ├── Equipment selection combo boxes (all equipment with skill points)
 │   ├── Skill points display
 │   └── Equipment mode only (ship toggle hidden)
 ├── Center Control
 │   ├── Convert button (vertically uppermost, horizontally centered)
-    │   ├── Slider representing percentage (1-100%) of available skill points
-    │   └── Number display (editable, shows actual amount)
+│   ├── Slider representing percentage (1-100%) of available skill points
+│   └── Number display (editable, shows actual amount)
 └── Right Panel (Destination)
     ├── Local tech display (identical to left)
-    ├── Equipment selection combo boxes
+    ├── Equipment selection combo boxes (only equipment where selected left panel equipment is "mother")
     ├── Skill points display
     └── Equipment mode only
 ```
 
 Both panels show only equipment mode (no ship toggle). The slider + number display allows input of amount to convert.
 
+**Mother Relationship**: Equipment can have a "mother" attribute (equipment ID) as defined in Equip.csv. The right panel filters to show only equipment where the left panel's selected equipment ID equals the "mother" attribute value.
+
 ## Data Flow
 
-1. User selects source equipment (left panel) and destination equipment (right panel)
-2. UI validates sufficient skill points exist in source equipment
-3. User sets amount via slider (percentage of available points) or number input (actual amount, range: 1 to available skill points)
-4. Click convert button sends `CommandType::ConvertSkillPoints(srcId, dstId, amount)`
-5. Server validates: checks user has sufficient skill points for source equipment
-6. Server calculates: `dstGained = amount × (stdSkillPoints_src / stdSkillPoints_dst)`
-7. Server updates database: deducts `amount` from source, adds `dstGained` to destination
-8. Server responds with `InfoType::SkillPointConvertResult(success, newSrcSP, newDstSP)`
-9. UI updates both skill point displays with new values
+1. User selects source equipment (left panel) from all equipment with skill points
+2. Right panel filters to show only equipment where selected source equipment is "mother" (attr["Mother"] == srcEquipId)
+3. User selects destination equipment from filtered right panel list
+4. UI validates sufficient skill points exist in source equipment
+5. User sets amount via slider (percentage of available points) or number input (actual amount, range: 1 to available skill points)
+6. Click convert button sends `CommandType::ConvertSkillPoints(srcId, dstId, amount)`
+7. Server validates: 
+   - User has sufficient skill points for source equipment
+   - Destination equipment has source equipment as "mother" (attr["Mother"] == srcEquipId)
+8. Server calculates: `dstGained = amount × (stdSkillPoints_src / stdSkillPoints_dst)`
+9. Server updates database: deducts `amount` from source, adds `dstGained` to destination
+10. Server responds with `InfoType::SkillPointConvertResult(success, newSrcSP, newDstSP)`
+11. UI updates both skill point displays with new values
 
 ## Protocol Changes
 
@@ -106,17 +112,64 @@ void Server::handleConvertSkillPoints(uint64 uid, const QJsonObject &obj) {
     int dstEquipId = obj["dstEquipId"].toInt();
     int64 amount = obj["amount"].toInteger();
     
-    // Validate equipment IDs exist
+    // Validate equipment IDs exist in registry
+    Equipment *srcEquip = equipRegistry.value(srcEquipId);
+    Equipment *dstEquip = equipRegistry.value(dstEquipId);
+    if(!srcEquip || !dstEquip || srcEquip->isInvalid() || dstEquip->isInvalid()) {
+        sendError(uid, KP::GameError::DevelopNotExist);
+        return;
+    }
+    
+    // Validate mother relationship: dst must have src as mother
+    int motherId = dstEquip->attr.value("Mother", 0);
+    if(motherId != srcEquipId) {
+        sendError(uid, KP::GameError::DevelopNotOption); // Or create new error type
+        return;
+    }
+    
     // Check user has sufficient skill points in source equipment
+    int64 srcSkillPoints = User::getSkillPoints(uid, srcEquipId);
+    if(srcSkillPoints < amount) {
+        sendError(uid, KP::GameError::ResourceLack);
+        return;
+    }
+    
     // Calculate dstGained using stdSkillPoints ratio
+    int64 dstStd = dstEquip->skillPointsStd();
+    int64 srcStd = srcEquip->skillPointsStd();
+    int64 dstGained = (amount * srcStd) / dstStd; // integer division
+    if(dstGained == 0) dstGained = 1; // Minimum 1 point gained
+    
     // Update database transactionally
-    // Send success response with new skill point values
-    // Or send error if validation fails
+    QSqlDatabase db = QSqlDatabase::database();
+    db.transaction();
+    try {
+        // Deduct from source, add to destination
+        User::addSkillPoints(uid, srcEquipId, -amount);
+        User::addSkillPoints(uid, dstEquipId, dstGained);
+        
+        // Get updated skill point values
+        int64 newSrcSP = User::getSkillPoints(uid, srcEquipId);
+        int64 newDstSP = User::getSkillPoints(uid, dstEquipId);
+        
+        db.commit();
+        
+        // Send success response with new skill point values
+        sendBytes(uid, KP::serverSkillPointConvertResult(true, newSrcSP, newDstSP));
+    } catch(const DBError &e) {
+        db.rollback();
+        qCritical() << "Naval Academy conversion failed:" << e.what();
+        sendError(uid, KP::GameError::DevelopNotExist);
+    }
 }
 ```
 
 ### Database Updates
-Update `UserSkillPoints` table (or equivalent) to deduct from source and add to destination. Use transaction for atomicity.
+Update `UserEquipSP` table using `User::addSkillPoints()` function:
+- Deduct from source: `User::addSkillPoints(uid, srcEquipId, -amount)`
+- Add to destination: `User::addSkillPoints(uid, dstEquipId, dstGained)`
+
+Use transaction for atomicity: wrap in `db.transaction()` and `db.commit()`/`db.rollback()`.
 
 ## Integration Points
 
@@ -140,11 +193,13 @@ Update `UserSkillPoints` table (or equivalent) to deduct from source and add to 
 ## Key Considerations
 
 1. **Reusability**: Leverage existing `TechView` local tech panel code for equipment display
-2. **Validation**: Real-time validation of sufficient skill points before allowing conversion
-3. **Feedback**: Clear success/error messages for conversion results
-4. **State Management**: Update skill point displays immediately after successful conversion
-5. **Error Recovery**: Handle server validation failures gracefully with rollback
-6. **UI Consistency**: Follow existing TechView patterns for layout and styling
+2. **Mother Relationship Filtering**: Right panel filters equipment where left panel selection is "mother" (attr["Mother"] == srcEquipId)
+3. **Validation**: Real-time validation of sufficient skill points before allowing conversion
+4. **Server-side Validation**: Server validates mother relationship in addition to skill point sufficiency
+5. **Feedback**: Clear success/error messages for conversion results
+6. **State Management**: Update skill point displays immediately after successful conversion
+7. **Error Recovery**: Handle server validation failures gracefully with rollback
+8. **UI Consistency**: Follow existing TechView patterns for layout and styling
 
 ## Files to Create/Modify
 
