@@ -32,9 +32,19 @@ public:
     Equipment * getEquipAtPosAndSlot(int fleetPosIndex, int slot);
     Equipment * getEquipAtPosAndEXSlot(int fleetPosIndex);
     QList<Equipment *> getAllEquipAtPos(int fleetPosIndex);
-    /* Returns headquarters equipment ID (272, 4098, 107, 413) if present on ship at
+    /* Returns headquarters equipment ID (see KP::headquartersEquip* constants) if present on ship at
      * position 1, otherwise 0. Checks fleet‑type restrictions per spec. */
     int headquartersEquipId(bool isExpedition) const;
+    /* Returns list of fleet positions (0‑based indices) that can escort critically
+     * damaged ships. A ship is eligible if it is a destroyer or light cruiser,
+     * is healthy (HP > 0, not fled), and the fleet possesses a headquarters
+     * equipment (see headquartersEquipId). */
+    QList<int> findEscortCandidates(bool isExpedition) const;
+    /* Attempts to perform an escorted retreat for the critically damaged ship at
+     * damagedPos (0‑based). Returns true if retreat succeeded (ship was critically
+     * damaged, at least one escort candidate exists, and both ships marked as fled).
+     * If the ship is not critically damaged or no candidates exist, returns false. */
+    bool performEscortRetreat(int damagedPos, bool isExpedition);
     int getPlaneCountAtPosAndSlot(int fleetPosIndex, int slot);
     void setPlaneCountAtPosAndSlot(int fleetPosIndex, int slot, int count);
     void setHPAtPos(int fleetPosIndex, int hp);

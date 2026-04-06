@@ -150,20 +150,55 @@ int FleetInfo::headquartersEquipId(bool isExpedition) const
         if (!eq) continue;
         int id = eq->getId();
         // Mobile strike force headquarters (272) – normal fleet only
-        if (id == 272 && type == KP::NormalFleet && !isExpedition)
+        if (id == KP::headquartersEquipMobileStrike
+            && type == KP::NormalFleet && !isExpedition)
             return id;
         // Expedition force headquarters (4098) – expedition fleet only
-        if (id == 4098 && isExpedition)
+        if (id == KP::headquartersEquipExpedition && isExpedition)
             return id;
         // Combined fleet headquarters (107) – surface/carrier/transport fleet
-        if (id == 107 && (type == KP::SurfaceFleet || type == KP::CarrierFleet
-                          || type == KP::TransportFleet))
+        if (id == KP::headquartersEquipCombinedFleet
+            && (type == KP::SurfaceFleet || type == KP::CarrierFleet
+                || type == KP::TransportFleet))
             return id;
         // Elite Torpedo Squadron Headquarters (413) – any fleet
-        if (id == 413)
+        if (id == KP::headquartersEquipEliteTorpedo)
             return id;
     }
     return 0;
+}
+
+QList<int> FleetInfo::findEscortCandidates(bool isExpedition) const
+{
+    QList<int> candidates;
+    if (headquartersEquipId(isExpedition) == 0) return candidates;
+    for (int i = 0; i < static_cast<int>(ships.size()); ++i) {
+        const Ship *ship = ships[i];
+        const ShipDynamic *dyn = shipDynamics[i];
+        if (!ship || !dyn || dyn->fleetFled) continue;
+        if (!ship->isDestroyer() && !ship->isLightCruiser()) continue;
+        if (!Ship::isHealthy(dyn)) continue;
+        candidates.append(i);
+    }
+    return candidates;
+}
+
+bool FleetInfo::performEscortRetreat(int damagedPos, bool isExpedition)
+{
+    if (damagedPos < 0 || damagedPos >= static_cast<int>(shipDynamics.size()))
+        return false;
+    ShipDynamic *dyn = shipDynamics[damagedPos];
+    if (!dyn) return false;
+    // Critically damaged means HP ≤ 0 or already fled
+    if (dyn->currentHP > 0 && !dyn->fleetFled) return false;
+    QList<int> candidates = findEscortCandidates(isExpedition);
+    if (candidates.empty()) return false;
+    int escortPos = candidates.first();
+    // Mark both ships as fled
+    dyn->fleetFled = true;
+    if (ShipDynamic *escortDyn = shipDynamics[escortPos])
+        escortDyn->fleetFled = true;
+    return true;
 }
 
 int FleetInfo::getPlaneCountAtPosAndSlot(int fleetPosIndex, int slot) {

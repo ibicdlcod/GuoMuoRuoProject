@@ -16,6 +16,7 @@
 
 #include <algorithm>
 
+#include "../Protocol/equipment.h"
 #include "../Protocol/kp.h"
 #include "../Protocol/lua.h"
 #include "../Protocol/utility.h"
@@ -1072,6 +1073,43 @@ const QJsonObject Server::processBattleCore(const CSteamID &uid,
                     (static_cast<double>(currentHP) / totalPlayerHP)) : 0;
             int newHP = std::max(0, currentHP - lossThisShip);
             dyn->currentHP = newHP;
+            // Check for equipment damage if ship took damage
+            if (lossThisShip > 0) {
+                Ship *ship = playerFleet->ships[i];
+                if (ship) {
+                    double remainingHPRatio = static_cast<double>(newHP) 
+                        / ship->attr["Hitpoints"];
+                    
+                    // Check if equipment should be damaged
+                    if (shouldDamageEquipment(remainingHPRatio, mt)) {
+                        // Get random non-plane equipment from ship
+                        int damagedSlot = getRandomNonPlaneEquipmentSlot(
+                            dyn, mt);
+                        if (damagedSlot != -1) {
+                            QUuid equipUuid = getEquipUuidFromSlot(
+                                dyn, damagedSlot);
+                            int equipDef = User::getEquipDef(equipUuid);
+                            
+                            // Calculate skill point deduction
+                            int sameTypeCount = countSameTypeEquipmentInArsenal(
+                                uid, equipDef);
+                            int currentSP = User::getSkillPoints(
+                                uid, equipDef);
+                            int deduction = calculateSkillPointDeduction(
+                                currentSP, sameTypeCount);
+                            
+                            // Apply deduction
+                            if (deduction > 0) {
+                                User::addSkillPoints(uid, equipDef, -deduction);
+                                qInfo() << "Equipment damage:" << equipDef 
+                                        << "lost" << deduction << "skill points"
+                                        << "(same-type count:" << sameTypeCount 
+                                        << ")";
+                            }
+                        }
+                    }
+                }
+            }
 
             // Update database
             query.prepare("UPDATE UserShip SET CurrentHP = :hp "
@@ -1755,17 +1793,23 @@ void Server::progressMap(const CSteamID &uid, QSslSocket *connection,
         }
         int activeFleet = result.value()[3];
         if(FleetInfo *fi = sortieFleets.value({uid, activeFleet}, nullptr)) {
-            // Check for critically damaged ships
-            bool hasCriticallyDamaged = false;
+            // Determine if this is an expedition map
+            bool isExpedition = (mapId >= KP::resourceMapIDStart
+                                 && mapId < KP::resourceMapIDEnd);
+            // Process critically damaged ships
+            bool fleetFailed = false;
             for (int i = 0; i < static_cast<int>(fi->ships.size()); ++i) {
                 Ship* ship = fi->ships[i];
                 ShipDynamic* dyn = fi->shipDynamics[i];
-                if (ship && dyn && !dyn->fleetFled && dyn->isCriticallyDamaged(ship)) {
-                    hasCriticallyDamaged = true;
+                if (!ship || !dyn || dyn->fleetFled) continue;
+                if (!dyn->isCriticallyDamaged(ship)) continue;
+                // Attempt escorted retreat
+                if (!fi->performEscortRetreat(i, isExpedition)) {
+                    fleetFailed = true;
                     break;
                 }
             }
-            if (hasCriticallyDamaged) {
+            if (fleetFailed) {
                 // Send fleet failure message
                 QByteArray msg = KP::serverFleetFailure(KP::FleetCriticallyDamaged, activeFleet);
                 senderM.sendMessage(connection, msg);
