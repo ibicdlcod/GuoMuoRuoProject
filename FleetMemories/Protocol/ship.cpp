@@ -7,6 +7,7 @@
 #include <QSqlQuery>
 
 #include "../Server/kerrors.h"
+#include "shipdynamic.h"
 #include "tech.h"
 #include "utility.h"
 
@@ -420,6 +421,24 @@ QList<std::tuple<int, int>> Ship::getVisibleBonuses() const {
 
 bool Ship::isAmnesiac() const {
     return Utility::checkMask(shipRegId, 0xF0000000, 0x70000000);
+}
+
+bool Ship::isDestroyer() const {
+    /* mask 0x000f0000 isolates ship‑type bits; destroyer = 0x00020000 */
+    return (shipRegId & 0x000f0000) == 0x00020000;
+}
+
+bool Ship::isHealthy(const ShipDynamic *dyn) const {
+    if (!dyn) return false;
+    int maxHP = attr.value("Hitpoints", 1);
+    /* Healthy means current HP >= 3/4 of max HP */
+    if (maxHP <= 0) return false;
+    return dyn->currentHP * 4 >= maxHP * 3;
+}
+
+bool Ship::isLightCruiser() const {
+    /* mask 0x000f0000 isolates ship‑type bits; light cruiser = 0x00030000 */
+    return (shipRegId & 0x000f0000) == 0x00030000;
 }
 
 int Ship::getLevel(int exp) {
