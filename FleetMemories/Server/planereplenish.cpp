@@ -129,16 +129,53 @@ ResOrd PlaneReplenish::calculateReplenishCost(const CSteamID &uid,
                       query.lastError(), query.lastQuery());
     }
 
+    QMap<int, int> planeLossesByEquip;
+
     while(query.next()) {
         int equipDef  = query.value("EquipDef").toInt();
         int lossCount = query.value("LossCount").toInt();
         int remaining = query.value("RemainingCount").toInt();
+
+        /* Accumulate losses for skill point deduction */
+        planeLossesByEquip[equipDef] += lossCount;
 
         Equipment *equip = server->equipRegistry.value(equipDef);
         if(equip) {
             int planesNeeded = lossCount + maintenanceCount(remaining, equip);
             ResOrd per100PlaneCost = equip->replenishCostPer100Planes();
             totalCost += scaleCost(per100PlaneCost, planesNeeded);
+        }
+    }
+
+    /* Apply skill point deductions for plane losses */
+    for (auto it = planeLossesByEquip.begin();
+         it != planeLossesByEquip.end(); ++it) {
+        int equipDef = it.key();
+        int totalLosses = it.value();
+        
+        /* Guard against zero/negative threshold */
+        int threshold = server->planeLossDeductionThreshold;
+        if (threshold <= 0) threshold = 100;
+        
+        /* Calculate number of deductions (round up) */
+        int deductions = (totalLosses + threshold - 1) / threshold;
+        
+        if (deductions > 0) {
+            int sameTypeCount = server->countSameTypeEquipmentInArsenal(
+                uid, equipDef);
+            int currentSP = User::getSkillPoints(uid, equipDef);
+            int deductionPer100 = server->calculateSkillPointDeduction(
+                currentSP, sameTypeCount);
+            
+            if (deductionPer100 > 0) {
+                int totalDeduction = deductionPer100 * deductions;
+                User::addSkillPoints(uid, equipDef, -totalDeduction);
+                
+                qInfo() << "Plane losses:" << equipDef << "lost" << totalLosses
+                        << "planes, deducted" << totalDeduction
+                        << "skill points (" << deductions << "×"
+                        << deductionPer100 << ")";
+            }
         }
     }
 
