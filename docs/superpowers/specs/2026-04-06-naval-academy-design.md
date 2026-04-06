@@ -1,0 +1,167 @@
+# Naval Academy Design
+
+**Goal**: Add a "Naval Academy" section to the Tech menu for converting skill points between equipment types using stdSkillPoints ratio.
+
+**Architecture**: New `NavalAcademyView` class mirroring `TechView`'s local tech panel, with dual equipment panels and conversion controls. Server-validated conversion with new protocol commands.
+
+**Tech Stack**: Qt/C++, SQLite, existing FleetMemories protocol (KP namespace).
+
+---
+
+## Overview
+
+The Naval Academy allows players to convert skill points from one equipment type to another, using the stdSkillPoints ratio formula. The feature appears as a new menu item "Naval Academy" after "View Tech" in the Tech menu.
+
+## UI Layout
+
+Horizontal layout with three sections:
+
+```
+Horizontal Layout
+├── Left Panel (Source)
+│   ├── Local tech display (identical to TechView right panel)
+│   ├── Equipment selection combo boxes
+│   ├── Skill points display
+│   └── Equipment mode only (ship toggle hidden)
+├── Center Control
+│   ├── Convert button (vertically uppermost, horizontally centered)
+    │   ├── Slider representing percentage (1-100%) of available skill points
+    │   └── Number display (editable, shows actual amount)
+└── Right Panel (Destination)
+    ├── Local tech display (identical to left)
+    ├── Equipment selection combo boxes
+    ├── Skill points display
+    └── Equipment mode only
+```
+
+Both panels show only equipment mode (no ship toggle). The slider + number display allows input of amount to convert.
+
+## Data Flow
+
+1. User selects source equipment (left panel) and destination equipment (right panel)
+2. UI validates sufficient skill points exist in source equipment
+3. User sets amount via slider (percentage of available points) or number input (actual amount, range: 1 to available skill points)
+4. Click convert button sends `CommandType::ConvertSkillPoints(srcId, dstId, amount)`
+5. Server validates: checks user has sufficient skill points for source equipment
+6. Server calculates: `dstGained = amount × (stdSkillPoints_src / stdSkillPoints_dst)`
+7. Server updates database: deducts `amount` from source, adds `dstGained` to destination
+8. Server responds with `InfoType::SkillPointConvertResult(success, newSrcSP, newDstSP)`
+9. UI updates both skill point displays with new values
+
+## Protocol Changes
+
+### CommandType (KP::CommandType)
+Add new enum value after `DemandSkillPoints` (line 237 in kp.h):
+```cpp
+ConvertSkillPoints,
+```
+
+### InfoType (KP::InfoType)
+Add new enum value after `SkillPointInfo` (line 322 in kp.h):
+```cpp
+SkillPointConvertResult,
+```
+
+### New Functions in KP Namespace
+
+**Client-side builder** (kp.cpp):
+```cpp
+QByteArray KP::clientConvertSkillPoints(int srcEquipId, int dstEquipId, int64 amount) {
+    QJsonObject result;
+    result["command"] = CommandType::ConvertSkillPoints;
+    result["srcEquipId"] = srcEquipId;
+    result["dstEquipId"] = dstEquipId;
+    result["amount"] = (qint64)amount;
+    return QJsonDocument(result).toJson(QJsonDocument::Compact);
+}
+```
+
+**Server-side response builder** (kp.cpp):
+```cpp
+QByteArray KP::serverSkillPointConvertResult(bool success, int64 newSrcSP, int64 newDstSP) {
+    QJsonObject result;
+    result["infotype"] = InfoType::SkillPointConvertResult;
+    result["success"] = success;
+    result["newSrcSP"] = (qint64)newSrcSP;
+    result["newDstSP"] = (qint64)newDstSP;
+    return QJsonDocument(result).toJson(QJsonDocument::Compact);
+}
+```
+
+## Server Implementation
+
+### Handler Registration
+Add case for `ConvertSkillPoints` in `Server::receivedInfo()` (server.cpp):
+```cpp
+case KP::CommandType::ConvertSkillPoints:
+    handleConvertSkillPoints(uid, obj);
+    break;
+```
+
+### Conversion Handler
+New method in Server class:
+```cpp
+void Server::handleConvertSkillPoints(uint64 uid, const QJsonObject &obj) {
+    int srcEquipId = obj["srcEquipId"].toInt();
+    int dstEquipId = obj["dstEquipId"].toInt();
+    int64 amount = obj["amount"].toInteger();
+    
+    // Validate equipment IDs exist
+    // Check user has sufficient skill points in source equipment
+    // Calculate dstGained using stdSkillPoints ratio
+    // Update database transactionally
+    // Send success response with new skill point values
+    // Or send error if validation fails
+}
+```
+
+### Database Updates
+Update `UserSkillPoints` table (or equivalent) to deduct from source and add to destination. Use transaction for atomicity.
+
+## Integration Points
+
+### MainWindow Changes
+- Add `NavalAcademyView *navalAcademyArea` member (mainwindow.h)
+- Add `switchToNavalAcademy()` slot (mainwindow.h)
+- Initialize navalAcademyArea in constructor (mainwindow.cpp)
+- Add to stacked layout (`lay->addWidget(navalAcademyArea)`)
+- Connect menu action to slot
+
+### Menu System
+- Add "Naval Academy" action after "View Tech" in mainwindow.ui
+- Set text: `//% "Naval Academy"` with translation ID `menu-naval-academy`
+- Connect to `switchToNavalAcademy()` slot
+
+### Client Integration
+- Add `receivedSkillPointConvertResult` signal to Client class
+- Add handler in Client to update skill point cache
+- Connect NavalAcademyView to receive skill point updates
+
+## Key Considerations
+
+1. **Reusability**: Leverage existing `TechView` local tech panel code for equipment display
+2. **Validation**: Real-time validation of sufficient skill points before allowing conversion
+3. **Feedback**: Clear success/error messages for conversion results
+4. **State Management**: Update skill point displays immediately after successful conversion
+5. **Error Recovery**: Handle server validation failures gracefully with rollback
+6. **UI Consistency**: Follow existing TechView patterns for layout and styling
+
+## Files to Create/Modify
+
+**Create:**
+- `FleetMemories/ClientGUI/ui/navalacademyview.h`
+- `FleetMemories/ClientGUI/ui/navalacademyview.cpp`
+- `FleetMemories/ClientGUI/ui/navalacademyview.ui`
+
+**Modify:**
+- `FleetMemories/Protocol/kp.h` (add enum values)
+- `FleetMemories/Protocol/kp.cpp` (add builder functions)
+- `FleetMemories/Server/server.h` (add handler declaration)
+- `FleetMemories/Server/server.cpp` (add handler implementation)
+- `FleetMemories/ClientGUI/ui/mainwindow.h` (add member and slot)
+- `FleetMemories/ClientGUI/ui/mainwindow.cpp` (add initialization and slot)
+- `FleetMemories/ClientGUI/ui/mainwindow.ui` (add menu action)
+- `FleetMemories/ClientGUI/clientv2.h` (add signal)
+- `FleetMemories/ClientGUI/clientv2.cpp` (add signal handler)
+
+[Implemented in NavalAcademyView]
