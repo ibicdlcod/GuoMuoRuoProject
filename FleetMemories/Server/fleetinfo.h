@@ -32,6 +32,9 @@ public:
     Equipment * getEquipAtPosAndSlot(int fleetPosIndex, int slot);
     Equipment * getEquipAtPosAndEXSlot(int fleetPosIndex);
     QList<Equipment *> getAllEquipAtPos(int fleetPosIndex);
+    /* Returns headquarters equipment ID (272, 4098, 107, 413) if present on ship at
+     * position 1, otherwise 0. Checks fleet‑type restrictions per spec. */
+    int headquartersEquipId(bool isExpedition) const;
     int getPlaneCountAtPosAndSlot(int fleetPosIndex, int slot);
     void setPlaneCountAtPosAndSlot(int fleetPosIndex, int slot, int count);
     void setHPAtPos(int fleetPosIndex, int hp);

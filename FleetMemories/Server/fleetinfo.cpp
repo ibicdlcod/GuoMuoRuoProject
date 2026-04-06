@@ -142,6 +142,30 @@ QList<Equipment *> FleetInfo::getAllEquipAtPos(int fleetPosIndex) {
     return result;
 }
 
+int FleetInfo::headquartersEquipId(bool isExpedition) const
+{
+    if (ships.empty() || !ships[0] || !shipDynamics[0]) return 0;
+    QList<Equipment *> equips = getAllEquipAtPos(0);
+    for (Equipment *eq : equips) {
+        if (!eq) continue;
+        int id = eq->getId();
+        // Mobile strike force headquarters (272) – normal fleet only
+        if (id == 272 && type == KP::NormalFleet && !isExpedition)
+            return id;
+        // Expedition force headquarters (4098) – expedition fleet only
+        if (id == 4098 && isExpedition)
+            return id;
+        // Combined fleet headquarters (107) – surface/carrier/transport fleet
+        if (id == 107 && (type == KP::SurfaceFleet || type == KP::CarrierFleet
+                          || type == KP::TransportFleet))
+            return id;
+        // Elite Torpedo Squadron Headquarters (413) – any fleet
+        if (id == 413)
+            return id;
+    }
+    return 0;
+}
+
 int FleetInfo::getPlaneCountAtPosAndSlot(int fleetPosIndex, int slot) {
     if(fleetPosIndex < 0
         || fleetPosIndex >= static_cast<int>(shipDynamics.size()))
