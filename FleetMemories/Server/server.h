@@ -198,10 +198,16 @@ private:
     void sqlinitUsers() const;
     void sqlinitARDOrders() const;
     void sqlinitVCR() const;
+    int countSameTypeEquipmentInArsenal(const CSteamID &uid, int equipDef);
+    int calculateSkillPointDeduction(int currentSkillPoints, int sameTypeCount);
+    bool shouldDamageEquipment(double remainingHPRatio, std::mt19937 &mt);
+    int getRandomNonPlaneEquipmentSlot(const ShipDynamic *dyn, std::mt19937 &mt);
+    QUuid getEquipUuidFromSlot(const ShipDynamic *dyn, int slot);
     void startSortie(const CSteamID &, QSslSocket *, int, int, bool);
     void switchCert(const QStringList &);
     void testFleetInfoEffectiveAttr();
     void testPlaneReplenishment();
+    void testEscortedRetreat();
     std::pair<KP::FleetFailType, int> updateFleet(const CSteamID &,
                                                   const QJsonArray &);
     void updateFleetIntoDatabase(const CSteamID &,
@@ -238,6 +244,9 @@ private:
 
     std::random_device random;
     std::mt19937 mt;
+
+    double equipmentDamageBaseChance;
+    int planeLossDeductionThreshold;
 
     sol::state lua;
 

@@ -256,6 +256,8 @@ bool Server::listen(const QHostAddress &address, quint16 port) {
             qCritical () << sslServer.errorString();
         else {
             sqlinit();
+            equipmentDamageBaseChance = settings->value("rule/equipmentdamagebasechance", 0.3).toDouble();
+            planeLossDeductionThreshold = settings->value("rule/planelossdeductionthreshold", 100).toInt();
             if(!equipmentRefresh()) {
                 //% "Equipment init failed!"
                 qCritical() << qtTrId("equip-init-failure");
@@ -4647,6 +4649,75 @@ check_duplicate_remodel_group:
     return {KP::ValidFleet, -1};
 }
 
+int Server::countSameTypeEquipmentInArsenal(const CSteamID &uid, int equipDef)
+{
+    QSqlQuery query;
+    query.prepare("SELECT COUNT(*) FROM UserEquip WHERE User = :uid "
+                  "AND EquipDef = :def");
+    query.bindValue(":uid", uid.ConvertToUint64());
+    query.bindValue(":def", equipDef);
+    if (query.exec() && query.first()) {
+        return query.value(0).toInt();
+    }
+    return 1; // At least the damaged equipment itself
+}
+
+int Server::calculateSkillPointDeduction(int currentSkillPoints, int sameTypeCount)
+{
+    if (currentSkillPoints <= 0 || sameTypeCount <= 0) return 0;
+    // Formula: max(currentSP, 0) × (1/a) ÷ 100
+    double deduction = static_cast<double>(currentSkillPoints)
+                       * (1.0 / sameTypeCount) / 100.0;
+    return static_cast<int>(std::ceil(deduction)); // Round up to nearest integer
+}
+
+bool Server::shouldDamageEquipment(double remainingHPRatio, std::mt19937 &mt)
+{
+    // Chance = base_chance × (1 - remaining_HP_percentage)
+    double chance = equipmentDamageBaseChance * (1.0 - remainingHPRatio);
+    std::uniform_real_distribution<double> dist(0.0, 1.0);
+    return dist(mt) < chance;
+}
+
+int Server::getRandomNonPlaneEquipmentSlot(const ShipDynamic *dyn, std::mt19937 &mt)
+{
+    QList<int> nonPlaneSlots;
+    
+    // Check regular slots (0-4)
+    for (int i = 0; i < dyn->slotEquip.size(); ++i) {
+        if (!dyn->slotEquip[i].isNull()) {
+            int equipDef = User::getEquipDef(dyn->slotEquip[i]);
+            Equipment *equip = equipRegistry.value(equipDef, nullptr);
+            if (equip && !equip->isPlane()) {
+                nonPlaneSlots.append(i);
+            }
+        }
+    }
+    
+    // Check EX slot
+    if (!dyn->slotEquipEx.isNull()) {
+        int equipDef = User::getEquipDef(dyn->slotEquipEx);
+        Equipment *equip = equipRegistry.value(equipDef, nullptr);
+        if (equip && !equip->isPlane()) {
+            nonPlaneSlots.append(5); // Use 5 to represent EX slot
+        }
+    }
+    
+    if (nonPlaneSlots.isEmpty()) return -1;
+    
+    std::uniform_int_distribution<int> dist(0, nonPlaneSlots.size() - 1);
+    return nonPlaneSlots[dist(mt)];
+}
+
+QUuid Server::getEquipUuidFromSlot(const ShipDynamic *dyn, int slot)
+{
+    if (slot == 5) {
+        return dyn->slotEquipEx; // EX slot
+    } else if (slot >= 0 && slot < dyn->slotEquip.size()) {
+        return dyn->slotEquip[slot];
+    }
+    return QUuid();
+}
 void Server::userInit(const CSteamID &uid) {
 user_attr:
     static const QMap<QString, int> defaults
