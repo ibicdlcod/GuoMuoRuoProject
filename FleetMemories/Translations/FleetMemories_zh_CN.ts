@@ -761,13 +761,13 @@ Great at battle and bad at politics--so cool!</source>
     </message>
     <message id="ip-invalid">
         <location filename="../ClientGUI/clientv2_command.cpp" line="184"/>
-        <location filename="../Server/server.cpp" line="3279"/>
+        <location filename="../Server/server.cpp" line="3280"/>
         <source>IP isn&apos;t valid.</source>
         <translation>IP不合法。</translation>
     </message>
     <message id="port-invalid">
         <location filename="../ClientGUI/clientv2_command.cpp" line="191"/>
-        <location filename="../Server/server.cpp" line="3285"/>
+        <location filename="../Server/server.cpp" line="3286"/>
         <source>Port isn&apos;t valid, it must fall between 1024 and 49151</source>
         <translation>端口不合法，必须在1024和49151之间</translation>
     </message>
@@ -1195,7 +1195,7 @@ Great at battle and bad at politics--so cool!</source>
     </message>
     <message id="switch-cert-when-connecting">
         <location filename="../ClientGUI/clientv2.cpp" line="1329"/>
-        <location filename="../Server/server.cpp" line="4355"/>
+        <location filename="../Server/server.cpp" line="4356"/>
         <source>Switch certificate when connected have no effect.</source>
         <translation>在线时转换证书没有效果。</translation>
     </message>
@@ -1652,7 +1652,7 @@ Great at battle and bad at politics--so cool!</source>
     </message>
     <message id="already-listening">
         <location filename="../Server/server.cpp" line="234"/>
-        <location filename="../Server/server.cpp" line="3273"/>
+        <location filename="../Server/server.cpp" line="3274"/>
         <source>Server is already listening.</source>
         <translation>服务器已在监听。</translation>
     </message>
@@ -2083,103 +2083,103 @@ Great at battle and bad at politics--so cool!</source>
         <translation type="unfinished">舰船旧ID%1不存在！</translation>
     </message>
     <message id="user-migrate-equip-failed">
-        <location filename="../Server/server.cpp" line="2454"/>
-        <location filename="../Server/server.cpp" line="2466"/>
-        <location filename="../Server/server.cpp" line="2481"/>
+        <location filename="../Server/server.cpp" line="2455"/>
+        <location filename="../Server/server.cpp" line="2467"/>
+        <location filename="../Server/server.cpp" line="2482"/>
         <source>User %1: import equip from KC failed, error %2</source>
         <translation>用户%1：导入舰C装备失败，错误%2</translation>
     </message>
     <message id="user-migrate-ship-failed">
-        <location filename="../Server/server.cpp" line="2517"/>
-        <location filename="../Server/server.cpp" line="2539"/>
-        <location filename="../Server/server.cpp" line="2553"/>
+        <location filename="../Server/server.cpp" line="2518"/>
+        <location filename="../Server/server.cpp" line="2540"/>
+        <location filename="../Server/server.cpp" line="2554"/>
         <source>User %1: import ship from KC failed, error %2</source>
         <translation>用户%1：导入舰C舰船失败，错误%2</translation>
     </message>
     <message id="import-kc-data-success">
-        <location filename="../Server/server.cpp" line="2560"/>
+        <location filename="../Server/server.cpp" line="2561"/>
         <source>User %1: import from KC data success!</source>
         <translation>用户%1：导入舰C数据成功！</translation>
     </message>
     <message id="minutepulse-sanity-regen-failed">
-        <location filename="../Server/server.cpp" line="2753"/>
+        <location filename="../Server/server.cpp" line="2754"/>
         <source>Minute pulse: sanity regen failed!</source>
         <translation type="unfinished">分钟脉冲：精力恢复失败！</translation>
     </message>
     <message id="modernize-ship-nonexistent">
-        <location filename="../Server/server.cpp" line="2788"/>
+        <location filename="../Server/server.cpp" line="2789"/>
         <source>User id %1: ship %2 does not exist when modernizing!</source>
         <translation type="unfinished">用户%1：近代化改造时舰船%2不存在！</translation>
     </message>
     <message id="modernize-ship-failed-def">
-        <location filename="../Server/server.cpp" line="2806"/>
-        <location filename="../Server/server.cpp" line="2828"/>
+        <location filename="../Server/server.cpp" line="2807"/>
+        <location filename="../Server/server.cpp" line="2829"/>
         <source>User id %1: using blueprint of ship definition %2 failed when modernizing!</source>
         <translation type="unfinished">用户%1：近代化改造时使用舰船型号%2的图纸失败！</translation>
     </message>
     <message id="modernize-ship-def">
-        <location filename="../Server/server.cpp" line="2836"/>
+        <location filename="../Server/server.cpp" line="2837"/>
         <source>User id %1: used blueprint of ship definition %2 when modernizing</source>
         <oldsource>User id %1: using blueprint of ship definition %2 when modernizing</oldsource>
         <translation type="unfinished">用户%1：近代化改造时使用了舰船型号%2的图纸</translation>
     </message>
     <message id="modernize-ship-failed">
-        <location filename="../Server/server.cpp" line="2851"/>
+        <location filename="../Server/server.cpp" line="2852"/>
         <source>User id %1: modernize ship %2 failed!</source>
         <translation type="unfinished">用户%1：近代化改造舰船%2失败！</translation>
     </message>
     <message id="modernize-ship">
-        <location filename="../Server/server.cpp" line="2859"/>
+        <location filename="../Server/server.cpp" line="2860"/>
         <source>User id %1: modernized ship %2 by 1 level</source>
         <translation type="unfinished">用户%1：近代化改造舰船%2提升1级</translation>
     </message>
     <message id="decorate-ship-medal-failed">
-        <location filename="../Server/server.cpp" line="2882"/>
+        <location filename="../Server/server.cpp" line="2883"/>
         <source>User id %1: reading medal balance failed when decorating!</source>
         <translation type="unfinished">用户%1：授勋时读取勋章余额失败！</translation>
     </message>
     <message id="decorate-ship-medal-insufficient">
-        <location filename="../Server/server.cpp" line="2893"/>
+        <location filename="../Server/server.cpp" line="2894"/>
         <source>User id %1: insufficient medals to decorate ships!</source>
         <translation type="unfinished">用户%1：勋章不足，无法授勋！</translation>
     </message>
     <message id="decorate-ship-nonexistent">
-        <location filename="../Server/server.cpp" line="2911"/>
+        <location filename="../Server/server.cpp" line="2912"/>
         <source>User id %1: ship %2 does not exist when decorating!</source>
         <translation type="unfinished">用户%1：授勋时舰船%2不存在！</translation>
     </message>
     <message id="decorate-ship-medal-deduct-failed">
-        <location filename="../Server/server.cpp" line="2929"/>
+        <location filename="../Server/server.cpp" line="2930"/>
         <source>User id %1: deducting medal failed when decorating ship %2!</source>
         <translation type="unfinished">用户%1：授勋舰船%2时扣除勋章失败！</translation>
     </message>
     <message id="decorate-ship-medal-ran-out">
-        <location filename="../Server/server.cpp" line="2937"/>
+        <location filename="../Server/server.cpp" line="2938"/>
         <source>User id %1: insufficient medals when decorating ship %2!</source>
         <translation type="unfinished">用户%1：授勋舰船%2时勋章不足！</translation>
     </message>
     <message id="decorate-ship-expcap-failed">
-        <location filename="../Server/server.cpp" line="2953"/>
+        <location filename="../Server/server.cpp" line="2954"/>
         <source>User id %1: updating ExpCap of ship %2 failed when decorating!</source>
         <translation type="unfinished">用户%1：授勋时更新舰船%2的经验上限失败！</translation>
     </message>
     <message id="decorate-ship">
-        <location filename="../Server/server.cpp" line="2961"/>
+        <location filename="../Server/server.cpp" line="2962"/>
         <source>User id %1: decorated ship %2, new ExpCap %3</source>
         <translation type="unfinished">用户%1：为舰船%2授勋，新经验上限%3</translation>
     </message>
     <message id="user-query-ship-fail">
-        <location filename="../Server/server.cpp" line="3093"/>
+        <location filename="../Server/server.cpp" line="3094"/>
         <source>Query ship %2 for user %1 failed!</source>
         <translation type="unfinished">用户%1查询舰船%2失败！</translation>
     </message>
     <message id="remodel-ship-failed">
-        <location filename="../Server/server.cpp" line="3144"/>
+        <location filename="../Server/server.cpp" line="3145"/>
         <source>User id %1: remodel ship failed!</source>
         <translation type="unfinished">用户%1：改造舰船失败！</translation>
     </message>
     <message id="remodeled-ship">
-        <location filename="../Server/server.cpp" line="3151"/>
+        <location filename="../Server/server.cpp" line="3152"/>
         <source>User id %1: remodeled ship %2 definition %3</source>
         <translation type="unfinished">用户%1：改造舰船%2，型号%3</translation>
     </message>
@@ -2204,56 +2204,56 @@ Great at battle and bad at politics--so cool!</source>
         <translation>用户ID%1：自然回复</translation>
     </message>
     <message id="listen-usage">
-        <location filename="../Server/server.cpp" line="3269"/>
+        <location filename="../Server/server.cpp" line="3270"/>
         <source>Usage: listen [ip] [port]</source>
         <translation>用法：listen [ip] [端口]</translation>
     </message>
     <message id="no-cert">
-        <location filename="../Server/server.cpp" line="3296"/>
+        <location filename="../Server/server.cpp" line="3297"/>
         <source>Server lack a certificate.</source>
         <translation>服务器没有安全证书。</translation>
     </message>
     <message id="no-private-key">
-        <location filename="../Server/server.cpp" line="3306"/>
+        <location filename="../Server/server.cpp" line="3307"/>
         <source>Server lack a private key.</source>
         <translation>服务器没有私钥。</translation>
     </message>
     <message id="corrupt-private-key">
-        <location filename="../Server/server.cpp" line="3314"/>
+        <location filename="../Server/server.cpp" line="3315"/>
         <source>Server private key can&apos;t be read.</source>
         <translation>服务器读取私钥失败。</translation>
     </message>
     <message id="server-listen">
-        <location filename="../Server/server.cpp" line="3329"/>
+        <location filename="../Server/server.cpp" line="3330"/>
         <source>Server is listening on address %1 and port %2</source>
         <translation>服务器在地址%1和端口%2上监听</translation>
     </message>
     <message id="server-listen-fail">
-        <location filename="../Server/server.cpp" line="3343"/>
+        <location filename="../Server/server.cpp" line="3344"/>
         <source>Server failed to listen on address %1 and port %2</source>
         <translation>服务器在地址%1和端口%2上监听失败</translation>
     </message>
     <message id="server-stop">
-        <location filename="../Server/server.cpp" line="3353"/>
+        <location filename="../Server/server.cpp" line="3354"/>
         <source>Server stopped listening.</source>
         <translation>服务器停止监听。</translation>
     </message>
     <message id="server-stopped-already">
-        <location filename="../Server/server.cpp" line="3357"/>
+        <location filename="../Server/server.cpp" line="3358"/>
         <source>Server isn&apos;t listening.</source>
         <translation>服务器未在监听。</translation>
     </message>
     <message id="user-query-progress-fail">
-        <location filename="../Server/server.cpp" line="3377"/>
-        <location filename="../Server/server.cpp" line="3394"/>
-        <location filename="../Server/server.cpp" line="3411"/>
-        <location filename="../Server/server.cpp" line="3428"/>
+        <location filename="../Server/server.cpp" line="3378"/>
+        <location filename="../Server/server.cpp" line="3395"/>
+        <location filename="../Server/server.cpp" line="3412"/>
+        <location filename="../Server/server.cpp" line="3429"/>
         <source>Query user map progress data for user %1 failed!</source>
         <translation type="unfinished">无</translation>
     </message>
     <message id="sortie-progress-failure">
-        <location filename="../Server/server.cpp" line="4196"/>
-        <location filename="../Server/server.cpp" line="4208"/>
+        <location filename="../Server/server.cpp" line="4197"/>
+        <location filename="../Server/server.cpp" line="4209"/>
         <location filename="../Server/server_battle.cpp" line="1925"/>
         <source>User %1: progress map %2 failure!</source>
         <translation type="unfinished">用户%1：推进海域%2失败！</translation>
@@ -2399,63 +2399,63 @@ Great at battle and bad at politics--so cool!</source>
         <translation type="unfinished">ARD回收：订单%1标记失败</translation>
     </message>
     <message id="decrease-supremacy-failed">
-        <location filename="../Server/server.cpp" line="2581"/>
+        <location filename="../Server/server.cpp" line="2582"/>
         <source>Minute pulse: decrease supermacy failed!</source>
         <translation type="unfinished">分钟脉冲：降低制海权失败！</translation>
     </message>
     <message id="recover-cond-failed">
-        <location filename="../Server/server.cpp" line="2600"/>
+        <location filename="../Server/server.cpp" line="2601"/>
         <source>Minute pulse: recover condition failed!</source>
         <translation type="unfinished">分钟脉冲：恢复疲劳度失败！</translation>
     </message>
     <message id="penalize-cond-failed">
-        <location filename="../Server/server.cpp" line="2615"/>
-        <location filename="../Server/server.cpp" line="2633"/>
-        <location filename="../Server/server.cpp" line="2646"/>
+        <location filename="../Server/server.cpp" line="2616"/>
+        <location filename="../Server/server.cpp" line="2634"/>
+        <location filename="../Server/server.cpp" line="2647"/>
         <source>Minute pulse: penalize condition failed!</source>
         <translation type="unfinished">分钟脉冲：惩罚疲劳度失败！</translation>
     </message>
     <message id="rank-reward-failed">
-        <location filename="../Server/server.cpp" line="2674"/>
-        <location filename="../Server/server.cpp" line="2684"/>
-        <location filename="../Server/server.cpp" line="2694"/>
+        <location filename="../Server/server.cpp" line="2675"/>
+        <location filename="../Server/server.cpp" line="2685"/>
+        <location filename="../Server/server.cpp" line="2695"/>
         <source>Minute pulse: reward ranking failed!</source>
         <translation type="unfinished">分钟脉冲：排名奖励发放失败！</translation>
     </message>
     <message id="supremacy-reward-failed">
-        <location filename="../Server/server.cpp" line="2733"/>
+        <location filename="../Server/server.cpp" line="2734"/>
         <source>Minute pulse: reward supremacy failed!</source>
         <translation type="unfinished">分钟脉冲：制海权奖励发放失败！</translation>
     </message>
     <message id="modernize-equip-nonexistent">
-        <location filename="../Server/server.cpp" line="2992"/>
+        <location filename="../Server/server.cpp" line="2993"/>
         <source>User id %1: equip %2 does not exist when modernizing!</source>
         <translation type="unfinished">用户%1：改修时装备%2不存在！</translation>
     </message>
     <message id="equip-dont-exist-improve">
-        <location filename="../Server/server.cpp" line="3001"/>
+        <location filename="../Server/server.cpp" line="3002"/>
         <source>User %2 attempted to improve equipment def %1 that don&apos;t exist!</source>
         <translation type="unfinished">用户%2试图改修不存在的装备型号%1！</translation>
     </message>
     <message id="modernize-equip-failed-def">
-        <location filename="../Server/server.cpp" line="3017"/>
-        <location filename="../Server/server.cpp" line="3041"/>
+        <location filename="../Server/server.cpp" line="3018"/>
+        <location filename="../Server/server.cpp" line="3042"/>
         <source>User id %1: deduct skill points of equip definition %2 failed when improving!</source>
         <translation type="unfinished">用户%1：改修时扣除装备型号%2的技能点失败！</translation>
     </message>
     <message id="modernize-equip-def">
-        <location filename="../Server/server.cpp" line="3049"/>
+        <location filename="../Server/server.cpp" line="3050"/>
         <source>User id %1: deducted skill points of equip definition %2 when improving</source>
         <translation type="unfinished">用户%1：改修时扣除了装备型号%2的技能点</translation>
     </message>
     <message id="modernize-equip-failed">
-        <location filename="../Server/server.cpp" line="3064"/>
+        <location filename="../Server/server.cpp" line="3065"/>
         <source>User id %1: improve equip %2 failed!</source>
         <oldsource>User id %1: modernize equip %2 failed!</oldsource>
         <translation type="unfinished">用户%1：改修装备%2失败！</translation>
     </message>
     <message id="modernize-equip">
-        <location filename="../Server/server.cpp" line="3072"/>
+        <location filename="../Server/server.cpp" line="3073"/>
         <source>User id %1: imporoved equip %2 by 1 level</source>
         <oldsource>User id %1: modernized equip %2 by 1 level</oldsource>
         <translation type="unfinished">用户%1：改修装备%2提升1级</translation>
@@ -2481,7 +2481,7 @@ Great at battle and bad at politics--so cool!</source>
         <translation type="unfinished">用户%1：更新数据库中舰队%2位置%3失败！</translation>
     </message>
     <message id="sortie-node-battle-failure">
-        <location filename="../Server/server.cpp" line="3703"/>
+        <location filename="../Server/server.cpp" line="3704"/>
         <location filename="../Server/server_battle.cpp" line="747"/>
         <source>User %1: start node battle failure!</source>
         <translation type="unfinished">用户%1：开始节点战斗失败！</translation>
@@ -2558,84 +2558,84 @@ Great at battle and bad at politics--so cool!</source>
         <translation type="unfinished">用户%1：添加虚拟经验失败！</translation>
     </message>
     <message id="no-app-secret-key">
-        <location filename="../Server/server.cpp" line="3469"/>
+        <location filename="../Server/server.cpp" line="3470"/>
         <source>Server lack the steam app secret key.</source>
         <translation>服务器没有steam的app私钥。</translation>
     </message>
     <message id="ticket-decrypt-failed">
-        <location filename="../Server/server.cpp" line="3499"/>
+        <location filename="../Server/server.cpp" line="3500"/>
         <source>%1: Ticket failed to decrypt</source>
         <translation>%1：解密凭据失败</translation>
     </message>
     <message id="ticket-appid-wrong">
-        <location filename="../Server/server.cpp" line="3513"/>
+        <location filename="../Server/server.cpp" line="3514"/>
         <source>%1: Ticket is not from correct App ID</source>
         <translation>%1：凭据不是来自正确的App ID</translation>
     </message>
     <message id="ticket-appid-right">
-        <location filename="../Server/server.cpp" line="3522"/>
+        <location filename="../Server/server.cpp" line="3523"/>
         <source>Ticket decrypt from correct App ID</source>
         <translation>凭据来自正确的App ID</translation>
     </message>
     <message id="time-gone">
-        <location filename="../Server/server.cpp" line="3531"/>
+        <location filename="../Server/server.cpp" line="3532"/>
         <source>Elapsed: %1 second(s)</source>
         <translation>经过时间：%1秒</translation>
     </message>
     <message id="request-timeout">
-        <location filename="../Server/server.cpp" line="3534"/>
+        <location filename="../Server/server.cpp" line="3535"/>
         <source>%1: Request timeout</source>
         <translation>%1：请求超时</translation>
     </message>
     <message id="steam-id-wrong">
-        <location filename="../Server/server.cpp" line="3548"/>
+        <location filename="../Server/server.cpp" line="3549"/>
         <source>%1: Steam ID invalid</source>
         <translation>%1：SteamID不正确</translation>
     </message>
     <message id="user-login">
-        <location filename="../Server/server.cpp" line="3559"/>
+        <location filename="../Server/server.cpp" line="3560"/>
         <source>User login: %1</source>
         <oldsource>User login: %1 (%2)</oldsource>
         <translation type="unfinished">用户登录：%1</translation>
     </message>
     <message id="superuser-login">
-        <location filename="../Server/server.cpp" line="3566"/>
+        <location filename="../Server/server.cpp" line="3567"/>
         <source>Superuser login: %1</source>
         <translation>管理员用户登录：%1</translation>
     </message>
     <message id="add-user-fail">
-        <location filename="../Server/server.cpp" line="3655"/>
-        <location filename="../Server/server.cpp" line="3663"/>
+        <location filename="../Server/server.cpp" line="3656"/>
+        <location filename="../Server/server.cpp" line="3664"/>
         <source>%1: Add user failure!</source>
         <translation>%1：添加用户失败！</translation>
     </message>
     <message id="sortie-node-battle-failure-end-force">
-        <location filename="../Server/server.cpp" line="3685"/>
+        <location filename="../Server/server.cpp" line="3686"/>
         <source>User %1: force end node battle failure!</source>
         <translation type="unfinished">用户%1：强制结束节点战斗失败！</translation>
     </message>
     <message id="Connection-not-properly-online">
-        <location filename="../Server/server.cpp" line="3752"/>
+        <location filename="../Server/server.cpp" line="3753"/>
         <source>User is not properly online!</source>
         <translation>用户没在线上！</translation>
     </message>
     <message id="invalid-uid">
-        <location filename="../Server/server.cpp" line="3758"/>
+        <location filename="../Server/server.cpp" line="3759"/>
         <source>Invalid-uid: %1</source>
         <translation>不正确的Steam uid:%1</translation>
     </message>
     <message id="packet-rate-exceeded">
-        <location filename="../Server/server.cpp" line="3766"/>
+        <location filename="../Server/server.cpp" line="3767"/>
         <source>User %1: packet rate exceeded!</source>
         <translation type="unfinished">用户%1：数据包速率超出限制！</translation>
     </message>
     <message id="gamestate-invalid">
-        <location filename="../Server/server.cpp" line="3820"/>
+        <location filename="../Server/server.cpp" line="3821"/>
         <source>Game state %1 not supported!</source>
         <translation>不支持游戏状态%1！</translation>
     </message>
     <message id="command-type-wrong">
-        <location filename="../Server/server.cpp" line="3911"/>
+        <location filename="../Server/server.cpp" line="3912"/>
         <source>User %1: command type not supported</source>
         <translation>用户%1：不支持的命令类型</translation>
     </message>
@@ -2667,18 +2667,18 @@ Great at battle and bad at politics--so cool!</source>
         <translation>打开用户%1的工厂槽失败！</translation>
     </message>
     <message id="delete-equip-nonexistent">
-        <location filename="../Server/server.cpp" line="4316"/>
+        <location filename="../Server/server.cpp" line="4317"/>
         <source>User id %1: equipment %2 does not exist when destructing!</source>
         <oldsource>User id %1: equipment %2 does not exist!</oldsource>
         <translation type="unfinished">用户ID%1：装备%2不存在！</translation>
     </message>
     <message id="delete-equip-failed">
-        <location filename="../Server/server.cpp" line="4337"/>
+        <location filename="../Server/server.cpp" line="4338"/>
         <source>User id %1: delete equipment failed!</source>
         <translation>用户ID%1：废弃装备失败！</translation>
     </message>
     <message id="delete-equip">
-        <location filename="../Server/server.cpp" line="4344"/>
+        <location filename="../Server/server.cpp" line="4345"/>
         <source>User id %1: deleted equipment %2</source>
         <translation>用户ID%1：废弃装备%2</translation>
     </message>
@@ -2972,38 +2972,38 @@ Great at battle and bad at politics--so cool!</source>
         <translation type="unfinished">读取海域制海权时数据库出错！</translation>
     </message>
     <message id="server-pem">
-        <location filename="../Server/server.cpp" line="4366"/>
+        <location filename="../Server/server.cpp" line="4367"/>
         <source>Server PEM is now %1.</source>
         <translation>服务器PEM现在是%1。</translation>
     </message>
     <message id="inbattle-check-failure">
-        <location filename="../Server/server.cpp" line="4381"/>
+        <location filename="../Server/server.cpp" line="4382"/>
         <source>Query in battle status failure for user %1!</source>
         <translation type="unfinished">查询用户%1的战斗状态失败！</translation>
     </message>
     <message id="update-fleet-clear-failure">
-        <location filename="../Server/server.cpp" line="4528"/>
+        <location filename="../Server/server.cpp" line="4529"/>
         <source>Update fleet (clear fleet) failure!</source>
         <translation>更新舰队（清除舰队）失败！</translation>
     </message>
     <message id="user-dock-init-fail">
-        <location filename="../Server/server.cpp" line="4847"/>
-        <location filename="../Server/server.cpp" line="4855"/>
+        <location filename="../Server/server.cpp" line="4848"/>
+        <location filename="../Server/server.cpp" line="4856"/>
         <source>Init %2 dock slots for user %1 failed!</source>
         <translation type="unfinished">用户%1初始化%2个船坞槽失败！</translation>
     </message>
     <message id="user-rank-init-fail">
-        <location filename="../Server/server.cpp" line="4890"/>
+        <location filename="../Server/server.cpp" line="4891"/>
         <source>%1: User rank init failure!</source>
         <translation type="unfinished">%1：用户排名初始化失败！</translation>
     </message>
     <message id="update-fleet-failure">
-        <location filename="../Server/server.cpp" line="4428"/>
-        <location filename="../Server/server.cpp" line="4548"/>
-        <location filename="../Server/server.cpp" line="4576"/>
-        <location filename="../Server/server.cpp" line="4608"/>
-        <location filename="../Server/server.cpp" line="4627"/>
-        <location filename="../Server/server.cpp" line="4646"/>
+        <location filename="../Server/server.cpp" line="4429"/>
+        <location filename="../Server/server.cpp" line="4549"/>
+        <location filename="../Server/server.cpp" line="4577"/>
+        <location filename="../Server/server.cpp" line="4609"/>
+        <location filename="../Server/server.cpp" line="4628"/>
+        <location filename="../Server/server.cpp" line="4647"/>
         <source>Update fleet failure!</source>
         <translation>更新舰队失败！</translation>
     </message>
@@ -3039,35 +3039,35 @@ Great at battle and bad at politics--so cool!</source>
         <translation type="unfinished">创建虚拟条件海域关系数据库失败。</translation>
     </message>
     <message id="ship-cant-equip-it">
-        <location filename="../Server/server.cpp" line="4561"/>
+        <location filename="../Server/server.cpp" line="4562"/>
         <source>Ship %1 can&apos;t equip %2!</source>
         <translation>舰船%1无法装备%2！</translation>
     </message>
     <message id="ship-cant-equip-it-extra">
-        <location filename="../Server/server.cpp" line="4593"/>
+        <location filename="../Server/server.cpp" line="4594"/>
         <source>Ship %1 can&apos;t equip %2 in extra slot!</source>
         <translation>舰船%1无法在补强格装备%2！</translation>
     </message>
     <message id="user-data-init-fail">
-        <location filename="../Server/server.cpp" line="4758"/>
-        <location filename="../Server/server.cpp" line="4767"/>
-        <location filename="../Server/server.cpp" line="4781"/>
-        <location filename="../Server/server.cpp" line="4791"/>
-        <location filename="../Server/server.cpp" line="4804"/>
-        <location filename="../Server/server.cpp" line="4813"/>
+        <location filename="../Server/server.cpp" line="4759"/>
+        <location filename="../Server/server.cpp" line="4768"/>
+        <location filename="../Server/server.cpp" line="4782"/>
+        <location filename="../Server/server.cpp" line="4792"/>
+        <location filename="../Server/server.cpp" line="4805"/>
+        <location filename="../Server/server.cpp" line="4814"/>
         <source>%1: User data init failure!</source>
         <translation>%1：用户数据初始化失败！</translation>
     </message>
     <message id="user-factory-init-fail">
-        <location filename="../Server/server.cpp" line="4826"/>
-        <location filename="../Server/server.cpp" line="4834"/>
+        <location filename="../Server/server.cpp" line="4827"/>
+        <location filename="../Server/server.cpp" line="4835"/>
         <source>Init %2 factory slots for user %1 failed!</source>
         <oldsource>Init 4 factory slots for user %1 failed!</oldsource>
         <translation type="unfinished">%1：用户4个工厂槽初始化失败！</translation>
     </message>
     <message id="init-userfleet-failed">
-        <location filename="../Server/server.cpp" line="4868"/>
-        <location filename="../Server/server.cpp" line="4876"/>
+        <location filename="../Server/server.cpp" line="4869"/>
+        <location filename="../Server/server.cpp" line="4877"/>
         <location filename="../Server/server_offer.cpp" line="189"/>
         <location filename="../Server/server_offer.cpp" line="195"/>
         <source>Set User Fleet Up failed!</source>

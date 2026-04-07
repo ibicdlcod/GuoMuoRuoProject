@@ -703,7 +703,7 @@ void Server::shutdown() {
 }
 
 void Server::sslErrors(QSslSocket *socket, const QList<QSslError> &errors) {
-    for(auto &error: errors) {
+    for(auto &error: std::as_const(errors)) {
         qCritical() << error.errorString();
     }
 }
@@ -2168,7 +2168,7 @@ void Server::initUserDropInfo(const CSteamID &uid) {
         (*result)[ship->getId()] = RNGesus::dropValue(ship->attr["Rarity"], mt);
         j++;
     }
-    for(auto *resultPtr: results) {
+    for(auto *resultPtr: std::as_const(results)) {
         auto result = *resultPtr;
         QString queryStr;
         queryStr.append("INSERT INTO UserShipDrop (User, ShipDef, Amount) ");
@@ -2319,7 +2319,7 @@ void Server::luaInitMap() {
         }
         normalMapUnions.insert(MapWithDiff::getUnionId(map->id));
     }
-    for(auto map: normalMapUnions) {
+    for(auto map: std::as_const(normalMapUnions)) {
         QString name = QStringLiteral("lua/map%1.lua").arg(map);
         QFile file(name);
         if(!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
@@ -2365,7 +2365,7 @@ void Server::migrate(const CSteamID &uid, const QJsonObject &input) {
     QMap<int, int> shipData;
     QMap<int, int> sourceModels;
 process_import_equip:
-    for(auto equip: equips) {
+    for(auto equip: std::as_const(equips)) {
         auto equipObj = equip.toObject();
         if(equipObj["id"].toInt() == 335) { // equip 335 is not honored
             continue;
@@ -2385,7 +2385,7 @@ process_import_equip:
     }
 process_import_ships:
     auto ships = input["ships"].toObject();
-    for(auto ship: ships) {
+    for(auto ship: std::as_const(ships)) {
         auto shipId = ship.toObject()["id"].toInt();
         if(!shipOldIdToNewId.contains(shipId)) {
             //% "Ship old id %1 don't exist!"
@@ -2428,7 +2428,8 @@ add_equip:
     kcEquipStmt.prepare("REPLACE INTO UserKCEquip "
                         "(EquipUuid, EquipDef, Star, Skillpoints) "
                         "VALUES (:id, :def, :star, :sp)");
-    for(auto equipDef: equipData.uniqueKeys()) {
+    const auto uniqueKeys = equipData.uniqueKeys();
+    for(auto equipDef: uniqueKeys) {
         auto dat = equipData.values(equipDef);
         std::sort(dat.begin(), dat.end(), [](std::tuple<int, int> a,
                   std::tuple<int, int> b)
@@ -2509,7 +2510,7 @@ query_existing_imported_ship:
                           + placeholders.join(QLatin1Char(','))
                           + QStringLiteral(") ORDER BY Exp DESC LIMIT 1"));
             query.addBindValue(uid.ConvertToUint64());
-            for(auto candidate : candidates)
+            for(auto candidate : std::as_const(candidates))
                 query.addBindValue(candidate);
             if(Q_UNLIKELY(!query.exec())) {
                 db.rollback();
@@ -2770,7 +2771,7 @@ QList<std::tuple<QUuid, int>> Server::modernize(
     QList<std::tuple<QUuid, int>> result;
 
     QSqlDatabase db = QSqlDatabase::database();
-    for(auto ship: ships) {
+    for(auto ship: std::as_const(ships)) {
         int shipDef = 0;
         int star = 0;
 
@@ -2895,7 +2896,7 @@ check_medals:
         return result;
     }
 
-    for(auto ship: ships) {
+    for(auto ship: std::as_const(ships)) {
         int expCap = 0;
 
 query_ship_expcap:
@@ -2974,7 +2975,7 @@ QList<std::tuple<QUuid, int>> Server::modernizeEquip(
     QList<std::tuple<QUuid, int>> result;
 
     QSqlDatabase db = QSqlDatabase::database();
-    for(auto equip: equips) {
+    for(auto equip: std::as_const(equips)) {
         int equipDef = 0;
         int star = 0;
 
@@ -3887,7 +3888,7 @@ anti_ddos:
         int shipDef = djson["shipdef"].toInt();
         QList<QUuid> defaultEquips;
         QJsonArray equipArray = djson["defaultequip"].toArray();
-        for(auto equip: equipArray) {
+        for(auto equip: std::as_const(equipArray)) {
             QUuid uid = QUuid(equip.toString());
             defaultEquips.append(uid);
         }
@@ -4047,7 +4048,7 @@ anti_ddos:
     case KP::CommandType::DestructEquip: {
         QList<QUuid> trash;
         QJsonArray array = djson["equipids"].toArray();
-        for(auto trashItem: array) {
+        for(auto trashItem: std::as_const(array)) {
             trash.append(QUuid(trashItem.toString()));
         }
         QList<QUuid> destructed = retireEquip(uid, trash);
@@ -4059,7 +4060,7 @@ anti_ddos:
         if(djson["isequip"].toBool()) {
             QList<QUuid> equips;
             QJsonArray array = djson["equipids"].toArray();
-            for(auto equip: array) {
+            for(auto equip: std::as_const(array)) {
                 equips.append(QUuid(equip.toString()));
             }
             QList<std::tuple<QUuid, int>> equipsReturned =
@@ -4070,7 +4071,7 @@ anti_ddos:
         else {
             QList<QUuid> ships;
             QJsonArray array = djson["equipids"].toArray();
-            for(auto ship: array) {
+            for(auto ship: std::as_const(array)) {
                 ships.append(QUuid(ship.toString()));
             }
             QList<std::tuple<QUuid, int>> shipsReturned = modernize(uid, ships);
@@ -4082,7 +4083,7 @@ anti_ddos:
     case KP::CommandType::DecorateShip: {
         QList<QUuid> ships;
         QJsonArray array = djson["shipids"].toArray();
-        for(auto ship: array) {
+        for(auto ship: std::as_const(array)) {
             ships.append(QUuid(ship.toString()));
         }
         QList<std::tuple<QUuid, int>> shipsReturned = decorateShip(uid, ships);
@@ -4291,7 +4292,7 @@ void Server::sendTestMessages() {
         qWarning() << "Server isn't listening, abort.";
     }
     else {
-        for(auto ship: shipRegistry) {
+        for(auto ship: std::as_const(shipRegistry)) {
             qCritical() << ship->toString() << equipRegistry[413]->canEquip(ship, lua);
         }
     }
@@ -4302,7 +4303,7 @@ QList<QUuid> Server::retireEquip(const CSteamID &uid,
                                   const QList<QUuid> &trash) {
     QList<QUuid> result;
     QSqlDatabase db = QSqlDatabase::database();
-    for(auto trashItem: trash) {
+    for(auto trashItem: std::as_const(trash)) {
         QSqlQuery query2;
         query2.prepare("SELECT EquipDef FROM UserEquip "
                        "WHERE User = :uid AND EquipUuid = :eid;");

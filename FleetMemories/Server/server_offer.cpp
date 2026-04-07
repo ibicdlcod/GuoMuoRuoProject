@@ -759,7 +759,7 @@ void Server::refreshClientFactory(const CSteamID &uid, QSslSocket *connection) {
 void Server::handleSupplyShip(const CSteamID &uid, QSslSocket *connection,
                               const QJsonArray &ships) {
     ResOrd res = User::getCurrentResources(uid);
-    for(const auto &entry: ships) {
+    for(const auto &entry: std::as_const(ships)) {
         QJsonObject shipEntry = entry.toObject();
         QString uuidStr = shipEntry["uuid"].toString();
         bool doFuel = shipEntry["fuel"].toBool();
