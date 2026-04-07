@@ -122,11 +122,16 @@ Ship::Ship(const QJsonObject &input, QObject *parent)
         attr[attrI] =
             attrs.value(attrI).toInt();
     }
+    QJsonObject customAttrs = input["custom"].toObject();
+    for(auto &attrC: customAttrs.keys()) {
+        customFlags[attrC] =
+            customAttrs.value(attrC).toInt();
+    }
 }
 
 int Ship::operator<=>(const Ship &other) const {
     int typeResult = this->getType().getTypeSort()
-    - other.getType().getTypeSort();
+                     - other.getType().getTypeSort();
     if(typeResult == 0)
         return shipRegId - other.shipRegId;
     else
@@ -164,7 +169,7 @@ const ResOrd Ship::repairRes() const {
     double ctrl = settings->value("rule/techfactorcontroller", 5.0).toDouble();
     double techFactor = (getTech() + 1.0) / std::hypot(ctrl, (getTech() + 1.0));
     return getType().repairResBase()
-        * (qint64)std::round(techFactor * attr["Hitpoints"]);
+           * (qint64)std::round(techFactor * attr["Hitpoints"]);
 }
 
 /* 8.2-repair.md#Repair time */
@@ -270,8 +275,8 @@ KP::AllegianceGroup Ship::mapOpenRule() const {
     case KP::Nordic: {
         switch(getAllegianceSubGroup()) {
         case KP::DDanishKingdom: return getAllegiance()
-            == QLocale::FaroeIslands ? KP::British
-                                     : KP::American; // Greeland
+                           == QLocale::FaroeIslands ? KP::British
+                       : KP::American; // Greeland
         case KP::DNorwegian: return KP::British;
         case KP::DIcelandic: return KP::American;
         default: return KP::German;

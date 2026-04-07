@@ -476,8 +476,10 @@ void Client::tsunkitAssets2() {
 
 void Client::sendTestMessages() {
     Ship *shigure = shipRegistryCache[1074947586];
+    qCritical() << shigure->customFlags;
+    /*
     for(auto equip: equipRegistryCache) {
         if(equip->type == EquipType("Command-fac"))
         qCritical() << equip->toString() << equip->canEquip(shigure, lua);
-    }
+    }*/
 }
