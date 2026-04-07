@@ -984,6 +984,14 @@ const QJsonObject Server::processBattleCore(const CSteamID &uid,
         }
         return shipPlanesArray;
     };
+    auto fledArrayPadded = [](const FleetInfo &fleet) -> QJsonArray {
+        QJsonArray arr;
+        for(int pos = 0; pos < KP::fleetRepSize; ++pos) {
+            const ShipDynamic *dyn = fleet.shipDynamics[pos];
+            arr.append(dyn && dyn->fleetFled);
+        }
+        return arr;
+    };
     // Build "before" state
     QJsonObject before;
     QJsonObject playerBefore;
@@ -992,6 +1000,7 @@ const QJsonObject Server::processBattleCore(const CSteamID &uid,
     if(playerFleet) {
         playerBefore["hp"] = hpArrayPadded(*playerFleet);
         playerBefore["planes"] = planeArraysPadded(*playerFleet);
+        playerBefore["fled"] = fledArrayPadded(*playerFleet);
     } else {
         qWarning() << "Player fleet not found in sortieFleets, using dummy";
         QJsonArray dummyHP;
@@ -1002,6 +1011,9 @@ const QJsonObject Server::processBattleCore(const CSteamID &uid,
         for(int i = 0; i < 5; ++i) dummySlots.append(0);
         dummyPlanes.append(dummySlots);
         playerBefore["planes"] = dummyPlanes;
+        QJsonArray dummyFled;
+        for(int i = 0; i < KP::fleetRepSize; ++i) dummyFled.append(false);
+        playerBefore["fled"] = dummyFled;
     }
     
     enemyBefore["hp"] = hpArray(enemyFleet);
@@ -1071,6 +1083,10 @@ const QJsonObject Server::processBattleCore(const CSteamID &uid,
             int lossThisShip = (totalPlayerHP > 0) ?
                 static_cast<int>(playerLossHP *
                     (static_cast<double>(currentHP) / totalPlayerHP)) : 0;
+            // retreat test
+            if(i == 1) {
+                lossThisShip = static_cast<int>(static_cast<double>(currentHP) * 0.8);
+            }
             int newHP = std::max(0, currentHP - lossThisShip);
             dyn->currentHP = newHP;
             // Check for equipment damage if ship took damage
@@ -1324,6 +1340,7 @@ const QJsonObject Server::processBattleCore(const CSteamID &uid,
     if(playerFleet) {
         playerAfter["hp"] = hpArrayPadded(*playerFleet);
         playerAfter["planes"] = planeArraysPadded(*playerFleet);
+        playerAfter["fled"] = fledArrayPadded(*playerFleet);
     } else {
         // Use same dummy data as before
         QJsonArray dummyHP;
@@ -1334,6 +1351,9 @@ const QJsonObject Server::processBattleCore(const CSteamID &uid,
         for(int i = 0; i < 5; ++i) dummySlots.append(0);
         dummyPlanes.append(dummySlots);
         playerAfter["planes"] = dummyPlanes;
+        QJsonArray dummyFled;
+        for(int i = 0; i < KP::fleetRepSize; ++i) dummyFled.append(false);
+        playerAfter["fled"] = dummyFled;
     }
     
     enemyAfter["hp"] = hpArray(enemyFleet);

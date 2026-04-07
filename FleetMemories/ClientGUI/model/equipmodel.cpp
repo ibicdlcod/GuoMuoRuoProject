@@ -17,7 +17,7 @@ extern std::unique_ptr<QSettings> settings;
 
 enum {
     CheckAlignmentRole =
-        Qt::UserRole + Qt::CheckStateRole + Qt::TextAlignmentRole
+    Qt::UserRole + Qt::CheckStateRole + Qt::TextAlignmentRole
 };
 
 EquipModel::EquipModel(QObject *parent, bool isInArsenal)
@@ -82,8 +82,15 @@ void EquipModel::switchDisplayType(int index) {
                         continue;
                 }
                 else {
-                    if(!(iter->second->canEquip(currentActiveShip, engine.lua)))
+                    if(!(iter->second->canEquip(currentActiveShip, engine.lua))) {
+                        if(iter->second->type.getDisplayGroup()
+                                .localeAwareCompare(
+                                    EquipType::getDisplayGroupsSorted().at(index - 1))
+                            == 0) {
+                            qCritical() << currentActiveShip->toString() << iter->second->toString();
+                        }
                         continue;
+                    }
                 }
             }
             if(iter->second->type.getDisplayGroup()
@@ -297,9 +304,9 @@ void EquipModel::customSort() {
         std::sort(sortedEquipIds.begin(), sortedEquipIds.end(),
                   [this](QUuid a, QUuid b) {
                       int va = clientEquips[a]->attr.value(
-                                   clientEquips[a]->type.getPrimaryAttr(), 0);
+                          clientEquips[a]->type.getPrimaryAttr(), 0);
                       int vb = clientEquips[b]->attr.value(
-                                   clientEquips[b]->type.getPrimaryAttr(), 0);
+                          clientEquips[b]->type.getPrimaryAttr(), 0);
                       return va != vb ? va < vb : a < b;
                   });
         break;
@@ -309,15 +316,15 @@ void EquipModel::customSort() {
                       int stdA = clientEquips[a]->skillPointsStd();
                       int stdB = clientEquips[b]->skillPointsStd();
                       double ratioA = stdA > 0
-                                      ? static_cast<double>(
-                                          skillPointReg.value(clientEquips[a]->getId(), 0))
-                                        / stdA
-                                      : 0.0;
+                                          ? static_cast<double>(
+                                                skillPointReg.value(clientEquips[a]->getId(), 0))
+                                                / stdA
+                                          : 0.0;
                       double ratioB = stdB > 0
-                                      ? static_cast<double>(
-                                          skillPointReg.value(clientEquips[b]->getId(), 0))
-                                        / stdB
-                                      : 0.0;
+                                          ? static_cast<double>(
+                                                skillPointReg.value(clientEquips[b]->getId(), 0))
+                                                / stdB
+                                          : 0.0;
                       return ratioA != ratioB ? ratioA < ratioB : a < b;
                   });
         break;
@@ -494,7 +501,7 @@ QVariant EquipModel::data(const QModelIndex &index, int role) const {
                         }
                     }
                     return QStringList(
-                        {shipStr, shipUidSimple, posStr}).join(" ");
+                               {shipStr, shipUidSimple, posStr}).join(" ");
                 }
             }
         }

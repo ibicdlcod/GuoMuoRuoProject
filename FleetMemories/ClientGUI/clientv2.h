@@ -158,7 +158,7 @@ public slots:
     void tsunkitAssets();
     void tsunkitAssets2();
     void uiRefresh();
-    Q_DECL_DEPRECATED void update();
+    void update();
 
 signals:
     void aboutToQuit();

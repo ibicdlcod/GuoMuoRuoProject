@@ -82,6 +82,12 @@ static constexpr int headquartersEquipMobileStrike = 272;
 static constexpr int headquartersEquipCombinedFleet = 107;
 static constexpr int headquartersEquipExpedition = 4098;
 static constexpr int headquartersEquipEliteTorpedo = 413;
+/* Test equipment IDs used in unit tests */
+static constexpr int equipIdTest1 = 1;
+static constexpr int equipIdTest39 = 39;
+static constexpr int equipIdTest44 = 44;
+static constexpr int equipIdTest46 = 46;
+static constexpr int equipIdPlaneTest = 16; // 九七式艦攻
 static constexpr int conditionMax = 480;
 static constexpr int factorySlotRows = 6;
 static constexpr int factorySlotColumns = 4;

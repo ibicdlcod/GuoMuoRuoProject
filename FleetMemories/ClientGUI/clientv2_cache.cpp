@@ -475,35 +475,9 @@ void Client::tsunkitAssets2() {
 }
 
 void Client::sendTestMessages() {
-#pragma message(NOT_M_CONST)
-    /*
-    constexpr int size = 20;
-    for(int i = 0; i < size; ++i) {
-        QByteArray msg = KP::clientTestMessages(i);
-        sender->enqueue(msg);
-    }
-*/
-    QSet<int> iconGroups;
-    for(auto equip: std::as_const(equipRegistryCache)) {
-        iconGroups.insert(equip->type.iconGroup());
-    }
-    for(auto iconGroup: iconGroups)  {
-        resourceFetcher.downloadFile(
-            QString("https://tsunkit.net/api/assets/images/equipTypeIcons/%1")
-                .arg(iconGroup),
-            QString("%1.png").arg(iconGroup),
-            QStringLiteral("TsunkitMode/equipTypeIcons/"));
-        QEventLoop loop;
-        QTimer timer; // Optional: for timeout
-        timer.setSingleShot(true); // Ensure timer only fires once
-
-        // Connect the signal you're waiting for to the QEventLoop::quit slot
-        connect(&resourceFetcher, &ResourceFetch::finished,
-                &loop, &QEventLoop::quit);
-
-        timer.start(settings->value(
-            "networkclient/downloadwaittimemsec", 80000).toInt());
-
-        loop.exec();
+    Ship *shigure = shipRegistryCache[1074947586];
+    for(auto equip: equipRegistryCache) {
+        if(equip->type == EquipType("Command-fac"))
+        qCritical() << equip->toString() << equip->canEquip(shigure, lua);
     }
 }

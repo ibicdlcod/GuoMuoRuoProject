@@ -29,12 +29,19 @@ void SegmentedHPBar::setValues(int totalHP, int previousHP, int currentHP)
     m_totalHP = totalHP;
     m_previousHP = previousHP;
     m_currentHP = currentHP;
+    m_fled = false;
     update();
 }
 
 void SegmentedHPBar::setInverted(bool inverted)
 {
     m_inverted = inverted;
+    update();
+}
+
+void SegmentedHPBar::setFled(bool fled)
+{
+    m_fled = fled;
     update();
 }
 
@@ -102,7 +109,8 @@ void SegmentedHPBar::paintEvent(QPaintEvent *event)
     painter.setBrush(Qt::NoBrush);
     painter.drawRoundedRect(QRectF(0.5, 0.5, w - 1, h - 1), 4.0, 4.0);
 
-    QString hpText = QString("%1/%2").arg(curr).arg(total);
+    //% "Fled"
+    QString hpText = m_fled ? qtTrId("ship-fled") : QString("%1/%2").arg(curr).arg(total);
     QFont font = painter.font();
     font.setPointSize(9);
     painter.setFont(font);
@@ -114,7 +122,9 @@ void SegmentedHPBar::paintEvent(QPaintEvent *event)
     int textX = (w - metrics.horizontalAdvance(hpText)) / 2;
     int textY = (h - metrics.height()) / 2 + metrics.ascent();
 
-    painter.setPen(QColor(textCol.red() ^ 0xFF, textCol.green() ^ 0xFF, textCol.blue() ^ 0xFF));
+    painter.setPen(QColor(textCol.red() ^ 0xFF,
+                          textCol.green() ^ 0xFF,
+                          textCol.blue() ^ 0xFF));
     painter.drawText(textX + 1, textY + 1, hpText);
     painter.setPen(textCol);
     painter.drawText(textX, textY, hpText);

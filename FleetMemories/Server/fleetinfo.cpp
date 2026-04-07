@@ -125,7 +125,7 @@ Equipment *FleetInfo::getEquipAtPosAndEXSlot(int fleetPosIndex) {
         shipDynamics[fleetPosIndex]->slotEquipEx, nullptr);
 }
 
-QList<Equipment *> FleetInfo::getAllEquipAtPos(int fleetPosIndex) {
+QList<Equipment *> FleetInfo::getAllEquipAtPos(int fleetPosIndex) const {
     QList<Equipment *> result;
     if(fleetPosIndex < 0
         || fleetPosIndex >= static_cast<int>(shipDynamics.size()))
@@ -172,12 +172,34 @@ QList<int> FleetInfo::findEscortCandidates(bool isExpedition) const
 {
     QList<int> candidates;
     if (headquartersEquipId(isExpedition) == 0) return candidates;
+    if (headquartersEquipId(isExpedition) ==  KP::headquartersEquipEliteTorpedo) {
+        for (int i = 0; i < static_cast<int>(ships.size()); ++i) {
+            const Ship *ship = ships[i];
+            const ShipDynamic *dyn = shipDynamics[i];
+            if(i == 0) {
+                if(!ship || !dyn || dyn->fleetFled) {
+                    return candidates; // fail
+                }
+                if(ship->isLightCruiser() || ship->isDestroyer()) {
+                    continue; // check others
+                }
+                else {
+                    return candidates; // fail
+                }
+            }
+            if (!ship || !dyn || dyn->fleetFled) continue;
+            if (!ship->isDestroyer() && !ship->isLightTorpedoCruiser()) {
+                return candidates;
+            }
+        }
+        return {-1}; // success
+    }
     for (int i = 0; i < static_cast<int>(ships.size()); ++i) {
         const Ship *ship = ships[i];
         const ShipDynamic *dyn = shipDynamics[i];
         if (!ship || !dyn || dyn->fleetFled) continue;
         if (!ship->isDestroyer() && !ship->isLightCruiser()) continue;
-        if (!Ship::isHealthy(dyn)) continue;
+        if (!ship->isHealthy(dyn)) continue;
         candidates.append(i);
     }
     return candidates;
@@ -189,10 +211,13 @@ bool FleetInfo::performEscortRetreat(int damagedPos, bool isExpedition)
         return false;
     ShipDynamic *dyn = shipDynamics[damagedPos];
     if (!dyn) return false;
-    // Critically damaged means HP ≤ 0 or already fled
-    if (dyn->currentHP > 0 && !dyn->fleetFled) return false;
     QList<int> candidates = findEscortCandidates(isExpedition);
     if (candidates.empty()) return false;
+    if (candidates[0] == -1) { // EliteTorpedo headquarters
+        /* single ship fleeing */
+        dyn->fleetFled = true;
+        return true;
+    }
     int escortPos = candidates.first();
     // Mark both ships as fled
     dyn->fleetFled = true;

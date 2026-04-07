@@ -441,6 +441,11 @@ bool Ship::isLightCruiser() const {
     return (shipRegId & 0x000f0000) == 0x00030000;
 }
 
+bool Ship::isLightTorpedoCruiser() const {
+    /* mask 0x000f0000 isolates ship‑type bits; light cruiser = 0x00030000 */
+    return (shipRegId & 0x000f2000) == 0x00032000;
+}
+
 int Ship::getLevel(int exp) {
     /* inverse of y / 100 = (x)(x-1)/2 */
     return std::floor(

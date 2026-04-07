@@ -17,6 +17,7 @@ public:
 
     void setValues(int totalHP, int previousHP, int currentHP);
     void setInverted(bool inverted);
+    void setFled(bool fled);
 
 protected:
     void paintEvent(QPaintEvent *event) override;
@@ -26,6 +27,7 @@ private:
     int m_previousHP = 1;
     int m_currentHP = 1;
     bool m_inverted = false;
+    bool m_fled = false;
 };
 
 #endif // SEGMENTEDHPBAR_H

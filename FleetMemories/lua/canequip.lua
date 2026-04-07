@@ -773,6 +773,8 @@ function can_equip(thisequip, thisship)
 		thisship)
 	end
 	
+	print("FUCK")
+	
 	return func(
 		thisequip:getId(),
 		thisequip.type,

@@ -233,11 +233,12 @@ user_ship:
                       "Slot3Planes, "
                       "Slot4Planes, "
                       "Slot5Planes, "
-                      "FleetIndex, "
-                      "FleetPosIndex, "
-                      "Fuel, "
-                      "Ammo, "
-                      "UserKCShip.Exp "
+                       "FleetIndex, "
+                       "FleetPosIndex, "
+                       "FleetFled, "
+                       "Fuel, "
+                       "Ammo, "
+                       "UserKCShip.Exp "
                       "FROM UserShip "
                       "LEFT JOIN UserKCShip "
                       "ON UserShip.ShipUuid = UserKCShip.ShipUuid "
@@ -268,9 +269,10 @@ user_ship:
             int slot3Planes;
             int slot4Planes;
             int slot5Planes;
-            int fleetIndex;
-            int fleetPosIndex;
-            double fuel;
+             int fleetIndex;
+             int fleetPosIndex;
+             bool fleetFled;
+             double fuel;
             double ammo;
             int expKC;
             while(query.next()) {
@@ -303,6 +305,7 @@ user_ship:
                 fleetIndex = query.value(rec.indexOf("FleetIndex")).toInt();
                 fleetPosIndex = query.value(
                     rec.indexOf("FleetPosIndex")).toInt();
+                fleetFled = query.value(rec.indexOf("FleetFled")).toBool();
                 fuel = query.value(rec.indexOf("Fuel")).toDouble();
                 ammo = query.value(rec.indexOf("Ammo")).toDouble();
                 expKC = query.value(
@@ -334,6 +337,7 @@ user_ship:
                 output["ammo"] = ammo;
                 output["fleetindex"] = fleetIndex;
                 output["fleetposindex"] = fleetPosIndex;
+                output["fleetfled"] = fleetFled;
                 output["fleettype"] = fleetIndex == -1
                         ? KP::NormalFleet
                         : fleetTypes[fleetIndex];

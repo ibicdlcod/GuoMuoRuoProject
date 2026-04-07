@@ -4,6 +4,7 @@
 #include <QMap>
 #include <QString>
 #include <sol/sol.hpp>
+#include <QDebug>
 
 using LuaMap = QMap<QString, int>;
 

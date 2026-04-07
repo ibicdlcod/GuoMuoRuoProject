@@ -43,6 +43,7 @@ public:
     bool isHealthy(const ShipDynamic *dyn) const;
     /* Returns true if ship is a light cruiser (mask 0x000f0000 == 0x00030000) */
     bool isLightCruiser() const;
+    bool isLightTorpedoCruiser() const;
     bool isNotEqual(const Ship &) const;
     KP::AllegianceGroup mapOpenRule() const;
     const ResOrd repairRes() const;

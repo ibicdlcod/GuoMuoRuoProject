@@ -31,7 +31,7 @@ public:
 
     Equipment * getEquipAtPosAndSlot(int fleetPosIndex, int slot);
     Equipment * getEquipAtPosAndEXSlot(int fleetPosIndex);
-    QList<Equipment *> getAllEquipAtPos(int fleetPosIndex);
+    QList<Equipment *> getAllEquipAtPos(int fleetPosIndex) const;
     /* Returns headquarters equipment ID (see KP::headquartersEquip* constants) if present on ship at
      * position 1, otherwise 0. Checks fleet‑type restrictions per spec. */
     int headquartersEquipId(bool isExpedition) const;

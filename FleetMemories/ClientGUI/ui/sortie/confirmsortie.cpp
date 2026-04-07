@@ -177,6 +177,13 @@ void ConfirmSortie::populateBattleResult(const QJsonObject &battleProcess)
     QJsonArray playerHPAfter = playerAfter["hp"].toArray();
     QJsonArray playerPlanesBefore = playerBefore["planes"].toArray();
     QJsonArray playerPlanesAfter = playerAfter["planes"].toArray();
+    QJsonArray playerFled = playerAfter["fled"].toArray();
+    if(playerFled.isEmpty()) {
+        // Backward compatibility: create array of false values
+        for(int i = 0; i < playerHPAfter.size(); ++i) {
+            playerFled.append(false);
+        }
+    }
     
     QJsonObject enemyBefore = before["enemy"].toObject();
     QJsonObject enemyAfter = after["enemy"].toObject();
@@ -240,7 +247,7 @@ void ConfirmSortie::populateBattleResult(const QJsonObject &battleProcess)
                           int shipIconId, int hpBefore, int hpAfter, int totalHP,
                           const QVector<int> &planesBefore, const QVector<int> &planesAfter,
                           bool inverted, int maxPlanes,
-                          const QStringList &equipNames) {
+                          const QStringList &equipNames, bool fled) {
         QLabel *iconLabel = new QLabel(container);
         QPixmap icon = Icute::shipIcon(shipIconId);
         if (!icon.isNull())
@@ -260,6 +267,7 @@ void ConfirmSortie::populateBattleResult(const QJsonObject &battleProcess)
         SegmentedHPBar *hpBar = new SegmentedHPBar(container);
         hpBar->setValues(totalHP, hpBefore, hpAfter);
         hpBar->setInverted(inverted);
+        hpBar->setFled(fled);
         grid->addWidget(hpBar, row, 2, Qt::AlignVCenter);
 
         QPushButton *planeButton = new QPushButton(container);
@@ -310,6 +318,7 @@ void ConfirmSortie::populateBattleResult(const QJsonObject &battleProcess)
         int hpBefore = playerHPBefore[i].toInt(1);
         int hpAfter  = playerHPAfter[i].toInt(1);
         int totalHP  = hpBefore;
+        bool fled = false;
         QString shipName;
         int shipLevel  = 1;
         int shipIconId = 0;
@@ -320,16 +329,27 @@ void ConfirmSortie::populateBattleResult(const QJsonObject &battleProcess)
                 totalHP    = ship->attr.value("Hitpoints", hpBefore);
                 shipIconId = ship->attr.value("OldInternalNo.", 0);
                 maxPlanes  = ship->attr.value("Planes", 0);
-                if (ShipDynamic *dyn = fleetView->getShipDynamic(i))
+                if (ShipDynamic *dyn = fleetView->getShipDynamic(i)) {
                     shipLevel = Ship::getLevel(std::min(dyn->exp, dyn->expCap));
+                    fled = dyn->fleetFled;
+                }
+                if(i < playerFled.size()) {
+                    fled = playerFled[i].toBool(false);
+                }
             } else {
                 // Should not happen due to earlier check, but keep fallback
                 //% "Player Ship %1"
                 shipName = qtTrId("battle-result-player-ship").arg(i + 1);
+                if(i < playerFled.size()) {
+                    fled = playerFled[i].toBool(false);
+                }
             }
         } else {
             //% "Player Ship %1"
             shipName = qtTrId("battle-result-player-ship").arg(i + 1);
+            if(i < playerFled.size()) {
+                fled = playerFled[i].toBool(false);
+            }
         }
 
         QStringList equipNames;
@@ -356,7 +376,7 @@ void ConfirmSortie::populateBattleResult(const QJsonObject &battleProcess)
 
         addShipRow(m_playerLayout, m_playerContainer, displayRow,
                    shipName, shipLevel, shipIconId, hpBefore, hpAfter, totalHP,
-                   planesBefore, planesAfter, true, maxPlanes, equipNames);
+                   planesBefore, planesAfter, true, maxPlanes, equipNames, fled);
         ++displayRow;
     }
 
@@ -393,6 +413,6 @@ void ConfirmSortie::populateBattleResult(const QJsonObject &battleProcess)
 
         addShipRow(m_enemyLayout, m_enemyContainer, i,
                    enemyName, 0, shipIconId, hpBefore, hpAfter, totalHP,
-                   planesBefore, planesAfter, false, maxPlanes, QStringList{});
+                   planesBefore, planesAfter, false, maxPlanes, QStringList{}, false);
     }
 }

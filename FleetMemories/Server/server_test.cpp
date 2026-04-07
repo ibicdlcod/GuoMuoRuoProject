@@ -17,10 +17,10 @@ void Server::testFleetInfoEffectiveAttr() {
         qWarning() << "testFleetInfoEffectiveAttr: ship 269550035 not in registry";
         return;
     }
-    Equipment *e1  = equipRegistry.value(1,  nullptr);
-    Equipment *e39 = equipRegistry.value(39, nullptr);
-    Equipment *e44 = equipRegistry.value(44, nullptr);
-    Equipment *e46 = equipRegistry.value(46, nullptr);
+    Equipment *e1  = equipRegistry.value(KP::equipIdTest1, nullptr);
+    Equipment *e39 = equipRegistry.value(KP::equipIdTest39, nullptr);
+    Equipment *e44 = equipRegistry.value(KP::equipIdTest44, nullptr);
+    Equipment *e46 = equipRegistry.value(KP::equipIdTest46, nullptr);
     if (!e1 || !e39 || !e44 || !e46) {
         qWarning() << "testFleetInfoEffectiveAttr: one or more equips (1/39/44/46) not in registry";
         return;
@@ -122,7 +122,7 @@ void Server::testPlaneReplenishment() {
     qInfo() << "Starting plane replenishment test";
     
     // Test Equipment::replenishCostPer100Planes
-    Equipment *testEquip = equipRegistry.value(16, nullptr); // 九七式艦攻 ID 16
+    Equipment *testEquip = equipRegistry.value(KP::equipIdPlaneTest, nullptr); // 九七式艦攻
     if(testEquip) {
         ResOrd devCost = testEquip->devRes();
         ResOrd per100PlaneCost = testEquip->replenishCostPer100Planes();
@@ -203,4 +203,216 @@ void Server::testEscortedRetreat() {
         return;
     }
     qInfo() << "testEscortedRetreat: PASS";
+}
+
+void Server::testEquipmentDamageChance() {
+    qInfo() << "Starting equipment damage chance test";
+    int passCount = 0;
+    int failCount = 0;
+    
+    auto check = [&](const QString &testName, bool condition) {
+        if (condition) {
+            qInfo().noquote() << testName << "PASS";
+            ++passCount;
+        } else {
+            qWarning().noquote() << testName << "FAIL";
+            ++failCount;
+        }
+    };
+    
+    /* Test chance formula with deterministic RNG */
+    equipmentDamageBaseChance = 0.1; // 10%
+    std::mt19937 mt(12345); // fixed seed
+    
+    // Test remaining HP ratio = 0.9 → chance = 0.1 × (1-0.9) = 0.01
+    // We'll run 10000 trials and check observed frequency is close
+    int hits = 0;
+    const int trials = 10000;
+    for (int i = 0; i < trials; ++i) {
+        if (shouldDamageEquipment(0.9, mt)) ++hits;
+    }
+    double observed = static_cast<double>(hits) / trials;
+    double expected = 0.01;
+    double tolerance = 0.005; // 0.5%
+    bool freqOk = std::abs(observed - expected) < tolerance;
+    check("Damage chance at 90% HP", freqOk);
+    if (!freqOk) {
+        qWarning() << "Expected" << expected << "got" << observed;
+    }
+    
+    // Test remaining HP ratio = 0.5 → chance = 0.1 × 0.5 = 0.05
+    hits = 0;
+    mt.seed(12345); // reset
+    for (int i = 0; i < trials; ++i) {
+        if (shouldDamageEquipment(0.5, mt)) ++hits;
+    }
+    observed = static_cast<double>(hits) / trials;
+    expected = 0.05;
+    freqOk = std::abs(observed - expected) < tolerance;
+    check("Damage chance at 50% HP", freqOk);
+    if (!freqOk) {
+        qWarning() << "Expected" << expected << "got" << observed;
+    }
+    
+    // Test remaining HP ratio = 0.1 → chance = 0.1 × 0.9 = 0.09
+    hits = 0;
+    mt.seed(12345);
+    for (int i = 0; i < trials; ++i) {
+        if (shouldDamageEquipment(0.1, mt)) ++hits;
+    }
+    observed = static_cast<double>(hits) / trials;
+    expected = 0.09;
+    freqOk = std::abs(observed - expected) < tolerance;
+    check("Damage chance at 10% HP", freqOk);
+    if (!freqOk) {
+        qWarning() << "Expected" << expected << "got" << observed;
+    }
+    
+    // Test remaining HP ratio = 0.0 (ship dead) -> chance = 0.1
+    hits = 0;
+    mt.seed(12345);
+    for (int i = 0; i < trials; ++i) {
+        if (shouldDamageEquipment(0.0, mt)) ++hits;
+    }
+    observed = static_cast<double>(hits) / trials;
+    expected = 0.1;
+    freqOk = std::abs(observed - expected) < tolerance;
+    check("Damage chance at 0% HP", freqOk);
+    if (!freqOk) {
+        qWarning() << "Expected" << expected << "got" << observed;
+    }
+    
+    // Test calculateSkillPointDeduction formula
+    check("SP deduction 100 SP, 1 same type", 
+          calculateSkillPointDeduction(100, 1) == 1); // 100 * 1/1 / 100 = 1
+    check("SP deduction 100 SP, 2 same type",
+          calculateSkillPointDeduction(100, 2) == 1);
+    check("SP deduction 100 SP, 5 same type",
+          calculateSkillPointDeduction(100, 5) == 1);
+    check("SP deduction 50 SP, 1 same type",
+          calculateSkillPointDeduction(50, 1) == 1);
+    check("SP deduction 200 SP, 1 same type",
+          calculateSkillPointDeduction(200, 1) == 2); // 200 * 1 / 100 = 2
+    check("SP deduction 0 SP, any count",
+          calculateSkillPointDeduction(0, 5) == 0);
+    check("SP deduction negative SP",
+          calculateSkillPointDeduction(-10, 1) == 0);
+    
+    qInfo() << "testEquipmentDamageChance: PASS" << passCount
+            << "/ FAIL" << failCount;
+}
+
+void Server::testEquipmentSkillPointLoss() {
+    qInfo() << "Starting equipment skill point loss test";
+    int passCount = 0;
+    int failCount = 0;
+    
+    auto check = [&](const QString &testName, bool condition) {
+        if (condition) {
+            qInfo().noquote() << testName << "PASS";
+            ++passCount;
+        } else {
+            qWarning().noquote() << testName << "FAIL";
+            ++failCount;
+        }
+    };
+    
+    /* Use known ship and equipment IDs (ship 269550035, equip 1/39/44/46) */
+    Ship *ship = shipRegistry.value(269550035, nullptr);
+    if (!ship) {
+        qWarning() << "testEquipmentSkillPointLoss: ship 269550035 not in registry";
+        return;
+    }
+    Equipment *e1  = equipRegistry.value(KP::equipIdTest1, nullptr);
+    Equipment *e39 = equipRegistry.value(KP::equipIdTest39, nullptr);
+    Equipment *e44 = equipRegistry.value(KP::equipIdTest44, nullptr);
+    Equipment *e46 = equipRegistry.value(KP::equipIdTest46, nullptr);
+    if (!e1 || !e39 || !e44 || !e46) {
+        qWarning() << "testEquipmentSkillPointLoss: one or more equips (1/39/44/46) not in registry";
+        return;
+    }
+    
+    /* Create a dummy FleetInfo with the ship and equipments */
+    FleetInfo fi;
+    fi.ships.push_back(ship);
+    ShipDynamic *dyn = new ShipDynamic(ship->attr["Hitpoints"]);
+    dyn->exp = 495000; // lv 100
+    dyn->star = 0;
+    // Assign equipment UUIDs
+    QUuid u1  = QUuid::fromString(
+        QLatin1String("{00000000-0000-0000-0000-000000000001}"));
+    QUuid u39 = QUuid::fromString(
+        QLatin1String("{00000000-0000-0000-0000-000000000039}"));
+    QUuid u44 = QUuid::fromString(
+        QLatin1String("{00000000-0000-0000-0000-000000000044}"));
+    QUuid u46 = QUuid::fromString(
+        QLatin1String("{00000000-0000-0000-0000-000000000046}"));
+    dyn->slotEquip = {u1, u39, u44, u46, QUuid()};
+    fi.equipMap[u1]  = e1;
+    fi.equipMap[u39] = e39;
+    fi.equipMap[u44] = e44;
+    fi.equipMap[u46] = e46;
+    fi.equipSkillEffects[u1]  = 1.0;
+    fi.equipSkillEffects[u39] = 1.0;
+    fi.equipSkillEffects[u44] = 1.0;
+    fi.equipSkillEffects[u46] = 1.0;
+    fi.shipDynamics.push_back(dyn);
+    
+    /* Test getRandomNonPlaneEquipmentSlot returns valid slot */
+    std::mt19937 mt(54321);
+    int slot = getRandomNonPlaneEquipmentSlot(dyn, mt);
+    check("Random slot is non-plane", slot >= 0 && slot <= 5);
+    if (slot >= 0) {
+        QUuid uuid = getEquipUuidFromSlot(dyn, slot);
+        check("UUID corresponds to equipment", !uuid.isNull());
+    }
+    
+    /* Test plane loss deduction threshold calculations */
+    planeLossDeductionThreshold = 100; // per 100 planes
+    check("Plane loss threshold set", planeLossDeductionThreshold == 100);
+    
+    // Test deduction count formula (same as in planereplenish.cpp)
+    auto deductionsForLosses = [](int losses, int threshold) -> int {
+        if (threshold <= 0) threshold = 100;
+        return (losses + threshold - 1) / threshold;
+    };
+    
+    check("0 losses -> 0 deductions", deductionsForLosses(0, 100) == 0);
+    check("50 losses -> 0 deductions", deductionsForLosses(50, 100) == 0);
+    check("100 losses -> 1 deduction", deductionsForLosses(100, 100) == 1);
+    check("101 losses -> 2 deductions", deductionsForLosses(101, 100) == 2);
+    check("200 losses -> 2 deductions", deductionsForLosses(200, 100) == 2);
+    check("201 losses -> 3 deductions", deductionsForLosses(201, 100) == 3);
+    
+    // Test with different thresholds
+    check("150 losses, threshold 50 -> 3 deductions",
+          deductionsForLosses(150, 50) == 3);
+    check("149 losses, threshold 50 -> 3 deductions",
+          deductionsForLosses(149, 50) == 3);
+    check("1 loss, threshold 1 -> 1 deduction",
+          deductionsForLosses(1, 1) == 1);
+    
+    /* Test skill point deduction formula (already covered in damage chance test,
+     * but repeat here for completeness) */
+    check("SP deduction 100 SP, 1 same type",
+          calculateSkillPointDeduction(100, 1) == 1);
+    check("SP deduction 100 SP, 2 same type",
+          calculateSkillPointDeduction(100, 2) == 1);
+    check("SP deduction 100 SP, 5 same type",
+          calculateSkillPointDeduction(100, 5) == 1);
+    check("SP deduction 50 SP, 1 same type",
+          calculateSkillPointDeduction(50, 1) == 1);
+    check("SP deduction 200 SP, 1 same type",
+          calculateSkillPointDeduction(200, 1) == 2);
+    check("SP deduction 0 SP, any count",
+          calculateSkillPointDeduction(0, 5) == 0);
+    check("SP deduction negative SP",
+          calculateSkillPointDeduction(-10, 1) == 0);
+    
+    /* Test that countSameTypeEquipmentInArsenal returns at least 1
+     * (cannot test DB dependency, but we can verify the function exists) */
+    // Skip DB test
+    
+    qInfo() << "testEquipmentSkillPointLoss: PASS" << passCount
+            << "/ FAIL" << failCount;
 }

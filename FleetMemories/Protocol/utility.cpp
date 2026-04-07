@@ -11,6 +11,8 @@
 #include <queue>
 #include <vector>
 
+#include "kp.h"
+
 void Utility::titleCase(QString &input)
 {
     input = input.toLower();

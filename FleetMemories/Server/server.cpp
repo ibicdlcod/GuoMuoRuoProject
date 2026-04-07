@@ -4289,10 +4289,8 @@ void Server::sendTestMessages() {
         qWarning() << "Server isn't listening, abort.";
     }
     else {
-        for(auto equip: equipRegistry) {
-            if(equip->isPlane()) {
-                qCritical() << equip->toString() << PlaneReplenish::maintenanceCount(100, equip);
-            }
+        for(auto ship: shipRegistry) {
+            qCritical() << ship->toString() << equipRegistry[413]->canEquip(ship, lua);
         }
     }
 }

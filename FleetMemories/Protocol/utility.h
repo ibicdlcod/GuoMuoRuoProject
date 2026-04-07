@@ -13,11 +13,10 @@
 
 #include <tuple>
 
-#include "kp.h"
-
 namespace Utility {
 
 void titleCase(QString &input);
+/* is not inline because lua uses it */
 bool checkMask(qint32 input, qint32 mask, qint32 desired);
 
 /* 8.1-supply.md#Supply_chain_and_attrition
