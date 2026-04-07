@@ -77,6 +77,11 @@ static constexpr int mapResourceControlDefault = 1000;
 static constexpr int hiddenMap = 99;
 static constexpr qint64 secsinMin = 60;
 static constexpr int equipIdMax = 0x10000;
+/* Headquarters equipment IDs (see doc/...) */
+static constexpr int headquartersEquipMobileStrike = 272;
+static constexpr int headquartersEquipCombinedFleet = 107;
+static constexpr int headquartersEquipExpedition = 4098;
+static constexpr int headquartersEquipEliteTorpedo = 413;
 static constexpr int conditionMax = 480;
 static constexpr int factorySlotRows = 6;
 static constexpr int factorySlotColumns = 4;

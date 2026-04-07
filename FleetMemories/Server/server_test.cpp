@@ -151,3 +151,56 @@ void Server::testPlaneReplenishment() {
     
     qInfo() << "Plane replenishment test completed";
 }
+
+void Server::testEscortedRetreat() {
+    qInfo() << "Starting escorted retreat test";
+    // Look up a destroyer ship (ID 269550035)
+    Ship *destroyer = shipRegistry.value(269550035, nullptr);
+    if (!destroyer) {
+        qWarning() << "testEscortedRetreat: destroyer ship 269550035 not in registry";
+        return;
+    }
+    // Look up headquarters equipment (Mobile strike force headquarters ID 272)
+    Equipment *hqEquip = equipRegistry.value(KP::headquartersEquipMobileStrike, nullptr);
+    if (!hqEquip) {
+        qWarning() << "testEscortedRetreat: headquarters equipment" << KP::headquartersEquipMobileStrike << "not in registry";
+        return;
+    }
+    // Create a FleetInfo with two destroyers (position 0: damaged, position 1: escort)
+    FleetInfo fi;
+    fi.type = KP::NormalFleet;
+    // Ship at position 0 (damaged)
+    fi.ships.push_back(destroyer);
+    ShipDynamic *damagedDyn = new ShipDynamic(destroyer->attr["Hitpoints"]);
+    damagedDyn->currentHP = 0; // critically damaged
+    damagedDyn->fleetFled = false;
+    // Add headquarters equipment to position 0 (slot 0)
+    QUuid hqUuid = QUuid::createUuid();
+    damagedDyn->slotEquip = {hqUuid, QUuid(), QUuid(), QUuid(), QUuid()};
+    fi.equipMap[hqUuid] = hqEquip;
+    fi.equipSkillEffects[hqUuid] = 1.0;
+    fi.shipDynamics.push_back(damagedDyn);
+    // Ship at position 1 (escort candidate)
+    fi.ships.push_back(destroyer);
+    ShipDynamic *escortDyn = new ShipDynamic(destroyer->attr["Hitpoints"]);
+    escortDyn->currentHP = destroyer->attr["Hitpoints"]; // healthy
+    escortDyn->fleetFled = false;
+    fi.shipDynamics.push_back(escortDyn);
+    // Test findEscortCandidates (non-expedition)
+    QList<int> candidates = fi.findEscortCandidates(false);
+    if (candidates.size() != 1 || candidates.first() != 1) {
+        qWarning() << "testEscortedRetreat: findEscortCandidates failed, got" << candidates;
+        return;
+    }
+    // Test performEscortRetreat
+    if (!fi.performEscortRetreat(0, false)) {
+        qWarning() << "testEscortedRetreat: performEscortRetreat failed";
+        return;
+    }
+    // Verify both ships marked as fled
+    if (!damagedDyn->fleetFled || !escortDyn->fleetFled) {
+        qWarning() << "testEscortedRetreat: ships not marked as fled";
+        return;
+    }
+    qInfo() << "testEscortedRetreat: PASS";
+}
