@@ -4,6 +4,8 @@
 #ifndef SHIPDYNAMIC_H
 #define SHIPDYNAMIC_H
 
+#include <QJsonObject>
+#include <QList>
 #include <QObject>
 #include <QUuid>
 
@@ -18,6 +20,7 @@ public:
     explicit ShipDynamic(int, QObject *parent = nullptr);
 
     bool isCriticallyDamaged(const Ship* ship) const;
+    void markAsFled();
 
     int star;
     int currentHP;
