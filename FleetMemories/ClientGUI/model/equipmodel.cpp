@@ -82,12 +82,12 @@ void EquipModel::switchDisplayType(int index) {
                         continue;
                 }
                 else {
-                    if(!(iter->second->canEquip(currentActiveShip, engine.lua))) {
+                    if(!(iter->second->canEquip(currentActiveShip,
+                                                engine.lua))) {
                         if(iter->second->type.getDisplayGroup()
                                 .localeAwareCompare(
                                     EquipType::getDisplayGroupsSorted().at(index - 1))
                             == 0) {
-                            qCritical() << currentActiveShip->toString() << iter->second->toString();
                         }
                         continue;
                     }
@@ -121,7 +121,8 @@ void EquipModel::switchDisplayType2(const QString &equipName) {
                     continue;
             }
             else {
-                if(!(iter->second->canEquip(currentActiveShip, engine.lua)))
+                if(!(iter->second->canEquip(currentActiveShip,
+                                            engine.lua)))
                     continue;
             }
         }
