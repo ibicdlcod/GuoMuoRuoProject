@@ -215,14 +215,14 @@ bool FleetInfo::performEscortRetreat(int damagedPos, bool isExpedition)
     if (candidates.empty()) return false;
     if (candidates[0] == -1) { // EliteTorpedo headquarters
         /* single ship fleeing */
-        dyn->fleetFled = true;
+        dyn->markAsFled();
         return true;
     }
     int escortPos = candidates.first();
     // Mark both ships as fled
-    dyn->fleetFled = true;
+    dyn->markAsFled();
     if (ShipDynamic *escortDyn = shipDynamics[escortPos])
-        escortDyn->fleetFled = true;
+        escortDyn->markAsFled();
     return true;
 }
 
