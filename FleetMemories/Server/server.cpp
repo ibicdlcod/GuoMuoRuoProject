@@ -1697,7 +1697,7 @@ void Server::doFetch(const CSteamID &uid, int factoryid, QSslSocket *connection,
     query.isSelect();
     if(Q_UNLIKELY(!query.first())) {
         //% "Fetch factory product failed."
-        throw DBError(qtTrId("fetch-facto-failed"), query.lastError());
+        throw DBError(qtTrId("fetch-facto-failed"), query.lastError(), query.lastQuery());
     }
     else {
         int jobID = query.value(0).toInt();
@@ -3650,16 +3650,18 @@ void Server::receivedLogin(const CSteamID &uid,
         QSqlQuery insert;
         if(!insert.prepare("INSERT INTO NewUsers (UserID, UserType) "
                            "VALUES (:uid, :type);")) {
-            qWarning() << insert.lastError().databaseText();
+            //% "%1: Add user failure!"
+            connection->disconnectFromHost();
+            throw DBError(qtTrId("add-user-fail").arg(uidInt),
+                          insert.lastError(), insert.lastQuery());
         }
         insert.bindValue(":uid", uidInt);
         insert.bindValue(":type", "commoner");
         if(!insert.exec()) {
+            connection->disconnectFromHost();
             //% "%1: Add user failure!"
             throw DBError(qtTrId("add-user-fail").arg(uidInt),
-                          query.lastError());
-            connection->disconnectFromHost();
-            return;
+                          insert.lastError(), insert.lastQuery());
         }
         else {
             userInit(uid);
@@ -4752,7 +4754,10 @@ user_attr_sql:
             if(!insert.prepare(
                     "INSERT INTO UserAttr (UserID, Attribute, Intvalue) "
                     "VALUES (:uid, :attr, :value);")) {
-                qWarning() << insert.lastError().databaseText();
+                //% "%1: User data init failure!"
+                throw DBError(qtTrId("user-data-init-fail")
+                              .arg(uid.ConvertToUint64()),
+                              insert.lastError(), insert.lastQuery());
             }
             insert.bindValue(":uid", uid.ConvertToUint64());
             insert.bindValue(":attr", i.key());
@@ -4772,7 +4777,10 @@ natural_regen_time:
         if(!insertTime.prepare("INSERT INTO UserAttr "
                                "(UserID, Attribute, Intvalue) "
                                "VALUES (:uid, :attr, :value);")) {
-            qWarning() << insertTime.lastError().databaseText();
+            //% "%1: User data init failure!"
+            throw DBError(qtTrId("user-data-init-fail")
+                          .arg(uid.ConvertToUint64()),
+                          insertTime.lastError(), insertTime.lastQuery());
         }
         insertTime.bindValue(":uid", uid.ConvertToUint64());
         insertTime.bindValue(":attr", "RecoverTime");
@@ -4792,7 +4800,10 @@ sanity_init:
         if(!insertSanity.prepare(
                 "INSERT INTO UserAttr (UserID, Attribute, Realvalue) "
                 "VALUES (:uid, :attr, :value);")) {
-            qWarning() << insertSanity.lastError().databaseText();
+            //% "%1: User data init failure!"
+            throw DBError(qtTrId("user-data-init-fail")
+                          .arg(uid.ConvertToUint64()),
+                          insertSanity.lastError(), insertSanity.lastQuery());
         }
         insertSanity.bindValue(":uid", uid.ConvertToUint64());
         insertSanity.bindValue(":attr", KP::attrSanity);
@@ -4811,7 +4822,10 @@ factory:
         if(!factoryNew.prepare("INSERT INTO Factories "
                                "(UserID, FactoryID) "
                                "VALUES (:uid, :facto);")) {
-            qWarning() << factoryNew.lastError().databaseText();
+            //% "Init %2 factory slots for user %1 failed!"
+            throw DBError(qtTrId("user-factory-init-fail")
+                          .arg(uid.ConvertToUint64()).arg(i),
+                          factoryNew.lastError(), factoryNew.lastQuery());
         }
         factoryNew.bindValue(":uid", uid.ConvertToUint64());
         factoryNew.bindValue(":facto", i);
@@ -4829,7 +4843,10 @@ dock:
         if(!factoryNew.prepare("INSERT INTO Docks "
                                "(UserID, DockID) "
                                "VALUES (:uid, :facto);")) {
-            qWarning() << factoryNew.lastError().databaseText();
+            //% "Init %2 dock slots for user %1 failed!"
+            throw DBError(qtTrId("user-dock-init-fail")
+                          .arg(uid.ConvertToUint64()).arg(KP::initDock()),
+                          factoryNew.lastError(), factoryNew.lastQuery());
         }
         factoryNew.bindValue(":uid", uid.ConvertToUint64());
         factoryNew.bindValue(":facto", i);
@@ -4847,7 +4864,9 @@ fleet_status:
         if(!insert.prepare("INSERT INTO UserAttr "
                            "(UserID, Attribute, Intvalue) "
                            "VALUES (:uid, :attr, :value);")) {
-            qWarning() << insert.lastError().databaseText();
+            //% "Set User Fleet Up failed!"
+            throw DBError(qtTrId("init-userfleet-failed"),
+                          insert.lastError(), insert.lastQuery());
         }
         insert.bindValue(":uid", uid.ConvertToUint64());
         insert.bindValue(":attr", QString("Fleet%1").arg(i+1));

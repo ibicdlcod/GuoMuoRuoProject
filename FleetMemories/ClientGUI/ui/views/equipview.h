@@ -87,6 +87,7 @@ private:
     HpDelegate *hpdelegate;
 
     /* shared */
+    QLabel *sortHint;
     QComboBox *sortBox;
     QCheckBox *reverseCheck;
     QToolButton *firstButton;

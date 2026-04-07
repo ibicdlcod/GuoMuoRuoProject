@@ -1374,103 +1374,108 @@ Great at battle and bad at politics--so cool!</translation>
     </message>
     <message id="retrieving-please-wait">
         <location filename="../ClientGUI/ui/navigator.cpp" line="19"/>
-        <location filename="../ClientGUI/ui/views/equipview.cpp" line="89"/>
-        <location filename="../ClientGUI/ui/views/equipview.cpp" line="392"/>
-        <location filename="../ClientGUI/ui/views/equipview.cpp" line="412"/>
-        <location filename="../ClientGUI/ui/views/equipview.cpp" line="509"/>
-        <location filename="../ClientGUI/ui/views/equipview.cpp" line="642"/>
+        <location filename="../ClientGUI/ui/views/equipview.cpp" line="92"/>
+        <location filename="../ClientGUI/ui/views/equipview.cpp" line="396"/>
+        <location filename="../ClientGUI/ui/views/equipview.cpp" line="416"/>
+        <location filename="../ClientGUI/ui/views/equipview.cpp" line="513"/>
+        <location filename="../ClientGUI/ui/views/equipview.cpp" line="646"/>
         <source>Retrieving data, please wait...</source>
         <translation type="unfinished">Retrieving data, please wait...</translation>
     </message>
     <message id="equipview-unselect">
-        <location filename="../ClientGUI/ui/views/equipview.cpp" line="99"/>
+        <location filename="../ClientGUI/ui/views/equipview.cpp" line="102"/>
         <source>Unselect</source>
         <translation>Unselect</translation>
     </message>
     <message id="no-ship">
-        <location filename="../ClientGUI/ui/views/equipview.cpp" line="270"/>
+        <location filename="../ClientGUI/ui/views/equipview.cpp" line="274"/>
         <source>No suitable Ship</source>
         <translation type="unfinished">No suitable Ship</translation>
     </message>
     <message id="no-user">
-        <location filename="../ClientGUI/ui/views/equipview.cpp" line="274"/>
+        <location filename="../ClientGUI/ui/views/equipview.cpp" line="278"/>
         <source>No suitable User</source>
         <translation type="unfinished">No suitable User</translation>
     </message>
     <message id="sort-order-desc">
-        <location filename="../ClientGUI/ui/views/equipview.cpp" line="84"/>
+        <location filename="../ClientGUI/ui/views/equipview.cpp" line="87"/>
         <source>Desc.</source>
         <translation>Desc.</translation>
     </message>
+    <message id="sort-hint">
+        <location filename="../ClientGUI/ui/views/equipview.cpp" line="79"/>
+        <source>Sort Mode:</source>
+        <translation type="unfinished"></translation>
+    </message>
     <message id="sort-equip-def">
-        <location filename="../ClientGUI/ui/views/equipview.cpp" line="450"/>
+        <location filename="../ClientGUI/ui/views/equipview.cpp" line="454"/>
         <source>Equipment type</source>
         <translation>Equipment type</translation>
     </message>
     <message id="sort-uuid">
-        <location filename="../ClientGUI/ui/views/equipview.cpp" line="452"/>
-        <location filename="../ClientGUI/ui/views/equipview.cpp" line="582"/>
+        <location filename="../ClientGUI/ui/views/equipview.cpp" line="456"/>
+        <location filename="../ClientGUI/ui/views/equipview.cpp" line="586"/>
         <source>UUID</source>
         <translation>UUID</translation>
     </message>
     <message id="sort-name">
-        <location filename="../ClientGUI/ui/views/equipview.cpp" line="454"/>
-        <location filename="../ClientGUI/ui/views/equipview.cpp" line="584"/>
+        <location filename="../ClientGUI/ui/views/equipview.cpp" line="458"/>
+        <location filename="../ClientGUI/ui/views/equipview.cpp" line="588"/>
         <source>Name</source>
         <translation>Name</translation>
     </message>
     <message id="sort-equip-star">
-        <location filename="../ClientGUI/ui/views/equipview.cpp" line="456"/>
+        <location filename="../ClientGUI/ui/views/equipview.cpp" line="460"/>
         <source>Improvement</source>
         <translation>Improvement</translation>
     </message>
     <message id="sort-equip-prim-attr">
-        <location filename="../ClientGUI/ui/views/equipview.cpp" line="458"/>
+        <location filename="../ClientGUI/ui/views/equipview.cpp" line="462"/>
         <source>Primary attribute</source>
         <translation>Primary attribute</translation>
     </message>
     <message id="sort-equip-skill">
-        <location filename="../ClientGUI/ui/views/equipview.cpp" line="460"/>
+        <location filename="../ClientGUI/ui/views/equipview.cpp" line="464"/>
         <source>Skill points</source>
         <translation>Skill points</translation>
     </message>
     <message id="sort-ship-def">
-        <location filename="../ClientGUI/ui/views/equipview.cpp" line="580"/>
+        <location filename="../ClientGUI/ui/views/equipview.cpp" line="584"/>
         <source>Ship type</source>
         <translation>Ship type</translation>
     </message>
     <message id="sort-ship-modernization">
-        <location filename="../ClientGUI/ui/views/equipview.cpp" line="586"/>
+        <location filename="../ClientGUI/ui/views/equipview.cpp" line="590"/>
         <source>Modernization</source>
         <translation>Modernization</translation>
     </message>
     <message id="sort-hp-pct">
-        <location filename="../ClientGUI/ui/views/equipview.cpp" line="588"/>
+        <location filename="../ClientGUI/ui/views/equipview.cpp" line="592"/>
         <source>HP%</source>
         <translation>HP%</translation>
     </message>
     <message id="sort-cond">
-        <location filename="../ClientGUI/ui/views/equipview.cpp" line="590"/>
+        <location filename="../ClientGUI/ui/views/equipview.cpp" line="594"/>
         <source>Condition</source>
         <translation>Condition</translation>
     </message>
     <message id="sort-level">
-        <location filename="../ClientGUI/ui/views/equipview.cpp" line="592"/>
+        <location filename="../ClientGUI/ui/views/equipview.cpp" line="596"/>
         <source>Level</source>
         <translation>Level</translation>
     </message>
     <message id="sort-position">
-        <location filename="../ClientGUI/ui/views/equipview.cpp" line="594"/>
+        <location filename="../ClientGUI/ui/views/equipview.cpp" line="598"/>
         <source>Position</source>
         <translation>Position</translation>
     </message>
     <message id="sort-fuel-pct">
-        <location filename="../ClientGUI/ui/views/equipview.cpp" line="596"/>
+        <location filename="../ClientGUI/ui/views/equipview.cpp" line="600"/>
         <source>Fuel%</source>
         <translation>Fuel%</translation>
     </message>
     <message id="sort-ammo-pct">
-        <location filename="../ClientGUI/ui/views/equipview.cpp" line="598"/>
+        <location filename="../ClientGUI/ui/views/equipview.cpp" line="602"/>
         <source>Ammo%</source>
         <translation>Ammo%</translation>
     </message>
@@ -1506,7 +1511,7 @@ Great at battle and bad at politics--so cool!</translation>
     </message>
     <message id="no-equip">
         <location filename="../ClientGUI/ui/navigator.cpp" line="80"/>
-        <location filename="../ClientGUI/ui/views/equipview.cpp" line="265"/>
+        <location filename="../ClientGUI/ui/views/equipview.cpp" line="269"/>
         <source>No suitable Equipment</source>
         <translation type="unfinished">No suitable Equipment</translation>
     </message>

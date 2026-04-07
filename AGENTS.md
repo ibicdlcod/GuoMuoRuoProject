@@ -49,6 +49,7 @@ Run the built executables directly for functional verification:
 3. **80 character line limit** – no line (except Qt translation hints `//% "..."`) should exceed 80 chars when properly indented by Qt Creator
 4. **Sort function declarations/definitions** within same `public:`/`private:` section
 5. **Prefer `""ms` from `std::chrono::literals`** when passing arguments that might accept `std::chrono::` types
+6. **Use id-based translation and DBError** instead of bare QStringLiteral when reporting server database errors
 
 ### Header Ordering
 Headers must be ordered as follows (each section alphabetically):

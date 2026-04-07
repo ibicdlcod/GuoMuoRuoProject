@@ -1140,8 +1140,9 @@ const QJsonObject Server::processBattleCore(const CSteamID &uid,
             query.bindValue(":fleet", fleetIndex);
             query.bindValue(":pos", static_cast<int>(i));
             if(!query.exec()) {
-                qWarning() << "Failed to update player ship HP:"
-                           << query.lastError();
+                //% "Failed to update player ship HP"
+                throw DBError(qtTrId("dbfail-update-ship-hp"),
+                              query.lastError(), query.lastQuery());
             }
 
             // Plane loss (same factor)
@@ -1153,13 +1154,12 @@ const QJsonObject Server::processBattleCore(const CSteamID &uid,
             uuidQuery.bindValue(":uid", uid.ConvertToUint64());
             uuidQuery.bindValue(":fleet", fleetIndex);
             uuidQuery.bindValue(":pos", static_cast<int>(i));
-            if(uuidQuery.exec() && uuidQuery.next()) {
-                shipUuid = uuidQuery.value("ShipUuid").toString();
-            } else {
-                qWarning() << "Failed to get ship UUID for plane loss tracking:"
-                           << uuidQuery.lastError();
-                // Continue without storing losses
+            if(!uuidQuery.exec() || !uuidQuery.next()) {
+                //% "Failed to get ship UUID for plane loss tracking"
+                throw DBError(qtTrId("dbfail-get-ship-uuid"),
+                              uuidQuery.lastError(), uuidQuery.lastQuery());
             }
+            shipUuid = uuidQuery.value("ShipUuid").toString();
             
             for(int slot = 0; slot < dyn->slotPlanes.size(); ++slot) {
                 int currentPlanes = dyn->slotPlanes[slot];
@@ -1210,8 +1210,9 @@ const QJsonObject Server::processBattleCore(const CSteamID &uid,
                 query.bindValue(":fleet", fleetIndex);
                 query.bindValue(":pos", static_cast<int>(i));
                 if(!query.exec()) {
-                    qWarning() << "Failed to update plane count:"
-                               << query.lastError();
+                    //% "Failed to update plane count"
+                    throw DBError(qtTrId("dbfail-update-plane-count"),
+                                  query.lastError(), query.lastQuery());
                 }
             }
         }

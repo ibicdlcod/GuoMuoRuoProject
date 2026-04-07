@@ -74,6 +74,9 @@ EquipView::EquipView(QWidget *parent)
         break;
     }
 
+    sortHint = new QLabel(this);
+    //% "Sort Mode:"
+    sortHint->setText(qtTrId("sort-hint"));
     sortBox = new QComboBox(this);
     sortBox->setSizePolicy(QSizePolicy(QSizePolicy::Maximum,
                                        QSizePolicy::Preferred,
@@ -152,6 +155,7 @@ EquipView::EquipView(QWidget *parent)
     layout->addWidget(fleetRadio3);
     layout->addWidget(fleetRadio4);
     layout->addWidget(fleetRadioUnassigned);
+    layout->addWidget(sortHint);
     layout->addWidget(sortBox);
     layout->addWidget(reverseCheck);
     layout->addWidget(firstButton);

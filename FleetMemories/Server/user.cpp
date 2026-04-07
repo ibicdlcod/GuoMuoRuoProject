@@ -237,13 +237,11 @@ ResOrd User::getCurrentResources(const CSteamID &uid) {
                   "OR Attribute = 'W' "
                   "OR Attribute = 'C');");
     query.bindValue(":id", uid.ConvertToUint64());
-    query.exec();
-    query.isSelect();
-    if(Q_UNLIKELY(!query.first())) {
+    if(Q_UNLIKELY(!query.exec() || !query.isSelect() || !query.first())) {
         //% "User %1: check resources failed!"
-        qWarning() << qtTrId("user-check-resource-failed")
-                          .arg(uid.ConvertToUint64());
-        return ResOrd(ResTuple());
+        throw DBError(qtTrId("user-check-resource-failed")
+                          .arg(uid.ConvertToUint64()),
+                      query.lastError(), query.lastQuery());
     }
     else {
         using namespace KP;
@@ -278,9 +276,9 @@ std::tuple<int, int> User::getCurrentSlots(const CSteamID &uid) {
     query.bindValue(":id", uid.ConvertToUint64());
     if(Q_UNLIKELY(!query.exec() || !query.isSelect() || !query.first())) {
         //% "User %1: check slots failed!"
-        qWarning() << qtTrId("user-check-slots-failed")
-                          .arg(uid.ConvertToUint64());
-        return {0, 0};
+        throw DBError(qtTrId("user-check-slots-failed")
+                          .arg(uid.ConvertToUint64()),
+                      query.lastError(), query.lastQuery());
     }
     else {
         do { // query.first is already called once
@@ -475,9 +473,9 @@ bool User::isDockBusy(const CSteamID &uid, int dockID) {
     query.bindValue(":facto", dockID);
     if(Q_UNLIKELY(!query.exec() || !query.isSelect() || !query.first())) {
         //% "User %1: dock %2 does not exist!"
-        qWarning() << qtTrId("user-nonexistent-dock")
-                          .arg(uid.ConvertToUint64()).arg(dockID);
-        return true;
+        throw DBError(qtTrId("user-nonexistent-dock")
+                          .arg(uid.ConvertToUint64()).arg(dockID),
+                      query.lastError(), query.lastQuery());
     }
     else {
         return !query.value(0).toUuid().isNull();
@@ -494,9 +492,9 @@ bool User::isFactoryBusy(const CSteamID &uid, int factoryID) {
     query.bindValue(":facto", factoryID);
     if(Q_UNLIKELY(!query.exec() || !query.isSelect() || !query.first())) {
         //% "User %1: factory %2 does not exist!"
-        qWarning() << qtTrId("user-nonexistent-factory")
-                          .arg(uid.ConvertToUint64()).arg(factoryID);
-        return true;
+        throw DBError(qtTrId("user-nonexistent-factory")
+                          .arg(uid.ConvertToUint64()).arg(factoryID),
+                      query.lastError(), query.lastQuery());
     }
     else {
         return query.value(0).toInt() != 0;
@@ -513,12 +511,10 @@ std::tuple<bool, int> User::isFactoryFinished(const CSteamID &uid,
                   "WHERE User = :id AND FactoryID = :facto");
     query.bindValue(":id", uid.ConvertToUint64());
     query.bindValue(":facto", factoryID);
-    query.exec();
-    query.isSelect();
-    if(Q_UNLIKELY(!query.first())) {
-        qWarning() << qtTrId("user-nonexistent-uid")
-                          .arg(uid.ConvertToUint64());
-        return {false, 0};
+    if(Q_UNLIKELY(!query.exec() || !query.isSelect() || !query.first())) {
+        throw DBError(qtTrId("user-nonexistent-uid")
+                          .arg(uid.ConvertToUint64()),
+                      query.lastError(), query.lastQuery());
     }
     else {
         bool done = query.value(0).toBool();
@@ -589,13 +585,11 @@ bool User::isSuperUser(const CSteamID &uid) {
     query.prepare("SELECT UserType"
                   " FROM NewUsers WHERE UserID = :id");
     query.bindValue(":id", QString::number(uid.ConvertToUint64()));
-    query.exec();
-    query.isSelect();
-    if(Q_UNLIKELY(!query.first())) {
+    if(Q_UNLIKELY(!query.exec() || !query.isSelect() || !query.first())) {
         //% "User id %1 does not exist!"
-        qWarning() << qtTrId("user-nonexistent-uid")
-                          .arg(uid.ConvertToUint64());
-        return false;
+        throw DBError(qtTrId("user-nonexistent-uid")
+                          .arg(uid.ConvertToUint64()),
+                      query.lastError(), query.lastQuery());
     }
     else {
         return query.value(0).toString().
@@ -880,9 +874,9 @@ void User::setResources(const CSteamID &uid, ResOrd goal) {
     QSqlDatabase db = QSqlDatabase::database();
     if(!db.transaction()) {
         //% "Failed to start transaction for set resources."
-        qWarning() << qtTrId("set-resources-transaction-failed")
-                      .arg(uid.ConvertToUint64());
-        return;
+        throw DBError(qtTrId("set-resources-transaction-failed")
+                      .arg(uid.ConvertToUint64()),
+                      db.lastError(), QString());
     }
     
     QSqlQuery query;
@@ -909,18 +903,17 @@ void User::setResources(const CSteamID &uid, ResOrd goal) {
     if(Q_UNLIKELY(!query.exec())) {
         db.rollback();
         //% "User id %1: set resources failed!"
-        qWarning() << qtTrId("set-resources-failed")
-                      .arg(uid.ConvertToUint64());
-        qWarning() << query.lastError();
-        return;
+        throw DBError(qtTrId("set-resources-failed")
+                      .arg(uid.ConvertToUint64()),
+                      query.lastError(), query.lastQuery());
     }
     
     if(!db.commit()) {
         db.rollback();
         //% "Failed to commit transaction for set resources."
-        qWarning() << qtTrId("set-resources-commit-failed")
-                      .arg(uid.ConvertToUint64());
-        return;
+        throw DBError(qtTrId("set-resources-commit-failed")
+                      .arg(uid.ConvertToUint64()),
+                      db.lastError(), QString());
     }
     
     //% "User id %1: set resources %2"

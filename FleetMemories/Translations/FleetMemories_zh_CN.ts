@@ -1357,103 +1357,108 @@ Great at battle and bad at politics--so cool!</source>
     </message>
     <message id="retrieving-please-wait">
         <location filename="../ClientGUI/ui/navigator.cpp" line="19"/>
-        <location filename="../ClientGUI/ui/views/equipview.cpp" line="89"/>
-        <location filename="../ClientGUI/ui/views/equipview.cpp" line="392"/>
-        <location filename="../ClientGUI/ui/views/equipview.cpp" line="412"/>
-        <location filename="../ClientGUI/ui/views/equipview.cpp" line="509"/>
-        <location filename="../ClientGUI/ui/views/equipview.cpp" line="642"/>
+        <location filename="../ClientGUI/ui/views/equipview.cpp" line="92"/>
+        <location filename="../ClientGUI/ui/views/equipview.cpp" line="396"/>
+        <location filename="../ClientGUI/ui/views/equipview.cpp" line="416"/>
+        <location filename="../ClientGUI/ui/views/equipview.cpp" line="513"/>
+        <location filename="../ClientGUI/ui/views/equipview.cpp" line="646"/>
         <source>Retrieving data, please wait...</source>
         <translation>获取数据中，请等待……</translation>
     </message>
     <message id="equipview-unselect">
-        <location filename="../ClientGUI/ui/views/equipview.cpp" line="99"/>
+        <location filename="../ClientGUI/ui/views/equipview.cpp" line="102"/>
         <source>Unselect</source>
         <translation>取消选择</translation>
     </message>
     <message id="no-ship">
-        <location filename="../ClientGUI/ui/views/equipview.cpp" line="270"/>
+        <location filename="../ClientGUI/ui/views/equipview.cpp" line="274"/>
         <source>No suitable Ship</source>
         <translation>没有符合的舰船</translation>
     </message>
     <message id="no-user">
-        <location filename="../ClientGUI/ui/views/equipview.cpp" line="274"/>
+        <location filename="../ClientGUI/ui/views/equipview.cpp" line="278"/>
         <source>No suitable User</source>
         <translation type="unfinished">没有符合的用户</translation>
     </message>
     <message id="sort-order-desc">
-        <location filename="../ClientGUI/ui/views/equipview.cpp" line="84"/>
+        <location filename="../ClientGUI/ui/views/equipview.cpp" line="87"/>
         <source>Desc.</source>
         <translation>降序</translation>
     </message>
+    <message id="sort-hint">
+        <location filename="../ClientGUI/ui/views/equipview.cpp" line="79"/>
+        <source>Sort Mode:</source>
+        <translation type="unfinished"></translation>
+    </message>
     <message id="sort-equip-def">
-        <location filename="../ClientGUI/ui/views/equipview.cpp" line="450"/>
+        <location filename="../ClientGUI/ui/views/equipview.cpp" line="454"/>
         <source>Equipment type</source>
         <translation>装备类型</translation>
     </message>
     <message id="sort-uuid">
-        <location filename="../ClientGUI/ui/views/equipview.cpp" line="452"/>
-        <location filename="../ClientGUI/ui/views/equipview.cpp" line="582"/>
+        <location filename="../ClientGUI/ui/views/equipview.cpp" line="456"/>
+        <location filename="../ClientGUI/ui/views/equipview.cpp" line="586"/>
         <source>UUID</source>
         <translation>UUID</translation>
     </message>
     <message id="sort-name">
-        <location filename="../ClientGUI/ui/views/equipview.cpp" line="454"/>
-        <location filename="../ClientGUI/ui/views/equipview.cpp" line="584"/>
+        <location filename="../ClientGUI/ui/views/equipview.cpp" line="458"/>
+        <location filename="../ClientGUI/ui/views/equipview.cpp" line="588"/>
         <source>Name</source>
         <translation>名称</translation>
     </message>
     <message id="sort-equip-star">
-        <location filename="../ClientGUI/ui/views/equipview.cpp" line="456"/>
+        <location filename="../ClientGUI/ui/views/equipview.cpp" line="460"/>
         <source>Improvement</source>
         <translation>改修</translation>
     </message>
     <message id="sort-equip-prim-attr">
-        <location filename="../ClientGUI/ui/views/equipview.cpp" line="458"/>
+        <location filename="../ClientGUI/ui/views/equipview.cpp" line="462"/>
         <source>Primary attribute</source>
         <translation>主要属性</translation>
     </message>
     <message id="sort-equip-skill">
-        <location filename="../ClientGUI/ui/views/equipview.cpp" line="460"/>
+        <location filename="../ClientGUI/ui/views/equipview.cpp" line="464"/>
         <source>Skill points</source>
         <translation>技能点</translation>
     </message>
     <message id="sort-ship-def">
-        <location filename="../ClientGUI/ui/views/equipview.cpp" line="580"/>
+        <location filename="../ClientGUI/ui/views/equipview.cpp" line="584"/>
         <source>Ship type</source>
         <translation>舰种</translation>
     </message>
     <message id="sort-ship-modernization">
-        <location filename="../ClientGUI/ui/views/equipview.cpp" line="586"/>
+        <location filename="../ClientGUI/ui/views/equipview.cpp" line="590"/>
         <source>Modernization</source>
         <translation>近代化改装</translation>
     </message>
     <message id="sort-hp-pct">
-        <location filename="../ClientGUI/ui/views/equipview.cpp" line="588"/>
+        <location filename="../ClientGUI/ui/views/equipview.cpp" line="592"/>
         <source>HP%</source>
         <translation>耐久%</translation>
     </message>
     <message id="sort-cond">
-        <location filename="../ClientGUI/ui/views/equipview.cpp" line="590"/>
+        <location filename="../ClientGUI/ui/views/equipview.cpp" line="594"/>
         <source>Condition</source>
         <translation>疲劳度</translation>
     </message>
     <message id="sort-level">
-        <location filename="../ClientGUI/ui/views/equipview.cpp" line="592"/>
+        <location filename="../ClientGUI/ui/views/equipview.cpp" line="596"/>
         <source>Level</source>
         <translation>等级</translation>
     </message>
     <message id="sort-position">
-        <location filename="../ClientGUI/ui/views/equipview.cpp" line="594"/>
+        <location filename="../ClientGUI/ui/views/equipview.cpp" line="598"/>
         <source>Position</source>
         <translation>位置</translation>
     </message>
     <message id="sort-fuel-pct">
-        <location filename="../ClientGUI/ui/views/equipview.cpp" line="596"/>
+        <location filename="../ClientGUI/ui/views/equipview.cpp" line="600"/>
         <source>Fuel%</source>
         <translation>燃料%</translation>
     </message>
     <message id="sort-ammo-pct">
-        <location filename="../ClientGUI/ui/views/equipview.cpp" line="598"/>
+        <location filename="../ClientGUI/ui/views/equipview.cpp" line="602"/>
         <source>Ammo%</source>
         <translation>弹药%</translation>
     </message>
@@ -1489,7 +1494,7 @@ Great at battle and bad at politics--so cool!</source>
     </message>
     <message id="no-equip">
         <location filename="../ClientGUI/ui/navigator.cpp" line="80"/>
-        <location filename="../ClientGUI/ui/views/equipview.cpp" line="265"/>
+        <location filename="../ClientGUI/ui/views/equipview.cpp" line="269"/>
         <source>No suitable Equipment</source>
         <translation>没有符合的装备</translation>
     </message>

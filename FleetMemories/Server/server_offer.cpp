@@ -186,7 +186,8 @@ void Server::offerShipInfoUser(const CSteamID &uid,
                           "FROM UserAttr "
                           "WHERE UserID = :uid "
                           "AND Attribute LIKE 'Fleet%';")) {
-            qWarning() << query.lastError().databaseText();
+            throw DBError(qtTrId("init-userfleet-failed"),
+                          query.lastError(), query.lastQuery());
         }
         query.bindValue(":uid", uid.ConvertToUint64());
         if(!query.exec() || !query.isSelect()) {
