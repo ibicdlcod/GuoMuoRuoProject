@@ -60,3 +60,11 @@ bool ShipDynamic::isCriticallyDamaged(const Ship* ship) const
     // Critically damaged if current HP < 1/4 of max HP
     return currentHP * 4 < maxHP;
 }
+
+void ShipDynamic::markAsFled()
+{
+    fleetFled = true;
+    fuel = 0.0;
+    ammo = 0.0;
+    condition -= 5;
+}
