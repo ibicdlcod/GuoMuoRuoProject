@@ -174,6 +174,7 @@ void Server::testEscortedRetreat() {
     ShipDynamic *damagedDyn = new ShipDynamic(destroyer->attr["Hitpoints"]);
     damagedDyn->currentHP = 0; // critically damaged
     damagedDyn->fleetFled = false;
+    int originalDamagedCondition = damagedDyn->condition;
     // Add headquarters equipment to position 0 (slot 0)
     QUuid hqUuid = QUuid::createUuid();
     damagedDyn->slotEquip = {hqUuid, QUuid(), QUuid(), QUuid(), QUuid()};
@@ -185,6 +186,7 @@ void Server::testEscortedRetreat() {
     ShipDynamic *escortDyn = new ShipDynamic(destroyer->attr["Hitpoints"]);
     escortDyn->currentHP = destroyer->attr["Hitpoints"]; // healthy
     escortDyn->fleetFled = false;
+    int originalEscortCondition = escortDyn->condition;
     fi.shipDynamics.push_back(escortDyn);
     // Test findEscortCandidates (non-expedition)
     QList<int> candidates = fi.findEscortCandidates(false);
@@ -197,9 +199,35 @@ void Server::testEscortedRetreat() {
         qWarning() << "testEscortedRetreat: performEscortRetreat failed";
         return;
     }
-    // Verify both ships marked as fled
+    // Verify both ships marked as fled and penalty applied
     if (!damagedDyn->fleetFled || !escortDyn->fleetFled) {
         qWarning() << "testEscortedRetreat: ships not marked as fled";
+        return;
+    }
+    if (damagedDyn->fuel != 0.0 || damagedDyn->ammo != 0.0) {
+        qWarning() << "testEscortedRetreat: damaged ship fuel/ammo not zero"
+                   << "fuel:" << damagedDyn->fuel
+                   << "ammo:" << damagedDyn->ammo;
+        return;
+    }
+    if (escortDyn->fuel != 0.0 || escortDyn->ammo != 0.0) {
+        qWarning() << "testEscortedRetreat: escort ship fuel/ammo not zero"
+                   << "fuel:" << escortDyn->fuel
+                   << "ammo:" << escortDyn->ammo;
+        return;
+    }
+    if (damagedDyn->condition != originalDamagedCondition - 5) {
+        qWarning() << "testEscortedRetreat: damaged ship condition"
+                   << "not reduced by 5"
+                   << "expected:" << (originalDamagedCondition - 5)
+                   << "got:" << damagedDyn->condition;
+        return;
+    }
+    if (escortDyn->condition != originalEscortCondition - 5) {
+        qWarning() << "testEscortedRetreat: escort ship condition"
+                   << "not reduced by 5"
+                   << "expected:" << (originalEscortCondition - 5)
+                   << "got:" << escortDyn->condition;
         return;
     }
     qInfo() << "testEscortedRetreat: PASS";
