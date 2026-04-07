@@ -15,6 +15,8 @@ description: Manual of style for C++ code
 7. Use `qobject_cast` instead of `static_cast` when casting Qt object pointers (QObject-derived types).
 8. Never use Qt reserved keywords (`signals`, `slots`, `emit`, `foreach`, `forever`, `Q_SIGNALS`, `Q_SLOTS`) as variable, parameter, or local names. Rename conflicting identifiers (e.g. `slots` → `equipSlots`).
 9. Comment with /* */ rather than //
+10. Fix all clazy warnings.
+11. Utilize DBError rather than manual "qWarning() << error strings"
 
 ### Database Error Handling
 
