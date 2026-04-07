@@ -93,12 +93,12 @@ ships: {
         row.expCap = query.value(rec.indexOf("ExpCap")).toInt();
         for(int i = 1; i <= 5; ++i) {
             row.equipSlots.append(query.value(
-                                           rec.indexOf(QStringLiteral("Slot")
-                                                       + QString::number(i))).toUuid());
+                rec.indexOf(QStringLiteral("Slot") + QString::number(i)))
+                .toUuid());
             row.planes.append(query.value(
-                                       rec.indexOf(QStringLiteral("Slot")
-                                                   + QString::number(i)
-                                                   + QStringLiteral("Planes"))).toInt());
+                rec.indexOf(QStringLiteral("Slot") + QString::number(i) +
+                    QStringLiteral("Planes")))
+                .toInt());
         }
         row.slotEx =
             query.value(rec.indexOf("SlotEX")).toUuid();
@@ -150,7 +150,8 @@ equip_defs: {
     }
 }
 
-    /* Populate FleetInfo vectors indexed by fleet position; nullptr for empty */
+    /* Populate FleetInfo vectors indexed by fleet position;
+     * nullptr for empty */
     info.ships.resize(KP::fleetRepSize, nullptr);
     info.shipDynamics.resize(KP::fleetRepSize, nullptr);
     info.shipTags.resize(KP::fleetRepSize, 0);

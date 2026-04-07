@@ -97,7 +97,8 @@ QMap<KP::CapitalType, int> FleetInfo::capitalness() {
 std::vector<int> FleetInfo::shipSpeeds() {
     std::vector<int> result;
     for(int i = 0; i < static_cast<int>(ships.size()); ++i) {
-        bool absent = !ships[i] || !shipDynamics[i] || shipDynamics[i]->fleetFled;
+        bool absent = !ships[i] || !shipDynamics[i] ||
+            shipDynamics[i]->fleetFled;
         result.push_back(absent ? -1 : ships[i]->attr["Speed"]);
     }
     return result;
@@ -171,8 +172,9 @@ int FleetInfo::headquartersEquipId(bool isExpedition) const
 QList<int> FleetInfo::findEscortCandidates(bool isExpedition) const
 {
     QList<int> candidates;
-    if (headquartersEquipId(isExpedition) == 0) return candidates;
-    if (headquartersEquipId(isExpedition) ==  KP::headquartersEquipEliteTorpedo) {
+    int hqId = headquartersEquipId(isExpedition);
+    if (hqId == 0) return candidates;
+    if (hqId == KP::headquartersEquipEliteTorpedo) {
         for (int i = 0; i < static_cast<int>(ships.size()); ++i) {
             const Ship *ship = ships[i];
             const ShipDynamic *dyn = shipDynamics[i];
