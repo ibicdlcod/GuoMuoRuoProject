@@ -176,12 +176,12 @@ set(CLIENT_SOURCES
     ClientGUI/ui/sortie/sortie.cpp
     ClientGUI/ui/sortie/sortie.h
     ClientGUI/ui/sortie/sortie.ui
-    ClientGUI/ui/techview.cpp
-    ClientGUI/ui/techview.h
-    ClientGUI/ui/techview.ui
     ClientGUI/ui/navalacademyview.cpp
     ClientGUI/ui/navalacademyview.h
     ClientGUI/ui/navalacademyview.ui
+    ClientGUI/ui/techview.cpp
+    ClientGUI/ui/techview.h
+    ClientGUI/ui/techview.ui
     ClientGUI/ui/views/equipselect.cpp
     ClientGUI/ui/views/equipselect.h
     ClientGUI/ui/views/equipview.cpp

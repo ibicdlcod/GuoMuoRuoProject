@@ -108,11 +108,12 @@
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="srcShipToggle">
-       <property name="text">
-        <string id="navalacademy-toship">Switch to ship</string>
-       </property>
-      </widget>
+       <widget class="QPushButton" name="srcShipToggle">
+        <property name="text">
+         <string id="navalacademy-toship">Switch to ship</string>
+        </property>
+        <property name="visible">false</property>
+       </widget>
      </item>
     </layout>
    </item>
@@ -279,11 +280,12 @@
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="dstShipToggle">
-       <property name="text">
-        <string id="navalacademy-toship">Switch to ship</string>
-       </property>
-      </widget>
+       <widget class="QPushButton" name="dstShipToggle">
+        <property name="text">
+         <string id="navalacademy-toship">Switch to ship</string>
+        </property>
+        <property name="visible">false</property>
+       </widget>
      </item>
     </layout>
    </item>
