@@ -37,9 +37,8 @@ NavalAcademyView::NavalAcademyView(QWidget *parent) :
     // Share same slots but track which panel
     connect(&engine, &Client::receivedSkillPointInfo,
             this, &NavalAcademyView::updateDstSkillPoints);
-    // TODO: connect receivedSkillPointConvertResult once signal exists
-    // connect(&engine, &Client::receivedSkillPointConvertResult,
-    //         this, &NavalAcademyView::updateSkillPointConvertResult);
+    connect(&engine, &Client::receivedSkillPointConvertResult,
+            this, &NavalAcademyView::updateSkillPointConvertResult);
 
     // Equipment selection
     connect(ui->srcEquipCombo, &QComboBox::activated,

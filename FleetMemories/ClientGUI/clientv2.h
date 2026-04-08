@@ -192,6 +192,7 @@ signals:
     void receivedResourceGainInfo(const QJsonObject &);
     void receivedResourceInfo(const QJsonObject &);
     void receivedShipBlueprint(const QJsonObject &);
+    void receivedSkillPointConvertResult(const QJsonObject &);
     void receivedSkillPointInfo(const QJsonObject &);
     void shipRegistryComplete();
     void tsunkitAssetsComplete();
