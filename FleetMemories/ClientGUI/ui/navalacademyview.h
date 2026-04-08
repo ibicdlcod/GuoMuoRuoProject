@@ -7,7 +7,8 @@
 #include <QFrame>
 #include <QTableWidgetItem>
 
-#include "../Protocol/kp.h"
+#include "../../Protocol/kp.h"
+#include "tablewidgetitemnumber.h"
 
 namespace Ui {
 class NavalAcademyView;
@@ -59,12 +60,6 @@ private:
     int64 availableSkillPoints = 0;
 };
 
-class TableWidgetItemNumber: public QTableWidgetItem {
-public:
-    explicit TableWidgetItemNumber(double);
-    virtual bool operator<(const QTableWidgetItem &other) const override {
-        return this->text().toDouble() < other.text().toDouble();
-    }
-};
+
 
 #endif // NAVALACADEMYVIEW_H

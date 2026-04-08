@@ -536,6 +536,4 @@ void TechView::showEvent(QShowEvent *event) {
     QWidget::showEvent(event);
 }
 
-TableWidgetItemNumber::TableWidgetItemNumber(double content) {
-    QTableWidgetItem::setText(QString::number(content));
-}
+
