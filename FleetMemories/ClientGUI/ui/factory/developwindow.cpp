@@ -15,6 +15,7 @@ DevelopWindow::DevelopWindow(QWidget *parent)
     : QDialog{parent},
     ui(new Ui::DevelopWindow) {
     ui->setupUi(this);
+    ui->idText->setInputMethodHints(Qt::ImhMultiLine);
 
     QList<QString> sortedGroups = EquipType::getDisplayGroupsSorted();
 

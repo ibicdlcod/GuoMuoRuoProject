@@ -18,6 +18,7 @@ EquipSelect::EquipSelect(int height, QWidget *parent)
     searchLabel->setText(qtTrId("equipview-search"));
     searchBox = new QLineEdit(this);
     searchBox->setObjectName("searchbox");
+    searchBox->setInputMethodHints(Qt::ImhNone);
     typeLabel = new QLabel(this);
     //% "Equip type:"
     typeLabel->setText(qtTrId("equipview-type"));

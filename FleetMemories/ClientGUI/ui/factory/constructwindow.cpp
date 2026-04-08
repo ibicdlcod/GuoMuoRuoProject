@@ -32,6 +32,7 @@ ConstructWindow::ConstructWindow(QWidget *parent)
     ui->searchBox->setStyleSheet(QStringLiteral(
         "background-color: palette(button);"
         ));
+    ui->searchBox->setInputMethodHints(Qt::ImhMultiLine);
     connect(ui->shipname, &QComboBox::currentIndexChanged,
             this, &ConstructWindow::shipNameChanged);
     Client &engine = Client::getInstance();

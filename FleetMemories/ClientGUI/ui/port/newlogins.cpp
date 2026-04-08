@@ -16,6 +16,8 @@ NewLoginS::NewLoginS(QWidget *parent) :
     ui(new Ui::NewLoginS)
 {
     ui->setupUi(this);
+    ui->ServerEdit->setInputMethodHints(Qt::ImhNone);
+    ui->PortEdit->setInputMethodHints(Qt::ImhDigitsOnly);
     ui->ServerEdit->setText("127.0.0.1");
     ui->PortEdit->setText("1826");
 }

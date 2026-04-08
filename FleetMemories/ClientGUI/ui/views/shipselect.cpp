@@ -22,6 +22,7 @@ ShipSelect::ShipSelect(int height, QWidget *parent)
     searchBox = new QLineEdit(this);
     searchBox->setObjectName("searchbox");
     searchBox->setMinimumSize(QSize(100, height));
+    searchBox->setInputMethodHints(Qt::ImhNone);
     nationLabel = new QLabel(this);
     //% "Nationality:"
     nationLabel->setText(qtTrId("shipview-nation"));

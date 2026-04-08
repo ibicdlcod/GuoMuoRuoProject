@@ -24,6 +24,7 @@ MainWindow::MainWindow(QWidget *parent, int argc, char ** argv)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+    ui->CommandPrompt->setInputMethodHints(Qt::ImhMultiLine);
 
     updateColorScheme(QApplication::styleHints()->colorScheme());
     QObject::connect(QApplication::styleHints(),

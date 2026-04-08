@@ -9,6 +9,9 @@
 #include <QStyleFactory>
 #include <QSurfaceFormat>
 #include <QTranslator>
+#include <QDebug>
+#include <cstdlib>
+#include <cstring>
 
 #include "../steam/steam_api.h"
 
@@ -39,6 +42,21 @@ int main(int argc, char *argv[]) {
         return STEAM_ERROR;
     }
     /* End Steam initialization */
+
+#if defined(Q_OS_LINUX)
+    // Auto-detect input method module based on XMODIFIERS
+    if (qEnvironmentVariableIsEmpty("QT_IM_MODULE")) {
+        const char* xmod = std::getenv("XMODIFIERS");
+        if (xmod && std::strstr(xmod, "fcitx")) {
+            qputenv("QT_IM_MODULE", "fcitx");
+        } else if (xmod && std::strstr(xmod, "ibus")) {
+            qputenv("QT_IM_MODULE", "ibus");
+        }
+        // Otherwise let Qt use default platform input context
+    }
+    qDebug() << "Using input method module:" << qgetenv("QT_IM_MODULE");
+#endif
+
     QApplication client(argc, argv);
     client.setWindowIcon(QIcon(":/resources/icon.ico"));
 #pragma message(NOT_M_CONST)

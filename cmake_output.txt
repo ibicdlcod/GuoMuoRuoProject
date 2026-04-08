@@ -1,0 +1,62 @@
+-- The C compiler identification is GNU 13.3.0
+-- The CXX compiler identification is GNU 13.3.0
+-- Detecting C compiler ABI info
+-- Detecting C compiler ABI info - done
+-- Check for working C compiler: /usr/bin/cc - skipped
+-- Detecting C compile features
+-- Detecting C compile features - done
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: /usr/bin/c++ - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- Looking for dlopen
+-- Looking for dlopen - found
+-- Failed to find Readline (missing: Readline_LIBRARY Readline_INCLUDE_DIR Readline_VERSION) 
+-- Failed to find Editline (missing: Editline_LIBRARY Editline_INCLUDE_DIR Editline_VERSION) 
+-- Looking for pow
+-- Looking for pow - not found
+-- Looking for pow
+-- Looking for pow - found
+-- Found LUA_MATH: TRUE
+-- 
+-- Lua 5.4.8.0 is now configured for Linux-6.8.0-107-generic
+-- 
+--   Platform:                               POSIX (Autodetect requested)
+--   C compiler:                             /usr/bin/cc
+--   Language for compilation:               C
+--   Use longjmp in place of C++ exceptions: OFF
+--   Restrict C to C89:                      OFF
+--   Additional debug consistency checks:    OFF
+--   Use ltests:                             OFF
+--   Build shared libraries:                 OFF
+--   Library loader support:                 None (OFF requested)
+--   Line editor support:                    None (Autodetect requested)
+--   Locale support:                         ON
+--   Installation directory:                 
+--   Test selection:                         Standard
+-- Found Lua: /home/hs/GuoMuoRuoProject/build/lua-cmake/src/liblua-5.4.a;/usr/lib/x86_64-linux-gnu/libm.so (found version "5.4.8")
+CMake Deprecation Warning at ClientGUI/ui/sortie/opengl/tinygltf/CMakeLists.txt:1 (cmake_minimum_required):
+  Compatibility with CMake < 3.10 will be removed from a future version of
+  CMake.
+
+  Update the VERSION argument <min> value.  Or, use the <min>...<max> syntax
+  to tell CMake that the project requires at least <min> but has been updated
+  to work with policies introduced by <max> or earlier.
+
+
+CMake Error at CMakeLists.txt:47 (find_package):
+  Could not find a package configuration file provided by "QT" with any of
+  the following names:
+
+    Qt6Config.cmake
+    qt6-config.cmake
+    Qt5Config.cmake
+    qt5-config.cmake
+
+  Add the installation prefix of "QT" to CMAKE_PREFIX_PATH or set "QT_DIR" to
+  a directory containing one of the above files.  If "QT" provides a separate
+  development package or SDK, be sure it has been installed.
+
+
+-- Configuring incomplete, errors occurred!
