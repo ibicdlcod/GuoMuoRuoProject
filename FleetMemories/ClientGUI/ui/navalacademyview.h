@@ -49,6 +49,9 @@ private:
     void resizeColumns(bool);
     void filterDstEquipByMother(int motherId);
     void updateConvertButtonState();
+    void resetEquipmentLists();
+    void demandLocalTechForEquip(int equipId);
+    void demandSkillPointsForEquip(int equipId);
 
     Ui::NavalAcademyView *ui;
     int currentSrcEquipId = 0;
