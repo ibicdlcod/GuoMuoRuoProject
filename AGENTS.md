@@ -12,19 +12,13 @@ FleetMemories is a client-server game built with Qt/C++. The project uses CMake 
 
 All source lives under `FleetMemories/`. C++20 is required on Windows; C++23 on Unix.
 
+## System Architecture
+
+For detailed system architecture documentation, see [doc/agents/architecture.md](doc/agents/architecture.md).
+
 ## Build Commands
 
-In Linux and Windows: refer to CMakeList.txt.user for Qt Creator settings.
-
-**WSL Detection:** Agents should automatically detect WSL environments using system checks:
-- Check `/proc/version` for "Microsoft" or "WSL" strings
-- Check for Windows mount points (`/mnt/c/`, `/mnt/wsl/`)
-- Check for WSL-specific files (`/proc/sys/fs/binfmt_misc/WSLInterop`)
-- Use `systemd-detect-virt` if available
-
-**If in WSL:** Don't build unless you have confirmed Qt SDK and MSVC are properly installed. You may not be operating in a build environment (which could be in another directory in Windows filesystem). Compilation errors can often be ignored in WSL if Qt SDK or MSVC are missing.
-
-**In native Linux/Windows:** Build normally with build instructions from Qt Configuration CMakeList.txt.user.
+For detailed build instructions including WSL detection and command-line alternatives, see [doc/agents/build.md](doc/agents/build.md).
 
 ## Lint & Test Commands
 
@@ -68,8 +62,10 @@ Refer to the skill for detailed examples and complete guidelines.
   - `Protocol/` – Shared protocol definitions
   - `lua/` – Lua script files (maps, equipment rules)
 - `doc/` – Game data CSV files and documentation
+  - `doc/agents/` – Agent documentation (architecture, build, game systems)
+  - `doc/database/` – Database schema documentation
 - `Translations/` – Localization files (`FleetMemories_{en_US,ja_JP,zh_CN}.ts`)
-- `.claude/skills/` – Agent skill definitions (manual-of-style, documentation-conventions)
+- `.claude/skills/` – Agent skill definitions (manual-of-style, documentation-conventions, auto-commit-push, etc.)
 
 ## Internationalization (i18n)
 
@@ -85,7 +81,7 @@ SQLite, accessed via Qt SQL. Key tables:
 - **Definition tables** (populated from CSV imports): `EquipReg`, `EquipName`, `ShipReg`, `ShipName`, `MapNode`, `MapRelation`, `MapResource`, `VirtualCondRelation`
 - **User tables**: `NewUsers`, `UserAttr`, `UserShip`, `UserEquip`, `Factories`, `Docks`, etc.
 
-See `CLAUDE.md` for full schema details.
+See `doc/database/db.md` for full schema details.
 
 ## Message Flow (Client-Server)
 
@@ -99,6 +95,10 @@ See `CLAUDE.md` for full schema details.
 
 - **`Client`** (`ClientGUI/clientv2.h`) – client-side god object: holds `sol::state lua`, game state (`KP::GameState`), network logic. Accessed via `Client::getInstance()`
 - **`Server`** (`Server/server.h`) – server-side god object: holds `sol::state lua`, all game logic, DB queries, `SenderManager`
+
+## Game Systems
+
+For detailed game systems documentation, see [doc/agents/game-systems.md](doc/agents/game-systems.md).
 
 ## Lua Scripting
 

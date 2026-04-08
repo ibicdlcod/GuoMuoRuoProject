@@ -18,7 +18,7 @@ Use this skill when ALL of the following conditions are met:
 ## Pre-Commit Checklist
 
 Before committing, ensure:
-- [ ] Run any relevant lint/typecheck commands (check CLAUDE.md for project-specific commands)
+- [ ] Run any relevant lint/typecheck commands (check AGENTS.md for project-specific commands)
 - [ ] Verify no secrets or sensitive data are included in changes
 - [ ] Check that all changes are relevant to the completed work
 
@@ -60,6 +60,6 @@ If push fails:
 1. **NEVER** commit if user explicitly said not to
 2. **ALWAYS** verify changes before committing
 3. **NEVER** commit secrets or sensitive data
-4. **ALWAYS** run verification commands if specified in CLAUDE.md
+4. **ALWAYS** run verification commands if specified in AGENTS.md
 5. **NEVER** force push (`--force`) unless explicitly instructed
 6. **ALWAYS** check git status before and after operations
