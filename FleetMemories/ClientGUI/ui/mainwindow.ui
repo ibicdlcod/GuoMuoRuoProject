@@ -294,7 +294,8 @@ border-style: none;</string>
     <property name="title">
      <string id="menu-tech">Tech</string>
     </property>
-    <addaction name="actionView_Tech"/>
+     <addaction name="actionView_Tech"/>
+     <addaction name="actionNaval_Academy"/>
    </widget>
    <widget class="QMenu" name="menuHelp">
     <property name="title">
@@ -347,6 +348,11 @@ border-style: none;</string>
   <action name="actionView_Tech">
    <property name="text">
     <string id="menu-view-tech">View Tech</string>
+   </property>
+  </action>
+  <action name="actionNaval_Academy">
+   <property name="text">
+    <string id="menu-naval-academy">Naval Academy</string>
    </property>
   </action>
   <action name="actionConstruct_Ships">

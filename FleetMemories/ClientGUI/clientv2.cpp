@@ -527,6 +527,9 @@ void Client::receivedInfo(const QJsonObject &djson) {
     case KP::InfoType::SkillPointInfo:
         emit receivedSkillPointInfo(djson);
         break;
+    case KP::InfoType::SkillPointConvertResult:
+        emit receivedSkillPointConvertResult(djson);
+        break;
     case KP::InfoType::RankInfo:
         emit receivedRankInfo(djson["content"].toArray(),
                               djson["total"].toInt());

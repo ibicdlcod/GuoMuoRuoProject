@@ -245,6 +245,7 @@ enum CommandType{
     Repair,
     DemandResourceUpdate,
     DemandSkillPoints,
+    ConvertSkillPoints,
     DemandTech,
     DestructEquip,
     Switch,
@@ -330,6 +331,7 @@ enum InfoType{
     GlobalTechInfo,
     LocalTechInfo,
     SkillPointInfo,
+    SkillPointConvertResult,
     ResourceInfo,
     RankInfo,
     ShipInfo,
@@ -740,6 +742,8 @@ QByteArray clientDemandShipInfo(QDateTime timeUtc
                                             QTime(0, 0, 0)));
 QByteArray clientDemandShipInfoUser();
 QByteArray clientDemandSkillPoints(int);
+QByteArray clientConvertSkillPoints(int srcEquipId, int dstEquipId,
+                                    int64 amount);
 QByteArray clientDemandTech(int local = 0);
 QByteArray clientDevelop(int, bool convert = false, int factoryID = -1);
 QByteArray clientDoBattleNode(const QJsonObject &);
@@ -924,6 +928,9 @@ QByteArray serverShipInfo(const QJsonArray &, bool user = false,
 QByteArray serverShipDecorated(const QList<std::tuple<QUuid, int>> &);
 QByteArray serverShipModernized(const QList<std::tuple<QUuid, int>> &);
 QByteArray serverSkillPoints(int, int64, int64);
+QByteArray serverSkillPointConvertResult(int srcEquipId, int dstEquipId,
+                                         bool success, int64 newSrcSP,
+                                         int64 newDstSP);
 QByteArray serverSuccess();
 QByteArray serverTestMessages(int);
 QByteArray serverVerifyComplete();

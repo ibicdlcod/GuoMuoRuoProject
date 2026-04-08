@@ -135,6 +135,7 @@ MainWindow::MainWindow(QWidget *parent, int argc, char ** argv)
     newLoginScreen = new NewLoginS(this);
     factoryArea = new FactoryArea(this);
     techArea = new TechView(this);
+    navalAcademyArea = new NavalAcademyView(this);
     battleArea = new Sortie(this);
     fleetArea = new FleetView(this);
     repairArea = new Repair(this);
@@ -144,6 +145,7 @@ MainWindow::MainWindow(QWidget *parent, int argc, char ** argv)
     lay->addWidget(newLoginScreen);
     lay->addWidget(factoryArea);
     lay->addWidget(techArea);
+    lay->addWidget(navalAcademyArea);
     lay->addWidget(battleArea);
     lay->addWidget(fleetArea);
     lay->addWidget(repairArea);
@@ -219,6 +221,8 @@ void MainWindow::unlockBattle() {
                     &engine, &Client::backToNavalBase),
             connect(ui->actionView_Tech, &QAction::triggered,
                     &engine, &Client::switchToTech),
+            connect(ui->actionNaval_Academy, &QAction::triggered,
+                    this, &MainWindow::switchToNavalAcademy),
             connect(ui->actionRepair, &QAction::triggered,
                     &engine, &Client::switchToRepairView),
             connect(ui->actionDevelop_Equipment, &QAction::triggered,
@@ -416,6 +420,15 @@ void MainWindow::switchToFleet() {
     }
     adjust();
     /* TODO:ADD */
+}
+
+void MainWindow::switchToNavalAcademy() {
+    Client &engine = Client::getInstance();
+    if(!engine.loggedIn()) {
+        return;
+    }
+    lay->setCurrentWidget(navalAcademyArea);
+    adjust();
 }
 
 void MainWindow::switchToRank() {

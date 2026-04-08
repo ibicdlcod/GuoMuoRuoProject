@@ -3252,6 +3252,110 @@ relax_condition:
     return sonSkillPoints;
 }
 
+void Server::handleConvertSkillPoints(const CSteamID &uid,
+                                      QSslSocket *connection,
+                                      const QJsonObject &djson) {
+    int srcEquipId = djson["srcequipid"].toInt();
+    int dstEquipId = djson["dstequipid"].toInt();
+    qint64 amount = djson["amount"].toVariant().toLongLong();
+
+    if(!equipRegistry.contains(srcEquipId) ||
+       !equipRegistry.contains(dstEquipId)) {
+        qCritical() << qtTrId("convert-skillpoints-equip-not-found")
+                       .arg(srcEquipId).arg(dstEquipId);
+        QByteArray msg = KP::serverDevelopFailed(KP::DevelopNotExist);
+        senderM.sendMessage(connection, msg);
+        return;
+    }
+
+    Equipment *srcEquip = equipRegistry.value(srcEquipId);
+    Equipment *dstEquip = equipRegistry.value(dstEquipId);
+    if(srcEquip->isInvalid() || dstEquip->isInvalid()) {
+        qCritical() << qtTrId("convert-skillpoints-equip-not-found")
+                       .arg(srcEquipId).arg(dstEquipId);
+        QByteArray msg = KP::serverDevelopFailed(KP::DevelopNotExist);
+        senderM.sendMessage(connection, msg);
+        return;
+    }
+
+    if(srcEquipId == dstEquipId) {
+        qCritical() << qtTrId("convert-skillpoints-same-equipment")
+                       .arg(srcEquipId);
+        QByteArray msg = KP::serverDevelopFailed(KP::DevelopNotOption);
+        senderM.sendMessage(connection, msg);
+        return;
+    }
+
+    int motherId = dstEquip->attr.value("Mother", 0);
+    if(motherId != srcEquipId) {
+        qCritical() << qtTrId("convert-skillpoints-not-mother-child")
+                       .arg(srcEquipId).arg(dstEquipId);
+        QByteArray msg = KP::serverDevelopFailed(KP::DevelopNotOption);
+        senderM.sendMessage(connection, msg);
+        return;
+    }
+
+    if(amount <= 0) {
+        qCritical() << qtTrId("convert-skillpoints-invalid-amount")
+                       .arg(amount);
+        QByteArray msg = KP::serverDevelopFailed(KP::ResourceLack);
+        senderM.sendMessage(connection, msg);
+        return;
+    }
+
+    qint64 srcSP = User::getSkillPoints(uid, srcEquipId);
+    if(srcSP < amount) {
+        qCritical() << qtTrId("convert-skillpoints-insufficient")
+                       .arg(srcEquipId).arg(srcSP).arg(amount);
+        QByteArray msg = KP::serverDevelopFailed(KP::ResourceLack);
+        senderM.sendMessage(connection, msg);
+        return;
+    }
+
+    int64 srcStd = srcEquip->skillPointsStd();
+    int64 dstStd = dstEquip->skillPointsStd();
+    if(srcStd <= 0 || dstStd <= 0) {
+        qCritical() << qtTrId("convert-skillpoints-invalid-std")
+                       .arg(srcEquipId).arg(srcStd)
+                       .arg(dstEquipId).arg(dstStd);
+        QByteArray msg = KP::serverDevelopFailed(KP::DevelopNotExist);
+        senderM.sendMessage(connection, msg);
+        return;
+    }
+    if (srcStd > 0 &&
+        amount > std::numeric_limits<int64>::max() / srcStd) {
+        qCritical() << qtTrId("convert-skillpoints-overflow")
+                       .arg(srcEquipId).arg(amount).arg(srcStd);
+        QByteArray msg = KP::serverDevelopFailed(KP::ResourceLack);
+        senderM.sendMessage(connection, msg);
+        return;
+    }
+    int64 dstGained = (amount * srcStd) / dstStd;
+    if(dstGained == 0) dstGained = 1;
+
+    QSqlDatabase db = QSqlDatabase::database();
+    db.transaction();
+
+    try {
+        User::addSkillPoints(uid, srcEquipId, -amount);
+        User::addSkillPoints(uid, dstEquipId, dstGained);
+    } catch (DBError &e) {
+        db.rollback();
+        for(QString &i : e.whats()) { qCritical() << i; }
+        QByteArray msg = KP::serverDevelopFailed(KP::DevelopNotExist);
+        senderM.sendMessage(connection, msg);
+        return;
+    }
+
+    db.commit();
+
+    qint64 newSrcSP = User::getSkillPoints(uid, srcEquipId);
+    qint64 newDstSP = User::getSkillPoints(uid, dstEquipId);
+    QByteArray msg = KP::serverSkillPointConvertResult(
+        srcEquipId, dstEquipId, true, newSrcSP, newDstSP);
+    senderM.sendMessage(connection, msg);
+}
+
 QUuid Server::newShip(const CSteamID &uid, int shipId, bool direct) {
     Q_UNUSED(direct)
     int startingHP;
@@ -4024,6 +4128,10 @@ anti_ddos:
                         connection,
                         uid,
                         djson["equipid"].toInt());});
+    }
+        break;
+    case KP::CommandType::ConvertSkillPoints: {
+        handleConvertSkillPoints(uid, connection, djson);
     }
         break;
     case KP::CommandType::DemandResourceUpdate: {

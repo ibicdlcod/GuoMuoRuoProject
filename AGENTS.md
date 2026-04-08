@@ -20,6 +20,16 @@ For detailed system architecture documentation, see [doc/agents/architecture.md]
 
 For detailed build instructions including WSL detection and command-line alternatives, see [doc/agents/build.md](doc/agents/build.md).
 
+**WSL Detection:** Agents should automatically detect WSL environments using system checks:
+- Check `/proc/version` for "Microsoft" or "WSL" strings
+- Check for Windows mount points (`/mnt/c/`, `/mnt/wsl/`)
+- Check for WSL-specific files (`/proc/sys/fs/binfmt_misc/WSLInterop`)
+- Use `systemd-detect-virt` if available
+
+**In WSL:** Don't build unless you have confirmed Qt SDK and MSVC are properly installed. You may not be operating in a build environment (which could be in another directory in Windows filesystem). Compilation errors can often be ignored in WSL if Qt SDK or MSVC are missing.
+
+**In native Linux/Windows:** Build normally with `cmake --build build`.
+
 ## Lint & Test Commands
 
 No formal linting or testing frameworks are configured. However:

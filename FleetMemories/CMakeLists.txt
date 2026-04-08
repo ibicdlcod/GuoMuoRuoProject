@@ -176,6 +176,11 @@ set(CLIENT_SOURCES
     ClientGUI/ui/sortie/sortie.cpp
     ClientGUI/ui/sortie/sortie.h
     ClientGUI/ui/sortie/sortie.ui
+    ClientGUI/ui/navalacademyview.cpp
+    ClientGUI/ui/navalacademyview.h
+    ClientGUI/ui/navalacademyview.ui
+    ClientGUI/ui/tablewidgetitemnumber.cpp
+    ClientGUI/ui/tablewidgetitemnumber.h
     ClientGUI/ui/techview.cpp
     ClientGUI/ui/techview.h
     ClientGUI/ui/techview.ui
