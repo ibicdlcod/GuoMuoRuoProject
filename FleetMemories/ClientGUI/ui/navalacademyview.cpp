@@ -72,12 +72,8 @@ void NavalAcademyView::demandLocalTechForEquip(int equipId)
     if(equipId == 0) return;
 
     Client &engine = Client::getInstance();
-    engine.socket.flush();
     QByteArray msg = KP::clientDemandTech(equipId);
-    const qint64 written = engine.socket.write(msg);
-    if(written <= 0) {
-        throw NetworkError(engine.socket.errorString());
-    }
+    engine.sendInfo(msg);
 }
 
 void NavalAcademyView::demandSkillPointsForEquip(int equipId)
@@ -85,12 +81,8 @@ void NavalAcademyView::demandSkillPointsForEquip(int equipId)
     if(equipId == 0) return;
 
     Client &engine = Client::getInstance();
-    engine.socket.flush();
     QByteArray msg = KP::clientDemandSkillPoints(equipId);
-    const qint64 written = engine.socket.write(msg);
-    if(written <= 0) {
-        throw NetworkError(engine.socket.errorString());
-    }
+    engine.sendInfo(msg);
 }
 
 void NavalAcademyView::demandLocalTech(int index)

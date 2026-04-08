@@ -286,6 +286,12 @@ void Client::serverResponseStd(const QJsonObject &djson) {
     }
 }
 
+void Client::sendInfo(const QByteArray &msg) {
+    if(socket.state() == QAbstractSocket::ConnectedState && sender) {
+        sender->enqueue(msg);
+    }
+}
+
 void Client::setTicketCache(uint8 rgubTicket [], uint32 cubTicket) {
 }
 
