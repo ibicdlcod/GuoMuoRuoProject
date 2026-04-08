@@ -303,6 +303,16 @@ QByteArray KP::clientDemandSkillPoints(int equipId) {
     return QCborValue::fromJsonValue(result).toCbor();
 }
 
+QByteArray KP::clientConvertSkillPoints(int srcEquipId, int dstEquipId, int64 amount) {
+    QJsonObject result;
+    result["type"] = DgramType::Request;
+    result["command"] = CommandType::ConvertSkillPoints;
+    result["srcEquipId"] = srcEquipId;
+    result["dstEquipId"] = dstEquipId;
+    result["amount"] = (qint64)amount;
+    return QCborValue::fromJsonValue(result).toCbor();
+}
+
 QByteArray KP::clientDemandTech(int local) {
     QJsonObject result;
     result["type"] = DgramType::Request;
@@ -989,6 +999,16 @@ QByteArray KP::serverSkillPoints(int equipId,
     result["equipid"] = equipId;
     result["actualSP"] = (qint64)currentSP;
     result["desiredSP"] = (qint64)standardSP;
+    return QCborValue::fromJsonValue(result).toCbor();
+}
+
+QByteArray KP::serverSkillPointConvertResult(bool success, int64 newSrcSP, int64 newDstSP) {
+    QJsonObject result;
+    result["type"] = DgramType::Info;
+    result["infotype"] = InfoType::SkillPointConvertResult;
+    result["success"] = success;
+    result["newSrcSP"] = (qint64)newSrcSP;
+    result["newDstSP"] = (qint64)newDstSP;
     return QCborValue::fromJsonValue(result).toCbor();
 }
 
