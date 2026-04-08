@@ -3259,7 +3259,8 @@ void Server::handleConvertSkillPoints(const CSteamID &uid,
     int dstEquipId = djson["dstequipid"].toInt();
     qint64 amount = djson["amount"].toVariant().toLongLong();
 
-    if(!equipRegistry.contains(srcEquipId) || !equipRegistry.contains(dstEquipId)) {
+    if(!equipRegistry.contains(srcEquipId) ||
+       !equipRegistry.contains(dstEquipId)) {
         qCritical() << qtTrId("convert-skillpoints-equip-not-found")
                        .arg(srcEquipId).arg(dstEquipId);
         QByteArray msg = KP::serverDevelopFailed(KP::DevelopNotExist);
@@ -3273,6 +3274,14 @@ void Server::handleConvertSkillPoints(const CSteamID &uid,
         qCritical() << qtTrId("convert-skillpoints-equip-not-found")
                        .arg(srcEquipId).arg(dstEquipId);
         QByteArray msg = KP::serverDevelopFailed(KP::DevelopNotExist);
+        senderM.sendMessage(connection, msg);
+        return;
+    }
+
+    if(srcEquipId == dstEquipId) {
+        qCritical() << qtTrId("convert-skillpoints-same-equipment")
+                       .arg(srcEquipId);
+        QByteArray msg = KP::serverDevelopFailed(KP::DevelopNotOption);
         senderM.sendMessage(connection, msg);
         return;
     }
@@ -3305,6 +3314,21 @@ void Server::handleConvertSkillPoints(const CSteamID &uid,
 
     int64 srcStd = srcEquip->skillPointsStd();
     int64 dstStd = dstEquip->skillPointsStd();
+    if(srcStd <= 0 || dstStd <= 0) {
+        qCritical() << qtTrId("convert-skillpoints-invalid-std")
+                       .arg(srcEquipId).arg(srcStd).arg(dstEquipId).arg(dstStd);
+        QByteArray msg = KP::serverDevelopFailed(KP::DevelopNotExist);
+        senderM.sendMessage(connection, msg);
+        return;
+    }
+    if (srcStd > 0 &&
+        amount > std::numeric_limits<int64>::max() / srcStd) {
+        qCritical() << qtTrId("convert-skillpoints-overflow")
+                       .arg(srcEquipId).arg(amount).arg(srcStd);
+        QByteArray msg = KP::serverDevelopFailed(KP::ResourceLack);
+        senderM.sendMessage(connection, msg);
+        return;
+    }
     int64 dstGained = (amount * srcStd) / dstStd;
     if(dstGained == 0) dstGained = 1;
 
