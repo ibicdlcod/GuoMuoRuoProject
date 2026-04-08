@@ -43,67 +43,22 @@ Run the built executables directly for functional verification:
 
 ## Code Style Guidelines
 
-### General Rules
-1. **Don't change code by others than Harusoft Ltd.**
-2. **One True Brace Style** – opening braces on same line
-3. **80 character line limit** – no line (except Qt translation hints `//% "..."`) should exceed 80 chars when properly indented by Qt Creator
-4. **Sort function declarations/definitions** within same `public:`/`private:` section
-5. **Prefer `""ms` from `std::chrono::literals`** when passing arguments that might accept `std::chrono::` types
-6. **Use id-based translation and DBError** instead of bare QStringLiteral when reporting server database errors
+All code style conventions are defined in the **manual-of-style** skill. When writing or editing code, agents **must** load and follow the skill:
 
-### Header Ordering
-Headers must be ordered as follows (each section alphabetically):
-
-1. **Mandatory includes** – local `.h` files, `ui_*.h` (if applicable) for `.cpp`
-2. **Qt headers** – alphabetically
-3. **Standard library headers** – alphabetically  
-4. **User-written headers in project** – alphabetically
-
-Example from `clientv2.cpp`:
-```cpp
-#include "clientv2.h"
-
-#include <QCoreApplication>
-#include <QPasswordDigestor>
-#include <QSettings>
-#include <QThread>
-
-#include "../steam/isteamfriends.h"
-#include "../Protocol/commandline.h"
-#include "../Protocol/kp.h"
-#include "../Protocol/utility.h"
-#include "networkerror.h"
-#include "steamauth.h"
+```bash
+skill manual-of-style
 ```
 
-### CMakeLists.txt Conventions
-- Source file entries in `set()` lists (`CLIENT_SOURCES`, `SERVER_SOURCES`, `PROTOCOL_SOURCES`, etc.) must be in **alphabetical order by full path** (pure string sort: `.cpp` sorts before `.h`)
-- When adding a new file, insert it at the correct alphabetical position
+The skill covers:
+- General coding rules (brace style, line length, header ordering)
+- CMakeLists.txt conventions  
+- Documentation standards
+- Qt-specific rules and reserved keywords
+- Naming conventions (PascalCase, camelCase, etc.)
+- Error handling patterns and DBError usage
+- Database error handling with translation IDs
 
-### Documentation
-- Use `/* */` syntax for block comments
-- If code connects to content in `doc/worldview_and_mechanics/`, document the connection with corresponding `.md` file reference at top
-- Otherwise document normally
-- For implemented mechanics, add `[Implemented in Foo::Bar]` or `[Implemented in Foo::Bar#label]` for label-denoted blocks
-
-### Qt-Specific Rules
-- Use `qobject_cast` instead of `static_cast` when casting Qt object pointers (QObject-derived types)
-- **Never use Qt reserved keywords** (`signals`, `slots`, `emit`, `foreach`, `forever`, `Q_SIGNALS`, `Q_SLOTS`) as variable, parameter, or local names
-  - Rename conflicting identifiers (e.g., `slots` → `equipSlots`)
-
-### Naming Conventions (inferred from codebase)
-- **Class names**: PascalCase (`Client`, `Server`, `FleetInfo`)
-- **Function names**: camelCase (`doBuyMedal`, `offerResourceInfo`, `calculateTech`)
-- **Member variables**: camelCase (`attemptMode`, `logoutPending`, `gameState`)
-- **Constants**: snake_case or mixed (`mapIDDifficultyMask`, `steamRateLimit`)
-- **Namespaces**: UpperCase (`KP`, `LuaInit`)
-- **Enums**: PascalCase (`CommandType`, `InfoType`, `MsgType`)
-
-### Error Handling
-- Use `qWarning()`, `qInfo()`, `qCritical()` for logging
-- Return `bool` for success/failure where appropriate
-- For user-facing errors, server returns enum values (`KP::GameError`, `KP::FleetFailType`) and client localizes them
-- Never commit secrets/keys to repository
+Refer to the skill for detailed examples and complete guidelines.
 
 ## Important Directories
 
@@ -157,10 +112,11 @@ See `CLAUDE.md` for full schema details.
 When about to claim work is complete:
 - Run `cmake --build build` to ensure code compiles
 - If modifying CMakeLists.txt, verify configuration still works
-- Check no Qt reserved keywords introduced
-- Verify header ordering
-- Ensure 80-character line limit respected
-- No magic numbers – use constants from `KP::` namespace where appropriate
+- Ensure code follows manual-of-style skill conventions:
+  - No Qt reserved keywords introduced
+  - Header ordering correct
+  - 80-character line limit respected
+  - No magic numbers – use constants from `KP::` namespace where appropriate
 
 ## Git Workflow
 
