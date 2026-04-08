@@ -8,9 +8,12 @@
 
 #include "../clientv2.h"
 #include "../equipicon.h"
-#include "../networkerror.h">
+#include "../networkerror.h"
 
 using namespace std::chrono_literals;
+
+const int PERCENT_MAX = 100;
+const int PERCENT_MIN = 1;
 
 extern std::unique_ptr<QSettings> settings;
 
@@ -220,8 +223,8 @@ void NavalAcademyView::updateAmountFromSlider(int value)
 {
     // Map slider value (1-100) to percentage of availableSkillPoints
     if(availableSkillPoints > 0) {
-        int64 amount = (availableSkillPoints * value) / 100;
-        if(amount < 1) amount = 1;
+        int64 amount = (availableSkillPoints * value) / PERCENT_MAX;
+        if(amount < PERCENT_MIN) amount = PERCENT_MIN;
         ui->amountSpinBox->setValue(amount);
     }
 }
@@ -230,9 +233,9 @@ void NavalAcademyView::updateAmountFromSpinBox(int value)
 {
     // Map spinbox value to slider position (percentage)
     if(availableSkillPoints > 0) {
-        int percentage = (value * 100) / availableSkillPoints;
-        if(percentage < 1) percentage = 1;
-        if(percentage > 100) percentage = 100;
+        int percentage = (value * PERCENT_MAX) / availableSkillPoints;
+        if(percentage < PERCENT_MIN) percentage = PERCENT_MIN;
+        if(percentage > PERCENT_MAX) percentage = PERCENT_MAX;
         ui->amountSlider->setValue(percentage);
     }
     updateConvertButtonState();

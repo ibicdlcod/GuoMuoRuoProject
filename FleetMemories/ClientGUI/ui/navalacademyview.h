@@ -24,9 +24,9 @@ public:
 public slots:
     void demandLocalTech(int);
     void demandSkillPoints(int);
-    void updateSrcSkillPoints(const QJsonObject &);
     void updateDstSkillPoints(const QJsonObject &);
     void updateSkillPointConvertResult(const QJsonObject &);
+    void updateSrcSkillPoints(const QJsonObject &);
 
 signals:
     void skillPointInfo(int equipId, int skillPoint);
@@ -37,21 +37,21 @@ protected:
     void showEvent(QShowEvent *event) override;
 
 private slots:
-    void updateLocalTech(const QJsonObject &);
-    void updateLocalTechViewTable(const QJsonObject &);
-    void onSrcEquipSelected(int index);
-    void onDstEquipSelected(int index);
     void onConvertClicked();
+    void onDstEquipSelected(int index);
+    void onSrcEquipSelected(int index);
     void updateAmountFromSlider(int value);
     void updateAmountFromSpinBox(int value);
+    void updateLocalTech(const QJsonObject &);
+    void updateLocalTechViewTable(const QJsonObject &);
 
 private:
-    void resizeColumns(bool);
-    void filterDstEquipByMother(int motherId);
-    void updateConvertButtonState();
-    void resetEquipmentLists();
     void demandLocalTechForEquip(int equipId);
     void demandSkillPointsForEquip(int equipId);
+    void filterDstEquipByMother(int motherId);
+    void resetEquipmentLists();
+    void resizeColumns(bool);
+    void updateConvertButtonState();
 
     Ui::NavalAcademyView *ui;
     int currentSrcEquipId = 0;
