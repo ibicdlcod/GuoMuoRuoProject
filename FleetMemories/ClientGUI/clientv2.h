@@ -10,6 +10,7 @@
 #include "ui/factory/developwindow.h"
 #include "ui/factory/constructwindow.h"
 #include "ui/techview.h"
+#include "ui/navalacademyview.h"
 #include "ui/views/equipselect.h"
 #include "model/equipmodel.h"
 #include "model/specequipmodel.h"
@@ -76,8 +77,6 @@ public:
     friend void TechView::equipOrShip();
     friend void NavalAcademyView::demandLocalTech(int);
     friend void NavalAcademyView::demandSkillPoints(int);
-    friend void NavalAcademyView::filterDstEquipByMother(int);
-    friend void NavalAcademyView::resetEquipmentLists();
 
     int equipBigTypeIndex = 0;
     int equipIndex = 0;
