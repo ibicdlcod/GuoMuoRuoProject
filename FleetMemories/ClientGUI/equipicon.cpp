@@ -6,6 +6,7 @@
 #include <QColor>
 #include <QApplication>
 #include <QStyleHints>
+#include <algorithm>
 
 
 QIcon Icute::equipTypeIcon(EquipType type, bool isRound = false) {
@@ -68,9 +69,13 @@ QPixmap Icute::shipIcon(int oldInternalId) {
     for (int y = 0; y < image.height(); ++y) {
         for (int x = 0; x < image.width(); ++x) {
             QColor color = image.pixelColor(x, y);
-            int alpha =
-                std::hypot(x - image.width() / 2.0, y - image.width() / 2.0)
-                > image.width() / 2.0 ? 0 : color.alpha();
+            double dx = x - image.width() / 2.0;
+            double dy = y - image.width() / 2.0;
+            double distance = std::hypot(dx, dy);
+            double radius = image.width() / 2.0;
+            constexpr double feather = 0.5;
+            double factor = 1.0 - std::clamp((distance - radius + feather) / (2.0 * feather), 0.0, 1.0);
+            int alpha = static_cast<int>(color.alpha() * factor);
             color.setRgb(color.red(), color.green(), color.blue(), alpha);
             image.setPixelColor(x, y, color);
         }

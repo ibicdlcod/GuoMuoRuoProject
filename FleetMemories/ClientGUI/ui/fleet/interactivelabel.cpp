@@ -83,6 +83,8 @@ void InteractiveLabel::paintEvent(QPaintEvent * /* event */)
     int iconY = (this->height() - size) / 2;
 
     QPainter painter(this);
+    painter.setRenderHint(QPainter::SmoothPixmapTransform);
+    painter.setRenderHint(QPainter::Antialiasing);
     painter.drawPixmap(QRect(iconX, iconY, size, size),
                        pixmap.scaled(QSize(size, size),
                                      Qt::KeepAspectRatio,
@@ -109,6 +111,7 @@ void InteractiveLabel::paintEvent(QPaintEvent * /* event */)
         painter.drawPolygon(triangle);
 
         painter.setPen(Qt::black);
+        painter.setRenderHint(QPainter::TextAntialiasing);
         QFont f = painter.font();
         f.setPixelSize(std::max(base * 2 / 3, 8));
         f.setBold(true);
