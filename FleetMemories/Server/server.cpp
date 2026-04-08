@@ -3262,26 +3262,26 @@ void Server::handleConvertSkillPoints(const CSteamID &uid,
     if(!equipRegistry.contains(srcEquipId) || !equipRegistry.contains(dstEquipId)) {
         qCritical() << qtTrId("convert-skillpoints-equip-not-found")
                        .arg(srcEquipId).arg(dstEquipId);
-        qint64 srcSP = User::getSkillPoints(uid, srcEquipId);
-        qint64 dstSP = User::getSkillPoints(uid, dstEquipId);
-        QByteArray msg = KP::serverSkillPointConvertResult(
-            srcEquipId, dstEquipId, false, srcSP, dstSP);
+        QByteArray msg = KP::serverDevelopFailed(KP::DevelopNotExist);
         senderM.sendMessage(connection, msg);
         return;
     }
 
     Equipment *srcEquip = equipRegistry.value(srcEquipId);
     Equipment *dstEquip = equipRegistry.value(dstEquipId);
-    int srcMother = srcEquip->attr.value("Mother").toInt();
-    int dstMother = dstEquip->attr.value("Mother").toInt();
-    bool motherChild = (srcMother == dstEquipId) || (dstMother == srcEquipId);
-    if(!motherChild) {
+    if(srcEquip->isInvalid() || dstEquip->isInvalid()) {
+        qCritical() << qtTrId("convert-skillpoints-equip-not-found")
+                       .arg(srcEquipId).arg(dstEquipId);
+        QByteArray msg = KP::serverDevelopFailed(KP::DevelopNotExist);
+        senderM.sendMessage(connection, msg);
+        return;
+    }
+
+    int motherId = dstEquip->attr.value("Mother", 0);
+    if(motherId != srcEquipId) {
         qCritical() << qtTrId("convert-skillpoints-not-mother-child")
                        .arg(srcEquipId).arg(dstEquipId);
-        qint64 srcSP = User::getSkillPoints(uid, srcEquipId);
-        qint64 dstSP = User::getSkillPoints(uid, dstEquipId);
-        QByteArray msg = KP::serverSkillPointConvertResult(
-            srcEquipId, dstEquipId, false, srcSP, dstSP);
+        QByteArray msg = KP::serverDevelopFailed(KP::DevelopNotOption);
         senderM.sendMessage(connection, msg);
         return;
     }
@@ -3289,10 +3289,7 @@ void Server::handleConvertSkillPoints(const CSteamID &uid,
     if(amount <= 0) {
         qCritical() << qtTrId("convert-skillpoints-invalid-amount")
                        .arg(amount);
-        qint64 srcSP = User::getSkillPoints(uid, srcEquipId);
-        qint64 dstSP = User::getSkillPoints(uid, dstEquipId);
-        QByteArray msg = KP::serverSkillPointConvertResult(
-            srcEquipId, dstEquipId, false, srcSP, dstSP);
+        QByteArray msg = KP::serverDevelopFailed(KP::ResourceLack);
         senderM.sendMessage(connection, msg);
         return;
     }
@@ -3301,26 +3298,26 @@ void Server::handleConvertSkillPoints(const CSteamID &uid,
     if(srcSP < amount) {
         qCritical() << qtTrId("convert-skillpoints-insufficient")
                        .arg(srcEquipId).arg(srcSP).arg(amount);
-        qint64 dstSP = User::getSkillPoints(uid, dstEquipId);
-        QByteArray msg = KP::serverSkillPointConvertResult(
-            srcEquipId, dstEquipId, false, srcSP, dstSP);
+        QByteArray msg = KP::serverDevelopFailed(KP::ResourceLack);
         senderM.sendMessage(connection, msg);
         return;
     }
+
+    int64 srcStd = srcEquip->skillPointsStd();
+    int64 dstStd = dstEquip->skillPointsStd();
+    int64 dstGained = (amount * srcStd) / dstStd;
+    if(dstGained == 0) dstGained = 1;
 
     QSqlDatabase db = QSqlDatabase::database();
     db.transaction();
 
     try {
         User::addSkillPoints(uid, srcEquipId, -amount);
-        User::addSkillPoints(uid, dstEquipId, amount);
+        User::addSkillPoints(uid, dstEquipId, dstGained);
     } catch (DBError &e) {
         db.rollback();
         for(QString &i : e.whats()) { qCritical() << i; }
-        qint64 srcSPafter = User::getSkillPoints(uid, srcEquipId);
-        qint64 dstSPafter = User::getSkillPoints(uid, dstEquipId);
-        QByteArray msg = KP::serverSkillPointConvertResult(
-            srcEquipId, dstEquipId, false, srcSPafter, dstSPafter);
+        QByteArray msg = KP::serverDevelopFailed(KP::DevelopNotExist);
         senderM.sendMessage(connection, msg);
         return;
     }
