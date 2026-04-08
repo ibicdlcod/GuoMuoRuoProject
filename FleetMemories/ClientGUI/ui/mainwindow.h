@@ -12,6 +12,7 @@
 #include "port/newlogins.h"
 #include "factory/factoryarea.h"
 #include "techview.h"
+#include "navalacademyview.h"
 #include "sortie/sortie.h"
 #include "fleet/fleetview.h"
 #include "maintenance/repair.h"
@@ -71,6 +72,7 @@ private slots:
     void switchToDevelop();
     void showResourceGain();
     void switchToFleet();
+    void switchToNavalAcademy();
     void switchToRank();
     void switchToSortie();
     void updateColorScheme(Qt::ColorScheme colorscheme);
@@ -87,6 +89,7 @@ private:
     NewLoginS *newLoginScreen;
     PortArea *portArea;
     TechView *techArea;
+    NavalAcademyView *navalAcademyArea;
     Sortie *battleArea;
     FleetView *fleetArea;
     Repair *repairArea;
