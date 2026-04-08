@@ -118,16 +118,12 @@ void TechView::demandLocalTech(int index) {
     Client &engine = Client::getInstance();
     if(isEquipChoice) {
         for(auto &equipReg:
-             engine.equipRegistryCache) {
+             engine.getEquipRegistryCache()) {
             for(auto &name: equipReg->localNames) {
                 if(name.localeAwareCompare(ui->localListEquip->currentText())
                     == 0) {
-                    engine.socket.flush();
                     QByteArray msg = KP::clientDemandTech(equipReg->getId());
-                    const qint64 written = engine.socket.write(msg);
-                    if (written <= 0) {
-                        throw NetworkError(engine.socket.errorString());
-                    }
+                    engine.sendInfo(msg);
                     return;
                 }
             }
@@ -135,16 +131,12 @@ void TechView::demandLocalTech(int index) {
     }
     else {
         for(auto &shipReg:
-             engine.shipRegistryCache) {
+             engine.getShipRegistryCache()) {
             for(auto &name: shipReg->localNames) {
                 if(name.localeAwareCompare(ui->localListShip->currentText())
                     == 0) {
-                    engine.socket.flush();
                     QByteArray msg = KP::clientDemandTech(shipReg->getId());
-                    const qint64 written = engine.socket.write(msg);
-                    if (written <= 0) {
-                        throw NetworkError(engine.socket.errorString());
-                    }
+                    engine.sendInfo(msg);
                     return;
                 }
             }
@@ -158,17 +150,13 @@ void TechView::demandSkillPoints(int index) {
     if(isEquipChoice) {
         Client &engine = Client::getInstance();
         for(auto &equipReg:
-             engine.equipRegistryCache) {
+             engine.getEquipRegistryCache()) {
             for(auto &name: equipReg->localNames) {
                 if(name.compare(ui->localListEquip->currentText(),
                                  Qt::CaseInsensitive) == 0) {
-                    engine.socket.flush();
                     QByteArray msg =
                         KP::clientDemandSkillPoints(equipReg->getId());
-                    const qint64 written = engine.socket.write(msg);
-                    if (written <= 0) {
-                        throw NetworkError(engine.socket.errorString());
-                    }
+                    engine.sendInfo(msg);
                     return;
                 }
             }
@@ -431,7 +419,7 @@ void TechView::resetLocalListName() {
     if(isEquipChoice) {
         ui->localListEquip->clear();
         for(auto &equipReg:
-             Client::getInstance().equipRegistryCache) {
+             Client::getInstance().getEquipRegistryCache()) {
             if(
                 (ui->localListType1->currentText().
                      localeAwareCompare(qtTrId("all-equipments")) == 0
@@ -464,7 +452,7 @@ void TechView::resetLocalListName() {
             ui->localListClass->clear();
         }
         for(auto &shipReg:
-             Client::getInstance().shipRegistryCache) {
+             Client::getInstance().getShipRegistryCache()) {
             if(shipReg->isAmnesiac()) {
                 continue;
             }

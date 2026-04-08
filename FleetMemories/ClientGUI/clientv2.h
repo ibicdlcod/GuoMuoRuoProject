@@ -58,6 +58,8 @@ public:
     void enterBattle();
     QList<Equipment *> getStoreEquipment() const;
     bool isEquipRegistryCacheGood() const;
+    const QMap<int, Equipment *> &getEquipRegistryCache() const;
+    const QMap<int, Ship *> &getShipRegistryCache() const;
     bool isInBattle() const;
     bool isShipRegistryCacheGood() const;
     void leaveBattle();
@@ -71,12 +73,6 @@ public:
     friend void DevelopWindow::resetListName(int);
     friend void EquipSelect::reCalculateAvailableEquips(int);
     friend void ShipDefModel::addShips(QList<int>);
-    friend void TechView::demandLocalTech(int);
-    friend void TechView::demandSkillPoints(int);
-    friend void TechView::resetLocalListName();
-    friend void TechView::equipOrShip();
-    friend void NavalAcademyView::demandLocalTech(int);
-    friend void NavalAcademyView::demandSkillPoints(int);
 
     int equipBigTypeIndex = 0;
     int equipIndex = 0;

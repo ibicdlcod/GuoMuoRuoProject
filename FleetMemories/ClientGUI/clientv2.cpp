@@ -124,6 +124,14 @@ bool Client::isEquipRegistryCacheGood() const {
     return equipRegistryCacheGood;
 }
 
+const QMap<int, Equipment *> &Client::getEquipRegistryCache() const {
+    return equipRegistryCache;
+}
+
+const QMap<int, Ship *> &Client::getShipRegistryCache() const {
+    return shipRegistryCache;
+}
+
 bool Client::isShipRegistryCacheGood() const {
     return shipRegistryCacheGood;
 }

@@ -246,7 +246,7 @@ void NavalAcademyView::filterDstEquipByMother(int motherId)
     ui->dstEquipCombo->clear();
     if(motherId == 0) return;
 
-    for(auto &equipReg: Client::getInstance().equipRegistryCache) {
+    for(auto &equipReg: Client::getInstance().getEquipRegistryCache()) {
         int equipMotherId = equipReg->attr.value("Mother", 0);
         if(equipMotherId == motherId) {
             QString equipName = equipReg->toString(
@@ -279,7 +279,7 @@ void NavalAcademyView::resetEquipmentLists()
     ui->srcEquipCombo->clear();
     ui->dstEquipCombo->clear();
 
-    for(auto &equipReg: Client::getInstance().equipRegistryCache) {
+    for(auto &equipReg: Client::getInstance().getEquipRegistryCache()) {
         // Skip virtual equipment
         if(equipReg->type.getDisplayGroup()
                 .compare("VIRTUAL", Qt::CaseInsensitive) == 0) {
