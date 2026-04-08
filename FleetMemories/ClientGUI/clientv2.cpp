@@ -132,6 +132,14 @@ const QMap<int, Ship *> &Client::getShipRegistryCache() const {
     return shipRegistryCache;
 }
 
+double Client::getTechCacheValue(int jobid) const {
+    return techCache.value(jobid, 0.0);
+}
+
+void Client::setTechCacheValue(int jobid, double value) {
+    techCache[jobid] = value;
+}
+
 bool Client::isShipRegistryCacheGood() const {
     return shipRegistryCacheGood;
 }

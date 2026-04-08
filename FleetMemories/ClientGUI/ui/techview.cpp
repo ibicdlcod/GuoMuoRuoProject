@@ -186,7 +186,7 @@ void TechView::updateGlobalTech(const QJsonObject &djson) {
     ui->globalTechValue->setText(
         QString::number(djson.value("value").toDouble()));
     Client &engine = Client::getInstance();
-    engine.techCache[0] = djson.value("value").toDouble();
+    engine.setTechCacheValue(0, djson.value("value").toDouble());
 }
 
 void TechView::updateGlobalTechViewTable(const QJsonObject &djson) {
@@ -301,8 +301,8 @@ void TechView::updateLocalTech(const QJsonObject &djson) {
     ui->localTechValue->setText(
         QString::number(djson.value("value").toDouble()));
     Client &engine = Client::getInstance();
-    engine.techCache[djson["jobid"].toInt()]
-        = djson.value("value").toDouble();
+    engine.setTechCacheValue(djson["jobid"].toInt(),
+        djson.value("value").toDouble());
 }
 
 void TechView::updateLocalTechViewTable(const QJsonObject &djson) {

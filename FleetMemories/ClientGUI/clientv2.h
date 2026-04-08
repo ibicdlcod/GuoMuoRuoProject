@@ -60,6 +60,8 @@ public:
     bool isEquipRegistryCacheGood() const;
     const QMap<int, Equipment *> &getEquipRegistryCache() const;
     const QMap<int, Ship *> &getShipRegistryCache() const;
+    double getTechCacheValue(int jobid) const;
+    void setTechCacheValue(int jobid, double value);
     bool isInBattle() const;
     bool isShipRegistryCacheGood() const;
     void leaveBattle();
