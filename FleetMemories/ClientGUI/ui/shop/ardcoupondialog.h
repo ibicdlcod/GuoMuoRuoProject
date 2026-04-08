@@ -16,6 +16,9 @@ class ARDCouponDialog : public QDialog {
 public:
     explicit ARDCouponDialog(QWidget *parent = nullptr);
 
+protected:
+    void showEvent(QShowEvent *event) override;
+
 private slots:
     void onPackageSelected(int id);
     void purchase();

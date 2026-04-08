@@ -14,6 +14,9 @@ class MedalBuyDialog : public QDialog {
 public:
     explicit MedalBuyDialog(QWidget *parent = nullptr);
 
+protected:
+    void showEvent(QShowEvent *event) override;
+
 private slots:
     void onAmountChanged(int amount);
     void purchase();

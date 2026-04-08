@@ -15,6 +15,7 @@
 #include <QLabel>
 #include <QPainter>
 #include <QProgressBar>
+#include <QShowEvent>
 #include <QStyleHints>
 #include <QVBoxLayout>
 
@@ -472,5 +473,13 @@ void ShipAttrDialog::refreshAttrs()
         } else {
             mulLabels_[i]->setText("");
         }
+    }
+}
+
+void ShipAttrDialog::showEvent(QShowEvent *event) {
+    QDialog::showEvent(event);
+    QScreen *currentScreen = screen();
+    if (currentScreen) {
+        move(currentScreen->availableGeometry().center() - rect().center());
     }
 }

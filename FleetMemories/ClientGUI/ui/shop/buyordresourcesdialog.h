@@ -16,6 +16,9 @@ class BuyOrdResourcesDialog : public QDialog {
 public:
     explicit BuyOrdResourcesDialog(QWidget *parent = nullptr);
 
+protected:
+    void showEvent(QShowEvent *event) override;
+
 private slots:
     void purchase();
     void updatePreview();

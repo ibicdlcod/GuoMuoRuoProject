@@ -3651,8 +3651,8 @@ void Server::receivedLogin(const CSteamID &uid,
         QSqlQuery insert;
         if(!insert.prepare("INSERT INTO NewUsers (UserID, UserType) "
                            "VALUES (:uid, :type);")) {
-            //% "%1: Add user failure!"
             connection->disconnectFromHost();
+            //% "%1: Add user failure!"
             throw DBError(qtTrId("add-user-fail").arg(uidInt),
                           insert.lastError(), insert.lastQuery());
         }

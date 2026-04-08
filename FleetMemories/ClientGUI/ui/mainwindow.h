@@ -48,6 +48,7 @@ signals:
 
 protected:
     void resizeEvent(QResizeEvent *) override;
+    void showEvent(QShowEvent *event) override;
 
 private slots:
     void adjust(int dummy = 0);
@@ -78,6 +79,7 @@ private slots:
 private:
     Ui::MainWindow *ui;
     bool pwConfirmMode = false;
+    bool m_firstShow = true;
     QList<FactorySlot *> slotfs;
 
     FactoryArea *factoryArea;

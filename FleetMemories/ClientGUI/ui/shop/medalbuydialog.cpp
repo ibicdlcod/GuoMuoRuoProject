@@ -7,6 +7,7 @@
 #include <QFormLayout>
 #include <QPushButton>
 #include <QVBoxLayout>
+#include <QShowEvent>
 
 #include "../../../Protocol/kp.h"
 #include "../../clientv2.h"
@@ -78,4 +79,12 @@ void MedalBuyDialog::purchase() {
     Client &engine = Client::getInstance();
     engine.doBuyMedal(amountBox->value());
     accept();
+}
+
+void MedalBuyDialog::showEvent(QShowEvent *event) {
+    QDialog::showEvent(event);
+    QScreen *currentScreen = screen();
+    if (currentScreen) {
+        move(currentScreen->availableGeometry().center() - rect().center());
+    }
 }

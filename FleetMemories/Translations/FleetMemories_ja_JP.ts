@@ -5,7 +5,7 @@
     <name></name>
     <message id="licence-not-found">
         <location filename="../Protocol/commandline.cpp" line="149"/>
-        <location filename="../ClientGUI/ui/mainwindow.cpp" line="105"/>
+        <location filename="../ClientGUI/ui/mainwindow.cpp" line="107"/>
         <location filename="../ClientGUI/ui/port/licensearea.cpp" line="35"/>
         <source>Can&apos;t find license file, exiting.</source>
         <translation type="unfinished">ライセンスファイルが見つかりません。終了します。</translation>
@@ -3826,7 +3826,7 @@ Great at battle and bad at politics--so cool!</source>
     <message id="lv-display">
         <location filename="../ClientGUI/ui/fleet/shipdisplay.cpp" line="70"/>
         <location filename="../ClientGUI/ui/fleet/shipdisplayflat.cpp" line="58"/>
-        <location filename="../ClientGUI/ui/fleet/shipattrdialog.cpp" line="164"/>
+        <location filename="../ClientGUI/ui/fleet/shipattrdialog.cpp" line="165"/>
         <source>Lv %1</source>
         <translation type="unfinished">輸送部隊</translation>
     </message>
@@ -3918,12 +3918,12 @@ Great at battle and bad at politics--so cool!</source>
         <translation type="unfinished">%1タ</translation>
     </message>
     <message id="settings-key">
-        <location filename="../ClientGUI/ui/settingswindow.cpp" line="31"/>
+        <location filename="../ClientGUI/ui/settingswindow.cpp" line="32"/>
         <source>Key</source>
         <translation type="unfinished">%1ク</translation>
     </message>
     <message id="settings-value">
-        <location filename="../ClientGUI/ui/settingswindow.cpp" line="33"/>
+        <location filename="../ClientGUI/ui/settingswindow.cpp" line="34"/>
         <source>Value</source>
         <translation type="unfinished">キー</translation>
     </message>
@@ -3996,44 +3996,44 @@ Great at battle and bad at politics--so cool!</source>
         <translation type="unfinished">計算中…</translation>
     </message>
     <message id="ard-dialog-title">
-        <location filename="../ClientGUI/ui/shop/ardcoupondialog.cpp" line="20"/>
+        <location filename="../ClientGUI/ui/shop/ardcoupondialog.cpp" line="21"/>
         <source>Buy ARD Coupons</source>
         <translation type="unfinished">装備要請</translation>
     </message>
     <message id="ard-dialog-desc">
-        <location filename="../ClientGUI/ui/shop/ardcoupondialog.cpp" line="25"/>
+        <location filename="../ClientGUI/ui/shop/ardcoupondialog.cpp" line="26"/>
         <source>Useful for elite admirals, who may want to do risky attacks or decorate their ship.</source>
         <oldsource>Useful for elite admirals, who may want to do risky attacks or decorate their ship</oldsource>
         <translation type="unfinished">ARDクーポン購入</translation>
     </message>
     <message id="ard-package-select">
-        <location filename="../ClientGUI/ui/shop/ardcoupondialog.cpp" line="30"/>
+        <location filename="../ClientGUI/ui/shop/ardcoupondialog.cpp" line="31"/>
         <source>Select a package</source>
         <translation type="unfinished">危険な作戦や艦船の殊勲を行いたい精鋭提督向けです。</translation>
     </message>
     <message id="ard-package-option">
-        <location filename="../ClientGUI/ui/shop/ardcoupondialog.cpp" line="41"/>
+        <location filename="../ClientGUI/ui/shop/ardcoupondialog.cpp" line="42"/>
         <source>%1 ARD Coupons — HK$ %2</source>
         <translation type="unfinished">パッケージを選択</translation>
     </message>
     <message id="ard-custom-label">
-        <location filename="../ClientGUI/ui/shop/ardcoupondialog.cpp" line="51"/>
+        <location filename="../ClientGUI/ui/shop/ardcoupondialog.cpp" line="52"/>
         <source>Custom:</source>
         <translation type="unfinished">%1 ARDクーポン — HK$ %2</translation>
     </message>
     <message id="ard-price-label">
-        <location filename="../ClientGUI/ui/shop/ardcoupondialog.cpp" line="67"/>
+        <location filename="../ClientGUI/ui/shop/ardcoupondialog.cpp" line="68"/>
         <source>Price:</source>
         <translation type="unfinished">カスタム：</translation>
     </message>
     <message id="ard-price-display">
-        <location filename="../ClientGUI/ui/shop/ardcoupondialog.cpp" line="104"/>
+        <location filename="../ClientGUI/ui/shop/ardcoupondialog.cpp" line="105"/>
         <source>HK$ %1</source>
         <oldsource>HK$%1</oldsource>
         <translation type="unfinished">価格：</translation>
     </message>
     <message id="ard-purchase-btn">
-        <location filename="../ClientGUI/ui/shop/ardcoupondialog.cpp" line="75"/>
+        <location filename="../ClientGUI/ui/shop/ardcoupondialog.cpp" line="76"/>
         <source>Purchase</source>
         <translation type="unfinished">HK$ %1</translation>
     </message>
@@ -4043,129 +4043,129 @@ Great at battle and bad at politics--so cool!</source>
         <translation type="unfinished">購入</translation>
     </message>
     <message id="shop-buy-equip-title">
-        <location filename="../ClientGUI/ui/shop/buyequipdialog.cpp" line="16"/>
+        <location filename="../ClientGUI/ui/shop/buyequipdialog.cpp" line="17"/>
         <source>Buy Equipment</source>
         <translation type="unfinished">泊地</translation>
     </message>
     <message id="shop-ard-balance">
-        <location filename="../ClientGUI/ui/shop/buyequipdialog.cpp" line="23"/>
-        <location filename="../ClientGUI/ui/shop/buyordresourcesdialog.cpp" line="26"/>
+        <location filename="../ClientGUI/ui/shop/buyequipdialog.cpp" line="24"/>
+        <location filename="../ClientGUI/ui/shop/buyordresourcesdialog.cpp" line="27"/>
         <source>ARD Coupons: %1</source>
         <translation type="unfinished">装備購入</translation>
     </message>
     <message id="shop-buy-ord-res-title">
-        <location filename="../ClientGUI/ui/shop/buyordresourcesdialog.cpp" line="19"/>
+        <location filename="../ClientGUI/ui/shop/buyordresourcesdialog.cpp" line="20"/>
         <source>Buy Ordinary Resources</source>
         <translation>基本資源購入</translation>
     </message>
     <message id="shop-ord-res-resource-label">
-        <location filename="../ClientGUI/ui/shop/buyordresourcesdialog.cpp" line="29"/>
+        <location filename="../ClientGUI/ui/shop/buyordresourcesdialog.cpp" line="30"/>
         <source>Resource:</source>
         <translation>資源：</translation>
     </message>
     <message id="res-name-oil">
-        <location filename="../ClientGUI/ui/shop/buyordresourcesdialog.cpp" line="37"/>
+        <location filename="../ClientGUI/ui/shop/buyordresourcesdialog.cpp" line="38"/>
         <source>Oil</source>
         <translation>重油</translation>
     </message>
     <message id="res-name-explo">
-        <location filename="../ClientGUI/ui/shop/buyordresourcesdialog.cpp" line="39"/>
+        <location filename="../ClientGUI/ui/shop/buyordresourcesdialog.cpp" line="40"/>
         <source>Explosives</source>
         <translation>弾薬</translation>
     </message>
     <message id="res-name-steel">
-        <location filename="../ClientGUI/ui/shop/buyordresourcesdialog.cpp" line="41"/>
+        <location filename="../ClientGUI/ui/shop/buyordresourcesdialog.cpp" line="42"/>
         <source>Steel</source>
         <translation>鋼材</translation>
     </message>
     <message id="res-name-rubber">
-        <location filename="../ClientGUI/ui/shop/buyordresourcesdialog.cpp" line="43"/>
+        <location filename="../ClientGUI/ui/shop/buyordresourcesdialog.cpp" line="44"/>
         <source>Rubber</source>
         <translation>ゴム</translation>
     </message>
     <message id="res-name-aluminum">
-        <location filename="../ClientGUI/ui/shop/buyordresourcesdialog.cpp" line="45"/>
+        <location filename="../ClientGUI/ui/shop/buyordresourcesdialog.cpp" line="46"/>
         <source>Aluminum</source>
         <translation>アルミ</translation>
     </message>
     <message id="res-name-tungsten">
-        <location filename="../ClientGUI/ui/shop/buyordresourcesdialog.cpp" line="47"/>
+        <location filename="../ClientGUI/ui/shop/buyordresourcesdialog.cpp" line="48"/>
         <source>Tungsten</source>
         <translation>タングステン</translation>
     </message>
     <message id="res-name-chromium">
-        <location filename="../ClientGUI/ui/shop/buyordresourcesdialog.cpp" line="49"/>
+        <location filename="../ClientGUI/ui/shop/buyordresourcesdialog.cpp" line="50"/>
         <source>Chromium</source>
         <translation>クロム</translation>
     </message>
     <message id="shop-ord-res-rate">
-        <location filename="../ClientGUI/ui/shop/buyordresourcesdialog.cpp" line="104"/>
+        <location filename="../ClientGUI/ui/shop/buyordresourcesdialog.cpp" line="105"/>
         <source>Rate: %1 per ARD Coupon</source>
         <translation>レート：クーポン1枚につき%1</translation>
     </message>
     <message id="shop-ord-res-coupons-label">
-        <location filename="../ClientGUI/ui/shop/buyordresourcesdialog.cpp" line="66"/>
+        <location filename="../ClientGUI/ui/shop/buyordresourcesdialog.cpp" line="67"/>
         <source>ARD Coupons to spend:</source>
         <translation>消費するARDクーポン数：</translation>
     </message>
     <message id="shop-ord-res-receive">
-        <location filename="../ClientGUI/ui/shop/buyordresourcesdialog.cpp" line="106"/>
+        <location filename="../ClientGUI/ui/shop/buyordresourcesdialog.cpp" line="107"/>
         <source>You will receive: %1</source>
         <translation>取得数量：%1</translation>
     </message>
     <message id="shop-equip-list-label">
-        <location filename="../ClientGUI/ui/shop/buyequipdialog.cpp" line="26"/>
+        <location filename="../ClientGUI/ui/shop/buyequipdialog.cpp" line="27"/>
         <source>Available equipment:</source>
         <translation type="unfinished">ARDクーポン：%1</translation>
     </message>
     <message id="shop-equip-item">
-        <location filename="../ClientGUI/ui/shop/buyequipdialog.cpp" line="43"/>
+        <location filename="../ClientGUI/ui/shop/buyequipdialog.cpp" line="44"/>
         <source>%1 — %2 ARD Coupons (Owned: %3)</source>
         <translation type="unfinished">購入可能な装備：</translation>
     </message>
     <message id="shop-buy-btn">
-        <location filename="../ClientGUI/ui/shop/buyequipdialog.cpp" line="59"/>
-        <location filename="../ClientGUI/ui/shop/buyordresourcesdialog.cpp" line="78"/>
+        <location filename="../ClientGUI/ui/shop/buyequipdialog.cpp" line="60"/>
+        <location filename="../ClientGUI/ui/shop/buyordresourcesdialog.cpp" line="79"/>
         <source>Buy</source>
         <translation type="unfinished">%1 — %2 ARDクーポン（所持数：%3）</translation>
     </message>
     <message id="shop-equip-price">
-        <location filename="../ClientGUI/ui/shop/buyequipdialog.cpp" line="84"/>
+        <location filename="../ClientGUI/ui/shop/buyequipdialog.cpp" line="85"/>
         <source>Price: %1 ARD Coupons</source>
         <translation type="unfinished">購入</translation>
     </message>
     <message id="medal-dialog-title">
-        <location filename="../ClientGUI/ui/shop/medalbuydialog.cpp" line="17"/>
+        <location filename="../ClientGUI/ui/shop/medalbuydialog.cpp" line="18"/>
         <source>Buy Medals</source>
         <translation type="unfinished">価格：%1 ARDクーポン</translation>
     </message>
     <message id="medal-coupon-balance">
-        <location filename="../ClientGUI/ui/shop/medalbuydialog.cpp" line="24"/>
+        <location filename="../ClientGUI/ui/shop/medalbuydialog.cpp" line="25"/>
         <source>Current ARD Coupons: %1</source>
         <translation type="unfinished">勲章購入</translation>
     </message>
     <message id="medal-current-count">
-        <location filename="../ClientGUI/ui/shop/medalbuydialog.cpp" line="30"/>
+        <location filename="../ClientGUI/ui/shop/medalbuydialog.cpp" line="31"/>
         <source>Current Medals: %1</source>
         <translation type="unfinished">現在のARDクーポン：%1</translation>
     </message>
     <message id="medal-amount-label">
-        <location filename="../ClientGUI/ui/shop/medalbuydialog.cpp" line="43"/>
+        <location filename="../ClientGUI/ui/shop/medalbuydialog.cpp" line="44"/>
         <source>Amount:</source>
         <translation type="unfinished">現在の勲章：%1</translation>
     </message>
     <message id="medal-cost-label">
-        <location filename="../ClientGUI/ui/shop/medalbuydialog.cpp" line="47"/>
+        <location filename="../ClientGUI/ui/shop/medalbuydialog.cpp" line="48"/>
         <source>Cost:</source>
         <translation type="unfinished">数量：</translation>
     </message>
     <message id="medal-purchase-btn">
-        <location filename="../ClientGUI/ui/shop/medalbuydialog.cpp" line="53"/>
+        <location filename="../ClientGUI/ui/shop/medalbuydialog.cpp" line="54"/>
         <source>Purchase</source>
         <translation type="unfinished">費用：</translation>
     </message>
     <message id="medal-cost-display">
-        <location filename="../ClientGUI/ui/shop/medalbuydialog.cpp" line="73"/>
+        <location filename="../ClientGUI/ui/shop/medalbuydialog.cpp" line="74"/>
         <source>%1 ARD Coupons</source>
         <translation type="unfinished">購入</translation>
     </message>
@@ -4220,17 +4220,17 @@ Great at battle and bad at politics--so cool!</source>
         <translation type="unfinished">旗艦生存時夜戦</translation>
     </message>
     <message id="mod-star-display">
-        <location filename="../ClientGUI/ui/fleet/shipattrdialog.cpp" line="169"/>
+        <location filename="../ClientGUI/ui/fleet/shipattrdialog.cpp" line="170"/>
         <source>★+%1/%2</source>
         <translation>★+%1/%2</translation>
     </message>
     <message id="eff-display">
-        <location filename="../ClientGUI/ui/fleet/shipattrdialog.cpp" line="172"/>
+        <location filename="../ClientGUI/ui/fleet/shipattrdialog.cpp" line="173"/>
         <source>Eff %1%</source>
         <translation>効率 %1%</translation>
     </message>
     <message id="lv-progress">
-        <location filename="../ClientGUI/ui/fleet/shipattrdialog.cpp" line="380"/>
+        <location filename="../ClientGUI/ui/fleet/shipattrdialog.cpp" line="381"/>
         <source>Lv Progress</source>
         <translation>Lv進捗</translation>
     </message>

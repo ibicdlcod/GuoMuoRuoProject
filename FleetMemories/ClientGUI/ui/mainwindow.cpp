@@ -8,6 +8,7 @@
 #include <QSettings>
 #include <QResizeEvent>
 #include <QScreen>
+#include <QShowEvent>
 #include <QStyleHints>
 #include <QScrollBar>
 #include <QMessageBox>
@@ -38,7 +39,8 @@ MainWindow::MainWindow(QWidget *parent, int argc, char ** argv)
     ui->MainArea->setStyleSheet("QWidget#mainArea { border-style: none }");
     lay = new QStackedLayout();
 
-    move(screen()->availableGeometry().center() - rect().center());
+    /* Window centering moved to showEvent() because screen() and rect()
+     * may not be accurate during construction on Linux */
 
     ui->ResourcesBar->hide();
     ui->OilLabel->setPixmap(QPixmap(QStringLiteral(
@@ -475,6 +477,17 @@ void MainWindow::updateResources(const QJsonObject &djson) {
     ui->AluminumCount->setText(QString::number(djson["al"].toInt()));
     ui->TungstenCount->setText(QString::number(djson["w"].toInt()));
     ui->ChromiumCount->setText(QString::number(djson["cr"].toInt()));
+}
+
+void MainWindow::showEvent(QShowEvent *event) {
+    if (m_firstShow) {
+        m_firstShow = false;
+        QScreen *currentScreen = screen();
+        if (currentScreen) {
+            move(currentScreen->availableGeometry().center() - rect().center());
+        }
+    }
+    QMainWindow::showEvent(event);
 }
 
 /* reimplement */

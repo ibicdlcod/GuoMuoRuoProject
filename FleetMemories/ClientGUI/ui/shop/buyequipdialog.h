@@ -15,6 +15,9 @@ class BuyEquipDialog : public QDialog {
 public:
     explicit BuyEquipDialog(QWidget *parent = nullptr);
 
+protected:
+    void showEvent(QShowEvent *event) override;
+
 private slots:
     void purchase();
     void selectionChanged();

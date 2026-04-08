@@ -10,6 +10,7 @@
 #include <QPushButton>
 #include <QRadioButton>
 #include <QVBoxLayout>
+#include <QShowEvent>
 
 #include "../../../Protocol/kp.h"
 #include "../../clientv2.h"
@@ -111,4 +112,12 @@ void ARDCouponDialog::purchase() {
     Client &engine = Client::getInstance();
     engine.initARDPurchase(units);
     accept();
+}
+
+void ARDCouponDialog::showEvent(QShowEvent *event) {
+    QDialog::showEvent(event);
+    QScreen *currentScreen = screen();
+    if (currentScreen) {
+        move(currentScreen->availableGeometry().center() - rect().center());
+    }
 }

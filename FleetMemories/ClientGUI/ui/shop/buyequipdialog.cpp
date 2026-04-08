@@ -6,6 +6,7 @@
 #include <QDialogButtonBox>
 #include <QLabel>
 #include <QVBoxLayout>
+#include <QShowEvent>
 
 #include "../../clientv2.h"
 #include "../../equipicon.h"
@@ -92,4 +93,12 @@ void BuyEquipDialog::purchase() {
     Client &engine = Client::getInstance();
     engine.doBuyFromStore(equipId);
     accept();
+}
+
+void BuyEquipDialog::showEvent(QShowEvent *event) {
+    QDialog::showEvent(event);
+    QScreen *currentScreen = screen();
+    if (currentScreen) {
+        move(currentScreen->availableGeometry().center() - rect().center());
+    }
 }

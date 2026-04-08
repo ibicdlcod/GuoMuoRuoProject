@@ -9,6 +9,7 @@
 #include <QHBoxLayout>
 #include <QRadioButton>
 #include <QVBoxLayout>
+#include <QShowEvent>
 
 #include "../../../Protocol/kp.h"
 #include "../../clientv2.h"
@@ -113,4 +114,12 @@ void BuyOrdResourcesDialog::purchase() {
     int coupons = couponsBox->value();
     Client::getInstance().doBuyOrdinaryResources(attr, coupons);
     accept();
+}
+
+void BuyOrdResourcesDialog::showEvent(QShowEvent *event) {
+    QDialog::showEvent(event);
+    QScreen *currentScreen = screen();
+    if (currentScreen) {
+        move(currentScreen->availableGeometry().center() - rect().center());
+    }
 }

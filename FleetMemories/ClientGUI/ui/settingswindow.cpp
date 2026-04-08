@@ -2,6 +2,7 @@
 #include "ui_settingswindow.h"
 
 #include <QLocale>
+#include <QScreen>
 #include <QScrollBar>
 #include <QSettings>
 
@@ -79,6 +80,10 @@ void SettingsWindow::showEvent(QShowEvent *event) {
     hH->resizeSection(hH->logicalIndex(1),
                       hH->sectionSize(hH->logicalIndex(1))
                           + outerTableWidth - innerTableWidth);
+    QScreen *currentScreen = screen();
+    if (currentScreen) {
+        move(currentScreen->availableGeometry().center() - rect().center());
+    }
 }
 
 void SettingsWindow::handleCellChange(int row, int column) {

@@ -40,6 +40,9 @@ public:
                             FleetView *fleetView,
                             QWidget *parent = nullptr);
 
+protected:
+    void showEvent(QShowEvent *event) override;
+
 private slots:
     void onEquipModified(QUuid shipUid, int equipSlotIndex, QUuid equipUid);
 
