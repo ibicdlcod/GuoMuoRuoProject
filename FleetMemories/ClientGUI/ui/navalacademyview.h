@@ -51,6 +51,8 @@ private:
     void demandSkillPointsForEquip(int equipId);
     void filterDstEquipByMother(int motherId);
     void resetEquipmentLists();
+    void resetSrcEquipmentList();
+    void resetDstEquipmentList();
     void resizeColumns(bool);
     void updateConvertButtonState();
 

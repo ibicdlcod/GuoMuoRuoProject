@@ -9,6 +9,7 @@
 #include "../clientv2.h"
 #include "../equipicon.h"
 #include "../networkerror.h"
+#include "../../Protocol/equiptype.h"
 
 using namespace std::chrono_literals;
 
@@ -28,8 +29,8 @@ NavalAcademyView::NavalAcademyView(QWidget *parent) :
     // Left panel connections (source)
     connect(&engine, &Client::receivedLocalTechInfo,
             this, &NavalAcademyView::updateLocalTech);
-    connect(&engine, &Client::receivedLocalTechInfo2,
-            this, &NavalAcademyView::updateLocalTechViewTable);
+    //connect(&engine, &Client::receivedLocalTechInfo2,
+    //        this, &NavalAcademyView::updateLocalTechViewTable);
     connect(&engine, &Client::receivedSkillPointInfo,
             this, &NavalAcademyView::updateSrcSkillPoints);
 
@@ -45,6 +46,10 @@ NavalAcademyView::NavalAcademyView(QWidget *parent) :
             this, &NavalAcademyView::onSrcEquipSelected);
     connect(ui->dstEquipCombo, &QComboBox::activated,
             this, &NavalAcademyView::onDstEquipSelected);
+    
+    // Equipment type filtering
+    connect(ui->srcListType1, &QComboBox::activated,
+            this, &NavalAcademyView::resetSrcEquipmentList);
 
     // Conversion controls
     connect(ui->convertButton, &QPushButton::clicked,
@@ -58,6 +63,16 @@ NavalAcademyView::NavalAcademyView(QWidget *parent) :
     ui->srcShipToggle->hide();
     ui->dstShipToggle->hide();
 
+    // Initialize equipment type lists
+    QList<QString> sortedGroups = EquipType::getDisplayGroupsSorted();
+    for(auto &equipType: sortedGroups) {
+        if(equipType.compare("VIRTUAL", Qt::CaseInsensitive) == 0)
+            continue;
+        ui->srcListType1->addItem(equipType);
+    }
+    //% "All equipments"
+    ui->srcListType1->addItem(qtTrId("all-equipments"));
+    
     // Initialize equipment lists
     resetEquipmentLists();
 }
@@ -87,9 +102,32 @@ void NavalAcademyView::demandSkillPointsForEquip(int equipId)
 
 void NavalAcademyView::demandLocalTech(int index)
 {
-    if(index < 0) return;
-    int equipId = ui->srcEquipCombo->itemData(index).toInt();
-    demandLocalTechForEquip(equipId);
+    Q_UNUSED(index)
+
+    Client &engine = Client::getInstance();
+    if(!engine.isEquipRegistryCacheGood()) {
+        return;
+    }
+    for(auto &equipReg:
+         engine.getEquipRegistryCache()) {
+        for(auto &name: equipReg->localNames) {
+            if(name.isEmpty()) {
+                continue;
+            }
+            if(name.localeAwareCompare(ui->srcEquipCombo->currentText())
+                == 0) {
+                QByteArray msg = KP::clientDemandTech(equipReg->getId());
+                engine.sendInfo(msg);
+                continue;
+            }
+            if(name.localeAwareCompare(ui->dstEquipCombo->currentText())
+                == 0) {
+                QByteArray msg = KP::clientDemandTech(equipReg->getId());
+                engine.sendInfo(msg);
+                continue;
+            }
+        }
+    }
 }
 
 void NavalAcademyView::demandSkillPoints(int index)
@@ -108,7 +146,7 @@ void NavalAcademyView::updateSrcSkillPoints(const QJsonObject &obj)
     availableSkillPoints = skillPoints;
     //% "Skill Points: %1"
     ui->leftSkillValue->setText(qtTrId("navalacademy-skillpoints-value")
-                                .arg(skillPoints));
+                                    .arg(skillPoints));
 
     updateConvertButtonState();
 }
@@ -121,7 +159,7 @@ void NavalAcademyView::updateDstSkillPoints(const QJsonObject &obj)
     int64 skillPoints = obj["actualSP"].toInteger();
     //% "Skill Points: %1"
     ui->rightSkillValue->setText(qtTrId("navalacademy-skillpoints-value")
-                                 .arg(skillPoints));
+                                     .arg(skillPoints));
 }
 
 void NavalAcademyView::updateSkillPointConvertResult(const QJsonObject &obj)
@@ -133,43 +171,152 @@ void NavalAcademyView::updateSkillPointConvertResult(const QJsonObject &obj)
         availableSkillPoints = newSrcSP;
         //% "Skill Points: %1"
         ui->leftSkillValue->setText(qtTrId("navalacademy-skillpoints-value")
-                                    .arg(newSrcSP));
+                                        .arg(newSrcSP));
         //% "Skill Points: %1"
         ui->rightSkillValue->setText(qtTrId("navalacademy-skillpoints-value")
-                                     .arg(newDstSP));
+                                         .arg(newDstSP));
     }
     // TODO: show error message if !success
 }
 
 void NavalAcademyView::updateLocalTech(const QJsonObject &obj)
 {
-    int equipId = obj["equipid"].toInt();
+    int equipId = obj["jobid"].toInt();
     if(equipId == currentSrcEquipId) {
-        double tech = obj["tech"].toDouble();
-        //% "LocalTech: %1"
+        double tech = obj["value"].toDouble();
+        //% "%1"
         ui->leftTechValue->setText(qtTrId("navalacademy-localtech-value")
-                                   .arg(tech));
+                                       .arg(tech));
     }
     else if(equipId == currentDstEquipId) {
-        double tech = obj["tech"].toDouble();
-        //% "LocalTech: %1"
+        double tech = obj["value"].toDouble();
+        //% "%1"
         ui->rightTechValue->setText(qtTrId("navalacademy-localtech-value")
-                                    .arg(tech));
+                                        .arg(tech));
     }
 }
 
 void NavalAcademyView::updateLocalTechViewTable(const QJsonObject &obj)
 {
+    return;
+    /* the below is inactive code */
+    /*
     // Similar to TechView::updateLocalTechViewTable but for left/right tables
-    // For now, just clear tables
-    ui->leftViewTable->clear();
-    ui->rightViewTable->clear();
+    int equipId = obj["equipid"].toInt();
+    QTableWidget *table = nullptr;
+    
+    if(equipId == currentSrcEquipId) {
+        table = ui->leftViewTable;
+    }
+    else if(equipId == currentDstEquipId) {
+        table = ui->rightViewTable;
+    }
+    else {
+        return; // Not for current selection
+    }
+    
+    // Clear table
+    table->clear();
+    table->setRowCount(0);
+    table->setColumnCount(2);
+    table->setHorizontalHeaderLabels(
+        QStringList() << qtTrId("techview-header-attr")
+                      << qtTrId("techview-header-value"));
+    
+    // Add basic equipment info
+    Client &engine = Client::getInstance();
+    Equipment *equip = engine.getEquipmentReg(equipId);
+    if(!equip || equip->isInvalid()) {
+        return;
+    }
+    
+    // Add rows for key attributes
+    int row = 0;
+    table->setRowCount(5); // Adjust as needed
+    
+    // Equipment ID
+    QTableWidgetItem *idAttr = new QTableWidgetItem(qtTrId("equipment-id"));
+    idAttr->setFlags(idAttr->flags() & ~Qt::ItemIsEditable);
+    QTableWidgetItem *idValue = new QTableWidgetItem(QString::number(equipId));
+    idValue->setFlags(idValue->flags() & ~Qt::ItemIsEditable);
+    table->setItem(row, 0, idAttr);
+    table->setItem(row, 1, idValue);
+    row++;
+    
+    // Equipment name
+    QTableWidgetItem *nameAttr = new QTableWidgetItem(qtTrId("equipment-name"));
+    nameAttr->setFlags(nameAttr->flags() & ~Qt::ItemIsEditable);
+    QString equipName = equip->toString(
+        settings->value("client/language", "ja_JP").toString());
+    if(equipName.isEmpty()) {
+        equipName = equip->toString("ja_JP");
+    }
+    QTableWidgetItem *nameValue = new QTableWidgetItem(equipName);
+    nameValue->setFlags(nameValue->flags() & ~Qt::ItemIsEditable);
+    table->setItem(row, 0, nameAttr);
+    table->setItem(row, 1, nameValue);
+    row++;
+    
+    // Equipment type
+    QTableWidgetItem *typeAttr = new QTableWidgetItem(qtTrId("equipment-type"));
+    typeAttr->setFlags(typeAttr->flags() & ~Qt::ItemIsEditable);
+    QTableWidgetItem *typeValue = new QTableWidgetItem(equip->type.toString());
+    typeValue->setFlags(typeValue->flags() & ~Qt::ItemIsEditable);
+    table->setItem(row, 0, typeAttr);
+    table->setItem(row, 1, typeValue);
+    row++;
+    
+    // Tech level from the JSON object
+    double tech = obj["tech"].toDouble();
+    QTableWidgetItem *techAttr = new QTableWidgetItem(qtTrId("tech-level"));
+    techAttr->setFlags(techAttr->flags() & ~Qt::ItemIsEditable);
+    QTableWidgetItem *techValue = new TableWidgetItemNumber(tech);
+    techValue->setFlags(techValue->flags() & ~Qt::ItemIsEditable);
+    table->setItem(row, 0, techAttr);
+    table->setItem(row, 1, techValue);
+    row++;
+    
+    // Mother equipment (if any)
+    int motherId = equip->attr.value("Mother", 0);
+    if(motherId != 0) {
+        QTableWidgetItem *motherAttr = new QTableWidgetItem(qtTrId("mother-equipment"));
+        motherAttr->setFlags(motherAttr->flags() & ~Qt::ItemIsEditable);
+        Equipment *motherEquip = engine.getEquipmentReg(motherId);
+        QString motherName;
+        if(motherEquip && !motherEquip->isInvalid()) {
+            motherName = motherEquip->toString(
+                settings->value("client/language", "ja_JP").toString());
+            if(motherName.isEmpty()) {
+                motherName = motherEquip->toString("ja_JP");
+            }
+        }
+        else {
+            motherName = QString::number(motherId);
+        }
+        QTableWidgetItem *motherValue = new QTableWidgetItem(motherName);
+        motherValue->setFlags(motherValue->flags() & ~Qt::ItemIsEditable);
+        table->setRowCount(row + 1);
+        table->setItem(row, 0, motherAttr);
+        table->setItem(row, 1, motherValue);
+    }
+    
+    // Resize columns
+    table->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
+    table->verticalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
+*/
 }
 
 void NavalAcademyView::onSrcEquipSelected(int index)
 {
     if(index < 0) return;
     int equipId = ui->srcEquipCombo->itemData(index).toInt();
+    
+    // Clear left table if equipment changed
+    if(equipId != currentSrcEquipId) {
+        //ui->leftViewTable->clear();
+        //ui->leftViewTable->setRowCount(0);
+    }
+    
     currentSrcEquipId = equipId;
 
     // Request skill points for source
@@ -178,7 +325,7 @@ void NavalAcademyView::onSrcEquipSelected(int index)
     demandLocalTech(index);
 
     // Filter destination equipment list
-    filterDstEquipByMother(equipId);
+    resetDstEquipmentList();
 
     updateConvertButtonState();
 }
@@ -187,6 +334,13 @@ void NavalAcademyView::onDstEquipSelected(int index)
 {
     if(index < 0) return;
     int equipId = ui->dstEquipCombo->itemData(index).toInt();
+    
+    // Clear right table if equipment changed
+    if(equipId != currentDstEquipId) {
+        //ui->rightViewTable->clear();
+        //ui->rightViewTable->setRowCount(0);
+    }
+    
     currentDstEquipId = equipId;
 
     // Request skill points for destination
@@ -216,7 +370,9 @@ void NavalAcademyView::updateAmountFromSlider(int value)
     if(availableSkillPoints > 0) {
         int64 amount = (availableSkillPoints * value) / PERCENT_MAX;
         if(amount < PERCENT_MIN) amount = PERCENT_MIN;
+        ui->amountSpinBox->blockSignals(true);
         ui->amountSpinBox->setValue(amount);
+        ui->amountSpinBox->blockSignals(false);
     }
 }
 
@@ -227,18 +383,23 @@ void NavalAcademyView::updateAmountFromSpinBox(int value)
         int percentage = (value * PERCENT_MAX) / availableSkillPoints;
         if(percentage < PERCENT_MIN) percentage = PERCENT_MIN;
         if(percentage > PERCENT_MAX) percentage = PERCENT_MAX;
+        ui->amountSlider->blockSignals(true);
         ui->amountSlider->setValue(percentage);
+        ui->amountSlider->blockSignals(false);
     }
     updateConvertButtonState();
 }
 
 void NavalAcademyView::resizeColumns(bool left)
 {
+    return;
+    /*
     QTableWidget *table = left ? ui->leftViewTable : ui->rightViewTable;
     QHeaderView *horizontal = table->horizontalHeader();
     horizontal->setSectionResizeMode(QHeaderView::ResizeToContents);
     QHeaderView *vertical = table->verticalHeader();
     vertical->setSectionResizeMode(QHeaderView::ResizeToContents);
+*/
 }
 
 void NavalAcademyView::filterDstEquipByMother(int motherId)
@@ -247,21 +408,92 @@ void NavalAcademyView::filterDstEquipByMother(int motherId)
     if(motherId == 0) return;
 
     for(auto &equipReg: Client::getInstance().getEquipRegistryCache()) {
-        int equipMotherId = equipReg->attr.value("Mother", 0);
-        if(equipMotherId == motherId) {
-            QString equipName = equipReg->toString(
-                settings->value("client/language", "ja_JP").toString());
-            if(equipName.isEmpty()) {
-                equipName = equipReg->toString("ja_JP");
-            }
-            ui->dstEquipCombo->addItem(equipName, equipReg->getId());
+        // Skip virtual equipment
+        if(equipReg->type.getDisplayGroup()
+                .compare("VIRTUAL", Qt::CaseInsensitive) == 0) {
+            continue;
         }
+        
+        // Filter by mother relationship
+        int equipMotherId = equipReg->attr.value("Mother", 0);
+        if(equipMotherId != motherId) {
+            continue;
+        }
+        
+        QString equipName = equipReg->toString(
+            settings->value("client/language", "ja_JP").toString());
+        if(equipName.isEmpty()) {
+            equipName = equipReg->toString("ja_JP");
+        }
+        ui->dstEquipCombo->addItem(equipName, equipReg->getId());
     }
 
     if(ui->dstEquipCombo->count() > 0) {
         ui->dstEquipCombo->setCurrentIndex(0);
         onDstEquipSelected(0);
     }
+}
+
+void NavalAcademyView::resetSrcEquipmentList()
+{
+    ui->srcEquipCombo->clear();
+    currentSrcEquipId = 0;
+    availableSkillPoints = 0;
+    ui->leftTechValue->clear();
+    ui->leftSkillValue->clear();
+    //ui->leftViewTable->clear();
+    //ui->leftViewTable->setRowCount(0);
+    
+    QString selectedType = ui->srcListType1->currentText();
+    bool filterByType = selectedType.compare(qtTrId("all-equipments"),
+                                             Qt::CaseInsensitive) != 0;
+    
+    for(auto &equipReg: Client::getInstance().getEquipRegistryCache()) {
+        // Skip virtual equipment
+        if(equipReg->type.getDisplayGroup()
+                .compare("VIRTUAL", Qt::CaseInsensitive) == 0) {
+            continue;
+        }
+        
+        // Filter by equipment type if not "All equipments"
+        if(filterByType) {
+            QString equipTypeGroup = equipReg->type.getDisplayGroup();
+            if(equipTypeGroup.compare(selectedType, Qt::CaseInsensitive) != 0) {
+                continue;
+            }
+        }
+        
+        QString equipName = equipReg->toString(
+            settings->value("client/language", "ja_JP").toString());
+        if(equipName.isEmpty()) {
+            equipName = equipReg->toString("ja_JP");
+        }
+        ui->srcEquipCombo->addItem(equipName, equipReg->getId());
+    }
+    
+    // Clear destination equipment info because source changed
+    ui->dstEquipCombo->clear();
+    currentDstEquipId = 0;
+    ui->rightTechValue->clear();
+    ui->rightSkillValue->clear();
+    updateConvertButtonState();
+}
+
+void NavalAcademyView::resetDstEquipmentList()
+{
+    ui->dstEquipCombo->clear();
+    currentDstEquipId = 0;
+    ui->rightTechValue->clear();
+    ui->rightSkillValue->clear();
+    //ui->rightViewTable->clear();
+    //ui->rightViewTable->setRowCount(0);
+
+    // If we have a source equipment selected, filter by mother relationship
+    if(currentSrcEquipId != 0) {
+        filterDstEquipByMother(currentSrcEquipId);
+    }
+
+    updateConvertButtonState();
 }
 
 void NavalAcademyView::updateConvertButtonState()
@@ -276,22 +508,8 @@ void NavalAcademyView::updateConvertButtonState()
 
 void NavalAcademyView::resetEquipmentLists()
 {
-    ui->srcEquipCombo->clear();
-    ui->dstEquipCombo->clear();
-
-    for(auto &equipReg: Client::getInstance().getEquipRegistryCache()) {
-        // Skip virtual equipment
-        if(equipReg->type.getDisplayGroup()
-                .compare("VIRTUAL", Qt::CaseInsensitive) == 0) {
-            continue;
-        }
-        QString equipName = equipReg->toString(
-            settings->value("client/language", "ja_JP").toString());
-        if(equipName.isEmpty()) {
-            equipName = equipReg->toString("ja_JP");
-        }
-        ui->srcEquipCombo->addItem(equipName, equipReg->getId());
-    }
+    // Reset both source and destination lists
+    resetSrcEquipmentList();
 }
 
 void NavalAcademyView::resizeEvent(QResizeEvent *event)
@@ -303,12 +521,14 @@ void NavalAcademyView::resizeEvent(QResizeEvent *event)
 
 void NavalAcademyView::showEvent(QShowEvent *event)
 {
+    /*
     ui->leftViewTable->setHorizontalHeaderLabels(
         QStringList() << qtTrId("techview-header-attr")
                       << qtTrId("techview-header-value"));
     ui->rightViewTable->setHorizontalHeaderLabels(
         QStringList() << qtTrId("techview-header-attr")
                       << qtTrId("techview-header-value"));
+*/
     QWidget::showEvent(event);
 }
 
