@@ -3316,7 +3316,8 @@ void Server::handleConvertSkillPoints(const CSteamID &uid,
     int64 dstStd = dstEquip->skillPointsStd();
     if(srcStd <= 0 || dstStd <= 0) {
         qCritical() << qtTrId("convert-skillpoints-invalid-std")
-                       .arg(srcEquipId).arg(srcStd).arg(dstEquipId).arg(dstStd);
+                       .arg(srcEquipId).arg(srcStd)
+                       .arg(dstEquipId).arg(dstStd);
         QByteArray msg = KP::serverDevelopFailed(KP::DevelopNotExist);
         senderM.sendMessage(connection, msg);
         return;
