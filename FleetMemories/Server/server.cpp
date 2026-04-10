@@ -78,7 +78,8 @@ const int elapsedMaxTolerance = steamRateLimit;
 }
 
 Server::Server(int argc, char ** argv) : CommandLine(argc, argv),
-    planeReplenish(this) {
+    planeReplenish(this),
+    expeditionManager(this) {
     /* no *settings could be used here */
     std::random_device rd;
     std::seed_seq seq{rd(), rd(), rd(), rd(), rd(), rd(), rd(), rd()};
@@ -2754,6 +2755,8 @@ regen_sanity:
                     query.lastError(), query.lastQuery());
             }
         }
+process_expeditions:
+        expeditionManager.processExpeditions();
 poll_ard_refunds:
         pollARDRefunds();
     } catch (DBError &e) {
@@ -3381,6 +3384,142 @@ void Server::handleConvertSkillPoints(const CSteamID &uid,
     senderM.sendMessage(connection, msg);
 }
 
+void Server::handleStartExpedition(const CSteamID &uid, QSslSocket *connection,
+                                   const QJsonObject &djson) {
+    try {
+        int mapUnionId = djson["mapUnionId"].toInt();
+        int fleetIndex = djson["fleetIndex"].toInt();
+        double autoResupplyThreshold =
+            djson["autoResupplyThreshold"].toDouble();
+        QJsonObject plansJson = djson["battlePlans"].toObject();
+
+        QMap<int, QByteArray> battlePlans;
+        for (auto it = plansJson.begin(); it != plansJson.end(); ++it) {
+            int nodeIndex = it.key().toInt();
+            QByteArray planData = QByteArray::fromBase64(
+                it.value().toString().toUtf8());
+            battlePlans[nodeIndex] = planData;
+        }
+
+        if (!normalMaps.contains(mapUnionId)) {
+            QByteArray msg = KP::serverExpeditionStartResult(mapUnionId, false,
+                                     "Map does not exist");
+            senderM.sendMessage(connection, msg);
+            return;
+        }
+
+        if (fleetIndex < 0 || fleetIndex >= KP::fleetsSize) {
+            QByteArray msg = KP::serverExpeditionStartResult(mapUnionId, false,
+                                     "Invalid fleet index");
+            senderM.sendMessage(connection, msg);
+            return;
+        }
+
+        if (!validateExpeditionBattlePlans(mapUnionId, battlePlans)) {
+            QByteArray msg = KP::serverExpeditionStartResult(mapUnionId, false,
+                                     "Invalid battle plans");
+            senderM.sendMessage(connection, msg);
+            return;
+        }
+
+        bool success = expeditionManager.startExpedition(uid, mapUnionId,
+                        fleetIndex, battlePlans, autoResupplyThreshold);
+
+        QByteArray msg = KP::serverExpeditionStartResult(
+            mapUnionId, success,
+            success ? QString() : "Failed to start expedition");
+        senderM.sendMessage(connection, msg);
+    }
+    catch (const DBError &e) {
+        qCritical() << "Start expedition DB error:" << e.what();
+        QByteArray msg = KP::serverExpeditionStartResult(
+            djson["mapUnionId"].toInt(), false, "Database error");
+        senderM.sendMessage(connection, msg);
+    }
+    catch (...) {
+        qCritical() << "Unknown error in handleStartExpedition";
+        QByteArray msg = KP::serverExpeditionStartResult(
+            djson["mapUnionId"].toInt(), false, "Internal error");
+        senderM.sendMessage(connection, msg);
+    }
+}
+
+void Server::handleCancelExpedition(const CSteamID &uid, QSslSocket *connection,
+                                    const QJsonObject &djson) {
+    int mapUnionId = djson["mapUnionId"].toInt();
+    int receiveFleetIndex = djson["receiveFleetIndex"].toInt();
+
+    if (receiveFleetIndex < 0 || receiveFleetIndex >= KP::fleetsSize) {
+        qWarning() << "Invalid receive fleet index:" << receiveFleetIndex;
+        return;
+    }
+
+    bool success = expeditionManager.cancelExpedition(uid, mapUnionId,
+                                                      receiveFleetIndex);
+    qInfo() << "Cancel expedition result:" << success;
+}
+
+void Server::handleUpdateExpeditionPlan(const CSteamID &uid,
+                                        QSslSocket *connection,
+                                        const QJsonObject &djson) {
+    int mapUnionId = djson["mapUnionId"].toInt();
+    QJsonObject plansJson = djson["battlePlans"].toObject();
+
+    QMap<int, QByteArray> battlePlans;
+    for (auto it = plansJson.begin(); it != plansJson.end(); ++it) {
+        int nodeIndex = it.key().toInt();
+        QByteArray planData = QByteArray::fromBase64(
+            it.value().toString().toUtf8());
+        battlePlans[nodeIndex] = planData;
+    }
+
+    if (!validateExpeditionBattlePlans(mapUnionId, battlePlans)) {
+        qWarning() << "Invalid battle plans for update";
+        return;
+    }
+
+    bool success = expeditionManager.updateBattlePlans(uid, mapUnionId,
+                                                       battlePlans);
+    qInfo() << "Update expedition plan result:" << success;
+}
+
+void Server::handleSetExpeditionSettings(const CSteamID &uid,
+                                         QSslSocket *connection,
+                                         const QJsonObject &djson) {
+    int mapUnionId = djson["mapUnionId"].toInt();
+    double autoResupplyThreshold =
+        djson["autoResupplyThreshold"].toDouble();
+    bool autoRestart = djson.value("autoRestart").toBool(false);
+
+    qInfo() << "Set expedition settings for map" << mapUnionId
+            << "threshold:" << autoResupplyThreshold
+            << "restart:" << autoRestart;
+}
+
+void Server::handleQueryExpeditionStatus(const CSteamID &uid,
+                                         QSslSocket *connection,
+                                         const QJsonObject &djson) {
+    QJsonArray expeditions = expeditionManager.getUserExpeditions(uid);
+    QByteArray msg = KP::serverExpeditionStatus(expeditions);
+    senderM.sendMessage(connection, msg);
+}
+
+bool Server::validateExpeditionBattlePlans(int mapUnionId,
+                                           const QMap<int, QByteArray> &battlePlans) {
+    if (!normalMaps.contains(mapUnionId)) {
+        qWarning() << "Map" << mapUnionId << "does not exist";
+        return false;
+    }
+
+    if (battlePlans.isEmpty()) {
+        qWarning() << "No battle plans provided";
+        return false;
+    }
+
+    qWarning() << "validateExpeditionBattlePlans: stub implementation for map"
+               << mapUnionId;
+    return true;
+}
 QUuid Server::newShip(const CSteamID &uid, int shipId, bool direct) {
     Q_UNUSED(direct)
     int startingHP;
@@ -4166,6 +4305,26 @@ anti_ddos:
         {offerResourceInfo(
                         connection,
                         uid);});
+    }
+        break;
+    case KP::CommandType::CancelExpedition: {
+        handleCancelExpedition(uid, connection, djson);
+    }
+        break;
+    case KP::CommandType::QueryExpeditionStatus: {
+        handleQueryExpeditionStatus(uid, connection, djson);
+    }
+        break;
+    case KP::CommandType::SetExpeditionSettings: {
+        handleSetExpeditionSettings(uid, connection, djson);
+    }
+        break;
+    case KP::CommandType::StartExpedition: {
+        handleStartExpedition(uid, connection, djson);
+    }
+        break;
+    case KP::CommandType::UpdateExpeditionPlan: {
+        handleUpdateExpeditionPlan(uid, connection, djson);
     }
         break;
     case KP::CommandType::DemandRankInfo: {
