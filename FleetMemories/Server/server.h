@@ -211,6 +211,7 @@ private:
     void testEscortedRetreat();
     void testEquipmentSkillPointLoss();
     void testEquipmentDamageChance();
+    void testEmergencyRepair();
     std::pair<KP::FleetFailType, int> updateFleet(const CSteamID &,
                                                   const QJsonArray &);
     void updateFleetIntoDatabase(const CSteamID &,

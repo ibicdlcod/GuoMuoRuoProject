@@ -1835,7 +1835,16 @@ void Server::progressMap(const CSteamID &uid, QSslSocket *connection,
                     break;
                 }
             }
+            if(fleetFailed && fi->performEmergencyRepair()) {
+                fleetFailed = false;
+                // Consume repair items
+                QList<QUuid> consumed = fi->takeConsumedEquip();
+                if(!consumed.isEmpty()) {
+                    retireEquip(uid, consumed);
+                }
+            }
             if (fleetFailed) {
+            critical_damage:
                 // Send fleet failure message
                 QByteArray msg = KP::serverFleetFailure(KP::FleetCriticallyDamaged, activeFleet);
                 senderM.sendMessage(connection, msg);
@@ -2304,6 +2313,12 @@ void Server::updateFleetIntoDatabase(const CSteamID &uid,
             "Condition = :cond, "
             "Fuel = :fuel, "
             "Ammo = :ammo, "
+            "Slot1 = :s1, "
+            "Slot2 = :s2, "
+            "Slot3 = :s3, "
+            "Slot4 = :s4, "
+            "Slot5 = :s5, "
+            "SlotEX = :sex, "
             "Slot1Planes = :p1, "
             "Slot2Planes = :p2, "
             "Slot3Planes = :p3, "
@@ -2321,6 +2336,12 @@ void Server::updateFleetIntoDatabase(const CSteamID &uid,
         query.bindValue(":fuel", dyn->fuel);
         query.bindValue(":ammo", dyn->ammo);
         query.bindValue(":fled", dyn->fleetFled ? 1 : 0);
+        for(int i = 0; i < 5; ++i) {
+            query.bindValue(
+                QStringLiteral(":s") + QString::number(i + 1),
+                i < dyn->slotEquip.size() ? dyn->slotEquip[i].toString() : QString());
+        }
+        query.bindValue(":sex", dyn->slotEquipEx.toString());
         for(int i = 0; i < 5; ++i) {
             query.bindValue(
                 QStringLiteral(":p") + QString::number(i + 1),

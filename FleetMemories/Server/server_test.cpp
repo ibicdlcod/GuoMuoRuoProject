@@ -444,3 +444,180 @@ void Server::testEquipmentSkillPointLoss() {
     qInfo() << "testEquipmentSkillPointLoss: PASS" << passCount
             << "/ FAIL" << failCount;
 }
+
+void Server::testEmergencyRepair() {
+    qInfo() << "Starting emergency repair test";
+    /* Look up a destroyer ship (ID 269550035) */
+    Ship *destroyer = shipRegistry.value(269550035, nullptr);
+    if (!destroyer) {
+        qWarning() << "testEmergencyRepair: destroyer ship 269550035 not in registry";
+        return;
+    }
+    /* Look up repair personnel (ID 42) and goddess (ID 43) */
+    Equipment *repairEquip = equipRegistry.value(KP::equipIdRepairPersonnel, nullptr);
+    Equipment *goddessEquip = equipRegistry.value(KP::equipIdGoddess, nullptr);
+    if (!repairEquip) {
+        qWarning() << "testEmergencyRepair: repair personnel equipment" << KP::equipIdRepairPersonnel << "not in registry";
+        return;
+    }
+    if (!goddessEquip) {
+        qWarning() << "testEmergencyRepair: goddess equipment" << KP::equipIdGoddess << "not in registry";
+        return;
+    }
+    
+    /* Test 1: Repair personnel should restore HP by 1/4 max HP */
+    {
+        FleetInfo fi;
+        fi.ships.push_back(destroyer);
+        ShipDynamic *dyn = new ShipDynamic(destroyer->attr["Hitpoints"]);
+        dyn->currentHP = 0; // critically damaged
+        dyn->fuel = 0.5;
+        dyn->ammo = 0.5;
+        int maxHP = destroyer->attr["Hitpoints"];
+        QUuid repairUuid = QUuid::createUuid();
+        dyn->slotEquip = {repairUuid, QUuid(), QUuid(), QUuid(), QUuid()};
+        fi.equipMap[repairUuid] = repairEquip;
+        fi.equipSkillEffects[repairUuid] = 1.0;
+        fi.shipDynamics.push_back(dyn);
+        
+        bool repaired = fi.performEmergencyRepair();
+        if (!repaired) {
+            qWarning() << "testEmergencyRepair Test 1: repair failed";
+            return;
+        }
+        int expectedHP = std::min(maxHP, maxHP / 4);
+        if (dyn->currentHP != expectedHP) {
+            qWarning() << "testEmergencyRepair Test 1: HP mismatch, expected" << expectedHP << "got" << dyn->currentHP;
+            return;
+        }
+        if (dyn->fuel != 0.5 || dyn->ammo != 0.5) {
+            qWarning() << "testEmergencyRepair Test 1: fuel/ammo changed unexpectedly";
+            return;
+        }
+        /* Equipment should be consumed */
+        QList<QUuid> consumed = fi.takeConsumedEquip();
+        if (consumed.size() != 1 || consumed[0] != repairUuid) {
+            qWarning() << "testEmergencyRepair Test 1: consumed equipment mismatch";
+            return;
+        }
+        /* Slot should be cleared */
+        if (!dyn->slotEquip[0].isNull()) {
+            qWarning() << "testEmergencyRepair Test 1: slot not cleared";
+            return;
+        }
+        qInfo() << "testEmergencyRepair Test 1: PASS";
+    }
+    
+    /* Test 2: Goddess should set HP to max, condition to 480, fuel/ammo to 1.0 */
+    {
+        FleetInfo fi;
+        fi.ships.push_back(destroyer);
+        ShipDynamic *dyn = new ShipDynamic(destroyer->attr["Hitpoints"]);
+        dyn->currentHP = 0;
+        dyn->condition = 100;
+        dyn->fuel = 0.2;
+        dyn->ammo = 0.3;
+        int maxHP = destroyer->attr["Hitpoints"];
+        QUuid goddessUuid = QUuid::createUuid();
+        dyn->slotEquip = {goddessUuid, QUuid(), QUuid(), QUuid(), QUuid()};
+        fi.equipMap[goddessUuid] = goddessEquip;
+        fi.equipSkillEffects[goddessUuid] = 1.0;
+        fi.shipDynamics.push_back(dyn);
+        
+        bool repaired = fi.performEmergencyRepair();
+        if (!repaired) {
+            qWarning() << "testEmergencyRepair Test 2: repair failed";
+            return;
+        }
+        if (dyn->currentHP != maxHP) {
+            qWarning() << "testEmergencyRepair Test 2: HP not max, expected" << maxHP << "got" << dyn->currentHP;
+            return;
+        }
+        if (dyn->condition != KP::conditionMax) {
+            qWarning() << "testEmergencyRepair Test 2: condition not max, got" << dyn->condition;
+            return;
+        }
+        if (dyn->fuel != 1.0 || dyn->ammo != 1.0) {
+            qWarning() << "testEmergencyRepair Test 2: fuel/ammo not set to 1.0";
+            return;
+        }
+        QList<QUuid> consumed = fi.takeConsumedEquip();
+        if (consumed.size() != 1 || consumed[0] != goddessUuid) {
+            qWarning() << "testEmergencyRepair Test 2: consumed equipment mismatch";
+            return;
+        }
+        if (!dyn->slotEquip[0].isNull()) {
+            qWarning() << "testEmergencyRepair Test 2: slot not cleared";
+            return;
+        }
+        qInfo() << "testEmergencyRepair Test 2: PASS";
+    }
+    
+    /* Test 3: Priority - repair personnel used before goddess */
+    {
+        FleetInfo fi;
+        fi.ships.push_back(destroyer);
+        ShipDynamic *dyn = new ShipDynamic(destroyer->attr["Hitpoints"]);
+        dyn->currentHP = 0;
+        int maxHP = destroyer->attr["Hitpoints"];
+        QUuid repairUuid = QUuid::createUuid();
+        QUuid goddessUuid = QUuid::createUuid();
+        dyn->slotEquip = {repairUuid, goddessUuid, QUuid(), QUuid(), QUuid()};
+        fi.equipMap[repairUuid] = repairEquip;
+        fi.equipMap[goddessUuid] = goddessEquip;
+        fi.equipSkillEffects[repairUuid] = 1.0;
+        fi.equipSkillEffects[goddessUuid] = 1.0;
+        fi.shipDynamics.push_back(dyn);
+        
+        bool repaired = fi.performEmergencyRepair();
+        if (!repaired) {
+            qWarning() << "testEmergencyRepair Test 3: repair failed";
+            return;
+        }
+        /* Should use repair personnel (slot 0) */
+        int expectedHP = std::min(maxHP, maxHP / 4);
+        if (dyn->currentHP != expectedHP) {
+            qWarning() << "testEmergencyRepair Test 3: HP mismatch, expected repair personnel effect" << expectedHP << "got" << dyn->currentHP;
+            return;
+        }
+        /* Only repair personnel should be consumed */
+        QList<QUuid> consumed = fi.takeConsumedEquip();
+        if (consumed.size() != 1 || consumed[0] != repairUuid) {
+            qWarning() << "testEmergencyRepair Test 3: consumed equipment mismatch, expected repair personnel";
+            return;
+        }
+        /* Slot 0 cleared, slot 1 still has goddess */
+        if (!dyn->slotEquip[0].isNull()) {
+            qWarning() << "testEmergencyRepair Test 3: slot 0 not cleared";
+            return;
+        }
+        if (dyn->slotEquip[1] != goddessUuid) {
+            qWarning() << "testEmergencyRepair Test 3: slot 1 goddess missing";
+            return;
+        }
+        qInfo() << "testEmergencyRepair Test 3: PASS";
+    }
+    
+    /* Test 4: No repair items -> repair fails */
+    {
+        FleetInfo fi;
+        fi.ships.push_back(destroyer);
+        ShipDynamic *dyn = new ShipDynamic(destroyer->attr["Hitpoints"]);
+        dyn->currentHP = 0;
+        fi.shipDynamics.push_back(dyn);
+        
+        bool repaired = fi.performEmergencyRepair();
+        if (repaired) {
+            qWarning() << "testEmergencyRepair Test 4: repair should have failed (no repair items)";
+            return;
+        }
+        QList<QUuid> consumed = fi.takeConsumedEquip();
+        if (!consumed.isEmpty()) {
+            qWarning() << "testEmergencyRepair Test 4: consumed list should be empty";
+            return;
+        }
+        qInfo() << "testEmergencyRepair Test 4: PASS";
+    }
+    
+    qInfo() << "testEmergencyRepair: all tests PASS";
+}

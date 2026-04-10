@@ -446,6 +446,19 @@ bool FleetInfo::performEmergencyRepair() {
             }
         }
         
+        // Check EX slot for repair personnel (if not found in regular slots)
+        if (!repaired && !dyn->slotEquipEx.isNull()) {
+            Equipment* equip = equipMap.value(dyn->slotEquipEx, nullptr);
+            if (equip && equip->getId() == KP::equipIdRepairPersonnel) {
+                dyn->currentHP += maxHP / 4;
+                if (dyn->currentHP > maxHP) dyn->currentHP = maxHP;
+                QUuid exUuid = dyn->slotEquipEx; // Save before clearing
+                dyn->slotEquipEx = QUuid(); // Clear EX slot
+                m_consumedEquip.append(exUuid);
+                repaired = true;
+            }
+        }
+        
         // If no repair personnel found, check for goddess
         if (!repaired) {
             // Check regular slots for goddess
@@ -477,8 +490,9 @@ bool FleetInfo::performEmergencyRepair() {
                     dyn->condition = KP::conditionMax;
                     dyn->fuel = 1.0;
                     dyn->ammo = 1.0;
+                    QUuid exUuid = dyn->slotEquipEx; // Save before clearing
                     dyn->slotEquipEx = QUuid(); // Clear EX slot
-                    m_consumedEquip.append(dyn->slotEquipEx);
+                    m_consumedEquip.append(exUuid);
                     repaired = true;
                 }
             }
