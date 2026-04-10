@@ -78,7 +78,6 @@ const int elapsedMaxTolerance = steamRateLimit;
 }
 
 Server::Server(int argc, char ** argv) : CommandLine(argc, argv),
-    equipmentDamageBaseChance(0.3), planeLossDeductionThreshold(100),
     planeReplenish(this) {
     /* no *settings could be used here */
     std::random_device rd;
@@ -258,7 +257,7 @@ bool Server::listen(const QHostAddress &address, quint16 port) {
             qCritical () << sslServer.errorString();
         else {
             sqlinit();
-            equipmentDamageBaseChance = settings->value("rule/equipmentdamagebasechance", 0.3).toDouble();
+            equipmentDamageBaseChance = settings->value("rule/equipmentdamagebasechance", 1.0).toDouble();
             planeLossDeductionThreshold = settings->value("rule/planelossdeductionthreshold", 100).toInt();
             if(!equipmentRefresh()) {
                 //% "Equipment init failed!"

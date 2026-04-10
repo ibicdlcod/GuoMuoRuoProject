@@ -1001,9 +1001,16 @@ void Client::receivedMsg(const QJsonObject &djson) {
         int equipDef = djson["equipdef"].toInt();
         int deduction = djson["deduction"].toInt();
         int sameTypeCount = djson["sameTypeCount"].toInt();
+        if(!equipRegistryCacheGood) {
         //% "Equipment %1 damaged, lost %2 skill points (same-type count: %3)"
         qInfo() << qtTrId("equipment-damaged")
                        .arg(equipDef).arg(deduction).arg(sameTypeCount);
+        }
+        else {
+            qInfo() << qtTrId("equipment-damaged")
+                           .arg(equipRegistryCache[equipDef]->toString())
+                           .arg(deduction).arg(sameTypeCount);
+        }
     }
     break;
     case KP::PlaneLossSkillDeduction: {
@@ -1012,10 +1019,18 @@ void Client::receivedMsg(const QJsonObject &djson) {
         int totalDeduction = djson["totaldeduction"].toInt();
         int deductions = djson["deductions"].toInt();
         int deductionPer100 = djson["deductionper100"].toInt();
+        if(!equipRegistryCacheGood) {
         //% "Plane losses: equipment %1 lost %2 planes, deducted %3 skill points (%4×%5)"
         qInfo() << qtTrId("plane-loss-skill-deduction")
                        .arg(equipDef).arg(totalLosses).arg(totalDeduction)
                        .arg(deductions).arg(deductionPer100);
+        }
+        else {
+            qInfo() << qtTrId("plane-loss-skill-deduction")
+                           .arg(equipRegistryCache[equipDef]->toString())
+                           .arg(totalLosses).arg(totalDeduction)
+                           .arg(deductions).arg(deductionPer100);
+        }
     }
     break;
     case KP::ShipBPRetired: {
