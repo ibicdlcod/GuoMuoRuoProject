@@ -171,10 +171,18 @@ ResOrd PlaneReplenish::calculateReplenishCost(const CSteamID &uid,
                 int totalDeduction = deductionPer100 * deductions;
                 User::addSkillPoints(uid, equipDef, -totalDeduction);
                 
-                qInfo() << "Plane losses:" << equipDef << "lost" << totalLosses
+                qDebug() << "Plane losses:" << equipDef << "lost" << totalLosses
                         << "planes, deducted" << totalDeduction
                         << "skill points (" << deductions << "×"
                         << deductionPer100 << ")";
+                // Send notification to client
+                if (server->connectedPeers.contains(uid)) {
+                    QByteArray msg = KP::serverPlaneLossSkillDeduction(
+                        equipDef, totalLosses, totalDeduction,
+                        deductions, deductionPer100);
+                    server->senderM.sendMessage(
+                        server->connectedPeers.value(uid), msg);
+                }
             }
         }
     }

@@ -175,6 +175,8 @@ enum MsgType{
     DisableShip,
     EquipImproved,
     EquipRetired,
+    EquipmentDamaged,
+    PlaneLossSkillDeduction,
     FairyBusy,
     FleetFail,
     Hello,
@@ -887,6 +889,8 @@ QByteArray serverEquipLackFather(GameError, int);
 QByteArray serverEquipLackMother(GameError, int, int64);
 QByteArray serverEquipImproved(const QList<std::tuple<QUuid, int>> &);
 QByteArray serverEquipRetired(const QList<QUuid> &);
+QByteArray serverEquipmentDamaged(int equipDef, int deduction, int sameTypeCount);
+QByteArray serverPlaneLossSkillDeduction(int equipDef, int totalLosses, int totalDeduction, int deductions, int deductionPer100);
 QByteArray serverEquipInfo(const QJsonArray &, bool user = false,
                            QDateTime timeUtc = QDateTime::currentDateTimeUtc(),
                            bool cacheHit = false);

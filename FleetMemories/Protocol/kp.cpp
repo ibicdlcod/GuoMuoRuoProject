@@ -645,6 +645,28 @@ QByteArray KP::serverEquipRetired(const QList<QUuid> &trash) {
     return QCborValue::fromJsonValue(result).toCbor();
 }
 
+QByteArray KP::serverEquipmentDamaged(int equipDef, int deduction, int sameTypeCount) {
+    QJsonObject result;
+    result["type"] = DgramType::Message;
+    result["msgtype"] = MsgType::EquipmentDamaged;
+    result["equipdef"] = equipDef;
+    result["deduction"] = deduction;
+    result["sameTypeCount"] = sameTypeCount;
+    return QCborValue::fromJsonValue(result).toCbor();
+}
+
+QByteArray KP::serverPlaneLossSkillDeduction(int equipDef, int totalLosses, int totalDeduction, int deductions, int deductionPer100) {
+    QJsonObject result;
+    result["type"] = DgramType::Message;
+    result["msgtype"] = MsgType::PlaneLossSkillDeduction;
+    result["equipdef"] = equipDef;
+    result["totallosses"] = totalLosses;
+    result["totaldeduction"] = totalDeduction;
+    result["deductions"] = deductions;
+    result["deductionper100"] = deductionPer100;
+    return QCborValue::fromJsonValue(result).toCbor();
+}
+
 QByteArray KP::serverEquipInfo(const QJsonArray &input, bool user,
                                QDateTime timeUtc, bool cacheHit) {
     QJsonObject result;

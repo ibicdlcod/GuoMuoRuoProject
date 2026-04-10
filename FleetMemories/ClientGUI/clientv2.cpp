@@ -997,6 +997,27 @@ void Client::receivedMsg(const QJsonObject &djson) {
         equipModel.destructedEquipment(trash);
     }
     break;
+    case KP::EquipmentDamaged: {
+        int equipDef = djson["equipdef"].toInt();
+        int deduction = djson["deduction"].toInt();
+        int sameTypeCount = djson["sameTypeCount"].toInt();
+        //% "Equipment %1 damaged, lost %2 skill points (same-type count: %3)"
+        qInfo() << qtTrId("equipment-damaged")
+                       .arg(equipDef).arg(deduction).arg(sameTypeCount);
+    }
+    break;
+    case KP::PlaneLossSkillDeduction: {
+        int equipDef = djson["equipdef"].toInt();
+        int totalLosses = djson["totallosses"].toInt();
+        int totalDeduction = djson["totaldeduction"].toInt();
+        int deductions = djson["deductions"].toInt();
+        int deductionPer100 = djson["deductionper100"].toInt();
+        //% "Plane losses: equipment %1 lost %2 planes, deducted %3 skill points (%4×%5)"
+        qInfo() << qtTrId("plane-loss-skill-deduction")
+                       .arg(equipDef).arg(totalLosses).arg(totalDeduction)
+                       .arg(deductions).arg(deductionPer100);
+    }
+    break;
     case KP::ShipBPRetired: {
         shipBPModel.bpUsed(djson["shipdef"].toInt());
     }

@@ -1121,10 +1121,17 @@ const QJsonObject Server::processBattleCore(const CSteamID &uid,
                                 // Apply deduction
                                 if (deduction > 0) {
                                     User::addSkillPoints(uid, equipDef, -deduction);
-                                    qInfo() << "Equipment damage:" << equipDef 
+                                    qDebug() << "Equipment damage:" << equipDef 
                                             << "lost" << deduction << "skill points"
                                             << "(same-type count:" << sameTypeCount 
                                             << ")";
+                                    // Send notification to client
+                                    auto socket = connectedPeers.value(uid, nullptr);
+                                    if (socket) {
+                                        QByteArray msg = KP::serverEquipmentDamaged(
+                                            equipDef, deduction, sameTypeCount);
+                                        senderM.sendMessage(socket, msg);
+                                    }
                                 }
                             }
                         }
