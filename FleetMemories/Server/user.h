@@ -15,6 +15,7 @@ namespace User {
 
 bool addShipBP(const CSteamID &, int, bool reverse = false);
 void addSkillPoints(const CSteamID &, int, int64);
+int checkGauge(const CSteamID &, int, KP::Difficulty);
 KP::AllegianceGroup checkHomePort(const CSteamID &);
 double checkMapSupremacy(const CSteamID &uid, int);
 void decideHomePort(const CSteamID &, KP::AllegianceGroup);

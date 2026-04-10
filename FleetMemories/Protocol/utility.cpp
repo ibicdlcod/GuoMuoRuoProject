@@ -137,3 +137,12 @@ std::tuple<bool, bool, double> Utility::computeAttrition(
     }
     return {true, true, std::exp(dist[targetMap]) - 1.0};
 }
+
+int Utility::enemyExp(int enemyInitialExp, int negativeGauge, int gaugeDebuff)
+{
+    if(negativeGauge >= 0) {
+        return enemyInitialExp;
+    }
+    double factor = (double)(negativeGauge) / std::hypot((double)negativeGauge, (double)gaugeDebuff);
+    return enemyInitialExp * (1 + factor);
+}

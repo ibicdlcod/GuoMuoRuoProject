@@ -93,12 +93,12 @@ ships: {
         row.expCap = query.value(rec.indexOf("ExpCap")).toInt();
         for(int i = 1; i <= 5; ++i) {
             row.equipSlots.append(query.value(
-                rec.indexOf(QStringLiteral("Slot") + QString::number(i)))
-                .toUuid());
+                                           rec.indexOf(QStringLiteral("Slot") + QString::number(i)))
+                                      .toUuid());
             row.planes.append(query.value(
-                rec.indexOf(QStringLiteral("Slot") + QString::number(i) +
-                    QStringLiteral("Planes")))
-                .toInt());
+                                       rec.indexOf(QStringLiteral("Slot") + QString::number(i) +
+                                                   QStringLiteral("Planes")))
+                                  .toInt());
         }
         row.slotEx =
             query.value(rec.indexOf("SlotEX")).toUuid();
@@ -846,7 +846,7 @@ void Server::processBattle(const CSteamID &uid, QSslSocket *connection,
 
 /* Enemy fleet creation - see docs/superpowers/specs/2026-04-03-enemy-fleetinfo-design.md */
 FleetInfo Server::createEnemyFleetInfo(int mapId, int nodeId,
-                                       KP::Difficulty diff) {
+                                       KP::Difficulty diff, int gauge) {
     FleetInfo info;
     Q_UNUSED(diff);
     KP::Difficulty diffCleaned = static_cast<KP::Difficulty>(
@@ -885,7 +885,13 @@ FleetInfo Server::createEnemyFleetInfo(int mapId, int nodeId,
         ShipDynamic *dyn = new ShipDynamic(shipId);
         dyn->currentHP = ship->attr.value("Hitpoints", 1);
         dyn->condition = 480;
-        dyn->exp = Ship::expCap(0);
+    armor_debuff:
+        if(lua["maps"][unionId]["softfactor"] == sol::nil) {
+            dyn->exp = Ship::expCap(0);
+        }
+        else {
+            dyn->exp = Utility::enemyExp(Ship::expCap(0), gauge, lua["maps"][unionId]["softfactor"]);
+        }
         dyn->expCap = Ship::expCap(0);
         dyn->star = 0;
         dyn->fuel = 1.0;
@@ -926,7 +932,11 @@ const QJsonObject Server::processBattleCore(const CSteamID &uid,
 
     KP::Difficulty diff = static_cast<KP::Difficulty>(
         MapWithDiff::getDiff(mapId));
-    FleetInfo enemyFleet = createEnemyFleetInfo(mapId, nodeId, diff);
+    FleetInfo enemyFleet
+        = createEnemyFleetInfo(
+            mapId, nodeId, diff,
+            User::checkGauge(uid,
+                             MapWithDiff::getUnionId(mapId), diff));
     
     // Retrieve player fleet
     FleetInfo *playerFleet = sortieFleets.value({uid, fleetIndex}, nullptr);
@@ -1082,8 +1092,8 @@ const QJsonObject Server::processBattleCore(const CSteamID &uid,
             int currentHP = dyn->currentHP;
             // Distribute loss proportionally to current HP
             int lossThisShip = (totalPlayerHP > 0) ?
-                static_cast<int>(playerLossHP *
-                    (static_cast<double>(currentHP) / totalPlayerHP)) : 0;
+                                   static_cast<int>(playerLossHP *
+                                                    (static_cast<double>(currentHP) / totalPlayerHP)) : 0;
             // retreat test
             if(i == 1) {
                 lossThisShip = static_cast<int>(static_cast<double>(currentHP) * 0.8);
@@ -1097,7 +1107,7 @@ const QJsonObject Server::processBattleCore(const CSteamID &uid,
                     int maxHP = ship->attr["Hitpoints"];
                     if (maxHP > 0) {
                         double remainingHPRatio = static_cast<double>(newHP) 
-                            / maxHP;
+                                                  / maxHP;
                         remainingHPRatio = std::clamp(remainingHPRatio, 0.0, 1.0);
                         
                         // Check if equipment should be damaged
@@ -1122,9 +1132,9 @@ const QJsonObject Server::processBattleCore(const CSteamID &uid,
                                 if (deduction > 0) {
                                     User::addSkillPoints(uid, equipDef, -deduction);
                                     qDebug() << "Equipment damage:" << equipDef 
-                                            << "lost" << deduction << "skill points"
-                                            << "(same-type count:" << sameTypeCount 
-                                            << ")";
+                                             << "lost" << deduction << "skill points"
+                                             << "(same-type count:" << sameTypeCount
+                                             << ")";
                                     // Send notification to client
                                     auto socket = connectedPeers.value(uid, nullptr);
                                     if (socket) {
@@ -1211,8 +1221,8 @@ const QJsonObject Server::processBattleCore(const CSteamID &uid,
                 query.prepare("UPDATE UserShip SET Slot"
                               + QString::number(slot + 1)
                               + "Planes = :planes WHERE User = :uid "
-                              "AND FleetIndex = :fleet "
-                              "AND FleetPosIndex = :pos");
+                                "AND FleetIndex = :fleet "
+                                "AND FleetPosIndex = :pos");
                 query.bindValue(":planes", newPlanes);
                 query.bindValue(":uid", uid.ConvertToUint64());
                 query.bindValue(":fleet", fleetIndex);
@@ -1231,8 +1241,8 @@ const QJsonObject Server::processBattleCore(const CSteamID &uid,
             if(!dyn || dyn->fleetFled) continue;
             int currentHP = dyn->currentHP;
             int lossThisShip = (totalEnemyHP > 0) ?
-                static_cast<int>(enemyLossHP *
-                    (static_cast<double>(currentHP) / totalEnemyHP)) : 0;
+                                   static_cast<int>(enemyLossHP *
+                                                    (static_cast<double>(currentHP) / totalEnemyHP)) : 0;
             int newHP = std::max(0, currentHP - lossThisShip);
             dyn->currentHP = newHP;
 
@@ -1284,9 +1294,9 @@ const QJsonObject Server::processBattleCore(const CSteamID &uid,
     
     // Compute damage
     double playerDamage = std::max(0.0, totalPlayerHPBefore
-                                    - totalPlayerHPAfter);
+                                            - totalPlayerHPAfter);
     double enemyDamage = std::max(0.0, totalEnemyHPBefore
-                                  - totalEnemyHPAfter);
+                                           - totalEnemyHPAfter);
     
     // Compute damage percentages (avoid division by zero)
     double playerDamagePercentage = 0.0;
@@ -1321,7 +1331,7 @@ const QJsonObject Server::processBattleCore(const CSteamID &uid,
         // More than 50% enemy ships sunk
         assessment = KP::AVictory;
     } else if(flagshipSunk
-              || enemyDamagePercentage > 2.5 * playerDamagePercentage) {
+               || enemyDamagePercentage > 2.5 * playerDamagePercentage) {
         // Flagship sunk OR enemy damage percentage > 2.5× player's
         assessment = KP::BVictory;
     } else if(playerDamage == 0.0 && enemyDamage == 0.0) {
@@ -1667,25 +1677,25 @@ ship:
                     query.lastError(), query.lastQuery());
                 return;
             }
-    }
-critical_damage_end:
-    {
-        update_exp:
-            QSqlQuery query;
-            query.prepare("UPDATE UserEquipSP "
-                          "SET Intvalue = Intvalue "
-                          "+ temp.e.cnt * temp.e.amount "
-                          "/ sqrt(temp.e.amount + Intvalue) "
-                          "FROM temp.e "
-                          "WHERE UserEquipSP.EquipDef = temp.e.EquipDef "
-                          "AND UserEquipSP.User = temp.e.User; ");
-            if(Q_UNLIKELY(!query.exec())) {
-                throw DBError(
-                    qtTrId("add-ship-exp-failre").arg(uid.ConvertToUint64()),
-                    query.lastError(), query.lastQuery());
-                return;
-            }
         }
+    critical_damage_end:
+    {
+    update_exp:
+        QSqlQuery query;
+        query.prepare("UPDATE UserEquipSP "
+                      "SET Intvalue = Intvalue "
+                      "+ temp.e.cnt * temp.e.amount "
+                      "/ sqrt(temp.e.amount + Intvalue) "
+                      "FROM temp.e "
+                      "WHERE UserEquipSP.EquipDef = temp.e.EquipDef "
+                      "AND UserEquipSP.User = temp.e.User; ");
+        if(Q_UNLIKELY(!query.exec())) {
+            throw DBError(
+                qtTrId("add-ship-exp-failre").arg(uid.ConvertToUint64()),
+                query.lastError(), query.lastQuery());
+            return;
+        }
+    }
     }
 ranking_exp:
     /* TODO: may changed to a more complicated method of offer points
@@ -1921,29 +1931,29 @@ void Server::progressMap(const CSteamID &uid, QSslSocket *connection,
         }
     }
 critical_damage_end:
-    {
-        QSqlQuery query;
-        query.prepare(
-            "UPDATE UserAttr "
-            "SET Intvalue = CASE Attribute "
-            "WHEN 'InBattle' THEN :inbattle "
-            "WHEN 'CurrentNode' THEN :nnode END "
-            "WHERE UserID = :uid "
-            "AND Attribute IN ('InBattle', 'CurrentNode');");
-        query.bindValue(
-            ":inbattle",
-            nNode == 0 ? KP::NoBattle : KP::BeforeBattle);
-        query.bindValue(":nnode", nNode);
-        query.bindValue(":uid", uid.ConvertToUint64());
-        if(Q_UNLIKELY(!query.exec())) {
-            //% "User %1: progress map %2 failure!"
-            throw DBError(
-                qtTrId("sortie-progress-failure")
-                    .arg(uid.ConvertToUint64()).arg(mapId),
-                query.lastError(), query.lastQuery());
-            return;
-        }
+{
+    QSqlQuery query;
+    query.prepare(
+        "UPDATE UserAttr "
+        "SET Intvalue = CASE Attribute "
+        "WHEN 'InBattle' THEN :inbattle "
+        "WHEN 'CurrentNode' THEN :nnode END "
+        "WHERE UserID = :uid "
+        "AND Attribute IN ('InBattle', 'CurrentNode');");
+    query.bindValue(
+        ":inbattle",
+        nNode == 0 ? KP::NoBattle : KP::BeforeBattle);
+    query.bindValue(":nnode", nNode);
+    query.bindValue(":uid", uid.ConvertToUint64());
+    if(Q_UNLIKELY(!query.exec())) {
+        //% "User %1: progress map %2 failure!"
+        throw DBError(
+            qtTrId("sortie-progress-failure")
+                .arg(uid.ConvertToUint64()).arg(mapId),
+            query.lastError(), query.lastQuery());
+        return;
     }
+}
     if(nNode == 0) {
         if(FleetInfo *fi = sortieFleets.value({uid, result.value()[3]}, nullptr)) {
             for(ShipDynamic *dyn : fi->shipDynamics) {

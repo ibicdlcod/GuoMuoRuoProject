@@ -43,6 +43,8 @@ std::tuple<bool, bool, double> computeAttrition(
     int targetMap,
     double expectedSupremacy);
 
+int enemyExp(int enemyInitialExp, int negativeGauge, int gaugeDebuff);
+
 } // namespace Utility
 
 #endif // UTILITY_H

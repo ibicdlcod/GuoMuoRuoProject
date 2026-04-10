@@ -2314,7 +2314,7 @@ Great at battle and bad at politics--so cool!</source>
     <message id="sortie-progress-failure">
         <location filename="../Server/server.cpp" line="4330"/>
         <location filename="../Server/server.cpp" line="4342"/>
-        <location filename="../Server/server_battle.cpp" line="1941"/>
+        <location filename="../Server/server_battle.cpp" line="1951"/>
         <source>User %1: progress map %2 failure!</source>
         <translation type="unfinished">用户%1：推进海域%2失败！</translation>
     </message>
@@ -2335,7 +2335,7 @@ Great at battle and bad at politics--so cool!</source>
     </message>
     <message id="dbfail-map-relations">
         <location filename="../Server/server_battle.cpp" line="273"/>
-        <location filename="../Server/server_battle.cpp" line="2289"/>
+        <location filename="../Server/server_battle.cpp" line="2299"/>
         <source>Database failed when querying map relations!</source>
         <translation type="unfinished">查询海域关系时数据库出错！</translation>
     </message>
@@ -2531,12 +2531,12 @@ Great at battle and bad at politics--so cool!</source>
         <translation type="unfinished">用户%1：查询舰队%2失败！</translation>
     </message>
     <message id="sortie-end-failure-freight-clear">
-        <location filename="../Server/server_battle.cpp" line="1969"/>
+        <location filename="../Server/server_battle.cpp" line="1979"/>
         <source>User %1: clear freight at map end failure!</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="update-fleet-db-failed">
-        <location filename="../Server/server_battle.cpp" line="2360"/>
+        <location filename="../Server/server_battle.cpp" line="2370"/>
         <source>User %1: update fleet %2 pos %3 in database failed!</source>
         <translation type="unfinished">用户%1：更新数据库中舰队%2位置%3失败！</translation>
     </message>
@@ -2548,23 +2548,23 @@ Great at battle and bad at politics--so cool!</source>
     </message>
     <message id="sortie-node-battle-failure-end">
         <location filename="../Server/server_battle.cpp" line="833"/>
-        <location filename="../Server/server_battle.cpp" line="1405"/>
+        <location filename="../Server/server_battle.cpp" line="1415"/>
         <source>User %1: end node battle failure!</source>
         <translation type="unfinished">用户%1：结束节点战斗失败！</translation>
     </message>
     <message id="map-info-failure-exp">
-        <location filename="../Server/server_battle.cpp" line="1456"/>
+        <location filename="../Server/server_battle.cpp" line="1466"/>
         <source>Map info: query mapid %1 nodeid %2 exp failed!</source>
         <translation type="unfinished">海域信息：查询海域ID%1节点ID%2经验值失败！</translation>
     </message>
     <message id="sortie-node-battle-failure-transport-read">
         <location filename="../Server/server_battle.cpp" line="787"/>
-        <location filename="../Server/server_battle.cpp" line="1498"/>
+        <location filename="../Server/server_battle.cpp" line="1508"/>
         <source>User %1: transport node read failure!</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="sortie-node-battle-failure-transport-clear">
-        <location filename="../Server/server_battle.cpp" line="1527"/>
+        <location filename="../Server/server_battle.cpp" line="1537"/>
         <source>User %1: transport node clear failure!</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2574,46 +2574,46 @@ Great at battle and bad at politics--so cool!</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="dbfail-update-ship-hp">
-        <location filename="../Server/server_battle.cpp" line="1152"/>
+        <location filename="../Server/server_battle.cpp" line="1162"/>
         <source>Failed to update player ship HP</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="dbfail-get-ship-uuid">
-        <location filename="../Server/server_battle.cpp" line="1167"/>
+        <location filename="../Server/server_battle.cpp" line="1177"/>
         <source>Failed to get ship UUID for plane loss tracking</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="dbfail-update-plane-count">
-        <location filename="../Server/server_battle.cpp" line="1222"/>
+        <location filename="../Server/server_battle.cpp" line="1232"/>
         <source>Failed to update plane count</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="ship-drop-illegal">
-        <location filename="../Server/server_battle.cpp" line="1551"/>
+        <location filename="../Server/server_battle.cpp" line="1561"/>
         <source>Attempt to drop invalid ship %1!</source>
         <translation type="unfinished">试图掉落无效舰船%1！</translation>
     </message>
     <message id="ship-drop-db-fail">
-        <location filename="../Server/server_battle.cpp" line="1564"/>
+        <location filename="../Server/server_battle.cpp" line="1574"/>
         <source>User %1: refresh database failure when drop ship %2!</source>
         <translation type="unfinished">用户%1：掉落舰船%2时刷新数据库失败！</translation>
     </message>
     <message id="add-ship-exp-failre">
-        <location filename="../Server/server_battle.cpp" line="1605"/>
-        <location filename="../Server/server_battle.cpp" line="1623"/>
-        <location filename="../Server/server_battle.cpp" line="1637"/>
-        <location filename="../Server/server_battle.cpp" line="1666"/>
-        <location filename="../Server/server_battle.cpp" line="1684"/>
+        <location filename="../Server/server_battle.cpp" line="1615"/>
+        <location filename="../Server/server_battle.cpp" line="1633"/>
+        <location filename="../Server/server_battle.cpp" line="1647"/>
+        <location filename="../Server/server_battle.cpp" line="1676"/>
+        <location filename="../Server/server_battle.cpp" line="1694"/>
         <source>User %1: add ship exp failure!</source>
         <translation type="unfinished">用户%1：添加舰船经验失败！</translation>
     </message>
     <message id="rank-add-exp-failed">
-        <location filename="../Server/server_battle.cpp" line="1702"/>
+        <location filename="../Server/server_battle.cpp" line="1712"/>
         <source>User %1: add ranking exp failed!</source>
         <translation type="unfinished">用户%1：添加排名经验失败！</translation>
     </message>
     <message id="virtual-add-exp-failed">
-        <location filename="../Server/server_battle.cpp" line="1737"/>
+        <location filename="../Server/server_battle.cpp" line="1747"/>
         <source>User %1: add virtual exp failed!</source>
         <translation type="unfinished">用户%1：添加虚拟经验失败！</translation>
     </message>
@@ -2981,53 +2981,53 @@ Great at battle and bad at politics--so cool!</source>
         <translation type="unfinished">创建rARD订单数据库失败。</translation>
     </message>
     <message id="sortie-start-failure-dock">
-        <location filename="../Server/server_battle.cpp" line="2025"/>
+        <location filename="../Server/server_battle.cpp" line="2035"/>
         <source>User %1: start map %2 failure due to uncertain docks!</source>
         <translation type="unfinished">用户%1：出击海域%2失败，船坞状态不确定！</translation>
     </message>
     <message id="sortie-start-failure-supply">
-        <location filename="../Server/server_battle.cpp" line="2049"/>
+        <location filename="../Server/server_battle.cpp" line="2059"/>
         <source>User %1: start map %2 failure due to uncertain supply!</source>
         <translation type="unfinished">用户%1：出击海域%2失败，补给状态不确定！</translation>
     </message>
     <message id="sortie-start-failure-rescheck">
-        <location filename="../Server/server_battle.cpp" line="2100"/>
+        <location filename="../Server/server_battle.cpp" line="2110"/>
         <source>User %1: start map %2 failure due to resource check!</source>
         <translation type="unfinished">用户%1：出击海域%2失败，资源检查未通过！</translation>
     </message>
     <message id="sortie-start-failure">
-        <location filename="../Server/server_battle.cpp" line="2152"/>
+        <location filename="../Server/server_battle.cpp" line="2162"/>
         <source>User %1: start map %2 failure!</source>
         <translation type="unfinished">用户%1：出击海域%2失败！</translation>
     </message>
     <message id="sortie-start-failure-node">
-        <location filename="../Server/server_battle.cpp" line="2166"/>
+        <location filename="../Server/server_battle.cpp" line="2176"/>
         <source>User %1: start map %2 node %3 failure!</source>
         <translation type="unfinished">用户%1：出击海域%2节点%3失败！</translation>
     </message>
     <message id="sortie-start-failure-index">
-        <location filename="../Server/server_battle.cpp" line="2181"/>
+        <location filename="../Server/server_battle.cpp" line="2191"/>
         <source>User %1: fleet index %2 start sortie failure!</source>
         <translation type="unfinished">用户%1：第%2舰队出击失败！</translation>
     </message>
     <message id="sortie-start-failure-general">
-        <location filename="../Server/server_battle.cpp" line="2196"/>
-        <location filename="../Server/server_battle.cpp" line="2213"/>
+        <location filename="../Server/server_battle.cpp" line="2206"/>
+        <location filename="../Server/server_battle.cpp" line="2223"/>
         <source>User %1: start sortie failure!</source>
         <translation type="unfinished">用户%1：出击失败！</translation>
     </message>
     <message id="sortie-start-failure-freight-clear">
-        <location filename="../Server/server_battle.cpp" line="2229"/>
+        <location filename="../Server/server_battle.cpp" line="2239"/>
         <source>User %1: clear freight at sortie start failure!</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="lua-error-branch">
-        <location filename="../Server/server_battle.cpp" line="2242"/>
+        <location filename="../Server/server_battle.cpp" line="2252"/>
         <source>Map %1 lua file has failed to run: %2</source>
         <translation type="unfinished">无</translation>
     </message>
     <message id="dbfail-map-supremacies">
-        <location filename="../Server/server_battle.cpp" line="2271"/>
+        <location filename="../Server/server_battle.cpp" line="2281"/>
         <source>Database failed when reading map supremacies!</source>
         <translation type="unfinished">读取海域制海权时数据库出错！</translation>
     </message>
@@ -3149,110 +3149,115 @@ Great at battle and bad at politics--so cool!</source>
         <source>User %1: add skillpoint of equipment %2 success, result: %3</source>
         <translation>用户%1：向装备%2添加技能点成功，点数：%3</translation>
     </message>
+    <message id="dbfail-when-querying-gauge">
+        <location filename="../Server/user.cpp" line="98"/>
+        <source>User ID %1: DB failure when querying gauge of map %2!</source>
+        <translation type="unfinished"></translation>
+    </message>
     <message id="user-supremacy-failure">
-        <location filename="../Server/user.cpp" line="114"/>
+        <location filename="../Server/user.cpp" line="135"/>
         <source>User %1: query map-supremacy failed!</source>
         <translation type="unfinished">用户%1：查询海域制海权失败！</translation>
     </message>
     <message id="user-add-homeport-failure">
-        <location filename="../Server/user.cpp" line="137"/>
+        <location filename="../Server/user.cpp" line="158"/>
         <source>User %1: set home port failed!</source>
         <translation type="unfinished">用户%1：设置母港失败！</translation>
     </message>
     <message id="user-add-homeport-success">
-        <location filename="../Server/user.cpp" line="143"/>
+        <location filename="../Server/user.cpp" line="164"/>
         <source>User %1: set home port</source>
         <translation type="unfinished">用户%1：已设置母港</translation>
     </message>
     <message id="dbfail-when-decreasing-map-hp">
-        <location filename="../Server/user.cpp" line="168"/>
+        <location filename="../Server/user.cpp" line="189"/>
         <source>User ID %1: DB failure when decreasing gauge of map %2!</source>
         <translation type="unfinished">用户%1：降低海域%2血条时数据库出错！</translation>
     </message>
     <message id="user-get-factory-developing-failed">
-        <location filename="../Server/user.cpp" line="195"/>
+        <location filename="../Server/user.cpp" line="216"/>
         <source>User %1: get num of factory currently developing equipment %2 failed!</source>
         <translation>用户%1：获取目前正开发装备%2的工厂槽数失败！</translation>
     </message>
     <message id="user-get-map-opened-failed">
-        <location filename="../Server/user.cpp" line="217"/>
+        <location filename="../Server/user.cpp" line="238"/>
         <source>User %1: get num of current opened maps failed!</source>
         <translation type="unfinished">用户%1：获取已开放海域数量失败！</translation>
     </message>
     <message id="user-check-resource-failed">
-        <location filename="../Server/user.cpp" line="242"/>
+        <location filename="../Server/user.cpp" line="263"/>
         <source>User %1: check resources failed!</source>
         <translation>用户%1：检查资源失败！</translation>
     </message>
     <message id="user-check-slots-failed">
-        <location filename="../Server/user.cpp" line="279"/>
+        <location filename="../Server/user.cpp" line="300"/>
         <source>User %1: check slots failed!</source>
         <translation type="unfinished">用户%1：检查槽位失败！</translation>
     </message>
     <message id="user-get-equip-amount-failed">
-        <location filename="../Server/user.cpp" line="307"/>
+        <location filename="../Server/user.cpp" line="328"/>
         <source>User %1: get equipment amount of %2 failed!</source>
         <translation>用户%1：获取装备%2的数量失败！</translation>
     </message>
     <message id="user-get-equip-data-failed">
-        <location filename="../Server/user.cpp" line="330"/>
+        <location filename="../Server/user.cpp" line="351"/>
         <source>Get equipment data of %1 failed!</source>
         <translation>获取装备%1的数据失败！</translation>
     </message>
     <message id="user-get-ship-data-failed">
-        <location filename="../Server/user.cpp" line="352"/>
+        <location filename="../Server/user.cpp" line="373"/>
         <source>Get ship data of %1 failed!</source>
         <translation>获取舰船%1的数据失败！</translation>
     </message>
     <message id="user-get-skillpoint-failed">
-        <location filename="../Server/user.cpp" line="375"/>
+        <location filename="../Server/user.cpp" line="396"/>
         <source>User %1: get skill point of equipment %2 failed!</source>
         <oldsource>Get improvement factor of equipment %2 failed!</oldsource>
         <translation type="unfinished">用户%1：获取装备%2的技能点失败！</translation>
     </message>
     <message id="init-userfactory-failed">
-        <location filename="../Server/user.cpp" line="460"/>
+        <location filename="../Server/user.cpp" line="481"/>
         <source>Set User Factory Up failed!</source>
         <translation>初始化工厂槽失败！</translation>
     </message>
     <message id="user-nonexistent-dock">
-        <location filename="../Server/user.cpp" line="476"/>
+        <location filename="../Server/user.cpp" line="497"/>
         <source>User %1: dock %2 does not exist!</source>
         <translation type="unfinished">用户%1：船坞%2不存在！</translation>
     </message>
     <message id="user-nonexistent-factory">
-        <location filename="../Server/user.cpp" line="495"/>
+        <location filename="../Server/user.cpp" line="516"/>
         <source>User %1: factory %2 does not exist!</source>
         <translation type="unfinished">用户%1：工厂%2不存在！</translation>
     </message>
     <message id="user-nonexistent-uid">
-        <location filename="../Server/user.cpp" line="515"/>
-        <location filename="../Server/user.cpp" line="590"/>
+        <location filename="../Server/user.cpp" line="536"/>
+        <location filename="../Server/user.cpp" line="611"/>
         <source>User id %1 does not exist!</source>
         <translation type="unfinished">用户%1不存在！</translation>
     </message>
     <message id="dbfail-when-decreasing-gauge">
-        <location filename="../Server/user.cpp" line="539"/>
+        <location filename="../Server/user.cpp" line="560"/>
         <source>User ID %1: DB failure when decreasing gauge of map %2!</source>
         <translation type="unfinished">用户%1：降低海域%2血条时数据库出错！</translation>
     </message>
     <message id="dbfail-when-query-map-unlocked">
-        <location filename="../Server/user.cpp" line="559"/>
+        <location filename="../Server/user.cpp" line="580"/>
         <source>User ID %1: DB failure when querying open status of map %2!</source>
         <translation type="unfinished">用户%1：查询海域%2开放状态时数据库出错！</translation>
     </message>
     <message id="new-ship-failed">
-        <location filename="../Server/user.cpp" line="654"/>
+        <location filename="../Server/user.cpp" line="675"/>
         <source>User id %1: new ship failed!</source>
         <translation>用户%1：建造舰船失败！</translation>
     </message>
     <message id="new-ship">
-        <location filename="../Server/user.cpp" line="661"/>
+        <location filename="../Server/user.cpp" line="682"/>
         <source>User id %1: new ship %2 definition %3</source>
         <translation>用户%1：建造舰船序列号%2，船名ID%3</translation>
     </message>
     <message id="new-equip-failed">
-        <location filename="../Server/user.cpp" line="619"/>
+        <location filename="../Server/user.cpp" line="640"/>
         <source>User id %1: new equipment failed!</source>
         <translation>用户%1：开发装备失败！</translation>
     </message>
@@ -3272,82 +3277,82 @@ Great at battle and bad at politics--so cool!</source>
         <translation type="unfinished">用户%1：添加舰船%2的图纸成功！</translation>
     </message>
     <message id="new-equip">
-        <location filename="../Server/user.cpp" line="626"/>
+        <location filename="../Server/user.cpp" line="647"/>
         <source>User id %1: new equipment %2 definition %3</source>
         <translation>用户%1：开发装备序列号%2，装备名ID%3</translation>
     </message>
     <message id="open-map-transaction-failed">
-        <location filename="../Server/user.cpp" line="672"/>
+        <location filename="../Server/user.cpp" line="693"/>
         <source>Failed to start transaction for opening map.</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="dbfail-when-ensuring-map-row">
-        <location filename="../Server/user.cpp" line="690"/>
+        <location filename="../Server/user.cpp" line="711"/>
         <source>User ID %1: DB failure when ensuring row for map %2!</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="dbfail-when-opening-map">
-        <location filename="../Server/user.cpp" line="704"/>
+        <location filename="../Server/user.cpp" line="725"/>
         <source>User ID %1: DB failure when opening map %2!</source>
         <translation type="unfinished">用户%1：开放海域%2时数据库出错！</translation>
     </message>
     <message id="dbfail-when-increasing-factory">
-        <location filename="../Server/user.cpp" line="725"/>
+        <location filename="../Server/user.cpp" line="746"/>
         <source>User ID %1: DB failure when increasing factory count!</source>
         <translation type="unfinished">用户%1：增加工厂数量时数据库出错！</translation>
     </message>
     <message id="init-user-factory-failed">
-        <location filename="../Server/user.cpp" line="748"/>
+        <location filename="../Server/user.cpp" line="769"/>
         <source>Set User Factory Up failed!</source>
         <translation type="unfinished">初始化工厂槽失败！</translation>
     </message>
     <message id="dbfail-when-increasing-dock">
-        <location filename="../Server/user.cpp" line="765"/>
+        <location filename="../Server/user.cpp" line="786"/>
         <source>User ID %1: DB failure when increasing dock count!</source>
         <translation type="unfinished">用户%1：增加船坞数量时数据库出错！</translation>
     </message>
     <message id="init-user-dock-failed">
-        <location filename="../Server/user.cpp" line="788"/>
+        <location filename="../Server/user.cpp" line="809"/>
         <source>Set User Dock Up failed!</source>
         <translation type="unfinished">初始化用户船坞失败！</translation>
     </message>
     <message id="open-map-commit-failed">
-        <location filename="../Server/user.cpp" line="797"/>
+        <location filename="../Server/user.cpp" line="818"/>
         <source>Failed to commit transaction for opening map.</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="dbfail-when-refresh-factory">
-        <location filename="../Server/user.cpp" line="824"/>
+        <location filename="../Server/user.cpp" line="845"/>
         <source>User ID %1: DB failure when refreshing factory</source>
         <translation>用户%1：更新工厂时发生数据库错误</translation>
     </message>
     <message id="map-supremacy-retention-incorrect">
-        <location filename="../Server/user.cpp" line="838"/>
+        <location filename="../Server/user.cpp" line="859"/>
         <source>Map supremacy retention %1 is incorrect!</source>
         <translation type="unfinished">海域制海权留存%1不正确！</translation>
     </message>
     <message id="dbfail-when-supremacy-map">
-        <location filename="../Server/user.cpp" line="854"/>
+        <location filename="../Server/user.cpp" line="875"/>
         <source>User ID %1: DB failure when setting supremacy of map %2!</source>
         <translation type="unfinished">用户%1：设置海域%2制海权时数据库出错！</translation>
     </message>
     <message id="set-resources-transaction-failed">
-        <location filename="../Server/user.cpp" line="877"/>
+        <location filename="../Server/user.cpp" line="898"/>
         <source>Failed to start transaction for set resources.</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="set-resources-failed">
-        <location filename="../Server/user.cpp" line="906"/>
+        <location filename="../Server/user.cpp" line="927"/>
         <source>User id %1: set resources failed!</source>
         <translation type="unfinished">用户%1：更新资源失败！</translation>
     </message>
     <message id="set-resources-commit-failed">
-        <location filename="../Server/user.cpp" line="914"/>
+        <location filename="../Server/user.cpp" line="935"/>
         <source>Failed to commit transaction for set resources.</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="set-resources">
-        <location filename="../Server/user.cpp" line="920"/>
+        <location filename="../Server/user.cpp" line="941"/>
         <source>User id %1: set resources %2</source>
         <oldsource>User id %1: set resources</oldsource>
         <translation type="unfinished">用户%1：更新资源</translation>

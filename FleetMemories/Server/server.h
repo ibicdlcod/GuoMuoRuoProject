@@ -153,7 +153,8 @@ private:
     void processBattle(const CSteamID &, QSslSocket *, const QJsonObject &);
     const QJsonObject processBattleCore(const CSteamID &, int, int, int,
                                         const QJsonObject &);
-    FleetInfo createEnemyFleetInfo(int mapId, int nodeId, KP::Difficulty diff);
+    FleetInfo createEnemyFleetInfo(int mapId, int nodeId,
+                                   KP::Difficulty diff, int gauge);
     void processDrop(const CSteamID &, QSslSocket *, int shipId);
     void processExpGain(const CSteamID &, int fleetIndex,
                         double baseExpGained, KP::BattleAssessment assm);

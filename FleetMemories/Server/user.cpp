@@ -84,6 +84,27 @@ void User::addSkillPoints(const CSteamID &uid, int equipId, int64 skillPoints) {
     }
 }
 
+int User::checkGauge(const CSteamID &uid, int mapId,  // relative id
+                           KP::Difficulty diff) {
+    QString diffStr = (*KP::diffEnumtoStr)[diff];
+    QSqlDatabase db = QSqlDatabase::database();
+    QSqlQuery query;
+    query.prepare("SELECT Gauge" + diffStr + " FROM UserMapState "
+                  "WHERE User = :id AND MapDef = :def;");
+    query.bindValue(":id", uid.ConvertToUint64());
+    query.bindValue(":def", mapId);
+    if(Q_UNLIKELY(!query.exec() || !query.isSelect())){
+        //% "User ID %1: DB failure when querying gauge of map %2!"
+        throw DBError(qtTrId("dbfail-when-querying-gauge")
+                          .arg(uid.ConvertToUint64()).arg(mapId),
+                      query.lastError(), query.lastQuery());
+        return false;
+    }
+    else {
+        return query.first();
+    }
+}
+
 KP::AllegianceGroup User::checkHomePort(const CSteamID &uid) {
     QSqlDatabase db = QSqlDatabase::database();
     QSqlQuery query;
