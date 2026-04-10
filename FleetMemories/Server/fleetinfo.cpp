@@ -12,6 +12,7 @@
 #include <QSettings>
 
 #include "fleetinfo.h"
+#include "user.h"
 
 extern std::unique_ptr<QSettings> settings;
 
@@ -200,7 +201,16 @@ QList<int> FleetInfo::findEscortCandidates(bool isExpedition) const
         const Ship *ship = ships[i];
         const ShipDynamic *dyn = shipDynamics[i];
         if (!ship || !dyn || dyn->fleetFled) continue;
-        if (!ship->isDestroyer() && !ship->isLightCruiser()) continue;
+        if (!ship->isDestroyer()) continue;
+        if (!ship->isHealthy(dyn)) continue;
+        candidates.append(i);
+    }
+    /* destroyers first, light cruisers second */
+    for (int i = 0; i < static_cast<int>(ships.size()); ++i) {
+        const Ship *ship = ships[i];
+        const ShipDynamic *dyn = shipDynamics[i];
+        if (!ship || !dyn || dyn->fleetFled) continue;
+        if (!ship->isLightCruiser()) continue;
         if (!ship->isHealthy(dyn)) continue;
         candidates.append(i);
     }
@@ -361,4 +371,125 @@ LuaMap FleetInfo::effectiveAttr(const CSteamID & /* uid */, int fleetPosIndex) {
     for(auto it = c.cbegin(); it != c.cend(); ++it)
         result[it.key()] += it.value();
     return result;
+}
+
+QList<QUuid> FleetInfo::takeConsumedEquip() {
+    QList<QUuid> result = m_consumedEquip;
+    m_consumedEquip.clear();
+    return result;
+}
+
+bool FleetInfo::performEmergencyRepair() {
+    // First pass: verify all critically damaged ships have repair capability
+    for (int i = 0; i < static_cast<int>(ships.size()); ++i) {
+        Ship* ship = ships[i];
+        ShipDynamic* dyn = shipDynamics[i];
+        if (!ship || !dyn || dyn->fleetFled) continue;
+        if (!dyn->isCriticallyDamaged(ship)) continue;
+        
+        bool hasRepairItem = false;
+        // Check regular slots
+        for (int slot = 0; slot < dyn->slotEquip.size(); ++slot) {
+            QUuid equipUuid = dyn->slotEquip[slot];
+            if (equipUuid.isNull()) continue;
+            Equipment* equip = equipMap.value(equipUuid, nullptr);
+            if (!equip) continue;
+            int equipId = equip->getId();
+            if (equipId == KP::equipIdRepairPersonnel || equipId == KP::equipIdGoddess) {
+                hasRepairItem = true;
+                break;
+            }
+        }
+        // Check EX slot
+        if (!hasRepairItem && !dyn->slotEquipEx.isNull()) {
+            Equipment* equip = equipMap.value(dyn->slotEquipEx, nullptr);
+            if (equip) {
+                int equipId = equip->getId();
+                if (equipId == KP::equipIdRepairPersonnel || equipId == KP::equipIdGoddess) {
+                    hasRepairItem = true;
+                }
+            }
+        }
+        
+        if (!hasRepairItem) {
+            return false; // This ship cannot be repaired, abort entire operation
+        }
+    }
+    
+    // Second pass: apply repairs and consume items
+    for (int i = 0; i < static_cast<int>(ships.size()); ++i) {
+        Ship* ship = ships[i];
+        ShipDynamic* dyn = shipDynamics[i];
+        if (!ship || !dyn || dyn->fleetFled) continue;
+        if (!dyn->isCriticallyDamaged(ship)) continue;
+        
+        int maxHP = ship->attr.value("Hitpoints", 1);
+        
+        // Look for repair personnel first, then goddess
+        bool repaired = false;
+        // Check regular slots
+        for (int slot = 0; slot < dyn->slotEquip.size(); ++slot) {
+            QUuid equipUuid = dyn->slotEquip[slot];
+            if (equipUuid.isNull()) continue;
+            Equipment* equip = equipMap.value(equipUuid, nullptr);
+            if (!equip) continue;
+            int equipId = equip->getId();
+            
+            if (equipId == KP::equipIdRepairPersonnel) {
+                // Repair personnel: add 1/4 max HP
+                dyn->currentHP += maxHP / 4;
+                if (dyn->currentHP > maxHP) dyn->currentHP = maxHP;
+                dyn->slotEquip[slot] = QUuid(); // Clear slot
+                m_consumedEquip.append(equipUuid);
+                repaired = true;
+                break;
+            }
+        }
+        
+        // If no repair personnel found, check for goddess
+        if (!repaired) {
+            // Check regular slots for goddess
+            for (int slot = 0; slot < dyn->slotEquip.size(); ++slot) {
+                QUuid equipUuid = dyn->slotEquip[slot];
+                if (equipUuid.isNull()) continue;
+                Equipment* equip = equipMap.value(equipUuid, nullptr);
+                if (!equip) continue;
+                int equipId = equip->getId();
+                
+                if (equipId == KP::equipIdGoddess) {
+                    // Goddess: full HP, condition, fuel, ammo
+                    dyn->currentHP = maxHP;
+                    dyn->condition = KP::conditionMax;
+                    dyn->fuel = 1.0;
+                    dyn->ammo = 1.0;
+                    dyn->slotEquip[slot] = QUuid(); // Clear slot
+                    m_consumedEquip.append(equipUuid);
+                    repaired = true;
+                    break;
+                }
+            }
+            
+            // Check EX slot for goddess (if not found in regular slots)
+            if (!repaired && !dyn->slotEquipEx.isNull()) {
+                Equipment* equip = equipMap.value(dyn->slotEquipEx, nullptr);
+                if (equip && equip->getId() == KP::equipIdGoddess) {
+                    dyn->currentHP = maxHP;
+                    dyn->condition = KP::conditionMax;
+                    dyn->fuel = 1.0;
+                    dyn->ammo = 1.0;
+                    dyn->slotEquipEx = QUuid(); // Clear EX slot
+                    m_consumedEquip.append(dyn->slotEquipEx);
+                    repaired = true;
+                }
+            }
+        }
+        
+        // Should always succeed due to verification pass
+        if (!repaired) {
+            // This shouldn't happen, but for safety
+            return false;
+        }
+    }
+    
+    return true;
 }
