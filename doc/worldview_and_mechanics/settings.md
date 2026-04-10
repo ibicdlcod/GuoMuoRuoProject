@@ -27,7 +27,7 @@
 |          msg_disabled/fatal          |                false                |                                                              |
 |           rule/devresscale           |                 10                  | the more this value, the more resources and time is required to develop equipment |
 |           rule/devtimebase           |                  6                  | the more this value, the more time is required to develop equipment |
-|     rule/equipmentdamagebasechance   |                 0.3                 | base chance (0–1) for non‑plane equipment to be damaged when ship takes HP damage; chance = base × (1 − remaining HP ratio) |
+|     rule/equipmentdamagebasechance   |                 1.0                 | base chance (0–1) for non‑plane equipment to be damaged when ship takes HP damage; chance = base × (1 − remaining HP ratio) |
 |        rule/skillpointfactor         |                1.25                 | the more this value, the more tech affects an equipment's standard skill points |
 |         rule/skillpointbase          |               10000.0               | the more this value, the more any equipment's standard skill points |
 |       rule/techcombinedeffects       |                 3.0                 | maximum deterimental effects of inferior local/global technology on global/local technology |
