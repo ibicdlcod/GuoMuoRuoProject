@@ -80,6 +80,11 @@ public:
     QHash<QUuid, Equipment *> equipMap;
     /* Per-UUID skill-point effect factor; populated by Server::queryFleetInfo. */
     QHash<QUuid, double> equipSkillEffects;
+
+    /* Emergency repair system */
+    QList<QUuid> m_consumedEquip;
+    bool performEmergencyRepair();
+    QList<QUuid> takeConsumedEquip();
 };
 
 #endif // FLEETINFO_H
