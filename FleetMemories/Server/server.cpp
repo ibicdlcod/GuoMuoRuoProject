@@ -3261,6 +3261,7 @@ void Server::handleConvertSkillPoints(const CSteamID &uid,
 
     if(!equipRegistry.contains(srcEquipId) ||
        !equipRegistry.contains(dstEquipId)) {
+        //% "Equipment not found for skill point conversion"
         qCritical() << qtTrId("convert-skillpoints-equip-not-found")
                        .arg(srcEquipId).arg(dstEquipId);
         QByteArray msg = KP::serverDevelopFailed(KP::DevelopNotExist);
@@ -3271,6 +3272,7 @@ void Server::handleConvertSkillPoints(const CSteamID &uid,
     Equipment *srcEquip = equipRegistry.value(srcEquipId);
     Equipment *dstEquip = equipRegistry.value(dstEquipId);
     if(srcEquip->isInvalid() || dstEquip->isInvalid()) {
+        //% "Equipment not found for skill point conversion"
         qCritical() << qtTrId("convert-skillpoints-equip-not-found")
                        .arg(srcEquipId).arg(dstEquipId);
         QByteArray msg = KP::serverDevelopFailed(KP::DevelopNotExist);
@@ -3279,6 +3281,7 @@ void Server::handleConvertSkillPoints(const CSteamID &uid,
     }
 
     if(srcEquipId == dstEquipId) {
+        //% "Cannot convert skill points between same equipment"
         qCritical() << qtTrId("convert-skillpoints-same-equipment")
                        .arg(srcEquipId);
         QByteArray msg = KP::serverDevelopFailed(KP::DevelopNotOption);
@@ -3286,8 +3289,27 @@ void Server::handleConvertSkillPoints(const CSteamID &uid,
         return;
     }
 
+    if(srcEquip->type.isVirtual()) {
+        //% "Cannot convert skill points from virtual equipment"
+        qCritical() << qtTrId("convert-skillpoints-virtual-source")
+                       .arg(srcEquipId);
+        QByteArray msg = KP::serverDevelopFailed(KP::DevelopNotOption);
+        senderM.sendMessage(connection, msg);
+        return;
+    }
+
+    if(dstEquip->type.isVirtual()) {
+        //% "Cannot convert skill points to virtual equipment"
+        qCritical() << qtTrId("convert-skillpoints-virtual-destination")
+                       .arg(dstEquipId);
+        QByteArray msg = KP::serverDevelopFailed(KP::DevelopNotOption);
+        senderM.sendMessage(connection, msg);
+        return;
+    }
+
     int motherId = dstEquip->attr.value("Mother", 0);
     if(motherId != srcEquipId) {
+        //% "Source equipment must be mother of destination equipment"
         qCritical() << qtTrId("convert-skillpoints-not-mother-child")
                        .arg(srcEquipId).arg(dstEquipId);
         QByteArray msg = KP::serverDevelopFailed(KP::DevelopNotOption);
@@ -3296,6 +3318,7 @@ void Server::handleConvertSkillPoints(const CSteamID &uid,
     }
 
     if(amount <= 0) {
+        //% "Invalid amount for skill point conversion"
         qCritical() << qtTrId("convert-skillpoints-invalid-amount")
                        .arg(amount);
         QByteArray msg = KP::serverDevelopFailed(KP::ResourceLack);
@@ -3305,6 +3328,7 @@ void Server::handleConvertSkillPoints(const CSteamID &uid,
 
     qint64 srcSP = User::getSkillPoints(uid, srcEquipId);
     if(srcSP < amount) {
+        //% "Insufficient skill points for conversion"
         qCritical() << qtTrId("convert-skillpoints-insufficient")
                        .arg(srcEquipId).arg(srcSP).arg(amount);
         QByteArray msg = KP::serverDevelopFailed(KP::ResourceLack);
@@ -3315,6 +3339,7 @@ void Server::handleConvertSkillPoints(const CSteamID &uid,
     int64 srcStd = srcEquip->skillPointsStd();
     int64 dstStd = dstEquip->skillPointsStd();
     if(srcStd <= 0 || dstStd <= 0) {
+        //% "Invalid skill point standard values"
         qCritical() << qtTrId("convert-skillpoints-invalid-std")
                        .arg(srcEquipId).arg(srcStd)
                        .arg(dstEquipId).arg(dstStd);
@@ -3322,9 +3347,10 @@ void Server::handleConvertSkillPoints(const CSteamID &uid,
         senderM.sendMessage(connection, msg);
         return;
     }
-    if (srcStd > 0 &&
-        amount > std::numeric_limits<int64>::max() / srcStd) {
-        qCritical() << qtTrId("convert-skillpoints-overflow")
+     if (srcStd > 0 &&
+         amount > std::numeric_limits<int64>::max() / srcStd) {
+         //% "Skill point conversion overflow detected"
+         qCritical() << qtTrId("convert-skillpoints-overflow")
                        .arg(srcEquipId).arg(amount).arg(srcStd);
         QByteArray msg = KP::serverDevelopFailed(KP::ResourceLack);
         senderM.sendMessage(connection, msg);

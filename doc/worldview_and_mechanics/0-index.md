@@ -1,12 +1,14 @@
 # Index
 
 - [Overview](1-overview.md)
+
 - [Technology](2-technology.md)
-
 * [Resources](3-resources.md)
+  
   * [Ore Purifier (DLC)](3.1-orepurifier.md) [NOTYETIMPLEMENTED]
-* [Equipment](4-equipment.md)
 
+* [Equipment](4-equipment.md)
+  
   * [Factory slot](4.1-factoryslot.md)
   * [Attributes](4.2-attributes.md)
   * [Development](4.3-development.md)
@@ -15,7 +17,9 @@
   * [Destruct](4.6-destruct.md)
   * [Improvement](4.7-improve.md)
   * [Industrial plant](4.8-industrial.md)
+
 * [Ships](5-ships.md)
+  
   * Attributes [See above]
   * [Capital-ness and fleet type](5.1-capitalness.md)
   * [Home port and initial ship](5.2-homeport.md)
@@ -29,24 +33,29 @@
   * [Labor condition](5.10-labor.md)
   * [Decoration](5.11-decoration.md)
   * [Enemies (Amnesiac Fleet)](5.12-enemyvessels.md) [PARTIAL]
+
 * [Sortie Map](6-sortie.md)
+  
   * [Normal map and map relations](6.1-map.md)
   * [Naval Supremacy and Normal expedition](6.2-supremacy.md) [Expedition: NOTYETIMPLEMENTED]
   * [Map gauge](6.3-gauge.md) [PARTIAL]
-  * [Retreat rule](6.4-retreat.md) [PARTIAL]
+  * [Retreat rule](6.4-retreat.md)
   * Historical Mode (DLC) [NOTYETIMPLEMENTED]
   * Quests and Achievements [NOTYETIMPLEMENTED]
   * Expedition quests [NOTYETIMPLEMENTED]
-* Drill [NOTYETIMPLEMENTED]
 
+* Drill [NOTYETIMPLEMENTED]
+  
   * vs AI
   * vs Player
-* Maintenance 
 
+* Maintenance
+  
   * [Supply](8.1-supply.md)
   * [Repair](8.2-repair.md)
-* Battle mechanic [NOTYETIMPLEMENTED]
 
+* Battle mechanic [NOTYETIMPLEMENTED]
+  
   * Tactical Goal (for friend fleet)
   * Tactical Goal (for enemy fleet)
   * Communication efficiency
@@ -62,4 +71,5 @@
   * Night-battle-start node
   * Commander's abilities
   * LBAS
+
 * [Shop](10-shop.md)

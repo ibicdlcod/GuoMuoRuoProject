@@ -23,8 +23,6 @@ public:
     ~NavalAcademyView();
 
 public slots:
-    void demandLocalTech(int);
-    void demandSkillPoints(int);
     void updateDstSkillPoints(const QJsonObject &);
     void updateSkillPointConvertResult(const QJsonObject &);
     void updateSrcSkillPoints(const QJsonObject &);
@@ -39,8 +37,8 @@ protected:
 
 private slots:
     void onConvertClicked();
-    void onDstEquipSelected(int index);
-    void onSrcEquipSelected(int index);
+    void onDstEquipSelected();
+    void onSrcEquipSelected();
     void updateAmountFromSlider(int value);
     void updateAmountFromSpinBox(int value);
     void updateLocalTech(const QJsonObject &);
