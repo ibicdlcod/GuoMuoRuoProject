@@ -13,7 +13,7 @@
   * [Attributes](4.2-attributes.md)
   * [Development](4.3-development.md)
   * [Normal/Special/Virtual preconditions](4.4-precondition.md) [Virtual preconditions: exotic conditions experience gain not implemented]
-  * [Equipment skill points](4.5-skillpoints.md) [Loss: NOTYETIMPLEMENTED]
+  * [Equipment skill points](4.5-skillpoints.md)
   * [Destruct](4.6-destruct.md)
   * [Improvement](4.7-improve.md)
   * [Industrial plant](4.8-industrial.md)
