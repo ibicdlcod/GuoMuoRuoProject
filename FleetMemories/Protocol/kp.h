@@ -69,6 +69,8 @@ static constexpr int normalFleetMaxCapitalness = 20;
 static constexpr int combinedFleetMinCapitalness = 15;
 static constexpr int combinedFleetMaxCapitalness = 50;
 static constexpr int transportFleetMaxCapitalness = 25;
+static constexpr int expeditionFleetMask = 256;
+static constexpr int maxExpeditionsPerUser = 10;
 static constexpr int resourceMapIDStart = 1024;
 static constexpr int resourceMapIDEnd = 2048;
 static constexpr int mapIDDifficultyMask = 4096;
@@ -263,6 +265,11 @@ enum CommandType{
     ProgressMap,
     EnterBattleNode,
     ChooseNode,
+    CancelExpedition,
+    QueryExpeditionStatus,
+    SetExpeditionSettings,
+    StartExpedition,
+    UpdateExpeditionPlan,
     DemandRankInfo,
     ARDPurchaseAuth,
     BuyFromStore,
@@ -345,6 +352,10 @@ enum InfoType{
     MapInfoUser,
     MapStart,
     MapProgress,
+    ExpeditionProgressUpdate,
+    ExpeditionStartResult,
+    ExpeditionStatus,
+    ExpeditionStopped,
     VisibleBonusInfo,
     DisasterLOSInfo,
     TransportFreightInfo,
@@ -763,6 +774,15 @@ QByteArray clientInitARDPurchase(int units);
 QByteArray clientMigrate(const QJsonObject &);
 QByteArray clientQueryNextNode(int, int, bool retreat = false);
 QByteArray clientSortie(int, int, bool);
+QByteArray clientCancelExpedition(int mapUnionId, int receiveFleetIndex);
+QByteArray clientQueryExpeditionStatus();
+QByteArray clientSetExpeditionSettings(int mapUnionId, double autoResupplyThreshold,
+                                       bool autoRestart = false);
+QByteArray clientStartExpedition(int mapUnionId, int fleetIndex,
+                                 const QMap<int, QByteArray> &battlePlans,
+                                 double autoResupplyThreshold);
+QByteArray clientUpdateExpeditionPlan(int mapUnionId,
+                                      const QMap<int, QByteArray> &battlePlans);
 QByteArray clientStateChange(GameState);
 QByteArray clientSteamAuth(uint8 [], uint32);
 QByteArray clientSteamLogout();
@@ -918,6 +938,12 @@ QByteArray serverTransportFreightInfo(int currentFreight, int capacity,
                                   int added);
 QByteArray serverPlaneReplenishResult(GameError, const ResOrd &cost);
 QByteArray serverMapStart(int mapId, int startNode);
+QByteArray serverExpeditionProgressUpdate(int mapUnionId, int nodeIndex,
+                                          const QJsonObject &battleResult);
+QByteArray serverExpeditionStartResult(int mapUnionId, bool accepted,
+                                       const QString &errorReason = QString());
+QByteArray serverExpeditionStatus(const QJsonArray &expeditions);
+QByteArray serverExpeditionStopped(int mapUnionId, int stopReason);
 QByteArray serverMedalPurchased(int amount);
 QByteArray serverNewEquip(QUuid, int);
 QByteArray serverNewmodelShip(QUuid, int, int);
