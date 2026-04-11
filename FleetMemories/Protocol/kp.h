@@ -25,6 +25,7 @@ Use macro "__cplusplus" to check whether your compiler supports it.)
 #include <QCborValue>
 #include <QDateTime>
 #include <QLocale>
+#include <optional>
 #include "steam/steamtypes.h"
 
 #pragma message(NOT_M_CONST)
@@ -58,7 +59,7 @@ Q_NAMESPACE
 /* this is deliberately not customized */
 /* do not modify as this is used in steam tickets */
 static constexpr int practicalBufferSize = 1024;
-static constexpr int fleetsSize = 4;
+static constexpr int nonExpeditionFleetsSize = 4;
 static constexpr int normalFleetSize = 7;
 static constexpr int combinedFleetSize = 14;
 static constexpr int fleetRepSize = 0x10;
@@ -310,7 +311,8 @@ enum GameError{
     ExpeditionInternalError,
     ExpeditionAlreadyExists,
     ExpeditionFleetAlreadyOnExpedition,
-    ExpeditionMaxReached
+    ExpeditionMaxReached,
+    ExpeditionFleetDoesNotFitMap
 };
 Q_ENUM_NS(GameError)
 
@@ -759,6 +761,8 @@ QByteArray clientDemandMapInfoUser();
 QByteArray clientDemandDecorate(const QList<QUuid> &);
 QByteArray clientDemandModernize(const QList<QUuid> &, bool);
 QByteArray clientDemandRankInfo(int, std::optional<int> page = std::nullopt);
+QByteArray clientExpeditionStatus(
+    std::optional<int> mapUnionId = std::nullopt);
 QByteArray clientDemandRepair(const QUuid &, int,
                               bool stop = false, bool forced = false);
 QByteArray clientDemandResourceUpdate();
@@ -788,10 +792,10 @@ QByteArray clientCancelExpedition(int mapUnionId, int receiveFleetIndex);
 QByteArray clientQueryExpeditionStatus();
 QByteArray clientSetExpeditionSettings(int mapUnionId, double autoResupplyThreshold,
                                        bool autoRestart = false);
-QByteArray clientStartExpedition(int mapUnionId, int fleetIndex,
+QByteArray clientStartExpedition(int mapId, int fleetIndex,
                                  const QMap<int, QByteArray> &battlePlans,
                                  double autoResupplyThreshold);
-QByteArray clientUpdateExpeditionPlan(int mapUnionId,
+QByteArray clientUpdateExpeditionPlan(int mapId,
                                       const QMap<int, QByteArray> &battlePlans);
 QByteArray clientStateChange(GameState);
 QByteArray clientSteamAuth(uint8 [], uint32);
@@ -948,12 +952,12 @@ QByteArray serverTransportFreightInfo(int currentFreight, int capacity,
                                   int added);
 QByteArray serverPlaneReplenishResult(GameError, const ResOrd &cost);
 QByteArray serverMapStart(int mapId, int startNode);
-QByteArray serverExpeditionProgressUpdate(int mapUnionId, int nodeIndex,
+QByteArray serverExpeditionProgressUpdate(int mapId, int nodeIndex,
                                           const QJsonObject &battleResult);
-QByteArray serverExpeditionStartResult(int mapUnionId, bool accepted,
+QByteArray serverExpeditionStartResult(int mapId, bool accepted,
                                        GameError error = KP::NoError);
 QByteArray serverExpeditionStatus(const QJsonArray &expeditions);
-QByteArray serverExpeditionStopped(int mapUnionId, int stopReason);
+QByteArray serverExpeditionStopped(int mapId, int stopReason);
 QByteArray serverMedalPurchased(int amount);
 QByteArray serverNewEquip(QUuid, int);
 QByteArray serverNewmodelShip(QUuid, int, int);
