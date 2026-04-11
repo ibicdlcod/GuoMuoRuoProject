@@ -133,6 +133,8 @@ Sortie::Sortie(QWidget *parent)
     
     connect(renderer, &MapRender::mapSelected,
             this, &Sortie::switchMap);
+    connect(this, &Sortie::expeditionMapsUpdated,
+            renderer, &MapRender::setExpeditionMaps);
     ui->diffChoice->setSizeAdjustPolicy(QComboBox::AdjustToContents);
     connect(ui->sortieButton, &QPushButton::clicked,
             this, &Sortie::confirmSortieStart);
@@ -405,6 +407,11 @@ void Sortie::recalculateAttrition() {
         ui->diffChoice->setCurrentIndex(index);
     }
     recalculateAttrition();
+    // Update expedition UI state if in expedition mode
+    if (expeditionMode) {
+        int mapUnionId = MapWithDiff::getUnionId(mapId);
+        updateExpeditionUI(mapUnionId);
+    }
  }
 
 void Sortie::confirmSortieStart() {
