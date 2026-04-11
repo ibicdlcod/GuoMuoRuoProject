@@ -3471,6 +3471,53 @@ void Server::handleStartExpedition(const CSteamID &uid, QSslSocket *connection,
                 it.value().toString().toUtf8());
             battlePlans[nodeIndex] = planData;
         }
+        
+        /* If no battle plans provided, try to load from database */
+        if (battlePlans.isEmpty()) {
+            qDebug() << "No battle plans provided, attempting to load from database";
+            bool loadedFromDB = false;
+            try {
+                QSqlQuery query;
+                query.prepare(
+                    "SELECT NodeIndex, PlanData FROM UserExpeditionBattlePlan "
+                    "WHERE User = :user AND MapUnionId = :mapUnionId"
+                );
+                query.bindValue(":user", uid.ConvertToUint64());
+                query.bindValue(":mapUnionId", mapUnionId);
+                
+                if (!query.exec()) {
+                    //% "Failed to query battle plans for user %1 map %2"
+                    throw DBError(qtTrId("expedition-query-battle-plans-failed")
+                                     .arg(uid.ConvertToUint64()).arg(mapUnionId),
+                                  query.lastError(), query.lastQuery());
+                }
+                
+                while (query.next()) {
+                    int nodeIndex = query.value("NodeIndex").toInt();
+                    QByteArray planData = query.value("PlanData").toByteArray();
+                    battlePlans[nodeIndex] = planData;
+                }
+                
+                loadedFromDB = true;
+                qDebug() << "Loaded" << battlePlans.size() 
+                         << "battle plans from database for map" << mapUnionId;
+            }
+            catch (const DBError &e) {
+                //% "Failed to load battle plans from database for user %1 map %2"
+                qWarning() << qtTrId("expedition-load-plans-failed")
+                              .arg(uid.ConvertToUint64()).arg(mapUnionId);
+                /* Continue with empty plans - will be validated later */
+            }
+            
+            /* If still no battle plans (database empty or query failed), return error */
+            if (battlePlans.isEmpty()) {
+                qWarning() << "No battle plans available for expedition";
+                QByteArray msg = KP::serverExpeditionStartResult(mapUnionId, false,
+                                         KP::ExpeditionInvalidBattlePlans);
+                senderM.sendMessage(connection, msg);
+                return;
+            }
+        }
 
         if (!hasMapWithUnionId(mapUnionId)) {
             QByteArray msg = KP::serverExpeditionStartResult(mapUnionId, false,
@@ -3596,9 +3643,11 @@ bool Server::validateExpeditionBattlePlans(int mapUnionId,
         return false;
     }
 
+    /* Empty battle plans are allowed (e.g., deleting all plans during update).
+     * Caller must decide if empty plans are acceptable for the operation. */
     if (battlePlans.isEmpty()) {
-        qWarning() << "No battle plans provided";
-        return false;
+        qDebug() << "Empty battle plans provided";
+        return true;
     }
 
     /* First pass: validate all provided battle plans are for valid nodes */

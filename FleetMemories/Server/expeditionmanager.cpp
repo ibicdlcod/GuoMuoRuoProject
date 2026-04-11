@@ -170,7 +170,7 @@ KP::GameError ExpeditionManager::startExpedition(const CSteamID &uid, int mapUni
     
     /* Insert battle plans */
     query.prepare(
-        "INSERT INTO UserExpeditionBattlePlan "
+        "INSERT OR REPLACE INTO UserExpeditionBattlePlan "
         "(User, MapUnionId, NodeIndex, NodeType, PlanData, SelectedChoiceNode) "
         "VALUES (:user, :mapUnionId, :nodeIndex, :nodeType, :planData, "
         ":selectedChoiceNode)"
@@ -424,7 +424,7 @@ bool ExpeditionManager::updateBattlePlans(const CSteamID &uid, int mapUnionId,
     
     /* Insert new battle plans */
     query.prepare(
-        "INSERT INTO UserExpeditionBattlePlan "
+        "INSERT OR REPLACE INTO UserExpeditionBattlePlan "
         "(User, MapUnionId, NodeIndex, NodeType, PlanData, SelectedChoiceNode) "
         "VALUES (:user, :mapUnionId, :nodeIndex, :nodeType, :planData, "
         ":selectedChoiceNode)"
