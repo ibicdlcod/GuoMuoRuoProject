@@ -30,6 +30,7 @@ MapRender::MapRender(QWidget *parent)
     pixmap = QPixmap::fromImage(image);
 
     pen = QPen(QColor(128, 192, 255), 7);
+    expeditionPen = QPen(QColor(128, 0, 255), 7);
     brushHovered = QBrush(Qt::blue);
 
     setBackgroundRole(QPalette::Base);
@@ -65,6 +66,12 @@ void MapRender::setDiff(const QString &text) {
     else if(text == qtTrId("diff-s")) {
         diff = KP::Historical;
     }
+}
+
+void MapRender::setExpeditionMaps(const QSet<int> &mapIds)
+{
+    expeditionMapIds = mapIds;
+    update();
 }
 
 void MapRender::mouseMoveEvent(QMouseEvent *event)
@@ -139,7 +146,6 @@ void MapRender::paintEvent(QPaintEvent * /* event */)
                        );
     painter.scale(width() / (double)globeMapWidth,
                   height() / (double)globeMapHeight);
-    painter.setPen(pen);
     if (antialiased)
         painter.setRenderHint(QPainter::Antialiasing, true);
 
@@ -164,6 +170,11 @@ void MapRender::paintEvent(QPaintEvent * /* event */)
         else {
             brush = QBrush(QColor::fromHsv(hueFactor * 120.0, 255, 255));
             painter.setBrush(brush);
+        }
+        if (expeditionMapIds.contains(MapWithDiff::getUnionId(map->id))) {
+            painter.setPen(expeditionPen);
+        } else {
+            painter.setPen(pen);
         }
         painter.drawEllipse(map->worldX - circleSize / 2,
                             map->worldY - circleSize / 2,

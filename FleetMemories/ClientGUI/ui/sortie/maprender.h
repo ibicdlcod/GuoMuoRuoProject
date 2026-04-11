@@ -21,6 +21,7 @@ public:
 
 public slots:
     void setDiff(const QString &text);
+    void setExpeditionMaps(const QSet<int> &mapIds);
 
 signals:
     void mapSelected(int mapId);
@@ -41,6 +42,9 @@ private:
     bool mousePressedInside = false;
     int hoverMapID = 0;
     KP::Difficulty diff;
+    
+    QSet<int> expeditionMapIds;
+    QPen expeditionPen;
 };
 
 #endif // MAPRENDER_H
