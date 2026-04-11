@@ -775,11 +775,11 @@ void Sortie::updateExpeditionUI(int mapUnionId)
     
     if (hasExpedition) {
         QJsonObject expObj = activeExpeditions[mapUnionId];
-        double threshold = expObj["autoresupplythreshold"].toDouble(1.0);
-        bool expAutoResupply = expObj.value("autorestart").toBool(true);
+        double expThreshold = expObj["autoresupplythreshold"].toDouble(1.0);
+        bool expAutoResupply = expObj.value("autorestart").toBool(false);
         
         thresholdSlider->blockSignals(true);
-        thresholdSlider->setValue(qRound(threshold * 100));
+        thresholdSlider->setValue(qRound(expThreshold * 100));
         thresholdSlider->setEnabled(false);
         thresholdSlider->blockSignals(false);
         
@@ -790,7 +790,7 @@ void Sortie::updateExpeditionUI(int mapUnionId)
         
         //% "Auto-restart: %1%"
         thresholdLabel->setText(qtTrId("expedition-auto-restart-label")
-                               .arg(qRound(threshold * 100)));
+                               .arg(qRound(expThreshold * 100)));
     } else {
         thresholdSlider->setEnabled(true);
         autoRestartCheckBox->setEnabled(true);
