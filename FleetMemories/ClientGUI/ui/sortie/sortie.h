@@ -9,6 +9,7 @@
 #include <QJsonArray>
 #include <QJsonObject>
 #include <QMap>
+#include <QSet>
 #include <QByteArray>
 #include "../../../Protocol/kp.h"
 #include "mapdetail.h"
@@ -30,6 +31,9 @@ class QCheckBox;
 class Sortie : public QFrame
 {
     Q_OBJECT
+
+signals:
+    void expeditionMapsUpdated(const QSet<int> &mapIds);
 
 public:
     explicit Sortie(QWidget *parent = nullptr);
@@ -60,6 +64,7 @@ private slots:
     void expeditionStatus(const QJsonArray &expeditions);
     void expeditionProgressUpdate(int mapUnionId, int nodeIndex, const QJsonObject &battleResult);
     void expeditionStopped(int mapUnionId, int stopReason);
+    void updateExpeditionUI(int mapUnionId);
     void startExpedition();
     void cancelExpedition();
     void updateExpeditionSettings();
@@ -95,6 +100,7 @@ private:
     // Expedition state
     bool expeditionMode = false;
     QMap<int, QMap<int, QByteArray>> expeditionBattlePlans;
+    QMap<int, QJsonObject> activeExpeditions;
     double autoRestartThreshold = 1.0; // 100%
     bool autoResupply = true;
     int expeditionFleetIndex = 0;

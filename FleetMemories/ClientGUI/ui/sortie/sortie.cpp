@@ -697,26 +697,29 @@ void Sortie::dealWithNode(const MapNode &node, int nodeId) {
              }
          }
          
-         int mapUnionId = MapWithDiff::getUnionId(currentMap->id);
-         int mapAbsoluteId = currentMap->getAbsoluteId();
-         qDebug() << "startExpedition: map union ID:" << mapUnionId 
-                  << "map absolute ID:" << mapAbsoluteId
-                  << "fleetIndex:" << fleetIndex;
-         
-         /* Get battle plans - try union ID first, then absolute ID for backward compatibility */
-         QMap<int, QByteArray> plans = expeditionBattlePlans.value(mapUnionId);
-         if (plans.isEmpty()) {
-             plans = expeditionBattlePlans.value(mapAbsoluteId);
-             if (!plans.isEmpty()) {
-                 qDebug() << "Migrating battle plans from absolute ID to union ID";
-                 expeditionBattlePlans[mapUnionId] = plans;
-                 expeditionBattlePlans.remove(mapAbsoluteId);
-             }
-         }
-         
-         expeditionFleetIndex = fleetIndex;
-         Client::getInstance().startExpedition(mapUnionId, fleetIndex,
-                                              plans, autoRestartThreshold);
+          int mapId = currentMap->id;
+          int mapUnionId = MapWithDiff::getUnionId(mapId);
+          KP::Difficulty diff = MapWithDiff::getDiff(mapId);
+          qDebug() << "startExpedition: map ID:" << mapId 
+                   << "union ID:" << mapUnionId
+                   << "difficulty:" << static_cast<int>(diff)
+                   << "fleetIndex:" << fleetIndex;
+          
+          /* Get battle plans using map ID (includes difficulty) */
+          QMap<int, QByteArray> plans = expeditionBattlePlans.value(mapId);
+          if (plans.isEmpty()) {
+              /* Try legacy union ID for backward compatibility */
+              plans = expeditionBattlePlans.value(mapUnionId);
+              if (!plans.isEmpty()) {
+                  qDebug() << "Migrating battle plans from union ID to map ID";
+                  expeditionBattlePlans[mapId] = plans;
+                  expeditionBattlePlans.remove(mapUnionId);
+              }
+          }
+          
+          expeditionFleetIndex = fleetIndex;
+          Client::getInstance().startExpedition(mapId, fleetIndex,
+                                               plans, autoRestartThreshold);
      }
      else {
          delete conf;
@@ -729,11 +732,13 @@ void Sortie::cancelExpedition()
         qWarning() << "No map selected for expedition";
         return;
     }
-    int mapUnionId = MapWithDiff::getUnionId(currentMap->id);
-    int mapAbsoluteId = currentMap->getAbsoluteId();
-    qDebug() << "cancelExpedition: map union ID:" << mapUnionId 
-             << "map absolute ID:" << mapAbsoluteId;
-    Client::getInstance().cancelExpedition(mapUnionId, expeditionFleetIndex);
+    int mapId = currentMap->id;
+    int mapUnionId = MapWithDiff::getUnionId(mapId);
+    KP::Difficulty diff = MapWithDiff::getDiff(mapId);
+    qDebug() << "cancelExpedition: map ID:" << mapId 
+             << "union ID:" << mapUnionId
+             << "difficulty:" << static_cast<int>(diff);
+    Client::getInstance().cancelExpedition(mapId, expeditionFleetIndex);
 }
 
  void Sortie::updateExpeditionSettings()
@@ -758,6 +763,12 @@ void Sortie::expeditionStartResult(int mapUnionId, bool accepted,
         //% "Expedition Start Failed"
         QMessageBox::warning(this, qtTrId("expedition-start-failed"), errorString);
     }
+}
+
+void Sortie::updateExpeditionUI(int mapUnionId)
+{
+    /* TODO: implement UI updates for expedition mapUnionId */
+    /* This stub will be replaced in Task 2 */
 }
 
 void Sortie::expeditionStatus(const QJsonArray &expeditions)
