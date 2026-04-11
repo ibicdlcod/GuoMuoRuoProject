@@ -767,13 +767,62 @@ void Sortie::expeditionStartResult(int mapUnionId, bool accepted,
 
 void Sortie::updateExpeditionUI(int mapUnionId)
 {
-    /* TODO: implement UI updates for expedition mapUnionId */
-    /* This stub will be replaced in Task 2 */
+    bool hasExpedition = activeExpeditions.contains(mapUnionId);
+    
+    expeditionPlanButton->setEnabled(!hasExpedition);
+    expeditionStartButton->setEnabled(!hasExpedition);
+    expeditionCancelButton->setEnabled(hasExpedition);
+    
+    if (hasExpedition) {
+        QJsonObject expObj = activeExpeditions[mapUnionId];
+        double threshold = expObj["threshold"].toDouble(1.0);
+        bool autoResupply = expObj["autoResupply"].toBool(true);
+        
+        thresholdSlider->blockSignals(true);
+        thresholdSlider->setValue(qRound(threshold * 100));
+        thresholdSlider->setEnabled(false);
+        thresholdSlider->blockSignals(false);
+        
+        autoRestartCheckBox->blockSignals(true);
+        autoRestartCheckBox->setChecked(autoResupply);
+        autoRestartCheckBox->setEnabled(false);
+        autoRestartCheckBox->blockSignals(false);
+        
+        //% "Auto-restart: %1%"
+        thresholdLabel->setText(qtTrId("expedition-auto-restart-label")
+                               .arg(qRound(threshold * 100)));
+    } else {
+        thresholdSlider->setEnabled(true);
+        autoRestartCheckBox->setEnabled(true);
+        // Restore local settings
+        thresholdSlider->setValue(qRound(autoRestartThreshold * 100));
+        autoRestartCheckBox->setChecked(autoResupply);
+        //% "Auto-restart: %1%"
+        thresholdLabel->setText(qtTrId("expedition-auto-restart-label")
+                               .arg(qRound(autoRestartThreshold * 100)));
+    }
 }
 
 void Sortie::expeditionStatus(const QJsonArray &expeditions)
 {
-    /* For now just log number of active expeditions */
+    activeExpeditions.clear();
+    QSet<int> expeditionMapIds;
+    
+    for (const QJsonValue &expValue : expeditions) {
+        QJsonObject expObj = expValue.toObject();
+        int mapUnionId = expObj["mapid"].toInt();
+        activeExpeditions[mapUnionId] = expObj;
+        expeditionMapIds.insert(mapUnionId);
+    }
+    
+    emit expeditionMapsUpdated(expeditionMapIds);
+    
+    // Update UI for currently selected map if in expedition mode
+    if (expeditionMode && currentMap) {
+        int mapUnionId = MapWithDiff::getUnionId(currentMap->id);
+        updateExpeditionUI(mapUnionId);
+    }
+    
     //% "Active expeditions: %1"
     qInfo() << qtTrId("expedition-status-count").arg(expeditions.size());
 }
