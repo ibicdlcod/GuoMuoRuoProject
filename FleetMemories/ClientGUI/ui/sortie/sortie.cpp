@@ -407,7 +407,7 @@ void Sortie::recalculateAttrition() {
         ui->diffChoice->setCurrentIndex(index);
     }
     recalculateAttrition();
-    // Update expedition UI state if in expedition mode
+    /* Update expedition UI state if in expedition mode */
     if (expeditionMode) {
         int mapUnionId = MapWithDiff::getUnionId(mapId);
         updateExpeditionUI(mapUnionId);
