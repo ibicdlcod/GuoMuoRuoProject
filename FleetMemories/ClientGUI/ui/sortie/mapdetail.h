@@ -31,6 +31,7 @@ public:
     QPointF getFleetCenter() const;
     static QPixmap recolorImage(const QString &filename, const QColor &color);
     void setChoiceNodes(const QList<int> &nodeIds);
+    void setExpeditionMode(bool expedition);
     void setFleetCenter(const QPointF &input);
 
 signals:
@@ -55,6 +56,7 @@ private:
 
     QList<int> choiceNodeIds;
     bool awaitingChoice = false;
+    bool expeditionMode = false;
 
     QPixmap rudder;
     QPixmap airNodeIcon;

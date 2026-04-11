@@ -627,8 +627,8 @@ Great at battle and bad at politics--so cool!</source>
         <translation type="unfinished">不正な方法で出撃海域に入ることはできません！</translation>
     </message>
     <message id="access-denied-login-first">
-        <location filename="../ClientGUI/clientv2.cpp" line="718"/>
-        <location filename="../ClientGUI/clientv2.cpp" line="1365"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="743"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="1390"/>
         <location filename="../ClientGUI/clientv2_cache.cpp" line="311"/>
         <location filename="../ClientGUI/clientv2_cache.cpp" line="330"/>
         <location filename="../ClientGUI/clientv2_cache.cpp" line="343"/>
@@ -661,7 +661,7 @@ Great at battle and bad at politics--so cool!</source>
     </message>
     <message id="read-dgram-failed">
         <location filename="../ClientGUI/clientv2.cpp" line="404"/>
-        <location filename="../Server/server.cpp" line="399"/>
+        <location filename="../Server/server.cpp" line="402"/>
         <source>Read datagram failed due to: %1</source>
         <translation type="unfinished">%1：最大再送信回数を超過しました！</translation>
     </message>
@@ -733,13 +733,13 @@ Great at battle and bad at politics--so cool!</source>
     </message>
     <message id="ip-invalid">
         <location filename="../ClientGUI/clientv2_command.cpp" line="184"/>
-        <location filename="../Server/server.cpp" line="3409"/>
+        <location filename="../Server/server.cpp" line="3687"/>
         <source>IP isn&apos;t valid.</source>
         <translation type="unfinished">使用法：connect [IP] [ポート]</translation>
     </message>
     <message id="port-invalid">
         <location filename="../ClientGUI/clientv2_command.cpp" line="191"/>
-        <location filename="../Server/server.cpp" line="3415"/>
+        <location filename="../Server/server.cpp" line="3693"/>
         <source>Port isn&apos;t valid, it must fall between 1024 and 49151</source>
         <translation type="unfinished">IPアドレスが無効です。</translation>
     </message>
@@ -765,426 +765,431 @@ Great at battle and bad at politics--so cool!</source>
         <translation type="unfinished">リモートが切断されました。</translation>
     </message>
     <message id="message-not-implemented">
-        <location filename="../ClientGUI/clientv2.cpp" line="670"/>
-        <location filename="../ClientGUI/clientv2.cpp" line="689"/>
-        <location filename="../ClientGUI/clientv2.cpp" line="1226"/>
-        <location filename="../ClientGUI/clientv2.cpp" line="1256"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="695"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="714"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="1251"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="1281"/>
         <source>Message not implemented</source>
         <translation type="unfinished">海域%1は開放されていません</translation>
     </message>
     <message id="logout-success">
-        <location filename="../ClientGUI/clientv2.cpp" line="675"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="700"/>
         <source>%1: logout success</source>
         <translation type="unfinished">メッセージは未実装です</translation>
     </message>
     <message id="logout-forced">
-        <location filename="../ClientGUI/clientv2.cpp" line="680"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="705"/>
         <source>%1: logged elsewhere, force quitting</source>
         <translation type="unfinished">%1：ログアウト成功</translation>
     </message>
     <message id="catbomb-too-much-requests">
-        <location filename="../ClientGUI/clientv2.cpp" line="685"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="710"/>
         <source>%1: Violated pack rate limit!</source>
         <translation type="unfinished">%1：別の場所でログインされたため、強制終了します</translation>
     </message>
     <message id="logout-notonline">
-        <location filename="../ClientGUI/clientv2.cpp" line="701"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="726"/>
         <source>%1: logout failure, not online</source>
         <translation type="unfinished">%1：パケットレート制限に違反しました！</translation>
     </message>
     <message id="client-bad-json">
-        <location filename="../ClientGUI/clientv2.cpp" line="712"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="737"/>
         <source>Client sent a bad JSON.</source>
         <translation type="unfinished">%1：ログアウト失敗、オンラインではありません</translation>
     </message>
     <message id="client-unsupported-json">
-        <location filename="../ClientGUI/clientv2.cpp" line="715"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="740"/>
         <source>Client sent an unsupported JSON.</source>
         <translation type="unfinished">クライアントが不正なJSONを送信しました。</translation>
     </message>
     <message id="equip-not-exist">
-        <location filename="../ClientGUI/clientv2.cpp" line="723"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="748"/>
         <source>This equipment/ship does not exist.</source>
         <oldsource>This equipment does not exist.</oldsource>
         <translation type="unfinished">クライアントが未対応のJSONを送信しました。</translation>
     </message>
     <message id="cloning-disallowed">
-        <location filename="../ClientGUI/clientv2.cpp" line="727"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="752"/>
         <source>You must use cloning vats to clone ships.</source>
         <translation type="unfinished">この装備/艦船は存在しません。</translation>
     </message>
     <message id="cloning-inexperienced">
-        <location filename="../ClientGUI/clientv2.cpp" line="731"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="756"/>
         <source>Ship level is too low!.</source>
         <translation type="unfinished">艦船の複製にはクローニング施設を使用してください。</translation>
     </message>
     <message id="blueprint-lack">
-        <location filename="../ClientGUI/clientv2.cpp" line="735"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="760"/>
         <source>You don&apos;t have the appropriate blueprints.</source>
         <translation type="unfinished">艦船のレベルが低すぎます！</translation>
     </message>
     <message id="industrial-lack">
-        <location filename="../ClientGUI/clientv2.cpp" line="739"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="764"/>
         <source>You don&apos;t have enough industrial points.</source>
         <translation type="unfinished">必要な設計図がありません。</translation>
     </message>
     <message id="equip-not-developable-father">
-        <location filename="../ClientGUI/clientv2.cpp" line="747"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="772"/>
         <source>This equipment requires you to possess %1 (id: %2) in order to develop.</source>
         <translation type="unfinished">工業ポイントが不足しています。</translation>
     </message>
     <message id="equip-not-developable-mother">
-        <location filename="../ClientGUI/clientv2.cpp" line="757"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="782"/>
         <source>This equipment requires you to possess extra %3 skillpoints of %1 (id: %2) in order to develop.</source>
         <translation type="unfinished">この装備の開発には%1（ID：%2）の所持が必要です。</translation>
     </message>
     <message id="factory-not-open">
-        <location filename="../ClientGUI/clientv2.cpp" line="767"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="792"/>
         <source>This factory/dock is closed.</source>
         <translation type="unfinished">この装備の開発には%1（ID：%2）のスキルポイントが追加で%3必要です。</translation>
     </message>
     <message id="factory-busy">
-        <location filename="../ClientGUI/clientv2.cpp" line="771"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="796"/>
         <source>You have not selected an available factory/dock slot.</source>
         <oldsource>You have not selected an available factory slot.</oldsource>
         <translation type="unfinished">この工廠/ドックは閉鎖されています。</translation>
     </message>
     <message id="resource-lack">
-        <location filename="../ClientGUI/clientv2.cpp" line="775"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="800"/>
         <source>You do not have sufficient resources.</source>
         <translation type="unfinished">空き工廠/ドックスロットを選択していません。</translation>
     </message>
     <message id="massproduction-disallowed">
-        <location filename="../ClientGUI/clientv2.cpp" line="779"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="804"/>
         <source>You have reached possessing limit for this equipment!</source>
         <translation type="unfinished">資源が不足しています。</translation>
     </message>
     <message id="production-disallowed">
-        <location filename="../ClientGUI/clientv2.cpp" line="783"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="808"/>
         <source>This equipment does not allow mass production!</source>
         <translation type="unfinished">この装備の所持上限に達しています！</translation>
     </message>
     <message id="default-equipment-incorrect">
-        <location filename="../ClientGUI/clientv2.cpp" line="787"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="812"/>
         <source>Default equipment provided is incorrect!</source>
         <translation type="unfinished">この装備は量産できません！</translation>
     </message>
     <message id="ship-to-convert-incorrect">
-        <location filename="../ClientGUI/clientv2.cpp" line="791"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="816"/>
         <source>Ship to remodel is incorrect!</source>
         <translation type="unfinished">初期装備の指定が不正です！</translation>
     </message>
     <message id="ship-is-disabled">
-        <location filename="../ClientGUI/clientv2.cpp" line="795"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="820"/>
         <source>Ship is disabled!</source>
         <translation type="unfinished">改造対象の艦船が不正です！</translation>
     </message>
     <message id="ship-is-repairing">
-        <location filename="../ClientGUI/clientv2.cpp" line="799"/>
-        <location filename="../ClientGUI/clientv2.cpp" line="1129"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="824"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="1154"/>
         <source>This operation involves ship under repair!</source>
         <translation type="unfinished">艦船は使用不能です！</translation>
     </message>
     <message id="fleet-ship-not-supplied">
-        <location filename="../ClientGUI/clientv2.cpp" line="1132"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="1157"/>
         <source>One or more ships are out of fuel or ammo.</source>
         <translation type="unfinished">この操作は修理中の艦船に関係しています！</translation>
     </message>
     <message id="fleet-insufficient-resources">
-        <location filename="../ClientGUI/clientv2.cpp" line="1140"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="1165"/>
         <source>Insufficient ordinary resources for this sortie.</source>
         <translation type="unfinished">出撃に必要な基本資源が不足しています。</translation>
     </message>
     <message id="equip-develop-failed">
-        <location filename="../ClientGUI/clientv2.cpp" line="803"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="828"/>
         <source>Equipment development failed.</source>
         <translation type="unfinished">この出撃に必要な重油または弾薬が不足しています。</translation>
     </message>
     <message id="fleet-is-busy">
-        <location filename="../ClientGUI/clientv2.cpp" line="811"/>
-        <location filename="../ClientGUI/clientv2.cpp" line="1134"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="836"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="1159"/>
         <source>Fleet is busy!</source>
         <translation type="unfinished">装備開発に失敗しました。</translation>
     </message>
     <message id="fleet-index-info">
-        <location filename="../ClientGUI/clientv2.cpp" line="1147"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="1172"/>
         <source>(fleet %1)</source>
         <translation>（第%1艦隊）</translation>
     </message>
     <message id="fleet-is-at-wrong-map-or-node">
-        <location filename="../ClientGUI/clientv2.cpp" line="815"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="840"/>
         <source>Fleet is not in correct map position!</source>
         <translation type="unfinished">艦隊は出撃中です！</translation>
     </message>
     <message id="battle-failed-server">
-        <location filename="../ClientGUI/clientv2.cpp" line="819"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="844"/>
         <source>Process battle info failed due to error on server side.</source>
         <translation type="unfinished">艦隊が正しい海域位置にいません！</translation>
     </message>
     <message id="battle-failed-server-drop">
-        <location filename="../ClientGUI/clientv2.cpp" line="823"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="848"/>
         <source>Process blueprint drop info failed due to error on server side.</source>
         <translation type="unfinished">サーバー側エラーにより戦闘情報の処理に失敗しました。</translation>
     </message>
     <message id="battle-failed">
-        <location filename="../ClientGUI/clientv2.cpp" line="827"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="852"/>
         <source>Process battle info failed.</source>
         <translation type="unfinished">サーバー側エラーにより設計図ドロップ情報の処理に失敗しました。</translation>
     </message>
     <message id="resource-require">
-        <location filename="../ClientGUI/clientv2.cpp" line="843"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="868"/>
         <source>This operation requires %1oil/%2explosives/%3steel/%4rubber/%5aluminum/%6tungsten/%7chromium</source>
         <translation type="unfinished">戦闘情報の処理に失敗しました。</translation>
     </message>
     <message id="develop-start">
-        <location filename="../ClientGUI/clientv2.cpp" line="855"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="880"/>
         <source>Developing equipment started.</source>
         <oldsource>Start developing equipment.</oldsource>
         <translation type="unfinished">この操作には重油%1/弾薬%2/鋼材%3/ゴム%4/アルミ%5/タングステン%6/クロム%7が必要です</translation>
     </message>
     <message id="construct-start">
-        <location filename="../ClientGUI/clientv2.cpp" line="858"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="883"/>
         <source>Constructing ship started.</source>
         <translation type="unfinished">装備開発を開始しました。</translation>
     </message>
     <message id="fairy-busy">
-        <location filename="../ClientGUI/clientv2.cpp" line="862"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="887"/>
         <source>Fairy is still working on %1.</source>
         <translation type="unfinished">艦船建造を開始しました。</translation>
     </message>
     <message id="factory-empty">
-        <location filename="../ClientGUI/clientv2.cpp" line="866"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="891"/>
         <source>Factory slot is empty.</source>
         <translation type="unfinished">妖精さんはまだ%1の作業中です。</translation>
     </message>
     <message id="develop-penguin">
-        <location filename="../ClientGUI/clientv2.cpp" line="871"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="896"/>
         <source>You got a cute penguin.</source>
         <translation type="unfinished">工廠スロットは空です。</translation>
     </message>
     <message id="develop-success">
-        <location filename="../ClientGUI/clientv2.cpp" line="880"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="905"/>
         <source>You got new equipment %1, serial number %2</source>
         <translation type="unfinished">かわいいペンギンを手に入れました。</translation>
     </message>
     <message id="develop-success-id">
-        <location filename="../ClientGUI/clientv2.cpp" line="888"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="913"/>
         <source>You get new equipment with id %1, serial number %2</source>
         <translation type="unfinished">新しい装備%1を入手しました。シリアル番号%2</translation>
     </message>
     <message id="construct-success">
-        <location filename="../ClientGUI/clientv2.cpp" line="902"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="927"/>
         <source>You got new ship %1, serial number %2</source>
         <translation type="unfinished">新しい装備（ID %1）を入手しました。シリアル番号%2</translation>
     </message>
     <message id="construct-success-id">
-        <location filename="../ClientGUI/clientv2.cpp" line="910"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="935"/>
         <source>You get new ship with id %1, serial number %2</source>
         <oldsource>You get new equipment with id %1, serial number %2</oldsource>
         <translation type="unfinished">新しい艦船%1を入手しました。シリアル番号%2</translation>
     </message>
     <message id="remodel-success">
-        <location filename="../ClientGUI/clientv2.cpp" line="925"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="950"/>
         <source>Ship serial number %2 is remodeled to %1</source>
         <translation type="unfinished">新しい艦船（ID %1）を入手しました。シリアル番号%2</translation>
     </message>
     <message id="remodel-success-id">
-        <location filename="../ClientGUI/clientv2.cpp" line="932"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="957"/>
         <source>Ship serial number %2 is remodeled to id %1</source>
         <translation type="unfinished">シリアル番号%2の艦船が%1に改造されました</translation>
     </message>
     <message id="ship-is-disabled-normal">
-        <location filename="../ClientGUI/clientv2.cpp" line="943"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="968"/>
         <source>Ship %1 is disabled.</source>
         <translation type="unfinished">シリアル番号%2の艦船がID %1に改造されました</translation>
     </message>
     <message id="server-hello">
-        <location filename="../ClientGUI/clientv2.cpp" line="949"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="974"/>
         <source>Server is alive and responding.</source>
         <translation type="unfinished">艦船%1は使用不能です。</translation>
     </message>
     <message id="client-start">
-        <location filename="../ClientGUI/clientv2.cpp" line="960"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="985"/>
         <source>You can now play the game.</source>
         <translation type="unfinished">サーバーは応答しています。</translation>
     </message>
     <message id="client-finish">
-        <location filename="../ClientGUI/clientv2.cpp" line="983"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="1008"/>
         <source>The client can now exit normally.</source>
         <translation type="unfinished">ゲームを開始できます。</translation>
     </message>
     <message id="destruct-equip-list">
-        <location filename="../ClientGUI/clientv2.cpp" line="996"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="1021"/>
         <source>The following equipment are destructed: %1</source>
         <translation type="unfinished">クライアントは正常に終了できます。</translation>
     </message>
     <message id="equipment-damaged">
-        <location filename="../ClientGUI/clientv2.cpp" line="1006"/>
-        <location filename="../ClientGUI/clientv2.cpp" line="1010"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="1031"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="1035"/>
         <source>Equipment %1 damaged, lost %2 skill points (same-type count: %3)</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="plane-loss-skill-deduction">
-        <location filename="../ClientGUI/clientv2.cpp" line="1024"/>
-        <location filename="../ClientGUI/clientv2.cpp" line="1029"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="1049"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="1054"/>
         <source>Plane losses: equipment %1 lost %2 planes, deducted %3 skill points (%4×%5)</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="bp-added">
-        <location filename="../ClientGUI/clientv2.cpp" line="1045"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="1070"/>
         <source>We gained the following blueprint: %1</source>
         <translation type="unfinished">以下の装備が解体されました：%1</translation>
     </message>
     <message id="modernize-equip-list">
-        <location filename="../ClientGUI/clientv2.cpp" line="1059"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="1084"/>
         <source>The following equipments are improved: %1</source>
         <translation type="unfinished">以下の設計図を獲得しました：%1</translation>
     </message>
     <message id="decorate-ship-list">
-        <location filename="../ClientGUI/clientv2.cpp" line="1074"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="1099"/>
         <source>The following ships are decorated: %1</source>
         <translation type="unfinished">以下の装備が改修されました：%1</translation>
     </message>
     <message id="modernize-ship-list">
-        <location filename="../ClientGUI/clientv2.cpp" line="1089"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="1114"/>
         <source>The following ships are modernized: %1</source>
         <oldsource>The following ship are modernized: %1</oldsource>
         <translation type="unfinished">以下の艦船が殊勲を受けました：%1</translation>
     </message>
     <message id="operation-success">
-        <location filename="../ClientGUI/clientv2.cpp" line="1095"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="1120"/>
         <source>Operation success!</source>
         <translation type="unfinished">以下の艦船が近代化改修されました：%1</translation>
     </message>
     <message id="fleet-size-error">
-        <location filename="../ClientGUI/clientv2.cpp" line="1115"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="1140"/>
         <source>Fleet is oversized or undersized.</source>
         <oldsource>Fleet is oversized.</oldsource>
         <translation type="unfinished">操作成功！</translation>
     </message>
     <message id="fleet-type-error">
-        <location filename="../ClientGUI/clientv2.cpp" line="1118"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="1143"/>
         <source>Fleet does not suit its type.</source>
         <translation type="unfinished">艦隊の編成数が不正です。</translation>
     </message>
     <message id="fleet-disabled-error">
-        <location filename="../ClientGUI/clientv2.cpp" line="1121"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="1146"/>
         <source>Fleet contains ships unavailable for battle.</source>
         <translation type="unfinished">艦隊が指定された艦隊タイプに適合しません。</translation>
     </message>
     <message id="fleet-equip-error">
-        <location filename="../ClientGUI/clientv2.cpp" line="1124"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="1149"/>
         <source>Fleet contains equipment unavailable for battle.</source>
         <translation type="unfinished">艦隊に戦闘不能な艦船が含まれています。</translation>
     </message>
     <message id="fleet-dont-fit-map">
-        <location filename="../ClientGUI/clientv2.cpp" line="1127"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="1152"/>
         <source>Fleet don&apos;t fit this map.</source>
         <translation type="unfinished">艦隊に戦闘不可な装備が含まれています。</translation>
     </message>
     <message id="fleet-contains-duplicate">
-        <location filename="../ClientGUI/clientv2.cpp" line="1137"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="1162"/>
         <source>Fleet contains duplicate ships!</source>
         <translation type="unfinished">艦隊がこの海域に適合しません。</translation>
     </message>
+    <message id="expedition-not-logged-in">
+        <location filename="../ClientGUI/clientv2.cpp" line="1436"/>
+        <source>Must be logged in to start expedition.</source>
+        <translation type="unfinished"></translation>
+    </message>
     <message id="valid-fleet">
-        <location filename="../ClientGUI/clientv2.cpp" line="1107"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="1132"/>
         <source>Modify fleet success!</source>
         <translation type="unfinished">艦隊に重複する艦船が含まれています！</translation>
     </message>
     <message id="fleet-critically-damaged">
-        <location filename="../ClientGUI/clientv2.cpp" line="1143"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="1168"/>
         <source>One or more ships are critically damaged (HP &lt; 25%%).</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="ard-steam-error">
-        <location filename="../ClientGUI/clientv2.cpp" line="1182"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="1207"/>
         <source>A Steam error occurred. Please try again later.</source>
         <translation type="unfinished">艦隊編成の変更に成功しました！</translation>
     </message>
     <message id="store-equip-not-exist">
-        <location filename="../ClientGUI/clientv2.cpp" line="1186"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="1211"/>
         <source>Equipment does not exist.</source>
         <translation type="unfinished">Steamエラーが発生しました。後でもう一度お試しください。</translation>
     </message>
     <message id="store-equip-not-available">
-        <location filename="../ClientGUI/clientv2.cpp" line="1190"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="1215"/>
         <source>Equipment is not available in the store.</source>
         <translation type="unfinished">装備が存在しません。</translation>
     </message>
     <message id="store-insufficient-coupons">
-        <location filename="../ClientGUI/clientv2.cpp" line="1194"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="1219"/>
         <source>Insufficient ARD Coupons.</source>
         <translation type="unfinished">装備はストアで販売されていません。</translation>
     </message>
     <message id="ard-purchase-failed">
-        <location filename="../ClientGUI/clientv2.cpp" line="1198"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="1223"/>
         <source>Purchase failed: %1</source>
         <translation type="unfinished">ARDクーポンが不足しています。</translation>
     </message>
     <message id="ard-purchase-pending">
-        <location filename="../ClientGUI/clientv2.cpp" line="1203"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="1228"/>
         <source>Awaiting Steam payment authorization...</source>
         <translation type="unfinished">購入に失敗しました：%1</translation>
     </message>
     <message id="ard-purchase-success">
-        <location filename="../ClientGUI/clientv2.cpp" line="1208"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="1233"/>
         <source>Purchase successful! %1 ARD Coupons added.</source>
         <translation type="unfinished">Steam決済の承認を待機中…</translation>
     </message>
     <message id="ard-purchase-clawback">
-        <location filename="../ClientGUI/clientv2.cpp" line="1214"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="1239"/>
         <source>Notice: %1 ARD Coupons have been reclaimed due to a refund or chargeback.</source>
         <translation type="unfinished">購入成功！ARDクーポンが%1枚追加されました。</translation>
     </message>
     <message id="medal-purchase-success">
-        <location filename="../ClientGUI/clientv2.cpp" line="1221"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="1246"/>
         <source>Purchase successful! %1 medal(s) added.</source>
         <translation type="unfinished">通知：返金またはチャージバックにより、ARDクーポンが%1枚回収されました。</translation>
     </message>
     <message id="login-success">
-        <location filename="../ClientGUI/clientv2.cpp" line="1234"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="1259"/>
         <source>%1: login success</source>
         <translation type="unfinished">購入成功！勲章が%1個追加されました。</translation>
     </message>
     <message id="ticket-decrypt-fail">
-        <location filename="../ClientGUI/clientv2.cpp" line="1245"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="1270"/>
         <source>Login failed: cannot decrypt ticket.</source>
         <translation type="unfinished">%1：ログイン成功</translation>
     </message>
     <message id="ticket-incorrect-appid">
-        <location filename="../ClientGUI/clientv2.cpp" line="1248"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="1273"/>
         <source>Login failed: ticket is from incorrect app id.</source>
         <translation type="unfinished">ログイン失敗：チケットを復号できません。</translation>
     </message>
     <message id="ticket-timeout">
-        <location filename="../ClientGUI/clientv2.cpp" line="1250"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="1275"/>
         <source>Login failed: ticket timeouted.</source>
         <translation type="unfinished">ログイン失敗：チケットのアプリIDが不正です。</translation>
     </message>
     <message id="steam-id-invalid">
-        <location filename="../ClientGUI/clientv2.cpp" line="1252"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="1277"/>
         <source>Login failed: steam id is invalid.</source>
         <translation type="unfinished">ログイン失敗：チケットがタイムアウトしました。</translation>
     </message>
     <message id="steam-auth-fail">
-        <location filename="../ClientGUI/clientv2.cpp" line="1254"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="1279"/>
         <source>Login failed: steam authentication failed.</source>
         <translation type="unfinished">ログイン失敗：Steam IDが無効です。</translation>
     </message>
     <message id="login-failed">
-        <location filename="../ClientGUI/clientv2.cpp" line="1259"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="1284"/>
         <source>%1: login failure, reason: %2</source>
         <translation type="unfinished">ログイン失敗：Steam認証に失敗しました。</translation>
     </message>
     <message id="switch-cert-when-connecting">
-        <location filename="../ClientGUI/clientv2.cpp" line="1390"/>
-        <location filename="../Server/server.cpp" line="4489"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="1415"/>
+        <location filename="../Server/server.cpp" line="4788"/>
         <source>Switch certificate when connected have no effect.</source>
         <translation type="unfinished">%1：ログイン失敗、理由：%2</translation>
     </message>
     <message id="client-pem">
-        <location filename="../ClientGUI/clientv2.cpp" line="1401"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="1426"/>
         <source>Client PEM is now %1.</source>
         <translation type="unfinished">接続中の証明書切り替えは無効です。</translation>
     </message>
@@ -1612,90 +1617,90 @@ Great at battle and bad at politics--so cool!</source>
         <translation type="unfinished">重み</translation>
     </message>
     <message id="dtls-1.2">
-        <location filename="../Server/server.cpp" line="41"/>
+        <location filename="../Server/server.cpp" line="43"/>
         <source>DTLS 1.2.</source>
         <translation type="unfinished">データベースエラー：%1</translation>
     </message>
     <message id="dtls-1.2+">
-        <location filename="../Server/server.cpp" line="45"/>
+        <location filename="../Server/server.cpp" line="47"/>
         <source>DTLS 1.2 or later.</source>
         <translation type="unfinished">DTLS 1.2。</translation>
     </message>
     <message id="protocol-unknown">
-        <location filename="../Server/server.cpp" line="49"/>
+        <location filename="../Server/server.cpp" line="51"/>
         <source>Unknown protocol.</source>
         <translation type="unfinished">DTLS 1.2以降。</translation>
     </message>
     <message id="connection-info-serverside">
-        <location filename="../Server/server.cpp" line="53"/>
+        <location filename="../Server/server.cpp" line="55"/>
         <source>Session cipher: %1; session protocol: %2.</source>
         <translation type="unfinished">不明なプロトコル。</translation>
     </message>
     <message id="already-listening">
-        <location filename="../Server/server.cpp" line="233"/>
-        <location filename="../Server/server.cpp" line="3403"/>
+        <location filename="../Server/server.cpp" line="236"/>
+        <location filename="../Server/server.cpp" line="3681"/>
         <source>Server is already listening.</source>
         <translation type="unfinished">セッション暗号：%1；セッションプロトコル：%2。</translation>
     </message>
     <message id="no-api-key">
-        <location filename="../Server/server.cpp" line="245"/>
+        <location filename="../Server/server.cpp" line="248"/>
         <source>Server lack an API key.</source>
         <translation type="unfinished">サーバーは既にリスン中です。</translation>
     </message>
     <message id="equip-init-failure">
-        <location filename="../Server/server.cpp" line="264"/>
+        <location filename="../Server/server.cpp" line="267"/>
         <source>Equipment init failed!</source>
         <translation type="unfinished">サーバーにAPIキーがありません。</translation>
     </message>
     <message id="ship-init-failure">
-        <location filename="../Server/server.cpp" line="268"/>
+        <location filename="../Server/server.cpp" line="271"/>
         <source>Ship init failed!</source>
         <translation type="unfinished">装備の初期化に失敗しました！</translation>
     </message>
     <message id="map-init-failure">
-        <location filename="../Server/server.cpp" line="272"/>
+        <location filename="../Server/server.cpp" line="275"/>
         <source>Map init failed!</source>
         <translation type="unfinished">艦船の初期化に失敗しました！</translation>
     </message>
     <message id="importcsv-usage">
-        <location filename="../Server/server.cpp" line="345"/>
+        <location filename="../Server/server.cpp" line="348"/>
         <source>Usage: importcsv [equip|ship|map]</source>
         <oldsource>Usage: importcsv [equip|ship]</oldsource>
         <translation type="unfinished">海域の初期化に失敗しました！</translation>
     </message>
     <message id="read-peerinfo-failed">
-        <location filename="../Server/server.cpp" line="406"/>
+        <location filename="../Server/server.cpp" line="409"/>
         <source>Failed to extract peer info (address, port).</source>
         <translation type="unfinished">使用法：importcsv [equip|ship|map]</translation>
     </message>
     <message id="client-dc">
-        <location filename="../Server/server.cpp" line="420"/>
+        <location filename="../Server/server.cpp" line="423"/>
         <source>%1: disconnected abruptly.</source>
         <translation type="unfinished">接続先情報（アドレス、ポート）の取得に失敗しました。</translation>
     </message>
     <message id="ard-not-authorized">
-        <location filename="../ClientGUI/clientv2.cpp" line="1162"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="1187"/>
         <source>Purchase was not authorized.</source>
         <translation type="unfinished">%1：予期せず切断されました。</translation>
     </message>
     <message id="ard-order-not-found">
-        <location filename="../ClientGUI/clientv2.cpp" line="1166"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="1191"/>
         <source>Order not found.</source>
         <translation type="unfinished">購入は承認されませんでした。</translation>
     </message>
     <message id="ard-order-mismatch">
-        <location filename="../ClientGUI/clientv2.cpp" line="1170"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="1195"/>
         <source>Order mismatch.</source>
         <translation type="unfinished">注文が見つかりません。</translation>
     </message>
     <message id="ard-db-error">
-        <location filename="../ClientGUI/clientv2.cpp" line="1174"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="1199"/>
         <source>Database error while processing purchase.</source>
         <oldsource>Database error while crediting purchase.</oldsource>
         <translation type="unfinished">注文の不一致。</translation>
     </message>
     <message id="ard-invalid-amount">
-        <location filename="../ClientGUI/clientv2.cpp" line="1178"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="1203"/>
         <source>Invalid ARD coupon amount.</source>
         <translation type="unfinished">購入処理中にデータベースエラーが発生しました。</translation>
     </message>
@@ -1705,18 +1710,18 @@ Great at battle and bad at politics--so cool!</source>
         <translation type="unfinished">無効なARDクーポン数量です。</translation>
     </message>
     <message id="user-calculate-tech-failed">
-        <location filename="../Server/server.cpp" line="480"/>
-        <location filename="../Server/server.cpp" line="557"/>
+        <location filename="../Server/server.cpp" line="483"/>
+        <location filename="../Server/server.cpp" line="560"/>
         <source>Calculate technology for user %1 failed!</source>
         <translation type="unfinished">%1 ARDクーポン</translation>
     </message>
     <message id="local-tech-bad-equipdef">
-        <location filename="../Server/server.cpp" line="504"/>
+        <location filename="../Server/server.cpp" line="507"/>
         <source>Local technology computation failed due to bad equipment ID!</source>
         <translation type="unfinished">ユーザー%1の技術計算に失敗しました！</translation>
     </message>
     <message id="equipid-invalid-skill-points-effect">
-        <location filename="../Server/server.cpp" line="644"/>
+        <location filename="../Server/server.cpp" line="647"/>
         <source>Skill points effect calculation failed due to invalid equipment ID!</source>
         <translation type="unfinished">不正な装備IDにより局所技術計算に失敗しました！</translation>
     </message>
@@ -1739,43 +1744,43 @@ Great at battle and bad at politics--so cool!</source>
         <translation type="unfinished">ユーザー%1：ランキング情報の取得に失敗しました！</translation>
     </message>
     <message id="client-id-received">
-        <location filename="../Server/server.cpp" line="658"/>
+        <location filename="../Server/server.cpp" line="661"/>
         <source>PSK callback, received a client&apos;s identity: &apos;%1&apos;</source>
         <translation type="unfinished">ユーザー%1の艦船リスト取得に失敗しました！</translation>
     </message>
     <message id="wait-for-dc">
-        <location filename="../Server/server.cpp" line="685"/>
+        <location filename="../Server/server.cpp" line="688"/>
         <source>Disconnect success: %1 port %2</source>
         <translation type="unfinished">PSKコールバック、クライアントIDを受信：&apos;%1&apos;</translation>
     </message>
     <message id="dc-failed">
-        <location filename="../Server/server.cpp" line="690"/>
+        <location filename="../Server/server.cpp" line="693"/>
         <source>Disconnect failed! %1 port %2</source>
         <translation type="unfinished">切断成功：%1 ポート%2</translation>
     </message>
     <message id="user-get-equip-list-failed-eidbased">
-        <location filename="../Server/server.cpp" line="722"/>
+        <location filename="../Server/server.cpp" line="725"/>
         <source>Get user&apos;s equipment list by uuid %1 failed!</source>
         <translation type="unfinished">切断失敗！%1 ポート%2</translation>
     </message>
     <message id="improve-beyond-possible">
-        <location filename="../Server/server.cpp" line="731"/>
+        <location filename="../Server/server.cpp" line="734"/>
         <source>Equip id %1: not allowed to improve beyond possible stars.</source>
         <oldsource>Equip id %1: not allowed to improve beyond 15 stars.</oldsource>
         <translation type="unfinished">UUID %1の装備リスト取得に失敗しました！</translation>
     </message>
     <message id="user-add-equip-star-failed-eidbased">
-        <location filename="../Server/server.cpp" line="743"/>
+        <location filename="../Server/server.cpp" line="746"/>
         <source>Improve equipment failed due to bad equipment uuid!</source>
         <translation type="unfinished">装備ID %1：改修上限を超えることはできません。</translation>
     </message>
     <message id="improve-success">
-        <location filename="../Server/server.cpp" line="750"/>
+        <location filename="../Server/server.cpp" line="753"/>
         <source>Equip id %1: improved to %2 stars.</source>
         <translation type="unfinished">不正な装備UUIDにより改修に失敗しました！</translation>
     </message>
     <message id="clear-negative-skillpoints-failed">
-        <location filename="../Server/server.cpp" line="783"/>
+        <location filename="../Server/server.cpp" line="786"/>
         <source>User %1: clear negative skill points failed!</source>
         <translation type="unfinished">装備ID %1：改修値%2に改修されました。</translation>
     </message>
@@ -1786,88 +1791,88 @@ Great at battle and bad at politics--so cool!</source>
         <translation type="unfinished">ユーザー%1：負のスキルポイントのクリアに失敗しました！</translation>
     </message>
     <message id="delete-all-equip-failed">
-        <location filename="../Server/server.cpp" line="821"/>
+        <location filename="../Server/server.cpp" line="824"/>
         <source>User id %1: delete all equipment failed!</source>
         <translation type="unfinished">ユーザー%1：艦隊疲労度の低下に失敗しました！</translation>
     </message>
     <message id="delete-all-equip">
-        <location filename="../Server/server.cpp" line="827"/>
+        <location filename="../Server/server.cpp" line="830"/>
         <source>User id %1: all equipment deleted</source>
         <translation type="unfinished">ユーザーID %1：全装備の削除に失敗しました！</translation>
     </message>
     <message id="delete-all-ship-failed">
-        <location filename="../Server/server.cpp" line="840"/>
+        <location filename="../Server/server.cpp" line="843"/>
         <source>User id %1: delete all ship failed!</source>
         <translation type="unfinished">ユーザーID %1：全装備を削除しました</translation>
     </message>
     <message id="delete-all-ship">
-        <location filename="../Server/server.cpp" line="846"/>
+        <location filename="../Server/server.cpp" line="849"/>
         <source>User id %1: all ship deleted</source>
         <translation type="unfinished">ユーザーID %1：全艦船の削除に失敗しました！</translation>
     </message>
     <message id="dbfail-buying-query-ip">
-        <location filename="../Server/server.cpp" line="910"/>
+        <location filename="../Server/server.cpp" line="913"/>
         <source>Database failed when buying: query existing industrial failed!</source>
         <translation type="unfinished">ユーザーID %1：全艦船を削除しました</translation>
     </message>
     <message id="dbfail-medal-buy">
-        <location filename="../Server/server.cpp" line="998"/>
+        <location filename="../Server/server.cpp" line="1001"/>
         <source>Database failed when buying medals.</source>
         <translation type="unfinished">購入時のデータベースエラー：既存の工業ポイント照会に失敗しました！</translation>
     </message>
     <message id="dbfail-medal-award">
-        <location filename="../Server/server.cpp" line="1020"/>
+        <location filename="../Server/server.cpp" line="1023"/>
         <source>Database failed when awarding medals.</source>
         <translation type="unfinished">勲章購入時にデータベースエラーが発生しました。</translation>
     </message>
     <message id="dbfail-ord-res-buy">
-        <location filename="../Server/server.cpp" line="1052"/>
+        <location filename="../Server/server.cpp" line="1055"/>
         <source>Database failed when buying resources.</source>
         <translation>資源購入時にデータベースエラーが発生しました。</translation>
     </message>
     <message id="dbfail-ord-res-add">
-        <location filename="../Server/server.cpp" line="1073"/>
+        <location filename="../Server/server.cpp" line="1076"/>
         <source>Database failed when adding resources.</source>
         <translation>資源追加時にデータベースエラーが発生しました。</translation>
     </message>
     <message id="dbfail-constructing-query-existing-bps">
-        <location filename="../Server/server.cpp" line="1120"/>
+        <location filename="../Server/server.cpp" line="1123"/>
         <source>Database failed when constructing: query existing ship blueprints failed!</source>
         <oldsource>Database failed when constructing: query existing ship blueprintss failed!</oldsource>
         <translation type="unfinished">勲章授与時にデータベースエラーが発生しました。</translation>
     </message>
     <message id="dbfail-cloning-sanity-deduct">
-        <location filename="../Server/server.cpp" line="1230"/>
+        <location filename="../Server/server.cpp" line="1233"/>
         <source>Database failed when deducting sanity.</source>
         <translation type="unfinished">建造時のデータベースエラー：既存の艦船設計図照会に失敗しました！</translation>
     </message>
     <message id="dbfail-constructing-query-existing-models">
-        <location filename="../Server/server.cpp" line="1496"/>
+        <location filename="../Server/server.cpp" line="1499"/>
         <source>Database failed when constructing: query existing models failed!</source>
         <translation type="unfinished">理性値の差し引き時にデータベースエラーが発生しました。</translation>
     </message>
     <message id="dbfail-constructing-query-existing-equips">
-        <location filename="../Server/server.cpp" line="1168"/>
+        <location filename="../Server/server.cpp" line="1171"/>
         <source>Database failed when constructing: query existing equips failed!</source>
         <translation type="unfinished">建造時のデータベースエラー：既存モデル照会に失敗しました！</translation>
     </message>
     <message id="dbfail-constructing">
-        <location filename="../Server/server.cpp" line="1295"/>
+        <location filename="../Server/server.cpp" line="1298"/>
         <source>Database failed when constructing.</source>
         <translation type="unfinished">建造時のデータベースエラー：既存装備照会に失敗しました！</translation>
     </message>
     <message id="dbfail-constructing-query-existing-ships">
-        <location filename="../Server/server.cpp" line="1320"/>
+        <location filename="../Server/server.cpp" line="1323"/>
         <source>Database failed when constructing: query existing ships failed!</source>
         <translation type="unfinished">建造時にデータベースエラーが発生しました。</translation>
     </message>
     <message id="dbfail-modernizing">
-        <location filename="../Server/server.cpp" line="1386"/>
+        <location filename="../Server/server.cpp" line="1389"/>
         <source>Database failed when modernizing.</source>
         <translation type="unfinished">建造時のデータベースエラー：既存艦船照会に失敗しました！</translation>
     </message>
     <message id="dbfail-modernizing-prev-lock">
-        <location filename="../Server/server.cpp" line="1351"/>
+        <location filename="../Server/server.cpp" line="1354"/>
         <source>Database failed when modernizing (locking previous ship).</source>
         <translation type="unfinished">近代化改修時にデータベースエラーが発生しました。</translation>
     </message>
@@ -1877,32 +1882,32 @@ Great at battle and bad at politics--so cool!</source>
         <translation type="unfinished">近代化改修時にデータベースエラーが発生しました（前艦船のロック）。</translation>
     </message>
     <message id="dbfail-store-buy">
-        <location filename="../Server/server.cpp" line="959"/>
+        <location filename="../Server/server.cpp" line="962"/>
         <source>Database failed when buying from store.</source>
         <translation type="unfinished">ストア購入情報の取得に失敗しました！ユーザー%1、注文ID %2</translation>
     </message>
     <message id="dbfail-constructing-delete-existing-bps">
-        <location filename="../Server/server.cpp" line="1441"/>
+        <location filename="../Server/server.cpp" line="1444"/>
         <source>Database failed when constructing: delete existing ship blueprints failed!</source>
         <translation type="unfinished">ストア購入時にデータベースエラーが発生しました。</translation>
     </message>
     <message id="dbfail-constructing-query-max-exp">
-        <location filename="../Server/server.cpp" line="1544"/>
+        <location filename="../Server/server.cpp" line="1547"/>
         <source>Database failed when constructing: query max exp failed!</source>
         <translation type="unfinished">建造時のデータベースエラー：既存艦船設計図の削除に失敗しました！</translation>
     </message>
     <message id="dbfail-developing">
-        <location filename="../Server/server.cpp" line="1669"/>
+        <location filename="../Server/server.cpp" line="1672"/>
         <source>Database failed when developing.</source>
         <translation type="unfinished">建造時のデータベースエラー：最大経験値の照会に失敗しました！</translation>
     </message>
     <message id="fetch-facto-failed">
-        <location filename="../Server/server.cpp" line="1699"/>
+        <location filename="../Server/server.cpp" line="1702"/>
         <source>Fetch factory product failed.</source>
         <translation type="unfinished">装備開発時にデータベースエラーが発生しました。</translation>
     </message>
     <message id="dbfail-fetching">
-        <location filename="../Server/server.cpp" line="1792"/>
+        <location filename="../Server/server.cpp" line="1795"/>
         <source>Database failed when fetching product.</source>
         <translation type="unfinished">工廠製品の取得に失敗しました。</translation>
     </message>
@@ -1936,7 +1941,7 @@ Great at battle and bad at politics--so cool!</source>
         <translation type="unfinished">装備データの読み込みに成功しました！</translation>
     </message>
     <message id="server-shutdown">
-        <location filename="../Server/server.cpp" line="2049"/>
+        <location filename="../Server/server.cpp" line="2052"/>
         <source>Server is shutting down</source>
         <translation type="unfinished">装備子リストの読み込みに成功しました！</translation>
     </message>
@@ -2029,14 +2034,14 @@ Great at battle and bad at politics--so cool!</source>
         <translation type="unfinished">%1件の艦船をインポートしました</translation>
     </message>
     <message id="lua-canequip-error">
-        <location filename="../ClientGUI/clientv2.cpp" line="1378"/>
-        <location filename="../Server/server.cpp" line="2289"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="1403"/>
+        <location filename="../Server/server.cpp" line="2292"/>
         <source>The code from the file %1 has failed to run: %2</source>
         <translation type="unfinished">艦船データのインポートに成功しました！</translation>
     </message>
     <message id="lua-canequip-success">
-        <location filename="../ClientGUI/clientv2.cpp" line="1383"/>
-        <location filename="../Server/server.cpp" line="2294"/>
+        <location filename="../ClientGUI/clientv2.cpp" line="1408"/>
+        <location filename="../Server/server.cpp" line="2297"/>
         <source>Load equipability table success!</source>
         <translation type="unfinished">ファイル%1のコードの実行に失敗しました：%2</translation>
     </message>
@@ -2054,159 +2059,159 @@ Great at battle and bad at politics--so cool!</source>
         <translation type="unfinished">海域テーブルの読み込みに失敗しました！</translation>
     </message>
     <message id="equipid-dont-exist">
-        <location filename="../Server/server.cpp" line="2374"/>
+        <location filename="../Server/server.cpp" line="2446"/>
         <source>Equip id %1 don&apos;t exist!</source>
         <translation type="unfinished">海域データの読み込みに成功しました！</translation>
     </message>
     <message id="shipoldid-dont-exist">
-        <location filename="../Server/server.cpp" line="2391"/>
+        <location filename="../Server/server.cpp" line="2463"/>
         <source>Ship old id %1 don&apos;t exist!</source>
         <translation type="unfinished">装備ID %1は存在しません！</translation>
     </message>
     <message id="user-migrate-equip-failed">
-        <location filename="../Server/server.cpp" line="2454"/>
-        <location filename="../Server/server.cpp" line="2466"/>
-        <location filename="../Server/server.cpp" line="2481"/>
+        <location filename="../Server/server.cpp" line="2526"/>
+        <location filename="../Server/server.cpp" line="2538"/>
+        <location filename="../Server/server.cpp" line="2553"/>
         <source>User %1: import equip from KC failed, error %2</source>
         <translation type="unfinished">艦船旧ID %1は存在しません！</translation>
     </message>
     <message id="user-migrate-ship-failed">
-        <location filename="../Server/server.cpp" line="2517"/>
-        <location filename="../Server/server.cpp" line="2539"/>
-        <location filename="../Server/server.cpp" line="2553"/>
+        <location filename="../Server/server.cpp" line="2589"/>
+        <location filename="../Server/server.cpp" line="2611"/>
+        <location filename="../Server/server.cpp" line="2625"/>
         <source>User %1: import ship from KC failed, error %2</source>
         <translation type="unfinished">ユーザー%1：KCからの装備インポートに失敗しました。エラー%2</translation>
     </message>
     <message id="import-kc-data-success">
-        <location filename="../Server/server.cpp" line="2560"/>
+        <location filename="../Server/server.cpp" line="2632"/>
         <source>User %1: import from KC data success!</source>
         <translation type="unfinished">ユーザー%1：KCからの艦船インポートに失敗しました。エラー%2</translation>
     </message>
     <message id="minutepulse-sanity-regen-failed">
-        <location filename="../Server/server.cpp" line="2753"/>
+        <location filename="../Server/server.cpp" line="2825"/>
         <source>Minute pulse: sanity regen failed!</source>
         <translation type="unfinished">ユーザー%1：KCデータのインポートに成功しました！</translation>
     </message>
     <message id="modernize-ship-nonexistent">
-        <location filename="../Server/server.cpp" line="2788"/>
+        <location filename="../Server/server.cpp" line="2862"/>
         <source>User id %1: ship %2 does not exist when modernizing!</source>
         <translation type="unfinished">定期処理：理性回復に失敗しました！</translation>
     </message>
     <message id="modernize-ship-failed-def">
-        <location filename="../Server/server.cpp" line="2806"/>
-        <location filename="../Server/server.cpp" line="2828"/>
+        <location filename="../Server/server.cpp" line="2880"/>
+        <location filename="../Server/server.cpp" line="2902"/>
         <source>User id %1: using blueprint of ship definition %2 failed when modernizing!</source>
         <translation type="unfinished">ユーザーID %1：近代化改修時に艦船%2が存在しません！</translation>
     </message>
     <message id="modernize-ship-def">
-        <location filename="../Server/server.cpp" line="2836"/>
+        <location filename="../Server/server.cpp" line="2910"/>
         <source>User id %1: used blueprint of ship definition %2 when modernizing</source>
         <oldsource>User id %1: using blueprint of ship definition %2 when modernizing</oldsource>
         <translation type="unfinished">ユーザーID %1：近代化改修時に艦船定義%2の設計図使用に失敗しました！</translation>
     </message>
     <message id="modernize-ship-failed">
-        <location filename="../Server/server.cpp" line="2851"/>
+        <location filename="../Server/server.cpp" line="2925"/>
         <source>User id %1: modernize ship %2 failed!</source>
         <translation type="unfinished">ユーザーID %1：近代化改修で艦船定義%2の設計図を使用しました</translation>
     </message>
     <message id="modernize-ship">
-        <location filename="../Server/server.cpp" line="2859"/>
+        <location filename="../Server/server.cpp" line="2933"/>
         <source>User id %1: modernized ship %2 by 1 level</source>
         <translation type="unfinished">ユーザーID %1：艦船%2の近代化改修に失敗しました！</translation>
     </message>
     <message id="decorate-ship-medal-failed">
-        <location filename="../Server/server.cpp" line="2882"/>
+        <location filename="../Server/server.cpp" line="2956"/>
         <source>User id %1: reading medal balance failed when decorating!</source>
         <translation type="unfinished">ユーザーID %1：艦船%2を1レベル近代化改修しました</translation>
     </message>
     <message id="decorate-ship-medal-insufficient">
-        <location filename="../Server/server.cpp" line="2893"/>
+        <location filename="../Server/server.cpp" line="2967"/>
         <source>User id %1: insufficient medals to decorate ships!</source>
         <translation type="unfinished">ユーザーID %1：殊勲時に勲章残高の読み取りに失敗しました！</translation>
     </message>
     <message id="decorate-ship-nonexistent">
-        <location filename="../Server/server.cpp" line="2911"/>
+        <location filename="../Server/server.cpp" line="2985"/>
         <source>User id %1: ship %2 does not exist when decorating!</source>
         <translation type="unfinished">ユーザーID %1：殊勲に必要な勲章が不足しています！</translation>
     </message>
     <message id="decorate-ship-medal-deduct-failed">
-        <location filename="../Server/server.cpp" line="2929"/>
+        <location filename="../Server/server.cpp" line="3003"/>
         <source>User id %1: deducting medal failed when decorating ship %2!</source>
         <translation type="unfinished">ユーザーID %1：殊勲時に艦船%2が存在しません！</translation>
     </message>
     <message id="decorate-ship-medal-ran-out">
-        <location filename="../Server/server.cpp" line="2937"/>
+        <location filename="../Server/server.cpp" line="3011"/>
         <source>User id %1: insufficient medals when decorating ship %2!</source>
         <translation type="unfinished">ユーザーID %1：艦船%2の殊勲時に勲章の差し引きに失敗しました！</translation>
     </message>
     <message id="decorate-ship-expcap-failed">
-        <location filename="../Server/server.cpp" line="2953"/>
+        <location filename="../Server/server.cpp" line="3027"/>
         <source>User id %1: updating ExpCap of ship %2 failed when decorating!</source>
         <translation type="unfinished">ユーザーID %1：艦船%2の殊勲時に勲章が不足しました！</translation>
     </message>
     <message id="decorate-ship">
-        <location filename="../Server/server.cpp" line="2961"/>
+        <location filename="../Server/server.cpp" line="3035"/>
         <source>User id %1: decorated ship %2, new ExpCap %3</source>
         <translation type="unfinished">ユーザーID %1：殊勲時に艦船%2の経験値上限の更新に失敗しました！</translation>
     </message>
     <message id="user-query-ship-fail">
-        <location filename="../Server/server.cpp" line="3093"/>
+        <location filename="../Server/server.cpp" line="3167"/>
         <source>Query ship %2 for user %1 failed!</source>
         <translation type="unfinished">ユーザーID %1：艦船%2に殊勲を授与しました。新しい経験値上限%3</translation>
     </message>
     <message id="remodel-ship-failed">
-        <location filename="../Server/server.cpp" line="3144"/>
+        <location filename="../Server/server.cpp" line="3218"/>
         <source>User id %1: remodel ship failed!</source>
         <translation type="unfinished">ユーザー%1の艦船%2の照会に失敗しました！</translation>
     </message>
     <message id="remodeled-ship">
-        <location filename="../Server/server.cpp" line="3151"/>
+        <location filename="../Server/server.cpp" line="3225"/>
         <source>User id %1: remodeled ship %2 definition %3</source>
         <translation type="unfinished">ユーザーID %1：艦船改造に失敗しました！</translation>
     </message>
     <message id="convert-skillpoints-equip-not-found">
-        <location filename="../Server/server.cpp" line="3264"/>
-        <location filename="../Server/server.cpp" line="3275"/>
+        <location filename="../Server/server.cpp" line="3338"/>
+        <location filename="../Server/server.cpp" line="3349"/>
         <source>Equipment not found for skill point conversion</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="convert-skillpoints-same-equipment">
-        <location filename="../Server/server.cpp" line="3284"/>
+        <location filename="../Server/server.cpp" line="3358"/>
         <source>Cannot convert skill points between same equipment</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="convert-skillpoints-virtual-source">
-        <location filename="../Server/server.cpp" line="3293"/>
+        <location filename="../Server/server.cpp" line="3367"/>
         <source>Cannot convert skill points from virtual equipment</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="convert-skillpoints-virtual-destination">
-        <location filename="../Server/server.cpp" line="3302"/>
+        <location filename="../Server/server.cpp" line="3376"/>
         <source>Cannot convert skill points to virtual equipment</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="convert-skillpoints-not-mother-child">
-        <location filename="../Server/server.cpp" line="3312"/>
+        <location filename="../Server/server.cpp" line="3386"/>
         <source>Source equipment must be mother of destination equipment</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="convert-skillpoints-invalid-amount">
-        <location filename="../Server/server.cpp" line="3321"/>
+        <location filename="../Server/server.cpp" line="3395"/>
         <source>Invalid amount for skill point conversion</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="convert-skillpoints-insufficient">
-        <location filename="../Server/server.cpp" line="3331"/>
+        <location filename="../Server/server.cpp" line="3405"/>
         <source>Insufficient skill points for conversion</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="convert-skillpoints-invalid-std">
-        <location filename="../Server/server.cpp" line="3342"/>
+        <location filename="../Server/server.cpp" line="3416"/>
         <source>Invalid skill point standard values</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="convert-skillpoints-overflow">
-        <location filename="../Server/server.cpp" line="3352"/>
+        <location filename="../Server/server.cpp" line="3426"/>
         <source>Skill point conversion overflow detected</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2231,56 +2236,56 @@ Great at battle and bad at politics--so cool!</source>
         <translation type="unfinished">ユーザーID %1：自然回復に失敗しました！</translation>
     </message>
     <message id="listen-usage">
-        <location filename="../Server/server.cpp" line="3399"/>
+        <location filename="../Server/server.cpp" line="3677"/>
         <source>Usage: listen [ip] [port]</source>
         <translation type="unfinished">ユーザーID %1：自然回復</translation>
     </message>
     <message id="no-cert">
-        <location filename="../Server/server.cpp" line="3426"/>
+        <location filename="../Server/server.cpp" line="3704"/>
         <source>Server lack a certificate.</source>
         <translation type="unfinished">使用法：listen [IP] [ポート]</translation>
     </message>
     <message id="no-private-key">
-        <location filename="../Server/server.cpp" line="3436"/>
+        <location filename="../Server/server.cpp" line="3714"/>
         <source>Server lack a private key.</source>
         <translation type="unfinished">サーバーに証明書がありません。</translation>
     </message>
     <message id="corrupt-private-key">
-        <location filename="../Server/server.cpp" line="3444"/>
+        <location filename="../Server/server.cpp" line="3722"/>
         <source>Server private key can&apos;t be read.</source>
         <translation type="unfinished">サーバーに秘密鍵がありません。</translation>
     </message>
     <message id="server-listen">
-        <location filename="../Server/server.cpp" line="3459"/>
+        <location filename="../Server/server.cpp" line="3737"/>
         <source>Server is listening on address %1 and port %2</source>
         <translation type="unfinished">サーバーの秘密鍵を読み取れません。</translation>
     </message>
     <message id="server-listen-fail">
-        <location filename="../Server/server.cpp" line="3473"/>
+        <location filename="../Server/server.cpp" line="3751"/>
         <source>Server failed to listen on address %1 and port %2</source>
         <translation type="unfinished">サーバーはアドレス%1、ポート%2でリスン中です</translation>
     </message>
     <message id="server-stop">
-        <location filename="../Server/server.cpp" line="3483"/>
+        <location filename="../Server/server.cpp" line="3761"/>
         <source>Server stopped listening.</source>
         <translation type="unfinished">サーバーはアドレス%1、ポート%2でのリスンに失敗しました</translation>
     </message>
     <message id="server-stopped-already">
-        <location filename="../Server/server.cpp" line="3487"/>
+        <location filename="../Server/server.cpp" line="3765"/>
         <source>Server isn&apos;t listening.</source>
         <translation type="unfinished">サーバーはリスンを停止しました。</translation>
     </message>
     <message id="user-query-progress-fail">
-        <location filename="../Server/server.cpp" line="3507"/>
-        <location filename="../Server/server.cpp" line="3524"/>
-        <location filename="../Server/server.cpp" line="3541"/>
-        <location filename="../Server/server.cpp" line="3558"/>
+        <location filename="../Server/server.cpp" line="3785"/>
+        <location filename="../Server/server.cpp" line="3802"/>
+        <location filename="../Server/server.cpp" line="3819"/>
+        <location filename="../Server/server.cpp" line="3836"/>
         <source>Query user map progress data for user %1 failed!</source>
         <translation type="unfinished">サーバーはリスンしていません。</translation>
     </message>
     <message id="sortie-progress-failure">
-        <location filename="../Server/server.cpp" line="4330"/>
-        <location filename="../Server/server.cpp" line="4342"/>
+        <location filename="../Server/server.cpp" line="4628"/>
+        <location filename="../Server/server.cpp" line="4640"/>
         <location filename="../Server/server_battle.cpp" line="1951"/>
         <source>User %1: progress map %2 failure!</source>
         <translation type="unfinished">ユーザー%1の海域進行データの照会に失敗しました！</translation>
@@ -2307,33 +2312,33 @@ Great at battle and bad at politics--so cool!</source>
         <translation type="unfinished">不明な海域ルール：</translation>
     </message>
     <message id="user-dock-broken">
-        <location filename="../Server/server.cpp" line="1826"/>
+        <location filename="../Server/server.cpp" line="1829"/>
         <source>User %1: dock is broken!</source>
         <translation type="unfinished">海域関連の照会時にデータベースエラーが発生しました！</translation>
     </message>
     <message id="dock-state-error2">
-        <location filename="../Server/server.cpp" line="1874"/>
+        <location filename="../Server/server.cpp" line="1877"/>
         <source>Complete user %1&apos;s dock(accel) failed!</source>
         <translation type="unfinished">ユーザー%1：ドックが破損しています！</translation>
     </message>
     <message id="dock-state-error3">
-        <location filename="../Server/server.cpp" line="1920"/>
+        <location filename="../Server/server.cpp" line="1923"/>
         <source>Complete user %1&apos;s dock(stop) failed!</source>
         <translation type="unfinished">ユーザー%1のドック（加速）完了に失敗しました！</translation>
     </message>
     <message id="dock-state-error4">
-        <location filename="../Server/server.cpp" line="1899"/>
+        <location filename="../Server/server.cpp" line="1902"/>
         <source>Complete user %1&apos;s dock(stop)(updatehp) failed!</source>
         <translation type="unfinished">ユーザー%1のドック（停止）完了に失敗しました！</translation>
     </message>
     <message id="user-ship-dont-exist">
         <location filename="../ClientGUI/ui/maintenance/repair.cpp" line="140"/>
-        <location filename="../Server/server.cpp" line="1968"/>
+        <location filename="../Server/server.cpp" line="1971"/>
         <source>User %1: ship %2 does not exist on account!</source>
         <translation type="unfinished">ユーザー%1のドック（停止）（HP更新）完了に失敗しました！</translation>
     </message>
     <message id="dbfail-repair">
-        <location filename="../Server/server.cpp" line="2038"/>
+        <location filename="../Server/server.cpp" line="2041"/>
         <source>Database failed when repairing.</source>
         <translation type="unfinished">ユーザー%1：艦船%2はアカウントに存在しません！</translation>
     </message>
@@ -2350,7 +2355,7 @@ Great at battle and bad at politics--so cool!</source>
         <translation type="unfinished">ユーザー%1のドロップ進行の更新に失敗しました！</translation>
     </message>
     <message id="user-get-equip-star-failed">
-        <location filename="../Server/server.cpp" line="2118"/>
+        <location filename="../Server/server.cpp" line="2121"/>
         <source>Get improvement factor of equipment %2 failed!</source>
         <translation type="unfinished">ユーザー%1のドロップ候補の照会に失敗しました！</translation>
     </message>
@@ -2374,34 +2379,34 @@ Great at battle and bad at politics--so cool!</source>
         <translation type="unfinished">仮想条件データベースのインポートに失敗しました！</translation>
     </message>
     <message id="user-add-ship-dropinfo-failed">
-        <location filename="../Server/server.cpp" line="2211"/>
+        <location filename="../Server/server.cpp" line="2214"/>
         <source>User %1: add dropinfo of ship failed!</source>
         <oldsource>User %1: add dropinfo of ship %2 failed!</oldsource>
         <translation type="unfinished">仮想条件関連データのインポートに成功しました！</translation>
     </message>
     <message id="user-add-ship-dropinfo-success">
-        <location filename="../Server/server.cpp" line="2217"/>
+        <location filename="../Server/server.cpp" line="2220"/>
         <source>User %1: add dropinfo of ship success!</source>
         <oldsource>User %1: add dropinfo of ship %2 success!</oldsource>
         <translation type="unfinished">ユーザー%1：艦船ドロップ情報の追加に失敗しました！</translation>
     </message>
     <message id="user-add-equip-sp-info-failed">
-        <location filename="../Server/server.cpp" line="2236"/>
+        <location filename="../Server/server.cpp" line="2239"/>
         <source>User %1: add skillinfo of equip failed!</source>
         <translation type="unfinished">ユーザー%1：艦船ドロップ情報の追加に成功しました！</translation>
     </message>
     <message id="user-add-equip-sp-info-success">
-        <location filename="../Server/server.cpp" line="2242"/>
+        <location filename="../Server/server.cpp" line="2245"/>
         <source>User %1: add skillinfo of equip success!</source>
         <translation type="unfinished">ユーザー%1：装備スキル情報の追加に失敗しました！</translation>
     </message>
     <message id="user-add-map-status-failed">
-        <location filename="../Server/server.cpp" line="2270"/>
+        <location filename="../Server/server.cpp" line="2273"/>
         <source>User %1: init map status failed!</source>
         <translation type="unfinished">ユーザー%1：装備スキル情報の追加に成功しました！</translation>
     </message>
     <message id="user-add-map-status-success">
-        <location filename="../Server/server.cpp" line="2276"/>
+        <location filename="../Server/server.cpp" line="2279"/>
         <source>User %1: init map status success!</source>
         <translation type="unfinished">ユーザー%1：海域ステータスの初期化に失敗しました！</translation>
     </message>
@@ -2426,63 +2431,63 @@ Great at battle and bad at politics--so cool!</source>
         <translation type="unfinished">ARD回収：注文%1の差し引きに失敗しました</translation>
     </message>
     <message id="decrease-supremacy-failed">
-        <location filename="../Server/server.cpp" line="2581"/>
+        <location filename="../Server/server.cpp" line="2653"/>
         <source>Minute pulse: decrease supermacy failed!</source>
         <translation type="unfinished">ARD回収：注文%1のマーキングに失敗しました</translation>
     </message>
     <message id="recover-cond-failed">
-        <location filename="../Server/server.cpp" line="2600"/>
+        <location filename="../Server/server.cpp" line="2672"/>
         <source>Minute pulse: recover condition failed!</source>
         <translation type="unfinished">定期処理：制覇度の低下に失敗しました！</translation>
     </message>
     <message id="penalize-cond-failed">
-        <location filename="../Server/server.cpp" line="2615"/>
-        <location filename="../Server/server.cpp" line="2633"/>
-        <location filename="../Server/server.cpp" line="2646"/>
+        <location filename="../Server/server.cpp" line="2687"/>
+        <location filename="../Server/server.cpp" line="2705"/>
+        <location filename="../Server/server.cpp" line="2718"/>
         <source>Minute pulse: penalize condition failed!</source>
         <translation type="unfinished">定期処理：疲労度の回復に失敗しました！</translation>
     </message>
     <message id="rank-reward-failed">
-        <location filename="../Server/server.cpp" line="2674"/>
-        <location filename="../Server/server.cpp" line="2684"/>
-        <location filename="../Server/server.cpp" line="2694"/>
+        <location filename="../Server/server.cpp" line="2746"/>
+        <location filename="../Server/server.cpp" line="2756"/>
+        <location filename="../Server/server.cpp" line="2766"/>
         <source>Minute pulse: reward ranking failed!</source>
         <translation type="unfinished">定期処理：疲労度のペナルティに失敗しました！</translation>
     </message>
     <message id="supremacy-reward-failed">
-        <location filename="../Server/server.cpp" line="2733"/>
+        <location filename="../Server/server.cpp" line="2805"/>
         <source>Minute pulse: reward supremacy failed!</source>
         <translation type="unfinished">定期処理：ランキング報酬に失敗しました！</translation>
     </message>
     <message id="modernize-equip-nonexistent">
-        <location filename="../Server/server.cpp" line="2992"/>
+        <location filename="../Server/server.cpp" line="3066"/>
         <source>User id %1: equip %2 does not exist when modernizing!</source>
         <translation type="unfinished">定期処理：制覇報酬に失敗しました！</translation>
     </message>
     <message id="equip-dont-exist-improve">
-        <location filename="../Server/server.cpp" line="3001"/>
+        <location filename="../Server/server.cpp" line="3075"/>
         <source>User %2 attempted to improve equipment def %1 that don&apos;t exist!</source>
         <translation type="unfinished">ユーザーID %1：改修時に装備%2が存在しません！</translation>
     </message>
     <message id="modernize-equip-failed-def">
-        <location filename="../Server/server.cpp" line="3017"/>
-        <location filename="../Server/server.cpp" line="3041"/>
+        <location filename="../Server/server.cpp" line="3091"/>
+        <location filename="../Server/server.cpp" line="3115"/>
         <source>User id %1: deduct skill points of equip definition %2 failed when improving!</source>
         <translation type="unfinished">ユーザー%2が存在しない装備定義%1の改修を試みました！</translation>
     </message>
     <message id="modernize-equip-def">
-        <location filename="../Server/server.cpp" line="3049"/>
+        <location filename="../Server/server.cpp" line="3123"/>
         <source>User id %1: deducted skill points of equip definition %2 when improving</source>
         <translation type="unfinished">ユーザーID %1：改修時に装備定義%2のスキルポイント差し引きに失敗しました！</translation>
     </message>
     <message id="modernize-equip-failed">
-        <location filename="../Server/server.cpp" line="3064"/>
+        <location filename="../Server/server.cpp" line="3138"/>
         <source>User id %1: improve equip %2 failed!</source>
         <oldsource>User id %1: modernize equip %2 failed!</oldsource>
         <translation type="unfinished">ユーザーID %1：改修で装備定義%2のスキルポイントを差し引きました</translation>
     </message>
     <message id="modernize-equip">
-        <location filename="../Server/server.cpp" line="3072"/>
+        <location filename="../Server/server.cpp" line="3146"/>
         <source>User id %1: imporoved equip %2 by 1 level</source>
         <oldsource>User id %1: modernized equip %2 by 1 level</oldsource>
         <translation type="unfinished">ユーザーID %1：装備%2の改修に失敗しました！</translation>
@@ -2508,7 +2513,7 @@ Great at battle and bad at politics--so cool!</source>
         <translation type="unfinished">ユーザー%1：艦隊%2位置%3のデータベース更新に失敗しました！</translation>
     </message>
     <message id="sortie-node-battle-failure">
-        <location filename="../Server/server.cpp" line="3833"/>
+        <location filename="../Server/server.cpp" line="4111"/>
         <location filename="../Server/server_battle.cpp" line="747"/>
         <source>User %1: start node battle failure!</source>
         <translation type="unfinished">海域情報：海域ID %1ノードID %2の照会に失敗しました！</translation>
@@ -2585,84 +2590,84 @@ Great at battle and bad at politics--so cool!</source>
         <translation type="unfinished">ユーザー%1：ランキング経験値の加算に失敗しました！</translation>
     </message>
     <message id="no-app-secret-key">
-        <location filename="../Server/server.cpp" line="3599"/>
+        <location filename="../Server/server.cpp" line="3877"/>
         <source>Server lack the steam app secret key.</source>
         <translation type="unfinished">ユーザー%1：仮想経験値の加算に失敗しました！</translation>
     </message>
     <message id="ticket-decrypt-failed">
-        <location filename="../Server/server.cpp" line="3629"/>
+        <location filename="../Server/server.cpp" line="3907"/>
         <source>%1: Ticket failed to decrypt</source>
         <translation type="unfinished">サーバーにSteamアプリシークレットキーがありません。</translation>
     </message>
     <message id="ticket-appid-wrong">
-        <location filename="../Server/server.cpp" line="3643"/>
+        <location filename="../Server/server.cpp" line="3921"/>
         <source>%1: Ticket is not from correct App ID</source>
         <translation type="unfinished">%1：チケットの復号に失敗しました</translation>
     </message>
     <message id="ticket-appid-right">
-        <location filename="../Server/server.cpp" line="3652"/>
+        <location filename="../Server/server.cpp" line="3930"/>
         <source>Ticket decrypt from correct App ID</source>
         <translation type="unfinished">%1：チケットが正しいアプリIDからのものではありません</translation>
     </message>
     <message id="time-gone">
-        <location filename="../Server/server.cpp" line="3661"/>
+        <location filename="../Server/server.cpp" line="3939"/>
         <source>Elapsed: %1 second(s)</source>
         <translation type="unfinished">チケットは正しいアプリIDから復号されました</translation>
     </message>
     <message id="request-timeout">
-        <location filename="../Server/server.cpp" line="3664"/>
+        <location filename="../Server/server.cpp" line="3942"/>
         <source>%1: Request timeout</source>
         <translation type="unfinished">経過時間：%1秒</translation>
     </message>
     <message id="steam-id-wrong">
-        <location filename="../Server/server.cpp" line="3678"/>
+        <location filename="../Server/server.cpp" line="3956"/>
         <source>%1: Steam ID invalid</source>
         <translation type="unfinished">%1：リクエストタイムアウト</translation>
     </message>
     <message id="user-login">
-        <location filename="../Server/server.cpp" line="3689"/>
+        <location filename="../Server/server.cpp" line="3967"/>
         <source>User login: %1</source>
         <oldsource>User login: %1 (%2)</oldsource>
         <translation type="unfinished">%1：Steam IDが無効です</translation>
     </message>
     <message id="superuser-login">
-        <location filename="../Server/server.cpp" line="3696"/>
+        <location filename="../Server/server.cpp" line="3974"/>
         <source>Superuser login: %1</source>
         <translation type="unfinished">ユーザーログイン：%1</translation>
     </message>
     <message id="add-user-fail">
-        <location filename="../Server/server.cpp" line="3785"/>
-        <location filename="../Server/server.cpp" line="3793"/>
+        <location filename="../Server/server.cpp" line="4063"/>
+        <location filename="../Server/server.cpp" line="4071"/>
         <source>%1: Add user failure!</source>
         <translation type="unfinished">管理者ログイン：%1</translation>
     </message>
     <message id="sortie-node-battle-failure-end-force">
-        <location filename="../Server/server.cpp" line="3815"/>
+        <location filename="../Server/server.cpp" line="4093"/>
         <source>User %1: force end node battle failure!</source>
         <translation type="unfinished">%1：ユーザー追加に失敗しました！</translation>
     </message>
     <message id="Connection-not-properly-online">
-        <location filename="../Server/server.cpp" line="3882"/>
+        <location filename="../Server/server.cpp" line="4160"/>
         <source>User is not properly online!</source>
         <translation type="unfinished">ユーザー%1：ノード戦闘の強制終了に失敗しました！</translation>
     </message>
     <message id="invalid-uid">
-        <location filename="../Server/server.cpp" line="3888"/>
+        <location filename="../Server/server.cpp" line="4166"/>
         <source>Invalid-uid: %1</source>
         <translation type="unfinished">ユーザーは正しくオンラインではありません！</translation>
     </message>
     <message id="packet-rate-exceeded">
-        <location filename="../Server/server.cpp" line="3896"/>
+        <location filename="../Server/server.cpp" line="4174"/>
         <source>User %1: packet rate exceeded!</source>
         <translation type="unfinished">無効なUID：%1</translation>
     </message>
     <message id="gamestate-invalid">
-        <location filename="../Server/server.cpp" line="3950"/>
+        <location filename="../Server/server.cpp" line="4228"/>
         <source>Game state %1 not supported!</source>
         <translation type="unfinished">ユーザー%1：パケットレートを超過しました！</translation>
     </message>
     <message id="command-type-wrong">
-        <location filename="../Server/server.cpp" line="4041"/>
+        <location filename="../Server/server.cpp" line="4319"/>
         <source>User %1: command type not supported</source>
         <translation type="unfinished">ゲーム状態%1は未対応です！</translation>
     </message>
@@ -2694,258 +2699,288 @@ Great at battle and bad at politics--so cool!</source>
         <translation type="unfinished">ユーザー%1のドック開放に失敗しました！</translation>
     </message>
     <message id="delete-equip-nonexistent">
-        <location filename="../Server/server.cpp" line="4450"/>
+        <location filename="../Server/server.cpp" line="4749"/>
         <source>User id %1: equipment %2 does not exist when destructing!</source>
         <oldsource>User id %1: equipment %2 does not exist!</oldsource>
         <translation type="unfinished">ユーザー%1の工廠開放に失敗しました！</translation>
     </message>
     <message id="delete-equip-failed">
-        <location filename="../Server/server.cpp" line="4471"/>
+        <location filename="../Server/server.cpp" line="4770"/>
         <source>User id %1: delete equipment failed!</source>
         <translation type="unfinished">ユーザーID %1：解体時に装備%2が存在しません！</translation>
     </message>
     <message id="delete-equip">
-        <location filename="../Server/server.cpp" line="4478"/>
+        <location filename="../Server/server.cpp" line="4777"/>
         <source>User id %1: deleted equipment %2</source>
         <translation type="unfinished">ユーザーID %1：装備の削除に失敗しました！</translation>
     </message>
     <message id="open-db-failed">
-        <location filename="../Server/server_sqlinit.cpp" line="394"/>
+        <location filename="../Server/server_sqlinit.cpp" line="443"/>
         <source>Open database failed!</source>
         <oldsource>User id %1: deleted equipment %2</oldsource>
         <translation type="unfinished">ユーザーID %1：装備%2を削除しました</translation>
     </message>
     <message id="sql-connect-success">
-        <location filename="../Server/server_sqlinit.cpp" line="398"/>
+        <location filename="../Server/server_sqlinit.cpp" line="447"/>
         <source>SQL connection successful!</source>
         <translation type="unfinished">データベースの開放に失敗しました！</translation>
     </message>
     <message id="userattr-migrate-realvalue-failed">
-        <location filename="../Server/server_sqlinit.cpp" line="424"/>
+        <location filename="../Server/server_sqlinit.cpp" line="473"/>
         <source>Failed to migrate UserAttr: add Realvalue column.</source>
         <translation type="unfinished">SQL接続に成功しました！</translation>
     </message>
     <message id="plane-losses-db-lack">
-        <location filename="../Server/server_sqlinit.cpp" line="455"/>
+        <location filename="../Server/server_sqlinit.cpp" line="504"/>
         <source>User plane losses database does not exist, creating...</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="plane-losses-db-gen-failure">
-        <location filename="../Server/server_sqlinit.cpp" line="460"/>
+        <location filename="../Server/server_sqlinit.cpp" line="509"/>
         <source>User plane losses table creation failure.</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="dock-db-lack">
-        <location filename="../Server/server_sqlinit.cpp" line="505"/>
+        <location filename="../Server/server_sqlinit.cpp" line="563"/>
         <source>Dock database does not exist, creating...</source>
         <translation type="unfinished">UserAttrの移行に失敗しました：Realvalue列の追加。</translation>
     </message>
     <message id="dock-db-gen-failure">
-        <location filename="../Server/server_sqlinit.cpp" line="510"/>
+        <location filename="../Server/server_sqlinit.cpp" line="568"/>
         <source>Create Dock database failed.</source>
         <translation type="unfinished">ドックデータベースが存在しません。作成中…</translation>
     </message>
     <message id="equip-db-lack">
-        <location filename="../Server/server_sqlinit.cpp" line="517"/>
+        <location filename="../Server/server_sqlinit.cpp" line="575"/>
         <source>Equipment database does not exist, creating...</source>
         <translation type="unfinished">ドックデータベースの作成に失敗しました。</translation>
     </message>
     <message id="equip-db-gen-failure">
-        <location filename="../Server/server_sqlinit.cpp" line="522"/>
+        <location filename="../Server/server_sqlinit.cpp" line="580"/>
         <source>Create Equipment database failed.</source>
         <translation type="unfinished">装備データベースが存在しません。作成中…</translation>
     </message>
     <message id="equip-name-db-lack">
-        <location filename="../Server/server_sqlinit.cpp" line="529"/>
+        <location filename="../Server/server_sqlinit.cpp" line="587"/>
         <source>Equipment name database does not exist, creating...</source>
         <translation type="unfinished">装備データベースの作成に失敗しました。</translation>
     </message>
     <message id="equip-name-db-gen-failure">
-        <location filename="../Server/server_sqlinit.cpp" line="534"/>
+        <location filename="../Server/server_sqlinit.cpp" line="592"/>
         <source>Create Equipment name database failed.</source>
         <translation type="unfinished">装備名データベースが存在しません。作成中…</translation>
     </message>
     <message id="equip-sp-db-lack">
-        <location filename="../Server/server_sqlinit.cpp" line="541"/>
+        <location filename="../Server/server_sqlinit.cpp" line="599"/>
         <source>User equipment skillpoints database does not exist, creating...</source>
         <translation type="unfinished">装備名データベースの作成に失敗しました。</translation>
     </message>
     <message id="equip-sp-db-gen-failure">
-        <location filename="../Server/server_sqlinit.cpp" line="546"/>
+        <location filename="../Server/server_sqlinit.cpp" line="604"/>
         <source>User equipment skillpoints fetch failure.</source>
         <oldsource>User equipment skillpoints fetch failure!</oldsource>
         <translation type="unfinished">ユーザー装備スキルポイントデータベースが存在しません。作成中…</translation>
     </message>
     <message id="equip-db-user-lack">
-        <location filename="../Server/server_sqlinit.cpp" line="553"/>
+        <location filename="../Server/server_sqlinit.cpp" line="611"/>
         <source>Equipment database for user does not exist, creating...</source>
         <translation type="unfinished">ユーザー装備スキルポイントの取得に失敗しました。</translation>
     </message>
     <message id="equip-db-user-gen-failure">
-        <location filename="../Server/server_sqlinit.cpp" line="558"/>
+        <location filename="../Server/server_sqlinit.cpp" line="616"/>
         <source>Create Equipment database for user failed.</source>
         <translation type="unfinished">ユーザー装備データベースが存在しません。作成中…</translation>
     </message>
     <message id="equip-db-kc-user-lack">
-        <location filename="../Server/server_sqlinit.cpp" line="565"/>
+        <location filename="../Server/server_sqlinit.cpp" line="623"/>
         <source>Equipment database (kancolle) for user does not exist, creating...</source>
         <translation type="unfinished">ユーザー装備データベースの作成に失敗しました。</translation>
     </message>
     <message id="equip-db-kc-user-gen-failure">
-        <location filename="../Server/server_sqlinit.cpp" line="570"/>
+        <location filename="../Server/server_sqlinit.cpp" line="628"/>
         <source>Create Equipment database (kancolle) for user failed.</source>
         <translation type="unfinished">ユーザー装備（艦これ）データベースが存在しません。作成中…</translation>
     </message>
     <message id="facto-db-lack">
-        <location filename="../Server/server_sqlinit.cpp" line="577"/>
+        <location filename="../Server/server_sqlinit.cpp" line="635"/>
         <source>Factory database does not exist, creating...</source>
         <translation type="unfinished">ユーザー装備（艦これ）データベースの作成に失敗しました。</translation>
     </message>
     <message id="facto-db-gen-failure">
-        <location filename="../Server/server_sqlinit.cpp" line="582"/>
+        <location filename="../Server/server_sqlinit.cpp" line="640"/>
         <source>Create Factory database failed.</source>
         <translation type="unfinished">工廠データベースが存在しません。作成中…</translation>
     </message>
     <message id="map-node-db-lack">
-        <location filename="../Server/server_sqlinit.cpp" line="589"/>
+        <location filename="../Server/server_sqlinit.cpp" line="647"/>
         <source>Map node database does not exist, creating...</source>
         <translation type="unfinished">工廠データベースの作成に失敗しました。</translation>
     </message>
     <message id="map-node-db-gen-failure">
-        <location filename="../Server/server_sqlinit.cpp" line="594"/>
+        <location filename="../Server/server_sqlinit.cpp" line="652"/>
         <source>Create Map node database failed.</source>
         <translation type="unfinished">海域ノードデータベースが存在しません。作成中…</translation>
     </message>
     <message id="map-relation-db-lack">
-        <location filename="../Server/server_sqlinit.cpp" line="601"/>
+        <location filename="../Server/server_sqlinit.cpp" line="659"/>
         <source>Map relation database does not exist, creating...</source>
         <translation type="unfinished">海域ノードデータベースの作成に失敗しました。</translation>
     </message>
     <message id="map-relation-db-gen-failure">
-        <location filename="../Server/server_sqlinit.cpp" line="606"/>
+        <location filename="../Server/server_sqlinit.cpp" line="664"/>
         <source>Create Map relation database failed.</source>
         <translation type="unfinished">海域関連データベースが存在しません。作成中…</translation>
     </message>
     <message id="map-resource-db-lack">
-        <location filename="../Server/server_sqlinit.cpp" line="613"/>
+        <location filename="../Server/server_sqlinit.cpp" line="671"/>
         <source>Map resource database does not exist, creating...</source>
         <translation type="unfinished">海域関連データベースの作成に失敗しました。</translation>
     </message>
     <message id="map-resource-db-gen-failure">
-        <location filename="../Server/server_sqlinit.cpp" line="618"/>
+        <location filename="../Server/server_sqlinit.cpp" line="676"/>
         <source>Create Map resource database failed.</source>
         <translation type="unfinished">海域資源データベースが存在しません。作成中…</translation>
     </message>
     <message id="ranking-lack">
-        <location filename="../Server/server_sqlinit.cpp" line="625"/>
+        <location filename="../Server/server_sqlinit.cpp" line="683"/>
         <source>Ranking database does not exist, creating...</source>
         <translation type="unfinished">海域資源データベースの作成に失敗しました。</translation>
     </message>
     <message id="ranking-db-gen-failure">
-        <location filename="../Server/server_sqlinit.cpp" line="630"/>
+        <location filename="../Server/server_sqlinit.cpp" line="688"/>
         <source>Create Ranking database failed.</source>
         <translation type="unfinished">ランキングデータベースが存在しません。作成中…</translation>
     </message>
     <message id="ship-db-lack">
-        <location filename="../Server/server_sqlinit.cpp" line="637"/>
+        <location filename="../Server/server_sqlinit.cpp" line="695"/>
         <source>Ship database does not exist, creating...</source>
         <translation type="unfinished">ランキングデータベースの作成に失敗しました。</translation>
     </message>
     <message id="equip-ship-db-gen-failure">
-        <location filename="../Server/server_sqlinit.cpp" line="642"/>
+        <location filename="../Server/server_sqlinit.cpp" line="700"/>
         <source>Create Ship database failed.</source>
         <translation type="unfinished">艦船データベースが存在しません。作成中…</translation>
     </message>
     <message id="ship-db-drop-lack">
-        <location filename="../Server/server_sqlinit.cpp" line="649"/>
+        <location filename="../Server/server_sqlinit.cpp" line="707"/>
         <source>Ship drop database does not exist, creating...</source>
         <translation type="unfinished">艦船データベースの作成に失敗しました。</translation>
     </message>
     <message id="equip-ship-drop-db-gen-failure">
-        <location filename="../Server/server_sqlinit.cpp" line="654"/>
+        <location filename="../Server/server_sqlinit.cpp" line="712"/>
         <source>Create Ship drop database failed.</source>
         <translation type="unfinished">艦船ドロップデータベースが存在しません。作成中…</translation>
     </message>
     <message id="ship-name-db-lack">
-        <location filename="../Server/server_sqlinit.cpp" line="661"/>
+        <location filename="../Server/server_sqlinit.cpp" line="719"/>
         <source>Ship name database does not exist, creating...</source>
         <translation type="unfinished">艦船ドロップデータベースの作成に失敗しました。</translation>
     </message>
     <message id="equip-ship-name-gen-failure">
-        <location filename="../Server/server_sqlinit.cpp" line="666"/>
+        <location filename="../Server/server_sqlinit.cpp" line="724"/>
         <source>Create Ship name failed.</source>
         <translation type="unfinished">艦船名データベースが存在しません。作成中…</translation>
     </message>
     <message id="ship-db-user-lack">
-        <location filename="../Server/server_sqlinit.cpp" line="673"/>
+        <location filename="../Server/server_sqlinit.cpp" line="731"/>
         <source>Ship database for user does not exist, creating...</source>
         <translation type="unfinished">艦船名の作成に失敗しました。</translation>
     </message>
     <message id="ship-db-user-gen-failure">
-        <location filename="../Server/server_sqlinit.cpp" line="678"/>
+        <location filename="../Server/server_sqlinit.cpp" line="736"/>
         <source>Create Ship database for user failed.</source>
         <translation type="unfinished">ユーザー艦船データベースが存在しません。作成中…</translation>
     </message>
     <message id="ship-db-bp-user-lack">
-        <location filename="../Server/server_sqlinit.cpp" line="685"/>
+        <location filename="../Server/server_sqlinit.cpp" line="743"/>
         <source>Ship blueprint database for user does not exist, creating...</source>
         <translation type="unfinished">ユーザー艦船データベースの作成に失敗しました。</translation>
     </message>
     <message id="ship-db-bp-user-gen-failure">
-        <location filename="../Server/server_sqlinit.cpp" line="690"/>
+        <location filename="../Server/server_sqlinit.cpp" line="748"/>
         <source>Create Ship blueprint database for user failed.</source>
         <translation type="unfinished">ユーザー艦船設計図データベースが存在しません。作成中…</translation>
     </message>
     <message id="ship-db-kc-user-lack">
-        <location filename="../Server/server_sqlinit.cpp" line="697"/>
+        <location filename="../Server/server_sqlinit.cpp" line="755"/>
         <source>Ship database (kancolle) for user does not exist, creating...</source>
         <translation type="unfinished">ユーザー艦船設計図データベースの作成に失敗しました。</translation>
     </message>
     <message id="ship-db-kc-user-gen-failure">
-        <location filename="../Server/server_sqlinit.cpp" line="702"/>
+        <location filename="../Server/server_sqlinit.cpp" line="760"/>
         <source>Create Ship database (kancolle) for user failed.</source>
         <oldsource>Create Equipment database (kancolle) for user failed.</oldsource>
         <translation type="unfinished">ユーザー艦船（艦これ）データベースが存在しません。作成中…</translation>
     </message>
     <message id="user-db-lack">
-        <location filename="../Server/server_sqlinit.cpp" line="709"/>
+        <location filename="../Server/server_sqlinit.cpp" line="767"/>
         <source>User database does not exist, creating...</source>
         <translation type="unfinished">ユーザー艦船（艦これ）データベースの作成に失敗しました。</translation>
     </message>
     <message id="user-db-gen-failure">
-        <location filename="../Server/server_sqlinit.cpp" line="714"/>
+        <location filename="../Server/server_sqlinit.cpp" line="772"/>
         <source>Create User database failed.</source>
         <translation type="unfinished">ユーザーデータベースが存在しません。作成中…</translation>
     </message>
     <message id="user-db-attr-lack">
-        <location filename="../Server/server_sqlinit.cpp" line="721"/>
+        <location filename="../Server/server_sqlinit.cpp" line="779"/>
         <source>User attributes database does not exist, creating...</source>
         <translation type="unfinished">ユーザーデータベースの作成に失敗しました。</translation>
     </message>
     <message id="user-db-attr-gen-failure">
-        <location filename="../Server/server_sqlinit.cpp" line="726"/>
+        <location filename="../Server/server_sqlinit.cpp" line="784"/>
         <source>Create User attributes database failed.</source>
         <translation type="unfinished">ユーザー属性データベースが存在しません。作成中…</translation>
     </message>
     <message id="user-db-map-lack">
-        <location filename="../Server/server_sqlinit.cpp" line="733"/>
+        <location filename="../Server/server_sqlinit.cpp" line="791"/>
         <source>User map info database does not exist, creating...</source>
         <translation type="unfinished">ユーザー属性データベースの作成に失敗しました。</translation>
     </message>
     <message id="user-db-map-gen-failure">
-        <location filename="../Server/server_sqlinit.cpp" line="738"/>
+        <location filename="../Server/server_sqlinit.cpp" line="796"/>
         <source>Create User map info database failed.</source>
         <translation type="unfinished">ユーザー海域情報データベースが存在しません。作成中…</translation>
     </message>
     <message id="ard-orders-db-lack">
-        <location filename="../Server/server_sqlinit.cpp" line="745"/>
+        <location filename="../Server/server_sqlinit.cpp" line="803"/>
         <source>ARD orders database does not exist, creating...</source>
         <translation type="unfinished">ユーザー海域情報データベースの作成に失敗しました。</translation>
     </message>
     <message id="ard-orders-db-gen-failure">
-        <location filename="../Server/server_sqlinit.cpp" line="750"/>
+        <location filename="../Server/server_sqlinit.cpp" line="808"/>
         <source>Create ARD orders database failed.</source>
         <translation type="unfinished">ARD注文データベースが存在しません。作成中…</translation>
+    </message>
+    <message id="expedition-db-lack">
+        <location filename="../Server/server_sqlinit.cpp" line="827"/>
+        <source>Expedition database does not exist, creating...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="expedition-db-gen-failure">
+        <location filename="../Server/server_sqlinit.cpp" line="832"/>
+        <source>Create Expedition database failed.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="expedition-battle-plans-db-lack">
+        <location filename="../Server/server_sqlinit.cpp" line="839"/>
+        <source>Expedition battle plans database does not exist, creating...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="expedition-battle-plans-db-gen-failure">
+        <location filename="../Server/server_sqlinit.cpp" line="844"/>
+        <source>Create Expedition battle plans database failed.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="expedition-settings-db-lack">
+        <location filename="../Server/server_sqlinit.cpp" line="851"/>
+        <source>Expedition settings database does not exist, creating...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="expedition-settings-db-gen-failure">
+        <location filename="../Server/server_sqlinit.cpp" line="856"/>
+        <source>Create Expedition settings database failed.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message id="sortie-start-failure-dock">
         <location filename="../Server/server_battle.cpp" line="2035"/>
@@ -2999,102 +3034,102 @@ Great at battle and bad at politics--so cool!</source>
         <translation type="unfinished">海域%1のLuaファイルの実行に失敗しました：%2</translation>
     </message>
     <message id="server-pem">
-        <location filename="../Server/server.cpp" line="4500"/>
+        <location filename="../Server/server.cpp" line="4799"/>
         <source>Server PEM is now %1.</source>
         <translation type="unfinished">海域制覇度の読み取り時にデータベースエラーが発生しました！</translation>
     </message>
     <message id="inbattle-check-failure">
-        <location filename="../Server/server.cpp" line="4515"/>
+        <location filename="../Server/server.cpp" line="4814"/>
         <source>Query in battle status failure for user %1!</source>
         <translation type="unfinished">サーバーPEMは%1に設定されました。</translation>
     </message>
     <message id="update-fleet-clear-failure">
-        <location filename="../Server/server.cpp" line="4662"/>
+        <location filename="../Server/server.cpp" line="4961"/>
         <source>Update fleet (clear fleet) failure!</source>
         <translation type="unfinished">ユーザー%1の戦闘ステータスの照会に失敗しました！</translation>
     </message>
     <message id="user-dock-init-fail">
-        <location filename="../Server/server.cpp" line="4981"/>
-        <location filename="../Server/server.cpp" line="4989"/>
+        <location filename="../Server/server.cpp" line="5280"/>
+        <location filename="../Server/server.cpp" line="5288"/>
         <source>Init %2 dock slots for user %1 failed!</source>
         <translation type="unfinished">艦隊更新（艦隊クリア）に失敗しました！</translation>
     </message>
     <message id="user-rank-init-fail">
-        <location filename="../Server/server.cpp" line="5024"/>
+        <location filename="../Server/server.cpp" line="5323"/>
         <source>%1: User rank init failure!</source>
         <translation type="unfinished">ユーザー%1の%2ドックスロットの初期化に失敗しました！</translation>
     </message>
     <message id="update-fleet-failure">
-        <location filename="../Server/server.cpp" line="4562"/>
-        <location filename="../Server/server.cpp" line="4682"/>
-        <location filename="../Server/server.cpp" line="4710"/>
-        <location filename="../Server/server.cpp" line="4742"/>
-        <location filename="../Server/server.cpp" line="4761"/>
-        <location filename="../Server/server.cpp" line="4780"/>
+        <location filename="../Server/server.cpp" line="4861"/>
+        <location filename="../Server/server.cpp" line="4981"/>
+        <location filename="../Server/server.cpp" line="5009"/>
+        <location filename="../Server/server.cpp" line="5041"/>
+        <location filename="../Server/server.cpp" line="5060"/>
+        <location filename="../Server/server.cpp" line="5079"/>
         <source>Update fleet failure!</source>
         <translation type="unfinished">%1：ユーザーランキングの初期化に失敗しました！</translation>
     </message>
     <message id="lua-map-error">
-        <location filename="../Server/server.cpp" line="2306"/>
-        <location filename="../Server/server.cpp" line="2335"/>
+        <location filename="../Server/server.cpp" line="2309"/>
+        <location filename="../Server/server.cpp" line="2338"/>
         <source>The code from the file %1 has failed to run: %2</source>
         <translation type="unfinished">艦隊更新に失敗しました！</translation>
     </message>
     <message id="lua-map-success">
-        <location filename="../Server/server.cpp" line="2311"/>
+        <location filename="../Server/server.cpp" line="2314"/>
         <source>Load map table success!</source>
         <translation type="unfinished">ファイル%1のコードの実行に失敗しました：%2</translation>
     </message>
     <message id="map-file-nonexistent">
-        <location filename="../Server/server.cpp" line="2326"/>
+        <location filename="../Server/server.cpp" line="2329"/>
         <source>Map file %1 don&apos;t exist!</source>
         <translation type="unfinished">海域テーブルの読み込みに成功しました！</translation>
     </message>
     <message id="lua-map-success-spec">
-        <location filename="../Server/server.cpp" line="2340"/>
+        <location filename="../Server/server.cpp" line="2343"/>
         <source>Load map %1 info success!</source>
         <translation type="unfinished">海域ファイル%1が存在しません！</translation>
     </message>
     <message id="user-db-vcr-lack">
-        <location filename="../Server/server_sqlinit.cpp" line="757"/>
+        <location filename="../Server/server_sqlinit.cpp" line="815"/>
         <source>Virtual condition-map relation database does not exist, creating...</source>
         <translation type="unfinished">海域%1情報の読み込みに成功しました！</translation>
     </message>
     <message id="user-db-vcr-gen-failure">
-        <location filename="../Server/server_sqlinit.cpp" line="762"/>
+        <location filename="../Server/server_sqlinit.cpp" line="820"/>
         <source>Create virtual condition-map relation info database failed.</source>
         <translation type="unfinished">仮想条件-海域関連データベースが存在しません。作成中…</translation>
     </message>
     <message id="ship-cant-equip-it">
-        <location filename="../Server/server.cpp" line="4695"/>
+        <location filename="../Server/server.cpp" line="4994"/>
         <source>Ship %1 can&apos;t equip %2!</source>
         <translation type="unfinished">仮想条件-海域関連情報データベースの作成に失敗しました。</translation>
     </message>
     <message id="ship-cant-equip-it-extra">
-        <location filename="../Server/server.cpp" line="4727"/>
+        <location filename="../Server/server.cpp" line="5026"/>
         <source>Ship %1 can&apos;t equip %2 in extra slot!</source>
         <translation type="unfinished">艦船%1は装備%2を装備できません！</translation>
     </message>
     <message id="user-data-init-fail">
-        <location filename="../Server/server.cpp" line="4892"/>
-        <location filename="../Server/server.cpp" line="4901"/>
-        <location filename="../Server/server.cpp" line="4915"/>
-        <location filename="../Server/server.cpp" line="4925"/>
-        <location filename="../Server/server.cpp" line="4938"/>
-        <location filename="../Server/server.cpp" line="4947"/>
+        <location filename="../Server/server.cpp" line="5191"/>
+        <location filename="../Server/server.cpp" line="5200"/>
+        <location filename="../Server/server.cpp" line="5214"/>
+        <location filename="../Server/server.cpp" line="5224"/>
+        <location filename="../Server/server.cpp" line="5237"/>
+        <location filename="../Server/server.cpp" line="5246"/>
         <source>%1: User data init failure!</source>
         <translation type="unfinished">艦船%1は増設スロットに装備%2を装備できません！</translation>
     </message>
     <message id="user-factory-init-fail">
-        <location filename="../Server/server.cpp" line="4960"/>
-        <location filename="../Server/server.cpp" line="4968"/>
+        <location filename="../Server/server.cpp" line="5259"/>
+        <location filename="../Server/server.cpp" line="5267"/>
         <source>Init %2 factory slots for user %1 failed!</source>
         <oldsource>Init 4 factory slots for user %1 failed!</oldsource>
         <translation type="unfinished">%1：ユーザーデータの初期化に失敗しました！</translation>
     </message>
     <message id="init-userfleet-failed">
-        <location filename="../Server/server.cpp" line="5002"/>
-        <location filename="../Server/server.cpp" line="5010"/>
+        <location filename="../Server/server.cpp" line="5301"/>
+        <location filename="../Server/server.cpp" line="5309"/>
         <location filename="../Server/server_offer.cpp" line="189"/>
         <location filename="../Server/server_offer.cpp" line="195"/>
         <source>Set User Fleet Up failed!</source>
@@ -3479,35 +3514,35 @@ Great at battle and bad at politics--so cool!</source>
     </message>
     <message id="diff-c">
         <location filename="../ClientGUI/ui/sortie/maprender.cpp" line="56"/>
-        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="87"/>
-        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="241"/>
-        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="268"/>
+        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="191"/>
+        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="378"/>
+        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="416"/>
         <source>Early</source>
         <translation type="unfinished">不明</translation>
     </message>
     <message id="diff-b">
         <location filename="../ClientGUI/ui/sortie/maprender.cpp" line="59"/>
-        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="89"/>
-        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="170"/>
-        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="244"/>
-        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="271"/>
+        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="193"/>
+        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="307"/>
+        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="381"/>
+        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="419"/>
         <source>Medium</source>
         <translation type="unfinished">序盤</translation>
     </message>
     <message id="diff-a">
         <location filename="../ClientGUI/ui/sortie/maprender.cpp" line="62"/>
-        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="91"/>
-        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="173"/>
-        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="247"/>
-        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="274"/>
+        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="195"/>
+        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="310"/>
+        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="384"/>
+        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="422"/>
         <source>Late</source>
         <translation type="unfinished">中盤</translation>
     </message>
     <message id="diff-s">
         <location filename="../ClientGUI/ui/sortie/maprender.cpp" line="65"/>
-        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="174"/>
-        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="251"/>
-        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="277"/>
+        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="311"/>
+        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="388"/>
+        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="425"/>
         <source>Historical</source>
         <translation type="unfinished">終盤</translation>
     </message>
@@ -3518,7 +3553,8 @@ Great at battle and bad at politics--so cool!</source>
     </message>
     <message id="fleet-not-ready">
         <location filename="../ClientGUI/ui/maintenance/repair.cpp" line="203"/>
-        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="289"/>
+        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="437"/>
+        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="672"/>
         <source>Please prepare your fleet in fleet view!</source>
         <translation type="unfinished">修理中止</translation>
     </message>
@@ -3528,52 +3564,175 @@ Great at battle and bad at politics--so cool!</source>
         <translation type="unfinished">艦隊画面で艦隊を編成してください！</translation>
     </message>
     <message id="fleet-empty">
-        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="306"/>
+        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="454"/>
+        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="694"/>
         <source>Fleet is empty.</source>
         <translation type="unfinished">艦船は修理の必要がありません。</translation>
     </message>
     <message id="disaster-los-check">
-        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="342"/>
+        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="500"/>
         <source>LOS check: required %1, fleet %2, chance to avoid %3%</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="disaster-deduction-occurred">
-        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="346"/>
+        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="504"/>
         <source>Fuel/ammo deducted: %1% fuel, %2% ammo</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="disaster-deduction-avoided">
-        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="351"/>
+        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="509"/>
         <source>LOS check succeeded! No resources deducted.</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="transport-freight-info">
-        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="360"/>
+        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="518"/>
         <source>Freight transport: current %1, capacity %2, added %3</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="continue-map">
-        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="390"/>
+        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="548"/>
         <source>Do you want to continue map progress?</source>
         <translation type="unfinished">艦隊が空です。</translation>
     </message>
+    <message id="expedition-auto-restart-label">
+        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="102"/>
+        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="796"/>
+        <source>Auto-restart: %1%</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="game-error-no-error">
+        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="36"/>
+        <source>No error</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="game-error-expedition-map-not-exist">
+        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="39"/>
+        <source>Expedition map does not exist</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="game-error-expedition-invalid-fleet-index">
+        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="42"/>
+        <source>Invalid fleet index</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="game-error-expedition-invalid-battle-plans">
+        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="45"/>
+        <source>Invalid battle plans</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="game-error-expedition-database-error">
+        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="48"/>
+        <source>Database error</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="game-error-expedition-internal-error">
+        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="51"/>
+        <source>Internal server error</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="game-error-expedition-already-exists">
+        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="54"/>
+        <source>Expedition already exists</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="game-error-expedition-fleet-already-on-expedition">
+        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="57"/>
+        <source>Fleet already on expedition</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="game-error-expedition-max-reached">
+        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="60"/>
+        <source>Maximum number of expeditions reached</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="game-error-unknown">
+        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="63"/>
+        <source>Unknown error</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="expedition-group">
+        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="88"/>
+        <source>Expedition</source>
+        <translation type="unfinished">遠征</translation>
+    </message>
+    <message id="expedition-plan-nodes">
+        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="93"/>
+        <source>Plan Nodes</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="expedition-start">
+        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="95"/>
+        <source>Start Expedition</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="expedition-cancel">
+        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="97"/>
+        <source>Cancel Expedition</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="auto-resupply-checkbox">
+        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="104"/>
+        <source>Auto-resupply</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="expedition-save-settings">
+        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="106"/>
+        <source>Save Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="expedition-start-success">
+        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="750"/>
+        <source>Expedition started successfully for map %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="expedition-start-failed">
+        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="757"/>
+        <source>Expedition start failed: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="expedition-status-count">
+        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="767"/>
+        <source>Active expeditions: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="expedition-progress-update">
+        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="774"/>
+        <source>Expedition %1 progressed to node %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="expedition-settings-saved">
+        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="862"/>
+        <source>Expedition settings saved for map %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="expedition-plan-saved">
+        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="949"/>
+        <source>Battle plan saved for node %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="expedition-stopped">
+        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="782"/>
+        <source>Expedition %1 stopped with reason %2</source>
+        <oldsource>Expedition stopped: map %1 reason %2</oldsource>
+        <translation type="unfinished"></translation>
+    </message>
     <message id="sortie-end">
-        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="404"/>
+        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="562"/>
         <source>This sortie ended successfully.</source>
         <translation type="unfinished">海域進行を続けますか？</translation>
     </message>
     <message id="empty-node-no-battle">
-        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="435"/>
+        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="593"/>
         <source>No enemies found. It&apos;s just my imagination.</source>
         <translation type="unfinished">出撃は成功裏に終了しました。</translation>
     </message>
     <message id="choice-node-prompt">
-        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="438"/>
+        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="596"/>
         <source>Admiral, please can choose your next step freely.</source>
         <translation type="unfinished">提督、次の行動を自由に選んでください。</translation>
     </message>
     <message id="fleet-move-error">
-        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="475"/>
+        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="633"/>
         <source>Fleet move failed!</source>
         <translation type="unfinished">敵影を見ず。気のせいだったか。</translation>
     </message>
@@ -3794,97 +3953,97 @@ Great at battle and bad at politics--so cool!</source>
         <translation type="obsolete">数値</translation>
     </message>
     <message id="Japanese">
-        <location filename="../Protocol/kp.h" line="561"/>
+        <location filename="../Protocol/kp.h" line="582"/>
         <source>Japanese</source>
         <translation type="unfinished">数量</translation>
     </message>
     <message id="German">
-        <location filename="../Protocol/kp.h" line="563"/>
+        <location filename="../Protocol/kp.h" line="584"/>
         <source>German</source>
         <translation type="unfinished">日本</translation>
     </message>
     <message id="Italian">
-        <location filename="../Protocol/kp.h" line="565"/>
+        <location filename="../Protocol/kp.h" line="586"/>
         <source>Italian</source>
         <translation type="unfinished">ドイツ</translation>
     </message>
     <message id="American">
-        <location filename="../Protocol/kp.h" line="567"/>
+        <location filename="../Protocol/kp.h" line="588"/>
         <source>American</source>
         <translation type="unfinished">イタリア</translation>
     </message>
     <message id="British">
-        <location filename="../Protocol/kp.h" line="569"/>
+        <location filename="../Protocol/kp.h" line="590"/>
         <source>British</source>
         <translation type="unfinished">アメリカ</translation>
     </message>
     <message id="French">
-        <location filename="../Protocol/kp.h" line="571"/>
+        <location filename="../Protocol/kp.h" line="592"/>
         <source>French</source>
         <translation type="unfinished">イギリス</translation>
     </message>
     <message id="Soviet">
-        <location filename="../Protocol/kp.h" line="573"/>
+        <location filename="../Protocol/kp.h" line="594"/>
         <source>Soviet</source>
         <translation type="unfinished">フランス</translation>
     </message>
     <message id="Chinese">
-        <location filename="../Protocol/kp.h" line="575"/>
+        <location filename="../Protocol/kp.h" line="596"/>
         <source>Chinese</source>
         <translation type="unfinished">ソ連</translation>
     </message>
     <message id="Benelux">
-        <location filename="../Protocol/kp.h" line="577"/>
+        <location filename="../Protocol/kp.h" line="598"/>
         <source>Benelux</source>
         <translation type="unfinished">中国</translation>
     </message>
     <message id="Nordic">
-        <location filename="../Protocol/kp.h" line="579"/>
+        <location filename="../Protocol/kp.h" line="600"/>
         <source>Nordic</source>
         <translation type="unfinished">ベネルクス</translation>
     </message>
     <message id="Commonwealth">
-        <location filename="../Protocol/kp.h" line="581"/>
+        <location filename="../Protocol/kp.h" line="602"/>
         <source>Commonwealth</source>
         <translation type="unfinished">北欧</translation>
     </message>
     <message id="Latin">
-        <location filename="../Protocol/kp.h" line="583"/>
+        <location filename="../Protocol/kp.h" line="604"/>
         <source>Iberian/Latin American</source>
         <translation type="unfinished">英連邦</translation>
     </message>
     <message id="EasternEuropean">
-        <location filename="../Protocol/kp.h" line="585"/>
+        <location filename="../Protocol/kp.h" line="606"/>
         <source>Eastern European</source>
         <translation type="unfinished">イベリア/ラテンアメリカ</translation>
     </message>
     <message id="MinorAsian">
-        <location filename="../Protocol/kp.h" line="587"/>
+        <location filename="../Protocol/kp.h" line="608"/>
         <source>Other Asian</source>
         <translation type="unfinished">東欧</translation>
     </message>
     <message id="Fantasy">
-        <location filename="../Protocol/kp.h" line="589"/>
+        <location filename="../Protocol/kp.h" line="610"/>
         <source>Fantasy ships</source>
         <translation type="unfinished">その他アジア</translation>
     </message>
     <message id="NormalFleet">
-        <location filename="../Protocol/kp.h" line="696"/>
+        <location filename="../Protocol/kp.h" line="717"/>
         <source>Normal</source>
         <translation type="unfinished">架空艦</translation>
     </message>
     <message id="CarrierFleet">
-        <location filename="../Protocol/kp.h" line="698"/>
+        <location filename="../Protocol/kp.h" line="719"/>
         <source>Carrier</source>
         <translation type="unfinished">通常</translation>
     </message>
     <message id="SurfaceFleet">
-        <location filename="../Protocol/kp.h" line="700"/>
+        <location filename="../Protocol/kp.h" line="721"/>
         <source>Surface</source>
         <translation type="unfinished">空母機動部隊</translation>
     </message>
     <message id="TransportFleet">
-        <location filename="../Protocol/kp.h" line="702"/>
+        <location filename="../Protocol/kp.h" line="723"/>
         <source>Transport</source>
         <translation type="unfinished">水上打撃部隊</translation>
     </message>
@@ -4250,17 +4409,17 @@ Great at battle and bad at politics--so cool!</source>
         <translation type="unfinished">制覇度</translation>
     </message>
     <message id="supply-attrition-home">
-        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="203"/>
+        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="340"/>
         <source>0% (home port)</source>
         <translation type="unfinished">0%（母港）</translation>
     </message>
     <message id="supply-attrition-no-route">
-        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="190"/>
+        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="327"/>
         <source>N/A (no route)</source>
         <translation type="unfinished">N/A（ルートなし）</translation>
     </message>
     <message id="supply-attrition-broken">
-        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="196"/>
+        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="333"/>
         <source>∞ (supply line broken)</source>
         <translation type="unfinished">∞（補給線途絶）</translation>
     </message>
@@ -4352,7 +4511,7 @@ Great at battle and bad at politics--so cool!</source>
     </message>
     <message id="battle-result-title">
         <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="88"/>
-        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="386"/>
+        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="544"/>
         <source>Battle Results</source>
         <translation type="unfinished"></translation>
     </message>
@@ -4447,6 +4606,275 @@ Great at battle and bad at politics--so cool!</source>
         <location filename="../ClientGUI/ui/navalacademyview.cpp" line="559"/>
         <location filename="../ClientGUI/ui/navalacademyview.cpp" line="561"/>
         <source></source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="expedition-map-not-exist">
+        <location filename="../Server/expeditionmanager.cpp" line="56"/>
+        <location filename="../Server/expeditionmanager.cpp" line="367"/>
+        <source>Map %1 does not exist</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="expedition-invalid-fleet-index">
+        <location filename="../Server/expeditionmanager.cpp" line="63"/>
+        <source>Invalid fleet index %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="expedition-check-existing-failed">
+        <location filename="../Server/expeditionmanager.cpp" line="78"/>
+        <source>Failed to check existing expedition for user %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="expedition-already-exists">
+        <location filename="../Server/expeditionmanager.cpp" line="85"/>
+        <source>User %1 already has expedition for map %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="expedition-check-active-failed">
+        <location filename="../Server/expeditionmanager.cpp" line="103"/>
+        <source>Failed to check active expeditions for user %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="expedition-max-reached">
+        <location filename="../Server/expeditionmanager.cpp" line="110"/>
+        <source>User %1 already has maximum number of expeditions (%2)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="expedition-check-fleet-status-failed">
+        <location filename="../Server/expeditionmanager.cpp" line="126"/>
+        <source>Failed to check fleet expedition status for user %1 fleet %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="expedition-fleet-already-on-expedition">
+        <location filename="../Server/expeditionmanager.cpp" line="133"/>
+        <source>Fleet %1 is already on expedition for user %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="expedition-insert-failed">
+        <location filename="../Server/expeditionmanager.cpp" line="166"/>
+        <source>Failed to insert expedition for user %1 map %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="expedition-map-not-in-registry">
+        <location filename="../Server/expeditionmanager.cpp" line="182"/>
+        <location filename="../Server/expeditionmanager.cpp" line="406"/>
+        <location filename="../Server/expeditionmanager.cpp" line="581"/>
+        <location filename="../Server/expeditionmanager.cpp" line="847"/>
+        <source>Map %1 not found for expedition progress</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="expedition-node-not-found">
+        <location filename="../Server/expeditionmanager.cpp" line="195"/>
+        <location filename="../Server/expeditionmanager.cpp" line="443"/>
+        <source>Node %1 not found in map %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="expedition-battle-plan-insert-failed">
+        <location filename="../Server/expeditionmanager.cpp" line="219"/>
+        <location filename="../Server/expeditionmanager.cpp" line="467"/>
+        <source>Failed to insert battle plan for user %1 map %2 node %3</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="expedition-move-fleet-failed">
+        <location filename="../Server/expeditionmanager.cpp" line="232"/>
+        <source>Failed to move fleet to expedition index for user %1 map %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="expedition-started">
+        <location filename="../Server/expeditionmanager.cpp" line="263"/>
+        <source>Expedition started for user %1 map %2 fleet %3</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="expedition-invalid-receive-fleet-index">
+        <location filename="../Server/expeditionmanager.cpp" line="279"/>
+        <source>Invalid receive fleet index %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="expedition-cancel-query-failed">
+        <location filename="../Server/expeditionmanager.cpp" line="295"/>
+        <source>Failed to query expedition for cancellation user %1 map %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="expedition-not-found">
+        <location filename="../Server/expeditionmanager.cpp" line="302"/>
+        <source>Expedition not found for user %1 map %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="expedition-already-inactive">
+        <location filename="../Server/expeditionmanager.cpp" line="311"/>
+        <source>Expedition already inactive for user %1 map %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="expedition-cancel-update-failed">
+        <location filename="../Server/expeditionmanager.cpp" line="327"/>
+        <source>Failed to cancel expedition for user %1 map %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="expedition-restore-fleet-failed">
+        <location filename="../Server/expeditionmanager.cpp" line="336"/>
+        <source>Failed to restore fleet for cancelled expedition user %1 map %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="expedition-cancelled">
+        <location filename="../Server/expeditionmanager.cpp" line="349"/>
+        <source>Expedition cancelled for user %1 map %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="expedition-update-plans-query-failed">
+        <location filename="../Server/expeditionmanager.cpp" line="382"/>
+        <source>Failed to query expedition for update battle plans user %1 map %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="expedition-active-no-update">
+        <location filename="../Server/expeditionmanager.cpp" line="392"/>
+        <source>Cannot update battle plans for active expedition user %1 map %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="expedition-delete-plans-failed">
+        <location filename="../Server/expeditionmanager.cpp" line="420"/>
+        <source>Failed to delete old battle plans for user %1 map %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="expedition-plans-updated">
+        <location filename="../Server/expeditionmanager.cpp" line="477"/>
+        <source>Battle plans updated for user %1 map %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="expedition-query-for-processing-failed">
+        <location filename="../Server/expeditionmanager.cpp" line="506"/>
+        <source>Failed to query expeditions for processing</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="expedition-query-user-failed">
+        <location filename="../Server/expeditionmanager.cpp" line="551"/>
+        <source>Failed to query expeditions for user %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="expedition-get-state-failed">
+        <location filename="../Server/expeditionmanager.cpp" line="597"/>
+        <source>Failed to get expedition state for user %1 map %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="expedition-not-active">
+        <location filename="../Server/expeditionmanager.cpp" line="604"/>
+        <location filename="../Server/expeditionmanager.cpp" line="1036"/>
+        <source>Expedition not active for user %1 map %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="expedition-node-not-found-in-map">
+        <location filename="../Server/expeditionmanager.cpp" line="615"/>
+        <source>Current node %1 not found in map %2</source>
+        <oldsource>Current node %1 not found in map %2 (map id: %3, nodes count: %4)</oldsource>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="expedition-no-choice-plan">
+        <location filename="../Server/expeditionmanager.cpp" line="636"/>
+        <source>No battle plan for choice node %1 map %2 user %3</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="expedition-update-node-failed">
+        <location filename="../Server/expeditionmanager.cpp" line="668"/>
+        <source>Failed to update expedition node for user %1 map %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="expedition-next-node-not-found">
+        <location filename="../Server/expeditionmanager.cpp" line="682"/>
+        <source>Next node %1 not found in map %2</source>
+        <oldsource>Next node %1 not found in map %2 (map id: %3, nodes count: %4)</oldsource>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="expedition-update-progress-time-failed">
+        <location filename="../Server/expeditionmanager.cpp" line="721"/>
+        <source>Failed to update next progress time for user %1 map %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="expedition-battle-plan-not-found">
+        <location filename="../Server/expeditionmanager.cpp" line="752"/>
+        <source>Battle plan not found for user %1 map %2 node %3</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="expedition-empty-battle-plan">
+        <location filename="../Server/expeditionmanager.cpp" line="760"/>
+        <source>Empty battle plan for user %1 map %2 node %3</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="expedition-battle-executed">
+        <location filename="../Server/expeditionmanager.cpp" line="786"/>
+        <source>Expedition battle executed for user %1 map %2 node %3</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="expedition-stopped-critically-damaged">
+        <location filename="../Server/expeditionmanager.cpp" line="815"/>
+        <source>Expedition stopped: critically damaged ship for user %1 map %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="expedition-stopped-no-fuel">
+        <location filename="../Server/expeditionmanager.cpp" line="822"/>
+        <source>Expedition stopped: no fuel for user %1 map %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="expedition-stopped-no-ammo">
+        <location filename="../Server/expeditionmanager.cpp" line="829"/>
+        <source>Expedition stopped: no ammo for user %1 map %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="expedition-settings-failed">
+        <location filename="../Server/expeditionmanager.cpp" line="863"/>
+        <source>Failed to set expedition settings for user %1 map %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="expedition-query-fleet-ships-failed">
+        <location filename="../Server/expeditionmanager.cpp" line="923"/>
+        <source>Failed to query expedition fleet ships for auto-resupply user %1 map %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="expedition-resupply-fuel-failed">
+        <location filename="../Server/expeditionmanager.cpp" line="984"/>
+        <source>Failed to resupply fuel for ship %1 user %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="expedition-resupply-ammo-failed">
+        <location filename="../Server/expeditionmanager.cpp" line="999"/>
+        <source>Failed to resupply ammo for ship %1 user %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="expedition-auto-resupply-performed">
+        <location filename="../Server/expeditionmanager.cpp" line="1009"/>
+        <source>Auto-resupply performed for user %1 map %2: oil %3, explosives %4</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="expedition-end-update-failed">
+        <location filename="../Server/expeditionmanager.cpp" line="1056"/>
+        <source>Failed to end expedition for user %1 map %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="expedition-ended">
+        <location filename="../Server/expeditionmanager.cpp" line="1077"/>
+        <source>Expedition ended for user %1 map %2 reason %3</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="expedition-query-fleet-consumption-failed">
+        <location filename="../Server/expeditionmanager.cpp" line="1112"/>
+        <source>Failed to query expedition fleet for fuel/ammo consumption user %1 map %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="expedition-update-fuel-ammo-failed">
+        <location filename="../Server/expeditionmanager.cpp" line="1145"/>
+        <source>Failed to update fuel/ammo for ship %1 user %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="expedition-fuel-ammo-consumed">
+        <location filename="../Server/expeditionmanager.cpp" line="1155"/>
+        <source>Fuel/ammo consumed for expedition battle user %1 map %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="expedition-move-fleet-index-failed">
+        <location filename="../Server/expeditionmanager.cpp" line="1179"/>
+        <source>Failed to move fleet %1 to expedition index %2 for user %3</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="expedition-restore-fleet-index-failed">
+        <location filename="../Server/expeditionmanager.cpp" line="1217"/>
+        <source>Failed to restore fleet from expedition index %1 to normal index %2 for user %3</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -4743,6 +5171,18 @@ Great at battle and bad at politics--so cool!</source>
         <location filename="../ClientGUI/ui/views/equipview.ui" line="14"/>
         <source>Form</source>
         <translation type="unfinished">フォーム</translation>
+    </message>
+</context>
+<context>
+    <name>ExpeditionView</name>
+    <message>
+        <source>Form</source>
+        <translation type="obsolete">フォーム</translation>
+    </message>
+    <message>
+        <source>Difficulty:</source>
+        <extracomment>map-diff</extracomment>
+        <translation type="obsolete">難易度：</translation>
     </message>
 </context>
 <context>
@@ -5233,7 +5673,7 @@ Great at battle and bad at politics--so cool!</source>
     </message>
     <message id="supremacy-value-na">
         <location filename="../ClientGUI/ui/sortie/sortie.ui" line="126"/>
-        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="225"/>
+        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="362"/>
         <source>N/A</source>
         <translation type="unfinished">N/A</translation>
     </message>
@@ -5244,20 +5684,20 @@ Great at battle and bad at politics--so cool!</source>
     </message>
     <message id="supply-attrition-na">
         <location filename="../ClientGUI/ui/sortie/sortie.ui" line="153"/>
-        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="164"/>
+        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="301"/>
         <source>N/A</source>
         <translation type="unfinished">N/A</translation>
+    </message>
+    <message id="selected-map-id">
+        <location filename="../ClientGUI/ui/sortie/sortie.ui" line="99"/>
+        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="564"/>
+        <source>None</source>
+        <translation type="unfinished">なし</translation>
     </message>
     <message id="start-battle">
         <location filename="../ClientGUI/ui/sortie/sortie.ui" line="173"/>
         <source>Weigh Anchor!</source>
         <translation type="unfinished">抜錨！</translation>
-    </message>
-    <message id="selected-map-id">
-        <location filename="../ClientGUI/ui/sortie/sortie.ui" line="99"/>
-        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="406"/>
-        <source>None</source>
-        <translation type="unfinished">なし</translation>
     </message>
     <message>
         <location filename="../ClientGUI/ui/sortie/sortie.ui" line="14"/>
@@ -5269,6 +5709,10 @@ Great at battle and bad at politics--so cool!</source>
         <source>Difficulty:</source>
         <extracomment>map-diff</extracomment>
         <translation type="unfinished">難易度：</translation>
+    </message>
+    <message>
+        <source>Expedition</source>
+        <translation type="obsolete">遠征</translation>
     </message>
 </context>
 <context>

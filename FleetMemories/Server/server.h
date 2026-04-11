@@ -26,6 +26,7 @@
 #include "../Protocol/mapwithdiff.h"
 #include "servermastersender.h"
 #include "planereplenish.h"
+#include "expeditionmanager.h"
 #include "sslserver.h"
 
 class Server : public CommandLine {
@@ -41,6 +42,8 @@ public:
     void datagramReceivedStd(const QJsonObject &, const PeerInfo &,
                              QSslSocket *);
     bool listen(const QHostAddress &, quint16);
+    MapWithDiff *getMapByUnionId(int mapUnionId) const;
+    bool hasMapWithUnionId(int mapUnionId) const;
     void naturalRegen(const CSteamID &);
 
 public slots:
@@ -76,6 +79,7 @@ private slots:
 
 private:
     friend class PlaneReplenish;
+    friend class ExpeditionManager;
     bool addEquipStar(const QUuid &, int);
     bool clearMap(const CSteamID &, int);
     void clearNegativeSkillPoints(const CSteamID &);
@@ -113,7 +117,13 @@ private:
     void handleConvertSkillPoints(const CSteamID &, QSslSocket *, const QJsonObject &);
     void handleInitARDPurchase(const CSteamID &, QSslSocket *, int packageId);
     void handleSupplyShip(const CSteamID &, QSslSocket *,
-                          const QJsonArray &);
+                           const QJsonArray &);
+    // Expedition handlers
+    void handleCancelExpedition(const CSteamID &, QSslSocket *, const QJsonObject &);
+    void handleQueryExpeditionStatus(const CSteamID &, QSslSocket *, const QJsonObject &);
+    void handleSetExpeditionSettings(const CSteamID &, QSslSocket *, const QJsonObject &);
+    void handleStartExpedition(const CSteamID &, QSslSocket *, const QJsonObject &);
+    void handleUpdateExpeditionPlan(const CSteamID &, QSslSocket *, const QJsonObject &);
     void pollARDRefunds();
     static int getBossDamage(const QJsonObject &);
     static bool getBossSunk(const QJsonObject &);
@@ -132,6 +142,11 @@ private:
     void initUserMapStatus(const CSteamID &);
     void luaInitEquipable();
     void luaInitMap();
+    bool nodeExistsInLua(int mapUnionId, int nodeIndex) const;
+    KP::NodeType getNodeTypeFromLua(int mapUnionId, int nodeIndex) const;
+    QList<int> getNextNodesFromLua(int mapUnionId, int nodeIndex) const;
+    MapNode getNodeFromLua(int mapUnionId, int nodeIndex) const;
+    QList<int> getAllNodeIndicesFromLua(int mapUnionId) const;
     [[nodiscard]] bool mapRefresh();
     void migrate(const CSteamID &, const QJsonObject &);
     void minutePulse();
@@ -161,6 +176,8 @@ private:
     void processVirtualExpGain(const CSteamID &, int mapUnionId,
                                KP::Difficulty diff, double baseExpGained,
                                KP::BattleAssessment assm);
+    bool validateExpeditionBattlePlans(int mapUnionId,
+                                       const QMap<int, QByteArray> &battlePlans);
     void progressMap(const CSteamID &, QSslSocket *, int, int,
                      bool retreat = false);
     FleetInfo queryFleetInfo(const CSteamID &, int fleetIndex);
@@ -200,6 +217,9 @@ private:
     void sqlinitUsers() const;
     void sqlinitARDOrders() const;
     void sqlinitVCR() const;
+    void sqlinitExpedition() const;
+    void sqlinitExpeditionBattlePlan() const;
+    void sqlinitExpeditionSettings() const;
     int countSameTypeEquipmentInArsenal(const CSteamID &uid, int equipDef);
     int calculateSkillPointDeduction(int currentSkillPoints, int sameTypeCount);
     bool shouldDamageEquipment(double remainingHPRatio, std::mt19937 &mt);
@@ -213,6 +233,7 @@ private:
     void testEquipmentSkillPointLoss();
     void testEquipmentDamageChance();
     void testEmergencyRepair();
+    void testExpeditionMechanics();
     std::pair<KP::FleetFailType, int> updateFleet(const CSteamID &,
                                                   const QJsonArray &);
     void updateFleetIntoDatabase(const CSteamID &,
@@ -233,6 +254,7 @@ private:
 
     QNetworkAccessManager networkManager;
     PlaneReplenish planeReplenish;
+    ExpeditionManager expeditionManager;
 
     QSet<int> openEquips;
     QMap<int, Equipment *> equipRegistry;

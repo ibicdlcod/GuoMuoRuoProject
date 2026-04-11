@@ -459,8 +459,8 @@ QByteArray KP::clientSetExpeditionSettings(int mapUnionId, double autoResupplyTh
     result["type"] = DgramType::Request;
     result["command"] = CommandType::SetExpeditionSettings;
     result["mapid"] = mapUnionId;
-    result["autoResupplyThreshold"] = autoResupplyThreshold;
-    result["autoRestart"] = autoRestart;
+    result["autoresupplythreshold"] = autoResupplyThreshold;
+    result["autorestart"] = autoRestart;
     return QCborValue::fromJsonValue(result).toCbor();
 }
 
@@ -472,12 +472,12 @@ QByteArray KP::clientStartExpedition(int mapUnionId, int fleetIndex,
     result["command"] = CommandType::StartExpedition;
     result["mapid"] = mapUnionId;
     result["fleetindex"] = fleetIndex;
-    result["autoResupplyThreshold"] = autoResupplyThreshold;
+    result["autoresupplythreshold"] = autoResupplyThreshold;
     QJsonObject plansObj;
     for(auto it = battlePlans.begin(); it != battlePlans.end(); ++it) {
         plansObj[QString::number(it.key())] = QString(it.value().toBase64());
     }
-    result["battlePlans"] = plansObj;
+    result["battleplans"] = plansObj;
     return QCborValue::fromJsonValue(result).toCbor();
 }
 
@@ -491,7 +491,7 @@ QByteArray KP::clientUpdateExpeditionPlan(int mapUnionId,
     for(auto it = battlePlans.begin(); it != battlePlans.end(); ++it) {
         plansObj[QString::number(it.key())] = QString(it.value().toBase64());
     }
-    result["battlePlans"] = plansObj;
+    result["battleplans"] = plansObj;
     return QCborValue::fromJsonValue(result).toCbor();
 }
 
@@ -938,19 +938,19 @@ QByteArray KP::serverExpeditionProgressUpdate(int mapUnionId, int nodeIndex,
     result["infotype"] = InfoType::ExpeditionProgressUpdate;
     result["mapid"] = mapUnionId;
     result["nodeindex"] = nodeIndex;
-    result["battleResult"] = battleResult;
+    result["battleresult"] = battleResult;
     return QCborValue::fromJsonValue(result).toCbor();
 }
 
 QByteArray KP::serverExpeditionStartResult(int mapUnionId, bool accepted,
-                                           const QString &errorReason) {
+                                           GameError error) {
     QJsonObject result;
     result["type"] = DgramType::Info;
     result["infotype"] = InfoType::ExpeditionStartResult;
     result["mapid"] = mapUnionId;
     result["accepted"] = accepted;
-    if(!errorReason.isEmpty())
-        result["errorReason"] = errorReason;
+    if(error != KP::NoError)
+        result["error"] = static_cast<int>(error);
     return QCborValue::fromJsonValue(result).toCbor();
 }
 
@@ -967,7 +967,7 @@ QByteArray KP::serverExpeditionStopped(int mapUnionId, int stopReason) {
     result["type"] = DgramType::Info;
     result["infotype"] = InfoType::ExpeditionStopped;
     result["mapid"] = mapUnionId;
-    result["stopReason"] = stopReason;
+    result["stopreason"] = stopReason;
     return QCborValue::fromJsonValue(result).toCbor();
 }
 

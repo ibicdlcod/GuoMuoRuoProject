@@ -22,7 +22,7 @@ public:
         : std::runtime_error(what.toStdString()) {
     }
 
-    QStringList whats();
+    QStringList whats() const;
 
 private:
     QSqlError e; // holds error of the query

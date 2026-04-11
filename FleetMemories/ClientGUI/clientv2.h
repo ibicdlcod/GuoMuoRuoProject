@@ -149,6 +149,13 @@ public slots:
     void setTicketCache(uint8 [], uint32);
     void showHelp(const QStringList &);
     void sortie(int, int, bool expedition = false);
+    void startExpedition(int mapUnionId, int fleetIndex,
+                         const QMap<int, QByteArray> &battlePlans,
+                         double autoResupplyThreshold);
+    void cancelExpedition(int mapUnionId, int receiveFleetIndex);
+    void setExpeditionSettings(int mapUnionId, double autoResupplyThreshold, bool autoRestart);
+    void updateExpeditionPlan(int mapUnionId, const QMap<int, QByteArray> &battlePlans);
+    void queryExpeditionStatus();
     void stopRepair(int);
     void switchToBattleView();
     void switchToFactory();
@@ -201,6 +208,11 @@ signals:
     void uiRefreshSig();
     void unlockBattle();
     void visibleBonusUpdated();
+    void receivedExpeditionStartResult(int mapUnionId, bool accepted, KP::GameError error);
+    void receivedExpeditionStatus(const QJsonArray &expeditions);
+    void receivedExpeditionProgressUpdate(int mapUnionId, int nodeIndex,
+                                          const QJsonObject &battleResult);
+    void receivedExpeditionStopped(int mapUnionId, int stopReason);
 
 private slots:
     void changeGameState(KP::GameState);

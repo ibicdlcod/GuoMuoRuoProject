@@ -14,6 +14,7 @@
 #include "techview.h"
 #include "navalacademyview.h"
 #include "sortie/sortie.h"
+
 #include "fleet/fleetview.h"
 #include "maintenance/repair.h"
 #include "shop/ardcoupondialog.h"
@@ -70,11 +71,13 @@ private slots:
     void switchToCloningVats();
     void switchToConstruct();
     void switchToDevelop();
+    void switchToExpedition();
     void showResourceGain();
     void switchToFleet();
     void switchToNavalAcademy();
     void switchToRank();
     void switchToSortie();
+
     void updateColorScheme(Qt::ColorScheme colorscheme);
     void updateResources(const QJsonObject &);
 
@@ -91,6 +94,7 @@ private:
     TechView *techArea;
     NavalAcademyView *navalAcademyArea;
     Sortie *battleArea;
+
     FleetView *fleetArea;
     Repair *repairArea;
     SettingsWindow settingsWindow;

@@ -658,6 +658,31 @@ void Client::receivedInfo(const QJsonObject &djson) {
         emit progressToNode(node, nextNodeId);
         break;
     }
+    case KP::InfoType::ExpeditionStartResult: {
+        int mapUnionId = djson["mapid"].toInt();
+        bool accepted = djson["accepted"].toBool();
+        KP::GameError error = djson.contains("error") ? static_cast<KP::GameError>(djson["error"].toInt()) : KP::NoError;
+        emit receivedExpeditionStartResult(mapUnionId, accepted, error);
+        break;
+    }
+    case KP::InfoType::ExpeditionStatus: {
+        QJsonArray expeditions = djson["expeditions"].toArray();
+        emit receivedExpeditionStatus(expeditions);
+        break;
+    }
+    case KP::InfoType::ExpeditionProgressUpdate: {
+        int mapUnionId = djson["mapid"].toInt();
+        int nodeIndex = djson["nodeindex"].toInt();
+        QJsonObject battleResult = djson["battleresult"].toObject();
+        emit receivedExpeditionProgressUpdate(mapUnionId, nodeIndex, battleResult);
+        break;
+    }
+    case KP::InfoType::ExpeditionStopped: {
+        int mapUnionId = djson["mapid"].toInt();
+        int stopReason = djson["stopreason"].toInt();
+        emit receivedExpeditionStopped(mapUnionId, stopReason);
+        break;
+    }
     default: throw std::domain_error("info type not supported"); break;
     }
 }
@@ -1401,4 +1426,69 @@ void Client::switchCert(const QStringList &input) {
     qInfo() << qtTrId("client-pem")
                    .arg(settings->value(
                                     "networkclient/pem", "Default").toString());
+}
+
+void Client::startExpedition(int mapUnionId, int fleetIndex,
+                             const QMap<int, QByteArray> &battlePlans,
+                             double autoResupplyThreshold) {
+    if (!loggedIn()) {
+        //% "Must be logged in to start expedition."
+        qWarning() << qtTrId("expedition-not-logged-in");
+        return;
+    }
+    QByteArray msg = KP::clientStartExpedition(mapUnionId, fleetIndex,
+                                               battlePlans, autoResupplyThreshold);
+    sender->enqueue(msg);
+}
+
+void Client::cancelExpedition(int mapUnionId, int receiveFleetIndex) {
+    if (!loggedIn()) {
+        //% "Must be logged in to cancel expedition."
+        qWarning() << qtTrId("expedition-not-logged-in");
+        return;
+    }
+    QByteArray msg = KP::clientCancelExpedition(mapUnionId, receiveFleetIndex);
+    sender->enqueue(msg);
+}
+
+void Client::setExpeditionSettings(int mapUnionId, double autoResupplyThreshold, bool autoRestart) {
+    qDebug() << "Client::setExpeditionSettings called with mapUnionId:" << mapUnionId
+             << "threshold:" << autoResupplyThreshold << "restart:" << autoRestart;
+    if (!loggedIn()) {
+        //% "Must be logged in to set expedition settings."
+        qWarning() << qtTrId("expedition-not-logged-in");
+        return;
+    }
+    if (!sender) {
+        qCritical() << "Client::setExpeditionSettings: sender is null";
+        return;
+    }
+    QByteArray msg = KP::clientSetExpeditionSettings(mapUnionId, autoResupplyThreshold, autoRestart);
+    sender->enqueue(msg);
+}
+
+void Client::updateExpeditionPlan(int mapUnionId, const QMap<int, QByteArray> &battlePlans) {
+    qDebug() << "Client::updateExpeditionPlan called with mapUnionId:" << mapUnionId
+             << "battlePlans count:" << battlePlans.size();
+    if (!loggedIn()) {
+        //% "Must be logged in to update expedition plans."
+        qWarning() << qtTrId("expedition-not-logged-in");
+        return;
+    }
+    if (!sender) {
+        qCritical() << "Client::updateExpeditionPlan: sender is null";
+        return;
+    }
+    QByteArray msg = KP::clientUpdateExpeditionPlan(mapUnionId, battlePlans);
+    sender->enqueue(msg);
+}
+
+void Client::queryExpeditionStatus() {
+    if (!loggedIn()) {
+        //% "Must be logged in to query expedition status."
+        qWarning() << qtTrId("expedition-not-logged-in");
+        return;
+    }
+    QByteArray msg = KP::clientQueryExpeditionStatus();
+    sender->enqueue(msg);
 }

@@ -137,6 +137,7 @@ MainWindow::MainWindow(QWidget *parent, int argc, char ** argv)
     techArea = new TechView(this);
     navalAcademyArea = new NavalAcademyView(this);
     battleArea = new Sortie(this);
+
     fleetArea = new FleetView(this);
     repairArea = new Repair(this);
 
@@ -147,6 +148,7 @@ MainWindow::MainWindow(QWidget *parent, int argc, char ** argv)
     lay->addWidget(techArea);
     lay->addWidget(navalAcademyArea);
     lay->addWidget(battleArea);
+
     lay->addWidget(fleetArea);
     lay->addWidget(repairArea);
 
@@ -249,6 +251,10 @@ void MainWindow::unlockBattle() {
                     &engine, &Client::switchToBattleView),
             connect(ui->actionBattle, &QAction::triggered,
                     this, &MainWindow::switchToSortie),
+            connect(ui->actionExpedition, &QAction::triggered,
+                    &engine, &Client::switchToBattleView),
+            connect(ui->actionExpedition, &QAction::triggered,
+                    this, &MainWindow::switchToExpedition),
             connect(ui->actionResource_status, &QAction::triggered,
                     &engine, &Client::switchToBattleView),
             connect(ui->actionResource_status, &QAction::triggered,
@@ -459,6 +465,18 @@ void MainWindow::switchToSortie() {
     engine.demandMapSupremacy();
     adjust();
 }
+
+void MainWindow::switchToExpedition() {
+    Client &engine = Client::getInstance();
+    if(!engine.loggedIn()) {
+        return;
+    }
+    battleArea->switchToState(KP::ExpeditionMapView);
+    engine.demandMapSupremacy();
+    adjust();
+}
+
+
 
 void MainWindow::updateColorScheme(Qt::ColorScheme colorscheme) {
     QPalette pal = QGuiApplication::palette();

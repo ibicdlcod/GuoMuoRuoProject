@@ -115,25 +115,44 @@ void MapDetail::setChoiceNodes(const QList<int> &nodeIds) {
     update();
 }
 
-void MapDetail::mousePressEvent(QMouseEvent *event) {
-    if(!awaitingChoice) {
+ void MapDetail::mousePressEvent(QMouseEvent *event) {
+    if (!mapPointer) {
         QWidget::mousePressEvent(event);
         return;
     }
-    for(int nodeId: std::as_const(choiceNodeIds)) {
-        if(!mapPointer->nodes.contains(nodeId))
-            continue;
-        const MapNode &node = mapPointer->nodes[nodeId];
-        QPointF nodePos(node.x * width(), node.y * height());
-        if(QLineF(event->position(), nodePos).length() <= circleSize * 1.5) {
-            awaitingChoice = false;
-            choiceNodeIds.clear();
-            update();
-            emit nodeClicked(nodeId);
-            return;
+    
+    /* Handle CHOICE node branch selection */
+    if (awaitingChoice) {
+        for(int nodeId: std::as_const(choiceNodeIds)) {
+            if(!mapPointer->nodes.contains(nodeId))
+                continue;
+            const MapNode &node = mapPointer->nodes[nodeId];
+            QPointF nodePos(node.x * width(), node.y * height());
+            if(QLineF(event->position(), nodePos).length() <= circleSize * 1.5) {
+                awaitingChoice = false;
+                choiceNodeIds.clear();
+                update();
+                emit nodeClicked(nodeId);
+                return;
+            }
+        }
+        QWidget::mousePressEvent(event);
+        return;
+    }
+    
+    /* Expedition mode: allow clicking any node to plan battle */
+    if (expeditionMode) {
+        for(const auto &[nodeId, node]: mapPointer->nodes.asKeyValueRange()) {
+            QPointF nodePos(node.x * width(), node.y * height());
+            if(QLineF(event->position(), nodePos).length() <= circleSize * 1.5) {
+                emit nodeClicked(nodeId);
+                return;
+            }
         }
     }
-}
+    
+    QWidget::mousePressEvent(event);
+ }
 
 void MapDetail::changeCurrentNode(const MapNode &node) {
     if(uninitialized) {
@@ -154,10 +173,16 @@ void MapDetail::changeCurrentNode(const MapNode &node) {
     }
 }
 
-void MapDetail::paintEvent(QPaintEvent *event) {
+ void MapDetail::paintEvent(QPaintEvent *event) {
+    if (!mapPointer) {
+        return;
+    }
     QPainter painter(this);
-    if (antialiased)
+    if (antialiased) {
         painter.setRenderHint(QPainter::Antialiasing, true);
+        painter.setRenderHint(QPainter::SmoothPixmapTransform, true);
+        painter.setRenderHint(QPainter::TextAntialiasing, true);
+    }
 
     for(const auto &node: std::as_const(mapPointer->nodes)) {
         QPointF thisNodePos(node.x * width(), node.y * height());
@@ -303,21 +328,30 @@ void MapDetail::paintEvent(QPaintEvent *event) {
                                 circleSize * 3, circleSize * 3);
         }
     }
-    QPixmap *icon;
-    switch(currentFleetType) {
-    case KP::NormalFleet: icon = &normalFleetIcon; break;
-    case KP::CarrierFleet: icon = &carrierFleetIcon; break;
-    case KP::SurfaceFleet: icon = &surfaceFleetIcon; break;
-    case KP::TransportFleet: icon = &transportFleetIcon; break;
+    if (!expeditionMode) {
+        QPixmap *icon = nullptr;
+        switch(currentFleetType) {
+        case KP::NormalFleet: icon = &normalFleetIcon; break;
+        case KP::CarrierFleet: icon = &carrierFleetIcon; break;
+        case KP::SurfaceFleet: icon = &surfaceFleetIcon; break;
+        case KP::TransportFleet: icon = &transportFleetIcon; break;
+        default: break;
+        }
+        if (icon) {
+            painter.drawPixmap(fleetCenter.x() * width() - circleSize * 1.5,
+                               fleetCenter.y() * height() - circleSize * 1.5,
+                               icon->scaled(QSize(circleSize * 3, circleSize * 3),
+                                            Qt::KeepAspectRatio,
+                                            Qt::SmoothTransformation
+                                            ));
+        }
     }
-
-    painter.drawPixmap(fleetCenter.x() * width() - circleSize * 1.5,
-                       fleetCenter.y() * height() - circleSize * 1.5,
-                       icon->scaled(QSize(circleSize * 3, circleSize * 3),
-                                    Qt::KeepAspectRatio,
-                                    Qt::SmoothTransformation
-                                    ));
     if(animation->currentValue() == animation->endValue()) {
         emit moveFinished();
     }
+}
+
+void MapDetail::setExpeditionMode(bool expedition) {
+    expeditionMode = expedition;
+    update();
 }

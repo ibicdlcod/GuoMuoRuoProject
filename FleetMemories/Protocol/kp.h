@@ -302,7 +302,15 @@ enum GameError{
     FleetBusy,
     FleetLost,
     ServerError,
-    DropError
+    DropError,
+    ExpeditionMapNotExist,
+    ExpeditionInvalidFleetIndex,
+    ExpeditionInvalidBattlePlans,
+    ExpeditionDatabaseError,
+    ExpeditionInternalError,
+    ExpeditionAlreadyExists,
+    ExpeditionFleetAlreadyOnExpedition,
+    ExpeditionMaxReached
 };
 Q_ENUM_NS(GameError)
 
@@ -322,7 +330,9 @@ enum SortieState{
     MapDetail,
     DrillView,
     BattleScreen,
-    ResourceGainView
+    ResourceGainView,
+    ExpeditionMapView,
+    ExpeditionMapDetail
 };
 Q_ENUM_NS(SortieState)
 
@@ -941,7 +951,7 @@ QByteArray serverMapStart(int mapId, int startNode);
 QByteArray serverExpeditionProgressUpdate(int mapUnionId, int nodeIndex,
                                           const QJsonObject &battleResult);
 QByteArray serverExpeditionStartResult(int mapUnionId, bool accepted,
-                                       const QString &errorReason = QString());
+                                       GameError error = KP::NoError);
 QByteArray serverExpeditionStatus(const QJsonArray &expeditions);
 QByteArray serverExpeditionStopped(int mapUnionId, int stopReason);
 QByteArray serverMedalPurchased(int amount);

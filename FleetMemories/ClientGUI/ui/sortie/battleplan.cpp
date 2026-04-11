@@ -30,3 +30,17 @@ BattlePlan::~BattlePlan()
 {
     delete ui;
 }
+
+QJsonObject BattlePlan::getPlanData() const
+{
+    QJsonObject plan;
+    plan["friendFleetPriority"] = ui->ffbox->currentIndex();
+    plan["enemyFleetPriority"] = ui->efbox->currentIndex();
+    plan["smoke"] = ui->smokeBox->isChecked();
+    plan["extraBattle"] = ui->extraBattleCheck->isChecked();
+    plan["extraBattleWhenLosing"] = ui->extraBattleWhenLosingCheck->isChecked();
+    plan["extraBattleWhenFlagship"] = ui->extraBattleWhenFlagshipCheck->isChecked();
+    plan["striveARank"] = ui->striveARankCheck->isChecked();
+    plan["striveSRank"] = ui->striveSRankCheck->isChecked();
+    return plan;
+}

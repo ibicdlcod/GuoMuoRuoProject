@@ -4,7 +4,7 @@
 #include "kerrors.h"
 #include <QSqlDatabase>
 
-QStringList DBError::whats()
+QStringList DBError::whats() const
 {
     QStringList result;
     //% "Database Error: %1"

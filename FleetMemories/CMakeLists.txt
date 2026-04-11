@@ -91,6 +91,7 @@ set(CLIENT_SOURCES
     ClientGUI/steamauth.cpp
     ClientGUI/steamauth.h
     ClientGUI/ui/boxcenterfusionstyle.h
+
     ClientGUI/ui/factory/constructwindow.cpp
     ClientGUI/ui/factory/constructwindow.h
     ClientGUI/ui/factory/constructwindow.ui
@@ -199,8 +200,10 @@ set(CLIENT_SOURCES
     ClientGUI/ui/views/shipselect.h
     ${TS_FILES}
 )
-set(SERVER_SOURCES
+ set(SERVER_SOURCES
     Server/erfinv.h
+    Server/expeditionmanager.cpp
+    Server/expeditionmanager.h
     Server/fleetinfo.cpp
     Server/fleetinfo.h
     Server/kerrors.cpp

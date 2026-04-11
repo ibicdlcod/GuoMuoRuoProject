@@ -5,6 +5,8 @@
 #include "server.h"
 
 #include <QBuffer>
+#include <QCborMap>
+#include <QCborValue>
 #include <QFile>
 #include <QSet>
 #include <QThread>
@@ -2354,6 +2356,75 @@ void Server::luaInitMap() {
     }
 }
 
+bool Server::nodeExistsInLua(int mapUnionId, int nodeIndex) const {
+    sol::state &lua = const_cast<sol::state&>(this->lua);
+    return (lua["maps"] != sol::nil
+            && lua["maps"][mapUnionId] != sol::nil
+            && lua["maps"][mapUnionId][nodeIndex] != sol::nil);
+}
+
+KP::NodeType Server::getNodeTypeFromLua(int mapUnionId, int nodeIndex) const {
+    sol::state &lua = const_cast<sol::state&>(this->lua);
+    if (lua["maps"] != sol::nil
+        && lua["maps"][mapUnionId] != sol::nil
+        && lua["maps"][mapUnionId][nodeIndex] != sol::nil) {
+        int typeInt = lua["maps"][mapUnionId][nodeIndex]["battle_type"];
+        return static_cast<KP::NodeType>(typeInt);
+    }
+    return KP::EMPTY;
+}
+
+QList<int> Server::getNextNodesFromLua(int mapUnionId, int nodeIndex) const {
+    QList<int> nextNodes;
+    sol::state &lua = const_cast<sol::state&>(this->lua);
+    if (lua["maps"] != sol::nil
+        && lua["maps"][mapUnionId] != sol::nil
+        && lua["maps"][mapUnionId][nodeIndex] != sol::nil) {
+        sol::table nextNodeTable = lua["maps"][mapUnionId][nodeIndex]["next_nodes"];
+        nextNodeTable.for_each(
+            [&nextNodes](sol::object const& key, sol::object const& value) {
+                if (value.is<int>()) {
+                    nextNodes.append(value.as<int>());
+                }
+            });
+    }
+    return nextNodes;
+}
+
+MapNode Server::getNodeFromLua(int mapUnionId, int nodeIndex) const {
+    sol::state &lua = const_cast<sol::state&>(this->lua);
+    if (lua["maps"] != sol::nil
+        && lua["maps"][mapUnionId] != sol::nil
+        && lua["maps"][mapUnionId][nodeIndex] != sol::nil) {
+        sol::table info = lua["maps"][mapUnionId][nodeIndex];
+        double x = info["x"];
+        double y = info["y"];
+        int lbDistance = 0;
+        if (info["lb_distance"] != sol::nil) {
+            lbDistance = info["lb_distance"];
+        }
+        int typeInt = info["battle_type"];
+        KP::NodeType type = static_cast<KP::NodeType>(typeInt);
+        QList<int> nextNodes = getNextNodesFromLua(mapUnionId, nodeIndex);
+        return MapNode(x, y, lbDistance, type, std::move(nextNodes));
+    }
+    return MapNode();
+}
+
+QList<int> Server::getAllNodeIndicesFromLua(int mapUnionId) const {
+    QList<int> indices;
+    sol::state &lua = const_cast<sol::state&>(this->lua);
+    if (lua["maps"] != sol::nil && lua["maps"][mapUnionId] != sol::nil) {
+        sol::table mapTable = lua["maps"][mapUnionId];
+        mapTable.for_each([&indices](sol::object const& key, sol::object const& value) {
+            if (key.is<int>()) {
+                indices.append(key.as<int>());
+            }
+        });
+    }
+    return indices;
+}
+
 /* 1-migrate.md */
 void Server::migrate(const CSteamID &uid, const QJsonObject &input) {
     auto hqlv = input["hqlv"].toInt();
@@ -3387,11 +3458,11 @@ void Server::handleConvertSkillPoints(const CSteamID &uid,
 void Server::handleStartExpedition(const CSteamID &uid, QSslSocket *connection,
                                    const QJsonObject &djson) {
     try {
-        int mapUnionId = djson["mapUnionId"].toInt();
-        int fleetIndex = djson["fleetIndex"].toInt();
+        int mapUnionId = djson["mapid"].toInt();
+        int fleetIndex = djson["fleetindex"].toInt();
         double autoResupplyThreshold =
-            djson["autoResupplyThreshold"].toDouble();
-        QJsonObject plansJson = djson["battlePlans"].toObject();
+            djson["autoresupplythreshold"].toDouble();
+        QJsonObject plansJson = djson["battleplans"].toObject();
 
         QMap<int, QByteArray> battlePlans;
         for (auto it = plansJson.begin(); it != plansJson.end(); ++it) {
@@ -3401,53 +3472,54 @@ void Server::handleStartExpedition(const CSteamID &uid, QSslSocket *connection,
             battlePlans[nodeIndex] = planData;
         }
 
-        if (!normalMaps.contains(mapUnionId)) {
+        if (!hasMapWithUnionId(mapUnionId)) {
             QByteArray msg = KP::serverExpeditionStartResult(mapUnionId, false,
-                                     "Map does not exist");
+                                     KP::ExpeditionMapNotExist);
             senderM.sendMessage(connection, msg);
             return;
         }
 
         if (fleetIndex < 0 || fleetIndex >= KP::fleetsSize) {
             QByteArray msg = KP::serverExpeditionStartResult(mapUnionId, false,
-                                     "Invalid fleet index");
+                                     KP::ExpeditionInvalidFleetIndex);
             senderM.sendMessage(connection, msg);
             return;
         }
 
         if (!validateExpeditionBattlePlans(mapUnionId, battlePlans)) {
             QByteArray msg = KP::serverExpeditionStartResult(mapUnionId, false,
-                                     "Invalid battle plans");
+                                     KP::ExpeditionInvalidBattlePlans);
             senderM.sendMessage(connection, msg);
             return;
         }
 
-        bool success = expeditionManager.startExpedition(uid, mapUnionId,
+        KP::GameError error = expeditionManager.startExpedition(uid, mapUnionId,
                         fleetIndex, battlePlans, autoResupplyThreshold);
 
         QByteArray msg = KP::serverExpeditionStartResult(
-            mapUnionId, success,
-            success ? QString() : "Failed to start expedition");
+            mapUnionId, error == KP::NoError, error);
         senderM.sendMessage(connection, msg);
     }
     catch (const DBError &e) {
-        qCritical() << "Start expedition DB error:" << e.what();
+        for(QString &i : e.whats()) {
+            qCritical() << i;
+        }
         QByteArray msg = KP::serverExpeditionStartResult(
-            djson["mapUnionId"].toInt(), false, "Database error");
+            djson["mapid"].toInt(), false, KP::ExpeditionDatabaseError);
         senderM.sendMessage(connection, msg);
     }
     catch (...) {
         qCritical() << "Unknown error in handleStartExpedition";
         QByteArray msg = KP::serverExpeditionStartResult(
-            djson["mapUnionId"].toInt(), false, "Internal error");
+            djson["mapid"].toInt(), false, KP::ExpeditionInternalError);
         senderM.sendMessage(connection, msg);
     }
 }
 
 void Server::handleCancelExpedition(const CSteamID &uid, QSslSocket *connection,
                                     const QJsonObject &djson) {
-    int mapUnionId = djson["mapUnionId"].toInt();
-    int receiveFleetIndex = djson["receiveFleetIndex"].toInt();
+    int mapUnionId = djson["mapid"].toInt();
+    int receiveFleetIndex = djson["receivefleetindex"].toInt();
 
     if (receiveFleetIndex < 0 || receiveFleetIndex >= KP::fleetsSize) {
         qWarning() << "Invalid receive fleet index:" << receiveFleetIndex;
@@ -3462,15 +3534,19 @@ void Server::handleCancelExpedition(const CSteamID &uid, QSslSocket *connection,
 void Server::handleUpdateExpeditionPlan(const CSteamID &uid,
                                         QSslSocket *connection,
                                         const QJsonObject &djson) {
-    int mapUnionId = djson["mapUnionId"].toInt();
-    QJsonObject plansJson = djson["battlePlans"].toObject();
+    qDebug() << "handleUpdateExpeditionPlan called for user" << uid.ConvertToUint64();
+    int mapUnionId = djson["mapid"].toInt();
+    qDebug() << "Map union ID:" << mapUnionId;
+    QJsonObject plansJson = djson["battleplans"].toObject();
 
     QMap<int, QByteArray> battlePlans;
+    qDebug() << "Processing" << plansJson.size() << "battle plans";
     for (auto it = plansJson.begin(); it != plansJson.end(); ++it) {
         int nodeIndex = it.key().toInt();
         QByteArray planData = QByteArray::fromBase64(
             it.value().toString().toUtf8());
         battlePlans[nodeIndex] = planData;
+        qDebug() << "  Node" << nodeIndex << "plan size:" << planData.size() << "bytes";
     }
 
     if (!validateExpeditionBattlePlans(mapUnionId, battlePlans)) {
@@ -3478,23 +3554,32 @@ void Server::handleUpdateExpeditionPlan(const CSteamID &uid,
         return;
     }
 
+    qDebug() << "Calling ExpeditionManager::updateBattlePlans with" << battlePlans.size()
+             << "battle plans for map" << mapUnionId;
     bool success = expeditionManager.updateBattlePlans(uid, mapUnionId,
                                                        battlePlans);
     qInfo() << "Update expedition plan result:" << success;
+    if (success) {
+        qDebug() << "Successfully processed update expedition plan request for user"
+                 << uid.ConvertToUint64() << "map" << mapUnionId
+                 << "with" << battlePlans.size() << "battle plans";
+    }
 }
 
-void Server::handleSetExpeditionSettings(const CSteamID &uid,
-                                         QSslSocket *connection,
-                                         const QJsonObject &djson) {
-    int mapUnionId = djson["mapUnionId"].toInt();
+ void Server::handleSetExpeditionSettings(const CSteamID &uid,
+                                          QSslSocket *connection,
+                                          const QJsonObject &djson) {
+    int mapUnionId = djson["mapid"].toInt();
     double autoResupplyThreshold =
-        djson["autoResupplyThreshold"].toDouble();
-    bool autoRestart = djson.value("autoRestart").toBool(false);
+        djson["autoresupplythreshold"].toDouble();
+    bool autoRestart = djson.value("autorestart").toBool(false);
 
     qInfo() << "Set expedition settings for map" << mapUnionId
             << "threshold:" << autoResupplyThreshold
             << "restart:" << autoRestart;
-}
+    expeditionManager.setExpeditionSettings(uid, mapUnionId,
+                                           autoResupplyThreshold, autoRestart);
+ }
 
 void Server::handleQueryExpeditionStatus(const CSteamID &uid,
                                          QSslSocket *connection,
@@ -3505,8 +3590,8 @@ void Server::handleQueryExpeditionStatus(const CSteamID &uid,
 }
 
 bool Server::validateExpeditionBattlePlans(int mapUnionId,
-                                           const QMap<int, QByteArray> &battlePlans) {
-    if (!normalMaps.contains(mapUnionId)) {
+                                            const QMap<int, QByteArray> &battlePlans) {
+    if (!hasMapWithUnionId(mapUnionId)) {
         qWarning() << "Map" << mapUnionId << "does not exist";
         return false;
     }
@@ -3516,8 +3601,62 @@ bool Server::validateExpeditionBattlePlans(int mapUnionId,
         return false;
     }
 
-    qWarning() << "validateExpeditionBattlePlans: stub implementation for map"
-               << mapUnionId;
+    /* First pass: validate all provided battle plans are for valid nodes */
+    /* We don't check for missing battle plans here to allow partial plans during planning */
+
+    /* Second pass: ensure no battle plans for nodes that shouldn't have them */
+    for (auto it = battlePlans.constBegin(); it != battlePlans.constEnd(); ++it) {
+        int nodeIndex = it.key();
+        if (!nodeExistsInLua(mapUnionId, nodeIndex)) {
+            qWarning() << "Battle plan for non-existent node" << nodeIndex;
+            return false;
+        }
+        KP::NodeType nodeType = getNodeTypeFromLua(mapUnionId, nodeIndex);
+        bool shouldHavePlan = false;
+        switch (nodeType) {
+        case KP::NORMAL:
+        case KP::BOSS:
+        case KP::NIGHT:
+        case KP::NIGHTBOSS:
+        case KP::AIR:
+        case KP::CHOICE:
+            shouldHavePlan = true;
+            break;
+        default:
+            /* STARTING, TRANSPORT, DISASTER, EMPTY should not have plans */
+            break;
+        }
+        if (!shouldHavePlan) {
+            qWarning() << "Battle plan for non-battle node" << nodeIndex 
+                       << "of type" << static_cast<int>(nodeType);
+            return false;
+        }
+        
+        /* For CHOICE nodes, validate selectedNode is a valid next node */
+        if (nodeType == KP::CHOICE) {
+            QByteArray planData = it.value();
+            QCborValue cbor = QCborValue::fromCbor(planData);
+            if (!cbor.isMap()) {
+                qWarning() << "Choice plan for node" << nodeIndex
+                           << "not a map";
+                return false;
+            }
+            QCborMap planMap = cbor.toMap();
+            if (!planMap.contains(QStringLiteral("selectedNode"))) {
+                qWarning() << "Choice plan for node" << nodeIndex
+                           << "missing selectedNode";
+                return false;
+            }
+            int selectedNode = planMap.value(QStringLiteral("selectedNode")).toInteger(-1);
+            if (!getNextNodesFromLua(mapUnionId, nodeIndex).contains(selectedNode)) {
+                qWarning() << "Choice plan for node" << nodeIndex
+                           << "selectedNode" << selectedNode
+                           << "not in nextNodes";
+                return false;
+            }
+        }
+    }
+
     return true;
 }
 QUuid Server::newShip(const CSteamID &uid, int shipId, bool direct) {
@@ -4584,8 +4723,9 @@ void Server::sendTestMessages() {
         qWarning() << "Server isn't listening, abort.";
     }
     else {
-        for(auto ship: std::as_const(shipRegistry)) {
-            qCritical() << ship->toString() << equipRegistry[413]->canEquip(ship, lua);
+        for(auto map: normalMaps) {
+            int unionId = MapWithDiff::getUnionId(map->id);
+            qCritical() << unionId << getAllNodeIndicesFromLua(unionId).size();
         }
     }
 }
@@ -5186,6 +5326,21 @@ rank:
             return;
         }
     }
+}
+
+MapWithDiff *Server::getMapByUnionId(int mapUnionId) const {
+    for (MapWithDiff *map : normalMaps) {
+        if (!map) continue;
+        int unionId = MapWithDiff::getUnionId(map->id);
+        if (unionId == mapUnionId) {
+            return map;
+        }
+    }
+    return nullptr;
+}
+
+bool Server::hasMapWithUnionId(int mapUnionId) const {
+    return getMapByUnionId(mapUnionId) != nullptr;
 }
 
 QT_END_NAMESPACE
