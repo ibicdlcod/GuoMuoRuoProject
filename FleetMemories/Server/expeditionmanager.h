@@ -37,7 +37,7 @@ public:
     
     // Queries
     QJsonArray getUserExpeditions(const CSteamID &uid) const;
-    QJsonArray getUserExpeditions(const CSteamID &uid, std::optional<int> mapUnionId) const;
+    QJsonArray getUserExpeditions(const CSteamID &uid, std::optional<int> mapUnionId, bool withBattlePlans = false) const;
     
 private:
     Server *server;

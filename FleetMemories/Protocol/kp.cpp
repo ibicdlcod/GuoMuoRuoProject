@@ -66,12 +66,15 @@ QByteArray KP::accessDenied() {
 }
 
 QByteArray KP::clientExpeditionStatus(
-    std::optional<int> mapUnionId) {
+    std::optional<int> mapUnionId, bool withBattlePlans) {
     QJsonObject result;
     result["type"] = DgramType::Request;
     result["command"] = CommandType::QueryExpeditionStatus;
     if (mapUnionId.has_value()) {
         result["mapid"] = mapUnionId.value();
+    }
+    if (withBattlePlans) {
+        result["withbattleplans"] = true;
     }
     return QCborValue::fromJsonValue(result).toCbor();
 }

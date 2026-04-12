@@ -4,6 +4,7 @@
 #include <QApplication>
 #include <QColor>
 #include <QDebug>
+#include <QFont>
 #include <QGuiApplication>
 #include <QMouseEvent>
 #include <QPainter>
@@ -314,6 +315,17 @@ void MapDetail::changeCurrentNode(const MapNode &node) {
         } break;
         default: break;
         }
+        if (expeditionMode && plannedNodeIds.contains(id)) {
+            painter.setPen(QColor(0, 255, 0)); // green color
+            QFont font = painter.font();
+            font.setPixelSize(circleSize * 0.8);
+            font.setBold(true);
+            painter.setFont(font);
+            QRectF checkRect(node.x * width() - circleSize / 2,
+                             node.y * height() - circleSize / 2,
+                             circleSize, circleSize);
+            painter.drawText(checkRect, Qt::AlignCenter, "\u2713"); // ✓
+        }
     }
     if(awaitingChoice) {
         for(int nodeId: std::as_const(choiceNodeIds)) {
@@ -354,5 +366,10 @@ void MapDetail::changeCurrentNode(const MapNode &node) {
 
 void MapDetail::setExpeditionMode(bool expedition) {
     expeditionMode = expedition;
+    update();
+}
+
+void MapDetail::setPlannedNodes(const QSet<int> &nodeIds) {
+    plannedNodeIds = nodeIds;
     update();
 }

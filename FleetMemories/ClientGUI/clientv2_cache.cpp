@@ -36,8 +36,12 @@ void Client::demandEquipSkillPoints(int equipDef) {
     return;
 }
 
-void Client::demandExpeditionStatus(std::optional<int> mapUnionId) {
-    QByteArray msg = KP::clientExpeditionStatus(mapUnionId);
+void Client::demandExpeditionStatus(std::optional<int> mapUnionId, bool withBattlePlans) {
+    if (withBattlePlans) {
+        //% "Requesting expedition status with battle plans"
+        qDebug() << qtTrId("expedition-request-with-plans");
+    }
+    QByteArray msg = KP::clientExpeditionStatus(mapUnionId, withBattlePlans);
     sender->enqueue(msg);
 }
 

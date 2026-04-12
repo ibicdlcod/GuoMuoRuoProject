@@ -762,7 +762,8 @@ QByteArray clientDemandDecorate(const QList<QUuid> &);
 QByteArray clientDemandModernize(const QList<QUuid> &, bool);
 QByteArray clientDemandRankInfo(int, std::optional<int> page = std::nullopt);
 QByteArray clientExpeditionStatus(
-    std::optional<int> mapUnionId = std::nullopt);
+    std::optional<int> mapUnionId = std::nullopt,
+    bool withBattlePlans = false);
 QByteArray clientDemandRepair(const QUuid &, int,
                               bool stop = false, bool forced = false);
 QByteArray clientDemandResourceUpdate();

@@ -111,6 +111,8 @@ private:
     bool expeditionChoicePending = false;
     int expeditionChoiceNodeId = -1;
     QList<int> expeditionChoiceNodeIds;
+
+    void updatePlannedNodes();
 };
 
 #endif // SORTIE_H

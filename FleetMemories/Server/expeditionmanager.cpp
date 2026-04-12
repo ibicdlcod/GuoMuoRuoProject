@@ -692,10 +692,11 @@ void ExpeditionManager::processExpeditions() {
 }
 
 QJsonArray ExpeditionManager::getUserExpeditions(const CSteamID &uid) const {
-    return getUserExpeditions(uid, std::nullopt);
+    return getUserExpeditions(uid, std::nullopt, false);
 }
 
-QJsonArray ExpeditionManager::getUserExpeditions(const CSteamID &uid, std::optional<int> mapUnionId) const {
+QJsonArray ExpeditionManager::getUserExpeditions(const CSteamID &uid, std::optional<int> mapUnionId, bool withBattlePlans) const {
+    qCritical() << withBattlePlans;
     QJsonArray result;
 
     if (!server) {
@@ -739,6 +740,7 @@ QJsonArray ExpeditionManager::getUserExpeditions(const CSteamID &uid, std::optio
             exp["isactive"] = query.value("IsActive").toBool();
             exp["autorestarthreshold"] = query.value("AutoRestartThreshold").toDouble();
             exp["stopreason"] = query.value("StopReason").toInt();
+            exp["diff"] = query.value("Diff").toInt();
             exp["haveexpedition"] = true;
             /* autoresupply field will be populated from settings query if available */
             exp["autoresupply"] = false;
@@ -791,6 +793,7 @@ QJsonArray ExpeditionManager::getUserExpeditions(const CSteamID &uid, std::optio
                 exp["autorestarthreshold"] = threshold;
                 exp["autoresupply"] = autoresupply;
                 exp["stopreason"] = 0;
+                exp["diff"] = 0;
                 exp["haveexpedition"] = false;
                 
                 expeditionMap[mapId] = exp;
@@ -811,6 +814,62 @@ QJsonArray ExpeditionManager::getUserExpeditions(const CSteamID &uid, std::optio
         exp["stopreason"] = 0;
         exp["haveexpedition"] = false;
         expeditionMap[mapUnionId.value()] = exp;
+    }
+    
+    /* Query battle plans if requested */
+    if (withBattlePlans) {
+        QSqlQuery query;
+        QString sql = "SELECT MapUnionId, Diff, NodeIndex, PlanData "
+                      "FROM UserExpeditionBattlePlan WHERE User = :user";
+        if (mapUnionId.has_value()) {
+            sql += " AND MapUnionId = :mapUnionId";
+        }
+        sql += " ORDER BY MapUnionId, Diff, NodeIndex";
+        query.prepare(sql);
+        query.bindValue(":user", QVariant::fromValue(userId));
+        if (mapUnionId.has_value()) {
+            query.bindValue(":mapUnionId", mapUnionId.value());
+        }
+        
+        if (!query.exec()) {
+            //% "Failed to query battle plans for user %1"
+            throw DBError(qtTrId("expedition-battle-plans-query-failed")
+                              .arg(uid.ConvertToUint64()),
+                          query.lastError(), query.lastQuery());
+        }
+        
+        /* Organize battle plans by mapUnionId and difficulty */
+        QMap<int, QMap<int, QJsonObject>> battlePlansByMapAndDiff; // mapUnionId -> diff -> {nodeIndex: planData}
+        while (query.next()) {
+            int mapId = query.value("MapUnionId").toInt();
+            int diff = query.value("Diff").toInt();
+            int nodeIndex = query.value("NodeIndex").toInt();
+            QByteArray planData = query.value("PlanData").toByteArray();
+            
+            /* Convert plan data to base64 for JSON transmission */
+            QString planBase64 = QString::fromLatin1(planData.toBase64());
+            
+            if (!battlePlansByMapAndDiff.contains(mapId)) {
+                battlePlansByMapAndDiff[mapId] = QMap<int, QJsonObject>();
+            }
+            if (!battlePlansByMapAndDiff[mapId].contains(diff)) {
+                battlePlansByMapAndDiff[mapId][diff] = QJsonObject();
+            }
+            battlePlansByMapAndDiff[mapId][diff][QString::number(nodeIndex)] = planBase64;
+        }
+        
+        /* Add battle plans to expedition entries */
+        for (auto mapIt = battlePlansByMapAndDiff.constBegin(); mapIt != battlePlansByMapAndDiff.constEnd(); ++mapIt) {
+            int mapId = mapIt.key();
+            if (expeditionMap.contains(mapId)) {
+                QJsonObject battlePlansObj;
+                const QMap<int, QJsonObject> &diffMap = mapIt.value();
+                for (auto diffIt = diffMap.constBegin(); diffIt != diffMap.constEnd(); ++diffIt) {
+                    battlePlansObj[QString::number(diffIt.key())] = diffIt.value();
+                }
+                expeditionMap[mapId]["battleplans"] = battlePlansObj;
+            }
+        }
     }
     
     /* Convert map to array */

@@ -6,6 +6,7 @@
 
 #include <QWidget>
 #include <QPropertyAnimation>
+#include <QSet>
 #include "../../Protocol/map.h"
 
 namespace Ui {
@@ -32,6 +33,7 @@ public:
     static QPixmap recolorImage(const QString &filename, const QColor &color);
     void setChoiceNodes(const QList<int> &nodeIds);
     void setExpeditionMode(bool expedition);
+    void setPlannedNodes(const QSet<int> &nodeIds);
     void setFleetCenter(const QPointF &input);
 
 signals:
@@ -57,6 +59,7 @@ private:
     QList<int> choiceNodeIds;
     bool awaitingChoice = false;
     bool expeditionMode = false;
+    QSet<int> plannedNodeIds;
 
     QPixmap rudder;
     QPixmap airNodeIcon;

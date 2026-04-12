@@ -3871,12 +3871,15 @@ void Server::handleQueryExpeditionStatus(const CSteamID &uid,
     if (djson.contains("mapid")) {
         mapUnionId = djson["mapid"].toInt();
     }
-    QJsonArray expeditions = expeditionManager.getUserExpeditions(uid, mapUnionId);
+    bool withBattlePlans = djson.contains("withbattleplans") && djson["withbattleplans"].toBool();
+    if (withBattlePlans) {
+        //% "Querying expedition status with battle plans for user %1"
+        qDebug() << qtTrId("expedition-query-with-plans").arg(uid.ConvertToUint64());
+    }
+    QJsonArray expeditions = expeditionManager.getUserExpeditions(uid, mapUnionId, withBattlePlans);
     QByteArray msg = KP::serverExpeditionStatus(expeditions);
     senderM.sendMessage(connection, msg);
 }
-
-
 
 bool Server::validateExpeditionBattlePlans(int mapUnionId,
                                             const QMap<int, QByteArray> &battlePlans) {

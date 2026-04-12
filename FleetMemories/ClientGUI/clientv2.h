@@ -106,7 +106,7 @@ public slots:
     void chooseNode(int mapId, int chosenNodeId);
     void demandEquipCache();
     void demandEquipSkillPoints(int);
-    void demandExpeditionStatus(std::optional<int> mapUnionId = std::nullopt);
+    void demandExpeditionStatus(std::optional<int> mapUnionId = std::nullopt, bool withBattlePlans = false);
     void demandMapCache();
     void demandMapSupremacy();
     void demandResourceGain();
