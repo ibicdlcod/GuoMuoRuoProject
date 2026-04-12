@@ -696,7 +696,6 @@ QJsonArray ExpeditionManager::getUserExpeditions(const CSteamID &uid) const {
 }
 
 QJsonArray ExpeditionManager::getUserExpeditions(const CSteamID &uid, std::optional<int> mapUnionId, bool withBattlePlans) const {
-    qCritical() << withBattlePlans;
     QJsonArray result;
 
     if (!server) {
