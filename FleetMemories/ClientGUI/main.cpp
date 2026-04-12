@@ -47,8 +47,8 @@ int main(int argc, char *argv[]) {
     // Auto-detect input method module based on XMODIFIERS
     if (qEnvironmentVariableIsEmpty("QT_IM_MODULE")) {
         const char* xmod = std::getenv("XMODIFIERS");
-        if (xmod && std::strstr(xmod, "fcitx5")) {
-            qputenv("QT_IM_MODULE", "fcitx5");
+        if (xmod && std::strstr(xmod, "fcitx")) {
+            qputenv("QT_IM_MODULE", "fcitx");
         } else if (xmod && std::strstr(xmod, "ibus")) {
             qputenv("QT_IM_MODULE", "ibus");
         }

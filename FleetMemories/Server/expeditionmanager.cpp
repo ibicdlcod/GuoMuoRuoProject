@@ -23,8 +23,10 @@
 
 extern std::unique_ptr<QSettings> settings;
 
-#include <cstdint>
 #include <algorithm>
+#include <cmath>
+#include <cstdint>
+#include <memory>
 #include <optional>
 
 #include "../Protocol/mapwithdiff.h"
@@ -196,7 +198,58 @@ KP::GameError ExpeditionManager::startExpedition(const CSteamID &uid, int mapId,
         qDebug() << "Expedition starting node determined:" << startingNode
                  << "for map" << mapUnionId << "difficulty" << diffStr;
     }
+
+    /* Supply attrition check similar to ordinary sortie start */
+    auto [reachable, finiteRoute, attrition] =
+        server->computeSupplyAttrition(uid, mapUnionId, diff);
+    if(!finiteRoute) {
+        //% "Supply line broken for expedition map %1"
+        qWarning() << qtTrId("expedition-supply-line-broken")
+                          .arg(mapUnionId);
+        return KP::ResourceLack;
+    }
     
+    if(attrition > 0.0) {
+        QSqlQuery consQuery;
+        consQuery.prepare(
+            "SELECT "
+            "  COALESCE(SUM(fc.Intvalue), 0) AS TotalFuel, "
+            "  COALESCE(SUM(ac.Intvalue), 0) AS TotalAmmo "
+            "FROM UserShip "
+            "LEFT JOIN ShipReg fc "
+            "  ON UserShip.ShipDef = fc.ShipID "
+            "  AND fc.Attribute = 'FuelConsumption' "
+            "LEFT JOIN ShipReg ac "
+            "  ON UserShip.ShipDef = ac.ShipID "
+            "  AND ac.Attribute = 'AmmoConsumption' "
+            "WHERE User = :uid "
+            "  AND FleetIndex = :fleetindex "
+            "  AND FleetFled = 0;");
+        consQuery.bindValue(":uid", uid.ConvertToUint64());
+        consQuery.bindValue(":fleetindex", fleetIndex);
+        if(Q_UNLIKELY(!consQuery.exec() || !consQuery.isSelect())) {
+            //% "Failed to compute fleet consumption for expedition"
+            throw DBError(
+                qtTrId("expedition-consumption-query-failed")
+                    .arg(uid.ConvertToUint64()).arg(mapUnionId),
+                consQuery.lastError(), consQuery.lastQuery());
+        }
+        consQuery.first();
+        int oilNeeded = static_cast<int>(
+            std::ceil(consQuery.value(0).toInt() * attrition));
+        int exploNeeded = static_cast<int>(
+            std::ceil(consQuery.value(1).toInt() * attrition));
+        
+        ResOrd res = User::getCurrentResources(uid);
+        res -= ResOrd(oilNeeded, exploNeeded, 0, 0, 0, 0, 0);
+        if(!res.sufficient()) {
+            //% "Insufficient resources for expedition to map %1"
+            qWarning() << qtTrId("expedition-insufficient-resources")
+                              .arg(mapUnionId);
+            return KP::ResourceLack;
+        }
+    }
+
     /* Insert expedition record */
     qint64 currentTime = QDateTime::currentDateTimeUtc().toSecsSinceEpoch();
     qint64 nextProgressTime = currentTime; // Start immediately
@@ -846,7 +899,7 @@ void ExpeditionManager::progressExpedition(const CSteamID &uid, int mapUnionId, 
                 nextNode = currentNodeObj.nextNodes.first();
             }
         } else {
-            /* TODO: change this to actual branch rule */
+            /* TODO: change this to actual branch rule, queried from server's lua */
             /* For other nodes, first next node */
             nextNode = currentNodeObj.nextNodes.first();
         }
@@ -909,8 +962,12 @@ void ExpeditionManager::progressExpedition(const CSteamID &uid, int mapUnionId, 
     
     /* Ensure fleet is loaded into sortieFleets for processing */
     QPair<CSteamID, int> fleetKey(uid, expeditionFleetIndex);
-    FleetInfo *fleet = new FleetInfo(server->queryFleetInfo(uid, expeditionFleetIndex));
-    server->sortieFleets.insert(fleetKey, fleet);
+    /* Delete old pointer if exists */
+    if (FleetInfo *old = server->sortieFleets.value(fleetKey, nullptr)) {
+        delete old;
+    }
+    std::unique_ptr<FleetInfo> fleet(new FleetInfo(server->queryFleetInfo(uid, expeditionFleetIndex)));
+    server->sortieFleets.insert(fleetKey, fleet.release());
     FleetInfo *fi = server->sortieFleets.value(fleetKey, nullptr);
     
     /* Disaster node handling */
@@ -1032,8 +1089,8 @@ void ExpeditionManager::executeExpeditionBattle(const CSteamID &uid,
     /* Ensure fleet is loaded into sortieFleets for battle processing */
     QPair<CSteamID, int> fleetKey(uid, expeditionFleetIndex);
     if (!server->sortieFleets.contains(fleetKey)) {
-        FleetInfo *fleet = new FleetInfo(server->queryFleetInfo(uid, expeditionFleetIndex));
-        server->sortieFleets.insert(fleetKey, fleet);
+        std::unique_ptr<FleetInfo> fleet(new FleetInfo(server->queryFleetInfo(uid, expeditionFleetIndex)));
+        server->sortieFleets.insert(fleetKey, fleet.release());
     }
 
     /* Execute battle using existing battle logic */
@@ -1689,7 +1746,7 @@ void ExpeditionManager::checkAndRestartExpedition(const CSteamID &uid, int mapUn
     int expeditionFleetIndex = mapUnionId + KP::expeditionFleetMask;
     
     /* Get fleet info */
-    FleetInfo *fleet = new FleetInfo(server->queryFleetInfo(uid, expeditionFleetIndex));
+    std::unique_ptr<FleetInfo> fleet(new FleetInfo(server->queryFleetInfo(uid, expeditionFleetIndex)));
     if (fleet->ships.empty()) {
         // No ships in expedition fleet - cannot restart
         return;
@@ -1809,7 +1866,10 @@ void ExpeditionManager::checkAndRestartExpedition(const CSteamID &uid, int mapUn
         }
         else {
             QPair<CSteamID, int> fleetKey(uid, expeditionFleetIndex);
-            server->sortieFleets.insert(fleetKey, fleet);
+            if (FleetInfo *old = server->sortieFleets.value(fleetKey, nullptr)) {
+                delete old;
+            }
+            server->sortieFleets.insert(fleetKey, fleet.release());
             //% "Expedition auto-restarted for user %1 map %2"
             qInfo() << qtTrId("expedition-auto-restarted")
                            .arg(uid.ConvertToUint64()).arg(mapUnionId);

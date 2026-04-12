@@ -15,6 +15,7 @@
 #include <QtTypes>
 
 #include <algorithm>
+#include <memory>
 
 #include "../Protocol/equipment.h"
 #include "../Protocol/kp.h"
@@ -2031,7 +2032,8 @@ void Server::startSortie(const CSteamID &uid, QSslSocket *connection,
         }
 
         delete sortieFleets.value({uid, fleetIndex}, nullptr);
-        sortieFleets[{uid, fleetIndex}] = new FleetInfo(queryFleetInfo(uid, fleetIndex));
+        std::unique_ptr<FleetInfo> fleet(new FleetInfo(queryFleetInfo(uid, fleetIndex)));
+        sortieFleets[{uid, fleetIndex}] = fleet.release();
         FleetInfo &info = *sortieFleets[{uid, fleetIndex}];
         sol::protected_function luaChooseStartingNode
             = lua["maps"][unionId]["branch_rule"][diffStrC];
@@ -2384,52 +2386,81 @@ void Server::handleAttrition(const CSteamID &uid, int fleetIndex,
      * cost: sum of (effective fraction used × FuelConsumption /
      * AmmoConsumption) across the fleet, multiplied by the sortie
      * attrition stored at sortie start. */
-    QSqlQuery attrValQ;
-    attrValQ.prepare(
-        "SELECT Realvalue FROM UserAttr "
-        "WHERE UserID = :uid AND Attribute = :attr;");
-    attrValQ.bindValue(":uid", uid.ConvertToUint64());
-    attrValQ.bindValue(":attr", KP::attrAttrition);
-    if(Q_LIKELY(attrValQ.exec() && attrValQ.isSelect()
-                && attrValQ.first())) {
-        double attrition = attrValQ.value(0).toDouble();
-        if(attrition > 0.0) {
-            QSqlQuery costQ;
-            costQ.prepare(
-                "SELECT "
-                "  SUM(MIN(Fuel,  :fuelFrac) "
-                "      * COALESCE(fc.Intvalue, 0)), "
-                "  SUM(MIN(Ammo,  :ammoFrac) "
-                "      * COALESCE(ac.Intvalue, 0)) "
-                "FROM UserShip "
-                "LEFT JOIN ShipReg fc "
-                "  ON UserShip.ShipDef = fc.ShipID "
-                "  AND fc.Attribute = 'FuelConsumption' "
-                "LEFT JOIN ShipReg ac "
-                "  ON UserShip.ShipDef = ac.ShipID "
-                "  AND ac.Attribute = 'AmmoConsumption' "
-                "WHERE User = :uid AND FleetIndex = :fi;");
-            costQ.bindValue(":fuelFrac", fuelFrac);
-            costQ.bindValue(":ammoFrac", ammoFrac);
-            costQ.bindValue(":uid", uid.ConvertToUint64());
-            costQ.bindValue(":fi", fleetIndex);
-            if(Q_LIKELY(costQ.exec() && costQ.isSelect()
-                        && costQ.first())) {
-                double oilCost  = costQ.value(0).toDouble() * attrition;
-                double exploCost = costQ.value(1).toDouble() * attrition;
-                QSqlQuery deductQ;
-                deductQ.prepare(
-                    "UPDATE UserAttr "
-                    "SET Intvalue = CASE Attribute "
-                    "WHEN 'O' THEN Intvalue - :oil "
-                    "WHEN 'E' THEN Intvalue - :explo END "
-                    "WHERE UserID = :uid "
-                    "AND Attribute IN ('O', 'E');");
-                deductQ.bindValue(":oil",   oilCost);
-                deductQ.bindValue(":explo", exploCost);
-                deductQ.bindValue(":uid",   uid.ConvertToUint64());
-                deductQ.exec();
+    double attrition = 0.0;
+    
+    if(fleetIndex >= KP::expeditionFleetMask) {
+        /* Expedition fleet: compute attrition from map supply lines */
+        int mapUnionId = fleetIndex - KP::expeditionFleetMask;
+        
+        /* Query expedition difficulty */
+        QSqlQuery expQuery;
+        expQuery.prepare(
+            "SELECT Diff FROM UserExpedition "
+            "WHERE User = :user AND MapUnionId = :mapUnionId AND IsActive = TRUE");
+        expQuery.bindValue(":user", uid.ConvertToUint64());
+        expQuery.bindValue(":mapUnionId", mapUnionId);
+        
+        if(Q_LIKELY(expQuery.exec() && expQuery.isSelect()
+                    && expQuery.first())) {
+            KP::Difficulty diff = static_cast<KP::Difficulty>(expQuery.value(0).toInt());
+            auto [reachable, finiteRoute, computedAttrition] =
+                computeSupplyAttrition(uid, mapUnionId, diff);
+            if(finiteRoute) {
+                attrition = computedAttrition;
             }
+            /* If not finiteRoute, attrition remains 0 (expedition shouldn't have started) */
+        }
+        /* If expedition not found, attrition remains 0 */
+    } else {
+        /* Normal fleet: use stored attrition from sortie start */
+        QSqlQuery attrValQ;
+        attrValQ.prepare(
+            "SELECT Realvalue FROM UserAttr "
+            "WHERE UserID = :uid AND Attribute = :attr;");
+        attrValQ.bindValue(":uid", uid.ConvertToUint64());
+        attrValQ.bindValue(":attr", KP::attrAttrition);
+        if(Q_LIKELY(attrValQ.exec() && attrValQ.isSelect()
+                    && attrValQ.first())) {
+            attrition = attrValQ.value(0).toDouble();
+        }
+    }
+    
+    if(attrition > 0.0) {
+        QSqlQuery costQ;
+        costQ.prepare(
+            "SELECT "
+            "  SUM(MIN(Fuel,  :fuelFrac) "
+            "      * COALESCE(fc.Intvalue, 0)), "
+            "  SUM(MIN(Ammo,  :ammoFrac) "
+            "      * COALESCE(ac.Intvalue, 0)) "
+            "FROM UserShip "
+            "LEFT JOIN ShipReg fc "
+            "  ON UserShip.ShipDef = fc.ShipID "
+            "  AND fc.Attribute = 'FuelConsumption' "
+            "LEFT JOIN ShipReg ac "
+            "  ON UserShip.ShipDef = ac.ShipID "
+            "  AND ac.Attribute = 'AmmoConsumption' "
+            "WHERE User = :uid AND FleetIndex = :fi;");
+        costQ.bindValue(":fuelFrac", fuelFrac);
+        costQ.bindValue(":ammoFrac", ammoFrac);
+        costQ.bindValue(":uid", uid.ConvertToUint64());
+        costQ.bindValue(":fi", fleetIndex);
+        if(Q_LIKELY(costQ.exec() && costQ.isSelect()
+                    && costQ.first())) {
+            double oilCost  = costQ.value(0).toDouble() * attrition;
+            double exploCost = costQ.value(1).toDouble() * attrition;
+            QSqlQuery deductQ;
+            deductQ.prepare(
+                "UPDATE UserAttr "
+                "SET Intvalue = CASE Attribute "
+                "WHEN 'O' THEN Intvalue - :oil "
+                "WHEN 'E' THEN Intvalue - :explo END "
+                "WHERE UserID = :uid "
+                "AND Attribute IN ('O', 'E');");
+            deductQ.bindValue(":oil",   oilCost);
+            deductQ.bindValue(":explo", exploCost);
+            deductQ.bindValue(":uid",   uid.ConvertToUint64());
+            deductQ.exec();
         }
     }
 }

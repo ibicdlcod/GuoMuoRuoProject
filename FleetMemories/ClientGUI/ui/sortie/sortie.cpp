@@ -110,6 +110,7 @@ Sortie::Sortie(QWidget *parent)
     // Expedition UI
     //% "Expedition"
     expeditionGroup = new QGroupBox(qtTrId("expedition-group"), this);
+    expeditionGroup->setAlignment(Qt::AlignHCenter);
     expeditionGroup->setVisible(false);
     QHBoxLayout *expeditionLayout = new QHBoxLayout(expeditionGroup);
     
@@ -206,7 +207,6 @@ Sortie::~Sortie()
 }
 
 void Sortie::switchToState(KP::SortieState state) {
-    globeFrame->resize(ui->MapView->size());
     Client &engine = Client::getInstance();
     switch(state) {
     case KP::MapView:
@@ -231,6 +231,10 @@ void Sortie::switchToState(KP::SortieState state) {
         expeditionMode = false;
         detail->setExpeditionMode(false);
         update();
+        ui->verticalLayout->update();
+        ui->verticalLayout->activate();
+        ui->MapView->updateGeometry();
+        globeFrame->resize(ui->MapView->size());
         break;
     case KP::MapDetail:
         globeFrame->setCurrentWidget(detail);
@@ -249,10 +253,18 @@ void Sortie::switchToState(KP::SortieState state) {
         expeditionMode = false;
         detail->setExpeditionMode(false);
         update();
+        ui->verticalLayout->update();
+        ui->verticalLayout->activate();
+        ui->MapView->updateGeometry();
+        globeFrame->resize(ui->MapView->size());
         break;
     case KP::BattleScreen:
         globeFrame->setCurrentWidget(battleW);
         update();
+        ui->verticalLayout->update();
+        ui->verticalLayout->activate();
+        ui->MapView->updateGeometry();
+        globeFrame->resize(ui->MapView->size());
         break;
     case KP::ResourceGainView: {
         globeFrame->setCurrentWidget(resourceGainW);
@@ -264,6 +276,10 @@ void Sortie::switchToState(KP::SortieState state) {
         }
         Client::getInstance().demandResourceGain();
         update();
+        ui->verticalLayout->update();
+        ui->verticalLayout->activate();
+        ui->MapView->updateGeometry();
+        globeFrame->resize(ui->MapView->size());
         break;
     }
     case KP::ExpeditionMapView:
@@ -280,6 +296,10 @@ void Sortie::switchToState(KP::SortieState state) {
         }
         ui->sortieButton->hide();
         update();
+        ui->verticalLayout->update();
+        ui->verticalLayout->activate();
+        ui->MapView->updateGeometry();
+        globeFrame->resize(ui->MapView->size());
         break;
     case KP::ExpeditionMapDetail:
         globeFrame->setCurrentWidget(detail);
@@ -294,6 +314,10 @@ void Sortie::switchToState(KP::SortieState state) {
             }
         }
         update();
+        ui->verticalLayout->update();
+        ui->verticalLayout->activate();
+        ui->MapView->updateGeometry();
+        globeFrame->resize(ui->MapView->size());
         break;
     default:
         break;

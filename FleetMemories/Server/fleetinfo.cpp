@@ -151,12 +151,17 @@ int FleetInfo::headquartersEquipId(bool isExpedition) const
     for (Equipment *eq : equips) {
         if (!eq) continue;
         int id = eq->getId();
+        if(isExpedition) {
+        // Expedition force headquarters (4098) – expedition fleet only
+        if (id == KP::headquartersEquipExpedition)
+            return id;
+        else
+            continue;
+        }
+        /* not expedition */
         // Mobile strike force headquarters (272) – normal fleet only
         if (id == KP::headquartersEquipMobileStrike
-            && type == KP::NormalFleet && !isExpedition)
-            return id;
-        // Expedition force headquarters (4098) – expedition fleet only
-        if (id == KP::headquartersEquipExpedition && isExpedition)
+            && type == KP::NormalFleet)
             return id;
         // Combined fleet headquarters (107) – surface/carrier/transport fleet
         if (id == KP::headquartersEquipCombinedFleet

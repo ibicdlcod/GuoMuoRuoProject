@@ -1850,8 +1850,8 @@ Great at battle and bad at politics--so cool!</translation>
         <translation type="unfinished">User %1: clear negative skill points failed!</translation>
     </message>
     <message id="cond-drop-failed">
-        <location filename="../Server/server_battle.cpp" line="310"/>
-        <location filename="../Server/server_battle.cpp" line="333"/>
+        <location filename="../Server/server_battle.cpp" line="311"/>
+        <location filename="../Server/server_battle.cpp" line="334"/>
         <source>User %1: decrease fleet condition failed!</source>
         <translation type="unfinished">User %1: decrease fleet condition failed!</translation>
     </message>
@@ -2286,22 +2286,22 @@ Great at battle and bad at politics--so cool!</translation>
         <translation type="unfinished"></translation>
     </message>
     <message id="user-query-regen-time-fail">
-        <location filename="../Server/server_battle.cpp" line="590"/>
+        <location filename="../Server/server_battle.cpp" line="591"/>
         <source>Query last regeneration time for user %1 failed!</source>
         <translation type="unfinished">Query last regeneration time for user %1 failed!</translation>
     </message>
     <message id="regen-min">
-        <location filename="../Server/server_battle.cpp" line="617"/>
+        <location filename="../Server/server_battle.cpp" line="618"/>
         <source>%1 minute(s) passed for regeneration purposes.</source>
         <translation type="unfinished">%1 minute(s) passed for regeneration purposes.</translation>
     </message>
     <message id="natural-regen-failed">
-        <location filename="../Server/server_battle.cpp" line="643"/>
+        <location filename="../Server/server_battle.cpp" line="644"/>
         <source>User ID %1: natural regeneration failed!</source>
         <translation type="unfinished">User ID %1: natural regeneration failed!</translation>
     </message>
     <message id="natural-regen">
-        <location filename="../Server/server_battle.cpp" line="649"/>
+        <location filename="../Server/server_battle.cpp" line="650"/>
         <source>User ID %1: natural regeneration</source>
         <translation type="unfinished">User ID %1: natural regeneration</translation>
     </message>
@@ -2356,7 +2356,7 @@ Great at battle and bad at politics--so cool!</translation>
     <message id="sortie-progress-failure">
         <location filename="../Server/server.cpp" line="4839"/>
         <location filename="../Server/server.cpp" line="4851"/>
-        <location filename="../Server/server_battle.cpp" line="1852"/>
+        <location filename="../Server/server_battle.cpp" line="1853"/>
         <source>User %1: progress map %2 failure!</source>
         <translation type="unfinished">User %1: progress map %2 failure!</translation>
     </message>
@@ -2366,18 +2366,18 @@ Great at battle and bad at politics--so cool!</translation>
         <translation type="unfinished">Get user %1&apos;s map supremacy failed!</translation>
     </message>
     <message id="dbfail-current-fleet">
-        <location filename="../Server/server_battle.cpp" line="235"/>
+        <location filename="../Server/server_battle.cpp" line="236"/>
         <source>Database failed when getting ships of current fleet!</source>
         <translation type="unfinished">Database failed when getting ships of current fleet!</translation>
     </message>
     <message id="unknown-map-rule">
-        <location filename="../Server/server_battle.cpp" line="254"/>
+        <location filename="../Server/server_battle.cpp" line="255"/>
         <source>Unknown map rule: </source>
         <translation type="unfinished">Unknown map rule: </translation>
     </message>
     <message id="dbfail-map-relations">
-        <location filename="../Server/server_battle.cpp" line="273"/>
-        <location filename="../Server/server_battle.cpp" line="2200"/>
+        <location filename="../Server/server_battle.cpp" line="274"/>
+        <location filename="../Server/server_battle.cpp" line="2202"/>
         <source>Database failed when querying map relations!</source>
         <translation type="unfinished">Database failed when querying map relations!</translation>
     </message>
@@ -2413,14 +2413,14 @@ Great at battle and bad at politics--so cool!</translation>
         <translation type="unfinished">Database failed when repairing.</translation>
     </message>
     <message id="update-drop-progress-failed">
-        <location filename="../Server/server_battle.cpp" line="408"/>
-        <location filename="../Server/server_battle.cpp" line="424"/>
+        <location filename="../Server/server_battle.cpp" line="409"/>
+        <location filename="../Server/server_battle.cpp" line="425"/>
         <source>Update drop progress for user %1 failed!</source>
         <translation type="unfinished">Update drop progress for user %1 failed!</translation>
     </message>
     <message id="query-drop-candidate-failed">
-        <location filename="../Server/server_battle.cpp" line="463"/>
-        <location filename="../Server/server_battle.cpp" line="505"/>
+        <location filename="../Server/server_battle.cpp" line="464"/>
+        <location filename="../Server/server_battle.cpp" line="506"/>
         <source>Query drop candidate for user %1 failed!</source>
         <translation type="unfinished">Query drop candidate for user %1 failed!</translation>
     </message>
@@ -2564,99 +2564,99 @@ Great at battle and bad at politics--so cool!</translation>
         <translation type="unfinished">User id %1: imporoved equip %2 by 1 level</translation>
     </message>
     <message id="map-info-failure">
-        <location filename="../Server/server_battle.cpp" line="728"/>
+        <location filename="../Server/server_battle.cpp" line="729"/>
         <source>Map info: query mapid %1 nodeid %2 failed!</source>
         <translation type="unfinished">Map info: query mapid %1 nodeid %2 failed!</translation>
     </message>
     <message id="query-fleet-info-failed">
-        <location filename="../Server/server_battle.cpp" line="81"/>
+        <location filename="../Server/server_battle.cpp" line="82"/>
         <source>User %1: query fleet %2 failed!</source>
         <translation type="unfinished">User %1: query fleet %2 failed!</translation>
     </message>
     <message id="sortie-node-battle-failure-transport-read">
-        <location filename="../Server/server_battle.cpp" line="787"/>
-        <location filename="../Server/server_battle.cpp" line="1504"/>
+        <location filename="../Server/server_battle.cpp" line="788"/>
+        <location filename="../Server/server_battle.cpp" line="1505"/>
         <source>User %1: transport node read failure!</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="sortie-node-battle-failure-transport-update">
-        <location filename="../Server/server_battle.cpp" line="808"/>
+        <location filename="../Server/server_battle.cpp" line="809"/>
         <source>User %1: transport node update failure!</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="sortie-end-failure-freight-clear">
-        <location filename="../Server/server_battle.cpp" line="1880"/>
+        <location filename="../Server/server_battle.cpp" line="1881"/>
         <source>User %1: clear freight at map end failure!</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="update-fleet-db-failed">
-        <location filename="../Server/server_battle.cpp" line="2271"/>
+        <location filename="../Server/server_battle.cpp" line="2273"/>
         <source>User %1: update fleet %2 pos %3 in database failed!</source>
         <translation type="unfinished">User %1: update fleet %2 pos %3 in database failed!</translation>
     </message>
     <message id="sortie-node-battle-failure">
         <location filename="../Server/server.cpp" line="4319"/>
-        <location filename="../Server/server_battle.cpp" line="747"/>
+        <location filename="../Server/server_battle.cpp" line="748"/>
         <source>User %1: start node battle failure!</source>
         <translation type="unfinished">User %1: start node battle failure!</translation>
     </message>
     <message id="sortie-node-battle-failure-end">
-        <location filename="../Server/server_battle.cpp" line="833"/>
-        <location filename="../Server/server_battle.cpp" line="1411"/>
+        <location filename="../Server/server_battle.cpp" line="834"/>
+        <location filename="../Server/server_battle.cpp" line="1412"/>
         <source>User %1: end node battle failure!</source>
         <translation type="unfinished">User %1: end node battle failure!</translation>
     </message>
     <message id="dbfail-update-ship-hp">
-        <location filename="../Server/server_battle.cpp" line="1158"/>
+        <location filename="../Server/server_battle.cpp" line="1159"/>
         <source>Failed to update player ship HP</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="dbfail-get-ship-uuid">
-        <location filename="../Server/server_battle.cpp" line="1173"/>
+        <location filename="../Server/server_battle.cpp" line="1174"/>
         <source>Failed to get ship UUID for plane loss tracking</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="dbfail-update-plane-count">
-        <location filename="../Server/server_battle.cpp" line="1228"/>
+        <location filename="../Server/server_battle.cpp" line="1229"/>
         <source>Failed to update plane count</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="map-info-failure-exp">
-        <location filename="../Server/server_battle.cpp" line="1462"/>
+        <location filename="../Server/server_battle.cpp" line="1463"/>
         <source>Map info: query mapid %1 nodeid %2 exp failed!</source>
         <translation type="unfinished">Map info: query mapid %1 nodeid %2 exp failed!</translation>
     </message>
     <message id="sortie-node-battle-failure-transport-clear">
-        <location filename="../Server/server_battle.cpp" line="1533"/>
+        <location filename="../Server/server_battle.cpp" line="1534"/>
         <source>User %1: transport node clear failure!</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="ship-drop-illegal">
-        <location filename="../Server/server_battle.cpp" line="1557"/>
+        <location filename="../Server/server_battle.cpp" line="1558"/>
         <source>Attempt to drop invalid ship %1!</source>
         <translation type="unfinished">Attempt to drop invalid ship %1!</translation>
     </message>
     <message id="ship-drop-db-fail">
-        <location filename="../Server/server_battle.cpp" line="1570"/>
+        <location filename="../Server/server_battle.cpp" line="1571"/>
         <source>User %1: refresh database failure when drop ship %2!</source>
         <translation type="unfinished">User %1: refresh database failure when drop ship %2!</translation>
     </message>
     <message id="add-ship-exp-failre">
-        <location filename="../Server/server_battle.cpp" line="1611"/>
-        <location filename="../Server/server_battle.cpp" line="1629"/>
-        <location filename="../Server/server_battle.cpp" line="1643"/>
-        <location filename="../Server/server_battle.cpp" line="1672"/>
-        <location filename="../Server/server_battle.cpp" line="1690"/>
+        <location filename="../Server/server_battle.cpp" line="1612"/>
+        <location filename="../Server/server_battle.cpp" line="1630"/>
+        <location filename="../Server/server_battle.cpp" line="1644"/>
+        <location filename="../Server/server_battle.cpp" line="1673"/>
+        <location filename="../Server/server_battle.cpp" line="1691"/>
         <source>User %1: add ship exp failure!</source>
         <translation type="unfinished">User %1: add ship exp failure!</translation>
     </message>
     <message id="rank-add-exp-failed">
-        <location filename="../Server/server_battle.cpp" line="1708"/>
+        <location filename="../Server/server_battle.cpp" line="1709"/>
         <source>User %1: add ranking exp failed!</source>
         <translation type="unfinished">User %1: add ranking exp failed!</translation>
     </message>
     <message id="virtual-add-exp-failed">
-        <location filename="../Server/server_battle.cpp" line="1743"/>
+        <location filename="../Server/server_battle.cpp" line="1744"/>
         <source>User %1: add virtual exp failed!</source>
         <translation type="unfinished">User %1: add virtual exp failed!</translation>
     </message>
@@ -3064,53 +3064,53 @@ Great at battle and bad at politics--so cool!</translation>
         <translation type="unfinished"></translation>
     </message>
     <message id="sortie-start-failure-dock">
-        <location filename="../Server/server_battle.cpp" line="1936"/>
+        <location filename="../Server/server_battle.cpp" line="1937"/>
         <source>User %1: start map %2 failure due to uncertain docks!</source>
         <translation type="unfinished">User %1: start map %2 failure due to uncertain docks!</translation>
     </message>
     <message id="sortie-start-failure-supply">
-        <location filename="../Server/server_battle.cpp" line="1960"/>
+        <location filename="../Server/server_battle.cpp" line="1961"/>
         <source>User %1: start map %2 failure due to uncertain supply!</source>
         <translation type="unfinished">User %1: start map %2 failure due to uncertain supply!</translation>
     </message>
     <message id="sortie-start-failure-rescheck">
-        <location filename="../Server/server_battle.cpp" line="2011"/>
+        <location filename="../Server/server_battle.cpp" line="2012"/>
         <source>User %1: start map %2 failure due to resource check!</source>
         <translation type="unfinished">User %1: start map %2 failure due to resource check!</translation>
     </message>
     <message id="sortie-start-failure">
-        <location filename="../Server/server_battle.cpp" line="2063"/>
+        <location filename="../Server/server_battle.cpp" line="2065"/>
         <source>User %1: start map %2 failure!</source>
         <translation type="unfinished">User %1: start map %2 failure!</translation>
     </message>
     <message id="sortie-start-failure-node">
-        <location filename="../Server/server_battle.cpp" line="2077"/>
+        <location filename="../Server/server_battle.cpp" line="2079"/>
         <source>User %1: start map %2 node %3 failure!</source>
         <translation type="unfinished">User %1: start map %2 node %3 failure!</translation>
     </message>
     <message id="sortie-start-failure-index">
-        <location filename="../Server/server_battle.cpp" line="2092"/>
+        <location filename="../Server/server_battle.cpp" line="2094"/>
         <source>User %1: fleet index %2 start sortie failure!</source>
         <translation type="unfinished">User %1: fleet index %2 start sortie failure!</translation>
     </message>
     <message id="sortie-start-failure-general">
-        <location filename="../Server/server_battle.cpp" line="2107"/>
-        <location filename="../Server/server_battle.cpp" line="2124"/>
+        <location filename="../Server/server_battle.cpp" line="2109"/>
+        <location filename="../Server/server_battle.cpp" line="2126"/>
         <source>User %1: start sortie failure!</source>
         <translation type="unfinished">User %1: start sortie failure!</translation>
     </message>
     <message id="sortie-start-failure-freight-clear">
-        <location filename="../Server/server_battle.cpp" line="2140"/>
+        <location filename="../Server/server_battle.cpp" line="2142"/>
         <source>User %1: clear freight at sortie start failure!</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="lua-error-branch">
-        <location filename="../Server/server_battle.cpp" line="2153"/>
+        <location filename="../Server/server_battle.cpp" line="2155"/>
         <source>Map %1 lua file has failed to run: %2</source>
         <translation type="unfinished">Map %1 lua file has failed to run: %2</translation>
     </message>
     <message id="dbfail-map-supremacies">
-        <location filename="../Server/server_battle.cpp" line="2182"/>
+        <location filename="../Server/server_battle.cpp" line="2184"/>
         <source>Database failed when reading map supremacies!</source>
         <translation type="unfinished">Database failed when reading map supremacies!</translation>
     </message>
@@ -3607,34 +3607,34 @@ Great at battle and bad at politics--so cool!</translation>
     <message id="diff-c">
         <location filename="../ClientGUI/ui/sortie/maprender.cpp" line="58"/>
         <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="219"/>
-        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="408"/>
-        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="452"/>
+        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="432"/>
+        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="476"/>
         <source>Early</source>
         <translation type="unfinished">Early</translation>
     </message>
     <message id="diff-b">
         <location filename="../ClientGUI/ui/sortie/maprender.cpp" line="61"/>
         <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="221"/>
-        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="337"/>
-        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="411"/>
-        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="455"/>
+        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="361"/>
+        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="435"/>
+        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="479"/>
         <source>Medium</source>
         <translation type="unfinished">Medium</translation>
     </message>
     <message id="diff-a">
         <location filename="../ClientGUI/ui/sortie/maprender.cpp" line="64"/>
         <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="223"/>
-        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="340"/>
-        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="414"/>
-        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="458"/>
+        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="364"/>
+        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="438"/>
+        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="482"/>
         <source>Late</source>
         <translation type="unfinished">Late</translation>
     </message>
     <message id="diff-s">
         <location filename="../ClientGUI/ui/sortie/maprender.cpp" line="67"/>
-        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="341"/>
-        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="418"/>
-        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="461"/>
+        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="365"/>
+        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="442"/>
+        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="485"/>
         <source>Historical</source>
         <translation type="unfinished">Historical</translation>
     </message>
@@ -3645,8 +3645,8 @@ Great at battle and bad at politics--so cool!</translation>
     </message>
     <message id="fleet-not-ready">
         <location filename="../ClientGUI/ui/maintenance/repair.cpp" line="203"/>
-        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="473"/>
-        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="708"/>
+        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="497"/>
+        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="732"/>
         <source>Please prepare your fleet in fleet view!</source>
         <translation type="unfinished">Please prepare your fleet in fleet view!</translation>
     </message>
@@ -3656,41 +3656,41 @@ Great at battle and bad at politics--so cool!</translation>
         <translation type="unfinished">Ship does not need repairs.</translation>
     </message>
     <message id="fleet-empty">
-        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="490"/>
-        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="730"/>
+        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="514"/>
+        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="754"/>
         <source>Fleet is empty.</source>
         <translation type="unfinished">Fleet is empty.</translation>
     </message>
     <message id="disaster-los-check">
-        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="536"/>
+        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="560"/>
         <source>LOS check: required %1, fleet %2, chance to avoid %3%</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="disaster-deduction-occurred">
-        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="540"/>
+        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="564"/>
         <source>Fuel/ammo deducted: %1% fuel, %2% ammo</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="disaster-deduction-avoided">
-        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="545"/>
+        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="569"/>
         <source>LOS check succeeded! No resources deducted.</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="transport-freight-info">
-        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="554"/>
+        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="578"/>
         <source>Freight transport: current %1, capacity %2, added %3</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="continue-map">
-        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="584"/>
+        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="608"/>
         <source>Do you want to continue map progress?</source>
         <translation type="unfinished">Do you want to continue map progress?</translation>
     </message>
     <message id="expedition-auto-restart-label">
-        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="126"/>
-        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="855"/>
-        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="875"/>
-        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="941"/>
+        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="127"/>
+        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="879"/>
+        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="899"/>
+        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="965"/>
         <source>Auto-restart: %1%</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3750,27 +3750,27 @@ Great at battle and bad at politics--so cool!</translation>
         <translation type="unfinished">Expedition</translation>
     </message>
     <message id="expedition-plan-nodes">
-        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="117"/>
+        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="118"/>
         <source>Plan Nodes</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="expedition-start">
-        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="119"/>
+        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="120"/>
         <source>Start Expedition</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="expedition-cancel">
-        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="121"/>
+        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="122"/>
         <source>Cancel Expedition</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="auto-resupply-checkbox">
-        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="128"/>
+        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="129"/>
         <source>Auto-resupply</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="expedition-save-settings">
-        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="130"/>
+        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="131"/>
         <source>Save Settings</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3805,63 +3805,63 @@ Great at battle and bad at politics--so cool!</translation>
         <translation type="unfinished"></translation>
     </message>
     <message id="cancel-expedition-title">
-        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="782"/>
+        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="806"/>
         <source>Cancel Expedition: %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="expedition-start-success">
-        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="804"/>
+        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="828"/>
         <source>Expedition started successfully for map %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="expedition-start-failed">
-        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="811"/>
+        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="835"/>
         <source>Expedition start failed: %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="expedition-status-count">
-        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="910"/>
+        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="934"/>
         <source>Active expeditions: %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="expedition-progress-update">
-        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="917"/>
+        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="941"/>
         <source>Expedition %1 progressed to node %2</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="expedition-settings-saved">
-        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="1009"/>
+        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="1033"/>
         <source>Expedition settings saved for map %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="expedition-plan-saved">
-        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="1099"/>
+        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="1123"/>
         <source>Battle plan saved for node %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="expedition-stopped">
-        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="926"/>
+        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="950"/>
         <source>Expedition %1 stopped with reason: %2</source>
         <oldsource>Expedition %1 stopped with reason %2</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message id="sortie-end">
-        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="598"/>
+        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="622"/>
         <source>This sortie ended successfully.</source>
         <translation type="unfinished">This sortie ended successfully.</translation>
     </message>
     <message id="empty-node-no-battle">
-        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="629"/>
+        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="653"/>
         <source>No enemies found. It&apos;s just my imagination.</source>
         <translation type="unfinished">No enemies found. It&apos;s just my imagination.</translation>
     </message>
     <message id="choice-node-prompt">
-        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="632"/>
+        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="656"/>
         <source>Admiral, please can choose your next step freely.</source>
         <translation type="unfinished">Admiral, please can choose your next step freely.</translation>
     </message>
     <message id="fleet-move-error">
-        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="669"/>
+        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="693"/>
         <source>Fleet move failed!</source>
         <translation type="unfinished">Fleet move failed!</translation>
     </message>
@@ -4550,17 +4550,17 @@ Great at battle and bad at politics--so cool!</translation>
         <translation type="unfinished">Resource gain per minute from naval supremacy, broken down by territory</translation>
     </message>
     <message id="supply-attrition-home">
-        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="370"/>
+        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="394"/>
         <source>0% (home port)</source>
         <translation type="unfinished">0% (home port)</translation>
     </message>
     <message id="supply-attrition-no-route">
-        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="357"/>
+        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="381"/>
         <source>N/A (no route)</source>
         <translation type="unfinished">N/A (no route)</translation>
     </message>
     <message id="supply-attrition-broken">
-        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="363"/>
+        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="387"/>
         <source>∞ (supply line broken)</source>
         <translation type="unfinished">∞ (supply line broken)</translation>
     </message>
@@ -4601,7 +4601,7 @@ Great at battle and bad at politics--so cool!</translation>
     </message>
     <message id="battle-result-title">
         <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="88"/>
-        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="580"/>
+        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="604"/>
         <source>Battle Results</source>
         <translation type="unfinished"></translation>
     </message>
@@ -4750,169 +4750,184 @@ Great at battle and bad at politics--so cool!</translation>
         <translation type="unfinished"></translation>
     </message>
     <message id="expedition-map-not-exist">
-        <location filename="../Server/expeditionmanager.cpp" line="62"/>
-        <location filename="../Server/expeditionmanager.cpp" line="462"/>
+        <location filename="../Server/expeditionmanager.cpp" line="64"/>
+        <location filename="../Server/expeditionmanager.cpp" line="515"/>
         <source>Map %1 does not exist</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="expedition-invalid-fleet-index">
-        <location filename="../Server/expeditionmanager.cpp" line="69"/>
+        <location filename="../Server/expeditionmanager.cpp" line="71"/>
         <source>Invalid fleet index %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="expedition-check-existing-failed">
-        <location filename="../Server/expeditionmanager.cpp" line="85"/>
+        <location filename="../Server/expeditionmanager.cpp" line="87"/>
         <source>Failed to check existing expedition for user %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="expedition-already-exists">
-        <location filename="../Server/expeditionmanager.cpp" line="92"/>
+        <location filename="../Server/expeditionmanager.cpp" line="94"/>
         <source>User %1 already has expedition for map %2 difficulty %3</source>
         <oldsource>User %1 already has expedition for map %2</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message id="expedition-check-active-failed">
-        <location filename="../Server/expeditionmanager.cpp" line="110"/>
+        <location filename="../Server/expeditionmanager.cpp" line="112"/>
         <source>Failed to check active expeditions for user %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="expedition-check-fleet-status-failed">
-        <location filename="../Server/expeditionmanager.cpp" line="125"/>
+        <location filename="../Server/expeditionmanager.cpp" line="127"/>
         <source>Failed to check fleet expedition status for user %1 fleet %2</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="expedition-fleet-already-on-expedition">
-        <location filename="../Server/expeditionmanager.cpp" line="132"/>
+        <location filename="../Server/expeditionmanager.cpp" line="134"/>
         <source>Fleet %1 is already on expedition for user %2</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="expedition-insert-failed">
-        <location filename="../Server/expeditionmanager.cpp" line="221"/>
+        <location filename="../Server/expeditionmanager.cpp" line="274"/>
         <source>Failed to insert expedition for user %1 map %2</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="expedition-map-not-in-registry">
-        <location filename="../Server/expeditionmanager.cpp" line="150"/>
-        <location filename="../Server/expeditionmanager.cpp" line="237"/>
-        <location filename="../Server/expeditionmanager.cpp" line="502"/>
-        <location filename="../Server/expeditionmanager.cpp" line="780"/>
-        <location filename="../Server/expeditionmanager.cpp" line="1105"/>
-        <location filename="../Server/expeditionmanager.cpp" line="1742"/>
+        <location filename="../Server/expeditionmanager.cpp" line="152"/>
+        <location filename="../Server/expeditionmanager.cpp" line="290"/>
+        <location filename="../Server/expeditionmanager.cpp" line="555"/>
+        <location filename="../Server/expeditionmanager.cpp" line="833"/>
+        <location filename="../Server/expeditionmanager.cpp" line="1162"/>
+        <location filename="../Server/expeditionmanager.cpp" line="1799"/>
         <source>Map %1 not found for expedition progress</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="expedition-no-branch-rule">
-        <location filename="../Server/expeditionmanager.cpp" line="162"/>
-        <location filename="../Server/expeditionmanager.cpp" line="1754"/>
+        <location filename="../Server/expeditionmanager.cpp" line="164"/>
+        <location filename="../Server/expeditionmanager.cpp" line="1811"/>
         <source>Map %1 doesn&apos;t have branch rule for difficulty %2</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="expedition-fleet-no-start-node">
-        <location filename="../Server/expeditionmanager.cpp" line="184"/>
-        <location filename="../Server/expeditionmanager.cpp" line="1773"/>
+        <location filename="../Server/expeditionmanager.cpp" line="186"/>
+        <location filename="../Server/expeditionmanager.cpp" line="1830"/>
         <source>Fleet doesn&apos;t fit map %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="expedition-lua-branch-rule-error">
-        <location filename="../Server/expeditionmanager.cpp" line="191"/>
-        <location filename="../Server/expeditionmanager.cpp" line="1780"/>
+        <location filename="../Server/expeditionmanager.cpp" line="193"/>
+        <location filename="../Server/expeditionmanager.cpp" line="1837"/>
         <source>Lua branch rule error for map %1: %2</source>
         <translation type="unfinished"></translation>
     </message>
+    <message id="expedition-supply-line-broken">
+        <location filename="../Server/expeditionmanager.cpp" line="207"/>
+        <source>Supply line broken for expedition map %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="expedition-consumption-query-failed">
+        <location filename="../Server/expeditionmanager.cpp" line="233"/>
+        <source>Failed to compute fleet consumption for expedition</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="expedition-insufficient-resources">
+        <location filename="../Server/expeditionmanager.cpp" line="247"/>
+        <source>Insufficient resources for expedition to map %1</source>
+        <translation type="unfinished"></translation>
+    </message>
     <message id="expedition-start-transaction-start-failed">
-        <location filename="../Server/expeditionmanager.cpp" line="244"/>
+        <location filename="../Server/expeditionmanager.cpp" line="297"/>
         <source>Failed to start transaction for starting expedition for user %1.</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="expedition-node-not-found">
-        <location filename="../Server/expeditionmanager.cpp" line="256"/>
-        <location filename="../Server/expeditionmanager.cpp" line="546"/>
+        <location filename="../Server/expeditionmanager.cpp" line="309"/>
+        <location filename="../Server/expeditionmanager.cpp" line="599"/>
         <source>Node %1 not found in map %2</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="expedition-battle-plan-insert-failed">
-        <location filename="../Server/expeditionmanager.cpp" line="281"/>
-        <location filename="../Server/expeditionmanager.cpp" line="571"/>
+        <location filename="../Server/expeditionmanager.cpp" line="334"/>
+        <location filename="../Server/expeditionmanager.cpp" line="624"/>
         <source>Failed to insert battle plan for user %1 map %2 node %3</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="expedition-start-commit-failed">
-        <location filename="../Server/expeditionmanager.cpp" line="291"/>
+        <location filename="../Server/expeditionmanager.cpp" line="344"/>
         <source>Failed to commit transaction for starting expedition for user %1.</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="expedition-move-fleet-failed">
-        <location filename="../Server/expeditionmanager.cpp" line="300"/>
+        <location filename="../Server/expeditionmanager.cpp" line="353"/>
         <source>Failed to move fleet to expedition index for user %1 map %2</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="expedition-started">
-        <location filename="../Server/expeditionmanager.cpp" line="333"/>
+        <location filename="../Server/expeditionmanager.cpp" line="386"/>
         <source>Expedition started for user %1 map %2 fleet %3</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="expedition-invalid-receive-fleet-index">
-        <location filename="../Server/expeditionmanager.cpp" line="358"/>
+        <location filename="../Server/expeditionmanager.cpp" line="411"/>
         <source>Invalid receive fleet index %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="expedition-cancel-query-failed">
-        <location filename="../Server/expeditionmanager.cpp" line="375"/>
+        <location filename="../Server/expeditionmanager.cpp" line="428"/>
         <source>Failed to query expedition for cancellation user %1 map %2</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="expedition-restore-fleet-failed">
-        <location filename="../Server/expeditionmanager.cpp" line="420"/>
+        <location filename="../Server/expeditionmanager.cpp" line="473"/>
         <source>Failed to restore fleet for cancelled expedition user %1 map %2</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="expedition-cancelled">
-        <location filename="../Server/expeditionmanager.cpp" line="433"/>
+        <location filename="../Server/expeditionmanager.cpp" line="486"/>
         <source>Expedition cancelled for user %1 map %2</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="expedition-update-plans-query-failed">
-        <location filename="../Server/expeditionmanager.cpp" line="478"/>
+        <location filename="../Server/expeditionmanager.cpp" line="531"/>
         <source>Failed to query expedition for update battle plans user %1 map %2</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="expedition-active-no-update">
-        <location filename="../Server/expeditionmanager.cpp" line="488"/>
+        <location filename="../Server/expeditionmanager.cpp" line="541"/>
         <source>Cannot update battle plans for active expedition user %1 map %2</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="expedition-delete-plans-failed">
-        <location filename="../Server/expeditionmanager.cpp" line="517"/>
+        <location filename="../Server/expeditionmanager.cpp" line="570"/>
         <source>Failed to delete old battle plans for user %1 map %2</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="expedition-plans-updated">
-        <location filename="../Server/expeditionmanager.cpp" line="587"/>
+        <location filename="../Server/expeditionmanager.cpp" line="640"/>
         <source>Battle plans updated for user %1 map %2</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="expedition-query-for-processing-failed">
-        <location filename="../Server/expeditionmanager.cpp" line="616"/>
+        <location filename="../Server/expeditionmanager.cpp" line="669"/>
         <source>Failed to query expeditions for processing</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="expedition-query-user-failed">
-        <location filename="../Server/expeditionmanager.cpp" line="674"/>
+        <location filename="../Server/expeditionmanager.cpp" line="727"/>
         <source>Failed to query expeditions for user %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="expedition-restore-fleet-commit-failed">
-        <location filename="../Server/expeditionmanager.cpp" line="1623"/>
+        <location filename="../Server/expeditionmanager.cpp" line="1680"/>
         <source>Failed to commit transaction for restoring fleet from expedition index %1 to normal index %2 for user %3</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="expedition-restart-failed">
-        <location filename="../Server/expeditionmanager.cpp" line="1806"/>
+        <location filename="../Server/expeditionmanager.cpp" line="1863"/>
         <source>Failed to restart expedition for user %1 map %2</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="expedition-auto-restarted">
-        <location filename="../Server/expeditionmanager.cpp" line="1814"/>
+        <location filename="../Server/expeditionmanager.cpp" line="1874"/>
         <source>Expedition auto-restarted for user %1 map %2</source>
         <translation type="unfinished"></translation>
     </message>
@@ -4922,217 +4937,217 @@ Great at battle and bad at politics--so cool!</translation>
         <translation type="unfinished"></translation>
     </message>
     <message id="expedition-cancel-found">
-        <location filename="../Server/expeditionmanager.cpp" line="385"/>
+        <location filename="../Server/expeditionmanager.cpp" line="438"/>
         <source>Expedition found for user %1 map %2 (active: %3)</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="expedition-cancel-not-found">
-        <location filename="../Server/expeditionmanager.cpp" line="389"/>
+        <location filename="../Server/expeditionmanager.cpp" line="442"/>
         <source>Expedition not found for user %1 map %2 (already cancelled?)</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="expedition-cancel-delete-failed">
-        <location filename="../Server/expeditionmanager.cpp" line="408"/>
+        <location filename="../Server/expeditionmanager.cpp" line="461"/>
         <source>Failed to cancel expedition for user %1 map %2</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="expedition-update-plans-transaction-start-failed">
-        <location filename="../Server/expeditionmanager.cpp" line="533"/>
+        <location filename="../Server/expeditionmanager.cpp" line="586"/>
         <source>Failed to start transaction for updating battle plans for user %1.</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="expedition-update-plans-commit-failed">
-        <location filename="../Server/expeditionmanager.cpp" line="581"/>
+        <location filename="../Server/expeditionmanager.cpp" line="634"/>
         <source>Failed to commit transaction for updating battle plans for user %1.</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="expedition-settings-query-user-failed">
-        <location filename="../Server/expeditionmanager.cpp" line="713"/>
+        <location filename="../Server/expeditionmanager.cpp" line="766"/>
         <source>Failed to query expedition settings for user %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="expedition-get-state-failed">
-        <location filename="../Server/expeditionmanager.cpp" line="797"/>
+        <location filename="../Server/expeditionmanager.cpp" line="850"/>
         <source>Failed to get expedition state for user %1 map %2</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="expedition-not-active">
-        <location filename="../Server/expeditionmanager.cpp" line="804"/>
-        <location filename="../Server/expeditionmanager.cpp" line="1311"/>
-        <location filename="../Server/expeditionmanager.cpp" line="1318"/>
+        <location filename="../Server/expeditionmanager.cpp" line="857"/>
+        <location filename="../Server/expeditionmanager.cpp" line="1368"/>
+        <location filename="../Server/expeditionmanager.cpp" line="1375"/>
         <source>Expedition not active for user %1 map %2</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="expedition-node-not-found-in-map">
-        <location filename="../Server/expeditionmanager.cpp" line="814"/>
+        <location filename="../Server/expeditionmanager.cpp" line="867"/>
         <source>Current node %1 not found in map %2</source>
         <oldsource>Current node %1 not found in map %2 (map id: %3, nodes count: %4)</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message id="expedition-no-choice-plan">
-        <location filename="../Server/expeditionmanager.cpp" line="836"/>
+        <location filename="../Server/expeditionmanager.cpp" line="889"/>
         <source>No battle plan for choice node %1 map %2 user %3</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="expedition-update-node-failed">
-        <location filename="../Server/expeditionmanager.cpp" line="870"/>
+        <location filename="../Server/expeditionmanager.cpp" line="923"/>
         <source>Failed to update expedition node for user %1 map %2</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="expedition-next-node-not-found">
-        <location filename="../Server/expeditionmanager.cpp" line="884"/>
+        <location filename="../Server/expeditionmanager.cpp" line="937"/>
         <source>Next node %1 not found in map %2</source>
         <oldsource>Next node %1 not found in map %2 (map id: %3, nodes count: %4)</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message id="expedition-update-progress-time-failed">
-        <location filename="../Server/expeditionmanager.cpp" line="981"/>
+        <location filename="../Server/expeditionmanager.cpp" line="1038"/>
         <source>Failed to update next progress time for user %1 map %2</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="expedition-battle-plan-not-found">
-        <location filename="../Server/expeditionmanager.cpp" line="1013"/>
+        <location filename="../Server/expeditionmanager.cpp" line="1070"/>
         <source>Battle plan not found for user %1 map %2 node %3</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="expedition-empty-battle-plan">
-        <location filename="../Server/expeditionmanager.cpp" line="1021"/>
+        <location filename="../Server/expeditionmanager.cpp" line="1078"/>
         <source>Empty battle plan for user %1 map %2 node %3</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="expedition-battle-executed">
-        <location filename="../Server/expeditionmanager.cpp" line="1044"/>
+        <location filename="../Server/expeditionmanager.cpp" line="1101"/>
         <source>Expedition battle executed for user %1 map %2 node %3</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="expedition-stopped-critically-damaged">
-        <location filename="../Server/expeditionmanager.cpp" line="1073"/>
+        <location filename="../Server/expeditionmanager.cpp" line="1130"/>
         <source>Expedition stopped: critically damaged ship for user %1 map %2</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="expedition-stopped-no-fuel">
-        <location filename="../Server/expeditionmanager.cpp" line="1080"/>
+        <location filename="../Server/expeditionmanager.cpp" line="1137"/>
         <source>Expedition stopped: no fuel for user %1 map %2</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="expedition-stopped-no-ammo">
-        <location filename="../Server/expeditionmanager.cpp" line="1087"/>
+        <location filename="../Server/expeditionmanager.cpp" line="1144"/>
         <source>Expedition stopped: no ammo for user %1 map %2</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="expedition-settings-failed">
-        <location filename="../Server/expeditionmanager.cpp" line="1122"/>
+        <location filename="../Server/expeditionmanager.cpp" line="1179"/>
         <source>Failed to set expedition settings for user %1 map %2</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="expedition-query-fleet-ships-failed">
-        <location filename="../Server/expeditionmanager.cpp" line="1183"/>
+        <location filename="../Server/expeditionmanager.cpp" line="1240"/>
         <source>Failed to query expedition fleet ships for auto-resupply user %1 map %2</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="expedition-auto-resupply-transaction-start-failed">
-        <location filename="../Server/expeditionmanager.cpp" line="1237"/>
+        <location filename="../Server/expeditionmanager.cpp" line="1294"/>
         <source>Failed to start transaction for auto-resupply for user %1 map %2</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="expedition-resupply-fuel-failed">
-        <location filename="../Server/expeditionmanager.cpp" line="1251"/>
+        <location filename="../Server/expeditionmanager.cpp" line="1308"/>
         <source>Failed to resupply fuel for ship %1 user %2</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="expedition-resupply-ammo-failed">
-        <location filename="../Server/expeditionmanager.cpp" line="1267"/>
+        <location filename="../Server/expeditionmanager.cpp" line="1324"/>
         <source>Failed to resupply ammo for ship %1 user %2</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="expedition-auto-resupply-commit-failed">
-        <location filename="../Server/expeditionmanager.cpp" line="1277"/>
+        <location filename="../Server/expeditionmanager.cpp" line="1334"/>
         <source>Failed to commit transaction for auto-resupply for user %1 map %2</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="expedition-auto-resupply-performed">
-        <location filename="../Server/expeditionmanager.cpp" line="1283"/>
+        <location filename="../Server/expeditionmanager.cpp" line="1340"/>
         <source>Auto-resupply performed for user %1 map %2: oil %3, explosives %4</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="expedition-end-update-failed">
-        <location filename="../Server/expeditionmanager.cpp" line="1336"/>
+        <location filename="../Server/expeditionmanager.cpp" line="1393"/>
         <source>Failed to end expedition for user %1 map %2</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="expedition-ended">
-        <location filename="../Server/expeditionmanager.cpp" line="1342"/>
+        <location filename="../Server/expeditionmanager.cpp" line="1399"/>
         <source>Expedition ended for user %1 map %2 reason %3</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="expedition-invalid-original-fleet-index">
-        <location filename="../Server/expeditionmanager.cpp" line="1373"/>
+        <location filename="../Server/expeditionmanager.cpp" line="1430"/>
         <source>Invalid original fleet index %1 for user %2, must be 0~%3</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="expedition-invalid-expedition-fleet-index">
-        <location filename="../Server/expeditionmanager.cpp" line="1382"/>
-        <location filename="../Server/expeditionmanager.cpp" line="1517"/>
+        <location filename="../Server/expeditionmanager.cpp" line="1439"/>
+        <location filename="../Server/expeditionmanager.cpp" line="1574"/>
         <source>Invalid expedition fleet index %1 for user %2, must be &gt;= %3</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="expedition-move-fleet-transaction-start-failed">
-        <location filename="../Server/expeditionmanager.cpp" line="1394"/>
+        <location filename="../Server/expeditionmanager.cpp" line="1451"/>
         <source>Failed to start transaction for moving fleet %1 to expedition index %2 for user %3</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="expedition-clear-expedition-fleet-failed">
-        <location filename="../Server/expeditionmanager.cpp" line="1414"/>
+        <location filename="../Server/expeditionmanager.cpp" line="1471"/>
         <source>Failed to clear expedition fleet index %1 for user %2</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="expedition-move-fleet-index-failed">
-        <location filename="../Server/expeditionmanager.cpp" line="1431"/>
+        <location filename="../Server/expeditionmanager.cpp" line="1488"/>
         <source>Failed to move fleet %1 to expedition index %2 for user %3</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="expedition-clear-fleet-status-failed">
-        <location filename="../Server/expeditionmanager.cpp" line="1447"/>
+        <location filename="../Server/expeditionmanager.cpp" line="1504"/>
         <source>Failed to clear expedition fleet status for user %1 index %2</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="expedition-update-fleet-status-failed">
-        <location filename="../Server/expeditionmanager.cpp" line="1463"/>
+        <location filename="../Server/expeditionmanager.cpp" line="1520"/>
         <source>Failed to update fleet status index %1 to %2 for user %3</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="expedition-recreate-fleet-status-failed">
-        <location filename="../Server/expeditionmanager.cpp" line="1481"/>
+        <location filename="../Server/expeditionmanager.cpp" line="1538"/>
         <source>Failed to recreate fleet status for user %1 index %2</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="expedition-move-fleet-commit-failed">
-        <location filename="../Server/expeditionmanager.cpp" line="1489"/>
+        <location filename="../Server/expeditionmanager.cpp" line="1546"/>
         <source>Failed to commit transaction for moving fleet %1 to expedition index %2 for user %3</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="expedition-restore-fleet-transaction-start-failed">
-        <location filename="../Server/expeditionmanager.cpp" line="1538"/>
+        <location filename="../Server/expeditionmanager.cpp" line="1595"/>
         <source>Failed to start transaction for restoring fleet from expedition index %1 to normal index %2 for user %3</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="expedition-clear-receive-fleet-failed">
-        <location filename="../Server/expeditionmanager.cpp" line="1558"/>
+        <location filename="../Server/expeditionmanager.cpp" line="1615"/>
         <source>Failed to clear receive fleet index %1 ships to idle for user %2</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="expedition-restore-fleet-index-failed">
-        <location filename="../Server/expeditionmanager.cpp" line="1575"/>
+        <location filename="../Server/expeditionmanager.cpp" line="1632"/>
         <source>Failed to restore fleet from expedition index %1 to normal index %2 for user %3</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="expedition-clear-receive-fleet-status-failed">
-        <location filename="../Server/expeditionmanager.cpp" line="1590"/>
+        <location filename="../Server/expeditionmanager.cpp" line="1647"/>
         <source>Failed to clear receive fleet status for user %1 index %2</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="expedition-restore-fleet-status-failed">
-        <location filename="../Server/expeditionmanager.cpp" line="1604"/>
+        <location filename="../Server/expeditionmanager.cpp" line="1661"/>
         <source>Failed to restore fleet status index %1 to %2 for user %3</source>
         <translation type="unfinished"></translation>
     </message>
@@ -5991,7 +6006,7 @@ Great at battle and bad at politics--so cool!</translation>
     </message>
     <message id="supremacy-value-na">
         <location filename="../ClientGUI/ui/sortie/sortie.ui" line="126"/>
-        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="392"/>
+        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="416"/>
         <source>N/A</source>
         <translation type="unfinished">N/A</translation>
     </message>
@@ -6002,13 +6017,13 @@ Great at battle and bad at politics--so cool!</translation>
     </message>
     <message id="supply-attrition-na">
         <location filename="../ClientGUI/ui/sortie/sortie.ui" line="153"/>
-        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="331"/>
+        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="355"/>
         <source>N/A</source>
         <translation type="unfinished">N/A</translation>
     </message>
     <message id="selected-map-id">
         <location filename="../ClientGUI/ui/sortie/sortie.ui" line="99"/>
-        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="600"/>
+        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="624"/>
         <source>None</source>
         <translation type="unfinished">None</translation>
     </message>
