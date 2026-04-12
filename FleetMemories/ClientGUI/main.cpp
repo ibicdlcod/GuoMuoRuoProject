@@ -56,7 +56,6 @@ int main(int argc, char *argv[]) {
 
     QApplication client(argc, argv);
     client.setWindowIcon(QIcon(":/resources/icon.ico"));
-#pragma message(NOT_M_CONST)
     /* Metadata */
     client.setApplicationName("FleetMemories");
     client.setApplicationVersion("0.60.1"); // temp

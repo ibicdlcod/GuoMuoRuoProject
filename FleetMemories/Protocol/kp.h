@@ -4,11 +4,6 @@
 #ifndef KP_H
 #define KP_H
 
-#define M_CONST \
-    __FILE__ QT_STRINGIFY(:__LINE__: MAGICCONSTANT UNDESIREABLE NO 1)
-#define NOT_M_CONST \
-    __FILE__ QT_STRINGIFY(:__LINE__: This is considered an integral \
-part of the program rather than magic constants.)
 #define SALT_FISH __FILE__ QT_STRINGIFY(:__LINE__: This is a salt fish.)
 #define SECRET \
     __FILE__ QT_STRINGIFY(:__LINE__: Go make your own steam app if modding!)
@@ -28,7 +23,6 @@ Use macro "__cplusplus" to check whether your compiler supports it.)
 #include <optional>
 #include "steam/steamtypes.h"
 
-#pragma message(NOT_M_CONST)
 namespace {
 const int steamRateLimit = 60; // see ClientGUI/steamauth.cpp
 }
@@ -55,7 +49,6 @@ Q_NAMESPACE
 
 /* Not in settings, because these values usually
  * have to be respected by both server and client */
-#pragma message(NOT_M_CONST)
 /* this is deliberately not customized */
 /* do not modify as this is used in steam tickets */
 static constexpr int practicalBufferSize = 1024;
@@ -130,7 +123,6 @@ static constexpr const char *microTxnBaseUrl =
 static constexpr const char *microTxnBaseUrl =
     "https://partner.steam-api.com/ISteamMicroTxnSandbox/";
 #endif
-#pragma message(NOT_M_CONST)
 const int steamAppId = 2632870; // Go request your own steam appid if modding!
 Q_GLOBAL_STATIC(QStringList,
                 supportedLangs,

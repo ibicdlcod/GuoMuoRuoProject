@@ -858,7 +858,7 @@ void Sortie::expeditionStartResult(int mapUnionId, bool accepted,
         //% "Expedition start failed: %1"
         qWarning() << qtTrId("expedition-start-failed").arg(errorString);
         //% "Expedition Start Failed"
-        QMessageBox::warning(this, qtTrId("expedition-start-failed"), errorString);
+        QMessageBox::warning(this, qtTrId("expedition-start-failed-title"), errorString);
     }
 }
 

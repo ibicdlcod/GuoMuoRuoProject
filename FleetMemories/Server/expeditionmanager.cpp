@@ -50,7 +50,8 @@ KP::GameError ExpeditionManager::startExpedition(const CSteamID &uid, int mapId,
                                                  const QMap<int, QByteArray> &battlePlans,
                                                  double autoRestartThreshold) {
     if (!server) {
-        qCritical() << "ExpeditionManager: server pointer is null";
+        //% "ExpeditionManager: server pointer is null"
+        qCritical() << qtTrId("expedition-server-null");
         return KP::NoError;
     }
     
@@ -178,8 +179,9 @@ KP::GameError ExpeditionManager::startExpedition(const CSteamID &uid, int mapId,
         }
         startingNode = chosenNode;
         
-        qDebug() << "Expedition starting node determined:" << startingNode
-                 << "for map" << mapUnionId << "difficulty" << diffStr;
+        //% "Expedition starting node determined: %1 for map %2 difficulty %3"
+        qDebug() << qtTrId("expedition-starting-node-determined")
+                        .arg(startingNode).arg(mapUnionId).arg(diffStr);
     }
 
     /* Supply attrition check similar to ordinary sortie start */
@@ -272,7 +274,9 @@ KP::GameError ExpeditionManager::startExpedition(const CSteamID &uid, int mapId,
         //% "Map %1 not found for expedition progress"
         throw DBError(qtTrId("expedition-map-not-in-registry").arg(mapUnionId));
     }
-    qDebug() << "startExpedition: Found map for union ID" << mapUnionId << "map->id:" << map->id << "map->diff:" << static_cast<int>(map->diff) << "map absolute ID:" << map->getAbsoluteId();
+    //% "startExpedition: Found map for union ID %1 map->id: %2 map->diff: %3 map absolute ID: %4"
+    qDebug() << qtTrId("expedition-found-map-union")
+                    .arg(mapUnionId).arg(map->id).arg(static_cast<int>(map->diff)).arg(map->getAbsoluteId());
     
     QSqlDatabase db = QSqlDatabase::database();
     if(!db.transaction()) {
@@ -367,7 +371,7 @@ KP::GameError ExpeditionManager::startExpedition(const CSteamID &uid, int mapId,
     }
     
     //% "Expedition started for user %1 map %2 fleet %3"
-    qInfo() << qtTrId("expedition-started")
+    qDebug() << qtTrId("expedition-started")
                    .arg(uid.ConvertToUint64()).arg(mapUnionId).arg(fleetIndex);
     
     // Refresh client anchorage with updated ship info
@@ -385,7 +389,8 @@ bool ExpeditionManager::cancelExpedition(const CSteamID &uid, int mapId,
     KP::Difficulty diff = MapWithDiff::getDiff(mapId);
     
     if (!server) {
-        qWarning() << "ExpeditionManager: server pointer is null";
+        //% "ExpeditionManager: server pointer is null"
+        qWarning() << qtTrId("expedition-server-null");
         return false;
     }
     
@@ -419,11 +424,11 @@ bool ExpeditionManager::cancelExpedition(const CSteamID &uid, int mapId,
     if (expeditionExists) {
         isActive = query.value("IsActive").toBool();
         //% "Expedition found for user %1 map %2 (active: %3)"
-        qInfo() << qtTrId("expedition-cancel-found")
+        qDebug() << qtTrId("expedition-cancel-found")
                        .arg(uid.ConvertToUint64()).arg(mapUnionId).arg(isActive);
     } else {
         //% "Expedition not found for user %1 map %2 (already cancelled?)"
-        qInfo() << qtTrId("expedition-cancel-not-found")
+        qDebug() << qtTrId("expedition-cancel-not-found")
                        .arg(uid.ConvertToUint64()).arg(mapUnionId);
         /* Expedition already doesn't exist, consider cancellation successful */
         return true;
@@ -467,7 +472,7 @@ bool ExpeditionManager::cancelExpedition(const CSteamID &uid, int mapId,
     }
     
     //% "Expedition cancelled for user %1 map %2"
-    qInfo() << qtTrId("expedition-cancelled")
+    qDebug() << qtTrId("expedition-cancelled")
                    .arg(uid.ConvertToUint64()).arg(mapUnionId);
     
     sendExpeditionStopped(uid, mapUnionId, diff, KP::UserCancelled);
@@ -485,11 +490,13 @@ bool ExpeditionManager::updateBattlePlans(const CSteamID &uid, int mapId,
                                           const QMap<int, QByteArray> &battlePlans) {
     int mapUnionId = MapWithDiff::getUnionId(mapId);
     KP::Difficulty diff = MapWithDiff::getDiff(mapId);
-    qDebug() << "ExpeditionManager::updateBattlePlans called for user" << uid.ConvertToUint64()
-             << "mapId" << mapId << "union" << mapUnionId << "diff" << static_cast<int>(diff)
-             << "with" << battlePlans.size() << "plans";
+    //% "ExpeditionManager::updateBattlePlans called for user %1 mapId %2 union %3 diff %4 with %5 plans"
+    qDebug() << qtTrId("expedition-update-battle-plans-called")
+             .arg(uid.ConvertToUint64()).arg(mapId).arg(mapUnionId)
+              .arg(static_cast<int>(diff)).arg(battlePlans.size());
     if (!server) {
-        qWarning() << "ExpeditionManager: server pointer is null";
+        //% "ExpeditionManager: server pointer is null"
+        qWarning() << qtTrId("expedition-server-null");
         return false;
     }
     
@@ -526,11 +533,13 @@ bool ExpeditionManager::updateBattlePlans(const CSteamID &uid, int mapId,
                               .arg(uid.ConvertToUint64()).arg(mapUnionId);
             return false;
         } else {
-            qDebug() << "Expedition exists but not active, allowing plan update";
+            //% "Expedition exists but not active, allowing plan update"
+            qDebug() << qtTrId("expedition-exists-not-active");
         }
     } else {
         /* Expedition doesn't exist yet - allow saving plans as draft */
-        qDebug() << "Expedition doesn't exist yet, saving plans as draft";
+        //% "Expedition doesn't exist yet, saving plans as draft"
+        qDebug() << qtTrId("expedition-not-exist-draft");
     }
     
     /* Validate battle plans */
@@ -538,7 +547,9 @@ bool ExpeditionManager::updateBattlePlans(const CSteamID &uid, int mapId,
     if (!map) {
         throw DBError(qtTrId("expedition-map-not-in-registry").arg(mapUnionId));
     }
-    qDebug() << "updateBattlePlans: Found map for union ID" << mapUnionId << "map->id:" << map->id << "map->diff:" << static_cast<int>(map->diff) << "map absolute ID:" << map->getAbsoluteId();
+    //% "Found map for union ID %1 map id %2 difficulty %3 absolute ID %4"
+    qDebug() << qtTrId("expedition-found-map-union")
+                  .arg(mapUnionId).arg(map->id).arg(static_cast<int>(map->diff)).arg(map->getAbsoluteId());
     
     /* Delete existing battle plans */
     query.prepare(
@@ -575,8 +586,9 @@ bool ExpeditionManager::updateBattlePlans(const CSteamID &uid, int mapId,
     for (auto it = battlePlans.constBegin(); it != battlePlans.constEnd(); ++it) {
         int nodeIndex = it.key();
         const QByteArray &planData = it.value();
-        qDebug() << "  Processing battle plan for node" << nodeIndex
-                 << "plan size:" << planData.size() << "bytes";
+        //% "Processing battle plan for node %1 plan size %2 bytes"
+        qDebug() << qtTrId("expedition-processing-battle-plan")
+                      .arg(nodeIndex).arg(planData.size());
         
         if (!nodeExistsInLua(mapUnionId, nodeIndex)) {
             //% "Node %1 not found in map %2"
@@ -622,19 +634,20 @@ bool ExpeditionManager::updateBattlePlans(const CSteamID &uid, int mapId,
     }
     
     //% "Battle plans updated for user %1 map %2"
-    qInfo() << qtTrId("expedition-plans-updated")
+    qDebug() << qtTrId("expedition-plans-updated")
                    .arg(uid.ConvertToUint64()).arg(mapUnionId);
     
-    qDebug() << "Successfully saved" << battlePlans.size() << "battle plans for user"
-             << uid.ConvertToUint64() << "map" << mapUnionId
-             << "to database (transaction committed)";
+    //% "Successfully saved %1 battle plans for user %2 map %3"
+    qDebug() << qtTrId("expedition-battle-plans-saved")
+                  .arg(battlePlans.size()).arg(uid.ConvertToUint64()).arg(mapUnionId);
     
     return true;
 }
 
 void ExpeditionManager::processExpeditions() {
     if(!server) {
-        qWarning() << "ExpeditionManager: server pointer is null";
+        //% "ExpeditionManager: server pointer is null"
+        qWarning() << qtTrId("expedition-server-null");
         return;
     }
     
@@ -671,8 +684,9 @@ void ExpeditionManager::processExpeditions() {
             // Continue with other expeditions
         }
         catch(...) {
-            qWarning() << "Unknown error progressing expedition for user"
-                       << uid.ConvertToUint64() << "map" << mapUnionId;
+            //% "Unknown error progressing expedition for user %1 map %2"
+            qWarning() << qtTrId("expedition-unknown-error-progressing")
+                            .arg(uid.ConvertToUint64()).arg(mapUnionId);
         }
     }
 }
@@ -685,7 +699,8 @@ QJsonArray ExpeditionManager::getUserExpeditions(const CSteamID &uid, std::optio
     QJsonArray result;
 
     if (!server) {
-        qCritical() << "ExpeditionManager: server pointer is null";
+        //% "ExpeditionManager: server pointer is null"
+        qCritical() << qtTrId("expedition-server-null");
         return result;
     }
 
@@ -808,7 +823,8 @@ QJsonArray ExpeditionManager::getUserExpeditions(const CSteamID &uid, std::optio
 
 void ExpeditionManager::progressExpedition(const CSteamID &uid, int mapUnionId, KP::Difficulty diff) {
     if (!server) {
-        qWarning() << "ExpeditionManager: server pointer is null";
+        //% "ExpeditionManager: server pointer is null"
+        qWarning() << qtTrId("expedition-server-null");
         return;
     }
     
@@ -817,7 +833,9 @@ void ExpeditionManager::progressExpedition(const CSteamID &uid, int mapUnionId, 
     if (!map) {
         throw DBError(qtTrId("expedition-map-not-in-registry").arg(mapUnionId));
     }
-    qDebug() << "progressExpedition: Found map for union ID" << mapUnionId << "map->id:" << map->id << "map->diff:" << static_cast<int>(map->diff) << "map absolute ID:" << map->getAbsoluteId();
+    //% "Found map for union ID %1 map id %2 difficulty %3 absolute ID %4"
+    qDebug() << qtTrId("expedition-found-map-union")
+                  .arg(mapUnionId).arg(map->id).arg(static_cast<int>(map->diff)).arg(map->getAbsoluteId());
     
     /* Get current expedition state */
     QSqlQuery query;
@@ -1017,7 +1035,7 @@ void ExpeditionManager::progressExpedition(const CSteamID &uid, int mapUnionId, 
     }
 
     /* Schedule next progression */
-    int progressPerNode = (::settings ? ::settings->value("rule/expeditionprogresspernode", 1).toInt() : 1)
+    int progressPerNode = settings->value("rule/expeditionprogresspernode", 15).toInt()
                           * KP::secsinMin;
 
     qint64 nextProgressTime = currentTime + progressPerNode;
@@ -1048,7 +1066,8 @@ void ExpeditionManager::progressExpedition(const CSteamID &uid, int mapUnionId, 
 void ExpeditionManager::executeExpeditionBattle(const CSteamID &uid,
                                                 int mapUnionId, KP::Difficulty diff, int nodeIndex) {
     if (!server) {
-        qWarning() << "ExpeditionManager: server pointer is null";
+        //% "ExpeditionManager: server pointer is null"
+        qWarning() << qtTrId("expedition-server-null");
         return;
     }
 
@@ -1097,7 +1116,7 @@ void ExpeditionManager::executeExpeditionBattle(const CSteamID &uid,
         uid, mapUnionId, nodeIndex, expeditionFleetIndex, battlePlan);
 
     //% "Expedition battle executed for user %1 map %2 node %3"
-    qInfo() << qtTrId("expedition-battle-executed")
+    qDebug() << qtTrId("expedition-battle-executed")
                    .arg(uid.ConvertToUint64()).arg(mapUnionId).arg(nodeIndex);
     
     /* Apply naval supremacy gain for expedition end nodes (6.2-supremacy.md) */
@@ -1147,10 +1166,11 @@ void ExpeditionManager::executeExpeditionBattle(const CSteamID &uid,
                 /* Only apply if new value is higher than current */
                 if (newSupremacy > currentSupremacy) {
                     User::setMapSupremacy(uid, mapUnionId, newSupremacy, 0);
-                    qInfo() << "Expedition naval supremacy updated for map" << mapUnionId
-                            << "difficulty" << static_cast<int>(diff)
-                            << "from" << currentSupremacy << "to" << newSupremacy
-                            << "(victory:" << static_cast<int>(assm) << ")";
+                    //% "Expedition naval supremacy updated for map %1 difficulty %2 from %3 to %4 (victory:%5)"
+                    qDebug() << qtTrId("expedition-naval-supremacy-updated")
+                             .arg(mapUnionId).arg(static_cast<int>(diff))
+                             .arg(currentSupremacy).arg(newSupremacy)
+                             .arg(static_cast<int>(assm));
                 }
             }
         }
@@ -1162,7 +1182,8 @@ void ExpeditionManager::executeExpeditionBattle(const CSteamID &uid,
 
 void ExpeditionManager::checkStopConditions(const CSteamID &uid, int mapUnionId, KP::Difficulty diff) {
     if (!server) {
-        qWarning() << "ExpeditionManager: server pointer is null";
+        //% "ExpeditionManager: server pointer is null"
+        qWarning() << qtTrId("expedition-server-null");
         return;
     }
 
@@ -1182,21 +1203,21 @@ void ExpeditionManager::checkStopConditions(const CSteamID &uid, int mapUnionId,
 
         if (dyn->isCriticallyDamaged(ship)) {
             //% "Expedition stopped: critically damaged ship for user %1 map %2"
-            qInfo() << qtTrId("expedition-stopped-critically-damaged")
+            qDebug() << qtTrId("expedition-stopped-critically-damaged")
                            .arg(uid.ConvertToUint64()).arg(mapUnionId);
             endExpedition(uid, mapUnionId, diff, KP::CriticallyDamaged); // critically damaged
             return;
         }
         if (dyn->fuel <= 0.0) {
             //% "Expedition stopped: no fuel for user %1 map %2"
-            qInfo() << qtTrId("expedition-stopped-no-fuel")
+            qDebug() << qtTrId("expedition-stopped-no-fuel")
                            .arg(uid.ConvertToUint64()).arg(mapUnionId);
             endExpedition(uid, mapUnionId, diff, KP::NoFuel); // no fuel
             return;
         }
         if (dyn->ammo <= 0.0) {
             //% "Expedition stopped: no ammo for user %1 map %2"
-            qInfo() << qtTrId("expedition-stopped-no-ammo")
+            qDebug() << qtTrId("expedition-stopped-no-ammo")
                            .arg(uid.ConvertToUint64()).arg(mapUnionId);
             endExpedition(uid, mapUnionId, diff, KP::NoAmmo); // no ammo
             return;
@@ -1208,7 +1229,8 @@ bool ExpeditionManager::setExpeditionSettings(const CSteamID &uid, int mapUnionI
                                               double autoRestartThreshold,
                                               bool autoResupply) {
     if (!server) {
-        qWarning() << "ExpeditionManager: server pointer is null";
+        //% "ExpeditionManager: server pointer is null"
+        qWarning() << qtTrId("expedition-server-null");
         return false;
     }
     /* Validate map exists */
@@ -1216,7 +1238,9 @@ bool ExpeditionManager::setExpeditionSettings(const CSteamID &uid, int mapUnionI
     if (!map) {
         throw DBError(qtTrId("expedition-map-not-in-registry").arg(mapUnionId));
     }
-    qDebug() << "setExpeditionSettings: Found map for union ID" << mapUnionId << "map->id:" << map->id << "map->diff:" << static_cast<int>(map->diff);
+    //% "Found map for union ID %1 map id %2 difficulty %3 absolute ID %4"
+    qDebug() << qtTrId("expedition-found-map-union")
+                  .arg(mapUnionId).arg(map->id).arg(static_cast<int>(map->diff)).arg(map->getAbsoluteId());
     uint64 userId = uid.ConvertToUint64();
     QSqlQuery query;
     query.prepare(
@@ -1235,15 +1259,17 @@ bool ExpeditionManager::setExpeditionSettings(const CSteamID &uid, int mapUnionI
                           .arg(uid.ConvertToUint64()).arg(mapUnionId),
                       query.lastError(), query.lastQuery());
     }
-    qInfo() << "Expedition settings updated for user" << uid.ConvertToUint64()
-            << "map" << mapUnionId << "threshold" << autoRestartThreshold
-            << "resupply" << autoResupply;
+    //% "Expedition settings updated for user %1 map %2 threshold %3 resupply %4"
+    qDebug() << qtTrId("expedition-settings-updated")
+            .arg(uid.ConvertToUint64()).arg(mapUnionId)
+            .arg(autoRestartThreshold).arg(autoResupply);
     return true;
 }
 
 bool ExpeditionManager::attemptAutoResupply(const CSteamID &uid, int mapUnionId, KP::Difficulty diff) {
     if (!server) {
-        qWarning() << "ExpeditionManager: server pointer is null";
+        //% "ExpeditionManager: server pointer is null"
+        qWarning() << qtTrId("expedition-server-null");
         return false;
     }
     
@@ -1390,7 +1416,7 @@ bool ExpeditionManager::attemptAutoResupply(const CSteamID &uid, int mapUnionId,
     }
     
     //% "Auto-resupply performed for user %1 map %2: oil %3, explosives %4"
-    qInfo() << qtTrId("expedition-auto-resupply-performed")
+    qDebug() << qtTrId("expedition-auto-resupply-performed")
                    .arg(uid.ConvertToUint64()).arg(mapUnionId)
                    .arg(totalOilCost).arg(totalExploCost);
     
@@ -1400,7 +1426,8 @@ bool ExpeditionManager::attemptAutoResupply(const CSteamID &uid, int mapUnionId,
 void ExpeditionManager::endExpedition(const CSteamID &uid, int mapUnionId,
                                       KP::Difficulty diff, KP::ExpeditionStopReason stopReason) {
     if (!server) {
-        qWarning() << "ExpeditionManager: server pointer is null";
+        //% "ExpeditionManager: server pointer is null"
+        qWarning() << qtTrId("expedition-server-null");
         return;
     }
     
@@ -1449,7 +1476,7 @@ void ExpeditionManager::endExpedition(const CSteamID &uid, int mapUnionId,
     }
     
     //% "Expedition ended for user %1 map %2 reason %3"
-    qInfo() << qtTrId("expedition-ended")
+    qDebug() << qtTrId("expedition-ended")
                    .arg(uid.ConvertToUint64()).arg(mapUnionId).arg(stopReason);
     
     sendExpeditionStopped(uid, mapUnionId, diff, stopReason);
@@ -1473,7 +1500,8 @@ bool ExpeditionManager::moveFleetToExpeditionIndex(const CSteamID &uid,
                                                    int originalFleetIndex,
                                                    int expeditionFleetIndex) {
     if (!server) {
-        qWarning() << "ExpeditionManager: server pointer is null";
+        //% "ExpeditionManager: server pointer is null"
+        qWarning() << qtTrId("expedition-server-null");
         return false;
     }
     
@@ -1617,7 +1645,8 @@ bool ExpeditionManager::restoreFleetToNormalIndex(const CSteamID &uid,
                                                   int expeditionFleetIndex,
                                                   int receiveFleetIndex) {
     if (!server) {
-        qWarning() << "ExpeditionManager: server pointer is null";
+        //% "ExpeditionManager: server pointer is null"
+        qWarning() << qtTrId("expedition-server-null");
         return false;
     }
     
@@ -1633,7 +1662,7 @@ bool ExpeditionManager::restoreFleetToNormalIndex(const CSteamID &uid,
     // Validate receive fleet index range (0 ~ KP::nonExpeditionFleetsSize-1)
     if (receiveFleetIndex < 0 || receiveFleetIndex >= KP::nonExpeditionFleetsSize) {
         //% "Invalid receive fleet index %1 for user %2, must be 1~%3"
-        qWarning() << qtTrId("expedition-invalid-receive-fleet-index")
+        qWarning() << qtTrId("expedition-invalid-receive-fleet-index-detailed")
                           .arg(receiveFleetIndex).arg(uid.ConvertToUint64())
                           .arg(KP::nonExpeditionFleetsSize);
         return false;
@@ -1741,7 +1770,8 @@ bool ExpeditionManager::restoreFleetToNormalIndex(const CSteamID &uid,
 
 void ExpeditionManager::checkAndRestartExpedition(const CSteamID &uid, int mapUnionId, KP::Difficulty diff) {
     if (!server) {
-        qWarning() << "ExpeditionManager: server pointer is null";
+        //% "ExpeditionManager: server pointer is null"
+        qWarning() << qtTrId("expedition-server-null");
         return;
     }
     
@@ -1892,9 +1922,9 @@ void ExpeditionManager::checkAndRestartExpedition(const CSteamID &uid, int mapUn
             return;
         }
         
-        qDebug() << "Expedition auto-restart starting node determined:"
-                 << startingNode << "for map" << mapUnionId << "difficulty"
-                 << diffStr;
+        //% "Expedition auto-restart starting node determined: %1 for map %2 difficulty %3"
+        qDebug() << qtTrId("expedition-auto-restart-starting-node")
+                      .arg(startingNode).arg(mapUnionId).arg(diffStr);
     }
     
     {
@@ -1924,7 +1954,7 @@ void ExpeditionManager::checkAndRestartExpedition(const CSteamID &uid, int mapUn
             }
             server->sortieFleets.insert(fleetKey, fleet.release());
             //% "Expedition auto-restarted for user %1 map %2"
-            qInfo() << qtTrId("expedition-auto-restarted")
+            qDebug() << qtTrId("expedition-auto-restarted")
                            .arg(uid.ConvertToUint64()).arg(mapUnionId);
         }
     }

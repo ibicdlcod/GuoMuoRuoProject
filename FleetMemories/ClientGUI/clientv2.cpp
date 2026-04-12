@@ -1434,7 +1434,7 @@ void Client::startExpedition(int mapId, int fleetIndex,
                              double autoResupplyThreshold) {
     if (!loggedIn()) {
         //% "Must be logged in to start expedition."
-        qWarning() << qtTrId("expedition-not-logged-in");
+        qWarning() << qtTrId("expedition-start-not-logged-in");
         return;
     }
     QByteArray msg = KP::clientStartExpedition(mapId, fleetIndex,
@@ -1445,7 +1445,7 @@ void Client::startExpedition(int mapId, int fleetIndex,
 void Client::cancelExpedition(int mapId, int receiveFleetIndex) {
     if (!loggedIn()) {
         //% "Must be logged in to cancel expedition."
-        qWarning() << qtTrId("expedition-not-logged-in");
+        qWarning() << qtTrId("expedition-cancel-not-logged-in");
         return;
     }
     QByteArray msg = KP::clientCancelExpedition(mapId, receiveFleetIndex);
@@ -1457,7 +1457,7 @@ void Client::setExpeditionSettings(int mapId, double autoResupplyThreshold, bool
              << "threshold:" << autoResupplyThreshold << "restart:" << autoRestart;
     if (!loggedIn()) {
         //% "Must be logged in to set expedition settings."
-        qWarning() << qtTrId("expedition-not-logged-in");
+        qWarning() << qtTrId("expedition-settings-not-logged-in");
         return;
     }
     if (!sender) {
@@ -1473,7 +1473,7 @@ void Client::updateExpeditionPlan(int mapId, const QMap<int, QByteArray> &battle
              << "battlePlans count:" << battlePlans.size();
     if (!loggedIn()) {
         //% "Must be logged in to update expedition plans."
-        qWarning() << qtTrId("expedition-not-logged-in");
+        qWarning() << qtTrId("expedition-update-plan-not-logged-in");
         return;
     }
     if (!sender) {
@@ -1487,7 +1487,7 @@ void Client::updateExpeditionPlan(int mapId, const QMap<int, QByteArray> &battle
 void Client::queryExpeditionStatus() {
     if (!loggedIn()) {
         //% "Must be logged in to query expedition status."
-        qWarning() << qtTrId("expedition-not-logged-in");
+        qWarning() << qtTrId("expedition-query-status-not-logged-in");
         return;
     }
     QByteArray msg = KP::clientQueryExpeditionStatus();

@@ -125,7 +125,6 @@ double Tech::calWeightEquip(double requiredSP, double actualSP) {
 
 /* 2-Technology.md#How characteristic tech level are determined */
 double Tech::techYearToCompact(int year) {
-#pragma message(NOT_M_CONST)
     if(year <= 1924)
         return std::max(0.0, (year - 1908) / 16.0);
     else if(year <= 1933)

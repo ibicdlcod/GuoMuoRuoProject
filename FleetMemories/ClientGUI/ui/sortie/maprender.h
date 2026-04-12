@@ -14,7 +14,6 @@ class MapRender : public QWidget
 public:
     explicit MapRender(QWidget *parent = nullptr);
 
-#pragma message(NOT_M_CONST)
     static constexpr int globeMapWidth = 5632;
     static constexpr int globeMapHeight = 2048;
     static constexpr int circleSize = 64;
