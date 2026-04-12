@@ -203,6 +203,7 @@ void NavalAcademyView::updateLocalTechViewTable(const QJsonObject &obj)
     table->setRowCount(5); // Adjust as needed
     
     // Equipment ID
+    //% "Equipment ID"
     QTableWidgetItem *idAttr = new QTableWidgetItem(qtTrId("equipment-id"));
     idAttr->setFlags(idAttr->flags() & ~Qt::ItemIsEditable);
     QTableWidgetItem *idValue = new QTableWidgetItem(QString::number(equipId));
@@ -212,6 +213,7 @@ void NavalAcademyView::updateLocalTechViewTable(const QJsonObject &obj)
     row++;
     
     // Equipment name
+    //% "Equipment name"
     QTableWidgetItem *nameAttr = new QTableWidgetItem(qtTrId("equipment-name"));
     nameAttr->setFlags(nameAttr->flags() & ~Qt::ItemIsEditable);
     QString equipName = equip->toString(
@@ -421,7 +423,7 @@ void NavalAcademyView::filterDstEquipByMother(int motherId)
     ui->dstEquipTable->horizontalHeader()->setSectionResizeMode(1, QHeaderView::Stretch);          // Name column
     // Set header labels
     ui->dstEquipTable->setHorizontalHeaderLabels(
-        QStringList() << qtTrId("equipment-id") << qtTrId("equipment-name"));
+        {qtTrId("equipment-id"), qtTrId("equipment-name")});
 }
 
 void NavalAcademyView::resetSrcEquipmentList()
@@ -493,7 +495,7 @@ void NavalAcademyView::resetSrcEquipmentList()
     
     // Set header labels
     ui->srcEquipTable->setHorizontalHeaderLabels(
-        QStringList() << qtTrId("equipment-id") << qtTrId("equipment-name"));
+        {qtTrId("equipment-id"), qtTrId("equipment-name")});
     
     updateConvertButtonState();
 }
@@ -519,7 +521,7 @@ void NavalAcademyView::resetDstEquipmentList()
         ui->dstEquipTable->horizontalHeader()->setSectionResizeMode(1, QHeaderView::Stretch);          // Name column
         // Set header labels
         ui->dstEquipTable->setHorizontalHeaderLabels(
-            QStringList() << qtTrId("equipment-id") << qtTrId("equipment-name"));
+            {qtTrId("equipment-id"), qtTrId("equipment-name")});
     }
 
     updateConvertButtonState();
@@ -556,9 +558,9 @@ void NavalAcademyView::showEvent(QShowEvent *event)
     
     // Set header labels
     ui->srcEquipTable->setHorizontalHeaderLabels(
-        QStringList() << qtTrId("equipment-id") << qtTrId("equipment-name"));
+        {qtTrId("equipment-id"), qtTrId("equipment-name")});
     ui->dstEquipTable->setHorizontalHeaderLabels(
-        QStringList() << qtTrId("equipment-id") << qtTrId("equipment-name"));
+        {qtTrId("equipment-id"), qtTrId("equipment-name")});
     
     // Set column resize modes
     ui->srcEquipTable->horizontalHeader()->setSectionResizeMode(0, QHeaderView::ResizeToContents);

@@ -24,7 +24,7 @@ FleetInfo::~FleetInfo() {
     }
 }
 
-double FleetInfo::los() {
+double FleetInfo::los() const {
     double a = settings->value("rule/loscontrol", 0.9).toDouble();
 
     std::vector<double> losValues;
@@ -71,7 +71,7 @@ int FleetInfo::transportCapacity(const CSteamID &uid, TransportMode mode) {
     return total;
 }
 
-QMap<KP::CapitalType, int> FleetInfo::capitalness() {
+QMap<KP::CapitalType, int> FleetInfo::capitalness() const {
     int any = 0;
     int screen = 0;
     int surface = 0;
@@ -95,7 +95,7 @@ QMap<KP::CapitalType, int> FleetInfo::capitalness() {
             };
 }
 
-std::vector<int> FleetInfo::shipSpeeds() {
+std::vector<int> FleetInfo::shipSpeeds() const {
     std::vector<int> result;
     for(int i = 0; i < static_cast<int>(ships.size()); ++i) {
         bool absent = !ships[i] || !shipDynamics[i] ||
@@ -151,12 +151,17 @@ int FleetInfo::headquartersEquipId(bool isExpedition) const
     for (Equipment *eq : equips) {
         if (!eq) continue;
         int id = eq->getId();
+        if(isExpedition) {
+        // Expedition force headquarters (4098) – expedition fleet only
+        if (id == KP::headquartersEquipExpedition)
+            return id;
+        else
+            continue;
+        }
+        /* not expedition */
         // Mobile strike force headquarters (272) – normal fleet only
         if (id == KP::headquartersEquipMobileStrike
-            && type == KP::NormalFleet && !isExpedition)
-            return id;
-        // Expedition force headquarters (4098) – expedition fleet only
-        if (id == KP::headquartersEquipExpedition && isExpedition)
+            && type == KP::NormalFleet)
             return id;
         // Combined fleet headquarters (107) – surface/carrier/transport fleet
         if (id == KP::headquartersEquipCombinedFleet
@@ -219,8 +224,8 @@ QList<int> FleetInfo::findEscortCandidates(bool isExpedition) const
 
 bool FleetInfo::performEscortRetreat(int damagedPos, bool isExpedition)
 {
-    if (damagedPos < 0 || damagedPos >= static_cast<int>(shipDynamics.size()))
-        return false;
+    if (damagedPos <= 0 || damagedPos >= static_cast<int>(shipDynamics.size()))
+        return false; // you can't retreat pos 0 that is flagship
     ShipDynamic *dyn = shipDynamics[damagedPos];
     if (!dyn) return false;
     QList<int> candidates = findEscortCandidates(isExpedition);

@@ -15,6 +15,7 @@
 #include <QtTypes>
 
 #include <algorithm>
+#include <memory>
 
 #include "../Protocol/equipment.h"
 #include "../Protocol/kp.h"
@@ -663,46 +664,23 @@ int Server::nextNode(const CSteamID &uid, QSslSocket *connection,
                      int mapId, int prevNode, int fleetIndex) {
     KP::Difficulty diff = static_cast<KP::Difficulty>
         (MapWithDiff::getDiff(mapId));
-    QString diffStr = (*KP::diffEnumtoStr)[diff];
-    QByteArray diffStrBytes = diffStr.toUtf8();
-    const char *diffStrC = diffStrBytes;
-    mapId = MapWithDiff::getUnionId(mapId);
-    if(lua["maps"][mapId] == sol::nil
-        || lua["maps"][mapId][prevNode] == sol::nil
-        || lua["maps"][mapId][prevNode]["branch_rule"] == sol::nil
-        || lua["maps"][mapId][prevNode]["branch_rule"][diffStrC]
-               == sol::nil) {
+    int mapUnionId = MapWithDiff::getUnionId(mapId);
+    
+    FleetInfo *fiPtr = sortieFleets.value({uid, fleetIndex}, nullptr);
+    if (!fiPtr) {
         QByteArray msg = KP::serverBattleError(KP::FleetLost);
         senderM.sendMessage(connection, msg);
         return 0;
     }
-    else {
-        FleetInfo *fiPtr = sortieFleets.value({uid, fleetIndex}, nullptr);
-        if(!fiPtr) {
-            QByteArray msg = KP::serverBattleError(KP::FleetLost);
-            senderM.sendMessage(connection, msg);
-            return 0;
-        }
-        FleetInfo &info = *fiPtr;
-        sol::protected_function luaChooseStartingNode
-            = lua["maps"][mapId][prevNode]["branch_rule"][diffStrC];
-        auto result = luaChooseStartingNode(info.ships,
-                                            info.los(),
-                                            info.type,
-                                            info.capitalness(),
-                                            info.shipTags,
-                                            info.shipSpeeds(),
-                                            info.getEquipGrid(),
-                                            0);
-        if(result.valid()) {
-            return result;
-        }
-        else {
-            QByteArray msg = KP::serverBattleError(KP::FleetLost);
-            senderM.sendMessage(connection, msg);
-            return 0;
-        }
+    FleetInfo &info = *fiPtr;
+    
+    int chosenNode = evaluateBranchRule(mapUnionId, prevNode, diff, info);
+    if (chosenNode == 0) {
+        QByteArray msg = KP::serverBattleError(KP::FleetLost);
+        senderM.sendMessage(connection, msg);
+        return 0;
     }
+    return chosenNode;
 }
 
 void Server::processBattle(const CSteamID &uid, QSslSocket *connection,
@@ -1094,10 +1072,6 @@ const QJsonObject Server::processBattleCore(const CSteamID &uid,
             int lossThisShip = (totalPlayerHP > 0) ?
                                    static_cast<int>(playerLossHP *
                                                     (static_cast<double>(currentHP) / totalPlayerHP)) : 0;
-            // retreat test
-            if(i == 1) {
-                lossThisShip = static_cast<int>(static_cast<double>(currentHP) * 0.8);
-            }
             int newHP = std::max(0, currentHP - lossThisShip);
             dyn->currentHP = newHP;
             // Check for equipment damage if ship took damage
@@ -1795,141 +1769,47 @@ void Server::progressMap(const CSteamID &uid, QSslSocket *connection,
             if(ammoOverride.is<double>())
                 ammoFrac = ammoOverride.as<double>();
         }
-        /* LOS check for DISASTER nodes */
-        double requiredLOS = -1.0;
-        double fleetLOS = 0.0;
-        double chanceToAvoid = 0.0;
-        bool deductionOccurred = true;
-        if(nType == KP::DISASTER) {
-            KP::Difficulty diff = MapWithDiff::getDiff(mapId);
-            QString diffStr = (*KP::diffEnumtoStr)[diff];
-            QByteArray diffStrBytes = diffStr.toUtf8();
-            const char *diffStrC = diffStrBytes;
-            FleetInfo *fi = sortieFleets.value({uid, result.value()[3]}, nullptr);
-            if(fi) {
-                fleetLOS = fi->los();
-            }
-            if(lua["maps"] != sol::nil
-                && lua["maps"][unionId] != sol::nil
-                && lua["maps"][unionId][nNode] != sol::nil
-                && lua["maps"][unionId][nNode]["los"] != sol::nil
-                && lua["maps"][unionId][nNode]["los"][diffStrC]
-                       != sol::nil) {
-                requiredLOS = lua["maps"][unionId][nNode]["los"][diffStrC];
-                if(requiredLOS <= 0.0) {
-                    // zero or negative LOS requirement means guaranteed avoid
-                    chanceToAvoid = 1.0;
-                    deductionOccurred = false;
-                } else {
-                    chanceToAvoid = std::min(1.0, fleetLOS / requiredLOS);
-                    std::uniform_real_distribution<double> dist(0.0, 1.0);
-                    deductionOccurred = dist(mt) > chanceToAvoid;
-                }
-            }
-            QByteArray msg = KP::serverDisasterLOSInfo(requiredLOS, fleetLOS,
-                                                       chanceToAvoid, fuelFrac, ammoFrac, deductionOccurred);
-            senderM.sendMessage(connection, msg);
-            if(!deductionOccurred) {
-                fuelFrac = 0.0;
-                ammoFrac = 0.0;
-            }
-        }
+
+        /* Disaster node handling */
+        DisasterResult disasterResult = handleDisasterNode(uid, mapId, nNode, nType,
+                                                           sortieFleets.value({uid, result.value()[3]}, nullptr),
+                                                           fuelFrac, ammoFrac,
+                                                           true, connection);
+        fuelFrac = disasterResult.fuelFrac;
+        ammoFrac = disasterResult.ammoFrac;
+
+        /* originally intended for expedition, but now handled elsewhere */
+        bool isExpedition = false;
+
         int activeFleet = result.value()[3];
-        if(FleetInfo *fi = sortieFleets.value({uid, activeFleet}, nullptr)) {
-            // Determine if this is an expedition map
-            bool isExpedition = (mapId >= KP::resourceMapIDStart
-                                 && mapId < KP::resourceMapIDEnd);
-            // Process critically damaged ships
-            bool fleetFailed = false;
-            for (int i = 0; i < static_cast<int>(fi->ships.size()); ++i) {
-                Ship* ship = fi->ships[i];
-                ShipDynamic* dyn = fi->shipDynamics[i];
-                if (!ship || !dyn || dyn->fleetFled) continue;
-                if (!dyn->isCriticallyDamaged(ship)) continue;
-                // Attempt escorted retreat
-                if (!fi->performEscortRetreat(i, isExpedition)) {
-                    fleetFailed = true;
-                    break;
-                }
-            }
-            if(fleetFailed && fi->performEmergencyRepair()) {
-                fleetFailed = false;
-                // Consume repair items
-                QList<QUuid> consumed = fi->takeConsumedEquip();
-                if(!consumed.isEmpty()) {
-                    retireEquip(uid, consumed);
-                }
-            }
-            if (fleetFailed) {
-            critical_damage:
-                // Send fleet failure message
-                QByteArray msg = KP::serverFleetFailure(KP::FleetCriticallyDamaged, activeFleet);
-                senderM.sendMessage(connection, msg);
-                // End sortie
-                nNode = 0;
-                goto critical_damage_end;
-            }
+        FleetInfo *fi = sortieFleets.value({uid, activeFleet}, nullptr);
+        if(fi) {
+            /* Apply fuel/ammo consumption */
             for(ShipDynamic *dyn : fi->shipDynamics) {
                 if(!dyn || dyn->fleetFled) continue;
                 dyn->fuel = std::max(0.0, dyn->fuel - fuelFrac);
                 dyn->ammo = std::max(0.0, dyn->ammo - ammoFrac);
             }
-            updateFleetIntoDatabase(uid, *fi, activeFleet);
-        }
 
-        /* 8.1-supply.md#Supply_chain_and_attrition — per-node attrition
+            bool fleetFailed = handleCriticalDamage(uid, fi, activeFleet,
+                                                    isExpedition, true, connection);
+
+            /* 8.1-supply.md#Supply_chain_and_attrition — per-node attrition
              * cost: sum of (effective fraction used × FuelConsumption /
              * AmmoConsumption) across the fleet, multiplied by the sortie
              * attrition stored at sortie start. */
-        QSqlQuery attrValQ;
-        attrValQ.prepare(
-            "SELECT Realvalue FROM UserAttr "
-            "WHERE UserID = :uid AND Attribute = :attr;");
-        attrValQ.bindValue(":uid", uid.ConvertToUint64());
-        attrValQ.bindValue(":attr", KP::attrAttrition);
-        if(Q_LIKELY(attrValQ.exec() && attrValQ.isSelect()
-                     && attrValQ.first())) {
-            double attrition = attrValQ.value(0).toDouble();
-            if(attrition > 0.0) {
-                QSqlQuery costQ;
-                costQ.prepare(
-                    "SELECT "
-                    "  SUM(MIN(Fuel,  :fuelFrac) "
-                    "      * COALESCE(fc.Intvalue, 0)), "
-                    "  SUM(MIN(Ammo,  :ammoFrac) "
-                    "      * COALESCE(ac.Intvalue, 0)) "
-                    "FROM UserShip "
-                    "LEFT JOIN ShipReg fc "
-                    "  ON UserShip.ShipDef = fc.ShipID "
-                    "  AND fc.Attribute = 'FuelConsumption' "
-                    "LEFT JOIN ShipReg ac "
-                    "  ON UserShip.ShipDef = ac.ShipID "
-                    "  AND ac.Attribute = 'AmmoConsumption' "
-                    "WHERE User = :uid AND FleetIndex = :fi;");
-                costQ.bindValue(":fuelFrac", fuelFrac);
-                costQ.bindValue(":ammoFrac", ammoFrac);
-                costQ.bindValue(":uid", uid.ConvertToUint64());
-                costQ.bindValue(":fi", activeFleet);
-                if(Q_LIKELY(costQ.exec() && costQ.isSelect()
-                             && costQ.first())) {
-                    double oilCost  = costQ.value(0).toDouble() * attrition;
-                    double exploCost = costQ.value(1).toDouble() * attrition;
-                    QSqlQuery deductQ;
-                    deductQ.prepare(
-                        "UPDATE UserAttr "
-                        "SET Intvalue = CASE Attribute "
-                        "WHEN 'O' THEN Intvalue - :oil "
-                        "WHEN 'E' THEN Intvalue - :explo END "
-                        "WHERE UserID = :uid "
-                        "AND Attribute IN ('O', 'E');");
-                    deductQ.bindValue(":oil",   oilCost);
-                    deductQ.bindValue(":explo", exploCost);
-                    deductQ.bindValue(":uid",   uid.ConvertToUint64());
-                    deductQ.exec();
-                }
+            /* Attrition handling */
+            handleAttrition(uid, activeFleet, fuelFrac, ammoFrac);
+
+            updateFleetIntoDatabase(uid, *fi, activeFleet);
+
+            if(fleetFailed) {
+                nNode = 0;
+                goto critical_damage_end;
             }
         }
     }
+
 critical_damage_end:
 {
     QSqlQuery query;
@@ -1996,7 +1876,8 @@ void Server::startSortie(const CSteamID &uid, QSslSocket *connection,
     const char *diffStrC = diffStrBytes;
     int unionId = MapWithDiff::getUnionId(mapId);
     if(expedition) {
-        return;//TODO: add expedition
+        /* originally intended for expedition, but now handled elsewhere */
+        return;
     }
     if(!User::isMapUnlocked(uid, unionId, diff)
         || lua["maps"][unionId] == sol::nil
@@ -2130,7 +2011,8 @@ void Server::startSortie(const CSteamID &uid, QSslSocket *connection,
         }
 
         delete sortieFleets.value({uid, fleetIndex}, nullptr);
-        sortieFleets[{uid, fleetIndex}] = new FleetInfo(queryFleetInfo(uid, fleetIndex));
+        std::unique_ptr<FleetInfo> fleet(new FleetInfo(queryFleetInfo(uid, fleetIndex)));
+        sortieFleets[{uid, fleetIndex}] = fleet.release();
         FleetInfo &info = *sortieFleets[{uid, fleetIndex}];
         sol::protected_function luaChooseStartingNode
             = lua["maps"][unionId]["branch_rule"][diffStrC];
@@ -2372,6 +2254,192 @@ void Server::updateFleetIntoDatabase(const CSteamID &uid,
                     .arg(fleetIndex)
                     .arg(dyn->fleetPosIndex),
                 query.lastError(), query.lastQuery());
+        }
+    }
+}
+
+Server::DisasterResult Server::handleDisasterNode(const CSteamID &uid, int mapId,
+                                                  int nodeIndex, KP::NodeType nodeType,
+                                                  FleetInfo *fleetInfo,
+                                                  double fuelFrac, double ammoFrac,
+                                                  bool sendMessages,
+                                                  QSslSocket *connection) {
+    DisasterResult result;
+    result.fuelFrac = fuelFrac;
+    result.ammoFrac = ammoFrac;
+    result.deductionOccurred = true;
+    result.requiredLOS = -1.0;
+    result.fleetLOS = 0.0;
+    result.chanceToAvoid = 0.0;
+
+    if(nodeType != KP::DISASTER) {
+        return result;
+    }
+
+    KP::Difficulty diff = MapWithDiff::getDiff(mapId);
+    QString diffStr = (*KP::diffEnumtoStr)[diff];
+    QByteArray diffStrBytes = diffStr.toUtf8();
+    const char *diffStrC = diffStrBytes;
+    int unionId = MapWithDiff::getUnionId(mapId);
+
+    if(fleetInfo) {
+        result.fleetLOS = fleetInfo->los();
+    }
+
+    if(lua["maps"] != sol::nil
+        && lua["maps"][unionId] != sol::nil
+        && lua["maps"][unionId][nodeIndex] != sol::nil
+        && lua["maps"][unionId][nodeIndex]["los"] != sol::nil
+        && lua["maps"][unionId][nodeIndex]["los"][diffStrC] != sol::nil) {
+        result.requiredLOS = lua["maps"][unionId][nodeIndex]["los"][diffStrC];
+        if(result.requiredLOS <= 0.0) {
+            /* zero or negative LOS requirement means guaranteed avoid */
+            result.chanceToAvoid = 1.0;
+            result.deductionOccurred = false;
+        } else {
+            result.chanceToAvoid = std::min(1.0, result.fleetLOS / result.requiredLOS);
+            std::uniform_real_distribution<double> dist(0.0, 1.0);
+            result.deductionOccurred = dist(mt) > result.chanceToAvoid;
+        }
+    }
+
+    if(!result.deductionOccurred) {
+        result.fuelFrac = 0.0;
+        result.ammoFrac = 0.0;
+    }
+
+    if(sendMessages && connection) {
+        QByteArray msg = KP::serverDisasterLOSInfo(result.requiredLOS, result.fleetLOS,
+                                                   result.chanceToAvoid, fuelFrac,
+                                                   ammoFrac, result.deductionOccurred);
+        senderM.sendMessage(connection, msg);
+    }
+
+    return result;
+}
+
+bool Server::handleCriticalDamage(const CSteamID &uid, FleetInfo *fleetInfo,
+                                  int fleetIndex,
+                                  bool isExpedition, bool sendMessages,
+                                  QSslSocket *connection) {
+    if(!fleetInfo) {
+        return false;
+    }
+
+    /* Process critically damaged ships */
+    bool fleetFailed = false;
+    for (int i = 0; i < static_cast<int>(fleetInfo->ships.size()); ++i) {
+        Ship* ship = fleetInfo->ships[i];
+        ShipDynamic* dyn = fleetInfo->shipDynamics[i];
+        if (!ship || !dyn || dyn->fleetFled) continue;
+        if (!dyn->isCriticallyDamaged(ship)) continue;
+        /* Attempt escorted retreat */
+        if (!fleetInfo->performEscortRetreat(i, isExpedition)) {
+            fleetFailed = true;
+            break;
+        }
+    }
+    if(fleetFailed && fleetInfo->performEmergencyRepair()) {
+        fleetFailed = false;
+        /* Consume repair items */
+        QList<QUuid> consumed = fleetInfo->takeConsumedEquip();
+        if(!consumed.isEmpty()) {
+            retireEquip(uid, consumed);
+        }
+    }
+    if(fleetFailed) {
+        if(sendMessages && connection) {
+            QByteArray msg = KP::serverFleetFailure(KP::FleetCriticallyDamaged,
+                                                    fleetIndex);
+            senderM.sendMessage(connection, msg);
+        }
+        return true;
+    }
+
+    return false;
+}
+
+void Server::handleAttrition(const CSteamID &uid, int fleetIndex,
+                             double fuelFrac, double ammoFrac) {
+    /* 8.1-supply.md#Supply_chain_and_attrition — per-node attrition
+     * cost: sum of (effective fraction used × FuelConsumption /
+     * AmmoConsumption) across the fleet, multiplied by the sortie
+     * attrition stored at sortie start. */
+    double attrition = 0.0;
+    
+    if(fleetIndex >= KP::expeditionFleetMask) {
+        /* Expedition fleet: compute attrition from map supply lines */
+        int mapUnionId = fleetIndex - KP::expeditionFleetMask;
+        
+        /* Query expedition difficulty */
+        QSqlQuery expQuery;
+        expQuery.prepare(
+            "SELECT Diff FROM UserExpedition "
+            "WHERE User = :user AND MapUnionId = :mapUnionId AND IsActive = TRUE");
+        expQuery.bindValue(":user", uid.ConvertToUint64());
+        expQuery.bindValue(":mapUnionId", mapUnionId);
+        
+        if(Q_LIKELY(expQuery.exec() && expQuery.isSelect()
+                     && expQuery.first())) {
+            KP::Difficulty diff = static_cast<KP::Difficulty>(expQuery.value(0).toInt());
+            auto [reachable, finiteRoute, computedAttrition] =
+                computeSupplyAttrition(uid, mapUnionId, diff);
+            if(finiteRoute) {
+                attrition = computedAttrition;
+            }
+            /* If not finiteRoute, attrition remains 0 (expedition shouldn't have started) */
+        }
+        /* If expedition not found, attrition remains 0 */
+    } else {
+        /* Normal fleet: use stored attrition from sortie start */
+        QSqlQuery attrValQ;
+        attrValQ.prepare(
+            "SELECT Realvalue FROM UserAttr "
+            "WHERE UserID = :uid AND Attribute = :attr;");
+        attrValQ.bindValue(":uid", uid.ConvertToUint64());
+        attrValQ.bindValue(":attr", KP::attrAttrition);
+        if(Q_LIKELY(attrValQ.exec() && attrValQ.isSelect()
+                     && attrValQ.first())) {
+            attrition = attrValQ.value(0).toDouble();
+        }
+    }
+    
+    if(attrition > 0.0) {
+        QSqlQuery costQ;
+        costQ.prepare(
+            "SELECT "
+            "  SUM(MIN(Fuel,  :fuelFrac) "
+            "      * COALESCE(fc.Intvalue, 0)), "
+            "  SUM(MIN(Ammo,  :ammoFrac) "
+            "      * COALESCE(ac.Intvalue, 0)) "
+            "FROM UserShip "
+            "LEFT JOIN ShipReg fc "
+            "  ON UserShip.ShipDef = fc.ShipID "
+            "  AND fc.Attribute = 'FuelConsumption' "
+            "LEFT JOIN ShipReg ac "
+            "  ON UserShip.ShipDef = ac.ShipID "
+            "  AND ac.Attribute = 'AmmoConsumption' "
+            "WHERE User = :uid AND FleetIndex = :fi;");
+        costQ.bindValue(":fuelFrac", fuelFrac);
+        costQ.bindValue(":ammoFrac", ammoFrac);
+        costQ.bindValue(":uid", uid.ConvertToUint64());
+        costQ.bindValue(":fi", fleetIndex);
+        if(Q_LIKELY(costQ.exec() && costQ.isSelect()
+                     && costQ.first())) {
+            double oilCost  = costQ.value(0).toDouble() * attrition;
+            double exploCost = costQ.value(1).toDouble() * attrition;
+            QSqlQuery deductQ;
+            deductQ.prepare(
+                "UPDATE UserAttr "
+                "SET Intvalue = CASE Attribute "
+                "WHEN 'O' THEN Intvalue - :oil "
+                "WHEN 'E' THEN Intvalue - :explo END "
+                "WHERE UserID = :uid "
+                "AND Attribute IN ('O', 'E');");
+            deductQ.bindValue(":oil",   oilCost);
+            deductQ.bindValue(":explo", exploCost);
+            deductQ.bindValue(":uid",   uid.ConvertToUint64());
+            deductQ.exec();
         }
     }
 }

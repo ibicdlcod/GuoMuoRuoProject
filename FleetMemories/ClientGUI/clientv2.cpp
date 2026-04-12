@@ -658,6 +658,32 @@ void Client::receivedInfo(const QJsonObject &djson) {
         emit progressToNode(node, nextNodeId);
         break;
     }
+    case KP::InfoType::ExpeditionStartResult: {
+        int mapUnionId = djson["mapid"].toInt();
+        bool accepted = djson["accepted"].toBool();
+        KP::GameError error = djson.contains("error") ? static_cast<KP::GameError>(djson["error"].toInt()) : KP::NoError;
+        emit receivedExpeditionStartResult(mapUnionId, accepted, error);
+        break;
+    }
+    case KP::InfoType::ExpeditionStatus: {
+        QJsonArray expeditions = djson["expeditions"].toArray();
+        emit receivedExpeditionStatus(expeditions);
+        break;
+    }
+    case KP::InfoType::ExpeditionProgressUpdate: {
+        int mapUnionId = djson["mapid"].toInt();
+        int nodeIndex = djson["nodeindex"].toInt();
+        QJsonObject battleResult = djson["battleresult"].toObject();
+        emit receivedExpeditionProgressUpdate(mapUnionId, nodeIndex, battleResult);
+        break;
+    }
+    case KP::InfoType::ExpeditionStopped: {
+        int mapUnionId = djson["mapid"].toInt();
+        int stopReasonInt = djson["stopreason"].toInt();
+        KP::ExpeditionStopReason stopReason = static_cast<KP::ExpeditionStopReason>(stopReasonInt);
+        emit receivedExpeditionStopped(mapUnionId, stopReason);
+        break;
+    }
     default: throw std::domain_error("info type not supported"); break;
     }
 }
@@ -1401,4 +1427,69 @@ void Client::switchCert(const QStringList &input) {
     qInfo() << qtTrId("client-pem")
                    .arg(settings->value(
                                     "networkclient/pem", "Default").toString());
+}
+
+void Client::startExpedition(int mapId, int fleetIndex,
+                             const QMap<int, QByteArray> &battlePlans,
+                             double autoResupplyThreshold) {
+    if (!loggedIn()) {
+        //% "Must be logged in to start expedition."
+        qWarning() << qtTrId("expedition-start-not-logged-in");
+        return;
+    }
+    QByteArray msg = KP::clientStartExpedition(mapId, fleetIndex,
+                                               battlePlans, autoResupplyThreshold);
+    sender->enqueue(msg);
+}
+
+void Client::cancelExpedition(int mapId, int receiveFleetIndex) {
+    if (!loggedIn()) {
+        //% "Must be logged in to cancel expedition."
+        qWarning() << qtTrId("expedition-cancel-not-logged-in");
+        return;
+    }
+    QByteArray msg = KP::clientCancelExpedition(mapId, receiveFleetIndex);
+    sender->enqueue(msg);
+}
+
+void Client::setExpeditionSettings(int mapId, double autoResupplyThreshold, bool autoRestart) {
+    qDebug() << "Client::setExpeditionSettings called with mapId:" << mapId
+             << "threshold:" << autoResupplyThreshold << "restart:" << autoRestart;
+    if (!loggedIn()) {
+        //% "Must be logged in to set expedition settings."
+        qWarning() << qtTrId("expedition-settings-not-logged-in");
+        return;
+    }
+    if (!sender) {
+        qCritical() << "Client::setExpeditionSettings: sender is null";
+        return;
+    }
+    QByteArray msg = KP::clientSetExpeditionSettings(mapId, autoResupplyThreshold, autoRestart);
+    sender->enqueue(msg);
+}
+
+void Client::updateExpeditionPlan(int mapId, const QMap<int, QByteArray> &battlePlans) {
+    qDebug() << "Client::updateExpeditionPlan called with mapId:" << mapId
+             << "battlePlans count:" << battlePlans.size();
+    if (!loggedIn()) {
+        //% "Must be logged in to update expedition plans."
+        qWarning() << qtTrId("expedition-update-plan-not-logged-in");
+        return;
+    }
+    if (!sender) {
+        qCritical() << "Client::updateExpeditionPlan: sender is null";
+        return;
+    }
+    QByteArray msg = KP::clientUpdateExpeditionPlan(mapId, battlePlans);
+    sender->enqueue(msg);
+}
+
+void Client::queryExpeditionStatus() {
+    if (!loggedIn()) {
+        //% "Must be logged in to query expedition status."
+        qWarning() << qtTrId("expedition-query-status-not-logged-in");
+        return;
+    }
+    QByteArray msg = KP::clientQueryExpeditionStatus();
+    sender->enqueue(msg);
 }

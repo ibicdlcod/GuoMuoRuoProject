@@ -47,12 +47,12 @@ EquipView::EquipView(QWidget *parent)
     columnResizeDebounce->setInterval(100ms);
     connect(columnResizeDebounce, &QTimer::timeout,
             this, [this]() {
-        arsenalView->setMinimumSize(
-            QSize(tableSizeWhole(arsenalView, model).width(),
-                  ui->ArsenalControl->size().height()));
-        arsenalView->hide();
-        arsenalView->show();
-    });
+                arsenalView->setMinimumSize(
+                    QSize(tableSizeWhole(arsenalView, model).width(),
+                          ui->ArsenalControl->size().height()));
+                arsenalView->hide();
+                arsenalView->show();
+            });
     connect(arsenalView->horizontalHeader(), &QHeaderView::sectionResized,
             this, &EquipView::columnResized);
 
@@ -103,20 +103,25 @@ EquipView::EquipView(QWidget *parent)
 
     // Fleet filter radio buttons
     fleetFilterGroup = new QButtonGroup(this);
-    fleetRadioAll = new QRadioButton("All", this);
+    //% "All"
+    fleetRadioAll = new QRadioButton(qtTrId("all-ships-including-disabled"), this);
     fleetRadio1 = new QRadioButton("1", this);
     fleetRadio2 = new QRadioButton("2", this);
     fleetRadio3 = new QRadioButton("3", this);
     fleetRadio4 = new QRadioButton("4", this);
-    fleetRadioUnassigned = new QRadioButton("U", this);
+    //% "U"
+    fleetRadioUnassigned = new QRadioButton(qtTrId("fleet-unassigned"), this);
     
     // Set tooltips
-    fleetRadioAll->setToolTip("All ships (including disabled)");
-    fleetRadio1->setToolTip("Fleet 1");
-    fleetRadio2->setToolTip("Fleet 2");
-    fleetRadio3->setToolTip("Fleet 3");
-    fleetRadio4->setToolTip("Fleet 4");
-    fleetRadioUnassigned->setToolTip("Unassigned ships");
+    //% "All ships (including disabled)"
+    fleetRadioAll->setToolTip(qtTrId("all-ships-including-disabled-tooltip"));
+    //% "Fleet %1"
+    fleetRadio1->setToolTip(qtTrId("fleet-xx").arg(1));
+    fleetRadio2->setToolTip(qtTrId("fleet-xx").arg(2));
+    fleetRadio3->setToolTip(qtTrId("fleet-xx").arg(3));
+    fleetRadio4->setToolTip(qtTrId("fleet-xx").arg(4));
+    //% "Unassigned ships"
+    fleetRadioUnassigned->setToolTip(qtTrId("fleet-unassigned-tooltip"));
     
     // Add to button group with IDs
     fleetFilterGroup->addButton(fleetRadioAll, -100);
@@ -217,20 +222,20 @@ EquipView::EquipView(QWidget *parent)
             this, &EquipView::buyActivated);
     connect(fleetFilterGroup, &QButtonGroup::buttonClicked,
             this, [this](QAbstractButton *button) {
-        int id = fleetFilterGroup->id(button);
-        std::optional<int> filterValue;
-        if(id == -100) {
-            filterValue = std::nullopt;
-        } else {
-            filterValue = id;
-        }
-        Client &engine = Client::getInstance();
-        engine.shipModel.setFleetFilter(filterValue);
-        
-        // Save to settings
-        settings->setValue("AnchorageFleetFilter", id);
-        settings->sync();
-    });
+                int id = fleetFilterGroup->id(button);
+                std::optional<int> filterValue;
+                if(id == -100) {
+                    filterValue = std::nullopt;
+                } else {
+                    filterValue = id;
+                }
+                Client &engine = Client::getInstance();
+                engine.shipModel.setFleetFilter(filterValue);
+
+                // Save to settings
+                settings->setValue("AnchorageFleetFilter", id);
+                settings->sync();
+            });
     /*
     connect(&engine, &Clientv2::uiRefreshSig,
             this, &EquipView::recalculateArsenalRows);
@@ -346,31 +351,16 @@ void EquipView::activate(bool arsenal, bool isEquip,
                this, nullptr);
 
     Client &engine = Client::getInstance();
-    
-    // Clear or apply fleet filter based on view
-    bool isAnchorage = (custom == KP::Anchorage);
-    if(isAnchorage) {
-        // Apply saved fleet filter when entering anchorage view
-        int savedFilter = settings->value("AnchorageFleetFilter", -100).toInt();
-        std::optional<int> filterValue;
-        if(savedFilter == -100) {
-            filterValue = std::nullopt;
-        } else {
-            filterValue = savedFilter;
-        }
-        engine.shipModel.setFleetFilter(filterValue);
+
+    // Apply saved fleet filter when entering anchorage view
+    int savedFilter = settings->value("AnchorageFleetFilter", -100).toInt();
+    std::optional<int> filterValue;
+    if(savedFilter == -100) {
+        filterValue = std::nullopt;
     } else {
-        // Clear fleet filter when leaving anchorage view
-        engine.shipModel.setFleetFilter(std::nullopt);
+        filterValue = savedFilter;
     }
-    
-    // Set fleet filter button visibility
-    fleetRadioAll->setVisible(isAnchorage);
-    fleetRadio1->setVisible(isAnchorage);
-    fleetRadio2->setVisible(isAnchorage);
-    fleetRadio3->setVisible(isAnchorage);
-    fleetRadio4->setVisible(isAnchorage);
-    fleetRadioUnassigned->setVisible(isAnchorage);
+    engine.shipModel.setFleetFilter(filterValue);
     
     disconnect(model, SIGNAL(needReCalculateRows()),
                this, SLOT(recalculateArsenalRows()));

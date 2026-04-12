@@ -5,6 +5,7 @@
 #define BATTLEPLAN_H
 
 #include <QDialog>
+#include <QJsonObject>
 
 namespace Ui {
 class BattlePlan;
@@ -18,6 +19,8 @@ public:
     explicit BattlePlan(QWidget *parent = nullptr, bool isNightNode = false,
                         bool isAirNode = false);
     ~BattlePlan();
+
+    QJsonObject getPlanData() const;
 
 private:
     Ui::BattlePlan *ui;

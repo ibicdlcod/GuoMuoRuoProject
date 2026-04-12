@@ -38,6 +38,19 @@ Q_GLOBAL_STATIC(QString,
                     ");"
                     ))
 
+/* User fleet status */
+Q_GLOBAL_STATIC(QString,
+                userFleetStatus,
+                QStringLiteral(
+                    "CREATE TABLE UserFleetStatus ( "
+                    "User BLOB NOT NULL, "
+                    "FleetIndex INTEGER NOT NULL, "
+                    "FleetType INTEGER NOT NULL DEFAULT 0, "
+                    "FOREIGN KEY(User) REFERENCES NewUsers(UserID)"
+                    "CONSTRAINT noduplicate UNIQUE(User, FleetIndex)"
+                    ");"
+                    ))
+
 /* Equipment registry */
 Q_GLOBAL_STATIC(QString,
                 equipReg,
@@ -372,6 +385,56 @@ Q_GLOBAL_STATIC(QString,
                     "FOREIGN KEY(UserID) REFERENCES NewUsers(UserID) "
                     ");"
                     ))
+/* Expedition info of users */
+Q_GLOBAL_STATIC(QString,
+                userExpedition,
+                QStringLiteral(
+                    "CREATE TABLE UserExpedition ("
+                    "User BLOB NOT NULL, "
+                    "MapUnionId INTEGER NOT NULL, "
+                    "Diff INTEGER NOT NULL, "
+                    "CurrentNode INTEGER DEFAULT 0, "
+                    "LastProgressTime INTEGER DEFAULT 0, "
+                    "NextProgressTime INTEGER DEFAULT 0, "
+                    "IsActive BOOLEAN DEFAULT FALSE, "
+                    "AutoRestartThreshold REAL DEFAULT 0.3, "
+                    "StopReason INTEGER DEFAULT 0, "
+                    "FOREIGN KEY(User) REFERENCES NewUsers(UserID), "
+                    "CONSTRAINT noduplicate UNIQUE(User, MapUnionId, Diff) "
+                    ");"
+                    ))
+
+/* Expedition battle plans of users */
+Q_GLOBAL_STATIC(QString,
+                userExpeditionBattlePlan,
+                QStringLiteral(
+                    "CREATE TABLE UserExpeditionBattlePlan ("
+                    "User BLOB NOT NULL, "
+                    "MapUnionId INTEGER NOT NULL, "
+                    "Diff INTEGER NOT NULL, "
+                    "NodeIndex INTEGER NOT NULL, "
+                    "NodeType INTEGER NOT NULL, "
+                    "PlanData BLOB, "
+                    "SelectedChoiceNode INTEGER DEFAULT -1, "
+                    "FOREIGN KEY(User) REFERENCES NewUsers(UserID), "
+                    "CONSTRAINT noduplicate UNIQUE(User, MapUnionId, Diff, NodeIndex) "
+                    ");"
+                    ))
+
+/* Expedition settings of users (optional) */
+Q_GLOBAL_STATIC(QString,
+                userExpeditionSettings,
+                QStringLiteral(
+                    "CREATE TABLE UserExpeditionSettings ("
+                    "User BLOB NOT NULL, "
+                    "MapUnionId INTEGER NOT NULL, "
+                    "Diff INTEGER NOT NULL DEFAULT 0, "
+                    "AutoRestartThreshold REAL DEFAULT 0.3, "
+                    "AutoResupply BOOLEAN DEFAULT FALSE, "
+                    "FOREIGN KEY(User) REFERENCES NewUsers(UserID), "
+                    "CONSTRAINT noduplicate UNIQUE(User, MapUnionId, Diff) "
+                    ");"
+                    ))
 
 } // namespace
 
@@ -496,6 +559,18 @@ void Server::sqlinit() const {
         }
         if(!tables.contains("ARDOrders")) {
             sqlinitARDOrders();
+        }
+        if(!tables.contains("UserExpedition")) {
+            sqlinitExpedition();
+        }
+        if(!tables.contains("UserExpeditionBattlePlan")) {
+            sqlinitExpeditionBattlePlan();
+        }
+        if(!tables.contains("UserExpeditionSettings")) {
+            sqlinitExpeditionSettings();
+        }
+        if(!tables.contains("UserFleetStatus")) {
+            sqlinitUserFleetStatus();
         }
     }
 }
@@ -760,6 +835,54 @@ void Server::sqlinitVCR() const {
     if(!query.exec()) {
         //% "Create virtual condition-map relation info database failed."
         throw DBError(qtTrId("user-db-vcr-gen-failure"),
+                      query.lastError(), query.lastQuery());
+    }
+}
+
+void Server::sqlinitExpedition() const {
+    //% "Expedition database does not exist, creating..."
+    qWarning() << qtTrId("expedition-db-lack");
+    QSqlQuery query;
+    query.prepare(*userExpedition);
+    if(!query.exec()) {
+        //% "Create Expedition database failed."
+        throw DBError(qtTrId("expedition-db-gen-failure"),
+                      query.lastError(), query.lastQuery());
+    }
+}
+
+void Server::sqlinitExpeditionBattlePlan() const {
+    //% "Expedition battle plans database does not exist, creating..."
+    qWarning() << qtTrId("expedition-battle-plans-db-lack");
+    QSqlQuery query;
+    query.prepare(*userExpeditionBattlePlan);
+    if(!query.exec()) {
+        //% "Create Expedition battle plans database failed."
+        throw DBError(qtTrId("expedition-battle-plans-db-gen-failure"),
+                      query.lastError(), query.lastQuery());
+    }
+}
+
+void Server::sqlinitUserFleetStatus() const {
+    //% "User fleet status database does not exist, creating..."
+    qWarning() << qtTrId("user-fleet-status-db-lack");
+    QSqlQuery query;
+    query.prepare(*userFleetStatus);
+    if(!query.exec()) {
+        //% "Create User fleet status database failed."
+        throw DBError(qtTrId("user-fleet-status-db-gen-failure"),
+                      query.lastError(), query.lastQuery());
+    }
+}
+
+void Server::sqlinitExpeditionSettings() const {
+    //% "Expedition settings database does not exist, creating..."
+    qWarning() << qtTrId("expedition-settings-db-lack");
+    QSqlQuery query;
+    query.prepare(*userExpeditionSettings);
+    if(!query.exec()) {
+        //% "Create Expedition settings database failed."
+        throw DBError(qtTrId("expedition-settings-db-gen-failure"),
                       query.lastError(), query.lastQuery());
     }
 }

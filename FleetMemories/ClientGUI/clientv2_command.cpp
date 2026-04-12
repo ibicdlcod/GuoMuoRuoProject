@@ -185,7 +185,6 @@ void Client::parseConnectReq(const QStringList &cmdParts) {
             return;
         }
         port = QString(cmdParts[2]).toInt();
-#pragma message(NOT_M_CONST)
         if(port < 1024 || port > 49151) {
             //% "Port isn't valid, it must fall between 1024 and 49151"
             qWarning() << qtTrId("port-invalid");
@@ -356,7 +355,6 @@ void Client::doSwitch(const QStringList &cmdParts) {
 void Client::exitGracefully() {
     exitGraceSpec();
     disconnect(timer, &QTimer::timeout, this, &Client::uiRefresh);
-#pragma message(NOT_M_CONST)
     //% "Goodbye."
     emit qout(qtTrId("goodbye-gui"), QColor("black"), QColor(64,255,64));
     if(logFile) {

@@ -15,7 +15,6 @@ extern std::unique_ptr<QSettings> settings;
 
 /* Part of Steam Authentication */
 void SteamAuth::RetrieveEncryptedAppTicket() {
-#pragma message(NOT_M_CONST)
     uint32 k_unSecretData = 0x5444;
 
     if(settings->contains("networkclient/requestEATCall")

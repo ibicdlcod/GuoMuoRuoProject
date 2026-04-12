@@ -95,8 +95,6 @@ void Client::sortie(int mapId, int fleetIndex, bool isExpedition) {
 
 void Client::queryNextNode(int mapId, int prevNode, bool retreat) {
     if(!isInBattle()) {
-        //% "You can't enter a sortie map illegally!"
-        qWarning() << qtTrId("illegal-map-progress");
         return;
     }
     else {

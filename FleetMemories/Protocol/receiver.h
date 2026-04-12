@@ -13,7 +13,6 @@
 #include "kp.h"
 
 // Do not modify
-#pragma message(NOT_M_CONST)
 namespace {
 const int maxNumberOfParts = 1024;
 }

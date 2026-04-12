@@ -4,12 +4,15 @@
 #include "ui/mainwindow.h"
 
 #include <QApplication>
+#include <QDebug>
 #include <QFile>
+#include <QLockFile>
+#include <QMessageBox>
 #include <QSettings>
+#include <QStandardPaths>
 #include <QStyleFactory>
 #include <QSurfaceFormat>
 #include <QTranslator>
-#include <QDebug>
 #include <cstdlib>
 #include <cstring>
 
@@ -23,7 +26,8 @@ QFile *logFile;
 std::unique_ptr<QSettings> settings;
 
 namespace {
-const int STEAM_ERROR = 1;
+const int INSTANCE_ERROR = 1;
+const int STEAM_ERROR = 2;
 }
 
 int main(int argc, char *argv[]) {
@@ -31,17 +35,10 @@ int main(int argc, char *argv[]) {
     format.setDepthBufferSize(24);
     QSurfaceFormat::setDefaultFormat(format);
 
-    /* Steam initialization */
+    /* Steam restart check - must be very early */
     if(SteamAPI_RestartAppIfNecessary(KP::steamAppId)) {
         return STEAM_ERROR;
     }
-    if(!SteamAPI_Init()) {
-        qFatal() <<
-            "Fatal Error - Steam must be running to play this game "
-            "(SteamAPI_Init() failed).\n";
-        return STEAM_ERROR;
-    }
-    /* End Steam initialization */
 
 #if defined(Q_OS_LINUX)
     // Auto-detect input method module based on XMODIFIERS
@@ -60,13 +57,21 @@ int main(int argc, char *argv[]) {
 
     QApplication client(argc, argv);
     client.setWindowIcon(QIcon(":/resources/icon.ico"));
-#pragma message(NOT_M_CONST)
     /* Metadata */
     client.setApplicationName("FleetMemories");
     client.setApplicationVersion("0.60.1"); // temp
     client.setOrganizationName("Harusame Software");
     client.setOrganizationDomain("fleetmemories.moe"); // temp
     /* End Metadata */
+
+    /* Steam initialization */
+    if(!SteamAPI_Init()) {
+        qFatal() <<
+            "Fatal Error - Steam must be running to play this game "
+            "(SteamAPI_Init() failed).\n";
+        return STEAM_ERROR;
+    }
+    /* End Steam initialization */
 
     settings = std::make_unique<QSettings>();
 
@@ -106,6 +111,18 @@ int main(int argc, char *argv[]) {
             break;
         }
     }
+
+    /* Single instance check */
+    QString lockPath = QStandardPaths::writableLocation(QStandardPaths::TempLocation)
+                       + "/" + client.applicationName() + ".lock";
+    QLockFile lockFile(lockPath);
+    if (!lockFile.tryLock()) {
+        //% "Another instance of FleetMemories is already running."
+        QMessageBox::warning(nullptr, client.applicationName(),
+                             qtTrId("client-instance-already-running"));
+        return INSTANCE_ERROR;
+    }
+
     KP::initLog(false);
     qInstallMessageHandler(customMessageHandler);
     /* End Multilingual Support */

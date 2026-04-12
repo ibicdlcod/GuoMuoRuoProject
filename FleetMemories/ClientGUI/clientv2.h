@@ -7,6 +7,7 @@
 #include <QColor>
 #include <QtNetwork>
 #include <QHttpServer>
+#include <optional>
 #include "ui/factory/developwindow.h"
 #include "ui/factory/constructwindow.h"
 #include "ui/techview.h"
@@ -105,6 +106,7 @@ public slots:
     void chooseNode(int mapId, int chosenNodeId);
     void demandEquipCache();
     void demandEquipSkillPoints(int);
+    void demandExpeditionStatus(std::optional<int> mapUnionId = std::nullopt);
     void demandMapCache();
     void demandMapSupremacy();
     void demandResourceGain();
@@ -149,6 +151,13 @@ public slots:
     void setTicketCache(uint8 [], uint32);
     void showHelp(const QStringList &);
     void sortie(int, int, bool expedition = false);
+    void startExpedition(int mapId, int fleetIndex,
+                         const QMap<int, QByteArray> &battlePlans,
+                         double autoResupplyThreshold);
+    void cancelExpedition(int mapId, int receiveFleetIndex);
+    void setExpeditionSettings(int mapId, double autoResupplyThreshold, bool autoRestart);
+    void updateExpeditionPlan(int mapId, const QMap<int, QByteArray> &battlePlans);
+    void queryExpeditionStatus();
     void stopRepair(int);
     void switchToBattleView();
     void switchToFactory();
@@ -201,6 +210,11 @@ signals:
     void uiRefreshSig();
     void unlockBattle();
     void visibleBonusUpdated();
+    void receivedExpeditionStartResult(int mapUnionId, bool accepted, KP::GameError error);
+    void receivedExpeditionStatus(const QJsonArray &expeditions);
+    void receivedExpeditionProgressUpdate(int mapUnionId, int nodeIndex,
+                                          const QJsonObject &battleResult);
+    void receivedExpeditionStopped(int mapUnionId, KP::ExpeditionStopReason stopReason);
 
 private slots:
     void changeGameState(KP::GameState);
@@ -306,7 +320,6 @@ private:
     int downloadCompleted = 0;
     int downloadRequired = 0;
 
-#pragma message(SALT_FISH)
     const QByteArray defaultSalt =
         QByteArrayLiteral("\xe8\xbf\x99\xe6\x98\xaf\xe4\xb8"
                           "\x80\xe6\x9d\xa1\xe5\x92\xb8\xe9"

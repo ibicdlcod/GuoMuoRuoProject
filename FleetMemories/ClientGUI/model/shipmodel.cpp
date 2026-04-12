@@ -390,7 +390,18 @@ QVariant ShipModel::data(const QModelIndex &index,
                 //% "Disabled"
                 return qtTrId("fleet-disabled");
             }
-            return QStringLiteral("%1-%2").arg(attr->fleetIndex + 1)
+            QString fleetIndexStr;
+            if(attr->fleetIndex < KP::nonExpeditionFleetsSize) {
+                fleetIndexStr = QString::number(attr->fleetIndex + 1);
+            }
+            else {
+                int mapUnionId = attr->fleetIndex & (~KP::expeditionFleetMask);
+                int dlcId = mapUnionId >> 16;
+                int subMapId = mapUnionId & 0xFFFF;
+                QString dlcStr = dlcId == 0 ? "X" : ("XE" + QString::number(dlcId) + "#");
+                fleetIndexStr = dlcStr + QString::number(subMapId);
+            }
+            return QStringLiteral("%1-%2").arg(fleetIndexStr)
                 .arg(attr->fleetPosIndex + 1);
         }
         else if(index.column() == fuelColumn()) {
@@ -714,8 +725,8 @@ Qt::ItemFlags ShipModel::flags(const QModelIndex &index) const {
         QUuid uidToDisplay = sortedShipIds[realRowIndex];
         ShipDynamic *attr = clientShipDynamicAttrs[uidToDisplay];
         bool isFull = (index.column() == fuelColumn())
-                      ? attr->fuel >= 1.0
-                      : attr->ammo >= 1.0;
+                          ? attr->fuel >= 1.0
+                          : attr->ammo >= 1.0;
         if(isFull) {
             // clazy:exclude=skipped-base-method
             return static_cast<QFlags<Qt::ItemFlag>>(
@@ -879,13 +890,13 @@ void ShipModel::customSort() {
                       int maxA = clientShips[a]->attr["Hitpoints"];
                       int maxB = clientShips[b]->attr["Hitpoints"];
                       double pctA = maxA > 0
-                                    ? static_cast<double>(
-                                        clientShipDynamicAttrs[a]->currentHP) / maxA
-                                    : 0.0;
+                                        ? static_cast<double>(
+                                              clientShipDynamicAttrs[a]->currentHP) / maxA
+                                        : 0.0;
                       double pctB = maxB > 0
-                                    ? static_cast<double>(
-                                        clientShipDynamicAttrs[b]->currentHP) / maxB
-                                    : 0.0;
+                                        ? static_cast<double>(
+                                              clientShipDynamicAttrs[b]->currentHP) / maxB
+                                        : 0.0;
                       return pctA != pctB ? pctA < pctB : a < b;
                   });
         break;

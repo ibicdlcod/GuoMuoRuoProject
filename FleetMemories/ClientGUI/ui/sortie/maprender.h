@@ -14,13 +14,14 @@ class MapRender : public QWidget
 public:
     explicit MapRender(QWidget *parent = nullptr);
 
-#pragma message(NOT_M_CONST)
     static constexpr int globeMapWidth = 5632;
     static constexpr int globeMapHeight = 2048;
     static constexpr int circleSize = 64;
 
 public slots:
     void setDiff(const QString &text);
+    void setExpeditionMaps(const QSet<int> &mapIds);
+    void setExpeditionActiveMaps(const QSet<int> &mapIds);
 
 signals:
     void mapSelected(int mapId);
@@ -41,6 +42,11 @@ private:
     bool mousePressedInside = false;
     int hoverMapID = 0;
     KP::Difficulty diff;
+    
+    QSet<int> expeditionMapIds;
+    QSet<int> expeditionActiveMapIds;
+    QPen expeditionPen;
+    QPen expeditionStoppedPen;
 };
 
 #endif // MAPRENDER_H

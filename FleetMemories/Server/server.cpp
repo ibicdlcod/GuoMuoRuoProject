@@ -5,6 +5,8 @@
 #include "server.h"
 
 #include <QBuffer>
+#include <QCborMap>
+#include <QCborValue>
 #include <QFile>
 #include <QSet>
 #include <QThread>
@@ -78,7 +80,8 @@ const int elapsedMaxTolerance = steamRateLimit;
 }
 
 Server::Server(int argc, char ** argv) : CommandLine(argc, argv),
-    planeReplenish(this) {
+    planeReplenish(this),
+    expeditionManager(this) {
     /* no *settings could be used here */
     std::random_device rd;
     std::seed_seq seq{rd(), rd(), rd(), rd(), rd(), rd(), rd(), rd()};
@@ -2153,130 +2156,283 @@ const QStringList Server::getValidCommands() const {
 
 void Server::initUserDropInfo(const CSteamID &uid) {
     QSqlDatabase db = QSqlDatabase::database();
-    QList<QMap<int, double> *> results;
-    int j = 0;
-    QMap<int, double> *result;
-    for(Ship *ship: std::as_const(shipRegistry)) {
-        if(j % 500 == 0) {
-            result = new QMap<int, double>();
-            results.append(result);
-        }
-        if(ship->isAmnesiac()) {
-            continue;
-        }
-        (*result)[ship->getId()] = RNGesus::dropValue(ship->attr["Rarity"], mt);
-        j++;
+    if(!db.transaction()) {
+        //% "Failed to start transaction for initializing user drop info."
+        throw DBError(qtTrId("user-add-ship-dropinfo-transaction-failed")
+                      .arg(uid.ConvertToUint64()),
+                      db.lastError());
     }
-    for(auto *resultPtr: std::as_const(results)) {
-        auto result = *resultPtr;
-        QString queryStr;
-        queryStr.append("INSERT INTO UserShipDrop (User, ShipDef, Amount) ");
-        queryStr.append("SELECT s.column1, s.column2, s.column3 ");
-        queryStr.append("FROM ( ");
-        queryStr.append("SELECT :uid AS column1, ");
-        queryStr.append(":firstkey AS column2, ");
-        queryStr.append(":first AS column3 ");
-        int i = 0;
-        for(const auto [key, value]: result.asKeyValueRange()) {
-            i++;
-            if(key == result.firstKey()) {
+    
+    try {
+        QList<QMap<int, double> *> results;
+        int j = 0;
+        QMap<int, double> *result;
+        for(Ship *ship: std::as_const(shipRegistry)) {
+            if(j % 500 == 0) {
+                result = new QMap<int, double>();
+                results.append(result);
+            }
+            if(ship->isAmnesiac()) {
                 continue;
             }
-            queryStr.append("UNION ALL ");
-            queryStr.append("SELECT :uid, ");
-            queryStr.append(":key"+QString::number(i)+", ");
-            queryStr.append(":value"+QString::number(i)+" ");
+            (*result)[ship->getId()] = RNGesus::dropValue(ship->attr["Rarity"], mt);
+            j++;
         }
-        queryStr.append(") AS s ");
-        queryStr.append("WHERE NOT EXISTS "
-                        "( SELECT 1 FROM UserShipDrop t "
-                        "WHERE t.User = s.column1 "
-                        "AND t.ShipDef = s.column2);");
-        QSqlQuery query2;
-        query2.prepare(queryStr);
-        query2.bindValue(":uid", uid.ConvertToUint64());
-        query2.bindValue(":firstkey", result.firstKey());
-        query2.bindValue(":first", result.first());
-        i = 0;
-        for(const auto [key, value]: result.asKeyValueRange()) {
-            i++;
-            if(key == result.firstKey()) {
-                continue;
+        for(auto *resultPtr: std::as_const(results)) {
+            auto result = *resultPtr;
+            QString queryStr;
+            queryStr.append("INSERT INTO UserShipDrop (User, ShipDef, Amount) ");
+            queryStr.append("SELECT s.column1, s.column2, s.column3 ");
+            queryStr.append("FROM ( ");
+            queryStr.append("SELECT :uid AS column1, ");
+            queryStr.append(":firstkey AS column2, ");
+            queryStr.append(":first AS column3 ");
+            int i = 0;
+            for(const auto [key, value]: result.asKeyValueRange()) {
+                i++;
+                if(key == result.firstKey()) {
+                    continue;
+                }
+                queryStr.append("UNION ALL ");
+                queryStr.append("SELECT :uid, ");
+                queryStr.append(":key"+QString::number(i)+", ");
+                queryStr.append(":value"+QString::number(i)+" ");
             }
-            query2.bindValue(":key"+QString::number(i), key);
-            query2.bindValue(":value"+QString::number(i), value);
+            queryStr.append(") AS s ");
+            queryStr.append("WHERE NOT EXISTS "
+                            "( SELECT 1 FROM UserShipDrop t "
+                            "WHERE t.User = s.column1 "
+                            "AND t.ShipDef = s.column2);");
+            QSqlQuery query2;
+            query2.prepare(queryStr);
+            query2.bindValue(":uid", uid.ConvertToUint64());
+            query2.bindValue(":firstkey", result.firstKey());
+            query2.bindValue(":first", result.first());
+            i = 0;
+            for(const auto [key, value]: result.asKeyValueRange()) {
+                i++;
+                if(key == result.firstKey()) {
+                    continue;
+                }
+                query2.bindValue(":key"+QString::number(i), key);
+                query2.bindValue(":value"+QString::number(i), value);
+            }
+            if(Q_UNLIKELY(!query2.exec())) {
+                //% "User %1: add dropinfo of ship failed!"
+                throw DBError(qtTrId("user-add-ship-dropinfo-failed")
+                              .arg(uid.ConvertToUint64()),
+                              query2.lastError(), query2.lastQuery());
+            }
+            delete resultPtr;
         }
-        if(Q_UNLIKELY(!query2.exec())) {
-            //% "User %1: add dropinfo of ship failed!"
-            throw DBError(qtTrId("user-add-ship-dropinfo-failed")
+        
+        if(!db.commit()) {
+            db.rollback();
+            //% "Failed to commit transaction for initializing user drop info."
+            throw DBError(qtTrId("user-add-ship-dropinfo-commit-failed")
                           .arg(uid.ConvertToUint64()),
-                          query2.lastError(), query2.lastQuery());
+                          db.lastError());
         }
-        else {
-            //% "User %1: add dropinfo of ship success!"
-            qDebug() << qtTrId("user-add-ship-dropinfo-success")
-                        .arg(uid.ConvertToUint64());
-        }
-        delete resultPtr;
+        
+        //% "User %1: add dropinfo of ship success!"
+        qDebug() << qtTrId("user-add-ship-dropinfo-success")
+                    .arg(uid.ConvertToUint64());
+        
+    } catch (const DBError &) {
+        db.rollback();
+        throw;
     }
 }
 
 void Server::initUserEquipSPInfo(const CSteamID &uid) {
     QSqlDatabase db = QSqlDatabase::database();
-    QSqlQuery query2;
-    query2.prepare(
-        "INSERT OR IGNORE INTO UserEquipSP (User, EquipDef, Intvalue) "
-        "SELECT :uid, EquipName.EquipID, 0 "
-        "FROM EquipName "
-        /* equipIdMax is 65536; higher than 32768 is amnesiac equip */
-        "WHERE EquipName.EquipID < 32768;");
-    query2.bindValue(":uid", uid.ConvertToUint64());
-    if(Q_UNLIKELY(!query2.exec())) {
-        //% "User %1: add skillinfo of equip failed!"
-        throw DBError(qtTrId("user-add-equip-sp-info-failed")
+    if(!db.transaction()) {
+        //% "Failed to start transaction for initializing user equip SP info."
+        throw DBError(qtTrId("user-add-equip-sp-info-transaction-failed")
                       .arg(uid.ConvertToUint64()),
-                      query2.lastError(), query2.lastQuery());
+                      db.lastError());
     }
-    else {
+    
+    try {
+        QSqlQuery query2;
+        query2.prepare(
+            "INSERT OR IGNORE INTO UserEquipSP (User, EquipDef, Intvalue) "
+            "SELECT :uid, EquipName.EquipID, 0 "
+            "FROM EquipName "
+            /* equipIdMax is 65536; higher than 32768 is amnesiac equip */
+            "WHERE EquipName.EquipID < 32768;");
+        query2.bindValue(":uid", uid.ConvertToUint64());
+        if(Q_UNLIKELY(!query2.exec())) {
+            //% "User %1: add skillinfo of equip failed!"
+            throw DBError(qtTrId("user-add-equip-sp-info-failed")
+                          .arg(uid.ConvertToUint64()),
+                          query2.lastError(), query2.lastQuery());
+        }
+        
+        if(!db.commit()) {
+            db.rollback();
+            //% "Failed to commit transaction for initializing user equip SP info."
+            throw DBError(qtTrId("user-add-equip-sp-info-commit-failed")
+                          .arg(uid.ConvertToUint64()),
+                          db.lastError());
+        }
+        
         //% "User %1: add skillinfo of equip success!"
         qDebug() << qtTrId("user-add-equip-sp-info-success")
                     .arg(uid.ConvertToUint64());
+        
+    } catch (const DBError &) {
+        db.rollback();
+        throw;
     }
 }
 
 void Server::initUserMapStatus(const CSteamID &uid) {
     QSqlDatabase db = QSqlDatabase::database();
-    for(int map: normalMapHasLua) {
-        QSqlQuery query2;
-        query2.prepare("INSERT OR IGNORE INTO UserMapState (User, MapDef, "
-                       "GaugeC, GaugeB, GaugeA, GaugeH) "
-                       "VALUES (:uid, :map, "
-                       ":amount1, :amount2, :amount3, :amount4);");
-        query2.bindValue(":uid", uid.ConvertToUint64());
-        query2.bindValue(":map", map);
-        int amount = 0;
-        if(lua["maps"][map] == sol::nil
-                || lua["maps"][map]["gauge"] == sol::nil) {
-        }
-        else {
-            amount = lua["maps"][map]["gauge"];
-        }
-        query2.bindValue(":amount1", amount);
-        query2.bindValue(":amount2", amount);
-        query2.bindValue(":amount3", amount);
-        query2.bindValue(":amount4", amount);
-        if(Q_UNLIKELY(!query2.exec())) {
-            //% "User %1: init map status failed!"
-            throw DBError(qtTrId("user-add-map-status-failed")
-                          .arg(uid.ConvertToUint64()),
-                          query2.lastError(), query2.lastQuery());
-        }
-        else {
-            //% "User %1: init map status success!"
-            qDebug() << qtTrId("user-add-map-status-success")
-                        .arg(uid.ConvertToUint64());
-        }
+    if(!db.transaction()) {
+        //% "Failed to start transaction for initializing user map status."
+        throw DBError(qtTrId("user-add-map-status-transaction-failed")
+                      .arg(uid.ConvertToUint64()),
+                      db.lastError());
     }
+    
+    try {
+        // Process maps in batches to avoid too long SQL statements
+        const int batchSize = 100;
+        int processed = 0;
+        
+        while(processed < normalMapHasLua.size()) {
+            int batchEnd = qMin(processed + batchSize, normalMapHasLua.size());
+            
+            // Build batch INSERT statement
+            QString queryStr = "INSERT OR IGNORE INTO UserMapState "
+                               "(User, MapDef, GaugeC, GaugeB, GaugeA, GaugeH) VALUES ";
+            QVector<QString> valuePlaceholders;
+            QVector<int> batchMaps;
+            
+            for(int i = processed; i < batchEnd; ++i) {
+                int map = normalMapHasLua[i];
+                batchMaps.append(map);
+                int batchIndex = i - processed; // Index within current batch
+                valuePlaceholders.append(QString("(:uid, :map%1, :amount%2, :amount%3, :amount%4, :amount%5)")
+                                         .arg(batchIndex)
+                                         .arg(4 * batchIndex)
+                                         .arg(4 * batchIndex + 1)
+                                         .arg(4 * batchIndex + 2)
+                                         .arg(4 * batchIndex + 3));
+            }
+            
+            queryStr += valuePlaceholders.join(", ");
+            queryStr += ";";
+            
+            QSqlQuery query2;
+            if(!query2.prepare(queryStr)) {
+                //% "User %1: init map status failed!"
+                throw DBError(qtTrId("user-add-map-status-failed")
+                              .arg(uid.ConvertToUint64()),
+                              query2.lastError(), query2.lastQuery());
+            }
+            
+            query2.bindValue(":uid", uid.ConvertToUint64());
+            
+            for(int i = 0; i < batchMaps.size(); ++i) {
+                int map = batchMaps[i];
+                int amount = 0;
+                if(lua["maps"][map] != sol::nil
+                        && lua["maps"][map]["gauge"] != sol::nil) {
+                    amount = lua["maps"][map]["gauge"];
+                }
+                
+                query2.bindValue(QString(":map%1").arg(i), map);
+                query2.bindValue(QString(":amount%1").arg(4 * i), amount);
+                query2.bindValue(QString(":amount%1").arg(4 * i + 1), amount);
+                query2.bindValue(QString(":amount%1").arg(4 * i + 2), amount);
+                query2.bindValue(QString(":amount%1").arg(4 * i + 3), amount);
+            }
+            
+            if(Q_UNLIKELY(!query2.exec())) {
+                //% "User %1: init map status failed!"
+                throw DBError(qtTrId("user-add-map-status-failed")
+                              .arg(uid.ConvertToUint64()),
+                              query2.lastError(), query2.lastQuery());
+            }
+            
+            processed = batchEnd;
+        }
+        
+        if(!db.commit()) {
+            db.rollback();
+            //% "Failed to commit transaction for initializing user map status."
+            throw DBError(qtTrId("user-add-map-status-commit-failed")
+                          .arg(uid.ConvertToUint64()),
+                          db.lastError());
+        }
+        
+        //% "User %1: init map status success!"
+        qDebug() << qtTrId("user-add-map-status-success")
+                    .arg(uid.ConvertToUint64());
+        
+    } catch (const DBError &) {
+        db.rollback();
+        throw;
+    }
+}
+
+void Server::initUserFleetStatus(const CSteamID &uid) {
+    QSqlDatabase db = QSqlDatabase::database();
+    if(!db.transaction()) {
+        //% "Failed to start transaction for initializing user fleet status."
+        throw DBError(qtTrId("init-userfleet-transaction-failed"),
+                      db.lastError());
+    }
+    
+    try {
+        // Build a single INSERT statement with all fleet indices
+        QString queryStr = "INSERT OR IGNORE INTO UserFleetStatus "
+                           "(User, FleetIndex, FleetType) VALUES ";
+        QVector<QString> valuePlaceholders;
+        
+        for(int i = 0; i < KP::nonExpeditionFleetsSize; ++i) {
+            valuePlaceholders.append(QString("(:uid, :fleetIndex%1, :fleetType%2)")
+                                     .arg(i).arg(i));
+        }
+        
+        queryStr += valuePlaceholders.join(", ");
+        queryStr += ";";
+        
+        QSqlQuery insert;
+        if(!insert.prepare(queryStr)) {
+            //% "Set User Fleet Up failed!"
+            throw DBError(qtTrId("init-userfleet-failed"),
+                          insert.lastError(), insert.lastQuery());
+        }
+        
+        insert.bindValue(":uid", uid.ConvertToUint64());
+        for(int i = 0; i < KP::nonExpeditionFleetsSize; ++i) {
+            insert.bindValue(QString(":fleetIndex%1").arg(i), i);
+            insert.bindValue(QString(":fleetType%1").arg(i), KP::NormalFleet);
+        }
+        
+        if(!insert.exec()) {
+            //% "Set User Fleet Up failed!"
+            throw DBError(qtTrId("init-userfleet-failed"),
+                          insert.lastError(), insert.lastQuery());
+        }
+        
+        if(!db.commit()) {
+            db.rollback();
+            //% "Failed to commit transaction for initializing user fleet status."
+            throw DBError(qtTrId("init-userfleet-commit-failed"),
+                          db.lastError());
+        }
+    } catch (const DBError &) {
+        db.rollback();
+        throw;
+    }
+    
+    // Also ensure any expedition fleet indices retain their existing fleet type
+    // (expedition fleet indices are >= KP::expeditionFleetMask)
+    // They should already exist from moveFleetToExpeditionIndex
 }
 
 void Server::luaInitEquipable() {
@@ -2350,6 +2506,136 @@ void Server::luaInitMap() {
                 }
             }
         }
+    }
+}
+
+bool Server::nodeExistsInLua(int mapUnionId, int nodeIndex) const {
+    sol::state &lua = const_cast<sol::state&>(this->lua);
+    return (lua["maps"] != sol::nil
+            && lua["maps"][mapUnionId] != sol::nil
+            && lua["maps"][mapUnionId][nodeIndex] != sol::nil);
+}
+
+KP::NodeType Server::getNodeTypeFromLua(int mapUnionId, int nodeIndex) const {
+    sol::state &lua = const_cast<sol::state&>(this->lua);
+    if (lua["maps"] != sol::nil
+        && lua["maps"][mapUnionId] != sol::nil
+        && lua["maps"][mapUnionId][nodeIndex] != sol::nil) {
+        int typeInt = lua["maps"][mapUnionId][nodeIndex]["battle_type"];
+        return static_cast<KP::NodeType>(typeInt);
+    }
+    return KP::EMPTY;
+}
+
+QList<int> Server::getNextNodesFromLua(int mapUnionId, int nodeIndex) const {
+    QList<int> nextNodes;
+    sol::state &lua = const_cast<sol::state&>(this->lua);
+    if (lua["maps"] != sol::nil
+        && lua["maps"][mapUnionId] != sol::nil
+        && lua["maps"][mapUnionId][nodeIndex] != sol::nil) {
+        sol::table nextNodeTable = lua["maps"][mapUnionId][nodeIndex]["next_nodes"];
+        nextNodeTable.for_each(
+            [&nextNodes](sol::object const& key, sol::object const& value) {
+                if (value.is<int>()) {
+                    nextNodes.append(value.as<int>());
+                }
+            });
+    }
+    return nextNodes;
+}
+
+MapNode Server::getNodeFromLua(int mapUnionId, int nodeIndex) const {
+    sol::state &lua = const_cast<sol::state&>(this->lua);
+    if (lua["maps"] != sol::nil
+        && lua["maps"][mapUnionId] != sol::nil
+        && lua["maps"][mapUnionId][nodeIndex] != sol::nil) {
+        sol::table info = lua["maps"][mapUnionId][nodeIndex];
+        double x = info["x"];
+        double y = info["y"];
+        int lbDistance = 0;
+        if (info["lb_distance"] != sol::nil) {
+            lbDistance = info["lb_distance"];
+        }
+        int typeInt = info["battle_type"];
+        KP::NodeType type = static_cast<KP::NodeType>(typeInt);
+        QList<int> nextNodes = getNextNodesFromLua(mapUnionId, nodeIndex);
+        return MapNode(x, y, lbDistance, type, std::move(nextNodes));
+    }
+    return MapNode();
+}
+
+QList<int> Server::getAllNodeIndicesFromLua(int mapUnionId) const {
+    QList<int> indices;
+    sol::state &lua = const_cast<sol::state&>(this->lua);
+    if (lua["maps"] != sol::nil && lua["maps"][mapUnionId] != sol::nil) {
+        sol::table mapTable = lua["maps"][mapUnionId];
+        mapTable.for_each([&indices](sol::object const& key, sol::object const& value) {
+            if (key.is<int>()) {
+                indices.append(key.as<int>());
+            }
+        });
+    }
+    return indices;
+}
+
+int Server::evaluateBranchRule(int mapUnionId, int nodeIndex,
+                               KP::Difficulty diff,
+                               const FleetInfo &fleet) const {
+    sol::state &lua = const_cast<sol::state&>(this->lua);
+    QString diffStr = (*KP::diffEnumtoStr)[diff];
+    QByteArray diffStrBytes = diffStr.toUtf8();
+    const char *diffStrC = diffStrBytes;
+    if (lua["maps"] == sol::nil
+        || lua["maps"][mapUnionId] == sol::nil
+        || lua["maps"][mapUnionId][nodeIndex] == sol::nil
+        || lua["maps"][mapUnionId][nodeIndex]["branch_rule"] == sol::nil
+        || lua["maps"][mapUnionId][nodeIndex]["branch_rule"][diffStrC]
+           == sol::nil) {
+        return 0;
+    }
+    sol::protected_function luaBranchRule
+        = lua["maps"][mapUnionId][nodeIndex]["branch_rule"][diffStrC];
+    auto result = luaBranchRule(fleet.ships,
+                                fleet.los(),
+                                fleet.type,
+                                fleet.capitalness(),
+                                fleet.shipTags,
+                                fleet.shipSpeeds(),
+                                fleet.getEquipGrid(),
+                                0);
+    if (result.valid()) {
+        return result;
+    } else {
+        return 0;
+    }
+}
+
+int Server::evaluateMapBranchRule(int mapUnionId, KP::Difficulty diff,
+                                  const FleetInfo &fleet) const {
+    sol::state &lua = const_cast<sol::state&>(this->lua);
+    QString diffStr = (*KP::diffEnumtoStr)[diff];
+    QByteArray diffStrBytes = diffStr.toUtf8();
+    const char *diffStrC = diffStrBytes;
+    if (lua["maps"] == sol::nil
+        || lua["maps"][mapUnionId] == sol::nil
+        || lua["maps"][mapUnionId]["branch_rule"] == sol::nil
+        || lua["maps"][mapUnionId]["branch_rule"][diffStrC] == sol::nil) {
+        return 0;
+    }
+    sol::protected_function luaBranchRule
+        = lua["maps"][mapUnionId]["branch_rule"][diffStrC];
+    auto result = luaBranchRule(fleet.ships,
+                                fleet.los(),
+                                fleet.type,
+                                fleet.capitalness(),
+                                fleet.shipTags,
+                                fleet.shipSpeeds(),
+                                fleet.getEquipGrid(),
+                                0);
+    if (result.valid()) {
+        return result;
+    } else {
+        return 0;
     }
 }
 
@@ -2765,6 +3051,8 @@ regen_sanity:
                     query.lastError(), query.lastQuery());
             }
         }
+process_expeditions:
+        expeditionManager.processExpeditions();
 poll_ard_refunds:
         pollARDRefunds();
     } catch (DBError &e) {
@@ -3403,6 +3691,265 @@ void Server::handleConvertSkillPoints(const CSteamID &uid,
     senderM.sendMessage(connection, msg);
 }
 
+void Server::handleStartExpedition(const CSteamID &uid, QSslSocket *connection,
+                                   const QJsonObject &djson) {
+    try {
+        int mapUnionId = djson["mapid"].toInt();
+        int fleetIndex = djson["fleetindex"].toInt();
+        double autoRestartThreshold =
+            djson["autorestarthreshold"].toDouble();
+        QJsonObject plansJson = djson["battleplans"].toObject();
+
+        QMap<int, QByteArray> battlePlans;
+        for (auto it = plansJson.begin(); it != plansJson.end(); ++it) {
+            int nodeIndex = it.key().toInt();
+            QByteArray planData = QByteArray::fromBase64(
+                it.value().toString().toUtf8());
+            battlePlans[nodeIndex] = planData;
+        }
+        
+        /* If no battle plans provided, try to load from database */
+        if (battlePlans.isEmpty()) {
+            qDebug() << "No battle plans provided, attempting to load from database";
+            bool loadedFromDB = false;
+            try {
+                QSqlQuery query;
+                query.prepare(
+                    "SELECT NodeIndex, PlanData FROM UserExpeditionBattlePlan "
+                    "WHERE User = :user AND MapUnionId = :mapUnionId"
+                );
+                query.bindValue(":user", uid.ConvertToUint64());
+                query.bindValue(":mapUnionId", mapUnionId);
+                
+                if (!query.exec()) {
+                    //% "Failed to query battle plans for user %1 map %2"
+                    throw DBError(qtTrId("expedition-query-battle-plans-failed")
+                                     .arg(uid.ConvertToUint64()).arg(mapUnionId),
+                                  query.lastError(), query.lastQuery());
+                }
+                
+                while (query.next()) {
+                    int nodeIndex = query.value("NodeIndex").toInt();
+                    QByteArray planData = query.value("PlanData").toByteArray();
+                    battlePlans[nodeIndex] = planData;
+                }
+                
+                loadedFromDB = true;
+                qDebug() << "Loaded" << battlePlans.size() 
+                         << "battle plans from database for map" << mapUnionId;
+            }
+            catch (const DBError &e) {
+                //% "Failed to load battle plans from database for user %1 map %2"
+                qWarning() << qtTrId("expedition-load-plans-failed")
+                              .arg(uid.ConvertToUint64()).arg(mapUnionId);
+                /* Continue with empty plans - will be validated later */
+            }
+            
+            /* If still no battle plans (database empty or query failed), return error */
+            if (battlePlans.isEmpty()) {
+                qWarning() << "No battle plans available for expedition";
+                QByteArray msg = KP::serverExpeditionStartResult(mapUnionId, false,
+                                         KP::ExpeditionInvalidBattlePlans);
+                senderM.sendMessage(connection, msg);
+                return;
+            }
+        }
+
+        if (!hasMapWithUnionId(mapUnionId)) {
+            QByteArray msg = KP::serverExpeditionStartResult(mapUnionId, false,
+                                     KP::ExpeditionMapNotExist);
+            senderM.sendMessage(connection, msg);
+            return;
+        }
+
+        if (fleetIndex < 0 || fleetIndex >= KP::nonExpeditionFleetsSize) {
+            QByteArray msg = KP::serverExpeditionStartResult(mapUnionId, false,
+                                     KP::ExpeditionInvalidFleetIndex);
+            senderM.sendMessage(connection, msg);
+            return;
+        }
+
+        if (!validateExpeditionBattlePlans(mapUnionId, battlePlans)) {
+            QByteArray msg = KP::serverExpeditionStartResult(mapUnionId, false,
+                                     KP::ExpeditionInvalidBattlePlans);
+            senderM.sendMessage(connection, msg);
+            return;
+        }
+
+        KP::GameError error = expeditionManager.startExpedition(uid, mapUnionId,
+                        fleetIndex, battlePlans, autoRestartThreshold);
+
+        QByteArray msg = KP::serverExpeditionStartResult(
+            mapUnionId, error == KP::NoError, error);
+        senderM.sendMessage(connection, msg);
+    }
+    catch (const DBError &e) {
+        for(QString &i : e.whats()) {
+            qCritical() << i;
+        }
+        QByteArray msg = KP::serverExpeditionStartResult(
+            djson["mapid"].toInt(), false, KP::ExpeditionDatabaseError);
+        senderM.sendMessage(connection, msg);
+    }
+    catch (...) {
+        qCritical() << "Unknown error in handleStartExpedition";
+        QByteArray msg = KP::serverExpeditionStartResult(
+            djson["mapid"].toInt(), false, KP::ExpeditionInternalError);
+        senderM.sendMessage(connection, msg);
+    }
+}
+
+void Server::handleCancelExpedition(const CSteamID &uid, QSslSocket *connection,
+                                    const QJsonObject &djson) {
+    int mapUnionId = djson["mapid"].toInt();
+    int receiveFleetIndex = djson["receivefleetindex"].toInt();
+
+    if (receiveFleetIndex < 0 || receiveFleetIndex >= KP::nonExpeditionFleetsSize) {
+        qWarning() << "Invalid receive fleet index:" << receiveFleetIndex;
+        return;
+    }
+
+    bool success = expeditionManager.cancelExpedition(uid, mapUnionId,
+                                                      receiveFleetIndex);
+    qInfo() << "Cancel expedition result:" << success;
+}
+
+void Server::handleUpdateExpeditionPlan(const CSteamID &uid,
+                                        QSslSocket *connection,
+                                        const QJsonObject &djson) {
+    qDebug() << "handleUpdateExpeditionPlan called for user" << uid.ConvertToUint64();
+    int mapUnionId = djson["mapid"].toInt();
+    qDebug() << "Map union ID:" << mapUnionId;
+    QJsonObject plansJson = djson["battleplans"].toObject();
+
+    QMap<int, QByteArray> battlePlans;
+    qDebug() << "Processing" << plansJson.size() << "battle plans";
+    for (auto it = plansJson.begin(); it != plansJson.end(); ++it) {
+        int nodeIndex = it.key().toInt();
+        QByteArray planData = QByteArray::fromBase64(
+            it.value().toString().toUtf8());
+        battlePlans[nodeIndex] = planData;
+        qDebug() << "  Node" << nodeIndex << "plan size:" << planData.size() << "bytes";
+    }
+
+    if (!validateExpeditionBattlePlans(mapUnionId, battlePlans)) {
+        qWarning() << "Invalid battle plans for update";
+        return;
+    }
+
+    qDebug() << "Calling ExpeditionManager::updateBattlePlans with" << battlePlans.size()
+             << "battle plans for map" << mapUnionId;
+    bool success = expeditionManager.updateBattlePlans(uid, mapUnionId,
+                                                       battlePlans);
+    qInfo() << "Update expedition plan result:" << success;
+    if (success) {
+        qDebug() << "Successfully processed update expedition plan request for user"
+                 << uid.ConvertToUint64() << "map" << mapUnionId
+                 << "with" << battlePlans.size() << "battle plans";
+    }
+}
+
+ void Server::handleSetExpeditionSettings(const CSteamID &uid,
+                                          QSslSocket *connection,
+                                          const QJsonObject &djson) {
+    int mapUnionId = djson["mapid"].toInt();
+    double autoRestartThreshold =
+        djson["autorestarthreshold"].toDouble();
+    bool autoResupply = djson.value("autoresupply").toBool(false);
+
+    qInfo() << "Set expedition settings for map" << mapUnionId
+            << "threshold:" << autoRestartThreshold
+            << "resupply:" << autoResupply;
+    expeditionManager.setExpeditionSettings(uid, mapUnionId,
+                                           autoRestartThreshold, autoResupply);
+ }
+
+void Server::handleQueryExpeditionStatus(const CSteamID &uid,
+                                         QSslSocket *connection,
+                                         const QJsonObject &djson) {
+    std::optional<int> mapUnionId = std::nullopt;
+    if (djson.contains("mapid")) {
+        mapUnionId = djson["mapid"].toInt();
+    }
+    QJsonArray expeditions = expeditionManager.getUserExpeditions(uid, mapUnionId);
+    QByteArray msg = KP::serverExpeditionStatus(expeditions);
+    senderM.sendMessage(connection, msg);
+}
+
+
+
+bool Server::validateExpeditionBattlePlans(int mapUnionId,
+                                            const QMap<int, QByteArray> &battlePlans) {
+    if (!hasMapWithUnionId(mapUnionId)) {
+        qWarning() << "Map" << mapUnionId << "does not exist";
+        return false;
+    }
+
+    /* Empty battle plans are allowed (e.g., deleting all plans during update).
+     * Caller must decide if empty plans are acceptable for the operation. */
+    if (battlePlans.isEmpty()) {
+        qDebug() << "Empty battle plans provided";
+        return true;
+    }
+
+    /* First pass: validate all provided battle plans are for valid nodes */
+    /* We don't check for missing battle plans here to allow partial plans during planning */
+
+    /* Second pass: ensure no battle plans for nodes that shouldn't have them */
+    for (auto it = battlePlans.constBegin(); it != battlePlans.constEnd(); ++it) {
+        int nodeIndex = it.key();
+        if (!nodeExistsInLua(mapUnionId, nodeIndex)) {
+            qWarning() << "Battle plan for non-existent node" << nodeIndex;
+            return false;
+        }
+        KP::NodeType nodeType = getNodeTypeFromLua(mapUnionId, nodeIndex);
+        bool shouldHavePlan = false;
+        switch (nodeType) {
+        case KP::NORMAL:
+        case KP::BOSS:
+        case KP::NIGHT:
+        case KP::NIGHTBOSS:
+        case KP::AIR:
+        case KP::CHOICE:
+            shouldHavePlan = true;
+            break;
+        default:
+            /* STARTING, TRANSPORT, DISASTER, EMPTY should not have plans */
+            break;
+        }
+        if (!shouldHavePlan) {
+            qWarning() << "Battle plan for non-battle node" << nodeIndex 
+                       << "of type" << static_cast<int>(nodeType);
+            return false;
+        }
+        
+        /* For CHOICE nodes, validate selectedNode is a valid next node */
+        if (nodeType == KP::CHOICE) {
+            QByteArray planData = it.value();
+            QCborValue cbor = QCborValue::fromCbor(planData);
+            if (!cbor.isMap()) {
+                qWarning() << "Choice plan for node" << nodeIndex
+                           << "not a map";
+                return false;
+            }
+            QCborMap planMap = cbor.toMap();
+            if (!planMap.contains(QStringLiteral("selectedNode"))) {
+                qWarning() << "Choice plan for node" << nodeIndex
+                           << "missing selectedNode";
+                return false;
+            }
+            int selectedNode = planMap.value(QStringLiteral("selectedNode")).toInteger(-1);
+            if (!getNextNodesFromLua(mapUnionId, nodeIndex).contains(selectedNode)) {
+                qWarning() << "Choice plan for node" << nodeIndex
+                           << "selectedNode" << selectedNode
+                           << "not in nextNodes";
+                return false;
+            }
+        }
+    }
+
+    return true;
+}
 QUuid Server::newShip(const CSteamID &uid, int shipId, bool direct) {
     Q_UNUSED(direct)
     int startingHP;
@@ -3865,6 +4412,8 @@ equip_skillpoints_fill:
     initUserEquipSPInfo(uid);
 map_status:
     initUserMapStatus(uid);
+fleet_status:
+    initUserFleetStatus(uid);
 
     connectedPeers[uid] = connection;
     connectedUsers[connection] = uid;
@@ -4190,6 +4739,27 @@ anti_ddos:
                         uid);});
     }
         break;
+    case KP::CommandType::CancelExpedition: {
+        handleCancelExpedition(uid, connection, djson);
+    }
+        break;
+    case KP::CommandType::QueryExpeditionStatus: {
+        handleQueryExpeditionStatus(uid, connection, djson);
+    }
+        break;
+
+    case KP::CommandType::SetExpeditionSettings: {
+        handleSetExpeditionSettings(uid, connection, djson);
+    }
+        break;
+    case KP::CommandType::StartExpedition: {
+        handleStartExpedition(uid, connection, djson);
+    }
+        break;
+    case KP::CommandType::UpdateExpeditionPlan: {
+        handleUpdateExpeditionPlan(uid, connection, djson);
+    }
+        break;
     case KP::CommandType::DemandRankInfo: {
         if(!djson.contains("page")) {
             offerRankInfo(uid, connection, djson["rpp"].toInt());
@@ -4447,8 +5017,9 @@ void Server::sendTestMessages() {
         qWarning() << "Server isn't listening, abort.";
     }
     else {
-        for(auto ship: std::as_const(shipRegistry)) {
-            qCritical() << ship->toString() << equipRegistry[413]->canEquip(ship, lua);
+        for(auto map: normalMaps) {
+            int unionId = MapWithDiff::getUnionId(map->id);
+            qCritical() << unionId << getAllNodeIndicesFromLua(unionId).size();
         }
     }
 }
@@ -4791,12 +5362,10 @@ check_duplicate_remodel_group:
         iter != fleetTypes.keyValueEnd();
         ++iter) {
         QSqlQuery query;
-        query.prepare("UPDATE UserAttr SET Intvalue = :type "
-                      "WHERE Attribute = :attr "
-                      "AND UserID = :uid");
+        query.prepare("UPDATE UserFleetStatus SET FleetType = :type "
+                      "WHERE User = :uid AND FleetIndex = :fleetIndex");
         query.bindValue(":uid", uid.ConvertToUint64());
-        query.bindValue(":attr", QString("Fleet%1")
-                        .arg(iter->first + 1));
+        query.bindValue(":fleetIndex", iter->first);
         query.bindValue(":type", iter->second);
         if(Q_UNLIKELY(!query.exec())) {
             //% "Update fleet failure!"
@@ -5016,18 +5585,18 @@ dock:
         }
     }
 fleet_status:
-    for(int i = 0; i < KP::fleetsSize; ++i) {
+    for(int i = 0; i < KP::nonExpeditionFleetsSize; ++i) {
         QSqlQuery insert;
-        if(!insert.prepare("INSERT INTO UserAttr "
-                           "(UserID, Attribute, Intvalue) "
-                           "VALUES (:uid, :attr, :value);")) {
+        if(!insert.prepare("INSERT OR IGNORE INTO UserFleetStatus "
+                           "(User, FleetIndex, FleetType) "
+                           "VALUES (:uid, :fleetIndex, :fleetType);")) {
             //% "Set User Fleet Up failed!"
             throw DBError(qtTrId("init-userfleet-failed"),
                           insert.lastError(), insert.lastQuery());
         }
         insert.bindValue(":uid", uid.ConvertToUint64());
-        insert.bindValue(":attr", QString("Fleet%1").arg(i+1));
-        insert.bindValue(":value", KP::NormalFleet);
+        insert.bindValue(":fleetIndex", i);
+        insert.bindValue(":fleetType", KP::NormalFleet);
         if(!insert.exec()) {
             //% "Set User Fleet Up failed!"
             throw DBError(qtTrId("init-userfleet-failed"),
@@ -5050,6 +5619,21 @@ rank:
             return;
         }
     }
+}
+
+MapWithDiff *Server::getMapByUnionId(int mapUnionId) const {
+    for (MapWithDiff *map : normalMaps) {
+        if (!map) continue;
+        int unionId = MapWithDiff::getUnionId(map->id);
+        if (unionId == mapUnionId) {
+            return map;
+        }
+    }
+    return nullptr;
+}
+
+bool Server::hasMapWithUnionId(int mapUnionId) const {
+    return getMapByUnionId(mapUnionId) != nullptr;
 }
 
 QT_END_NAMESPACE

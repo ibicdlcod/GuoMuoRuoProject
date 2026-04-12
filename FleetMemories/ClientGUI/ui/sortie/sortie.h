@@ -6,7 +6,11 @@
 
 #include <QFrame>
 #include <QLabel>
+#include <QJsonArray>
 #include <QJsonObject>
+#include <QMap>
+#include <QSet>
+#include <QByteArray>
 #include "../../../Protocol/kp.h"
 #include "mapdetail.h"
 #include "maprender.h"
@@ -19,9 +23,18 @@ namespace Ui {
 class Sortie;
 }
 
+class QGroupBox;
+class QPushButton;
+class QSlider;
+class QCheckBox;
+
 class Sortie : public QFrame
 {
     Q_OBJECT
+
+signals:
+    void expeditionMapsUpdated(const QSet<int> &mapIds);
+    void expeditionActiveMapsUpdated(const QSet<int> &mapIds);
 
 public:
     explicit Sortie(QWidget *parent = nullptr);
@@ -46,6 +59,20 @@ private slots:
     void sortieEnd();
     void sortieStart(const QJsonObject &djson);
     void switchMap(int mapId);
+    void expeditionNodeClicked(int nodeId);
+    // Expedition slots
+    void expeditionStartResult(int mapUnionId, bool accepted, KP::GameError error);
+    void expeditionStatus(const QJsonArray &expeditions);
+    void expeditionProgressUpdate(int mapUnionId, int nodeIndex, const QJsonObject &battleResult);
+    void expeditionStopped(int mapUnionId, KP::ExpeditionStopReason stopReason);
+    void updateExpeditionUI(int mapUnionId);
+    void startExpedition();
+    void cancelExpedition();
+    void updateExpeditionSettings();
+    void updateExpeditionAutoRestart();
+    void updateAutoRestartLabel();
+    void saveExpeditionSettings();
+    void planExpeditionNodes();
 
 private:
     Ui::Sortie *ui;
@@ -54,13 +81,36 @@ private:
     BattleWidget *battleW;
     ResourceGainView *resourceGainW;
     MapViewWidget *globeFrame;
+    // Expedition UI
+    QGroupBox *expeditionGroup;
+    QPushButton *expeditionPlanButton;
+    QPushButton *expeditionStartButton;
+    QPushButton *expeditionCancelButton;
+    QSlider *thresholdSlider;
+    QLabel *thresholdLabel;
+    QCheckBox *autoRestartCheckBox;
+    QPushButton *saveSettingsButton;
 
     KP::SortieState sortieState = KP::MapView;
     int mapIndex = 0;
     QString mapStr;
-    MapWithDiff *currentMap;
+    MapWithDiff *currentMap = nullptr;
     int currentNodeId = 0;
     QJsonObject currentBattleProcess;
+
+    // Expedition state
+    bool expeditionMode = false;
+    QMap<int, QMap<int, QByteArray>> expeditionBattlePlans;
+    QSet<int> expeditionMapIds;
+    QSet<int> expeditionActiveMapIds;
+    QMap<int, QJsonObject> expeditionSettings;
+    double autoRestartThreshold = 1.0; // 100%
+    bool autoResupply = true;
+    int expeditionFleetIndex = 0;
+    // Expedition choice selection state
+    bool expeditionChoicePending = false;
+    int expeditionChoiceNodeId = -1;
+    QList<int> expeditionChoiceNodeIds;
 };
 
 #endif // SORTIE_H
