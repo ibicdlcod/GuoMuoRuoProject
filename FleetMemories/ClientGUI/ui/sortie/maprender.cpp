@@ -31,6 +31,7 @@ MapRender::MapRender(QWidget *parent)
 
     pen = QPen(QColor(128, 192, 255), 7);
     expeditionPen = QPen(QColor(128, 0, 255), 7);
+    expeditionStoppedPen = QPen(QColor(128, 128, 128), 7);
     brushHovered = QBrush(Qt::blue);
 
     setBackgroundRole(QPalette::Base);
@@ -71,6 +72,12 @@ void MapRender::setDiff(const QString &text) {
 void MapRender::setExpeditionMaps(const QSet<int> &mapIds)
 {
     expeditionMapIds = mapIds;
+    update();
+}
+
+void MapRender::setExpeditionActiveMaps(const QSet<int> &mapIds)
+{
+    expeditionActiveMapIds = mapIds;
     update();
 }
 
@@ -171,8 +178,14 @@ void MapRender::paintEvent(QPaintEvent * /* event */)
             brush = QBrush(QColor::fromHsv(hueFactor * 120.0, 255, 255));
             painter.setBrush(brush);
         }
-        if (expeditionMapIds.contains(MapWithDiff::getUnionId(map->id))) {
-            painter.setPen(expeditionPen);
+        int mapId = MapWithDiff::getUnionId(map->id);
+        if (expeditionMapIds.contains(mapId)) {
+            if(expeditionActiveMapIds.contains(mapId)) {
+                painter.setPen(expeditionPen);
+            }
+            else {
+                painter.setPen(expeditionStoppedPen);
+            }
         } else {
             painter.setPen(pen);
         }

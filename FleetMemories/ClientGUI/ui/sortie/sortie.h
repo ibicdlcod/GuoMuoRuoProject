@@ -34,6 +34,7 @@ class Sortie : public QFrame
 
 signals:
     void expeditionMapsUpdated(const QSet<int> &mapIds);
+    void expeditionActiveMapsUpdated(const QSet<int> &mapIds);
 
 public:
     explicit Sortie(QWidget *parent = nullptr);
@@ -101,7 +102,8 @@ private:
     bool expeditionMode = false;
     QMap<int, QMap<int, QByteArray>> expeditionBattlePlans;
     QSet<int> expeditionMapIds;
-    QMap<int, QJsonObject> activeExpeditions;
+    QSet<int> expeditionActiveMapIds;
+    QMap<int, QJsonObject> expeditionSettings;
     double autoRestartThreshold = 1.0; // 100%
     bool autoResupply = true;
     int expeditionFleetIndex = 0;

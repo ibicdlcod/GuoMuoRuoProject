@@ -22,6 +22,7 @@ public:
 public slots:
     void setDiff(const QString &text);
     void setExpeditionMaps(const QSet<int> &mapIds);
+    void setExpeditionActiveMaps(const QSet<int> &mapIds);
 
 signals:
     void mapSelected(int mapId);
@@ -44,7 +45,9 @@ private:
     KP::Difficulty diff;
     
     QSet<int> expeditionMapIds;
+    QSet<int> expeditionActiveMapIds;
     QPen expeditionPen;
+    QPen expeditionStoppedPen;
 };
 
 #endif // MAPRENDER_H

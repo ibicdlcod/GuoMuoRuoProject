@@ -71,7 +71,6 @@ static constexpr int combinedFleetMinCapitalness = 15;
 static constexpr int combinedFleetMaxCapitalness = 50;
 static constexpr int transportFleetMaxCapitalness = 25;
 static constexpr int expeditionFleetMask = 256;
-static constexpr int maxExpeditionsPerUser = 10;
 static constexpr int resourceMapIDStart = 1024;
 static constexpr int resourceMapIDEnd = 2048;
 static constexpr int mapIDDifficultyMask = 4096;

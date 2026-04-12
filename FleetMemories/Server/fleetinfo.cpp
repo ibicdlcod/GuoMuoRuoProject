@@ -219,8 +219,8 @@ QList<int> FleetInfo::findEscortCandidates(bool isExpedition) const
 
 bool FleetInfo::performEscortRetreat(int damagedPos, bool isExpedition)
 {
-    if (damagedPos < 0 || damagedPos >= static_cast<int>(shipDynamics.size()))
-        return false;
+    if (damagedPos <= 0 || damagedPos >= static_cast<int>(shipDynamics.size()))
+        return false; // you can't retreat pos 0 that is flagship
     ShipDynamic *dyn = shipDynamics[damagedPos];
     if (!dyn) return false;
     QList<int> candidates = findEscortCandidates(isExpedition);

@@ -159,6 +159,8 @@ Sortie::Sortie(QWidget *parent)
             this, &Sortie::switchMap);
     connect(this, &Sortie::expeditionMapsUpdated,
             renderer, &MapRender::setExpeditionMaps);
+    connect(this, &Sortie::expeditionActiveMapsUpdated,
+            renderer, &MapRender::setExpeditionActiveMaps);
     ui->diffChoice->setSizeAdjustPolicy(QComboBox::AdjustToContents);
     connect(ui->sortieButton, &QPushButton::clicked,
             this, &Sortie::confirmSortieStart);
@@ -815,12 +817,12 @@ void Sortie::expeditionStartResult(int mapUnionId, bool accepted,
 void Sortie::updateExpeditionUI(int mapUnionId)
 {
     bool hasExpedition = false;
-    bool hasSettings = activeExpeditions.contains(mapUnionId);
+    bool hasSettings = expeditionSettings.contains(mapUnionId);
     double serverThreshold = 1.0;
     bool serverAutoResupply = false;
     
     if (hasSettings) {
-        QJsonObject expObj = activeExpeditions[mapUnionId];
+        QJsonObject expObj = expeditionSettings[mapUnionId];
         /* Determine if there's an expedition record */
         if (expObj.contains("haveexpedition")) {
             hasExpedition = expObj["haveexpedition"].toBool(false);
@@ -880,16 +882,23 @@ void Sortie::expeditionStatus(const QJsonArray &expeditions)
     for (const QJsonValue &expValue : expeditions) {
         QJsonObject expObj = expValue.toObject();
         int mapUnionId = expObj["mapid"].toInt();
-        activeExpeditions[mapUnionId] = expObj;
+        expeditionSettings[mapUnionId] = expObj;
         if(expObj["haveexpedition"].toBool()) {
             expeditionMapIds.insert(mapUnionId);
         }
         else {
             expeditionMapIds.remove(mapUnionId);
         }
+        if(expObj["isactive"].toBool()) {
+            expeditionActiveMapIds.insert(mapUnionId);
+        }
+        else {
+            expeditionActiveMapIds.remove(mapUnionId);
+        }
     }
     
     emit expeditionMapsUpdated(expeditionMapIds);
+    emit expeditionActiveMapsUpdated(expeditionActiveMapIds);
     
     // Update UI for currently selected map if in expedition mode
     if (expeditionMode && currentMap) {

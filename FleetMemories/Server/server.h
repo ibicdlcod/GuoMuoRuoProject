@@ -80,6 +80,14 @@ private slots:
 private:
     friend class PlaneReplenish;
     friend class ExpeditionManager;
+    struct DisasterResult {
+        double fuelFrac;
+        double ammoFrac;
+        bool deductionOccurred;
+        double requiredLOS;
+        double fleetLOS;
+        double chanceToAvoid;
+    };
     bool addEquipStar(const QUuid &, int);
     bool clearMap(const CSteamID &, int);
     void clearNegativeSkillPoints(const CSteamID &);
@@ -114,6 +122,16 @@ private:
                                const QJsonObject &);
     void handleBattleAftermath(const CSteamID &, QSslSocket *, const QJsonObject &,
                                int, int, int, KP::NodeType, int);
+    DisasterResult handleDisasterNode(const CSteamID &uid, int mapId, int nodeIndex,
+                                      KP::NodeType nodeType, FleetInfo *fleetInfo,
+                                      double fuelFrac, double ammoFrac,
+                                      bool sendMessages, QSslSocket *connection = nullptr);
+    bool handleCriticalDamage(const CSteamID &uid, FleetInfo *fleetInfo,
+                              int fleetIndex,
+                              bool isExpedition, bool sendMessages,
+                              QSslSocket *connection = nullptr);
+    void handleAttrition(const CSteamID &uid, int fleetIndex,
+                         double fuelFrac, double ammoFrac);
     void handleConvertSkillPoints(const CSteamID &, QSslSocket *, const QJsonObject &);
     void handleInitARDPurchase(const CSteamID &, QSslSocket *, int packageId);
     void handleSupplyShip(const CSteamID &, QSslSocket *,
