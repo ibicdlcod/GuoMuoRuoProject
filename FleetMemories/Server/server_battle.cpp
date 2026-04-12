@@ -664,46 +664,23 @@ int Server::nextNode(const CSteamID &uid, QSslSocket *connection,
                      int mapId, int prevNode, int fleetIndex) {
     KP::Difficulty diff = static_cast<KP::Difficulty>
         (MapWithDiff::getDiff(mapId));
-    QString diffStr = (*KP::diffEnumtoStr)[diff];
-    QByteArray diffStrBytes = diffStr.toUtf8();
-    const char *diffStrC = diffStrBytes;
-    mapId = MapWithDiff::getUnionId(mapId);
-    if(lua["maps"][mapId] == sol::nil
-        || lua["maps"][mapId][prevNode] == sol::nil
-        || lua["maps"][mapId][prevNode]["branch_rule"] == sol::nil
-        || lua["maps"][mapId][prevNode]["branch_rule"][diffStrC]
-               == sol::nil) {
+    int mapUnionId = MapWithDiff::getUnionId(mapId);
+    
+    FleetInfo *fiPtr = sortieFleets.value({uid, fleetIndex}, nullptr);
+    if (!fiPtr) {
         QByteArray msg = KP::serverBattleError(KP::FleetLost);
         senderM.sendMessage(connection, msg);
         return 0;
     }
-    else {
-        FleetInfo *fiPtr = sortieFleets.value({uid, fleetIndex}, nullptr);
-        if(!fiPtr) {
-            QByteArray msg = KP::serverBattleError(KP::FleetLost);
-            senderM.sendMessage(connection, msg);
-            return 0;
-        }
-        FleetInfo &info = *fiPtr;
-        sol::protected_function luaChooseStartingNode
-            = lua["maps"][mapId][prevNode]["branch_rule"][diffStrC];
-        auto result = luaChooseStartingNode(info.ships,
-                                            info.los(),
-                                            info.type,
-                                            info.capitalness(),
-                                            info.shipTags,
-                                            info.shipSpeeds(),
-                                            info.getEquipGrid(),
-                                            0);
-        if(result.valid()) {
-            return result;
-        }
-        else {
-            QByteArray msg = KP::serverBattleError(KP::FleetLost);
-            senderM.sendMessage(connection, msg);
-            return 0;
-        }
+    FleetInfo &info = *fiPtr;
+    
+    int chosenNode = evaluateBranchRule(mapUnionId, prevNode, diff, info);
+    if (chosenNode == 0) {
+        QByteArray msg = KP::serverBattleError(KP::FleetLost);
+        senderM.sendMessage(connection, msg);
+        return 0;
     }
+    return chosenNode;
 }
 
 void Server::processBattle(const CSteamID &uid, QSslSocket *connection,
@@ -1793,45 +1770,46 @@ void Server::progressMap(const CSteamID &uid, QSslSocket *connection,
                 ammoFrac = ammoOverride.as<double>();
         }
 
-    /* Disaster node handling */
-    DisasterResult disasterResult = handleDisasterNode(uid, mapId, nNode, nType,
-                                                       sortieFleets.value({uid, result.value()[3]}, nullptr),
-                                                       fuelFrac, ammoFrac,
-                                                       true, connection);
-    fuelFrac = disasterResult.fuelFrac;
-    ammoFrac = disasterResult.ammoFrac;
+        /* Disaster node handling */
+        DisasterResult disasterResult = handleDisasterNode(uid, mapId, nNode, nType,
+                                                           sortieFleets.value({uid, result.value()[3]}, nullptr),
+                                                           fuelFrac, ammoFrac,
+                                                           true, connection);
+        fuelFrac = disasterResult.fuelFrac;
+        ammoFrac = disasterResult.ammoFrac;
 
-    /* TODO: Determine if this is an expedition map */
-    bool isExpedition = false;
+        /* originally intended for expedition, but now handled elsewhere */
+        bool isExpedition = false;
 
-    int activeFleet = result.value()[3];
-    FleetInfo *fi = sortieFleets.value({uid, activeFleet}, nullptr);
-    if(fi) {
-        /* Apply fuel/ammo consumption */
-        for(ShipDynamic *dyn : fi->shipDynamics) {
-            if(!dyn || dyn->fleetFled) continue;
-            dyn->fuel = std::max(0.0, dyn->fuel - fuelFrac);
-            dyn->ammo = std::max(0.0, dyn->ammo - ammoFrac);
-        }
+        int activeFleet = result.value()[3];
+        FleetInfo *fi = sortieFleets.value({uid, activeFleet}, nullptr);
+        if(fi) {
+            /* Apply fuel/ammo consumption */
+            for(ShipDynamic *dyn : fi->shipDynamics) {
+                if(!dyn || dyn->fleetFled) continue;
+                dyn->fuel = std::max(0.0, dyn->fuel - fuelFrac);
+                dyn->ammo = std::max(0.0, dyn->ammo - ammoFrac);
+            }
 
-        bool fleetFailed = handleCriticalDamage(uid, fi, activeFleet,
-                                                isExpedition, true, connection);
+            bool fleetFailed = handleCriticalDamage(uid, fi, activeFleet,
+                                                    isExpedition, true, connection);
 
-        updateFleetIntoDatabase(uid, *fi, activeFleet);
-
-        if(fleetFailed) {
-            nNode = 0;
-            goto critical_damage_end;
-        }
-    }
-
-    /* 8.1-supply.md#Supply_chain_and_attrition — per-node attrition
+            /* 8.1-supply.md#Supply_chain_and_attrition — per-node attrition
              * cost: sum of (effective fraction used × FuelConsumption /
              * AmmoConsumption) across the fleet, multiplied by the sortie
              * attrition stored at sortie start. */
-    /* Attrition handling */
-    handleAttrition(uid, activeFleet, fuelFrac, ammoFrac);
+            /* Attrition handling */
+            handleAttrition(uid, activeFleet, fuelFrac, ammoFrac);
+
+            updateFleetIntoDatabase(uid, *fi, activeFleet);
+
+            if(fleetFailed) {
+                nNode = 0;
+                goto critical_damage_end;
+            }
+        }
     }
+
 critical_damage_end:
 {
     QSqlQuery query;
@@ -1898,7 +1876,8 @@ void Server::startSortie(const CSteamID &uid, QSslSocket *connection,
     const char *diffStrC = diffStrBytes;
     int unionId = MapWithDiff::getUnionId(mapId);
     if(expedition) {
-        return;//TODO: add expedition
+        /* originally intended for expedition, but now handled elsewhere */
+        return;
     }
     if(!User::isMapUnlocked(uid, unionId, diff)
         || lua["maps"][unionId] == sol::nil
@@ -2401,7 +2380,7 @@ void Server::handleAttrition(const CSteamID &uid, int fleetIndex,
         expQuery.bindValue(":mapUnionId", mapUnionId);
         
         if(Q_LIKELY(expQuery.exec() && expQuery.isSelect()
-                    && expQuery.first())) {
+                     && expQuery.first())) {
             KP::Difficulty diff = static_cast<KP::Difficulty>(expQuery.value(0).toInt());
             auto [reachable, finiteRoute, computedAttrition] =
                 computeSupplyAttrition(uid, mapUnionId, diff);
@@ -2420,7 +2399,7 @@ void Server::handleAttrition(const CSteamID &uid, int fleetIndex,
         attrValQ.bindValue(":uid", uid.ConvertToUint64());
         attrValQ.bindValue(":attr", KP::attrAttrition);
         if(Q_LIKELY(attrValQ.exec() && attrValQ.isSelect()
-                    && attrValQ.first())) {
+                     && attrValQ.first())) {
             attrition = attrValQ.value(0).toDouble();
         }
     }
@@ -2446,7 +2425,7 @@ void Server::handleAttrition(const CSteamID &uid, int fleetIndex,
         costQ.bindValue(":uid", uid.ConvertToUint64());
         costQ.bindValue(":fi", fleetIndex);
         if(Q_LIKELY(costQ.exec() && costQ.isSelect()
-                    && costQ.first())) {
+                     && costQ.first())) {
             double oilCost  = costQ.value(0).toDouble() * attrition;
             double exploCost = costQ.value(1).toDouble() * attrition;
             QSqlQuery deductQ;

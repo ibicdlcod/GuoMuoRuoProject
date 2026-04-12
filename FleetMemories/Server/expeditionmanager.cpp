@@ -169,31 +169,14 @@ KP::GameError ExpeditionManager::startExpedition(const CSteamID &uid, int mapId,
         /* Get fleet info for branch rule calculation */
         FleetInfo fleet = server->queryFleetInfo(uid, fleetIndex);
         
-        sol::protected_function luaChooseStartingNode
-            = server->lua["maps"][mapUnionId]["branch_rule"][diffStrC];
-        auto result = luaChooseStartingNode(fleet.ships,
-                                            fleet.los(),
-                                            fleet.type,
-                                            fleet.capitalness(),
-                                            fleet.shipTags,
-                                            fleet.shipSpeeds(),
-                                            fleet.getEquipGrid(),
-                                            0);
-        if (result.valid()) {
-            startingNode = result;
-            if (startingNode == 0) {
-                //% "Fleet doesn't fit map %1"
-                qWarning() << qtTrId("expedition-fleet-no-start-node")
-                                  .arg(mapUnionId);
-                return KP::ExpeditionFleetDoesNotFitMap;
-            }
-        } else {
-            sol::error err = result;
-            //% "Lua branch rule error for map %1: %2"
-            qWarning() << qtTrId("expedition-lua-branch-rule-error")
-                              .arg(mapUnionId).arg(err.what());
-            return KP::ExpeditionInternalError;
+        int chosenNode = server->evaluateMapBranchRule(mapUnionId, diff, fleet);
+        if (chosenNode == 0) {
+            //% "Fleet doesn't fit map %1"
+            qWarning() << qtTrId("expedition-fleet-no-start-node")
+                              .arg(mapUnionId);
+            return KP::ExpeditionFleetDoesNotFitMap;
         }
+        startingNode = chosenNode;
         
         qDebug() << "Expedition starting node determined:" << startingNode
                  << "for map" << mapUnionId << "difficulty" << diffStr;
@@ -330,6 +313,7 @@ KP::GameError ExpeditionManager::startExpedition(const CSteamID &uid, int mapId,
         query.bindValue(":selectedChoiceNode", selectedChoiceNode);
         
         if (!query.exec()) {
+            db.rollback();
             //% "Failed to insert battle plan for user %1 map %2 node %3"
             throw DBError(qtTrId("expedition-battle-plan-insert-failed")
                               .arg(uid.ConvertToUint64()).arg(mapUnionId)
@@ -620,6 +604,7 @@ bool ExpeditionManager::updateBattlePlans(const CSteamID &uid, int mapId,
         query.bindValue(":selectedChoiceNode", selectedChoiceNode);
         
         if (!query.exec()) {
+            db.rollback();
             //% "Failed to insert battle plan for user %1 map %2 node %3"
             throw DBError(qtTrId("expedition-battle-plan-insert-failed")
                               .arg(uid.ConvertToUint64()).arg(mapUnionId)
@@ -899,9 +884,23 @@ void ExpeditionManager::progressExpedition(const CSteamID &uid, int mapUnionId, 
                 nextNode = currentNodeObj.nextNodes.first();
             }
         } else {
-            /* TODO: change this to actual branch rule, queried from server's lua */
-            /* For other nodes, first next node */
-            nextNode = currentNodeObj.nextNodes.first();
+            /* Apply branch rule from Lua if available */
+            int expeditionFleetIndex = mapUnionId + KP::expeditionFleetMask;
+            FleetInfo fleet = server->queryFleetInfo(uid, expeditionFleetIndex);
+            
+            int chosenNode = server->evaluateBranchRule(mapUnionId, currentNode,
+                                                        diff, fleet);
+            if (chosenNode != 0 && currentNodeObj.nextNodes.contains(chosenNode)) {
+                nextNode = chosenNode;
+            } else {
+                if (chosenNode != 0) {
+                    //% "Branch rule returned invalid node %1 map %2 user %3"
+                    qWarning() << qtTrId("expedition-branch-rule-invalid-node")
+                                      .arg(chosenNode).arg(mapUnionId)
+                                      .arg(uid.ConvertToUint64());
+                }
+                nextNode = currentNodeObj.nextNodes.first();
+            }
         }
     }
     
@@ -1100,6 +1099,62 @@ void ExpeditionManager::executeExpeditionBattle(const CSteamID &uid,
     //% "Expedition battle executed for user %1 map %2 node %3"
     qInfo() << qtTrId("expedition-battle-executed")
                    .arg(uid.ConvertToUint64()).arg(mapUnionId).arg(nodeIndex);
+    
+    /* Apply naval supremacy gain for expedition end nodes (6.2-supremacy.md) */
+    if (server->nodeExistsInLua(mapUnionId, nodeIndex)) {
+        MapNode node = server->getNodeFromLua(mapUnionId, nodeIndex);
+        
+        /* Check if this is a battle node with no next nodes (end node) */
+        bool isBattleNode = (node.type == KP::NORMAL ||
+                             node.type == KP::BOSS ||
+                             node.type == KP::NIGHT ||
+                             node.type == KP::NIGHTBOSS ||
+                             node.type == KP::AIR);
+        
+        if (isBattleNode && server->getNextNodesFromLua(mapUnionId, nodeIndex).isEmpty()) {
+            /* Get battle assessment from result */
+            KP::BattleAssessment assm = static_cast<KP::BattleAssessment>(
+                battleResult["assm"].toInt());
+            
+            /* Only apply for S/A/B victories */
+            if (assm == KP::SVictory || assm == KP::AVictory || assm == KP::BVictory) {
+                double currentSupremacy = User::checkMapSupremacy(uid, mapUnionId);
+                
+                /* Calculate base supremacy gain according to difficulty */
+                double baseSupremacy2Times;
+                switch(diff) {
+                case KP::EarlyWar: baseSupremacy2Times = 100; break;
+                case KP::MidWar: baseSupremacy2Times = 200; break;
+                case KP::LateWar: baseSupremacy2Times = 300; break;
+                case KP::Historical: baseSupremacy2Times = 400; break; // Extrapolated pattern
+                default: baseSupremacy2Times = 0; break;
+                }
+
+                baseSupremacy2Times *= KP::expeditionSupremacyMaxFactor;
+
+                /* Apply victory factor */
+                double factor;
+                switch(assm) {
+                case KP::SVictory: factor = 1.0; break;
+                case KP::AVictory: factor = 0.8; break;
+                case KP::BVictory: factor = 0.5; break;
+                default: factor = 0.0; break;
+                }
+
+                /* Calculate new supremacy: (a/2 + base) * factor */
+                double newSupremacy = (currentSupremacy / 2.0 + baseSupremacy2Times / 2.0) * factor;
+
+                /* Only apply if new value is higher than current */
+                if (newSupremacy > currentSupremacy) {
+                    User::setMapSupremacy(uid, mapUnionId, newSupremacy, 0);
+                    qInfo() << "Expedition naval supremacy updated for map" << mapUnionId
+                            << "difficulty" << static_cast<int>(diff)
+                            << "from" << currentSupremacy << "to" << newSupremacy
+                            << "(victory:" << static_cast<int>(assm) << ")";
+                }
+            }
+        }
+    }
     
     // Send progress update with battle result
     sendExpeditionProgressUpdate(uid, mapUnionId, diff, nodeIndex, battleResult);
@@ -1303,12 +1358,11 @@ bool ExpeditionManager::attemptAutoResupply(const CSteamID &uid, int mapUnionId,
         upd.bindValue(":uid", uid.ConvertToUint64());
         upd.bindValue(":uuid", pair.first);
         if (!upd.exec()) {
-            /* TODO: convert to DBError */
-            //% "Failed to resupply fuel for ship %1 user %2"
-            qWarning() << qtTrId("expedition-resupply-fuel-failed")
-                              .arg(pair.first).arg(uid.ConvertToUint64());
             db.rollback();
-            return false;
+            //% "Failed to resupply fuel for ship %1 user %2"
+            throw DBError(qtTrId("expedition-resupply-fuel-failed")
+                              .arg(pair.first).arg(uid.ConvertToUint64()),
+                          upd.lastError(), upd.lastQuery());
         }
     }
     
@@ -1319,12 +1373,11 @@ bool ExpeditionManager::attemptAutoResupply(const CSteamID &uid, int mapUnionId,
         upd.bindValue(":uid", uid.ConvertToUint64());
         upd.bindValue(":uuid", pair.first);
         if (!upd.exec()) {
-            /* TODO: convert to DBError */
-            //% "Failed to resupply ammo for ship %1 user %2"
-            qWarning() << qtTrId("expedition-resupply-ammo-failed")
-                              .arg(pair.first).arg(uid.ConvertToUint64());
             db.rollback();
-            return false;
+            //% "Failed to resupply ammo for ship %1 user %2"
+            throw DBError(qtTrId("expedition-resupply-ammo-failed")
+                              .arg(pair.first).arg(uid.ConvertToUint64()),
+                          upd.lastError(), upd.lastQuery());
         }
     }
     

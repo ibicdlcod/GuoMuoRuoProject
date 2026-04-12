@@ -3,6 +3,7 @@
 
 #include <QApplication>
 #include <QColor>
+#include <QDebug>
 #include <QGuiApplication>
 #include <QMouseEvent>
 #include <QPainter>
@@ -110,8 +111,9 @@ void MapDetail::displayDetailedMap(Map *map) {
 }
 
 void MapDetail::setChoiceNodes(const QList<int> &nodeIds) {
+    qInfo() << "MapDetail::setChoiceNodes nodeIds:" << nodeIds << "awaitingChoice:" << (!nodeIds.isEmpty());
     choiceNodeIds = nodeIds;
-    awaitingChoice = true;
+    awaitingChoice = !nodeIds.isEmpty();
     update();
 }
 

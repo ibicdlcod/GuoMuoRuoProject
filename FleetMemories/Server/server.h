@@ -167,6 +167,10 @@ private:
     QList<int> getNextNodesFromLua(int mapUnionId, int nodeIndex) const;
     MapNode getNodeFromLua(int mapUnionId, int nodeIndex) const;
     QList<int> getAllNodeIndicesFromLua(int mapUnionId) const;
+    int evaluateBranchRule(int mapUnionId, int nodeIndex, KP::Difficulty diff,
+                           const FleetInfo &fleet) const;
+    int evaluateMapBranchRule(int mapUnionId, KP::Difficulty diff,
+                              const FleetInfo &fleet) const;
     [[nodiscard]] bool mapRefresh();
     void migrate(const CSteamID &, const QJsonObject &);
     void minutePulse();

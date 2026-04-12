@@ -2578,6 +2578,67 @@ QList<int> Server::getAllNodeIndicesFromLua(int mapUnionId) const {
     return indices;
 }
 
+int Server::evaluateBranchRule(int mapUnionId, int nodeIndex,
+                               KP::Difficulty diff,
+                               const FleetInfo &fleet) const {
+    sol::state &lua = const_cast<sol::state&>(this->lua);
+    QString diffStr = (*KP::diffEnumtoStr)[diff];
+    QByteArray diffStrBytes = diffStr.toUtf8();
+    const char *diffStrC = diffStrBytes;
+    if (lua["maps"] == sol::nil
+        || lua["maps"][mapUnionId] == sol::nil
+        || lua["maps"][mapUnionId][nodeIndex] == sol::nil
+        || lua["maps"][mapUnionId][nodeIndex]["branch_rule"] == sol::nil
+        || lua["maps"][mapUnionId][nodeIndex]["branch_rule"][diffStrC]
+           == sol::nil) {
+        return 0;
+    }
+    sol::protected_function luaBranchRule
+        = lua["maps"][mapUnionId][nodeIndex]["branch_rule"][diffStrC];
+    auto result = luaBranchRule(fleet.ships,
+                                fleet.los(),
+                                fleet.type,
+                                fleet.capitalness(),
+                                fleet.shipTags,
+                                fleet.shipSpeeds(),
+                                fleet.getEquipGrid(),
+                                0);
+    if (result.valid()) {
+        return result;
+    } else {
+        return 0;
+    }
+}
+
+int Server::evaluateMapBranchRule(int mapUnionId, KP::Difficulty diff,
+                                  const FleetInfo &fleet) const {
+    sol::state &lua = const_cast<sol::state&>(this->lua);
+    QString diffStr = (*KP::diffEnumtoStr)[diff];
+    QByteArray diffStrBytes = diffStr.toUtf8();
+    const char *diffStrC = diffStrBytes;
+    if (lua["maps"] == sol::nil
+        || lua["maps"][mapUnionId] == sol::nil
+        || lua["maps"][mapUnionId]["branch_rule"] == sol::nil
+        || lua["maps"][mapUnionId]["branch_rule"][diffStrC] == sol::nil) {
+        return 0;
+    }
+    sol::protected_function luaBranchRule
+        = lua["maps"][mapUnionId]["branch_rule"][diffStrC];
+    auto result = luaBranchRule(fleet.ships,
+                                fleet.los(),
+                                fleet.type,
+                                fleet.capitalness(),
+                                fleet.shipTags,
+                                fleet.shipSpeeds(),
+                                fleet.getEquipGrid(),
+                                0);
+    if (result.valid()) {
+        return result;
+    } else {
+        return 0;
+    }
+}
+
 /* 1-migrate.md */
 void Server::migrate(const CSteamID &uid, const QJsonObject &input) {
     auto hqlv = input["hqlv"].toInt();

@@ -24,7 +24,7 @@ FleetInfo::~FleetInfo() {
     }
 }
 
-double FleetInfo::los() {
+double FleetInfo::los() const {
     double a = settings->value("rule/loscontrol", 0.9).toDouble();
 
     std::vector<double> losValues;
@@ -71,7 +71,7 @@ int FleetInfo::transportCapacity(const CSteamID &uid, TransportMode mode) {
     return total;
 }
 
-QMap<KP::CapitalType, int> FleetInfo::capitalness() {
+QMap<KP::CapitalType, int> FleetInfo::capitalness() const {
     int any = 0;
     int screen = 0;
     int surface = 0;
@@ -95,7 +95,7 @@ QMap<KP::CapitalType, int> FleetInfo::capitalness() {
             };
 }
 
-std::vector<int> FleetInfo::shipSpeeds() {
+std::vector<int> FleetInfo::shipSpeeds() const {
     std::vector<int> result;
     for(int i = 0; i < static_cast<int>(ships.size()); ++i) {
         bool absent = !ships[i] || !shipDynamics[i] ||

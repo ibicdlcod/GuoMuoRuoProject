@@ -107,6 +107,10 @@ private:
     double autoRestartThreshold = 1.0; // 100%
     bool autoResupply = true;
     int expeditionFleetIndex = 0;
+    // Expedition choice selection state
+    bool expeditionChoicePending = false;
+    int expeditionChoiceNodeId = -1;
+    QList<int> expeditionChoiceNodeIds;
 };
 
 #endif // SORTIE_H

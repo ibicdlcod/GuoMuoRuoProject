@@ -17,9 +17,9 @@ public:
     };
     FleetInfo();
     ~FleetInfo();
-    double los();
-    QMap<KP::CapitalType, int> capitalness();
-    std::vector<int> shipSpeeds();
+    double los() const;
+    QMap<KP::CapitalType, int> capitalness() const;
+    std::vector<int> shipSpeeds() const;
     int transportCapacity(const CSteamID &uid, TransportMode mode = Default);
 
     /* Returns the sum of:
