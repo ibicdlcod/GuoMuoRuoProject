@@ -17,6 +17,8 @@ description: Manual of style for C++ code
 9. Comment with /* */ rather than //
 10. Fix all clazy warnings.
 11. Utilize DBError rather than manual "qWarning() << error strings"
+12. JSON object fields are all lowercase.
+13. Use qtTrId() (id-based translation) wherever the string would be visible to the user in Client or logged with qDebug()/qInfo()/qWarning()/qCritical(), not bare c-strings
 
 ### Database Error Handling
 

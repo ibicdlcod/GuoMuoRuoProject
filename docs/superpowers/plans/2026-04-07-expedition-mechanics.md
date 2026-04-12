@@ -18,7 +18,7 @@
 - `FleetMemories/ClientGUI/ui/expedition/expeditionview.ui` – Qt Designer UI file
 - `FleetMemories/Server/expeditionmanager.h` – Server‑side expedition tracking and processing
 - `FleetMemories/Server/expeditionmanager.cpp` – Expedition manager implementation
-
+bool
 **Modified files:**
 - `FleetMemories/Protocol/kp.h` – Add `expeditionFleetMask`, expedition command/info types, constants
 - `FleetMemories/Protocol/kp.cpp` – Add builder functions for expedition messages
@@ -56,14 +56,14 @@
 - For non‑battle nodes (STARTING, EMPTY, etc.), no plan stored
 
 ### Automatic Progression
-- Server processes expedition progress every `rule/expeditionprogresspernode` seconds
+- Server processes expedition progress every time a minutePulse() occurs, but each individual expedition should progress one node per `rule/expeditionprogresspernode` seconds. Node arrival timestamp should be stored in database.
 - On node arrival: execute battle (if battle node) using stored plan, apply results
 - Update expedition state (node, resources, damage)
 - Check stop conditions: critically damaged ship, 0% fuel, 0% ammo
 - If auto‑resupply threshold met and resources available, resupply and continue
 
 ### Multiple Expeditions
-- User can have up to 4 simultaneous expeditions (one per map unionid)
+- User can have up to infinite simultaneous expeditions (but one per map unionid)
 - Each expedition independent; separate progress timers
 - Fleet assignment exclusive (fleet cannot be in two expeditions)
 
@@ -76,8 +76,8 @@
 CREATE TABLE UserExpedition (
     UserID BLOB NOT NULL,
     MapUnionId INTEGER NOT NULL,
-    FleetIndex INTEGER NOT NULL,          -- Original normal fleet index (0‑3)
-    ExpeditionIndex INTEGER NOT NULL,     -- mapUnionId + expeditionFleetMask
+    --FleetIndex INTEGER NOT NULL,          -- Original normal fleet index (0‑3), NOT needed because fleet on expedition will always change its index to non-normal
+    --ExpeditionIndex INTEGER NOT NULL,     -- mapUnionId + expeditionFleetMask, NOT needed because server can instantly calculate it from mapUnionId 
     CurrentNode INTEGER DEFAULT 0,        -- 0‑based node index in map
     LastProgressTime INTEGER DEFAULT 0,   -- Unix timestamp of last node progression
     NextProgressTime INTEGER DEFAULT 0,   -- Unix timestamp for next node
@@ -122,7 +122,6 @@ CREATE TABLE UserExpeditionSettings (
 ### New Constants in kp.h
 ```cpp
 static constexpr int expeditionFleetMask = 256;
-static constexpr int maxExpeditionsPerUser = 4; // One per map unionid
 ```
 
 ### New CommandType Enum Values
@@ -519,12 +518,6 @@ Execute test suite, fix any issues.
 - Validate battle plans are for correct map nodes
 
 ## Future Extensions
-
-1. **Expedition rewards**: Resource gain, item drops, experience bonuses
-2. **Expedition events**: Random events during progression
-3. **Expedition cooperation**: Multiple users sending fleets on same expedition
-4. **Expedition difficulty levels**: Different enemy strengths/rewards
-5. **Expedition queueing**: Plan next expedition while current active
 
 ## Testing Strategy
 

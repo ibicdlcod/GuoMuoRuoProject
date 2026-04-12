@@ -36,7 +36,11 @@ bool Server::importEquipFromCSV() {
     QString title = textStream.readLine();
     QStringList titleParts = title.split(",");
 
-    db.transaction();
+    if(!db.transaction()) {
+        //% "Failed to start transaction for importing equipment CSV."
+        throw DBError(qtTrId("equip-csv-import-transaction-start-failed"),
+                      db.lastError());
+    }
 
     QSqlQuery insertEquipName;
     insertEquipName.prepare(
@@ -182,7 +186,11 @@ bool Server::importShipFromCSV() {
     QString title = textStream.readLine();
     QStringList titleParts = title.split(",");
 
-    db.transaction();
+    if(!db.transaction()) {
+        //% "Failed to start transaction for importing ship CSV."
+        throw DBError(qtTrId("ship-csv-import-transaction-start-failed"),
+                      db.lastError());
+    }
 
     QSqlQuery replaceShipReg;
     replaceShipReg.prepare(
@@ -328,7 +336,11 @@ bool Server::importMapNodeFromCSV() {
     QString title = textStream.readLine();
     QStringList titleParts = title.split(",");
 
-    db.transaction();
+    if(!db.transaction()) {
+        //% "Failed to start transaction for importing map node CSV."
+        throw DBError(qtTrId("map-node-csv-import-transaction-start-failed"),
+                      db.lastError());
+    }
 
     {
         QSqlQuery query;
@@ -459,7 +471,11 @@ bool Server::importMapRelationFromCSV() {
     QStringList titleParts = title.split(",");
     Q_UNUSED(titleParts)
 
-    db.transaction();
+    if(!db.transaction()) {
+        //% "Failed to start transaction for importing map relation CSV."
+        throw DBError(qtTrId("map-relation-csv-import-transaction-start-failed"),
+                      db.lastError());
+    }
 
     {
         QSqlQuery query;
@@ -544,7 +560,11 @@ bool Server::importVCRFromCSV() {
     QString title = textStream.readLine();
     QStringList titleParts = title.split(",");
 
-    db.transaction();
+    if(!db.transaction()) {
+        //% "Failed to start transaction for importing VCR CSV."
+        throw DBError(qtTrId("vcr-csv-import-transaction-start-failed"),
+                      db.lastError());
+    }
 
     {
         QSqlQuery query;

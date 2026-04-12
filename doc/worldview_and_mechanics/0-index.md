@@ -37,8 +37,8 @@
 * [Sortie Map](6-sortie.md)
   
   * [Normal map and map relations](6.1-map.md)
-  * [Naval Supremacy and Normal expedition](6.2-supremacy.md) [Expedition: NOTYETIMPLEMENTED]
-  * [Map gauge](6.3-gauge.md) [PARTIAL]
+  * [Naval Supremacy and Normal expedition](6.2-supremacy.md)
+  * [Map gauge](6.3-gauge.md)
   * [Retreat rule](6.4-retreat.md)
   * Historical Mode (DLC) [NOTYETIMPLEMENTED]
   * Quests and Achievements [NOTYETIMPLEMENTED]

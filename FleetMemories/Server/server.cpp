@@ -2421,7 +2421,12 @@ process_import_ships:
 
 add_equip:
     QSqlDatabase db = QSqlDatabase::database();
-    db.transaction();
+    if(!db.transaction()) {
+        //% "Failed to start transaction for migrating user %1."
+        throw DBError(qtTrId("migrate-transaction-start-failed")
+                          .arg(uid.ConvertToUint64()),
+                      db.lastError());
+    }
 
     QSqlQuery kcEquipStmt;
     kcEquipStmt.prepare("REPLACE INTO UserKCEquip "
@@ -2554,7 +2559,13 @@ new_ship_as_imported:
                           .arg(uid.ConvertToUint64()), kcShipStmt.lastError(), kcShipStmt.lastQuery());
         }
     }
-    db.commit();
+    if(!db.commit()) {
+        db.rollback();
+        //% "Failed to commit transaction for migrating user %1."
+        throw DBError(qtTrId("migrate-transaction-commit-failed")
+                          .arg(uid.ConvertToUint64()),
+                      db.lastError());
+    }
 
     //% "User %1: import from KC data success!"
     qInfo() << qtTrId("import-kc-data-success").arg(uid.ConvertToUint64());
@@ -3359,7 +3370,12 @@ void Server::handleConvertSkillPoints(const CSteamID &uid,
     if(dstGained == 0) dstGained = 1;
 
     QSqlDatabase db = QSqlDatabase::database();
-    db.transaction();
+    if(!db.transaction()) {
+        //% "Failed to start transaction for converting skill points for user %1."
+        throw DBError(qtTrId("skillpoint-convert-transaction-start-failed")
+                          .arg(uid.ConvertToUint64()),
+                      db.lastError());
+    }
 
     try {
         User::addSkillPoints(uid, srcEquipId, -amount);
@@ -3372,7 +3388,13 @@ void Server::handleConvertSkillPoints(const CSteamID &uid,
         return;
     }
 
-    db.commit();
+    if(!db.commit()) {
+        db.rollback();
+        //% "Failed to commit transaction for converting skill points for user %1."
+        throw DBError(qtTrId("skillpoint-convert-transaction-commit-failed")
+                          .arg(uid.ConvertToUint64()),
+                      db.lastError());
+    }
 
     qint64 newSrcSP = User::getSkillPoints(uid, srcEquipId);
     qint64 newDstSP = User::getSkillPoints(uid, dstEquipId);
@@ -4587,6 +4609,7 @@ check_duplicate_remodel_group:
                 }
                 seenRemodelGroups[fleetIndex].insert(groupKey);
             }
+
             if(!fleetSizes.contains(fleetIndex)) {
                 fleetSizes[fleetIndex] = 0;
                 screenSizes[fleetIndex] = 0;

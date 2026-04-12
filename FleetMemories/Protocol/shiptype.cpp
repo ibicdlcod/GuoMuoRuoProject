@@ -443,6 +443,9 @@ int ShipType::getCapitalness() const {
 KP::CapitalType ShipType::getCapitalType() const {
     switch((iRep & 0xf0) >> 4) {
     case 1:
+        if((iRep & 0xf8) == 0x18) {
+            return KP::SurfaceShip;
+        }
         [[fallthrough]];
     case 2:
         [[fallthrough]];
