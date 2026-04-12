@@ -6,6 +6,7 @@
 #include "kerrors.h"
 #include "../Protocol/kp.h"
 #include "../Protocol/resord.h"
+#include "../Protocol/mapwithdiff.h"
 #include "user.h"
 
 #include <QSqlDatabase>
@@ -24,6 +25,7 @@ extern std::unique_ptr<QSettings> settings;
 
 #include <cstdint>
 #include <algorithm>
+#include <optional>
 
 #include "../Protocol/mapwithdiff.h"
 #include "../Protocol/mapnode.h"
@@ -41,14 +43,18 @@ ExpeditionManager::ExpeditionManager(Server *server)
     // No timer needed - will be called from Server::minutePulse()
 }
 
-KP::GameError ExpeditionManager::startExpedition(const CSteamID &uid, int mapUnionId,
+KP::GameError ExpeditionManager::startExpedition(const CSteamID &uid, int mapId,
                                                  int fleetIndex,
                                                  const QMap<int, QByteArray> &battlePlans,
-                                                 double autoResupplyThreshold) {
+                                                  double autoRestartThreshold) {
     if (!server) {
         qCritical() << "ExpeditionManager: server pointer is null";
         return KP::NoError;
     }
+    
+    /* Extract union ID and difficulty from map ID */
+    int mapUnionId = MapWithDiff::getUnionId(mapId);
+    KP::Difficulty diff = MapWithDiff::getDiff(mapId);
     
     /* Validate map exists */
     if (!server->hasMapWithUnionId(mapUnionId)) {
@@ -58,7 +64,7 @@ KP::GameError ExpeditionManager::startExpedition(const CSteamID &uid, int mapUni
     }
     
     /* Validate fleet index */
-    if (fleetIndex < 0 || fleetIndex >= KP::fleetsSize) {
+    if (fleetIndex < 0 || fleetIndex >= KP::nonExpeditionFleetsSize) {
         //% "Invalid fleet index %1"
         qWarning() << qtTrId("expedition-invalid-fleet-index").arg(fleetIndex);
         return KP::ExpeditionInvalidFleetIndex;
@@ -68,22 +74,23 @@ KP::GameError ExpeditionManager::startExpedition(const CSteamID &uid, int mapUni
     QSqlQuery query;
     query.prepare(
         "SELECT COUNT(*) FROM UserExpedition "
-        "WHERE User = :user AND MapUnionId = :mapUnionId"
-    );
+        "WHERE User = :user AND MapUnionId = :mapUnionId AND Diff = :diff"
+        );
     query.bindValue(":user", uid.ConvertToUint64());
     query.bindValue(":mapUnionId", mapUnionId);
+    query.bindValue(":diff", static_cast<int>(diff));
     
     if (!query.exec()) {
         //% "Failed to check existing expedition for user %1"
         throw DBError(qtTrId("expedition-check-existing-failed")
-                         .arg(uid.ConvertToUint64()),
+                          .arg(uid.ConvertToUint64()),
                       query.lastError(), query.lastQuery());
     }
     
     if (query.next() && query.value(0).toInt() > 0) {
-        //% "User %1 already has expedition for map %2"
+        //% "User %1 already has expedition for map %2 difficulty %3"
         qWarning() << qtTrId("expedition-already-exists")
-                      .arg(uid.ConvertToUint64()).arg(mapUnionId);
+                          .arg(uid.ConvertToUint64()).arg(mapUnionId).arg(static_cast<int>(diff));
         return KP::ExpeditionAlreadyExists;
     }
     
@@ -95,43 +102,43 @@ KP::GameError ExpeditionManager::startExpedition(const CSteamID &uid, int mapUni
     query.prepare(
         "SELECT COUNT(*) FROM UserExpedition "
         "WHERE User = :user AND IsActive = TRUE"
-    );
+        );
     query.bindValue(":user", uid.ConvertToUint64());
     
     if (!query.exec()) {
         //% "Failed to check active expeditions for user %1"
         throw DBError(qtTrId("expedition-check-active-failed")
-                         .arg(uid.ConvertToUint64()),
+                          .arg(uid.ConvertToUint64()),
                       query.lastError(), query.lastQuery());
     }
     
     if (query.next() && query.value(0).toInt() >= KP::maxExpeditionsPerUser) {
         //% "User %1 already has maximum number of expeditions (%2)"
         qWarning() << qtTrId("expedition-max-reached")
-                      .arg(uid.ConvertToUint64())
-                      .arg(KP::maxExpeditionsPerUser);
+                          .arg(uid.ConvertToUint64())
+                          .arg(KP::maxExpeditionsPerUser);
         return KP::ExpeditionMaxReached;
     }
     
-    /* Check if this fleet is already on another expedition */
+    /* Check if this map unionid is already on expedition */
     query.prepare(
         "SELECT COUNT(*) FROM UserExpedition "
-        "WHERE User = :user AND IsActive = TRUE AND FleetIndex = :fleetIndex"
-    );
+        "WHERE User = :user AND IsActive = TRUE AND MapUnionId = :mapunionid"
+        );
     query.bindValue(":user", uid.ConvertToUint64());
-    query.bindValue(":fleetIndex", fleetIndex);
+    query.bindValue(":mapunionid", MapWithDiff::getUnionId(fleetIndex - KP::expeditionFleetMask));
     
     if (!query.exec()) {
         //% "Failed to check fleet expedition status for user %1 fleet %2"
         throw DBError(qtTrId("expedition-check-fleet-status-failed")
-                         .arg(uid.ConvertToUint64()).arg(fleetIndex),
+                          .arg(uid.ConvertToUint64()).arg(fleetIndex),
                       query.lastError(), query.lastQuery());
     }
     
     if (query.next() && query.value(0).toInt() > 0) {
         //% "Fleet %1 is already on expedition for user %2"
         qWarning() << qtTrId("expedition-fleet-already-on-expedition")
-                      .arg(fleetIndex).arg(uid.ConvertToUint64());
+                          .arg(fleetIndex).arg(uid.ConvertToUint64());
         return KP::ExpeditionFleetAlreadyOnExpedition;
     }
     
@@ -142,39 +149,95 @@ KP::GameError ExpeditionManager::startExpedition(const CSteamID &uid, int mapUni
     /* Calculate expedition fleet index */
     int expeditionFleetIndex = mapUnionId + KP::expeditionFleetMask;
     
+    /* Determine starting node using Lua branch_rule similar to ordinary sortie */
+    int startingNode = 0;
+    {
+        MapWithDiff *map = findMapByUnionId(server, mapUnionId);
+        if (!map) {
+            //% "Map %1 not found for expedition progress"
+            throw DBError(qtTrId("expedition-map-not-in-registry").arg(mapUnionId));
+        }
+        
+        QString diffStr = (*KP::diffEnumtoStr)[diff];
+        QByteArray diffStrBytes = diffStr.toUtf8();
+        const char *diffStrC = diffStrBytes;
+        
+        /* Check if Lua branch_rule exists */
+        if (server->lua["maps"][mapUnionId] == sol::nil
+            || server->lua["maps"][mapUnionId]["branch_rule"] == sol::nil
+            || server->lua["maps"][mapUnionId]["branch_rule"][diffStrC] == sol::nil) {
+            //% "Map %1 doesn't have branch rule for difficulty %2"
+            qWarning() << qtTrId("expedition-no-branch-rule")
+                              .arg(mapUnionId).arg(diffStr);
+            return KP::ExpeditionMapNotExist;
+        }
+        
+        /* Get fleet info for branch rule calculation */
+        FleetInfo fleet = server->queryFleetInfo(uid, fleetIndex);
+        
+        sol::protected_function luaChooseStartingNode
+            = server->lua["maps"][mapUnionId]["branch_rule"][diffStrC];
+        auto result = luaChooseStartingNode(fleet.ships,
+                                            fleet.los(),
+                                            fleet.type,
+                                            fleet.capitalness(),
+                                            fleet.shipTags,
+                                            fleet.shipSpeeds(),
+                                            fleet.getEquipGrid(),
+                                            0);
+        if (result.valid()) {
+            startingNode = result;
+            if (startingNode == 0) {
+                //% "Fleet doesn't fit map %1"
+                qWarning() << qtTrId("expedition-fleet-no-start-node")
+                                  .arg(mapUnionId);
+                return KP::ExpeditionFleetDoesNotFitMap;
+            }
+        } else {
+            sol::error err = result;
+            //% "Lua branch rule error for map %1: %2"
+            qWarning() << qtTrId("expedition-lua-branch-rule-error")
+                              .arg(mapUnionId).arg(err.what());
+            return KP::ExpeditionInternalError;
+        }
+        
+        qDebug() << "Expedition starting node determined:" << startingNode
+                 << "for map" << mapUnionId << "difficulty" << diffStr;
+    }
+    
     /* Insert expedition record */
     qint64 currentTime = QDateTime::currentDateTimeUtc().toSecsSinceEpoch();
     qint64 nextProgressTime = currentTime; // Start immediately
     
     query.prepare(
         "INSERT INTO UserExpedition "
-        "(User, MapUnionId, FleetIndex, ExpeditionIndex, CurrentNode, LastProgressTime, NextProgressTime, "
-        "IsActive, AutoResupplyThreshold, StopReason) "
-        "VALUES (:user, :mapUnionId, :fleetIndex, :expeditionIndex, 0, :lastProgressTime, :nextProgressTime, "
-        "TRUE, :autoResupplyThreshold, 0)"
-    );
+        "(User, MapUnionId, Diff, CurrentNode, LastProgressTime, NextProgressTime, "
+        "IsActive, AutoRestartThreshold, StopReason) "
+        "VALUES (:user, :mapUnionId, :diff, :currentNode, :lastProgressTime, :nextProgressTime, "
+        "TRUE, :autoRestartThreshold, 0)"
+        );
     query.bindValue(":user", uid.ConvertToUint64());
     query.bindValue(":mapUnionId", mapUnionId);
-    query.bindValue(":fleetIndex", fleetIndex);
-    query.bindValue(":expeditionIndex", expeditionFleetIndex);
+    query.bindValue(":diff", static_cast<int>(diff));
+    query.bindValue(":currentNode", startingNode);
     query.bindValue(":lastProgressTime", currentTime);
     query.bindValue(":nextProgressTime", nextProgressTime);
-    query.bindValue(":autoResupplyThreshold", autoResupplyThreshold);
+    query.bindValue(":autoRestartThreshold", autoRestartThreshold);
     
     if (!query.exec()) {
         //% "Failed to insert expedition for user %1 map %2"
         throw DBError(qtTrId("expedition-insert-failed")
-                         .arg(uid.ConvertToUint64()).arg(mapUnionId),
+                          .arg(uid.ConvertToUint64()).arg(mapUnionId),
                       query.lastError(), query.lastQuery());
     }
     
     /* Insert battle plans */
     query.prepare(
         "INSERT OR REPLACE INTO UserExpeditionBattlePlan "
-        "(User, MapUnionId, NodeIndex, NodeType, PlanData, SelectedChoiceNode) "
-        "VALUES (:user, :mapUnionId, :nodeIndex, :nodeType, :planData, "
+        "(User, MapUnionId, Diff, NodeIndex, NodeType, PlanData, SelectedChoiceNode) "
+        "VALUES (:user, :mapUnionId, :diff, :nodeIndex, :nodeType, :planData, "
         ":selectedChoiceNode)"
-    );
+        );
     
     MapWithDiff *map = findMapByUnionId(server, mapUnionId);
     if (!map) {
@@ -193,7 +256,7 @@ KP::GameError ExpeditionManager::startExpedition(const CSteamID &uid, int mapUni
         if (!nodeExistsInLua(mapUnionId, nodeIndex)) {
             //% "Node %1 not found in map %2"
             qWarning() << qtTrId("expedition-node-not-found")
-                          .arg(nodeIndex).arg(mapUnionId);
+                              .arg(nodeIndex).arg(mapUnionId);
             QSqlDatabase::database().rollback();
             return KP::ExpeditionInvalidBattlePlans;
         }
@@ -202,6 +265,7 @@ KP::GameError ExpeditionManager::startExpedition(const CSteamID &uid, int mapUni
         
         query.bindValue(":user", uid.ConvertToUint64());
         query.bindValue(":mapUnionId", mapUnionId);
+        query.bindValue(":diff", static_cast<int>(diff));
         query.bindValue(":nodeIndex", nodeIndex);
         query.bindValue(":nodeType", static_cast<int>(node.type));
         query.bindValue(":planData", planData);
@@ -217,8 +281,8 @@ KP::GameError ExpeditionManager::startExpedition(const CSteamID &uid, int mapUni
         if (!query.exec()) {
             //% "Failed to insert battle plan for user %1 map %2 node %3"
             throw DBError(qtTrId("expedition-battle-plan-insert-failed")
-                             .arg(uid.ConvertToUint64()).arg(mapUnionId)
-                             .arg(nodeIndex),
+                              .arg(uid.ConvertToUint64()).arg(mapUnionId)
+                              .arg(nodeIndex),
                           query.lastError(), query.lastQuery());
         }
     }
@@ -230,15 +294,16 @@ KP::GameError ExpeditionManager::startExpedition(const CSteamID &uid, int mapUni
         if (!moveFleetToExpeditionIndex(uid, fleetIndex, expeditionFleetIndex)) {
             //% "Failed to move fleet to expedition index for user %1 map %2"
             qWarning() << qtTrId("expedition-move-fleet-failed")
-                          .arg(uid.ConvertToUint64()).arg(mapUnionId);
+                              .arg(uid.ConvertToUint64()).arg(mapUnionId);
             /* Rollback expedition insertion */
             QSqlQuery cleanupQuery;
             cleanupQuery.prepare(
                 "DELETE FROM UserExpedition "
-                "WHERE User = :user AND MapUnionId = :mapUnionId"
-            );
+                "WHERE User = :user AND MapUnionId = :mapUnionId AND Diff = :diff"
+                );
             cleanupQuery.bindValue(":user", uid.ConvertToUint64());
             cleanupQuery.bindValue(":mapUnionId", mapUnionId);
+            cleanupQuery.bindValue(":diff", static_cast<int>(diff));
             cleanupQuery.exec(); // Ignore result
             return KP::ExpeditionInternalError;
         }
@@ -251,90 +316,99 @@ KP::GameError ExpeditionManager::startExpedition(const CSteamID &uid, int mapUni
         QSqlQuery cleanupQuery;
         cleanupQuery.prepare(
             "DELETE FROM UserExpedition "
-            "WHERE User = :user AND MapUnionId = :mapUnionId"
-        );
+            "WHERE User = :user AND MapUnionId = :mapUnionId AND Diff = :diff"
+            );
         cleanupQuery.bindValue(":user", uid.ConvertToUint64());
         cleanupQuery.bindValue(":mapUnionId", mapUnionId);
+        cleanupQuery.bindValue(":diff", static_cast<int>(diff));
         cleanupQuery.exec(); // Ignore result
         return KP::ExpeditionInternalError;
     }
     
     //% "Expedition started for user %1 map %2 fleet %3"
     qInfo() << qtTrId("expedition-started")
-               .arg(uid.ConvertToUint64()).arg(mapUnionId).arg(fleetIndex);
+                   .arg(uid.ConvertToUint64()).arg(mapUnionId).arg(fleetIndex);
     
     return KP::NoError;
 }
 
-bool ExpeditionManager::cancelExpedition(const CSteamID &uid, int mapUnionId,
+bool ExpeditionManager::cancelExpedition(const CSteamID &uid, int mapId,
                                          int receiveFleetIndex) {
+    int mapUnionId = MapWithDiff::getUnionId(mapId);
+    KP::Difficulty diff = MapWithDiff::getDiff(mapId);
+    
     if (!server) {
         qWarning() << "ExpeditionManager: server pointer is null";
         return false;
     }
     
     /* Validate receive fleet index */
-    if (receiveFleetIndex < 0 || receiveFleetIndex >= KP::fleetsSize) {
+    if (receiveFleetIndex < 0 || receiveFleetIndex >= KP::nonExpeditionFleetsSize) {
         //% "Invalid receive fleet index %1"
         qWarning() << qtTrId("expedition-invalid-receive-fleet-index")
-                      .arg(receiveFleetIndex);
+                          .arg(receiveFleetIndex);
         return false;
     }
     
-    /* Check if expedition exists and is active */
+    /* Check if expedition exists */
     QSqlQuery query;
     query.prepare(
-        "SELECT IsActive, ExpeditionIndex FROM UserExpedition "
-        "WHERE User = :user AND MapUnionId = :mapUnionId"
-    );
+        "SELECT IsActive FROM UserExpedition "
+        "WHERE User = :user AND MapUnionId = :mapUnionId AND Diff = :diff"
+        );
     query.bindValue(":user", uid.ConvertToUint64());
     query.bindValue(":mapUnionId", mapUnionId);
+    query.bindValue(":diff", static_cast<int>(diff));
     
     if (!query.exec()) {
         //% "Failed to query expedition for cancellation user %1 map %2"
         throw DBError(qtTrId("expedition-cancel-query-failed")
-                         .arg(uid.ConvertToUint64()).arg(mapUnionId),
+                          .arg(uid.ConvertToUint64()).arg(mapUnionId),
                       query.lastError(), query.lastQuery());
     }
     
-    if (!query.next()) {
-        //% "Expedition not found for user %1 map %2"
-        qWarning() << qtTrId("expedition-not-found")
-                      .arg(uid.ConvertToUint64()).arg(mapUnionId);
-        return false;
+    bool isActive = false;
+    bool expeditionExists = query.next();
+    if (expeditionExists) {
+        isActive = query.value("IsActive").toBool();
+        //% "Expedition found for user %1 map %2 (active: %3)"
+        qInfo() << qtTrId("expedition-cancel-found")
+                       .arg(uid.ConvertToUint64()).arg(mapUnionId).arg(isActive);
+    } else {
+        //% "Expedition not found for user %1 map %2 (already cancelled?)"
+        qInfo() << qtTrId("expedition-cancel-not-found")
+                       .arg(uid.ConvertToUint64()).arg(mapUnionId);
+        /* Expedition already doesn't exist, consider cancellation successful */
+        return true;
     }
     
-    bool isActive = query.value("IsActive").toBool();
-    int expeditionFleetIndex = query.value("ExpeditionIndex").toInt();
-    if (!isActive) {
-        //% "Expedition already inactive for user %1 map %2"
-        qWarning() << qtTrId("expedition-already-inactive")
-                      .arg(uid.ConvertToUint64()).arg(mapUnionId);
-        return false;
-    }
+    int expeditionFleetIndex = mapUnionId + KP::expeditionFleetMask;
     
-    /* Update expedition to inactive with stop reason = user cancelled */
+    /* Delete expedition record when player cancels (keep battle plans for future use) */
     query.prepare(
-        "UPDATE UserExpedition "
-        "SET IsActive = FALSE, StopReason = 4 " /* 4 = user cancelled */
-        "WHERE User = :user AND MapUnionId = :mapUnionId"
-    );
+        "DELETE FROM UserExpedition "
+        "WHERE User = :user AND MapUnionId = :mapUnionId AND Diff = :diff"
+        );
     query.bindValue(":user", uid.ConvertToUint64());
     query.bindValue(":mapUnionId", mapUnionId);
+    query.bindValue(":diff", static_cast<int>(diff));
     
     if (!query.exec()) {
         //% "Failed to cancel expedition for user %1 map %2"
-        throw DBError(qtTrId("expedition-cancel-update-failed")
-                         .arg(uid.ConvertToUint64()).arg(mapUnionId),
+        throw DBError(qtTrId("expedition-cancel-delete-failed")
+                          .arg(uid.ConvertToUint64()).arg(mapUnionId),
                       query.lastError(), query.lastQuery());
     }
+    
+    /* Note: Battle plans in UserExpeditionBattlePlan are NOT deleted
+     * so they can be reused if the player starts a new expedition later */
     
     /* Restore fleet to normal index (receiveFleetIndex) */
     try {
         if (!restoreFleetToNormalIndex(uid, expeditionFleetIndex, receiveFleetIndex)) {
             //% "Failed to restore fleet for cancelled expedition user %1 map %2"
             qWarning() << qtTrId("expedition-restore-fleet-failed")
-                          .arg(uid.ConvertToUint64()).arg(mapUnionId);
+                              .arg(uid.ConvertToUint64()).arg(mapUnionId);
             /* Expedition still marked inactive, but fleet remains on expedition index */
             /* This is an error state that needs manual intervention */
         }
@@ -347,15 +421,20 @@ bool ExpeditionManager::cancelExpedition(const CSteamID &uid, int mapUnionId,
     
     //% "Expedition cancelled for user %1 map %2"
     qInfo() << qtTrId("expedition-cancelled")
-               .arg(uid.ConvertToUint64()).arg(mapUnionId);
+                   .arg(uid.ConvertToUint64()).arg(mapUnionId);
+    
+    sendExpeditionStopped(uid, mapUnionId, diff, KP::UserCancelled);
     
     return true;
 }
 
-bool ExpeditionManager::updateBattlePlans(const CSteamID &uid, int mapUnionId,
+bool ExpeditionManager::updateBattlePlans(const CSteamID &uid, int mapId,
                                           const QMap<int, QByteArray> &battlePlans) {
+    int mapUnionId = MapWithDiff::getUnionId(mapId);
+    KP::Difficulty diff = MapWithDiff::getDiff(mapId);
     qDebug() << "ExpeditionManager::updateBattlePlans called for user" << uid.ConvertToUint64()
-             << "map" << mapUnionId << "with" << battlePlans.size() << "plans";
+             << "mapId" << mapId << "union" << mapUnionId << "diff" << static_cast<int>(diff)
+             << "with" << battlePlans.size() << "plans";
     if (!server) {
         qWarning() << "ExpeditionManager: server pointer is null";
         return false;
@@ -372,15 +451,16 @@ bool ExpeditionManager::updateBattlePlans(const CSteamID &uid, int mapUnionId,
     QSqlQuery query;
     query.prepare(
         "SELECT IsActive FROM UserExpedition "
-        "WHERE User = :user AND MapUnionId = :mapUnionId"
-    );
+        "WHERE User = :user AND MapUnionId = :mapUnionId AND Diff = :diff"
+        );
     query.bindValue(":user", uid.ConvertToUint64());
     query.bindValue(":mapUnionId", mapUnionId);
+    query.bindValue(":diff", static_cast<int>(diff));
     
     if (!query.exec()) {
         //% "Failed to query expedition for update battle plans user %1 map %2"
         throw DBError(qtTrId("expedition-update-plans-query-failed")
-                         .arg(uid.ConvertToUint64()).arg(mapUnionId),
+                          .arg(uid.ConvertToUint64()).arg(mapUnionId),
                       query.lastError(), query.lastQuery());
     }
     
@@ -390,7 +470,7 @@ bool ExpeditionManager::updateBattlePlans(const CSteamID &uid, int mapUnionId,
         if (isActive) {
             //% "Cannot update battle plans for active expedition user %1 map %2"
             qWarning() << qtTrId("expedition-active-no-update")
-                          .arg(uid.ConvertToUint64()).arg(mapUnionId);
+                              .arg(uid.ConvertToUint64()).arg(mapUnionId);
             return false;
         } else {
             qDebug() << "Expedition exists but not active, allowing plan update";
@@ -410,25 +490,26 @@ bool ExpeditionManager::updateBattlePlans(const CSteamID &uid, int mapUnionId,
     /* Delete existing battle plans */
     query.prepare(
         "DELETE FROM UserExpeditionBattlePlan "
-        "WHERE User = :user AND MapUnionId = :mapUnionId"
-    );
+        "WHERE User = :user AND MapUnionId = :mapUnionId AND Diff = :diff"
+        );
     query.bindValue(":user", uid.ConvertToUint64());
     query.bindValue(":mapUnionId", mapUnionId);
+    query.bindValue(":diff", static_cast<int>(diff));
     
     if (!query.exec()) {
         //% "Failed to delete old battle plans for user %1 map %2"
         throw DBError(qtTrId("expedition-delete-plans-failed")
-                         .arg(uid.ConvertToUint64()).arg(mapUnionId),
+                          .arg(uid.ConvertToUint64()).arg(mapUnionId),
                       query.lastError(), query.lastQuery());
     }
     
     /* Insert new battle plans */
     query.prepare(
         "INSERT OR REPLACE INTO UserExpeditionBattlePlan "
-        "(User, MapUnionId, NodeIndex, NodeType, PlanData, SelectedChoiceNode) "
-        "VALUES (:user, :mapUnionId, :nodeIndex, :nodeType, :planData, "
+        "(User, MapUnionId, Diff, NodeIndex, NodeType, PlanData, SelectedChoiceNode) "
+        "VALUES (:user, :mapUnionId, :diff, :nodeIndex, :nodeType, :planData, "
         ":selectedChoiceNode)"
-    );
+        );
     
     QSqlDatabase::database().transaction();
     
@@ -441,15 +522,16 @@ bool ExpeditionManager::updateBattlePlans(const CSteamID &uid, int mapUnionId,
         if (!nodeExistsInLua(mapUnionId, nodeIndex)) {
             //% "Node %1 not found in map %2"
             qWarning() << qtTrId("expedition-node-not-found")
-                          .arg(nodeIndex).arg(mapUnionId);
+                              .arg(nodeIndex).arg(mapUnionId);
             QSqlDatabase::database().rollback();
             return false;
         }
         
         MapNode node = getNodeFromLua(mapUnionId, nodeIndex);
         
-    query.bindValue(":user", uid.ConvertToUint64());
-    query.bindValue(":mapUnionId", mapUnionId);
+        query.bindValue(":user", uid.ConvertToUint64());
+        query.bindValue(":mapUnionId", mapUnionId);
+        query.bindValue(":diff", static_cast<int>(diff));
         query.bindValue(":nodeIndex", nodeIndex);
         query.bindValue(":nodeType", static_cast<int>(node.type));
         query.bindValue(":planData", planData);
@@ -465,8 +547,8 @@ bool ExpeditionManager::updateBattlePlans(const CSteamID &uid, int mapUnionId,
         if (!query.exec()) {
             //% "Failed to insert battle plan for user %1 map %2 node %3"
             throw DBError(qtTrId("expedition-battle-plan-insert-failed")
-                             .arg(uid.ConvertToUint64()).arg(mapUnionId)
-                             .arg(nodeIndex),
+                              .arg(uid.ConvertToUint64()).arg(mapUnionId)
+                              .arg(nodeIndex),
                           query.lastError(), query.lastQuery());
         }
     }
@@ -475,7 +557,7 @@ bool ExpeditionManager::updateBattlePlans(const CSteamID &uid, int mapUnionId,
     
     //% "Battle plans updated for user %1 map %2"
     qInfo() << qtTrId("expedition-plans-updated")
-               .arg(uid.ConvertToUint64()).arg(mapUnionId);
+                   .arg(uid.ConvertToUint64()).arg(mapUnionId);
     
     qDebug() << "Successfully saved" << battlePlans.size() << "battle plans for user"
              << uid.ConvertToUint64() << "map" << mapUnionId
@@ -495,10 +577,10 @@ void ExpeditionManager::processExpeditions() {
     QSqlQuery query;
     // Query active expeditions where NextProgressTime has been reached
     query.prepare(
-        "SELECT User, MapUnionId "
+        "SELECT User, MapUnionId, Diff "
         "FROM UserExpedition "
         "WHERE IsActive = TRUE AND NextProgressTime <= :currentTime"
-    );
+        );
     query.bindValue(":currentTime", currentTime);
     
     if(!query.exec()) {
@@ -508,13 +590,13 @@ void ExpeditionManager::processExpeditions() {
     }
     
     while(query.next()) {
-        QByteArray userBlob = query.value("User").toByteArray();
-        CSteamID uid;
-        uid.SetFromUint64(*reinterpret_cast<const uint64*>(userBlob.constData()));
-        int mapUnionId = query.value("MapUnionId").toInt();
+        uint64 userId = query.value(0).toULongLong();
+        CSteamID uid(userId);
+        int mapUnionId = query.value(1).toInt();
+        int diff = query.value(2).toInt();
         
         try {
-            progressExpedition(uid, mapUnionId);
+            progressExpedition(uid, mapUnionId, static_cast<KP::Difficulty>(diff));
         }
         catch(DBError &e) {
             for(QString &i : e.whats()) {
@@ -530,46 +612,135 @@ void ExpeditionManager::processExpeditions() {
 }
 
 QJsonArray ExpeditionManager::getUserExpeditions(const CSteamID &uid) const {
+    return getUserExpeditions(uid, std::nullopt);
+}
+
+QJsonArray ExpeditionManager::getUserExpeditions(const CSteamID &uid, std::optional<int> mapUnionId) const {
     QJsonArray result;
-    
+
     if (!server) {
         qCritical() << "ExpeditionManager: server pointer is null";
         return result;
     }
+
+    uint64 userId = uid.ConvertToUint64();
+    QMap<int, QJsonObject> expeditionMap; // key: mapUnionId
     
-    QSqlQuery query;
-    query.prepare(
-        "SELECT MapUnionId, CurrentNode, LastProgressTime, NextProgressTime, "
-        "IsActive, AutoResupplyThreshold, StopReason "
-        "FROM UserExpedition "
-        "WHERE User = :user"
-    );
-    query.bindValue(":user", uid.ConvertToUint64());
-    
-    if (!query.exec()) {
-        //% "Failed to query expeditions for user %1"
-        throw DBError(qtTrId("expedition-query-user-failed")
-                         .arg(uid.ConvertToUint64()),
-                      query.lastError(), query.lastQuery());
+    /* Query active expeditions from UserExpedition table */
+    {
+        QSqlQuery query;
+        QString sql = "SELECT MapUnionId, CurrentNode, LastProgressTime, NextProgressTime, "
+                      "IsActive, AutoRestartThreshold, StopReason, Diff "
+                      "FROM UserExpedition WHERE User = :user";
+        if (mapUnionId.has_value()) {
+            sql += " AND MapUnionId = :mapUnionId";
+        }
+        query.prepare(sql);
+        query.bindValue(":user", QVariant::fromValue(userId));
+        if (mapUnionId.has_value()) {
+            query.bindValue(":mapUnionId", mapUnionId.value());
+        }
+
+        if (!query.exec()) {
+            //% "Failed to query expeditions for user %1"
+            throw DBError(qtTrId("expedition-query-user-failed")
+                              .arg(uid.ConvertToUint64()),
+                          query.lastError(), query.lastQuery());
+        }
+
+            while (query.next()) {
+                int mapId = query.value("MapUnionId").toInt();
+                QJsonObject exp;
+                exp["mapid"] = mapId;
+                exp["currentnode"] = query.value("CurrentNode").toInt();
+                exp["lastprogresstime"] = query.value("LastProgressTime").toInt();
+                exp["nextprogresstime"] = query.value("NextProgressTime").toInt();
+                exp["isactive"] = query.value("IsActive").toBool();
+                exp["autorestarthreshold"] = query.value("AutoRestartThreshold").toDouble();
+                exp["stopreason"] = query.value("StopReason").toInt();
+                exp["haveexpedition"] = true;
+                /* autoresupply field will be populated from settings query if available */
+                exp["autoresupply"] = false;
+                
+                expeditionMap[mapId] = exp;
+            }
     }
     
-    while (query.next()) {
+    /* Query user settings from UserExpeditionSettings table */
+    {
+        QSqlQuery query;
+        QString sql = "SELECT MapUnionId, AutoRestartThreshold, AutoResupply "
+                      "FROM UserExpeditionSettings WHERE User = :user";
+        if (mapUnionId.has_value()) {
+            sql += " AND MapUnionId = :mapUnionId";
+        }
+        query.prepare(sql);
+        query.bindValue(":user", QVariant::fromValue(userId));
+        if (mapUnionId.has_value()) {
+            query.bindValue(":mapUnionId", mapUnionId.value());
+        }
+
+        if (!query.exec()) {
+            //% "Failed to query expedition settings for user %1"
+            throw DBError(qtTrId("expedition-settings-query-user-failed")
+                              .arg(uid.ConvertToUint64()),
+                          query.lastError(), query.lastQuery());
+        }
+
+        while (query.next()) {
+            int mapId = query.value("MapUnionId").toInt();
+            double threshold = query.value("AutoRestartThreshold").toDouble();
+            bool autoresupply = query.value("AutoResupply").toBool();
+            
+            if (expeditionMap.contains(mapId)) {
+                /* Update existing entry with settings */
+                QJsonObject &exp = expeditionMap[mapId];
+                /* For active expeditions, update both threshold and autoresupply from settings */
+                /* The expedition uses the threshold from UserExpedition when it started, but UI shows current saved settings */
+                exp["autorestarthreshold"] = threshold;
+                exp["autoresupply"] = autoresupply;
+            } else {
+                /* Create new entry for maps with only settings (no active expedition) */
+                QJsonObject exp;
+                exp["mapid"] = mapId;
+                exp["currentnode"] = 0;
+                exp["lastprogresstime"] = 0;
+                exp["nextprogresstime"] = 0;
+                exp["isactive"] = false;
+                exp["autorestarthreshold"] = threshold;
+                exp["autoresupply"] = autoresupply;
+                exp["stopreason"] = 0;
+                exp["haveexpedition"] = false;
+                
+                expeditionMap[mapId] = exp;
+            }
+        }
+    }
+    
+    /* If a specific mapUnionId was requested but no record exists, create a default entry */
+    if (mapUnionId.has_value() && !expeditionMap.contains(mapUnionId.value())) {
         QJsonObject exp;
-        exp["mapid"] = query.value("MapUnionId").toInt();
-        exp["currentnode"] = query.value("CurrentNode").toInt();
-        exp["lastprogresstime"] = query.value("LastProgressTime").toInt();
-        exp["nextprogresstime"] = query.value("NextProgressTime").toInt();
-        exp["isactive"] = query.value("IsActive").toBool();
-        exp["autoresupplythreshold"] = query.value("AutoResupplyThreshold").toDouble();
-        exp["stopreason"] = query.value("StopReason").toInt();
-        
+        exp["mapid"] = mapUnionId.value();
+        exp["currentnode"] = 0;
+        exp["lastprogresstime"] = 0;
+        exp["nextprogresstime"] = 0;
+        exp["isactive"] = false;
+        exp["autorestarthreshold"] = 1.0;
+        exp["autoresupply"] = false;
+        exp["stopreason"] = 0;
+        exp["haveexpedition"] = false;
+        expeditionMap[mapUnionId.value()] = exp;
+    }
+    
+    /* Convert map to array */
+    for (const QJsonObject &exp : expeditionMap) {
         result.append(exp);
     }
-    
+
     return result;
 }
 
-void ExpeditionManager::progressExpedition(const CSteamID &uid, int mapUnionId) {
+void ExpeditionManager::progressExpedition(const CSteamID &uid, int mapUnionId, KP::Difficulty diff) {
     if (!server) {
         qWarning() << "ExpeditionManager: server pointer is null";
         return;
@@ -585,35 +756,36 @@ void ExpeditionManager::progressExpedition(const CSteamID &uid, int mapUnionId) 
     /* Get current expedition state */
     QSqlQuery query;
     query.prepare(
-        "SELECT CurrentNode, AutoResupplyThreshold "
+        "SELECT CurrentNode, AutoRestartThreshold "
         "FROM UserExpedition "
-        "WHERE User = :user AND MapUnionId = :mapUnionId AND IsActive = TRUE"
-    );
+        "WHERE User = :user AND MapUnionId = :mapUnionId AND Diff = :diff AND IsActive = TRUE"
+        );
     query.bindValue(":user", uid.ConvertToUint64());
     query.bindValue(":mapUnionId", mapUnionId);
+    query.bindValue(":diff", static_cast<int>(diff));
     
     if (!query.exec()) {
         //% "Failed to get expedition state for user %1 map %2"
         throw DBError(qtTrId("expedition-get-state-failed")
-                         .arg(uid.ConvertToUint64()).arg(mapUnionId),
+                          .arg(uid.ConvertToUint64()).arg(mapUnionId),
                       query.lastError(), query.lastQuery());
     }
     
     if (!query.next()) {
         //% "Expedition not active for user %1 map %2"
         qWarning() << qtTrId("expedition-not-active")
-                      .arg(uid.ConvertToUint64()).arg(mapUnionId);
+                          .arg(uid.ConvertToUint64()).arg(mapUnionId);
         return;
     }
     
     int currentNode = query.value("CurrentNode").toInt();
-    double autoResupplyThreshold = query.value("AutoResupplyThreshold").toDouble();
+    double autoRestartThreshold = query.value("AutoRestartThreshold").toDouble();
     
     /* Determine next node */
     if (!nodeExistsInLua(mapUnionId, currentNode)) {
         //% "Current node %1 not found in map %2"
         throw DBError(qtTrId("expedition-node-not-found-in-map")
-                         .arg(currentNode).arg(mapUnionId));
+                          .arg(currentNode).arg(mapUnionId));
     }
     
     MapNode currentNodeObj = getNodeFromLua(mapUnionId, currentNode);
@@ -624,18 +796,19 @@ void ExpeditionManager::progressExpedition(const CSteamID &uid, int mapUnionId) 
         if (currentNodeObj.type == KP::CHOICE) {
             query.prepare(
                 "SELECT SelectedChoiceNode FROM UserExpeditionBattlePlan "
-                "WHERE User = :user AND MapUnionId = :mapUnionId "
+                "WHERE User = :user AND MapUnionId = :mapUnionId AND Diff = :diff "
                 "AND NodeIndex = :nodeIndex"
-            );
-    query.bindValue(":user", uid.ConvertToUint64());
+                );
+            query.bindValue(":user", uid.ConvertToUint64());
             query.bindValue(":mapUnionId", mapUnionId);
+            query.bindValue(":diff", static_cast<int>(diff));
             query.bindValue(":nodeIndex", currentNode);
             
             if (!query.exec() || !query.next()) {
                 //% "No battle plan for choice node %1 map %2 user %3"
                 throw DBError(qtTrId("expedition-no-choice-plan")
-                                 .arg(currentNode).arg(mapUnionId)
-                                 .arg(uid.ConvertToUint64()));
+                                  .arg(currentNode).arg(mapUnionId)
+                                  .arg(uid.ConvertToUint64()));
             }
             
             int selectedChoice = query.value("SelectedChoiceNode").toInt();
@@ -655,24 +828,25 @@ void ExpeditionManager::progressExpedition(const CSteamID &uid, int mapUnionId) 
     query.prepare(
         "UPDATE UserExpedition "
         "SET CurrentNode = :nextNode, LastProgressTime = :currentTime "
-        "WHERE User = :user AND MapUnionId = :mapUnionId"
-    );
+        "WHERE User = :user AND MapUnionId = :mapUnionId AND Diff = :diff"
+        );
     qint64 currentTime = QDateTime::currentDateTimeUtc().toSecsSinceEpoch();
     query.bindValue(":nextNode", nextNode);
     query.bindValue(":currentTime", currentTime);
     query.bindValue(":user", uid.ConvertToUint64());
     query.bindValue(":mapUnionId", mapUnionId);
+    query.bindValue(":diff", static_cast<int>(diff));
     
     if (!query.exec()) {
         //% "Failed to update expedition node for user %1 map %2"
         throw DBError(qtTrId("expedition-update-node-failed")
-                         .arg(uid.ConvertToUint64()).arg(mapUnionId),
+                          .arg(uid.ConvertToUint64()).arg(mapUnionId),
                       query.lastError(), query.lastQuery());
     }
     
     /* If next node is 0, expedition completed */
     if (nextNode == 0) {
-        endExpedition(uid, mapUnionId, 0); /* 0 = completed */
+        endExpedition(uid, mapUnionId, diff, KP::Completed); /* KP::Completed */
         return;
     }
     
@@ -680,7 +854,7 @@ void ExpeditionManager::progressExpedition(const CSteamID &uid, int mapUnionId) 
     if (!nodeExistsInLua(mapUnionId, nextNode)) {
         //% "Next node %1 not found in map %2"
         throw DBError(qtTrId("expedition-next-node-not-found")
-                         .arg(nextNode).arg(mapUnionId));
+                          .arg(nextNode).arg(mapUnionId));
     }
     
     MapNode nextNodeObj = getNodeFromLua(mapUnionId, nextNode);
@@ -693,14 +867,14 @@ void ExpeditionManager::progressExpedition(const CSteamID &uid, int mapUnionId) 
                          nextNodeObj.type == KP::AIR);
     
     if (isBattleNode) {
-        executeExpeditionBattle(uid, mapUnionId, nextNode);
+        executeExpeditionBattle(uid, mapUnionId, diff, nextNode);
     }
     
     /* Check stop conditions (critical damage, no fuel/ammo) */
-    checkStopConditions(uid, mapUnionId);
+    checkStopConditions(uid, mapUnionId, diff);
     
     /* Attempt auto-resupply if needed */
-    attemptAutoResupply(uid, mapUnionId);
+    attemptAutoResupply(uid, mapUnionId, diff);
     
     /* Schedule next progression */
     int progressPerNode = ::settings ? ::settings->value("rule/expeditionprogresspernode", 900).toInt() : 900;
@@ -710,27 +884,28 @@ void ExpeditionManager::progressExpedition(const CSteamID &uid, int mapUnionId) 
     query.prepare(
         "UPDATE UserExpedition "
         "SET NextProgressTime = :nextProgressTime "
-        "WHERE User = :user AND MapUnionId = :mapUnionId"
-    );
+        "WHERE User = :user AND MapUnionId = :mapUnionId AND Diff = :diff"
+        );
     query.bindValue(":nextProgressTime", nextProgressTime);
     query.bindValue(":user", uid.ConvertToUint64());
     query.bindValue(":mapUnionId", mapUnionId);
+    query.bindValue(":diff", static_cast<int>(diff));
     
     if (!query.exec()) {
         //% "Failed to update next progress time for user %1 map %2"
         throw DBError(qtTrId("expedition-update-progress-time-failed")
-                         .arg(uid.ConvertToUint64()).arg(mapUnionId),
+                          .arg(uid.ConvertToUint64()).arg(mapUnionId),
                       query.lastError(), query.lastQuery());
     }
     
     /* Send progress update to client (for non-battle nodes) */
     if (!isBattleNode) {
-        sendExpeditionProgressUpdate(uid, mapUnionId, nextNode);
+        sendExpeditionProgressUpdate(uid, mapUnionId, diff, nextNode);
     }
 }
 
 void ExpeditionManager::executeExpeditionBattle(const CSteamID &uid,
-                                                int mapUnionId, int nodeIndex) {
+                                                int mapUnionId, KP::Difficulty diff, int nodeIndex) {
     if (!server) {
         qWarning() << "ExpeditionManager: server pointer is null";
         return;
@@ -741,16 +916,17 @@ void ExpeditionManager::executeExpeditionBattle(const CSteamID &uid,
     QSqlQuery query;
     query.prepare(
         "SELECT PlanData FROM UserExpeditionBattlePlan "
-        "WHERE User = :user AND MapUnionId = :mapUnionId AND NodeIndex = :nodeIndex"
-    );
+        "WHERE User = :user AND MapUnionId = :mapUnionId AND Diff = :diff AND NodeIndex = :nodeIndex"
+        );
     query.bindValue(":user", userId);
     query.bindValue(":mapUnionId", mapUnionId);
+    query.bindValue(":diff", static_cast<int>(diff));
     query.bindValue(":nodeIndex", nodeIndex);
 
     if (!query.exec() || !query.next()) {
         //% "Battle plan not found for user %1 map %2 node %3"
         qWarning() << qtTrId("expedition-battle-plan-not-found")
-                      .arg(uid.ConvertToUint64()).arg(mapUnionId).arg(nodeIndex);
+                          .arg(uid.ConvertToUint64()).arg(mapUnionId).arg(nodeIndex);
         return;
     }
 
@@ -758,7 +934,7 @@ void ExpeditionManager::executeExpeditionBattle(const CSteamID &uid,
     if (planData.isEmpty()) {
         //% "Empty battle plan for user %1 map %2 node %3"
         qWarning() << qtTrId("expedition-empty-battle-plan")
-                      .arg(uid.ConvertToUint64()).arg(mapUnionId).arg(nodeIndex);
+                          .arg(uid.ConvertToUint64()).arg(mapUnionId).arg(nodeIndex);
         return;
     }
 
@@ -780,17 +956,17 @@ void ExpeditionManager::executeExpeditionBattle(const CSteamID &uid,
         uid, mapUnionId, nodeIndex, expeditionFleetIndex, battlePlan);
 
     /* Apply fuel/ammo consumption */
-    consumeFuelAndAmmoForBattle(uid, mapUnionId);
+    consumeFuelAndAmmoForBattle(uid, mapUnionId, diff, nodeIndex);
 
     //% "Expedition battle executed for user %1 map %2 node %3"
     qInfo() << qtTrId("expedition-battle-executed")
-               .arg(uid.ConvertToUint64()).arg(mapUnionId).arg(nodeIndex);
+                   .arg(uid.ConvertToUint64()).arg(mapUnionId).arg(nodeIndex);
     
     // Send progress update with battle result
-    sendExpeditionProgressUpdate(uid, mapUnionId, nodeIndex, battleResult);
+    sendExpeditionProgressUpdate(uid, mapUnionId, diff, nodeIndex, battleResult);
 }
 
-void ExpeditionManager::checkStopConditions(const CSteamID &uid, int mapUnionId) {
+void ExpeditionManager::checkStopConditions(const CSteamID &uid, int mapUnionId, KP::Difficulty diff) {
     if (!server) {
         qWarning() << "ExpeditionManager: server pointer is null";
         return;
@@ -813,30 +989,30 @@ void ExpeditionManager::checkStopConditions(const CSteamID &uid, int mapUnionId)
         if (dyn->isCriticallyDamaged(ship)) {
             //% "Expedition stopped: critically damaged ship for user %1 map %2"
             qInfo() << qtTrId("expedition-stopped-critically-damaged")
-                       .arg(uid.ConvertToUint64()).arg(mapUnionId);
-            endExpedition(uid, mapUnionId, 1); // critically damaged
+                           .arg(uid.ConvertToUint64()).arg(mapUnionId);
+            endExpedition(uid, mapUnionId, diff, KP::CriticallyDamaged); // critically damaged
             return;
         }
         if (dyn->fuel <= 0.0) {
             //% "Expedition stopped: no fuel for user %1 map %2"
             qInfo() << qtTrId("expedition-stopped-no-fuel")
-                       .arg(uid.ConvertToUint64()).arg(mapUnionId);
-            endExpedition(uid, mapUnionId, 2); // no fuel
+                           .arg(uid.ConvertToUint64()).arg(mapUnionId);
+            endExpedition(uid, mapUnionId, diff, KP::NoFuel); // no fuel
             return;
         }
         if (dyn->ammo <= 0.0) {
             //% "Expedition stopped: no ammo for user %1 map %2"
             qInfo() << qtTrId("expedition-stopped-no-ammo")
-                       .arg(uid.ConvertToUint64()).arg(mapUnionId);
-            endExpedition(uid, mapUnionId, 3); // no ammo
+                           .arg(uid.ConvertToUint64()).arg(mapUnionId);
+            endExpedition(uid, mapUnionId, diff, KP::NoAmmo); // no ammo
             return;
         }
     }
 }
 
 bool ExpeditionManager::setExpeditionSettings(const CSteamID &uid, int mapUnionId,
-                                              double autoResupplyThreshold,
-                                              bool autoRestart) {
+                                               double autoRestartThreshold,
+                                               bool autoResupply) {
     if (!server) {
         qWarning() << "ExpeditionManager: server pointer is null";
         return false;
@@ -851,26 +1027,27 @@ bool ExpeditionManager::setExpeditionSettings(const CSteamID &uid, int mapUnionI
     QSqlQuery query;
     query.prepare(
         "INSERT OR REPLACE INTO UserExpeditionSettings "
-        "(User, MapUnionId, AutoResupplyThreshold, AutoRestart) "
-        "VALUES (:user, :mapUnionId, :threshold, :restart)"
-    );
+        "(User, MapUnionId, Diff, AutoRestartThreshold, AutoResupply) "
+        "VALUES (:user, :mapUnionId, :diff, :threshold, :restart)"
+        );
     query.bindValue(":user", userId);
     query.bindValue(":mapUnionId", mapUnionId);
-    query.bindValue(":threshold", autoResupplyThreshold);
-    query.bindValue(":restart", autoRestart);
+    query.bindValue(":diff", static_cast<int>(map->diff));
+    query.bindValue(":threshold", autoRestartThreshold);
+    query.bindValue(":restart", autoResupply);
     if (!query.exec()) {
         //% "Failed to set expedition settings for user %1 map %2"
         throw DBError(qtTrId("expedition-settings-failed")
-                         .arg(uid.ConvertToUint64()).arg(mapUnionId),
+                          .arg(uid.ConvertToUint64()).arg(mapUnionId),
                       query.lastError(), query.lastQuery());
     }
     qInfo() << "Expedition settings updated for user" << uid.ConvertToUint64()
-            << "map" << mapUnionId << "threshold" << autoResupplyThreshold
-            << "restart" << autoRestart;
+            << "map" << mapUnionId << "threshold" << autoRestartThreshold
+            << "resupply" << autoResupply;
     return true;
 }
 
-bool ExpeditionManager::attemptAutoResupply(const CSteamID &uid, int mapUnionId) {
+bool ExpeditionManager::attemptAutoResupply(const CSteamID &uid, int mapUnionId, KP::Difficulty diff) {
     if (!server) {
         qWarning() << "ExpeditionManager: server pointer is null";
         return false;
@@ -880,15 +1057,16 @@ bool ExpeditionManager::attemptAutoResupply(const CSteamID &uid, int mapUnionId)
     uint64 userId = uid.ConvertToUint64();
     QSqlQuery query;
     query.prepare(
-        "SELECT AutoRestart FROM UserExpeditionSettings "
-        "WHERE User = :user AND MapUnionId = :mapUnionId"
-    );
+        "SELECT AutoResupply FROM UserExpeditionSettings "
+        "WHERE User = :user AND MapUnionId = :mapUnionId AND Diff = :diff"
+        );
     query.bindValue(":user", userId);
     query.bindValue(":mapUnionId", mapUnionId);
+    query.bindValue(":diff", static_cast<int>(diff));
     
-    bool autoResupplyEnabled = false; // Default disabled (AutoRestart column defaults to FALSE)
+    bool autoResupplyEnabled = false; // Default disabled (AutoResupply column defaults to FALSE)
     if (query.exec() && query.next()) {
-        autoResupplyEnabled = query.value("AutoRestart").toBool();
+        autoResupplyEnabled = query.value("AutoResupply").toBool();
     }
     
     if (!autoResupplyEnabled) {
@@ -914,14 +1092,14 @@ bool ExpeditionManager::attemptAutoResupply(const CSteamID &uid, int mapUnionId)
         "ON UserShip.ShipDef = ac.ShipID "
         "AND ac.Attribute = 'AmmoConsumption' "
         "WHERE User = :uid AND FleetIndex = :fleetIndex"
-    );
+        );
     query.bindValue(":uid", uid.ConvertToUint64());
     query.bindValue(":fleetIndex", expeditionFleetIndex);
     
     if (!query.exec()) {
         //% "Failed to query expedition fleet ships for auto-resupply user %1 map %2"
         throw DBError(qtTrId("expedition-query-fleet-ships-failed")
-                         .arg(uid.ConvertToUint64()).arg(mapUnionId),
+                          .arg(uid.ConvertToUint64()).arg(mapUnionId),
                       query.lastError(), query.lastQuery());
     }
     
@@ -982,7 +1160,7 @@ bool ExpeditionManager::attemptAutoResupply(const CSteamID &uid, int mapUnionId)
         if (!upd.exec()) {
             //% "Failed to resupply fuel for ship %1 user %2"
             qWarning() << qtTrId("expedition-resupply-fuel-failed")
-                          .arg(pair.first).arg(uid.ConvertToUint64());
+                              .arg(pair.first).arg(uid.ConvertToUint64());
             QSqlDatabase::database().rollback();
             return false;
         }
@@ -997,7 +1175,7 @@ bool ExpeditionManager::attemptAutoResupply(const CSteamID &uid, int mapUnionId)
         if (!upd.exec()) {
             //% "Failed to resupply ammo for ship %1 user %2"
             qWarning() << qtTrId("expedition-resupply-ammo-failed")
-                          .arg(pair.first).arg(uid.ConvertToUint64());
+                              .arg(pair.first).arg(uid.ConvertToUint64());
             QSqlDatabase::database().rollback();
             return false;
         }
@@ -1007,14 +1185,14 @@ bool ExpeditionManager::attemptAutoResupply(const CSteamID &uid, int mapUnionId)
     
     //% "Auto-resupply performed for user %1 map %2: oil %3, explosives %4"
     qInfo() << qtTrId("expedition-auto-resupply-performed")
-               .arg(uid.ConvertToUint64()).arg(mapUnionId)
-               .arg(totalOilCost).arg(totalExploCost);
+                   .arg(uid.ConvertToUint64()).arg(mapUnionId)
+                   .arg(totalOilCost).arg(totalExploCost);
     
     return true;
 }
 
 void ExpeditionManager::endExpedition(const CSteamID &uid, int mapUnionId,
-                                      int stopReason) {
+                                      KP::Difficulty diff, KP::ExpeditionStopReason stopReason) {
     if (!server) {
         qWarning() << "ExpeditionManager: server pointer is null";
         return;
@@ -1022,95 +1200,104 @@ void ExpeditionManager::endExpedition(const CSteamID &uid, int mapUnionId,
     
     uint64 userId = uid.ConvertToUint64();
     
-    /* Get fleet indices */
+    /* Check if expedition exists and is active */
     QSqlQuery query;
     query.prepare(
-        "SELECT FleetIndex, ExpeditionIndex FROM UserExpedition "
-        "WHERE User = :user AND MapUnionId = :mapUnionId AND IsActive = TRUE"
-    );
+        "SELECT COUNT(*) FROM UserExpedition "
+        "WHERE User = :user AND MapUnionId = :mapUnionId AND Diff = :diff AND IsActive = TRUE"
+        );
     query.bindValue(":user", userId);
     query.bindValue(":mapUnionId", mapUnionId);
+    query.bindValue(":diff", static_cast<int>(diff));
     
     if (!query.exec() || !query.next()) {
         //% "Expedition not active for user %1 map %2"
         qWarning() << qtTrId("expedition-not-active")
-                      .arg(uid.ConvertToUint64()).arg(mapUnionId);
+                          .arg(uid.ConvertToUint64()).arg(mapUnionId);
         return;
     }
     
-    int originalFleetIndex = query.value("FleetIndex").toInt();
-    int expeditionFleetIndex = query.value("ExpeditionIndex").toInt();
+    if (query.value(0).toInt() == 0) {
+        //% "Expedition not active for user %1 map %2"
+        qWarning() << qtTrId("expedition-not-active")
+                          .arg(uid.ConvertToUint64()).arg(mapUnionId);
+        return;
+    }
     
     /* Mark expedition inactive */
     query.prepare(
         "UPDATE UserExpedition "
         "SET IsActive = FALSE, StopReason = :stopReason "
-        "WHERE User = :user AND MapUnionId = :mapUnionId"
-    );
+        "WHERE User = :user AND MapUnionId = :mapUnionId AND Diff = :diff"
+        );
     query.bindValue(":user", userId);
     query.bindValue(":mapUnionId", mapUnionId);
+    query.bindValue(":diff", static_cast<int>(diff));
     query.bindValue(":stopReason", stopReason);
     
     if (!query.exec()) {
         //% "Failed to end expedition for user %1 map %2"
         throw DBError(qtTrId("expedition-end-update-failed")
-                         .arg(uid.ConvertToUint64()).arg(mapUnionId),
+                          .arg(uid.ConvertToUint64()).arg(mapUnionId),
                       query.lastError(), query.lastQuery());
-    }
-    
-    /* Restore fleet to original index */
-    try {
-        if (!restoreFleetToNormalIndex(uid, expeditionFleetIndex,
-                                       originalFleetIndex)) {
-            //% "Failed to restore fleet for ended expedition user %1 map %2"
-            qWarning() << qtTrId("expedition-restore-fleet-failed")
-                          .arg(uid.ConvertToUint64()).arg(mapUnionId);
-        }
-    }
-    catch (DBError &e) {
-        for(QString &i : e.whats()) {
-            qCritical() << i;
-        }
     }
     
     //% "Expedition ended for user %1 map %2 reason %3"
     qInfo() << qtTrId("expedition-ended")
-               .arg(uid.ConvertToUint64()).arg(mapUnionId).arg(stopReason);
+                   .arg(uid.ConvertToUint64()).arg(mapUnionId).arg(stopReason);
     
-    sendExpeditionStopped(uid, mapUnionId, stopReason);
+    sendExpeditionStopped(uid, mapUnionId, diff, stopReason);
+    
+    /* Check if auto-restart is enabled and conditions are met */
+    checkAndRestartExpedition(uid, mapUnionId, diff);
 }
 
 void ExpeditionManager::consumeFuelAndAmmoForBattle(const CSteamID &uid,
-                                                    int mapUnionId) {
+                                                    int mapUnionId, KP::Difficulty diff,
+                                                    int nodeIndex) {
     if (!server) {
         qWarning() << "ExpeditionManager: server pointer is null";
         return;
     }
     
+    /* Determine node type and fuel/ammo fractions */
+    KP::NodeType nodeType = getNodeTypeFromLua(mapUnionId, nodeIndex);
+    double fuelFrac = KP::defaultFuelUsage(nodeType);
+    double ammoFrac = KP::defaultAmmoUsage(nodeType);
+    
+    /* Lua per-node overrides */
+    sol::state &lua = server->lua;
+    if (lua["maps"] != sol::nil
+        && lua["maps"][mapUnionId] != sol::nil
+        && lua["maps"][mapUnionId][nodeIndex] != sol::nil) {
+        sol::object fuelOverride = lua["maps"][mapUnionId][nodeIndex]["fuel"];
+        sol::object ammoOverride = lua["maps"][mapUnionId][nodeIndex]["ammo"];
+        if (fuelOverride.is<double>())
+            fuelFrac = fuelOverride.as<double>();
+        if (ammoOverride.is<double>())
+            ammoFrac = ammoOverride.as<double>();
+    }
+    
+    /* DISASTER nodes have LOS check in regular battles, but expeditions skip it.
+     * Use default fractions (likely 0) or Lua overrides if present. */
+    
     int expeditionFleetIndex = mapUnionId + KP::expeditionFleetMask;
     uint64 userId = uid.ConvertToUint64();
     
-    /* Deduct 10% of fuel/ammo consumption per battle */
+    /* Query ships in expedition fleet */
     QSqlQuery query;
     query.prepare(
-        "SELECT UserShip.ShipUuid, UserShip.ShipDef, Fuel, Ammo, "
-        "fc.Intvalue AS FuelCons, ac.Intvalue AS AmmoCons "
+        "SELECT UserShip.ShipUuid, Fuel, Ammo "
         "FROM UserShip "
-        "LEFT JOIN ShipReg fc "
-        "ON UserShip.ShipDef = fc.ShipID "
-        "AND fc.Attribute = 'FuelConsumption' "
-        "LEFT JOIN ShipReg ac "
-        "ON UserShip.ShipDef = ac.ShipID "
-        "AND ac.Attribute = 'AmmoConsumption' "
         "WHERE User = :uid AND FleetIndex = :fleetIndex"
-    );
+        );
     query.bindValue(":uid", userId);
     query.bindValue(":fleetIndex", expeditionFleetIndex);
     
     if (!query.exec()) {
         //% "Failed to query expedition fleet for fuel/ammo consumption user %1 map %2"
         throw DBError(qtTrId("expedition-query-fleet-consumption-failed")
-                         .arg(uid.ConvertToUint64()).arg(mapUnionId),
+                          .arg(uid.ConvertToUint64()).arg(mapUnionId),
                       query.lastError(), query.lastQuery());
     }
     
@@ -1120,21 +1307,16 @@ void ExpeditionManager::consumeFuelAndAmmoForBattle(const CSteamID &uid,
         QString shipUuid = query.value("ShipUuid").toString();
         double fuel = query.value("Fuel").toDouble();
         double ammo = query.value("Ammo").toDouble();
-        int fuelCons = query.value("FuelCons").toInt();
-        int ammoCons = query.value("AmmoCons").toInt();
         
-        /* Deduct 10% of consumption (0.1 * consumption) */
-        double fuelDeduct = 0.1 * fuelCons;
-        double ammoDeduct = 0.1 * ammoCons;
-        
-        fuel = std::max(0.0, fuel - fuelDeduct);
-        ammo = std::max(0.0, ammo - ammoDeduct);
+        /* Deduct node fuel/ammo fractions (percentages) */
+        fuel = std::max(0.0, fuel - fuelFrac);
+        ammo = std::max(0.0, ammo - ammoFrac);
         
         QSqlQuery update;
         update.prepare(
             "UPDATE UserShip SET Fuel = :fuel, Ammo = :ammo "
             "WHERE User = :uid AND ShipUuid = :uuid"
-        );
+            );
         update.bindValue(":fuel", fuel);
         update.bindValue(":ammo", ammo);
         update.bindValue(":uid", userId);
@@ -1143,7 +1325,7 @@ void ExpeditionManager::consumeFuelAndAmmoForBattle(const CSteamID &uid,
         if (!update.exec()) {
             //% "Failed to update fuel/ammo for ship %1 user %2"
             qWarning() << qtTrId("expedition-update-fuel-ammo-failed")
-                          .arg(shipUuid).arg(uid.ConvertToUint64());
+                              .arg(shipUuid).arg(uid.ConvertToUint64());
             QSqlDatabase::database().rollback();
             return;
         }
@@ -1151,9 +1333,9 @@ void ExpeditionManager::consumeFuelAndAmmoForBattle(const CSteamID &uid,
     
     QSqlDatabase::database().commit();
     
-    //% "Fuel/ammo consumed for expedition battle user %1 map %2"
+    //% "Fuel/ammo consumed for expedition battle user %1 map %2 node %3"
     qInfo() << qtTrId("expedition-fuel-ammo-consumed")
-               .arg(uid.ConvertToUint64()).arg(mapUnionId);
+                   .arg(uid.ConvertToUint64()).arg(mapUnionId).arg(nodeIndex);
 }
 
 bool ExpeditionManager::moveFleetToExpeditionIndex(const CSteamID &uid,
@@ -1163,25 +1345,94 @@ bool ExpeditionManager::moveFleetToExpeditionIndex(const CSteamID &uid,
         qWarning() << "ExpeditionManager: server pointer is null";
         return false;
     }
-    uint64 userId = uid.ConvertToUint64();
     
-    QSqlQuery query;
-    query.prepare(
-        "UPDATE UserShip SET FleetIndex = :newIndex "
-        "WHERE User = :user AND FleetIndex = :oldIndex"
-    );
-    query.bindValue(":user", userId);
-    query.bindValue(":oldIndex", originalFleetIndex);
-    query.bindValue(":newIndex", expeditionFleetIndex);
-    
-    if (!query.exec()) {
-        //% "Failed to move fleet %1 to expedition index %2 for user %3"
-        throw DBError(qtTrId("expedition-move-fleet-index-failed")
-                         .arg(originalFleetIndex).arg(expeditionFleetIndex)
-                         .arg(uid.ConvertToUint64()),
-                      query.lastError(), query.lastQuery());
+    // Validate original fleet index range (0 ~ KP::nonExpeditionFleetsSize-1)
+    if (originalFleetIndex < 0 || originalFleetIndex >= KP::nonExpeditionFleetsSize) {
+        //% "Invalid original fleet index %1 for user %2, must be 0~%3"
+        qWarning() << qtTrId("expedition-invalid-original-fleet-index")
+                          .arg(originalFleetIndex).arg(uid.ConvertToUint64())
+                          .arg(KP::nonExpeditionFleetsSize - 1);
+        return false;
     }
     
+    // Validate expedition fleet index (should be >= KP::expeditionFleetMask)
+    if (expeditionFleetIndex < KP::expeditionFleetMask) {
+        //% "Invalid expedition fleet index %1 for user %2, must be >= %3"
+        qWarning() << qtTrId("expedition-invalid-expedition-fleet-index")
+                          .arg(expeditionFleetIndex).arg(uid.ConvertToUint64())
+                          .arg(KP::expeditionFleetMask);
+        return false;
+    }
+    
+    uint64 userId = uid.ConvertToUint64();
+    {
+        QSqlQuery query;
+        query.prepare(
+            "UPDATE UserShip SET FleetIndex = :newIndex "
+            "WHERE User = :user AND FleetIndex = :oldIndex"
+            );
+        query.bindValue(":user", userId);
+        query.bindValue(":oldIndex", originalFleetIndex);
+        query.bindValue(":newIndex", expeditionFleetIndex);
+
+        if (!query.exec()) {
+            //% "Failed to move fleet %1 to expedition index %2 for user %3"
+            throw DBError(qtTrId("expedition-move-fleet-index-failed")
+                              .arg(originalFleetIndex).arg(expeditionFleetIndex)
+                              .arg(uid.ConvertToUint64()),
+                          query.lastError(), query.lastQuery());
+        }
+    }
+    {
+        QSqlQuery query;
+        /* Update UserFleetStatus table - move fleet type record */
+        query.prepare(
+            "DELETE FROM UserFleetStatus "
+            "WHERE User = :user AND FleetIndex = :expeditionIndex"
+            );
+        query.bindValue(":user", userId);
+        query.bindValue(":expeditionIndex", expeditionFleetIndex);
+        if (!query.exec()) {
+            //% "Failed to clear expedition fleet status for user %1 index %2"
+            qWarning() << qtTrId("expedition-clear-fleet-status-failed")
+                              .arg(uid.ConvertToUint64()).arg(expeditionFleetIndex);
+            // Continue anyway
+        }
+    }
+    {
+        QSqlQuery query;
+        query.prepare(
+            "UPDATE UserFleetStatus SET FleetIndex = :newIndex "
+            "WHERE User = :user AND FleetIndex = :oldIndex"
+            );
+        query.bindValue(":user", userId);
+        query.bindValue(":oldIndex", originalFleetIndex);
+        query.bindValue(":newIndex", expeditionFleetIndex);
+        if (!query.exec()) {
+            //% "Failed to update fleet status index %1 to %2 for user %3"
+            qWarning() << qtTrId("expedition-update-fleet-status-failed")
+                              .arg(originalFleetIndex).arg(expeditionFleetIndex)
+                              .arg(uid.ConvertToUint64());
+            // Continue anyway - fleet status is less critical
+        }
+    }
+    {
+        /* Recreate original fleet index entry with NormalFleet type */
+        QSqlQuery query;
+        query.prepare(
+            "INSERT OR REPLACE INTO UserFleetStatus (User, FleetIndex, FleetType) "
+            "VALUES (:user, :originalIndex, :fleetType)"
+            );
+        query.bindValue(":user", userId);
+        query.bindValue(":originalIndex", originalFleetIndex);
+        query.bindValue(":fleetType", static_cast<int>(KP::NormalFleet));
+        if (!query.exec()) {
+            //% "Failed to recreate fleet status for user %1 index %2"
+            qWarning() << qtTrId("expedition-recreate-fleet-status-failed")
+                              .arg(uid.ConvertToUint64()).arg(originalFleetIndex);
+            // Continue anyway - fleet status is less critical
+        }
+    }
     /* Update sortieFleets map if fleet is loaded */
     QPair<CSteamID, int> oldKey(uid, originalFleetIndex);
     QPair<CSteamID, int> newKey(uid, expeditionFleetIndex);
@@ -1201,13 +1452,32 @@ bool ExpeditionManager::restoreFleetToNormalIndex(const CSteamID &uid,
         qWarning() << "ExpeditionManager: server pointer is null";
         return false;
     }
+    
+    // Validate expedition fleet index (should be >= KP::expeditionFleetMask)
+    if (expeditionFleetIndex < KP::expeditionFleetMask) {
+        //% "Invalid expedition fleet index %1 for user %2, must be >= %3"
+        qWarning() << qtTrId("expedition-invalid-expedition-fleet-index")
+                          .arg(expeditionFleetIndex).arg(uid.ConvertToUint64())
+                          .arg(KP::expeditionFleetMask);
+        return false;
+    }
+    
+    // Validate receive fleet index range (0 ~ KP::nonExpeditionFleetsSize-1)
+    if (receiveFleetIndex < 0 || receiveFleetIndex >= KP::nonExpeditionFleetsSize) {
+        //% "Invalid receive fleet index %1 for user %2, must be 1~%3"
+        qWarning() << qtTrId("expedition-invalid-receive-fleet-index")
+                          .arg(receiveFleetIndex).arg(uid.ConvertToUint64())
+                          .arg(KP::nonExpeditionFleetsSize);
+        return false;
+    }
+    
     uint64 userId = uid.ConvertToUint64();
     
     QSqlQuery query;
     query.prepare(
         "UPDATE UserShip SET FleetIndex = :newIndex "
         "WHERE User = :user AND FleetIndex = :oldIndex"
-    );
+        );
     query.bindValue(":user", userId);
     query.bindValue(":oldIndex", expeditionFleetIndex);
     query.bindValue(":newIndex", receiveFleetIndex);
@@ -1215,9 +1485,38 @@ bool ExpeditionManager::restoreFleetToNormalIndex(const CSteamID &uid,
     if (!query.exec()) {
         //% "Failed to restore fleet from expedition index %1 to normal index %2 for user %3"
         throw DBError(qtTrId("expedition-restore-fleet-index-failed")
-                         .arg(expeditionFleetIndex).arg(receiveFleetIndex)
-                         .arg(uid.ConvertToUint64()),
+                          .arg(expeditionFleetIndex).arg(receiveFleetIndex)
+                          .arg(uid.ConvertToUint64()),
                       query.lastError(), query.lastQuery());
+    }
+    
+    /* Update UserFleetStatus table - restore fleet type record */
+    query.prepare(
+        "DELETE FROM UserFleetStatus "
+        "WHERE User = :user AND FleetIndex = :receiveIndex"
+        );
+    query.bindValue(":user", userId);
+    query.bindValue(":receiveIndex", receiveFleetIndex);
+    if (!query.exec()) {
+        //% "Failed to clear receive fleet status for user %1 index %2"
+        qWarning() << qtTrId("expedition-clear-receive-fleet-status-failed")
+                          .arg(uid.ConvertToUint64()).arg(receiveFleetIndex);
+        // Continue anyway
+    }
+    
+    query.prepare(
+        "UPDATE UserFleetStatus SET FleetIndex = :newIndex "
+        "WHERE User = :user AND FleetIndex = :oldIndex"
+        );
+    query.bindValue(":user", userId);
+    query.bindValue(":oldIndex", expeditionFleetIndex);
+    query.bindValue(":newIndex", receiveFleetIndex);
+    if (!query.exec()) {
+        //% "Failed to restore fleet status index %1 to %2 for user %3"
+        qWarning() << qtTrId("expedition-restore-fleet-status-failed")
+                          .arg(expeditionFleetIndex).arg(receiveFleetIndex)
+                          .arg(uid.ConvertToUint64());
+        // Continue anyway - fleet status is less critical
     }
     
     /* Update sortieFleets map if fleet is loaded */
@@ -1232,6 +1531,124 @@ bool ExpeditionManager::restoreFleetToNormalIndex(const CSteamID &uid,
     return true;
 }
 
+void ExpeditionManager::checkAndRestartExpedition(const CSteamID &uid, int mapUnionId, KP::Difficulty diff) {
+    if (!server) {
+        qWarning() << "ExpeditionManager: server pointer is null";
+        return;
+    }
+    
+    uint64 userId = uid.ConvertToUint64();
+    
+    /* Check if expedition exists and is inactive */
+    QSqlQuery query;
+    query.prepare(
+        "SELECT StopReason FROM UserExpedition "
+        "WHERE User = :user AND MapUnionId = :mapUnionId AND Diff = :diff AND IsActive = FALSE"
+        );
+    query.bindValue(":user", userId);
+    query.bindValue(":mapUnionId", mapUnionId);
+    query.bindValue(":diff", static_cast<int>(diff));
+    
+    if (!query.exec() || !query.next()) {
+        // Expedition not found or already active
+        return;
+    }
+    
+    KP::ExpeditionStopReason stopReason = static_cast<KP::ExpeditionStopReason>(query.value("StopReason").toInt());
+    if (stopReason == KP::UserCancelled) { // User cancelled - don't auto-restart
+        return;
+    }
+
+    {
+        QSqlQuery query;
+        /* Get auto-restart setting */
+        query.prepare(
+        "SELECT AutoResupply FROM UserExpeditionSettings "
+            "WHERE User = :user AND MapUnionId = :mapUnionId AND Diff = :diff"
+            );
+        query.bindValue(":user", userId);
+        query.bindValue(":mapUnionId", mapUnionId);
+        query.bindValue(":diff", static_cast<int>(diff));
+
+        bool autoRestart = false;
+        if (query.exec() && query.next()) {
+            autoRestart = query.value("AutoResupply").toBool();
+        }
+        if (!autoRestart) {
+            return;
+        }
+    }
+    
+    /* Calculate expedition fleet index */
+    int expeditionFleetIndex = mapUnionId + KP::expeditionFleetMask;
+    
+    /* Get fleet info */
+    FleetInfo fleet = server->queryFleetInfo(uid, expeditionFleetIndex);
+    if (fleet.ships.empty()) {
+        // No ships in expedition fleet - cannot restart
+        return;
+    }
+    
+    /* Check if all ships are repaired (not critically damaged) */
+    bool allShipsRepaired = true;
+    for (int i = 0; i < fleet.ships.size(); ++i) {
+        Ship *ship = fleet.ships.at(i);
+        ShipDynamic *dyn = fleet.shipDynamics.at(i);
+        if (!ship || !dyn) continue;
+        
+        if (dyn->isCriticallyDamaged(ship)) {
+            allShipsRepaired = false;
+            break;
+        }
+    }
+    
+    if (!allShipsRepaired) {
+        // Ships need repair before restarting
+        return;
+    }
+    
+    /* Check if fleet has sufficient fuel and ammo */
+    bool hasFuel = false;
+    bool hasAmmo = false;
+    
+    for (int i = 0; i < fleet.ships.size(); ++i) {
+        ShipDynamic *dyn = fleet.shipDynamics.at(i);
+        if (!dyn) continue;
+        
+        if (dyn->fuel > 0.0) hasFuel = true;
+        if (dyn->ammo > 0.0) hasAmmo = true;
+        
+        if (hasFuel && hasAmmo) break;
+    }
+
+    if (!hasFuel || !hasAmmo) {
+        // Fleet needs resupply before restarting
+        // Could attempt auto-resupply here if enabled
+        return;
+    }
+    
+    /* All conditions met - restart expedition */
+    query.prepare(
+        "UPDATE UserExpedition "
+        "SET IsActive = TRUE, StopReason = NULL "
+        "WHERE User = :user AND MapUnionId = :mapUnionId AND Diff = :diff"
+        );
+    query.bindValue(":user", userId);
+    query.bindValue(":mapUnionId", mapUnionId);
+    query.bindValue(":diff", static_cast<int>(diff));
+    
+    if (!query.exec()) {
+        //% "Failed to restart expedition for user %1 map %2"
+        qWarning() << qtTrId("expedition-restart-failed")
+                          .arg(uid.ConvertToUint64()).arg(mapUnionId);
+        return;
+    }
+    
+    //% "Expedition auto-restarted for user %1 map %2"
+    qInfo() << qtTrId("expedition-auto-restarted")
+                   .arg(uid.ConvertToUint64()).arg(mapUnionId);
+}
+
 void ExpeditionManager::sendToUser(const CSteamID &uid, const QByteArray &msg) {
     if (!server) return;
     QSslSocket *socket = server->connectedPeers.value(uid, nullptr);
@@ -1241,16 +1658,18 @@ void ExpeditionManager::sendToUser(const CSteamID &uid, const QByteArray &msg) {
 }
 
 void ExpeditionManager::sendExpeditionProgressUpdate(const CSteamID &uid,
-                                                     int mapUnionId, int nodeIndex,
+                                                     int mapUnionId, KP::Difficulty diff, int nodeIndex,
                                                      const QJsonObject &battleResult) {
-    QByteArray msg = KP::serverExpeditionProgressUpdate(mapUnionId, nodeIndex,
+    int mapId = mapUnionId + KP::mapIDDifficultyMask * static_cast<int>(diff);
+    QByteArray msg = KP::serverExpeditionProgressUpdate(mapId, nodeIndex,
                                                         battleResult);
     sendToUser(uid, msg);
 }
 
 void ExpeditionManager::sendExpeditionStopped(const CSteamID &uid,
-                                              int mapUnionId, int stopReason) {
-    QByteArray msg = KP::serverExpeditionStopped(mapUnionId, stopReason);
+                                              int mapUnionId, KP::Difficulty diff, KP::ExpeditionStopReason stopReason) {
+    int mapId = mapUnionId + KP::mapIDDifficultyMask * static_cast<int>(diff);
+    QByteArray msg = KP::serverExpeditionStopped(mapId, stopReason);
     sendToUser(uid, msg);
 }
 

@@ -64,6 +64,30 @@ static QString gameErrorToString(KP::GameError error)
     }
 }
 
+static QString expeditionStopReasonToString(KP::ExpeditionStopReason reason)
+{
+    switch(reason) {
+    case KP::Completed:
+        //% "Completed"
+        return qtTrId("expedition-stop-completed");
+    case KP::CriticallyDamaged:
+        //% "Critically damaged"
+        return qtTrId("expedition-stop-critically-damaged");
+    case KP::NoFuel:
+        //% "No fuel"
+        return qtTrId("expedition-stop-no-fuel");
+    case KP::NoAmmo:
+        //% "No ammo"
+        return qtTrId("expedition-stop-no-ammo");
+    case KP::UserCancelled:
+        //% "User cancelled"
+        return qtTrId("expedition-stop-user-cancelled");
+    default:
+        //% "Unknown reason"
+        return qtTrId("expedition-stop-unknown");
+    }
+}
+
 Sortie::Sortie(QWidget *parent)
     : QFrame(parent)
     , ui(new Ui::Sortie)
@@ -245,6 +269,7 @@ void Sortie::switchToState(KP::SortieState state) {
         expeditionGroup->setVisible(true);
         expeditionMode = true;
         detail->setExpeditionMode(true);
+        engine.demandExpeditionStatus();
         for (int i = 0; i < ui->mapSelectBar->count(); ++i) {
             QLayoutItem *item = ui->mapSelectBar->itemAt(i);
             if (item->widget()) {
@@ -259,6 +284,7 @@ void Sortie::switchToState(KP::SortieState state) {
         expeditionGroup->setVisible(true);
         expeditionMode = true;
         detail->setExpeditionMode(true);
+        engine.demandExpeditionStatus();
         for (int i = 0; i < ui->mapSelectBar->count(); ++i) {
             QLayoutItem *item = ui->mapSelectBar->itemAt(i);
             if (item->widget()) {
@@ -408,9 +434,10 @@ void Sortie::recalculateAttrition() {
     }
     recalculateAttrition();
     /* Update expedition UI state if in expedition mode */
-    if (expeditionMode) {
-        int mapUnionId = MapWithDiff::getUnionId(mapId);
-        updateExpeditionUI(mapUnionId);
+    if (expeditionMode && currentMap) {
+        /* Send full map ID (with difficulty) so server knows which difficulty's settings to return */
+        engine.demandExpeditionStatus(currentMap->id);
+        /* UI will update when expeditionStatus signal arrives */
     }
  }
 
@@ -692,17 +719,17 @@ void Sortie::dealWithNode(const MapNode &node, int nodeId) {
          int fleetIndex = conf->getFleetIndex();
          /* check empty fleets */
          delete conf;
-         for(auto *widget: QApplication::topLevelWidgets()) {
-             if(qobject_cast<MainWindow *>(widget)) {
-                 MainWindow *mainWindowM = qobject_cast<MainWindow *>(widget);
-                 auto fv = mainWindowM->getFleetArea();
-                 if(fv && fv->isCurrentFleetEmpty()) {
-                     //% "Fleet is empty."
-                     qWarning() << qtTrId("fleet-empty");
-                     return;
-                 }
-             }
-         }
+          for(auto *widget: QApplication::topLevelWidgets()) {
+              if(qobject_cast<MainWindow *>(widget)) {
+                  MainWindow *mainWindowM = qobject_cast<MainWindow *>(widget);
+                  auto fv = mainWindowM->getFleetArea();
+                  if(fv && fv->isCurrentFleetEmpty()) {
+                      //% "Fleet is empty."
+                      qWarning() << qtTrId("fleet-empty");
+                      return;
+                  }
+              }
+          }
          
           int mapId = currentMap->id;
           int mapUnionId = MapWithDiff::getUnionId(mapId);
@@ -745,7 +772,20 @@ void Sortie::cancelExpedition()
     qDebug() << "cancelExpedition: map ID:" << mapId 
              << "union ID:" << mapUnionId
              << "difficulty:" << static_cast<int>(diff);
-    Client::getInstance().cancelExpedition(mapId, expeditionFleetIndex);
+    
+    /* Create confirmation dialog for expedition cancellation */
+    QString mapText = currentMap->toString();
+    ConfirmSortie *conf = new ConfirmSortie(this, mapText, QStringLiteral(""));
+    //% "Cancel Expedition: %1"
+    conf->setWindowTitle(qtTrId("cancel-expedition-title").arg(mapText));
+    if (conf->exec() == QDialog::Accepted) {
+        int receiveFleetIndex = conf->getFleetIndex();
+        delete conf;
+        Client::getInstance().cancelExpedition(mapId, receiveFleetIndex);
+        Client::getInstance().demandExpeditionStatus(mapUnionId);
+    } else {
+        delete conf;
+    }
 }
 
  void Sortie::updateExpeditionSettings()
@@ -760,9 +800,9 @@ void Sortie::expeditionStartResult(int mapUnionId, bool accepted,
     if (accepted) {
         //% "Expedition started successfully for map %1"
         qInfo() << qtTrId("expedition-start-success").arg(mapUnionId);
-        expeditionGroup->setEnabled(false);
         expeditionStartButton->setEnabled(false);
         expeditionCancelButton->setEnabled(true);
+        Client::getInstance().demandExpeditionStatus(mapUnionId);
     } else {
         QString errorString = gameErrorToString(error);
         //% "Expedition start failed: %1"
@@ -774,34 +814,55 @@ void Sortie::expeditionStartResult(int mapUnionId, bool accepted,
 
 void Sortie::updateExpeditionUI(int mapUnionId)
 {
-    bool hasExpedition = activeExpeditions.contains(mapUnionId);
+    bool hasExpedition = false;
+    bool hasSettings = activeExpeditions.contains(mapUnionId);
+    double serverThreshold = 1.0;
+    bool serverAutoResupply = false;
+    
+    if (hasSettings) {
+        QJsonObject expObj = activeExpeditions[mapUnionId];
+        /* Determine if there's an expedition record */
+        if (expObj.contains("haveexpedition")) {
+            hasExpedition = expObj["haveexpedition"].toBool(false);
+        } else {
+            /* Backward compatibility: if haveexpedition field missing, check isactive */
+            /* If isactive field exists (meaning there's a UserExpedition record), assume expedition exists */
+            hasExpedition = expObj.contains("isactive");
+        }
+        serverThreshold = expObj["autorestarthreshold"].toDouble(1.0);
+        serverAutoResupply = expObj.value("autoresupply").toBool(false);
+    }
     
     expeditionPlanButton->setEnabled(!hasExpedition);
     expeditionStartButton->setEnabled(!hasExpedition);
     expeditionCancelButton->setEnabled(hasExpedition);
     
     if (hasExpedition) {
-        QJsonObject expObj = activeExpeditions[mapUnionId];
-        double expThreshold = expObj["autoresupplythreshold"].toDouble(1.0);
-        bool expAutoResupply = expObj.value("autorestart").toBool(false);
-        
+        /* Has active expedition - disable controls and show expedition threshold */
         thresholdSlider->blockSignals(true);
-        thresholdSlider->setValue(qRound(expThreshold * 100));
+        thresholdSlider->setValue(qRound(serverThreshold * 100));
         thresholdSlider->setEnabled(false);
         thresholdSlider->blockSignals(false);
         
         autoRestartCheckBox->blockSignals(true);
-        autoRestartCheckBox->setChecked(expAutoResupply);
+        autoRestartCheckBox->setChecked(serverAutoResupply);
         autoRestartCheckBox->setEnabled(false);
         autoRestartCheckBox->blockSignals(false);
         
         //% "Auto-restart: %1%"
         thresholdLabel->setText(qtTrId("expedition-auto-restart-label")
-                               .arg(qRound(expThreshold * 100)));
+                               .arg(qRound(serverThreshold * 100)));
     } else {
+        /* No expedition - enable controls and show saved settings if available */
         thresholdSlider->setEnabled(true);
         autoRestartCheckBox->setEnabled(true);
-        /* Restore local settings */
+        
+        if (hasSettings) {
+            /* Update local variables with server settings */
+            autoRestartThreshold = serverThreshold;
+            autoResupply = serverAutoResupply;
+        }
+        
         thresholdSlider->blockSignals(true);
         thresholdSlider->setValue(qRound(autoRestartThreshold * 100));
         thresholdSlider->blockSignals(false);
@@ -816,14 +877,16 @@ void Sortie::updateExpeditionUI(int mapUnionId)
 
 void Sortie::expeditionStatus(const QJsonArray &expeditions)
 {
-    activeExpeditions.clear();
-    QSet<int> expeditionMapIds;
-    
     for (const QJsonValue &expValue : expeditions) {
         QJsonObject expObj = expValue.toObject();
         int mapUnionId = expObj["mapid"].toInt();
         activeExpeditions[mapUnionId] = expObj;
-        expeditionMapIds.insert(mapUnionId);
+        if(expObj["haveexpedition"].toBool()) {
+            expeditionMapIds.insert(mapUnionId);
+        }
+        else {
+            expeditionMapIds.remove(mapUnionId);
+        }
     }
     
     emit expeditionMapsUpdated(expeditionMapIds);
@@ -835,7 +898,7 @@ void Sortie::expeditionStatus(const QJsonArray &expeditions)
     }
     
     //% "Active expeditions: %1"
-    qInfo() << qtTrId("expedition-status-count").arg(expeditions.size());
+    qInfo() << qtTrId("expedition-status-count").arg(expeditionMapIds.size());
 }
 
 void Sortie::expeditionProgressUpdate(int mapUnionId, int nodeIndex,
@@ -847,16 +910,18 @@ void Sortie::expeditionProgressUpdate(int mapUnionId, int nodeIndex,
     /* Could update a progress bar or log battle results */
 }
 
-void Sortie::expeditionStopped(int mapUnionId, int stopReason)
+void Sortie::expeditionStopped(int mapUnionId, KP::ExpeditionStopReason stopReason)
 {
-    //% "Expedition %1 stopped with reason %2"
+    QString reasonString = expeditionStopReasonToString(stopReason);
+    //% "Expedition %1 stopped with reason: %2"
     qInfo() << qtTrId("expedition-stopped")
-               .arg(mapUnionId).arg(stopReason);
+               .arg(mapUnionId).arg(reasonString);
     expeditionGroup->setEnabled(true);
     expeditionStartButton->setEnabled(true);
     expeditionCancelButton->setEnabled(false);
     /* Clear battle plans for this map */
     expeditionBattlePlans.remove(mapUnionId);
+    Client::getInstance().demandExpeditionStatus(mapUnionId);
 }
 
 void Sortie::updateAutoRestartLabel()
@@ -879,9 +944,10 @@ void Sortie::updateAutoRestartLabel()
       qDebug() << "updateExpeditionAutoRestart: map union ID:" << mapUnionId 
                << "map absolute ID:" << mapAbsoluteId
                << "threshold:" << autoRestartThreshold << "resupply:" << autoResupply;
-      Client::getInstance().setExpeditionSettings(mapUnionId,
-                                                 autoRestartThreshold,
-                                                  autoResupply);
+       Client::getInstance().setExpeditionSettings(mapUnionId,
+                                                  autoRestartThreshold,
+                                                   autoResupply);
+       Client::getInstance().demandExpeditionStatus(mapUnionId);
  }
 
 void Sortie::saveExpeditionSettings()
@@ -903,6 +969,7 @@ void Sortie::saveExpeditionSettings()
     Client::getInstance().setExpeditionSettings(mapUnionId,
                                                autoRestartThreshold,
                                                autoResupply);
+    Client::getInstance().demandExpeditionStatus(mapUnionId);
     
     /* Send battle plans to server if any exist */
     /* Get battle plans - try union ID first, then absolute ID for backward compatibility */
@@ -957,15 +1024,18 @@ void Sortie::expeditionNodeClicked(int nodeId)
     MapNode node = currentMap->nodes[nodeId];
     
     /* Check if this node type should have a battle plan */
-    bool shouldHavePlan = false;
     switch (node.type) {
     case KP::NORMAL:
+        [[fallthrough]];
     case KP::BOSS:
+        [[fallthrough]];
     case KP::NIGHT:
+        [[fallthrough]];
     case KP::NIGHTBOSS:
+        [[fallthrough]];
     case KP::AIR:
+        [[fallthrough]];
     case KP::CHOICE:
-        shouldHavePlan = true;
         break;
     default:
         /* STARTING, TRANSPORT, DISASTER, EMPTY do not need battle plans */
@@ -980,7 +1050,7 @@ void Sortie::expeditionNodeClicked(int nodeId)
     int selectedChoiceNode = -1;
     if (node.type == KP::CHOICE) {
         QMenu menu(this);
-        QMap<QAction*, int> actionMap;
+        QHash<QAction*, int> actionMap;
         for (int nextId : node.nextNodes) {
             if (!currentMap->nodes.contains(nextId)) continue;
             const MapNode &nextNode = currentMap->nodes[nextId];

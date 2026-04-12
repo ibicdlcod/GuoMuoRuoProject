@@ -12,6 +12,7 @@
 
 #include "../Protocol/mapnode.h"
 #include "steam/steamclientpublic.h"
+#include <optional>
 
 class Server;
 
@@ -22,20 +23,21 @@ public:
     explicit ExpeditionManager(Server *server);
     
     // Core operations
-    KP::GameError startExpedition(const CSteamID &uid, int mapUnionId, int fleetIndex,
+    KP::GameError startExpedition(const CSteamID &uid, int mapId, int fleetIndex,
                                   const QMap<int, QByteArray> &battlePlans,
-                                  double autoResupplyThreshold);
-    bool cancelExpedition(const CSteamID &uid, int mapUnionId, int receiveFleetIndex);
-    bool updateBattlePlans(const CSteamID &uid, int mapUnionId,
+                                  double autoRestartThreshold);
+    bool cancelExpedition(const CSteamID &uid, int mapId, int receiveFleetIndex);
+    bool updateBattlePlans(const CSteamID &uid, int mapId,
                            const QMap<int, QByteArray> &battlePlans);
-    bool setExpeditionSettings(const CSteamID &uid, int mapUnionId,
-                               double autoResupplyThreshold, bool autoRestart);
+    bool setExpeditionSettings(const CSteamID &uid, int mapId,
+                               double autoRestartThreshold, bool autoResupply);
     
     // Periodic processing
     void processExpeditions(); // Called by Server::minutePulse()
     
     // Queries
     QJsonArray getUserExpeditions(const CSteamID &uid) const;
+    QJsonArray getUserExpeditions(const CSteamID &uid, std::optional<int> mapUnionId) const;
     
 private:
     Server *server;
@@ -47,12 +49,13 @@ private:
     MapNode getNodeFromLua(int mapUnionId, int nodeIndex) const;
     
     // Process single expedition
-    void progressExpedition(const CSteamID &uid, int mapUnionId);
-    void executeExpeditionBattle(const CSteamID &uid, int mapUnionId, int nodeIndex);
-    void checkStopConditions(const CSteamID &uid, int mapUnionId);
-    bool attemptAutoResupply(const CSteamID &uid, int mapUnionId);
-    void endExpedition(const CSteamID &uid, int mapUnionId, int stopReason);
-    void consumeFuelAndAmmoForBattle(const CSteamID &uid, int mapUnionId);
+    void progressExpedition(const CSteamID &uid, int mapUnionId, KP::Difficulty diff);
+    void executeExpeditionBattle(const CSteamID &uid, int mapUnionId, KP::Difficulty diff, int nodeIndex);
+    void checkStopConditions(const CSteamID &uid, int mapUnionId, KP::Difficulty diff);
+    bool attemptAutoResupply(const CSteamID &uid, int mapUnionId, KP::Difficulty diff);
+    void endExpedition(const CSteamID &uid, int mapUnionId, KP::Difficulty diff, KP::ExpeditionStopReason stopReason);
+    void checkAndRestartExpedition(const CSteamID &uid, int mapUnionId, KP::Difficulty diff);
+    void consumeFuelAndAmmoForBattle(const CSteamID &uid, int mapUnionId, KP::Difficulty diff, int nodeIndex);
     
     // Fleet index management
     bool moveFleetToExpeditionIndex(const CSteamID &uid, int originalFleetIndex, int expeditionFleetIndex);
@@ -60,8 +63,8 @@ private:
     
     // Client communication
     void sendToUser(const CSteamID &uid, const QByteArray &msg);
-    void sendExpeditionProgressUpdate(const CSteamID &uid, int mapUnionId, int nodeIndex, const QJsonObject &battleResult = QJsonObject());
-    void sendExpeditionStopped(const CSteamID &uid, int mapUnionId, int stopReason);
+    void sendExpeditionProgressUpdate(const CSteamID &uid, int mapUnionId, KP::Difficulty diff, int nodeIndex, const QJsonObject &battleResult = QJsonObject());
+    void sendExpeditionStopped(const CSteamID &uid, int mapUnionId, KP::Difficulty diff, KP::ExpeditionStopReason stopReason);
 };
 
 #endif // EXPEDITIONMANAGER_H

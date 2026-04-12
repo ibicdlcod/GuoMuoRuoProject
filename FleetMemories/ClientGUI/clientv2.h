@@ -7,6 +7,7 @@
 #include <QColor>
 #include <QtNetwork>
 #include <QHttpServer>
+#include <optional>
 #include "ui/factory/developwindow.h"
 #include "ui/factory/constructwindow.h"
 #include "ui/techview.h"
@@ -105,6 +106,7 @@ public slots:
     void chooseNode(int mapId, int chosenNodeId);
     void demandEquipCache();
     void demandEquipSkillPoints(int);
+    void demandExpeditionStatus(std::optional<int> mapUnionId = std::nullopt);
     void demandMapCache();
     void demandMapSupremacy();
     void demandResourceGain();
@@ -149,12 +151,12 @@ public slots:
     void setTicketCache(uint8 [], uint32);
     void showHelp(const QStringList &);
     void sortie(int, int, bool expedition = false);
-    void startExpedition(int mapUnionId, int fleetIndex,
+    void startExpedition(int mapId, int fleetIndex,
                          const QMap<int, QByteArray> &battlePlans,
                          double autoResupplyThreshold);
-    void cancelExpedition(int mapUnionId, int receiveFleetIndex);
-    void setExpeditionSettings(int mapUnionId, double autoResupplyThreshold, bool autoRestart);
-    void updateExpeditionPlan(int mapUnionId, const QMap<int, QByteArray> &battlePlans);
+    void cancelExpedition(int mapId, int receiveFleetIndex);
+    void setExpeditionSettings(int mapId, double autoResupplyThreshold, bool autoRestart);
+    void updateExpeditionPlan(int mapId, const QMap<int, QByteArray> &battlePlans);
     void queryExpeditionStatus();
     void stopRepair(int);
     void switchToBattleView();
@@ -212,7 +214,7 @@ signals:
     void receivedExpeditionStatus(const QJsonArray &expeditions);
     void receivedExpeditionProgressUpdate(int mapUnionId, int nodeIndex,
                                           const QJsonObject &battleResult);
-    void receivedExpeditionStopped(int mapUnionId, int stopReason);
+    void receivedExpeditionStopped(int mapUnionId, KP::ExpeditionStopReason stopReason);
 
 private slots:
     void changeGameState(KP::GameState);

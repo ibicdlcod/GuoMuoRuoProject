@@ -38,6 +38,19 @@ Q_GLOBAL_STATIC(QString,
                     ");"
                     ))
 
+/* User fleet status */
+Q_GLOBAL_STATIC(QString,
+                userFleetStatus,
+                QStringLiteral(
+                    "CREATE TABLE UserFleetStatus ( "
+                    "User BLOB NOT NULL, "
+                    "FleetIndex INTEGER NOT NULL, "
+                    "FleetType INTEGER NOT NULL DEFAULT 0, "
+                    "FOREIGN KEY(User) REFERENCES NewUsers(UserID)"
+                    "CONSTRAINT noduplicate UNIQUE(User, FleetIndex)"
+                    ");"
+                    ))
+
 /* Equipment registry */
 Q_GLOBAL_STATIC(QString,
                 equipReg,
@@ -379,16 +392,15 @@ Q_GLOBAL_STATIC(QString,
                     "CREATE TABLE UserExpedition ("
                     "User BLOB NOT NULL, "
                     "MapUnionId INTEGER NOT NULL, "
-                    "FleetIndex INTEGER NOT NULL, "
-                    "ExpeditionIndex INTEGER NOT NULL, "
+                    "Diff INTEGER NOT NULL, "
                     "CurrentNode INTEGER DEFAULT 0, "
                     "LastProgressTime INTEGER DEFAULT 0, "
                     "NextProgressTime INTEGER DEFAULT 0, "
                     "IsActive BOOLEAN DEFAULT FALSE, "
-                    "AutoResupplyThreshold REAL DEFAULT 0.3, "
+                    "AutoRestartThreshold REAL DEFAULT 0.3, "
                     "StopReason INTEGER DEFAULT 0, "
                     "FOREIGN KEY(User) REFERENCES NewUsers(UserID), "
-                    "CONSTRAINT noduplicate UNIQUE(User, MapUnionId) "
+                    "CONSTRAINT noduplicate UNIQUE(User, MapUnionId, Diff) "
                     ");"
                     ))
 
@@ -399,12 +411,13 @@ Q_GLOBAL_STATIC(QString,
                     "CREATE TABLE UserExpeditionBattlePlan ("
                     "User BLOB NOT NULL, "
                     "MapUnionId INTEGER NOT NULL, "
+                    "Diff INTEGER NOT NULL, "
                     "NodeIndex INTEGER NOT NULL, "
                     "NodeType INTEGER NOT NULL, "
                     "PlanData BLOB, "
                     "SelectedChoiceNode INTEGER DEFAULT -1, "
                     "FOREIGN KEY(User) REFERENCES NewUsers(UserID), "
-                    "CONSTRAINT noduplicate UNIQUE(User, MapUnionId, NodeIndex) "
+                    "CONSTRAINT noduplicate UNIQUE(User, MapUnionId, Diff, NodeIndex) "
                     ");"
                     ))
 
@@ -415,10 +428,11 @@ Q_GLOBAL_STATIC(QString,
                     "CREATE TABLE UserExpeditionSettings ("
                     "User BLOB NOT NULL, "
                     "MapUnionId INTEGER NOT NULL, "
-                    "AutoResupplyThreshold REAL DEFAULT 0.3, "
-                    "AutoRestart BOOLEAN DEFAULT FALSE, "
+                    "Diff INTEGER NOT NULL DEFAULT 0, "
+                    "AutoRestartThreshold REAL DEFAULT 0.3, "
+                    "AutoResupply BOOLEAN DEFAULT FALSE, "
                     "FOREIGN KEY(User) REFERENCES NewUsers(UserID), "
-                    "CONSTRAINT noduplicate UNIQUE(User, MapUnionId) "
+                    "CONSTRAINT noduplicate UNIQUE(User, MapUnionId, Diff) "
                     ");"
                     ))
 
@@ -554,6 +568,9 @@ void Server::sqlinit() const {
         }
         if(!tables.contains("UserExpeditionSettings")) {
             sqlinitExpeditionSettings();
+        }
+        if(!tables.contains("UserFleetStatus")) {
+            sqlinitUserFleetStatus();
         }
     }
 }
@@ -842,6 +859,18 @@ void Server::sqlinitExpeditionBattlePlan() const {
     if(!query.exec()) {
         //% "Create Expedition battle plans database failed."
         throw DBError(qtTrId("expedition-battle-plans-db-gen-failure"),
+                      query.lastError(), query.lastQuery());
+    }
+}
+
+void Server::sqlinitUserFleetStatus() const {
+    //% "User fleet status database does not exist, creating..."
+    qWarning() << qtTrId("user-fleet-status-db-lack");
+    QSqlQuery query;
+    query.prepare(*userFleetStatus);
+    if(!query.exec()) {
+        //% "Create User fleet status database failed."
+        throw DBError(qtTrId("user-fleet-status-db-gen-failure"),
                       query.lastError(), query.lastQuery());
     }
 }

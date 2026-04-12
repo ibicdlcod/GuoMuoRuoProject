@@ -3,6 +3,7 @@
 
 #include "kp.h"
 #include <cmath>
+#include <optional>
 #include <QFile>
 #include <QJsonArray>
 #include <QSettings>
@@ -470,8 +471,8 @@ QByteArray KP::clientSetExpeditionSettings(int mapUnionId, double autoResupplyTh
     result["type"] = DgramType::Request;
     result["command"] = CommandType::SetExpeditionSettings;
     result["mapid"] = mapUnionId;
-    result["autoresupplythreshold"] = autoResupplyThreshold;
-    result["autorestart"] = autoRestart;
+    result["autorestarthreshold"] = autoResupplyThreshold;
+    result["autoresupply"] = autoRestart;
     return QCborValue::fromJsonValue(result).toCbor();
 }
 
@@ -483,7 +484,7 @@ QByteArray KP::clientStartExpedition(int mapId, int fleetIndex,
     result["command"] = CommandType::StartExpedition;
     result["mapid"] = mapId;
     result["fleetindex"] = fleetIndex;
-    result["autoresupplythreshold"] = autoResupplyThreshold;
+    result["autorestarthreshold"] = autoResupplyThreshold;
     QJsonObject plansObj;
     for(auto it = battlePlans.begin(); it != battlePlans.end(); ++it) {
         plansObj[QString::number(it.key())] = QString(it.value().toBase64());
@@ -973,7 +974,7 @@ QByteArray KP::serverExpeditionStatus(const QJsonArray &expeditions) {
     return QCborValue::fromJsonValue(result).toCbor();
 }
 
-QByteArray KP::serverExpeditionStopped(int mapId, int stopReason) {
+QByteArray KP::serverExpeditionStopped(int mapId, KP::ExpeditionStopReason stopReason) {
     QJsonObject result;
     result["type"] = DgramType::Info;
     result["infotype"] = InfoType::ExpeditionStopped;

@@ -8,6 +8,7 @@
 #include <QSqlQuery>
 #include <QSqlRecord>
 #include <QTimer>
+#include <QMap>
 
 #include <cmath>
 
@@ -24,24 +25,24 @@ void Server::offerEquipInfo(QSslSocket *connection) {
     QJsonArray equipInfos;
     int i = 0;
     for(auto equipIdIter = equipRegistry.keyBegin();
-        equipIdIter != equipRegistry.keyEnd();
-        ++equipIdIter, ++i) {
+         equipIdIter != equipRegistry.keyEnd();
+         ++equipIdIter, ++i) {
         auto equipid = *equipIdIter;
         QJsonObject result;
         result["eid"] = equipid;
         Equipment *e = equipRegistry.value(equipid);
         QJsonObject ename;
         for(auto lang = e->localNames.keyValueBegin();
-            lang != e->localNames.keyValueEnd();
-            ++lang) {
+             lang != e->localNames.keyValueEnd();
+             ++lang) {
             ename[lang->first] = lang->second;
         }
         result["name"] = ename;
         result["type"] = e->type.toString();
         QJsonObject attrs;
         for(auto a = e->attr.keyValueBegin();
-            a != e->attr.keyValueEnd();
-            ++a) {
+             a != e->attr.keyValueEnd();
+             ++a) {
             attrs[a->first] = a->second;
         }
         result["attr"] = attrs;
@@ -49,12 +50,12 @@ void Server::offerEquipInfo(QSslSocket *connection) {
     }
     connection->flush();
     QByteArray msg =
-            KP::serverEquipInfo(equipInfos,
-                                false,
-                                settings->value("server/equipdbtimestamp",
-                                                QDateTime::currentDateTimeUtc()
-                                                ).toDateTime()
-                                );
+        KP::serverEquipInfo(equipInfos,
+                            false,
+                            settings->value("server/equipdbtimestamp",
+                                            QDateTime::currentDateTimeUtc()
+                                            ).toDateTime()
+                            );
     senderM.sendMessage(connection, msg);
     connection->flush();
 }
@@ -62,58 +63,58 @@ void Server::offerEquipInfo(QSslSocket *connection) {
 void Server::offerEquipInfoUser(const CSteamID &uid,
                                 QSslSocket *connection) {
     QJsonArray userEquipInfos;
-        QSqlDatabase db = QSqlDatabase::database();
-        QSqlQuery query;
-        query.prepare("SELECT UserEquip.EquipDef, "
-                      "UserEquip.EquipUuid, "
-                      "UserEquip.Star, "
-                      "UserKCEquip.Star "
-                      "FROM UserEquip "
-                      "LEFT JOIN UserKCEquip "
-                      "ON UserEquip.EquipUuid = UserKCEquip.EquipUuid "
-                      "WHERE UserEquip.User = :id;");
-        query.bindValue(":id", uid.ConvertToUint64());
-        if(!query.exec() || !query.isSelect()) {
-            //% "Get user %1's equipment list failed!"
-            throw DBError(qtTrId("user-get-equip-list-failed")
+    QSqlDatabase db = QSqlDatabase::database();
+    QSqlQuery query;
+    query.prepare("SELECT UserEquip.EquipDef, "
+                  "UserEquip.EquipUuid, "
+                  "UserEquip.Star, "
+                  "UserKCEquip.Star "
+                  "FROM UserEquip "
+                  "LEFT JOIN UserKCEquip "
+                  "ON UserEquip.EquipUuid = UserKCEquip.EquipUuid "
+                  "WHERE UserEquip.User = :id;");
+    query.bindValue(":id", uid.ConvertToUint64());
+    if(!query.exec() || !query.isSelect()) {
+        //% "Get user %1's equipment list failed!"
+        throw DBError(qtTrId("user-get-equip-list-failed")
                           .arg(uid.ConvertToUint64()),
-                          query.lastError(), query.lastQuery());
+                      query.lastError(), query.lastQuery());
+    }
+    else {
+        QUuid serial;
+        int def;
+        int star;
+        int starkc;
+        while(query.next()) {
+            QJsonObject output;
+            def = query.value(0).toInt();
+            serial = query.value(1).toUuid();
+            star = query.value(2).toInt();
+            starkc = query.value(3).isNull() ? 0 : query.value(3).toInt();
+            output["def"] = def;
+            output["serial"] = serial.toString();
+            output["star"] = star + starkc;
+            userEquipInfos.append(output);
         }
-        else {
-            QUuid serial;
-            int def;
-            int star;
-            int starkc;
-            while(query.next()) {
-                QJsonObject output;
-                def = query.value(0).toInt();
-                serial = query.value(1).toUuid();
-                star = query.value(2).toInt();
-                starkc = query.value(3).isNull() ? 0 : query.value(3).toInt();
-                output["def"] = def;
-                output["serial"] = serial.toString();
-                output["star"] = star + starkc;
-                userEquipInfos.append(output);
-            }
-            connection->flush();
-            QByteArray msg =
-                    KP::serverEquipInfo(userEquipInfos, true);
-            QTimer::singleShot(100ms, this,
-                               [=, this]() {
-                                   senderM.sendMessage(connection, msg);
-                               });
-            connection->flush();
-        }
+        connection->flush();
+        QByteArray msg =
+            KP::serverEquipInfo(userEquipInfos, true);
+        QTimer::singleShot(100ms, this,
+                           [=, this]() {
+                               senderM.sendMessage(connection, msg);
+                           });
+        connection->flush();
+    }
 }
 
 void Server::offerSPInfo(QSslSocket *connection,
                          const CSteamID &uid, int equipId) {
     connection->flush();
     QByteArray msg =
-            KP::serverSkillPoints(equipId,
-                                  User::getSkillPoints(uid, equipId),
-                                  equipRegistry.value(equipId)
-                                      ->skillPointsStd());
+        KP::serverSkillPoints(equipId,
+                              User::getSkillPoints(uid, equipId),
+                              equipRegistry.value(equipId)
+                                  ->skillPointsStd());
     senderM.sendMessage(connection, msg);
     connection->flush();
 }
@@ -122,44 +123,44 @@ void Server::offerShipInfo(QSslSocket *connection) {
     QJsonArray shipInfos;
     int i = 0;
     for(auto shipIdIter = shipRegistry.keyBegin();
-        shipIdIter != shipRegistry.keyEnd();
-        ++shipIdIter, ++i) {
+         shipIdIter != shipRegistry.keyEnd();
+         ++shipIdIter, ++i) {
         auto shipid = *shipIdIter;
         QJsonObject result;
         result["sid"] = shipid;
         Ship *e = shipRegistry.value(shipid);
         QJsonObject ename;
         for(auto lang = e->localNames.keyValueBegin();
-            lang != e->localNames.keyValueEnd();
-            ++lang) {
+             lang != e->localNames.keyValueEnd();
+             ++lang) {
             ename[lang->first] = lang->second;
         }
         result["name"] = ename;
         QJsonObject eclass;
         for(auto lang = e->shipClassText.keyValueBegin();
-            lang != e->shipClassText.keyValueEnd();
-            ++lang) {
+             lang != e->shipClassText.keyValueEnd();
+             ++lang) {
             eclass[lang->first] = lang->second;
         }
         result["class"] = eclass;
         QJsonObject eorder;
         for(auto lang = e->shipOrderText.keyValueBegin();
-            lang != e->shipOrderText.keyValueEnd();
-            ++lang) {
+             lang != e->shipOrderText.keyValueEnd();
+             ++lang) {
             eorder[lang->first] = lang->second;
         }
         result["shiporder"] = eorder;
         QJsonObject attrs;
         for(auto a = e->attr.keyValueBegin();
-            a != e->attr.keyValueEnd();
-            ++a) {
+             a != e->attr.keyValueEnd();
+             ++a) {
             attrs[a->first] = a->second;
         }
         result["attr"] = attrs;
         QJsonObject customAttrs;
         for(auto a = e->customFlags.keyValueBegin();
-            a != e->customFlags.keyValueEnd();
-            ++a) {
+             a != e->customFlags.keyValueEnd();
+             ++a) {
             customAttrs[a->first] = a->second;
         }
         result["custom"] = customAttrs;
@@ -167,222 +168,222 @@ void Server::offerShipInfo(QSslSocket *connection) {
     }
     connection->flush();
     QByteArray msg =
-            KP::serverShipInfo(shipInfos,
-                               false,
-                               settings->value("server/shipdbtimestamp",
-                                               QDateTime::currentDateTimeUtc()
-                                               ).toDateTime()
-                               );
+        KP::serverShipInfo(shipInfos,
+                           false,
+                           settings->value("server/shipdbtimestamp",
+                                           QDateTime::currentDateTimeUtc()
+                                           ).toDateTime()
+                           );
     senderM.sendMessage(connection, msg);
     connection->flush();
 }
 
 void Server::offerShipInfoUser(const CSteamID &uid,
                                QSslSocket *connection) {
-    QList<KP::FleetType> fleetTypes(KP::fleetsSize);
-    for(int i = 0; i < KP::fleetsSize; ++i) {
-        QSqlQuery query;
-        if(!query.prepare("SELECT Attribute, Intvalue "
-                          "FROM UserAttr "
-                          "WHERE UserID = :uid "
-                          "AND Attribute LIKE 'Fleet%';")) {
-            throw DBError(qtTrId("init-userfleet-failed"),
-                          query.lastError(), query.lastQuery());
-        }
-        query.bindValue(":uid", uid.ConvertToUint64());
-        if(!query.exec() || !query.isSelect()) {
-            //% "Set User Fleet Up failed!"
-            throw DBError(qtTrId("init-userfleet-failed"),
-                          query.lastError(), query.lastQuery());
-            return;
-        }
-        else {
-            while(query.next()) {
-                auto fleetIndexStr = query.value(0).toString();
-                bool isInt;
-                int fleetIndex = fleetIndexStr
-                        .last(fleetIndexStr.size()
-                              - QStringLiteral("Fleet").size())
-                        .toInt(&isInt) - 1;
-                if(isInt) {
-                    fleetTypes[fleetIndex] =
-                            static_cast<KP::FleetType>(query.value(1).toInt());
-                }
+    QMap<int, KP::FleetType> fleetTypes;
+    // Initialize non-expedition fleet indices with default fleet type
+    for(int i = 0; i < KP::nonExpeditionFleetsSize; ++i) {
+        fleetTypes[i] = KP::NormalFleet;
+    }
+    
+    QSqlQuery query;
+    if(!query.prepare("SELECT FleetIndex, FleetType "
+                       "FROM UserFleetStatus "
+                       "WHERE User = :uid "
+                       "ORDER BY FleetIndex;")) {
+        throw DBError(qtTrId("init-userfleet-failed"),
+                      query.lastError(), query.lastQuery());
+    }
+    query.bindValue(":uid", uid.ConvertToUint64());
+    if(!query.exec() || !query.isSelect()) {
+        //% "Set User Fleet Up failed!"
+        throw DBError(qtTrId("init-userfleet-failed"),
+                      query.lastError(), query.lastQuery());
+        return;
+    }
+    else {
+        while(query.next()) {
+            int fleetIndex = query.value(0).toInt();
+            if(fleetIndex >= 0) {
+                fleetTypes[fleetIndex] =
+                    static_cast<KP::FleetType>(query.value(1).toInt());
             }
         }
     }
 
-    QJsonArray userShipInfos;
 user_ship:
-        QSqlDatabase db = QSqlDatabase::database();
-        QSqlQuery query;
-        query.prepare("SELECT UserShip.ShipDef,"
-                      "UserShip.ShipUuid,"
-                      "Star, "
-                      "CurrentHP, "
-                      "Condition, "
-                      "UserShip.Exp, "
-                      "ExpCap, "
-                      "Slot1, "
-                      "Slot2, "
-                      "Slot3, "
-                      "Slot4, "
-                      "Slot5, "
-                      "SlotEX, "
-                      "Slot1Planes, "
-                      "Slot2Planes, "
-                      "Slot3Planes, "
-                      "Slot4Planes, "
-                      "Slot5Planes, "
-                       "FleetIndex, "
-                       "FleetPosIndex, "
-                       "FleetFled, "
-                       "Fuel, "
-                       "Ammo, "
-                       "UserKCShip.Exp "
-                      "FROM UserShip "
-                      "LEFT JOIN UserKCShip "
-                      "ON UserShip.ShipUuid = UserKCShip.ShipUuid "
-                      "WHERE User = :id;");
-        query.bindValue(":id", uid.ConvertToUint64());
-        if(!query.exec() || !query.isSelect()) {
-            //% "Get user %1's ship list failed!"
-            throw DBError(qtTrId("user-get-ship-list-failed")
+{
+    QJsonArray userShipInfos;
+    QSqlDatabase db = QSqlDatabase::database();
+    QSqlQuery query;
+    query.prepare("SELECT UserShip.ShipDef,"
+                  "UserShip.ShipUuid,"
+                  "Star, "
+                  "CurrentHP, "
+                  "Condition, "
+                  "UserShip.Exp, "
+                  "ExpCap, "
+                  "Slot1, "
+                  "Slot2, "
+                  "Slot3, "
+                  "Slot4, "
+                  "Slot5, "
+                  "SlotEX, "
+                  "Slot1Planes, "
+                  "Slot2Planes, "
+                  "Slot3Planes, "
+                  "Slot4Planes, "
+                  "Slot5Planes, "
+                  "FleetIndex, "
+                  "FleetPosIndex, "
+                  "FleetFled, "
+                  "Fuel, "
+                  "Ammo, "
+                  "UserKCShip.Exp "
+                  "FROM UserShip "
+                  "LEFT JOIN UserKCShip "
+                  "ON UserShip.ShipUuid = UserKCShip.ShipUuid "
+                  "WHERE User = :id;");
+    query.bindValue(":id", uid.ConvertToUint64());
+    if(!query.exec() || !query.isSelect()) {
+        //% "Get user %1's ship list failed!"
+        throw DBError(qtTrId("user-get-ship-list-failed")
                           .arg(uid.ConvertToUint64()),
-                          query.lastError(), query.lastQuery());
-        }
-        else {
-            QUuid serial;
-            int def;
-            int star;
-            int currentHP;
-            int condition;
-            int exp;
-            int expCap;
-            QUuid slot1;
-            QUuid slot2;
-            QUuid slot3;
-            QUuid slot4;
-            QUuid slot5;
-            QUuid slotEX;
-            int slot1Planes;
-            int slot2Planes;
-            int slot3Planes;
-            int slot4Planes;
-            int slot5Planes;
-             int fleetIndex;
-             int fleetPosIndex;
-             bool fleetFled;
-             double fuel;
-            double ammo;
-            int expKC;
-            while(query.next()) {
-                QJsonObject output;
-                auto rec = query.record();
-                def = query.value(rec.indexOf("UserShip.ShipDef")).toInt();
-                serial = query.value(
-                    rec.indexOf("UserShip.ShipUuid")).toUuid();
-                star = query.value(rec.indexOf("Star")).toInt();
-                currentHP = query.value(rec.indexOf("CurrentHP")).toInt();
-                condition = query.value(rec.indexOf("Condition")).toInt();
-                exp = query.value(rec.indexOf("UserShip.Exp")).toInt();
-                expCap = query.value(rec.indexOf("ExpCap")).toInt();
-                slot1 = query.value(rec.indexOf("Slot1")).toUuid();
-                slot2 = query.value(rec.indexOf("Slot2")).toUuid();
-                slot3 = query.value(rec.indexOf("Slot3")).toUuid();
-                slot4 = query.value(rec.indexOf("Slot4")).toUuid();
-                slot5 = query.value(rec.indexOf("Slot5")).toUuid();
-                slotEX = query.value(rec.indexOf("SlotEX")).toUuid();
-                slot1Planes = query.value(
-                    rec.indexOf("Slot1Planes")).toInt();
-                slot2Planes = query.value(
-                    rec.indexOf("Slot2Planes")).toInt();
-                slot3Planes = query.value(
-                    rec.indexOf("Slot3Planes")).toInt();
-                slot4Planes = query.value(
-                    rec.indexOf("Slot4Planes")).toInt();
-                slot5Planes = query.value(
-                    rec.indexOf("Slot5Planes")).toInt();
-                fleetIndex = query.value(rec.indexOf("FleetIndex")).toInt();
-                fleetPosIndex = query.value(
-                    rec.indexOf("FleetPosIndex")).toInt();
-                fleetFled = query.value(rec.indexOf("FleetFled")).toBool();
-                fuel = query.value(rec.indexOf("Fuel")).toDouble();
-                ammo = query.value(rec.indexOf("Ammo")).toDouble();
-                expKC = query.value(
-                    rec.indexOf("UserKCShip.Exp")).toInt();
+                      query.lastError(), query.lastQuery());
+    }
+    else {
+        QUuid serial;
+        int def;
+        int star;
+        int currentHP;
+        int condition;
+        int exp;
+        int expCap;
+        QUuid slot1;
+        QUuid slot2;
+        QUuid slot3;
+        QUuid slot4;
+        QUuid slot5;
+        QUuid slotEX;
+        int slot1Planes;
+        int slot2Planes;
+        int slot3Planes;
+        int slot4Planes;
+        int slot5Planes;
+        int fleetIndex;
+        int fleetPosIndex;
+        bool fleetFled;
+        double fuel;
+        double ammo;
+        int expKC;
+        while(query.next()) {
+            QJsonObject output;
+            auto rec = query.record();
+            def = query.value(rec.indexOf("UserShip.ShipDef")).toInt();
+            serial = query.value(
+                              rec.indexOf("UserShip.ShipUuid")).toUuid();
+            star = query.value(rec.indexOf("Star")).toInt();
+            currentHP = query.value(rec.indexOf("CurrentHP")).toInt();
+            condition = query.value(rec.indexOf("Condition")).toInt();
+            exp = query.value(rec.indexOf("UserShip.Exp")).toInt();
+            expCap = query.value(rec.indexOf("ExpCap")).toInt();
+            slot1 = query.value(rec.indexOf("Slot1")).toUuid();
+            slot2 = query.value(rec.indexOf("Slot2")).toUuid();
+            slot3 = query.value(rec.indexOf("Slot3")).toUuid();
+            slot4 = query.value(rec.indexOf("Slot4")).toUuid();
+            slot5 = query.value(rec.indexOf("Slot5")).toUuid();
+            slotEX = query.value(rec.indexOf("SlotEX")).toUuid();
+            slot1Planes = query.value(
+                                   rec.indexOf("Slot1Planes")).toInt();
+            slot2Planes = query.value(
+                                   rec.indexOf("Slot2Planes")).toInt();
+            slot3Planes = query.value(
+                                   rec.indexOf("Slot3Planes")).toInt();
+            slot4Planes = query.value(
+                                   rec.indexOf("Slot4Planes")).toInt();
+            slot5Planes = query.value(
+                                   rec.indexOf("Slot5Planes")).toInt();
+            fleetIndex = query.value(rec.indexOf("FleetIndex")).toInt();
+            fleetPosIndex = query.value(
+                                     rec.indexOf("FleetPosIndex")).toInt();
+            fleetFled = query.value(rec.indexOf("FleetFled")).toBool();
+            fuel = query.value(rec.indexOf("Fuel")).toDouble();
+            ammo = query.value(rec.indexOf("Ammo")).toDouble();
+            expKC = query.value(
+                             rec.indexOf("UserKCShip.Exp")).toInt();
 
-                output["def"] = def;
-                output["serial"] = serial.toString();
-                output["star"] = star;
-                output["hp"] = currentHP;
-                output["cond"] = condition;
-                output["exp"] = exp + expKC;
-                output["expcap"] = expCap;
-                output["equip"] = QJsonArray({
-                                                 slot1.toString(),
-                                                 slot2.toString(),
-                                                 slot3.toString(),
-                                                 slot4.toString(),
-                                                 slot5.toString(),
-                                             });
-                output["equipex"] = slotEX.toString();
-                output["planes"] = QJsonArray({
-                                                  slot1Planes,
-                                                  slot2Planes,
-                                                  slot3Planes,
-                                                  slot4Planes,
-                                                  slot5Planes,
-                                              });
-                output["fuel"] = fuel;
-                output["ammo"] = ammo;
-                output["fleetindex"] = fleetIndex;
-                output["fleetposindex"] = fleetPosIndex;
-                output["fleetfled"] = fleetFled;
-                output["fleettype"] = fleetIndex == -1
-                        ? KP::NormalFleet
-                        : fleetTypes[fleetIndex];
-                userShipInfos.append(output);
-            }
-            QByteArray msg =
-                    KP::serverShipInfo(userShipInfos, true);
-            QTimer::singleShot(100ms, this,
-                               [=, this](){
-                connection->flush();
-                senderM.sendMessage(connection, msg);
-                connection->flush();
+            output["def"] = def;
+            output["serial"] = serial.toString();
+            output["star"] = star;
+            output["hp"] = currentHP;
+            output["cond"] = condition;
+            output["exp"] = exp + expKC;
+            output["expcap"] = expCap;
+            output["equip"] = QJsonArray({
+                slot1.toString(),
+                slot2.toString(),
+                slot3.toString(),
+                slot4.toString(),
+                slot5.toString(),
             });
+            output["equipex"] = slotEX.toString();
+            output["planes"] = QJsonArray({
+                slot1Planes,
+                slot2Planes,
+                slot3Planes,
+                slot4Planes,
+                slot5Planes,
+            });
+            output["fuel"] = fuel;
+            output["ammo"] = ammo;
+            output["fleetindex"] = fleetIndex;
+            output["fleetposindex"] = fleetPosIndex;
+            output["fleetfled"] = fleetFled;
+            output["fleettype"] = fleetIndex == -1
+                                      ? KP::NormalFleet
+                                      : fleetTypes.value(fleetIndex, KP::NormalFleet);
+            userShipInfos.append(output);
         }
+        QByteArray msg =
+            KP::serverShipInfo(userShipInfos, true);
+        QTimer::singleShot(100ms, this,
+                           [=, this](){
+                               connection->flush();
+                               senderM.sendMessage(connection, msg);
+                               connection->flush();
+                           });
+    }
+}
 user_ship_bp:
-        QSqlQuery query2;
-        query2.prepare("SELECT ShipDef, Amount "
-                       "FROM UserShipBP "
-                       "WHERE User = :id;");
-        query2.bindValue(":id", uid.ConvertToUint64());
-        if(!query2.exec() || !query2.isSelect()) {
-            //% "Get user %1's ship list failed!"
-            throw DBError(qtTrId("user-get-ship-list-failed")
+    QSqlQuery query2;
+    query2.prepare("SELECT ShipDef, Amount "
+                   "FROM UserShipBP "
+                   "WHERE User = :id;");
+    query2.bindValue(":id", uid.ConvertToUint64());
+    if(!query2.exec() || !query2.isSelect()) {
+        //% "Get user %1's ship list failed!"
+        throw DBError(qtTrId("user-get-ship-list-failed")
                           .arg(uid.ConvertToUint64()),
-                          query2.lastError(), query2.lastQuery());
+                      query2.lastError(), query2.lastQuery());
+    }
+    else {
+        QSqlRecord rec = query2.record();
+        int defCol = rec.indexOf("ShipDef");
+        int countCol = rec.indexOf("Amount");
+        QJsonObject userShipBP;
+        while(query2.next()) {
+            userShipBP[query2.value(defCol).toString()] =
+                query2.value(countCol).toInt();
         }
-        else {
-            QSqlRecord rec = query2.record();
-            int defCol = rec.indexOf("ShipDef");
-            int countCol = rec.indexOf("Amount");
-            QJsonObject userShipBP;
-            while(query2.next()) {
-                userShipBP[query2.value(defCol).toString()] =
-                    query2.value(countCol).toInt();
-            }
-            QByteArray msg =
-                    KP::serverShipBPInfo(userShipBP);
-            QTimer::singleShot(1000ms, this,
-                               [=, this](){
-                connection->flush();
-                senderM.sendMessage(connection, msg);
-                connection->flush();
-            });
-        }
+        QByteArray msg =
+            KP::serverShipBPInfo(userShipBP);
+        QTimer::singleShot(1000ms, this,
+                           [=, this](){
+                               connection->flush();
+                               senderM.sendMessage(connection, msg);
+                               connection->flush();
+                           });
+    }
 }
 
 void Server::offerMapInfo(const CSteamID &uid, QSslSocket *connection)
@@ -394,8 +395,8 @@ void Server::offerMapInfo(const CSteamID &uid, QSslSocket *connection)
         mapInfo["id"] = map->id;
         QJsonObject ename;
         for(auto lang = map->localNames.keyValueBegin();
-            lang != map->localNames.keyValueEnd();
-            ++lang) {
+             lang != map->localNames.keyValueEnd();
+             ++lang) {
             ename[lang->first] = lang->second;
         }
         mapInfo["name"] = ename;
@@ -477,10 +478,10 @@ void Server::offerMapInfo(const CSteamID &uid, QSslSocket *connection)
     QTimer::singleShot(100ms, this, [=, this]{
         connection->flush();
         QByteArray msg =
-                KP::serverMapInfo(mapInfos,
-                    settings->value("server/mapdbtimestamp",
-                        QDateTime::currentDateTimeUtc()
-                    ).toDateTime());
+            KP::serverMapInfo(mapInfos,
+                              settings->value("server/mapdbtimestamp",
+                                              QDateTime::currentDateTimeUtc()
+                                              ).toDateTime());
         senderM.sendMessage(connection, msg);
         connection->flush();
     });
@@ -498,7 +499,7 @@ void Server::offerMapInfoUser(const CSteamID &uid, QSslSocket *connection)
     if(!query.exec() || !query.isSelect()) {
         //% "Get user %1's map supremacy failed!"
         throw DBError(qtTrId("user-get-map-supremacy-failed")
-                      .arg(uid.ConvertToUint64()),
+                          .arg(uid.ConvertToUint64()),
                       query.lastError(), query.lastQuery());
     }
     else {
@@ -525,7 +526,7 @@ void Server::offerRankInfo(const CSteamID &uid, QSslSocket *connection,
         if(!query.exec() || !query.isSelect()) {
             //% "User %1: rank info failed!"
             throw DBError(qtTrId("user-rank-info-failed")
-                          .arg(uid.ConvertToUint64()),
+                              .arg(uid.ConvertToUint64()),
                           query.lastError(), query.lastQuery());
         }
         else if(query.first()) {
@@ -545,7 +546,7 @@ void Server::offerRankInfo(const CSteamID &uid, QSslSocket *connection,
         if(!query.exec() || !query.isSelect()) {
             //% "User %1: rank info failed!"
             throw DBError(qtTrId("user-rank-info-failed")
-                          .arg(uid.ConvertToUint64()),
+                              .arg(uid.ConvertToUint64()),
                           query.lastError(), query.lastQuery());
         }
         else if(query.first()) {
@@ -572,7 +573,7 @@ void Server::offerRankInfo(const CSteamID &uid, QSslSocket *connection,
         if(!query.exec() || !query.isSelect()) {
             //% "User %1: rank info failed!"
             throw DBError(qtTrId("user-rank-info-failed")
-                          .arg(uid.ConvertToUint64()),
+                              .arg(uid.ConvertToUint64()),
                           query.lastError(), query.lastQuery());
         }
         else {
@@ -634,8 +635,8 @@ void Server::offerTechInfo(QSslSocket *connection, const CSteamID &uid,
 }
 
 void Server::offerTechInfoComponents(
-        QSslSocket *connection, const QList<TechEntry> &content,
-        bool initial, bool global) {
+    QSslSocket *connection, const QList<TechEntry> &content,
+    bool initial, bool global) {
     Q_UNUSED(initial)
     /* see e337bb37ef2ee656321dc9688679a6c6f118cc16 for previous version
      * if this stopped working */
@@ -648,22 +649,22 @@ void Server::offerTechInfoComponents(
 void Server::refreshClientDock(const CSteamID &uid, QSslSocket *connection) {
     QSqlDatabase db = QSqlDatabase::database();
 complete_repairs: {
-        QSqlQuery query;
-        query.prepare("UPDATE UserShip "
-                      "SET CurrentHP = Docks.MaxHP "
-                      "FROM Docks "
-                      "WHERE UserShip.ShipUuid = Docks.Uuid "
-                      "AND Docks.SuccessTime <= unixepoch() "
-                      "AND User = :uid;");
-        query.bindValue(":uid", uid.ConvertToUint64());
-        if(!query.exec()) {
-            //% "Complete user %1's dock failed!"
-            throw DBError(qtTrId("dock-state-complete-error")
+    QSqlQuery query;
+    query.prepare("UPDATE UserShip "
+                  "SET CurrentHP = Docks.MaxHP "
+                  "FROM Docks "
+                  "WHERE UserShip.ShipUuid = Docks.Uuid "
+                  "AND Docks.SuccessTime <= unixepoch() "
+                  "AND User = :uid;");
+    query.bindValue(":uid", uid.ConvertToUint64());
+    if(!query.exec()) {
+        //% "Complete user %1's dock failed!"
+        throw DBError(qtTrId("dock-state-complete-error")
                           .arg(uid.ConvertToUint64()),
-                          query.lastError(), query.lastQuery());
-            return;
-        }
+                      query.lastError(), query.lastQuery());
+        return;
     }
+}
     {
         QSqlQuery query;
         query.prepare("UPDATE Docks "
@@ -677,7 +678,7 @@ complete_repairs: {
         query.bindValue(":uid", uid.ConvertToUint64());
         if(!query.exec()) {
             throw DBError(qtTrId("dock-state-error")
-                          .arg(uid.ConvertToUint64()),
+                              .arg(uid.ConvertToUint64()),
                           query.lastError(), query.lastQuery());
             return;
         }
@@ -696,7 +697,7 @@ send_updated_msg:
     if(!query.exec() || !query.isSelect()) {
         //% "Open user %1's dock failed!"
         throw DBError(qtTrId("dock-state-error")
-                      .arg(uid.ConvertToUint64()),
+                          .arg(uid.ConvertToUint64()),
                       query.lastError(), query.lastQuery());
         return;
     }
@@ -830,7 +831,7 @@ void Server::handleSupplyShip(const CSteamID &uid, QSslSocket *connection,
         if(Q_UNLIKELY(!upd.exec())) {
             //% "User %1: supply ship %2 failed!"
             throw DBError(qtTrId("supply-ship-failed")
-                          .arg(uid.ConvertToUint64()).arg(uuidStr),
+                              .arg(uid.ConvertToUint64()).arg(uuidStr),
                           upd.lastError(), upd.lastQuery());
         }
     }

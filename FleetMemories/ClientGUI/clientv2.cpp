@@ -679,7 +679,8 @@ void Client::receivedInfo(const QJsonObject &djson) {
     }
     case KP::InfoType::ExpeditionStopped: {
         int mapUnionId = djson["mapid"].toInt();
-        int stopReason = djson["stopreason"].toInt();
+        int stopReasonInt = djson["stopreason"].toInt();
+        KP::ExpeditionStopReason stopReason = static_cast<KP::ExpeditionStopReason>(stopReasonInt);
         emit receivedExpeditionStopped(mapUnionId, stopReason);
         break;
     }
@@ -1428,7 +1429,7 @@ void Client::switchCert(const QStringList &input) {
                                     "networkclient/pem", "Default").toString());
 }
 
-void Client::startExpedition(int mapUnionId, int fleetIndex,
+void Client::startExpedition(int mapId, int fleetIndex,
                              const QMap<int, QByteArray> &battlePlans,
                              double autoResupplyThreshold) {
     if (!loggedIn()) {
@@ -1436,23 +1437,23 @@ void Client::startExpedition(int mapUnionId, int fleetIndex,
         qWarning() << qtTrId("expedition-not-logged-in");
         return;
     }
-    QByteArray msg = KP::clientStartExpedition(mapUnionId, fleetIndex,
+    QByteArray msg = KP::clientStartExpedition(mapId, fleetIndex,
                                                battlePlans, autoResupplyThreshold);
     sender->enqueue(msg);
 }
 
-void Client::cancelExpedition(int mapUnionId, int receiveFleetIndex) {
+void Client::cancelExpedition(int mapId, int receiveFleetIndex) {
     if (!loggedIn()) {
         //% "Must be logged in to cancel expedition."
         qWarning() << qtTrId("expedition-not-logged-in");
         return;
     }
-    QByteArray msg = KP::clientCancelExpedition(mapUnionId, receiveFleetIndex);
+    QByteArray msg = KP::clientCancelExpedition(mapId, receiveFleetIndex);
     sender->enqueue(msg);
 }
 
-void Client::setExpeditionSettings(int mapUnionId, double autoResupplyThreshold, bool autoRestart) {
-    qDebug() << "Client::setExpeditionSettings called with mapUnionId:" << mapUnionId
+void Client::setExpeditionSettings(int mapId, double autoResupplyThreshold, bool autoRestart) {
+    qDebug() << "Client::setExpeditionSettings called with mapId:" << mapId
              << "threshold:" << autoResupplyThreshold << "restart:" << autoRestart;
     if (!loggedIn()) {
         //% "Must be logged in to set expedition settings."
@@ -1463,12 +1464,12 @@ void Client::setExpeditionSettings(int mapUnionId, double autoResupplyThreshold,
         qCritical() << "Client::setExpeditionSettings: sender is null";
         return;
     }
-    QByteArray msg = KP::clientSetExpeditionSettings(mapUnionId, autoResupplyThreshold, autoRestart);
+    QByteArray msg = KP::clientSetExpeditionSettings(mapId, autoResupplyThreshold, autoRestart);
     sender->enqueue(msg);
 }
 
-void Client::updateExpeditionPlan(int mapUnionId, const QMap<int, QByteArray> &battlePlans) {
-    qDebug() << "Client::updateExpeditionPlan called with mapUnionId:" << mapUnionId
+void Client::updateExpeditionPlan(int mapId, const QMap<int, QByteArray> &battlePlans) {
+    qDebug() << "Client::updateExpeditionPlan called with mapId:" << mapId
              << "battlePlans count:" << battlePlans.size();
     if (!loggedIn()) {
         //% "Must be logged in to update expedition plans."
@@ -1479,7 +1480,7 @@ void Client::updateExpeditionPlan(int mapUnionId, const QMap<int, QByteArray> &b
         qCritical() << "Client::updateExpeditionPlan: sender is null";
         return;
     }
-    QByteArray msg = KP::clientUpdateExpeditionPlan(mapUnionId, battlePlans);
+    QByteArray msg = KP::clientUpdateExpeditionPlan(mapId, battlePlans);
     sender->enqueue(msg);
 }
 

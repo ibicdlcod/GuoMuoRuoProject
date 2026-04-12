@@ -121,6 +121,7 @@ private:
     // Expedition handlers
     void handleCancelExpedition(const CSteamID &, QSslSocket *, const QJsonObject &);
     void handleQueryExpeditionStatus(const CSteamID &, QSslSocket *, const QJsonObject &);
+
     void handleSetExpeditionSettings(const CSteamID &, QSslSocket *, const QJsonObject &);
     void handleStartExpedition(const CSteamID &, QSslSocket *, const QJsonObject &);
     void handleUpdateExpeditionPlan(const CSteamID &, QSslSocket *, const QJsonObject &);
@@ -140,6 +141,7 @@ private:
     void initUserDropInfo(const CSteamID &);
     void initUserEquipSPInfo(const CSteamID &);
     void initUserMapStatus(const CSteamID &);
+    void initUserFleetStatus(const CSteamID &);
     void luaInitEquipable();
     void luaInitMap();
     bool nodeExistsInLua(int mapUnionId, int nodeIndex) const;
@@ -219,6 +221,7 @@ private:
     void sqlinitVCR() const;
     void sqlinitExpedition() const;
     void sqlinitExpeditionBattlePlan() const;
+    void sqlinitUserFleetStatus() const;
     void sqlinitExpeditionSettings() const;
     int countSameTypeEquipmentInArsenal(const CSteamID &uid, int equipDef);
     int calculateSkillPointDeduction(int currentSkillPoints, int sameTypeCount);

@@ -699,6 +699,15 @@ enum BattleAssessment {
 };
 Q_ENUM_NS(BattleAssessment)
 
+enum ExpeditionStopReason {
+    Completed = 0,
+    CriticallyDamaged = 1,
+    NoFuel = 2,
+    NoAmmo = 3,
+    UserCancelled = 4
+};
+Q_ENUM_NS(ExpeditionStopReason)
+
 using DiffMap = QMap<Difficulty, QString>;
 Q_GLOBAL_STATIC(DiffMap,
                 diffEnumtoStr,
@@ -957,7 +966,7 @@ QByteArray serverExpeditionProgressUpdate(int mapId, int nodeIndex,
 QByteArray serverExpeditionStartResult(int mapId, bool accepted,
                                        GameError error = KP::NoError);
 QByteArray serverExpeditionStatus(const QJsonArray &expeditions);
-QByteArray serverExpeditionStopped(int mapId, int stopReason);
+QByteArray serverExpeditionStopped(int mapId, KP::ExpeditionStopReason stopReason);
 QByteArray serverMedalPurchased(int amount);
 QByteArray serverNewEquip(QUuid, int);
 QByteArray serverNewmodelShip(QUuid, int, int);

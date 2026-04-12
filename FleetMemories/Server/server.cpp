@@ -2156,130 +2156,283 @@ const QStringList Server::getValidCommands() const {
 
 void Server::initUserDropInfo(const CSteamID &uid) {
     QSqlDatabase db = QSqlDatabase::database();
-    QList<QMap<int, double> *> results;
-    int j = 0;
-    QMap<int, double> *result;
-    for(Ship *ship: std::as_const(shipRegistry)) {
-        if(j % 500 == 0) {
-            result = new QMap<int, double>();
-            results.append(result);
-        }
-        if(ship->isAmnesiac()) {
-            continue;
-        }
-        (*result)[ship->getId()] = RNGesus::dropValue(ship->attr["Rarity"], mt);
-        j++;
+    if(!db.transaction()) {
+        //% "Failed to start transaction for initializing user drop info."
+        throw DBError(qtTrId("user-add-ship-dropinfo-transaction-failed")
+                      .arg(uid.ConvertToUint64()),
+                      db.lastError());
     }
-    for(auto *resultPtr: std::as_const(results)) {
-        auto result = *resultPtr;
-        QString queryStr;
-        queryStr.append("INSERT INTO UserShipDrop (User, ShipDef, Amount) ");
-        queryStr.append("SELECT s.column1, s.column2, s.column3 ");
-        queryStr.append("FROM ( ");
-        queryStr.append("SELECT :uid AS column1, ");
-        queryStr.append(":firstkey AS column2, ");
-        queryStr.append(":first AS column3 ");
-        int i = 0;
-        for(const auto [key, value]: result.asKeyValueRange()) {
-            i++;
-            if(key == result.firstKey()) {
+    
+    try {
+        QList<QMap<int, double> *> results;
+        int j = 0;
+        QMap<int, double> *result;
+        for(Ship *ship: std::as_const(shipRegistry)) {
+            if(j % 500 == 0) {
+                result = new QMap<int, double>();
+                results.append(result);
+            }
+            if(ship->isAmnesiac()) {
                 continue;
             }
-            queryStr.append("UNION ALL ");
-            queryStr.append("SELECT :uid, ");
-            queryStr.append(":key"+QString::number(i)+", ");
-            queryStr.append(":value"+QString::number(i)+" ");
+            (*result)[ship->getId()] = RNGesus::dropValue(ship->attr["Rarity"], mt);
+            j++;
         }
-        queryStr.append(") AS s ");
-        queryStr.append("WHERE NOT EXISTS "
-                        "( SELECT 1 FROM UserShipDrop t "
-                        "WHERE t.User = s.column1 "
-                        "AND t.ShipDef = s.column2);");
-        QSqlQuery query2;
-        query2.prepare(queryStr);
-        query2.bindValue(":uid", uid.ConvertToUint64());
-        query2.bindValue(":firstkey", result.firstKey());
-        query2.bindValue(":first", result.first());
-        i = 0;
-        for(const auto [key, value]: result.asKeyValueRange()) {
-            i++;
-            if(key == result.firstKey()) {
-                continue;
+        for(auto *resultPtr: std::as_const(results)) {
+            auto result = *resultPtr;
+            QString queryStr;
+            queryStr.append("INSERT INTO UserShipDrop (User, ShipDef, Amount) ");
+            queryStr.append("SELECT s.column1, s.column2, s.column3 ");
+            queryStr.append("FROM ( ");
+            queryStr.append("SELECT :uid AS column1, ");
+            queryStr.append(":firstkey AS column2, ");
+            queryStr.append(":first AS column3 ");
+            int i = 0;
+            for(const auto [key, value]: result.asKeyValueRange()) {
+                i++;
+                if(key == result.firstKey()) {
+                    continue;
+                }
+                queryStr.append("UNION ALL ");
+                queryStr.append("SELECT :uid, ");
+                queryStr.append(":key"+QString::number(i)+", ");
+                queryStr.append(":value"+QString::number(i)+" ");
             }
-            query2.bindValue(":key"+QString::number(i), key);
-            query2.bindValue(":value"+QString::number(i), value);
+            queryStr.append(") AS s ");
+            queryStr.append("WHERE NOT EXISTS "
+                            "( SELECT 1 FROM UserShipDrop t "
+                            "WHERE t.User = s.column1 "
+                            "AND t.ShipDef = s.column2);");
+            QSqlQuery query2;
+            query2.prepare(queryStr);
+            query2.bindValue(":uid", uid.ConvertToUint64());
+            query2.bindValue(":firstkey", result.firstKey());
+            query2.bindValue(":first", result.first());
+            i = 0;
+            for(const auto [key, value]: result.asKeyValueRange()) {
+                i++;
+                if(key == result.firstKey()) {
+                    continue;
+                }
+                query2.bindValue(":key"+QString::number(i), key);
+                query2.bindValue(":value"+QString::number(i), value);
+            }
+            if(Q_UNLIKELY(!query2.exec())) {
+                //% "User %1: add dropinfo of ship failed!"
+                throw DBError(qtTrId("user-add-ship-dropinfo-failed")
+                              .arg(uid.ConvertToUint64()),
+                              query2.lastError(), query2.lastQuery());
+            }
+            delete resultPtr;
         }
-        if(Q_UNLIKELY(!query2.exec())) {
-            //% "User %1: add dropinfo of ship failed!"
-            throw DBError(qtTrId("user-add-ship-dropinfo-failed")
+        
+        if(!db.commit()) {
+            db.rollback();
+            //% "Failed to commit transaction for initializing user drop info."
+            throw DBError(qtTrId("user-add-ship-dropinfo-commit-failed")
                           .arg(uid.ConvertToUint64()),
-                          query2.lastError(), query2.lastQuery());
+                          db.lastError());
         }
-        else {
-            //% "User %1: add dropinfo of ship success!"
-            qDebug() << qtTrId("user-add-ship-dropinfo-success")
-                        .arg(uid.ConvertToUint64());
-        }
-        delete resultPtr;
+        
+        //% "User %1: add dropinfo of ship success!"
+        qDebug() << qtTrId("user-add-ship-dropinfo-success")
+                    .arg(uid.ConvertToUint64());
+        
+    } catch (const DBError &) {
+        db.rollback();
+        throw;
     }
 }
 
 void Server::initUserEquipSPInfo(const CSteamID &uid) {
     QSqlDatabase db = QSqlDatabase::database();
-    QSqlQuery query2;
-    query2.prepare(
-        "INSERT OR IGNORE INTO UserEquipSP (User, EquipDef, Intvalue) "
-        "SELECT :uid, EquipName.EquipID, 0 "
-        "FROM EquipName "
-        /* equipIdMax is 65536; higher than 32768 is amnesiac equip */
-        "WHERE EquipName.EquipID < 32768;");
-    query2.bindValue(":uid", uid.ConvertToUint64());
-    if(Q_UNLIKELY(!query2.exec())) {
-        //% "User %1: add skillinfo of equip failed!"
-        throw DBError(qtTrId("user-add-equip-sp-info-failed")
+    if(!db.transaction()) {
+        //% "Failed to start transaction for initializing user equip SP info."
+        throw DBError(qtTrId("user-add-equip-sp-info-transaction-failed")
                       .arg(uid.ConvertToUint64()),
-                      query2.lastError(), query2.lastQuery());
+                      db.lastError());
     }
-    else {
+    
+    try {
+        QSqlQuery query2;
+        query2.prepare(
+            "INSERT OR IGNORE INTO UserEquipSP (User, EquipDef, Intvalue) "
+            "SELECT :uid, EquipName.EquipID, 0 "
+            "FROM EquipName "
+            /* equipIdMax is 65536; higher than 32768 is amnesiac equip */
+            "WHERE EquipName.EquipID < 32768;");
+        query2.bindValue(":uid", uid.ConvertToUint64());
+        if(Q_UNLIKELY(!query2.exec())) {
+            //% "User %1: add skillinfo of equip failed!"
+            throw DBError(qtTrId("user-add-equip-sp-info-failed")
+                          .arg(uid.ConvertToUint64()),
+                          query2.lastError(), query2.lastQuery());
+        }
+        
+        if(!db.commit()) {
+            db.rollback();
+            //% "Failed to commit transaction for initializing user equip SP info."
+            throw DBError(qtTrId("user-add-equip-sp-info-commit-failed")
+                          .arg(uid.ConvertToUint64()),
+                          db.lastError());
+        }
+        
         //% "User %1: add skillinfo of equip success!"
         qDebug() << qtTrId("user-add-equip-sp-info-success")
                     .arg(uid.ConvertToUint64());
+        
+    } catch (const DBError &) {
+        db.rollback();
+        throw;
     }
 }
 
 void Server::initUserMapStatus(const CSteamID &uid) {
     QSqlDatabase db = QSqlDatabase::database();
-    for(int map: normalMapHasLua) {
-        QSqlQuery query2;
-        query2.prepare("INSERT OR IGNORE INTO UserMapState (User, MapDef, "
-                       "GaugeC, GaugeB, GaugeA, GaugeH) "
-                       "VALUES (:uid, :map, "
-                       ":amount1, :amount2, :amount3, :amount4);");
-        query2.bindValue(":uid", uid.ConvertToUint64());
-        query2.bindValue(":map", map);
-        int amount = 0;
-        if(lua["maps"][map] == sol::nil
-                || lua["maps"][map]["gauge"] == sol::nil) {
-        }
-        else {
-            amount = lua["maps"][map]["gauge"];
-        }
-        query2.bindValue(":amount1", amount);
-        query2.bindValue(":amount2", amount);
-        query2.bindValue(":amount3", amount);
-        query2.bindValue(":amount4", amount);
-        if(Q_UNLIKELY(!query2.exec())) {
-            //% "User %1: init map status failed!"
-            throw DBError(qtTrId("user-add-map-status-failed")
-                          .arg(uid.ConvertToUint64()),
-                          query2.lastError(), query2.lastQuery());
-        }
-        else {
-            //% "User %1: init map status success!"
-            qDebug() << qtTrId("user-add-map-status-success")
-                        .arg(uid.ConvertToUint64());
-        }
+    if(!db.transaction()) {
+        //% "Failed to start transaction for initializing user map status."
+        throw DBError(qtTrId("user-add-map-status-transaction-failed")
+                      .arg(uid.ConvertToUint64()),
+                      db.lastError());
     }
+    
+    try {
+        // Process maps in batches to avoid too long SQL statements
+        const int batchSize = 100;
+        int processed = 0;
+        
+        while(processed < normalMapHasLua.size()) {
+            int batchEnd = qMin(processed + batchSize, normalMapHasLua.size());
+            
+            // Build batch INSERT statement
+            QString queryStr = "INSERT OR IGNORE INTO UserMapState "
+                               "(User, MapDef, GaugeC, GaugeB, GaugeA, GaugeH) VALUES ";
+            QVector<QString> valuePlaceholders;
+            QVector<int> batchMaps;
+            
+            for(int i = processed; i < batchEnd; ++i) {
+                int map = normalMapHasLua[i];
+                batchMaps.append(map);
+                int batchIndex = i - processed; // Index within current batch
+                valuePlaceholders.append(QString("(:uid, :map%1, :amount%2, :amount%3, :amount%4, :amount%5)")
+                                         .arg(batchIndex)
+                                         .arg(4 * batchIndex)
+                                         .arg(4 * batchIndex + 1)
+                                         .arg(4 * batchIndex + 2)
+                                         .arg(4 * batchIndex + 3));
+            }
+            
+            queryStr += valuePlaceholders.join(", ");
+            queryStr += ";";
+            
+            QSqlQuery query2;
+            if(!query2.prepare(queryStr)) {
+                //% "User %1: init map status failed!"
+                throw DBError(qtTrId("user-add-map-status-failed")
+                              .arg(uid.ConvertToUint64()),
+                              query2.lastError(), query2.lastQuery());
+            }
+            
+            query2.bindValue(":uid", uid.ConvertToUint64());
+            
+            for(int i = 0; i < batchMaps.size(); ++i) {
+                int map = batchMaps[i];
+                int amount = 0;
+                if(lua["maps"][map] != sol::nil
+                        && lua["maps"][map]["gauge"] != sol::nil) {
+                    amount = lua["maps"][map]["gauge"];
+                }
+                
+                query2.bindValue(QString(":map%1").arg(i), map);
+                query2.bindValue(QString(":amount%1").arg(4 * i), amount);
+                query2.bindValue(QString(":amount%1").arg(4 * i + 1), amount);
+                query2.bindValue(QString(":amount%1").arg(4 * i + 2), amount);
+                query2.bindValue(QString(":amount%1").arg(4 * i + 3), amount);
+            }
+            
+            if(Q_UNLIKELY(!query2.exec())) {
+                //% "User %1: init map status failed!"
+                throw DBError(qtTrId("user-add-map-status-failed")
+                              .arg(uid.ConvertToUint64()),
+                              query2.lastError(), query2.lastQuery());
+            }
+            
+            processed = batchEnd;
+        }
+        
+        if(!db.commit()) {
+            db.rollback();
+            //% "Failed to commit transaction for initializing user map status."
+            throw DBError(qtTrId("user-add-map-status-commit-failed")
+                          .arg(uid.ConvertToUint64()),
+                          db.lastError());
+        }
+        
+        //% "User %1: init map status success!"
+        qDebug() << qtTrId("user-add-map-status-success")
+                    .arg(uid.ConvertToUint64());
+        
+    } catch (const DBError &) {
+        db.rollback();
+        throw;
+    }
+}
+
+void Server::initUserFleetStatus(const CSteamID &uid) {
+    QSqlDatabase db = QSqlDatabase::database();
+    if(!db.transaction()) {
+        //% "Failed to start transaction for initializing user fleet status."
+        throw DBError(qtTrId("init-userfleet-transaction-failed"),
+                      db.lastError());
+    }
+    
+    try {
+        // Build a single INSERT statement with all fleet indices
+        QString queryStr = "INSERT OR IGNORE INTO UserFleetStatus "
+                           "(User, FleetIndex, FleetType) VALUES ";
+        QVector<QString> valuePlaceholders;
+        
+        for(int i = 0; i < KP::nonExpeditionFleetsSize; ++i) {
+            valuePlaceholders.append(QString("(:uid, :fleetIndex%1, :fleetType%2)")
+                                     .arg(i).arg(i));
+        }
+        
+        queryStr += valuePlaceholders.join(", ");
+        queryStr += ";";
+        
+        QSqlQuery insert;
+        if(!insert.prepare(queryStr)) {
+            //% "Set User Fleet Up failed!"
+            throw DBError(qtTrId("init-userfleet-failed"),
+                          insert.lastError(), insert.lastQuery());
+        }
+        
+        insert.bindValue(":uid", uid.ConvertToUint64());
+        for(int i = 0; i < KP::nonExpeditionFleetsSize; ++i) {
+            insert.bindValue(QString(":fleetIndex%1").arg(i), i);
+            insert.bindValue(QString(":fleetType%1").arg(i), KP::NormalFleet);
+        }
+        
+        if(!insert.exec()) {
+            //% "Set User Fleet Up failed!"
+            throw DBError(qtTrId("init-userfleet-failed"),
+                          insert.lastError(), insert.lastQuery());
+        }
+        
+        if(!db.commit()) {
+            db.rollback();
+            //% "Failed to commit transaction for initializing user fleet status."
+            throw DBError(qtTrId("init-userfleet-commit-failed"),
+                          db.lastError());
+        }
+    } catch (const DBError &) {
+        db.rollback();
+        throw;
+    }
+    
+    // Also ensure any expedition fleet indices retain their existing fleet type
+    // (expedition fleet indices are >= KP::expeditionFleetMask)
+    // They should already exist from moveFleetToExpeditionIndex
 }
 
 void Server::luaInitEquipable() {
@@ -3460,8 +3613,8 @@ void Server::handleStartExpedition(const CSteamID &uid, QSslSocket *connection,
     try {
         int mapUnionId = djson["mapid"].toInt();
         int fleetIndex = djson["fleetindex"].toInt();
-        double autoResupplyThreshold =
-            djson["autoresupplythreshold"].toDouble();
+        double autoRestartThreshold =
+            djson["autorestarthreshold"].toDouble();
         QJsonObject plansJson = djson["battleplans"].toObject();
 
         QMap<int, QByteArray> battlePlans;
@@ -3526,7 +3679,7 @@ void Server::handleStartExpedition(const CSteamID &uid, QSslSocket *connection,
             return;
         }
 
-        if (fleetIndex < 0 || fleetIndex >= KP::fleetsSize) {
+        if (fleetIndex < 0 || fleetIndex >= KP::nonExpeditionFleetsSize) {
             QByteArray msg = KP::serverExpeditionStartResult(mapUnionId, false,
                                      KP::ExpeditionInvalidFleetIndex);
             senderM.sendMessage(connection, msg);
@@ -3541,7 +3694,7 @@ void Server::handleStartExpedition(const CSteamID &uid, QSslSocket *connection,
         }
 
         KP::GameError error = expeditionManager.startExpedition(uid, mapUnionId,
-                        fleetIndex, battlePlans, autoResupplyThreshold);
+                        fleetIndex, battlePlans, autoRestartThreshold);
 
         QByteArray msg = KP::serverExpeditionStartResult(
             mapUnionId, error == KP::NoError, error);
@@ -3568,7 +3721,7 @@ void Server::handleCancelExpedition(const CSteamID &uid, QSslSocket *connection,
     int mapUnionId = djson["mapid"].toInt();
     int receiveFleetIndex = djson["receivefleetindex"].toInt();
 
-    if (receiveFleetIndex < 0 || receiveFleetIndex >= KP::fleetsSize) {
+    if (receiveFleetIndex < 0 || receiveFleetIndex >= KP::nonExpeditionFleetsSize) {
         qWarning() << "Invalid receive fleet index:" << receiveFleetIndex;
         return;
     }
@@ -3617,24 +3770,30 @@ void Server::handleUpdateExpeditionPlan(const CSteamID &uid,
                                           QSslSocket *connection,
                                           const QJsonObject &djson) {
     int mapUnionId = djson["mapid"].toInt();
-    double autoResupplyThreshold =
-        djson["autoresupplythreshold"].toDouble();
-    bool autoRestart = djson.value("autorestart").toBool(false);
+    double autoRestartThreshold =
+        djson["autorestarthreshold"].toDouble();
+    bool autoResupply = djson.value("autoresupply").toBool(false);
 
     qInfo() << "Set expedition settings for map" << mapUnionId
-            << "threshold:" << autoResupplyThreshold
-            << "restart:" << autoRestart;
+            << "threshold:" << autoRestartThreshold
+            << "resupply:" << autoResupply;
     expeditionManager.setExpeditionSettings(uid, mapUnionId,
-                                           autoResupplyThreshold, autoRestart);
+                                           autoRestartThreshold, autoResupply);
  }
 
 void Server::handleQueryExpeditionStatus(const CSteamID &uid,
                                          QSslSocket *connection,
                                          const QJsonObject &djson) {
-    QJsonArray expeditions = expeditionManager.getUserExpeditions(uid);
+    std::optional<int> mapUnionId = std::nullopt;
+    if (djson.contains("mapid")) {
+        mapUnionId = djson["mapid"].toInt();
+    }
+    QJsonArray expeditions = expeditionManager.getUserExpeditions(uid, mapUnionId);
     QByteArray msg = KP::serverExpeditionStatus(expeditions);
     senderM.sendMessage(connection, msg);
 }
+
+
 
 bool Server::validateExpeditionBattlePlans(int mapUnionId,
                                             const QMap<int, QByteArray> &battlePlans) {
@@ -4170,6 +4329,8 @@ equip_skillpoints_fill:
     initUserEquipSPInfo(uid);
 map_status:
     initUserMapStatus(uid);
+fleet_status:
+    initUserFleetStatus(uid);
 
     connectedPeers[uid] = connection;
     connectedUsers[connection] = uid;
@@ -4503,6 +4664,7 @@ anti_ddos:
         handleQueryExpeditionStatus(uid, connection, djson);
     }
         break;
+
     case KP::CommandType::SetExpeditionSettings: {
         handleSetExpeditionSettings(uid, connection, djson);
     }
@@ -5116,12 +5278,10 @@ check_duplicate_remodel_group:
         iter != fleetTypes.keyValueEnd();
         ++iter) {
         QSqlQuery query;
-        query.prepare("UPDATE UserAttr SET Intvalue = :type "
-                      "WHERE Attribute = :attr "
-                      "AND UserID = :uid");
+        query.prepare("UPDATE UserFleetStatus SET FleetType = :type "
+                      "WHERE User = :uid AND FleetIndex = :fleetIndex");
         query.bindValue(":uid", uid.ConvertToUint64());
-        query.bindValue(":attr", QString("Fleet%1")
-                        .arg(iter->first + 1));
+        query.bindValue(":fleetIndex", iter->first);
         query.bindValue(":type", iter->second);
         if(Q_UNLIKELY(!query.exec())) {
             //% "Update fleet failure!"
@@ -5341,18 +5501,18 @@ dock:
         }
     }
 fleet_status:
-    for(int i = 0; i < KP::fleetsSize; ++i) {
+    for(int i = 0; i < KP::nonExpeditionFleetsSize; ++i) {
         QSqlQuery insert;
-        if(!insert.prepare("INSERT INTO UserAttr "
-                           "(UserID, Attribute, Intvalue) "
-                           "VALUES (:uid, :attr, :value);")) {
+        if(!insert.prepare("INSERT OR IGNORE INTO UserFleetStatus "
+                           "(User, FleetIndex, FleetType) "
+                           "VALUES (:uid, :fleetIndex, :fleetType);")) {
             //% "Set User Fleet Up failed!"
             throw DBError(qtTrId("init-userfleet-failed"),
                           insert.lastError(), insert.lastQuery());
         }
         insert.bindValue(":uid", uid.ConvertToUint64());
-        insert.bindValue(":attr", QString("Fleet%1").arg(i+1));
-        insert.bindValue(":value", KP::NormalFleet);
+        insert.bindValue(":fleetIndex", i);
+        insert.bindValue(":fleetType", KP::NormalFleet);
         if(!insert.exec()) {
             //% "Set User Fleet Up failed!"
             throw DBError(qtTrId("init-userfleet-failed"),

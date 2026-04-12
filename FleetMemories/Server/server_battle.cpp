@@ -1795,6 +1795,7 @@ void Server::progressMap(const CSteamID &uid, QSslSocket *connection,
             if(ammoOverride.is<double>())
                 ammoFrac = ammoOverride.as<double>();
         }
+    handle_disaster:
         /* LOS check for DISASTER nodes */
         double requiredLOS = -1.0;
         double fleetLOS = 0.0;
@@ -1834,6 +1835,8 @@ void Server::progressMap(const CSteamID &uid, QSslSocket *connection,
                 ammoFrac = 0.0;
             }
         }
+
+    handle_fleeing:
         int activeFleet = result.value()[3];
         if(FleetInfo *fi = sortieFleets.value({uid, activeFleet}, nullptr)) {
             // Determine if this is an expedition map
@@ -1877,10 +1880,11 @@ void Server::progressMap(const CSteamID &uid, QSslSocket *connection,
             updateFleetIntoDatabase(uid, *fi, activeFleet);
         }
 
-        /* 8.1-supply.md#Supply_chain_and_attrition — per-node attrition
+    /* 8.1-supply.md#Supply_chain_and_attrition — per-node attrition
              * cost: sum of (effective fraction used × FuelConsumption /
              * AmmoConsumption) across the fleet, multiplied by the sortie
              * attrition stored at sortie start. */
+    handle_attrition:
         QSqlQuery attrValQ;
         attrValQ.prepare(
             "SELECT Realvalue FROM UserAttr "

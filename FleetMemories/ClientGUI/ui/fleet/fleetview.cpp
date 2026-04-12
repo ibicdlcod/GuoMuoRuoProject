@@ -166,7 +166,7 @@ equip_slots:
     ui->fleet_1->setEnabled(false);
     QList<QPushButton *> fleetButtons{ui->fleet_1, ui->fleet_2,
                                       ui->fleet_3, ui->fleet_4};
-    assert(fleetButtons.size() == KP::fleetsSize);
+    assert(fleetButtons.size() == KP::nonExpeditionFleetsSize);
     for(auto fleetButton: fleetButtons) {
         switch(QApplication::styleHints()->colorScheme()) {
         case Qt::ColorScheme::Dark:
@@ -189,7 +189,7 @@ equip_slots:
     connect(ui->supplyFleetButton, &QPushButton::clicked,
             this, &FleetView::supplyFleet);
 
-    for(int i = 0; i < KP::fleetsSize; ++i) {
+    for(int i = 0; i < KP::nonExpeditionFleetsSize; ++i) {
         for(int j = 0; j < KP::combinedFleetSize; ++j) {
             shipPlaneCount[FleetPos{i, j}] = QVector<int>(KP::maxEquipSlots, 0);
         }

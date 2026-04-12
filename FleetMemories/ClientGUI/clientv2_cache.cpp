@@ -9,6 +9,7 @@
 #include <QSettings>
 #include <QTextStream>
 #include <QTimer>
+#include <optional>
 
 #include "networkerror.h"
 
@@ -33,6 +34,11 @@ void Client::demandEquipSkillPoints(int equipDef) {
         throw NetworkError(socket.errorString());
     }
     return;
+}
+
+void Client::demandExpeditionStatus(std::optional<int> mapUnionId) {
+    QByteArray msg = KP::clientExpeditionStatus(mapUnionId);
+    sender->enqueue(msg);
 }
 
 void Client::demandMapCache() {

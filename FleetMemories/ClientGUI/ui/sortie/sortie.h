@@ -63,7 +63,7 @@ private slots:
     void expeditionStartResult(int mapUnionId, bool accepted, KP::GameError error);
     void expeditionStatus(const QJsonArray &expeditions);
     void expeditionProgressUpdate(int mapUnionId, int nodeIndex, const QJsonObject &battleResult);
-    void expeditionStopped(int mapUnionId, int stopReason);
+    void expeditionStopped(int mapUnionId, KP::ExpeditionStopReason stopReason);
     void updateExpeditionUI(int mapUnionId);
     void startExpedition();
     void cancelExpedition();
@@ -100,6 +100,7 @@ private:
     // Expedition state
     bool expeditionMode = false;
     QMap<int, QMap<int, QByteArray>> expeditionBattlePlans;
+    QSet<int> expeditionMapIds;
     QMap<int, QJsonObject> activeExpeditions;
     double autoRestartThreshold = 1.0; // 100%
     bool autoResupply = true;
