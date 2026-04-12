@@ -111,7 +111,6 @@ void MapDetail::displayDetailedMap(Map *map) {
 }
 
 void MapDetail::setChoiceNodes(const QList<int> &nodeIds) {
-    qInfo() << "MapDetail::setChoiceNodes nodeIds:" << nodeIds << "awaitingChoice:" << (!nodeIds.isEmpty());
     choiceNodeIds = nodeIds;
     awaitingChoice = !nodeIds.isEmpty();
     update();

@@ -167,113 +167,6 @@ void NavalAcademyView::updateLocalTech(const QJsonObject &obj)
 void NavalAcademyView::updateLocalTechViewTable(const QJsonObject &obj)
 {
     return;
-    /* the below is inactive code */
-    /*
-    // Similar to TechView::updateLocalTechViewTable but for left/right tables
-    int equipId = obj["equipid"].toInt();
-    QTableWidget *table = nullptr;
-    
-    if(equipId == currentSrcEquipId) {
-        table = ui->srcEquipTable;
-    }
-    else if(equipId == currentDstEquipId) {
-        table = ui->dstEquipTable;
-    }
-    else {
-        return; // Not for current selection
-    }
-    
-    // Clear table
-    table->clear();
-    table->setRowCount(0);
-    table->setColumnCount(2);
-    table->setHorizontalHeaderLabels(
-        QStringList() << qtTrId("techview-header-attr")
-                      << qtTrId("techview-header-value"));
-    
-    // Add basic equipment info
-    Client &engine = Client::getInstance();
-    Equipment *equip = engine.getEquipmentReg(equipId);
-    if(!equip || equip->isInvalid()) {
-        return;
-    }
-    
-    // Add rows for key attributes
-    int row = 0;
-    table->setRowCount(5); // Adjust as needed
-    
-    // Equipment ID
-    //% "Equipment ID"
-    QTableWidgetItem *idAttr = new QTableWidgetItem(qtTrId("equipment-id"));
-    idAttr->setFlags(idAttr->flags() & ~Qt::ItemIsEditable);
-    QTableWidgetItem *idValue = new QTableWidgetItem(QString::number(equipId));
-    idValue->setFlags(idValue->flags() & ~Qt::ItemIsEditable);
-    table->setItem(row, 0, idAttr);
-    table->setItem(row, 1, idValue);
-    row++;
-    
-    // Equipment name
-    //% "Equipment name"
-    QTableWidgetItem *nameAttr = new QTableWidgetItem(qtTrId("equipment-name"));
-    nameAttr->setFlags(nameAttr->flags() & ~Qt::ItemIsEditable);
-    QString equipName = equip->toString(
-        settings->value("client/language", "ja_JP").toString());
-    if(equipName.isEmpty()) {
-        equipName = equip->toString("ja_JP");
-    }
-    QTableWidgetItem *nameValue = new QTableWidgetItem(equipName);
-    nameValue->setFlags(nameValue->flags() & ~Qt::ItemIsEditable);
-    table->setItem(row, 0, nameAttr);
-    table->setItem(row, 1, nameValue);
-    row++;
-    
-    // Equipment type
-    QTableWidgetItem *typeAttr = new QTableWidgetItem(qtTrId("equipment-type"));
-    typeAttr->setFlags(typeAttr->flags() & ~Qt::ItemIsEditable);
-    QTableWidgetItem *typeValue = new QTableWidgetItem(equip->type.toString());
-    typeValue->setFlags(typeValue->flags() & ~Qt::ItemIsEditable);
-    table->setItem(row, 0, typeAttr);
-    table->setItem(row, 1, typeValue);
-    row++;
-    
-    // Tech level from the JSON object
-    double tech = obj["tech"].toDouble();
-    QTableWidgetItem *techAttr = new QTableWidgetItem(qtTrId("tech-level"));
-    techAttr->setFlags(techAttr->flags() & ~Qt::ItemIsEditable);
-    QTableWidgetItem *techValue = new TableWidgetItemNumber(tech);
-    techValue->setFlags(techValue->flags() & ~Qt::ItemIsEditable);
-    table->setItem(row, 0, techAttr);
-    table->setItem(row, 1, techValue);
-    row++;
-    
-    // Mother equipment (if any)
-    int motherId = equip->attr.value("Mother", 0);
-    if(motherId != 0) {
-        QTableWidgetItem *motherAttr = new QTableWidgetItem(qtTrId("mother-equipment"));
-        motherAttr->setFlags(motherAttr->flags() & ~Qt::ItemIsEditable);
-        Equipment *motherEquip = engine.getEquipmentReg(motherId);
-        QString motherName;
-        if(motherEquip && !motherEquip->isInvalid()) {
-            motherName = motherEquip->toString(
-                settings->value("client/language", "ja_JP").toString());
-            if(motherName.isEmpty()) {
-                motherName = motherEquip->toString("ja_JP");
-            }
-        }
-        else {
-            motherName = QString::number(motherId);
-        }
-        QTableWidgetItem *motherValue = new QTableWidgetItem(motherName);
-        motherValue->setFlags(motherValue->flags() & ~Qt::ItemIsEditable);
-        table->setRowCount(row + 1);
-        table->setItem(row, 0, motherAttr);
-        table->setItem(row, 1, motherValue);
-    }
-    
-    // Resize columns
-    table->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
-    table->verticalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
-*/
 }
 
 void NavalAcademyView::onSrcEquipSelected()
@@ -558,7 +451,10 @@ void NavalAcademyView::showEvent(QShowEvent *event)
     
     // Set header labels
     ui->srcEquipTable->setHorizontalHeaderLabels(
-        {qtTrId("equipment-id"), qtTrId("equipment-name")});
+        //% "Equipment ID"
+        {qtTrId("equipment-id"),
+         //% "Equipment name"
+         qtTrId("equipment-name")});
     ui->dstEquipTable->setHorizontalHeaderLabels(
         {qtTrId("equipment-id"), qtTrId("equipment-name")});
     

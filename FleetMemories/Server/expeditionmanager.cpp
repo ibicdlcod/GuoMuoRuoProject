@@ -275,7 +275,7 @@ KP::GameError ExpeditionManager::startExpedition(const CSteamID &uid, int mapId,
         throw DBError(qtTrId("expedition-map-not-in-registry").arg(mapUnionId));
     }
     //% "startExpedition: Found map for union ID %1 map->id: %2 map->diff: %3 map absolute ID: %4"
-    qDebug() << qtTrId("expedition-found-map-union")
+    qDebug() << qtTrId("expedition-found-map-union-start")
                     .arg(mapUnionId).arg(map->id).arg(static_cast<int>(map->diff)).arg(map->getAbsoluteId());
     
     QSqlDatabase db = QSqlDatabase::database();
@@ -833,7 +833,6 @@ void ExpeditionManager::progressExpedition(const CSteamID &uid, int mapUnionId, 
     if (!map) {
         throw DBError(qtTrId("expedition-map-not-in-registry").arg(mapUnionId));
     }
-    //% "Found map for union ID %1 map id %2 difficulty %3 absolute ID %4"
     qDebug() << qtTrId("expedition-found-map-union")
                   .arg(mapUnionId).arg(map->id).arg(static_cast<int>(map->diff)).arg(map->getAbsoluteId());
     
@@ -1238,7 +1237,6 @@ bool ExpeditionManager::setExpeditionSettings(const CSteamID &uid, int mapUnionI
     if (!map) {
         throw DBError(qtTrId("expedition-map-not-in-registry").arg(mapUnionId));
     }
-    //% "Found map for union ID %1 map id %2 difficulty %3 absolute ID %4"
     qDebug() << qtTrId("expedition-found-map-union")
                   .arg(mapUnionId).arg(map->id).arg(static_cast<int>(map->diff)).arg(map->getAbsoluteId());
     uint64 userId = uid.ConvertToUint64();

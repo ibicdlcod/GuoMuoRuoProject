@@ -624,14 +624,15 @@ ask_for_retreat:
         //% "Battle Results"
         conf->setWindowTitle(qtTrId("battle-result-title"));
         currentBattleProcess = QJsonObject(); // clear after showing
+
+        auto temp = currentMap;
+        if(temp) {
+            engine.queryNextNode(temp->getAbsoluteId(), currentNodeId,
+                                 !conf->exec() == QDialog::Accepted);
+        }
     } else {
         //% "Do you want to continue map progress?"
         conf->setWindowTitle(qtTrId("continue-map"));
-    }
-    auto temp = currentMap;
-    if(temp) {
-        engine.queryNextNode(temp->getAbsoluteId(), currentNodeId,
-                             !conf->exec() == QDialog::Accepted);
     }
     delete conf;
 }

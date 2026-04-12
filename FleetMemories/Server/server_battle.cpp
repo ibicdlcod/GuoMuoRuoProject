@@ -675,11 +675,6 @@ int Server::nextNode(const CSteamID &uid, QSslSocket *connection,
     FleetInfo &info = *fiPtr;
     
     int chosenNode = evaluateBranchRule(mapUnionId, prevNode, diff, info);
-    if (chosenNode == 0) {
-        QByteArray msg = KP::serverBattleError(KP::FleetLost);
-        senderM.sendMessage(connection, msg);
-        return 0;
-    }
     return chosenNode;
 }
 
