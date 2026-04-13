@@ -15,4 +15,6 @@ Rules for gathering information from tsunkit:
 
 Rules for gathering information from kancolle wiki:
 
-1. (TBD)
+1. Normal maps are at https://wikiwiki.jp/kancolle/%E5%87%BA%E6%92%83. Note [鎮守府海域](https://wikiwiki.jp/kancolle/出撃#k9353bd7) is X=1, [南西諸島海域](https://wikiwiki.jp/kancolle/出撃#e9a8e47c) is X=2, [北方海域](https://wikiwiki.jp/kancolle/出撃#q2b974dd) is X=3, [南西海域](https://wikiwiki.jp/kancolle/出撃#q2b9jkdf) is X=7, [西方海域](https://wikiwiki.jp/kancolle/出撃#m93e7305) is X=4, [南方海域](https://wikiwiki.jp/kancolle/出撃#r83debbc) = X=5, [中部海域](https://wikiwiki.jp/kancolle/出撃#n3e79a3d) is X=6
+2. Event maps are at https://wikiwiki.jp/kancolle/%E6%9C%9F%E9%96%93%E9%99%90%E5%AE%9A%E5%87%BA%E6%92%83. Note [逆転！ナルヴィク攻防戦](https://wikiwiki.jp/kancolle/期間限定出撃#q0922cf7) is X=61 and each link below that in https://wikiwiki.jp/kancolle/%E6%9C%9F%E9%96%93%E9%99%90%E5%AE%9A%E5%87%BA%E6%92%83 is X one less
+3. Combine and update the detailed design philosophy in doc/design_philosophy/kancolle-map/X-Y.md
