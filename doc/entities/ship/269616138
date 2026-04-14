@@ -1,0 +1,69 @@
+class: 吹雪型
+description:
+  english: 1928 Fubuki-class destroyer
+  japanese: 吹雪型駆逐艦
+historical_data:
+  builder: Q2813947
+  commissioning_date: ''
+  decommissioning_date: ''
+  fate: ''
+  notable_events: []
+  operators: []
+  service_history: Uranami (浦波, "Shore Wave") was the tenth of twenty-four Fubuki-class
+    destroyers, built for the Imperial Japanese Navy following World War I. Uranami
+    saw heavy service in WW2. In December, immediately into the war, Uranami won a
+    gunfight and sank the Dutch submarine O 20, took part in the invasions of Bangka
+    and the Andaman Islands, and would see heavy action at the naval battle of Guadalcanal,
+    where she probably torpedoed and sank the destroyer USS Benham.
+metadata:
+  generated: '2026-04-06 17:53:10'
+  source: Wikidata/Wikipedia
+name:
+  english: Japanese destroyer Uranami
+  japanese: 浦波
+  other:
+    el: Uranami
+    fi: Uranami
+    fr: Uranami
+    id: Kapal perusak Jepang Uranami
+    it: Uranami
+    jv: Prau panumpes Jepang Uranami
+    ms: Kapal pembinasa Jepun Uranami
+    mul: Uranami
+    pl: Uranami (1928)
+    pt: Uranami (contratorpedeiro de 1928)
+    uk: Уранамі (1929)
+    vi: Uranami (tàu khu trục Nhật)
+    zh: 浦波號驅逐艦
+    zh-cn: 浦波号驱逐舰
+    zh-hans: 浦波号驱逐舰
+order: 10番艦
+personality:
+  appearance: ''
+  memories: []
+  moral_values: Believes in using force only for defensive purposes and protecting
+    innocent lives.
+  personality_traits:
+  - agile
+  - alert
+  - melancholic
+  - loyal
+  relationships: {}
+  voice: ''
+ship_id: 269616138
+technical_data:
+  armament: ''
+  beam: ''
+  displacement: ''
+  draft: ''
+  length: ''
+  propulsion: ''
+  speed: ''
+wikidata_id: Q6130864
+wikipedia_extract: Uranami (浦波, "Shore Wave") was the tenth of twenty-four Fubuki-class
+  destroyers, built for the Imperial Japanese Navy following World War I. Uranami
+  saw heavy service in WW2. In December, immediately into the war, Uranami won a gunfight
+  and sank the Dutch submarine O 20, took part in the invasions of Bangka and the
+  Andaman Islands, and would see heavy action at the naval battle of Guadalcanal,
+  where she probably torpedoed and sank the destroyer USS Benham. Uranami was sunk
+  by Taffy 2 aircraft during the battle of Leyte Gulf.

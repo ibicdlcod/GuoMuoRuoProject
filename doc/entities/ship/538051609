@@ -1,0 +1,61 @@
+class: 綾波型
+description:
+  english: 1931 Fubuki-class destroyer
+  japanese: 吹雪型駆逐艦
+historical_data:
+  builder: Q2687837
+  commissioning_date: ''
+  decommissioning_date: ''
+  fate: ''
+  notable_events: []
+  operators: []
+  service_history: Sazanami (漣, "Ripples") was the nineteenth of twenty-four Fubuki-class
+    destroyers, built for the Imperial Japanese Navy following World War I.
+metadata:
+  generated: '2026-04-06 18:26:19'
+  source: Wikidata/Wikipedia
+name:
+  english: Japanese destroyer Sazanami
+  japanese: 漣改
+  other:
+    de: Sazanami
+    el: Sazanami
+    es: Sazanami
+    fi: Sazanami
+    fr: Sazanami
+    id: Kapal perusak Jepang Sazanami
+    it: Sazanami
+    jv: Prau panumpes Jepang Sazanami
+    mul: Sazanami
+    nl: Sazanami
+    pl: Sazanami (1931)
+    uk: Садзанамі (1932)
+    vi: Sazanami (tàu khu trục Nhật)
+    zh: 漣號驅逐艦
+    zh-cn: 涟号驱逐舰
+    zh-hans: 涟号驱逐舰
+    zh-hant: 漣號驅逐艦
+order: 9番艦
+personality:
+  appearance: ''
+  memories: []
+  moral_values: Believes in using force only for defensive purposes and protecting
+    innocent lives.
+  personality_traits:
+  - alert
+  - agile
+  - loyal
+  relationships: {}
+  voice: ''
+ship_id: 538051609
+technical_data:
+  armament: ''
+  beam: ''
+  displacement: ''
+  draft: ''
+  length: ''
+  propulsion: ''
+  speed: ''
+wikidata_id: Q4383739
+wikipedia_extract: Sazanami (漣, "Ripples") was the nineteenth of twenty-four Fubuki-class
+  destroyers, built for the Imperial Japanese Navy following World War I.

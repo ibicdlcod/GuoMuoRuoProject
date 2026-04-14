@@ -1,0 +1,71 @@
+class: 秋月型
+description:
+  english: 1942 Akizuki-class destroyer
+  japanese: 秋月型駆逐艦四番艦
+historical_data:
+  builder: Q2687837
+  commissioning_date: ''
+  decommissioning_date: ''
+  fate: ''
+  notable_events: []
+  operators: []
+  service_history: Hatsuzuki (初月) was an Akizuki-class destroyer of the Imperial Japanese
+    Navy. Her name means "New Moon (in Autumn)" or "(another name of) August". In
+    the Battle off Cape Engaño, to cover the escape of allied ships, Hatsuzuki single-handedly
+    faced an overwhelming force of four cruisers and at least 9 destroyers for two
+    hours before she was sunk with only 8 survivors.
+metadata:
+  generated: '2026-04-06 18:03:27'
+  source: Wikidata/Wikipedia
+name:
+  english: Japanese destroyer Hatsuzuki
+  japanese: 初月
+  other:
+    cs: Hacuzuki
+    de: Hatsuzuki
+    el: Hatsuzuki
+    es: Hatsuzuki
+    fi: Hatsuzuki
+    fr: Hatsuzuki
+    hu: Hacuzuki
+    id: Kapal perusak Jepang Hatsuzuki
+    it: Hatsuzuki
+    jv: Prau panumpes Jepang Hatsuzuki
+    mul: Hatsuzuki
+    pl: Hatsuzuki
+    ru: Хацудзуки (эсминец)
+    sk: Hacuzuki
+    th: ฮัทสึซึกิ
+    uk: Хацудзукі
+    vi: Hatsuzuki (tàu khu trục Nhật)
+    zh: 初月號驅逐艦
+    zh-cn: 初月号驱逐舰
+    zh-hans: 初月号驱逐舰
+order: 4番艦
+personality:
+  appearance: ''
+  memories: []
+  moral_values: Believes in using force only for defensive purposes and protecting
+    innocent lives.
+  personality_traits:
+  - alert
+  - melancholic
+  - agile
+  - loyal
+  relationships: {}
+  voice: ''
+ship_id: 269650692
+technical_data:
+  armament: ''
+  beam: ''
+  displacement: ''
+  draft: ''
+  length: ''
+  propulsion: ''
+  speed: ''
+wikidata_id: Q768460
+wikipedia_extract: Hatsuzuki (初月) was an Akizuki-class destroyer of the Imperial Japanese
+  Navy. Her name means "New Moon (in Autumn)" or "(another name of) August". In the
+  Battle off Cape Engaño, to cover the escape of allied ships, Hatsuzuki single-handedly
+  faced an overwhelming force of four cruisers and at least 9 destroyers for two hours
+  before she was sunk with only 8 survivors.

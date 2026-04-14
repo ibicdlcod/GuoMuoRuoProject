@@ -1,0 +1,92 @@
+class: 長門型
+description:
+  english: 1920 Nagato-class battleship
+  japanese: 大日本帝国海軍の戦艦
+historical_data:
+  builder: Q2790777
+  commissioning_date: '1921'
+  decommissioning_date: ''
+  fate: ''
+  notable_events: []
+  operators: []
+  service_history: 'Mutsu (Japanese: 陸奥; named after the ancient Mutsu Province) was
+    the second and last Nagato-class dreadnought battleship built for the Imperial
+    Japanese Navy (IJN) at the end of World War I. In 1923 she carried supplies for
+    the survivors of the Great Kantō earthquake. The ship was modernized in 1934–1936
+    with improvements to her armour and machinery, and a rebuilt superstructure in
+    the pagoda mast style.'
+metadata:
+  generated: '2026-04-06 18:08:16'
+  source: Wikidata/Wikipedia
+name:
+  english: Japanese battleship Mutsu
+  japanese: 陸奥
+  other:
+    bg: Муцу (линеен кораб, 1920)
+    ca: Mutsu
+    cs: Mucu
+    de: Mutsu
+    es: Acorazado Mutsu
+    fa: نبردناو موتسو
+    fi: Mutsu
+    fr: Mutsu
+    gl: Mutsu
+    hu: Mucu japán hadihajó
+    id: Kapal tempur Jepang Mutsu
+    it: Mutsu (nave da battaglia)
+    ko: 일본 전함 무츠
+    mul: Mutsu
+    nl: Mutsu
+    pl: Mutsu
+    pt: Mutsu
+    ru: Муцу
+    sk: Mucu
+    sl: Mutsu
+    th: มุทสึ
+    tr: Mutsu (zırhlı)
+    vi: Mutsu
+    yue: 陸奧號戰艦
+    zh: 陸奧號戰艦
+    zh-cn: 陆奥号战列舰
+    zh-hans: 陆奥号战舰
+    zh-hant: 陸奧號戰艦
+    zh-hk: 陸奧號戰艦
+    zh-sg: 陆奥号战列舰
+order: 2番艦
+personality:
+  appearance: ''
+  memories: []
+  moral_values: Believes in using force only for defensive purposes and protecting
+    innocent lives.
+  personality_traits:
+  - melancholic
+  - powerful
+  - dignified
+  - stoic
+  relationships: {}
+  voice: ''
+ship_id: 269812482
+technical_data:
+  armament: ''
+  beam: ''
+  displacement: '38980'
+  draft: ''
+  length: ''
+  propulsion: ''
+  speed: ''
+wikidata_id: Q1813237
+wikipedia_extract: 'Mutsu (Japanese: 陸奥; named after the ancient Mutsu Province) was
+  the second and last Nagato-class dreadnought battleship built for the Imperial Japanese
+  Navy (IJN) at the end of World War I. In 1923 she carried supplies for the survivors
+  of the Great Kantō earthquake. The ship was modernized in 1934–1936 with improvements
+  to her armour and machinery, and a rebuilt superstructure in the pagoda mast style.
+
+  Other than participating in the Battle of Midway and the Battle of the Eastern Solomons
+  in 1942, where she did not see any significant combat, Mutsu spent most of the first
+  year of the Pacific War in training. She returned to Japan in early 1943. That June,
+  one of her aft magazines detonated while she was at anchor, sinking the ship with
+  the loss of 1,121 crew and visitors. The IJN investigation into the cause of her
+  loss concluded that it was the work of a disgruntled crew member. The navy dispersed
+  the survivors in an attempt to conceal the sinking in the interest of morale in
+  Japan. Much of the wreck was scrapped after the war, but some artefacts and relics
+  are on display in Japan, and a small portion of the ship remains where she was sunk.'

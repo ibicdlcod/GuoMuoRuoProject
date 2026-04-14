@@ -1,0 +1,50 @@
+class: 占守型
+description:
+  english: 1940 Shimushu-class escort ship
+  japanese: 占守型海防艦
+historical_data:
+  builder: Q85718221
+  commissioning_date: ''
+  decommissioning_date: ''
+  fate: ''
+  notable_events: []
+  operators: []
+  service_history: Ishigaki (石垣) was one of four Shimushu-class escort ships built
+    for the Imperial Japanese Navy during World War II.
+metadata:
+  generated: '2026-04-06 18:21:44'
+  source: Wikidata/Wikipedia
+name:
+  english: Japanese escort Ishigaki
+  japanese: 石垣改
+  other:
+    fa: کشتی اسکورت ایشیگاکی
+    fi: Ishigaki
+    id: Kapal pertahanan pesisir Jepang Ishigaki
+    jv: Prau pangayom pasisir Jepang Ishigaki
+    ms: Kapal pengiring Jepun Ishigaki
+    mul: Ishigaki
+    nl: Ishigaki
+    zh: 石垣號海防艦
+    zh-cn: 石垣号海防艇
+order: 4番艦
+personality:
+  appearance: ''
+  memories: []
+  moral_values: Believes in using force only for defensive purposes and protecting
+    innocent lives.
+  personality_traits: []
+  relationships: {}
+  voice: ''
+ship_id: 537985524
+technical_data:
+  armament: ''
+  beam: ''
+  displacement: ''
+  draft: ''
+  length: ''
+  propulsion: ''
+  speed: ''
+wikidata_id: Q6158580
+wikipedia_extract: Ishigaki (石垣) was one of four Shimushu-class escort ships built
+  for the Imperial Japanese Navy during World War II.

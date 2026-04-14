@@ -1,0 +1,106 @@
+class: 翔鶴型
+description:
+  english: 1939 Shōkaku-class aircraft carrier
+  japanese: 大日本帝国海軍の大型正規空母
+historical_data:
+  builder: Q748148
+  commissioning_date: ''
+  decommissioning_date: ''
+  fate: ''
+  notable_events: []
+  operators: []
+  service_history: 'Zuikaku (Japanese: 瑞鶴; meaning "Auspicious Crane") was the second
+    and last Shōkaku-class aircraft carrier built for the Imperial Japanese Navy (IJN)
+    shortly before the beginning of the Pacific War. Zuikaku was one of the most modern
+    Japanese aircraft carriers when commissioned, and saw successful action throughout
+    numerous battles during the Pacific War. Zuikaku started the war as part of Kidō
+    Butai.'
+metadata:
+  generated: '2026-04-06 18:36:24'
+  source: Wikidata/Wikipedia
+name:
+  english: Japanese aircraft carrier Zuikaku
+  japanese: 瑞鶴改
+  other:
+    ar: زويكاكو
+    ast: Portaaviones xaponés Zuikaku
+    ca: Portaavions Zuikaku
+    cs: Zuikaku
+    da: Zuikaku
+    de: Zuikaku
+    de-ch: Zuikaku
+    en-ca: Japanese aircraft carrier Zuikaku
+    es: Zuikaku
+    fa: ناو هواپیمابر ژاپنی زوئیکاکو
+    fi: Zuikaku
+    fr: Zuikaku
+    he: זואיקאקו
+    hu: Zuikaku
+    id: Kapal induk Jepang Zuikaku
+    it: Zuikaku
+    jv: Prau pamotan palwa udara Jepang Zuikaki
+    ko: 일본 항공모함 즈이카쿠
+    mr: झुइकाकु
+    ms: Kapal induk Jepun Zuikaku
+    mul: Zuikaku
+    nl: Zuikaku
+    pl: Zuikaku
+    pt: Porta-aviões japonês Zuikaku
+    pt-br: Zuikaku
+    ru: Дзуйкаку
+    sk: Zuikaku
+    sv: Zuikaku
+    th: เรือบรรทุกเครื่องบินซุยคาคุ
+    tr: Zuikaku (uçak gemisi)
+    uk: Дзуйкаку
+    vi: Zuikaku (tàu sân bay Nhật)
+    zh: 瑞鶴號航空母艦
+order: 2番艦
+personality:
+  appearance: ''
+  memories: []
+  moral_values: Believes in using force only for defensive purposes and protecting
+    innocent lives.
+  personality_traits:
+  - melancholic
+  - strategic
+  - commanding
+  - nurturing
+  relationships: {}
+  voice: ''
+ship_id: 538313474
+technical_data:
+  armament: ''
+  beam: ''
+  displacement: '29800'
+  draft: '26'
+  length: '257.5'
+  propulsion: ''
+  speed: ''
+wikidata_id: Q228691
+wikipedia_extract: 'Zuikaku (Japanese: 瑞鶴; meaning "Auspicious Crane") was the second
+  and last Shōkaku-class aircraft carrier built for the Imperial Japanese Navy (IJN)
+  shortly before the beginning of the Pacific War. Zuikaku was one of the most modern
+  Japanese aircraft carriers when commissioned, and saw successful action throughout
+  numerous battles during the Pacific War.
+
+  Zuikaku started the war as part of Kidō Butai. Her aircraft struck airfields during
+  the attack on Pearl Harbor that formally brought the United States into the war.
+  She also participated in the Indian Ocean raid, where her dive bombers sank or helped
+  to sink several major British warships. Zuikaku and her sister Shōkaku were detached
+  from Kidō Butai to support Operation Mo, the invasion of Port Moresby, New Guinea,
+  during which her torpedo bombers contributed to the sinking of the aircraft carrier
+  USS Lexington at the Battle of the Coral Sea; however heavy airgroup losses and
+  damage to Shōkaku resulted in both carriers missing the Battle of Midway.  She and
+  her sister fought US carriers at the Battle of the Eastern Solomons, and again at
+  the Battle of the Santa Cruz Islands where she helped to sink the aircraft carrier
+  USS Hornet. During the Battle of the Philippine Sea and Battle of Leyte Gulf, she
+  was damaged by US carrier aircraft, being sunk in the latter engagement.
+
+  Zuikaku was one of six carriers to participate in the Pearl Harbor attack and was
+  the last of the six to be sunk in the war (Akagi, Kaga, Hiryū, and Sōryū in the
+  Battle of Midway; Shōkaku in the Battle of the Philippine Sea; and Zuikaku in the
+  Battle of Leyte Gulf.)
+
+  A memorial for the fallen personnel of the Zuikaku is located at the grounds of
+  Kashihara Shrine, located in the city of Kashihara, Nara Prefecture, Japan.'

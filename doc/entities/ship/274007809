@@ -1,0 +1,97 @@
+class: Nelson級
+description:
+  english: 1925 Nelson-class battleship
+  japanese: 戦艦
+historical_data:
+  builder: Q689159
+  commissioning_date: '1927'
+  decommissioning_date: ''
+  fate: ''
+  notable_events: []
+  operators: []
+  service_history: 'HMS Nelson (pennant number: 28) was the name ship of her class
+    of two battleships built for the Royal Navy in the 1920s. They were the first
+    battleships built to meet the limitations of the Washington Naval Treaty of 1922.
+    Entering service in 1927, the ship spent her peacetime career with the Atlantic
+    and Home Fleets, usually as the fleet flagship.'
+metadata:
+  generated: '2026-04-06 18:19:41'
+  source: Wikidata/Wikipedia
+name:
+  english: HMS Nelson
+  japanese: Nelson
+  other:
+    bg: Нелсън (линеен кораб, 1925)
+    bjn: HMS Nelson
+    ca: HMS Nelson
+    cs: HMS Nelson
+    de: HMS Nelson
+    el: HMS Nelson
+    en-ca: HMS Nelson
+    es: HMS Nelson
+    fa: اچ‌ام‌اس نلسون (۲۸)
+    fi: HMS Nelson
+    fr: HMS Nelson
+    ga: HMS Nelson
+    gl: HMS Nelson (28)
+    he: אה"מ נלסון (1925)
+    hu: HMS Nelson
+    id: HMS Nelson
+    it: HMS Nelson
+    jv: HMS Nelson
+    ko: 넬슨
+    min: HMS Nelson
+    ms: HMS Nelson
+    mul: HMS Nelson
+    nl: HMS Nelson
+    pl: HMS Nelson
+    pt: HMS Nelson (28)
+    ru: HMS Nelson
+    sk: HMS Nelson
+    su: HMS Nelson
+    sv: HMS Nelson
+    uk: HMS Nelson (28)
+    vi: HMS Nelson (28)
+    zh: 納爾遜號戰艦
+order: 1番艦
+personality:
+  appearance: ''
+  memories: []
+  moral_values: Believes in using force only for defensive purposes and protecting
+    innocent lives.
+  personality_traits:
+  - powerful
+  - dignified
+  - stoic
+  relationships: {}
+  voice: ''
+ship_id: 274007809
+technical_data:
+  armament: ''
+  beam: ''
+  displacement: '34500'
+  draft: '32.3'
+  length: '216.5'
+  propulsion: ''
+  speed: ''
+wikidata_id: Q1032062
+wikipedia_extract: 'HMS Nelson (pennant number: 28) was the name ship of her class
+  of two battleships built for the Royal Navy in the 1920s. They were the first battleships
+  built to meet the limitations of the Washington Naval Treaty of 1922. Entering service
+  in 1927, the ship spent her peacetime career with the Atlantic and Home Fleets,
+  usually as the fleet flagship. During the early stages of World War II, she searched
+  for German commerce raiders, missed participating in the Norwegian Campaign after
+  she was badly damaged by a mine in late 1939, and escorted convoys in the Atlantic
+  Ocean.
+
+  In mid-1941 Nelson escorted several convoys to Malta before being torpedoed in September.
+  After repairs she resumed doing so before supporting the British invasion of French
+  Algeria during Operation Torch in late 1942. The ship covered the invasions of Sicily
+  (Operation Husky) and Italy (Operation Avalanche) in mid-1943 while bombarding coastal
+  defences during Operation Baytown. During the Normandy landings in June 1944, Nelson
+  provided naval gunfire support before she struck a mine and spent the rest of the
+  year under repair. The ship was transferred to the Eastern Fleet in mid-1945 and
+  returned home a few months after the Japanese surrender in September to serve as
+  the flagship of the Home Fleet. She became a training ship in early 1946 and was
+  reduced to reserve in late 1947. Nelson was scrapped two years later after being
+  used as a target for bomb tests.'

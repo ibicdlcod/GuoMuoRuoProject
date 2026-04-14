@@ -1,0 +1,88 @@
+class: 千歳型
+description:
+  english: 1936 Chitose-class aircraft carrier
+  japanese: 日本の航空母艦
+historical_data:
+  builder: Q2688386
+  commissioning_date: ''
+  decommissioning_date: ''
+  fate: ''
+  notable_events: []
+  operators: []
+  service_history: Chitose (千歳) was a warship of the Imperial Japanese Navy that served
+    from 1938 to 1944, seeing service as a seaplane carrier and later as a light aircraft
+    carrier during World War II. In her initial guise as a seaplane carrier, she first
+    saw service during the Second Sino-Japanese War in 1938, and subsequently played
+    a key role in the Imperial Japanese Navy's development of a network of seaplane
+    bases on the islands of the Pacific Ocean. After the outbreak of World War II
+    in the Pacific, she took part in the Philippines campaign, the Dutch East Indies
+    campaign, the Battle of Midway, and the Guadalcanal campaign, during which she
+    was damaged in the Battle of the Eastern Solomons and also saw service related
+    to the Battle of Cape Esperance.
+metadata:
+  generated: '2026-04-06 18:21:13'
+  source: Wikidata/Wikipedia
+name:
+  english: Japanese aircraft carrier Chitose
+  japanese: 千歳改
+  other:
+    cs: Čitose (1936)
+    de: Chitose
+    en-ca: Japanese aircraft carrier Chitose
+    es: Chitose
+    fa: ناو هواپیمابر چیتوز
+    fi: Chitose
+    fr: Chitose
+    id: Kapal induk Jepang Chitose
+    it: Chitose
+    mul: Chitose
+    nl: Chitose
+    pl: Chitose
+    ru: Авианосец «Читосе»
+    uk: Тітосе
+    vi: Chitose
+    zh: 千歲號航空母艦
+    zh-hans: 千岁号航空母舰
+    zh-hant: 千歲號航空母艦
+    zh-hk: 千歲號航空母艦
+order: 1番艦
+personality:
+  appearance: ''
+  memories: []
+  moral_values: Believes in using force only for defensive purposes and protecting
+    innocent lives.
+  personality_traits:
+  - melancholic
+  - strategic
+  - commanding
+  - nurturing
+  relationships: {}
+  voice: ''
+ship_id: 286794241
+technical_data:
+  armament: ''
+  beam: ''
+  displacement: ''
+  draft: '20.8'
+  length: '192.5'
+  propulsion: ''
+  speed: ''
+wikidata_id: Q4564982
+wikipedia_extract: 'Chitose (千歳) was a warship of the Imperial Japanese Navy that
+  served from 1938 to 1944, seeing service as a seaplane carrier and later as a light
+  aircraft carrier during World War II. In her initial guise as a seaplane carrier,
+  she first saw service during the Second Sino-Japanese War in 1938, and subsequently
+  played a key role in the Imperial Japanese Navy''s development of a network of seaplane
+  bases on the islands of the Pacific Ocean. After the outbreak of World War II in
+  the Pacific, she took part in the Philippines campaign, the Dutch East Indies campaign,
+  the Battle of Midway, and the Guadalcanal campaign, during which she was damaged
+  in the Battle of the Eastern Solomons and also saw service related to the Battle
+  of Cape Esperance.
+
+  Chitose was converted into a light aircraft carrier during 1943, and subsequently
+  took part in the Battle of the Philippine Sea and the Battle of Leyte Gulf. She
+  was sunk in the Battle off Cape Engaño, one of several actions that made up the
+  Battle of Leyte Gulf, on 25 October 1944.
+
+  Although it has been speculated that Chitose as a seaplane carrier also carried
+  Type A midget submarines, only her sister ship Chiyoda had that capability.'

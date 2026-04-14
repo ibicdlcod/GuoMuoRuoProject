@@ -1,0 +1,67 @@
+class: 神風型
+description:
+  english: 1922 Kamikaze-class destroyer of the Imperial Japanese Navy
+  japanese: 2代目神風型駆逐艦
+historical_data:
+  builder: Q11357147
+  commissioning_date: ''
+  decommissioning_date: ''
+  fate: ''
+  notable_events: []
+  operators: []
+  service_history: The Japanese destroyer Kamikaze (神風, "Divine Wind" or "Spirit Wind")
+    was the lead ship of nine Kamikaze-class destroyers built for the Imperial Japanese
+    Navy (IJN) during the 1920s. At the beginning of the Pacific War in December 1941,
+    the ship was assigned to the Ōminato Guard District. She remained in northern
+    Japanese waters until mid-1942 when she participated in the Aleutian Islands Campaign.
+metadata:
+  generated: '2026-04-06 18:23:33'
+  source: Wikidata/Wikipedia
+name:
+  english: Japanese destroyer Kamikaze
+  japanese: 神風改
+  other:
+    de: Kamikaze
+    eo: Kamikazo
+    es: Kamikaze
+    fi: Kamikaze
+    fr: Kamikaze
+    id: Kapal perusak Jepang Kamikaze
+    it: Kamikaze
+    jv: Prau panumpes Jepang Kamikaze
+    mul: Kamikaze
+    nl: Kamikaze
+    pl: Kamikaze (1922)
+    uk: Камікадзе (1922)
+    vi: Kamikaze (1922)
+    zh: 神風號驅逐艦
+    zh-hans: 神风号驱逐舰
+order: 1番艦
+personality:
+  appearance: ''
+  memories: []
+  moral_values: Believes in using force only for defensive purposes and protecting
+    innocent lives.
+  personality_traits:
+  - alert
+  - agile
+  - loyal
+  relationships: {}
+  voice: ''
+ship_id: 538051073
+technical_data:
+  armament: ''
+  beam: ''
+  displacement: ''
+  draft: '9.1'
+  length: '102.60'
+  propulsion: ''
+  speed: ''
+wikidata_id: Q1423570
+wikipedia_extract: The Japanese destroyer Kamikaze (神風, "Divine Wind" or "Spirit Wind")
+  was the lead ship of nine Kamikaze-class destroyers built for the Imperial Japanese
+  Navy (IJN) during the 1920s. At the beginning of the Pacific War in December 1941,
+  the ship was assigned to the Ōminato Guard District. She remained in northern Japanese
+  waters until mid-1942 when she participated in the Aleutian Islands Campaign. Kamikaze
+  continued to patrol northern Japanese waters until early 1945 when she was transferred
+  to the Singapore area.

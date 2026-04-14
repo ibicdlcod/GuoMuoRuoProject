@@ -1,0 +1,104 @@
+class: Graf Zeppelin級
+description:
+  english: 1938 Graf Zeppelin-class aircraft carrier
+  japanese: ''
+historical_data:
+  builder: Q641314
+  commissioning_date: ''
+  decommissioning_date: ''
+  fate: ''
+  notable_events: []
+  operators: []
+  service_history: The German aircraft carrier Graf Zeppelin was the lead ship in
+    a class of two carriers of the same name ordered by the Kriegsmarine of Nazi Germany.
+    She was the only aircraft carrier launched by Germany and represented part of
+    the Kriegsmarine's attempt to create a well-balanced oceangoing fleet, capable
+    of projecting German naval power far beyond the narrow confines of the Baltic
+    and North Seas. The carrier would have had a complement of 42 fighters and dive
+    bombers.
+metadata:
+  generated: '2026-04-06 18:13:36'
+  source: Wikidata/Wikipedia
+name:
+  english: German aircraft carrier Graf Zeppelin
+  japanese: Graf Zeppelin
+  other:
+    ar: حاملة الطائرات الألمانية غراف زبلن
+    ast: Portaaviones alemán Graf Zeppelin
+    ca: Graf Zeppelin del 1938
+    cs: Graf Zeppelin
+    da: Graf Zeppelin
+    de: Graf Zeppelin
+    el: Graf Zeppelin
+    eo: Aviadila ŝipo Graf Zeppelin
+    es: Graf Zeppelin
+    et: Graf Zeppelin
+    eu: Graf Zeppelin
+    fa: ناو هواپیمابر گراف زپلین
+    fi: Graf Zeppelin
+    fr: Graf Zeppelin
+    he: גראף צפלין (נושאת מטוסים)
+    hr: Graf Zeppelin
+    hu: Graf Zeppelin
+    id: Kapal induk Jerman Graf Zeppelin
+    is: Þýska flugmóðurskipið Graf Zeppelin
+    it: Graf Zeppelin
+    ko: 독일 항공모함 그라프 체펠린
+    ms: Kapal pengangkut pesawat Graf Zeppelin
+    mul: Graf Zeppelin
+    nb: «Graf Zeppelin»
+    nl: Graf Zeppelin
+    pl: Graf Zeppelin
+    pt: Porta-aviões Graf Zeppelin
+    ru: Graf Zeppelin
+    sv: Graf Zeppelin
+    th: เรือบรรทุกเครื่องบิน กราฟ เซพเพลิน
+    uk: Graf Zeppelin
+    vi: Graf Zeppelin
+    zh: 齊柏林伯爵號航空母艦
+    zh-cn: 齐柏林伯爵号航空母舰
+    zh-hans: 齐柏林伯爵号航空母舰
+    zh-hant: 齊柏林伯爵號航空母艦
+    zh-hk: 齊柏林伯爵號航空母艦
+    zh-sg: 齐柏林伯爵号航空母舰
+    zh-tw: 齊柏林伯爵號航空母艦
+order: 1番艦
+personality:
+  appearance: ''
+  memories: []
+  moral_values: Believes in using force only for defensive purposes and protecting
+    innocent lives.
+  personality_traits:
+  - melancholic
+  - strategic
+  - commanding
+  - nurturing
+  relationships: {}
+  voice: ''
+ship_id: 270927873
+technical_data:
+  armament: ''
+  beam: ''
+  displacement: '34088'
+  draft: '36.2'
+  length: '262.5'
+  propulsion: ''
+  speed: ''
+wikidata_id: Q156962
+wikipedia_extract: 'The German aircraft carrier Graf Zeppelin was the lead ship in
+  a class of two carriers of the same name ordered by the Kriegsmarine of Nazi Germany.
+  She was the only aircraft carrier launched by Germany and represented part of the
+  Kriegsmarine''s attempt to create a well-balanced oceangoing fleet, capable of projecting
+  German naval power far beyond the narrow confines of the Baltic and North Seas.
+  The carrier would have had a complement of 42 fighters and dive bombers.
+
+  Construction on Graf Zeppelin began on 28 December 1936, when her keel was laid
+  down at the Deutsche Werke shipyard in Kiel. Named in honor of Graf (Count) Ferdinand
+  von Zeppelin, the ship was launched on 8 December 1938, and was 85% complete by
+  the outbreak of World War II in September 1939. Graf Zeppelin was not completed
+  and was never operational due to shifting construction priorities necessitated by
+  the war. She remained in the Baltic for the duration of the war; with Germany''s
+  defeat imminent, the ship''s custodian crew scuttled her just outside Stettin in
+  March 1945. The Soviet Union raised the ship in March 1946, and she was ultimately
+  sunk in weapons tests north of Poland 17 months later. The wreck was discovered
+  by a Polish survey ship in July 2006.'

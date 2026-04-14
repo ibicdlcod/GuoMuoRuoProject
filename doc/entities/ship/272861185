@@ -1,0 +1,85 @@
+class: Atlanta級
+description:
+  english: 1941 Atlanta-class cruiser
+  japanese: アメリカ海軍の軽巡洋艦
+historical_data:
+  builder: Q634984
+  commissioning_date: ''
+  decommissioning_date: ''
+  fate: ''
+  notable_events: []
+  operators: []
+  service_history: USS Atlanta (CL-51) of the United States Navy was the lead ship
+    of the Atlanta class of eight light cruisers. She was the third Navy ship named
+    after the city of Atlanta, Georgia. Designed to provide anti-aircraft protection
+    for US naval task groups, Atlanta served in this capacity in the naval battles
+    Midway and the Eastern Solomons.
+metadata:
+  generated: '2026-04-06 18:16:26'
+  source: Wikidata/Wikipedia
+name:
+  english: USS Atlanta
+  japanese: Atlanta
+  other:
+    af: USS Atlanta
+    cs: USS Atlanta
+    de: USS Atlanta
+    es: USS Atlanta
+    fa: یواس‌اس آتلانتا (سی‌ال-۵۱)
+    fr: USS Atlanta
+    ga: USS Atlanta
+    it: USS Atlanta
+    mul: USS Atlanta
+    nl: USS Atlanta
+    pl: USS Atlanta
+    pt: USS Atlanta (CL-51)
+    sv: USS Atlanta
+    vi: USS Atlanta
+    zh: 亞特蘭大號輕巡洋艦
+    zh-cn: 亚特兰大号轻巡洋舰
+    zh-hans: 亚特兰大号
+order: 1番艦
+personality:
+  appearance: ''
+  memories: []
+  moral_values: Believes in using force only for defensive purposes and protecting
+    innocent lives.
+  personality_traits:
+  - melancholic
+  relationships: {}
+  voice: ''
+ship_id: 272861185
+technical_data:
+  armament: ''
+  beam: ''
+  displacement: ''
+  draft: '16.1'
+  length: '164.9'
+  propulsion: ''
+  speed: ''
+wikidata_id: Q281442
+wikipedia_extract: "USS Atlanta (CL-51) of the United States Navy was the lead ship\
+  \ of the Atlanta class of eight light cruisers. She was the third Navy ship named\
+  \ after the city of Atlanta, Georgia. Designed to provide anti-aircraft protection\
+  \ for US naval task groups, Atlanta served in this capacity in the naval battles\
+  \ Midway and the Eastern Solomons. Atlanta was heavily damaged by Japanese and friendly\
+  \ gunfire in a night surface action on 13 November 1942 during the Naval Battle\
+  \ of Guadalcanal. The cruiser was sunk on her captain's orders in the afternoon\
+  \ of the same day.\nAtlanta, in some works, is designated CLAA-51 because of her\
+  \ primary armament as an anti-aircraft cruiser. Hence, all of the Atlanta-class\
+  \ ships are sometimes designated as CLAA. However, her entire battery of 5-inch\
+  \ (127 mm) guns were dual-purpose (DP) guns, and were capable of being used against\
+  \ both air and surface targets, able to fire anti-aircraft, high-explosive and armor-piercing\
+  \ shells.\nThe Atlanta-class ships were lightly armored, making them poor surface\
+  \ combatants compared to a typical light cruiser. In terms of armament, the Atlanta-class\
+  \ was closer to a destroyer, being armed with 5-inch guns, than a light cruiser,\
+  \ which were generally equipped with 6-inch guns; but at well over 500 feet (152\
+  \ m) in length, and combined with their large battery of sixteen 5-inch (127 mm)\
+  \ guns, reduced to twelve in number for later ships of the class, they were designated\
+  \ as light cruisers. The unusual features of the Atlanta-class is a result of the\
+  \ class originally being intended to be a destroyer leader. A destroyer leader is\
+  \ larger than its destroyer counterparts to accommodate command staff and resources\
+  \ as well as other general utilities to support the destroyers that they would be\
+  \ paired with. \nIn-line with this intended role the ship was given a complement\
+  \ of torpedoes and relatively thin armor compared to other contemporary light cruisers.\
+  \ Later, the dimensions and tonnage of the ship resulted in a change in d"

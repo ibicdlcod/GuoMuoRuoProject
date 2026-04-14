@@ -1,0 +1,83 @@
+class: Conte di Cavour級
+description:
+  english: 1911 Conte di Cavour-class battleship
+  japanese: ''
+historical_data:
+  builder: Q290188
+  commissioning_date: ''
+  decommissioning_date: ''
+  fate: ''
+  notable_events: []
+  operators: []
+  service_history: Conte di Cavour was the name ship of the three Conte di Cavour-class
+    dreadnought battleships built for the Royal Italian Navy (Regia Marina) in the
+    1910s. Completed in 1915 she served during World War I, although she was little
+    used and saw no combat. The ship supported operations during the Corfu Incident
+    in 1923 and spent much of the rest of the decade in reserve.
+metadata:
+  generated: '2026-04-06 18:14:59'
+  source: Wikidata/Wikipedia
+name:
+  english: Conte di Cavour
+  japanese: Conte di Cavour
+  other:
+    af: Conti di Cavour
+    bg: Конте ди Кавур (линеен кораб, 1911)
+    ca: Conte di Cavour
+    cs: Conte di Cavour
+    de: Conte di Cavour
+    el: Conte di Cavour
+    es: Conte di Cavour
+    fa: نبردناو کونته دى کاوور
+    fi: RN Conte di Cavour
+    fr: Conte di Cavour
+    id: Kapal tempur Italia Conte di Cavour
+    it: Conte di Cavour
+    mul: Conte di Cavour
+    nl: Italian battleship Conte di Cavour
+    pl: Conte di Cavour
+    pt: Conte di Cavour (couraçado)
+    ru: Конте ди Кавур (линкор)
+    sr: Италијански бојни брод Конте ди Кавур
+    sr-ec: Италијански бојни брод Конте ди Кавур
+    sr-el: Italijanski bojni brod Konte di Kavur
+    uk: Conte di Cavour
+    zh: 凱沃爾號
+order: 1番艦
+personality:
+  appearance: ''
+  memories: []
+  moral_values: Believes in using force only for defensive purposes and protecting
+    innocent lives.
+  personality_traits:
+  - powerful
+  - dignified
+  - stoic
+  relationships: {}
+  voice: ''
+ship_id: 271914241
+technical_data:
+  armament: ''
+  beam: ''
+  displacement: ''
+  draft: '28.0'
+  length: '176.1'
+  propulsion: ''
+  speed: ''
+wikidata_id: Q688532
+wikipedia_extract: 'Conte di Cavour was the name ship of the three Conte di Cavour-class
+  dreadnought battleships built for the Royal Italian Navy (Regia Marina) in the 1910s.
+  Completed in 1915 she served during World War I, although she was little used and
+  saw no combat. The ship supported operations during the Corfu Incident in 1923 and
+  spent much of the rest of the decade in reserve. She was rebuilt between 1933 and
+  1937 with more powerful guns, additional armor and considerably more speed than
+  before.
+
+  During World War II, both Conte di Cavour and her sister ship, Giulio Cesare, participated
+  in the Battle of Calabria in July 1940, where the latter was lightly damaged. Conte
+  di Cavour was badly damaged when British torpedo bombers attacked the fleet at Taranto
+  in November 1940. She was deliberately run aground, with most of her hull underwater,
+  and repairs were not completed before the Italian armistice in September 1943. The
+  ship was then captured by the Germans, but they made no effort to finish her repairs.
+  She was damaged in an Allied air raid in early 1945 and capsized a week later. Conte
+  di Cavour was eventually scrapped in 1946.'

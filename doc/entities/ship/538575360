@@ -1,0 +1,58 @@
+class: 陸軍特種船(R1)
+description:
+  english: large amphibious ship of the Imperial Japanese Army
+  japanese: ''
+historical_data:
+  builder: Q1653679
+  commissioning_date: ''
+  decommissioning_date: ''
+  fate: ''
+  notable_events: []
+  operators: []
+  service_history: Shinshū Maru (神州丸 or 神洲丸) was a ship of the Imperial Japanese Army
+    during World War II. She was the world's first landing craft carrier ship to be
+    designed as such, and a pioneer of modern-day amphibious assault ships. During
+    some of her operations, she was known to have used at least four cover names,
+    R1, GL, MT, and Ryūjō Maru.
+metadata:
+  generated: '2026-04-06 18:39:03'
+  source: Wikidata/Wikipedia
+name:
+  english: Japanese amphibious ship Shinshū Maru
+  japanese: 神州丸改
+  other:
+    de: Shinshū Maru (1934)
+    fi: Shinshūmaru
+    fr: Shinshū Maru
+    id: Kapal serbu amfibi Jepang Shinshū Maru
+    jv: Prau serang amfibi Jepang Shinshū Maru
+    mul: Shinshū Maru
+    nl: Shinshuu Maru
+    ru: Синсю-мару
+    zh: 神州丸
+order: '-'
+personality:
+  appearance: ''
+  memories: []
+  moral_values: Believes in using force only for defensive purposes and protecting
+    innocent lives.
+  personality_traits: []
+  relationships: {}
+  voice: ''
+ship_id: 538575360
+technical_data:
+  armament: ''
+  beam: ''
+  displacement: ''
+  draft: ''
+  length: ''
+  propulsion: ''
+  speed: ''
+wikidata_id: Q6158365
+wikipedia_extract: Shinshū Maru (神州丸 or 神洲丸) was a ship of the Imperial Japanese Army
+  during World War II. She was the world's first landing craft carrier ship to be
+  designed as such, and a pioneer of modern-day amphibious assault ships. During some
+  of her operations, she was known to have used at least four cover names, R1, GL,
+  MT, and Ryūjō Maru.  During her career, she was outfitted with a dummy forefunnel
+  in an effort to disguise her as the submarine tender Taigei, which was converted
+  to the light carrier Ryūhō.

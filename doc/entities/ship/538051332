@@ -1,0 +1,63 @@
+class: 睦月型
+description:
+  english: 1925 Mutsuki-class destroyer
+  japanese: 日本海軍の睦月型駆逐艦4番艦
+historical_data:
+  builder: Q1653679
+  commissioning_date: ''
+  decommissioning_date: ''
+  fate: ''
+  notable_events: []
+  operators: []
+  service_history: Uzuki (卯月, "April") was one of twelve Mutsuki-class destroyers
+    built for the Imperial Japanese Navy (IJN) during the 1920s. During the Pacific
+    War, she participated in the Battle of Wake Island in December 1941 and the occupations
+    of New Guinea and the Solomon Islands in early 1942.
+metadata:
+  generated: '2026-04-06 18:24:14'
+  source: Wikidata/Wikipedia
+name:
+  english: Japanese destroyer Uzuki
+  japanese: 卯月改
+  other:
+    cs: Uzuki
+    de: Uzuki
+    fi: Uzuki
+    fr: Uzuki
+    id: Kapal perusak Jepang Uzuki
+    it: Uzuki
+    jv: Prau panumpes Jepang Uzuki
+    mul: Uzuki
+    pl: Uzuki (1925)
+    ru: Удзуки
+    uk: Удзукі (1926)
+    vi: Uzuki (tàu khu trục Nhật)
+    zh: 卯月號驅逐艦
+    zh-cn: 卯月号驱逐舰
+    zh-hans: 卯月号驱逐舰
+order: 4番艦
+personality:
+  appearance: ''
+  memories: []
+  moral_values: Believes in using force only for defensive purposes and protecting
+    innocent lives.
+  personality_traits:
+  - alert
+  - agile
+  - loyal
+  relationships: {}
+  voice: ''
+ship_id: 538051332
+technical_data:
+  armament: ''
+  beam: ''
+  displacement: ''
+  draft: ''
+  length: ''
+  propulsion: ''
+  speed: ''
+wikidata_id: Q3893647
+wikipedia_extract: Uzuki (卯月, "April") was one of twelve Mutsuki-class destroyers
+  built for the Imperial Japanese Navy (IJN) during the 1920s. During the Pacific
+  War, she participated in the Battle of Wake Island in December 1941 and the occupations
+  of New Guinea and the Solomon Islands in early 1942.

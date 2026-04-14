@@ -1,0 +1,58 @@
+class: 巡潜乙型改一
+description:
+  english: 1942 Type B2 submarine
+  japanese: 日本の一等潜水艦
+historical_data:
+  builder: Q2688386
+  commissioning_date: ''
+  decommissioning_date: ''
+  fate: ''
+  notable_events: []
+  operators: []
+  service_history: I-41 was an Imperial Japanese Navy B2 type submarine. She was completed
+    at Kure Navy Yard on 18 September 1943, whereupon she entered into service with
+    the Imperial Japanese Navy Yokosuka Naval District, SubRon 11, and sailed to Yokosuka
+    for final trials under the command of Lt. Commander Tamori Yoshimatsu.
+metadata:
+  generated: '2026-04-06 18:10:49'
+  source: Wikidata/Wikipedia
+name:
+  english: Japanese Submarine I-41
+  japanese: 伊41
+  other:
+    fa: زیردریایی آی-۴۱
+    fr: I-41
+    mul: I-41
+    uk: I-41
+    vi: I-41 (tàu ngầm Nhật)
+    zh: 伊號第四十一潜艦
+    zh-hans: 伊號第四十一潜艦
+    zh-hant: 伊號第四十一潛艦
+order: 2番艦
+personality:
+  appearance: ''
+  memories: []
+  moral_values: Believes in using force only for defensive purposes and protecting
+    innocent lives.
+  personality_traits:
+  - patient
+  - stealthy
+  - observant
+  relationships: {}
+  voice: ''
+ship_id: 269943874
+technical_data:
+  armament: ''
+  beam: ''
+  displacement: ''
+  draft: ''
+  length: ''
+  propulsion: ''
+  speed: ''
+wikidata_id: Q11379210
+wikipedia_extract: I-41 was an Imperial Japanese Navy B2 type submarine.  She was
+  completed at Kure Navy Yard on 18 September 1943, whereupon she entered into service
+  with the Imperial Japanese Navy Yokosuka Naval District, SubRon 11, and sailed to
+  Yokosuka for final trials under the command of Lt. Commander Tamori Yoshimatsu.  This
+  was completed by 15 December 1943 and command was transferred to Lt. Commander Itakura
+  Mitsuma.  I-41 was reassigned to the Sixth Fleet in SubRon 1's Sub Division 15.

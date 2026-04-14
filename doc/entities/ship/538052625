@@ -1,0 +1,58 @@
+class: 陽炎型
+description:
+  english: 1940 Kagerō-class destroyer
+  japanese: 陽炎型駆逐艦
+historical_data:
+  builder: ''
+  commissioning_date: ''
+  decommissioning_date: ''
+  fate: ''
+  notable_events: []
+  operators: []
+  service_history: Hagikaze (萩風; Clover Wind) was one of 19 Kagerō-class destroyers
+    built for the Imperial Japanese Navy during the 1930s.
+metadata:
+  generated: '2026-04-06 18:29:20'
+  source: Wikidata/Wikipedia
+name:
+  english: Japanese destroyer Hagikaze
+  japanese: 萩風改
+  other:
+    cs: Hagikaze
+    es: Hagikaze
+    fi: Hagikaze
+    fr: Hagikaze
+    id: Kapal perusak Jepang Hagikaze
+    it: Hagikaze
+    jv: Prau panumpes Jepang Hagikaze
+    mul: Hagikaze
+    pl: Hagikaze (1940)
+    pt: Hagikaze (contratorpedeiro)
+    ru: Хагикадзэ
+    uk: Хагікадзе
+    vi: Hagikaze
+    zh: 萩风号驱逐舰
+order: 17番艦
+personality:
+  appearance: ''
+  memories: []
+  moral_values: Believes in using force only for defensive purposes and protecting
+    innocent lives.
+  personality_traits:
+  - alert
+  - agile
+  - loyal
+  relationships: {}
+  voice: ''
+ship_id: 538052625
+technical_data:
+  armament: ''
+  beam: ''
+  displacement: ''
+  draft: ''
+  length: ''
+  propulsion: ''
+  speed: ''
+wikidata_id: Q2990119
+wikipedia_extract: Hagikaze (萩風; Clover Wind) was one of 19 Kagerō-class destroyers
+  built for the Imperial Japanese Navy during the 1930s.

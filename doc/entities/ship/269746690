@@ -1,0 +1,66 @@
+class: 青葉型
+description:
+  english: 1926 Aoba-class cruiser
+  japanese: 青葉型重巡洋艦
+historical_data:
+  builder: Q11478590
+  commissioning_date: '1927'
+  decommissioning_date: ''
+  fate: ''
+  notable_events: []
+  operators: []
+  service_history: 'Kinugasa (Japanese: 衣笠; named after Mount Kinugasa) was the second
+    vessel in the two-vessel Aoba class of heavy cruisers in the Imperial Japanese
+    Navy. Following the Japanese ship-naming conventions, the ship was named after
+    Mount Kinugasa, located in Yokosuka, Kanagawa, Japan.'
+metadata:
+  generated: '2026-04-06 18:06:29'
+  source: Wikidata/Wikipedia
+name:
+  english: Japanese cruiser Kinugasa
+  japanese: 衣笠
+  other:
+    bg: Кинугаса
+    ca: Kinugasa
+    cs: Kinugasa
+    de: Kinugasa
+    es: Kinugasa
+    fa: ناو کینوگاسا
+    fi: Kinugasa
+    fr: Kinugasa
+    gl: Kinugasa
+    id: Kapal penjelajah Jepang Kinugasa
+    it: Kinugasa
+    jv: Prau dlajah Jepang Kinugasa
+    mul: Kinugasa
+    nl: Japanese cruiser Kinugasa
+    pt: Kinugasa (cruzador)
+    ru: Кинугаса
+    sr: Јапанска тешка крстарица Кинугаса
+    uk: Кінугаса (крейсер)
+    vi: Kinugasa
+    zh: 衣笠號重巡洋艦
+    zh-cn: 衣笠号重巡洋舰
+order: 2番艦
+personality:
+  appearance: ''
+  memories: []
+  moral_values: Believes in using force only for defensive purposes and protecting
+    innocent lives.
+  personality_traits: []
+  relationships: {}
+  voice: ''
+ship_id: 269746690
+technical_data:
+  armament: ''
+  beam: ''
+  displacement: '8800'
+  draft: '17.56'
+  length: '185.17'
+  propulsion: ''
+  speed: ''
+wikidata_id: Q1701436
+wikipedia_extract: 'Kinugasa (Japanese: 衣笠; named after Mount Kinugasa) was the second
+  vessel in the two-vessel Aoba class of heavy cruisers in the Imperial Japanese Navy.
+  Following the Japanese ship-naming conventions, the ship was named after Mount Kinugasa,
+  located in Yokosuka, Kanagawa, Japan.'

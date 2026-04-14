@@ -1,0 +1,96 @@
+class: 長門型
+description:
+  english: 1919 Nagato-class battleship
+  japanese: 大日本帝国海軍の戦艦
+historical_data:
+  builder: Q2688386
+  commissioning_date: ''
+  decommissioning_date: ''
+  fate: ''
+  notable_events: []
+  operators: []
+  service_history: 'Nagato (Japanese: 長門; named after the ancient Nagato Province)
+    was a super-dreadnought battleship built for the Imperial Japanese Navy (IJN).
+    Completed in 1920 as the lead ship of her class, she carried supplies for the
+    survivors of the Great Kantō earthquake in 1923. The ship was modernized in 1934–1936
+    with improvements to her armor and machinery and a rebuilt superstructure in the
+    pagoda mast style.'
+metadata:
+  generated: '2026-04-06 18:35:22'
+  source: Wikidata/Wikipedia
+name:
+  english: Japanese battleship Nagato
+  japanese: 長門改
+  other:
+    ar: سفينة ناغاتو اليابانية
+    bg: Нагато (линеен кораб, 1919)
+    ca: Nagato
+    cs: Nagato
+    de: Nagato
+    es: Acorazado Nagato
+    fa: نبردناو ناگاتو
+    fi: Nagato
+    fr: Nagato
+    gl: Nagato
+    id: Kapal tempur Jepang Nagato
+    it: Nagato
+    ko: 일본 전함 나가토
+    mul: Nagato
+    nb: Nagato
+    nl: Japanese battleship Nagato
+    pl: Nagato
+    pt: Nagato
+    ro: Cuirasatul japonez Nagato
+    ru: Нагато
+    sk: Nagato
+    th: นางาโตะ
+    uk: Наґато
+    vi: Nagato
+    yue: 長門號
+    zh: 長門號戰艦
+order: 1番艦
+personality:
+  appearance: ''
+  memories: []
+  moral_values: Believes in using force only for defensive purposes and protecting
+    innocent lives.
+  personality_traits:
+  - melancholic
+  - powerful
+  - dignified
+  - stoic
+  relationships: {}
+  voice: ''
+ship_id: 538247937
+technical_data:
+  armament: ''
+  beam: ''
+  displacement: '38980'
+  draft: ''
+  length: ''
+  propulsion: ''
+  speed: ''
+wikidata_id: Q1291512
+wikipedia_extract: 'Nagato (Japanese: 長門; named after the ancient Nagato Province)
+  was a super-dreadnought battleship built for the Imperial Japanese Navy (IJN). Completed
+  in 1920 as the lead ship of her class, she carried supplies for the survivors of
+  the Great Kantō earthquake in 1923. The ship was modernized in 1934–1936 with improvements
+  to her armor and machinery and a rebuilt superstructure in the pagoda mast style.
+  Nagato briefly participated in the Second Sino-Japanese War in 1937 and was the
+  flagship of Admiral Isoroku Yamamoto during the attack on Pearl Harbor. She covered
+  the withdrawal of the attacking ships and did not participate in the attack itself.
+
+  Other than participating in the Battle of Midway in June 1942, where she did not
+  see combat, the ship spent most of the first two years of the Pacific War training
+  in home waters. She was transferred to Truk in mid-1943, but did not see any combat
+  until the Battle of the Philippine Sea in mid-1944 when she was attacked by American
+  aircraft. Nagato did not fire her main armament against enemy vessels until the
+  Battle of Leyte Gulf in October. She was lightly damaged during the battle and returned
+  to Japan the following month. The IJN was running out of fuel by this time and decided
+  not to fully repair her. Nagato was converted into a floating anti-aircraft platform
+  and assigned to coastal defense duties. She was attacked in July 1945 as part of
+  the American campaign to destroy the IJN''s last remaining capital ships, but was
+  only slightly damaged and went on to be the only Japanese battleship to have survived
+  World War II. In mid-1946, the ship was a target for nuclear weapon tests during
+  Operation Crossroads. She survived the first test with little damage, but was sunk
+  by the second.'

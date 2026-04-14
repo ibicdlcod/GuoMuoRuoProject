@@ -1,0 +1,67 @@
+class: 高雄型
+description:
+  english: 1930 Takao-class cruiser
+  japanese: 重巡洋艦
+historical_data:
+  builder: Q2688386
+  commissioning_date: ''
+  decommissioning_date: ''
+  fate: ''
+  notable_events: []
+  operators: []
+  service_history: Atago (愛宕) was the second vessel in the Takao-class heavy cruisers,
+    active in World War II with the Imperial Japanese Navy (IJN). These were among
+    the largest and most modern cruisers in the Japanese fleet, designed with the
+    intention to form the backbone of a multipurpose long-range strike force. Her
+    sister ships were Takao, Maya, and Chōkai.
+metadata:
+  generated: '2026-04-06 18:06:58'
+  source: Wikidata/Wikipedia
+name:
+  english: Japanese cruiser Atago
+  japanese: 愛宕
+  other:
+    bg: Атаго
+    cs: Atago
+    de: Atago
+    en-ca: Japanese cruiser Atago
+    es: Atago (1932)
+    fa: ناو اتاگو
+    fi: Atago
+    fr: Atago
+    id: Kapal penjelajah Jepang Atago
+    it: Atago
+    jv: Prau dlajah Jepang Atago
+    mul: Atago
+    pl: Atago (1932)
+    pt: Atago (cruzador)
+    ro: Atago
+    ru: Атаго
+    th: อาตาโก
+    uk: Атаго (крейсер)
+    vi: Atago (tàu tuần dương Nhật Bản)
+    zh: 愛宕號重巡洋艦
+order: 2番艦
+personality:
+  appearance: ''
+  memories: []
+  moral_values: Believes in using force only for defensive purposes and protecting
+    innocent lives.
+  personality_traits: []
+  relationships: {}
+  voice: ''
+ship_id: 269747202
+technical_data:
+  armament: ''
+  beam: ''
+  displacement: ''
+  draft: '20.42'
+  length: '203.76'
+  propulsion: ''
+  speed: ''
+wikidata_id: Q753165
+wikipedia_extract: Atago (愛宕) was the second vessel in the Takao-class heavy cruisers,
+  active in World War II with the Imperial Japanese Navy (IJN). These were among the
+  largest and most modern cruisers in the Japanese fleet, designed with the intention
+  to form the backbone of a multipurpose long-range strike force. Her sister ships
+  were Takao, Maya, and Chōkai.

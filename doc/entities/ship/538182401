@@ -1,0 +1,63 @@
+class: 妙高型
+description:
+  english: 1927 Myōkō-class cruiser
+  japanese: 大日本帝国海軍の重巡洋艦
+historical_data:
+  builder: Q2790777
+  commissioning_date: ''
+  decommissioning_date: ''
+  fate: ''
+  notable_events: []
+  operators: []
+  service_history: Myōkō (妙高) was the lead ship of the four-member Myōkō class of
+    heavy cruisers of the Imperial Japanese Navy (IJN), which were active in World
+    War II. She was named after Mount Myōkō in Niigata Prefecture. The other ships
+    of the class were Nachi, Ashigara, and Haguro.
+metadata:
+  generated: '2026-04-06 18:34:18'
+  source: Wikidata/Wikipedia
+name:
+  english: Myōkō
+  japanese: 妙高改
+  other:
+    bg: Миоко
+    cs: Mjókó
+    de: Myōkō
+    es: Myōkō
+    fi: Myōkō
+    fr: Myōkō
+    id: Kapal penjelajah Jepang Myōkō
+    it: Myōkō
+    jv: Prau dlajah Jepang Myōkō
+    mul: Myōkō
+    nl: Japanese cruiser Myōkō
+    pl: Myōkō
+    pt: Myōkō (cruzador)
+    ru: Мёко
+    uk: Мьоко (крейсер)
+    vi: Myōkō (tàu tuần dương Nhật)
+    zh: 妙高號重巡洋艦
+    zh-hant: 妙高號
+order: 1番艦
+personality:
+  appearance: ''
+  memories: []
+  moral_values: Believes in using force only for defensive purposes and protecting
+    innocent lives.
+  personality_traits: []
+  relationships: {}
+  voice: ''
+ship_id: 538182401
+technical_data:
+  armament: ''
+  beam: ''
+  displacement: ''
+  draft: '19.51'
+  length: '203.76'
+  propulsion: ''
+  speed: ''
+wikidata_id: Q1851781
+wikipedia_extract: Myōkō (妙高) was the lead ship of the four-member Myōkō class of
+  heavy cruisers of the Imperial Japanese Navy (IJN), which were active in World War
+  II. She was named after Mount Myōkō in Niigata Prefecture. The other ships of the
+  class were Nachi, Ashigara, and Haguro.

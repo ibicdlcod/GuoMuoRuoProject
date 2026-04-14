@@ -1,0 +1,49 @@
+class: 大泊型
+description:
+  english: Imperial Japanese Navy icebreaker
+  japanese: ''
+historical_data:
+  builder: Q6379823
+  commissioning_date: ''
+  decommissioning_date: ''
+  fate: ''
+  notable_events: []
+  operators: []
+  service_history: The Ōtomari (大泊) was an icebreaker of the Imperial Japanese Navy
+    (IJN) serving during the 1920s through World War II, the only ship of her class.
+    She was the only icebreaker warship in the IJN.
+metadata:
+  generated: '2026-04-06 18:12:41'
+  source: Wikidata/Wikipedia
+name:
+  english: Japanese icebreaker Ōtomari
+  japanese: 大泊
+  other:
+    uz: Yaponiya muzyorar kemasi Otomari
+    zh: 大泊号碎冰船
+    zh-hant: 大泊號碎冰船
+order: '-'
+personality:
+  appearance: ''
+  memories: []
+  moral_values: Believes in using force only for defensive purposes and protecting
+    innocent lives.
+  personality_traits:
+  - resilient
+  - steadfast
+  - protective
+  relationships: {}
+  voice: ''
+ship_id: 270075616
+technical_data:
+  armament: ''
+  beam: ''
+  displacement: ''
+  draft: ''
+  length: ''
+  propulsion: ''
+  speed: ''
+wikidata_id: Q11166108
+wikipedia_extract: The Ōtomari (大泊) was an icebreaker of the Imperial Japanese Navy
+  (IJN) serving during the 1920s through World War II, the only ship of her class.
+  She was the only icebreaker warship in the IJN.

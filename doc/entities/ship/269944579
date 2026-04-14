@@ -1,0 +1,54 @@
+class: 潜高型
+description:
+  english: 1944 I-201-class submarine
+  japanese: 日本の潜水艦
+historical_data:
+  builder: ''
+  commissioning_date: ''
+  decommissioning_date: ''
+  fate: ''
+  notable_events: []
+  operators: []
+  service_history: The Japanese submarine I-203 was an  I-201-class high-speed submarine
+    built for the Imperial Japanese Navy during World War II. She was commissioned
+    in May 1945, and the war ended before she could carry out an operational patrol.
+    She surrendered to the United States Navy in 1945 and was sunk as a target in
+    1946.
+metadata:
+  generated: '2026-04-06 18:11:13'
+  source: Wikidata/Wikipedia
+name:
+  english: Japanese submarine I-203
+  japanese: 伊203
+  other:
+    fr: I-203
+    mul: I-203
+    uk: I-203
+    zh: 伊號第二百三潛艦
+order: 3番艦
+personality:
+  appearance: ''
+  memories: []
+  moral_values: Believes in using force only for defensive purposes and protecting
+    innocent lives.
+  personality_traits:
+  - patient
+  - melancholic
+  - stealthy
+  - observant
+  relationships: {}
+  voice: ''
+ship_id: 269944579
+technical_data:
+  armament: ''
+  beam: ''
+  displacement: ''
+  draft: ''
+  length: ''
+  propulsion: ''
+  speed: ''
+wikidata_id: Q10862505
+wikipedia_extract: The Japanese submarine I-203 was an  I-201-class high-speed submarine
+  built for the Imperial Japanese Navy during World War II. She was commissioned in
+  May 1945, and the war ended before she could carry out an operational patrol. She
+  surrendered to the United States Navy in 1945 and was sunk as a target in 1946.

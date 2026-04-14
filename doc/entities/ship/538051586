@@ -1,0 +1,60 @@
+class: 吹雪型
+description:
+  english: 1928 Fubuki-class destroyer
+  japanese: 吹雪型駆逐艦
+historical_data:
+  builder: Q11543253
+  commissioning_date: ''
+  decommissioning_date: ''
+  fate: ''
+  notable_events: []
+  operators: []
+  service_history: Shirayuki (白雪, "White Snow") was the second of twenty-four Fubuki-class
+    destroyers, built for the Imperial Japanese Navy following World War I. Shirayuki
+    was sunk in the Battle of the Bismarck Sea on 3 March 1943 while under attack
+    by American and Australian aircraft.
+metadata:
+  generated: '2026-04-06 18:24:59'
+  source: Wikidata/Wikipedia
+name:
+  english: Japanese destroyer Shirayuki
+  japanese: 白雪改
+  other:
+    fi: Shirayuki
+    fr: Shirayuki
+    id: Kapal perusak Jepang Shirayuki
+    it: Shirayuki
+    jv: Prau panumpes Jepang Shirayuki
+    mul: Shirayuki
+    pl: Shirayuki (1928)
+    ru: Сираюки
+    uk: Сіраюкі (1928)
+    vi: Shirayuki (tàu khu trục Nhật) (1928)
+    zh: 白雪號驅逐艦
+order: 2番艦
+personality:
+  appearance: ''
+  memories: []
+  moral_values: Believes in using force only for defensive purposes and protecting
+    innocent lives.
+  personality_traits:
+  - alert
+  - melancholic
+  - agile
+  - loyal
+  relationships: {}
+  voice: ''
+ship_id: 538051586
+technical_data:
+  armament: ''
+  beam: ''
+  displacement: ''
+  draft: ''
+  length: ''
+  propulsion: ''
+  speed: ''
+wikidata_id: Q11580424
+wikipedia_extract: Shirayuki (白雪, "White Snow") was the second of twenty-four Fubuki-class
+  destroyers, built for the Imperial Japanese Navy following World War I. Shirayuki
+  was sunk in the Battle of the Bismarck Sea on 3 March 1943 while under attack by
+  American and Australian aircraft.

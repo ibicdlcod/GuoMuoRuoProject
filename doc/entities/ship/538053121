@@ -1,0 +1,73 @@
+class: 島風型
+description:
+  english: warship
+  japanese: 大日本帝国海軍の一等駆逐艦
+historical_data:
+  builder: Q2687837
+  commissioning_date: ''
+  decommissioning_date: ''
+  fate: ''
+  notable_events: []
+  operators: []
+  service_history: Shimakaze (島風, Island Wind) was an experimental destroyer of the
+    Imperial Japanese Navy during World War II, and intended as the lead ship in a
+    projected new "Type C" of destroyers. She was the only destroyer to be armed with
+    15 torpedo tubes, each capable of firing the 610 mm (24 in) Type 93 "Long Lance"
+    torpedo. The ship also served as a testbed for a powerful, high-temperature, high-pressure
+    steam turbine that was able to develop 79,240 shp (59,090 kW).
+metadata:
+  generated: '2026-04-06 18:30:38'
+  source: Wikidata/Wikipedia
+name:
+  english: Japanese destroyer Shimakaze
+  japanese: 島風改
+  other:
+    cs: Šimakaze
+    de: Shimakaze
+    en-ca: Japanese destroyer Shimakaze
+    es: Shimakaze
+    fa: شیماکازه نابودگر ژاپنی
+    fi: Shimakaze
+    fr: Shimakaze
+    id: Kapal perusak Jepang Shimakaze
+    it: Shimakaze
+    jv: Prau panumpes Jepang Shimakaze
+    ko: 일본 구축함 시마카제
+    mul: Shimakaze
+    pl: Shimakaze
+    pt: Shimakaze (contratorpedeiro de 1942)
+    ru: Симакадзэ
+    uk: Сімакадзе
+    vi: Shimakaze
+    yue: 島風號驅逐艦
+    zh: 島風號驅逐艦
+    zh-hans: 岛风号驱逐舰
+    zh-hant: 島風號驅逐艦
+    zh-hk: 島風號驅逐艦
+order: 1番艦
+personality:
+  appearance: ''
+  memories: []
+  moral_values: Believes in using force only for defensive purposes and protecting
+    innocent lives.
+  personality_traits: []
+  relationships: {}
+  voice: ''
+ship_id: 538053121
+technical_data:
+  armament: ''
+  beam: ''
+  displacement: ''
+  draft: '11.2'
+  length: ''
+  propulsion: ''
+  speed: ''
+wikidata_id: Q1968193
+wikipedia_extract: 'Shimakaze (島風, Island Wind) was an experimental destroyer of the
+  Imperial Japanese Navy during World War II, and intended as the lead ship in a projected
+  new "Type C" of destroyers. She was the only destroyer to be armed with 15 torpedo
+  tubes, each capable of firing the 610 mm (24 in) Type 93 "Long Lance" torpedo. The
+  ship also served as a testbed for a powerful, high-temperature, high-pressure steam
+  turbine that was able to develop 79,240 shp (59,090 kW). This made her one of the
+  fastest destroyers in the world: her design speed was 39 knots (72 km/h; 45 mph),
+  but on trials she made 40.9 knots (75.7 km/h; 47.1 mph).'

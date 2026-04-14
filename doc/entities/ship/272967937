@@ -1,0 +1,108 @@
+class: Iowa級
+description:
+  english: 1942 Iowa-class battleship
+  japanese: 戦艦
+historical_data:
+  builder: Q524435
+  commissioning_date: ''
+  decommissioning_date: ''
+  fate: ''
+  notable_events: []
+  operators: []
+  service_history: USS Iowa (BB-61) is a retired battleship, the lead ship of her
+    class, and the fourth in the United States Navy to be named after the state of
+    Iowa. Owing to the cancellation of the Montana-class battleships, Iowa is the
+    last lead ship of any class of United States battleships and was the only ship
+    of her class to serve in the Atlantic Ocean during World War II. During World
+    War II, she carried President Franklin D.
+metadata:
+  generated: '2026-04-06 18:18:01'
+  source: Wikidata/Wikipedia
+name:
+  english: USS Iowa
+  japanese: Iowa
+  other:
+    ar: يو إس إس آيوا (بي بي-61)
+    bg: Айова (линеен кораб, 1942)
+    ca: USS Iowa (BB-61)
+    cs: USS Iowa
+    de: USS Iowa
+    en-ca: USS Iowa (BB-61)
+    es: USS Iowa
+    fa: یواس‌اس آیووا
+    fi: USS Iowa
+    fr: USS Iowa
+    ga: USS Iowa
+    gor: USS Iowa
+    he: איווה (BB-61)
+    hr: USS Iowa
+    id: USS Iowa
+    it: USS Iowa
+    ko: USS 아이오와
+    ms: USS Iowa
+    mul: USS Iowa
+    nb: USS «Iowa»
+    nl: USS Iowa
+    pl: USS Iowa
+    pt: USS Iowa
+    pt-br: USS Iowa
+    ru: USS Iowa
+    sh: USS Iowa
+    sk: USS Iowa
+    sv: USS Iowa
+    th: ยูเอสเอส ไอโอวา
+    tr: USS Iowa (BB-61)
+    uk: USS Iowa
+    ur: یو ایس ایس آئیووا (بی بی-61)
+    vi: USS Iowa
+    zh: 艾奧瓦號戰艦
+    zh-hans: 艾奥瓦号战列舰
+    zh-hant: 愛荷華號戰艦
+    zh-hk: 艾奧瓦號戰艦
+order: 1番艦
+personality:
+  appearance: ''
+  memories: []
+  moral_values: Believes in using force only for defensive purposes and protecting
+    innocent lives.
+  personality_traits:
+  - powerful
+  - dignified
+  - reverent
+  - stoic
+  relationships: {}
+  voice: ''
+ship_id: 272967937
+technical_data:
+  armament: ''
+  beam: ''
+  displacement: '45000'
+  draft: '32.97'
+  length: '270.43'
+  propulsion: ''
+  speed: ''
+wikidata_id: Q562161
+wikipedia_extract: "USS Iowa (BB-61) is a retired battleship, the lead ship of her\
+  \ class, and the fourth in the United States Navy to be named after the state of\
+  \ Iowa. Owing to the cancellation of the Montana-class battleships, Iowa is the\
+  \ last lead ship of any class of United States battleships and was the only ship\
+  \ of her class to serve in the Atlantic Ocean during World War II.\nDuring World\
+  \ War II, she carried President Franklin D. Roosevelt across the Atlantic to Mers\
+  \ El Kébir, Algeria, en route to a conference of vital importance in 1943 in Tehran\
+  \ with Prime Minister Winston Churchill of the United Kingdom and Joseph Stalin,\
+  \ leader of the Soviet Union. When transferred to the Pacific Fleet in 1944, Iowa\
+  \ shelled beachheads at Kwajalein and Eniwetok in advance of Allied amphibious landings\
+  \ and screened aircraft carriers operating in the Marshall Islands. \nDuring the\
+  \ Korean War, Iowa was involved in raids on the North Korean coast, after which\
+  \ she was decommissioned into the United States Navy reserve fleets, better known\
+  \ as the \"mothball fleet\". She was reactivated in 1984 as part of the 600-ship\
+  \ Navy plan and operated in both the Atlantic and Pacific Fleets to counter the\
+  \ recently expanded Soviet Navy. In April 1989, an explosion of undetermined origin\
+  \ wrecked her No. 2 gun turret, killing 47 sailors.\nIowa was decommissioned for\
+  \ the last time in October 1990 after 19 total years of active service, and was\
+  \ initially stricken from the Naval Vessel Register  in 1995, before being reinstated\
+  \ from 1999 to 2006 to comply with federal laws that required retention and maintenance\
+  \ of two Iowa-class battleships. In 2011, Iowa was donated to the Los Angeles–based\
+  \ nonprofit Pacific Battleship Center and was permanently moved to Berth 87 at the\
+  \ Port of Los Angeles in 2012, where she was opened to the public as the USS Iowa\
+  \ Museum."

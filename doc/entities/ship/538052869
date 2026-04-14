@@ -1,0 +1,131 @@
+class: 夕雲型
+description:
+  english: Wikimedia disambiguation page
+  japanese: ウィキメディアの曖昧さ回避ページ
+historical_data:
+  builder: ''
+  commissioning_date: ''
+  decommissioning_date: ''
+  fate: ''
+  notable_events: []
+  operators: []
+  service_history: 'Three warships of Japan have been named Makinami (巻波), meaning
+    "Overflowing Waves" (Rolling Wave):
+
+
+    Japanese destroyer Makinami (1941) a Yugumo-class destroyer launched in 1941 and
+    sunk in 1943
+
+    JDS Makinami an Ayanami-class destroyer launched in 1960 and decommissioned in
+    1990
+
+    JS Makinami (DD-112) a Takanami-class destroyer launched in 2002'
+metadata:
+  generated: '2026-04-06 18:29:46'
+  source: Wikidata/Wikipedia
+name:
+  english: Makinami
+  japanese: 巻波改
+  other:
+    af: Makinami
+    an: Makinami
+    ast: Makinami
+    bar: Makinami
+    br: Makinami
+    ca: Makinami
+    co: Makinami
+    cs: Makinami
+    cy: Makinami
+    da: Makinami
+    de: Makinami
+    de-at: Makinami
+    de-ch: Makinami
+    en-ca: Makinami
+    en-gb: Makinami
+    eo: Makinami
+    es: Makinami
+    et: Makinami
+    eu: Makinami
+    fi: Makinami
+    fr: Makinami
+    frp: Makinami
+    frr: Makinami
+    fur: Makinami
+    ga: Makinami
+    gd: Makinami
+    gl: Makinami
+    gsw: Makinami
+    hr: Makinami
+    ia: Makinami
+    id: Makinami
+    ie: Makinami
+    io: Makinami
+    is: Makinami
+    it: Makinami
+    kg: Makinami
+    lb: Makinami
+    li: Makinami
+    lij: Makinami
+    mg: Makinami
+    min: Makinami
+    ms: Makinami
+    nap: Makinami
+    nb: Makinami
+    nds: Makinami
+    nds-nl: Makinami
+    nl: Makinami
+    nn: Makinami
+    nrm: Makinami
+    oc: Makinami
+    pcd: Makinami
+    pl: Makinami
+    pms: Makinami
+    pt: Makinami
+    pt-br: Makinami
+    rm: Makinami
+    ro: Makinami
+    sc: Makinami
+    scn: Makinami
+    sco: Makinami
+    sk: Makinami
+    sl: Makinami
+    sr-el: Makinami
+    sv: Makinami
+    sw: Makinami
+    vec: Makinami
+    vi: Makinami
+    vls: Makinami
+    vo: Makinami
+    wa: Makinami
+    wo: Makinami
+    zu: Makinami
+order: 5番艦
+personality:
+  appearance: ''
+  memories: []
+  moral_values: Believes in using force only for defensive purposes and protecting
+    innocent lives.
+  personality_traits:
+  - melancholic
+  relationships: {}
+  voice: ''
+ship_id: 538052869
+technical_data:
+  armament: ''
+  beam: ''
+  displacement: ''
+  draft: ''
+  length: ''
+  propulsion: ''
+  speed: ''
+wikidata_id: Q1182496
+wikipedia_extract: 'Three warships of Japan have been named Makinami (巻波), meaning
+  "Overflowing Waves" (Rolling Wave):
+
+
+  Japanese destroyer Makinami (1941) a Yugumo-class destroyer launched in 1941 and
+  sunk in 1943
+
+  JDS Makinami an Ayanami-class destroyer launched in 1960 and decommissioned in 1990
+
+  JS Makinami (DD-112) a Takanami-class destroyer launched in 2002'

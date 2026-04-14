@@ -1,0 +1,65 @@
+class: Gato級
+description:
+  english: 1941 Gato-class submarine
+  japanese: ''
+historical_data:
+  builder: Q1778836
+  commissioning_date: ''
+  decommissioning_date: ''
+  fate: ''
+  notable_events: []
+  operators: []
+  service_history: USS Drum (SS-228) is a Gato-class submarine of the United States
+    Navy, the first Navy ship named after the drum, a type of fish. Drum is a museum
+    ship in Mobile, Alabama, at Battleship Memorial Park. Drum was the twelfth of
+    the Gato class but was the first completed and the first to enter combat in World
+    War II.
+metadata:
+  generated: '2026-04-06 18:18:49'
+  source: Wikidata/Wikipedia
+name:
+  english: USS Drum
+  japanese: Drum
+  other:
+    cs: USS Drum
+    de: USS Drum
+    de-ch: USS Drum
+    en-ca: USS Drum
+    fa: یواس‌اس درام (اس‌اس-۲۲۸)
+    fr: USS Drum
+    ga: USS Drum
+    mul: USS Drum
+    pl: USS Drum
+    pt: USS Drum (SS-228)
+    uk: USS Drum (SS-228)
+    vi: USS Drum (SS-228)
+    zh: 鼓魚號潛艇
+order: SS-228
+personality:
+  appearance: ''
+  memories: []
+  moral_values: Believes in using force only for defensive purposes and protecting
+    innocent lives.
+  personality_traits:
+  - patient
+  - stealthy
+  - reverent
+  - observant
+  relationships: {}
+  voice: ''
+ship_id: 273091088
+technical_data:
+  armament: ''
+  beam: ''
+  displacement: ''
+  draft: ''
+  length: ''
+  propulsion: ''
+  speed: ''
+wikidata_id: Q1331366
+wikipedia_extract: 'USS Drum (SS-228) is a Gato-class submarine of the United States
+  Navy, the first Navy ship named after the drum, a type of fish. Drum is a museum
+  ship in Mobile, Alabama, at Battleship Memorial Park.
+
+  Drum was the twelfth of the Gato class but was the first completed and the first
+  to enter combat in World War II. She is the oldest of her class still in existence.'

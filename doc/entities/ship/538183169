@@ -1,0 +1,83 @@
+class: 利根型
+description:
+  english: 1937 Tone-class cruiser
+  japanese: 大日本帝国海軍の巡洋艦
+historical_data:
+  builder: Q648280
+  commissioning_date: ''
+  decommissioning_date: ''
+  fate: ''
+  notable_events: []
+  operators: []
+  service_history: Tone (利根) was the lead ship in the two-vessel Tone class of heavy
+    cruisers in the Imperial Japanese Navy. The ship was named after the Tone River,
+    in the Kantō region of Japan and was completed on 20 November 1938 at Mitsubishi's
+    Nagasaki shipyards. Tone was designed for long-range scouting missions and had
+    a large seaplane capacity.
+metadata:
+  generated: '2026-04-06 18:35:02'
+  source: Wikidata/Wikipedia
+name:
+  english: Japanese cruiser Tone
+  japanese: 利根改
+  other:
+    ar: توني
+    cs: Tone
+    de: Tone
+    en-ca: Japanese cruiser Tone
+    es: Tone
+    fa: رزم‌ناو ژاپنی تونه (۱۹۳۷)
+    fi: Tone
+    fr: Tone
+    id: Kapal penjelajah Jepang Tone
+    it: Tone
+    jv: Prau dlajah Jepang Tone
+    mul: Tone
+    nl: Tone
+    pl: Tone (1937)
+    pt: Tone (cruzador de 1937)
+    sk: Tone
+    sr: Јапанска тешка крстарица Тоне
+    sr-ec: Јапанска тешка крстарица Тоне
+    sr-el: Japanska teška krstarica Tone
+    th: โทเน
+    uk: Тоне (крейсер)
+    vi: Tone (tàu tuần dương Nhật)
+    zh: 利根號重巡洋艦
+order: 1番艦
+personality:
+  appearance: ''
+  memories: []
+  moral_values: Believes in using force only for defensive purposes and protecting
+    innocent lives.
+  personality_traits:
+  - melancholic
+  relationships: {}
+  voice: ''
+ship_id: 538183169
+technical_data:
+  armament: ''
+  beam: ''
+  displacement: ''
+  draft: '19.40'
+  length: '201.6'
+  propulsion: ''
+  speed: ''
+wikidata_id: Q2116806
+wikipedia_extract: 'Tone (利根) was the lead ship in the two-vessel Tone class of heavy
+  cruisers in the Imperial Japanese Navy. The ship was named after the Tone River,
+  in the Kantō region of Japan and was completed on 20 November 1938 at Mitsubishi''s
+  Nagasaki shipyards. Tone was designed for long-range scouting missions and had a
+  large seaplane capacity. She was extensively employed during World War II usually
+  providing scouting services to their aircraft carrier task forces.  She almost always
+  operated in this capacity in conjunction with her sister ship Chikuma. She was involved
+  in sinking the destroyer USS Edsall in the Java Sea, before escorting aircraft carriers
+  at the Indian Ocean Raid and battles of Midway, Eastern Solomons, and Santa Cruz
+  throughout 1942.
+
+  In 1944, Tone sank the British steamship Behar, and committed a war crime when between
+  60 and 80 civilians were murdered aboard the ship. At the battle of Leyte Gulf,
+  Tone survived several bomb hits from US aircraft and in turn fought Taffy 3 where
+  she mostly operated alongside the heavy cruiser Haguro, together crippling the escort
+  carrier USS Kalinin Bay and damaging the escort carrier USS Fanshaw Bay. Near the
+  end of the war, Tone was sunk in port by US carrier aircraft and scrapped post war.'

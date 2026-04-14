@@ -1,0 +1,86 @@
+class: 龍驤型
+description:
+  english: Japanese light aircraft carrier
+  japanese: ''
+historical_data:
+  builder: Q648280
+  commissioning_date: ''
+  decommissioning_date: ''
+  fate: ''
+  notable_events: []
+  operators: []
+  service_history: 'Ryūjō (Japanese: 龍驤 "Prancing Dragon") was a light aircraft carrier
+    built for the Imperial Japanese Navy (IJN) during the early 1930s. Small and lightly
+    built in an attempt to exploit a loophole in the Washington Naval Treaty of 1922,
+    she proved to be top-heavy and only marginally stable and was back in the shipyard
+    for modifications to address those issues within a year of completion. With her
+    stability improved, Ryūjō returned to service and was employed in operations during
+    the Second Sino-Japanese War.'
+metadata:
+  generated: '2026-04-06 18:36:40'
+  source: Wikidata/Wikipedia
+name:
+  english: Japanese aircraft carrier Ryūjō
+  japanese: 龍驤改
+  other:
+    ca: Portaavions Ryūjō
+    cs: Rjúdžó
+    de: Ryūjō
+    es: Ryūjō
+    fi: Ryūjō
+    fr: Ryūjō
+    id: Kapal induk Jepang Ryūjō
+    it: Ryūjō
+    ko: 일본 항공모함 류조
+    mul: Ryūjō
+    nb: Ryujo
+    nl: Ryujo
+    pl: Ryūjō
+    pt: Ryūjō (porta-aviões)
+    ru: Рюдзё
+    sr: Јапански носач авиона Рјуџо
+    sr-ec: Јапански носач авиона Рјуђо
+    sr-el: Japanski nosač aviona Rjuđo
+    sv: Ryūjō
+    uk: Рюдзьо
+    vi: Ryūjō
+    zh: 龍驤號航空母艦
+    zh-hans: 龙骧号航空母舰
+    zh-hant: 龍驤號航空母艦
+    zh-hk: 龍驤號航空母艦
+order: 1番艦
+personality:
+  appearance: ''
+  memories: []
+  moral_values: Believes in using force only for defensive purposes and protecting
+    innocent lives.
+  personality_traits:
+  - melancholic
+  - strategic
+  - commanding
+  - nurturing
+  relationships: {}
+  voice: ''
+ship_id: 538317313
+technical_data:
+  armament: ''
+  beam: ''
+  displacement: '8000'
+  draft: '23'
+  length: '179.9'
+  propulsion: ''
+  speed: ''
+wikidata_id: Q1140436
+wikipedia_extract: 'Ryūjō (Japanese: 龍驤 "Prancing Dragon") was a light aircraft carrier
+  built for the Imperial Japanese Navy (IJN) during the early 1930s. Small and lightly
+  built in an attempt to exploit a loophole in the Washington Naval Treaty of 1922,
+  she proved to be top-heavy and only marginally stable and was back in the shipyard
+  for modifications to address those issues within a year of completion. With her
+  stability improved, Ryūjō returned to service and was employed in operations during
+  the Second Sino-Japanese War. During World War II, she provided air support for
+  operations in the Philippines, Malaya, and the Dutch East Indies, where her aircraft
+  participated in the Second Battle of the Java Sea. During the Indian Ocean raid
+  in April 1942, the carrier attacked British merchant shipping with her guns and
+  aircraft. Ryūjō next participated in the Battle of Dutch Harbor, the opening battle
+  of the Aleutian Islands campaign, in June 1942. She was sunk by American carrier-based
+  aircraft in the Battle of the Eastern Solomons on 24 August 1942.'

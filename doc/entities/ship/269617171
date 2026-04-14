@@ -1,0 +1,123 @@
+class: 陽炎型
+description:
+  english: Wikimedia disambiguation page
+  japanese: ウィキメディアの曖昧さ回避ページ
+historical_data:
+  builder: ''
+  commissioning_date: ''
+  decommissioning_date: ''
+  fate: ''
+  notable_events: []
+  operators: []
+  service_history: 'At least two warships of Japan have been named Akigumo:
+
+
+    Japanese destroyer Akigumo (1941), a Kagerō-class destroyer launched in 1941 and
+    sunk in 1944
+
+    JDS Akigumo, a Yamagumo-class destroyer launched in 1973 and struck in 2005'
+metadata:
+  generated: '2026-04-06 18:00:37'
+  source: Wikidata/Wikipedia
+name:
+  english: Akigumo
+  japanese: 秋雲
+  other:
+    af: Akigumo
+    an: Akigumo
+    ast: Akigumo
+    bar: Akigumo
+    br: Akigumo
+    ca: Akigumo
+    co: Akigumo
+    cs: Akigumo
+    cy: Akigumo
+    da: Akigumo
+    de: Akigumo
+    de-at: Akigumo
+    de-ch: Akigumo
+    en-ca: Akigumo
+    en-gb: Akigumo
+    eo: Akigumo
+    es: Akigumo
+    et: Akigumo
+    eu: Akigumo
+    fi: Akigumo
+    fr: Akigumo
+    frp: Akigumo
+    fur: Akigumo
+    ga: Akigumo
+    gd: Akigumo
+    gl: Akigumo
+    gsw: Akigumo
+    hr: Akigumo
+    ia: Akigumo
+    id: Akigumo
+    ie: Akigumo
+    io: Akigumo
+    is: Akigumo
+    it: Akigumo
+    kg: Akigumo
+    lb: Akigumo
+    li: Akigumo
+    lij: Akigumo
+    mg: Akigumo
+    min: Akigumo
+    ms: Akigumo
+    nap: Akigumo
+    nb: Akigumo
+    nds: Akigumo
+    nds-nl: Akigumo
+    nl: Akigumo
+    nn: Akigumo
+    nrm: Akigumo
+    oc: Akigumo
+    pcd: Akigumo
+    pl: Akigumo
+    pms: Akigumo
+    pt: Akigumo
+    pt-br: Akigumo
+    rm: Akigumo
+    ro: Akigumo
+    sc: Akigumo
+    scn: Akigumo
+    sco: Akigumo
+    sk: Akigumo
+    sl: Akigumo
+    sr-el: Akigumo
+    sv: Akigumo
+    sw: Akigumo
+    vec: Akigumo
+    vi: Akigumo
+    vls: Akigumo
+    vo: Akigumo
+    wa: Akigumo
+    wo: Akigumo
+    zu: Akigumo
+order: 19番艦
+personality:
+  appearance: ''
+  memories: []
+  moral_values: Believes in using force only for defensive purposes and protecting
+    innocent lives.
+  personality_traits:
+  - melancholic
+  relationships: {}
+  voice: ''
+ship_id: 269617171
+technical_data:
+  armament: ''
+  beam: ''
+  displacement: ''
+  draft: ''
+  length: ''
+  propulsion: ''
+  speed: ''
+wikidata_id: Q10852033
+wikipedia_extract: 'At least two warships of Japan have been named Akigumo:
+
+
+  Japanese destroyer Akigumo (1941), a Kagerō-class destroyer launched in 1941 and
+  sunk in 1944
+
+  JDS Akigumo, a Yamagumo-class destroyer launched in 1973 and struck in 2005'

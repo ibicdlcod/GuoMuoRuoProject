@@ -1,0 +1,124 @@
+class: 陽炎型
+description:
+  english: Wikimedia disambiguation page
+  japanese: ウィキメディアの曖昧さ回避ページ
+historical_data:
+  builder: ''
+  commissioning_date: ''
+  decommissioning_date: ''
+  fate: ''
+  notable_events: []
+  operators: []
+  service_history: 'At least two warships of Japan have borne the name Urakaze:
+
+
+    Japanese destroyer Urakaze (1915) an Urakaze-class destroyer launched in 1915
+    and sunk in 1945. Japanese destroyer Urakaze (1940) a Kagerō-class destroyer launched
+    in 1940 and sunk in 1944.'
+metadata:
+  generated: '2026-04-06 18:28:57'
+  source: Wikidata/Wikipedia
+name:
+  english: Urakaze
+  japanese: 浦風改
+  other:
+    af: Urakaze
+    an: Urakaze
+    ast: Urakaze
+    bar: Urakaze
+    br: Urakaze
+    ca: Urakaze
+    co: Urakaze
+    cs: Urakaze
+    cy: Urakaze
+    da: Urakaze
+    de: Urakaze
+    de-at: Urakaze
+    de-ch: Urakaze
+    en-ca: Urakaze
+    en-gb: Urakaze
+    eo: Urakaze
+    es: Urakaze
+    et: Urakaze
+    eu: Urakaze
+    fi: Urakaze
+    fr: Urakaze
+    frp: Urakaze
+    fur: Urakaze
+    ga: Urakaze
+    gd: Urakaze
+    gl: Urakaze
+    gsw: Urakaze
+    hr: Urakaze
+    ia: Urakaze
+    id: Urakaze
+    ie: Urakaze
+    io: Urakaze
+    is: Urakaze
+    it: Urakaze
+    kg: Urakaze
+    lb: Urakaze
+    li: Urakaze
+    lij: Urakaze
+    mg: Urakaze
+    min: Urakaze
+    ms: Urakaze
+    nap: Urakaze
+    nb: Urakaze
+    nds: Urakaze
+    nds-nl: Urakaze
+    nl: Urakaze
+    nn: Urakaze
+    nrm: Urakaze
+    oc: Urakaze
+    pcd: Urakaze
+    pl: Urakaze
+    pms: Urakaze
+    pt: Urakaze
+    pt-br: Urakaze
+    rm: Urakaze
+    ro: Urakaze
+    ru: Уракадзэ
+    sc: Urakaze
+    scn: Urakaze
+    sco: Urakaze
+    sk: Urakaze
+    sl: Urakaze
+    sr-el: Urakaze
+    sv: Urakaze
+    sw: Urakaze
+    vec: Urakaze
+    vi: Urakaze
+    vls: Urakaze
+    vo: Urakaze
+    wa: Urakaze
+    wo: Urakaze
+    zu: Urakaze
+order: 11番艦
+personality:
+  appearance: ''
+  memories: []
+  moral_values: Believes in using force only for defensive purposes and protecting
+    innocent lives.
+  personality_traits:
+  - melancholic
+  relationships: {}
+  voice: ''
+ship_id: 538052619
+technical_data:
+  armament: ''
+  beam: ''
+  displacement: ''
+  draft: ''
+  length: ''
+  propulsion: ''
+  speed: ''
+wikidata_id: Q11058071
+wikipedia_extract: 'At least two warships of Japan have borne the name Urakaze:
+
+
+  Japanese destroyer Urakaze (1915) an Urakaze-class destroyer launched in 1915 and
+  sunk in 1945.
+
+  Japanese destroyer Urakaze (1940) a Kagerō-class destroyer launched in 1940 and
+  sunk in 1944.'

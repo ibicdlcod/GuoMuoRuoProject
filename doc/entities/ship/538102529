@@ -1,0 +1,58 @@
+class: 秋月型
+description:
+  english: list of ships with the same or similar names
+  japanese: ''
+historical_data:
+  builder: ''
+  commissioning_date: ''
+  decommissioning_date: ''
+  fate: ''
+  notable_events: []
+  operators: []
+  service_history: 'Three Japanese destroyers have been named Akizuki:
+
+
+    Japanese destroyer Akizuki (1941), an Akizuki-class destroyer launched in 1941
+    and sunk in 1944
+
+    JDS Akizuki, an Akizuki-class destroyer launched in 1959 and stricken in 1993
+
+    JS Akizuki, an Akizuki-class destroyer launched in 2010'
+metadata:
+  generated: '2026-04-06 18:31:48'
+  source: Wikidata/Wikipedia
+name:
+  english: Japanese destroyer Akizuki
+  japanese: 秋月改
+  other:
+    id: Kapal perusak Jepang Akizuki
+    pl: Akizuki
+order: 1番艦
+personality:
+  appearance: ''
+  memories: []
+  moral_values: Believes in using force only for defensive purposes and protecting
+    innocent lives.
+  personality_traits:
+  - melancholic
+  relationships: {}
+  voice: ''
+ship_id: 538102529
+technical_data:
+  armament: ''
+  beam: ''
+  displacement: ''
+  draft: ''
+  length: ''
+  propulsion: ''
+  speed: ''
+wikidata_id: Q60528405
+wikipedia_extract: 'Three Japanese destroyers have been named Akizuki:
+
+
+  Japanese destroyer Akizuki (1941), an Akizuki-class destroyer launched in 1941 and
+  sunk in 1944
+
+  JDS Akizuki, an Akizuki-class destroyer launched in 1959 and stricken in 1993
+
+  JS Akizuki, an Akizuki-class destroyer launched in 2010'

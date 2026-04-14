@@ -1,0 +1,84 @@
+class: Zara級
+description:
+  english: 1931 Zara-class cruiser
+  japanese: ''
+historical_data:
+  builder: Q3880846
+  commissioning_date: ''
+  decommissioning_date: ''
+  fate: ''
+  notable_events: []
+  operators: []
+  service_history: Pola was a Zara-class heavy cruiser of the Italian Regia Marina
+    (Royal Navy), named after the Italian city of Pola (now Pula, Croatia). She was
+    built in the Odero Terni Orlando shipyard in Livorno in the early 1930s and entered
+    service in 1932. She was the fourth and last ship in the class, which also included
+    Zara, Fiume, and Gorizia.
+metadata:
+  generated: '2026-04-06 18:14:50'
+  source: Wikidata/Wikipedia
+name:
+  english: Pola
+  japanese: Pola
+  other:
+    bg: Пола
+    ca: Creuer Pola
+    cs: Pola
+    el: Pola
+    es: Pola
+    fa: ناو پلا
+    fi: RN Pola
+    fr: Pola
+    id: Kapal penjelajah Italia Pola
+    it: Pola
+    jv: Prau dlajah Itali Pola
+    mul: RN Pola
+    nl: Italian cruiser Pola
+    pl: Pola
+    pt: Pola (cruzador)
+    ru: Пола
+    sr: Италијанска крстарица Пола
+    sr-ec: Италијанска крстарица Пола
+    sr-el: Italijanska krstarica Pola
+    th: โพลา
+    uk: Pola
+    zh: 波拉號重巡洋艦
+    zh-cn: 波拉号
+    zh-hans: 波拉号
+order: 3番艦
+personality:
+  appearance: ''
+  memories: []
+  moral_values: Believes in using force only for defensive purposes and protecting
+    innocent lives.
+  personality_traits:
+  - melancholic
+  relationships: {}
+  voice: ''
+ship_id: 271845123
+technical_data:
+  armament: ''
+  beam: ''
+  displacement: ''
+  draft: '20.6'
+  length: '182.8'
+  propulsion: ''
+  speed: ''
+wikidata_id: Q2591947
+wikipedia_extract: 'Pola was a Zara-class heavy cruiser of the Italian Regia Marina
+  (Royal Navy), named after the Italian city of Pola (now Pula, Croatia). She was
+  built in the Odero Terni Orlando shipyard in Livorno in the early 1930s and entered
+  service in 1932. She was the fourth and last ship in the class, which also included
+  Zara, Fiume, and Gorizia. Compared to her sisters, Pola was built as a flagship
+  with a larger conning tower to accommodate an admiral''s staff. Like her sisters,
+  she was armed with a battery of eight 203-millimeter (8.0 in) guns and was capable
+  of a top speed of 32 knots (59 km/h; 37 mph).
+
+  Pola initially served as the flagship of the 2nd Squadron, and in 1940 she led the
+  squadron during the battles of Calabria and Cape Spartivento, in July and November,
+  respectively. During the latter engagement she briefly battled the British cruiser
+  HMS Berwick. Pola was thereafter reassigned to the 3rd Division, along with her
+  three sister ships. The ship took part in the Battle of Cape Matapan in late March
+  1941. During the battle, she was disabled by a British aerial torpedo. Later, in
+  a fierce night engagement in the early hours of 29 March, Pola, Zara, Fiume, and
+  two destroyers were sunk by the British Mediterranean Fleet with heavy loss of life.'

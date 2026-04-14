@@ -1,0 +1,100 @@
+class: 金剛型
+description:
+  english: 1913 Kongō-class battlecruiser
+  japanese: 大日本帝国海軍の戦艦
+historical_data:
+  builder: Q6379823
+  commissioning_date: ''
+  decommissioning_date: ''
+  fate: ''
+  notable_events: []
+  operators: []
+  service_history: 'Haruna (Japanese: 榛名; named after Mount Haruna) was a warship
+    of the Imperial Japanese Navy during World War I and World War II. Designed by
+    the British naval engineer George Thurston, she was the fourth and last battlecruiser
+    of the Kongō class, amongst the most heavily armed ships of their type in any
+    navy when built. Laid down in 1912 at the Kawasaki Shipyards in Kobe, Haruna was
+    formally commissioned in 1915 on the same day as her sister ship, Kirishima.'
+metadata:
+  generated: '2026-04-06 18:08:29'
+  source: Wikidata/Wikipedia
+name:
+  english: Japanese battleship Haruna
+  japanese: 榛名
+  other:
+    bg: Харуна (линеен крайцер, 1913)
+    br: Haruna (morreder)
+    ca: Cuirassat Haruna
+    cs: Haruna
+    de: Haruna
+    el: Haruna
+    en-ca: Japanese battleship Haruna
+    es: Acorazado japonés Haruna
+    fa: نبردناو هارونا
+    fi: Haruna
+    fr: Haruna
+    he: אוניית המערכה הרונה
+    id: Kapal tempur Jepang Haruna
+    it: Haruna
+    ko: 하루나
+    ms: Kapal perang Haruna
+    mul: Haruna
+    nl: Haruna
+    pl: Haruna
+    pt: Haruna
+    ro: Cuirasatul japonez Haruna
+    ru: Харуна
+    sk: Haruna
+    sv: Haruna
+    vi: Haruna
+    yue: 榛名號
+    zh: 榛名號戰艦
+    zh-cn: 榛名号战列舰
+    zh-hans: 榛名号战舰
+    zh-hant: 榛名號戰艦
+    zh-hk: 榛名號戰艦
+    zh-sg: 榛名号战列舰
+order: 3番艦
+personality:
+  appearance: ''
+  memories: []
+  moral_values: Believes in using force only for defensive purposes and protecting
+    innocent lives.
+  personality_traits: []
+  relationships: {}
+  voice: ''
+ship_id: 269816067
+technical_data:
+  armament: ''
+  beam: '31'
+  displacement: '37187'
+  draft: '31'
+  length: '222'
+  propulsion: ''
+  speed: ''
+wikidata_id: Q1066681
+wikipedia_extract: "Haruna (Japanese: 榛名; named after Mount Haruna) was a warship\
+  \ of the Imperial Japanese Navy during World War I and World War II. Designed by\
+  \ the British naval engineer George Thurston, she was the fourth and last battlecruiser\
+  \ of the Kongō class, amongst the most heavily armed ships of their type in any\
+  \ navy when built. Laid down in 1912 at the Kawasaki Shipyards in Kobe, Haruna was\
+  \ formally commissioned in 1915 on the same day as her sister ship, Kirishima. \n\
+  Haruna patrolled off the Chinese coast during World War I. During gunnery drills\
+  \ in 1920, an explosion destroyed one of her guns, damaged the gun turret, and killed\
+  \ seven men. During her career, Haruna underwent two major reconstructions. Beginning\
+  \ in 1926, the Imperial Japanese Navy rebuilt her as a battleship, strengthening\
+  \ her armor and improving her speed and power capabilities. In 1933, her superstructure\
+  \ was completely rebuilt, her speed was increased, and she was equipped with launch\
+  \ catapults for floatplanes. Now fast enough to accompany Japan's growing carrier\
+  \ fleet, Haruna was reclassified as a fast battleship. During the Second Sino-Japanese\
+  \ War, Haruna transported Imperial Japanese Army troops to mainland China before\
+  \ being redeployed to the 3rd Battleship Division in 1941. On the eve of the Japanese\
+  \ attack on Pearl Harbor, she sailed as part of the Southern Force in preparation\
+  \ for the Battle of Singapore.\nHaruna fought in almost every major naval action\
+  \ of the Pacific Theater during World War II. She covered the Japanese landings\
+  \ in Malaya (in present-day Malaysia), the Dutch East Indies (now Indonesia), and\
+  \ the Indian Ocean raid in 1942. She then engaged American forces, first at the\
+  \ Battle of Midway where she repelled several torpedo bombers, and during the Guadalcanal\
+  \ campaign when she bombarded Henderson Field. Throughout 1943, Haruna primarily\
+  \ remained at Truk Lagoon (Micronesia), Kure Naval Base (near Hiroshima), Sasebo\
+  \ Naval Base (near Nagasaki), and the Lingga Islands (in present-day Indon"

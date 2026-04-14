@@ -1,0 +1,132 @@
+class: 白露型
+description:
+  english: list of ships with the same or similar names
+  japanese: ''
+historical_data:
+  builder: ''
+  commissioning_date: ''
+  decommissioning_date: ''
+  fate: ''
+  notable_events: []
+  operators: []
+  service_history: 'Several destroyers of the Imperial Japanese Navy have been named
+    Kawakaze (江風, ”River Wind”):
+
+
+    Japanese destroyer Kawakaze (1916), an Urakaze-class destroyer launched and sold
+    to Italy in 1916 as Audace; captured by Germany in 1943 and renamed TA 20; sunk
+    in 1944. Japanese destroyer Kawakaze (1917), a Kawakaze-class destroyer launched
+    in 1917; retired in 1934. Japanese destroyer Kawakaze (1936), a Shiratsuyu-class
+    destroyer launched in 1936; sunk in 1943.'
+metadata:
+  generated: '2026-04-06 18:27:41'
+  source: Wikidata/Wikipedia
+name:
+  english: Kawakaze
+  japanese: 江風改
+  other:
+    af: Kawakaze
+    an: Kawakaze
+    ast: Kawakaze
+    bar: Kawakaze
+    br: Kawakaze
+    ca: Kawakaze
+    co: Kawakaze
+    cs: Kawakaze
+    cy: Kawakaze
+    da: Kawakaze
+    de: Kawakaze
+    de-at: Kawakaze
+    de-ch: Kawakaze
+    en-ca: Kawakaze
+    en-gb: Kawakaze
+    eo: Kawakaze
+    es: Kawakaze
+    et: Kawakaze
+    eu: Kawakaze
+    fi: Kawakaze
+    fr: Kawakaze
+    frp: Kawakaze
+    fur: Kawakaze
+    ga: Kawakaze
+    gd: Kawakaze
+    gl: Kawakaze
+    gsw: Kawakaze
+    hr: Kawakaze
+    ia: Kawakaze
+    id: Kawakaze
+    ie: Kawakaze
+    io: Kawakaze
+    is: Kawakaze
+    it: Kawakaze
+    kg: Kawakaze
+    lb: Kawakaze
+    li: Kawakaze
+    lij: Kawakaze
+    mg: Kawakaze
+    min: Kawakaze
+    ms: Kawakaze
+    nap: Kawakaze
+    nb: Kawakaze
+    nds: Kawakaze
+    nds-nl: Kawakaze
+    nl: Kawakaze
+    nn: Kawakaze
+    nrm: Kawakaze
+    oc: Kawakaze
+    pcd: Kawakaze
+    pl: Kawakaze
+    pms: Kawakaze
+    pt: Kawakaze
+    pt-br: Kawakaze
+    rm: Kawakaze
+    ro: Kawakaze
+    ru: Кавакадзэ
+    sc: Kawakaze
+    scn: Kawakaze
+    sco: Kawakaze
+    sk: Kawakaze
+    sl: Kawakaze
+    sr-el: Kawakaze
+    sv: Kawakaze
+    sw: Kawakaze
+    vec: Kawakaze
+    vi: Kawakaze
+    vls: Kawakaze
+    vo: Kawakaze
+    wa: Kawakaze
+    wo: Kawakaze
+    zu: Kawakaze
+order: 9番艦
+personality:
+  appearance: ''
+  memories: []
+  moral_values: Believes in using force only for defensive purposes and protecting
+    innocent lives.
+  personality_traits:
+  - melancholic
+  relationships: {}
+  voice: ''
+ship_id: 538052105
+technical_data:
+  armament: ''
+  beam: ''
+  displacement: ''
+  draft: ''
+  length: ''
+  propulsion: ''
+  speed: ''
+wikidata_id: Q5403487
+wikipedia_extract: 'Several destroyers of the Imperial Japanese Navy have been named
+  Kawakaze (江風, ”River Wind”):
+
+
+  Japanese destroyer Kawakaze (1916), an Urakaze-class destroyer launched and sold
+  to Italy in 1916 as Audace; captured by Germany in 1943 and renamed TA 20; sunk
+  in 1944.
+
+  Japanese destroyer Kawakaze (1917), a Kawakaze-class destroyer launched in 1917;
+  retired in 1934.
+
+  Japanese destroyer Kawakaze (1936), a Shiratsuyu-class destroyer launched in 1936;
+  sunk in 1943.'

@@ -1,0 +1,80 @@
+class: Z1型
+description:
+  english: 1935 Type 1934-class destroyer
+  japanese: 駆逐艦
+historical_data:
+  builder: Q641314
+  commissioning_date: ''
+  decommissioning_date: ''
+  fate: ''
+  notable_events: []
+  operators: []
+  service_history: Z3 Max Schultz was one of four Type 1934 destroyers built for the
+    German Navy (Kriegsmarine) during the mid-1930s. Completed in 1937, two years
+    before the start of World War II, the ship spent most of her time training although
+    she did participate in the occupation of Memel in early 1939. Shortly before the
+    beginning of World War II, the ship accidentally rammed and sank a German torpedo
+    boat.
+metadata:
+  generated: '2026-04-06 18:13:16'
+  source: Wikidata/Wikipedia
+name:
+  english: German destroyer Z3 Max Schultz
+  japanese: Z3
+  other:
+    ca: Z3 Max Schultz
+    cs: Z 3 Max Schultz
+    de: Z 3 Max Schultz
+    el: Z3 Max Schultz
+    es: Z3 Max Schultz
+    fa: ناوشکن زد۳ ماکس شولتز
+    fi: Z3 Max Schultz
+    fr: Z 3 Max Schultz
+    gl: Z3 Max Schultz
+    id: Kapal perusak Jerman Z3 Max Schultz
+    it: Z3 Max Schultz
+    mul: Z3 Max Schultz
+    nl: German destroyer Z3 Max Schultz
+    pl: Z3 Max Schultz
+    ru: Z-3 Max Schultz
+    uk: Z3 Max Schultz
+    zh: Z-3马克斯·舒尔茨号驱逐舰
+    zh-cn: Z-3马克斯·舒尔茨号驱逐舰
+    zh-hant: Z-3馬克斯·舒爾茨號驅逐艦
+    zh-tw: Z3馬克斯·舒爾茨號驅逐艦
+order: 3番艦
+personality:
+  appearance: ''
+  memories: []
+  moral_values: Believes in using force only for defensive purposes and protecting
+    innocent lives.
+  personality_traits:
+  - alert
+  - melancholic
+  - agile
+  - loyal
+  relationships: {}
+  voice: ''
+ship_id: 270665475
+technical_data:
+  armament: ''
+  beam: ''
+  displacement: ''
+  draft: '11.3'
+  length: '119.3'
+  propulsion: ''
+  speed: ''
+wikidata_id: Q136617
+wikipedia_extract: Z3 Max Schultz was one of four Type 1934 destroyers built for the
+  German Navy (Kriegsmarine) during the mid-1930s. Completed in 1937, two years before
+  the start of World War II, the ship spent most of her time training although she
+  did participate in the occupation of Memel in early 1939. Shortly before the beginning
+  of World War II, the ship accidentally rammed and sank a German torpedo boat. Z3
+  Max Schultz spent the following month under repair. In mid-February 1940, while
+  proceeding into the North Sea to search for British fishing trawlers, one of her
+  sisters, Z1 Leberecht Maass, was bombed and sunk by a patrolling German bomber,
+  with loss of 280 of her crew. While trying to rescue survivors, Z3 Max Schultz was
+  either bombed by a patrolling German bomber, or struck a British mine and sunk,
+  with the loss of all 308 of her crew. A contemporary German court of inquiry stated
+  that Z3 Max Schultz was damaged by the German bomber, however postwar research revealed
+  that Z3 Max Schultz may have hit a mine instead.

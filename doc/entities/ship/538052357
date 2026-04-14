@@ -1,0 +1,57 @@
+class: 朝潮型
+description:
+  english: Wikimedia disambiguation page
+  japanese: ウィキメディアの曖昧さ回避ページ
+historical_data:
+  builder: ''
+  commissioning_date: ''
+  decommissioning_date: ''
+  fate: ''
+  notable_events: []
+  operators: []
+  service_history: Two naval vessels of Japan have been named Asagumo (朝雲), which
+    translates to "Morning Clouds". Japanese destroyer Asagumo (1937) was an Asashio-class
+    destroyer in the Imperial Japanese Navy. She was launched in 1937, completed in
+    1938, sunk in 1944, and struck in 1945.
+metadata:
+  generated: '2026-04-06 18:28:06'
+  source: Wikidata/Wikipedia
+name:
+  english: Asagumo
+  japanese: 朝雲改
+  other:
+    es: Asagumo
+    fr: Asagumo
+    nl: Asagumo
+    pl: Asagumo
+    zh: 朝雲
+order: 5番艦
+personality:
+  appearance: ''
+  memories: []
+  moral_values: Believes in using force only for defensive purposes and protecting
+    innocent lives.
+  personality_traits:
+  - melancholic
+  relationships: {}
+  voice: ''
+ship_id: 538052357
+technical_data:
+  armament: ''
+  beam: ''
+  displacement: ''
+  draft: ''
+  length: ''
+  propulsion: ''
+  speed: ''
+wikidata_id: Q6158498
+wikipedia_extract: 'Two naval vessels of Japan have been named Asagumo (朝雲), which
+  translates to "Morning Clouds".
+
+
+  Japanese destroyer Asagumo (1937) was an Asashio-class destroyer in the Imperial
+  Japanese Navy. She was launched in 1937, completed in 1938, sunk in 1944, and struck
+  in 1945.
+
+  JDS Asagumo (DD-115) was a Yamagumo-class destroyer in the Japanese Maritime Self-Defense
+  Force. She was launched in 1966 and decommissioned in 1998.'

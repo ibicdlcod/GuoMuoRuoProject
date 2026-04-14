@@ -1,0 +1,97 @@
+class: 伊勢型
+description:
+  english: 1916 Ise-class battleship
+  japanese: 大日本帝国海軍の戦艦
+historical_data:
+  builder: Q6379823
+  commissioning_date: ''
+  decommissioning_date: ''
+  fate: ''
+  notable_events: []
+  operators: []
+  service_history: 'Ise (Japanese: 伊勢; named after the ancient Ise Province) was the
+    lead ship of her class of two dreadnought battleships built for the Imperial Japanese
+    Navy (IJN) during the 1910s. Although completed in 1917, she played no role in
+    World War I. Ise supported Japanese forces in the early 1920s during the Siberian
+    Intervention in the Russian Civil War.'
+metadata:
+  generated: '2026-04-06 18:07:59'
+  source: Wikidata/Wikipedia
+name:
+  english: Japanese battleship Ise
+  japanese: 伊勢
+  other:
+    bg: Исе (линеен кораб, 1916)
+    ca: Ise
+    cs: Ise
+    de: Ise
+    es: Acorazado Ise
+    fa: نبردناو ایسه
+    fi: Ise
+    fr: Isé
+    gl: Ise
+    id: Kapal tempur Jepang Ise
+    it: Ise
+    ko: 일본 전함 이세
+    mn: Японы Тулааны хөлөг Исэ
+    mul: Ise
+    nl: Japanese battleship Ise
+    pl: Ise
+    pt: Ise (couraçado)
+    ru: Исэ
+    sk: Ise
+    th: อิเสะ
+    tr: Ise (zırhlı)
+    uk: Ісе
+    vi: Ise
+    yue: 伊勢號
+    zh: 伊勢號戰艦
+    zh-cn: 伊势号战列舰
+    zh-hans: 伊势号战舰
+    zh-hant: 伊勢號戰艦
+    zh-hk: 伊勢號戰艦
+    zh-sg: 伊势号战列舰
+order: 1番艦
+personality:
+  appearance: ''
+  memories: []
+  moral_values: Believes in using force only for defensive purposes and protecting
+    innocent lives.
+  personality_traits:
+  - powerful
+  - dignified
+  - stoic
+  relationships: {}
+  voice: ''
+ship_id: 269812225
+technical_data:
+  armament: ''
+  beam: ''
+  displacement: '35400'
+  draft: ''
+  length: ''
+  propulsion: ''
+  speed: ''
+wikidata_id: Q1198671
+wikipedia_extract: 'Ise (Japanese: 伊勢; named after the ancient Ise Province) was the
+  lead ship of her class of two dreadnought battleships built for the Imperial Japanese
+  Navy (IJN) during the 1910s. Although completed in 1917, she played no role in World
+  War I. Ise supported Japanese forces in the early 1920s during the Siberian Intervention
+  in the Russian Civil War. In 1923, she assisted survivors of the Great Kantō earthquake.
+  The ship was partially modernised in two stages in 1928–1929 and 1931–1932, during
+  which her forward superstructure was rebuilt in the pagoda mast style. Ise was reconstructed
+  in 1934–1937, with improvements to her armour and her propulsion machinery. Afterwards
+  she played a minor role in the Second Sino-Japanese War.
+
+  Despite the expensive reconstruction, the ship was considered obsolete by the eve
+  of the Pacific War, and did not see significant action in the early years of the
+  war. Following the loss of most of the IJN''s large aircraft carriers during the
+  Battle of Midway in mid-1942, she was rebuilt with a flight deck replacing the rear
+  pair of gun turrets to give her the ability to operate an air group of floatplanes;
+  lack of aircraft and qualified pilots meant that Ise never actually operated aircraft
+  in combat. She participated in the Battle off Cape Engaño in late 1944, where she
+  was one of the ships that decoyed the American carrier fleet supporting the invasion
+  of Leyte away from the landing beaches. Afterwards the ship was transferred to Southeast
+  Asia. In early 1945 Ise participated in Operation Kita, where she transported petrol
+  and other strategic materials to Japan. The ship was then reduced to reserve until
+  American airstrikes in July sank her. After the war Ise was scrapped in 1946–1947.'

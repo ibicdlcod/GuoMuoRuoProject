@@ -1,0 +1,75 @@
+class: 青葉型
+description:
+  english: 1926 Aoba-class cruiser
+  japanese: 大日本帝国海軍の巡洋艦
+historical_data:
+  builder: Q11357147
+  commissioning_date: ''
+  decommissioning_date: ''
+  fate: ''
+  notable_events: []
+  operators: []
+  service_history: 'Aoba (Japanese: 青葉; named after Mount Aoba) was the lead ship
+    in the two-vessel Aoba class of heavy cruisers in the Imperial Japanese Navy.
+    Launched in 1926 and heavily modernized in 1938–40, Aoba initially served as a
+    patrol craft, largely along the China coast, and saw extensive service during
+    World War II. Repeatedly heavily damaged and repaired, she was finally crippled
+    by bombing and settled on the bottom of shallow Kure harbor in April 1945; two
+    raids in late July reduced her to an unsalvageable hulk.'
+metadata:
+  generated: '2026-04-06 18:06:24'
+  source: Wikidata/Wikipedia
+name:
+  english: Japanese cruiser Aoba
+  japanese: 青葉
+  other:
+    bg: Аоба
+    ca: Aoba
+    cs: Aoba
+    de: Aoba (Schiff, 1927)
+    es: Aoba (1927)
+    fi: Aoba
+    fr: Aoba
+    gl: Aoba
+    id: Kapal penjelajah Jepang Aoba
+    it: Aoba
+    jv: Prau dlajah Jepang Aoba
+    mul: Aoba
+    nl: Aoba
+    pl: Aoba
+    pt: Aoba (cruzador)
+    ru: Аоба
+    sr: Јапанска тешка крстарица Аоба
+    uk: Аоба (крейсер)
+    vi: Aoba (tàu tuần dương Nhật)
+    zh: 青葉號重巡洋艦
+    zh-cn: 青叶号重巡洋舰
+order: 1番艦
+personality:
+  appearance: ''
+  memories: []
+  moral_values: Believes in using force only for defensive purposes and protecting
+    innocent lives.
+  personality_traits: []
+  relationships: {}
+  voice: ''
+ship_id: 269746689
+technical_data:
+  armament: ''
+  beam: ''
+  displacement: '8800'
+  draft: '17.56'
+  length: '185.17'
+  propulsion: ''
+  speed: ''
+wikidata_id: Q615536
+wikipedia_extract: 'Aoba (Japanese: 青葉; named after Mount Aoba) was the lead ship
+  in the two-vessel Aoba class of heavy cruisers in the Imperial Japanese Navy. Launched
+  in 1926 and heavily modernized in 1938–40, Aoba initially served as a patrol craft,
+  largely along the China coast, and saw extensive service during World War II.  Repeatedly
+  heavily damaged and repaired, she was finally crippled by bombing and settled on
+  the bottom of shallow Kure harbor in April 1945; two raids in late July reduced
+  her to an unsalvageable hulk. During the attack on 24 July 1945, future Vice Admiral
+  Dick H. Guinn dropped the 2,000 lb (910 kg) bomb which contributed to her sinking.
+  She was formally removed from the Navy List on 20 November 1945, and her wreck scrapped
+  in 1946–47.'

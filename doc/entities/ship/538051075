@@ -1,0 +1,65 @@
+class: 神風型
+description:
+  english: 1922 Kamikaze-class destroyer of the Imperial Japanese Navy
+  japanese: 2代目神風型駆逐艦
+historical_data:
+  builder: Q2687837
+  commissioning_date: ''
+  decommissioning_date: ''
+  fate: ''
+  notable_events: []
+  operators: []
+  service_history: Harukaze (春風, “Spring Wind”) was one of nine Kamikaze-class destroyers
+    built for the Imperial Japanese Navy (IJN) during the 1920s. During the Pacific
+    War, she participated in the Philippines Campaign in December 1941 and the Dutch
+    East Indies Campaign in early 1942. She took part in the Battle of Sunda Strait
+    in March and helped to sink two Allied cruisers.
+metadata:
+  generated: '2026-04-06 18:23:42'
+  source: Wikidata/Wikipedia
+name:
+  english: Japanese destroyer Harukaze
+  japanese: 春風改
+  other:
+    bjn: Kapal parakai Japang Harukaze
+    es: Harukaze
+    fi: Harukaze
+    fr: Harukaze
+    id: Kapal perusak Jepang Harukaze
+    it: Harukaze
+    jv: Prau panumpes Jepang Harukaze
+    ms: Kapal pembinasa Jepun Harukaze
+    mul: Harukaze
+    pl: Harukaze (1922)
+    uk: Харукадзе (1923)
+    vi: Harukaze (tàu khu trục Nhật)
+    zh: 春風號驅逐艦
+    zh-cn: 春风号驱逐舰
+    zh-hans: 春风号驱逐舰
+order: 3番艦
+personality:
+  appearance: ''
+  memories: []
+  moral_values: Believes in using force only for defensive purposes and protecting
+    innocent lives.
+  personality_traits:
+  - alert
+  - agile
+  - loyal
+  relationships: {}
+  voice: ''
+ship_id: 538051075
+technical_data:
+  armament: ''
+  beam: ''
+  displacement: ''
+  draft: ''
+  length: ''
+  propulsion: ''
+  speed: ''
+wikidata_id: Q4385732
+wikipedia_extract: Harukaze (春風, “Spring Wind”) was one of nine Kamikaze-class destroyers
+  built for the Imperial Japanese Navy (IJN) during the 1920s. During the Pacific
+  War, she participated in the Philippines Campaign in December 1941 and the Dutch
+  East Indies Campaign in early 1942. She took part in the Battle of Sunda Strait
+  in March and helped to sink two Allied cruisers.
