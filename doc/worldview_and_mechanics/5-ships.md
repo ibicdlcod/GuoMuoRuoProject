@@ -12,7 +12,7 @@ Refer to [capitalness](5.1-capitalness.md) for "price to deploy" details. In sho
 
 ### Escorts
 
-Condition: *shipid & 0x000f0000 == 0x00010000*
+Condition: `shipid & 0x000f0000 == 0x00010000`
 
 #### Coastal defense ship
 
@@ -23,7 +23,7 @@ Condition: `shipid & 0x000ff000 == 0x00010000`
 - **Demerits**: Poor at everything except ASW; weak DPM/armor penetration, no torpedo
 - **Design Philosophy**: Specialized ASW platform that's cheap to deploy, encouraging players to use appropriate counters. Have a negative price to deploy (capitalness = -1).
 
-#### Escort Destoryer
+#### Escort Destroyer
 
 Condition: `shipid & 0x000ff000 == 0x00011000`
 
@@ -99,7 +99,7 @@ Condition: `shipid & 0x000f2000 == 0x00032000`
 
 #### Light (Aviation) cruiser
 
-Condition: `shipid & 0x000f4000 == 0x00034000` (This means, unlike in Kanti Collection, submarine tenders, who have` shipid & 0x000f5000 == 0x00035000`, count as a light (aviation) cruiser)
+Condition: `shipid & 0x000f4000 == 0x00034000` (This means, unlike in Kantai Collection, submarine tenders, who have` shipid & 0x000f5000 == 0x00035000`, count as a light (aviation) cruiser)
 
 **Variations**: These light cruisers have more plane slots and more types of seaplanes available. Unlike the Kantai Collection Gotland/Gotland andra, they can equip seaplane fighters unconditionally.
 
