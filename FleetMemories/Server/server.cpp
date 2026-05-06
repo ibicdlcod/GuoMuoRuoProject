@@ -252,7 +252,7 @@ bool Server::listen(const QHostAddress &address, quint16 port) {
         settings->setValue("steam/webkey", keyFile.readAll());
         if(!settings->contains("steam/lastrefundpolltime")) {
             settings->setValue("steam/lastrefundpolltime",
-                QDateTime::currentDateTimeUtc().toSecsSinceEpoch());
+                QDateTime::currentSecsSinceEpoch());
         }
 
         listening = sslServer.listen(address, port);
@@ -613,7 +613,8 @@ virtual_skill_point_effect:
                                 calculateTech(uid,
                                               std::get<0>(visibleBouusEquip));
                         result.append(subtech.second);
-                        for(const auto &equipData: subtech.second) {
+                        for(const auto &equipData:
+                            std::as_const(subtech.second)) {
                             Equipment *equipDef =
                                     equipRegistry[std::get<1>(equipData)];
                             source.append({equipDef->getTech(),
@@ -2095,6 +2096,7 @@ void Server::generateTestShip(const CSteamID &uid) {
                     qInfo() << "SUCCESS" << "\t" << ship->toString("ja_JP");
                     QUuid newId = newShip(uid, ship->getId(), true);
                     //addShipStar(newId, dist2(mt));
+                    Q_UNUSED(newId)
                 }
             }
         }
@@ -2671,13 +2673,14 @@ process_import_equip:
 process_import_ships:
     auto ships = input["ships"].toObject();
     for(auto ship: std::as_const(ships)) {
-        auto shipId = ship.toObject()["id"].toInt();
+        auto shipObject = ship.toObject();
+        auto shipId = shipObject["id"].toInt();
         if(!shipOldIdToNewId.contains(shipId)) {
             //% "Ship old id %1 don't exist!"
             qWarning() << qtTrId("shipoldid-dont-exist").arg(shipId);
             continue;
         }
-        auto shipExp = ship.toObject()["exp"].toInt();
+        auto shipExp = shipObject["exp"].toInt();
         int fmShipId = 0;
         int latestShipId = 0;
         Ship *fmShip = shipRegistry[shipOldIdToNewId[shipId]];
@@ -2881,7 +2884,7 @@ decrease_supremacy:
 recover_condition:
         QDateTime lastRecoverTime
                 = settings->value("server/lastrecvcondtime",
-                      QDateTime::fromSecsSinceEpoch(0, QTimeZone(Qt::UTC)))
+                      QDateTime::fromSecsSinceEpoch(0, QTimeZone::UTC))
                 .toDateTime();
         qint64 lastRecoverTimeInt = lastRecoverTime.toSecsSinceEpoch();
         {
@@ -2947,7 +2950,7 @@ subtract_kc_exp:
 award_industrial_points:
         QDateTime lastSettleTime
                 = settings->value("server/nextsettleranktime",
-                      QDateTime::fromSecsSinceEpoch(0, QTimeZone(Qt::UTC)))
+                      QDateTime::fromSecsSinceEpoch(0, QTimeZone::UTC))
                 .toDateTime();
         lastSettleTime.setDate(QDate(lastSettleTime.date().year(),
                                      lastSettleTime.date().month(),
@@ -3514,6 +3517,8 @@ waive_condition:
         if(mother->getId() == 16391) { // SU-0
             return 0;
         }
+    default:
+        ; /* do nothing */
     }
 
 relax_condition:

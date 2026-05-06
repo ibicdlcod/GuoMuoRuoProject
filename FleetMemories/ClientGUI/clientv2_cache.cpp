@@ -425,7 +425,12 @@ void Client::tsunkitAssets() {
         iconGroups.insert(equip->type.iconGroup());
     }
     downloadRequired = iconGroups.size();
-    for(auto iconGroup: iconGroups)  {
+    if(downloadRequired == 0) {
+        //% "Server lack data!"
+        qCritical() << qtTrId("server-lack-data");
+        tsunkitAssets2();
+    }
+    for(auto iconGroup: iconGroups) {
         ResourceFetch *resourceFetcher = new ResourceFetch();
         resourceFetcher->downloadFile(
             QString("https://tsunkit.net/api/assets/images/equipTypeIcons/%1")
@@ -452,6 +457,10 @@ void Client::tsunkitAssets2() {
         oldInternalIDs.insert(ship->attr["OldInternalNo."]);
     }
     downloadRequired = oldInternalIDs.size();
+    if(downloadRequired == 0) {
+        qCritical() << qtTrId("server-lack-data");
+        emit tsunkitAssetsComplete();
+    }
     int downloadStarted = 0;
     for(auto oldInternalID: oldInternalIDs) {
         if(oldInternalID == 0) {

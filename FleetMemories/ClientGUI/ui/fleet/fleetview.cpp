@@ -478,6 +478,7 @@ void FleetView::modifyFleetShip(int posIndex, QUuid uid) {
         newText->setText(newName);
         QFont font = newText->font();
         int fontSize = 1;
+        /* to be optimized
         while(true)
         {
             font.setPointSize(fontSize);
@@ -490,7 +491,11 @@ void FleetView::modifyFleetShip(int posIndex, QUuid uid) {
                 font.setPointSize(fontSize);
                 break;
             }
-        }
+        } */
+        /* temporary solution to be replaced */
+        fontSize = 10;
+        font.setPointSize(fontSize);
+
         newText->setFont(font);
         newLvText->show();
         newLvText->setContent(shipD->currentHP, ship->attr["Hitpoints"],
