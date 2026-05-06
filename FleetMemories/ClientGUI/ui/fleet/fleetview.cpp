@@ -477,20 +477,35 @@ void FleetView::modifyFleetShip(int posIndex, QUuid uid) {
         QString newName = ship->toString();
         newText->setText(newName);
         QFont font = newText->font();
+        int maxH = newText->maximumHeight();
+        int maxW = newText->maximumWidth();
+        /* Fall back to minimum size when the widget hasn't
+           been laid out yet and maximum values are unset. */
+        if (maxH <= 0) {
+            maxH = newText->minimumHeight();
+        }
+        if (maxW <= 0) {
+            maxW = newText->minimumWidth();
+        }
+        if (maxH <= 0) {
+            maxH = 55;
+        }
+        if (maxW <= 0) {
+            maxW = 160;
+        }
+        int constexpr maxFontSize = 72;
         int fontSize = 1;
-        while(true)
-        {
+        QString const text = newText->text();
+        for (; fontSize <= maxFontSize; ++fontSize) {
             font.setPointSize(fontSize);
-            QRect r = QFontMetrics(font).boundingRect(newText->text());
-            if (r.height() < newText->maximumHeight()
-                && r.width() < newText->maximumWidth())
-                fontSize++;
-            else {
-                fontSize--;
-                font.setPointSize(fontSize);
+            QSize const sz = QFontMetrics(font)
+                .boundingRect(text).size();
+            if (sz.height() >= maxH || sz.width() >= maxW) {
                 break;
             }
         }
+        fontSize = qMax(1, fontSize - 1);
+        font.setPointSize(fontSize);
         newText->setFont(font);
         newLvText->show();
         newLvText->setContent(shipD->currentHP, ship->attr["Hitpoints"],
