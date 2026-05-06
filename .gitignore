@@ -72,6 +72,7 @@ Thumbs.db
 *.exe
 
 # Qt build
+*/.qtcreator/
 build-*/
 build/
 */build/*
