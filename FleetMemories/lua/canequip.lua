@@ -183,7 +183,7 @@ local function general(equipid, equiptype, shipid, flags, isex)
 			canEquipRecon = false
 		end
 		
-		canEquipDiveBomb = checkmask(shipid, 0x000f0000, 0x00030000)
+		canEquipDiveBomb = checkmask(shipid, 0x000f0000, 0x00034000)
 			or checkmask(shipid, 0x000f0000, 0x00040000)
 			or checkmask(shipid, 0x000f0000, 0x00050000)
 			or checkmask(shipid, 0x000f0000, 0x00080000)
@@ -283,7 +283,7 @@ local function general(equipid, equiptype, shipid, flags, isex)
 				return false
 			end
 			return checkmask(shipid, 0x000f0000, 0x00040000)
-				or checkmask(shipid, 0x000f1000, 0x00050000)
+				or checkmask(shipid, 0x000f1000, 0x00051000)
 		elseif size == 4 then --战舰炮
 			return checkmask(shipid, 0x000f0000, 0x00050000)
 		elseif size == 5 then --特大口径（ban巡战）
@@ -385,7 +385,14 @@ local function sonar(equipid, equiptype, shipid, flags, isex)
 end
 
 local function apshell(equipid, equiptype, shipid, flags, isex)
-	return (not isex) and checkmask(shipid, 0x000f0000, 0x00050000)
+	if flags:get('apshell') == 1 then
+		return true
+	elseif flags:get('apshell') == -1 then
+		return false
+	end
+	return (not isex) and 
+		(checkmask(shipid, 0x000f0000, 0x00040000)
+		or checkmask(shipid, 0x000f0000, 0x00050000))
 end
 
 local function alshell(equipid, equiptype, shipid, flags, isex)
@@ -626,7 +633,12 @@ local function surfacepersonnel(equipid, equiptype, shipid, flags, isex)
 end
 
 local function antiair(equipid, equiptype, shipid, flags, isex)
-	return true
+	if flags:get('antiair') == 1 then
+		return true
+	elseif flags:get('antiair') == -1 then
+		return false
+	end
+	return not checkmask(shipid, 0x000f0000, 0x00070000)
 end
 
 local function flyingboat(equipid, equiptype, shipid, flags, isex)
