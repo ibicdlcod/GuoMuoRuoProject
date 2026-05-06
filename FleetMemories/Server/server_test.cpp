@@ -1,7 +1,9 @@
 /* Copyright (C) 2026 Harusoft Ltd.
  * SPDX-License-Identifier: AGPL-3.0-or-later */
 
+#define NOMINMAX
 #include "server.h"
+#include <algorithm>
 
 /* Tests FleetInfo::effectiveAttr with three cases using ship 269550035
  * (Japanese destroyer: HP=100, Eva=800, AA=40, ASW=68) and its default
