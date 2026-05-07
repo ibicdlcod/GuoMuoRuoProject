@@ -74,6 +74,8 @@ With less firepower but more accuracy than battleship main guns; intended to fig
 
 Trigger cut-ins with Torpedo.
 
+Unlike KC (but like KC arcade), second-gun-flat can trigger point-blank shot which lowers the enemy's formation coefficiency.
+
 second-gun-flak-big type can only be equipped on heavy cruisers, battleships, and carriers; other types can additionally be equipped on light cruisers and seaplane tenders
 
 #### Main/secondary gun (high-angle) (small-gun-flak, mid-gun-flak, second-gun-flak, second-gun-flak-big)

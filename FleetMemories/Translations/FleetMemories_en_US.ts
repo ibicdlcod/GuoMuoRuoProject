@@ -1289,7 +1289,7 @@ Great at battle and bad at politics--so cool!</translation>
     </message>
     <message id="server-lack-data">
         <location filename="../ClientGUI/clientv2_cache.cpp" line="430"/>
-        <location filename="../ClientGUI/clientv2_cache.cpp" line="462"/>
+        <location filename="../ClientGUI/clientv2_cache.cpp" line="461"/>
         <source>Server lack data!</source>
         <translation type="unfinished"></translation>
     </message>
