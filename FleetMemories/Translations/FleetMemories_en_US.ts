@@ -351,27 +351,27 @@ Great at battle and bad at politics--so cool!</translation>
         <translation type="vanished">%1 Chromium </translation>
     </message>
     <message id="input-buffer-empty">
-        <location filename="../Protocol/sender.cpp" line="43"/>
+        <location filename="../Protocol/sender.cpp" line="44"/>
         <source>Input buffer is empty.</source>
         <translation>Input buffer is empty.</translation>
     </message>
     <message id="unable-send-data">
-        <location filename="../Protocol/sender.cpp" line="80"/>
+        <location filename="../Protocol/sender.cpp" line="84"/>
         <source>Unable to send data.</source>
         <translation>Unable to send data.</translation>
     </message>
     <message id="error-reading-intended-message">
-        <location filename="../Protocol/sender.cpp" line="112"/>
+        <location filename="../Protocol/sender.cpp" line="117"/>
         <source>Error reading intended message.</source>
         <translation>Error reading intended message.</translation>
     </message>
     <message id="unable-send-data-connection-broke">
-        <location filename="../Protocol/sender.cpp" line="134"/>
+        <location filename="../Protocol/sender.cpp" line="139"/>
         <source>Unable to send data, connection broke.</source>
         <translation>Unable to send data, connection broke.</translation>
     </message>
     <message id="write-buffer-failed-to-fill">
-        <location filename="../Protocol/sender.cpp" line="140"/>
+        <location filename="../Protocol/sender.cpp" line="145"/>
         <source>Write buffer failed to fill completely.</source>
         <translation>Write buffer failed to fill completely.</translation>
     </message>
@@ -1315,49 +1315,49 @@ Great at battle and bad at politics--so cool!</translation>
         <translation type="unfinished">Idle</translation>
     </message>
     <message id="equip-uuid">
-        <location filename="../ClientGUI/model/equipmodel.cpp" line="534"/>
-        <location filename="../ClientGUI/model/equipmodel.cpp" line="701"/>
+        <location filename="../ClientGUI/model/equipmodel.cpp" line="547"/>
+        <location filename="../ClientGUI/model/equipmodel.cpp" line="714"/>
         <location filename="../ClientGUI/model/specequipmodel.cpp" line="59"/>
         <source>Equipment UUID</source>
         <translation type="unfinished">Equipment UUID</translation>
     </message>
     <message id="equip-name">
-        <location filename="../ClientGUI/model/equipmodel.cpp" line="538"/>
-        <location filename="../ClientGUI/model/equipmodel.cpp" line="703"/>
+        <location filename="../ClientGUI/model/equipmodel.cpp" line="551"/>
+        <location filename="../ClientGUI/model/equipmodel.cpp" line="716"/>
         <source>Equipment name</source>
         <translation type="unfinished">Equipment name</translation>
     </message>
     <message id="equip-star">
-        <location filename="../ClientGUI/model/equipmodel.cpp" line="542"/>
-        <location filename="../ClientGUI/model/equipmodel.cpp" line="705"/>
+        <location filename="../ClientGUI/model/equipmodel.cpp" line="555"/>
+        <location filename="../ClientGUI/model/equipmodel.cpp" line="718"/>
         <source>Improvement level</source>
         <oldsource>Equipment improvement level</oldsource>
         <translation type="unfinished">Improvement level</translation>
     </message>
     <message id="equip-attr">
-        <location filename="../ClientGUI/model/equipmodel.cpp" line="546"/>
-        <location filename="../ClientGUI/model/equipmodel.cpp" line="707"/>
+        <location filename="../ClientGUI/model/equipmodel.cpp" line="559"/>
+        <location filename="../ClientGUI/model/equipmodel.cpp" line="720"/>
         <source>Attributes</source>
         <oldsource>Equipment attributes</oldsource>
         <translation type="unfinished">Attributes</translation>
     </message>
     <message id="destruct">
-        <location filename="../ClientGUI/model/equipmodel.cpp" line="550"/>
-        <location filename="../ClientGUI/model/equipmodel.cpp" line="709"/>
+        <location filename="../ClientGUI/model/equipmodel.cpp" line="563"/>
+        <location filename="../ClientGUI/model/equipmodel.cpp" line="722"/>
         <source>Destruct</source>
         <oldsource>Destruct this equipment</oldsource>
         <translation type="unfinished">Destruct</translation>
     </message>
     <message id="equip-select">
-        <location filename="../ClientGUI/model/equipmodel.cpp" line="554"/>
-        <location filename="../ClientGUI/model/equipmodel.cpp" line="711"/>
+        <location filename="../ClientGUI/model/equipmodel.cpp" line="567"/>
+        <location filename="../ClientGUI/model/equipmodel.cpp" line="724"/>
         <source>Select</source>
         <oldsource>Select this equipment</oldsource>
         <translation type="unfinished">Select</translation>
     </message>
     <message id="equip-pos">
-        <location filename="../ClientGUI/model/equipmodel.cpp" line="558"/>
-        <location filename="../ClientGUI/model/equipmodel.cpp" line="713"/>
+        <location filename="../ClientGUI/model/equipmodel.cpp" line="571"/>
+        <location filename="../ClientGUI/model/equipmodel.cpp" line="726"/>
         <source>Position</source>
         <translation type="unfinished">Position</translation>
     </message>
@@ -4010,7 +4010,7 @@ Great at battle and bad at politics--so cool!</translation>
         <translation type="unfinished">All ship classes</translation>
     </message>
     <message id="fleet-idle">
-        <location filename="../ClientGUI/model/equipmodel.cpp" line="502"/>
+        <location filename="../ClientGUI/model/equipmodel.cpp" line="515"/>
         <location filename="../ClientGUI/model/shipmodel.cpp" line="387"/>
         <source>Idle</source>
         <translation type="unfinished">Idle</translation>
@@ -4063,7 +4063,7 @@ Great at battle and bad at politics--so cool!</translation>
         <translation type="unfinished">Current Star %1, maximum star %2</translation>
     </message>
     <message id="fleet-disabled">
-        <location filename="../ClientGUI/model/equipmodel.cpp" line="505"/>
+        <location filename="../ClientGUI/model/equipmodel.cpp" line="518"/>
         <location filename="../ClientGUI/model/shipmodel.cpp" line="391"/>
         <location filename="../ClientGUI/ui/views/selectdelegate.cpp" line="87"/>
         <source>Disabled</source>

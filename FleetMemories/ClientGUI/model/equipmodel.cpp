@@ -494,8 +494,21 @@ QVariant EquipModel::data(const QModelIndex &index, int role) const {
                     if(mainWindowM) {
                         FleetPos pos =
                             mainWindowM->getFleetArea()->getShipIndex(shipUid);
+
+                        QString fleetIndexStr;
+                        if(!(pos.fleetindex & KP::expeditionFleetMask)) {
+                            fleetIndexStr = QString::number(pos.fleetindex + 1);
+                        }
+                        else {
+                            int mapUnionId = pos.fleetindex & (~KP::expeditionFleetMask);
+                            int dlcId = mapUnionId >> 16;
+                            int subMapId = mapUnionId & 0xFFFF;
+                            QString dlcStr = dlcId == 0 ? "X" : ("XE" + QString::number(dlcId) + "#");
+                            fleetIndexStr = dlcStr + QString::number(subMapId);
+                        }
+
                         posStr = QStringLiteral("%1-%2(%3)")
-                                     .arg(pos.fleetindex + 1)
+                                     .arg(fleetIndexStr)
                                      .arg(pos.posindex + 1)
                                      .arg(equipPos);
                         if(pos.fleetindex == -1 && pos.posindex == -1) {

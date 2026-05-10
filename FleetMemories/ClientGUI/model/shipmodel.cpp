@@ -391,7 +391,7 @@ QVariant ShipModel::data(const QModelIndex &index,
                 return qtTrId("fleet-disabled");
             }
             QString fleetIndexStr;
-            if(attr->fleetIndex < KP::nonExpeditionFleetsSize) {
+            if(!(attr->fleetIndex & KP::expeditionFleetMask)) {
                 fleetIndexStr = QString::number(attr->fleetIndex + 1);
             }
             else {
