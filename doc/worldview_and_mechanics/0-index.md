@@ -54,22 +54,6 @@
   * [Supply](8.1-supply.md)
   * [Repair](8.2-repair.md)
 
-* Battle mechanic [NOTYETIMPLEMENTED]
-  
-  * Tactical Goal (for friend fleet)
-  * Tactical Goal (for enemy fleet)
-  * Communication efficiency
-  * Los
-  * Air battle
-  * Air superiority coefficient
-  * Guided strikes (触接)
-  * Formation coefficient
-  * Approaching phase
-  * Battle phase
-  * Disengaging phase (If we want night battle, we prevent them disengage; if we don't, we try to disengage)
-  * Night battle
-  * Night-battle-start node
-  * Commander's abilities
-  * LBAS
+* [Battle mechanic](9-battle.md) [NOTYETIMPLEMENTED]
 
 * [Shop](10-shop.md)

@@ -469,3 +469,46 @@ In the below table "main gun" does not include big-caliber ones. "recon plane" c
 | Land attack                             | Main gun/Big-caliber Main gun        | Landing craft/Special Amphibious tanks              |                   |
 | Land attack                             | Anti-land rocket                     |                                                     |                   |
 | Land attack                             | Mortar                               |                                                     |                   |
+
+## Overall Design Philosophy
+
+### 1. Role Specialization
+
+Each equipment category reinforces a ship's historical role. Destroyers rely on torpedoes and ASW gear, battleships on heavy guns and AP shells, carriers on aircraft, etc. Hybrid equipment (e.g., seaplanes) allows some ships to cross roles, but with trade-offs.
+
+### 2. Trade-offs and Opportunity Cost
+
+Every equipment slot is precious. Choosing a radar over a gun sacrifices firepower for accuracy; equipping AA guns reduces offensive capability for survivability. This forces players to tailor fleets to specific threats.
+
+### 3. Synergy and Combos
+
+Many mechanics reward combining specific equipment types (e.g., sonar + depth charge for ASW, high-angle gun + radar for AA cut-ins). This encourages deep knowledge of equipment interactions.
+
+### 4. Historical Authenticity
+
+Equipment restrictions and performance roughly mirror real-world limitations (caliber fits, aircraft types, radar technology), grounding the game in a plausible historical framework.
+
+### 5. Strategic Layering
+
+Equipment choices affect multiple layers:
+
+- Immediate combat (damage, accuracy)
+- Map navigation (LoS for routing, speed for routing)
+- Resource management (whirlpool reduction, expedition bonuses)
+- Long-term planning (land-based air, repair facilities)
+
+### 6. Risk-Reward Balance
+
+High-damage options (torpedo cut-ins, AP shells) come with drawbacks (useless if damaged, slot-intensive). Defensive items (bulges, repair crews) trade offensive power for survivability.
+
+## Conclusion
+
+This equipment system creates a rich, tactical sandbox where fleet composition and loadout decisions are as important as level and modernization. By intertwining historical detail with meaningful game-mechanical choices, it achieves a balance between realism and engaging strategy.
+
+The key lessons for game design are:
+
+1. **Meaningful choices**: Every equipment slot should represent a real decision with clear trade-offs.
+2. **Historical grounding**: Use real-world limitations to create natural balance and flavor.
+3. **Synergistic systems**: Design equipment to work together in interesting combinations.
+4. **Multiple layers**: Equipment should affect combat, navigation, economy, and long-term strategy.
+5. **Risk management**: High-power options should come with significant drawbacks or risks.
