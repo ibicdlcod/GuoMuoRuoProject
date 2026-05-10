@@ -123,7 +123,6 @@ protected slots:
     virtual void clearCheckBoxes();
 
 private:
-    QObject *mainWindow = nullptr;
     QMap<int, int> skillPointReg;
 };
 

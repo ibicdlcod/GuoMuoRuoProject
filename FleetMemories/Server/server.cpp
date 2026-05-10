@@ -5254,7 +5254,7 @@ check_duplicate_remodel_group:
         }
     }
 
-    QSet<QString> lockedEquipUuids;
+    QSet<QUuid> lockedEquipUuids;
     {
         QSqlQuery query;
         query.prepare("SELECT Slot1, Slot2, Slot3, Slot4, Slot5, SlotEX "
@@ -5271,8 +5271,8 @@ check_duplicate_remodel_group:
         }
         while(query.next()) {
             for(int col = 0; col <= KP::maxEquipSlots; ++col) {
-                QString euuid = query.value(col).toString();
-                if(!euuid.isEmpty())
+                QUuid euuid = query.value(col).toUuid();
+                if(!euuid.isNull())
                     lockedEquipUuids.insert(euuid);
             }
         }
@@ -5282,8 +5282,8 @@ check_duplicate_remodel_group:
         auto shipDataObj = shipData.toObject();
         auto equipArr = shipDataObj["equip"].toArray();
         for(int i = 0; i <= KP::maxEquipSlots; ++i) {
-            QString euuid = equipArr[i].toString();
-            if(!euuid.isEmpty() && lockedEquipUuids.contains(euuid)) {
+            QUuid euuid = QUuid(equipArr[i].toString());
+            if(!euuid.isNull() && lockedEquipUuids.contains(euuid)) {
                 int shipFleetIndex = shipDataObj["pos"].toInt()
                                      / KP::fleetRepSize;
                 return {KP::EquipLocked, shipFleetIndex};

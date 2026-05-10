@@ -484,8 +484,12 @@ QVariant EquipModel::data(const QModelIndex &index, int role) const {
                     QString shipStr = ship->toString();
                     QString shipUidSimple =
                         "("+shipUid.toString().first(9).last(8)+")";
-                    MainWindow *mainWindowM =
-                        qobject_cast<MainWindow *>(mainWindow);
+                    MainWindow *mainWindowM = nullptr;
+                    for(QWidget *w : QApplication::topLevelWidgets()) {
+                        if(w) {
+                            mainWindowM = qobject_cast<MainWindow *>(w);
+                        }
+                    }
                     QString posStr;
                     if(mainWindowM) {
                         FleetPos pos =
@@ -582,6 +586,54 @@ QVariant EquipModel::data(const QModelIndex &index, int role) const {
                 break;
             }
 
+            QBrush brush = QBrush(color);
+            return brush;
+        }
+        else if(index.column() == fleetPosColumn()) {
+            bool isOnExpedition = false;
+            if(!shipEquipReverse.contains(uidToDisplay)) {
+                return QVariant();
+            }
+            else {
+                auto [shipUid, equipPos] = shipEquipReverse[uidToDisplay];
+                if(equipPos == -1) {
+                    return QVariant();
+                }
+                else {
+                    Ship *ship = std::get<0>(
+                        engine.shipModel.getShip(shipUid));
+                    QString shipStr = ship->toString();
+                    QString shipUidSimple =
+                        "("+shipUid.toString().first(9).last(8)+")";
+                    MainWindow *mainWindowM = nullptr;
+                    for(QWidget *w : QApplication::topLevelWidgets()) {
+                        if(w) {
+                            mainWindowM = qobject_cast<MainWindow *>(w);
+                        }
+                    }
+                    QString posStr;
+                    if(mainWindowM) {
+                        FleetPos pos =
+                            mainWindowM->getFleetArea()->getShipIndex(shipUid);
+                        if(pos.fleetindex & KP::expeditionFleetMask) {
+                            isOnExpedition = true;
+                        }
+                    }
+                }
+            }
+            if(!isOnExpedition) {
+                return QVariant();
+            }
+            QColor color = QColor();
+            switch(QApplication::styleHints()->colorScheme()) {
+            case Qt::ColorScheme::Dark:
+                color.setHsv(0, 128, 255);
+                break;
+            case Qt::ColorScheme::Light: [[fallthrough]];
+            default:
+                color.setHsv(0, 255, 128);
+                break;
+            }
             QBrush brush = QBrush(color);
             return brush;
         }
