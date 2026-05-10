@@ -19,6 +19,7 @@ Sender::Sender(QAbstractSocket *destination,
     m_hasRead(0),
     m_hasWritten(0),
     m_doneSignaled(false),
+    m_source(nullptr),
     m_readySend(true),
     m_partnum(0),
     m_partnumtotal(0)
@@ -66,6 +67,9 @@ void Sender::start() {
 }
 
 void Sender::destinationBytesWritten(qint64 length) {
+    if (!m_source)
+        return;
+
     if (m_destination->bytesToWrite() < m_buffer.size() / 2) {
         // the transmit buffer is running low, refill]
         send();
@@ -90,6 +94,7 @@ void Sender::send() {
                    this, &Sender::destinationError);
         input.dequeue();
         buffer.close();
+        m_source = nullptr;
 
         m_partnum = 0;
         m_partnumtotal = 0;
@@ -145,8 +150,10 @@ void Sender::send() {
 }
 
 bool Sender::signalDone() {
-    if (!m_doneSignaled &&
-        ((m_sourceSize && m_hasWritten == m_sourceSize) || m_source->atEnd())) {
+    if (m_doneSignaled || !m_source)
+        return m_doneSignaled;
+
+    if ((m_sourceSize && m_hasWritten == m_sourceSize) || m_source->atEnd()) {
         emit done();
         m_doneSignaled = true;
     }
