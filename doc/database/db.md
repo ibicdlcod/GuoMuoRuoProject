@@ -26,6 +26,7 @@ if(!tables.contains("NewUsers")) {
 ```
 
 **Connection settings** (configurable via `settings`):
+
 - Driver: `QSQLITE` (default)
 - Hostname: `SpearofTanaka` (default)
 - Database: `ocean.db` (default)
@@ -36,31 +37,32 @@ if(!tables.contains("NewUsers")) {
 
 ### Definition Tables (CSV-imported)
 
-| Table | Purpose | Import Source |
-|-------|---------|---------------|
-| `EquipReg` | Equipment attribute key-value store | `doc/equip/equip.csv` |
-| `EquipName` | Equipment localized names | `doc/equip/equipname.csv` |
-| `ShipReg` | Ship attribute key-value store | `doc/ship/ship.csv` |
-| `ShipName` | Ship localized names and text attributes | `doc/ship/shipname.csv` |
-| `MapNode` | Map node names | `doc/map/mapnode.csv` |
-| `MapRelation` | Unlock relationships between maps | `doc/map/maprelation.csv` |
-| `MapResource` | Per-map resource attributes | `doc/map/mapresource.csv` |
+| Table                 | Purpose                                  | Import Source                     |
+| --------------------- | ---------------------------------------- | --------------------------------- |
+| `EquipReg`            | Equipment attribute key-value store      | `doc/equip/equip.csv`             |
+| `EquipName`           | Equipment localized names                | `doc/equip/equipname.csv`         |
+| `ShipReg`             | Ship attribute key-value store           | `doc/ship/ship.csv`               |
+| `ShipName`            | Ship localized names and text attributes | `doc/ship/shipname.csv`           |
+| `MapNode`             | Map node names                           | `doc/map/mapnode.csv`             |
+| `MapRelation`         | Unlock relationships between maps        | `doc/map/maprelation.csv`         |
+| `MapResource`         | Per-map resource attributes              | `doc/map/mapresource.csv`         |
 | `VirtualCondRelation` | Equipment precondition–map relationships | `doc/map/virtualcondrelation.csv` |
 
 ### User Tables (Per-player state)
 
-| Category | Tables |
-|----------|--------|
-| **User accounts** | `NewUsers`, `UserAttr`, `UserRanking` |
-| **Ships** | `UserShip`, `UserKCShip`, `UserShipBP`, `UserShipDrop` |
-| **Equipment** | `UserEquip`, `UserKCEquip`, `UserEquipSP`, `UserPlaneLosses` |
-| **Map state** | `UserMapState` |
-| **Production slots** | `Factories`, `Docks` |
-| **Transactions** | `ARDOrders` |
+| Category             | Tables                                                       |
+| -------------------- | ------------------------------------------------------------ |
+| **User accounts**    | `NewUsers`, `UserAttr`, `UserRanking`                        |
+| **Ships**            | `UserShip`, `UserKCShip`, `UserShipBP`, `UserShipDrop`       |
+| **Equipment**        | `UserEquip`, `UserKCEquip`, `UserEquipSP`, `UserPlaneLosses` |
+| **Map state**        | `UserMapState`                                               |
+| **Production slots** | `Factories`, `Docks`                                         |
+| **Transactions**     | `ARDOrders`                                                  |
 
 ## Definition Tables
 
 ### EquipReg
+
 ```sql
 CREATE TABLE EquipReg (
     EquipID INTEGER NOT NULL,
@@ -69,8 +71,10 @@ CREATE TABLE EquipReg (
     CONSTRAINT noduplicate UNIQUE(EquipID, Attribute)
 );
 ```
+
 **Purpose**: Equipment attribute key-value store (e.g., `Firepower`, `Armor`, `Range`).  
 **Columns**:
+
 - `EquipID` – Equipment definition ID (references `EquipName.EquipID`)
 - `Attribute` – Attribute name (string key)
 - `Intvalue` – Integer value of the attribute
@@ -78,6 +82,7 @@ CREATE TABLE EquipReg (
 **Constraints**: Unique combination of `EquipID` and `Attribute`.
 
 ### EquipName
+
 ```sql
 CREATE TABLE EquipName (
     EquipID INTEGER PRIMARY KEY,
@@ -86,14 +91,17 @@ CREATE TABLE EquipName (
     en_US TEXT
 );
 ```
+
 **Purpose**: Equipment localized names.  
 **Columns**:
+
 - `EquipID` – Primary key
 - `ja_JP`, `zh_CN`, `en_US` – Localized names in Japanese, Chinese, and English
 
 **Usage**: Imported from `equipname.csv`; referenced by `EquipReg`, `UserEquip`, `UserKCEquip`, `UserEquipSP`, `VirtualCondRelation`.
 
 ### ShipReg
+
 ```sql
 CREATE TABLE ShipReg (
     ShipID INTEGER NOT NULL,
@@ -102,8 +110,10 @@ CREATE TABLE ShipReg (
     CONSTRAINT noduplicate UNIQUE(ShipID, Attribute)
 );
 ```
+
 **Purpose**: Ship attribute key-value store (e.g., `MaxHP`, `Firepower`, `FuelConsumption`).  
 **Columns**:
+
 - `ShipID` – Ship definition ID (references `ShipName.ShipID`)
 - `Attribute` – Attribute name
 - `Intvalue` – Integer value
@@ -111,6 +121,7 @@ CREATE TABLE ShipReg (
 **Constraints**: Unique combination of `ShipID` and `Attribute`.
 
 ### ShipName
+
 ```sql
 CREATE TABLE ShipName (
     ShipID INTEGER,
@@ -119,8 +130,10 @@ CREATE TABLE ShipName (
     value TEXT
 );
 ```
+
 **Purpose**: Ship localized names and text attributes.  
 **Columns**:
+
 - `ShipID` – Ship definition ID
 - `lang` – Language code (`ja_JP`, `zh_CN`, `en_US`)
 - `textattr` – Text attribute type (e.g., `name`, `description`)
@@ -129,6 +142,7 @@ CREATE TABLE ShipName (
 **Note**: No primary key defined; multiple rows per `ShipID` for different languages and attributes.
 
 ### MapNode
+
 ```sql
 CREATE TABLE MapNode (
     MapID INTEGER PRIMARY KEY,
@@ -137,12 +151,15 @@ CREATE TABLE MapNode (
     en_US TEXT
 );
 ```
+
 **Purpose**: Map node names.  
 **Columns**:
+
 - `MapID` – Primary key (map ID)
 - `ja_JP`, `zh_CN`, `en_US` – Localized map names
 
 ### MapRelation
+
 ```sql
 CREATE TABLE MapRelation (
     Type TEXT,
@@ -152,12 +169,15 @@ CREATE TABLE MapRelation (
     FOREIGN KEY(Node2) REFERENCES MapNode(MapID)
 );
 ```
+
 **Purpose**: Unlock relationships between maps.  
 **Columns**:
+
 - `Type` – Relationship type (unused in current implementation)
 - `Node1`, `Node2` – Map IDs (references `MapNode.MapID`)
 
 ### MapResource
+
 ```sql
 CREATE TABLE MapResource (
     MapID INTEGER,
@@ -167,8 +187,10 @@ CREATE TABLE MapResource (
     CONSTRAINT noduplicate UNIQUE(MapID, Attribute)
 );
 ```
+
 **Purpose**: Per-map resource attributes (e.g., resource yields).  
 **Columns**:
+
 - `MapID` – Map ID (references `MapNode.MapID`)
 - `Attribute` – Resource attribute name
 - `Intvalue` – Integer value
@@ -176,6 +198,7 @@ CREATE TABLE MapResource (
 **Constraints**: Unique combination of `MapID` and `Attribute`.
 
 ### VirtualCondRelation
+
 ```sql
 CREATE TABLE VirtualCondRelation (
     EquipDef INTEGER NOT NULL,
@@ -186,8 +209,10 @@ CREATE TABLE VirtualCondRelation (
     FOREIGN KEY(MapDef) REFERENCES MapNode(MapID)
 );
 ```
+
 **Purpose**: Equipment precondition–map relationships (affects equipment usability on maps).  
 **Columns**:
+
 - `EquipDef` – Equipment ID (references `EquipName.EquipID`)
 - `MapDef` – Map ID (references `MapNode.MapID`)
 - `MinDiff` – Minimum difficulty (1=early, 2=mid, 3=late)
@@ -196,20 +221,24 @@ CREATE TABLE VirtualCondRelation (
 ## User Tables
 
 ### NewUsers
+
 ```sql
 CREATE TABLE NewUsers (
     UserID BLOB PRIMARY KEY,
     UserType TEXT NOT NULL DEFAULT 'commoner'
 );
 ```
+
 **Purpose**: User registry.  
 **Columns**:
+
 - `UserID` – Primary key (binary user identifier, likely UUID)
 - `UserType` – User type: `'commoner'` (default) or `'admin'`
 
 **Referenced by**: Nearly all user tables via foreign key.
 
 ### UserAttr
+
 ```sql
 CREATE TABLE UserAttr (
     UserID BLOB NOT NULL,
@@ -220,8 +249,10 @@ CREATE TABLE UserAttr (
     CONSTRAINT noduplicate UNIQUE(UserID, Attribute)
 );
 ```
+
 **Purpose**: General per-user key-value attributes (resources, game state, counters).  
 **Columns**:
+
 - `UserID` – User identifier (references `NewUsers.UserID`)
 - `Attribute` – Attribute key (see below for common keys)
 - `Intvalue` – Integer value (default 0)
@@ -231,22 +262,23 @@ CREATE TABLE UserAttr (
 
 **Common Attribute Keys** (from `CLAUDE.md` and code inspection):
 
-| Attribute | Default | Purpose |
-|-----------|---------|---------|
+| Attribute                         | Default                                     | Purpose                                                                  |
+| --------------------------------- | ------------------------------------------- | ------------------------------------------------------------------------ |
 | `O`, `E`, `S`, `R`, `A`, `W`, `C` | 10000, 10000, 10000, 6000, 8000, 6000, 6000 | Resources (Oil, Explosives, Steel, Rubber, Aluminum, Tungsten, Chromium) |
-| `ARDCoupon` | 0 | ARD coupon balance (1 unit = 0.01 HKD) |
-| `Medal` | 0 | Medal balance (purchasable at 999 coupons each) |
-| `Sanity` | 0.0 | Sanity balance (stored in `Realvalue`) |
-| `FleetSize` | 1 | Number of unlocked fleets |
-| `FactorySize`, `DockSize` | init values | Factory/repair slot counts |
-| `HomePort` | set on first login | Nation ID |
-| `CurrentMap`, `CurrentNode` | 0 | Map/node currently in sortie |
-| `InBattle` | `KP::NoBattle` | Battle state machine |
-| `ActiveFleet` | 0 | Fleet index in sortie |
-| `RecoverTime` | timestamp | Condition/HP natural recovery reference time |
-| `Attrition` | (unset) | Resource supply attrition multiplier (`Realvalue`) |
+| `ARDCoupon`                       | 0                                           | ARD coupon balance (1 unit = 0.01 HKD)                                   |
+| `Medal`                           | 0                                           | Medal balance (purchasable at 999 coupons each)                          |
+| `Sanity`                          | 0.0                                         | Sanity balance (stored in `Realvalue`)                                   |
+| `FleetSize`                       | 1                                           | Number of unlocked fleets                                                |
+| `FactorySize`, `DockSize`         | init values                                 | Factory/repair slot counts                                               |
+| `HomePort`                        | set on first login                          | Nation ID                                                                |
+| `CurrentMap`, `CurrentNode`       | 0                                           | Map/node currently in sortie                                             |
+| `InBattle`                        | `KP::NoBattle`                              | Battle state machine                                                     |
+| `ActiveFleet`                     | 0                                           | Fleet index in sortie                                                    |
+| `RecoverTime`                     | timestamp                                   | Condition/HP natural recovery reference time                             |
+| `Attrition`                       | (unset)                                     | Resource supply attrition multiplier (`Realvalue`)                       |
 
 ### UserShip
+
 ```sql
 CREATE TABLE UserShip (
     User BLOB NOT NULL,
@@ -284,13 +316,16 @@ CREATE TABLE UserShip (
     FOREIGN KEY(SlotEX) REFERENCES UserEquip(EquipUuid)
 );
 ```
+
 **Purpose**: Ship instances owned by user.  
 **Key Columns**:
+
 - `ShipUuid` – Primary key (unique ship instance identifier)
 - `User` – Owner (references `NewUsers.UserID`)
 - `ShipDef` – Ship definition (references `ShipName.ShipID`)
 
 **Status Columns**:
+
 - `Star` – Star level (0–6?)
 - `CurrentHP` – Current hit points
 - `Condition` – Morale/condition (default 480 = `KP::conditionMax`)
@@ -298,18 +333,22 @@ CREATE TABLE UserShip (
 - `Exp`, `ExpCap` – Experience and experience cap
 
 **Equipment Slots**:
+
 - `Slot1`–`Slot5`, `SlotEX` – References to `UserEquip.EquipUuid` (nullable)
 - `Slot1Planes`–`Slot5Planes` – Plane counts for aircraft slots
 
 **Fleet Assignment**:
+
 - `FleetIndex` – Which fleet the ship belongs to (-1 = unassigned)
 - `FleetPosIndex` – Position within fleet (-1 = unassigned)
 - `FleetFled` – Whether ship fled from battle (0/1)
 
 **Supply Levels**:
+
 - `Fuel`, `Ammo` – Fractional resource levels (0.0–1.0, default 1.0)
 
 ### UserKCShip
+
 ```sql
 CREATE TABLE UserKCShip (
     ShipUuid TEXT PRIMARY KEY,
@@ -318,13 +357,16 @@ CREATE TABLE UserKCShip (
     FOREIGN KEY(ShipDef) REFERENCES ShipName(ShipID)
 );
 ```
+
 **Purpose**: KC-variant extra experience (left-joined with `UserShip`).  
 **Columns**:
+
 - `ShipUuid` – Primary key (matches `UserShip.ShipUuid`)
 - `ShipDef` – Ship definition (references `ShipName.ShipID`)
 - `Exp` – Additional experience (KC-specific)
 
 ### UserShipBP
+
 ```sql
 CREATE TABLE UserShipBP (
     User BLOB NOT NULL,
@@ -335,8 +377,10 @@ CREATE TABLE UserShipBP (
     CONSTRAINT noduplicate UNIQUE(User, ShipDef)
 );
 ```
+
 **Purpose**: Ship blueprint counts per user.  
 **Columns**:
+
 - `User` – Owner (references `NewUsers.UserID`)
 - `ShipDef` – Ship definition (references `ShipName.ShipID`)
 - `Amount` – Number of blueprints owned
@@ -344,6 +388,7 @@ CREATE TABLE UserShipBP (
 **Constraints**: Unique per user and ship definition.
 
 ### UserShipDrop
+
 ```sql
 CREATE TABLE UserShipDrop (
     User BLOB NOT NULL,
@@ -354,8 +399,10 @@ CREATE TABLE UserShipDrop (
     CONSTRAINT noduplicate UNIQUE(User, ShipDef)
 );
 ```
+
 **Purpose**: Ship drop weight values (affects drop rates).  
 **Columns**:
+
 - `User` – Owner (references `NewUsers.UserID`)
 - `ShipDef` – Ship definition (references `ShipName.ShipID`)
 - `Amount` – Float weight value
@@ -363,6 +410,7 @@ CREATE TABLE UserShipDrop (
 **Constraints**: Unique per user and ship definition.
 
 ### UserEquip
+
 ```sql
 CREATE TABLE UserEquip (
     User BLOB NOT NULL,
@@ -373,14 +421,17 @@ CREATE TABLE UserEquip (
     FOREIGN KEY(EquipDef) REFERENCES EquipName(EquipID)
 );
 ```
+
 **Purpose**: Equipment instances owned by user.  
 **Columns**:
+
 - `User` – Owner (references `NewUsers.UserID`)
 - `EquipUuid` – Primary key (unique equipment instance identifier)
 - `EquipDef` – Equipment definition (references `EquipName.EquipID`)
 - `Star` – Star level (enhancement level)
 
 ### UserKCEquip
+
 ```sql
 CREATE TABLE UserKCEquip (
     EquipUuid TEXT PRIMARY KEY,
@@ -390,14 +441,17 @@ CREATE TABLE UserKCEquip (
     FOREIGN KEY(EquipDef) REFERENCES EquipName(EquipID)
 );
 ```
+
 **Purpose**: KC-variant equipment (left-joined with `UserEquip`).  
 **Columns**:
+
 - `EquipUuid` – Primary key (matches `UserEquip.EquipUuid`)
 - `EquipDef` – Equipment definition (references `EquipName.EquipID`)
 - `Star` – Star level
 - `SkillPoints` – Skill points (KC-specific)
 
 ### UserEquipSP
+
 ```sql
 CREATE TABLE UserEquipSP (
     User BLOB NOT NULL,
@@ -408,8 +462,10 @@ CREATE TABLE UserEquipSP (
     CONSTRAINT noduplicate UNIQUE(User, EquipDef)
 );
 ```
+
 **Purpose**: Equipment skill point accumulation per user.  
 **Columns**:
+
 - `User` – Owner (references `NewUsers.UserID`)
 - `EquipDef` – Equipment definition (references `EquipName.EquipID`)
 - `Intvalue` – Skill points accumulated
@@ -417,6 +473,7 @@ CREATE TABLE UserEquipSP (
 **Constraints**: Unique per user and equipment definition.
 
 ### UserPlaneLosses
+
 ```sql
 CREATE TABLE UserPlaneLosses (
     User BLOB NOT NULL,
@@ -432,8 +489,10 @@ CREATE TABLE UserPlaneLosses (
     CONSTRAINT noduplicate UNIQUE(User, ShipUuid, Slot)
 );
 ```
+
 **Purpose**: Plane losses for abnormal exit recovery.  
 **Columns**:
+
 - `User` – Owner (references `NewUsers.UserID`)
 - `ShipUuid` – Ship instance (references `UserShip.ShipUuid`)
 - `Slot` – Equipment slot index (1-5)
@@ -445,6 +504,7 @@ CREATE TABLE UserPlaneLosses (
 **Constraints**: Unique per user, ship, and slot.
 
 ### UserMapState
+
 ```sql
 CREATE TABLE UserMapState (
     User BLOB NOT NULL,
@@ -463,8 +523,10 @@ CREATE TABLE UserMapState (
     CONSTRAINT noduplicate UNIQUE(User, MapDef)
 );
 ```
+
 **Purpose**: Per-map completion state and gauge HP.  
 **Columns**:
+
 - `User` – Owner (references `NewUsers.UserID`)
 - `MapDef` – Map ID (references `MapNode.MapID`)
 - `Supremacy` – Supremacy value (-1 = unset)
@@ -474,6 +536,7 @@ CREATE TABLE UserMapState (
 **Constraints**: Unique per user and map.
 
 ### UserRanking
+
 ```sql
 CREATE TABLE UserRanking (
     User BLOB PRIMARY KEY,
@@ -483,14 +546,17 @@ CREATE TABLE UserRanking (
     FOREIGN KEY(User) REFERENCES NewUsers(UserID)
 );
 ```
+
 **Purpose**: Ranking victory points.  
 **Columns**:
+
 - `User` – Primary key (references `NewUsers.UserID`)
 - `CurrentVP` – Current victory points
 - `PreviousVP` – Previous victory points
 - `Industrial` – Industrial score
 
 ### Factories
+
 ```sql
 CREATE TABLE Factories (
     UserID BLOB NOT NULL,
@@ -506,8 +572,10 @@ CREATE TABLE Factories (
     CONSTRAINT noduplicate UNIQUE(UserID, FactoryID)
 );
 ```
+
 **Purpose**: Equipment manufacturing slots.  
 **Columns**:
+
 - `UserID` – Owner (references `NewUsers.UserID`)
 - `FactoryID` – Factory slot number (0-based)
 - `CurrentJob` – Job type/recipe ID
@@ -518,6 +586,7 @@ CREATE TABLE Factories (
 **Constraints**: Unique per user and factory slot.
 
 ### Docks
+
 ```sql
 CREATE TABLE Docks (
     UserID BLOB NOT NULL,
@@ -533,8 +602,10 @@ CREATE TABLE Docks (
     CONSTRAINT noduplicate UNIQUE(UserID, DockID)
 );
 ```
+
 **Purpose**: Ship repair slots.  
 **Columns**:
+
 - `UserID` – Owner (references `NewUsers.UserID`)
 - `DockID` – Dock slot number (0-based)
 - `Uuid` – Ship being repaired (references `UserShip.ShipUuid`, nullable)
@@ -546,6 +617,7 @@ CREATE TABLE Docks (
 **Constraints**: Unique per user and dock slot.
 
 ### ARDOrders
+
 ```sql
 CREATE TABLE ARDOrders (
     OrderID INTEGER PRIMARY KEY,
@@ -555,8 +627,10 @@ CREATE TABLE ARDOrders (
     FOREIGN KEY(UserID) REFERENCES NewUsers(UserID)
 );
 ```
+
 **Purpose**: ARD purchase order log for refund clawback.  
 **Columns**:
+
 - `OrderID` – Primary key (auto-increment?)
 - `UserID` – Purchaser (references `NewUsers.UserID`)
 - `Units` – Number of ARD coupon units purchased
@@ -578,26 +652,26 @@ graph TD
     NewUsers --> UserEquipSP
     NewUsers --> UserPlaneLosses
     NewUsers --> ARDOrders
-    
+
     UserShip --> UserPlaneLosses
     UserShip --> Factories[Factories.PrevUuid]
     UserShip --> Docks[Docks.Uuid]
-    
+
     UserEquip --> UserShip.Slot1-EX
-    
+
     EquipName --> EquipReg
     EquipName --> UserEquip
     EquipName --> UserKCEquip
     EquipName --> UserEquipSP
     EquipName --> UserPlaneLosses
     EquipName --> VirtualCondRelation
-    
+
     ShipName --> ShipReg
     ShipName --> UserShip
     ShipName --> UserKCShip
     ShipName --> UserShipBP
     ShipName --> UserShipDrop
-    
+
     MapNode --> MapRelation
     MapNode --> MapResource
     MapNode --> UserMapState
@@ -605,6 +679,7 @@ graph TD
 ```
 
 **Key Relationships**:
+
 - `NewUsers.UserID` is the root foreign key for most user tables
 - `UserShip.ShipUuid` is referenced by `Factories.PrevUuid`, `Docks.Uuid`, `UserPlaneLosses.ShipUuid`
 - `UserEquip.EquipUuid` is referenced by `UserShip` slot columns (1-5 and EX)
@@ -613,6 +688,7 @@ graph TD
 ## Common Queries and Usage Patterns
 
 ### Resource Access
+
 ```sql
 -- Get user resources (Oil, Explosives, etc.)
 SELECT Attribute, Intvalue, Realvalue FROM UserAttr 
@@ -624,6 +700,7 @@ WHERE UserID = :uid AND Attribute = :resource;
 ```
 
 ### Ship Fleet Assignment
+
 ```sql
 -- Clear fleet assignment
 UPDATE UserShip SET FleetIndex = -1, FleetPosIndex = -1 WHERE User = :uid;
@@ -634,6 +711,7 @@ WHERE ShipUuid = :uuid AND User = :uid;
 ```
 
 ### Equipment Slot Management
+
 ```sql
 -- Equip item to ship slot
 UPDATE UserShip SET Slot1 = :euuid WHERE ShipUuid = :uuid;
@@ -645,6 +723,7 @@ WHERE ShipUuid = :uuid;
 ```
 
 ### Battle State Machine
+
 ```sql
 -- Set battle state
 UPDATE UserAttr SET Intvalue = :type 
@@ -654,6 +733,7 @@ WHERE UserID = :uid AND Attribute = 'InBattle';
 ## Migration Notes
 
 ### Realvalue Column Addition
+
 The `UserAttr` table originally had only `Intvalue`. The `Realvalue` column was added via migration in `sqlinit()`:
 
 ```cpp
@@ -678,12 +758,12 @@ This allows storing double-precision attributes like `Sanity` and `Attrition`.
 
 The previous `doc/database/db.txt` (6 lines) was incomplete and outdated. Key corrections:
 
-| Old (db.txt) | Actual (from code) |
-|--------------|-------------------|
-| `EquipDef` | `EquipReg` |
-| `Equipname` (lowercase) | `EquipName` |
-| `UserFactory` | `Factories` |
-| Missing columns: `Realvalue`, `SlotEX`, `Fuel`, `Ammo`, etc. | Full schema as above |
-| No foreign key constraints | Foreign keys defined for referential integrity |
+| Old (db.txt)                                                 | Actual (from code)                             |
+| ------------------------------------------------------------ | ---------------------------------------------- |
+| `EquipDef`                                                   | `EquipReg`                                     |
+| `Equipname` (lowercase)                                      | `EquipName`                                    |
+| `UserFactory`                                                | `Factories`                                    |
+| Missing columns: `Realvalue`, `SlotEX`, `Fuel`, `Ammo`, etc. | Full schema as above                           |
+| No foreign key constraints                                   | Foreign keys defined for referential integrity |
 
 **This document supersedes all previous database documentation.**

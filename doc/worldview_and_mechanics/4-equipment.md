@@ -34,10 +34,6 @@ High firing range (together with LOS) improve the chance of firing gunshot attac
 
 #### Main gun (small/medium caliber)
 
-Trigger gun cut-ins with other Main gun/Secondary gun/Recon plane.
-
-Trigger gun/torpedo cut-ins with Torpedo.
-
 **Documentation Note**: One type of cut-in will only be mentioned once despite it usually involves two types of equipment. This does not mean it must be arranged in order (equip-slot-wise)
 
 ##### Small-caliber main guns (small-gun-flat, small-gun-flak)
@@ -54,7 +50,7 @@ Equip-able by cruisers and battlecruisers. Intended to win combat with enemies w
 
 #### Big-caliber Main Gun
 
-Trigger gun cut-ins with other Big-caliber Main Gun/Recon plane/AP shell. Their much greater range meaning they won't attack enemies together with secondary guns/torpedoes.
+Their much greater range meaning they won't attack enemies together with secondary guns/torpedoes.
 
 ##### Battleship main guns (big-gun)
 
@@ -72,19 +68,13 @@ Equip-able by only super-battleships and Advanced battleships (such as Nagato-cl
 
 With less firepower but more accuracy than battleship main guns; intended to fight lesser, closer enemies.
 
-Trigger cut-ins with Torpedo.
-
 Unlike KC (but like KC arcade), second-gun-flat can trigger point-blank shot which lowers the enemy's formation coefficiency.
 
-second-gun-flak-big type can only be equipped on heavy cruisers, battleships, and carriers; other types can additionally be equipped on light cruisers and seaplane tenders
+"second-gun-flak-big" type can only be equipped on heavy cruisers, battleships, and carriers; other types can additionally be equipped on light cruisers and seaplane tenders
 
 #### Main/secondary gun (high-angle) (small-gun-flak, mid-gun-flak, second-gun-flak, second-gun-flak-big)
 
 Provide superior anti-air power.
-
-Trigger anti-air cut-ins with Anti-Air Radar/AA Control Device/AA Cannon.
-
-Trigger anti-air cut-ins with other Flak guns/AA gun when on anti-air cruiser/destroyers/battleships.
 
 ### Torpedo (torp)
 
@@ -94,8 +84,6 @@ Torpedo have a high reload time that day/night battle phase is expected to have 
 
 High torpedo stats (together with speed) increase the chance of preemptive/concluding torpedo strikes (which occurs in approaching/disengaging phase)
 
-Trigger cut-ins with other Torpedo.
-
 Equip-able by destroyers, cruisers, submarines, battlecruisers, escort destroyers.
 
 **Design Philosophy**:
@@ -104,8 +92,6 @@ Equip-able by destroyers, cruisers, submarines, battlecruisers, escort destroyer
 - The risk-reward balance: torpedo-focused builds sacrifice daytime shelling power for night-time dominance. They should focus on slow, heavily-armored targets instead of lightly-armored ones that is very difficult to hit anyway.
 
 #### Submarine torpedo (torp-sub)
-
-Trigger cut-ins with submarine equipment.
 
 Equip-able by submarines.
 
@@ -143,8 +129,6 @@ Condition: `isfighter = 1`
 
 Contest air superiority; increasing air superiority coefficient with benefits previously mentioned.
 
-Trigger cut-in with dive-bomber.
-
 Note that unlike Kantai Collection, fighter/divebomber/torpbomber/recon attributes are not mutually exclusive. But a plane can't trigger cut-in with itself even if it may have two attributes that otherwise fulfills the conditions.
 
 ##### Interceptors
@@ -159,8 +143,6 @@ Condition: `isdivebomber = 1`
 
 Perform dive-bombing attacks; with stable damage in battle phase.
 
-Trigger cut-in with other dive-bomber/torpedo-bomber.
-
 #### Torpedo-bombers
 
 Condition: `istorpbomber = 1`
@@ -171,7 +153,7 @@ Deliver torpedo attacks which like torpedoes have high but unstable damage; prov
 
 Condition: `isrecon = 1`
 
-High LOS; enable guided strikes and can improve the formation coefficient. As previously mentioned, crucial to improve non-carrier warship's power by cut-ins (this type of cut-in is equivalent to artillery spotting in Kantai Collection); other ship's recon planes can be used in these cut-in conditions (with much lower probability if the communication efficiency is low).
+High LOS; enable guided strikes and can improve the formation coefficient. As mentioned below, crucial to improve non-carrier warship's power by cut-ins (this type of cut-in is equivalent to artillery spotting in Kantai Collection).
 
 #### Night planes
 
@@ -181,7 +163,7 @@ Can operate in night battle (carrier planes require night-capable carrier or nig
 
 #### Jet planes
 
-Condition: `isnight = 1 or getspecial = 28`
+Condition: `getspecial = 28`
 
 The next-generation of planes, in this game cut-in involving only jet planes have much higher damage coefficient.
 
@@ -190,8 +172,6 @@ The next-generation of planes, in this game cut-in involving only jet planes hav
 Condition: `ispatrol = 1`
 
 Slow planes or autogyroes used in ASW warfare. Little other functionality would be provided (expect that patrol-liason-f type is a fighter and participate in air superiority)
-
-Autogyro (patrol-autogryo) triggers ASW cut-ins with Liaisons (patrol-liaison or patrol-liaison-f).
 
 ### Radar
 
@@ -231,7 +211,7 @@ Unlike Kantai collection, can be equipped by heavy cruisers besides battleships.
 
 #### Type 3 Shell (al-shell)
 
-Trigger Anti-air cut-in with Big-caliber Main Gun+AA Ctonrol devices on battle ships; effective against soft-skin land structures.
+Effective against soft-skin land structures.
 
 ### Anti-air
 
@@ -241,7 +221,7 @@ Equip-able on all surface ships.
 
 - AA guns are a defensive investment: they sacrifice offensive slots for survivability against air-heavy fleets.
 - The variety of stats (firepower, evasion, etc.) on some guns makes them more than pure AA tools, offering niche builds.
-- A mix of flak guns/cannons/machine guns are the best.
+- A mix of flak guns/cannons/machine guns are the best, as they provide long-range/medium-range/close range AAs respectively.
 
 #### Anti-air cannons (aa-cannon)
 
@@ -250,6 +230,8 @@ Provided medium-range anti-aircraft fire; is better than protecting entire fleet
 Triggers anti-air cut-in with Anti-air machine guns.
 
 #### Anti-air machine guns (aa-gun)
+
+Condition: `size = 0` and `isspecial = 25`
 
 Provided small-range anti-aircraft fire; focus on protecting equipped ship rather than the entire fleet.
 
@@ -261,7 +243,7 @@ Condition: is type aa-gun and `isrocket = 1`
 
 Rocket launchers represent advanced AA technology that might nullify air strike on equipped ship, a powerful but slot-expensive option. The more powerful stats said rocket launchers have and more base AA stats of the ship, the greater the probability (never reaches 100, unlike Kantai Collection)
 
-#### Anti-air control device
+#### Anti-air control device (aa-control-device)
 
 Enhances anti-air together with flak guns or big-caliber main guns (on battleships). 
 
@@ -274,21 +256,21 @@ Enhances anti-air together with flak guns or big-caliber main guns (on battleshi
 - ASW aircraft extend anti-submarine capability to carriers and hybrid ships, giving them a utility role beyond air combat.
 - The higher base ASW and more powerful ASW equipment, the higher chance of preemptive ASW attack against enemy submarines.
 
-#### Passive sonars (sonar-passive)
+#### Sonars
+
+##### Passive sonars (sonar-passive)
 
 Increases ASW detection and damage; advanced ones provide torpedo evasion.
-
-Triggers anti-sub cut-ins with either types of depth charges.
 
 Equip-able on light cruisers/destroyers/escorts.
 
 Equip-able on submarines (visible bonus on LOS and evasion, but attacking other submarines is not possible)
 
-#### Big passive sonars (sonar-passive-big)
+##### Big passive sonars (sonar-passive-big)
 
 Like passive sonar but equip-able only on capital ships.
 
-#### Active sonars (sonar-active)
+##### Active sonars (sonar-active)
 
 Like passive sonar, but useful in fishing.
 
@@ -298,9 +280,13 @@ High ASW damage; Triggers anti-sub cut-ins with depth charge racks.
 
 Equip-able on light cruisers/destroyers/escorts/seaplane tenders.
 
+##### Mortar (二式12cm迫撃砲改, 二式12cm迫撃砲改 集中配備)
+
+In addition to depth charge capabilities, have anti-land effects
+
 #### Depth charge racks (depthc-racks)
 
-Like projectors, essential for high ASW damage.
+Like projectors, essential for high ASW damage. 
 
 #### Patrol planes (see above)
 
@@ -326,9 +312,9 @@ Does not count as a torpedo; increases the accuracy and chance of preemptive tor
 
 ### Landing Craft / Special Amphibious Tanks / Land corps
 
-Depending on stats, either functions only as transporter or essential against land targets.
+"Tranposrt" attribute > 0: Used for transport mission-critical material (for transport gauge maps)
 
-Triggers anti-land cut-ins with each other.
+"Antiland" attribute > 0: Used for marine attack against land targets.
 
 #### Landing craft (landing-craft)
 
@@ -338,30 +324,148 @@ Triggers anti-land cut-ins with each other.
 
 ### Emergency Repair
 
+Prevents sinking once per sortie; consumed after activation. Allows players to push deeper into difficult maps with reduced risk.
+
+**Design Philosophy**:
+
+- Repair items are a safety net that reduces frustration, especially in event maps with high-stakes routing.
+- As a primarily paid item, they represent a monetization point while also being a strategic resource to be hoarded for the toughest challenges.
+
 ### Bulges
 
-### Engine Improvement
+Trade evasion for survivability, making ships harder to sink but easier to hit.
 
-### Others
+Particularly useful for ships that are already slow or intended to absorb damage (e.g., battleships in a tanking role).
 
-- **Searchlights / Illumination shells**: Increase night-battle accuracy and cut-in rate, but searchlights make the bearer a priority target.
+Landing craft (landing-craft)
 
-- **Drum cans**: Boost expedition income and resource-node yields; essential for transport missions.
+#### Small bulges (bulge-small)
 
-- **Repair facilities**: Increase the number of ships a repair ship can service simultaneously.
+Equipable on certain destroyers.
+
+#### Medium bulges (bulge-medium)
+
+Equipable on cruisers, light carriers, seaplane tenders, etc.
+
+#### Large bulges (bulge-large)
+
+Equipable on battleships and standard carriers.
+
+### Engine Improvement (engine-boiler, engine-turbine)
+
+Increase ship speed (which unlike KC but similar to KC-Arcade, is a number) and evasion.
+
+Combining turbines and boilers give visible bonuses, further amplifing their effects.
+
+Equipable on non-escorts.
+
+**Design Philosophy**:
+
+- Unlike KC which ship speed affects map branch rule but no discernable effect in battle, in this game high speed (relative to enemies) increase formation efficiency and helps engage and disengage.
+
+### Night illumination
+
+#### Searchlights (searchlight, searchlight-big)
+
+Increase night battle LOS; make the bearer a priority target (concealment changed to 0).
+
+#### Illumination shells (starshell)
+
+Increase night battle LOS.
+
+### Drum cans (drum)
+
+Boost map supremacy gained from expedition. [NOTIMPLEMENTED]
+
+Used for transport mission-critical material (for transport gauge maps), like landing-craft.
+
+### Repair facilities (repair-fac)
+
+Increase the number of ships a repair ship can service simultaneously; enable battleship repair.
+
+### Aircraft personnel (aircraft-personnel)
 
 - **Skilled aircraft mechanics**: Extend range and increase firepower of carrier aircraft.
 
 - **Night-operation aircraft personnel**: Enable night-time carrier air attacks.
 
-- **Skilled lookouts**: Improve night-battle cut-in rates.
+### Surface personnel (surface-personnel)
 
-- **Fleet command facility**: Allows heavily damaged ships to retreat in combined-fleet operations.
+**Skilled lookouts**: Improve LOS. Primary function is visible bonus on Japanese ships.
 
-- **WG42 (rocket launchers)**: Specialized anti-land weaponry.
+### Command chain (command-fac)
 
-- **Large flying boats**: Exceptional scouting and contact rates; minor ASW capability.
+**Fleet command facility**: Allows heavily damaged ships to retreat. Each equipment have a suited fleet type.
 
-- **Onboard resupply**: Lets replenishment ships refuel/reammo the fleet at sea.
+**Telecommunication antenna/device**: Increase communication efficiency.
 
-- #### **Combat rations**: Temporarily boost morale (fatigue recovery).
+### Rocket launchers (al-rocket)
+
+Specialized anti-land weaponry.
+
+### Large flying boats (flyingboat)
+
+Exceptional scouting and contact rates; minor ASW capability. Extends the range of LBAS squadrons.
+
+### Onboard supply (underway-replenish) [NOTIMPLEMENTED]
+
+Lets replenishment ships refuel/reammo the fleet at sea.
+
+### Combat rations (food)
+
+Not a consumable item (unlike KC), but boost stats of ship at the expense of one equip slot.
+
+### Ballons (ballon) [NOTIMPLEMENTED]
+
+Increase daytime damage in certain nodes.
+
+### Smoke (smoke) [NOTIMPLEMENTED]
+
+Increase concealment.
+
+## Cut-ins
+
+Representing synergy between equipment, utilizing them is essential for achieving good results in battle.
+
+For all types of cut-ins the more powerful your equipment (that triggers cut-in) are, the more likely cut-in can occur.
+
+In the below table "main gun" does not include big-caliber ones. "recon plane" can include other ships' equipment (require high communicatoin efficiency)
+
+| Cut-in type                             | Equipment 1                          | Equipment 2                                         | Equipment 3       |
+|:---------------------------------------:|:------------------------------------:|:---------------------------------------------------:|:-----------------:|
+| Gunshot                                 | Main gun                             | Main gun                                            |                   |
+| Gunshot                                 | Main gun                             | Secondary gun                                       |                   |
+| Gunshot (spotting fire)                 | Main gun                             | Recon plane                                         |                   |
+| Gunshot+Torpedo                         | Main gun                             | Torpedo                                             |                   |
+| Gunshot                                 | Big-caliber main gun                 | Big-caliber main gun                                |                   |
+| Gunshot (spotting fire)                 | Big-caliber main gun                 | Recon plane                                         |                   |
+| Gunshot                                 | Big-caliber main gun                 | AP shell                                            |                   |
+| Gunshot+Torpedo                         | Secondary gun                        | Torpedo                                             |                   |
+| Anti-air                                | Secondary gun (flak)                 | Anti-air radar                                      |                   |
+| Anti-air                                | Secondary gun (flak)                 | AA control device                                   |                   |
+| Anti-air                                | Secondary gun (flak)                 | AA cannon                                           |                   |
+| Anti-air (require AA focused ships)     | Secondary gun (flak)                 | Secondary gun (flak)                                |                   |
+| Anti-air (require AA focused ships)     | Secondary gun (flak)                 | AA gun                                              |                   |
+| Anti-air (require battleships)          | Type 3 shell                         | Big-caliber main gun                                | AA control device |
+| Anti-air (require Shiratsuyu-class)     | C3H gun                              | C3H gun                                             |                   |
+| Anti-air (require Shiratsuyu-class)     | C3H gun                              | Anti-air radar                                      |                   |
+| Anti-air (require Shiratsuyu-class)     | C3H gun                              | 25mm対空機銃増備                                          |                   |
+| Torpedo                                 | Torpedo                              | Torpedo                                             |                   |
+| Torpedo (require submarines)            | Submarine torpedo                    | Submarine equipment                                 |                   |
+| Air bombing                             | Fighter                              | Dive bomber                                         |                   |
+| Air bombing                             | Dive bomber                          | Dive bomber                                         |                   |
+| Air bombing+air torpedo                 | Dive bomber                          | Torpedo bomber                                      |                   |
+| ASW                                     | Autogyro ASW plane (patrol-autogyro) | Liaison ASW plane (patrol-liaison/patrol-liaison-f) |                   |
+| ASW                                     | Sonar                                | Depth charge projector                              |                   |
+| ASW                                     | Sonar                                | Depth charge racks                                  |                   |
+| ASW                                     | Depth charge projector               | Depth charge racks                                  |                   |
+| Land attack                             | Landing craft                        | Special Amphibious tanks                            |                   |
+| Land attack                             | Land corps                           | Special Amphibious tanks                            |                   |
+| Land attack                             | Landing craft                        | Land corps                                          |                   |
+| Land attack                             | Dive bomber (require anti-land>0)    | Dive bomber (require anti-land>0)                   |                   |
+| Land attack (effectiv e with soft skin) | Main gun                             | Type 3 shell                                        |                   |
+| Land attack (effectiv e with soft skin) | Big-caliber Main gun                 | Type 3 shell                                        |                   |
+| Land attack (effectiv e with hard skin) | Big-caliber Main gun                 | Big-caliber Main gun                                | AP shell          |
+| Land attack                             | Main gun/Big-caliber Main gun        | Landing craft/Special Amphibious tanks              |                   |
+| Land attack                             | Anti-land rocket                     |                                                     |                   |
+| Land attack                             | Mortar                               |                                                     |                   |
