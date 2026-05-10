@@ -401,6 +401,7 @@ enum FleetFailType{
     FleetShipNotSupplied,
     FleetInsufficientResources,
     FleetCriticallyDamaged,
+    EquipLocked,
 };
 Q_ENUM_NS(FleetFailType)
 

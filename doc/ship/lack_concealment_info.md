@@ -6,6 +6,7 @@ remain unchanged from their original settings in `Ship.xlsx`.
 ## Japanese ships (no WoWS equivalent)
 
 ### Seaplane Tenders / Auxiliary
+
 - 千歳型
 - 日進型
 - 瑞穂型
@@ -17,6 +18,7 @@ remain unchanged from their original settings in `Ship.xlsx`.
 - 改氷川丸級
 
 ### Carriers (no WoWS page / removed post-rework)
+
 - 赤城型 (Akagi – premium; wiki page lacks performance data)
 - 大鷹型
 - 飛鷹型
@@ -27,6 +29,7 @@ remain unchanged from their original settings in `Ship.xlsx`.
 - 春日丸級
 
 ### Escort / Coastal Defense
+
 - 占守型
 - 択捉型
 - 日振型
@@ -36,6 +39,7 @@ remain unchanged from their original settings in `Ship.xlsx`.
 - 松型
 
 ### Submarines
+
 - 巡潜乙型
 - 巡潜乙型改一
 - 巡潜乙型改二
@@ -49,8 +53,9 @@ remain unchanged from their original settings in `Ship.xlsx`.
 - 三式潜航輸送艇
 
 ### Amphibious / Transport / Misc
+
 - 大淀型
-- 改敷島型
+- 改敷島型--I'm here
 - 改風早型
 - 大泊型
 - 特1TL型
@@ -67,23 +72,28 @@ remain unchanged from their original settings in `Ship.xlsx`.
 ## Foreign ships (no WoWS wiki page or 404)
 
 ### Italy
+
 - Aquila級 (carrier; wiki page not found)
 - Marcello級 (submarine; not in WoWS)
 - Guglielmo Marconi級 (submarine; not in WoWS)
 
 ### Germany
+
 - UボートIXC型 (submarine; not in WoWS)
 
 ### USA
+
 - Casablanca級 (escort carrier; wiki page not found)
 - Gato級 (submarine; not in WoWS)
 - Salmon級 (submarine; not in WoWS)
 - John C.Butler級 (destroyer escort; not in WoWS)
 
 ### France
+
 - C.Teste級 (seaplane tender; wiki page not found)
 
 ### Sweden
+
 - Gotland級 (wiki page not found)
 
 ## Methodology
@@ -95,17 +105,17 @@ data from the [World of Warships wiki](https://wiki.wargaming.net).
 
 Some classes use a **sister-ship substitution** when the exact class page is unavailable:
 
-| Spreadsheet class | WoWS page used | Reason |
-|---|---|---|
-| 綾波型 | Fubuki | Ayanami is Fubuki-subclass |
-| 暁型 | Akatsuki | Direct match |
-| 長良型 | Kuma | Nagara not a separate WoWS ship |
-| 川内型 | Kuma | Sendai not a separate WoWS ship |
-| 蒼龍型 | Ryūjō | Hiryū wiki page lacks performance data |
-| 飛龍型 | Ryūjō | Hiryū wiki page lacks performance data |
-| 大鳳型 | Shōkaku | Taihō wiki page times out (504 Gateway) |
-| Brooklyn級 | Helena | Brooklyn-class uses St. Louis subclass |
-| South Dakota級 | Massachusetts | Same class |
-| Nevada級 | New Mexico | Same tier US Standard BB |
-| Northampton級 | New Orleans | Successor heavy cruiser class |
-| Illustrious級 | Indomitable | Same class |
+| Spreadsheet class | WoWS page used | Reason                                  |
+| ----------------- | -------------- | --------------------------------------- |
+| 綾波型               | Fubuki         | Ayanami is Fubuki-subclass              |
+| 暁型                | Akatsuki       | Direct match                            |
+| 長良型               | Kuma           | Nagara not a separate WoWS ship         |
+| 川内型               | Kuma           | Sendai not a separate WoWS ship         |
+| 蒼龍型               | Ryūjō          | Hiryū wiki page lacks performance data  |
+| 飛龍型               | Ryūjō          | Hiryū wiki page lacks performance data  |
+| 大鳳型               | Shōkaku        | Taihō wiki page times out (504 Gateway) |
+| Brooklyn級         | Helena         | Brooklyn-class uses St. Louis subclass  |
+| South Dakota級     | Massachusetts  | Same class                              |
+| Nevada級           | New Mexico     | Same tier US Standard BB                |
+| Northampton級      | New Orleans    | Successor heavy cruiser class           |
+| Illustrious級      | Indomitable    | Same class                              |

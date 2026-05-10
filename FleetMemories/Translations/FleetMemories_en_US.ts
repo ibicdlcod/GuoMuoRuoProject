@@ -1131,6 +1131,11 @@ Great at battle and bad at politics--so cool!</translation>
         <source>Fleet contains equipment unavailable for battle.</source>
         <translation type="unfinished">Fleet contains equipment unavailable for battle.</translation>
     </message>
+    <message id="fleet-equip-locked">
+        <location filename="../ClientGUI/clientv2.cpp" line="1153"/>
+        <source>Equip is locked (ship is on sortie or expedition).</source>
+        <translation type="unfinished">Equip is locked (ship is on sortie or expedition).</translation>
+    </message>
     <message id="fleet-dont-fit-map">
         <location filename="../ClientGUI/clientv2.cpp" line="1153"/>
         <source>Fleet don&apos;t fit this map.</source>
@@ -3111,6 +3116,11 @@ Great at battle and bad at politics--so cool!</translation>
     <message id="expedition-db-gen-failure">
         <location filename="../Server/server_sqlinit.cpp" line="849"/>
         <source>Create Expedition database failed.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="expedition-equip-query-failure">
+        <location filename="../Server/server.cpp" line="5267"/>
+        <source>Query expedition equipment failure for user %1!</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="expedition-battle-plans-db-lack">

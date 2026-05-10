@@ -1148,6 +1148,9 @@ void Client::receivedMsg(const QJsonObject &djson) {
             case KP::EquipError:
                 //% "Fleet contains equipment unavailable for battle."
                 warn << qtTrId("fleet-equip-error"); break;
+            case KP::EquipLocked:
+                //% "Equip is locked (ship is on sortie or expedition)."
+                warn << qtTrId("fleet-equip-locked"); break;
             case KP::FleetDontFitMap:
                 //% "Fleet don't fit this map."
                 warn << qtTrId("fleet-dont-fit-map"); break;

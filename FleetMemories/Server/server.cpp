@@ -5254,10 +5254,49 @@ check_duplicate_remodel_group:
         }
     }
 
+    QSet<QString> lockedEquipUuids;
+    {
+        QSqlQuery query;
+        query.prepare("SELECT Slot1, Slot2, Slot3, Slot4, Slot5, SlotEX "
+                      "FROM UserShip "
+                      "WHERE User = :uid AND FleetIndex >= :expMask");
+        query.bindValue(":uid", uid.ConvertToUint64());
+        query.bindValue(":expMask", KP::expeditionFleetMask);
+        if(Q_UNLIKELY(!query.exec() || !query.isSelect())) {
+            //% "Query expedition equipment failure for user %1!"
+            throw DBError(qtTrId("expedition-equip-query-failure")
+                          .arg(uid.ConvertToUint64()),
+                          query.lastError(), query.lastQuery());
+            return {KP::ValidFleet, -1};
+        }
+        while(query.next()) {
+            for(int col = 0; col <= KP::maxEquipSlots; ++col) {
+                QString euuid = query.value(col).toString();
+                if(!euuid.isEmpty())
+                    lockedEquipUuids.insert(euuid);
+            }
+        }
+    }
+
+    for(const auto &shipData: input) {
+        auto shipDataObj = shipData.toObject();
+        auto equipArr = shipDataObj["equip"].toArray();
+        for(int i = 0; i <= KP::maxEquipSlots; ++i) {
+            QString euuid = equipArr[i].toString();
+            if(!euuid.isEmpty() && lockedEquipUuids.contains(euuid)) {
+                int shipFleetIndex = shipDataObj["pos"].toInt()
+                                     / KP::fleetRepSize;
+                return {KP::EquipLocked, shipFleetIndex};
+            }
+        }
+    }
+
     QSqlQuery query;
     query.prepare("UPDATE UserShip SET FleetIndex = -1, "
                   "FleetPosIndex = -1 "
-                  "WHERE User = :uid");
+                  "WHERE User = :uid "
+                  "AND FleetIndex < :expMask");
+    query.bindValue(":expMask", KP::expeditionFleetMask);
     query.bindValue(":uid", uid.ConvertToUint64());
     if(Q_UNLIKELY(!query.exec())) {
         //% "Update fleet (clear fleet) failure!"
