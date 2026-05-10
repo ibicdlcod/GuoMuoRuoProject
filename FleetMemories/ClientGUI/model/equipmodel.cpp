@@ -486,7 +486,7 @@ QVariant EquipModel::data(const QModelIndex &index, int role) const {
                         "("+shipUid.toString().first(9).last(8)+")";
                     MainWindow *mainWindowM = nullptr;
                     for(QWidget *w : QApplication::topLevelWidgets()) {
-                        if(w) {
+                        if(w && qobject_cast<MainWindow *>(w)) {
                             mainWindowM = qobject_cast<MainWindow *>(w);
                         }
                     }
@@ -607,11 +607,10 @@ QVariant EquipModel::data(const QModelIndex &index, int role) const {
                         "("+shipUid.toString().first(9).last(8)+")";
                     MainWindow *mainWindowM = nullptr;
                     for(QWidget *w : QApplication::topLevelWidgets()) {
-                        if(w) {
+                        if(w && qobject_cast<MainWindow *>(w)) {
                             mainWindowM = qobject_cast<MainWindow *>(w);
                         }
                     }
-                    QString posStr;
                     if(mainWindowM) {
                         FleetPos pos =
                             mainWindowM->getFleetArea()->getShipIndex(shipUid);

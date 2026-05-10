@@ -1316,48 +1316,48 @@ Great at battle and bad at politics--so cool!</translation>
     </message>
     <message id="equip-uuid">
         <location filename="../ClientGUI/model/equipmodel.cpp" line="534"/>
-        <location filename="../ClientGUI/model/equipmodel.cpp" line="702"/>
+        <location filename="../ClientGUI/model/equipmodel.cpp" line="701"/>
         <location filename="../ClientGUI/model/specequipmodel.cpp" line="59"/>
         <source>Equipment UUID</source>
         <translation type="unfinished">Equipment UUID</translation>
     </message>
     <message id="equip-name">
         <location filename="../ClientGUI/model/equipmodel.cpp" line="538"/>
-        <location filename="../ClientGUI/model/equipmodel.cpp" line="704"/>
+        <location filename="../ClientGUI/model/equipmodel.cpp" line="703"/>
         <source>Equipment name</source>
         <translation type="unfinished">Equipment name</translation>
     </message>
     <message id="equip-star">
         <location filename="../ClientGUI/model/equipmodel.cpp" line="542"/>
-        <location filename="../ClientGUI/model/equipmodel.cpp" line="706"/>
+        <location filename="../ClientGUI/model/equipmodel.cpp" line="705"/>
         <source>Improvement level</source>
         <oldsource>Equipment improvement level</oldsource>
         <translation type="unfinished">Improvement level</translation>
     </message>
     <message id="equip-attr">
         <location filename="../ClientGUI/model/equipmodel.cpp" line="546"/>
-        <location filename="../ClientGUI/model/equipmodel.cpp" line="708"/>
+        <location filename="../ClientGUI/model/equipmodel.cpp" line="707"/>
         <source>Attributes</source>
         <oldsource>Equipment attributes</oldsource>
         <translation type="unfinished">Attributes</translation>
     </message>
     <message id="destruct">
         <location filename="../ClientGUI/model/equipmodel.cpp" line="550"/>
-        <location filename="../ClientGUI/model/equipmodel.cpp" line="710"/>
+        <location filename="../ClientGUI/model/equipmodel.cpp" line="709"/>
         <source>Destruct</source>
         <oldsource>Destruct this equipment</oldsource>
         <translation type="unfinished">Destruct</translation>
     </message>
     <message id="equip-select">
         <location filename="../ClientGUI/model/equipmodel.cpp" line="554"/>
-        <location filename="../ClientGUI/model/equipmodel.cpp" line="712"/>
+        <location filename="../ClientGUI/model/equipmodel.cpp" line="711"/>
         <source>Select</source>
         <oldsource>Select this equipment</oldsource>
         <translation type="unfinished">Select</translation>
     </message>
     <message id="equip-pos">
         <location filename="../ClientGUI/model/equipmodel.cpp" line="558"/>
-        <location filename="../ClientGUI/model/equipmodel.cpp" line="714"/>
+        <location filename="../ClientGUI/model/equipmodel.cpp" line="713"/>
         <source>Position</source>
         <translation type="unfinished">Position</translation>
     </message>
