@@ -651,7 +651,7 @@ Great at battle and bad at politics--so cool!</source>
     <message id="ard-purchase-start">
         <location filename="../ClientGUI/clientv2_actions.cpp" line="35"/>
         <source>Starting ARD coupon purchase...</source>
-        <translation type="unfinished">正在发起ARD凭证购买……</translation>
+        <translation type="unfinished">正在发起高级物资调度券购买……</translation>
     </message>
     <message id="access-denied-login-first">
         <location filename="../ClientGUI/clientv2.cpp" line="744"/>
@@ -1172,7 +1172,7 @@ Great at battle and bad at politics--so cool!</source>
     <message id="store-insufficient-coupons">
         <location filename="../ClientGUI/clientv2.cpp" line="1223"/>
         <source>Insufficient ARD Coupons.</source>
-        <translation type="unfinished">ARD凭证不足。</translation>
+        <translation type="unfinished">高级物资调度券不足。</translation>
     </message>
     <message id="ard-purchase-failed">
         <location filename="../ClientGUI/clientv2.cpp" line="1227"/>
@@ -1187,12 +1187,12 @@ Great at battle and bad at politics--so cool!</source>
     <message id="ard-purchase-success">
         <location filename="../ClientGUI/clientv2.cpp" line="1237"/>
         <source>Purchase successful! %1 ARD Coupons added.</source>
-        <translation type="unfinished">购买成功！已添加%1张ARD凭证。</translation>
+        <translation type="unfinished">购买成功！已添加%1张高级物资调度券。</translation>
     </message>
     <message id="ard-purchase-clawback">
         <location filename="../ClientGUI/clientv2.cpp" line="1243"/>
         <source>Notice: %1 ARD Coupons have been reclaimed due to a refund or chargeback.</source>
-        <translation type="unfinished">通知：由于退款或拒付，已回收%1张ARD凭证。</translation>
+        <translation type="unfinished">通知：由于退款或拒付，已回收%1张高级物资调度券。</translation>
     </message>
     <message id="medal-purchase-success">
         <location filename="../ClientGUI/clientv2.cpp" line="1250"/>
@@ -1798,12 +1798,12 @@ Great at battle and bad at politics--so cool!</source>
     <message id="ard-invalid-amount">
         <location filename="../ClientGUI/clientv2.cpp" line="1207"/>
         <source>Invalid ARD coupon amount.</source>
-        <translation type="unfinished">ARD凭证数量无效。</translation>
+        <translation type="unfinished">高级物资调度券数量无效。</translation>
     </message>
     <message id="ard-coupon-description">
         <location filename="../Server/server_ard.cpp" line="165"/>
         <source>%1 ARD Coupons</source>
-        <translation type="unfinished">%1张ARD凭证</translation>
+        <translation type="unfinished">%1张高级物资调度券</translation>
     </message>
     <message id="user-calculate-tech-failed">
         <location filename="../Server/server.cpp" line="483"/>
@@ -4496,13 +4496,7 @@ Great at battle and bad at politics--so cool!</source>
     <message id="ard-dialog-title">
         <location filename="../ClientGUI/ui/shop/ardcoupondialog.cpp" line="21"/>
         <source>Buy ARD Coupons</source>
-        <translation type="unfinished">购买ARD凭证</translation>
-    </message>
-    <message id="ard-dialog-desc">
-        <location filename="../ClientGUI/ui/shop/ardcoupondialog.cpp" line="26"/>
-        <source>Useful for elite admirals, who may want to do risky attacks or decorate their ship.</source>
-        <oldsource>Useful for elite admirals, who may want to do risky attacks or decorate their ship</oldsource>
-        <translation type="unfinished">适合精锐提督，用于进行高风险作战或为舰船授勋。</translation>
+        <translation type="unfinished">购买高级物资调度券</translation>
     </message>
     <message id="ard-package-select">
         <location filename="../ClientGUI/ui/shop/ardcoupondialog.cpp" line="31"/>
@@ -4512,7 +4506,7 @@ Great at battle and bad at politics--so cool!</source>
     <message id="ard-package-option">
         <location filename="../ClientGUI/ui/shop/ardcoupondialog.cpp" line="42"/>
         <source>%1 ARD Coupons — HK$ %2</source>
-        <translation type="unfinished">%1张ARD凭证 — HK$ %2</translation>
+        <translation type="unfinished">%1张高级物资调度券 — HK$ %2</translation>
     </message>
     <message id="ard-custom-label">
         <location filename="../ClientGUI/ui/shop/ardcoupondialog.cpp" line="52"/>
@@ -4553,7 +4547,7 @@ Great at battle and bad at politics--so cool!</source>
         <location filename="../ClientGUI/ui/shop/buyequipdialog.cpp" line="24"/>
         <location filename="../ClientGUI/ui/shop/buyordresourcesdialog.cpp" line="27"/>
         <source>ARD Coupons: %1</source>
-        <translation type="unfinished">ARD凭证余额：%1</translation>
+        <translation type="unfinished">高级物资调度券：%1</translation>
     </message>
     <message id="shop-buy-ord-res-title">
         <location filename="../ClientGUI/ui/shop/buyordresourcesdialog.cpp" line="20"/>
@@ -4603,12 +4597,12 @@ Great at battle and bad at politics--so cool!</source>
     <message id="shop-ord-res-rate">
         <location filename="../ClientGUI/ui/shop/buyordresourcesdialog.cpp" line="105"/>
         <source>Rate: %1 per ARD Coupon</source>
-        <translation>汇率：每张凭证兑 %1</translation>
+        <translation>汇率：每张高级物资调度券兑 %1</translation>
     </message>
     <message id="shop-ord-res-coupons-label">
         <location filename="../ClientGUI/ui/shop/buyordresourcesdialog.cpp" line="67"/>
         <source>ARD Coupons to spend:</source>
-        <translation>消耗 ARD 凭证数：</translation>
+        <translation>消耗 高级物资调度券：</translation>
     </message>
     <message id="shop-ord-res-receive">
         <location filename="../ClientGUI/ui/shop/buyordresourcesdialog.cpp" line="107"/>
@@ -4623,7 +4617,7 @@ Great at battle and bad at politics--so cool!</source>
     <message id="shop-equip-item">
         <location filename="../ClientGUI/ui/shop/buyequipdialog.cpp" line="44"/>
         <source>%1 — %2 ARD Coupons (Owned: %3)</source>
-        <translation type="unfinished">%1 — %2张ARD凭证（已拥有：%3）</translation>
+        <translation type="unfinished">%1 — %2张高级物资调度券（已拥有：%3）</translation>
     </message>
     <message id="shop-buy-btn">
         <location filename="../ClientGUI/ui/shop/buyequipdialog.cpp" line="60"/>
@@ -4634,7 +4628,7 @@ Great at battle and bad at politics--so cool!</source>
     <message id="shop-equip-price">
         <location filename="../ClientGUI/ui/shop/buyequipdialog.cpp" line="85"/>
         <source>Price: %1 ARD Coupons</source>
-        <translation type="unfinished">价格：%1张ARD凭证</translation>
+        <translation type="unfinished">价格：%1张高级物资调度券</translation>
     </message>
     <message id="medal-dialog-title">
         <location filename="../ClientGUI/ui/shop/medalbuydialog.cpp" line="18"/>
@@ -4644,7 +4638,7 @@ Great at battle and bad at politics--so cool!</source>
     <message id="medal-coupon-balance">
         <location filename="../ClientGUI/ui/shop/medalbuydialog.cpp" line="25"/>
         <source>Current ARD Coupons: %1</source>
-        <translation type="unfinished">当前ARD凭证：%1</translation>
+        <translation type="unfinished">当前高级物资调度券：%1</translation>
     </message>
     <message id="medal-current-count">
         <location filename="../ClientGUI/ui/shop/medalbuydialog.cpp" line="31"/>
@@ -4669,7 +4663,7 @@ Great at battle and bad at politics--so cool!</source>
     <message id="medal-cost-display">
         <location filename="../ClientGUI/ui/shop/medalbuydialog.cpp" line="74"/>
         <source>%1 ARD Coupons</source>
-        <translation type="unfinished">%1张ARD凭证</translation>
+        <translation type="unfinished">%1张高级物资调度券</translation>
     </message>
     <message id="res-gain-col-supremacy">
         <location filename="../ClientGUI/ui/sortie/resourcegainview.cpp" line="87"/>
@@ -5826,7 +5820,7 @@ Great at battle and bad at politics--so cool!</source>
     <message id="menu-buy-ard">
         <location filename="../ClientGUI/ui/mainwindow.ui" line="395"/>
         <source>Buy ARD Coupons</source>
-        <translation type="unfinished">购买ARD凭证</translation>
+        <translation type="unfinished">购买高级物资调度券</translation>
     </message>
     <message id="menu-buy-medal">
         <location filename="../ClientGUI/ui/mainwindow.ui" line="400"/>

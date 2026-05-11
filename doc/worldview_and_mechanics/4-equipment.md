@@ -454,7 +454,9 @@ In the below table "main gun" does not include big-caliber ones. "recon plane" c
 | Torpedo (require submarines)            | Submarine torpedo                    | Submarine equipment                                 |                   |
 | Air bombing                             | Fighter                              | Dive bomber                                         |                   |
 | Air bombing                             | Dive bomber                          | Dive bomber                                         |                   |
-| Air bombing+air torpedo                 | Dive bomber                          | Torpedo bomber                                      |                   |
+| Air bombing                             | Dive bomber                          | Torpedo bomber                                      |                   |
+| Air bombing                             | Recon plane                          | Dive bomber                                         |                   |
+| Air bombing                             | Recon plane                          | Torpedo bomber                                      |                   |
 | ASW                                     | Autogyro ASW plane (patrol-autogyro) | Liaison ASW plane (patrol-liaison/patrol-liaison-f) |                   |
 | ASW                                     | Sonar                                | Depth charge projector                              |                   |
 | ASW                                     | Sonar                                | Depth charge racks                                  |                   |
@@ -469,6 +471,8 @@ In the below table "main gun" does not include big-caliber ones. "recon plane" c
 | Land attack                             | Main gun/Big-caliber Main gun        | Landing craft/Special Amphibious tanks              |                   |
 | Land attack                             | Anti-land rocket                     |                                                     |                   |
 | Land attack                             | Mortar                               |                                                     |                   |
+
+AA focused ships: Heavy (anti-air) cruisers, Light (anti-air) cruisers, destroyers and battleships that have bare AA stats over 250.
 
 ## Overall Design Philosophy
 

@@ -9,6 +9,7 @@ Constructing ships and Developing equipment which is precisely on your current t
 ## How a combined level is calculated from its components
 
 [Implemented in: Tech::calLevel]
+
 $$
 \text{Level}=\sum_{i=1}^{\infty}v_i(a^{w_i}-1)a^{-\sum_{j=1}^iw_j}
 $$
@@ -27,12 +28,14 @@ $a$: [settings: rule/techglobalscope](settings.md) when calculating global tech,
 
 [Implemented in Tech::calWeightShip] A Kanmusu's weight when calculating its technology is its [level]/[settings: rule/shiplevelperweight](settings.md).
 
-### Weight of equipment, taking skill points into account 
+### Weight of equipment, taking skill points into account
 
 [Implemented in Tech::calWeightEquip] An equipment's weight when calculating its technology is
+
 $$
 \frac{by}{\sqrt{x^2+y^2}}+1
 $$
+
 where $y$ is [actual skill points], $x$ is [required skill points], $b$ is [settings: rule/skillpointweightcontrib](settings.md).
 
 We will deal with skill points later.
@@ -42,6 +45,7 @@ We will deal with skill points later.
 [Implemented in Tech::calExperiment]
 
 When developing equipment the success rate would be:
+
 $$
 \text{Success rate}=\int_{t_{\text{wanted}}-t_{\text{current}}}^{\infty}\frac{1}{\sigma\sqrt{2\pi}}e^{-\frac{1}{2}(\frac{x}{\sigma})^2}dx
 $$
@@ -68,14 +72,16 @@ For equipment: All equipment of this exact type and a virtual equipment of this 
 
 An equipment that does not have a predecessor will have it's local technology not counted when developing.
 
-## Combined effects 
+## Combined effects
 
 [Implemented in Tech::calCapable]
 
 The highest among global and local would be in effect. However local technology $x$ level behind will cause a detrimental effect of
+
 $$
 -\frac{x^2}{2\sqrt{1+x^2}}
 $$
+
 be applied on global technology (the reverse is also true). The resulting technology will NOT be lower than the lowest among global and local technology.
 
 ## How characteristic tech level are determined
@@ -85,42 +91,41 @@ be applied on global technology (the reverse is also true). The resulting techno
 Generally (variations may exist):
 
 | year this ship/equipment is functional | tech level |
-| :------------------------------------: | :--------: |
-|             1908 or older              |     0      |
-|                  1912                  |    0.25    |
-|                  1916                  |    0.5     |
-|                  1920                  |    0.75    |
-|                  1924                  |     1      |
-|                  1925                  |    1.33    |
-|                  1926                  |    1.67    |
-|                  1927                  |     2      |
-|                  1928                  |    2.33    |
-|                  1929                  |    2.67    |
-|                  1930                  |     3      |
-|                  1931                  |    3.33    |
-|                  1932                  |    3.67    |
-|                  1933                  |     4      |
-|                  1934                  |    4.5     |
-|                  1935                  |     5      |
-|                  1936                  |    5.5     |
-|                  1937                  |     6      |
-|                  1938                  |    6.5     |
-|                  1939                  |     7      |
-|                  1940                  |    7.5     |
-|                  1941                  |     8      |
-|                  1942                  |     9      |
-|                  1943                  |     10     |
-|                  1944                  |     11     |
-|                  1945                  |     12     |
-|                  1946                  |     13     |
-|                  1947                  |    13.5    |
-|                  1948                  |     14     |
-|                  1949                  |   14.25    |
-|                  1950                  |    14.5    |
-|                  1951                  |   14.75    |
-|                  1952                  |     15     |
-|                  1953                  |   15.25    |
-|                  1954                  |    15.5    |
-|                  1955                  |   15.75    |
-|                  1956                  |     16     |
-
+|:--------------------------------------:|:----------:|
+| 1908 or older                          | 0          |
+| 1912                                   | 0.25       |
+| 1916                                   | 0.5        |
+| 1920                                   | 0.75       |
+| 1924                                   | 1          |
+| 1925                                   | 1.33       |
+| 1926                                   | 1.67       |
+| 1927                                   | 2          |
+| 1928                                   | 2.33       |
+| 1929                                   | 2.67       |
+| 1930                                   | 3          |
+| 1931                                   | 3.33       |
+| 1932                                   | 3.67       |
+| 1933                                   | 4          |
+| 1934                                   | 4.5        |
+| 1935                                   | 5          |
+| 1936                                   | 5.5        |
+| 1937                                   | 6          |
+| 1938                                   | 6.5        |
+| 1939                                   | 7          |
+| 1940                                   | 7.5        |
+| 1941                                   | 8          |
+| 1942                                   | 9          |
+| 1943                                   | 10         |
+| 1944                                   | 11         |
+| 1945                                   | 12         |
+| 1946                                   | 13         |
+| 1947                                   | 13.5       |
+| 1948                                   | 14         |
+| 1949                                   | 14.25      |
+| 1950                                   | 14.5       |
+| 1951                                   | 14.75      |
+| 1952                                   | 15         |
+| 1953                                   | 15.25      |
+| 1954                                   | 15.5       |
+| 1955                                   | 15.75      |
+| 1956                                   | 16         |

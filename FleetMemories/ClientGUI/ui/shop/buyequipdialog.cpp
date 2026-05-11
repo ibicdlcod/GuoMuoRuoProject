@@ -84,6 +84,7 @@ void BuyEquipDialog::selectionChanged() {
     //% "Price: %1 ARD Coupons"
     priceLabel->setText(qtTrId("shop-equip-price").arg(price));
     buyBtn->setEnabled(true);
+    adjustSize();
 }
 
 void BuyEquipDialog::purchase() {
