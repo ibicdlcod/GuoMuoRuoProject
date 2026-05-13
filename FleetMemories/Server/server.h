@@ -22,8 +22,8 @@
 #include "../Protocol/peerinfo.h"
 #include "../Protocol/receiver.h"
 #include "../Protocol/ship.h"
-#include "../Protocol/map.h"
 #include "../Protocol/mapwithdiff.h"
+#include "battle.h"
 #include "servermastersender.h"
 #include "planereplenish.h"
 #include "expeditionmanager.h"
@@ -301,6 +301,7 @@ private:
     int planeLossDeductionThreshold;
 
     sol::state lua;
+    Battle battleProcessor;
 
     QTimer *clock;
 

@@ -1054,7 +1054,7 @@ void ExpeditionManager::progressExpedition(const CSteamID &uid, int mapUnionId, 
 
     if(fi) {
         /* Apply fuel/ammo consumption */
-        for(ShipDynamic *dyn : fi->shipDynamics) {
+        for(auto &dyn : fi->shipDynamics) {
             if(!dyn || dyn->fleetFled) continue;
             dyn->fuel = std::max(0.0, dyn->fuel - fuelFrac);
             dyn->ammo = std::max(0.0, dyn->ammo - ammoFrac);
@@ -1255,7 +1255,7 @@ void ExpeditionManager::checkStopConditions(const CSteamID &uid, int mapUnionId,
     /* Check each ship */
     for (int i = 0; i < fleet.ships.size(); ++i) {
         Ship *ship = fleet.ships.at(i);
-        ShipDynamic *dyn = fleet.shipDynamics.at(i);
+        ShipDynamic *dyn = fleet.shipDynamics.at(i).get();
         if (!ship || !dyn) continue;
 
         if (dyn->isCriticallyDamaged(ship)) {
@@ -1895,7 +1895,7 @@ void ExpeditionManager::checkAndRestartExpedition(const CSteamID &uid, int mapUn
     bool allShipsRepaired = true;
     for (int i = 0; i < fleet->ships.size(); ++i) {
         Ship *ship = fleet->ships.at(i);
-        ShipDynamic *dyn = fleet->shipDynamics.at(i);
+        ShipDynamic *dyn = fleet->shipDynamics.at(i).get();
         if (!ship || !dyn) continue;
         
         if (dyn->isCriticallyDamaged(ship)) {
@@ -1914,7 +1914,7 @@ void ExpeditionManager::checkAndRestartExpedition(const CSteamID &uid, int mapUn
     bool hasAmmo = false;
     
     for (int i = 0; i < fleet->ships.size(); ++i) {
-        ShipDynamic *dyn = fleet->shipDynamics.at(i);
+        ShipDynamic *dyn = fleet->shipDynamics.at(i).get();
         if (!dyn) continue;
         
         if (dyn->fuel > 0.0) hasFuel = true;

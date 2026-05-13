@@ -1296,6 +1296,9 @@ void customMessageHandler(QtMsgType type,
                           const QMessageLogContext &context,
                           const QString &msg_original) {
     QString msg = msg_original;
+    if(msg.contains("QtWaylandClient")) {
+        return;
+    }
     if(msg.endsWith("\n")) {
         msg.remove(msg.length() - 1, 1);
     }

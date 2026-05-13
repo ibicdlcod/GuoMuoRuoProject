@@ -52,6 +52,11 @@ void CommandLine::customMessageHandler(QtMsgType type,
     const char *function = context.function ? context.function : "";
     bool msg_off = false;
 
+    if(type == QtWarningMsg
+        && msg.contains(
+            QLatin1String("Got leave event for surface")))
+        msg_off = true;
+
 #if defined(QT_DEBUG)
     QString txt2 = QStringLiteral("%1 (%2:%3, %4)")
                    .arg(localMsg, file,

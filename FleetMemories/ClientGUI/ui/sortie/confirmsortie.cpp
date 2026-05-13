@@ -192,6 +192,7 @@ void ConfirmSortie::populateBattleResult(const QJsonObject &battleProcess)
     QJsonArray enemyPlanesBefore = enemyBefore["planes"].toArray();
     QJsonArray enemyPlanesAfter = enemyAfter["planes"].toArray();
     QJsonArray enemyShipIds = battleProcess["enemyShipIds"].toArray();
+    QJsonArray enemyLevels = battleProcess["enemyLevels"].toArray();
     
     // Set assessment label
     if(m_assessmentLabel) {
@@ -411,8 +412,9 @@ void ConfirmSortie::populateBattleResult(const QJsonObject &battleProcess)
         for (int s = 0; s < pb.size(); ++s) planesBefore[s] = pb[s].toInt(0);
         for (int s = 0; s < pa.size(); ++s) planesAfter[s]  = pa[s].toInt(0);
 
+        int enemyLevel = i < enemyLevels.size() ? enemyLevels[i].toInt(0) : 0;
         addShipRow(m_enemyLayout, m_enemyContainer, i,
-                   enemyName, 0, shipIconId, hpBefore, hpAfter, totalHP,
+                   enemyName, enemyLevel, shipIconId, hpBefore, hpAfter, totalHP,
                    planesBefore, planesAfter, false, maxPlanes, QStringList{}, false);
     }
 }

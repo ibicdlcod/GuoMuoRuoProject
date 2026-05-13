@@ -16,14 +16,6 @@
 
 extern std::unique_ptr<QSettings> settings;
 
-FleetInfo::FleetInfo() {}
-
-FleetInfo::~FleetInfo() {
-    for(ShipDynamic *dyn : shipDynamics) {
-        delete dyn;
-    }
-}
-
 double FleetInfo::los() const {
     double a = settings->value("rule/loscontrol", 0.9).toDouble();
 
@@ -32,12 +24,12 @@ double FleetInfo::los() const {
     for(int i = 0; i < static_cast<int>(ships.size()); ++i) {
         if(!ships[i] || !shipDynamics[i] || shipDynamics[i]->fleetFled)
             continue;
-        LuaMap attrs = attrFromShip(ships[i], shipDynamics[i]);
-        LuaMap b = attrFromEquipment(ships[i], shipDynamics[i],
+        LuaMap attrs = attrFromShip(ships[i], shipDynamics[i].get());
+        LuaMap b = attrFromEquipment(ships[i], shipDynamics[i].get(),
                                      equipMap, equipSkillEffects);
         for(auto it = b.cbegin(); it != b.cend(); ++it)
             attrs[it.key()] += it.value();
-        LuaMap c = getVisibleBonusSecondType(ships[i], shipDynamics[i]);
+        LuaMap c = getVisibleBonusSecondType(ships[i], shipDynamics[i].get());
         for(auto it = c.cbegin(); it != c.cend(); ++it)
             attrs[it.key()] += it.value();
         losValues.push_back(attrs.value(QStringLiteral("Los"), 0));
@@ -134,8 +126,8 @@ QList<Equipment *> FleetInfo::getAllEquipAtPos(int fleetPosIndex) const {
         return result;
     if(!shipDynamics[fleetPosIndex] || shipDynamics[fleetPosIndex]->fleetFled)
         return result;
-    ShipDynamic *dyn = shipDynamics[fleetPosIndex];
-    for(const QUuid &uuid : dyn->slotEquip) {
+    ShipDynamic *dyn = shipDynamics[fleetPosIndex].get();
+    for(const QUuid &uuid : std::as_const(dyn->slotEquip)) {
         if(Equipment *eq = equipMap.value(uuid, nullptr))
             result.append(eq);
     }
@@ -148,7 +140,7 @@ int FleetInfo::headquartersEquipId(bool isExpedition) const
 {
     if (ships.empty() || !ships[0] || !shipDynamics[0]) return 0;
     QList<Equipment *> equips = getAllEquipAtPos(0);
-    for (Equipment *eq : equips) {
+    for (Equipment *eq : std::as_const(equips)) {
         if (!eq) continue;
         int id = eq->getId();
         if(isExpedition) {
@@ -183,7 +175,7 @@ QList<int> FleetInfo::findEscortCandidates(bool isExpedition) const
     if (hqId == KP::headquartersEquipEliteTorpedo) {
         for (int i = 0; i < static_cast<int>(ships.size()); ++i) {
             const Ship *ship = ships[i];
-            const ShipDynamic *dyn = shipDynamics[i];
+            const ShipDynamic *dyn = shipDynamics[i].get();
             if(i == 0) {
                 if(!ship || !dyn || dyn->fleetFled) {
                     return candidates; // fail
@@ -204,7 +196,7 @@ QList<int> FleetInfo::findEscortCandidates(bool isExpedition) const
     }
     for (int i = 0; i < static_cast<int>(ships.size()); ++i) {
         const Ship *ship = ships[i];
-        const ShipDynamic *dyn = shipDynamics[i];
+        const ShipDynamic *dyn = shipDynamics[i].get();
         if (!ship || !dyn || dyn->fleetFled) continue;
         if (!ship->isDestroyer()) continue;
         if (!ship->isHealthy(dyn)) continue;
@@ -213,7 +205,7 @@ QList<int> FleetInfo::findEscortCandidates(bool isExpedition) const
     /* destroyers first, light cruisers second */
     for (int i = 0; i < static_cast<int>(ships.size()); ++i) {
         const Ship *ship = ships[i];
-        const ShipDynamic *dyn = shipDynamics[i];
+        const ShipDynamic *dyn = shipDynamics[i].get();
         if (!ship || !dyn || dyn->fleetFled) continue;
         if (!ship->isLightCruiser()) continue;
         if (!ship->isHealthy(dyn)) continue;
@@ -226,7 +218,7 @@ bool FleetInfo::performEscortRetreat(int damagedPos, bool isExpedition)
 {
     if (damagedPos <= 0 || damagedPos >= static_cast<int>(shipDynamics.size()))
         return false; // you can't retreat pos 0 that is flagship
-    ShipDynamic *dyn = shipDynamics[damagedPos];
+    ShipDynamic *dyn = shipDynamics[damagedPos].get();
     if (!dyn) return false;
     QList<int> candidates = findEscortCandidates(isExpedition);
     if (candidates.empty()) return false;
@@ -238,7 +230,7 @@ bool FleetInfo::performEscortRetreat(int damagedPos, bool isExpedition)
     int escortPos = candidates.first();
     // Mark both ships as fled
     dyn->markAsFled();
-    if (ShipDynamic *escortDyn = shipDynamics[escortPos])
+    if (ShipDynamic *escortDyn = shipDynamics[escortPos].get())
         escortDyn->markAsFled();
     return true;
 }
@@ -280,13 +272,13 @@ void FleetInfo::setHPAtPos(int fleetPosIndex, int hp) {
 std::vector<std::vector<Equipment *>> FleetInfo::getEquipGrid() const {
     std::vector<std::vector<Equipment *>> grid;
     grid.reserve(shipDynamics.size());
-    for(const ShipDynamic *dyn : shipDynamics) {
+    for(const auto &dyn : shipDynamics) {
         if(!dyn || dyn->fleetFled) {
             grid.push_back({});
             continue;
         }
         std::vector<Equipment *> row;
-        for(const QUuid &uuid : dyn->slotEquip) {
+        for(const QUuid &uuid : std::as_const(dyn->slotEquip)) {
             if(Equipment *eq = equipMap.value(uuid, nullptr))
                 row.push_back(eq);
         }
@@ -363,16 +355,16 @@ LuaMap FleetInfo::effectiveAttr(const CSteamID & /* uid */, int fleetPosIndex) {
         || shipDynamics[fleetPosIndex]->fleetFled)
         return {};
     LuaMap result = attrFromShip(ships[fleetPosIndex],
-                                 shipDynamics[fleetPosIndex]);
+                                 shipDynamics[fleetPosIndex].get());
     /* b */
     LuaMap b = attrFromEquipment(ships[fleetPosIndex],
-                                 shipDynamics[fleetPosIndex],
+                                 shipDynamics[fleetPosIndex].get(),
                                  equipMap, equipSkillEffects);
     for(auto it = b.cbegin(); it != b.cend(); ++it)
         result[it.key()] += it.value();
     /* c: visible bonus second type (virtual-equipment addend) */
     LuaMap c = getVisibleBonusSecondType(ships[fleetPosIndex],
-                                         shipDynamics[fleetPosIndex]);
+                                         shipDynamics[fleetPosIndex].get());
     for(auto it = c.cbegin(); it != c.cend(); ++it)
         result[it.key()] += it.value();
     return result;
@@ -388,7 +380,7 @@ bool FleetInfo::performEmergencyRepair() {
     // First pass: verify all critically damaged ships have repair capability
     for (int i = 0; i < static_cast<int>(ships.size()); ++i) {
         Ship* ship = ships[i];
-        ShipDynamic* dyn = shipDynamics[i];
+        ShipDynamic* dyn = shipDynamics[i].get();
         if (!ship || !dyn || dyn->fleetFled) continue;
         if (!dyn->isCriticallyDamaged(ship)) continue;
         
@@ -424,7 +416,7 @@ bool FleetInfo::performEmergencyRepair() {
     // Second pass: apply repairs and consume items
     for (int i = 0; i < static_cast<int>(ships.size()); ++i) {
         Ship* ship = ships[i];
-        ShipDynamic* dyn = shipDynamics[i];
+        ShipDynamic* dyn = shipDynamics[i].get();
         if (!ship || !dyn || dyn->fleetFled) continue;
         if (!dyn->isCriticallyDamaged(ship)) continue;
         

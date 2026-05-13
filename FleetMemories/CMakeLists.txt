@@ -196,7 +196,9 @@ set(CLIENT_SOURCES
     ClientGUI/ui/views/shipselect.h
     ${TS_FILES}
 )
- set(SERVER_SOURCES
+set(SERVER_SOURCES
+    Server/battle.h
+    Server/battle.cpp
     Server/erfinv.h
     Server/expeditionmanager.cpp
     Server/expeditionmanager.h
@@ -290,7 +292,6 @@ qt_add_executable(CFClient
     ${CLIENT_SOURCES}
     common.qrc
     ${app_icon_resource_windows}
-
 )
 qt_add_executable(CFServer
     MANUAL_FINALIZATION

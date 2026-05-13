@@ -41,7 +41,7 @@ void Server::testFleetInfoEffectiveAttr() {
     auto buildInfo = [&](int exp, int star, bool withEquips) -> FleetInfo {
         FleetInfo fi;
         fi.ships.push_back(ship);
-        ShipDynamic *dyn = new ShipDynamic(ship->attr["Hitpoints"]);
+        auto dyn = std::make_unique<ShipDynamic>(ship->attr["Hitpoints"]);
         dyn->exp  = exp;
         dyn->star = star;
         if (withEquips) {
@@ -55,7 +55,7 @@ void Server::testFleetInfoEffectiveAttr() {
             fi.equipSkillEffects[u44] = 1.0;
             fi.equipSkillEffects[u46] = 1.0;
         }
-        fi.shipDynamics.push_back(dyn);
+        fi.shipDynamics.push_back(std::move(dyn));
         return fi;
     };
 
@@ -173,7 +173,7 @@ void Server::testEscortedRetreat() {
     fi.type = KP::NormalFleet;
     // Ship at position 0 (damaged)
     fi.ships.push_back(destroyer);
-    ShipDynamic *damagedDyn = new ShipDynamic(destroyer->attr["Hitpoints"]);
+    auto damagedDyn = std::make_unique<ShipDynamic>(destroyer->attr["Hitpoints"]);
     damagedDyn->currentHP = 0; // critically damaged
     damagedDyn->fleetFled = false;
     int originalDamagedCondition = damagedDyn->condition;
@@ -182,14 +182,14 @@ void Server::testEscortedRetreat() {
     damagedDyn->slotEquip = {hqUuid, QUuid(), QUuid(), QUuid(), QUuid()};
     fi.equipMap[hqUuid] = hqEquip;
     fi.equipSkillEffects[hqUuid] = 1.0;
-    fi.shipDynamics.push_back(damagedDyn);
+    fi.shipDynamics.push_back(std::move(damagedDyn));
     // Ship at position 1 (escort candidate)
     fi.ships.push_back(destroyer);
-    ShipDynamic *escortDyn = new ShipDynamic(destroyer->attr["Hitpoints"]);
+    auto escortDyn = std::make_unique<ShipDynamic>(destroyer->attr["Hitpoints"]);
     escortDyn->currentHP = destroyer->attr["Hitpoints"]; // healthy
     escortDyn->fleetFled = false;
     int originalEscortCondition = escortDyn->condition;
-    fi.shipDynamics.push_back(escortDyn);
+    fi.shipDynamics.push_back(std::move(escortDyn));
     // Test findEscortCandidates (non-expedition)
     QList<int> candidates = fi.findEscortCandidates(false);
     if (candidates.size() != 1 || candidates.first() != 1) {
@@ -365,7 +365,7 @@ void Server::testEquipmentSkillPointLoss() {
     /* Create a dummy FleetInfo with the ship and equipments */
     FleetInfo fi;
     fi.ships.push_back(ship);
-    ShipDynamic *dyn = new ShipDynamic(ship->attr["Hitpoints"]);
+    auto dyn = std::make_unique<ShipDynamic>(ship->attr["Hitpoints"]);
     dyn->exp = 495000; // lv 100
     dyn->star = 0;
     // Assign equipment UUIDs
@@ -386,14 +386,15 @@ void Server::testEquipmentSkillPointLoss() {
     fi.equipSkillEffects[u39] = 1.0;
     fi.equipSkillEffects[u44] = 1.0;
     fi.equipSkillEffects[u46] = 1.0;
-    fi.shipDynamics.push_back(dyn);
+    ShipDynamic *rawDyn = dyn.get();
+    fi.shipDynamics.push_back(std::move(dyn));
     
     /* Test getRandomNonPlaneEquipmentSlot returns valid slot */
     std::mt19937 mt(54321);
-    int slot = getRandomNonPlaneEquipmentSlot(dyn, mt);
+    int slot = getRandomNonPlaneEquipmentSlot(rawDyn, mt);
     check("Random slot is non-plane", slot >= 0 && slot <= 5);
     if (slot >= 0) {
-        QUuid uuid = getEquipUuidFromSlot(dyn, slot);
+        QUuid uuid = getEquipUuidFromSlot(rawDyn, slot);
         check("UUID corresponds to equipment", !uuid.isNull());
     }
     
@@ -471,7 +472,7 @@ void Server::testEmergencyRepair() {
     {
         FleetInfo fi;
         fi.ships.push_back(destroyer);
-        ShipDynamic *dyn = new ShipDynamic(destroyer->attr["Hitpoints"]);
+        auto dyn = std::make_unique<ShipDynamic>(destroyer->attr["Hitpoints"]);
         dyn->currentHP = 0; // critically damaged
         dyn->fuel = 0.5;
         dyn->ammo = 0.5;
@@ -480,7 +481,8 @@ void Server::testEmergencyRepair() {
         dyn->slotEquip = {repairUuid, QUuid(), QUuid(), QUuid(), QUuid()};
         fi.equipMap[repairUuid] = repairEquip;
         fi.equipSkillEffects[repairUuid] = 1.0;
-        fi.shipDynamics.push_back(dyn);
+        ShipDynamic *rawDyn = dyn.get();
+        fi.shipDynamics.push_back(std::move(dyn));
         
         bool repaired = fi.performEmergencyRepair();
         if (!repaired) {
@@ -488,11 +490,11 @@ void Server::testEmergencyRepair() {
             return;
         }
         int expectedHP = std::min(maxHP, maxHP / 4);
-        if (dyn->currentHP != expectedHP) {
-            qWarning() << "testEmergencyRepair Test 1: HP mismatch, expected" << expectedHP << "got" << dyn->currentHP;
+        if (rawDyn->currentHP != expectedHP) {
+            qWarning() << "testEmergencyRepair Test 1: HP mismatch, expected" << expectedHP << "got" << rawDyn->currentHP;
             return;
         }
-        if (dyn->fuel != 0.5 || dyn->ammo != 0.5) {
+        if (rawDyn->fuel != 0.5 || rawDyn->ammo != 0.5) {
             qWarning() << "testEmergencyRepair Test 1: fuel/ammo changed unexpectedly";
             return;
         }
@@ -503,7 +505,7 @@ void Server::testEmergencyRepair() {
             return;
         }
         /* Slot should be cleared */
-        if (!dyn->slotEquip[0].isNull()) {
+        if (!rawDyn->slotEquip[0].isNull()) {
             qWarning() << "testEmergencyRepair Test 1: slot not cleared";
             return;
         }
@@ -514,7 +516,7 @@ void Server::testEmergencyRepair() {
     {
         FleetInfo fi;
         fi.ships.push_back(destroyer);
-        ShipDynamic *dyn = new ShipDynamic(destroyer->attr["Hitpoints"]);
+        auto dyn = std::make_unique<ShipDynamic>(destroyer->attr["Hitpoints"]);
         dyn->currentHP = 0;
         dyn->condition = 100;
         dyn->fuel = 0.2;
@@ -524,22 +526,23 @@ void Server::testEmergencyRepair() {
         dyn->slotEquip = {goddessUuid, QUuid(), QUuid(), QUuid(), QUuid()};
         fi.equipMap[goddessUuid] = goddessEquip;
         fi.equipSkillEffects[goddessUuid] = 1.0;
-        fi.shipDynamics.push_back(dyn);
+        ShipDynamic *rawDyn = dyn.get();
+        fi.shipDynamics.push_back(std::move(dyn));
         
         bool repaired = fi.performEmergencyRepair();
         if (!repaired) {
             qWarning() << "testEmergencyRepair Test 2: repair failed";
             return;
         }
-        if (dyn->currentHP != maxHP) {
-            qWarning() << "testEmergencyRepair Test 2: HP not max, expected" << maxHP << "got" << dyn->currentHP;
+        if (rawDyn->currentHP != maxHP) {
+            qWarning() << "testEmergencyRepair Test 2: HP not max, expected" << maxHP << "got" << rawDyn->currentHP;
             return;
         }
-        if (dyn->condition != KP::conditionMax) {
-            qWarning() << "testEmergencyRepair Test 2: condition not max, got" << dyn->condition;
+        if (rawDyn->condition != KP::conditionMax) {
+            qWarning() << "testEmergencyRepair Test 2: condition not max, got" << rawDyn->condition;
             return;
         }
-        if (dyn->fuel != 1.0 || dyn->ammo != 1.0) {
+        if (rawDyn->fuel != 1.0 || rawDyn->ammo != 1.0) {
             qWarning() << "testEmergencyRepair Test 2: fuel/ammo not set to 1.0";
             return;
         }
@@ -548,7 +551,7 @@ void Server::testEmergencyRepair() {
             qWarning() << "testEmergencyRepair Test 2: consumed equipment mismatch";
             return;
         }
-        if (!dyn->slotEquip[0].isNull()) {
+        if (!rawDyn->slotEquip[0].isNull()) {
             qWarning() << "testEmergencyRepair Test 2: slot not cleared";
             return;
         }
@@ -559,7 +562,7 @@ void Server::testEmergencyRepair() {
     {
         FleetInfo fi;
         fi.ships.push_back(destroyer);
-        ShipDynamic *dyn = new ShipDynamic(destroyer->attr["Hitpoints"]);
+        auto dyn = std::make_unique<ShipDynamic>(destroyer->attr["Hitpoints"]);
         dyn->currentHP = 0;
         int maxHP = destroyer->attr["Hitpoints"];
         QUuid repairUuid = QUuid::createUuid();
@@ -569,7 +572,8 @@ void Server::testEmergencyRepair() {
         fi.equipMap[goddessUuid] = goddessEquip;
         fi.equipSkillEffects[repairUuid] = 1.0;
         fi.equipSkillEffects[goddessUuid] = 1.0;
-        fi.shipDynamics.push_back(dyn);
+        ShipDynamic *rawDyn = dyn.get();
+        fi.shipDynamics.push_back(std::move(dyn));
         
         bool repaired = fi.performEmergencyRepair();
         if (!repaired) {
@@ -578,8 +582,8 @@ void Server::testEmergencyRepair() {
         }
         /* Should use repair personnel (slot 0) */
         int expectedHP = std::min(maxHP, maxHP / 4);
-        if (dyn->currentHP != expectedHP) {
-            qWarning() << "testEmergencyRepair Test 3: HP mismatch, expected repair personnel effect" << expectedHP << "got" << dyn->currentHP;
+        if (rawDyn->currentHP != expectedHP) {
+            qWarning() << "testEmergencyRepair Test 3: HP mismatch, expected repair personnel effect" << expectedHP << "got" << rawDyn->currentHP;
             return;
         }
         /* Only repair personnel should be consumed */
@@ -589,11 +593,11 @@ void Server::testEmergencyRepair() {
             return;
         }
         /* Slot 0 cleared, slot 1 still has goddess */
-        if (!dyn->slotEquip[0].isNull()) {
+        if (!rawDyn->slotEquip[0].isNull()) {
             qWarning() << "testEmergencyRepair Test 3: slot 0 not cleared";
             return;
         }
-        if (dyn->slotEquip[1] != goddessUuid) {
+        if (rawDyn->slotEquip[1] != goddessUuid) {
             qWarning() << "testEmergencyRepair Test 3: slot 1 goddess missing";
             return;
         }
@@ -604,9 +608,9 @@ void Server::testEmergencyRepair() {
     {
         FleetInfo fi;
         fi.ships.push_back(destroyer);
-        ShipDynamic *dyn = new ShipDynamic(destroyer->attr["Hitpoints"]);
+        auto dyn = std::make_unique<ShipDynamic>(destroyer->attr["Hitpoints"]);
         dyn->currentHP = 0;
-        fi.shipDynamics.push_back(dyn);
+        fi.shipDynamics.push_back(std::move(dyn));
         
         bool repaired = fi.performEmergencyRepair();
         if (repaired) {

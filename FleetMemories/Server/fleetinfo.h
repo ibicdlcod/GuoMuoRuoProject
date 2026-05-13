@@ -2,6 +2,9 @@
 #define FLEETINFO_H
 #include <QHash>
 #include <QList>
+
+#include <memory>
+
 #include "lua.h"
 #include "../Protocol/shipdynamic.h"
 #include "../Protocol/kp.h"
@@ -15,8 +18,11 @@ public:
     enum TransportMode {
         Default
     };
-    FleetInfo();
-    ~FleetInfo();
+    FleetInfo() = default;
+    FleetInfo(FleetInfo &&) = default;
+    FleetInfo &operator=(FleetInfo &&) = default;
+    FleetInfo(const FleetInfo &) = delete;
+    FleetInfo &operator=(const FleetInfo &) = delete;
     double los() const;
     QMap<KP::CapitalType, int> capitalness() const;
     std::vector<int> shipSpeeds() const;
@@ -73,7 +79,7 @@ public:
 
     KP::FleetType type;
     std::vector<Ship *> ships;
-    std::vector<ShipDynamic *> shipDynamics;
+    std::vector<std::unique_ptr<ShipDynamic>> shipDynamics;
     std::vector<int> shipTags; /* a vector of 0 for now */
 
     /* UUID-keyed equipment lookup; populated by Server::queryFleetInfo. */
