@@ -612,6 +612,32 @@ enum FleetType {
 };
 Q_ENUM_NS(FleetType);
 
+/* Friend Fleet Priority – see doc/worldview_and_mechanics/9.c1-goal-friend.md */
+enum FriendFleetPriority {
+    FriendFirepower = 0,
+    FriendAccuracy = 1,
+    FriendEvasion = 2,
+    FriendASW = 3,
+    FriendAntiAir = 4,
+    FriendProtectCapital = 5,
+    FriendProtectScreens = 6,
+    FriendProtectFlagship = 7,
+    FriendProtectDamaged = 8,
+};
+
+/* Enemy Fleet Priority – see doc/worldview_and_mechanics/9.c2-goal-enemy.md */
+enum EnemyFleetPriority {
+    EnemyIgnoreSubs = 0,
+    EnemyBalanced = 1,
+    EnemyFocusCapital = 2,
+    EnemyFocusScreen = 3,
+    EnemyFocusLand = 4,
+    EnemyFocusSea = 5,
+    EnemyFocusFlagship = 6,
+    EnemyFocusNonFlagship = 7,
+    EnemyRandom = 8,
+};
+
 enum CapitalType {
     AnyCapitalType = 0,
     Screen = 1,

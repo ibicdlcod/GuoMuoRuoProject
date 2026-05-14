@@ -10,6 +10,10 @@ void Battle::battleProcessor(FleetInfo *friendf, FleetInfo *enemyf,
     currentBattlePlan = battlePlan;
     currentFriendFleet = friendf;
     currentEnemyFleet = enemyf;
+    friendGoal = static_cast<KP::FriendFleetPriority>(
+        battlePlan.value("friendFleetPriority").toInt(0));
+    enemyGoal = static_cast<KP::EnemyFleetPriority>(
+        battlePlan.value("enemyFleetPriority").toInt(0));
     for(int i = 0; i < KP::combinedFleetSize; ++i) {
         friendFleetConcealmentStatus.push_back(ConcealmentStatus::Unclear);
     }
@@ -51,7 +55,10 @@ void Battle::battleProcessor(FleetInfo *friendf, FleetInfo *enemyf,
                         || idx >= static_cast<int>(
                                currentFriendFleet->ships.size())
                         || !currentFriendFleet->ships[idx]
-                        || !currentFriendFleet->shipDynamics[idx])
+                        || !currentFriendFleet->shipDynamics[idx]
+                        || currentFriendFleet
+                               ->shipDynamics[idx]
+                               ->fleetFled)
                         return 0.0;
                     int level = Ship::getLevel(
                         currentFriendFleet
@@ -190,6 +197,14 @@ void Battle::battleProcessor(FleetInfo *friendf, FleetInfo *enemyf,
 void Battle::airBattle() {
     clock = 0;
     isNight = false;
+    for(int i = 0; i < currentFriendFleet->ships.size(); ++i) {
+        Ship *ship = currentFriendFleet->ships[i];
+        ShipDynamic *dyn = currentFriendFleet->shipDynamics[i].get();
+        if(!ship || dyn->fleetFled) {
+            continue;
+        }
+        qCritical() << selectEnemyTarget(i);
+    }
     advanceClockTime(0);
 }
 
@@ -295,4 +310,158 @@ void Battle::forceVisible(FriendOrEnemyIndex index) {
 
     insertEvent(EventType::DecideHidden, clock + 30, index,
                 [this](FriendOrEnemyIndex idx) { decideHidden(idx); });
+}
+
+/* Target selection — see doc/worldview_and_mechanics/9-battle.md */
+
+int Battle::selectEnemyTarget(int friendIndex) const {
+    std::vector<int> visible;
+    for(int i = 0;
+        i < static_cast<int>(currentEnemyFleet->ships.size());
+        ++i) {
+        if(!currentEnemyFleet->ships[i]
+            || !currentEnemyFleet->shipDynamics[i]
+            || currentEnemyFleet->shipDynamics[i]->fleetFled
+            || currentEnemyFleet->shipDynamics[i]->currentHP <= 0)
+            continue;
+        if(enemyFleetConcealmentStatus[i] != ConcealmentStatus::Visible)
+            continue;
+        visible.push_back(i);
+    }
+    if(visible.empty())
+        return -1;
+
+    for(int tries = 0; tries < 1; ++tries) {
+        int idx = visible[std::uniform_int_distribution<int>(
+            0, static_cast<int>(visible.size()) - 1)(gen)];
+        if(isPrioritizedTarget(friendIndex, idx))
+            return idx;
+    }
+    return visible[std::uniform_int_distribution<int>(
+        0, static_cast<int>(visible.size()) - 1)(gen)];
+}
+
+int Battle::selectFriendTarget(int enemyIndex) const {
+    (void)enemyIndex;
+    std::vector<int> visible;
+    for(int i = 0;
+        i < static_cast<int>(currentFriendFleet->ships.size());
+        ++i) {
+        if(!currentFriendFleet->ships[i]
+            || !currentFriendFleet->shipDynamics[i]
+            || currentFriendFleet->shipDynamics[i]->fleetFled
+            || currentFriendFleet->shipDynamics[i]->currentHP <= 0)
+            continue;
+        if(friendFleetConcealmentStatus[i] != ConcealmentStatus::Visible)
+            continue;
+        visible.push_back(i);
+    }
+    if(visible.empty())
+        return -1;
+
+    for(int tries = 0; tries < 1; ++tries) {
+        int idx = visible[std::uniform_int_distribution<int>(
+            0, static_cast<int>(visible.size()) - 1)(gen)];
+        if(!isProtectedShip(idx))
+            return idx;
+    }
+    return visible[std::uniform_int_distribution<int>(
+        0, static_cast<int>(visible.size()) - 1)(gen)];
+}
+
+bool Battle::isPrioritizedTarget(int friendIndex,
+                                 int enemyIndex) const {
+    const Ship *enemyShip = currentEnemyFleet->ships[enemyIndex];
+    if(!enemyShip || !currentEnemyFleet->shipDynamics[enemyIndex]
+        || currentEnemyFleet->shipDynamics[enemyIndex]->fleetFled
+        || currentEnemyFleet->shipDynamics[enemyIndex]->currentHP <= 0)
+        return false;
+    int eid = enemyShip->getId();
+    bool isEnemySub =
+        (eid & 0x000f0000) == 0x00070000;
+
+    switch(enemyGoal) {
+    case KP::EnemyIgnoreSubs: {
+        if(!isEnemySub)
+            return true;
+        for(int i = 0;
+            i < static_cast<int>(
+                currentEnemyFleet->ships.size());
+            ++i) {
+            if(!currentEnemyFleet->ships[i]
+                || currentEnemyFleet
+                       ->shipDynamics[i]
+                       ->fleetFled)
+                continue;
+            int sid = currentEnemyFleet->ships[i]->getId();
+            if((sid & 0x000f0000) != 0x00070000
+                && enemyFleetConcealmentStatus[i]
+                       == ConcealmentStatus::Visible)
+                return false;
+        }
+        return true;
+    }
+    case KP::EnemyBalanced: {
+        const Ship *friendShip =
+            currentFriendFleet->ships[friendIndex];
+        if(!friendShip)
+            return false;
+        int fsid = friendShip->getId();
+        if((fsid & 0x000f0000) == 0x00070000)
+            return true;
+        if(isEnemySub)
+            return true;
+        int friendCapi =
+            friendShip->getType().getCapitalness();
+        int enemyCapi =
+            enemyShip->getType().getCapitalness();
+        return enemyCapi >= friendCapi - 2
+               && enemyCapi <= friendCapi;
+    }
+    case KP::EnemyFocusCapital:
+        return enemyShip->getType().getCapitalness() >= 3;
+    case KP::EnemyFocusScreen:
+        return enemyShip->getType().getCapitalness() < 3;
+    case KP::EnemyFocusLand:
+        return (eid & 0x000f0000) == 0x000c0000;
+    case KP::EnemyFocusSea:
+        return (eid & 0x000f0000) != 0x000c0000;
+    case KP::EnemyFocusFlagship:
+        return enemyIndex == 0;
+    case KP::EnemyFocusNonFlagship:
+        return enemyIndex != 0;
+    case KP::EnemyRandom:
+    default:
+        return true;
+    }
+}
+
+bool Battle::isProtectedShip(int friendIndex) const {
+    if(friendGoal <= KP::FriendAntiAir)
+        return false;
+    const Ship *ship = currentFriendFleet->ships[friendIndex];
+    if(!ship || currentFriendFleet
+                    ->shipDynamics[friendIndex]
+                    ->fleetFled)
+        return false;
+    switch(friendGoal) {
+    case KP::FriendProtectCapital:
+        return ship->getType().getCapitalness() >= 3;
+    case KP::FriendProtectScreens:
+        return ship->getType().getCapitalness() < 3;
+    case KP::FriendProtectFlagship:
+        return friendIndex == 0;
+    case KP::FriendProtectDamaged: {
+        int maxHp = ship->attr.value(
+            QStringLiteral("Hitpoints"), 0);
+        int curHp =
+            currentFriendFleet
+                ->shipDynamics[friendIndex]
+                ->currentHP;
+        return maxHp > 0
+               && curHp < maxHp * 0.5;
+    }
+    default:
+        return false;
+    }
 }

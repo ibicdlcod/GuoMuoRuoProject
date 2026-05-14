@@ -4302,22 +4302,22 @@ Great at battle and bad at politics--so cool!</source>
         <translation type="unfinished">虚构舰</translation>
     </message>
     <message id="NormalFleet">
-        <location filename="../Protocol/kp.h" line="720"/>
+        <location filename="../Protocol/kp.h" line="746"/>
         <source>Normal</source>
         <translation>通常舰队</translation>
     </message>
     <message id="CarrierFleet">
-        <location filename="../Protocol/kp.h" line="722"/>
+        <location filename="../Protocol/kp.h" line="748"/>
         <source>Carrier</source>
         <translation>空母机动</translation>
     </message>
     <message id="SurfaceFleet">
-        <location filename="../Protocol/kp.h" line="724"/>
+        <location filename="../Protocol/kp.h" line="750"/>
         <source>Surface</source>
         <translation>水上打击</translation>
     </message>
     <message id="TransportFleet">
-        <location filename="../Protocol/kp.h" line="726"/>
+        <location filename="../Protocol/kp.h" line="752"/>
         <source>Transport</source>
         <translation>输送护卫</translation>
     </message>
@@ -4700,23 +4700,113 @@ Great at battle and bad at politics--so cool!</source>
         <source>∞ (supply line broken)</source>
         <translation type="unfinished">∞（补给线断绝）</translation>
     </message>
-    <message id="day-battle-plan">
+    <message id="ff-firepower">
+        <location filename="../ClientGUI/ui/sortie/battleplan.cpp" line="10"/>
+        <source></source>
+        <translation type="unfinished">无</translation>
+    </message>
+    <message id="ff-accuracy">
         <location filename="../ClientGUI/ui/sortie/battleplan.cpp" line="11"/>
+        <source></source>
+        <translation type="unfinished">无</translation>
+    </message>
+    <message id="ff-evasion">
+        <location filename="../ClientGUI/ui/sortie/battleplan.cpp" line="12"/>
+        <source></source>
+        <translation type="unfinished">无</translation>
+    </message>
+    <message id="ff-asw">
+        <location filename="../ClientGUI/ui/sortie/battleplan.cpp" line="13"/>
+        <source></source>
+        <translation type="unfinished">无</translation>
+    </message>
+    <message id="ff-antiair">
+        <location filename="../ClientGUI/ui/sortie/battleplan.cpp" line="14"/>
+        <source></source>
+        <translation type="unfinished">无</translation>
+    </message>
+    <message id="ff-protect-capital">
+        <location filename="../ClientGUI/ui/sortie/battleplan.cpp" line="15"/>
+        <source></source>
+        <translation type="unfinished">无</translation>
+    </message>
+    <message id="ff-protect-screens">
+        <location filename="../ClientGUI/ui/sortie/battleplan.cpp" line="16"/>
+        <source></source>
+        <translation type="unfinished">无</translation>
+    </message>
+    <message id="ff-protect-flagship">
+        <location filename="../ClientGUI/ui/sortie/battleplan.cpp" line="17"/>
+        <source></source>
+        <translation type="unfinished">无</translation>
+    </message>
+    <message id="ff-protect-damaged">
+        <location filename="../ClientGUI/ui/sortie/battleplan.cpp" line="18"/>
+        <source></source>
+        <translation type="unfinished">无</translation>
+    </message>
+    <message id="ef-ignore-subs">
+        <location filename="../ClientGUI/ui/sortie/battleplan.cpp" line="20"/>
+        <source></source>
+        <translation type="unfinished">无</translation>
+    </message>
+    <message id="ef-balanced">
+        <location filename="../ClientGUI/ui/sortie/battleplan.cpp" line="21"/>
+        <source></source>
+        <translation type="unfinished">无</translation>
+    </message>
+    <message id="ef-focus-capital">
+        <location filename="../ClientGUI/ui/sortie/battleplan.cpp" line="22"/>
+        <source></source>
+        <translation type="unfinished">无</translation>
+    </message>
+    <message id="ef-focus-screen">
+        <location filename="../ClientGUI/ui/sortie/battleplan.cpp" line="23"/>
+        <source></source>
+        <translation type="unfinished">无</translation>
+    </message>
+    <message id="ef-focus-land">
+        <location filename="../ClientGUI/ui/sortie/battleplan.cpp" line="24"/>
+        <source></source>
+        <translation type="unfinished">无</translation>
+    </message>
+    <message id="ef-focus-sea">
+        <location filename="../ClientGUI/ui/sortie/battleplan.cpp" line="25"/>
+        <source></source>
+        <translation type="unfinished">无</translation>
+    </message>
+    <message id="ef-focus-flagship">
+        <location filename="../ClientGUI/ui/sortie/battleplan.cpp" line="26"/>
+        <source></source>
+        <translation type="unfinished">无</translation>
+    </message>
+    <message id="ef-focus-nonflagship">
+        <location filename="../ClientGUI/ui/sortie/battleplan.cpp" line="27"/>
+        <source></source>
+        <translation type="unfinished">无</translation>
+    </message>
+    <message id="ef-random">
+        <location filename="../ClientGUI/ui/sortie/battleplan.cpp" line="28"/>
+        <source></source>
+        <translation type="unfinished">无</translation>
+    </message>
+    <message id="day-battle-plan">
+        <location filename="../ClientGUI/ui/sortie/battleplan.cpp" line="32"/>
         <source>Day battle:</source>
         <translation type="unfinished">昼战：</translation>
     </message>
     <message id="db">
-        <location filename="../ClientGUI/ui/sortie/battleplan.cpp" line="13"/>
+        <location filename="../ClientGUI/ui/sortie/battleplan.cpp" line="34"/>
         <source>Day Battle</source>
         <translation type="unfinished">昼战</translation>
     </message>
     <message id="db-b">
-        <location filename="../ClientGUI/ui/sortie/battleplan.cpp" line="15"/>
+        <location filename="../ClientGUI/ui/sortie/battleplan.cpp" line="36"/>
         <source>Day Battle when losing</source>
         <translation type="unfinished">劣势时昼战</translation>
     </message>
     <message id="db-flagship">
-        <location filename="../ClientGUI/ui/sortie/battleplan.cpp" line="17"/>
+        <location filename="../ClientGUI/ui/sortie/battleplan.cpp" line="38"/>
         <source>Day Battle when flagship remains</source>
         <translation type="unfinished">旗舰存活时昼战</translation>
     </message>

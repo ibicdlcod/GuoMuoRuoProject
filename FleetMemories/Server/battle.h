@@ -32,13 +32,14 @@ public:
     };
 
     void battleProcessor(FleetInfo *friendf, FleetInfo *enemyf,
-                         const QJsonObject &battlePlan, bool isExpedition = false);
-    void airBattle();
-    void approachingPhase();
-    void centralPhase();
-    void disengagingPhase();
-    void nightBattle();
+                         const QJsonObject &battlePlan,
+                         bool isExpedition = false);
 
+    /* Target selection — see doc/worldview_and_mechanics/9-battle.md */
+    int selectEnemyTarget(int friendIndex) const;
+    int selectFriendTarget(int enemyIndex) const;
+
+private:
     /* Random number generator */
     inline static std::random_device rd;
     inline static std::mt19937 gen = std::mt19937(rd());
@@ -53,17 +54,28 @@ public:
     std::vector<bool> receivedOrders;
     std::vector<double> commEfficiency;
 
-    void decideHidden(FriendOrEnemyIndex);
-    void forceVisible(FriendOrEnemyIndex);
+    KP::FriendFleetPriority friendGoal;
+    KP::EnemyFleetPriority enemyGoal;
 
     clockTime clock;
     std::list<Event> events;
+    bool isNight;
+
+    void airBattle();
+    void approachingPhase();
+    void centralPhase();
+    void disengagingPhase();
+    void nightBattle();
+
+    void decideHidden(FriendOrEnemyIndex);
+    void forceVisible(FriendOrEnemyIndex);
 
     void advanceClockTime(clockTime timeInterval);
     void insertEvent(EventType, clockTime, FriendOrEnemyIndex,
                      std::function<void(FriendOrEnemyIndex)>);
 
-    bool isNight;
+    bool isPrioritizedTarget(int friendIndex, int enemyIndex) const;
+    bool isProtectedShip(int friendIndex) const;
 };
 
 #endif // BATTLE_H

@@ -6,6 +6,27 @@ BattlePlan::BattlePlan(QWidget *parent, bool isNightNode, bool isAirNode)
     , ui(new Ui::BattlePlan)
 {
     ui->setupUi(this);
+
+    ui->ffbox->addItem(qtTrId("ff-firepower"));
+    ui->ffbox->addItem(qtTrId("ff-accuracy"));
+    ui->ffbox->addItem(qtTrId("ff-evasion"));
+    ui->ffbox->addItem(qtTrId("ff-asw"));
+    ui->ffbox->addItem(qtTrId("ff-antiair"));
+    ui->ffbox->addItem(qtTrId("ff-protect-capital"));
+    ui->ffbox->addItem(qtTrId("ff-protect-screens"));
+    ui->ffbox->addItem(qtTrId("ff-protect-flagship"));
+    ui->ffbox->addItem(qtTrId("ff-protect-damaged"));
+
+    ui->efbox->addItem(qtTrId("ef-ignore-subs"));
+    ui->efbox->addItem(qtTrId("ef-balanced"));
+    ui->efbox->addItem(qtTrId("ef-focus-capital"));
+    ui->efbox->addItem(qtTrId("ef-focus-screen"));
+    ui->efbox->addItem(qtTrId("ef-focus-land"));
+    ui->efbox->addItem(qtTrId("ef-focus-sea"));
+    ui->efbox->addItem(qtTrId("ef-focus-flagship"));
+    ui->efbox->addItem(qtTrId("ef-focus-nonflagship"));
+    ui->efbox->addItem(qtTrId("ef-random"));
+
     if(isNightNode) {
         //% "Day battle:"
         ui->extraBattleLabel->setText(qtTrId("day-battle-plan"));

@@ -332,11 +332,11 @@ maps[1][4] = {
 			if choice == 1 then
 				return {0x7F010100, 0x7F011100}
 			elseif choice == 2 then
-				return {0x7F020100}
+				return {0x7F020100, 0x7F011100}
 			elseif choice == 3 then
-				return {0x7F020200}
+				return {0x7F020200, 0x7F011100}
 			elseif choice == 4 then
-				return {0x7F020300}
+				return {0x7F020300, 0x7F011100}
 			else
 				return {}
 			end
