@@ -26,6 +26,7 @@ void Battle::battleProcessor(FleetInfo *friendf, FleetInfo *enemyf,
 
 void Battle::airBattle() {
     clock = 0;
+    isNight = false;
     for(int i = 0; i < KP::combinedFleetSize; ++i) {
         if(i < currentFriendFleet->ships.size() && currentFriendFleet->ships[i]) {
             insertEvent(EventType::DecideHidden, 0, {true, i},
@@ -54,6 +55,7 @@ void Battle::disengagingPhase() {
 }
 
 void Battle::nightBattle() {
+    isNight = true;
     advanceClockTime(30);
 }
 
@@ -84,7 +86,26 @@ void Battle::decideHidden(FriendOrEnemyIndex index) {
     bool result;
 
     /* placeholder */
-    static std::bernoulli_distribution dist(0.5);
+    int hideChance = 0;
+
+    Ship *ship = index.isFriend ? currentFriendFleet->ships[index.index]
+        : currentEnemyFleet->ships[index.index];
+    ShipDynamic *shipDyn = index.isFriend ? currentFriendFleet->shipDynamics[index.index].get()
+                                          : currentEnemyFleet->shipDynamics[index.index].get();
+    LuaMap attrs = FleetInfo::attrFromShip(ship, shipDyn);
+    double shipConcealment = attrs.value(QStringLiteral("Concealment"), 0);
+    double antagonistLos = index.isFriend ? currentEnemyFleet->los(isNight)
+                                          : currentFriendFleet->los(isNight);
+    double concealFactor = std::log(shipConcealment) - std::log(antagonistLos);
+    double concealChance = concealFactor / (2 * std::hypot(concealFactor, 1)) + 0.5;
+    if(shipConcealment <= 0)
+        concealChance = 0;
+    if(antagonistLos <= 0)
+        concealChance = 1;
+    if(shipConcealment <= 0 && antagonistLos <= 0)
+        concealChance = 0.5;
+
+    static std::bernoulli_distribution dist(concealChance);
     result = dist(gen);
 
     if(index.isFriend) {

@@ -12,11 +12,14 @@
 #include <QSettings>
 
 #include "fleetinfo.h"
-#include "user.h"
 
 extern std::unique_ptr<QSettings> settings;
 
-double FleetInfo::los() const {
+/* LOS, undiscovered ships and surprise attacks
+ * - see doc/worldview_and_mechanics/9.c4-los.md
+ * [Implemented in FleetInfo::los]
+ */
+double FleetInfo::los(bool isNight) const {
     double a = settings->value("rule/loscontrol", 0.9).toDouble();
 
     std::vector<double> losValues;
@@ -24,15 +27,69 @@ double FleetInfo::los() const {
     for(int i = 0; i < static_cast<int>(ships.size()); ++i) {
         if(!ships[i] || !shipDynamics[i] || shipDynamics[i]->fleetFled)
             continue;
-        LuaMap attrs = attrFromShip(ships[i], shipDynamics[i].get());
-        LuaMap b = attrFromEquipment(ships[i], shipDynamics[i].get(),
-                                     equipMap, equipSkillEffects);
-        for(auto it = b.cbegin(); it != b.cend(); ++it)
-            attrs[it.key()] += it.value();
-        LuaMap c = getVisibleBonusSecondType(ships[i], shipDynamics[i].get());
-        for(auto it = c.cbegin(); it != c.cend(); ++it)
-            attrs[it.key()] += it.value();
-        losValues.push_back(attrs.value(QStringLiteral("Los"), 0));
+
+        double shipLos = 0.0;
+
+        if(!isNight) {
+            LuaMap attrs = attrFromShip(ships[i], shipDynamics[i].get());
+            shipLos = attrs.value(QStringLiteral("Los"), 0);
+        }
+
+        bool skipAllEquip = false;
+
+        if(isNight) {
+            bool nonNightCarrier =
+                (ships[i]->getId() & 0x000f8000) == 0x00060000;
+            if(nonNightCarrier) {
+                bool hasNightPersonnel = false;
+                auto checkPersonnel = [&](const QUuid &slot) {
+                    Equipment *eq = equipMap.value(slot, nullptr);
+                    if(eq) {
+                        int eid = eq->getId();
+                        if(eid == 258 || eid == 259)
+                            hasNightPersonnel = true;
+                    }
+                };
+                for(const auto &slot : shipDynamics[i]->slotEquip)
+                    checkPersonnel(slot);
+                checkPersonnel(shipDynamics[i]->slotEquipEx);
+                skipAllEquip = !hasNightPersonnel;
+            }
+        }
+
+        if(!skipAllEquip) {
+            auto addEquipLos = [&](const QUuid &slot, int pos) {
+                Equipment *eq = equipMap.value(slot, nullptr);
+                if(!eq)
+                    return;
+                if(isNight && eq->isPlane() && !eq->type.isNight())
+                    return;
+                if(!isNight) {
+                    int sp = eq->type.getSpecial();
+                    if(sp == 15 || sp == 16)
+                        return;
+                }
+                double skillEff = equipSkillEffects.value(slot, 1.0);
+                double visBonus = getVisibleBonusFirstType(
+                    ships[i], shipDynamics[i].get(), pos);
+                int los =
+                    eq->attr.value(QStringLiteral("Los"), 0);
+                shipLos +=
+                    std::round(los * skillEff * visBonus);
+            };
+            int slotCount = shipDynamics[i]->slotEquip.size();
+            for(int j = 0; j < slotCount; ++j)
+                addEquipLos(shipDynamics[i]->slotEquip[j], j);
+            addEquipLos(shipDynamics[i]->slotEquipEx, slotCount);
+        }
+
+        {
+            LuaMap c = getVisibleBonusSecondType(ships[i],
+                                                 shipDynamics[i].get());
+            shipLos += c.value(QStringLiteral("Los"), 0);
+        }
+
+        losValues.push_back(shipLos);
     }
 
     std::sort(losValues.begin(), losValues.end(), std::greater<double>());

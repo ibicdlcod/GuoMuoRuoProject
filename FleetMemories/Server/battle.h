@@ -60,7 +60,7 @@ public:
     void insertEvent(EventType, clockTime, FriendOrEnemyIndex,
                      std::function<void(FriendOrEnemyIndex)>);
 
-    bool currentReturnedBool = false;
+    bool isNight;
 };
 
 #endif // BATTLE_H

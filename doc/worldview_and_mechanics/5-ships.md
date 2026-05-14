@@ -186,31 +186,31 @@ Condition: `shipid & 0x000f0000 == 0x00060000`
 
 #### Light carriers
 
-Condition: `shipid & 0x000f1000 == 0x00051000`
+Condition: `shipid & 0x000f1000 == 0x00061000`
 
 **Variations**: Smaller, slower carriers with fewer aircraft and lower durability; Medium price to deploy (capitalness = 3). Engage in ASW unlike ordinary carriers.
 
 #### Carriers (advanced ASW)
 
-Condition: `shipid & 0x000f2000 == 0x00052000`
+Condition: `shipid & 0x000f2000 == 0x00062000`
 
 **Variations**: These carriers engage in ASW unlike ordinary carriers with no weakness of that of a light carrier. Medium price to deploy (capitalness = 4)
 
 #### Escort carriers
 
-Condition: `shipid & 0x000f3000 == 0x00053000`(counts as both a light carrier and advanced ASW)
+Condition: `shipid & 0x000f3000 == 0x00063000`(counts as both a light carrier and advanced ASW)
 
 **Variations**: These carriers are even lighter and put more emphasis on ASW; used for transport/convoy escort; low price to deploy (capitalness = 2)
 
 #### Armored carriers
 
-Condition: `shipid & 0x000f4000 == 0x00054000`
+Condition: `shipid & 0x000f4000 == 0x00064000`
 
 **Variations**: These carriers are more resilient compared to regular carriers; lower aerial capability if damaged, but suffers much less from this rule
 
 #### Carriers (night aviation)
 
-Condition: `shipid & 0x000f8000 == 0x00058000`
+Condition: `shipid & 0x000f8000 == 0x00068000`
 
 **Variations**: These carriers can participate in night battle without extra night-aviation personnel
 
