@@ -301,7 +301,6 @@ private:
     int planeLossDeductionThreshold;
 
     sol::state lua;
-    Battle battleProcessor;
 
     QTimer *clock;
 

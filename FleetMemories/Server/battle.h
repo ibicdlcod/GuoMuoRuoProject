@@ -33,7 +33,8 @@ public:
 
     void battleProcessor(FleetInfo *friendf, FleetInfo *enemyf,
                          const QJsonObject &battlePlan,
-                         bool isExpedition = false);
+                         bool isExpedition = false,
+                         bool isNightCommence = false);
 
     /* Target selection — see doc/worldview_and_mechanics/9-battle.md */
     int selectEnemyTarget(int friendIndex) const;
@@ -57,9 +58,19 @@ private:
     KP::FriendFleetPriority friendGoal;
     KP::EnemyFleetPriority enemyGoal;
 
+    bool extraBattle;
+    bool extraBattleWhenLosing;
+    bool extraBattleWhenFlagship;
+    bool extraBattleWhenBorBelow;
+    bool extraBattleWhenAorBelow;
+
     clockTime clock;
     std::list<Event> events;
     bool isNight;
+
+    double airSuperiorityCoefficient; // the enemy have -(this value)
+    double friendFormationEfficiency;
+    double enemyFormationEfficiency;
 
     void airBattle();
     void approachingPhase();
@@ -73,6 +84,12 @@ private:
     void advanceClockTime(clockTime timeInterval);
     void insertEvent(EventType, clockTime, FriendOrEnemyIndex,
                      std::function<void(FriendOrEnemyIndex)>);
+
+    void computeAirSuperiority();
+    void computeFormationEfficiency();
+    double maxEnemyFighterAA(const FleetInfo *fleet) const;
+    double fleetAirSuperiority(const FleetInfo *fleet,
+                               const FleetInfo *enemyFleet) const;
 
     bool isPrioritizedTarget(int friendIndex, int enemyIndex) const;
     bool isProtectedShip(int friendIndex) const;

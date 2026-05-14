@@ -348,8 +348,11 @@ std::vector<std::vector<Equipment *>> FleetInfo::getEquipGrid() const {
 
 /* ---- effectiveAttr helpers ---- */
 
-/* a: ship base attrs scaled by efficiency at current level/star */
-LuaMap FleetInfo::attrFromShip(const Ship *ship, const ShipDynamic *dyn) {
+/* a: ship base attrs scaled by efficiency at current level/star.
+ *    when friendGoal is provided, applies tactical-goal multipliers
+ *    and replaces Accuracy with a level-based formula. */
+LuaMap FleetInfo::attrFromShip(const Ship *ship, const ShipDynamic *dyn,
+                               int friendGoal) {
     LuaMap result;
     if(!dyn) {
         return result;
@@ -363,6 +366,64 @@ LuaMap FleetInfo::attrFromShip(const Ship *ship, const ShipDynamic *dyn) {
         else
             result[it.key()] = static_cast<int>(std::round(it.value() * eff));
     }
+
+    if(friendGoal < 0) {
+        return result;
+    }
+
+    double dpmMul = 1.0;
+    double accMul = 1.0;
+    double evaMul = 1.0;
+    double aswMul = 1.0;
+    double aaMul = 1.0;
+
+    switch(static_cast<KP::FriendFleetPriority>(friendGoal)) {
+    case KP::FriendFirepower:
+        dpmMul = 1.5; /* acc 1.0, eva 1.0, asw 1.0, aa 1.0 */
+        break;
+    case KP::FriendAccuracy:
+        dpmMul = 1.2; accMul = 1.5; evaMul = 1.1; aswMul = 1.3; aaMul = 1.4;
+        break;
+    case KP::FriendEvasion:
+        dpmMul = 1.1; accMul = 1.2; evaMul = 1.5; aswMul = 1.2; aaMul = 1.1;
+        break;
+    case KP::FriendASW:
+        /* dpm 1.0, acc 1.0 */ evaMul = 1.2; aswMul = 2.0; aaMul = 1.1;
+        break;
+    case KP::FriendAntiAir:
+        dpmMul = 1.1; /* acc 1.0 */ evaMul = 1.1; aswMul = 1.5; aaMul = 2.0;
+        break;
+    case KP::FriendProtectCapital:
+        dpmMul = 1.3; /* acc 1.0, eva 1.0, asw 1.0 */ aaMul = 1.6;
+        break;
+    case KP::FriendProtectScreens:
+        dpmMul = 1.2; accMul = 1.1; evaMul = 1.4; aswMul = 1.5;
+        /* aa 1.0 */
+        break;
+    case KP::FriendProtectFlagship:
+        dpmMul = 1.3; accMul = 1.2; evaMul = 1.2; aswMul = 1.2; aaMul = 1.3;
+        break;
+    case KP::FriendProtectDamaged:
+        /* all multipliers are 1.0 */
+        break;
+    }
+
+    double baseAcc = 1000.0 * ((lv + 25.0) / 100.0)
+                     / std::hypot(1.0, (lv + 25.0) / 100.0);
+    result[QStringLiteral("Accuracy")]
+        = static_cast<int>(std::round(baseAcc * accMul));
+
+    auto mulApply = [&](const QString &key, double mul) {
+        if(mul != 1.0 && result.contains(key))
+            result[key] = static_cast<int>(
+                std::round(result[key] * mul));
+    };
+    mulApply(QStringLiteral("DPM"), dpmMul);
+    mulApply(QStringLiteral("Torpedo"), dpmMul);
+    mulApply(QStringLiteral("Evasion"), evaMul);
+    mulApply(QStringLiteral("Asw"), aswMul);
+    mulApply(QStringLiteral("Antiair"), aaMul);
+
     return result;
 }
 

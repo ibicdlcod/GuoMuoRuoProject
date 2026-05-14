@@ -6,12 +6,12 @@ Unlike KC (but similar to KC arcade), some phase of battle have an internal cloc
 
 The battle have the following characteristics:
 
-- [Tactical Goal (for friend fleet)](9.c1-goal-friend.md)
-- [Tactical Goal (against enemy fleet)](9.c2-goal-enemy.md)
+- [Tactical Goal (for friend fleet)](9.c1-goal-friend.md) [IMPLEMENTED]
+- [Tactical Goal (against enemy fleet)](9.c2-goal-enemy.md) [IMPLEMENTED]
 - Target selection (see below)
 - [Communication efficiency](9.c3-communication.md) [IMPLEMENTED]
 - [LOS, undiscovered ships and surprise attacks](9.c4-los.md) [IMPLEMENTED]
-- [Air superiority coefficient](9.c5-air-superiority.md)
+- [Air superiority coefficient](9.c5-air-superiority.md) [IMPLEMENTED]
 - [Guided strikes (触接)](9.c6-guidedstrikes.md)
 - [Formation efficiency](9.c7-formation.md)
 - [Commander's abilities](9.c8-abilities.md)

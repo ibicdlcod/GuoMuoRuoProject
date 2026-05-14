@@ -59,7 +59,8 @@ public:
     std::vector<std::vector<Equipment *>> getEquipGrid() const;
 
     /* effectiveAttr helpers – exposed as statics for external testing. */
-    static LuaMap attrFromShip(const Ship *ship, const ShipDynamic *dyn);
+    static LuaMap attrFromShip(const Ship *ship, const ShipDynamic *dyn,
+                               int friendGoal = -1);
     static LuaMap attrFromEquipment(const Ship *ship, const ShipDynamic *dyn,
                                     const QHash<QUuid, Equipment *> &equipMap,
                                     const QHash<QUuid, double> &skillEffects);

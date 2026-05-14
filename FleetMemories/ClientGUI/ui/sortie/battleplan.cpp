@@ -27,6 +27,10 @@ BattlePlan::BattlePlan(QWidget *parent, bool isNightNode, bool isAirNode)
     ui->efbox->addItem(qtTrId("ef-focus-nonflagship"));
     ui->efbox->addItem(qtTrId("ef-random"));
 
+    ui->extraBattleCheck->setChecked(false);
+    ui->extraBattleWhenLosingCheck->setChecked(false);
+    ui->extraBattleWhenFlagshipCheck->setChecked(false);
+
     if(isNightNode) {
         //% "Day battle:"
         ui->extraBattleLabel->setText(qtTrId("day-battle-plan"));
@@ -52,6 +56,25 @@ BattlePlan::~BattlePlan()
     delete ui;
 }
 
+void BattlePlan::setPlanData(const QJsonObject &plan)
+{
+    ui->ffbox->setCurrentIndex(
+        plan.value("friendFleetPriority").toInt(0));
+    ui->efbox->setCurrentIndex(
+        plan.value("enemyFleetPriority").toInt(0));
+    ui->smokeBox->setChecked(plan.value("smoke").toBool(false));
+    ui->extraBattleCheck->setChecked(
+        plan.value("extraBattle").toBool(false));
+    ui->extraBattleWhenLosingCheck->setChecked(
+        plan.value("extraBattleWhenLosing").toBool(false));
+    ui->extraBattleWhenFlagshipCheck->setChecked(
+        plan.value("extraBattleWhenFlagship").toBool(false));
+    ui->striveARankCheck->setChecked(
+        plan.value("extraBattleWhenBorBelow").toBool(false));
+    ui->striveSRankCheck->setChecked(
+        plan.value("extraBattleWhenAorBelow").toBool(false));
+}
+
 QJsonObject BattlePlan::getPlanData() const
 {
     QJsonObject plan;
@@ -61,7 +84,7 @@ QJsonObject BattlePlan::getPlanData() const
     plan["extraBattle"] = ui->extraBattleCheck->isChecked();
     plan["extraBattleWhenLosing"] = ui->extraBattleWhenLosingCheck->isChecked();
     plan["extraBattleWhenFlagship"] = ui->extraBattleWhenFlagshipCheck->isChecked();
-    plan["striveARank"] = ui->striveARankCheck->isChecked();
-    plan["striveSRank"] = ui->striveSRankCheck->isChecked();
+    plan["extraBattleWhenBorBelow"] = ui->striveARankCheck->isChecked();
+    plan["extraBattleWhenAorBelow"] = ui->striveSRankCheck->isChecked();
     return plan;
 }

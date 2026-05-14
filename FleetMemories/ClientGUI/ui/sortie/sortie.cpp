@@ -729,7 +729,7 @@ void Sortie::dealWithNode(const MapNode &node, int nodeId) {
                 ;
             }
             /* TODO: extract info from battleplan */
-            QJsonObject planinfo;
+            QJsonObject planinfo = plan->getPlanData();
             engine.doBattle(planinfo);
         } else {
             //% "Fleet move failed!"
@@ -1191,16 +1191,26 @@ void Sortie::expeditionNodeClicked(int nodeId)
     /* For other node types, show battle plan dialog */
     bool isNightNode = (node.type == KP::NIGHT || node.type == KP::NIGHTBOSS);
     bool isAirNode = (node.type == KP::AIR);
-    
+
+    int mapUnionId = MapWithDiff::getUnionId(currentMap->id);
+    int mapAbsoluteId = currentMap->getAbsoluteId();
+    QMap<int, QByteArray> plans = expeditionBattlePlans.value(mapUnionId);
+    if (plans.isEmpty()) {
+        plans = expeditionBattlePlans.value(mapAbsoluteId);
+    }
+
     std::unique_ptr<BattlePlan> plan
         = std::make_unique<BattlePlan>(nullptr, isNightNode, isAirNode);
+    if (plans.contains(nodeId)) {
+        QJsonObject existingPlan
+            = QCborValue::fromCbor(plans[nodeId]).toMap().toJsonObject();
+        plan->setPlanData(existingPlan);
+    }
     if (plan->exec() != QDialog::Accepted) {
         return;
     }
     QJsonObject planData = plan->getPlanData();
     QByteArray serializedPlan = QCborValue::fromJsonValue(planData).toCbor();
-    int mapUnionId = MapWithDiff::getUnionId(currentMap->id);
-    int mapAbsoluteId = currentMap->getAbsoluteId();
     expeditionBattlePlans[mapUnionId][nodeId] = serializedPlan;
     updatePlannedNodes();
     qDebug() << "Saved battle plan for node" << nodeId << "map union ID:" << mapUnionId 

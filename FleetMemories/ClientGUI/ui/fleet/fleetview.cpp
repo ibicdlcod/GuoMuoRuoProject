@@ -644,6 +644,9 @@ void FleetView::receivedShipInfo(const QJsonObject &info) {
     ui->FleetMenu->show();
     ready = true;
     scrollArea->show();
+    if(simplified) {
+        simplify();
+    }
 }
 
 void FleetView::sendFleetData(bool checked) {

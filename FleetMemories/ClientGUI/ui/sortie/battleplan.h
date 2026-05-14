@@ -21,6 +21,7 @@ public:
     ~BattlePlan();
 
     QJsonObject getPlanData() const;
+    void setPlanData(const QJsonObject &plan);
 
 private:
     Ui::BattlePlan *ui;
