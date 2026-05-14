@@ -585,7 +585,61 @@ void Sortie::battleProcess(const QJsonObject &djson) {
     Client &engine = Client::getInstance();
     switchToState(KP::BattleScreen);
     currentBattleProcess = djson;
-    /* TODO: battle animation */
+
+    QJsonArray damageLog = djson["damageLog"].toArray();
+    for(const auto &entryRef : damageLog) {
+        QJsonObject entry = entryRef.toObject();
+        KP::BattleActionType actionType
+            = static_cast<KP::BattleActionType>(entry["type"].toInt());
+        switch(actionType) {
+        case KP::AirTorpedoAttack: {
+            int attackerShip = entry["attackerShip"].toInt();
+            int defenderShip = entry["defenderShip"].toInt();
+            int damage = entry["damage"].toInt();
+            //% "Air torpedo: ship %1 → enemy %2, %3 damage"
+            qInfo() << qtTrId("battle-air-torpedo")
+                           .arg(attackerShip).arg(defenderShip).arg(damage);
+            break;
+        }
+        case KP::AirDiveAttack: {
+            int attackerShip = entry["attackerShip"].toInt();
+            int defenderShip = entry["defenderShip"].toInt();
+            int damage = entry["damage"].toInt();
+            //% "Air dive: ship %1 → enemy %2, %3 damage"
+            qInfo() << qtTrId("battle-air-dive")
+                           .arg(attackerShip).arg(defenderShip).arg(damage);
+            break;
+        }
+        case KP::AirCutInAttack: {
+            int attackerShip = entry["attackerShip"].toInt();
+            int defenderShip = entry["defenderShip"].toInt();
+            int damage = entry["damage"].toInt();
+            //% "Air cut-in: ship %1 → enemy %2, %3 damage"
+            qInfo() << qtTrId("battle-air-cutin")
+                           .arg(attackerShip).arg(defenderShip).arg(damage);
+            break;
+        }
+        case KP::AntiAirPlaneLoss: {
+            int attackerSlot = entry["attackerSlot"].toInt();
+            int lost = entry["planesLost"].toInt();
+            int remaining = entry["planesRemaining"].toInt();
+            //% "AA defense: slot %1 lost %2 planes (%3 remaining)"
+            qInfo() << qtTrId("battle-aa-plane-loss")
+                           .arg(attackerSlot).arg(lost).arg(remaining);
+            break;
+        }
+        case KP::AttackSkipped: {
+            int attackerShip = entry["attackerShip"].toInt();
+            int attackerSlot = entry["attackerSlot"].toInt();
+            QString reason = entry["reason"].toString();
+            //% "Air attack skipped: ship %1 slot %2 (%3)"
+            qInfo() << qtTrId("battle-air-skipped")
+                           .arg(attackerShip).arg(attackerSlot)
+                           .arg(reason);
+            break;
+        }
+        }
+    }
 }
 
 void Sortie::disasterLOSInfo(const QJsonObject &djson) {

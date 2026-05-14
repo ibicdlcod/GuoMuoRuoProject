@@ -3730,7 +3730,7 @@ Great at battle and bad at politics--so cool!</source>
     <message id="fleet-not-ready">
         <location filename="../ClientGUI/ui/maintenance/repair.cpp" line="203"/>
         <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="517"/>
-        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="775"/>
+        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="829"/>
         <source>Please prepare your fleet in fleet view!</source>
         <translation type="unfinished">修理中止</translation>
     </message>
@@ -3741,40 +3741,40 @@ Great at battle and bad at politics--so cool!</source>
     </message>
     <message id="fleet-empty">
         <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="534"/>
-        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="797"/>
+        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="851"/>
         <source>Fleet is empty.</source>
         <translation type="unfinished">艦船は修理の必要がありません。</translation>
     </message>
     <message id="disaster-los-check">
-        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="599"/>
+        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="653"/>
         <source>LOS check: required %1, fleet %2, chance to avoid %3%</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="disaster-deduction-occurred">
-        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="603"/>
+        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="657"/>
         <source>Fuel/ammo deducted: %1% fuel, %2% ammo</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="disaster-deduction-avoided">
-        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="608"/>
+        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="662"/>
         <source>LOS check succeeded! No resources deducted.</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="transport-freight-info">
-        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="617"/>
+        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="671"/>
         <source>Freight transport: current %1, capacity %2, added %3</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="continue-map">
-        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="653"/>
+        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="707"/>
         <source>Do you want to continue map progress?</source>
         <translation type="unfinished">艦隊が空です。</translation>
     </message>
     <message id="expedition-auto-restart-label">
         <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="127"/>
-        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="913"/>
-        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="933"/>
-        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="1024"/>
+        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="967"/>
+        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="987"/>
+        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="1078"/>
         <source>Auto-restart: %1%</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3888,74 +3888,99 @@ Great at battle and bad at politics--so cool!</source>
         <source>Unknown reason</source>
         <translation type="unfinished"></translation>
     </message>
+    <message id="battle-air-torpedo">
+        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="600"/>
+        <source>Air torpedo: ship %1 → enemy %2, %3 damage</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="battle-air-dive">
+        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="609"/>
+        <source>Air dive: ship %1 → enemy %2, %3 damage</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="battle-air-cutin">
+        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="618"/>
+        <source>Air cut-in: ship %1 → enemy %2, %3 damage</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="battle-aa-plane-loss">
+        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="627"/>
+        <source>AA defense: slot %1 lost %2 planes (%3 remaining)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="battle-air-skipped">
+        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="636"/>
+        <source>Air attack skipped: ship %1 slot %2 (%3)</source>
+        <translation type="unfinished"></translation>
+    </message>
     <message id="cancel-expedition-title">
-        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="840"/>
+        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="894"/>
         <source>Cancel Expedition: %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="expedition-start-success">
-        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="862"/>
+        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="916"/>
         <source>Expedition started successfully for map %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="expedition-start-failed">
-        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="869"/>
+        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="923"/>
         <source>Expedition start failed: %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="expedition-start-failed-title">
-        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="871"/>
+        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="925"/>
         <source>Expedition Start Failed</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="expedition-battle-plans-loaded">
-        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="982"/>
+        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="1036"/>
         <source>Loaded %1 battle plans for map %2</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="expedition-progress-update">
-        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="1002"/>
+        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="1056"/>
         <source>Expedition %1 progressed to node %2</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="expedition-settings-saved">
-        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="1093"/>
+        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="1147"/>
         <source>Expedition settings saved for map %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="expedition-choice-saved">
-        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="1142"/>
+        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="1196"/>
         <source>Branch selection saved for node %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="expedition-plan-saved">
-        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="1219"/>
+        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="1273"/>
         <source>Battle plan saved for node %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="expedition-stopped">
-        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="1011"/>
+        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="1065"/>
         <source>Expedition %1 stopped with reason: %2</source>
         <oldsource>Expedition %1 stopped with reason %2</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message id="sortie-end">
-        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="665"/>
+        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="719"/>
         <source>This sortie ended successfully.</source>
         <translation type="unfinished">海域進行を続けますか？</translation>
     </message>
     <message id="empty-node-no-battle">
-        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="696"/>
+        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="750"/>
         <source>No enemies found. It&apos;s just my imagination.</source>
         <translation type="unfinished">出撃は成功裏に終了しました。</translation>
     </message>
     <message id="choice-node-prompt">
-        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="699"/>
+        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="753"/>
         <source>Admiral, please can choose your next step freely.</source>
         <translation type="unfinished">提督、次の行動を自由に選んでください。</translation>
     </message>
     <message id="fleet-move-error">
-        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="736"/>
+        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="790"/>
         <source>Fleet move failed!</source>
         <translation type="unfinished">敵影を見ず。気のせいだったか。</translation>
     </message>
@@ -4251,22 +4276,22 @@ Great at battle and bad at politics--so cool!</source>
         <translation type="unfinished">その他アジア</translation>
     </message>
     <message id="NormalFleet">
-        <location filename="../Protocol/kp.h" line="746"/>
+        <location filename="../Protocol/kp.h" line="755"/>
         <source>Normal</source>
         <translation type="unfinished">架空艦</translation>
     </message>
     <message id="CarrierFleet">
-        <location filename="../Protocol/kp.h" line="748"/>
+        <location filename="../Protocol/kp.h" line="757"/>
         <source>Carrier</source>
         <translation type="unfinished">通常</translation>
     </message>
     <message id="SurfaceFleet">
-        <location filename="../Protocol/kp.h" line="750"/>
+        <location filename="../Protocol/kp.h" line="759"/>
         <source>Surface</source>
         <translation type="unfinished">空母機動部隊</translation>
     </message>
     <message id="TransportFleet">
-        <location filename="../Protocol/kp.h" line="752"/>
+        <location filename="../Protocol/kp.h" line="761"/>
         <source>Transport</source>
         <translation type="unfinished">水上打撃部隊</translation>
     </message>
@@ -4824,7 +4849,7 @@ Great at battle and bad at politics--so cool!</source>
     </message>
     <message id="battle-result-title">
         <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="88"/>
-        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="643"/>
+        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="697"/>
         <source>Battle Results</source>
         <translation type="unfinished"></translation>
     </message>
@@ -6007,7 +6032,7 @@ Great at battle and bad at politics--so cool!</source>
     </message>
     <message id="selected-map-id">
         <location filename="../ClientGUI/ui/sortie/sortie.ui" line="99"/>
-        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="667"/>
+        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="721"/>
         <source>None</source>
         <translation type="unfinished">なし</translation>
     </message>

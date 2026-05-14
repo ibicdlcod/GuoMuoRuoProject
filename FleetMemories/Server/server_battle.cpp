@@ -1045,8 +1045,8 @@ const QJsonObject Server::processBattleCore(const CSteamID &uid,
     if(playerFleet) {
         bool isExpedition = fleetIndex & KP::expeditionFleetMask;
         Battle battleProcessor;
-        qCritical() << battlePlan;
         battleProcessor.battleProcessor(playerFleet, &enemyFleet, battlePlan, isExpedition);
+        result["damageLog"] = battleProcessor.getDamageLog();
 
         // Database connection
         QSqlDatabase db = QSqlDatabase::database();

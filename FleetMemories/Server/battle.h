@@ -3,6 +3,7 @@
 
 #include "fleetinfo.h"
 #include <functional>
+#include <QJsonArray>
 #include <random>
 
 class Battle
@@ -23,6 +24,7 @@ public:
     enum class EventType {
         DecideHidden,
         ForceVisible,
+        AirAttack,
     };
     struct Event {
         EventType type;
@@ -31,10 +33,21 @@ public:
         FriendOrEnemyIndex index;
     };
 
+    struct AirSquadron {
+        int shipIndex;
+        int slotIndex;
+        Equipment *equip = nullptr;
+        int planeCount = 0;
+        bool isTorpBomber = false;
+        bool isDiveBomber = false;
+    };
+
     void battleProcessor(FleetInfo *friendf, FleetInfo *enemyf,
                          const QJsonObject &battlePlan,
                          bool isExpedition = false,
                          bool isNightCommence = false);
+
+    QJsonArray getDamageLog() const { return m_damageLog; }
 
     /* Target selection — see doc/worldview_and_mechanics/9-battle.md */
     int selectEnemyTarget(int friendIndex) const;
@@ -68,9 +81,14 @@ private:
     std::list<Event> events;
     bool isNight;
 
-    double airSuperiorityCoefficient; // the enemy have -(this value)
+    double airSuperiorityCoefficient;
     double friendFormationEfficiency;
     double enemyFormationEfficiency;
+
+    std::vector<AirSquadron> friendAirSquadrons;
+    std::vector<AirSquadron> enemyAirSquadrons;
+
+    QJsonArray m_damageLog;
 
     void airBattle();
     void approachingPhase();
@@ -93,6 +111,32 @@ private:
 
     bool isPrioritizedTarget(int friendIndex, int enemyIndex) const;
     bool isProtectedShip(int friendIndex) const;
+
+    /* Air attack — see doc/worldview_and_mechanics/9.a1-airattack.md */
+    bool isCarrier(const Ship *ship) const;
+    bool isArmoredCarrier(const Ship *ship) const;
+    bool isSeaplaneShip(const Ship *ship) const;
+    double carrierFiringSpeed(const Ship *ship,
+                              const ShipDynamic *dyn,
+                              const FleetInfo *fleet) const;
+    void collectAirSquadrons();
+    void setupAirReloading(clockTime phaseStart, clockTime phaseLength);
+    void processAirAttack(FriendOrEnemyIndex attacker);
+    void applyIndividualAntiAir(FriendOrEnemyIndex defender,
+                                AirSquadron &squadron);
+    void executeAirTorpedoAttack(FriendOrEnemyIndex attacker,
+                                 FriendOrEnemyIndex defender,
+                                 AirSquadron &squadron);
+    void executeAirDiveAttack(FriendOrEnemyIndex attacker,
+                              FriendOrEnemyIndex defender,
+                              AirSquadron &squadron);
+    void executeAirAttackCutIn(FriendOrEnemyIndex attacker,
+                               FriendOrEnemyIndex defender);
+
+    FleetInfo *fleetOf(bool isFriend) const;
+    std::vector<ConcealmentStatus> &concealmentOf(bool isFriend);
+    std::vector<AirSquadron> &airSquadronsOf(bool isFriend);
+    QMap<QString, int> shipAttrOf(bool isFriend, int index) const;
 };
 
 #endif // BATTLE_H

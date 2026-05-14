@@ -717,6 +717,15 @@ enum BattleAssessment {
 };
 Q_ENUM_NS(BattleAssessment)
 
+enum BattleActionType {
+    AirTorpedoAttack = 0,
+    AirDiveAttack = 1,
+    AirCutInAttack = 2,
+    AntiAirPlaneLoss = 3,
+    AttackSkipped = 4
+};
+Q_ENUM_NS(BattleActionType)
+
 enum ExpeditionStopReason {
     Completed = 0,
     CriticallyDamaged = 1,
