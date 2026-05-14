@@ -1043,7 +1043,8 @@ const QJsonObject Server::processBattleCore(const CSteamID &uid,
     
     // Now compute losses and update fleets
     if(playerFleet) {
-        battleProcessor.battleProcessor(playerFleet, &enemyFleet, battlePlan);
+        bool isExpedition = fleetIndex & KP::expeditionFleetMask;
+        battleProcessor.battleProcessor(playerFleet, &enemyFleet, battlePlan, isExpedition);
 
         // Database connection
         QSqlDatabase db = QSqlDatabase::database();

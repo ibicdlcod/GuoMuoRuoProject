@@ -32,7 +32,7 @@ public:
     };
 
     void battleProcessor(FleetInfo *friendf, FleetInfo *enemyf,
-                         const QJsonObject &battlePlan);
+                         const QJsonObject &battlePlan, bool isExpedition = false);
     void airBattle();
     void approachingPhase();
     void centralPhase();
@@ -49,6 +49,9 @@ public:
 
     std::vector<ConcealmentStatus> friendFleetConcealmentStatus;
     std::vector<ConcealmentStatus> enemyFleetConcealmentStatus;
+
+    std::vector<bool> receivedOrders;
+    std::vector<double> commEfficiency;
 
     void decideHidden(FriendOrEnemyIndex);
     void forceVisible(FriendOrEnemyIndex);

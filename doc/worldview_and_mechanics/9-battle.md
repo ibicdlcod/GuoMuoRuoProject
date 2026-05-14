@@ -8,8 +8,9 @@ The battle have the following characteristics:
 
 - [Tactical Goal (for friend fleet)](9.c1-goal-friend.md)
 - [Tactical Goal (against enemy fleet)](9.c2-goal-enemy.md)
-- [Communication efficiency](9.c3-communication.md)
-- [LOS, undiscovered ships and surprise attacks](9.c4-los.md)
+- Target selection (see below)
+- [Communication efficiency](9.c3-communication.md) [IMPLEMENTED]
+- [LOS, undiscovered ships and surprise attacks](9.c4-los.md) [IMPLEMENTED]
 - [Air superiority coefficient](9.c5-air-superiority.md)
 - [Guided strikes (触接)](9.c6-guidedstrikes.md)
 - [Formation efficiency](9.c7-formation.md)
@@ -53,3 +54,11 @@ The battle have the following special modes worthy of attention:
 
 - [Night-battle-start node](9.s1-nightstart.md)
 - [Air-battle-only node](9.s2-aironly.md)
+
+## Target selection
+
+When friend fleet attack enemy fleet, "Tactical Goal (against enemy fleet)" is activated and ships will select randomly from a list of **visible** enemy ships. If the target is prioritized, it is selected; else another random selection would be made.
+
+When enemy fleet attack friend fleet, "Tactical Goal (for friend fleet)" is activated and enemy ships will select randomly from a list of **visible** friend ships. If the target is not protected, it is selected; else another random selection would be made.
+
+Of course, ships that are sunk (hp <= 0) is excluded from target selection.

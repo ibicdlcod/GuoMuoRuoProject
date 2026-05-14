@@ -2441,7 +2441,7 @@ Great at battle and bad at politics--so cool!</translation>
     <message id="sortie-progress-failure">
         <location filename="../Server/server.cpp" line="4930"/>
         <location filename="../Server/server.cpp" line="4942"/>
-        <location filename="../Server/server_battle.cpp" line="1799"/>
+        <location filename="../Server/server_battle.cpp" line="1800"/>
         <source>User %1: progress map %2 failure!</source>
         <translation type="unfinished">User %1: progress map %2 failure!</translation>
     </message>
@@ -2462,7 +2462,7 @@ Great at battle and bad at politics--so cool!</translation>
     </message>
     <message id="dbfail-map-relations">
         <location filename="../Server/server_battle.cpp" line="305"/>
-        <location filename="../Server/server_battle.cpp" line="2149"/>
+        <location filename="../Server/server_battle.cpp" line="2150"/>
         <source>Database failed when querying map relations!</source>
         <translation type="unfinished">Database failed when querying map relations!</translation>
     </message>
@@ -2660,7 +2660,7 @@ Great at battle and bad at politics--so cool!</translation>
     </message>
     <message id="sortie-node-battle-failure-transport-read">
         <location filename="../Server/server_battle.cpp" line="791"/>
-        <location filename="../Server/server_battle.cpp" line="1450"/>
+        <location filename="../Server/server_battle.cpp" line="1451"/>
         <source>User %1: transport node read failure!</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2670,12 +2670,12 @@ Great at battle and bad at politics--so cool!</translation>
         <translation type="unfinished"></translation>
     </message>
     <message id="sortie-end-failure-freight-clear">
-        <location filename="../Server/server_battle.cpp" line="1827"/>
+        <location filename="../Server/server_battle.cpp" line="1828"/>
         <source>User %1: clear freight at map end failure!</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="update-fleet-db-failed">
-        <location filename="../Server/server_battle.cpp" line="2220"/>
+        <location filename="../Server/server_battle.cpp" line="2221"/>
         <source>User %1: update fleet %2 pos %3 in database failed!</source>
         <translation type="unfinished">User %1: update fleet %2 pos %3 in database failed!</translation>
     </message>
@@ -2687,61 +2687,61 @@ Great at battle and bad at politics--so cool!</translation>
     </message>
     <message id="sortie-node-battle-failure-end">
         <location filename="../Server/server_battle.cpp" line="837"/>
-        <location filename="../Server/server_battle.cpp" line="1357"/>
+        <location filename="../Server/server_battle.cpp" line="1358"/>
         <source>User %1: end node battle failure!</source>
         <translation type="unfinished">User %1: end node battle failure!</translation>
     </message>
     <message id="dbfail-update-ship-hp">
-        <location filename="../Server/server_battle.cpp" line="1120"/>
+        <location filename="../Server/server_battle.cpp" line="1121"/>
         <source>Failed to update player ship HP</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="dbfail-get-ship-uuid">
-        <location filename="../Server/server_battle.cpp" line="1135"/>
+        <location filename="../Server/server_battle.cpp" line="1136"/>
         <source>Failed to get ship UUID for plane loss tracking</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="dbfail-update-plane-count">
-        <location filename="../Server/server_battle.cpp" line="1188"/>
+        <location filename="../Server/server_battle.cpp" line="1189"/>
         <source>Failed to update plane count</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="map-info-failure-exp">
-        <location filename="../Server/server_battle.cpp" line="1408"/>
+        <location filename="../Server/server_battle.cpp" line="1409"/>
         <source>Map info: query mapid %1 nodeid %2 exp failed!</source>
         <translation type="unfinished">Map info: query mapid %1 nodeid %2 exp failed!</translation>
     </message>
     <message id="sortie-node-battle-failure-transport-clear">
-        <location filename="../Server/server_battle.cpp" line="1479"/>
+        <location filename="../Server/server_battle.cpp" line="1480"/>
         <source>User %1: transport node clear failure!</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="ship-drop-illegal">
-        <location filename="../Server/server_battle.cpp" line="1503"/>
+        <location filename="../Server/server_battle.cpp" line="1504"/>
         <source>Attempt to drop invalid ship %1!</source>
         <translation type="unfinished">Attempt to drop invalid ship %1!</translation>
     </message>
     <message id="ship-drop-db-fail">
-        <location filename="../Server/server_battle.cpp" line="1516"/>
+        <location filename="../Server/server_battle.cpp" line="1517"/>
         <source>User %1: refresh database failure when drop ship %2!</source>
         <translation type="unfinished">User %1: refresh database failure when drop ship %2!</translation>
     </message>
     <message id="add-ship-exp-failre">
-        <location filename="../Server/server_battle.cpp" line="1557"/>
-        <location filename="../Server/server_battle.cpp" line="1575"/>
-        <location filename="../Server/server_battle.cpp" line="1589"/>
-        <location filename="../Server/server_battle.cpp" line="1618"/>
-        <location filename="../Server/server_battle.cpp" line="1636"/>
+        <location filename="../Server/server_battle.cpp" line="1558"/>
+        <location filename="../Server/server_battle.cpp" line="1576"/>
+        <location filename="../Server/server_battle.cpp" line="1590"/>
+        <location filename="../Server/server_battle.cpp" line="1619"/>
+        <location filename="../Server/server_battle.cpp" line="1637"/>
         <source>User %1: add ship exp failure!</source>
         <translation type="unfinished">User %1: add ship exp failure!</translation>
     </message>
     <message id="rank-add-exp-failed">
-        <location filename="../Server/server_battle.cpp" line="1654"/>
+        <location filename="../Server/server_battle.cpp" line="1655"/>
         <source>User %1: add ranking exp failed!</source>
         <translation type="unfinished">User %1: add ranking exp failed!</translation>
     </message>
     <message id="virtual-add-exp-failed">
-        <location filename="../Server/server_battle.cpp" line="1689"/>
+        <location filename="../Server/server_battle.cpp" line="1690"/>
         <source>User %1: add virtual exp failed!</source>
         <translation type="unfinished">User %1: add virtual exp failed!</translation>
     </message>
@@ -3154,53 +3154,53 @@ Great at battle and bad at politics--so cool!</translation>
         <translation type="unfinished"></translation>
     </message>
     <message id="sortie-start-failure-dock">
-        <location filename="../Server/server_battle.cpp" line="1884"/>
+        <location filename="../Server/server_battle.cpp" line="1885"/>
         <source>User %1: start map %2 failure due to uncertain docks!</source>
         <translation type="unfinished">User %1: start map %2 failure due to uncertain docks!</translation>
     </message>
     <message id="sortie-start-failure-supply">
-        <location filename="../Server/server_battle.cpp" line="1908"/>
+        <location filename="../Server/server_battle.cpp" line="1909"/>
         <source>User %1: start map %2 failure due to uncertain supply!</source>
         <translation type="unfinished">User %1: start map %2 failure due to uncertain supply!</translation>
     </message>
     <message id="sortie-start-failure-rescheck">
-        <location filename="../Server/server_battle.cpp" line="1959"/>
+        <location filename="../Server/server_battle.cpp" line="1960"/>
         <source>User %1: start map %2 failure due to resource check!</source>
         <translation type="unfinished">User %1: start map %2 failure due to resource check!</translation>
     </message>
     <message id="sortie-start-failure">
-        <location filename="../Server/server_battle.cpp" line="2012"/>
+        <location filename="../Server/server_battle.cpp" line="2013"/>
         <source>User %1: start map %2 failure!</source>
         <translation type="unfinished">User %1: start map %2 failure!</translation>
     </message>
     <message id="sortie-start-failure-node">
-        <location filename="../Server/server_battle.cpp" line="2026"/>
+        <location filename="../Server/server_battle.cpp" line="2027"/>
         <source>User %1: start map %2 node %3 failure!</source>
         <translation type="unfinished">User %1: start map %2 node %3 failure!</translation>
     </message>
     <message id="sortie-start-failure-index">
-        <location filename="../Server/server_battle.cpp" line="2041"/>
+        <location filename="../Server/server_battle.cpp" line="2042"/>
         <source>User %1: fleet index %2 start sortie failure!</source>
         <translation type="unfinished">User %1: fleet index %2 start sortie failure!</translation>
     </message>
     <message id="sortie-start-failure-general">
-        <location filename="../Server/server_battle.cpp" line="2056"/>
-        <location filename="../Server/server_battle.cpp" line="2073"/>
+        <location filename="../Server/server_battle.cpp" line="2057"/>
+        <location filename="../Server/server_battle.cpp" line="2074"/>
         <source>User %1: start sortie failure!</source>
         <translation type="unfinished">User %1: start sortie failure!</translation>
     </message>
     <message id="sortie-start-failure-freight-clear">
-        <location filename="../Server/server_battle.cpp" line="2089"/>
+        <location filename="../Server/server_battle.cpp" line="2090"/>
         <source>User %1: clear freight at sortie start failure!</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="lua-error-branch">
-        <location filename="../Server/server_battle.cpp" line="2102"/>
+        <location filename="../Server/server_battle.cpp" line="2103"/>
         <source>Map %1 lua file has failed to run: %2</source>
         <translation type="unfinished">Map %1 lua file has failed to run: %2</translation>
     </message>
     <message id="dbfail-map-supremacies">
-        <location filename="../Server/server_battle.cpp" line="2131"/>
+        <location filename="../Server/server_battle.cpp" line="2132"/>
         <source>Database failed when reading map supremacies!</source>
         <translation type="unfinished">Database failed when reading map supremacies!</translation>
     </message>
