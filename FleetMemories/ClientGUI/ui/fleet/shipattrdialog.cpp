@@ -90,7 +90,7 @@ static LuaMap equipContrib(const QUuid &shipUuid) {
 
 CardPlaceholder::CardPlaceholder(QWidget *parent, int oldInternalId)
     : QFrame(parent)
-    , icon_(QPixmap(":/Assets/Image/Sea.jpg"))
+    , icon_(QPixmap(":/resources/Image/Sea.jpg"))
 {
     setFrameShape(QFrame::Box);
     setFrameShadow(QFrame::Sunken);

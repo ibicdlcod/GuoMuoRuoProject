@@ -38,16 +38,16 @@ MapDetail::MapDetail(QWidget *parent)
     antialiased = true;
 
     QColor iconColor = getIconColor();
-    rudder = recolorImage(":/Assets/Image/rudder.png", getRudderColor());
-    airNodeIcon = recolorImage(":/Assets/Image/plane.png", iconColor);
+    rudder = recolorImage(":/resources/Image/rudder.png", getRudderColor());
+    airNodeIcon = recolorImage(":/resources/Image/plane.png", iconColor);
     carrierFleetIcon = recolorImage(
-        ":/Assets/Image/fleetIcons/carrier.png", QColor(0, 192, 0));
+        ":/resources/Image/fleetIcons/carrier.png", QColor(0, 192, 0));
     surfaceFleetIcon = recolorImage(
-        ":/Assets/Image/fleetIcons/battleship.png", QColor(0, 192, 0));
+        ":/resources/Image/fleetIcons/battleship.png", QColor(0, 192, 0));
     transportFleetIcon = recolorImage(
-        ":/Assets/Image/fleetIcons/transport.png", QColor(0, 192, 0));
+        ":/resources/Image/fleetIcons/transport.png", QColor(0, 192, 0));
     normalFleetIcon = recolorImage(
-        ":/Assets/Image/fleetIcons/normal.png", QColor(0, 192, 0));
+        ":/resources/Image/fleetIcons/normal.png", QColor(0, 192, 0));
 
     /* https://stackoverflow.com/questions/43428627/
      * applying-qpropertyanimation-to-qrect */

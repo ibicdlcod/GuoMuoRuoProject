@@ -1,7 +1,7 @@
 <RCC>
     <qresource prefix="/">
         <file>openingwords.txt</file>
-        <file>Assets/Image/Sea.jpg</file>
+        <file>resources/Image/Sea.jpg</file>
         <file>harusoft.pem</file>
         <file>resources/icon.ico</file>
         <file>resources/resord/aluminum.png</file>
@@ -35,18 +35,18 @@
         <file>resources/shipCond/gooddark.svg</file>
         <file>resources/shipCond/warn.svg</file>
         <file>resources/shipCond/warndark.svg</file>
-        <file>Assets/Image/rudder.png</file>
-        <file>Assets/Image/LICENSE_rudder.png.txt</file>
-        <file>Assets/Image/plane.png</file>
-        <file>Assets/Image/LICENSE_plane.png.txt</file>
-        <file>Assets/Image/fleetIcons/battleship.png</file>
-        <file>Assets/Image/fleetIcons/carrier.png</file>
-        <file>Assets/Image/fleetIcons/LICENSE_battleship.png.txt</file>
-        <file>Assets/Image/fleetIcons/LICENSE_carrier.png.txt</file>
-        <file>Assets/Image/fleetIcons/LICENSE_normal.png.txt</file>
-        <file>Assets/Image/fleetIcons/LICENSE_transport.png.txt</file>
-        <file>Assets/Image/fleetIcons/normal.png</file>
-        <file>Assets/Image/fleetIcons/transport.png</file>
+        <file>resources/Image/rudder.png</file>
+        <file>resources/Image/LICENSE_rudder.png.txt</file>
+        <file>resources/Image/plane.png</file>
+        <file>resources/Image/LICENSE_plane.png.txt</file>
+        <file>resources/Image/fleetIcons/battleship.png</file>
+        <file>resources/Image/fleetIcons/carrier.png</file>
+        <file>resources/Image/fleetIcons/LICENSE_battleship.png.txt</file>
+        <file>resources/Image/fleetIcons/LICENSE_carrier.png.txt</file>
+        <file>resources/Image/fleetIcons/LICENSE_normal.png.txt</file>
+        <file>resources/Image/fleetIcons/LICENSE_transport.png.txt</file>
+        <file>resources/Image/fleetIcons/normal.png</file>
+        <file>resources/Image/fleetIcons/transport.png</file>
         <file>ClientGUI/ui/sortie/opengl/fshader.glsl</file>
         <file>ClientGUI/ui/sortie/opengl/vshader.glsl</file>
     </qresource>

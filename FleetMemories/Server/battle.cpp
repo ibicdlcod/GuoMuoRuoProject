@@ -216,7 +216,6 @@ void Battle::battleProcessor(FleetInfo *friendf, FleetInfo *enemyf,
             disengagingPhase();
         }
     }
-    qCritical() << m_damageLog;
 }
 
 void Battle::airBattle() {
