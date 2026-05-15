@@ -37,6 +37,8 @@ public:
     ShipType getType() const;
     QList<std::tuple<int, int>> getVisibleBonuses() const;
     bool isAmnesiac() const;
+    /* Returns true if ship is a destroyer (mask 0x000f0000 == 0x00060000) */
+    bool isBattleShip() const;
     /* Returns true if ship is a destroyer (mask 0x000f0000 == 0x00020000) */
     bool isDestroyer() const;
     /* Returns true if current HP >= 3/4 of max HP */
@@ -44,6 +46,8 @@ public:
     /* Returns true if ship is a light cruiser (mask 0x000f0000 == 0x00030000) */
     bool isLightCruiser() const;
     bool isLightTorpedoCruiser() const;
+    bool isAAFocused() const;
+    bool isShiratsuyu() const;
     bool isNotEqual(const Ship &) const;
     KP::AllegianceGroup mapOpenRule() const;
     const ResOrd repairRes() const;

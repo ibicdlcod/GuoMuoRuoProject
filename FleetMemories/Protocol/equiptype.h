@@ -52,6 +52,13 @@ public:
     static bool isJet(const int);
     static bool isCarrierPlane(const int);
     static bool isVirtual(const int);
+    static bool isBigMainGun(const int);
+    static bool isFlakSecGun(const int);
+    static bool isAARadar(const int);
+    static bool isAAControl(const int);
+    static bool isAACannon(const int);
+    static bool isAAGun(const int);
+    static bool isAntilandShell(const int);
 
     int getSize() const;
     bool isMainGun() const;
@@ -74,6 +81,13 @@ public:
     bool isJet() const;
     bool isCarrierPlane() const;
     bool isVirtual() const;
+    bool isBigMainGun() const;
+    bool isFlakSecGun() const;
+    bool isAARadar() const;
+    bool isAAControl() const;
+    bool isAACannon() const;
+    bool isAAGun() const;
+    bool isAntilandShell() const;
 
     static QList<QString> allEquipTypes();
     friend class Server;

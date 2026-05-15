@@ -16,9 +16,21 @@
 class QSplitter;
 class QGridLayout;
 class QLabel;
+class QPushButton;
+class QDialog;
 
 #include "../fleet/fleetview.h"
 #include "sortie.h"
+
+class BattleDetailDialog : public QDialog
+{
+    Q_OBJECT
+public:
+    explicit BattleDetailDialog(const QJsonArray &damageLog,
+                                FleetView *fv,
+                                const QJsonArray &enemyShipIds,
+                                QWidget *parent = nullptr);
+};
 
 class ConfirmSortie : public QDialog
 {
@@ -38,18 +50,22 @@ private:
     void clearBattleResultLayout();
     void populateBattleResult(const QJsonObject &battleProcess);
     void createBattleResultLayout();
+    void showBattleDetail();
 
 private:
     Ui::ConfirmSortie *ui;
     FleetView *fv;
     bool m_battleResultMode;
     QJsonObject m_battleProcess;
+    QJsonArray m_damageLog;
+    QJsonArray m_enemyShipIds;
     QSplitter *m_battleSplitter;
     QWidget *m_playerContainer;
     QWidget *m_enemyContainer;
     QGridLayout *m_playerLayout;
     QGridLayout *m_enemyLayout;
     QLabel *m_assessmentLabel;
+    QPushButton *m_detailButton;
 };
 
 #endif // CONFIRMSORTIE_H

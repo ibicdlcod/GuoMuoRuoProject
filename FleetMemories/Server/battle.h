@@ -25,6 +25,8 @@ public:
         DecideHidden,
         ForceVisible,
         AirAttack,
+        MainGunAttack,
+        SecondaryGunAttack,
     };
     struct Event {
         EventType type;
@@ -38,8 +40,10 @@ public:
         int slotIndex;
         Equipment *equip = nullptr;
         int planeCount = 0;
+        bool isFighter = false;
         bool isTorpBomber = false;
         bool isDiveBomber = false;
+        bool isRecon = false;
     };
 
     void battleProcessor(FleetInfo *friendf, FleetInfo *enemyf,
@@ -80,6 +84,7 @@ private:
     clockTime clock;
     std::list<Event> events;
     bool isNight;
+    bool isNightCommence;
 
     double airSuperiorityCoefficient;
     double friendFormationEfficiency;
@@ -132,6 +137,29 @@ private:
                               AirSquadron &squadron);
     void executeAirAttackCutIn(FriendOrEnemyIndex attacker,
                                FriendOrEnemyIndex defender);
+
+    /* Gunshot — see doc/worldview_and_mechanics/9.a2-gunshot.md */
+    bool hasMainGun(bool isFriend, int index) const;
+    bool hasSecGun(bool isFriend, int index) const;
+    double maxMainGunFiringRange(bool isFriend, int index) const;
+    double maxMainGunFiringSpeed(bool isFriend, int index) const;
+    double maxMainGunArmorPenetration(bool isFriend,
+                                      int index) const;
+    double mainGunBaseAccuracy(bool isFriend, int index) const;
+    void setupApproachingGunshots();
+    void processMainGunAttack(FriendOrEnemyIndex attacker);
+
+    bool isAntagonistFleetSunk(FriendOrEnemyIndex attacker) const;
+
+    /* S1/S2/S3 plane loss
+     * — see doc/worldview_and_mechanics/9.p1-airbattle.md */
+    double fleetAntiAir(const FleetInfo *fleet) const;
+    double fleetInterception(const FleetInfo *fleet) const;
+    double individualShipFleetAA(const FleetInfo *fleet,
+                                 int index) const;
+    void processS1PlaneLoss();
+    void processS2PlaneLoss();
+    void processS3AACutIn();
 
     FleetInfo *fleetOf(bool isFriend) const;
     std::vector<ConcealmentStatus> &concealmentOf(bool isFriend);

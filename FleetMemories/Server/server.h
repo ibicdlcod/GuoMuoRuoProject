@@ -162,6 +162,7 @@ private:
     void initUserFleetStatus(const CSteamID &);
     void luaInitEquipable();
     void luaInitMap();
+    void checkMapLuaChanges();
     bool nodeExistsInLua(int mapUnionId, int nodeIndex) const;
     KP::NodeType getNodeTypeFromLua(int mapUnionId, int nodeIndex) const;
     QList<int> getNextNodesFromLua(int mapUnionId, int nodeIndex) const;
@@ -292,6 +293,7 @@ private:
 
     QMap<int, MapWithDiff *> normalMaps;
     QList<int> normalMapHasLua;
+    QMap<int, QDateTime> mapLuaTimestamps;
     QMap<int, ResOrd> resourceMaps;
 
     std::random_device random;

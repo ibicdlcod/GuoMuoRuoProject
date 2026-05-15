@@ -722,9 +722,21 @@ enum BattleActionType {
     AirDiveAttack = 1,
     AirCutInAttack = 2,
     AntiAirPlaneLoss = 3,
-    AttackSkipped = 4
+    AttackSkipped = 4,
+    MainGunAttack = 5,
+    SecondaryGunAttack = 6,
+    BattlePhaseCommence = 7
 };
 Q_ENUM_NS(BattleActionType)
+
+enum BattlePhase {
+    AirBattlePhase = 0,
+    ApproachingPhase = 1,
+    CentralPhase = 2,
+    DisengagingPhase = 3,
+    NightBattlePhase = 4
+};
+Q_ENUM_NS(BattlePhase)
 
 enum ExpeditionStopReason {
     Completed = 0,

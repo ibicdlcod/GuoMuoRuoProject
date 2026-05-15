@@ -303,6 +303,44 @@ bool EquipType::isVirtual(const int type) {
     return type == 0x01000000;
 }
 
+bool EquipType::isBigMainGun(const int eqTypeInt) {
+    return isMainGun(eqTypeInt) && (eqTypeInt & 0x7) >= 4;
+}
+
+bool EquipType::isFlakSecGun(const int eqTypeInt) {
+    return isSecGun(eqTypeInt) && isFlak(eqTypeInt);
+}
+
+bool EquipType::isAARadar(const int eqTypeInt) {
+    return isRadar(eqTypeInt) && isFlak(eqTypeInt);
+}
+
+bool EquipType::isAAControl(const int eqTypeInt) {
+    EquipType t(eqTypeInt);
+    return t.getSpecial() == KP::AAControl;
+}
+
+bool EquipType::isAACannon(const int eqTypeInt) {
+    EquipType t(eqTypeInt);
+    return t.isFlak()
+           && !t.isMainGun()
+           && !t.isSecGun()
+           && !t.isRadar()
+           && t.getSpecial() != KP::AAControl
+           && t.getSpecial() != KP::AntiAir;
+}
+
+bool EquipType::isAAGun(const int eqTypeInt) {
+    EquipType t(eqTypeInt);
+    return t.getSpecial() == KP::AntiAir
+           && t.getSize() == 0;
+}
+
+bool EquipType::isAntilandShell(const int eqTypeInt) {
+    EquipType t(eqTypeInt);
+    return t.getSpecial() == KP::AntilandShell;
+}
+
 int EquipType::getSize() const {
     return getSize(iRep);
 }
@@ -385,6 +423,40 @@ bool EquipType::isCarrierPlane() const {
 
 bool EquipType::isVirtual() const {
     return isVirtual(iRep);
+}
+
+bool EquipType::isBigMainGun() const {
+    return isMainGun() && (iRep & 0x7) >= 4;
+}
+
+bool EquipType::isFlakSecGun() const {
+    return isSecGun() && isFlak();
+}
+
+bool EquipType::isAARadar() const {
+    return isRadar() && isFlak();
+}
+
+bool EquipType::isAAControl() const {
+    return getSpecial() == KP::AAControl;
+}
+
+bool EquipType::isAACannon() const {
+    return isFlak()
+           && !isMainGun()
+           && !isSecGun()
+           && !isRadar()
+           && getSpecial() != KP::AAControl
+           && getSpecial() != KP::AntiAir;
+}
+
+bool EquipType::isAAGun() const {
+    return getSpecial() == KP::AntiAir
+           && getSize() == 0;
+}
+
+bool EquipType::isAntilandShell() const {
+    return getSpecial() == KP::AntilandShell;
 }
 
 QList<QString> EquipType::allEquipTypes() {

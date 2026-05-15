@@ -2498,15 +2498,27 @@ void Server::luaInitMap() {
                 qDebug() << qtTrId("lua-map-success-spec").arg(map);
                 normalMapHasLua.append(map);
                 QFileInfo fileInfo(name);
-                QDateTime lastModifiedDate =
-                    fileInfo.lastModified(QTimeZone::UTC);
-                QDateTime mapDBTimeStamp =
-                    settings->value("server/mapdbtimestamp").toDateTime();
-                if(lastModifiedDate > mapDBTimeStamp) {
-                    settings->setValue("server/mapdbtimestamp",
-                                       lastModifiedDate);
-                }
+                mapLuaTimestamps[map] = fileInfo.lastModified(
+                    QTimeZone::UTC);
             }
+        }
+    }
+}
+
+void Server::checkMapLuaChanges() {
+    for(auto mapUnionId : std::as_const(normalMapHasLua)) {
+        QString name = QStringLiteral("lua/map%1.lua")
+                           .arg(mapUnionId);
+        QFileInfo fileInfo(name);
+        QDateTime mtime = fileInfo.lastModified(QTimeZone::UTC);
+        if(mapLuaTimestamps.contains(mapUnionId)
+            && mapLuaTimestamps[mapUnionId] < mtime) {
+            //% "Map Lua file %1 changed, reloading..."
+            qInfo() << qtTrId("map-lua-changed-reload")
+                           .arg(name);
+            settings->setValue("server/mapdbtimestamp", mtime);
+            luaInitMap();
+            return;
         }
     }
 }
@@ -2865,6 +2877,8 @@ void Server::minutePulse() {
         return;
     }
     try{
+        checkMapLuaChanges();
+
 anti_ddos_regen_allowed_packets:
         for(const auto &[key, value]: allowedPackets.asKeyValueRange()) {
             value += settings->value("server/packetallowedregen", 60).toInt();

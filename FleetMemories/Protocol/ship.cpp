@@ -428,6 +428,11 @@ bool Ship::isAmnesiac() const {
     return Utility::checkMask(shipRegId, 0xF0000000, 0x70000000);
 }
 
+bool Ship::isBattleShip() const {
+    /* mask 0x000f0000 isolates ship‑type bits; destroyer = 0x00060000 */
+    return (shipRegId & 0x000f0000) == 0x00060000;
+}
+
 bool Ship::isDestroyer() const {
     /* mask 0x000f0000 isolates ship‑type bits; destroyer = 0x00020000 */
     return (shipRegId & 0x000f0000) == 0x00020000;
@@ -449,6 +454,24 @@ bool Ship::isLightCruiser() const {
 bool Ship::isLightTorpedoCruiser() const {
     /* mask 0x000f0000 isolates ship‑type bits; light cruiser = 0x00030000 */
     return (shipRegId & 0x000f2000) == 0x00032000;
+}
+
+bool Ship::isAAFocused() const {
+    if((shipRegId & 0x000f8000) == 0x00038000)
+        return true;
+    if((shipRegId & 0x000f8000) == 0x00048000)
+        return true;
+    if(isDestroyer() || isBattleShip()) {
+        int bareAA = attr.value(
+            QStringLiteral("Antiair"), 0);
+        if(bareAA > 250)
+            return true;
+    }
+    return false;
+}
+
+bool Ship::isShiratsuyu() const {
+    return (shipRegId & 0x00ff0f00) == 0x00120600;
 }
 
 int Ship::getLevel(int exp) {

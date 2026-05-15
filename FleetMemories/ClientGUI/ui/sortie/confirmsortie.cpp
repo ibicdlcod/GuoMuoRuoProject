@@ -12,6 +12,8 @@
 #include <QVBoxLayout>
 #include <QVector>
 #include <algorithm>
+#include <QScrollBar>
+#include <QTextEdit>
 
 #include <QSettings>
 
@@ -36,6 +38,7 @@ ConfirmSortie::ConfirmSortie(QWidget *parent, QString mapText, QString diffText)
     , m_playerLayout(nullptr)
     , m_enemyLayout(nullptr)
     , m_assessmentLabel(nullptr)
+    , m_detailButton(nullptr)
 {
     ui->setupUi(this);
     ui->mapInfoLabel->setText(mapText);
@@ -98,6 +101,11 @@ void ConfirmSortie::clearBattleResultLayout()
         delete m_assessmentLabel;
         m_assessmentLabel = nullptr;
     }
+    if(m_detailButton) {
+        ui->fleetLayout->removeWidget(m_detailButton);
+        delete m_detailButton;
+        m_detailButton = nullptr;
+    }
     if(m_battleSplitter) {
         ui->fleetLayout->removeWidget(m_battleSplitter);
         delete m_battleSplitter;
@@ -131,6 +139,18 @@ void ConfirmSortie::createBattleResultLayout()
     font.setBold(true);
     m_assessmentLabel->setFont(font);
     ui->fleetLayout->addWidget(m_assessmentLabel);
+    
+    m_detailButton = new QPushButton(this);
+    //% "Battle Report"
+    m_detailButton->setText(qtTrId("battle-report-button"));
+    m_detailButton->setMaximumWidth(200);
+    QHBoxLayout *btnLayout = new QHBoxLayout();
+    btnLayout->addStretch();
+    btnLayout->addWidget(m_detailButton);
+    btnLayout->addStretch();
+    ui->fleetLayout->addLayout(btnLayout);
+    connect(m_detailButton, &QPushButton::clicked,
+            this, &ConfirmSortie::showBattleDetail);
     
     m_battleSplitter = new QSplitter(Qt::Horizontal, this);
 
@@ -193,6 +213,9 @@ void ConfirmSortie::populateBattleResult(const QJsonObject &battleProcess)
     QJsonArray enemyPlanesAfter = enemyAfter["planes"].toArray();
     QJsonArray enemyShipIds = battleProcess["enemyShipIds"].toArray();
     QJsonArray enemyLevels = battleProcess["enemyLevels"].toArray();
+
+    m_damageLog = battleProcess["damageLog"].toArray();
+    m_enemyShipIds = enemyShipIds;
     
     // Set assessment label
     if(m_assessmentLabel) {
@@ -417,4 +440,142 @@ void ConfirmSortie::populateBattleResult(const QJsonObject &battleProcess)
                    enemyName, enemyLevel, shipIconId, hpBefore, hpAfter, totalHP,
                    planesBefore, planesAfter, false, maxPlanes, QStringList{}, false);
     }
+}
+
+void ConfirmSortie::showBattleDetail() {
+    BattleDetailDialog *dlg = new BattleDetailDialog(
+        m_damageLog, fv, m_enemyShipIds, this);
+    dlg->setAttribute(Qt::WA_DeleteOnClose);
+    //% "Battle Report"
+    dlg->setWindowTitle(qtTrId("battle-report-title"));
+    dlg->resize(600, 500);
+    dlg->exec();
+}
+
+BattleDetailDialog::BattleDetailDialog(
+    const QJsonArray &damageLog, FleetView *fv,
+    const QJsonArray &enemyShipIds, QWidget *parent)
+    : QDialog(parent)
+{
+    auto *layout = new QVBoxLayout(this);
+    auto *textEdit = new QTextEdit(this);
+    textEdit->setReadOnly(true);
+    textEdit->setFont(QFont("monospace", 10));
+    layout->addWidget(textEdit);
+
+    Client &engine = Client::getInstance();
+
+    auto shipName = [&](bool isFriend, int idx) -> QString {
+        QString name;
+        if(isFriend) {
+            if(fv && fv->getShip(idx)) {
+                if(Ship *s = fv->getShip(idx))
+                    name = s->toString();
+            }
+        } else {
+            if(idx >= 0 && idx < enemyShipIds.size()) {
+                int eid = enemyShipIds[idx].toInt();
+                if(Ship *s = engine.getShipReg(eid))
+                    name = s->toString();
+            }
+        }
+        if(name.isEmpty())
+            name = isFriend
+                       //% "Ally Ship %1"
+                       ? qtTrId("battle-report-ally-ship")
+                             .arg(idx + 1)
+                       //% "Enemy Ship %1"
+                       : qtTrId("battle-report-enemy-ship")
+                             .arg(idx + 1);
+        return QString("%1 (#%2)").arg(name).arg(idx + 1);
+    };
+
+    QStringList lines;
+    for(const auto &entryRef : damageLog) {
+        QJsonObject e = entryRef.toObject();
+        int type = e["type"].toInt();
+        bool attF = e["attackerFleet"].toBool();
+        int attS = e["attackerShip"].toInt();
+        int defS = e["defenderShip"].toInt(-1);
+        int dmg = e["damage"].toInt(0);
+        int slot = e["attackerSlot"].toInt(-1);
+        int lost = e["planesLost"].toInt(0);
+        int remain = e["planesRemaining"].toInt(0);
+        bool overp = e["overpenetration"].toBool(false);
+        QString reason = e["reason"].toString();
+        int battlePhaseVal = e["battlePhase"].toInt(-1);
+        QString phase = e["phase"].toString();
+        int clockT = e["clock"].toInt(0);
+
+        auto phaseLabel = [](int pv) -> QString {
+            switch(pv) {
+            case KP::AirBattlePhase:
+                //% "Air Battle"
+                return qtTrId("battle-phase-air");
+            case KP::ApproachingPhase:
+                //% "Approaching"
+                return qtTrId("battle-phase-approaching");
+            case KP::CentralPhase:
+                //% "Central"
+                return qtTrId("battle-phase-central");
+            case KP::DisengagingPhase:
+                //% "Disengaging"
+                return qtTrId("battle-phase-disengaging");
+            case KP::NightBattlePhase:
+                //% "Night Battle"
+                return qtTrId("battle-phase-night");
+            default: return QString();
+            }
+        };
+
+        QString attName = shipName(attF, attS);
+        QString defName = shipName(!attF, defS);
+
+        QString line;
+        switch(type) {
+        case KP::MainGunAttack:
+            line = QString("MainGun  %1 → %2: %3 dmg%4")
+                       .arg(attName, defName).arg(dmg)
+                       .arg(overp ? QStringLiteral(" (OVER)")
+                                  : QString());
+            break;
+        case KP::AirTorpedoAttack:
+            line = QString("AirTorp  %1 → %2: %3 dmg")
+                       .arg(attName, defName).arg(dmg);
+            break;
+        case KP::AirDiveAttack:
+            line = QString("AirDive  %1 → %2: %3 dmg")
+                       .arg(attName, defName).arg(dmg);
+            break;
+        case KP::AirCutInAttack:
+            line = QString("AirCutIn %1 → %2: %3 dmg")
+                       .arg(attName, defName).arg(dmg);
+            break;
+        case KP::AntiAirPlaneLoss:
+            if(!phase.isEmpty())
+                line = QString("AALoss[%1] slot %2: -%3 (%4)")
+                           .arg(phase).arg(slot).arg(lost)
+                           .arg(remain);
+            else
+                line = QString("AALoss   slot %1: -%2 (%3)")
+                           .arg(slot).arg(lost).arg(remain);
+            break;
+        case KP::AttackSkipped:
+            line = QString("Skip     %1: %2")
+                       .arg(attName).arg(reason);
+            break;
+        case KP::BattlePhaseCommence:
+            line = QString("--[ %1 ]--")
+                       .arg(phaseLabel(battlePhaseVal));
+            break;
+        default:
+            line = QString("Unknown[%1]").arg(type);
+            break;
+        }
+        if(type != KP::BattlePhaseCommence)
+            line = QString("T+%1  %2").arg(clockT).arg(line);
+        lines.append(line);
+    }
+
+    textEdit->setPlainText(lines.join("\n"));
 }

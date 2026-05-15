@@ -1057,6 +1057,8 @@ const QJsonObject Server::processBattleCore(const CSteamID &uid,
             ShipDynamic *dyn = playerFleet->shipDynamics[i].get();
             ShipDynamic *dynPrevious = playerFleetPrevious.shipDynamics[i].get();
             if(!dyn || dyn->fleetFled) continue;
+            if(dyn->currentHP <= 0)
+                dyn->currentHP = 1;
             int currentHP = dynPrevious->currentHP;
             int newHP = dyn->currentHP;
             // Distribute loss proportionally to current HP

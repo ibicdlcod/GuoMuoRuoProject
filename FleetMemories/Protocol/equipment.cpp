@@ -246,6 +246,14 @@ bool Equipment::isRocketPlane() const {
     return equipRegId == 350 || equipRegId == 351 || equipRegId == 352;
 }
 
+bool Equipment::isC3HGun() const {
+    return getId() == 529;
+}
+
+bool Equipment::is25mmConcentrated() const {
+    return getId() == 131;
+}
+
 bool Equipment::canEquip(Ship *ship, sol::state &lua) const {
     sol::protected_function luaCanEquip = lua["can_equip"];
     auto result = luaCanEquip(this, ship);

@@ -1299,6 +1299,9 @@ void customMessageHandler(QtMsgType type,
     if(msg.contains("QtWaylandClient")) {
         return;
     }
+    if(msg.contains("supports grabbing the mouse only for popup")) {
+        return;
+    }
     if(msg.endsWith("\n")) {
         msg.remove(msg.length() - 1, 1);
     }

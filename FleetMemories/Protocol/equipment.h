@@ -110,6 +110,8 @@ public:
     bool isNotEqual(const Equipment &) const;
     bool isPlane() const;
     bool isRocketPlane() const;
+    bool isC3HGun() const;
+    bool is25mmConcentrated() const;
     int skillPointsStd() const;
     QString toString(QString lang = settings->value("client/language", "ja_JP")
                                         .toString()) const;
