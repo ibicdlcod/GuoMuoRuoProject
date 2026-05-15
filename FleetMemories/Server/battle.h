@@ -9,18 +9,23 @@
 class Battle
 {
 public:
-    Battle();
+    Battle(std::mt19937 &rng);
+
+    /* ——— types ————————————————————————————————————————————— */
 
     using clockTime = int;
+
     enum ConcealmentStatus {
         Unclear,
-        Visible, /* for 30 seconds */
+        Visible,   /* for 30 seconds */
         Concealed, /* for 15 seconds or upon attacking */
     };
+
     struct FriendOrEnemyIndex {
         bool isFriend;
         int index;
     };
+
     enum class EventType {
         DecideHidden,
         ForceVisible,
@@ -28,6 +33,7 @@ public:
         MainGunAttack,
         SecondaryGunAttack,
     };
+
     struct Event {
         EventType type;
         clockTime time;
@@ -46,34 +52,49 @@ public:
         bool isRecon = false;
     };
 
+    /* ——— public api ———————————————————————————————————————— */
+
     void battleProcessor(FleetInfo *friendf, FleetInfo *enemyf,
                          const QJsonObject &battlePlan,
                          bool isExpedition = false,
                          bool isNightCommence = false);
-
     QJsonArray getDamageLog() const { return m_damageLog; }
 
-    /* Target selection — see doc/worldview_and_mechanics/9-battle.md */
     int selectEnemyTarget(int friendIndex) const;
     int selectFriendTarget(int enemyIndex) const;
 
 private:
-    /* Random number generator */
-    inline static std::random_device rd;
-    inline static std::mt19937 gen = std::mt19937(rd());
+    /* ——— random ———————————————————————————————————————————— */
+
+    std::mt19937 &rng;
+
+    /* ——— battle state —————————————————————————————————————— */
 
     QJsonObject currentBattlePlan;
     FleetInfo *currentFriendFleet;
     FleetInfo *currentEnemyFleet;
+    clockTime clock;
+    std::list<Event> events;
+    bool isNight;
+    bool isNightCommence;
+    QJsonArray m_damageLog;
+
+    /* ——— concealment ——————————————————————————————————————— */
 
     std::vector<ConcealmentStatus> friendFleetConcealmentStatus;
     std::vector<ConcealmentStatus> enemyFleetConcealmentStatus;
 
+    /* ——— command / orders —————————————————————————————————— */
+
     std::vector<bool> receivedOrders;
     std::vector<double> commEfficiency;
 
+    /* ——— tactical goals ————————————————————————————————————— */
+
     KP::FriendFleetPriority friendGoal;
     KP::EnemyFleetPriority enemyGoal;
+
+    /* ——— night‑battle / extra‑battle flags ————————————————— */
 
     bool extraBattle;
     bool extraBattleWhenLosing;
@@ -81,19 +102,20 @@ private:
     bool extraBattleWhenBorBelow;
     bool extraBattleWhenAorBelow;
 
-    clockTime clock;
-    std::list<Event> events;
-    bool isNight;
-    bool isNightCommence;
+    /* ——— pre‑battle hp totals (for disengaging assessment) —— */
+
+    double totalFriendHPPreBattle = 0.0;
+    double totalEnemyHPPreBattle = 0.0;
+
+    /* ——— air ———————————————————————————————————————————————— */
 
     double airSuperiorityCoefficient;
     double friendFormationEfficiency;
     double enemyFormationEfficiency;
-
     std::vector<AirSquadron> friendAirSquadrons;
     std::vector<AirSquadron> enemyAirSquadrons;
 
-    QJsonArray m_damageLog;
+    /* ——— phases ————————————————————————————————————————————— */
 
     void airBattle();
     void approachingPhase();
@@ -101,12 +123,18 @@ private:
     void disengagingPhase();
     void nightBattle();
 
-    void decideHidden(FriendOrEnemyIndex);
-    void forceVisible(FriendOrEnemyIndex);
+    /* ——— event system ——————————————————————————————————————— */
 
     void advanceClockTime(clockTime timeInterval);
     void insertEvent(EventType, clockTime, FriendOrEnemyIndex,
                      std::function<void(FriendOrEnemyIndex)>);
+
+    /* ——— concealment ———————————————————————————————————————— */
+
+    void decideHidden(FriendOrEnemyIndex);
+    void forceVisible(FriendOrEnemyIndex);
+
+    /* ——— air superiority / formation ——————————————————————— */
 
     void computeAirSuperiority();
     void computeFormationEfficiency();
@@ -114,10 +142,13 @@ private:
     double fleetAirSuperiority(const FleetInfo *fleet,
                                const FleetInfo *enemyFleet) const;
 
+    /* ——— target selection ——————————————————————————————————— */
+
     bool isPrioritizedTarget(int friendIndex, int enemyIndex) const;
     bool isProtectedShip(int friendIndex) const;
 
-    /* Air attack — see doc/worldview_and_mechanics/9.a1-airattack.md */
+    /* ——— air attack ————————————————————————————————————————— */
+
     bool isCarrier(const Ship *ship) const;
     bool isArmoredCarrier(const Ship *ship) const;
     bool isSeaplaneShip(const Ship *ship) const;
@@ -138,7 +169,18 @@ private:
     void executeAirAttackCutIn(FriendOrEnemyIndex attacker,
                                FriendOrEnemyIndex defender);
 
-    /* Gunshot — see doc/worldview_and_mechanics/9.a2-gunshot.md */
+    /* ——— s1 / s2 / s3 plane loss ———————————————————————————— */
+
+    double fleetAntiAir(const FleetInfo *fleet) const;
+    double fleetInterception(const FleetInfo *fleet) const;
+    double individualShipFleetAA(const FleetInfo *fleet,
+                                 int index) const;
+    void processS1PlaneLoss();
+    void processS2PlaneLoss();
+    void processS3AACutIn();
+
+    /* ——— gunshot ———————————————————————————————————————————— */
+
     bool hasMainGun(bool isFriend, int index) const;
     bool hasSecGun(bool isFriend, int index) const;
     double maxMainGunFiringRange(bool isFriend, int index) const;
@@ -148,18 +190,13 @@ private:
     double mainGunBaseAccuracy(bool isFriend, int index) const;
     void setupApproachingGunshots();
     void processMainGunAttack(FriendOrEnemyIndex attacker);
-
     bool isAntagonistFleetSunk(FriendOrEnemyIndex attacker) const;
 
-    /* S1/S2/S3 plane loss
-     * — see doc/worldview_and_mechanics/9.p1-airbattle.md */
-    double fleetAntiAir(const FleetInfo *fleet) const;
-    double fleetInterception(const FleetInfo *fleet) const;
-    double individualShipFleetAA(const FleetInfo *fleet,
-                                 int index) const;
-    void processS1PlaneLoss();
-    void processS2PlaneLoss();
-    void processS3AACutIn();
+    /* ——— disengaging / extra‑battle ————————————————————————— */
+
+    KP::BattleAssessment computePreliminaryAssessment() const;
+
+    /* ——— utility ———————————————————————————————————————————— */
 
     FleetInfo *fleetOf(bool isFriend) const;
     std::vector<ConcealmentStatus> &concealmentOf(bool isFriend);

@@ -722,8 +722,11 @@ void Sortie::dealWithNode(const MapNode &node, int nodeId) {
             bool isNightNode = (node.type == KP::NIGHT
                                 || node.type == KP::NIGHTBOSS);
             bool isAirNode = (node.type == KP::AIR);
+            bool isBossNode = (node.type == KP::BOSS
+                               || node.type == KP::NIGHTBOSS);
             std::unique_ptr<BattlePlan> plan
-                = std::make_unique<BattlePlan>(nullptr, isNightNode, isAirNode);
+                = std::make_unique<BattlePlan>(nullptr, isNightNode, isAirNode,
+                                               isBossNode);
             while(plan->exec() != QDialog::Accepted) {
                 ;
             }
@@ -1190,6 +1193,8 @@ void Sortie::expeditionNodeClicked(int nodeId)
     /* For other node types, show battle plan dialog */
     bool isNightNode = (node.type == KP::NIGHT || node.type == KP::NIGHTBOSS);
     bool isAirNode = (node.type == KP::AIR);
+    bool isBossNode = (node.type == KP::BOSS
+                       || node.type == KP::NIGHTBOSS);
 
     int mapUnionId = MapWithDiff::getUnionId(currentMap->id);
     int mapAbsoluteId = currentMap->getAbsoluteId();
@@ -1199,7 +1204,8 @@ void Sortie::expeditionNodeClicked(int nodeId)
     }
 
     std::unique_ptr<BattlePlan> plan
-        = std::make_unique<BattlePlan>(nullptr, isNightNode, isAirNode);
+        = std::make_unique<BattlePlan>(nullptr, isNightNode, isAirNode,
+                                       isBossNode);
     if (plans.contains(nodeId)) {
         QJsonObject existingPlan
             = QCborValue::fromCbor(plans[nodeId]).toMap().toJsonObject();

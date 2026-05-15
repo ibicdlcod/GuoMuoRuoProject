@@ -3,7 +3,8 @@
 #include <cmath>
 #include <numeric>
 
-Battle::Battle() {
+Battle::Battle(std::mt19937 &rng)
+    : rng(rng) {
 
 }
 
@@ -19,7 +20,8 @@ void Battle::battleProcessor(FleetInfo *friendf, FleetInfo *enemyf,
     friendGoal = static_cast<KP::FriendFleetPriority>(
         battlePlan.value("friendFleetPriority").toInt(0));
     enemyGoal = static_cast<KP::EnemyFleetPriority>(
-        battlePlan.value("enemyFleetPriority").toInt(0));
+        battlePlan.value("enemyFleetPriority")
+            .toInt(static_cast<int>(KP::EnemyBalanced)));
     extraBattle = battlePlan.value("extraBattle").toBool(true);
     extraBattleWhenLosing
         = battlePlan.value("extraBattleWhenLosing").toBool(false);
@@ -29,6 +31,24 @@ void Battle::battleProcessor(FleetInfo *friendf, FleetInfo *enemyf,
         = battlePlan.value("extraBattleWhenBorBelow").toBool(false);
     extraBattleWhenAorBelow
         = battlePlan.value("extraBattleWhenAorBelow").toBool(false);
+
+    totalFriendHPPreBattle = 0.0;
+    for(int i = 0;
+         i < static_cast<int>(currentFriendFleet->ships.size()); ++i) {
+        if(currentFriendFleet->shipDynamics[i]
+            && !currentFriendFleet->shipDynamics[i]->fleetFled)
+            totalFriendHPPreBattle
+                += currentFriendFleet->shipDynamics[i]->currentHP;
+    }
+    totalEnemyHPPreBattle = 0.0;
+    for(int i = 0;
+         i < static_cast<int>(currentEnemyFleet->ships.size()); ++i) {
+        if(currentEnemyFleet->shipDynamics[i]
+            && !currentEnemyFleet->shipDynamics[i]->fleetFled)
+            totalEnemyHPPreBattle
+                += currentEnemyFleet->shipDynamics[i]->currentHP;
+    }
+
     for(int i = 0; i < KP::combinedFleetSize; ++i) {
         friendFleetConcealmentStatus.push_back(ConcealmentStatus::Unclear);
     }
@@ -193,7 +213,7 @@ void Battle::battleProcessor(FleetInfo *friendf, FleetInfo *enemyf,
                     x / std::hypot(1.0, x);
 
                 std::bernoulli_distribution dist(p);
-                receivedOrder = dist(gen);
+                receivedOrder = dist(rng);
             }
             receivedOrders[i] = receivedOrder;
         }
@@ -276,7 +296,138 @@ void Battle::disengagingPhase() {
         log["battlePhase"] = static_cast<int>(KP::DisengagingPhase);
         m_damageLog.append(log);
     }
+
+    /* Disengaging phase — night battle decision
+     * — see doc/worldview_and_mechanics/9.p4-disengage.md */
+    if(!isNightCommence) {
+        KP::BattleAssessment assm
+            = computePreliminaryAssessment();
+
+        bool ourWantsNightBattle = extraBattle;
+        if(extraBattleWhenLosing
+            && assm >= KP::CDefeat)
+            ourWantsNightBattle = true;
+        if(extraBattleWhenBorBelow
+            && assm >= KP::BVictory)
+            ourWantsNightBattle = true;
+        if(extraBattleWhenAorBelow
+            && assm >= KP::AVictory)
+            ourWantsNightBattle = true;
+        if(extraBattleWhenFlagship
+            && currentFriendFleet->shipDynamics[0]
+            && currentFriendFleet->shipDynamics[0]->currentHP > 0)
+            ourWantsNightBattle = true;
+
+        /* enemy 50/50 night battle preference */
+        std::bernoulli_distribution enemyNightDist(0.5);
+        bool enemyWantsNightBattle = enemyNightDist(rng);
+
+        std::vector<int> fSpeeds = currentFriendFleet->shipSpeeds();
+        std::vector<int> eSpeeds = currentEnemyFleet->shipSpeeds();
+        double speedF = 1.0;
+        for(int s : fSpeeds)
+            if(s > 0) speedF = std::max(speedF, static_cast<double>(s));
+        double speedE = 1.0;
+        for(int s : eSpeeds)
+            if(s > 0) speedE = std::max(speedE, static_cast<double>(s));
+
+        double losF = currentFriendFleet->los(false);
+        double losE = currentEnemyFleet->los(false);
+
+        double x = std::min(
+            1.0, losF * speedF
+                     / std::max(1.0, speedE
+                                        * std::hypot(losF, losE)));
+        double y = std::min(
+            20.0, 2000.0 / std::max(1.0, std::sqrt(speedE * speedF)));
+
+        double phaseDuration;
+        if(ourWantsNightBattle && enemyWantsNightBattle) {
+            extraBattle = true;
+            phaseDuration = 20.0;
+        } else if(!ourWantsNightBattle && !enemyWantsNightBattle) {
+            extraBattle = false;
+            phaseDuration = y;
+        } else if(ourWantsNightBattle && !enemyWantsNightBattle) {
+            phaseDuration = (20.0 - y) * x + y;
+            std::bernoulli_distribution nightChance(x);
+            extraBattle = nightChance(rng);
+        } else {
+            phaseDuration = (20.0 - y) * (1.0 - x) + y;
+            std::bernoulli_distribution nightChance(1.0 - x);
+            extraBattle = nightChance(rng);
+        }
+        advanceClockTime(static_cast<clockTime>(phaseDuration));
+        return;
+    }
+
     advanceClockTime(20);
+}
+
+KP::BattleAssessment Battle::computePreliminaryAssessment() const {
+    double curFriendHP = 0.0;
+    for(int i = 0;
+         i < static_cast<int>(
+             currentFriendFleet->ships.size());
+         ++i) {
+        if(currentFriendFleet->shipDynamics[i]
+            && !currentFriendFleet->shipDynamics[i]->fleetFled
+            && currentFriendFleet->shipDynamics[i]->currentHP > 0)
+            curFriendHP
+                += currentFriendFleet->shipDynamics[i]->currentHP;
+    }
+    double curEnemyHP = 0.0;
+    int enemyShipsSunk = 0;
+    int totalEnemy = 0;
+    for(int i = 0;
+         i < static_cast<int>(
+             currentEnemyFleet->ships.size());
+         ++i) {
+        if(!currentEnemyFleet->shipDynamics[i]
+            || currentEnemyFleet->shipDynamics[i]->fleetFled)
+            continue;
+        ++totalEnemy;
+        if(currentEnemyFleet->shipDynamics[i]->currentHP <= 0) {
+            ++enemyShipsSunk;
+            continue;
+        }
+        curEnemyHP
+            += currentEnemyFleet->shipDynamics[i]->currentHP;
+    }
+
+    double friendDamage = std::max(
+        0.0, totalFriendHPPreBattle - curFriendHP);
+    double enemyDamage = std::max(
+        0.0, totalEnemyHPPreBattle - curEnemyHP);
+
+    double friendDamagePct = 0.0;
+    if(totalFriendHPPreBattle > 0.0)
+        friendDamagePct
+            = friendDamage / totalFriendHPPreBattle * 100.0;
+    double enemyDamagePct = 0.0;
+    if(totalEnemyHPPreBattle > 0.0)
+        enemyDamagePct
+            = enemyDamage / totalEnemyHPPreBattle * 100.0;
+
+    bool flagshipSunk = !currentEnemyFleet->shipDynamics[0]
+                        || currentEnemyFleet->shipDynamics[0]->fleetFled
+                        || currentEnemyFleet->shipDynamics[0]->currentHP
+                               <= 0;
+
+    if(enemyShipsSunk == totalEnemy)
+        return KP::SVictory;
+    if(enemyShipsSunk > totalEnemy / 2)
+        return KP::AVictory;
+    if(flagshipSunk
+        || enemyDamagePct > 2.5 * friendDamagePct)
+        return KP::BVictory;
+    if(friendDamage <= 0.0 && enemyDamage <= 0.0)
+        return KP::CDefeat;
+    if(enemyDamagePct > 1.0 * friendDamagePct)
+        return KP::CDefeat;
+    if(enemyDamagePct > 0.4 * friendDamagePct)
+        return KP::DDefeat;
+    return KP::EDefeat;
 }
 
 void Battle::nightBattle() {
@@ -340,7 +491,7 @@ void Battle::nightBattle() {
                 double interval = 600.0 * z / y;
                 if(interval <= 0.0)
                     continue;
-                if(!unloadDist(gen)) {
+                if(!unloadDist(rng)) {
                     insertEvent(
                         EventType::MainGunAttack, 0,
                         {isFriend, i},
@@ -416,7 +567,7 @@ void Battle::decideHidden(FriendOrEnemyIndex index) {
         concealChance = 0.5;
 
     std::bernoulli_distribution dist(concealChance);
-    result = dist(gen);
+    result = dist(rng);
 
     if(index.isFriend) {
         friendFleetConcealmentStatus[index.index] =
@@ -477,12 +628,12 @@ int Battle::selectEnemyTarget(int friendIndex) const {
 
     for(int tries = 0; tries < 1; ++tries) {
         int idx = visible[std::uniform_int_distribution<int>(
-            0, static_cast<int>(visible.size()) - 1)(gen)];
+            0, static_cast<int>(visible.size()) - 1)(rng)];
         if(isPrioritizedTarget(friendIndex, idx))
             return idx;
     }
     return visible[std::uniform_int_distribution<int>(
-        0, static_cast<int>(visible.size()) - 1)(gen)];
+        0, static_cast<int>(visible.size()) - 1)(rng)];
 }
 
 int Battle::selectFriendTarget(int enemyIndex) const {
@@ -505,12 +656,12 @@ int Battle::selectFriendTarget(int enemyIndex) const {
 
     for(int tries = 0; tries < 1; ++tries) {
         int idx = visible[std::uniform_int_distribution<int>(
-            0, static_cast<int>(visible.size()) - 1)(gen)];
+            0, static_cast<int>(visible.size()) - 1)(rng)];
         if(!isProtectedShip(idx))
             return idx;
     }
     return visible[std::uniform_int_distribution<int>(
-        0, static_cast<int>(visible.size()) - 1)(gen)];
+        0, static_cast<int>(visible.size()) - 1)(rng)];
 }
 
 bool Battle::isPrioritizedTarget(int friendIndex,
@@ -776,7 +927,7 @@ void Battle::computeFormationEfficiency() {
         c /= fSpeeds.size();
 
         std::normal_distribution<double> dist(0.0, 1.0);
-        double d = dist(gen);
+        double d = dist(rng);
 
         double total = b + c + d;
         friendFormationEfficiency = total / std::hypot(1.0, total);
@@ -792,7 +943,7 @@ void Battle::computeFormationEfficiency() {
         c /= eSpeeds.size();
 
         std::normal_distribution<double> dist(0.0, 1.0);
-        double d = dist(gen);
+        double d = dist(rng);
 
         double total = b + c + d;
         enemyFormationEfficiency = total / std::hypot(1.0, total);
@@ -977,7 +1128,7 @@ void Battle::setupAirReloading(clockTime phaseStart, clockTime phaseLength) {
                 std::uniform_int_distribution<clockTime> dist(
                     0, phaseLength - 1);
                 insertEvent(EventType::AirAttack,
-                            baseClock + dist(gen),
+                            baseClock + dist(rng),
                             {isFriend, i},
                             [this](FriendOrEnemyIndex idx) {
                                 processAirAttack(idx);
@@ -1117,7 +1268,7 @@ void Battle::applyIndividualAntiAir(FriendOrEnemyIndex defender,
     lossChance = std::clamp(lossChance, 0.0, 1.0);
 
     std::binomial_distribution<int> dist(squadron.planeCount, lossChance);
-    int lost = dist(gen);
+    int lost = dist(rng);
     squadron.planeCount -= lost;
     if(squadron.planeCount < 0)
         squadron.planeCount = 0;
@@ -1186,7 +1337,7 @@ void Battle::executeAirTorpedoAttack(FriendOrEnemyIndex attacker,
                          * dpm;
 
     std::binomial_distribution<int> hitDist(squadron.planeCount, pHit);
-    int hits = hitDist(gen);
+    int hits = hitDist(rng);
     int totalDmg = static_cast<int>(std::round(hits * perPlaneDmg));
 
     defDyn->currentHP = std::max(0, defDyn->currentHP - totalDmg);
@@ -1247,7 +1398,7 @@ void Battle::executeAirDiveAttack(FriendOrEnemyIndex attacker,
     double n = static_cast<double>(squadron.planeCount);
     double sqrtArmor = std::sqrt(armor);
     std::normal_distribution<double> xDist(n - sqrtArmor, sqrtArmor / 2.0);
-    double x = xDist(gen);
+    double x = xDist(rng);
     int totalDmg = static_cast<int>(std::round(
         std::max(x, 0.0) * dpm
         * bombing / std::hypot(static_cast<double>(armor), bombing)));
@@ -1359,7 +1510,7 @@ void Battle::executeAirAttackCutIn(FriendOrEnemyIndex attacker,
             triggerChance = std::clamp(triggerChance, 0.0, 1.0);
 
             std::bernoulli_distribution trigDist(triggerChance);
-            if(!trigDist(gen))
+            if(!trigDist(rng))
                 continue;
 
             double totalEquips = 2.0;
@@ -1502,7 +1653,7 @@ void Battle::processS1PlaneLoss() {
             lossChance = std::clamp(lossChance, 0.0, 1.0);
             std::binomial_distribution<int> dist(
                 sq.planeCount, lossChance);
-            int lost = dist(gen);
+            int lost = dist(rng);
             sq.planeCount -= lost;
             if(sq.planeCount < 0)
                 sq.planeCount = 0;
@@ -1541,7 +1692,7 @@ void Battle::processS2PlaneLoss() {
             lossChance = std::clamp(lossChance, 0.0, 1.0);
             std::binomial_distribution<int> dist(
                 sq.planeCount, lossChance);
-            int lost = dist(gen);
+            int lost = dist(rng);
             sq.planeCount -= lost;
             if(sq.planeCount < 0)
                 sq.planeCount = 0;
@@ -1625,7 +1776,7 @@ void Battle::processS3AACutIn() {
                 = triggerY / std::hypot(1.0, triggerY);
             std::bernoulli_distribution trigDist(
                 triggerChance);
-            if(!trigDist(gen))
+            if(!trigDist(rng))
                 continue;
 
             struct EquipRef {
@@ -1806,7 +1957,7 @@ void Battle::processS3AACutIn() {
                                         0.0, 1.0);
                 std::binomial_distribution<int> dist(
                     sq.planeCount, lossChance);
-                int lost = dist(gen);
+                int lost = dist(rng);
                 sq.planeCount -= lost;
                 if(sq.planeCount < 0)
                     sq.planeCount = 0;
@@ -2078,7 +2229,7 @@ void Battle::processMainGunAttack(FriendOrEnemyIndex attacker) {
     evasionChance = std::clamp(evasionChance, 0.0, 1.0);
 
     std::uniform_real_distribution<double> evadeDist(0.0, 1.0);
-    if(evadeDist(gen) > evasionChance) {
+    if(evadeDist(rng) > evasionChance) {
         if(!isAntagonistFleetSunk(attacker)) {
             QJsonObject log;
             log["type"] = KP::AttackSkipped;
@@ -2103,7 +2254,7 @@ void Battle::processMainGunAttack(FriendOrEnemyIndex attacker) {
                      / std::hypot(1.0, sigmoidTerm);
 
     std::uniform_real_distribution<double> damageDist(0.0, 1.0);
-    double v = damageDist(gen);
+    double v = damageDist(rng);
 
     int totalDmg;
     if(v < sigmoid - 0.5) {
@@ -2123,7 +2274,7 @@ void Battle::processMainGunAttack(FriendOrEnemyIndex attacker) {
             fSpeed = 1.0;
         std::normal_distribution<double> firepowerDist(
             10.0 * dpm / fSpeed, dpm / 50.0);
-        double u = firepowerDist(gen);
+        double u = firepowerDist(rng);
         if(u <= 0.0)
             u = 0.0;
         double x

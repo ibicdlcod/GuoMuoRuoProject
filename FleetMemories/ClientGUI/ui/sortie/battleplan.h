@@ -17,7 +17,7 @@ class BattlePlan : public QDialog
 
 public:
     explicit BattlePlan(QWidget *parent = nullptr, bool isNightNode = false,
-                        bool isAirNode = false);
+                        bool isAirNode = false, bool isBossNode = false);
     ~BattlePlan();
 
     QJsonObject getPlanData() const;
