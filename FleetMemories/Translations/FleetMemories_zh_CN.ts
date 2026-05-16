@@ -4311,22 +4311,22 @@ Great at battle and bad at politics--so cool!</source>
         <translation type="unfinished">虚构舰</translation>
     </message>
     <message id="NormalFleet">
-        <location filename="../Protocol/kp.h" line="768"/>
+        <location filename="../Protocol/kp.h" line="769"/>
         <source>Normal</source>
         <translation>通常舰队</translation>
     </message>
     <message id="CarrierFleet">
-        <location filename="../Protocol/kp.h" line="770"/>
+        <location filename="../Protocol/kp.h" line="771"/>
         <source>Carrier</source>
         <translation>空母机动</translation>
     </message>
     <message id="SurfaceFleet">
-        <location filename="../Protocol/kp.h" line="772"/>
+        <location filename="../Protocol/kp.h" line="773"/>
         <source>Surface</source>
         <translation>水上打击</translation>
     </message>
     <message id="TransportFleet">
-        <location filename="../Protocol/kp.h" line="774"/>
+        <location filename="../Protocol/kp.h" line="775"/>
         <source>Transport</source>
         <translation>输送护卫</translation>
     </message>
