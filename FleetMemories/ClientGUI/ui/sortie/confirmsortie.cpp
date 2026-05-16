@@ -547,6 +547,14 @@ BattleDetailDialog::BattleDetailDialog(
             line = QString("PtBlank  %1 → %2: -formation")
                        .arg(attName, defName);
             break;
+        case KP::GunshotCutInAttack: {
+            QString cutType = e["cutInType"].toString();
+            double dmgMul = e["damageMultiplier"].toDouble(1.0);
+            line = QString("GunCutIn[%1] %2 → %3: %4 dmg (x%5)")
+                       .arg(cutType, attName, defName)
+                       .arg(dmg).arg(dmgMul);
+            break;
+        }
         case KP::AirTorpedoAttack:
             line = QString("AirTorp  %1 → %2: %3 dmg")
                        .arg(attName, defName).arg(dmg);

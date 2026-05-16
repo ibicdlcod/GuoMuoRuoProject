@@ -1,5 +1,6 @@
 #include "battle.h"
 #include "Protocol/utility.h"
+#include <algorithm>
 #include <cmath>
 #include <numeric>
 
@@ -2276,6 +2277,572 @@ void Battle::setupApproachingGunshots() {
     scheduleFleet(false);
 }
 
+bool Battle::processGunshotCutIn(FriendOrEnemyIndex attacker) {
+    FleetInfo *attFleet = fleetOf(attacker.isFriend);
+    if(attacker.index < 0
+        || attacker.index
+               >= static_cast<int>(attFleet->ships.size()))
+        return false;
+    Ship *attShip = attFleet->ships[attacker.index];
+    ShipDynamic *attDyn
+        = attFleet->shipDynamics[attacker.index].get();
+    if(!attShip || !attDyn || attDyn->fleetFled
+        || attDyn->currentHP <= 0)
+        return false;
+
+    std::vector<Equipment *> equips;
+    auto addEquip = [&](const QUuid &uuid) {
+        Equipment *eq = attFleet->equipMap.value(uuid, nullptr);
+        if(eq)
+            equips.push_back(eq);
+    };
+    for(const QUuid &uuid : attDyn->slotEquip)
+        addEquip(uuid);
+    addEquip(attDyn->slotEquipEx);
+
+    QList<int> startingEquip = attShip->getStartingEquip();
+    if(!startingEquip.isEmpty()) {
+        int defaultId = startingEquip.first();
+        for(auto it = attFleet->equipMap.cbegin();
+             it != attFleet->equipMap.cend(); ++it) {
+            if(it.value()->getId() == defaultId) {
+                equips.push_back(it.value());
+                break;
+            }
+        }
+    }
+
+    double fCoeff = attacker.isFriend
+                        ? friendFormationEfficiency
+                        : enemyFormationEfficiency;
+    double aCoeff = airSuperiorityCoefficient;
+
+    /* Spotting fire cut-in (takes precedence) */
+    auto trySpottingFire = [&](Equipment *reconEq, Equipment *gunEq,
+                               double commMult) -> bool {
+        double q = reconEq->attrPrimaryStr().isEmpty()
+                       ? 0.0
+                       : static_cast<double>(
+                             reconEq->attr.value(
+                                 reconEq->attrPrimaryStr(), 0))
+                             / 100.0;
+        double triggerChance
+            = std::max(0.0, aCoeff) * q / std::hypot(1.0, q);
+        triggerChance *= commMult;
+        triggerChance = std::clamp(triggerChance, 0.0, 1.0);
+        std::bernoulli_distribution trigDist(triggerChance);
+        if(!trigDist(rng))
+            return false;
+
+        double dmgMul = gunEq->type.isBigMainGun() ? 1.25 : 1.2;
+        double accMul = 1.5;
+
+        int targetIdx;
+        if(attacker.isFriend)
+            targetIdx = selectEnemyTarget(attacker.index);
+        else
+            targetIdx = selectFriendTarget(attacker.index);
+        if(targetIdx < 0)
+            return true;
+
+        FriendOrEnemyIndex defender{!attacker.isFriend,
+                                    targetIdx};
+        FleetInfo *defFleet = fleetOf(defender.isFriend);
+        Ship *defShip = defFleet->ships[defender.index];
+        ShipDynamic *defDyn
+            = defFleet->shipDynamics[defender.index].get();
+        if(!defShip || !defDyn || defDyn->fleetFled
+            || defDyn->currentHP <= 0)
+            return true;
+
+        QMap<QString, int> attrs = shipAttrOf(
+            attacker.isFriend, attacker.index);
+        double dpm = attrs.value(QStringLiteral("DPM"), 0);
+        {
+            auto addEquipDPM = [&](const QUuid &uuid) {
+                Equipment *eq
+                    = attFleet->equipMap.value(uuid, nullptr);
+                if(!eq)
+                    return;
+                int edpm
+                    = eq->attr.value(QStringLiteral("DPM"), 0);
+                if(edpm > 0)
+                    dpm += static_cast<double>(edpm);
+            };
+            for(const QUuid &uuid : attDyn->slotEquip)
+                addEquipDPM(uuid);
+            addEquipDPM(attDyn->slotEquipEx);
+        }
+        if(dpm <= 0.0)
+            dpm = 1.0;
+
+        QMap<QString, int> defAttrs = shipAttrOf(
+            defender.isFriend, defender.index);
+        double evasion
+            = defAttrs.value(QStringLiteral("Evasion"), 0);
+        double armor
+            = defAttrs.value(QStringLiteral("Armor"), 0);
+        if(armor <= 0)
+            armor = 1;
+        int defMaxHP
+            = defShip->attr.value(QStringLiteral("Hitpoints"), 1);
+
+        double baseAcc = mainGunBaseAccuracy(
+            attacker.isFriend, attacker.index);
+        auto addEquipAcc = [&](const QUuid &uuid) {
+            Equipment *eq
+                = attFleet->equipMap.value(uuid, nullptr);
+            if(!eq)
+                return;
+            if(!eq->type.isMainGun()
+                && !eq->type.isBigMainGun())
+                return;
+            baseAcc += static_cast<double>(
+                eq->attr.value(QStringLiteral("Accuracy"), 0));
+        };
+        for(const QUuid &uuid : attDyn->slotEquip)
+            addEquipAcc(uuid);
+        addEquipAcc(attDyn->slotEquipEx);
+        double accuracy = baseAcc * accMul;
+
+        double evasionChance
+            = std::exp((accuracy - evasion) / 1000.0);
+        evasionChance = std::clamp(evasionChance, 0.0, 1.0);
+        std::uniform_real_distribution<double> evadeDist(
+            0.0, 1.0);
+        if(evadeDist(rng) > evasionChance)
+            return true;
+
+        double ap
+            = maxMainGunArmorPenetration(attacker.isFriend,
+                                         attacker.index);
+        double sigmoidTerm = ap > 0.0 && armor > 0.0
+                                 ? std::log(10.0 * ap / armor)
+                                 : -10.0;
+        double sigmoid = sigmoidTerm
+                         / std::hypot(1.0, sigmoidTerm);
+
+        std::uniform_real_distribution<double> damageDist(
+            0.0, 1.0);
+        double v = damageDist(rng);
+        if(v >= sigmoid + 0.5)
+            return true;
+
+        {
+            double w = attacker.isFriend
+                           ? 1.0
+                                 + 0.25
+                                       * friendFormationEfficiency
+                           : 1.0
+                                 + 0.25
+                                       * enemyFormationEfficiency;
+            double z = std::max(
+                static_cast<double>(defMaxHP) / 16.0, 256.0);
+            double y = maxMainGunFiringSpeed(
+                attacker.isFriend, attacker.index);
+            if(y <= 0.0)
+                y = 1.0;
+            std::normal_distribution<double> firepowerDist(
+                10.0 * dpm / y, dpm / 50.0);
+            double u = firepowerDist(rng);
+            if(u <= 0.0)
+                u = 0.0;
+            double x = w * u * z / std::hypot(w * u, z);
+            int totalDmg = static_cast<int>(std::round(
+                std::round(x * dmgMul)));
+            defDyn->currentHP
+                = std::max(0, defDyn->currentHP - totalDmg);
+            {
+                QJsonObject log;
+                log["type"] = KP::GunshotCutInAttack;
+                log["clock"] = clock;
+                log["attackerFleet"] = attacker.isFriend;
+                log["attackerShip"] = attacker.index;
+                log["defenderFleet"] = defender.isFriend;
+                log["defenderShip"] = defender.index;
+                log["cutInType"]
+                    = QStringLiteral("spotting");
+                log["damage"] = totalDmg;
+                log["defenderHP"] = defDyn->currentHP;
+                log["damageMultiplier"] = dmgMul;
+                log["accuracyMultiplier"] = accMul;
+                m_damageLog.append(log);
+            }
+        }
+        return true;
+    };
+
+    /* Try own-ship recon planes */
+    for(size_t i = 0; i < equips.size(); ++i) {
+        for(size_t j = 0; j < equips.size(); ++j) {
+            if(i == j)
+                continue;
+            Equipment *e1 = equips[i];
+            Equipment *e2 = equips[j];
+
+            bool e1Gun = e1->type.isMainGun()
+                         || e1->type.isBigMainGun();
+            bool e2Gun = e2->type.isMainGun()
+                         || e2->type.isBigMainGun();
+            bool e1Recon = e1->type.isRecon();
+            bool e2Recon = e2->type.isRecon();
+
+            if(!((e1Gun && e2Recon) || (e1Recon && e2Gun)))
+                continue;
+
+            Equipment *reconEq = e1Recon ? e1 : e2;
+            Equipment *gunEq = e1Gun ? e1 : e2;
+
+            if(trySpottingFire(reconEq, gunEq, 1.0))
+                return true;
+        }
+    }
+
+    /* Try recon planes from other ships in the same fleet */
+    {
+        FleetInfo *fleet = fleetOf(attacker.isFriend);
+        for(int si = 0;
+             si < static_cast<int>(fleet->ships.size()); ++si) {
+            if(si == attacker.index)
+                continue;
+            Ship *otherShip = fleet->ships[si];
+            ShipDynamic *otherDyn
+                = fleet->shipDynamics[si].get();
+            if(!otherShip || !otherDyn || otherDyn->fleetFled
+                || otherDyn->currentHP <= 0)
+                continue;
+
+            double commMult
+                = commEfficiency[attacker.isFriend
+                                     ? attacker.index
+                                     : si]
+                  * commEfficiency[attacker.isFriend ? si
+                                                      : attacker.index];
+            if(commMult <= 0.0)
+                continue;
+
+            auto checkSlot = [&](const QUuid &uuid) {
+                Equipment *eq
+                    = fleet->equipMap.value(uuid, nullptr);
+                if(!eq || !eq->type.isRecon())
+                    return;
+                for(Equipment *gunEq : equips) {
+                    if(!gunEq->type.isMainGun()
+                        && !gunEq->type.isBigMainGun())
+                        continue;
+                    if(trySpottingFire(eq, gunEq, commMult))
+                        return;
+                }
+            };
+            for(const QUuid &uuid : otherDyn->slotEquip)
+                checkSlot(uuid);
+            checkSlot(otherDyn->slotEquipEx);
+        }
+    }
+            int defMaxHP
+                = defShip->attr.value(QStringLiteral("Hitpoints"),
+                                      1);
+
+            double baseAcc = mainGunBaseAccuracy(
+                attacker.isFriend, attacker.index);
+            auto addEquipAcc = [&](const QUuid &uuid) {
+                Equipment *eq
+                    = attFleet->equipMap.value(uuid, nullptr);
+                if(!eq)
+                    return;
+                if(!eq->type.isMainGun()
+                    && !eq->type.isBigMainGun())
+                    return;
+                baseAcc += static_cast<double>(
+                    eq->attr.value(QStringLiteral("Accuracy"), 0));
+            };
+            for(const QUuid &uuid : attDyn->slotEquip)
+                addEquipAcc(uuid);
+            addEquipAcc(attDyn->slotEquipEx);
+            double accuracy = baseAcc * accMul;
+
+            double evasionChance
+                = std::exp((accuracy - evasion) / 1000.0);
+            evasionChance = std::clamp(evasionChance, 0.0, 1.0);
+            std::uniform_real_distribution<double> evadeDist(
+                0.0, 1.0);
+            if(evadeDist(rng) > evasionChance)
+                return false;
+
+            double ap
+                = maxMainGunArmorPenetration(attacker.isFriend,
+                                             attacker.index);
+            double sigmoidTerm
+                = ap > 0.0 && armor > 0.0
+                      ? std::log(10.0 * ap / armor)
+                      : -10.0;
+            double sigmoid = sigmoidTerm
+                             / std::hypot(1.0, sigmoidTerm);
+
+            std::uniform_real_distribution<double> damageDist(
+                0.0, 1.0);
+            double v = damageDist(rng);
+            if(v >= sigmoid + 0.5)
+                return false;
+
+            {
+                double w = attacker.isFriend
+                               ? 1.0
+                                     + 0.25
+                                           * friendFormationEfficiency
+                               : 1.0
+                                     + 0.25
+                                           * enemyFormationEfficiency;
+                double z = std::max(
+                    static_cast<double>(defMaxHP) / 16.0, 256.0);
+                double y = maxMainGunFiringSpeed(
+                    attacker.isFriend, attacker.index);
+                if(y <= 0.0)
+                    y = 1.0;
+                std::normal_distribution<double> firepowerDist(
+                    10.0 * dpm / y, dpm / 50.0);
+                double u = firepowerDist(rng);
+                if(u <= 0.0)
+                    u = 0.0;
+                double x = w * u * z
+                           / std::hypot(w * u, z);
+                int totalDmg = static_cast<int>(std::round(
+                    std::round(x * dmgMul)));
+                defDyn->currentHP = std::max(
+                    0, defDyn->currentHP - totalDmg);
+                {
+                    QJsonObject log;
+                    log["type"] = KP::GunshotCutInAttack;
+                    log["clock"] = clock;
+                    log["attackerFleet"] = attacker.isFriend;
+                    log["attackerShip"] = attacker.index;
+                    log["defenderFleet"] = defender.isFriend;
+                    log["defenderShip"] = defender.index;
+                    log["cutInType"]
+                        = QStringLiteral("spotting");
+                    log["damage"] = totalDmg;
+                    log["defenderHP"] = defDyn->currentHP;
+                    log["damageMultiplier"] = dmgMul;
+                    log["accuracyMultiplier"] = accMul;
+                    m_damageLog.append(log);
+                }
+            }
+            return true;
+        }
+    }
+
+    /* Plain gunshot cut-in */
+    struct CutInCandidate {
+        Equipment *e1;
+        Equipment *e2;
+        double dmgMul;
+    };
+    std::vector<CutInCandidate> candidates;
+    for(size_t i = 0; i < equips.size(); ++i) {
+        for(size_t j = i + 1; j < equips.size(); ++j) {
+            Equipment *a = equips[i];
+            Equipment *b = equips[j];
+
+            /* Main + Main */
+            if(a->type.isMainGun() && b->type.isMainGun())
+                candidates.push_back({a, b, 1.1});
+            /* Main + Secondary */
+            if((a->type.isMainGun() && b->type.isSecGun())
+                || (a->type.isSecGun() && b->type.isMainGun()))
+                candidates.push_back({a, b, 1.05});
+            /* Big + Big */
+            if(a->type.isBigMainGun()
+                && b->type.isBigMainGun())
+                candidates.push_back({a, b, 1.12});
+            /* Big + AP */
+            if((a->type.isBigMainGun()
+                 && b->type.isAntilandShell())
+                || (a->type.isAntilandShell()
+                     && b->type.isBigMainGun()))
+                candidates.push_back({a, b, 1.17});
+        }
+    }
+    std::sort(candidates.begin(), candidates.end(),
+              [](const CutInCandidate &x,
+                 const CutInCandidate &y) {
+                  return x.dmgMul > y.dmgMul;
+              });
+
+    for(const auto &cand : candidates) {
+        Equipment *e1 = cand.e1;
+        Equipment *e2 = cand.e2;
+
+        auto getP = [&](Equipment *eq) -> double {
+            if(eq->type.isBigMainGun())
+                return eq->attrPrimaryStr().isEmpty()
+                           ? 0.0
+                           : static_cast<double>(eq->attr.value(
+                                 eq->attrPrimaryStr(), 0))
+                                 / 250.0;
+            if(eq->type.isSecGun())
+                return eq->attrPrimaryStr().isEmpty()
+                           ? 0.0
+                           : static_cast<double>(eq->attr.value(
+                                 eq->attrPrimaryStr(), 0))
+                                 / 50.0;
+            if(eq->type.isAntilandShell())
+                return 5.0;
+            return eq->attrPrimaryStr().isEmpty()
+                       ? 0.0
+                       : static_cast<double>(eq->attr.value(
+                             eq->attrPrimaryStr(), 0))
+                             / 100.0;
+        };
+        double p1 = getP(e1);
+        double p2 = getP(e2);
+
+        double base = std::max(0.0, (fCoeff + 1.0) / 4.0);
+        double a1 = base * p1 / std::hypot(1.0, p1);
+        double a2 = base * p2 / std::hypot(1.0, p2);
+        double triggerChance = a1 * a2;
+        triggerChance = std::clamp(triggerChance, 0.0, 1.0);
+        std::bernoulli_distribution trigDist(triggerChance);
+        if(!trigDist(rng))
+            continue;
+
+        double dmgMul = cand.dmgMul;
+
+        int targetIdx;
+        if(attacker.isFriend)
+            targetIdx = selectEnemyTarget(attacker.index);
+        else
+            targetIdx = selectFriendTarget(attacker.index);
+        if(targetIdx < 0)
+            return false;
+
+        FriendOrEnemyIndex defender{!attacker.isFriend,
+                                    targetIdx};
+        FleetInfo *defFleet = fleetOf(defender.isFriend);
+        Ship *defShip = defFleet->ships[defender.index];
+        ShipDynamic *defDyn
+            = defFleet->shipDynamics[defender.index].get();
+        if(!defShip || !defDyn || defDyn->fleetFled
+            || defDyn->currentHP <= 0)
+            return false;
+
+        QMap<QString, int> attrs
+            = shipAttrOf(attacker.isFriend, attacker.index);
+        double dpm = attrs.value(QStringLiteral("DPM"), 0);
+        {
+            auto addEquipDPM = [&](const QUuid &uuid) {
+                Equipment *eq
+                    = attFleet->equipMap.value(uuid, nullptr);
+                if(!eq)
+                    return;
+                int edpm
+                    = eq->attr.value(QStringLiteral("DPM"), 0);
+                if(edpm > 0)
+                    dpm += static_cast<double>(edpm);
+            };
+            for(const QUuid &uuid : attDyn->slotEquip)
+                addEquipDPM(uuid);
+            addEquipDPM(attDyn->slotEquipEx);
+        }
+        if(dpm <= 0.0)
+            dpm = 1.0;
+
+        QMap<QString, int> defAttrs
+            = shipAttrOf(defender.isFriend, defender.index);
+        double evasion
+            = defAttrs.value(QStringLiteral("Evasion"), 0);
+        double armor
+            = defAttrs.value(QStringLiteral("Armor"), 0);
+        if(armor <= 0)
+            armor = 1;
+        int defMaxHP
+            = defShip->attr.value(QStringLiteral("Hitpoints"), 1);
+
+        double baseAcc = mainGunBaseAccuracy(
+            attacker.isFriend, attacker.index);
+        auto addEquipAcc = [&](const QUuid &uuid) {
+            Equipment *eq
+                = attFleet->equipMap.value(uuid, nullptr);
+            if(!eq)
+                return;
+            if(!eq->type.isMainGun()
+                && !eq->type.isBigMainGun())
+                return;
+            baseAcc += static_cast<double>(
+                eq->attr.value(QStringLiteral("Accuracy"), 0));
+        };
+        for(const QUuid &uuid : attDyn->slotEquip)
+            addEquipAcc(uuid);
+        addEquipAcc(attDyn->slotEquipEx);
+        double accuracy = baseAcc;
+
+        double evasionChance
+            = std::exp((accuracy - evasion) / 1000.0);
+        evasionChance = std::clamp(evasionChance, 0.0, 1.0);
+        std::uniform_real_distribution<double> evadeDist(
+            0.0, 1.0);
+        if(evadeDist(rng) > evasionChance)
+            return false;
+
+        double ap = maxMainGunArmorPenetration(
+            attacker.isFriend, attacker.index);
+        double sigmoidTerm = ap > 0.0 && armor > 0.0
+                                 ? std::log(10.0 * ap / armor)
+                                 : -10.0;
+        double sigmoid = sigmoidTerm
+                         / std::hypot(1.0, sigmoidTerm);
+
+        std::uniform_real_distribution<double> damageDist(
+            0.0, 1.0);
+        double v = damageDist(rng);
+        if(v >= sigmoid + 0.5)
+            return false;
+
+        {
+            double w = attacker.isFriend
+                           ? 1.0
+                                 + 0.25
+                                       * friendFormationEfficiency
+                           : 1.0
+                                 + 0.25
+                                       * enemyFormationEfficiency;
+            double z = std::max(
+                static_cast<double>(defMaxHP) / 16.0, 256.0);
+            double y = maxMainGunFiringSpeed(
+                attacker.isFriend, attacker.index);
+            if(y <= 0.0)
+                y = 1.0;
+            std::normal_distribution<double> firepowerDist(
+                10.0 * dpm / y, dpm / 50.0);
+            double u = firepowerDist(rng);
+            if(u <= 0.0)
+                u = 0.0;
+            double x = w * u * z
+                       / std::hypot(w * u, z);
+            int totalDmg = static_cast<int>(std::round(
+                std::round(x * dmgMul)));
+            defDyn->currentHP
+                = std::max(0, defDyn->currentHP - totalDmg);
+            {
+                QJsonObject log;
+                log["type"] = KP::GunshotCutInAttack;
+                log["clock"] = clock;
+                log["attackerFleet"] = attacker.isFriend;
+                log["attackerShip"] = attacker.index;
+                log["defenderFleet"] = defender.isFriend;
+                log["defenderShip"] = defender.index;
+                log["cutInType"] = QStringLiteral("plain");
+                log["damage"] = totalDmg;
+                log["defenderHP"] = defDyn->currentHP;
+                log["damageMultiplier"] = dmgMul;
+                m_damageLog.append(log);
+            }
+        }
+        return true;
+    }
+
+    return false;
+}
+
 void Battle::processMainGunAttack(FriendOrEnemyIndex attacker) {
     FleetInfo *attFleet = fleetOf(attacker.isFriend);
     if(attacker.index < 0
@@ -2290,6 +2857,34 @@ void Battle::processMainGunAttack(FriendOrEnemyIndex attacker) {
         return;
 
     forceVisible(attacker);
+
+    if(processGunshotCutIn(attacker)) {
+        auto scheduleReload = [&]() {
+            double y = maxMainGunFiringSpeed(attacker.isFriend,
+                                             attacker.index);
+            if(y > 0.0) {
+                int maxHP = attShip->attr.value(
+                    QStringLiteral("Hitpoints"), 1);
+                if(maxHP <= 0)
+                    maxHP = 1;
+                double hpFrac
+                    = static_cast<double>(attDyn->currentHP) / maxHP;
+                double z = (hpFrac + 1.0) / 2.0;
+                double interval = 600.0 * z / y;
+                if(interval > 0.0) {
+                    clockTime nextTime
+                        = clock + static_cast<clockTime>(interval);
+                    insertEvent(EventType::MainGunAttack, nextTime,
+                                attacker,
+                                [this](FriendOrEnemyIndex idx) {
+                                    processMainGunAttack(idx);
+                                });
+                }
+            }
+        };
+        scheduleReload();
+        return;
+    }
 
     auto scheduleReload = [&]() {
         double y = maxMainGunFiringSpeed(attacker.isFriend,
@@ -2359,6 +2954,20 @@ void Battle::processMainGunAttack(FriendOrEnemyIndex attacker) {
     QMap<QString, int> attrs
         = shipAttrOf(attacker.isFriend, attacker.index);
     double dpm = attrs.value(QStringLiteral("DPM"), 0);
+    {
+        auto addEquipDPM = [&](const QUuid &uuid) {
+            Equipment *eq
+                = attFleet->equipMap.value(uuid, nullptr);
+            if(!eq)
+                return;
+            int edpm = eq->attr.value(QStringLiteral("DPM"), 0);
+            if(edpm > 0)
+                dpm += static_cast<double>(edpm);
+        };
+        for(const QUuid &uuid : attDyn->slotEquip)
+            addEquipDPM(uuid);
+        addEquipDPM(attDyn->slotEquipEx);
+    }
     if(dpm <= 0.0)
         dpm = 1.0;
 

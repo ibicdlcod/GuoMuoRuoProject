@@ -202,6 +202,7 @@ private:
     void processMainGunAttack(FriendOrEnemyIndex attacker);
     void processSecondaryGunAttack(FriendOrEnemyIndex attacker,
                                    QUuid slotUuid);
+    bool processGunshotCutIn(FriendOrEnemyIndex attacker);
     bool isAntagonistFleetSunk(FriendOrEnemyIndex attacker) const;
 
     /* ——— disengaging / extra‑battle ————————————————————————— */
