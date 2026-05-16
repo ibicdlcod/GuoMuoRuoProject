@@ -97,6 +97,33 @@ void MapDetail::setFleetCenter(const QPointF &input) {
 
 void MapDetail::displayDetailedMap(Map *map) {
     mapPointer = map;
+    geographicalMap = QPixmap();
+
+    QString enName = map->localNames.value("en_US");
+    enName.replace(QLatin1String(" "), QLatin1String("_"));
+    QString path = QString(":/resources/map/geographical/map%1_%2.png")
+                       .arg(map->id).arg(enName);
+    QImage geoImage(path);
+    if (geoImage.isNull()) {
+        return;
+    }
+    if (geoImage.format() != QImage::Format_ARGB32) {
+        geoImage = geoImage.convertToFormat(QImage::Format_ARGB32);
+    }
+    for (int y = 0; y < geoImage.height(); ++y) {
+        QRgb *line = reinterpret_cast<QRgb *>(geoImage.scanLine(y));
+        for (int x = 0; x < geoImage.width(); ++x) {
+            QRgb pixel = line[x];
+            int r = qRed(pixel);
+            int g = qGreen(pixel);
+            int b = qBlue(pixel);
+            if (b > r + 10 && b > g + 10) {
+                line[x] = qRgba(r, g, b, 0);
+            }
+        }
+    }
+    geographicalMap = QPixmap::fromImage(geoImage);
+
     for(auto *widget: QApplication::topLevelWidgets()) {
         if(qobject_cast<MainWindow *>(widget)) {
             MainWindow *mainWindowM = qobject_cast<MainWindow *>(widget);
@@ -359,6 +386,11 @@ void MapDetail::changeCurrentNode(const MapNode &node) {
                                             ));
         }
     }
+
+    if (!geographicalMap.isNull()) {
+        painter.drawPixmap(rect(), geographicalMap);
+    }
+
     if(animation->currentValue() == animation->endValue()) {
         emit moveFinished();
     }

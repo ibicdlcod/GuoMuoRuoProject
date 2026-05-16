@@ -3935,12 +3935,12 @@ Great at battle and bad at politics--so cool!</translation>
         <translation type="unfinished"></translation>
     </message>
     <message id="expedition-choice-saved">
-        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="1144"/>
+        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="1143"/>
         <source>Branch selection saved for node %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="expedition-plan-saved">
-        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="1224"/>
+        <location filename="../ClientGUI/ui/sortie/sortie.cpp" line="1223"/>
         <source>Battle plan saved for node %1</source>
         <translation type="unfinished"></translation>
     </message>

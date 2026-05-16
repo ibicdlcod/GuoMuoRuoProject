@@ -1103,13 +1103,12 @@ void Sortie::saveExpeditionSettings()
 
 void Sortie::expeditionNodeClicked(int nodeId)
 {
+    if (!expeditionMode || sortieState != KP::ExpeditionMapDetail) {
+        return;
+    }
     qInfo() << "expeditionNodeClicked called with nodeId:" << nodeId
             << "expeditionMode:" << expeditionMode
             << "sortieState:" << static_cast<int>(sortieState);
-    if (!expeditionMode || sortieState != KP::ExpeditionMapDetail) {
-        qDebug() << "Not in expedition planning mode, returning";
-        return;
-    }
     if (!currentMap) {
         qWarning() << "No map selected for expedition planning";
         return;

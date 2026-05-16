@@ -336,8 +336,8 @@ void Battle::disengagingPhase() {
 
         double x = std::min(
             1.0, losF * speedF
-                     / std::max(1.0, speedE
-                                        * std::hypot(losF, losE)));
+                / std::max(1.0, speedE
+                                    * std::hypot(losF, losE)));
         double y = std::min(
             20.0, 2000.0 / std::max(1.0, std::sqrt(speedE * speedF)));
 
@@ -409,7 +409,8 @@ KP::BattleAssessment Battle::computePreliminaryAssessment() const {
         enemyDamagePct
             = enemyDamage / totalEnemyHPPreBattle * 100.0;
 
-    bool flagshipSunk = !currentEnemyFleet->shipDynamics[0]
+    bool flagshipSunk = currentEnemyFleet->shipDynamics.size() <=0
+                        || !currentEnemyFleet->shipDynamics[0]
                         || currentEnemyFleet->shipDynamics[0]->fleetFled
                         || currentEnemyFleet->shipDynamics[0]->currentHP
                                <= 0;
@@ -1823,9 +1824,9 @@ void Battle::processS3AACutIn() {
             /* 1: Sec-gun flak + AA radar */
             {
                 auto f1 = findEquip([](const Equipment *eq)
-                    { return eq->type.isFlakSecGun(); });
+                                    { return eq->type.isFlakSecGun(); });
                 auto f2 = findEquip([](const Equipment *eq)
-                    { return eq->type.isAARadar(); });
+                                    { return eq->type.isAARadar(); });
                 if(!f1.empty() && !f2.empty()) {
                     chosen = {f1[0], f2[0]};
                     matchType = 1;
@@ -1834,9 +1835,9 @@ void Battle::processS3AACutIn() {
             /* 2: Sec-gun flak + AA control device */
             if(matchType < 0) {
                 auto f1 = findEquip([](const Equipment *eq)
-                    { return eq->type.isFlakSecGun(); });
+                                    { return eq->type.isFlakSecGun(); });
                 auto f2 = findEquip([](const Equipment *eq)
-                    { return eq->type.isAAControl(); });
+                                    { return eq->type.isAAControl(); });
                 if(!f1.empty() && !f2.empty()) {
                     chosen = {f1[0], f2[0]};
                     matchType = 2;
@@ -1845,9 +1846,9 @@ void Battle::processS3AACutIn() {
             /* 3: Sec-gun flak + AA cannon */
             if(matchType < 0) {
                 auto f1 = findEquip([](const Equipment *eq)
-                    { return eq->type.isFlakSecGun(); });
+                                    { return eq->type.isFlakSecGun(); });
                 auto f2 = findEquip([](const Equipment *eq)
-                    { return eq->type.isAACannon(); });
+                                    { return eq->type.isAACannon(); });
                 if(!f1.empty() && !f2.empty()) {
                     chosen = {f1[0], f2[0]};
                     matchType = 3;
@@ -1857,7 +1858,7 @@ void Battle::processS3AACutIn() {
              *    (AA focused ships) */
             if(matchType < 0) {
                 auto f1 = findEquip([](const Equipment *eq)
-                    { return eq->type.isFlakSecGun(); });
+                                    { return eq->type.isFlakSecGun(); });
                 if(f1.size() >= 2
                     && ship->isAAFocused()) {
                     chosen = {f1[0], f1[1]};
@@ -1868,9 +1869,9 @@ void Battle::processS3AACutIn() {
              *    (AA focused ships) */
             if(matchType < 0) {
                 auto f1 = findEquip([](const Equipment *eq)
-                    { return eq->type.isFlakSecGun(); });
+                                    { return eq->type.isFlakSecGun(); });
                 auto f2 = findEquip([](const Equipment *eq)
-                    { return eq->type.isAAGun(); });
+                                    { return eq->type.isAAGun(); });
                 if(!f1.empty() && !f2.empty()
                     && ship->isAAFocused()) {
                     chosen = {f1[0], f2[0]};
@@ -1881,11 +1882,11 @@ void Battle::processS3AACutIn() {
              *    + AA control device (battleships) */
             if(matchType < 0) {
                 auto f1 = findEquip([](const Equipment *eq)
-                    { return eq->type.isAntilandShell(); });
+                                    { return eq->type.isAntilandShell(); });
                 auto f2 = findEquip([](const Equipment *eq)
-                    { return eq->type.isBigMainGun(); });
+                                    { return eq->type.isBigMainGun(); });
                 auto f3 = findEquip([](const Equipment *eq)
-                    { return eq->type.isAAControl(); });
+                                    { return eq->type.isAAControl(); });
                 if(!f1.empty() && !f2.empty()
                     && !f3.empty()
                     && ship->isBattleShip()) {
@@ -1896,7 +1897,7 @@ void Battle::processS3AACutIn() {
             /* 7: C3H + C3H (Shiratsuyu) */
             if(matchType < 0) {
                 auto f1 = findEquip([](const Equipment *eq)
-                    { return eq->isC3HGun(); });
+                                    { return eq->isC3HGun(); });
                 if(f1.size() >= 2
                     && ship->isShiratsuyu()) {
                     chosen = {f1[0], f1[1]};
@@ -1906,9 +1907,9 @@ void Battle::processS3AACutIn() {
             /* 8: C3H + AA radar (Shiratsuyu) */
             if(matchType < 0) {
                 auto f1 = findEquip([](const Equipment *eq)
-                    { return eq->isC3HGun(); });
+                                    { return eq->isC3HGun(); });
                 auto f2 = findEquip([](const Equipment *eq)
-                    { return eq->type.isAARadar(); });
+                                    { return eq->type.isAARadar(); });
                 if(!f1.empty() && !f2.empty()
                     && ship->isShiratsuyu()) {
                     chosen = {f1[0], f2[0]};
@@ -1918,9 +1919,9 @@ void Battle::processS3AACutIn() {
             /* 9: C3H + 25mm AA conc (Shiratsuyu) */
             if(matchType < 0) {
                 auto f1 = findEquip([](const Equipment *eq)
-                    { return eq->isC3HGun(); });
+                                    { return eq->isC3HGun(); });
                 auto f2 = findEquip([](const Equipment *eq)
-                    { return eq->is25mmConcentrated(); });
+                                    { return eq->is25mmConcentrated(); });
                 if(!f1.empty() && !f2.empty()
                     && ship->isShiratsuyu()) {
                     chosen = {f1[0], f2[0]};
@@ -2166,6 +2167,30 @@ void Battle::processMainGunAttack(FriendOrEnemyIndex attacker) {
         || attDyn->currentHP <= 0)
         return;
 
+    auto scheduleReload = [&]() {
+        double y = maxMainGunFiringSpeed(attacker.isFriend,
+                                         attacker.index);
+        if(y > 0.0) {
+            int maxHP = attShip->attr.value(
+                QStringLiteral("Hitpoints"), 1);
+            if(maxHP <= 0)
+                maxHP = 1;
+            double hpFrac
+                = static_cast<double>(attDyn->currentHP) / maxHP;
+            double z = (hpFrac + 1.0) / 2.0;
+            double interval = 600.0 * z / y;
+            if(interval > 0.0) {
+                clockTime nextTime
+                    = clock + static_cast<clockTime>(interval);
+                insertEvent(EventType::MainGunAttack, nextTime,
+                            attacker,
+                            [this](FriendOrEnemyIndex idx) {
+                                processMainGunAttack(idx);
+                            });
+            }
+        }
+    };
+
     int targetIdx;
     if(attacker.isFriend)
         targetIdx = selectEnemyTarget(attacker.index);
@@ -2181,6 +2206,7 @@ void Battle::processMainGunAttack(FriendOrEnemyIndex attacker) {
             log["attackerShip"] = attacker.index;
             m_damageLog.append(log);
         }
+        scheduleReload();
         return;
     }
 
@@ -2202,6 +2228,7 @@ void Battle::processMainGunAttack(FriendOrEnemyIndex attacker) {
             log["defenderShip"] = defender.index;
             m_damageLog.append(log);
         }
+        scheduleReload();
         return;
     }
 
@@ -2241,6 +2268,7 @@ void Battle::processMainGunAttack(FriendOrEnemyIndex attacker) {
             log["defenderShip"] = defender.index;
             m_damageLog.append(log);
         }
+        scheduleReload();
         return;
     }
 
@@ -2292,6 +2320,7 @@ void Battle::processMainGunAttack(FriendOrEnemyIndex attacker) {
             log["defenderShip"] = defender.index;
             m_damageLog.append(log);
         }
+        scheduleReload();
         return;
     }
 
@@ -2311,25 +2340,5 @@ void Battle::processMainGunAttack(FriendOrEnemyIndex attacker) {
         m_damageLog.append(log);
     }
 
-    double y = maxMainGunFiringSpeed(attacker.isFriend,
-                                     attacker.index);
-    if(y > 0.0) {
-        int maxHP = attShip->attr.value(
-            QStringLiteral("Hitpoints"), 1);
-        if(maxHP <= 0)
-            maxHP = 1;
-        double hpFrac
-            = static_cast<double>(attDyn->currentHP) / maxHP;
-        double z = (hpFrac + 1.0) / 2.0;
-        double interval = 600.0 * z / y;
-        if(interval > 0.0) {
-            clockTime nextTime
-                = clock + static_cast<clockTime>(interval);
-            insertEvent(EventType::MainGunAttack, nextTime,
-                        attacker,
-                        [this](FriendOrEnemyIndex idx) {
-                            processMainGunAttack(idx);
-                        });
-        }
-    }
+    scheduleReload();
 }

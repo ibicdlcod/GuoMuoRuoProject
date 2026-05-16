@@ -67,6 +67,7 @@ private:
     QPixmap surfaceFleetIcon;
     QPixmap transportFleetIcon;
     QPixmap normalFleetIcon;
+    QPixmap geographicalMap;
 };
 
 #endif // MAPDETAIL_H
