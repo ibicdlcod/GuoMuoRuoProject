@@ -74,6 +74,8 @@ Refer to the skill for detailed examples and complete guidelines.
 - `doc/` – Game data CSV files and documentation
   - `doc/agents/` – Agent documentation (architecture, build, game systems)
   - `doc/database/` – Database schema documentation
+  - `doc/doc/design_philosophy/` - Design philosophy (for AI)
+  - `doc/doc/worldview_and_mechanics/` - Design philosophy (for human readers)
 - `Translations/` – Localization files (`FleetMemories_{en_US,ja_JP,zh_CN}.ts`)
 - `.claude/skills/` – Agent skill definitions (manual-of-style, documentation-conventions, auto-commit-push, etc.)
 

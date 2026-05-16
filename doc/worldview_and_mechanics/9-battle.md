@@ -45,7 +45,7 @@ In the battle the following attack against enemies can occur:
 The battle is organized into the following phases:
 
 - [Air battle](9.p1-airbattle.md)
-- [Approaching phase](9.p2-approching.md) (clock depending on max firing range, speed and LOS)
+- [Approaching phase](9.p2-approaching.md) (20s clock, actual attack clock depending on max firing range, speed and LOS)
 - [Central phase](9.p3-central.md) (90s clock)
 - [Disengaging phase](9.p4-disengage.md) (clock depending on speed and LOS) (If we want night battle, we prevent them disengage; if we don't, we try to disengage)
 - [Night battle](9.p5-nightbattle.md) (30s clock)
