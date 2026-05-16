@@ -4256,22 +4256,22 @@ Great at battle and bad at politics--so cool!</source>
         <translation type="unfinished">その他アジア</translation>
     </message>
     <message id="NormalFleet">
-        <location filename="../Protocol/kp.h" line="767"/>
+        <location filename="../Protocol/kp.h" line="768"/>
         <source>Normal</source>
         <translation type="unfinished">架空艦</translation>
     </message>
     <message id="CarrierFleet">
-        <location filename="../Protocol/kp.h" line="769"/>
+        <location filename="../Protocol/kp.h" line="770"/>
         <source>Carrier</source>
         <translation type="unfinished">通常</translation>
     </message>
     <message id="SurfaceFleet">
-        <location filename="../Protocol/kp.h" line="771"/>
+        <location filename="../Protocol/kp.h" line="772"/>
         <source>Surface</source>
         <translation type="unfinished">空母機動部隊</translation>
     </message>
     <message id="TransportFleet">
-        <location filename="../Protocol/kp.h" line="773"/>
+        <location filename="../Protocol/kp.h" line="774"/>
         <source>Transport</source>
         <translation type="unfinished">水上打撃部隊</translation>
     </message>

@@ -32,10 +32,13 @@ In the battle the following attack against enemies can occur:
 - [Torpedo attack](9.a3-torpedoattack.md)
   - Torpedo attack
   - Torpedo reloading device
+  - 
   - Torpedo cut-in
   - Gunshot+Torpedo cut-in
 - [ASW attack](9.a4-asw.md)
   - ASW detection vs concealment
+  - ASW depth charge attack
+  - ASW aerial attack
   - ASW cut-in
 - [Land attack](9.5-landattack.md)
   - General land attack

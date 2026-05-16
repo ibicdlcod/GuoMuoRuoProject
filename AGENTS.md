@@ -122,7 +122,7 @@ For detailed game systems documentation, see [doc/agents/game-systems.md](doc/ag
 ## Verification Before Completion
 
 When about to claim work is complete:
-- Run `cmake --build build` to ensure code compiles
+- Run `cmake --build build` to ensure code compiles (using "-j" parallel parameter with value that is appropriate to the machine)
 - If modifying CMakeLists.txt, verify configuration still works
 - Ensure code follows manual-of-style skill conventions:
   - No Qt reserved keywords introduced

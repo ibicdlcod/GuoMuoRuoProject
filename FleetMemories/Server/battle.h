@@ -83,6 +83,8 @@ private:
 
     std::vector<ConcealmentStatus> friendFleetConcealmentStatus;
     std::vector<ConcealmentStatus> enemyFleetConcealmentStatus;
+    std::vector<bool> friendReducedConcealment;
+    std::vector<bool> enemyReducedConcealment;
 
     /* ——— command / orders —————————————————————————————————— */
 
@@ -188,8 +190,18 @@ private:
     double maxMainGunArmorPenetration(bool isFriend,
                                       int index) const;
     double mainGunBaseAccuracy(bool isFriend, int index) const;
+    double secGunFiringSpeed(bool isFriend, int index,
+                             const QUuid &slotUuid) const;
+    double secGunBaseAccuracy(bool isFriend, int index) const;
+    double secGunCombinedAccuracy(bool isFriend, int index) const;
+    double secGunArmorPenetration(bool isFriend, int index,
+                                  const QUuid &slotUuid) const;
     void setupApproachingGunshots();
+    void setupSecondaryGunshots(clockTime phaseStart,
+                                clockTime phaseLength);
     void processMainGunAttack(FriendOrEnemyIndex attacker);
+    void processSecondaryGunAttack(FriendOrEnemyIndex attacker,
+                                   QUuid slotUuid);
     bool isAntagonistFleetSunk(FriendOrEnemyIndex attacker) const;
 
     /* ——— disengaging / extra‑battle ————————————————————————— */

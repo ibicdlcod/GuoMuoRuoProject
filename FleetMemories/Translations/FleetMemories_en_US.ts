@@ -4274,22 +4274,22 @@ Great at battle and bad at politics--so cool!</translation>
         <translation type="unfinished">Fantasy ships</translation>
     </message>
     <message id="NormalFleet">
-        <location filename="../Protocol/kp.h" line="767"/>
+        <location filename="../Protocol/kp.h" line="768"/>
         <source>Normal</source>
         <translation type="unfinished">Normal</translation>
     </message>
     <message id="CarrierFleet">
-        <location filename="../Protocol/kp.h" line="769"/>
+        <location filename="../Protocol/kp.h" line="770"/>
         <source>Carrier</source>
         <translation type="unfinished">Carrier</translation>
     </message>
     <message id="SurfaceFleet">
-        <location filename="../Protocol/kp.h" line="771"/>
+        <location filename="../Protocol/kp.h" line="772"/>
         <source>Surface</source>
         <translation type="unfinished">Surface</translation>
     </message>
     <message id="TransportFleet">
-        <location filename="../Protocol/kp.h" line="773"/>
+        <location filename="../Protocol/kp.h" line="774"/>
         <source>Transport</source>
         <translation type="unfinished">Transport</translation>
     </message>

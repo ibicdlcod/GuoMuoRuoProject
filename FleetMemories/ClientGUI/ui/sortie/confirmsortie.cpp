@@ -539,6 +539,14 @@ BattleDetailDialog::BattleDetailDialog(
                        .arg(overp ? QStringLiteral(" (OVER)")
                                   : QString());
             break;
+        case KP::SecondaryGunAttack:
+            line = QString("SecGun   %1 → %2: %3 dmg")
+                       .arg(attName, defName).arg(dmg);
+            break;
+        case KP::PointBlankShot:
+            line = QString("PtBlank  %1 → %2: -formation")
+                       .arg(attName, defName);
+            break;
         case KP::AirTorpedoAttack:
             line = QString("AirTorp  %1 → %2: %3 dmg")
                        .arg(attName, defName).arg(dmg);

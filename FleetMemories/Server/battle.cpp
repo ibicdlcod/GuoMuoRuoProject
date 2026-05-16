@@ -55,6 +55,8 @@ void Battle::battleProcessor(FleetInfo *friendf, FleetInfo *enemyf,
     for(int i = 0; i < KP::combinedFleetSize; ++i) {
         enemyFleetConcealmentStatus.push_back(ConcealmentStatus::Unclear);
     }
+    friendReducedConcealment.resize(KP::combinedFleetSize, false);
+    enemyReducedConcealment.resize(KP::combinedFleetSize, false);
     for(int i = 0; i < KP::combinedFleetSize; ++i) {
         if(i < currentFriendFleet->ships.size() && currentFriendFleet->ships[i]) {
             decideHidden({true, i});
@@ -241,6 +243,8 @@ void Battle::battleProcessor(FleetInfo *friendf, FleetInfo *enemyf,
 }
 
 void Battle::airBattle() {
+    /* Air battle phase
+     * — see doc/worldview_and_mechanics/9.p1-airbattle.md */
     clock = 0;
     isNight = false;
     {
@@ -265,6 +269,8 @@ void Battle::airBattle() {
 }
 
 void Battle::approachingPhase() {
+    /* Approaching phase
+     * — see doc/worldview_and_mechanics/9.p2-approaching.md */
     {
         QJsonObject log;
         log["type"] = KP::BattlePhaseCommence;
@@ -277,6 +283,8 @@ void Battle::approachingPhase() {
 }
 
 void Battle::centralPhase() {
+    /* Central phase
+     * — see doc/worldview_and_mechanics/9.p3-central.md */
     {
         QJsonObject log;
         log["type"] = KP::BattlePhaseCommence;
@@ -285,10 +293,13 @@ void Battle::centralPhase() {
         m_damageLog.append(log);
     }
     setupAirReloading(20, 90);
+    setupSecondaryGunshots(20, 90);
     advanceClockTime(90);
 }
 
 void Battle::disengagingPhase() {
+    /* Disengaging phase
+     * — see doc/worldview_and_mechanics/9.p4-disengage.md */
     {
         QJsonObject log;
         log["type"] = KP::BattlePhaseCommence;
@@ -365,6 +376,8 @@ void Battle::disengagingPhase() {
 }
 
 KP::BattleAssessment Battle::computePreliminaryAssessment() const {
+    /* Battle assessment for disengaging phase
+     * — see doc/worldview_and_mechanics/9.p4-disengage.md */
     double curFriendHP = 0.0;
     for(int i = 0;
          i < static_cast<int>(
@@ -432,6 +445,8 @@ KP::BattleAssessment Battle::computePreliminaryAssessment() const {
 }
 
 void Battle::nightBattle() {
+    /* Night battle phase
+     * — see doc/worldview_and_mechanics/9.p5-nightbattle.md */
     isNight = true;
     {
         QJsonObject log;
@@ -452,8 +467,32 @@ void Battle::nightBattle() {
         for(int i = 0;
              i < static_cast<int>(currentEnemyFleet->ships.size()); ++i)
             processAirAttack({false, i});
+        auto fireSecGuns = [&](bool isFriend) {
+            FleetInfo *fleet = fleetOf(isFriend);
+            for(int i = 0;
+                 i < static_cast<int>(fleet->ships.size()); ++i) {
+                ShipDynamic *dyn = fleet->shipDynamics[i].get();
+                if(!dyn || dyn->fleetFled || dyn->currentHP <= 0)
+                    continue;
+                if(!hasSecGun(isFriend, i))
+                    continue;
+                auto fireSlot = [&](const QUuid &uuid) {
+                    Equipment *eq
+                        = fleet->equipMap.value(uuid, nullptr);
+                    if(!eq || !eq->type.isSecGun())
+                        return;
+                    processSecondaryGunAttack({isFriend, i}, uuid);
+                };
+                for(const QUuid &uuid : dyn->slotEquip)
+                    fireSlot(uuid);
+                fireSlot(dyn->slotEquipEx);
+            }
+        };
+        fireSecGuns(true);
+        fireSecGuns(false);
     }
     setupAirReloading(0, 30);
+    setupSecondaryGunshots(0, 30);
 
     if(isNightCommence) {
         double attLos = currentFriendFleet->los(true);
@@ -541,6 +580,8 @@ void Battle::insertEvent(EventType type, clockTime time,
     events.insert(it, e);
 }
 
+/* Concealment — see doc/worldview_and_mechanics/9.c4-los.md */
+
 void Battle::decideHidden(FriendOrEnemyIndex index) {
     bool result;
 
@@ -556,6 +597,18 @@ void Battle::decideHidden(FriendOrEnemyIndex index) {
                                                  static_cast<int>(friendGoal))
                        : FleetInfo::attrFromShip(ship, shipDyn);
     double shipConcealment = attrs.value(QStringLiteral("Concealment"), 0);
+    if(index.isFriend) {
+        if(friendReducedConcealment[index.index]) {
+            shipConcealment *= 0.5;
+            friendReducedConcealment[index.index] = false;
+        }
+    }
+    else {
+        if(enemyReducedConcealment[index.index]) {
+            shipConcealment *= 0.5;
+            enemyReducedConcealment[index.index] = false;
+        }
+    }
     double antagonistLos = index.isFriend ? currentEnemyFleet->los(isNight)
                                           : currentFriendFleet->los(isNight);
     double concealFactor = std::log(shipConcealment) - std::log(antagonistLos);
@@ -591,11 +644,16 @@ void Battle::decideHidden(FriendOrEnemyIndex index) {
 }
 
 void Battle::forceVisible(FriendOrEnemyIndex index) {
+    /* Force visibility after gunshot with 50% concealment penalty
+     * — see doc/worldview_and_mechanics/9.a2-gunshot.md
+     * — see doc/worldview_and_mechanics/9.c4-los.md */
     if(index.isFriend) {
         friendFleetConcealmentStatus[index.index] = ConcealmentStatus::Visible;
+        friendReducedConcealment[index.index] = true;
     }
     else {
         enemyFleetConcealmentStatus[index.index] = ConcealmentStatus::Visible;
+        enemyReducedConcealment[index.index] = true;
     }
 
     events.remove_if([&](const Event &e) {
@@ -2117,6 +2175,70 @@ double Battle::mainGunBaseAccuracy(bool isFriend, int index) const {
     return 1000.0 * ra / std::hypot(1.0, ra);
 }
 
+double Battle::secGunFiringSpeed(bool isFriend, int index,
+                                 const QUuid &slotUuid) const {
+    FleetInfo *fleet = fleetOf(isFriend);
+    if(index < 0 || index >= static_cast<int>(fleet->ships.size()))
+        return 0.0;
+    ShipDynamic *dyn = fleet->shipDynamics[index].get();
+    if(!dyn || dyn->fleetFled)
+        return 0.0;
+    Equipment *eq = fleet->equipMap.value(slotUuid, nullptr);
+    if(!eq || !eq->type.isSecGun())
+        return 0.0;
+    return static_cast<double>(
+        eq->attr.value(QStringLiteral("Firingspeed"), 0));
+}
+
+double Battle::secGunBaseAccuracy(bool isFriend, int index) const {
+    FleetInfo *fleet = fleetOf(isFriend);
+    if(index < 0 || index >= static_cast<int>(fleet->ships.size()))
+        return 0.0;
+    ShipDynamic *dyn = fleet->shipDynamics[index].get();
+    if(!dyn || dyn->fleetFled)
+        return 0.0;
+    int lv = Ship::getLevel(dyn->exp);
+    double ra = (lv + 25.0) / 100.0;
+    return 1000.0 * ra / std::hypot(1.0, ra);
+}
+
+double Battle::secGunCombinedAccuracy(bool isFriend,
+                                      int index) const {
+    FleetInfo *fleet = fleetOf(isFriend);
+    if(index < 0 || index >= static_cast<int>(fleet->ships.size()))
+        return 0.0;
+    ShipDynamic *dyn = fleet->shipDynamics[index].get();
+    if(!dyn || dyn->fleetFled)
+        return 0.0;
+    double result = 0.0;
+    auto check = [&](const QUuid &uuid) {
+        Equipment *eq = fleet->equipMap.value(uuid, nullptr);
+        if(!eq || !eq->type.isSecGun())
+            return;
+        result += static_cast<double>(
+            eq->attr.value(QStringLiteral("Accuracy"), 0));
+    };
+    for(const QUuid &uuid : dyn->slotEquip)
+        check(uuid);
+    check(dyn->slotEquipEx);
+    return result;
+}
+
+double Battle::secGunArmorPenetration(bool isFriend, int index,
+                                      const QUuid &slotUuid) const {
+    FleetInfo *fleet = fleetOf(isFriend);
+    if(index < 0 || index >= static_cast<int>(fleet->ships.size()))
+        return 0.0;
+    ShipDynamic *dyn = fleet->shipDynamics[index].get();
+    if(!dyn || dyn->fleetFled)
+        return 0.0;
+    Equipment *eq = fleet->equipMap.value(slotUuid, nullptr);
+    if(!eq || !eq->type.isSecGun())
+        return 0.0;
+    return static_cast<double>(
+        eq->attr.value(QStringLiteral("Armorpenetration"), 0));
+}
+
 void Battle::setupApproachingGunshots() {
     auto scheduleFleet = [&](bool isFriend) {
         FleetInfo *fleet = fleetOf(isFriend);
@@ -2166,6 +2288,8 @@ void Battle::processMainGunAttack(FriendOrEnemyIndex attacker) {
     if(!attShip || !attDyn || attDyn->fleetFled
         || attDyn->currentHP <= 0)
         return;
+
+    forceVisible(attacker);
 
     auto scheduleReload = [&]() {
         double y = maxMainGunFiringSpeed(attacker.isFriend,
@@ -2252,11 +2376,11 @@ void Battle::processMainGunAttack(FriendOrEnemyIndex attacker) {
     double equipAcc = attrs.value(QStringLiteral("Accuracy"), 0);
     double accuracy = baseAcc + equipAcc;
     double evasionChance
-        = std::exp((accuracy - evasion) / 1000.0);
+        = std::exp((evasion - accuracy) / 1000.0);
     evasionChance = std::clamp(evasionChance, 0.0, 1.0);
 
     std::uniform_real_distribution<double> evadeDist(0.0, 1.0);
-    if(evadeDist(rng) > evasionChance) {
+    if(evadeDist(rng) < evasionChance) {
         if(!isAntagonistFleetSunk(attacker)) {
             QJsonObject log;
             log["type"] = KP::AttackSkipped;
@@ -2340,5 +2464,276 @@ void Battle::processMainGunAttack(FriendOrEnemyIndex attacker) {
         m_damageLog.append(log);
     }
 
+    scheduleReload();
+}
+
+void Battle::setupSecondaryGunshots(clockTime phaseStart,
+                                    clockTime phaseLength) {
+    auto scheduleFleet = [&](bool isFriend, clockTime baseClock) {
+        FleetInfo *fleet = fleetOf(isFriend);
+        for(int i = 0;
+             i < static_cast<int>(fleet->ships.size()); ++i) {
+            Ship *ship = fleet->ships[i];
+            ShipDynamic *dyn = fleet->shipDynamics[i].get();
+            if(!ship || !dyn || dyn->fleetFled || dyn->currentHP <= 0)
+                continue;
+            if(!hasSecGun(isFriend, i))
+                continue;
+            auto scheduleSlot = [&](const QUuid &uuid) {
+                Equipment *eq = fleet->equipMap.value(uuid, nullptr);
+                if(!eq || !eq->type.isSecGun())
+                    return;
+                double y = secGunFiringSpeed(isFriend, i, uuid);
+                if(y <= 0.0)
+                    return;
+                int maxHP = ship->attr.value(
+                    QStringLiteral("Hitpoints"), 1);
+                if(maxHP <= 0)
+                    maxHP = 1;
+                double hpFrac
+                    = static_cast<double>(dyn->currentHP) / maxHP;
+                double z = (hpFrac + 1.0) / 2.0;
+                double interval = 600.0 * z / y;
+                if(interval <= 0.0)
+                    return;
+                for(clockTime t = static_cast<clockTime>(interval);
+                     t < phaseLength;
+                     t += static_cast<clockTime>(interval)) {
+                    insertEvent(EventType::SecondaryGunAttack,
+                                baseClock + t,
+                                {isFriend, i},
+                                [this, uuid = uuid](
+                                    FriendOrEnemyIndex idx) {
+                                    processSecondaryGunAttack(idx, uuid);
+                                });
+                }
+            };
+            for(const QUuid &uuid : dyn->slotEquip)
+                scheduleSlot(uuid);
+            scheduleSlot(dyn->slotEquipEx);
+        }
+    };
+    scheduleFleet(true, phaseStart);
+    scheduleFleet(false, phaseStart);
+}
+
+void Battle::processSecondaryGunAttack(FriendOrEnemyIndex attacker,
+                                       QUuid slotUuid) {
+    FleetInfo *attFleet = fleetOf(attacker.isFriend);
+    if(attacker.index < 0
+        || attacker.index
+               >= static_cast<int>(attFleet->ships.size()))
+        return;
+    Ship *attShip = attFleet->ships[attacker.index];
+    ShipDynamic *attDyn
+        = attFleet->shipDynamics[attacker.index].get();
+    if(!attShip || !attDyn || attDyn->fleetFled
+        || attDyn->currentHP <= 0)
+        return;
+    Equipment *secEq = attFleet->equipMap.value(slotUuid, nullptr);
+    if(!secEq || !secEq->type.isSecGun())
+        return;
+
+    forceVisible(attacker);
+
+    auto scheduleReload = [&]() {
+        double y = secGunFiringSpeed(attacker.isFriend,
+                                     attacker.index, slotUuid);
+        if(y > 0.0) {
+            int maxHP = attShip->attr.value(
+                QStringLiteral("Hitpoints"), 1);
+            if(maxHP <= 0)
+                maxHP = 1;
+            double hpFrac
+                = static_cast<double>(attDyn->currentHP) / maxHP;
+            double z = (hpFrac + 1.0) / 2.0;
+            double interval = 600.0 * z / y;
+            if(interval > 0.0) {
+                clockTime nextTime
+                    = clock + static_cast<clockTime>(interval);
+                insertEvent(EventType::SecondaryGunAttack, nextTime,
+                            attacker,
+                            [this, slotUuid = slotUuid](
+                                FriendOrEnemyIndex idx) {
+                                processSecondaryGunAttack(idx,
+                                                          slotUuid);
+                            });
+            }
+        }
+    };
+
+    int targetIdx;
+    if(attacker.isFriend)
+        targetIdx = selectEnemyTarget(attacker.index);
+    else
+        targetIdx = selectFriendTarget(attacker.index);
+    if(targetIdx < 0) {
+        if(!isAntagonistFleetSunk(attacker)) {
+            QJsonObject log;
+            log["type"] = KP::AttackSkipped;
+            log["clock"] = clock;
+            log["reason"] = QStringLiteral("no target");
+            log["attackerFleet"] = attacker.isFriend;
+            log["attackerShip"] = attacker.index;
+            log["attackerSlot"] = slotUuid.toString();
+            m_damageLog.append(log);
+        }
+        scheduleReload();
+        return;
+    }
+
+    FriendOrEnemyIndex defender{!attacker.isFriend, targetIdx};
+    FleetInfo *defFleet = fleetOf(defender.isFriend);
+    Ship *defShip = defFleet->ships[defender.index];
+    ShipDynamic *defDyn
+        = defFleet->shipDynamics[defender.index].get();
+    if(!defShip || !defDyn || defDyn->fleetFled
+        || defDyn->currentHP <= 0) {
+        if(!isAntagonistFleetSunk(attacker)) {
+            QJsonObject log;
+            log["type"] = KP::AttackSkipped;
+            log["clock"] = clock;
+            log["reason"] = QStringLiteral("target invalid");
+            log["attackerFleet"] = attacker.isFriend;
+            log["attackerShip"] = attacker.index;
+            log["defenderFleet"] = defender.isFriend;
+            log["defenderShip"] = defender.index;
+            log["attackerSlot"] = slotUuid.toString();
+            m_damageLog.append(log);
+        }
+        scheduleReload();
+        return;
+    }
+
+    QMap<QString, int> defAttrs
+        = shipAttrOf(defender.isFriend, defender.index);
+    double evasion = defAttrs.value(QStringLiteral("Evasion"), 0);
+    double armor = defAttrs.value(QStringLiteral("Armor"), 0);
+    if(armor <= 0)
+        armor = 1;
+    int defMaxHP = defShip->attr.value(
+        QStringLiteral("Hitpoints"), 1);
+
+    double baseAcc = secGunBaseAccuracy(attacker.isFriend,
+                                        attacker.index);
+    double equipAcc = secGunCombinedAccuracy(attacker.isFriend,
+                                             attacker.index);
+    double accuracy = baseAcc + equipAcc;
+
+    auto checkPointBlank = [&]() {
+        double pbChance
+            = std::exp((accuracy - 4.0 * evasion) / 1000.0);
+        pbChance = std::clamp(pbChance, 0.0, 1.0);
+        std::bernoulli_distribution pbDist(pbChance);
+        if(pbDist(rng)) {
+            if(!attacker.isFriend)
+                friendFormationEfficiency
+                    = 0.9375 * friendFormationEfficiency - 0.0625;
+            else
+                enemyFormationEfficiency
+                    = 0.9375 * enemyFormationEfficiency - 0.0625;
+            QJsonObject log;
+            log["type"] = KP::PointBlankShot;
+            log["clock"] = clock;
+            log["attackerFleet"] = attacker.isFriend;
+            log["attackerShip"] = attacker.index;
+            log["defenderFleet"] = defender.isFriend;
+            log["defenderShip"] = defender.index;
+            log["attackerSlot"] = slotUuid.toString();
+            m_damageLog.append(log);
+        }
+    };
+
+    double evasionChance
+        = std::exp((accuracy - evasion) / 1000.0);
+    evasionChance = std::clamp(evasionChance, 0.0, 1.0);
+
+    std::uniform_real_distribution<double> evadeDist(0.0, 1.0);
+    if(evadeDist(rng) > evasionChance) {
+        if(!isAntagonistFleetSunk(attacker)) {
+            QJsonObject log;
+            log["type"] = KP::AttackSkipped;
+            log["clock"] = clock;
+            log["reason"] = QStringLiteral("evaded");
+            log["attackerFleet"] = attacker.isFriend;
+            log["attackerShip"] = attacker.index;
+            log["defenderFleet"] = defender.isFriend;
+            log["defenderShip"] = defender.index;
+            log["attackerSlot"] = slotUuid.toString();
+            m_damageLog.append(log);
+        }
+        checkPointBlank();
+        scheduleReload();
+        return;
+    }
+
+    double ap = secGunArmorPenetration(attacker.isFriend,
+                                       attacker.index, slotUuid);
+    double sigmoidTerm = ap > 0.0 && armor > 0.0
+                             ? std::log(10.0 * ap / armor)
+                             : -10.0;
+    double sigmoid = sigmoidTerm
+                     / std::hypot(1.0, sigmoidTerm);
+
+    std::uniform_real_distribution<double> damageDist(0.0, 1.0);
+    double v = damageDist(rng);
+
+    if(v >= sigmoid + 0.5) {
+        if(!isAntagonistFleetSunk(attacker)) {
+            QJsonObject log;
+            log["type"] = KP::AttackSkipped;
+            log["clock"] = clock;
+            log["reason"] = QStringLiteral("miss");
+            log["attackerFleet"] = attacker.isFriend;
+            log["attackerShip"] = attacker.index;
+            log["defenderFleet"] = defender.isFriend;
+            log["defenderShip"] = defender.index;
+            log["attackerSlot"] = slotUuid.toString();
+            m_damageLog.append(log);
+        }
+        checkPointBlank();
+        scheduleReload();
+        return;
+    }
+
+    {
+        double w = attacker.isFriend
+                       ? 1.0 + 0.25 * friendFormationEfficiency
+                       : 1.0 + 0.25 * enemyFormationEfficiency;
+        double z = std::max(static_cast<double>(defMaxHP) / 64.0,
+                            64.0);
+        double y = secGunFiringSpeed(attacker.isFriend,
+                                     attacker.index, slotUuid);
+        if(y <= 0.0)
+            y = 1.0;
+        double dpm = static_cast<double>(
+            secEq->attr.value(QStringLiteral("DPM"), 0));
+        if(dpm <= 0.0)
+            dpm = 1.0;
+        std::normal_distribution<double> firepowerDist(
+            10.0 * dpm / y, dpm / 50.0);
+        double u = firepowerDist(rng);
+        if(u <= 0.0)
+            u = 0.0;
+        double x = w * u * z / std::hypot(w * u, z);
+        int totalDmg = static_cast<int>(std::round(x));
+        defDyn->currentHP = std::max(0,
+                                     defDyn->currentHP - totalDmg);
+        {
+            QJsonObject log;
+            log["type"] = KP::SecondaryGunAttack;
+            log["clock"] = clock;
+            log["attackerFleet"] = attacker.isFriend;
+            log["attackerShip"] = attacker.index;
+            log["defenderFleet"] = defender.isFriend;
+            log["defenderShip"] = defender.index;
+            log["attackerSlot"] = slotUuid.toString();
+            log["damage"] = totalDmg;
+            log["defenderHP"] = defDyn->currentHP;
+            m_damageLog.append(log);
+        }
+    }
+
+    checkPointBlank();
     scheduleReload();
 }
