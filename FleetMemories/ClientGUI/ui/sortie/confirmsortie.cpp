@@ -533,62 +533,110 @@ BattleDetailDialog::BattleDetailDialog(
 
         QString line;
         switch(type) {
-        case KP::MainGunAttack:
-            line = QString("MainGun  %1 → %2: %3 dmg%4")
+        case KP::MainGunAttack: {
+            //% "[Main gun] %1 → %2: %3 damage%4"
+            line = qtTrId("battle-report-main-gun")
                        .arg(attName, defName).arg(dmg)
-                       .arg(overp ? QStringLiteral(" (OVER)")
+                       .arg(overp ? qtTrId("battle-report-overpen")
                                   : QString());
             break;
+        }
         case KP::SecondaryGunAttack:
-            line = QString("SecGun   %1 → %2: %3 dmg")
+            //% "[Secondary gun] %1 → %2: %3 damage"
+            line = qtTrId("battle-report-sec-gun")
                        .arg(attName, defName).arg(dmg);
             break;
         case KP::PointBlankShot:
-            line = QString("PtBlank  %1 → %2: -formation")
+            //% "[Point-blank shot] %1 → %2: formation efficiency reduced"
+            line = qtTrId("battle-report-point-blank")
                        .arg(attName, defName);
             break;
         case KP::GunshotCutInAttack: {
             QString cutType = e["cutInType"].toString();
+            //% "Spotting Gun"
+            QString spotLabel = qtTrId("battle-report-spotting-gun");
+            //% "Gun"
+            QString gunLabel = qtTrId("battle-report-gun");
+            QString cutLabel = cutType == QStringLiteral("spotting")
+                                   ? spotLabel : gunLabel;
             double dmgMul = e["damageMultiplier"].toDouble(1.0);
-            line = QString("GunCutIn[%1] %2 → %3: %4 dmg (x%5)")
-                       .arg(cutType, attName, defName)
-                       .arg(dmg).arg(dmgMul);
+            //% "[%1] cut-in  %2 → %3: %4 damage (x%5)"
+            line = qtTrId("battle-report-gun-cutin")
+                       .arg(cutLabel, attName, defName)
+                       .arg(dmg).arg(dmgMul, 0, 'f', 1);
             break;
         }
         case KP::AirTorpedoAttack:
-            line = QString("AirTorp  %1 → %2: %3 dmg")
+            //% "[Air torpedo] %1 → %2: %3 damage"
+            line = qtTrId("battle-report-air-torp")
                        .arg(attName, defName).arg(dmg);
             break;
         case KP::AirDiveAttack:
-            line = QString("AirDive  %1 → %2: %3 dmg")
+            //% "[Air dive bomb] %1 → %2: %3 damage"
+            line = qtTrId("battle-report-air-dive")
                        .arg(attName, defName).arg(dmg);
             break;
         case KP::AirCutInAttack:
-            line = QString("AirCutIn %1 → %2: %3 dmg")
+            //% "[Air cut-in] %1 → %2: %3 damage"
+            line = qtTrId("battle-report-air-cutin")
                        .arg(attName, defName).arg(dmg);
             break;
         case KP::AntiAirPlaneLoss:
             if(!phase.isEmpty())
-                line = QString("AALoss[%1] slot %2: -%3 (%4)")
+                //% "Anti-air loss [%1 phase] slot %2: -%3 (%4 remaining)"
+                line = qtTrId("battle-report-aa-loss-phase")
                            .arg(phase).arg(slot).arg(lost)
                            .arg(remain);
             else
-                line = QString("AALoss   slot %1: -%2 (%3)")
+                //% "Anti-air loss slot %1: -%2 (%3 remaining)"
+                line = qtTrId("battle-report-aa-loss")
                            .arg(slot).arg(lost).arg(remain);
             break;
         case KP::AttackSkipped:
-            line = QString("Skip     %1: %2")
-                       .arg(attName).arg(reason);
+            if((reason == QStringLiteral("evaded")
+                 || reason == QStringLiteral("miss"))
+                && defS >= 0) {
+                //% "Attack skipped (%1): %2 attempted against %3"
+                line = qtTrId("battle-report-skip-def")
+                           .arg(reason, attName, defName);
+            } else {
+                //% "Attack skipped (%1): %2"
+                line = qtTrId("battle-report-skip")
+                           .arg(attName).arg(reason);
+            }
             break;
         case KP::BattlePhaseCommence:
-            line = QString("--[ %1 ]--")
+            line = QStringLiteral("--[ %1 ]--")
                        .arg(phaseLabel(battlePhaseVal));
             break;
-        default:
-            line = QString("Unknown[%1]").arg(type);
+        case KP::AirSuperiorityValue: {
+            double fas = e["friendAS"].toDouble();
+            double eas = e["enemyAS"].toDouble();
+            double coeff = e["coefficient"].toDouble();
+            //% "Air superiority: Friend %1, Enemy %2, Coefficient %3"
+            line = qtTrId("battle-report-air-sup")
+                       .arg(fas, 0, 'f', 1)
+                       .arg(eas, 0, 'f', 1)
+                       .arg(coeff, 0, 'f', 3);
             break;
         }
-        if(type != KP::BattlePhaseCommence)
+        case KP::FormationEfficiencyValue: {
+            double feff = e["friendEff"].toDouble();
+            double eeff = e["enemyEff"].toDouble();
+            //% "Formation efficiency: Friend %1, Enemy %2"
+            line = qtTrId("battle-report-formation-eff")
+                       .arg(feff, 0, 'f', 3)
+                       .arg(eeff, 0, 'f', 3);
+            break;
+        }
+        default:
+            //% "Unknown battle action type %1"
+            line = qtTrId("battle-report-unknown").arg(type);
+            break;
+        }
+        if(type != KP::BattlePhaseCommence
+            && type != KP::AirSuperiorityValue
+            && type != KP::FormationEfficiencyValue)
             line = QString("T+%1  %2").arg(clockT).arg(line);
         lines.append(line);
     }

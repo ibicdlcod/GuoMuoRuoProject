@@ -4311,22 +4311,22 @@ Great at battle and bad at politics--so cool!</source>
         <translation type="unfinished">虚构舰</translation>
     </message>
     <message id="NormalFleet">
-        <location filename="../Protocol/kp.h" line="769"/>
+        <location filename="../Protocol/kp.h" line="771"/>
         <source>Normal</source>
         <translation>通常舰队</translation>
     </message>
     <message id="CarrierFleet">
-        <location filename="../Protocol/kp.h" line="771"/>
+        <location filename="../Protocol/kp.h" line="773"/>
         <source>Carrier</source>
         <translation>空母机动</translation>
     </message>
     <message id="SurfaceFleet">
-        <location filename="../Protocol/kp.h" line="773"/>
+        <location filename="../Protocol/kp.h" line="775"/>
         <source>Surface</source>
         <translation>水上打击</translation>
     </message>
     <message id="TransportFleet">
-        <location filename="../Protocol/kp.h" line="775"/>
+        <location filename="../Protocol/kp.h" line="777"/>
         <source>Transport</source>
         <translation>输送护卫</translation>
     </message>
@@ -4924,6 +4924,92 @@ Great at battle and bad at politics--so cool!</source>
         <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="526"/>
         <source>Night Battle</source>
         <translation type="unfinished">夜战</translation>
+    </message>
+    <message id="battle-report-main-gun">
+        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="538"/>
+        <source>[Main gun] %1 → %2: %3 damage%4</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="battle-report-overpen">
+        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="540"/>
+        <source></source>
+        <translation type="unfinished">无</translation>
+    </message>
+    <message id="battle-report-sec-gun">
+        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="546"/>
+        <source>[Secondary gun] %1 → %2: %3 damage</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="battle-report-point-blank">
+        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="551"/>
+        <source>[Point-blank shot] %1 → %2: formation efficiency reduced</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="battle-report-spotting-gun">
+        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="557"/>
+        <source>Spotting Gun</source>
+        <oldsource>Spotting GunGun</oldsource>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="battle-report-gun">
+        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="559"/>
+        <source>Gun</source>
+        <translation type="unfinished">无</translation>
+    </message>
+    <message id="battle-report-gun-cutin">
+        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="564"/>
+        <source>[%1] cut-in  %2 → %3: %4 damage (x%5)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="battle-report-air-torp">
+        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="571"/>
+        <source>[Air torpedo] %1 → %2: %3 damage</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="battle-report-air-dive">
+        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="576"/>
+        <source>[Air dive bomb] %1 → %2: %3 damage</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="battle-report-air-cutin">
+        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="581"/>
+        <source>[Air cut-in] %1 → %2: %3 damage</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="battle-report-aa-loss-phase">
+        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="587"/>
+        <source>Anti-air loss [%1 phase] slot %2: -%3 (%4 remaining)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="battle-report-aa-loss">
+        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="592"/>
+        <source>Anti-air loss slot %1: -%2 (%3 remaining)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="battle-report-skip-def">
+        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="600"/>
+        <source>Attack skipped (%1): %2 attempted against %3</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="battle-report-skip">
+        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="604"/>
+        <source>Attack skipped (%1): %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="battle-report-air-sup">
+        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="617"/>
+        <source>Air superiority: Friend %1, Enemy %2, Coefficient %3</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="battle-report-formation-eff">
+        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="627"/>
+        <source>Formation efficiency: Friend %1, Enemy %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="battle-report-unknown">
+        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="634"/>
+        <source>Unknown battle action type %1</source>
+        <translation type="unfinished"></translation>
     </message>
     <message id="battle-result-title">
         <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="91"/>

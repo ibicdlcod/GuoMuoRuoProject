@@ -101,6 +101,7 @@ void MapDetail::displayDetailedMap(Map *map) {
 
     QString enName = map->localNames.value("en_US");
     enName.replace(QLatin1String(" "), QLatin1String("_"));
+    enName.remove(QLatin1Char('\''));
     QString path = QString(":/resources/map/geographical/map%1_%2.png")
                        .arg(map->id).arg(enName);
     QImage geoImage(path);
