@@ -508,6 +508,7 @@ BattleDetailDialog::BattleDetailDialog(
         int battlePhaseVal = e["battlePhase"].toInt(-1);
         QString phase = e["phase"].toString();
         int clockT = e["clock"].toInt(0);
+        int cutInType = e["cutInType"].toInt(-1);
 
         auto phaseLabel = [](int pv) -> QString {
             switch(pv) {
@@ -563,8 +564,10 @@ BattleDetailDialog::BattleDetailDialog(
             //% "[Main gun] %1 → %2: %3 damage%4"
             line = qtTrId("battle-report-main-gun")
                        .arg(attName, defName).arg(dmg)
-                       .arg(overp ? qtTrId("battle-report-overpen")
-                                  : QString());
+                       .arg(overp
+                                //% " (Overpenetration)"
+                                ? qtTrId("battle-report-overpen")
+                                : QString());
             break;
         }
         case KP::SecondaryGunAttack:
@@ -578,12 +581,11 @@ BattleDetailDialog::BattleDetailDialog(
                        .arg(attName, defName);
             break;
         case KP::GunshotCutInAttack: {
-            QString cutType = e["cutInType"].toString();
             //% "Spotting Gun"
             QString spotLabel = qtTrId("battle-report-spotting-gun");
             //% "Gun"
             QString gunLabel = qtTrId("battle-report-gun");
-            QString cutLabel = cutType == QStringLiteral("spotting")
+            QString cutLabel = cutInType == KP::SpottingFire
                                    ? spotLabel : gunLabel;
             double dmgMul = e["damageMultiplier"].toDouble(1.0);
             //% "[%1] cut-in  %2 → %3: %4 damage (x%5)"
@@ -699,6 +701,20 @@ BattleDetailDialog::BattleDetailDialog(
             //% "Guided strike (recon) triggered: air attack power x%1"
             line = qtTrId("battle-report-guided-strike")
                        .arg(mul, 0, 'f', 2);
+            break;
+        }
+        case KP::TorpedoAttack: {
+            double dmgMul = e["damageMultiplier"].toDouble(0.0);
+            if(dmgMul > 0.0) {
+                //% "[Torpedo cut-in] %1 → %2: %3 damage (x%4)"
+                line = qtTrId("battle-report-torp-cutin")
+                           .arg(attName, defName).arg(dmg)
+                           .arg(dmgMul, 0, 'f', 2);
+            } else {
+                //% "[Torpedo] %1 → %2: %3 damage"
+                line = qtTrId("battle-report-torpedo")
+                           .arg(attName, defName).arg(dmg);
+            }
             break;
         }
         default:

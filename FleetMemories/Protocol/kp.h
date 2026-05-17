@@ -730,7 +730,8 @@ enum BattleActionType {
     GunshotCutInAttack = 9,
     AirSuperiorityValue = 10,
     FormationEfficiencyValue = 11,
-    GuidedStrikeTrigger = 12
+    GuidedStrikeTrigger = 12,
+    TorpedoAttack = 13
 };
 Q_ENUM_NS(BattleActionType)
 
@@ -742,6 +743,14 @@ enum SkipReason {
     AllPlanesLost = 4
 };
 Q_ENUM_NS(SkipReason)
+
+enum CutInType {
+    SpottingFire = 0,
+    PlainGun = 1,
+    PlainTorp = 2,
+    GunTorp = 3
+};
+Q_ENUM_NS(CutInType)
 
 enum BattlePhase {
     AirBattlePhase = 0,

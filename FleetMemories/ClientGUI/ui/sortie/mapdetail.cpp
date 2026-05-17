@@ -277,9 +277,9 @@ void MapDetail::changeCurrentNode(const MapNode &node) {
             QPen pen(QColor(0, 128, 255));
             pen.setWidth(circleBorderSize);
             painter.setPen(pen);
-            painter.drawEllipse(node.x * width() - circleSize,
-                                node.y * height() - circleSize,
-                                circleSize * 2, circleSize * 2);
+            painter.drawEllipse(node.x * width() - circleSize / 2,
+                                node.y * height() - circleSize / 2,
+                                circleSize, circleSize);
         } break;
         case KP::DISASTER: {
             painter.setBrush(QBrush(Qt::gray));

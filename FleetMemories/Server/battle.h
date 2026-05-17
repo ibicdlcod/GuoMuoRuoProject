@@ -32,6 +32,7 @@ public:
         AirAttack,
         MainGunAttack,
         SecondaryGunAttack,
+        TorpedoAttack,
     };
 
     struct Event {
@@ -85,6 +86,8 @@ private:
     std::vector<ConcealmentStatus> enemyFleetConcealmentStatus;
     std::vector<bool> friendReducedConcealment;
     std::vector<bool> enemyReducedConcealment;
+    std::vector<clockTime> friendSubTorpLastFire;
+    std::vector<clockTime> enemySubTorpLastFire;
 
     /* ——— command / orders —————————————————————————————————— */
 
@@ -115,6 +118,7 @@ private:
     double friendFormationEfficiency;
     double enemyFormationEfficiency;
     double reconGuidedStrikeMultiplier;
+    bool midgetGuidedStrikeTriggered;
     std::vector<AirSquadron> friendAirSquadrons;
     std::vector<AirSquadron> enemyAirSquadrons;
 
@@ -142,6 +146,7 @@ private:
     void computeAirSuperiority();
     void computeFormationEfficiency();
     void processReconGuidedStrike();
+    void processMidgetGuidedStrike();
     double maxEnemyFighterAA(const FleetInfo *fleet) const;
     double fleetAirSuperiority(const FleetInfo *fleet,
                                const FleetInfo *enemyFleet) const;
@@ -207,6 +212,22 @@ private:
                                    QUuid slotUuid);
     bool processGunshotCutIn(FriendOrEnemyIndex attacker);
     bool isAntagonistFleetSunk(FriendOrEnemyIndex attacker) const;
+
+    /* ——— torpedo —————————————————————————————————————————————— */
+
+    bool hasTorpedo(bool isFriend, int index) const;
+    bool hasTorpReloadingDevice(bool isFriend, int index) const;
+    double torpBaseAccuracy(bool isFriend, int index) const;
+    double maxTorpedoStat(bool isFriend, int index) const;
+    double torpCombinedAccuracy(bool isFriend, int index) const;
+    int selectTorpedoTarget(int attackerIndex, bool isFriend) const;
+    void setupTorpedoAttacks(clockTime phaseStart,
+                             clockTime phaseLength);
+    void processTorpedoAttack(FriendOrEnemyIndex attacker);
+    bool processTorpedoCutIn(FriendOrEnemyIndex attacker);
+    void scheduleSubTorp(FriendOrEnemyIndex index);
+    void cancelSubTorpEvents(FriendOrEnemyIndex index);
+    bool isSubmarine(bool isFriend, int index) const;
 
     /* ——— disengaging / extra‑battle ————————————————————————— */
 

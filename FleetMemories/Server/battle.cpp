@@ -19,6 +19,7 @@ void Battle::battleProcessor(FleetInfo *friendf, FleetInfo *enemyf,
     this->isNightCommence = isNightCommence;
     m_damageLog = QJsonArray();
     reconGuidedStrikeMultiplier = 1.0;
+    midgetGuidedStrikeTriggered = false;
     friendGoal = static_cast<KP::FriendFleetPriority>(
         battlePlan.value("friendFleetPriority").toInt(0));
     enemyGoal = static_cast<KP::EnemyFleetPriority>(
@@ -59,6 +60,8 @@ void Battle::battleProcessor(FleetInfo *friendf, FleetInfo *enemyf,
     }
     friendReducedConcealment.resize(KP::combinedFleetSize, false);
     enemyReducedConcealment.resize(KP::combinedFleetSize, false);
+    friendSubTorpLastFire.resize(KP::combinedFleetSize, 0);
+    enemySubTorpLastFire.resize(KP::combinedFleetSize, 0);
     for(int i = 0; i < KP::combinedFleetSize; ++i) {
         if(i < currentFriendFleet->ships.size() && currentFriendFleet->ships[i]) {
             decideHidden({true, i});
@@ -259,7 +262,9 @@ void Battle::airBattle() {
     computeAirSuperiority();
     collectAirSquadrons();
     reconGuidedStrikeMultiplier = 1.0;
+    midgetGuidedStrikeTriggered = false;
     processReconGuidedStrike();
+    processMidgetGuidedStrike();
     processS1PlaneLoss();
     processS2PlaneLoss();
     processS3AACutIn();
@@ -288,6 +293,64 @@ void Battle::approachingPhase() {
         log["battlePhase"] = static_cast<int>(KP::ApproachingPhase);
         m_damageLog.append(log);
     }
+
+    if(midgetGuidedStrikeTriggered) {
+        auto fireApproachTorp = [&](bool isFriend) {
+            FleetInfo *fleet = fleetOf(isFriend);
+            for(int i = 0;
+                 i < static_cast<int>(fleet->ships.size());
+                 ++i) {
+                Ship *ship = fleet->ships[i];
+                ShipDynamic *dyn
+                    = fleet->shipDynamics[i].get();
+                if(!ship || !dyn || dyn->fleetFled
+                    || dyn->currentHP <= 0)
+                    continue;
+                int typeMask = ship->getId() & 0x000f0000;
+                if(typeMask == 0x00070000)
+                    continue;
+                if(!hasTorpedo(isFriend, i))
+                    continue;
+                double x = 0.0;
+                {
+                    QMap<QString, int> attrs = shipAttrOf(
+                        isFriend, i);
+                    x = static_cast<double>(
+                        attrs.value(QStringLiteral("Torpedo"),
+                                    0));
+                }
+                {
+                    auto addEquipTorp = [&](const QUuid &uuid) {
+                        Equipment *eq
+                            = fleet->equipMap.value(uuid,
+                                                    nullptr);
+                        if(!eq || !eq->type.isTorp())
+                            return;
+                        int et = eq->attr.value(
+                            QStringLiteral("Torpedo"), 0);
+                        if(et > 0)
+                            x += static_cast<double>(et);
+                    };
+                    for(const QUuid &uuid : dyn->slotEquip)
+                        addEquipTorp(uuid);
+                    addEquipTorp(dyn->slotEquipEx);
+                }
+                double preEvasion
+                    = 1.0
+                      - x / std::hypot(4096.0, x);
+                preEvasion
+                    = std::clamp(preEvasion, 0.0, 1.0);
+                std::bernoulli_distribution evadeDist(
+                    preEvasion);
+                if(evadeDist(rng))
+                    continue;
+                processTorpedoAttack({isFriend, i});
+            }
+        };
+        fireApproachTorp(true);
+        fireApproachTorp(false);
+    }
+
     setupApproachingGunshots();
     advanceClockTime(20);
 }
@@ -304,6 +367,7 @@ void Battle::centralPhase() {
     }
     setupAirReloading(20, 90);
     setupSecondaryGunshots(20, 90);
+    setupTorpedoAttacks(20, 90);
     advanceClockTime(90);
 }
 
@@ -317,6 +381,15 @@ void Battle::disengagingPhase() {
         log["battlePhase"] = static_cast<int>(KP::DisengagingPhase);
         m_damageLog.append(log);
     }
+
+    for(int i = 0;
+         i < static_cast<int>(currentFriendFleet->ships.size());
+         ++i)
+        processTorpedoAttack({true, i});
+    for(int i = 0;
+         i < static_cast<int>(currentEnemyFleet->ships.size());
+         ++i)
+        processTorpedoAttack({false, i});
 
     /* Disengaging phase — night battle decision
      * — see doc/worldview_and_mechanics/9.p4-disengage.md */
@@ -383,6 +456,778 @@ void Battle::disengagingPhase() {
     }
 
     advanceClockTime(20);
+}
+
+/* Torpedo attack — see doc/worldview_and_mechanics/9.a3-torpedoattack.md */
+
+bool Battle::hasTorpedo(bool isFriend, int index) const {
+    FleetInfo *fleet = fleetOf(isFriend);
+    if(index < 0 || index >= static_cast<int>(fleet->ships.size()))
+        return false;
+    ShipDynamic *dyn = fleet->shipDynamics[index].get();
+    if(!dyn || dyn->fleetFled)
+        return false;
+    auto check = [&](const QUuid &uuid) {
+        Equipment *eq = fleet->equipMap.value(uuid, nullptr);
+        return eq && eq->type.isTorp();
+    };
+    for(const QUuid &uuid : dyn->slotEquip)
+        if(check(uuid))
+            return true;
+    return check(dyn->slotEquipEx);
+}
+
+bool Battle::hasTorpReloadingDevice(bool isFriend,
+                                    int index) const {
+    FleetInfo *fleet = fleetOf(isFriend);
+    if(index < 0 || index >= static_cast<int>(fleet->ships.size()))
+        return false;
+    ShipDynamic *dyn = fleet->shipDynamics[index].get();
+    if(!dyn || dyn->fleetFled)
+        return false;
+    auto check = [&](const QUuid &uuid) {
+        Equipment *eq = fleet->equipMap.value(uuid, nullptr);
+        if(!eq || !eq->type.isTorp())
+            return false;
+        return eq->attr.value(QStringLiteral("Firingspeed"),
+                              0) > 0;
+    };
+    for(const QUuid &uuid : dyn->slotEquip)
+        if(check(uuid))
+            return true;
+    return check(dyn->slotEquipEx);
+}
+
+double Battle::torpBaseAccuracy(bool isFriend, int index) const {
+    FleetInfo *fleet = fleetOf(isFriend);
+    if(index < 0 || index >= static_cast<int>(fleet->ships.size()))
+        return 0.0;
+    ShipDynamic *dyn = fleet->shipDynamics[index].get();
+    if(!dyn || dyn->fleetFled)
+        return 0.0;
+    int lv = Ship::getLevel(dyn->exp);
+    if(isNight) {
+        double ra = (lv + 25.0) / 100.0;
+        return 1000.0 * ra / std::hypot(1.0, ra);
+    }
+    double ra = (lv + 50.0) / 100.0;
+    return 250.0 * ra / std::hypot(1.0, ra);
+}
+
+double Battle::maxTorpedoStat(bool isFriend, int index) const {
+    FleetInfo *fleet = fleetOf(isFriend);
+    if(index < 0 || index >= static_cast<int>(fleet->ships.size()))
+        return 0.0;
+    ShipDynamic *dyn = fleet->shipDynamics[index].get();
+    if(!dyn || dyn->fleetFled)
+        return 0.0;
+    double result = 0.0;
+    auto check = [&](const QUuid &uuid) {
+        Equipment *eq = fleet->equipMap.value(uuid, nullptr);
+        if(!eq || !eq->type.isTorp())
+            return;
+        int t = eq->attr.value(QStringLiteral("Torpedo"), 0);
+        result = std::max(result, static_cast<double>(t));
+    };
+    for(const QUuid &uuid : dyn->slotEquip)
+        check(uuid);
+    check(dyn->slotEquipEx);
+    return result;
+}
+
+double Battle::torpCombinedAccuracy(bool isFriend,
+                                    int index) const {
+    FleetInfo *fleet = fleetOf(isFriend);
+    if(index < 0 || index >= static_cast<int>(fleet->ships.size()))
+        return 0.0;
+    ShipDynamic *dyn = fleet->shipDynamics[index].get();
+    if(!dyn || dyn->fleetFled)
+        return 0.0;
+    double result = 0.0;
+    auto check = [&](const QUuid &uuid) {
+        Equipment *eq = fleet->equipMap.value(uuid, nullptr);
+        if(!eq || !eq->type.isTorp())
+            return;
+        result += static_cast<double>(
+            eq->attr.value(QStringLiteral("Torpedoaccuracy"),
+                           0));
+    };
+    for(const QUuid &uuid : dyn->slotEquip)
+        check(uuid);
+    check(dyn->slotEquipEx);
+    return result;
+}
+
+int Battle::selectTorpedoTarget(int attackerIndex,
+                               bool isFriend) const {
+    FleetInfo *defFleet = fleetOf(!isFriend);
+    std::vector<int> visible;
+    for(int i = 0;
+         i < static_cast<int>(defFleet->ships.size()); ++i) {
+        Ship *ship = defFleet->ships[i];
+        ShipDynamic *dyn = defFleet->shipDynamics[i].get();
+        if(!ship || !dyn || dyn->fleetFled
+            || dyn->currentHP <= 0)
+            continue;
+        auto &conceal
+            = isFriend ? enemyFleetConcealmentStatus
+                       : friendFleetConcealmentStatus;
+        if(conceal[i] != ConcealmentStatus::Visible)
+            continue;
+        /* Torpedoes cannot target submarines or land */
+        int typeMask = ship->getId() & 0x000f0000;
+        if(typeMask == 0x00070000 || typeMask == 0x000c0000)
+            continue;
+        visible.push_back(i);
+    }
+    if(visible.empty())
+        return -1;
+    return visible[std::uniform_int_distribution<int>(
+        0, static_cast<int>(visible.size()) - 1)(rng)];
+}
+
+bool Battle::processTorpedoCutIn(FriendOrEnemyIndex attacker) {
+    FleetInfo *attFleet = fleetOf(attacker.isFriend);
+    if(attacker.index < 0
+        || attacker.index >= static_cast<int>(attFleet->ships.size()))
+        return false;
+    Ship *attShip = attFleet->ships[attacker.index];
+    ShipDynamic *attDyn
+        = attFleet->shipDynamics[attacker.index].get();
+    if(!attShip || !attDyn || attDyn->fleetFled
+        || attDyn->currentHP <= 0)
+        return false;
+
+    std::vector<Equipment *> equips;
+    auto addEquip = [&](const QUuid &uuid) {
+        Equipment *eq = attFleet->equipMap.value(uuid, nullptr);
+        if(eq)
+            equips.push_back(eq);
+    };
+    for(const QUuid &uuid : attDyn->slotEquip)
+        addEquip(uuid);
+    addEquip(attDyn->slotEquipEx);
+
+    double fCoeff = attacker.isFriend
+                        ? friendFormationEfficiency
+                        : enemyFormationEfficiency;
+
+    /* Plain Torpedo cut-in */
+    struct CutInCandidate {
+        Equipment *e1;
+        Equipment *e2;
+        double dmgMul;
+        double accMul;
+    };
+    std::vector<CutInCandidate> candidates;
+    for(size_t i = 0; i < equips.size(); ++i) {
+        for(size_t j = i + 1; j < equips.size(); ++j) {
+            Equipment *a = equips[i];
+            Equipment *b = equips[j];
+            /* Torp + Torp */
+            if(a->type.isTorp() && b->type.isTorp()
+                && !a->type.isTorpBomber()
+                && !b->type.isTorpBomber())
+                candidates.push_back({a, b, 1.1, 1.2});
+            /* Sub Torp + Sub Equip */
+            /* Submarine equipment identified by type mask or classification */
+        }
+    }
+    std::sort(candidates.begin(), candidates.end(),
+              [](const CutInCandidate &x, const CutInCandidate &y) {
+                  return x.dmgMul > y.dmgMul;
+              });
+
+    auto primaryStatOf = [](Equipment *eq) -> double {
+        QString attrName = eq->type.getPrimaryAttr();
+        if(attrName == QStringLiteral("Tech")
+            || attrName.contains(QStringLiteral("Father"))
+            || attrName.contains(QStringLiteral("Mother"))
+            || attrName
+                   == QStringLiteral("Disallowmassproduction"))
+            return 0.0;
+        return static_cast<double>(eq->attr.value(attrName, 0));
+    };
+
+    for(const auto &cand : candidates) {
+        double p1 = primaryStatOf(cand.e1) / 100.0;
+        double p2 = primaryStatOf(cand.e2) / 100.0;
+        double base = std::max(0.0, (fCoeff + 1.0) / 4.0);
+        double a1 = base * p1 / std::hypot(1.0, p1);
+        double a2 = base * p2 / std::hypot(1.0, p2);
+        double triggerChance = a1 * a2;
+        triggerChance = std::clamp(triggerChance, 0.0, 1.0);
+        std::bernoulli_distribution trigDist(triggerChance);
+        if(!trigDist(rng))
+            continue;
+
+        double dmgMul = cand.dmgMul;
+        double accMul = cand.accMul;
+
+        int targetIdx = selectTorpedoTarget(attacker.index,
+                                            attacker.isFriend);
+        if(targetIdx < 0)
+            return false;
+
+        FriendOrEnemyIndex defender{!attacker.isFriend,
+                                    targetIdx};
+        FleetInfo *defFleet = fleetOf(defender.isFriend);
+        Ship *defShip = defFleet->ships[defender.index];
+        ShipDynamic *defDyn
+            = defFleet->shipDynamics[defender.index].get();
+        if(!defShip || !defDyn || defDyn->fleetFled
+            || defDyn->currentHP <= 0)
+            return false;
+
+        QMap<QString, int> defAttrs
+            = shipAttrOf(defender.isFriend, defender.index);
+        double evasion
+            = defAttrs.value(QStringLiteral("Evasion"), 0);
+        double armor
+            = defAttrs.value(QStringLiteral("Armor"), 0);
+        if(armor <= 0)
+            armor = 1;
+        int defMaxHP
+            = defShip->attr.value(QStringLiteral("Hitpoints"), 1);
+
+        double baseAcc = torpBaseAccuracy(attacker.isFriend,
+                                          attacker.index);
+        double equipAcc = torpCombinedAccuracy(
+            attacker.isFriend, attacker.index);
+        double accuracy = (baseAcc + equipAcc) * accMul;
+
+        double evasionChance
+            = std::exp((accuracy - evasion) / 1000.0);
+        evasionChance = std::clamp(evasionChance, 0.0, 1.0);
+        std::uniform_real_distribution<double> evadeDist(
+            0.0, 1.0);
+        if(evadeDist(rng) > evasionChance)
+            return false;
+
+        double b = 0.0;
+        {
+            QMap<QString, int> attrs = shipAttrOf(
+                attacker.isFriend, attacker.index);
+            b = static_cast<double>(
+                attrs.value(QStringLiteral("Torpedo"), 0));
+        }
+        {
+            auto addEquipTorp = [&](const QUuid &uuid) {
+                Equipment *eq
+                    = attFleet->equipMap.value(uuid, nullptr);
+                if(!eq || !eq->type.isTorp())
+                    return;
+                int et
+                    = eq->attr.value(QStringLiteral("Torpedo"),
+                                     0);
+                if(et > 0)
+                    b += static_cast<double>(et);
+            };
+            for(const QUuid &uuid : attDyn->slotEquip)
+                addEquipTorp(uuid);
+            addEquipTorp(attDyn->slotEquipEx);
+        }
+        double r = b * b / std::hypot(b, armor);
+        std::normal_distribution<double> firepowerDist(
+            r, r / 2.0);
+        double u = firepowerDist(rng);
+        u = std::max(u, 0.0);
+        double w = attacker.isFriend
+                       ? 1.0
+                             + 0.5 * friendFormationEfficiency
+                       : 1.0
+                             + 0.5 * enemyFormationEfficiency;
+        double z = std::max(
+            static_cast<double>(defMaxHP) / 8.0, 512.0);
+        double x = w * u * z / std::hypot(w * u, z);
+        int totalDmg = static_cast<int>(std::round(
+            std::round(x * dmgMul)));
+        defDyn->currentHP
+            = std::max(0, defDyn->currentHP - totalDmg);
+
+        {
+            QJsonObject log;
+            log["type"] = KP::TorpedoAttack;
+            log["clock"] = clock;
+            log["attackerFleet"] = attacker.isFriend;
+            log["attackerShip"] = attacker.index;
+            log["defenderFleet"] = defender.isFriend;
+            log["defenderShip"] = defender.index;
+            log["damage"] = totalDmg;
+            log["defenderHP"] = defDyn->currentHP;
+            log["damageMultiplier"] = dmgMul;
+            log["accuracyMultiplier"] = accMul;
+            log["cutInType"] = static_cast<int>(KP::PlainTorp);
+            m_damageLog.append(log);
+        }
+        return true;
+    }
+
+    /* Gun-Torpedo cut-in */
+    struct GunTorpCandidate {
+        Equipment *gun;
+        Equipment *torp;
+        double dmgMul;
+        double accMul;
+    };
+    std::vector<GunTorpCandidate> gtCandidates;
+    for(Equipment *gun : equips) {
+        if(!gun->type.isMainGun() && !gun->type.isSecGun())
+            continue;
+        for(Equipment *torp : equips) {
+            if(!torp->type.isTorp() || torp->type.isTorpBomber())
+                continue;
+            if(gun->type.isMainGun())
+                gtCandidates.push_back({gun, torp, 1.07, 1.2});
+            else if(gun->type.isSecGun())
+                gtCandidates.push_back({gun, torp, 1.02, 1.2});
+        }
+    }
+    std::sort(gtCandidates.begin(), gtCandidates.end(),
+              [](const GunTorpCandidate &x,
+                 const GunTorpCandidate &y) {
+                  return x.dmgMul > y.dmgMul;
+              });
+
+    for(const auto &cand : gtCandidates) {
+        double pGun = primaryStatOf(cand.gun);
+        double pTorp = primaryStatOf(cand.torp);
+        if(cand.gun->type.isSecGun())
+            pGun /= 50.0;
+        else
+            pGun /= 100.0;
+        pTorp /= 100.0;
+
+        double base = std::max(0.0, (fCoeff + 1.0) / 2.0);
+        double a1 = base * pGun / std::hypot(1.0, pGun);
+        double a2 = base * pTorp / std::hypot(1.0, pTorp);
+        double triggerChance = a1 * a2;
+        triggerChance = std::clamp(triggerChance, 0.0, 1.0);
+        std::bernoulli_distribution trigDist(triggerChance);
+        if(!trigDist(rng))
+            continue;
+
+        double dmgMul = cand.dmgMul;
+        double accMul = cand.accMul;
+
+        int targetIdx = selectTorpedoTarget(attacker.index,
+                                            attacker.isFriend);
+        if(targetIdx < 0)
+            return false;
+
+        FriendOrEnemyIndex defender{!attacker.isFriend,
+                                    targetIdx};
+        FleetInfo *defFleet = fleetOf(defender.isFriend);
+        Ship *defShip = defFleet->ships[defender.index];
+        ShipDynamic *defDyn
+            = defFleet->shipDynamics[defender.index].get();
+        if(!defShip || !defDyn || defDyn->fleetFled
+            || defDyn->currentHP <= 0)
+            return false;
+
+        QMap<QString, int> defAttrs
+            = shipAttrOf(defender.isFriend, defender.index);
+        double evasion
+            = defAttrs.value(QStringLiteral("Evasion"), 0);
+        double armor
+            = defAttrs.value(QStringLiteral("Armor"), 0);
+        if(armor <= 0)
+            armor = 1;
+        int defMaxHP
+            = defShip->attr.value(QStringLiteral("Hitpoints"), 1);
+
+        /* Torpedo accuracy calculation */
+        double baseTorpAcc = torpBaseAccuracy(
+            attacker.isFriend, attacker.index);
+        double equipTorpAcc = torpCombinedAccuracy(
+            attacker.isFriend, attacker.index);
+        double torpAccuracy = (baseTorpAcc + equipTorpAcc)
+                              * accMul;
+
+        double evasionChance
+            = std::exp((torpAccuracy - evasion) / 1000.0);
+        evasionChance = std::clamp(evasionChance, 0.0, 1.0);
+        std::uniform_real_distribution<double> evadeDist(
+            0.0, 1.0);
+        if(evadeDist(rng) > evasionChance)
+            return false;
+
+        int totalDmg = 0;
+
+        /* Gun part */
+        {
+            QMap<QString, int> attrs = shipAttrOf(
+                attacker.isFriend, attacker.index);
+            double dpm = attrs.value(QStringLiteral("DPM"), 0);
+            {
+                auto addEquipDPM = [&](const QUuid &uuid) {
+                    Equipment *eq
+                        = attFleet->equipMap.value(uuid,
+                                                   nullptr);
+                    if(!eq)
+                        return;
+                    int edpm
+                        = eq->attr.value(
+                            QStringLiteral("DPM"), 0);
+                    if(edpm > 0)
+                        dpm += static_cast<double>(edpm);
+                };
+                for(const QUuid &uuid : attDyn->slotEquip)
+                    addEquipDPM(uuid);
+                addEquipDPM(attDyn->slotEquipEx);
+            }
+            if(dpm <= 0.0)
+                dpm = 1.0;
+
+            double ap = cand.gun->type.isMainGun()
+                            ? maxMainGunArmorPenetration(
+                                  attacker.isFriend,
+                                  attacker.index)
+                            : secGunArmorPenetration(
+                                  attacker.isFriend,
+                                  attacker.index,
+                                  attDyn->slotEquip.front());
+            double sigmoidTerm
+                = ap > 0.0 && armor > 0.0
+                      ? std::log(10.0 * ap / armor)
+                      : -10.0;
+            double sigmoid = sigmoidTerm
+                             / std::hypot(1.0, sigmoidTerm);
+            std::uniform_real_distribution<double>
+                damageDist(0.0, 1.0);
+            double v = damageDist(rng);
+            if(v < sigmoid + 0.5) {
+                double wGun = attacker.isFriend
+                                  ? 1.0
+                                        + 0.25
+                                              * friendFormationEfficiency
+                                  : 1.0
+                                        + 0.25
+                                              * enemyFormationEfficiency;
+                double zGun = std::max(
+                    static_cast<double>(defMaxHP) / 16.0,
+                    256.0);
+                double y = cand.gun->type.isMainGun()
+                               ? maxMainGunFiringSpeed(
+                                     attacker.isFriend,
+                                     attacker.index)
+                               : secGunFiringSpeed(
+                                     attacker.isFriend,
+                                     attacker.index,
+                                     attDyn->slotEquip.front());
+                if(y <= 0.0)
+                    y = 1.0;
+                std::normal_distribution<double> fpDist(
+                    10.0 * dpm / y, dpm / 50.0);
+                double ug = fpDist(rng);
+                ug = std::max(ug, 0.0);
+                double xGun = wGun * ug * zGun
+                              / std::hypot(wGun * ug, zGun);
+                totalDmg += static_cast<int>(
+                    std::round(xGun));
+            }
+        }
+
+        /* Torpedo part */
+        {
+            double b2 = 0.0;
+            {
+                QMap<QString, int> attrs = shipAttrOf(
+                    attacker.isFriend, attacker.index);
+                b2 = static_cast<double>(
+                    attrs.value(QStringLiteral("Torpedo"), 0));
+            }
+            {
+                auto addEquipTorp2 = [&](const QUuid &uuid) {
+                    Equipment *eq
+                        = attFleet->equipMap.value(uuid,
+                                                   nullptr);
+                    if(!eq || !eq->type.isTorp())
+                        return;
+                    int et = eq->attr.value(
+                        QStringLiteral("Torpedo"), 0);
+                    if(et > 0)
+                        b2 += static_cast<double>(et);
+                };
+                for(const QUuid &uuid : attDyn->slotEquip)
+                    addEquipTorp2(uuid);
+                addEquipTorp2(attDyn->slotEquipEx);
+            }
+            double r2 = b2 * b2 / std::hypot(b2, armor);
+            std::normal_distribution<double> fpDist2(
+                r2, r2 / 2.0);
+            double ut = fpDist2(rng);
+            ut = std::max(ut, 0.0);
+            double wTorp = attacker.isFriend
+                               ? 1.0
+                                     + 0.5
+                                           * friendFormationEfficiency
+                               : 1.0
+                                     + 0.5
+                                           * enemyFormationEfficiency;
+            double zTorp = std::max(
+                static_cast<double>(defMaxHP) / 8.0, 512.0);
+            double xTorp = wTorp * ut * zTorp
+                           / std::hypot(wTorp * ut, zTorp);
+            totalDmg += static_cast<int>(
+                std::round(xTorp));
+        }
+
+        totalDmg = static_cast<int>(
+            std::round(totalDmg * dmgMul));
+        defDyn->currentHP
+            = std::max(0, defDyn->currentHP - totalDmg);
+
+        {
+            QJsonObject log;
+            log["type"] = KP::TorpedoAttack;
+            log["clock"] = clock;
+            log["attackerFleet"] = attacker.isFriend;
+            log["attackerShip"] = attacker.index;
+            log["defenderFleet"] = defender.isFriend;
+            log["defenderShip"] = defender.index;
+            log["damage"] = totalDmg;
+            log["defenderHP"] = defDyn->currentHP;
+            log["damageMultiplier"] = dmgMul;
+            log["accuracyMultiplier"] = accMul;
+            log["cutInType"]
+                = QStringLiteral("gun-torp");
+            m_damageLog.append(log);
+        }
+        return true;
+    }
+
+    return false;
+}
+
+bool Battle::isSubmarine(bool isFriend, int index) const {
+    FleetInfo *fleet = fleetOf(isFriend);
+    if(index < 0 || index >= static_cast<int>(fleet->ships.size()))
+        return false;
+    Ship *ship = fleet->ships[index];
+    if(!ship)
+        return false;
+    return (ship->getId() & 0x000f0000) == 0x00070000;
+}
+
+void Battle::scheduleSubTorp(FriendOrEnemyIndex index) {
+    if(!isSubmarine(index.isFriend, index.index))
+        return;
+    if(!hasTorpedo(index.isFriend, index.index))
+        return;
+    auto &conceal = index.isFriend
+                        ? friendFleetConcealmentStatus
+                        : enemyFleetConcealmentStatus;
+    if(conceal[index.index] != ConcealmentStatus::Concealed)
+        return;
+    FleetInfo *fleet = fleetOf(index.isFriend);
+    ShipDynamic *dyn
+        = fleet->shipDynamics[index.index].get();
+    if(!dyn || dyn->fleetFled || dyn->currentHP <= 0)
+        return;
+    int maxHP = fleet->ships[index.index]
+                    ->attr.value(QStringLiteral("Hitpoints"), 1);
+    if(maxHP <= 0)
+        maxHP = 1;
+    double hpFrac
+        = static_cast<double>(dyn->currentHP) / maxHP;
+    double z = (hpFrac + 1.0) / 2.0;
+    double y = maxTorpedoStat(index.isFriend, index.index);
+    if(y <= 0.0)
+        y = 1.0;
+    double interval = 600.0 * z / y;
+    if(interval <= 0.0)
+        return;
+
+    auto &lastFire = index.isFriend
+                         ? friendSubTorpLastFire
+                         : enemySubTorpLastFire;
+    clockTime last = lastFire[index.index];
+    clockTime due = last + static_cast<clockTime>(interval);
+    clockTime nextTime = std::max(clock, due);
+
+    cancelSubTorpEvents(index);
+    insertEvent(EventType::TorpedoAttack, nextTime, index,
+                [this](FriendOrEnemyIndex idx) {
+                    processTorpedoAttack(idx);
+                    if(isSubmarine(idx.isFriend, idx.index)) {
+                        auto &lf
+                            = idx.isFriend
+                                  ? friendSubTorpLastFire
+                                  : enemySubTorpLastFire;
+                        lf[idx.index] = clock;
+                        scheduleSubTorp(idx);
+                    }
+                });
+}
+
+void Battle::cancelSubTorpEvents(FriendOrEnemyIndex index) {
+    events.remove_if([&](const Event &e) {
+        return e.type == EventType::TorpedoAttack
+               && e.index.isFriend == index.isFriend
+               && e.index.index == index.index;
+    });
+}
+
+void Battle::processTorpedoAttack(FriendOrEnemyIndex attacker) {
+    FleetInfo *attFleet = fleetOf(attacker.isFriend);
+    if(attacker.index < 0
+        || attacker.index >= static_cast<int>(attFleet->ships.size()))
+        return;
+    Ship *attShip = attFleet->ships[attacker.index];
+    ShipDynamic *attDyn
+        = attFleet->shipDynamics[attacker.index].get();
+    if(!attShip || !attDyn || attDyn->fleetFled
+        || attDyn->currentHP <= 0)
+        return;
+    if(!hasTorpedo(attacker.isFriend, attacker.index))
+        return;
+
+    if(processTorpedoCutIn(attacker))
+        return;
+
+    int targetIdx = selectTorpedoTarget(attacker.index,
+                                        attacker.isFriend);
+    if(targetIdx < 0)
+        return;
+
+    FriendOrEnemyIndex defender{!attacker.isFriend,
+                                targetIdx};
+    FleetInfo *defFleet = fleetOf(defender.isFriend);
+    Ship *defShip = defFleet->ships[defender.index];
+    ShipDynamic *defDyn
+        = defFleet->shipDynamics[defender.index].get();
+    if(!defShip || !defDyn || defDyn->fleetFled
+        || defDyn->currentHP <= 0)
+        return;
+
+    QMap<QString, int> defAttrs
+        = shipAttrOf(defender.isFriend, defender.index);
+    double evasion
+        = defAttrs.value(QStringLiteral("Evasion"), 0);
+    double armor
+        = defAttrs.value(QStringLiteral("Armor"), 0);
+    if(armor <= 0)
+        armor = 1;
+    int defMaxHP
+        = defShip->attr.value(QStringLiteral("Hitpoints"), 1);
+
+    double baseAcc = torpBaseAccuracy(attacker.isFriend,
+                                      attacker.index);
+    double equipAcc = torpCombinedAccuracy(attacker.isFriend,
+                                           attacker.index);
+    double accuracy = baseAcc + equipAcc;
+
+    double evasionChance
+        = std::exp((accuracy - evasion) / 1000.0);
+    evasionChance = std::clamp(evasionChance, 0.0, 1.0);
+    std::uniform_real_distribution<double> evadeDist(
+        0.0, 1.0);
+    if(evadeDist(rng) > evasionChance) {
+        if(!isAntagonistFleetSunk(attacker)) {
+            QJsonObject log;
+            log["type"] = KP::AttackSkipped;
+            log["clock"] = clock;
+            log["reason"]
+                = static_cast<int>(KP::Evaded);
+            log["attackType"] = KP::TorpedoAttack;
+            log["attackerFleet"] = attacker.isFriend;
+            log["attackerShip"] = attacker.index;
+            log["defenderFleet"] = defender.isFriend;
+            log["defenderShip"] = defender.index;
+            m_damageLog.append(log);
+        }
+        return;
+    }
+
+    double b = 0.0;
+    {
+        QMap<QString, int> attrs = shipAttrOf(
+            attacker.isFriend, attacker.index);
+        b = static_cast<double>(
+            attrs.value(QStringLiteral("Torpedo"), 0));
+    }
+    {
+        auto addEquipTorp = [&](const QUuid &uuid) {
+            Equipment *eq
+                = attFleet->equipMap.value(uuid, nullptr);
+            if(!eq || !eq->type.isTorp())
+                return;
+            int et = eq->attr.value(QStringLiteral("Torpedo"),
+                                    0);
+            if(et > 0)
+                b += static_cast<double>(et);
+        };
+        for(const QUuid &uuid : attDyn->slotEquip)
+            addEquipTorp(uuid);
+        addEquipTorp(attDyn->slotEquipEx);
+    }
+    double r = b * b / std::hypot(b, armor);
+
+    std::normal_distribution<double> firepowerDist(r,
+                                                   r / 2.0);
+    double u = firepowerDist(rng);
+    u = std::max(u, 0.0);
+
+    double w = attacker.isFriend
+                   ? 1.0
+                         + 0.5 * friendFormationEfficiency
+                   : 1.0 + 0.5 * enemyFormationEfficiency;
+    double z = std::max(static_cast<double>(defMaxHP) / 8.0,
+                        512.0);
+    double x = w * u * z / std::hypot(w * u, z);
+    int totalDmg = static_cast<int>(std::round(x));
+    defDyn->currentHP
+        = std::max(0, defDyn->currentHP - totalDmg);
+
+    {
+        QJsonObject log;
+        log["type"] = KP::TorpedoAttack;
+        log["clock"] = clock;
+        log["attackerFleet"] = attacker.isFriend;
+        log["attackerShip"] = attacker.index;
+        log["defenderFleet"] = defender.isFriend;
+        log["defenderShip"] = defender.index;
+        log["damage"] = totalDmg;
+        log["defenderHP"] = defDyn->currentHP;
+        m_damageLog.append(log);
+    }
+}
+
+void Battle::setupTorpedoAttacks(clockTime phaseStart,
+                                 clockTime phaseLength) {
+    auto scheduleFleet
+        = [&](bool isFriend, clockTime baseClock) {
+              FleetInfo *fleet = fleetOf(isFriend);
+              for(int i = 0;
+                   i < static_cast<int>(fleet->ships.size());
+                   ++i) {
+                  Ship *ship = fleet->ships[i];
+                  ShipDynamic *dyn
+                      = fleet->shipDynamics[i].get();
+                  if(!ship || !dyn || dyn->fleetFled
+                      || dyn->currentHP <= 0)
+                      continue;
+                  if(!hasTorpReloadingDevice(isFriend, i))
+                      continue;
+                  double a = maxTorpedoStat(isFriend, i);
+                  if(a <= 0.0)
+                      continue;
+                  std::exponential_distribution<double>
+                      expDist(1.0 / a);
+                  double t = expDist(rng);
+                  if(t > phaseLength)
+                      continue;
+                  insertEvent(EventType::TorpedoAttack,
+                              baseClock + static_cast<clockTime>(t),
+                              {isFriend, i},
+                              [this](FriendOrEnemyIndex idx) {
+                                  processTorpedoAttack(idx);
+                              });
+              }
+          };
+    scheduleFleet(true, phaseStart);
+    scheduleFleet(false, phaseStart);
 }
 
 KP::BattleAssessment Battle::computePreliminaryAssessment() const {
@@ -506,9 +1351,18 @@ void Battle::nightBattle() {
         };
         fireSecGuns(true);
         fireSecGuns(false);
+        for(int i = 0;
+             i < static_cast<int>(currentFriendFleet->ships.size());
+             ++i)
+            processTorpedoAttack({true, i});
+        for(int i = 0;
+             i < static_cast<int>(currentEnemyFleet->ships.size());
+             ++i)
+            processTorpedoAttack({false, i});
     }
     setupAirReloading(0, 30);
     setupSecondaryGunshots(0, 30);
+    setupTorpedoAttacks(0, 30);
 
     if(isNightCommence) {
         double attLos = currentFriendFleet->los(true);
@@ -652,10 +1506,12 @@ void Battle::decideHidden(FriendOrEnemyIndex index) {
     if(result) {
         insertEvent(EventType::DecideHidden, clock + 15, index,
                     [this](FriendOrEnemyIndex idx) { decideHidden(idx); });
+        scheduleSubTorp(index);
     }
     else {
         insertEvent(EventType::DecideHidden, clock + 30, index,
                     [this](FriendOrEnemyIndex idx) { decideHidden(idx); });
+        cancelSubTorpEvents(index);
     }
 }
 
@@ -677,6 +1533,7 @@ void Battle::forceVisible(FriendOrEnemyIndex index) {
                && e.index.isFriend == index.isFriend
                && e.index.index == index.index;
     });
+    cancelSubTorpEvents(index);
 
     insertEvent(EventType::DecideHidden, clock + 30, index,
                 [this](FriendOrEnemyIndex idx) { decideHidden(idx); });
@@ -898,6 +1755,89 @@ void Battle::processReconGuidedStrike() {
             log["shipIndex"] = cand.shipIndex;
             log["accuracy"] = cand.accuracy;
             log["multiplier"] = reconGuidedStrikeMultiplier;
+            m_damageLog.append(log);
+        }
+        return;
+    }
+}
+
+void Battle::processMidgetGuidedStrike() {
+    /* Midget sub guided strike — see doc/9.c6-guidedstrikes.md */
+
+    struct Candidate {
+        int shipIndex;
+        bool isFriend;
+        QUuid slotUuid;
+        double torpAcc;
+        double shipTorp;
+    };
+    std::vector<Candidate> candidates;
+
+    auto collectMidgets = [&](bool isFriend) {
+        FleetInfo *fleet = fleetOf(isFriend);
+        for(int i = 0;
+             i < static_cast<int>(fleet->ships.size()); ++i) {
+            Ship *ship = fleet->ships[i];
+            ShipDynamic *dyn = fleet->shipDynamics[i].get();
+            if(!ship || !dyn || dyn->fleetFled
+                || dyn->currentHP <= 0)
+                continue;
+            double shipTorp = 0.0;
+            {
+                QMap<QString, int> attrs
+                    = shipAttrOf(isFriend, i);
+                shipTorp = static_cast<double>(
+                    attrs.value(QStringLiteral("Torpedo"), 0));
+            }
+            auto checkSlot = [&](const QUuid &uuid) {
+                Equipment *eq
+                    = fleet->equipMap.value(uuid, nullptr);
+                if(!eq)
+                    return;
+                int spec = eq->type.getSpecial();
+                if(spec != 1)
+                    return;
+                double ta = static_cast<double>(
+                    eq->attr.value(
+                        QStringLiteral("Torpedoaccuracy"), 0));
+                if(ta > 0.0)
+                    candidates.push_back(
+                        {i, isFriend, uuid, ta, shipTorp});
+            };
+            for(const QUuid &uuid : dyn->slotEquip)
+                checkSlot(uuid);
+            checkSlot(dyn->slotEquipEx);
+        }
+    };
+    collectMidgets(true);
+    collectMidgets(false);
+
+    std::sort(candidates.begin(), candidates.end(),
+              [](const Candidate &x, const Candidate &y) {
+                  return x.torpAcc > y.torpAcc;
+              });
+
+    for(const auto &cand : candidates) {
+        double a = cand.shipTorp;
+        double b = cand.torpAcc;
+        double x = a * b / 10000.0;
+        double p = x / std::hypot(1.0, x);
+        p = std::clamp(p, 0.0, 1.0);
+        std::bernoulli_distribution dist(p);
+        if(!dist(rng))
+            continue;
+
+        midgetGuidedStrikeTriggered = true;
+        {
+            QJsonObject log;
+            log["type"] = KP::GuidedStrikeTrigger;
+            log["clock"] = clock;
+            log["guidedType"]
+                = QStringLiteral("midget");
+            log["shipFleet"] = cand.isFriend;
+            log["shipIndex"] = cand.shipIndex;
+            log["torpedoStat"] = cand.shipTorp;
+            log["torpedoAccuracy"] = cand.torpAcc;
             m_damageLog.append(log);
         }
         return;
@@ -2603,7 +3543,7 @@ bool Battle::processGunshotCutIn(FriendOrEnemyIndex attacker) {
             std::normal_distribution<double> firepowerDist(
                 10.0 * dpm / y, dpm / 50.0);
             double u = firepowerDist(rng);
-            u = std::max(0.0, u);
+            u = std::max(u, 0.0);
             double x = w * u * z / std::hypot(w * u, z);
             int totalDmg = static_cast<int>(std::round(
                 std::round(x * dmgMul)));
@@ -2880,7 +3820,7 @@ bool Battle::processGunshotCutIn(FriendOrEnemyIndex attacker) {
             std::normal_distribution<double> firepowerDist(
                 10.0 * dpm / y, dpm / 50.0);
             double u = firepowerDist(rng);
-            u = std::max(0.0, u);
+            u = std::max(u, 0.0);
             double x = w * u * z / std::hypot(w * u, z);
             int totalDmg = static_cast<int>(std::round(
                 std::round(x * dmgMul)));
@@ -2894,7 +3834,7 @@ bool Battle::processGunshotCutIn(FriendOrEnemyIndex attacker) {
                 log["attackerShip"] = attacker.index;
                 log["defenderFleet"] = defender.isFriend;
                 log["defenderShip"] = defender.index;
-                log["cutInType"] = QStringLiteral("plain");
+                log["cutInType"] = static_cast<int>(KP::PlainGun);
                 log["damage"] = totalDmg;
                 log["defenderHP"] = defDyn->currentHP;
                 log["damageMultiplier"] = dmgMul;
@@ -3106,7 +4046,7 @@ void Battle::processMainGunAttack(FriendOrEnemyIndex attacker) {
         std::normal_distribution<double> firepowerDist(
             10.0 * dpm / fSpeed, dpm / 50.0);
         double u = firepowerDist(rng);
-        u = std::max(0.0, u);
+        u = std::max(u, 0.0);
         double x
             = w * u * z / std::hypot(w * u, z);
         totalDmg = static_cast<int>(std::round(x));
@@ -3398,7 +4338,7 @@ void Battle::processSecondaryGunAttack(FriendOrEnemyIndex attacker,
         std::normal_distribution<double> firepowerDist(
             10.0 * dpm / y, dpm / 50.0);
         double u = firepowerDist(rng);
-        u = std::max(0.0, u);
+        u = std::max(u, 0.0);
         double x = w * u * z / std::hypot(w * u, z);
         int totalDmg = static_cast<int>(std::round(x));
         defDyn->currentHP = std::max(0,

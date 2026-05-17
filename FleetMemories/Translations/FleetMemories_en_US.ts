@@ -4273,22 +4273,22 @@ Great at battle and bad at politics--so cool!</translation>
         <translation type="unfinished">Fantasy ships</translation>
     </message>
     <message id="NormalFleet">
-        <location filename="../Protocol/kp.h" line="781"/>
+        <location filename="../Protocol/kp.h" line="790"/>
         <source>Normal</source>
         <translation type="unfinished">Normal</translation>
     </message>
     <message id="CarrierFleet">
-        <location filename="../Protocol/kp.h" line="783"/>
+        <location filename="../Protocol/kp.h" line="792"/>
         <source>Carrier</source>
         <translation type="unfinished">Carrier</translation>
     </message>
     <message id="SurfaceFleet">
-        <location filename="../Protocol/kp.h" line="785"/>
+        <location filename="../Protocol/kp.h" line="794"/>
         <source>Surface</source>
         <translation type="unfinished">Surface</translation>
     </message>
     <message id="TransportFleet">
-        <location filename="../Protocol/kp.h" line="787"/>
+        <location filename="../Protocol/kp.h" line="796"/>
         <source>Transport</source>
         <translation type="unfinished">Transport</translation>
     </message>
@@ -4891,178 +4891,189 @@ Great at battle and bad at politics--so cool!</translation>
         <translation type="unfinished"></translation>
     </message>
     <message id="battle-phase-air">
-        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="516"/>
+        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="517"/>
         <source>Air Battle</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="battle-phase-approaching">
-        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="519"/>
+        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="520"/>
         <source>Approaching</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="battle-phase-central">
-        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="522"/>
+        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="523"/>
         <source>Central</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="battle-phase-disengaging">
-        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="525"/>
+        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="526"/>
         <source>Disengaging</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="battle-phase-night">
-        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="528"/>
+        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="529"/>
         <source>Night Battle</source>
         <translation type="unfinished">Night Battle</translation>
     </message>
     <message id="battle-report-label-main-gun">
-        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="537"/>
+        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="538"/>
         <source>[Main gun]</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="battle-report-label-sec-gun">
-        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="540"/>
+        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="541"/>
         <source>[Secondary gun]</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="battle-report-label-air-torp">
-        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="543"/>
+        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="544"/>
         <source>[Air torpedo]</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="battle-report-label-air-dive">
-        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="546"/>
+        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="547"/>
         <source>[Air dive bomb]</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="battle-report-label-air-cutin">
-        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="549"/>
+        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="550"/>
         <source>[Air cut-in]</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="battle-report-label-gun-cutin">
-        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="552"/>
+        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="553"/>
         <source>[Gun cut-in]</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="battle-report-main-gun">
-        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="564"/>
+        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="565"/>
         <source>[Main gun] %1 → %2: %3 damage%4</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="battle-report-overpen">
-        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="566"/>
-        <source></source>
+        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="569"/>
+        <source> (Overpenetration)</source>
+        <oldsource>[Main gun] %1 → %2: %3 damage%4 (Overpenetration)</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message id="battle-report-sec-gun">
-        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="572"/>
+        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="575"/>
         <source>[Secondary gun] %1 → %2: %3 damage</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="battle-report-point-blank">
-        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="577"/>
+        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="580"/>
         <source>[Point-blank shot] %1 → %2: formation efficiency reduced</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="battle-report-spotting-gun">
-        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="583"/>
+        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="585"/>
         <source>Spotting Gun</source>
         <oldsource>Spotting GunGun</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message id="battle-report-gun">
-        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="585"/>
+        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="587"/>
         <source>Gun</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="battle-report-gun-cutin">
-        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="590"/>
+        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="592"/>
         <source>[%1] cut-in  %2 → %3: %4 damage (x%5)</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="battle-report-air-torp">
-        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="597"/>
+        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="599"/>
         <source>[Air torpedo] %1 → %2: %3 damage</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="battle-report-air-dive">
-        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="602"/>
+        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="604"/>
         <source>[Air dive bomb] %1 → %2: %3 damage</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="battle-report-air-cutin">
-        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="607"/>
+        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="609"/>
         <source>[Air cut-in] %1 → %2: %3 damage</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="battle-report-aa-loss-phase">
-        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="613"/>
+        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="615"/>
         <source>%1: Anti-air loss [%2 phase] slot %3: -%4 (%5 remaining)</source>
         <oldsource>Anti-air loss [%1 phase] slot %2: -%3 (%4 remaining)</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message id="battle-report-aa-loss">
-        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="618"/>
+        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="620"/>
         <source>%1: Anti-air loss slot %2: -%3 (%4 remaining)</source>
         <oldsource>Anti-air loss slot %1: -%2 (%3 remaining)</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message id="battle-report-reason-evaded">
-        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="628"/>
+        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="630"/>
         <source>evaded</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="battle-report-reason-non-pen">
-        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="632"/>
+        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="634"/>
         <source>non-penetration</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="battle-report-reason-no-target">
-        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="636"/>
+        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="638"/>
         <source>no target</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="battle-report-reason-target-invalid">
-        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="640"/>
+        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="642"/>
         <source>target invalid</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="battle-report-reason-planes-lost">
-        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="644"/>
+        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="646"/>
         <source>all planes lost</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="battle-report-skip-atk-type">
-        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="657"/>
+        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="659"/>
         <source>%1 %2: %3 attempted against %4</source>
         <oldsource>%1: %2 attempted against %3</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message id="battle-report-skip">
-        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="664"/>
-        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="668"/>
+        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="666"/>
+        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="670"/>
         <source>%1: %2</source>
         <oldsource>Attack skipped (%1): %2</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message id="battle-report-air-sup">
-        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="682"/>
+        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="684"/>
         <source>Air superiority: Friend %1, Enemy %2, Coefficient %3</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="battle-report-formation-eff">
-        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="692"/>
+        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="694"/>
         <source>Formation efficiency: Friend %1, Enemy %2</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="battle-report-guided-strike">
-        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="700"/>
+        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="702"/>
         <source>Guided strike (recon) triggered: air attack power x%1</source>
         <translation type="unfinished"></translation>
     </message>
+    <message id="battle-report-torp-cutin">
+        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="710"/>
+        <source>[Torpedo cut-in] %1 → %2: %3 damage (x%4)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="battle-report-torpedo">
+        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="715"/>
+        <source>[Torpedo] %1 → %2: %3 damage</source>
+        <translation type="unfinished"></translation>
+    </message>
     <message id="battle-report-unknown">
-        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="706"/>
+        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="722"/>
         <source>Unknown battle action type %1</source>
         <translation type="unfinished"></translation>
     </message>
