@@ -729,7 +729,8 @@ enum BattleActionType {
     PointBlankShot = 8,
     GunshotCutInAttack = 9,
     AirSuperiorityValue = 10,
-    FormationEfficiencyValue = 11
+    FormationEfficiencyValue = 11,
+    GuidedStrikeTrigger = 12
 };
 Q_ENUM_NS(BattleActionType)
 

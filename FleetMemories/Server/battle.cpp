@@ -18,6 +18,7 @@ void Battle::battleProcessor(FleetInfo *friendf, FleetInfo *enemyf,
     isNight = isNightCommence;
     this->isNightCommence = isNightCommence;
     m_damageLog = QJsonArray();
+    reconGuidedStrikeMultiplier = 1.0;
     friendGoal = static_cast<KP::FriendFleetPriority>(
         battlePlan.value("friendFleetPriority").toInt(0));
     enemyGoal = static_cast<KP::EnemyFleetPriority>(
@@ -257,6 +258,8 @@ void Battle::airBattle() {
     }
     computeAirSuperiority();
     collectAirSquadrons();
+    reconGuidedStrikeMultiplier = 1.0;
+    processReconGuidedStrike();
     processS1PlaneLoss();
     processS2PlaneLoss();
     processS3AACutIn();
@@ -266,6 +269,12 @@ void Battle::airBattle() {
     for(int i = 0;
          i < static_cast<int>(currentEnemyFleet->ships.size()); ++i)
         processAirAttack({false, i});
+    for(int i = 0;
+         i < static_cast<int>(currentFriendFleet->ships.size()); ++i)
+        syncSquadronPlanes({true, i});
+    for(int i = 0;
+         i < static_cast<int>(currentEnemyFleet->ships.size()); ++i)
+        syncSquadronPlanes({false, i});
     advanceClockTime(0);
 }
 
@@ -468,6 +477,12 @@ void Battle::nightBattle() {
         for(int i = 0;
              i < static_cast<int>(currentEnemyFleet->ships.size()); ++i)
             processAirAttack({false, i});
+        for(int i = 0;
+             i < static_cast<int>(currentFriendFleet->ships.size()); ++i)
+            syncSquadronPlanes({true, i});
+        for(int i = 0;
+             i < static_cast<int>(currentEnemyFleet->ships.size()); ++i)
+            syncSquadronPlanes({false, i});
         auto fireSecGuns = [&](bool isFriend) {
             FleetInfo *fleet = fleetOf(isFriend);
             for(int i = 0;
@@ -818,6 +833,74 @@ bool Battle::isProtectedShip(int friendIndex) const {
     }
     default:
         return false;
+    }
+}
+
+void Battle::processReconGuidedStrike() {
+    /* Reconnaissance plane guided strike — see doc/9.c6-guidedstrikes.md */
+    if(airSuperiorityCoefficient <= 0.0)
+        return;
+
+    struct Candidate {
+        int shipIndex;
+        bool isFriend;
+        double accuracy;
+    };
+    std::vector<Candidate> candidates;
+
+    auto collectPlanes = [&](bool isFriend) {
+        FleetInfo *fleet = fleetOf(isFriend);
+        for(int i = 0;
+             i < static_cast<int>(fleet->ships.size()); ++i) {
+            ShipDynamic *dyn = fleet->shipDynamics[i].get();
+            if(!dyn || dyn->fleetFled || dyn->currentHP <= 0)
+                continue;
+            auto checkSlot = [&](const QUuid &uuid) {
+                Equipment *eq
+                    = fleet->equipMap.value(uuid, nullptr);
+                if(!eq)
+                    return;
+                double acc = static_cast<double>(
+                    eq->attr.value(QStringLiteral("Accuracy"),
+                                   0));
+                if(acc > 0.0)
+                    candidates.push_back({i, isFriend, acc});
+            };
+            for(const QUuid &uuid : dyn->slotEquip)
+                checkSlot(uuid);
+            checkSlot(dyn->slotEquipEx);
+        }
+    };
+    collectPlanes(true);
+    collectPlanes(false);
+
+    std::sort(candidates.begin(), candidates.end(),
+              [](const Candidate &x, const Candidate &y) {
+                  return x.accuracy > y.accuracy;
+              });
+
+    for(const auto &cand : candidates) {
+        double b = cand.accuracy / 100.0;
+        double p = airSuperiorityCoefficient * b
+                   / std::hypot(1.0, b);
+        p = std::clamp(p, 0.0, 1.0);
+        std::bernoulli_distribution dist(p);
+        if(!dist(rng))
+            continue;
+
+        reconGuidedStrikeMultiplier = 1.0 + cand.accuracy / 100.0;
+        {
+            QJsonObject log;
+            log["type"] = KP::GuidedStrikeTrigger;
+            log["clock"] = clock;
+            log["guidedType"] = QStringLiteral("recon");
+            log["shipFleet"] = cand.isFriend;
+            log["shipIndex"] = cand.shipIndex;
+            log["accuracy"] = cand.accuracy;
+            log["multiplier"] = reconGuidedStrikeMultiplier;
+            m_damageLog.append(log);
+        }
+        return;
     }
 }
 
@@ -1298,6 +1381,24 @@ void Battle::processAirAttack(FriendOrEnemyIndex attacker) {
     executeAirAttackCutIn(attacker, {!attacker.isFriend, 0});
 }
 
+void Battle::syncSquadronPlanes(FriendOrEnemyIndex attacker) {
+    FleetInfo *attFleet = fleetOf(attacker.isFriend);
+    if(attacker.index < 0
+        || attacker.index >= static_cast<int>(attFleet->ships.size()))
+        return;
+    ShipDynamic *dyn
+        = attFleet->shipDynamics[attacker.index].get();
+    if(!dyn || dyn->fleetFled)
+        return;
+    auto &squadrons = airSquadronsOf(attacker.isFriend);
+    for(const AirSquadron &sq : squadrons) {
+        if(sq.shipIndex != attacker.index)
+            continue;
+        if(sq.slotIndex < dyn->slotPlanes.size())
+            dyn->slotPlanes[sq.slotIndex] = sq.planeCount;
+    }
+}
+
 void Battle::applyIndividualAntiAir(FriendOrEnemyIndex defender,
                                     AirSquadron &squadron) {
     FleetInfo *defFleet = fleetOf(defender.isFriend);
@@ -1420,8 +1521,9 @@ void Battle::executeAirTorpedoAttack(FriendOrEnemyIndex attacker,
 
     std::binomial_distribution<int> hitDist(squadron.planeCount, pHit);
     int hits = hitDist(rng);
-    int totalDmg = static_cast<int>(std::round(hits * perPlaneDmg));
-
+    int totalDmg = static_cast<int>(std::round(
+        std::round(hits * perPlaneDmg)
+        * reconGuidedStrikeMultiplier));
     defDyn->currentHP = std::max(0, defDyn->currentHP - totalDmg);
 
     {
@@ -1483,7 +1585,8 @@ void Battle::executeAirDiveAttack(FriendOrEnemyIndex attacker,
     double x = xDist(rng);
     int totalDmg = static_cast<int>(std::round(
         std::max(x, 0.0) * dpm
-        * bombing / std::hypot(static_cast<double>(armor), bombing)));
+        * bombing / std::hypot(static_cast<double>(armor), bombing)
+        * reconGuidedStrikeMultiplier));
 
     defDyn->currentHP = std::max(0, defDyn->currentHP - totalDmg);
 
@@ -1607,7 +1710,8 @@ void Battle::executeAirAttackCutIn(FriendOrEnemyIndex attacker,
             int totalDmg = static_cast<int>(std::round(
                 std::exp(totalEquips / 16.0) * dpm * maxPlanes
                 * maxPrimary
-                / std::hypot(static_cast<double>(armor), maxPrimary)));
+                / std::hypot(static_cast<double>(armor), maxPrimary)
+                * reconGuidedStrikeMultiplier));
 
             defDyn->currentHP = std::max(0, defDyn->currentHP - totalDmg);
 
@@ -2499,8 +2603,7 @@ bool Battle::processGunshotCutIn(FriendOrEnemyIndex attacker) {
             std::normal_distribution<double> firepowerDist(
                 10.0 * dpm / y, dpm / 50.0);
             double u = firepowerDist(rng);
-            if(u <= 0.0)
-                u = 0.0;
+            u = std::max(0.0, u);
             double x = w * u * z / std::hypot(w * u, z);
             int totalDmg = static_cast<int>(std::round(
                 std::round(x * dmgMul)));
@@ -2777,10 +2880,8 @@ bool Battle::processGunshotCutIn(FriendOrEnemyIndex attacker) {
             std::normal_distribution<double> firepowerDist(
                 10.0 * dpm / y, dpm / 50.0);
             double u = firepowerDist(rng);
-            if(u <= 0.0)
-                u = 0.0;
-            double x = w * u * z
-                       / std::hypot(w * u, z);
+            u = std::max(0.0, u);
+            double x = w * u * z / std::hypot(w * u, z);
             int totalDmg = static_cast<int>(std::round(
                 std::round(x * dmgMul)));
             defDyn->currentHP
@@ -3005,8 +3106,7 @@ void Battle::processMainGunAttack(FriendOrEnemyIndex attacker) {
         std::normal_distribution<double> firepowerDist(
             10.0 * dpm / fSpeed, dpm / 50.0);
         double u = firepowerDist(rng);
-        if(u <= 0.0)
-            u = 0.0;
+        u = std::max(0.0, u);
         double x
             = w * u * z / std::hypot(w * u, z);
         totalDmg = static_cast<int>(std::round(x));
@@ -3298,8 +3398,7 @@ void Battle::processSecondaryGunAttack(FriendOrEnemyIndex attacker,
         std::normal_distribution<double> firepowerDist(
             10.0 * dpm / y, dpm / 50.0);
         double u = firepowerDist(rng);
-        if(u <= 0.0)
-            u = 0.0;
+        u = std::max(0.0, u);
         double x = w * u * z / std::hypot(w * u, z);
         int totalDmg = static_cast<int>(std::round(x));
         defDyn->currentHP = std::max(0,

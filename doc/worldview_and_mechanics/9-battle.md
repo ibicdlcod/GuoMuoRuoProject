@@ -12,7 +12,7 @@ The battle have the following characteristics:
 - [Communication efficiency](9.c3-communication.md) [IMPLEMENTED]
 - [LOS, undiscovered ships and surprise attacks](9.c4-los.md) [IMPLEMENTED]
 - [Air superiority coefficient](9.c5-air-superiority.md) [IMPLEMENTED]
-- [Guided strikes (触接)](9.c6-guidedstrikes.md)
+- [Guided strikes (触接)](9.c6-guidedstrikes.md) [Implemented in Battle::processReconGuidedStrike]
 - [Formation efficiency](9.c7-formation.md) [IMPLEMENTED]
 - [Commander's abilities](9.c8-abilities.md)
 - [LBAS](9.c9-lbas.md)

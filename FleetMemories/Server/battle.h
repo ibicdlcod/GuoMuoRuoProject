@@ -114,6 +114,7 @@ private:
     double airSuperiorityCoefficient;
     double friendFormationEfficiency;
     double enemyFormationEfficiency;
+    double reconGuidedStrikeMultiplier;
     std::vector<AirSquadron> friendAirSquadrons;
     std::vector<AirSquadron> enemyAirSquadrons;
 
@@ -140,6 +141,7 @@ private:
 
     void computeAirSuperiority();
     void computeFormationEfficiency();
+    void processReconGuidedStrike();
     double maxEnemyFighterAA(const FleetInfo *fleet) const;
     double fleetAirSuperiority(const FleetInfo *fleet,
                                const FleetInfo *enemyFleet) const;
@@ -160,6 +162,7 @@ private:
     void collectAirSquadrons();
     void setupAirReloading(clockTime phaseStart, clockTime phaseLength);
     void processAirAttack(FriendOrEnemyIndex attacker);
+    void syncSquadronPlanes(FriendOrEnemyIndex attacker);
     void applyIndividualAntiAir(FriendOrEnemyIndex defender,
                                 AirSquadron &squadron);
     void executeAirTorpedoAttack(FriendOrEnemyIndex attacker,

@@ -609,14 +609,15 @@ BattleDetailDialog::BattleDetailDialog(
             break;
         case KP::AntiAirPlaneLoss:
             if(!phase.isEmpty())
-                //% "Anti-air loss [%1 phase] slot %2: -%3 (%4 remaining)"
+                //% "%1: Anti-air loss [%2 phase] slot %3: -%4 (%5 remaining)"
                 line = qtTrId("battle-report-aa-loss-phase")
-                           .arg(phase).arg(slot).arg(lost)
-                           .arg(remain);
+                           .arg(attName, phase).arg(slot)
+                           .arg(lost).arg(remain);
             else
-                //% "Anti-air loss slot %1: -%2 (%3 remaining)"
+                //% "%1: Anti-air loss slot %2: -%3 (%4 remaining)"
                 line = qtTrId("battle-report-aa-loss")
-                           .arg(slot).arg(lost).arg(remain);
+                           .arg(attName).arg(slot).arg(lost)
+                           .arg(remain);
             break;
         case KP::AttackSkipped: {
             QString reasonLabel;
@@ -691,6 +692,13 @@ BattleDetailDialog::BattleDetailDialog(
             line = qtTrId("battle-report-formation-eff")
                        .arg(feff, 0, 'f', 3)
                        .arg(eeff, 0, 'f', 3);
+            break;
+        }
+        case KP::GuidedStrikeTrigger: {
+            double mul = e["multiplier"].toDouble(1.0);
+            //% "Guided strike (recon) triggered: air attack power x%1"
+            line = qtTrId("battle-report-guided-strike")
+                       .arg(mul, 0, 'f', 2);
             break;
         }
         default:

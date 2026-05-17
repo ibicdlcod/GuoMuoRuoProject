@@ -4255,22 +4255,22 @@ Great at battle and bad at politics--so cool!</source>
         <translation type="unfinished">その他アジア</translation>
     </message>
     <message id="NormalFleet">
-        <location filename="../Protocol/kp.h" line="780"/>
+        <location filename="../Protocol/kp.h" line="781"/>
         <source>Normal</source>
         <translation type="unfinished">架空艦</translation>
     </message>
     <message id="CarrierFleet">
-        <location filename="../Protocol/kp.h" line="782"/>
+        <location filename="../Protocol/kp.h" line="783"/>
         <source>Carrier</source>
         <translation type="unfinished">通常</translation>
     </message>
     <message id="SurfaceFleet">
-        <location filename="../Protocol/kp.h" line="784"/>
+        <location filename="../Protocol/kp.h" line="785"/>
         <source>Surface</source>
         <translation type="unfinished">空母機動部隊</translation>
     </message>
     <message id="TransportFleet">
-        <location filename="../Protocol/kp.h" line="786"/>
+        <location filename="../Protocol/kp.h" line="787"/>
         <source>Transport</source>
         <translation type="unfinished">水上打撃部隊</translation>
     </message>
@@ -4949,64 +4949,71 @@ Great at battle and bad at politics--so cool!</source>
     </message>
     <message id="battle-report-aa-loss-phase">
         <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="613"/>
-        <source>Anti-air loss [%1 phase] slot %2: -%3 (%4 remaining)</source>
+        <source>%1: Anti-air loss [%2 phase] slot %3: -%4 (%5 remaining)</source>
+        <oldsource>Anti-air loss [%1 phase] slot %2: -%3 (%4 remaining)</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message id="battle-report-aa-loss">
         <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="618"/>
-        <source>Anti-air loss slot %1: -%2 (%3 remaining)</source>
+        <source>%1: Anti-air loss slot %2: -%3 (%4 remaining)</source>
+        <oldsource>Anti-air loss slot %1: -%2 (%3 remaining)</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message id="battle-report-reason-evaded">
-        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="627"/>
+        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="628"/>
         <source>evaded</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="battle-report-reason-non-pen">
-        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="631"/>
+        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="632"/>
         <source>non-penetration</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="battle-report-reason-no-target">
-        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="635"/>
+        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="636"/>
         <source>no target</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="battle-report-reason-target-invalid">
-        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="639"/>
+        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="640"/>
         <source>target invalid</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="battle-report-reason-planes-lost">
-        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="643"/>
+        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="644"/>
         <source>all planes lost</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="battle-report-skip-atk-type">
-        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="656"/>
+        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="657"/>
         <source>%1 %2: %3 attempted against %4</source>
         <oldsource>%1: %2 attempted against %3</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message id="battle-report-skip">
-        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="663"/>
-        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="667"/>
+        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="664"/>
+        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="668"/>
         <source>%1: %2</source>
         <oldsource>Attack skipped (%1): %2</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message id="battle-report-air-sup">
-        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="681"/>
+        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="682"/>
         <source>Air superiority: Friend %1, Enemy %2, Coefficient %3</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="battle-report-formation-eff">
-        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="691"/>
+        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="692"/>
         <source>Formation efficiency: Friend %1, Enemy %2</source>
         <translation type="unfinished"></translation>
     </message>
+    <message id="battle-report-guided-strike">
+        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="700"/>
+        <source>Guided strike (recon) triggered: air attack power x%1</source>
+        <translation type="unfinished"></translation>
+    </message>
     <message id="battle-report-unknown">
-        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="698"/>
+        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="706"/>
         <source>Unknown battle action type %1</source>
         <translation type="unfinished"></translation>
     </message>
