@@ -30,6 +30,7 @@ public:
     QList<QUuid> slotEquip;
     QUuid slotEquipEx;
     QList<int> slotPlanes;
+    QList<int> originalSlotPlanes;
     double fuel;
     double ammo;
     int fleetIndex;

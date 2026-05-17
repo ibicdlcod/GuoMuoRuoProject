@@ -1251,7 +1251,8 @@ void Battle::processAirAttack(FriendOrEnemyIndex attacker) {
                 QJsonObject log;
                 log["type"] = KP::AttackSkipped;
                 log["clock"] = clock;
-                log["reason"] = QStringLiteral("no target");
+                log["reason"] = static_cast<int>(KP::NoTarget);
+                log["attackType"] = KP::AirTorpedoAttack;
                 log["attackerFleet"] = attacker.isFriend;
                 log["attackerShip"] = attacker.index;
                 log["attackerSlot"] = sq.slotIndex;
@@ -1268,7 +1269,8 @@ void Battle::processAirAttack(FriendOrEnemyIndex attacker) {
                 QJsonObject log;
                 log["type"] = KP::AttackSkipped;
                 log["clock"] = clock;
-                log["reason"] = QStringLiteral("all planes lost");
+                log["reason"] = static_cast<int>(KP::AllPlanesLost);
+                log["attackType"] = KP::AirTorpedoAttack;
                 log["attackerFleet"] = attacker.isFriend;
                 log["attackerShip"] = attacker.index;
                 log["attackerSlot"] = sq.slotIndex;
@@ -2818,6 +2820,9 @@ void Battle::processMainGunAttack(FriendOrEnemyIndex attacker) {
         return;
 
     forceVisible(attacker);
+    if(attShip->isBattleShip()) {
+        qCritical() << clock;
+    }
 
     if(processGunshotCutIn(attacker)) {
         auto scheduleReload = [&]() {
@@ -2881,7 +2886,8 @@ void Battle::processMainGunAttack(FriendOrEnemyIndex attacker) {
             QJsonObject log;
             log["type"] = KP::AttackSkipped;
             log["clock"] = clock;
-            log["reason"] = QStringLiteral("no target");
+            log["attackType"] = KP::MainGunAttack;
+            log["reason"] = static_cast<int>(KP::NoTarget);
             log["attackerFleet"] = attacker.isFriend;
             log["attackerShip"] = attacker.index;
             m_damageLog.append(log);
@@ -2901,8 +2907,9 @@ void Battle::processMainGunAttack(FriendOrEnemyIndex attacker) {
             QJsonObject log;
             log["type"] = KP::AttackSkipped;
             log["clock"] = clock;
-            log["reason"] = QStringLiteral("target invalid");
+            log["reason"] = static_cast<int>(KP::TargetInvalid);
             log["attackerFleet"] = attacker.isFriend;
+            log["attackType"] = KP::MainGunAttack;
             log["attackerShip"] = attacker.index;
             log["defenderFleet"] = defender.isFriend;
             log["defenderShip"] = defender.index;
@@ -2955,8 +2962,9 @@ void Battle::processMainGunAttack(FriendOrEnemyIndex attacker) {
             QJsonObject log;
             log["type"] = KP::AttackSkipped;
             log["clock"] = clock;
-            log["reason"] = QStringLiteral("evaded");
+            log["reason"] = static_cast<int>(KP::Evaded);
             log["attackerFleet"] = attacker.isFriend;
+            log["attackType"] = KP::MainGunAttack;
             log["attackerShip"] = attacker.index;
             log["defenderFleet"] = defender.isFriend;
             log["defenderShip"] = defender.index;
@@ -3007,7 +3015,8 @@ void Battle::processMainGunAttack(FriendOrEnemyIndex attacker) {
             QJsonObject log;
             log["type"] = KP::AttackSkipped;
             log["clock"] = clock;
-            log["reason"] = QStringLiteral("miss");
+            log["reason"] = static_cast<int>(KP::NonPenetration);
+            log["attackType"] = KP::MainGunAttack;
             log["attackerFleet"] = attacker.isFriend;
             log["attackerShip"] = attacker.index;
             log["defenderFleet"] = defender.isFriend;
@@ -3019,6 +3028,7 @@ void Battle::processMainGunAttack(FriendOrEnemyIndex attacker) {
     }
 
     defDyn->currentHP = std::max(0, defDyn->currentHP - totalDmg);
+
 
     {
         QJsonObject log;
@@ -3142,7 +3152,8 @@ void Battle::processSecondaryGunAttack(FriendOrEnemyIndex attacker,
             QJsonObject log;
             log["type"] = KP::AttackSkipped;
             log["clock"] = clock;
-            log["reason"] = QStringLiteral("no target");
+            log["reason"] = static_cast<int>(KP::NoTarget);
+            log["attackType"] = KP::SecondaryGunAttack;
             log["attackerFleet"] = attacker.isFriend;
             log["attackerShip"] = attacker.index;
             log["attackerSlot"] = slotUuid.toString();
@@ -3163,7 +3174,8 @@ void Battle::processSecondaryGunAttack(FriendOrEnemyIndex attacker,
             QJsonObject log;
             log["type"] = KP::AttackSkipped;
             log["clock"] = clock;
-            log["reason"] = QStringLiteral("target invalid");
+            log["reason"] = static_cast<int>(KP::TargetInvalid);
+            log["attackType"] = KP::SecondaryGunAttack;
             log["attackerFleet"] = attacker.isFriend;
             log["attackerShip"] = attacker.index;
             log["defenderFleet"] = defender.isFriend;
@@ -3224,7 +3236,8 @@ void Battle::processSecondaryGunAttack(FriendOrEnemyIndex attacker,
             QJsonObject log;
             log["type"] = KP::AttackSkipped;
             log["clock"] = clock;
-            log["reason"] = QStringLiteral("evaded");
+            log["attackType"] = KP::SecondaryGunAttack;
+            log["reason"] = static_cast<int>(KP::Evaded);
             log["attackerFleet"] = attacker.isFriend;
             log["attackerShip"] = attacker.index;
             log["defenderFleet"] = defender.isFriend;
@@ -3253,7 +3266,9 @@ void Battle::processSecondaryGunAttack(FriendOrEnemyIndex attacker,
             QJsonObject log;
             log["type"] = KP::AttackSkipped;
             log["clock"] = clock;
-            log["reason"] = QStringLiteral("miss");
+            log["attackType"] = KP::SecondaryGunAttack;
+            log["reason"] = static_cast<int>(KP::NonPenetration);
+            log["attackType"] = KP::SecondaryGunAttack;
             log["attackerFleet"] = attacker.isFriend;
             log["attackerShip"] = attacker.index;
             log["defenderFleet"] = defender.isFriend;

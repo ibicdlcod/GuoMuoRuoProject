@@ -21,26 +21,34 @@ The battle have the following characteristics:
 In the battle the following attack against enemies can occur:
 
 - [Air attack](9.a1-airattack.md)
+  
   - Air bombing + individual anti-air
   - Air torpedo + individual anti-air
   - Air attack cut-in + individual anti-air
   - Jet plane attack (TBD)
+
 - [Gunshot](9.a2-gunshot.md)
+  
   - Main gun gunshot
   - Secondary gun gunshot
   - Gunshot cut-in
+
 - [Torpedo attack](9.a3-torpedoattack.md)
-  - Torpedo attack
+  
   - Torpedo reloading device
-  - 
+  - Torpedo attack
   - Torpedo cut-in
   - Gunshot+Torpedo cut-in
+
 - [ASW attack](9.a4-asw.md)
+  
   - ASW detection vs concealment
   - ASW depth charge attack
   - ASW aerial attack
   - ASW cut-in
-- [Land attack](9.5-landattack.md)
+
+- Land attack [NOTIMPLEMENTED]
+  
   - General land attack
   - Soft attack
   - Hard attack

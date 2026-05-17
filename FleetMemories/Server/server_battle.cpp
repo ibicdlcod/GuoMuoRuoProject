@@ -1809,9 +1809,13 @@ critical_damage_end:
 }
     if(nNode == 0) {
         if(FleetInfo *fi = sortieFleets.value({uid, result.value()[3]}, nullptr)) {
+            /* Restore plane counts to pre-sortie levels */
             for(auto &dyn : fi->shipDynamics) {
                 if(!dyn) {
                     continue;
+                }
+                if(!dyn->originalSlotPlanes.isEmpty()) {
+                    dyn->slotPlanes = dyn->originalSlotPlanes;
                 }
                 dyn->fleetFled = false;
             }
@@ -1987,6 +1991,10 @@ void Server::startSortie(const CSteamID &uid, QSslSocket *connection,
         std::unique_ptr<FleetInfo> fleet(new FleetInfo(queryFleetInfo(uid, fleetIndex)));
         sortieFleets[{uid, fleetIndex}] = fleet.release();
         FleetInfo &info = *sortieFleets[{uid, fleetIndex}];
+        for(auto &dyn : info.shipDynamics) {
+            if(dyn)
+                dyn->originalSlotPlanes = dyn->slotPlanes;
+        }
         sol::protected_function luaChooseStartingNode
             = lua["maps"][unionId]["branch_rule"][diffStrC];
         auto result = luaChooseStartingNode(info.ships,

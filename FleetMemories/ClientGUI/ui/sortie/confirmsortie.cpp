@@ -503,6 +503,8 @@ BattleDetailDialog::BattleDetailDialog(
         int remain = e["planesRemaining"].toInt(0);
         bool overp = e["overpenetration"].toBool(false);
         QString reason = e["reason"].toString();
+        int skipReason = e["reason"].toInt(-1);
+        int skipAtkType = e["attackType"].toInt(-1);
         int battlePhaseVal = e["battlePhase"].toInt(-1);
         QString phase = e["phase"].toString();
         int clockT = e["clock"].toInt(0);
@@ -524,6 +526,30 @@ BattleDetailDialog::BattleDetailDialog(
             case KP::NightBattlePhase:
                 //% "Night Battle"
                 return qtTrId("battle-phase-night");
+            default: return QString();
+            }
+        };
+
+        auto typeLabel = [](int at) -> QString {
+            switch(at) {
+            case KP::MainGunAttack:
+                //% "[Main gun]"
+                return qtTrId("battle-report-label-main-gun");
+            case KP::SecondaryGunAttack:
+                //% "[Secondary gun]"
+                return qtTrId("battle-report-label-sec-gun");
+            case KP::AirTorpedoAttack:
+                //% "[Air torpedo]"
+                return qtTrId("battle-report-label-air-torp");
+            case KP::AirDiveAttack:
+                //% "[Air dive bomb]"
+                return qtTrId("battle-report-label-air-dive");
+            case KP::AirCutInAttack:
+                //% "[Air cut-in]"
+                return qtTrId("battle-report-label-air-cutin");
+            case KP::GunshotCutInAttack:
+                //% "[Gun cut-in]"
+                return qtTrId("battle-report-label-gun-cutin");
             default: return QString();
             }
         };
@@ -592,19 +618,57 @@ BattleDetailDialog::BattleDetailDialog(
                 line = qtTrId("battle-report-aa-loss")
                            .arg(slot).arg(lost).arg(remain);
             break;
-        case KP::AttackSkipped:
-            if((reason == QStringLiteral("evaded")
-                 || reason == QStringLiteral("miss"))
-                && defS >= 0) {
-                //% "Attack skipped (%1): %2 attempted against %3"
-                line = qtTrId("battle-report-skip-def")
-                           .arg(reason, attName, defName);
+        case KP::AttackSkipped: {
+            QString reasonLabel;
+            if(skipReason >= 0) {
+                switch(skipReason) {
+                case KP::Evaded:
+                    //% "evaded"
+                    reasonLabel = qtTrId("battle-report-reason-evaded");
+                    break;
+                case KP::NonPenetration:
+                    //% "non-penetration"
+                    reasonLabel = qtTrId("battle-report-reason-non-pen");
+                    break;
+                case KP::NoTarget:
+                    //% "no target"
+                    reasonLabel = qtTrId("battle-report-reason-no-target");
+                    break;
+                case KP::TargetInvalid:
+                    //% "target invalid"
+                    reasonLabel = qtTrId("battle-report-reason-target-invalid");
+                    break;
+                case KP::AllPlanesLost:
+                    //% "all planes lost"
+                    reasonLabel = qtTrId("battle-report-reason-planes-lost");
+                    break;
+                default:
+                    reasonLabel = reason;
+                    break;
+                }
             } else {
-                //% "Attack skipped (%1): %2"
+                reasonLabel = reason;
+            }
+            bool hasTarget = skipAtkType >= 0 && defS >= 0;
+            if(hasTarget) {
+                QString atkLabel = typeLabel(skipAtkType);
+                //% "%1 %2: %3 attempted against %4"
+                line = qtTrId("battle-report-skip-atk-type")
+                           .arg(atkLabel, reasonLabel,
+                                attName, defName);
+            } else if(skipReason == KP::NoTarget
+                       || skipReason == KP::TargetInvalid
+                       || skipReason == KP::AllPlanesLost) {
+                //% "%1: %2"
                 line = qtTrId("battle-report-skip")
-                           .arg(attName).arg(reason);
+                           .arg(attName, reasonLabel);
+            } else {
+                //% "%1: %2"
+                line = qtTrId("battle-report-skip")
+                           .arg(attName, reasonLabel);
             }
             break;
+        }
         case KP::BattlePhaseCommence:
             line = QStringLiteral("--[ %1 ]--")
                        .arg(phaseLabel(battlePhaseVal));

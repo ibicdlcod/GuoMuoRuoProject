@@ -733,6 +733,15 @@ enum BattleActionType {
 };
 Q_ENUM_NS(BattleActionType)
 
+enum SkipReason {
+    Evaded = 0,
+    NonPenetration = 1,
+    NoTarget = 2,
+    TargetInvalid = 3,
+    AllPlanesLost = 4
+};
+Q_ENUM_NS(SkipReason)
+
 enum BattlePhase {
     AirBattlePhase = 0,
     ApproachingPhase = 1,

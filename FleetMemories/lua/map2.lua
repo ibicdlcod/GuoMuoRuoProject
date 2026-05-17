@@ -180,7 +180,7 @@ maps[2][3] = {
 	},
 	enemy = {
 		C = function()
-			return {}
+			return {0x7F050100, 0x7F052200}
 		end,
 		B = function()
 			return {}
