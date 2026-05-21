@@ -1044,7 +1044,7 @@ const QJsonObject Server::processBattleCore(const CSteamID &uid,
     // Now compute losses and update fleets
     if(playerFleet) {
         bool isExpedition = fleetIndex & KP::expeditionFleetMask;
-        Battle battleProcessor(mt);
+        Battle battleProcessor(mt, equipRegistry);
         battleProcessor.battleProcessor(playerFleet, &enemyFleet, battlePlan, isExpedition);
         result["damageLog"] = battleProcessor.getDamageLog();
 

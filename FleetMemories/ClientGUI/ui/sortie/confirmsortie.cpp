@@ -551,6 +551,9 @@ BattleDetailDialog::BattleDetailDialog(
             case KP::GunshotCutInAttack:
                 //% "[Gun cut-in]"
                 return qtTrId("battle-report-label-gun-cutin");
+            case KP::TorpedoAttack:
+                //% "[Torpedo]"
+                return qtTrId("battle-report-label-torpedo");
             default: return QString();
             }
         };

@@ -4,12 +4,14 @@
 #include "fleetinfo.h"
 #include <functional>
 #include <QJsonArray>
+#include <QMap>
 #include <random>
 
 class Battle
 {
 public:
-    Battle(std::mt19937 &rng);
+    Battle(std::mt19937 &rng,
+           const QMap<int, Equipment *> &equipRegistry);
 
     /* ——— types ————————————————————————————————————————————— */
 
@@ -68,6 +70,7 @@ private:
     /* ——— random ———————————————————————————————————————————— */
 
     std::mt19937 &rng;
+    const QMap<int, Equipment *> &equipRegistry;
 
     /* ——— battle state —————————————————————————————————————— */
 

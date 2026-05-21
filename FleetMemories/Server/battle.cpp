@@ -4,8 +4,9 @@
 #include <cmath>
 #include <numeric>
 
-Battle::Battle(std::mt19937 &rng)
-    : rng(rng) {
+Battle::Battle(std::mt19937 &rng,
+               const QMap<int, Equipment *> &equipRegistry)
+    : rng(rng), equipRegistry(equipRegistry) {
 
 }
 
@@ -64,11 +65,13 @@ void Battle::battleProcessor(FleetInfo *friendf, FleetInfo *enemyf,
     enemySubTorpLastFire.resize(KP::combinedFleetSize, 0);
     for(int i = 0; i < KP::combinedFleetSize; ++i) {
         if(i < currentFriendFleet->ships.size() && currentFriendFleet->ships[i]) {
+            qWarning() << "FUCK1";
             decideHidden({true, i});
         }
     }
     for(int i = 0; i < KP::combinedFleetSize; ++i) {
         if(i < currentEnemyFleet->ships.size() && currentEnemyFleet->ships[i]) {
+            qWarning() << "FUCK2";
             decideHidden({false, i});
         }
     }
@@ -696,12 +699,12 @@ bool Battle::processTorpedoCutIn(FriendOrEnemyIndex attacker) {
             attacker.isFriend, attacker.index);
         double accuracy = (baseAcc + equipAcc) * accMul;
 
-        double evasionChance
-            = std::exp((accuracy - evasion) / 1000.0);
+        double evasionChance = evasion > 0.0
+            ? std::exp2(-accuracy / evasion) : 0.0;
         evasionChance = std::clamp(evasionChance, 0.0, 1.0);
         std::uniform_real_distribution<double> evadeDist(
             0.0, 1.0);
-        if(evadeDist(rng) > evasionChance)
+        if(evadeDist(rng) < evasionChance)
             return false;
 
         double b = 0.0;
@@ -844,12 +847,12 @@ bool Battle::processTorpedoCutIn(FriendOrEnemyIndex attacker) {
         double torpAccuracy = (baseTorpAcc + equipTorpAcc)
                               * accMul;
 
-        double evasionChance
-            = std::exp((torpAccuracy - evasion) / 1000.0);
+        double evasionChance = evasion > 0.0
+            ? std::exp2(-torpAccuracy / evasion) : 0.0;
         evasionChance = std::clamp(evasionChance, 0.0, 1.0);
         std::uniform_real_distribution<double> evadeDist(
             0.0, 1.0);
-        if(evadeDist(rng) > evasionChance)
+        if(evadeDist(rng) < evasionChance)
             return false;
 
         int totalDmg = 0;
@@ -1118,12 +1121,12 @@ void Battle::processTorpedoAttack(FriendOrEnemyIndex attacker) {
                                            attacker.index);
     double accuracy = baseAcc + equipAcc;
 
-    double evasionChance
-        = std::exp((accuracy - evasion) / 1000.0);
+    double evasionChance = evasion > 0.0
+        ? std::exp2(-accuracy / evasion) : 0.0;
     evasionChance = std::clamp(evasionChance, 0.0, 1.0);
     std::uniform_real_distribution<double> evadeDist(
         0.0, 1.0);
-    if(evadeDist(rng) > evasionChance) {
+    if(evadeDist(rng) < evasionChance) {
         if(!isAntagonistFleetSunk(attacker)) {
             QJsonObject log;
             log["type"] = KP::AttackSkipped;
@@ -1387,6 +1390,7 @@ void Battle::nightBattle() {
                     continue;
                 if(!hasMainGun(isFriend, i))
                     continue;
+                qCritical() << "FUCK7";
                 double y = maxMainGunFiringSpeed(isFriend, i);
                 if(y <= 0.0)
                     continue;
@@ -1491,6 +1495,7 @@ void Battle::decideHidden(FriendOrEnemyIndex index) {
         concealChance = 0.5;
 
     std::bernoulli_distribution dist(concealChance);
+    qCritical() << concealChance << ship->toString() << shipConcealment << antagonistLos;
     result = dist(rng);
 
     if(index.isFriend) {
@@ -1505,12 +1510,14 @@ void Battle::decideHidden(FriendOrEnemyIndex index) {
     }
     if(result) {
         insertEvent(EventType::DecideHidden, clock + 15, index,
-                    [this](FriendOrEnemyIndex idx) { decideHidden(idx); });
+                    [this](FriendOrEnemyIndex idx) {
+                        qWarning() << "FUCK3";decideHidden(idx); });
         scheduleSubTorp(index);
     }
     else {
         insertEvent(EventType::DecideHidden, clock + 30, index,
-                    [this](FriendOrEnemyIndex idx) { decideHidden(idx); });
+                    [this](FriendOrEnemyIndex idx) {
+                        qWarning() << "FUCK4";decideHidden(idx); });
         cancelSubTorpEvents(index);
     }
 }
@@ -1536,7 +1543,8 @@ void Battle::forceVisible(FriendOrEnemyIndex index) {
     cancelSubTorpEvents(index);
 
     insertEvent(EventType::DecideHidden, clock + 30, index,
-                [this](FriendOrEnemyIndex idx) { decideHidden(idx); });
+                [this](FriendOrEnemyIndex idx) {
+                    qWarning() << "FUCK5";decideHidden(idx); });
 }
 
 /* Target selection — see doc/worldview_and_mechanics/9-battle.md */
@@ -3138,6 +3146,18 @@ bool Battle::hasMainGun(bool isFriend, int index) const {
     }
     if(checkGun(dyn->slotEquipEx))
         return true;
+
+    QList<int> startingEquip = ship->getStartingEquip();
+    if(!startingEquip.isEmpty()) {
+        int defaultId = startingEquip.first();
+        if(equipRegistry.contains(defaultId)) {
+            Equipment *eq = equipRegistry[defaultId];
+            if(eq->type.isMainGun()) {
+                return true;
+            }
+        }
+    }
+
     return false;
 }
 
@@ -3326,6 +3346,7 @@ void Battle::setupApproachingGunshots() {
              i < static_cast<int>(fleet->ships.size()); ++i) {
             if(!hasMainGun(isFriend, i))
                 continue;
+            qCritical() << "FUCK6";
             double maxRange = maxMainGunFiringRange(isFriend, i);
             if(maxRange <= 0.0)
                 continue;
@@ -3503,12 +3524,12 @@ bool Battle::processGunshotCutIn(FriendOrEnemyIndex attacker) {
         addEquipAcc(attDyn->slotEquipEx);
         double accuracy = baseAcc * accMul;
 
-        double evasionChance
-            = std::exp((accuracy - evasion) / 1000.0);
+        double evasionChance = evasion > 0.0
+            ? std::exp2(-accuracy / evasion) : 0.0;
         evasionChance = std::clamp(evasionChance, 0.0, 1.0);
         std::uniform_real_distribution<double> evadeDist(
             0.0, 1.0);
-        if(evadeDist(rng) > evasionChance)
+        if(evadeDist(rng) < evasionChance)
             return true;
 
         double ap
@@ -3781,12 +3802,12 @@ bool Battle::processGunshotCutIn(FriendOrEnemyIndex attacker) {
         addEquipAcc(attDyn->slotEquipEx);
         double accuracy = baseAcc;
 
-        double evasionChance
-            = std::exp((accuracy - evasion) / 1000.0);
+        double evasionChance = evasion > 0.0
+            ? std::exp2(-accuracy / evasion) : 0.0;
         evasionChance = std::clamp(evasionChance, 0.0, 1.0);
         std::uniform_real_distribution<double> evadeDist(
             0.0, 1.0);
-        if(evadeDist(rng) > evasionChance)
+        if(evadeDist(rng) < evasionChance)
             return false;
 
         double ap = maxMainGunArmorPenetration(
@@ -3993,11 +4014,11 @@ void Battle::processMainGunAttack(FriendOrEnemyIndex attacker) {
         = mainGunBaseAccuracy(attacker.isFriend, attacker.index);
     double equipAcc = attrs.value(QStringLiteral("Accuracy"), 0);
     double accuracy = baseAcc + equipAcc;
-    double evasionChance
-        = std::exp((evasion - accuracy) / 1000.0);
-    evasionChance = std::clamp(evasionChance, 0.0, 1.0);
+    double evasionChance = evasion > 0.0
+        ? std::exp2(-accuracy / evasion) : 0.0;
 
     std::uniform_real_distribution<double> evadeDist(0.0, 1.0);
+
     if(evadeDist(rng) < evasionChance) {
         if(!isAntagonistFleetSunk(attacker)) {
             QJsonObject log;
@@ -4068,7 +4089,6 @@ void Battle::processMainGunAttack(FriendOrEnemyIndex attacker) {
     }
 
     defDyn->currentHP = std::max(0, defDyn->currentHP - totalDmg);
-
 
     {
         QJsonObject log;
@@ -4266,12 +4286,12 @@ void Battle::processSecondaryGunAttack(FriendOrEnemyIndex attacker,
         }
     };
 
-    double evasionChance
-        = std::exp((accuracy - evasion) / 1000.0);
+    double evasionChance = evasion > 0.0
+        ? std::exp2(-accuracy / evasion) : 0.0;
     evasionChance = std::clamp(evasionChance, 0.0, 1.0);
 
     std::uniform_real_distribution<double> evadeDist(0.0, 1.0);
-    if(evadeDist(rng) > evasionChance) {
+    if(evadeDist(rng) < evasionChance) {
         if(!isAntagonistFleetSunk(attacker)) {
             QJsonObject log;
             log["type"] = KP::AttackSkipped;
