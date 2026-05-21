@@ -33,14 +33,14 @@ In the battle the following attack against enemies can occur:
   - Secondary gun gunshot
   - Gunshot cut-in
 
-- [Torpedo attack](9.a3-torpedoattack.md)
+- [Torpedo attack](9.a3-torpedoattack.md) [IMPLEMENTED]
   
   - Torpedo reloading device
   - Torpedo attack
   - Torpedo cut-in
   - Gunshot+Torpedo cut-in
 
-- [ASW attack](9.a4-asw.md)
+- [ASW attack](9.a4-asw.md) [NOTIMPLEMENTED]
   
   - ASW detection vs concealment
   - ASW depth charge attack
@@ -55,7 +55,7 @@ In the battle the following attack against enemies can occur:
 
 The battle is organized into the following phases:
 
-- [Air battle](9.p1-airbattle.md)
+- [Air battle](9.p1-airbattle.md) (0s clock)
 - [Approaching phase](9.p2-approaching.md) (20s clock, actual attack clock depending on max firing range, speed and LOS)
 - [Central phase](9.p3-central.md) (90s clock)
 - [Disengaging phase](9.p4-disengage.md) (clock depending on speed and LOS) (If we want night battle, we prevent them disengage; if we don't, we try to disengage)
@@ -63,8 +63,8 @@ The battle is organized into the following phases:
 
 The battle have the following special modes worthy of attention:
 
-- [Night-battle-start node](9.s1-nightstart.md)
-- [Air-battle-only node](9.s2-aironly.md)
+- [Night-battle-start node](9.s1-nightstart.md) 
+- [Air-battle-only node](9.s2-aironly.md) [NOTIMPLEMENTED]
 
 ## Target selection
 

@@ -32,14 +32,26 @@ Condition: `shipid & 0x000ff000 == 0x00011000`
 - **Demerits**: Same with destroyer with added lack of speed
 - **Design Philosophy**: Zero price to deploy (capitalness = 0) unless fleet max space (7 or 14) is considered
 
+##### Torpedo boats (TBD)
+
+A special type of escort destroyer with much lower health, firepower and much better evasion.
+
+Only appears as enemies in current plan.
+
 #### Coastal defense battleship
 
-Condition: `shipid & 0x000ff000 == 0x00018000`
+Condition: `shipid & 0x000f8000 == 0x00018000`
 
 - **Role**: Outdated (as of WWII) ships for coastal defense
 - **Merits**: Submarine-like fuel/repair cost
 - **Demerits**: Poor at everything
 - **Design Philosophy**: Used in low-stress expeditions
+
+##### Coastal defense battleship (with torpedo capabilities)
+
+Condition: `shipid & 0x000fA000 == 0x0001A000`
+
+As the name suggests, can equip and fire torpedo unlike normal coastal defense battleships.
 
 ### Destroyers
 
