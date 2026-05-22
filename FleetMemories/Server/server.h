@@ -45,6 +45,9 @@ public:
     MapWithDiff *getMapByUnionId(int mapUnionId) const;
     bool hasMapWithUnionId(int mapUnionId) const;
     void naturalRegen(const CSteamID &);
+    bool runTestBattle(const QString &luaPath,
+                       const QString &reportPath,
+                       int repeatCount = 1);
 
 public slots:
     void displayPrompt() override;
@@ -260,6 +263,15 @@ private:
     void testEquipmentDamageChance();
     void testEmergencyRepair();
     void testExpeditionMechanics();
+    FleetInfo buildFleetFromLua(sol::table t);
+    void writeMarkdownReport(const QString &path,
+                             const QJsonArray &damageLog,
+                             const FleetInfo &friendFleet,
+                             const FleetInfo &enemyFleet) const;
+    void writeAggregateReport(const QString &path,
+                              int repeatCount,
+                              const FleetInfo &friendFleet,
+                              const FleetInfo &enemyFleet) const;
     std::pair<KP::FleetFailType, int> updateFleet(const CSteamID &,
                                                   const QJsonArray &);
     void updateFleetIntoDatabase(const CSteamID &,
@@ -290,6 +302,34 @@ private:
     QMap<int, Ship *> shipRegistry;
     QMap<int, int> shipOldIdToNewId;
     QMultiMap<int, int> shipRemodelGroup;
+
+    struct RunStats {
+        QMap<QString, double> damageDealt;
+        QMap<QString, double> damageTaken;
+        struct CompoKey {
+            int fleetId;
+            int shipIndex;
+            int attackType;
+            int cutInType;
+            bool operator<(const CompoKey &o) const {
+                if(fleetId != o.fleetId) return fleetId < o.fleetId;
+                if(shipIndex != o.shipIndex)
+                    return shipIndex < o.shipIndex;
+                if(attackType != o.attackType)
+                    return attackType < o.attackType;
+                return cutInType < o.cutInType;
+            }
+        };
+        QMap<CompoKey, double> damageCompo;
+        QMap<CompoKey, int> attempts;
+        QMap<CompoKey, int> hits;
+        double airSupCoef = 0.0;
+        double friendFormEff = 0.0;
+        double enemyFormEff = 0.0;
+        bool hasAirSup = false;
+        bool hasFormEff = false;
+    };
+    QList<RunStats> allRunStats;
 
     QMap<int, MapWithDiff *> normalMaps;
     QList<int> normalMapHasLua;

@@ -2436,4 +2436,867 @@ void Server::handleAttrition(const CSteamID &uid, int fleetIndex,
     }
 }
 
+/* Test battle mode — see test/example.lua
+ * [Implemented in Server::runTestBattle] */
+
+FleetInfo Server::buildFleetFromLua(sol::table t) {
+    FleetInfo info;
+    info.type = static_cast<KP::FleetType>(t.get_or("type", 0));
+
+    sol::table shipsTbl = t["ships"];
+    sol::table dynTbl = t["shipDynamics"];
+    sol::optional<sol::table> tagsTbl = t["shipTags"];
+    sol::optional<sol::table> effTbl = t["equipSkillEffects"];
+
+    /* Find max index in ships table */
+    int maxShipIdx = -1;
+    for(const auto &pair : shipsTbl) {
+        int idx = pair.first.as<int>();
+        if(idx > maxShipIdx) maxShipIdx = idx;
+    }
+    int fleetSize = maxShipIdx + 1;
+    /* Pre-allocate */
+    info.ships.resize(fleetSize, nullptr);
+    info.shipDynamics.resize(fleetSize);
+    info.shipTags.resize(fleetSize, 0);
+
+    for(int pos = 0; pos < fleetSize; ++pos) {
+        sol::optional<int> shipIdOpt = shipsTbl[pos];
+        if(!shipIdOpt.has_value() || shipIdOpt.value() == 0) {
+            info.ships.push_back(nullptr);
+            info.shipDynamics.emplace_back();
+            continue;
+        }
+        int shipId = shipIdOpt.value();
+        if(!shipRegistry.contains(shipId)) {
+            qWarning() << "Ship ID" << Qt::hex << shipId
+                       << "not found in registry";
+            continue;
+        }
+        Ship *ship = shipRegistry[shipId];
+        info.ships[pos] = ship;
+
+        auto dyn = std::make_unique<ShipDynamic>();
+        dyn->star = 0;
+        dyn->condition = KP::conditionMax;
+        dyn->expCap = Ship::expCap(0);
+        dyn->fleetIndex = 0;
+        dyn->fleetPosIndex = pos;
+        dyn->fleetFled = false;
+
+        sol::optional<sol::table> sdOpt = dynTbl[pos];
+        if(sdOpt.has_value()) {
+            sol::table sd = sdOpt.value();
+            dyn->currentHP = sd.get_or(
+                "currentHP", ship->attr["Hitpoints"]);
+            dyn->fuel = sd.get_or("fuel", 1.0);
+            dyn->ammo = sd.get_or("ammo", 1.0);
+            int lv = sd.get_or("lv", 1);
+            double scale
+                = settings->value("rule/shipexpscale", 100.0)
+                      .toDouble();
+            dyn->exp = static_cast<int>(
+                scale * lv * (lv - 1) / 2.0);
+            dyn->expCap = Ship::expCap(0);
+
+            sol::optional<sol::table> slotsTbl = sd["slotEquip"];
+            QList<int> equipDefs;
+            if(slotsTbl.has_value()) {
+                sol::table st = slotsTbl.value();
+                for(std::size_t i = 0; i < st.size(); ++i)
+                    equipDefs.append(st.get_or(i, 0));
+            }
+            else {
+                equipDefs = ship->getStartingEquip();
+            }
+            for(int equipDef : equipDefs) {
+                if(equipDef == 0 || !equipRegistry.contains(
+                        equipDef)) {
+                    dyn->slotEquip.append(QUuid());
+                    continue;
+                }
+                QUuid uuid = QUuid::createUuid();
+                info.equipMap.insert(uuid,
+                                     equipRegistry[equipDef]);
+                info.equipSkillEffects.insert(uuid, 1.0);
+                dyn->slotEquip.append(uuid);
+            }
+
+            int exDef = sd.get_or("slotEquipEx", 0);
+            if(exDef != 0 && equipRegistry.contains(exDef)) {
+                QUuid uuid = QUuid::createUuid();
+                info.equipMap.insert(uuid,
+                                     equipRegistry[exDef]);
+                info.equipSkillEffects.insert(uuid, 1.0);
+                dyn->slotEquipEx = uuid;
+            }
+            else {
+                dyn->slotEquipEx = QUuid();
+            }
+
+            sol::optional<sol::table> planesTbl = sd["slotPlanes"];
+            if(planesTbl.has_value()) {
+                sol::table pt = planesTbl.value();
+                for(std::size_t i = 0;
+                     i < pt.size() && i < 5; ++i)
+                    dyn->slotPlanes.append(pt.get_or(i, 0));
+            }
+            else {
+                for(const QUuid &uuid : dyn->slotEquip) {
+                    Equipment *eq
+                        = info.equipMap.value(uuid, nullptr);
+                    if(eq)
+                        dyn->slotPlanes.append(
+                            eq->attr.value(
+                                QStringLiteral("Planes"),
+                                0));
+                    else
+                        dyn->slotPlanes.append(0);
+                }
+            }
+            while(dyn->slotPlanes.size() < 5)
+                dyn->slotPlanes.append(0);
+        }
+        else {
+            dyn->currentHP = ship->attr["Hitpoints"];
+            dyn->fuel = 1.0;
+            dyn->ammo = 1.0;
+            dyn->exp = 0;
+            dyn->expCap = Ship::expCap(0);
+            dyn->slotPlanes = QList<int>(5, 0);
+        }
+        info.shipDynamics[pos] = std::move(dyn);
+    }
+
+    if(tagsTbl.has_value()) {
+        sol::table tt = tagsTbl.value();
+        for(std::size_t i = 0; i < tt.size(); ++i)
+            info.shipTags[i] = tt.get_or(i, 0);
+    }
+
+    if(effTbl.has_value()) {
+        sol::table et = effTbl.value();
+        for(const auto &pair : et) {
+            int defId = pair.first.as<int>();
+            double mul = pair.second.as<double>();
+            for(auto it = info.equipMap.cbegin();
+                 it != info.equipMap.cend(); ++it) {
+                if(it.value()->getId() == defId) {
+                    info.equipSkillEffects[it.key()] = mul;
+                    break;
+                }
+            }
+        }
+    }
+
+    return info;
+}
+
+static QString shipLabel(const FleetInfo &friendFleet,
+                         const FleetInfo &enemyFleet,
+                         bool isFriend, int idx) {
+    const FleetInfo &fleet
+        = isFriend ? friendFleet : enemyFleet;
+    if(idx < 0
+        || idx >= static_cast<int>(fleet.ships.size())
+        || !fleet.ships[idx])
+        return QStringLiteral("?");
+    return QStringLiteral("%1 (#%2)")
+        .arg(fleet.ships[idx]->toString())
+        .arg(idx + 1);
+}
+
+static QString typeLabelForReport(int attackType, int cutInType) {
+    if(cutInType == static_cast<int>(KP::PlainTorp))
+        return QStringLiteral("[Torpedo cut-in]");
+    if(cutInType == static_cast<int>(KP::GunTorp)
+        || cutInType == -2) // gun-torp stored as string
+        return QStringLiteral("[Gun-Torpedo cut-in]");
+    if(cutInType == static_cast<int>(KP::SpottingFire)
+        || cutInType == -1) // spotting stored as string
+        return QStringLiteral("[Spotting cut-in]");
+    if(cutInType == static_cast<int>(KP::PlainGun))
+        return QStringLiteral("[Gun cut-in]");
+    switch(attackType) {
+    case KP::MainGunAttack: return QStringLiteral("[Main gun]");
+    case KP::SecondaryGunAttack:
+        return QStringLiteral("[Secondary gun]");
+    case KP::TorpedoAttack: return QStringLiteral("[Torpedo]");
+    case KP::AirTorpedoAttack:
+        return QStringLiteral("[Air torpedo]");
+    case KP::AirDiveAttack:
+        return QStringLiteral("[Air dive bomb]");
+    case KP::AirCutInAttack:
+        return QStringLiteral("[Air cut-in]");
+    case KP::GunshotCutInAttack:
+        return QStringLiteral("[Cut-in]");
+    case KP::AntiAirPlaneLoss:
+        return QStringLiteral("[AA loss]");
+    default: return QString();
+    }
+}
+
+static QString phaseLabelForReport(int phase) {
+    switch(phase) {
+    case KP::AirBattlePhase: return QStringLiteral("Air Battle");
+    case KP::ApproachingPhase:
+        return QStringLiteral("Approaching");
+    case KP::CentralPhase: return QStringLiteral("Central");
+    case KP::DisengagingPhase:
+        return QStringLiteral("Disengaging");
+    case KP::NightBattlePhase:
+        return QStringLiteral("Night Battle");
+    default: return QString();
+    }
+}
+
+static int parseCutInFromJson(const QJsonObject &e) {
+    QJsonValue cv = e["cutInType"];
+    if(cv.isDouble())
+        return cv.toInt(-1);
+    if(cv.isString()) {
+        QString s = cv.toString();
+        if(s == QStringLiteral("spotting"))
+            return -1;
+        if(s == QStringLiteral("gun-torp"))
+            return -2;
+        return -1;
+    }
+    return -1;
+}
+
+void Server::writeMarkdownReport(const QString &path,
+                                 const QJsonArray &damageLog,
+                                 const FleetInfo &friendFleet,
+                                 const FleetInfo &enemyFleet) const {
+    QFile f(path);
+    if(!f.open(QIODevice::WriteOnly | QIODevice::Text)) {
+        qWarning() << "Cannot open report file" << path;
+        return;
+    }
+    QTextStream out(&f);
+
+    out << "# Battle Report\n\n## Fleets\n\n";
+    out << "| # | Friend | HP |\n";
+    out << "|---|--------|----|\n";
+    for(int i = 0;
+         i < static_cast<int>(friendFleet.ships.size()); ++i) {
+        if(!friendFleet.ships[i])
+            continue;
+        int hp = friendFleet.shipDynamics[i]
+                     ? friendFleet.shipDynamics[i]->currentHP
+                     : 0;
+        out << "| " << (i + 1) << " | "
+            << friendFleet.ships[i]->toString()
+            << " | " << hp << " |\n";
+    }
+
+    out << "\n## Battle Log\n\n";
+    for(const auto &entryRef : damageLog) {
+        QJsonObject e = entryRef.toObject();
+        int type = e["type"].toInt();
+        int clockT = e["clock"].toInt(0);
+        QString timeStr
+            = QStringLiteral("T+%1").arg(clockT);
+        int attFId = e["attackerFleet"].toBool() ? 0 : 1;
+        int attS = e["attackerShip"].toInt(-1);
+        int defS = e["defenderShip"].toInt(-1);
+        int dmg = e["damage"].toInt(0);
+        int skipReason = e["reason"].toInt(-1);
+        int atkType = e["attackType"].toInt(-1);
+        int cutIn = parseCutInFromJson(e);
+        int phase = e["battlePhase"].toInt(-1);
+        bool overp = e["overpenetration"].toBool(false);
+
+        switch(type) {
+        case KP::BattlePhaseCommence:
+            out << "- " << timeStr << "   --[ "
+                << phaseLabelForReport(phase)
+                << " ]--\n";
+            break;
+        case KP::AttackSkipped: {
+            QString reasonStr;
+            switch(skipReason) {
+            case KP::Evaded:
+                reasonStr = QStringLiteral("evaded");
+                break;
+            case KP::NonPenetration:
+                reasonStr
+                    = QStringLiteral("non-penetration");
+                break;
+            case KP::NoTarget:
+                reasonStr = QStringLiteral("no target");
+                break;
+            case KP::TargetInvalid:
+                reasonStr
+                    = QStringLiteral("target invalid");
+                break;
+            case KP::AllPlanesLost:
+                reasonStr
+                    = QStringLiteral("all planes lost");
+                break;
+            default:
+                reasonStr = e["reason"].toString();
+                break;
+            }
+            if(defS >= 0 && atkType >= 0) {
+                QString lbl = typeLabelForReport(
+                    atkType, cutIn);
+                out << "- " << timeStr << "   " << lbl
+                    << " " << reasonStr << ": "
+                    << shipLabel(friendFleet, enemyFleet, attFId == 0, attS)
+                    << " " << reasonStr << ": "
+                    << shipLabel(friendFleet, enemyFleet, attFId == 0, attS)
+                    << " attempted against "
+                    << shipLabel(friendFleet, enemyFleet, attFId != 0, defS)
+                    << "\n";
+            }
+            else {
+                out << "- " << timeStr << "   "
+                    << reasonStr << ": "
+                    << shipLabel(friendFleet, enemyFleet, attFId == 0, attS)
+                    << "\n";
+            }
+            break;
+        }
+        case KP::AirSuperiorityValue: {
+            out << "- " << timeStr
+                << "   Air superiority: friend = "
+                << e["friendAS"].toDouble() << ", enemy = "
+                << e["enemyAS"].toDouble()
+                << " (coeff: "
+                << e["coefficient"].toDouble() << ")\n";
+            break;
+        }
+        case KP::FormationEfficiencyValue: {
+            out << "- " << timeStr
+                << "   Formation efficiency: Friend "
+                << e["friendEff"].toDouble() << ", Enemy "
+                << e["enemyEff"].toDouble() << "\n";
+            break;
+        }
+        case KP::PointBlankShot: {
+            out << "- " << timeStr
+                << "   [Point-blank] "
+                << shipLabel(friendFleet, enemyFleet, attFId == 0, attS)
+                << " → formation efficiency reduced\n";
+            break;
+        }
+        case KP::GuidedStrikeTrigger: {
+            out << "- " << timeStr
+                << "   Guided strike triggered (x"
+                << e["multiplier"].toDouble() << ")\n";
+            break;
+        }
+        case KP::AntiAirPlaneLoss: {
+            out << "- " << timeStr
+                << "   [AA loss] slot "
+                << e["attackerSlot"].toInt()
+                << ": -" << e["planesLost"].toInt() << " ("
+                << e["planesRemaining"].toInt()
+                << " remaining)\n";
+            break;
+        }
+        default: {
+            QString lbl
+                = typeLabelForReport(type, cutIn);
+            QString overpStr = overp
+                ? QStringLiteral(" (Overpenetration)")
+                : QString();
+            if(type == KP::GunshotCutInAttack
+                || type == KP::TorpedoAttack) {
+                double dmgMul
+                    = e["damageMultiplier"].toDouble(0.0);
+                if(dmgMul > 0.0)
+                    out << "- " << timeStr << "   " << lbl
+                        << " " << shipLabel(
+                               friendFleet, enemyFleet, attFId == 0, attS)
+                        << " → " << shipLabel(
+                               friendFleet, enemyFleet, attFId != 0, defS)
+                        << ": " << dmg
+                        << " damage (x" << dmgMul << ")"
+                        << overpStr << "\n";
+                else
+                    out << "- " << timeStr << "   " << lbl
+                        << " " << shipLabel(
+                               friendFleet, enemyFleet, attFId == 0, attS)
+                        << " → " << shipLabel(
+                               friendFleet, enemyFleet, attFId != 0, defS)
+                        << ": " << dmg << " damage"
+                        << overpStr << "\n";
+            }
+            else if(defS >= 0) {
+                out << "- " << timeStr << "   " << lbl
+                    << " " << shipLabel(
+                           friendFleet, enemyFleet, attFId == 0, attS)
+                    << " → " << shipLabel(
+                           friendFleet, enemyFleet, attFId != 0, defS)
+                    << ": " << dmg << " damage" << overpStr
+                    << "\n";
+            }
+            else {
+                out << "- " << timeStr << "   " << lbl
+                    << " " << shipLabel(
+                           friendFleet, enemyFleet, attFId == 0, attS)
+                    << ": " << dmg << " damage" << overpStr
+                    << "\n";
+            }
+            break;
+        }
+        }
+    }
+
+    out << "\n## Results\n\n";
+    out << "| # | Friend | HP |\n";
+    out << "|---|--------|----|\n";
+    for(int i = 0;
+         i < static_cast<int>(friendFleet.ships.size()); ++i) {
+        if(!friendFleet.ships[i])
+            continue;
+        int hp = friendFleet.shipDynamics[i]
+                     ? friendFleet.shipDynamics[i]->currentHP
+                     : 0;
+        out << "| " << (i + 1) << " | "
+            << friendFleet.ships[i]->toString()
+            << " | " << hp << " |\n";
+    }
+
+    out.flush();
+    f.close();
+
+    //% "Wrote battle report to %1"
+    qInfo() << qtTrId("test-battle-report-written")
+                   .arg(path);
+}
+
+void Server::writeAggregateReport(
+    const QString &path, int repeatCount,
+    const FleetInfo &friendFleet,
+    const FleetInfo &enemyFleet) const {
+    QFile f(path);
+    if(!f.open(QIODevice::WriteOnly | QIODevice::Text)) {
+        qWarning() << "Cannot open report file" << path;
+        return;
+    }
+    QTextStream out(&f);
+
+    out << "# Battle Report — Aggregate (" << repeatCount
+        << " runs)\n\n";
+
+    /* Fleet overview tables */
+    auto fleetSection
+        = [&](const QString &title,
+              const FleetInfo &fleetInfo, int fleetId) {
+              out << "## " << title << "\n\n";
+              out << "| # | Ship | Avg Dmg Dealt | Avg Dmg "
+                     "Taken | Avg Final HP |\n";
+              out << "|---|------|---------------|----------"
+                     "-----|-------------|\n";
+              for(int i = 0;
+                   i < static_cast<int>(
+                           fleetInfo.ships.size());
+                   ++i) {
+                  if(!fleetInfo.ships[i])
+                      continue;
+                  QString key = QStringLiteral("%1_%2")
+                                    .arg(fleetId)
+                                    .arg(i);
+                  double avgDealt
+                      = allRunStats.isEmpty()
+                            ? 0.0
+                            : std::accumulate(
+                                  allRunStats.begin(),
+                                  allRunStats.end(), 0.0,
+                                  [&](double sum,
+                                      const RunStats &rs) {
+                                      return sum
+                                             + rs.damageDealt
+                                                   .value(key,
+                                                          0.0);
+                                  })
+                                  / repeatCount;
+                  double avgTaken
+                      = allRunStats.isEmpty()
+                            ? 0.0
+                            : std::accumulate(
+                                  allRunStats.begin(),
+                                  allRunStats.end(), 0.0,
+                                  [&](double sum,
+                                      const RunStats &rs) {
+                                      return sum
+                                             + rs.damageTaken
+                                                   .value(key,
+                                                          0.0);
+                                  })
+                                  / repeatCount;
+                  out << "| " << (i + 1) << " | "
+                      << fleetInfo.ships[i]->toString()
+                      << " | "
+                      << QString::number(avgDealt, 'f', 1)
+                      << " | "
+                      << QString::number(avgTaken, 'f', 1)
+                      << " | -\n";
+              }
+          };
+
+    fleetSection(QStringLiteral("Friend Fleet"),
+                 friendFleet, 0);
+    fleetSection(QStringLiteral("Enemy Fleet"), enemyFleet,
+                 1);
+
+    /* Damage composition */
+    auto compoSection
+        = [&](const QString &title,
+              const FleetInfo &fleetInfo, int fleetId) {
+              struct AtkCol {
+                  int attackType;
+                  int cutInType;
+                  QString label;
+              };
+              QList<AtkCol> cols = {
+                  {KP::MainGunAttack, -1,
+                   QStringLiteral("Main Gun")},
+                  {KP::SecondaryGunAttack, -1,
+                   QStringLiteral("Sec Gun")},
+                  {KP::TorpedoAttack, -1,
+                   QStringLiteral("Torpedo")},
+                  {KP::TorpedoAttack,
+                   static_cast<int>(KP::PlainTorp),
+                   QStringLiteral("Torp Cut-in")},
+                  {KP::TorpedoAttack, -2,
+                   QStringLiteral("Gun-Torp Cut-in")},
+                  {KP::AirTorpedoAttack, -1,
+                   QStringLiteral("Air Torpedo")},
+                  {KP::AirDiveAttack, -1,
+                   QStringLiteral("Air Dive")},
+                  {KP::AirCutInAttack, -1,
+                   QStringLiteral("Air Cut-in")},
+                  {KP::GunshotCutInAttack, -1,
+                   QStringLiteral("Spotting Cut-in")},
+                  {KP::GunshotCutInAttack,
+                   static_cast<int>(KP::PlainGun),
+                   QStringLiteral("Gun Cut-in")},
+              };
+              out << "## " << title
+                  << " Damage Composition (avg per run)\n\n";
+              out << "| # | Ship |";
+              for(const auto &c : cols)
+                  out << " " << c.label << " |";
+              out << "\n";
+              out << "|---|------|";
+              for(std::size_t i = 0; i < cols.size(); ++i)
+                  out << "---|";
+              out << "\n";
+              for(int i = 0;
+                   i < static_cast<int>(
+                           fleetInfo.ships.size());
+                   ++i) {
+                  if(!fleetInfo.ships[i])
+                      continue;
+                  out << "| " << (i + 1) << " | "
+                      << fleetInfo.ships[i]->toString()
+                      << " |";
+                  for(const auto &c : cols) {
+                      double sum = 0.0;
+                      for(const auto &rs : allRunStats) {
+                          RunStats::CompoKey ck{fleetId, i,
+                                                c.attackType,
+                                                c.cutInType};
+                          sum += rs.damageCompo.value(
+                              ck, 0.0);
+                      }
+                      double avg
+                          = repeatCount > 0
+                                ? sum / repeatCount
+                                : 0.0;
+                      if(avg > 0.0)
+                          out << " "
+                              << QString::number(avg, 'f',
+                                                 1)
+                              << " |";
+                      else
+                          out << " - |";
+                  }
+                  out << "\n";
+              }
+          };
+
+    compoSection(QStringLiteral("Friend"), friendFleet, 0);
+    compoSection(QStringLiteral("Enemy"), enemyFleet, 1);
+
+    /* Hit rates */
+    auto hitSection
+        = [&](const QString &title,
+              const FleetInfo &fleetInfo, int fleetId) {
+              struct HitCol {
+                  int attackType;
+                  QString label;
+              };
+              QList<HitCol> hcols = {
+                  {KP::MainGunAttack,
+                   QStringLiteral("Main Gun")},
+                  {KP::SecondaryGunAttack,
+                   QStringLiteral("Sec Gun")},
+                  {KP::TorpedoAttack,
+                   QStringLiteral("Torpedo")},
+                  {KP::AirTorpedoAttack,
+                   QStringLiteral("Air Torpedo")},
+                  {KP::AirDiveAttack,
+                   QStringLiteral("Air Dive")},
+                  {KP::GunshotCutInAttack,
+                   QStringLiteral("Cut-in")},
+              };
+              out << "## " << title
+                  << " Hit Rates (hits/total by base type)\n\n";
+              out << "| # | Ship |";
+              for(const auto &c : hcols)
+                  out << " " << c.label << " |";
+              out << "\n";
+              out << "|---|------|";
+              for(std::size_t i = 0; i < hcols.size(); ++i)
+                  out << "---|";
+              out << "\n";
+              for(int i = 0;
+                   i < static_cast<int>(
+                           fleetInfo.ships.size());
+                   ++i) {
+                  if(!fleetInfo.ships[i])
+                      continue;
+                  out << "| " << (i + 1) << " | "
+                      << fleetInfo.ships[i]->toString()
+                      << " |";
+                  for(const auto &c : hcols) {
+                      int attempts = 0;
+                      int hits = 0;
+                      for(const auto &rs : allRunStats) {
+                          RunStats::CompoKey ck{fleetId, i,
+                                                c.attackType,
+                                                -1};
+                          attempts += rs.attempts.value(
+                              ck, 0);
+                          hits += rs.hits.value(ck, 0);
+                      }
+                      if(attempts > 0) {
+                          double rate
+                              = 100.0 * hits / attempts;
+                          out << " "
+                              << QString::number(rate, 'f',
+                                                 1)
+                              << "% (" << hits << "/"
+                              << attempts << ") |";
+                      }
+                      else {
+                          out << " - |";
+                      }
+                  }
+                  out << "\n";
+              }
+          };
+
+    hitSection(QStringLiteral("Friend"), friendFleet, 0);
+    hitSection(QStringLiteral("Enemy"), enemyFleet, 1);
+
+    /* Global averages */
+    double avgAirSup = 0.0;
+    double avgFriendEff = 0.0;
+    double avgEnemyEff = 0.0;
+    int airSupRuns = 0;
+    int formEffRuns = 0;
+    for(const auto &rs : allRunStats) {
+        if(rs.hasAirSup) {
+            avgAirSup += rs.airSupCoef;
+            airSupRuns++;
+        }
+        if(rs.hasFormEff) {
+            avgFriendEff += rs.friendFormEff;
+            avgEnemyEff += rs.enemyFormEff;
+            formEffRuns++;
+        }
+    }
+    if(airSupRuns > 0)
+        avgAirSup /= airSupRuns;
+    if(formEffRuns > 0) {
+        avgFriendEff /= formEffRuns;
+        avgEnemyEff /= formEffRuns;
+    }
+
+    out << "## Global Averages\n\n";
+    out << "| Metric | Average |\n";
+    out << "|--------|--------|\n";
+    out << "| Air Superiority Coefficient | "
+        << QString::number(avgAirSup, 'f', 3) << " |\n";
+    out << "| Friend Formation Efficiency | "
+        << QString::number(avgFriendEff, 'f', 3) << " |\n";
+    out << "| Enemy Formation Efficiency | "
+        << QString::number(avgEnemyEff, 'f', 3) << " |\n";
+
+    out.flush();
+    f.close();
+
+    //% "Wrote aggregate battle report to %1"
+    qInfo() << qtTrId("test-battle-agg-report-written")
+                   .arg(path);
+}
+
+bool Server::runTestBattle(const QString &luaPath,
+                           const QString &reportPath,
+                           int repeatCount) {
+    sqlinit();
+    importEquipFromCSV();
+    importShipFromCSV();
+    luaInitEquipable();
+
+    sol::protected_function_result loadResult
+        = lua.safe_script_file(luaPath.toStdString(),
+                               sol::script_pass_on_error);
+    if(!loadResult.valid()) {
+        sol::error err = loadResult;
+        qCritical() << "Failed to load test lua:"
+                     << err.what();
+        return false;
+    }
+    sol::table testData = loadResult;
+
+    sol::table friendTbl = testData["FriendFleetInfo"];
+    sol::table enemyTbl = testData["EnemyFleetInfo"];
+    if(!friendTbl.valid() || !enemyTbl.valid()) {
+        qCritical()
+            << "Test lua must define FriendFleetInfo and "
+               "EnemyFleetInfo tables";
+        return false;
+    }
+
+    FleetInfo friendFleet = buildFleetFromLua(friendTbl);
+    FleetInfo enemyFleet = buildFleetFromLua(enemyTbl);
+
+    QJsonObject battlePlan;
+    battlePlan["friendFleetPriority"] = 0;
+    battlePlan["enemyFleetPriority"]
+        = static_cast<int>(KP::EnemyBalanced);
+    battlePlan["extraBattle"] = true;
+    battlePlan["extraBattleWhenLosing"] = false;
+    battlePlan["extraBattleWhenFlagship"] = false;
+    battlePlan["extraBattleWhenBorBelow"] = false;
+    battlePlan["extraBattleWhenAorBelow"] = false;
+
+    sol::optional<sol::table> bpOpt
+        = testData["BattlePlan"];
+    if(bpOpt.has_value()) {
+        sol::table bp = bpOpt.value();
+        battlePlan["friendFleetPriority"]
+            = bp.get_or("friendFleetPriority", 0);
+        battlePlan["enemyFleetPriority"] = bp.get_or(
+            "enemyFleetPriority",
+            static_cast<int>(KP::EnemyBalanced));
+        battlePlan["extraBattle"]
+            = bp.get_or("extraBattle", true);
+        battlePlan["extraBattleWhenLosing"]
+            = bp.get_or("extraBattleWhenLosing", false);
+        battlePlan["extraBattleWhenFlagship"]
+            = bp.get_or("extraBattleWhenFlagship", false);
+        battlePlan["extraBattleWhenBorBelow"]
+            = bp.get_or("extraBattleWhenBorBelow", false);
+        battlePlan["extraBattleWhenAorBelow"]
+            = bp.get_or("extraBattleWhenAorBelow", false);
+    }
+
+    allRunStats.clear();
+    std::random_device rd;
+    for(int run = 0; run < repeatCount; ++run) {
+        FleetInfo fFriend;
+        deepCopyFleetInfo(friendFleet, fFriend);
+        FleetInfo fEnemy;
+        deepCopyFleetInfo(enemyFleet, fEnemy);
+
+        std::seed_seq seq{rd(), rd(), rd(), rd(), rd(),
+                           rd(), rd(), rd()};
+        std::mt19937 runMt(seq);
+        Battle battle(runMt, equipRegistry);
+        battle.battleProcessor(&fFriend, &fEnemy,
+                               battlePlan);
+        QJsonArray damageLog = battle.getDamageLog();
+
+        if(repeatCount == 1 && !reportPath.isEmpty()) {
+            writeMarkdownReport(reportPath, damageLog,
+                                fFriend, fEnemy);
+            return true;
+        }
+
+        RunStats rs;
+        for(const auto &entryRef : damageLog) {
+            QJsonObject e = entryRef.toObject();
+            int type = e["type"].toInt();
+            int attFId
+                = e["attackerFleet"].toBool() ? 0 : 1;
+            int attS = e["attackerShip"].toInt(-1);
+            int defS = e["defenderShip"].toInt(-1);
+            int dmg = e["damage"].toInt(0);
+            int atkType = e["attackType"].toInt(-1);
+            int cutIn = parseCutInFromJson(e);
+            int skipReason = e["reason"].toInt(-1);
+
+            if(type == KP::AirSuperiorityValue) {
+                rs.airSupCoef
+                    = e["coefficient"].toDouble();
+                rs.hasAirSup = true;
+                continue;
+            }
+            if(type == KP::FormationEfficiencyValue) {
+                rs.friendFormEff
+                    = e["friendEff"].toDouble();
+                rs.enemyFormEff
+                    = e["enemyEff"].toDouble();
+                rs.hasFormEff = true;
+                continue;
+            }
+
+            if(attS < 0)
+                continue;
+
+            QString dealKey
+                = QStringLiteral("%1_%2")
+                      .arg(attFId)
+                      .arg(attS);
+            QString takeKey
+                = QStringLiteral("%1_%2")
+                      .arg(attFId == 0 ? 1 : 0)
+                      .arg(defS);
+
+            if(type == KP::AttackSkipped) {
+                if(skipReason == KP::Evaded
+                    && atkType >= 0) {
+                    RunStats::CompoKey ck{
+                        attFId, attS, atkType, -1};
+                    rs.attempts[ck]++;
+                }
+                continue;
+            }
+
+            if(atkType < 0)
+                atkType = type;
+
+            RunStats::CompoKey ckFull{attFId, attS, atkType,
+                                      cutIn};
+            RunStats::CompoKey ckBase{attFId, attS, atkType,
+                                      -1};
+
+            rs.damageDealt[dealKey] += dmg;
+            if(defS >= 0)
+                rs.damageTaken[takeKey] += dmg;
+            rs.damageCompo[ckFull] += dmg;
+            rs.attempts[ckBase]++;
+            rs.hits[ckBase]++;
+        }
+        allRunStats.append(rs);
+    }
+
+    if(repeatCount > 1 && !reportPath.isEmpty()) {
+        writeAggregateReport(reportPath, repeatCount,
+                             friendFleet, enemyFleet);
+        return true;
+    }
+
+    return false;
+}
+
 QT_END_NAMESPACE

@@ -3,6 +3,7 @@
 
 #include <QCoreApplication>
 #include <QLocale>
+#include <QSqlDatabase>
 #include <QTranslator>
 #include "../steam/steam_gameserver.h"
 
@@ -40,6 +41,62 @@ int main(int argc, char *argv[]) {
         }
         std::abort();
     });
+
+    /* Test battle mode — see test/example.lua */
+    {
+        QString luaPath;
+        QString reportPath;
+        int repeatCount = 1;
+        bool isTestMode = false;
+        for(int i = 1; i < argc; ++i) {
+            QString arg = QString::fromLocal8Bit(argv[i]);
+            if(arg == QStringLiteral("--testbattle") && i + 1 < argc) {
+                luaPath = QString::fromLocal8Bit(argv[++i]);
+                isTestMode = true;
+            }
+            else if(arg == QStringLiteral("--report") && i + 1 < argc) {
+                reportPath = QString::fromLocal8Bit(argv[++i]);
+            }
+            else if(arg == QStringLiteral("--repeat") && i + 1 < argc) {
+                repeatCount
+                    = QString::fromLocal8Bit(argv[++i]).toInt();
+            }
+        }
+        if(isTestMode) {
+            if(luaPath.isEmpty()) {
+                qCritical() << "--testbattle requires a lua file path";
+                return 1;
+            }
+            if(repeatCount > 1 && reportPath.isEmpty()) {
+                qCritical()
+                    << "--report is required when --repeat is specified";
+                return 1;
+            }
+            if(repeatCount < 1)
+                repeatCount = 1;
+
+            QT_USE_NAMESPACE
+            Server server(argc, argv);
+            server.setApplicationName("FleetMemories Server");
+            server.setApplicationVersion("0.60.1");
+            server.setOrganizationName("Harusame Software");
+            server.setOrganizationDomain("fleetmemories.moe");
+            settings = std::make_unique<QSettings>(new QSettings);
+            settings->setValue("server/language", "en_US");
+            KP::initLog(true);
+
+            QSqlDatabase db = QSqlDatabase::addDatabase(
+                QStringLiteral("QSQLITE"));
+            db.setDatabaseName(QStringLiteral(":memory:"));
+            if(!db.open()) {
+                qCritical() << "Failed to open in-memory database";
+                return 1;
+            }
+
+            server.runTestBattle(luaPath, reportPath, repeatCount);
+            return 0;
+        }
+    }
 
     SteamErrMsg err;
     /* doubt this will have actual effect */
