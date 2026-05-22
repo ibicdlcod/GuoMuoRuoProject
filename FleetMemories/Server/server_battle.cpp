@@ -934,6 +934,8 @@ FleetInfo Server::createEnemyFleetInfo(int mapId, int nodeId,
     return info;
 }
 
+/* Battle processor — see doc/worldview_and_mechanics/9-battle.md
+ * [Implemented in Server::processBattleCore] */
 const QJsonObject Server::processBattleCore(const CSteamID &uid,
                                             int mapId,
                                             int nodeId,
@@ -2436,8 +2438,12 @@ void Server::handleAttrition(const CSteamID &uid, int fleetIndex,
     }
 }
 
-/* Test battle mode — see test/example.lua
- * [Implemented in Server::runTestBattle] */
+/* Test battle mode
+ * — see doc/worldview_and_mechanics/9.t1-testbattle.md
+ * [Implemented in Server::runTestBattle,
+ *  Server::buildFleetFromLua,
+ *  Server::writeMarkdownReport,
+ *  Server::writeAggregateReport] */
 
 FleetInfo Server::buildFleetFromLua(sol::table t) {
     FleetInfo info;

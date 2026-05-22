@@ -6,35 +6,54 @@ Unlike KC (but similar to KC arcade), some phase of battle have an internal cloc
 
 The battle have the following characteristics:
 
-- [Tactical Goal (for friend fleet)](9.c1-goal-friend.md) [IMPLEMENTED]
-- [Tactical Goal (against enemy fleet)](9.c2-goal-enemy.md) [IMPLEMENTED]
-- Target selection (see below) [IMPLEMENTED]
-- [Communication efficiency](9.c3-communication.md) [IMPLEMENTED]
-- [LOS, undiscovered ships and surprise attacks](9.c4-los.md) [IMPLEMENTED]
-- [Air superiority coefficient](9.c5-air-superiority.md) [IMPLEMENTED]
-- [Guided strikes (触接)](9.c6-guidedstrikes.md) [IMPLEMENTED]
-- [Formation efficiency](9.c7-formation.md) [IMPLEMENTED]
+- [Tactical Goal (for friend fleet)](9.c1-goal-friend.md)
+  [Implemented in Battle::battleProcessor#friend-goal,
+   Battle::isProtectedShip]
+- [Tactical Goal (against enemy fleet)](9.c2-goal-enemy.md)
+  [Implemented in Battle::battleProcessor#enemy-goal,
+   Battle::isPrioritizedTarget]
+- Target selection (see below)
+  [Implemented in Battle::selectEnemyTarget,
+   Battle::selectFriendTarget]
+- [Communication efficiency](9.c3-communication.md)
+  [Implemented in Battle::battleProcessor#communication-init]
+- [LOS, undiscovered ships and surprise attacks](9.c4-los.md)
+  [Implemented in Battle::decideHidden,
+   Battle::forceVisible]
+- [Air superiority coefficient](9.c5-air-superiority.md)
+  [Implemented in Battle::computeAirSuperiority,
+   Battle::fleetAirSuperiority]
+- [Guided strikes (触接)](9.c6-guidedstrikes.md)
+  [Implemented in Battle::processReconGuidedStrike,
+   Battle::processMidgetGuidedStrike]
+- [Formation efficiency](9.c7-formation.md)
+  [Implemented in Battle::computeFormationEfficiency]
 - [Commander's abilities](9.c8-abilities.md)
 - [LBAS](9.c9-lbas.md)
 - Radiation (TBD)
 
 In the battle the following attack against enemies can occur:
 
-- [Air attack ](9.a1-airattack.md) [IMPLEMENTED]
-  
+- [Air attack ](9.a1-airattack.md)
+  [Implemented in Battle::airBattle,
+   Battle::processAirAttack]
+   
   - Air bombing + individual anti-air
   - Air torpedo + individual anti-air
   - Air attack cut-in + individual anti-air
   - Jet plane attack (TBD)
 
-- [Gunshot](9.a2-gunshot.md) [IMPLEMENTED]
+- [Gunshot](9.a2-gunshot.md)
+  [Implemented in Battle::processMainGunAttack,
+   Battle::processSecondaryGunAttack]
   
   - Main gun gunshot
   - Secondary gun gunshot
   - Gunshot cut-in
 
-- [Torpedo attack](9.a3-torpedoattack.md) [IMPLEMENTED]
-  
+- [Torpedo attack](9.a3-torpedoattack.md)
+  [Implemented in Battle::processTorpedoAttack]
+   
   - Torpedo reloading device
   - Torpedo attack
   - Torpedo cut-in

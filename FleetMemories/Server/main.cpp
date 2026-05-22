@@ -42,7 +42,10 @@ int main(int argc, char *argv[]) {
         std::abort();
     });
 
-    /* Test battle mode — see test/example.lua */
+    /* Test battle mode
+     * — see doc/worldview_and_mechanics/9.t1-testbattle.md
+     * [Implemented in main.cpp#test-battle-mode]
+     * [Implemented in Server::runTestBattle] */
     {
         QString luaPath;
         QString reportPath;
@@ -84,6 +87,18 @@ int main(int argc, char *argv[]) {
             settings = std::make_unique<QSettings>(new QSettings);
             settings->setValue("server/language", "en_US");
             KP::initLog(true);
+
+            QTranslator translator;
+            const QString baseName
+                = QStringLiteral("FleetMemories_")
+                  + QLocale(
+                        settings->value("server/language",
+                                        "en_US")
+                            .toString())
+                        .name();
+            if(translator.load(
+                   QStringLiteral(":/i18n/") + baseName))
+                server.installTranslator(&translator);
 
             QSqlDatabase db = QSqlDatabase::addDatabase(
                 QStringLiteral("QSQLITE"));

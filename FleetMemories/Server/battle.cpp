@@ -81,7 +81,8 @@ void Battle::battleProcessor(FleetInfo *friendf, FleetInfo *enemyf,
             && currentFriendFleet->ships[i]) {
             bool receivedOrder = false;
             /* communication efficiency -
-             * see doc/worldview_and_mechanics/9.c3-communication.md */
+             * see doc/worldview_and_mechanics/9.c3-communication.md
+             * [Implemented in Battle::battleProcessor#communication-init] */
             if(i == 0) {
                 /* flagship always receives orders */
                 commEfficiency[0] = 1; // only used when only flagship is present in a fleet
@@ -251,7 +252,8 @@ void Battle::battleProcessor(FleetInfo *friendf, FleetInfo *enemyf,
 
 void Battle::airBattle() {
     /* Air battle phase
-     * — see doc/worldview_and_mechanics/9.p1-airbattle.md */
+     * — see doc/worldview_and_mechanics/9.p1-airbattle.md
+     * [Implemented in Battle::airBattle] */
     clock = 0;
     isNight = false;
     {
@@ -287,7 +289,8 @@ void Battle::airBattle() {
 
 void Battle::approachingPhase() {
     /* Approaching phase
-     * — see doc/worldview_and_mechanics/9.p2-approaching.md */
+     * — see doc/worldview_and_mechanics/9.p2-approaching.md
+     * [Implemented in Battle::approachingPhase] */
     {
         QJsonObject log;
         log["type"] = KP::BattlePhaseCommence;
@@ -359,7 +362,8 @@ void Battle::approachingPhase() {
 
 void Battle::centralPhase() {
     /* Central phase
-     * — see doc/worldview_and_mechanics/9.p3-central.md */
+     * — see doc/worldview_and_mechanics/9.p3-central.md
+     * [Implemented in Battle::centralPhase] */
     {
         QJsonObject log;
         log["type"] = KP::BattlePhaseCommence;
@@ -375,7 +379,8 @@ void Battle::centralPhase() {
 
 void Battle::disengagingPhase() {
     /* Disengaging phase
-     * — see doc/worldview_and_mechanics/9.p4-disengage.md */
+     * — see doc/worldview_and_mechanics/9.p4-disengage.md
+     * [Implemented in Battle::disengagingPhase] */
     {
         QJsonObject log;
         log["type"] = KP::BattlePhaseCommence;
@@ -460,7 +465,12 @@ void Battle::disengagingPhase() {
     advanceClockTime(20);
 }
 
-/* Torpedo attack — see doc/worldview_and_mechanics/9.a3-torpedoattack.md */
+/* Torpedo attack — see doc/worldview_and_mechanics/9.a3-torpedoattack.md
+ * [Implemented in Battle::processTorpedoAttack,
+ *  Battle::hasTorpedo,
+ *  Battle::setupTorpedoAttacks,
+ *  Battle::torpBaseAccuracy,
+ *  Battle::torpCombinedAccuracy] */
 
 bool Battle::hasTorpedo(bool isFriend, int index) const {
     FleetInfo *fleet = fleetOf(isFriend);
@@ -1303,7 +1313,8 @@ KP::BattleAssessment Battle::computePreliminaryAssessment() const {
 
 void Battle::nightBattle() {
     /* Night battle phase
-     * — see doc/worldview_and_mechanics/9.p5-nightbattle.md */
+     * — see doc/worldview_and_mechanics/9.p5-nightbattle.md
+     * [Implemented in Battle::nightBattle] */
     isNight = true;
     {
         QJsonObject log;
@@ -1452,7 +1463,9 @@ void Battle::insertEvent(EventType type, clockTime time,
     events.insert(it, e);
 }
 
-/* Concealment — see doc/worldview_and_mechanics/9.c4-los.md */
+/* Concealment — see doc/worldview_and_mechanics/9.c4-los.md
+ * [Implemented in Battle::decideHidden,
+ *  Battle::forceVisible] */
 
 void Battle::decideHidden(FriendOrEnemyIndex index) {
     bool result;
@@ -1545,7 +1558,10 @@ void Battle::forceVisible(FriendOrEnemyIndex index) {
                     decideHidden(idx); });
 }
 
-/* Target selection — see doc/worldview_and_mechanics/9-battle.md */
+/* Target selection
+ * — see doc/worldview_and_mechanics/9-battle.md
+ * [Implemented in Battle::selectEnemyTarget,
+ *  Battle::selectFriendTarget] */
 
 int Battle::selectEnemyTarget(int friendIndex) const {
     std::vector<int> visible;
@@ -1700,7 +1716,9 @@ bool Battle::isProtectedShip(int friendIndex) const {
 }
 
 void Battle::processReconGuidedStrike() {
-    /* Reconnaissance plane guided strike — see doc/9.c6-guidedstrikes.md */
+/* Reconnaissance plane guided strike
+ * — see doc/worldview_and_mechanics/9.c6-guidedstrikes.md
+ * [Implemented in Battle::processReconGuidedStrike] */
     if(airSuperiorityCoefficient <= 0.0)
         return;
 
@@ -1768,7 +1786,9 @@ void Battle::processReconGuidedStrike() {
 }
 
 void Battle::processMidgetGuidedStrike() {
-    /* Midget sub guided strike — see doc/9.c6-guidedstrikes.md */
+    /* Midget sub guided strike
+     * — see doc/worldview_and_mechanics/9.c6-guidedstrikes.md
+     * [Implemented in Battle::processMidgetGuidedStrike] */
 
     struct Candidate {
         int shipIndex;
@@ -1850,8 +1870,11 @@ void Battle::processMidgetGuidedStrike() {
     }
 }
 
-/* Air superiority coefficient
- * - see doc/worldview_and_mechanics/9.c5-air-superiority.md */
+/* Air superiority helpers
+ * - see doc/worldview_and_mechanics/9.c5-air-superiority.md
+ * [Implemented in Battle::computeAirSuperiority,
+ *  Battle::fleetAirSuperiority,
+ *  Battle::maxEnemyFighterAA] */
 double Battle::maxEnemyFighterAA(const FleetInfo *fleet) const {
     double maxAA = 0.0;
     for(int i = 0; i < static_cast<int>(fleet->ships.size()); ++i) {
@@ -1990,7 +2013,8 @@ void Battle::computeAirSuperiority() {
 }
 
 /* Formation efficiency
- * - see doc/worldview_and_mechanics/9.c7-formation.md */
+ * - see doc/worldview_and_mechanics/9.c7-formation.md
+ * [Implemented in Battle::computeFormationEfficiency] */
 void Battle::computeFormationEfficiency() {
     auto validSpeeds = [](const std::vector<int> &speeds)
     -> std::vector<double>
@@ -2059,7 +2083,17 @@ void Battle::computeFormationEfficiency() {
     }
 }
 
-/* Air attack — see doc/worldview_and_mechanics/9.a1-airattack.md */
+/* Air attack — see doc/worldview_and_mechanics/9.a1-airattack.md
+ * [Implemented in Battle::processAirAttack,
+ *  Battle::executeAirTorpedoAttack,
+ *  Battle::executeAirDiveAttack,
+ *  Battle::executeAirAttackCutIn,
+ *  Battle::processS1PlaneLoss,
+ *  Battle::processS2PlaneLoss,
+ *  Battle::processS3AACutIn,
+ *  Battle::applyIndividualAntiAir,
+ *  Battle::setupAirReloading,
+ *  Battle::collectAirSquadrons] */
 
 FleetInfo *Battle::fleetOf(bool isFriend) const {
     return isFriend ? currentFriendFleet : currentEnemyFleet;
@@ -3122,7 +3156,16 @@ void Battle::processS3AACutIn() {
     tryCutIn(false);
 }
 
-/* Gunshot — see doc/worldview_and_mechanics/9.a2-gunshot.md */
+/* Gunshot — see doc/worldview_and_mechanics/9.a2-gunshot.md
+ * [Implemented in Battle::processMainGunAttack,
+ *  Battle::processGunshotCutIn,
+ *  Battle::processSecondaryGunAttack,
+ *  Battle::setupApproachingGunshots,
+ *  Battle::setupSecondaryGunshots,
+ *  Battle::hasMainGun,
+ *  Battle::hasSecGun,
+ *  Battle::mainGunBaseAccuracy,
+ *  Battle::secGunBaseAccuracy] */
 
 bool Battle::hasMainGun(bool isFriend, int index) const {
     FleetInfo *fleet = fleetOf(isFriend);
