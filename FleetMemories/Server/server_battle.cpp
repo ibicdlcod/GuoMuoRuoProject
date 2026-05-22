@@ -915,7 +915,18 @@ FleetInfo Server::createEnemyFleetInfo(int mapId, int nodeId,
             dyn->slotEquip.append(uuid);
         }
         dyn->slotEquipEx = QUuid(); // empty UUID
-        dyn->slotPlanes = QList<int>(5, 0); // five slots, zero planes
+        QList<int> planes;
+        for(const QUuid &uuid : dyn->slotEquip) {
+            Equipment *eq = info.equipMap.value(uuid, nullptr);
+            if(eq)
+                planes.append(
+                    eq->attr.value(QStringLiteral("Planes"), 0));
+            else
+                planes.append(0);
+        }
+        while(planes.size() < 5)
+            planes.append(0);
+        dyn->slotPlanes = planes;
         info.ships.push_back(ship);
         info.shipDynamics.push_back(std::move(dyn));
     });

@@ -13,6 +13,7 @@ Battle::Battle(std::mt19937 &rng,
 void Battle::battleProcessor(FleetInfo *friendf, FleetInfo *enemyf,
                              const QJsonObject &battlePlan, bool isExpedition,
                              bool isNightCommence) {
+    clock = 0;
     currentBattlePlan = battlePlan;
     currentFriendFleet = friendf;
     currentEnemyFleet = enemyf;
@@ -65,13 +66,11 @@ void Battle::battleProcessor(FleetInfo *friendf, FleetInfo *enemyf,
     enemySubTorpLastFire.resize(KP::combinedFleetSize, 0);
     for(int i = 0; i < KP::combinedFleetSize; ++i) {
         if(i < currentFriendFleet->ships.size() && currentFriendFleet->ships[i]) {
-            qWarning() << "FUCK1";
             decideHidden({true, i});
         }
     }
     for(int i = 0; i < KP::combinedFleetSize; ++i) {
         if(i < currentEnemyFleet->ships.size() && currentEnemyFleet->ships[i]) {
-            qWarning() << "FUCK2";
             decideHidden({false, i});
         }
     }
@@ -1390,7 +1389,6 @@ void Battle::nightBattle() {
                     continue;
                 if(!hasMainGun(isFriend, i))
                     continue;
-                qCritical() << "FUCK7";
                 double y = maxMainGunFiringSpeed(isFriend, i);
                 if(y <= 0.0)
                     continue;
@@ -1495,7 +1493,7 @@ void Battle::decideHidden(FriendOrEnemyIndex index) {
         concealChance = 0.5;
 
     std::bernoulli_distribution dist(concealChance);
-    qCritical() << concealChance << ship->toString() << shipConcealment << antagonistLos;
+
     result = dist(rng);
 
     if(index.isFriend) {
@@ -1511,13 +1509,13 @@ void Battle::decideHidden(FriendOrEnemyIndex index) {
     if(result) {
         insertEvent(EventType::DecideHidden, clock + 15, index,
                     [this](FriendOrEnemyIndex idx) {
-                        qWarning() << "FUCK3";decideHidden(idx); });
+                        decideHidden(idx); });
         scheduleSubTorp(index);
     }
     else {
         insertEvent(EventType::DecideHidden, clock + 30, index,
                     [this](FriendOrEnemyIndex idx) {
-                        qWarning() << "FUCK4";decideHidden(idx); });
+                        decideHidden(idx); });
         cancelSubTorpEvents(index);
     }
 }
@@ -1544,7 +1542,7 @@ void Battle::forceVisible(FriendOrEnemyIndex index) {
 
     insertEvent(EventType::DecideHidden, clock + 30, index,
                 [this](FriendOrEnemyIndex idx) {
-                    qWarning() << "FUCK5";decideHidden(idx); });
+                    decideHidden(idx); });
 }
 
 /* Target selection — see doc/worldview_and_mechanics/9-battle.md */
@@ -3204,6 +3202,19 @@ double Battle::maxMainGunFiringRange(bool isFriend,
     for(const QUuid &uuid : dyn->slotEquip)
         check(uuid);
     check(dyn->slotEquipEx);
+    QList<int> startingEquip = fleet->ships[index]->getStartingEquip();
+    if(!startingEquip.isEmpty()) {
+        int defaultId = startingEquip.first();
+        if(equipRegistry.contains(defaultId)) {
+            Equipment *eq = equipRegistry[defaultId];
+            if(eq->type.isMainGun()) {
+                int r = eq->attr.value(
+                    QStringLiteral("Firingrange"), 0);
+                if(r > 0)
+                    result = std::max(result, static_cast<double>(r));
+            }
+        }
+    }
     return result;
 }
 
@@ -3227,6 +3238,19 @@ double Battle::maxMainGunFiringSpeed(bool isFriend,
     for(const QUuid &uuid : dyn->slotEquip)
         check(uuid);
     check(dyn->slotEquipEx);
+    QList<int> startingEquip = fleet->ships[index]->getStartingEquip();
+    if(!startingEquip.isEmpty()) {
+        int defaultId = startingEquip.first();
+        if(equipRegistry.contains(defaultId)) {
+            Equipment *eq = equipRegistry[defaultId];
+            if(eq->type.isMainGun()) {
+                int s = eq->attr.value(
+                    QStringLiteral("Firingspeed"), 0);
+                if(s > 0)
+                    result = std::max(result, static_cast<double>(s));
+            }
+        }
+    }
     return result;
 }
 
@@ -3251,6 +3275,19 @@ double Battle::maxMainGunArmorPenetration(bool isFriend,
     for(const QUuid &uuid : dyn->slotEquip)
         check(uuid);
     check(dyn->slotEquipEx);
+    QList<int> startingEquip = fleet->ships[index]->getStartingEquip();
+    if(!startingEquip.isEmpty()) {
+        int defaultId = startingEquip.first();
+        if(equipRegistry.contains(defaultId)) {
+            Equipment *eq = equipRegistry[defaultId];
+            if(eq->type.isMainGun()) {
+                int ap = eq->attr.value(
+                    QStringLiteral("Armorpenetration"), 0);
+                if(ap > 0)
+                    result = std::max(result, static_cast<double>(ap));
+            }
+        }
+    }
     return result;
 }
 
@@ -3346,7 +3383,6 @@ void Battle::setupApproachingGunshots() {
              i < static_cast<int>(fleet->ships.size()); ++i) {
             if(!hasMainGun(isFriend, i))
                 continue;
-            qCritical() << "FUCK6";
             double maxRange = maxMainGunFiringRange(isFriend, i);
             if(maxRange <= 0.0)
                 continue;

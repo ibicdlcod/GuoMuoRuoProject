@@ -77,7 +77,7 @@ private:
     QJsonObject currentBattlePlan;
     FleetInfo *currentFriendFleet;
     FleetInfo *currentEnemyFleet;
-    clockTime clock;
+    clockTime clock = 0;
     std::list<Event> events;
     bool isNight;
     bool isNightCommence;
