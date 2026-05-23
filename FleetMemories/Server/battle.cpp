@@ -2049,8 +2049,8 @@ void Battle::computeFormationEfficiency() {
     double maxEnemy = *std::max_element(eSpeeds.begin(), eSpeeds.end());
     double losFriend = currentFriendFleet->los(isNight);
     double losEnemy = currentEnemyFleet->los(isNight);
-    double logLosFriend = std::log(losFriend);
-    double logLosEnemy = std::log(losEnemy);
+    double logLosFriend = std::log(std::max(losFriend, std::exp(-10.0)));
+    double logLosEnemy = std::log(std::max(losEnemy, std::exp(-10.0)));
     double logMaxFriend = std::log(maxFriend);
     double logMaxEnemy = std::log(maxEnemy);
     {
