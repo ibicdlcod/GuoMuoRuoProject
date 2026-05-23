@@ -6,6 +6,7 @@
 
 namespace {
 constexpr double kLog10 = 2.30258509299404568402;
+constexpr double kTwoOverE = 0.73575888234288464319;
 }
 
 Battle::Battle(std::mt19937 &rng,
@@ -615,10 +616,13 @@ bool Battle::processTorpedoCutIn(FriendOrEnemyIndex attacker) {
         return false;
 
     std::vector<Equipment *> equips;
+    QHash<Equipment *, QUuid> equipToUuid;
     auto addEquip = [&](const QUuid &uuid) {
         Equipment *eq = attFleet->equipMap.value(uuid, nullptr);
-        if(eq)
+        if(eq) {
             equips.push_back(eq);
+            equipToUuid[eq] = uuid;
+        }
     };
     for(const QUuid &uuid : std::as_const(attDyn->slotEquip))
         addEquip(uuid);
@@ -654,7 +658,7 @@ bool Battle::processTorpedoCutIn(FriendOrEnemyIndex attacker) {
                   return x.dmgMul > y.dmgMul;
               });
 
-    auto primaryStatOf = [](Equipment *eq) -> double {
+    auto primaryStatOf = [&](Equipment *eq) -> double {
         QString attrName = eq->type.getPrimaryAttr();
         if(attrName == QStringLiteral("Tech")
             || attrName.contains(QStringLiteral("Father"))
@@ -662,13 +666,17 @@ bool Battle::processTorpedoCutIn(FriendOrEnemyIndex attacker) {
             || attrName
                    == QStringLiteral("Disallowmassproduction"))
             return 0.0;
-        return static_cast<double>(eq->attr.value(attrName, 0));
+        double raw = static_cast<double>(
+            eq->attr.value(attrName, 0));
+        double skillEff = attFleet->equipSkillEffects.value(
+            equipToUuid.value(eq), 1.0);
+        return raw * skillEff;
     };
 
     for(const auto &cand : candidates) {
         double p1 = primaryStatOf(cand.e1) / 100.0;
         double p2 = primaryStatOf(cand.e2) / 100.0;
-        double base = std::max(0.0, (fCoeff + 1.0) / 4.0);
+        double base = std::max(0.0, (fCoeff + 1.0) / 2.0);
         double a1 = base * p1 / std::hypot(1.0, p1);
         double a2 = base * p2 / std::hypot(1.0, p2);
         double triggerChance = a1 * a2;
@@ -809,10 +817,10 @@ bool Battle::processTorpedoCutIn(FriendOrEnemyIndex attacker) {
         double pGun = primaryStatOf(cand.gun);
         double pTorp = primaryStatOf(cand.torp);
         if(cand.gun->type.isSecGun())
-            pGun /= 50.0;
+            pGun /= 25.0;
         else
-            pGun /= 100.0;
-        pTorp /= 100.0;
+            pGun /= 50.0;
+        pTorp /= 50.0;
 
         double base = std::max(0.0, (fCoeff + 1.0) / 2.0);
         double a1 = base * pGun / std::hypot(1.0, pGun);
@@ -912,7 +920,7 @@ bool Battle::processTorpedoCutIn(FriendOrEnemyIndex attacker) {
             std::uniform_real_distribution<double>
                 damageDist(0.0, 1.0);
             double v = damageDist(rng);
-            if(v < sigmoid + 0.5) {
+            if(v < sigmoid * kTwoOverE + 0.5) {
                 double wGun = attacker.isFriend
                                   ? 1.0
                                         + 0.25
@@ -3277,10 +3285,12 @@ double Battle::maxMainGunFiringSpeed(bool isFriend,
     if(!dyn || dyn->fleetFled)
         return 0.0;
     double result = 0.0;
+    bool hasSlottedMainGun = false;
     auto check = [&](const QUuid &uuid) {
         Equipment *eq = fleet->equipMap.value(uuid, nullptr);
         if(!eq || !eq->type.isMainGun())
             return;
+        hasSlottedMainGun = true;
         int s = eq->attr.value(QStringLiteral("Firingspeed"), 0);
         if(s > 0)
             result = std::max(result, static_cast<double>(s));
@@ -3301,6 +3311,8 @@ double Battle::maxMainGunFiringSpeed(bool isFriend,
             }
         }
     }
+    if(!hasSlottedMainGun)
+        result *= 0.5;
     return result;
 }
 
@@ -3497,7 +3509,7 @@ bool Battle::processGunshotCutIn(FriendOrEnemyIndex attacker) {
                         : enemyFormationEfficiency;
     double aCoeff = airSuperiorityCoefficient;
 
-    auto primaryStatOf = [](Equipment *eq) -> double {
+    auto primaryStatOf = [&](Equipment *eq) -> double {
         QString attrName = eq->type.getPrimaryAttr();
         if(attrName == QStringLiteral("Tech")
             || attrName.contains(QStringLiteral("Father"))
@@ -3505,7 +3517,11 @@ bool Battle::processGunshotCutIn(FriendOrEnemyIndex attacker) {
             || attrName
                    == QStringLiteral("Disallowmassproduction"))
             return 0.0;
-        return static_cast<double>(eq->attr.value(attrName, 0));
+        double raw = static_cast<double>(
+            eq->attr.value(attrName, 0));
+        double skillEff = attFleet->equipSkillEffects.value(
+            equipToUuid.value(eq), 1.0);
+        return raw * skillEff;
     };
 
     auto planeCountOf = [&](const ShipDynamic *dyn,
@@ -3630,7 +3646,7 @@ bool Battle::processGunshotCutIn(FriendOrEnemyIndex attacker) {
         std::uniform_real_distribution<double> damageDist(
             0.0, 1.0);
         double v = damageDist(rng);
-        if(v >= sigmoid + 0.5)
+        if(v >= sigmoid * kTwoOverE + 0.5)
             return true;
 
         {
@@ -3809,7 +3825,7 @@ bool Battle::processGunshotCutIn(FriendOrEnemyIndex attacker) {
         double p1 = getP(e1);
         double p2 = getP(e2);
 
-        double base = std::max(0.0, (fCoeff + 1.0) / 4.0);
+        double base = std::max(0.0, (fCoeff + 1.0) / 2.0);
         double a1 = base * p1 / std::hypot(1.0, p1);
         double a2 = base * p2 / std::hypot(1.0, p2);
         double triggerChance = a1 * a2;
@@ -3907,7 +3923,7 @@ bool Battle::processGunshotCutIn(FriendOrEnemyIndex attacker) {
         std::uniform_real_distribution<double> damageDist(
             0.0, 1.0);
         double v = damageDist(rng);
-        if(v >= sigmoid + 0.5)
+        if(v >= sigmoid * kTwoOverE + 0.5)
             return false;
 
         {
@@ -4138,7 +4154,7 @@ void Battle::processMainGunAttack(FriendOrEnemyIndex attacker) {
     if(v < sigmoid - 0.5) {
         totalDmg = static_cast<int>(std::round(
             static_cast<double>(defMaxHP) / 64.0));
-    } else if(v < sigmoid + 0.5) {
+    } else if(v < sigmoid * kTwoOverE + 0.5) {
         double w = attacker.isFriend
                        ? 1.0 + 0.25 * friendFormationEfficiency
                        : 1.0 + 0.25 * enemyFormationEfficiency;
@@ -4407,7 +4423,7 @@ void Battle::processSecondaryGunAttack(FriendOrEnemyIndex attacker,
     std::uniform_real_distribution<double> damageDist(0.0, 1.0);
     double v = damageDist(rng);
 
-    if(v >= sigmoid + 0.5) {
+    if(v >= sigmoid * kTwoOverE + 0.5) {
         if(!isAntagonistFleetSunk(attacker)) {
             QJsonObject log;
             log["type"] = KP::AttackSkipped;

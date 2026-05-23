@@ -323,6 +323,7 @@ private:
         QMap<CompoKey, double> damageCompo;
         QMap<CompoKey, int> attempts;
         QMap<CompoKey, int> hits;
+        QMap<QString, int> finalHP;
         double airSupCoef = 0.0;
         double friendFormEff = 0.0;
         double enemyFormEff = 0.0;

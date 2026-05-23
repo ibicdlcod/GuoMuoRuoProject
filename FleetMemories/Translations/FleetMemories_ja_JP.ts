@@ -1208,7 +1208,7 @@ Great at battle and bad at politics--so cool!</source>
     </message>
     <message id="switch-cert-when-connecting">
         <location filename="../ClientGUI/clientv2.cpp" line="1425"/>
-        <location filename="../Server/server.cpp" line="5104"/>
+        <location filename="../Server/server.cpp" line="5105"/>
         <source>Switch certificate when connected have no effect.</source>
         <translation type="unfinished">%1：ログイン失敗、理由：%2</translation>
     </message>
@@ -1768,7 +1768,7 @@ Great at battle and bad at politics--so cool!</source>
         <translation type="unfinished">購入処理中にデータベースエラーが発生しました。</translation>
     </message>
     <message id="ard-coupon-description">
-        <location filename="../Server/server_ard.cpp" line="165"/>
+        <location filename="../Server/server_ard.cpp" line="167"/>
         <source>%1 ARD Coupons</source>
         <translation type="unfinished">無効なARDクーポン数量です。</translation>
     </message>
@@ -1848,8 +1848,8 @@ Great at battle and bad at politics--so cool!</source>
         <translation type="unfinished">装備ID %1：改修値%2に改修されました。</translation>
     </message>
     <message id="cond-drop-failed">
-        <location filename="../Server/server_battle.cpp" line="342"/>
-        <location filename="../Server/server_battle.cpp" line="365"/>
+        <location filename="../Server/server_battle.cpp" line="346"/>
+        <location filename="../Server/server_battle.cpp" line="369"/>
         <source>User %1: decrease fleet condition failed!</source>
         <translation type="unfinished">ユーザー%1：負のスキルポイントのクリアに失敗しました！</translation>
     </message>
@@ -1940,7 +1940,7 @@ Great at battle and bad at politics--so cool!</source>
         <translation type="unfinished">近代化改修時にデータベースエラーが発生しました。</translation>
     </message>
     <message id="store-purchase-info-failed">
-        <location filename="../Server/server_ard.cpp" line="95"/>
+        <location filename="../Server/server_ard.cpp" line="96"/>
         <source>Store purchase info failed! User %1, orderid %2</source>
         <translation type="unfinished">近代化改修時にデータベースエラーが発生しました（前艦船のロック）。</translation>
     </message>
@@ -1978,33 +1978,33 @@ Great at battle and bad at politics--so cool!</source>
         <location filename="../Server/server_import.cpp" line="20"/>
         <location filename="../Server/server_import.cpp" line="170"/>
         <location filename="../Server/server_import.cpp" line="319"/>
-        <location filename="../Server/server_import.cpp" line="455"/>
-        <location filename="../Server/server_import.cpp" line="543"/>
-        <location filename="../Server/server_import.cpp" line="651"/>
-        <location filename="../Server/server_import.cpp" line="693"/>
-        <location filename="../Server/server_import.cpp" line="730"/>
-        <location filename="../Server/server_import.cpp" line="778"/>
+        <location filename="../Server/server_import.cpp" line="459"/>
+        <location filename="../Server/server_import.cpp" line="547"/>
+        <location filename="../Server/server_import.cpp" line="655"/>
+        <location filename="../Server/server_import.cpp" line="697"/>
+        <location filename="../Server/server_import.cpp" line="734"/>
+        <location filename="../Server/server_import.cpp" line="818"/>
         <source>Database uninitialized!</source>
         <translation type="unfinished">製品取得時にデータベースエラーが発生しました。</translation>
     </message>
     <message id="vcr-csv-import-transaction-start-failed">
-        <location filename="../Server/server_import.cpp" line="565"/>
+        <location filename="../Server/server_import.cpp" line="569"/>
         <source>Failed to start transaction for importing VCR CSV.</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="equip-refresh-failed">
-        <location filename="../Server/server_import.cpp" line="658"/>
-        <location filename="../Server/server_import.cpp" line="700"/>
+        <location filename="../Server/server_import.cpp" line="662"/>
+        <location filename="../Server/server_import.cpp" line="704"/>
         <source>Load equipment table failed!</source>
         <translation type="unfinished">データベースが未初期化です！</translation>
     </message>
     <message id="equip-load-good">
-        <location filename="../Server/server_import.cpp" line="715"/>
+        <location filename="../Server/server_import.cpp" line="719"/>
         <source>Load equipment registry success!</source>
         <translation type="unfinished">装備テーブルの読み込みに失敗しました！</translation>
     </message>
     <message id="equip-child-load-good">
-        <location filename="../Server/server_import.cpp" line="722"/>
+        <location filename="../Server/server_import.cpp" line="726"/>
         <source>Load equipment child list success!</source>
         <translation type="unfinished">装備データの読み込みに成功しました！</translation>
     </message>
@@ -2017,14 +2017,14 @@ Great at battle and bad at politics--so cool!</source>
         <location filename="../Server/server_import.cpp" line="29"/>
         <location filename="../Server/server_import.cpp" line="179"/>
         <location filename="../Server/server_import.cpp" line="329"/>
-        <location filename="../Server/server_import.cpp" line="465"/>
-        <location filename="../Server/server_import.cpp" line="553"/>
-        <location filename="../Server/server_import.cpp" line="644"/>
+        <location filename="../Server/server_import.cpp" line="469"/>
+        <location filename="../Server/server_import.cpp" line="557"/>
+        <location filename="../Server/server_import.cpp" line="648"/>
         <source>%1: CSV file cannot be opened</source>
         <translation type="unfinished">サーバーをシャットダウン中</translation>
     </message>
     <message id="equip-export-good">
-        <location filename="../Server/server_import.cpp" line="685"/>
+        <location filename="../Server/server_import.cpp" line="689"/>
         <source>Export equipment registry success!</source>
         <translation type="unfinished">%1：CSVファイルを開けません</translation>
     </message>
@@ -2070,34 +2070,34 @@ Great at battle and bad at politics--so cool!</source>
     <message id="map-node-import-failed">
         <location filename="../Server/server_import.cpp" line="351"/>
         <location filename="../Server/server_import.cpp" line="394"/>
-        <location filename="../Server/server_import.cpp" line="409"/>
-        <location filename="../Server/server_import.cpp" line="422"/>
-        <location filename="../Server/server_import.cpp" line="440"/>
+        <location filename="../Server/server_import.cpp" line="413"/>
+        <location filename="../Server/server_import.cpp" line="426"/>
+        <location filename="../Server/server_import.cpp" line="444"/>
         <source>Import map node database failed!</source>
         <translation type="unfinished">装備データのインポートに成功しました！</translation>
     </message>
     <message id="num-of-map-node-imports">
-        <location filename="../Server/server_import.cpp" line="432"/>
+        <location filename="../Server/server_import.cpp" line="436"/>
         <source>Imported %1 map node(s)</source>
         <translation type="unfinished">海域ノードデータベースのインポートに失敗しました！</translation>
     </message>
     <message id="map-node-import-good">
-        <location filename="../Server/server_import.cpp" line="446"/>
+        <location filename="../Server/server_import.cpp" line="450"/>
         <source>Import map node registry success!</source>
         <translation type="unfinished">%1件の海域ノードをインポートしました</translation>
     </message>
     <message id="map-relation-csv-import-transaction-start-failed">
-        <location filename="../Server/server_import.cpp" line="476"/>
+        <location filename="../Server/server_import.cpp" line="480"/>
         <source>Failed to start transaction for importing map relation CSV.</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="num-of-map-relation-imports">
-        <location filename="../Server/server_import.cpp" line="520"/>
+        <location filename="../Server/server_import.cpp" line="524"/>
         <source>Imported %1 map relation(s)</source>
         <translation type="unfinished">海域ノードデータのインポートに成功しました！</translation>
     </message>
     <message id="map-relation-import-good">
-        <location filename="../Server/server_import.cpp" line="534"/>
+        <location filename="../Server/server_import.cpp" line="538"/>
         <source>Import map relation registry success!</source>
         <translation type="unfinished">%1件の海域関連をインポートしました</translation>
     </message>
@@ -2134,15 +2134,15 @@ Great at battle and bad at politics--so cool!</source>
         <translation type="unfinished">ファイル%1のコードの実行に失敗しました：%2</translation>
     </message>
     <message id="map-refresh-failed">
-        <location filename="../Server/server_import.cpp" line="785"/>
-        <location filename="../Server/server_import.cpp" line="801"/>
-        <location filename="../Server/server_import.cpp" line="848"/>
-        <location filename="../Server/server_import.cpp" line="875"/>
+        <location filename="../Server/server_import.cpp" line="825"/>
+        <location filename="../Server/server_import.cpp" line="841"/>
+        <location filename="../Server/server_import.cpp" line="888"/>
+        <location filename="../Server/server_import.cpp" line="915"/>
         <source>Load map table failed!</source>
         <translation type="unfinished">装備可能テーブルの読み込みに成功しました！</translation>
     </message>
     <message id="map-load-good">
-        <location filename="../Server/server_import.cpp" line="905"/>
+        <location filename="../Server/server_import.cpp" line="945"/>
         <source>Load map registry success!</source>
         <translation type="unfinished">海域テーブルの読み込みに失敗しました！</translation>
     </message>
@@ -2339,22 +2339,22 @@ Great at battle and bad at politics--so cool!</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="user-query-regen-time-fail">
-        <location filename="../Server/server_battle.cpp" line="622"/>
+        <location filename="../Server/server_battle.cpp" line="626"/>
         <source>Query last regeneration time for user %1 failed!</source>
         <translation type="unfinished">ユーザーID %1：艦船%2を定義%3に改造しました</translation>
     </message>
     <message id="regen-min">
-        <location filename="../Server/server_battle.cpp" line="648"/>
+        <location filename="../Server/server_battle.cpp" line="652"/>
         <source>%1 minute(s) passed for regeneration purposes.</source>
         <translation type="unfinished">ユーザー%1の最終回復時間の照会に失敗しました！</translation>
     </message>
     <message id="natural-regen-failed">
-        <location filename="../Server/server_battle.cpp" line="674"/>
+        <location filename="../Server/server_battle.cpp" line="678"/>
         <source>User ID %1: natural regeneration failed!</source>
         <translation type="unfinished">回復目的で%1分が経過しました。</translation>
     </message>
     <message id="natural-regen">
-        <location filename="../Server/server_battle.cpp" line="680"/>
+        <location filename="../Server/server_battle.cpp" line="684"/>
         <source>User ID %1: natural regeneration</source>
         <translation type="unfinished">ユーザーID %1：自然回復に失敗しました！</translation>
     </message>
@@ -2409,7 +2409,7 @@ Great at battle and bad at politics--so cool!</source>
     <message id="sortie-progress-failure">
         <location filename="../Server/server.cpp" line="4944"/>
         <location filename="../Server/server.cpp" line="4956"/>
-        <location filename="../Server/server_battle.cpp" line="1804"/>
+        <location filename="../Server/server_battle.cpp" line="1821"/>
         <source>User %1: progress map %2 failure!</source>
         <translation type="unfinished">ユーザー%1の海域進行データの照会に失敗しました！</translation>
     </message>
@@ -2419,18 +2419,18 @@ Great at battle and bad at politics--so cool!</source>
         <translation type="unfinished">ユーザー%1：海域%2の進行に失敗しました！</translation>
     </message>
     <message id="dbfail-current-fleet">
-        <location filename="../Server/server_battle.cpp" line="267"/>
+        <location filename="../Server/server_battle.cpp" line="271"/>
         <source>Database failed when getting ships of current fleet!</source>
         <translation type="unfinished">ユーザー%1の海域制覇度の取得に失敗しました！</translation>
     </message>
     <message id="unknown-map-rule">
-        <location filename="../Server/server_battle.cpp" line="286"/>
+        <location filename="../Server/server_battle.cpp" line="290"/>
         <source>Unknown map rule: </source>
         <translation type="unfinished">現在の艦隊の艦船取得時にデータベースエラーが発生しました！</translation>
     </message>
     <message id="dbfail-map-relations">
-        <location filename="../Server/server_battle.cpp" line="305"/>
-        <location filename="../Server/server_battle.cpp" line="2162"/>
+        <location filename="../Server/server_battle.cpp" line="309"/>
+        <location filename="../Server/server_battle.cpp" line="2179"/>
         <source>Database failed when querying map relations!</source>
         <translation type="unfinished">不明な海域ルール：</translation>
     </message>
@@ -2466,14 +2466,14 @@ Great at battle and bad at politics--so cool!</source>
         <translation type="unfinished">ユーザー%1：艦船%2はアカウントに存在しません！</translation>
     </message>
     <message id="update-drop-progress-failed">
-        <location filename="../Server/server_battle.cpp" line="440"/>
-        <location filename="../Server/server_battle.cpp" line="456"/>
+        <location filename="../Server/server_battle.cpp" line="444"/>
+        <location filename="../Server/server_battle.cpp" line="460"/>
         <source>Update drop progress for user %1 failed!</source>
         <translation type="unfinished">修理時にデータベースエラーが発生しました。</translation>
     </message>
     <message id="query-drop-candidate-failed">
-        <location filename="../Server/server_battle.cpp" line="495"/>
-        <location filename="../Server/server_battle.cpp" line="537"/>
+        <location filename="../Server/server_battle.cpp" line="499"/>
+        <location filename="../Server/server_battle.cpp" line="541"/>
         <source>Query drop candidate for user %1 failed!</source>
         <translation type="unfinished">ユーザー%1のドロップ進行の更新に失敗しました！</translation>
     </message>
@@ -2483,21 +2483,21 @@ Great at battle and bad at politics--so cool!</source>
         <translation type="unfinished">ユーザー%1のドロップ候補の照会に失敗しました！</translation>
     </message>
     <message id="map-relation-import-failed">
-        <location filename="../Server/server_import.cpp" line="486"/>
-        <location filename="../Server/server_import.cpp" line="511"/>
-        <location filename="../Server/server_import.cpp" line="528"/>
+        <location filename="../Server/server_import.cpp" line="490"/>
+        <location filename="../Server/server_import.cpp" line="515"/>
+        <location filename="../Server/server_import.cpp" line="532"/>
         <source>Import map relation database failed!</source>
         <translation type="unfinished">装備%2の改修係数の取得に失敗しました！</translation>
     </message>
     <message id="vcr-import-failed">
-        <location filename="../Server/server_import.cpp" line="575"/>
-        <location filename="../Server/server_import.cpp" line="614"/>
-        <location filename="../Server/server_import.cpp" line="625"/>
+        <location filename="../Server/server_import.cpp" line="579"/>
+        <location filename="../Server/server_import.cpp" line="618"/>
+        <location filename="../Server/server_import.cpp" line="629"/>
         <source>Import vcr database failed!</source>
         <translation type="unfinished">海域関連データベースのインポートに失敗しました！</translation>
     </message>
     <message id="vcr-import-good">
-        <location filename="../Server/server_import.cpp" line="631"/>
+        <location filename="../Server/server_import.cpp" line="635"/>
         <source>Virtual condition relation registry success!</source>
         <translation type="unfinished">仮想条件データベースのインポートに失敗しました！</translation>
     </message>
@@ -2560,22 +2560,22 @@ Great at battle and bad at politics--so cool!</source>
         <translation type="unfinished">ユーザー%1：海域ステータスの初期化に失敗しました！</translation>
     </message>
     <message id="ard-refund-poll-failed">
-        <location filename="../Server/server_ard.cpp" line="228"/>
+        <location filename="../Server/server_ard.cpp" line="233"/>
         <source>ARD refund poll failed: %1</source>
         <translation type="unfinished">ユーザー%1：海域ステータスの初期化に成功しました！</translation>
     </message>
     <message id="ard-clawback-lookup-failed">
-        <location filename="../Server/server_ard.cpp" line="254"/>
+        <location filename="../Server/server_ard.cpp" line="259"/>
         <source>ARD clawback: order lookup failed</source>
         <translation type="unfinished">ARD返金ポーリングに失敗しました：%1</translation>
     </message>
     <message id="ard-clawback-deduct-failed">
-        <location filename="../Server/server_ard.cpp" line="273"/>
+        <location filename="../Server/server_ard.cpp" line="278"/>
         <source>ARD clawback: deduct failed for order %1</source>
         <translation type="unfinished">ARD回収：注文検索に失敗しました</translation>
     </message>
     <message id="ard-clawback-mark-failed">
-        <location filename="../Server/server_ard.cpp" line="282"/>
+        <location filename="../Server/server_ard.cpp" line="287"/>
         <source>ARD clawback: mark failed for order %1</source>
         <translation type="unfinished">ARD回収：注文%1の差し引きに失敗しました</translation>
     </message>
@@ -2642,99 +2642,99 @@ Great at battle and bad at politics--so cool!</source>
         <translation type="unfinished">ユーザーID %1：装備%2の改修に失敗しました！</translation>
     </message>
     <message id="map-info-failure">
-        <location filename="../Server/server_battle.cpp" line="732"/>
+        <location filename="../Server/server_battle.cpp" line="736"/>
         <source>Map info: query mapid %1 nodeid %2 failed!</source>
         <translation type="unfinished">ユーザーID %1：装備%2を1レベル改修しました</translation>
     </message>
     <message id="query-fleet-info-failed">
-        <location filename="../Server/server_battle.cpp" line="113"/>
+        <location filename="../Server/server_battle.cpp" line="117"/>
         <source>User %1: query fleet %2 failed!</source>
         <translation type="unfinished">ユーザー%1：艦隊%2の照会に失敗しました！</translation>
     </message>
     <message id="sortie-end-failure-freight-clear">
-        <location filename="../Server/server_battle.cpp" line="1836"/>
+        <location filename="../Server/server_battle.cpp" line="1853"/>
         <source>User %1: clear freight at map end failure!</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="update-fleet-db-failed">
-        <location filename="../Server/server_battle.cpp" line="2233"/>
+        <location filename="../Server/server_battle.cpp" line="2250"/>
         <source>User %1: update fleet %2 pos %3 in database failed!</source>
         <translation type="unfinished">ユーザー%1：艦隊%2位置%3のデータベース更新に失敗しました！</translation>
     </message>
     <message id="sortie-node-battle-failure">
         <location filename="../Server/server.cpp" line="4424"/>
-        <location filename="../Server/server_battle.cpp" line="751"/>
+        <location filename="../Server/server_battle.cpp" line="755"/>
         <source>User %1: start node battle failure!</source>
         <translation type="unfinished">海域情報：海域ID %1ノードID %2の照会に失敗しました！</translation>
     </message>
     <message id="sortie-node-battle-failure-end">
-        <location filename="../Server/server_battle.cpp" line="837"/>
-        <location filename="../Server/server_battle.cpp" line="1362"/>
+        <location filename="../Server/server_battle.cpp" line="841"/>
+        <location filename="../Server/server_battle.cpp" line="1379"/>
         <source>User %1: end node battle failure!</source>
         <translation type="unfinished">ユーザー%1：ノード戦闘の開始に失敗しました！</translation>
     </message>
     <message id="map-info-failure-exp">
-        <location filename="../Server/server_battle.cpp" line="1413"/>
+        <location filename="../Server/server_battle.cpp" line="1430"/>
         <source>Map info: query mapid %1 nodeid %2 exp failed!</source>
         <translation type="unfinished">ユーザー%1：ノード戦闘の終了に失敗しました！</translation>
     </message>
     <message id="sortie-node-battle-failure-transport-read">
-        <location filename="../Server/server_battle.cpp" line="791"/>
-        <location filename="../Server/server_battle.cpp" line="1455"/>
+        <location filename="../Server/server_battle.cpp" line="795"/>
+        <location filename="../Server/server_battle.cpp" line="1472"/>
         <source>User %1: transport node read failure!</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="sortie-node-battle-failure-transport-clear">
-        <location filename="../Server/server_battle.cpp" line="1484"/>
+        <location filename="../Server/server_battle.cpp" line="1501"/>
         <source>User %1: transport node clear failure!</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="sortie-node-battle-failure-transport-update">
-        <location filename="../Server/server_battle.cpp" line="812"/>
+        <location filename="../Server/server_battle.cpp" line="816"/>
         <source>User %1: transport node update failure!</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="dbfail-update-ship-hp">
-        <location filename="../Server/server_battle.cpp" line="1125"/>
+        <location filename="../Server/server_battle.cpp" line="1142"/>
         <source>Failed to update player ship HP</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="dbfail-get-ship-uuid">
-        <location filename="../Server/server_battle.cpp" line="1140"/>
+        <location filename="../Server/server_battle.cpp" line="1157"/>
         <source>Failed to get ship UUID for plane loss tracking</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="dbfail-update-plane-count">
-        <location filename="../Server/server_battle.cpp" line="1193"/>
+        <location filename="../Server/server_battle.cpp" line="1210"/>
         <source>Failed to update plane count</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="ship-drop-illegal">
-        <location filename="../Server/server_battle.cpp" line="1508"/>
+        <location filename="../Server/server_battle.cpp" line="1525"/>
         <source>Attempt to drop invalid ship %1!</source>
         <translation type="unfinished">海域情報：海域ID %1ノードID %2の経験値照会に失敗しました！</translation>
     </message>
     <message id="ship-drop-db-fail">
-        <location filename="../Server/server_battle.cpp" line="1521"/>
+        <location filename="../Server/server_battle.cpp" line="1538"/>
         <source>User %1: refresh database failure when drop ship %2!</source>
         <translation type="unfinished">無効な艦船%1のドロップを試みました！</translation>
     </message>
     <message id="add-ship-exp-failre">
-        <location filename="../Server/server_battle.cpp" line="1562"/>
-        <location filename="../Server/server_battle.cpp" line="1580"/>
-        <location filename="../Server/server_battle.cpp" line="1594"/>
-        <location filename="../Server/server_battle.cpp" line="1623"/>
-        <location filename="../Server/server_battle.cpp" line="1641"/>
+        <location filename="../Server/server_battle.cpp" line="1579"/>
+        <location filename="../Server/server_battle.cpp" line="1597"/>
+        <location filename="../Server/server_battle.cpp" line="1611"/>
+        <location filename="../Server/server_battle.cpp" line="1640"/>
+        <location filename="../Server/server_battle.cpp" line="1658"/>
         <source>User %1: add ship exp failure!</source>
         <translation type="unfinished">ユーザー%1：艦船%2ドロップ時のデータベース更新に失敗しました！</translation>
     </message>
     <message id="rank-add-exp-failed">
-        <location filename="../Server/server_battle.cpp" line="1659"/>
+        <location filename="../Server/server_battle.cpp" line="1676"/>
         <source>User %1: add ranking exp failed!</source>
         <translation type="unfinished">ユーザー%1：艦船経験値の加算に失敗しました！</translation>
     </message>
     <message id="virtual-add-exp-failed">
-        <location filename="../Server/server_battle.cpp" line="1694"/>
+        <location filename="../Server/server_battle.cpp" line="1711"/>
         <source>User %1: add virtual exp failed!</source>
         <translation type="unfinished">ユーザー%1：ランキング経験値の加算に失敗しました！</translation>
     </message>
@@ -2821,12 +2821,12 @@ Great at battle and bad at politics--so cool!</source>
         <translation type="unfinished">ゲーム状態%1は未対応です！</translation>
     </message>
     <message id="ship-refresh-failed">
-        <location filename="../Server/server_import.cpp" line="737"/>
+        <location filename="../Server/server_import.cpp" line="741"/>
         <source>Load ship table failed!</source>
         <translation type="unfinished">ユーザー%1：未対応のコマンドタイプです</translation>
     </message>
     <message id="ship-load-good">
-        <location filename="../Server/server_import.cpp" line="752"/>
+        <location filename="../Server/server_import.cpp" line="792"/>
         <source>Load ship registry success!</source>
         <translation type="unfinished">艦船テーブルの読み込みに失敗しました！</translation>
     </message>
@@ -2848,18 +2848,18 @@ Great at battle and bad at politics--so cool!</source>
         <translation type="unfinished">ユーザー%1のドック開放に失敗しました！</translation>
     </message>
     <message id="delete-equip-nonexistent">
-        <location filename="../Server/server.cpp" line="5065"/>
+        <location filename="../Server/server.cpp" line="5066"/>
         <source>User id %1: equipment %2 does not exist when destructing!</source>
         <oldsource>User id %1: equipment %2 does not exist!</oldsource>
         <translation type="unfinished">ユーザー%1の工廠開放に失敗しました！</translation>
     </message>
     <message id="delete-equip-failed">
-        <location filename="../Server/server.cpp" line="5086"/>
+        <location filename="../Server/server.cpp" line="5087"/>
         <source>User id %1: delete equipment failed!</source>
         <translation type="unfinished">ユーザーID %1：解体時に装備%2が存在しません！</translation>
     </message>
     <message id="delete-equip">
-        <location filename="../Server/server.cpp" line="5093"/>
+        <location filename="../Server/server.cpp" line="5094"/>
         <source>User id %1: deleted equipment %2</source>
         <translation type="unfinished">ユーザーID %1：装備の削除に失敗しました！</translation>
     </message>
@@ -3112,7 +3112,7 @@ Great at battle and bad at politics--so cool!</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="expedition-equip-query-failure">
-        <location filename="../Server/server.cpp" line="5281"/>
+        <location filename="../Server/server.cpp" line="5282"/>
         <source>Query expedition equipment failure for user %1!</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3147,89 +3147,99 @@ Great at battle and bad at politics--so cool!</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="sortie-start-failure-dock">
-        <location filename="../Server/server_battle.cpp" line="1893"/>
+        <location filename="../Server/server_battle.cpp" line="1910"/>
         <source>User %1: start map %2 failure due to uncertain docks!</source>
         <translation type="unfinished">ARD注文データベースの作成に失敗しました。</translation>
     </message>
     <message id="sortie-start-failure-supply">
-        <location filename="../Server/server_battle.cpp" line="1917"/>
+        <location filename="../Server/server_battle.cpp" line="1934"/>
         <source>User %1: start map %2 failure due to uncertain supply!</source>
         <translation type="unfinished">ユーザー%1：ドック状態不確定のため海域%2の出撃開始に失敗しました！</translation>
     </message>
     <message id="sortie-start-failure-rescheck">
-        <location filename="../Server/server_battle.cpp" line="1968"/>
+        <location filename="../Server/server_battle.cpp" line="1985"/>
         <source>User %1: start map %2 failure due to resource check!</source>
         <translation type="unfinished">ユーザー%1：補給状態不確定のため海域%2の出撃開始に失敗しました！</translation>
     </message>
     <message id="sortie-start-failure">
-        <location filename="../Server/server_battle.cpp" line="2025"/>
+        <location filename="../Server/server_battle.cpp" line="2042"/>
         <source>User %1: start map %2 failure!</source>
         <translation type="unfinished">ユーザー%1：資源チェックのため海域%2の出撃開始に失敗しました！</translation>
     </message>
     <message id="sortie-start-failure-node">
-        <location filename="../Server/server_battle.cpp" line="2039"/>
+        <location filename="../Server/server_battle.cpp" line="2056"/>
         <source>User %1: start map %2 node %3 failure!</source>
         <translation type="unfinished">ユーザー%1：海域%2の出撃開始に失敗しました！</translation>
     </message>
     <message id="sortie-start-failure-index">
-        <location filename="../Server/server_battle.cpp" line="2054"/>
+        <location filename="../Server/server_battle.cpp" line="2071"/>
         <source>User %1: fleet index %2 start sortie failure!</source>
         <translation type="unfinished">ユーザー%1：海域%2ノード%3の出撃開始に失敗しました！</translation>
     </message>
     <message id="sortie-start-failure-general">
-        <location filename="../Server/server_battle.cpp" line="2069"/>
         <location filename="../Server/server_battle.cpp" line="2086"/>
+        <location filename="../Server/server_battle.cpp" line="2103"/>
         <source>User %1: start sortie failure!</source>
         <translation type="unfinished">ユーザー%1：艦隊インデックス%2の出撃開始に失敗しました！</translation>
     </message>
     <message id="sortie-start-failure-freight-clear">
-        <location filename="../Server/server_battle.cpp" line="2102"/>
+        <location filename="../Server/server_battle.cpp" line="2119"/>
         <source>User %1: clear freight at sortie start failure!</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="lua-error-branch">
-        <location filename="../Server/server_battle.cpp" line="2115"/>
+        <location filename="../Server/server_battle.cpp" line="2132"/>
         <source>Map %1 lua file has failed to run: %2</source>
         <translation type="unfinished">ユーザー%1：出撃開始に失敗しました！</translation>
     </message>
     <message id="dbfail-map-supremacies">
-        <location filename="../Server/server_battle.cpp" line="2144"/>
+        <location filename="../Server/server_battle.cpp" line="2161"/>
         <source>Database failed when reading map supremacies!</source>
         <translation type="unfinished">海域%1のLuaファイルの実行に失敗しました：%2</translation>
     </message>
+    <message id="test-battle-report-written">
+        <location filename="../Server/server_battle.cpp" line="2903"/>
+        <source>Wrote battle report to %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="test-battle-agg-report-written">
+        <location filename="../Server/server_battle.cpp" line="3192"/>
+        <source>Wrote aggregate battle report to %1</source>
+        <translation type="unfinished"></translation>
+    </message>
     <message id="server-pem">
-        <location filename="../Server/server.cpp" line="5115"/>
+        <location filename="../Server/server.cpp" line="5116"/>
         <source>Server PEM is now %1.</source>
         <translation type="unfinished">海域制覇度の読み取り時にデータベースエラーが発生しました！</translation>
     </message>
     <message id="inbattle-check-failure">
-        <location filename="../Server/server.cpp" line="5130"/>
+        <location filename="../Server/server.cpp" line="5131"/>
         <source>Query in battle status failure for user %1!</source>
         <translation type="unfinished">サーバーPEMは%1に設定されました。</translation>
     </message>
     <message id="update-fleet-clear-failure">
-        <location filename="../Server/server.cpp" line="5317"/>
+        <location filename="../Server/server.cpp" line="5318"/>
         <source>Update fleet (clear fleet) failure!</source>
         <translation type="unfinished">ユーザー%1の戦闘ステータスの照会に失敗しました！</translation>
     </message>
     <message id="user-dock-init-fail">
-        <location filename="../Server/server.cpp" line="5634"/>
-        <location filename="../Server/server.cpp" line="5642"/>
+        <location filename="../Server/server.cpp" line="5635"/>
+        <location filename="../Server/server.cpp" line="5643"/>
         <source>Init %2 dock slots for user %1 failed!</source>
         <translation type="unfinished">艦隊更新（艦隊クリア）に失敗しました！</translation>
     </message>
     <message id="user-rank-init-fail">
-        <location filename="../Server/server.cpp" line="5677"/>
+        <location filename="../Server/server.cpp" line="5678"/>
         <source>%1: User rank init failure!</source>
         <translation type="unfinished">ユーザー%1の%2ドックスロットの初期化に失敗しました！</translation>
     </message>
     <message id="update-fleet-failure">
-        <location filename="../Server/server.cpp" line="5177"/>
-        <location filename="../Server/server.cpp" line="5337"/>
-        <location filename="../Server/server.cpp" line="5365"/>
-        <location filename="../Server/server.cpp" line="5397"/>
-        <location filename="../Server/server.cpp" line="5416"/>
-        <location filename="../Server/server.cpp" line="5433"/>
+        <location filename="../Server/server.cpp" line="5178"/>
+        <location filename="../Server/server.cpp" line="5338"/>
+        <location filename="../Server/server.cpp" line="5366"/>
+        <location filename="../Server/server.cpp" line="5398"/>
+        <location filename="../Server/server.cpp" line="5417"/>
+        <location filename="../Server/server.cpp" line="5434"/>
         <source>Update fleet failure!</source>
         <translation type="unfinished">%1：ユーザーランキングの初期化に失敗しました！</translation>
     </message>
@@ -3280,28 +3290,28 @@ Great at battle and bad at politics--so cool!</source>
         <translation type="unfinished">仮想条件-海域関連データベースが存在しません。作成中…</translation>
     </message>
     <message id="ship-cant-equip-it">
-        <location filename="../Server/server.cpp" line="5350"/>
+        <location filename="../Server/server.cpp" line="5351"/>
         <source>Ship %1 can&apos;t equip %2!</source>
         <translation type="unfinished">仮想条件-海域関連情報データベースの作成に失敗しました。</translation>
     </message>
     <message id="ship-cant-equip-it-extra">
-        <location filename="../Server/server.cpp" line="5382"/>
+        <location filename="../Server/server.cpp" line="5383"/>
         <source>Ship %1 can&apos;t equip %2 in extra slot!</source>
         <translation type="unfinished">艦船%1は装備%2を装備できません！</translation>
     </message>
     <message id="user-data-init-fail">
-        <location filename="../Server/server.cpp" line="5545"/>
-        <location filename="../Server/server.cpp" line="5554"/>
-        <location filename="../Server/server.cpp" line="5568"/>
-        <location filename="../Server/server.cpp" line="5578"/>
-        <location filename="../Server/server.cpp" line="5591"/>
-        <location filename="../Server/server.cpp" line="5600"/>
+        <location filename="../Server/server.cpp" line="5546"/>
+        <location filename="../Server/server.cpp" line="5555"/>
+        <location filename="../Server/server.cpp" line="5569"/>
+        <location filename="../Server/server.cpp" line="5579"/>
+        <location filename="../Server/server.cpp" line="5592"/>
+        <location filename="../Server/server.cpp" line="5601"/>
         <source>%1: User data init failure!</source>
         <translation type="unfinished">艦船%1は増設スロットに装備%2を装備できません！</translation>
     </message>
     <message id="user-factory-init-fail">
-        <location filename="../Server/server.cpp" line="5613"/>
-        <location filename="../Server/server.cpp" line="5621"/>
+        <location filename="../Server/server.cpp" line="5614"/>
+        <location filename="../Server/server.cpp" line="5622"/>
         <source>Init %2 factory slots for user %1 failed!</source>
         <oldsource>Init 4 factory slots for user %1 failed!</oldsource>
         <translation type="unfinished">%1：ユーザーデータの初期化に失敗しました！</translation>
@@ -3309,8 +3319,8 @@ Great at battle and bad at politics--so cool!</source>
     <message id="init-userfleet-failed">
         <location filename="../Server/server.cpp" line="2408"/>
         <location filename="../Server/server.cpp" line="2420"/>
-        <location filename="../Server/server.cpp" line="5655"/>
-        <location filename="../Server/server.cpp" line="5663"/>
+        <location filename="../Server/server.cpp" line="5656"/>
+        <location filename="../Server/server.cpp" line="5664"/>
         <location filename="../Server/server_offer.cpp" line="194"/>
         <location filename="../Server/server_offer.cpp" line="200"/>
         <source>Set User Fleet Up failed!</source>
@@ -3976,7 +3986,7 @@ Great at battle and bad at politics--so cool!</source>
         <translation type="unfinished">艦船名のローカル言語（%1）が見つかりません！</translation>
     </message>
     <message id="remodel-nonexistent">
-        <location filename="../Protocol/ship.cpp" line="369"/>
+        <location filename="../Protocol/ship.cpp" line="397"/>
         <source>Remodel target %1 does not exist!</source>
         <translation type="unfinished">艦船属性の取得に失敗しました！</translation>
     </message>
@@ -4896,135 +4906,140 @@ Great at battle and bad at politics--so cool!</source>
         <source>[Gun cut-in]</source>
         <translation type="unfinished"></translation>
     </message>
+    <message id="battle-report-label-torpedo">
+        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="556"/>
+        <source>[Torpedo]</source>
+        <translation type="unfinished"></translation>
+    </message>
     <message id="battle-report-main-gun">
-        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="565"/>
+        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="568"/>
         <source>[Main gun] %1 → %2: %3 damage%4</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="battle-report-overpen">
-        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="569"/>
+        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="572"/>
         <source> (Overpenetration)</source>
         <oldsource>[Main gun] %1 → %2: %3 damage%4 (Overpenetration)</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message id="battle-report-sec-gun">
-        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="575"/>
+        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="578"/>
         <source>[Secondary gun] %1 → %2: %3 damage</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="battle-report-point-blank">
-        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="580"/>
+        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="583"/>
         <source>[Point-blank shot] %1 → %2: formation efficiency reduced</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="battle-report-spotting-gun">
-        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="585"/>
+        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="588"/>
         <source>Spotting Gun</source>
         <oldsource>Spotting GunGun</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message id="battle-report-gun">
-        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="587"/>
+        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="590"/>
         <source>Gun</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="battle-report-gun-cutin">
-        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="592"/>
+        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="595"/>
         <source>[%1] cut-in  %2 → %3: %4 damage (x%5)</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="battle-report-air-torp">
-        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="599"/>
+        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="602"/>
         <source>[Air torpedo] %1 → %2: %3 damage</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="battle-report-air-dive">
-        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="604"/>
+        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="607"/>
         <source>[Air dive bomb] %1 → %2: %3 damage</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="battle-report-air-cutin">
-        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="609"/>
+        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="612"/>
         <source>[Air cut-in] %1 → %2: %3 damage</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="battle-report-aa-loss-phase">
-        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="615"/>
+        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="618"/>
         <source>%1: Anti-air loss [%2 phase] slot %3: -%4 (%5 remaining)</source>
         <oldsource>Anti-air loss [%1 phase] slot %2: -%3 (%4 remaining)</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message id="battle-report-aa-loss">
-        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="620"/>
+        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="623"/>
         <source>%1: Anti-air loss slot %2: -%3 (%4 remaining)</source>
         <oldsource>Anti-air loss slot %1: -%2 (%3 remaining)</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message id="battle-report-reason-evaded">
-        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="630"/>
+        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="633"/>
         <source>evaded</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="battle-report-reason-non-pen">
-        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="634"/>
+        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="637"/>
         <source>non-penetration</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="battle-report-reason-no-target">
-        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="638"/>
+        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="641"/>
         <source>no target</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="battle-report-reason-target-invalid">
-        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="642"/>
+        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="645"/>
         <source>target invalid</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="battle-report-reason-planes-lost">
-        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="646"/>
+        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="649"/>
         <source>all planes lost</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="battle-report-skip-atk-type">
-        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="659"/>
+        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="662"/>
         <source>%1 %2: %3 attempted against %4</source>
         <oldsource>%1: %2 attempted against %3</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message id="battle-report-skip">
-        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="666"/>
-        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="670"/>
+        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="669"/>
+        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="673"/>
         <source>%1: %2</source>
         <oldsource>Attack skipped (%1): %2</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message id="battle-report-air-sup">
-        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="684"/>
+        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="687"/>
         <source>Air superiority: Friend %1, Enemy %2, Coefficient %3</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="battle-report-formation-eff">
-        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="694"/>
+        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="697"/>
         <source>Formation efficiency: Friend %1, Enemy %2</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="battle-report-guided-strike">
-        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="702"/>
+        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="705"/>
         <source>Guided strike (recon) triggered: air attack power x%1</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="battle-report-torp-cutin">
-        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="710"/>
+        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="713"/>
         <source>[Torpedo cut-in] %1 → %2: %3 damage (x%4)</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="battle-report-torpedo">
-        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="715"/>
+        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="718"/>
         <source>[Torpedo] %1 → %2: %3 damage</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="battle-report-unknown">
-        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="722"/>
+        <location filename="../ClientGUI/ui/sortie/confirmsortie.cpp" line="725"/>
         <source>Unknown battle action type %1</source>
         <translation type="unfinished"></translation>
     </message>

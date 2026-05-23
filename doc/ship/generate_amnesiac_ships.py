@@ -11,12 +11,17 @@ then scaled by level efficiency.
 Level scaling: Base(Lv10)=0.570, Regular(Lv40)=0.763, Veteran+(Lv100)=1.0
 
 Default equipment from amnesiac equip IDs (8192+).
+
+The `remodel` column of each generated ship points to the corresponding ship
+of the same class (type_enc) and tier from Ship.xlsx.bak (loaded via its CSV
+backup).
 """
 
 import csv, math, os, sys
 
 HERE = os.path.dirname(__file__)
 SHIP_CSV = os.path.join(HERE, "Ship.csv")
+SHIP_BAK_CSV = os.path.join(HERE, "Ship.csv.bak")
 EQUIP_CSV = os.path.join(HERE, "..", "equip", "Equip.csv")
 
 # ── tiers ──────────────────────────────────────────────────
@@ -47,83 +52,108 @@ def tech_intervals(is_plane):
 
 
 # ── enemy class definitions ────────────────────────────────
+# (name_base, class_text, type_code, is_plane,
+#  bak_target_type, bak_target_class,
+#  [(equiptype, first_tier_or_None), ...],
+#  stat_modifiers_dict)
+#
+# bak_target_type / bak_target_class identify the ship in Ship.xlsx.bak
+# to reference via the `remodel` column.
+
 ENEMY_CLASSES = [
-    # (name_ja, class_text, type_code, is_plane,
-    #  [(equiptype, first_tier_or_None), ...],
-    #  stat_modifiers_dict)
-    ("Amnesiac Torpedo Boat", "PT Boat", 0x11, False,
+
+    ("魚雷艇", "魚雷艇", 0x10, False,
+     0x010, 0x100,
      [("Small-gun-flat", 0)],
      {"DPM":0.5, "Hitpoints":0.4, "Evasion":1.5, "Armor":0.3}),
 
-    ("Amnesiac Escort r", "Escort r", 0x11, False,
+    ("海防ㄖ級", "海防ㄖ級", 0x11, False,
+     0x011, 0x100,
      [("Small-gun-flat", 0), ("Sonar-passive", 1), ("Depthc-projector", 1)],
      {"Asw":1.4, "DPM":0.8}),
 
-    ("Amnesiac Dst b", "Dst b", 0x20, False,
+    ("駆逐ㄅ級", "駆逐ㄅ級", 0x20, False,
+     0x020, 0x100,
      [("Small-gun-flat", 0), ("Torp", 0), ("Midget-sub", 5)],
      {"DPM":1.1, "Torpedo":1.15}),
 
-    ("Amnesiac Dst p", "Dst p", 0x20, False,
+    ("駆逐ㄆ級", "駆逐ㄆ級", 0x20, False,
+     0x020, 0x200,
      [("Small-gun-flat", 0), ("Sonar-passive", 0), ("Depthc-projector", 0)],
      {"Asw":1.4, "Torpedo":0.7, "DPM":0.85}),
 
-    ("Amnesiac Dst m", "Dst m", 0x20, False,
+    ("駆逐ㄇ級", "駆逐ㄇ級", 0x20, False,
+     0x020, 0x300,
      [("Small-gun-flat", 0), ("AA-gun", 0), ("Midget-sub", 4)],
      {"Antiair":1.3, "DPM":0.85, "Torpedo":0.85}),
 
-    ("Amnesiac Dst f", "Dst f", 0x20, False,
+    ("駆逐ㄈ級", "駆逐ㄈ級", 0x20, False,
+     0x020, 0x400,
      [("Small-gun-flat", 0), ("Radar-small-flat", 0), ("Midget-sub", 4)],
      {"Los":1.5, "Concealment":1.4, "Accuracy":1.2}),
 
-    ("Amnesiac CL d", "CL d", 0x30, False,
+    ("軽巡ㄉ級", "軽巡ㄉ級", 0x30, False,
+     0x030, 0x100,
      [("Mid-gun-flat", 0), ("Sp-recon", 0), ("Sonar-passive", 0), ("Depthc-projector", 0)],
      {"Asw":1.3, "Los":1.1}),
 
-    ("Amnesiac CL t", "CL t", 0x30, False,
+    ("軽巡ㄊ級", "軽巡ㄊ級", 0x30, False,
+     0x030, 0x200,
      [("Mid-gun-flat", 0), ("Radar-small-flak", 0), ("AA-gun", 0)],
      {"Antiair":1.4, "Los":1.2, "Accuracy":1.1}),
 
-    ("Amnesiac CL n", "CL n", 0x32, False,
+    ("雷巡ㄋ級", "雷巡ㄋ級", 0x32, False,
+     0x032, 0x300,
      [("Mid-gun-flat", 0), ("Torp", 0), ("Midget-sub", 0), ("Midget-sub", 3)],
      {"Torpedo":1.5, "DPM":0.85}),
 
-    ("Amnesiac CA g", "CA g", 0x40, False,
+    ("重巡ㄍ級", "重巡ㄍ級", 0x40, False,
+     0x040, 0x100,
      [("Mid-gun-flat-ca", 0), ("Midget-sub", 5)],
      {"DPM":1.0, "Armor":1.0}),
 
-    ("Amnesiac CA k", "CA k", 0x44, False,
+    ("航巡ㄎ級", "航巡ㄎ級", 0x44, False,
+     0x044, 0x200,
      [("Mid-gun-flat-ca", 0), ("Sp-fight", 0), ("Sp-bomb", 0), ("Midget-sub", 5)],
      {"Los":1.2, "Antiair":1.1}),
 
-    ("Amnesiac BC sh", "BC sh", 0x51, False,
+    ("戦巡ㄕ級", "戦巡ㄕ級", 0x51, False,
+     0x050, 0x100,
      [("Big-gun", 0), ("Torp", 0), ("Midget-sub", 2)],
      {"Speed":1.15, "Torpedo":1.2, "Evasion":1.1}),
 
-    ("Amnesiac BB j", "BB j", 0x50, False,
+    ("戦艦ㄐ級", "戦艦ㄐ級", 0x50, False,
+     0x050, 0x100,
      [("Big-gun", 0)],
      {"DPM":1.2, "Armor":1.15}),
 
-    ("Amnesiac BB q", "BB q", 0x52, False,
+    ("戦艦ㄑ級", "戦艦ㄑ級", 0x52, False,
+     0x052, 0x200,
      [("Big-gun", 0)],
      {"Speed":1.2, "Evasion":1.15, "Accuracy":1.15, "DPM":0.9, "Armor":0.9}),
 
-    ("Amnesiac CVL zh", "CVL zh", 0x61, True,
+    ("軽母ㄓ級", "軽母ㄓ級", 0x61, True,
+     0x061, 0x100,
      [("Fighter", 0), ("Bomb-torp", 0), ("Bomb-dive", 0)],
      {"DPM":1.1, "Armor":1.1, "Planes":1.1}),
 
-    ("Amnesiac CVL ch", "CVL ch", 0x62, True,
+    ("軽母ㄔ級", "軽母ㄔ級", 0x62, True,
+     0x061, 0x200,
      [("Fighter", 0), ("Bomb-dive", 0)],
      {"Asw":1.8, "Planes":1.1}),
 
-    ("Amnesiac CV l", "CV l", 0x60, True,
+    ("空母ㄌ級", "空母ㄌ級", 0x60, True,
+     0x060, 0x100,
      [("Fighter", 0), ("Bomb-dive", 0), ("Bomb-torp", 0)],
      {"Planes":1.2}),
 
-    ("Amnesiac SS x", "SS x", 0x70, False,
+    ("潜水ㄒ級", "潜水ㄒ級", 0x70, False,
+     0x070, 0x100,
      [("Torp-sub", 0)],
      {"Torpedo":1.0}),
 
-    ("Amnesiac TP h", "TP h", 0x90, False,
+    ("輸送ㄏ級", "輸送ㄏ級", 0x90, False,
+     0x090, 0x100,
      [("Small-gun-flat", 1), ("Mid-gun-flat", 3), ("Mid-gun-flak", 5),
       ("Radar-small-flak", 5), ("Sp-recon", 4)],
      {"DPM":0.7, "Hitpoints":0.8}),
@@ -153,6 +183,45 @@ def _init_headers():
 def header_cols():
     _init_headers()
     return _HEADER_INDICATORS, _HEADER_TITLES
+
+
+# ── bak ship loader (for remodel targeting) ────────────────
+_BAK_ENEMY = None
+
+def load_bak_enemy():
+    global _BAK_ENEMY
+    if _BAK_ENEMY is not None:
+        return _BAK_ENEMY
+    bak = {}
+    fp = os.path.normpath(SHIP_BAK_CSV)
+    if not os.path.exists(fp):
+        print(f"WARN: {fp} not found, remodel will be 0", file=sys.stderr)
+        _BAK_ENEMY = {}
+        return {}
+    inds, titles = header_cols()
+    with open(fp, encoding="utf-8") as f:
+        r = csv.reader(f)
+        next(r); next(r)
+        for line in r:
+            if not line or not line[0]:
+                continue
+            sid = int(line[0])
+            if (sid & 0xFF000000) < 0x70000000:
+                continue
+            type_enc = (sid >> 12) & 0xFFF
+            tier_byte = (sid >> 24) & 0xFF
+            cls = sid & 0xFFF
+            key = (type_enc, tier_byte, cls)
+            bak[key] = sid
+    _BAK_ENEMY = bak
+    print(f"Loaded {len(bak)} bak enemy ships for remodel targeting",
+          file=sys.stderr)
+    return bak
+
+
+def find_remodel_target(bak_type, bak_class, tier_byte):
+    bak = load_bak_enemy()
+    return bak.get((bak_type, tier_byte, bak_class), 0)
 
 
 # ── player ship loading ────────────────────────────────────
@@ -209,11 +278,10 @@ def load_amnesiac_equips():
                 continue
             etype = line[4].strip()
             tech = int(sv(line[5]))
-            yr = 0
-            for t in TIERS:
+            for idx, t in enumerate(TIERS):
                 yr = t["plane" if etype in _PLANE_TYPES else "ship"]
                 if tech == yr:
-                    el.append((eid, etype, TIERS.index(t)))
+                    el.append((eid, etype, idx))
                     break
     _EQUIP_CACHE = el
     return el
@@ -272,7 +340,8 @@ def level_scale(stats, lv):
 
 
 # ── row building ───────────────────────────────────────────
-def build_row(sid, name_ja, cls_text, type_code, tech_yr, equips, stats, tier_i):
+def build_row(sid, name_ja, cls_text, type_code, tech_yr,
+              equips, stats, tier_i, remodel_target):
     inds, titles = header_cols()
     ncols = len(inds)
     row = [""] * ncols
@@ -286,7 +355,7 @@ def build_row(sid, name_ja, cls_text, type_code, tech_yr, equips, stats, tier_i)
             if ttl.startswith("OldNo") or ttl.startswith("OldInternalNo"):
                 continue
             if ttl == "remodel":
-                row[i] = "0"
+                row[i] = str(remodel_target)
             elif ttl == "Defaultequip1":
                 row[i] = str(int(equips[0])) if len(equips) > 0 else ""
             elif ttl == "Defaultequip2":
@@ -343,6 +412,9 @@ def generate_all():
     player_ships = load_player_ships()
     print(f"Loaded {len(player_ships)} player ships", file=sys.stderr)
 
+    # Pre-load bak enemy data for remodel targeting
+    load_bak_enemy()
+
     # Default slot counts by major type
     DEFAULT_SLOTS = {
         0x10: 2, 0x20: 2, 0x30: 3, 0x40: 3,
@@ -353,7 +425,8 @@ def generate_all():
 
     all_rows = []
     for cl_idx, eclass in enumerate(ENEMY_CLASSES):
-        name_ja, cls_text, type_code, is_plane, eq_specs, mods = eclass
+        (name_base, cls_text, type_code, is_plane,
+         bak_type, bak_class, eq_specs, mods) = eclass
         mids = tech_intervals(is_plane)
         class_index = cl_idx + 1
 
@@ -371,7 +444,7 @@ def generate_all():
             if cnt == 0:
                 avg, cnt = avg_stats(player_ships, type_code, 0, 9999)
             if cnt == 0:
-                print(f"  WARN: no player ships for {name_ja} tier {tier_i}",
+                print(f"  WARN: no player ships for {name_base} tier {tier_i}",
                       file=sys.stderr)
                 continue
 
@@ -400,10 +473,19 @@ def generate_all():
             while len(equips) < 5:
                 equips.append(0)
 
-            row = build_row(sid, name_ja, cls_text, type_code,
-                            tech_yr, equips, stats, tier_i)
+            tier_name = ti["name"]
+            # ja_JP name: Japanese class name + English tier (no separator)
+            full_name = f"{name_base}{tier_name}"
+
+            # Find target from bak: same (type, tier)
+            remodel_id = find_remodel_target(bak_type, bak_class,
+                                             ti["byte"])
+
+            row = build_row(sid, full_name, cls_text, type_code,
+                            tech_yr, equips, stats, tier_i, remodel_id)
             class_rows.append(row)
-            print(f"  [{sid}] {name_ja} tier={tier_i} ({cnt} ref ships)",
+            print(f"  [{sid}] {name_base}{tier_name} tier={tier_i} "
+                  f"remodel=0x{remodel_id:08X} ({cnt} ref ships)",
                   file=sys.stderr)
 
         # Monotonic enforcement: each stat >= previous tier
@@ -414,7 +496,6 @@ def generate_all():
             prev = class_rows[i - 1]
             curr = class_rows[i]
             for k in _ROUND_KEYS:
-                # Find column index for this attribute
                 for ci, (ind, ttl) in enumerate(zip(*header_cols())):
                     if ind == "attr" and ttl == k:
                         pv = int(prev[ci]) if prev[ci] else 0
@@ -425,7 +506,13 @@ def generate_all():
 
         all_rows.extend(class_rows)
 
-    with open(SHIP_CSV, "a", encoding="utf-8") as f:
+    with open(SHIP_CSV, "a+", encoding="utf-8") as f:
+        # Ensure file ends with newline before appending
+        f.seek(0, 2)
+        if f.tell() > 0:
+            f.seek(f.tell() - 1, 0)
+            if f.read(1) != "\n":
+                f.write("\n")
         for row in all_rows:
             f.write(",".join(str(v) for v in row) + "\n")
 

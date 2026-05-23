@@ -62,7 +62,8 @@ void Server::handleARDPurchaseAuth(const CSteamID &uid,
                 try {
                 QByteArray responseData = reply->readAll();
                 QJsonDocument doc = QJsonDocument::fromJson(responseData);
-                QString result = doc.object()["response"]
+                QJsonObject root = doc.object();
+                QString result = root["response"]
                                      .toObject()["result"].toString();
                 if(result == QStringLiteral("OK")) {
                     QSqlQuery query;
@@ -104,7 +105,8 @@ void Server::handleARDPurchaseAuth(const CSteamID &uid,
                     }
                 }
                 else {
-                    QString errDesc = doc.object()["response"]
+                    QJsonObject root2 = doc.object();
+                    QString errDesc = root2["response"]
                                           .toObject()["error"]
                                           .toObject()["errordesc"].toString();
                     qWarning() << "FinalizeTxn Steam error:" << errDesc;
@@ -171,7 +173,8 @@ void Server::handleInitARDPurchase(const CSteamID &uid,
                 reply->deleteLater();
                 QByteArray responseData = reply->readAll();
                 QJsonDocument doc = QJsonDocument::fromJson(responseData);
-                QString result = doc.object()["response"]
+                QJsonObject root3 = doc.object();
+                QString result = root3["response"]
                                      .toObject()["result"].toString();
                 if(result == QStringLiteral("OK")) {
                     pendingARDOrders[orderId] = {uid, units};
@@ -181,7 +184,8 @@ void Server::handleInitARDPurchase(const CSteamID &uid,
                     }
                 }
                 else {
-                    QString errDesc = doc.object()["response"]
+                    QJsonObject root4 = doc.object();
+                    QString errDesc = root4["response"]
                                           .toObject()["error"]
                                           .toObject()["errordesc"].toString();
                     qWarning() << "InitTxn Steam error:" << errDesc;
@@ -222,7 +226,8 @@ void Server::pollARDRefunds() {
                 check_response:
                     QByteArray responseData = reply->readAll();
                     QJsonDocument doc = QJsonDocument::fromJson(responseData);
-                    QJsonObject resp = doc.object()["response"].toObject();
+                    QJsonObject root5 = doc.object();
+                    QJsonObject resp = root5["response"].toObject();
                     if(resp["result"].toString() != QStringLiteral("OK")) {
                         //% "ARD refund poll failed: %1"
                         qWarning() << qtTrId("ard-refund-poll-failed")
@@ -239,7 +244,7 @@ void Server::pollARDRefunds() {
                         QStringLiteral("RefundedFriendlyFraud"),
                     };
                     QJsonArray transactions = resp["transactions"].toArray();
-                    for(const QJsonValue &txVal : transactions) {
+                    for(const QJsonValue &txVal : std::as_const(transactions)) {
                         QJsonObject tx = txVal.toObject();
                         if(!reversedStatuses.contains(tx["status"].toString())) {
                             continue;

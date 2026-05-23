@@ -15,7 +15,7 @@ description: Manual of style for C++ code
 7. Use `qobject_cast` instead of `static_cast` when casting Qt object pointers (QObject-derived types).
 8. Never use Qt reserved keywords (`signals`, `slots`, `emit`, `foreach`, `forever`, `Q_SIGNALS`, `Q_SLOTS`) as variable, parameter, or local names. Rename conflicting identifiers (e.g. `slots` → `equipSlots`).
 9. Comment with /* */ rather than //
-10. Fix all clazy warnings.
+10. Fix all clazy warnings. In particular, don't write Qt Container code that could be detached in c++11 range-loop.
 11. Utilize DBError rather than manual "qWarning() << error strings"
 12. JSON object fields are all lowercase.
 13. Use qtTrId() (id-based translation) wherever the string would be visible to the user in Client or logged with qDebug()/qInfo()/qWarning()/qCritical(), not bare c-strings

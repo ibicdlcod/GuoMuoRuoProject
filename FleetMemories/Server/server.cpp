@@ -5039,9 +5039,10 @@ void Server::sendTestMessages() {
         qWarning() << "Server isn't listening, abort.";
     }
     else {
-        for(auto map: normalMaps) {
-            int unionId = MapWithDiff::getUnionId(map->id);
-            qCritical() << unionId << getAllNodeIndicesFromLua(unionId).size();
+        for(auto equip: equipRegistry.values()) {
+            if(equip->type.isTorp()) {
+            qCritical() << equip->toString() << equip->attr["Firingspeed"];
+            }
         }
     }
 }

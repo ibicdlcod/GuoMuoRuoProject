@@ -21,34 +21,26 @@
 return {
     FriendFleetInfo = {
         ships = {
-            [0] = 0x10120401,   -- 神風 (Kamikaze)
-            [1] = 0x10120402,  
-            [2] = 0x10120403, 
-            [3] = 0x10120404, 
-            [4] = 0x10120405, 
-            [5] = 0x10120407,  
-            [6] = 0x10120408,  
+            [0] = 0x10120201,   -- 神風 (Kamikaze)
+            [1] = 0x10120202,  
+            [2] = 0x10120203, 
+            [3] = 0x10120204, 
+            [4] = 0x10120205,  
         },
         shipDynamics = {
-            [0] = { lv = 10, slotEquip = {125, 125, 0, 0, 0},
+            [0] = { lv = 10, slotEquip = {1, 174, 0, 0, 0},
                     slotEquipEx = 0, slotPlanes = {0, 0, 0, 0, 0},
                     fuel = 1.0, ammo = 1.0 },
-            [1] = { lv = 10, slotEquip = {125, 125, 0, 0, 0},
+            [1] = { lv = 10, slotEquip = {1, 174, 0, 0, 0},
                     slotEquipEx = 0, slotPlanes = {0, 0, 0, 0, 0},
                     fuel = 1.0, ammo = 1.0 },
-            [2] = { lv = 10, slotEquip = {125, 125, 0, 0, 0},
+            [2] = { lv = 10, slotEquip = {1, 174, 0, 0, 0},
                     slotEquipEx = 0, slotPlanes = {0, 0, 0, 0, 0},
                     fuel = 1.0, ammo = 1.0 },
-            [3] = { lv = 10, slotEquip = {125, 125, 0, 0, 0},
+            [3] = { lv = 10, slotEquip = {1, 174, 0, 0, 0},
                     slotEquipEx = 0, slotPlanes = {0, 0, 0, 0, 0},
                     fuel = 1.0, ammo = 1.0 },
-            [4] = { lv = 10, slotEquip = {125, 125, 0, 0, 0},
-                    slotEquipEx = 0, slotPlanes = {0, 0, 0, 0, 0},
-                    fuel = 1.0, ammo = 1.0 },
-            [5] = { lv = 10, slotEquip = {125, 125, 0, 0, 0},
-                    slotEquipEx = 0, slotPlanes = {0, 0, 0, 0, 0},
-                    fuel = 1.0, ammo = 1.0 },
-            [6] = { lv = 10, slotEquip = {125, 125, 0, 0, 0},
+            [4] = { lv = 10, slotEquip = {1, 174, 0, 0, 0},
                     slotEquipEx = 0, slotPlanes = {0, 0, 0, 0, 0},
                     fuel = 1.0, ammo = 1.0 },
         },
@@ -57,13 +49,11 @@ return {
     },
     EnemyFleetInfo = {
         ships = {
-            [0] = 0x7A020100,   -- 駆逐ㄅ級Base
-            [1] = 0x7A020100,   -- 駆逐ㄅ級Base
-            [2] = 0x7A020100,   -- 駆逐ㄅ級Base
-            [3] = 0x7A020100,   -- 駆逐ㄅ級Base
-            [4] = 0x7A020100,   -- 駆逐ㄅ級Base
-            [5] = 0x7A020100,   -- 駆逐ㄅ級Base
-            [6] = 0x7A020100,   -- 駆逐ㄅ級Base
+            [0] = 0x7F020100,   -- 駆逐ㄅ級Base
+            [1] = 0x7F020100,   -- 駆逐ㄅ級Base
+            [2] = 0x7F020100,   -- 駆逐ㄅ級Base
+            [3] = 0x7F020100,   -- 駆逐ㄅ級Base
+            [4] = 0x7F020100,   -- 駆逐ㄅ級Base
         },
         shipDynamics = {
             [0] = { lv = 100, fuel = 1.0, ammo = 1.0 },
@@ -71,8 +61,6 @@ return {
             [2] = { lv = 100, fuel = 1.0, ammo = 1.0 },
             [3] = { lv = 100, fuel = 1.0, ammo = 1.0 },
             [4] = { lv = 100, fuel = 1.0, ammo = 1.0 },
-            [5] = { lv = 100, fuel = 1.0, ammo = 1.0 },
-            [6] = { lv = 100, fuel = 1.0, ammo = 1.0 },
         },
     },
     BattlePlan = {

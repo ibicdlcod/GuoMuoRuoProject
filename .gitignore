@@ -97,6 +97,9 @@ static_build/
 !FleetMemories/steam/*
 !FleetMemories/steam/*/*
 !FleetMemories/steam/*/*/*
+*.bak
+*.bak*
+*.db
 
 # Temp folder
 temp/

@@ -8,6 +8,11 @@ Sunk ships (HP ≤ 0) cannot make any attacks — their pending
 events are silently dropped when the attack-processing function
 encounters the HP guard.
 
+All cut-in trigger calculations use the **effective** primary
+stat of equipment: raw stat × skillpoint effect multiplier
+(from `FleetInfo::equipSkillEffects`). Visible bonuses are
+applied separately where noted in individual attack-type docs.
+
 The battle have the following characteristics:
 
 - [Tactical Goal (for friend fleet)](9.c1-goal-friend.md)

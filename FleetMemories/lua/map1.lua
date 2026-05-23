@@ -126,7 +126,8 @@ maps[1][2] = {
 	},
 	enemy = {
 		C = function()
-			choice = math.random(1, 4)
+			return {0x7F010100, 0x7F011100}
+			--[[choice = math.random(1, 4)
 			if choice == 1 then
 				return {0x7F010100, 0x7F011100}
 			elseif choice == 2 then
@@ -137,7 +138,7 @@ maps[1][2] = {
 				return {0x7F020300}
 			else
 				return {}
-			end
+			end]]
 		end,
 		B = function()
 			return {}

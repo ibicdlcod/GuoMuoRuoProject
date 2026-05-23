@@ -15,7 +15,11 @@
 #include <QtTypes>
 
 #include <algorithm>
+#include <future>
 #include <memory>
+#include <mutex>
+#include <thread>
+#include <vector>
 
 #include "../Protocol/equipment.h"
 #include "../Protocol/kp.h"
@@ -2960,13 +2964,33 @@ void Server::writeAggregateReport(
                                                           0.0);
                                   })
                                   / repeatCount;
+                  double avgFinalHP
+                      = allRunStats.isEmpty()
+                            ? 0.0
+                            : std::accumulate(
+                                  allRunStats.begin(),
+                                  allRunStats.end(), 0.0,
+                                  [&](double sum,
+                                      const RunStats &rs) {
+                                      return sum
+                                             + rs.finalHP
+                                                   .value(key,
+                                                          0);
+                                  })
+                                  / repeatCount;
+                  int maxHP = fleetInfo.ships[i]
+                                  ->attr.value(
+                                      QStringLiteral("Hitpoints"),
+                                      0);
                   out << "| " << (i + 1) << " | "
                       << fleetInfo.ships[i]->toString()
                       << " | "
                       << QString::number(avgDealt, 'f', 1)
                       << " | "
                       << QString::number(avgTaken, 'f', 1)
-                      << " | -\n";
+                      << " | "
+                      << QString::number(avgFinalHP, 'f', 1)
+                      << " / " << maxHP << " |\n";
               }
           };
 
@@ -3253,95 +3277,144 @@ bool Server::runTestBattle(const QString &luaPath,
             = bp.get_or("extraBattleWhenAorBelow", false);
     }
 
-    allRunStats.clear();
-    std::random_device rd;
-    for(int run = 0; run < repeatCount; ++run) {
+    /* Single run: produce per-event report directly */
+    if(repeatCount <= 1) {
         FleetInfo fFriend;
         deepCopyFleetInfo(friendFleet, fFriend);
         FleetInfo fEnemy;
         deepCopyFleetInfo(enemyFleet, fEnemy);
-
-        std::seed_seq seq{rd(), rd(), rd(), rd(), rd(),
-                           rd(), rd(), rd()};
-        std::mt19937 runMt(seq);
-        Battle battle(runMt, equipRegistry);
-        battle.battleProcessor(&fFriend, &fEnemy,
-                               battlePlan);
-        QJsonArray damageLog = battle.getDamageLog();
-
-        if(repeatCount == 1 && !reportPath.isEmpty()) {
-            writeMarkdownReport(reportPath, damageLog,
+        Battle battle(mt, equipRegistry);
+        battle.battleProcessor(&fFriend, &fEnemy, battlePlan);
+        if(!reportPath.isEmpty())
+            writeMarkdownReport(reportPath,
+                                battle.getDamageLog(),
                                 fFriend, fEnemy);
-            return true;
-        }
-
-        RunStats rs;
-        for(const auto &entryRef : damageLog) {
-            QJsonObject e = entryRef.toObject();
-            int type = e["type"].toInt();
-            int attFId
-                = e["attackerFleet"].toBool() ? 0 : 1;
-            int attS = e["attackerShip"].toInt(-1);
-            int defS = e["defenderShip"].toInt(-1);
-            int dmg = e["damage"].toInt(0);
-            int atkType = e["attackType"].toInt(-1);
-            int cutIn = parseCutInFromJson(e);
-            int skipReason = e["reason"].toInt(-1);
-
-            if(type == KP::AirSuperiorityValue) {
-                rs.airSupCoef
-                    = e["coefficient"].toDouble();
-                rs.hasAirSup = true;
-                continue;
-            }
-            if(type == KP::FormationEfficiencyValue) {
-                rs.friendFormEff
-                    = e["friendEff"].toDouble();
-                rs.enemyFormEff
-                    = e["enemyEff"].toDouble();
-                rs.hasFormEff = true;
-                continue;
-            }
-
-            if(attS < 0)
-                continue;
-
-            QString dealKey
-                = QStringLiteral("%1_%2")
-                      .arg(attFId)
-                      .arg(attS);
-            QString takeKey
-                = QStringLiteral("%1_%2")
-                      .arg(attFId == 0 ? 1 : 0)
-                      .arg(defS);
-
-            if(type == KP::AttackSkipped) {
-                if(skipReason == KP::Evaded
-                    && atkType >= 0) {
-                    RunStats::CompoKey ck{
-                        attFId, attS, atkType, -1};
-                    rs.attempts[ck]++;
-                }
-                continue;
-            }
-
-            if(atkType < 0)
-                atkType = type;
-
-            RunStats::CompoKey ckFull{attFId, attS, atkType,
-                                      cutIn};
-            RunStats::CompoKey ckBase{attFId, attS, atkType,
-                                      -1};
-
-            rs.damageDealt[dealKey] += dmg;
-            if(defS >= 0)
-                rs.damageTaken[takeKey] += dmg;
-            rs.damageCompo[ckFull] += dmg;
-            rs.attempts[ckBase]++;
-            rs.hits[ckBase]++;
-        }
-        allRunStats.append(rs);
+        return true;
     }
+
+    allRunStats.clear();
+    std::random_device rd;
+
+    unsigned int nThreads = std::max(
+        1u, std::thread::hardware_concurrency());
+    int perThread = repeatCount / static_cast<int>(nThreads);
+    int remainder = repeatCount % static_cast<int>(nThreads);
+
+    std::mutex statsMutex;
+    std::vector<std::future<void>> futures;
+
+    auto worker = [&](int start, int count) {
+        std::vector<RunStats> localStats;
+        localStats.reserve(count);
+        std::seed_seq seq{rd(), rd(), rd(), rd(),
+                           rd(), rd(), rd(), rd()};
+        std::mt19937 threadMt(seq);
+        for(int run = 0; run < count; ++run) {
+            FleetInfo fFriend;
+            deepCopyFleetInfo(friendFleet, fFriend);
+            FleetInfo fEnemy;
+            deepCopyFleetInfo(enemyFleet, fEnemy);
+
+            Battle battle(threadMt, equipRegistry);
+            battle.battleProcessor(&fFriend, &fEnemy,
+                                   battlePlan);
+            QJsonArray damageLog = battle.getDamageLog();
+
+            RunStats rs;
+            for(const auto &entryRef : damageLog) {
+                QJsonObject e = entryRef.toObject();
+                int type = e["type"].toInt();
+                int attFId
+                    = e["attackerFleet"].toBool() ? 0 : 1;
+                int attS = e["attackerShip"].toInt(-1);
+                int defS = e["defenderShip"].toInt(-1);
+                int dmg = e["damage"].toInt(0);
+                int atkType = e["attackType"].toInt(-1);
+                int cutIn = parseCutInFromJson(e);
+                int skipReason = e["reason"].toInt(-1);
+
+                if(type == KP::AirSuperiorityValue) {
+                    rs.airSupCoef
+                        = e["coefficient"].toDouble();
+                    rs.hasAirSup = true;
+                    continue;
+                }
+                if(type == KP::FormationEfficiencyValue) {
+                    rs.friendFormEff
+                        = e["friendEff"].toDouble();
+                    rs.enemyFormEff
+                        = e["enemyEff"].toDouble();
+                    rs.hasFormEff = true;
+                    continue;
+                }
+
+                if(attS < 0)
+                    continue;
+
+                QString dealKey
+                    = QStringLiteral("%1_%2")
+                          .arg(attFId)
+                          .arg(attS);
+                QString takeKey
+                    = QStringLiteral("%1_%2")
+                          .arg(attFId == 0 ? 1 : 0)
+                          .arg(defS);
+
+                if(type == KP::AttackSkipped) {
+                    if(skipReason == KP::Evaded
+                        && atkType >= 0) {
+                        RunStats::CompoKey ck{
+                            attFId, attS, atkType, -1};
+                        rs.attempts[ck]++;
+                    }
+                    continue;
+                }
+
+                if(atkType < 0)
+                    atkType = type;
+
+                RunStats::CompoKey ckFull{
+                    attFId, attS, atkType, cutIn};
+                RunStats::CompoKey ckBase{
+                    attFId, attS, atkType, -1};
+
+                rs.damageDealt[dealKey] += dmg;
+                if(defS >= 0)
+                    rs.damageTaken[takeKey] += dmg;
+                rs.damageCompo[ckFull] += dmg;
+                rs.attempts[ckBase]++;
+                rs.hits[ckBase]++;
+            }
+            for(size_t i = 0; i < fFriend.shipDynamics.size();
+                 ++i) {
+                if(fFriend.shipDynamics[i] && fFriend.ships[i])
+                    rs.finalHP[QStringLiteral("0_%1").arg(i)]
+                        = fFriend.shipDynamics[i]->currentHP;
+            }
+            for(size_t i = 0; i < fEnemy.shipDynamics.size();
+                 ++i) {
+                if(fEnemy.shipDynamics[i] && fEnemy.ships[i])
+                    rs.finalHP[QStringLiteral("1_%1").arg(i)]
+                        = fEnemy.shipDynamics[i]->currentHP;
+            }
+            localStats.push_back(rs);
+        }
+        std::lock_guard<std::mutex> lock(statsMutex);
+        for(const auto &s : localStats)
+            allRunStats.append(s);
+    };
+
+    int cursor = 0;
+    for(unsigned int t = 0; t < nThreads; ++t) {
+        int chunk = perThread + (static_cast<int>(t) < remainder ? 1 : 0);
+        if(chunk <= 0)
+            break;
+        futures.push_back(
+            std::async(std::launch::async, worker, cursor, chunk));
+        cursor += chunk;
+    }
+    for(auto &f : futures)
+        f.get();
 
     if(repeatCount > 1 && !reportPath.isEmpty()) {
         writeAggregateReport(reportPath, repeatCount,
