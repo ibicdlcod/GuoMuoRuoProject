@@ -382,7 +382,7 @@ bool Server::importMapNodeFromCSV() {
     int importedMapNodes = 0;
     while(!textStream.atEnd()) {
         QString text = textStream.readLine();
-        if(text.startsWith(","))
+        if(text.startsWith(",") || text.trimmed().isEmpty())
             continue;
         else {
             QStringList lineParts = text.split(",");
@@ -400,7 +400,11 @@ bool Server::importMapNodeFromCSV() {
             for(int i = 0; i < titleParts.length(); ++i) {
                 if(indicatorParts[i].compare("name", Qt::CaseInsensitive)
                         == 0) {
-                    auto &q = updateMapNodeLang[titleParts[i]];
+                    auto it = updateMapNodeLang.find(titleParts[i]);
+                    if(it == updateMapNodeLang.end()) {
+                        continue;
+                    }
+                    QSqlQuery &q = it.value();
                     q.bindValue(":id", mapNodeId);
                     q.bindValue(":value", lineParts[i]);
                     if(!q.exec()) {
@@ -745,8 +749,44 @@ bool Server::shipRefresh() {
         openShips.insert(query.value(idCol).toInt());
     }
     shipRegistry.clear();
+
+    /* Batch-load ship names: one query for all ships */
+    QHash<int, QMap<QString, QString>> batchNames;
+    QSqlQuery nameQ;
+    nameQ.prepare(
+        "SELECT ShipID, lang, textattr, value FROM ShipName "
+        "ORDER BY ShipID");
+    if(nameQ.exec() && nameQ.isSelect()) {
+        while(nameQ.next()) {
+            int sid = nameQ.value(0).toInt();
+            QString lang = nameQ.value(1).toString();
+            QString attr = nameQ.value(2).toString();
+            QString val = nameQ.value(3).toString();
+            QString key = attr + lang;
+            batchNames[sid][key] = val;
+        }
+    }
+
+    /* Batch-load ship attributes: one query for all ships */
+    QHash<int, QMap<QString, int>> batchAttrs;
+    QSqlQuery attrQ;
+    attrQ.prepare(
+        "SELECT ShipID, Attribute, Intvalue FROM ShipReg "
+        "ORDER BY ShipID");
+    if(attrQ.exec() && attrQ.isSelect()) {
+        while(attrQ.next()) {
+            int sid = attrQ.value(0).toInt();
+            QString attrName = attrQ.value(1).toString();
+            int val = attrQ.value(2).toInt();
+            batchAttrs[sid][attrName] = val;
+        }
+    }
+
     for(auto shipID : std::as_const(openShips)) {
-        shipRegistry[shipID] = new Ship(shipID, this);
+        shipRegistry[shipID] = new Ship(
+            shipID, this,
+            batchNames.value(shipID),
+            batchAttrs.value(shipID));
     }
     //% "Load ship registry success!"
     qInfo() << qtTrId("ship-load-good");

@@ -21,6 +21,9 @@ class Ship : public QObject
 public:
     explicit Ship(int, QObject *parent = nullptr);
     explicit Ship(const QJsonObject &, QObject *parent = nullptr);
+    explicit Ship(int shipId, QObject *parent,
+                  const QMap<QString, QString> &names,
+                  const QMap<QString, int> &attrs);
 
     int operator<=>(const Ship &) const;
     const ResOrd consRes() const;

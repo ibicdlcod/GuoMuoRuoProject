@@ -236,7 +236,7 @@ KP::GameError ExpeditionManager::startExpedition(const CSteamID &uid, int mapId,
     }
 
     /* Insert expedition record */
-    qint64 currentTime = QDateTime::currentDateTimeUtc().toSecsSinceEpoch();
+    qint64 currentTime = QDateTime::currentSecsSinceEpoch();
     qint64 nextProgressTime = currentTime; // Start immediately
     
     query.prepare(
@@ -651,7 +651,7 @@ void ExpeditionManager::processExpeditions() {
         return;
     }
     
-    qint64 currentTime = QDateTime::currentDateTimeUtc().toSecsSinceEpoch();
+    qint64 currentTime = QDateTime::currentSecsSinceEpoch();
     
     QSqlQuery query;
     // Query active expeditions where NextProgressTime has been reached
@@ -872,7 +872,7 @@ QJsonArray ExpeditionManager::getUserExpeditions(const CSteamID &uid, std::optio
     }
     
     /* Convert map to array */
-    for (const QJsonObject &exp : expeditionMap) {
+    for (const QJsonObject &exp : std::as_const(expeditionMap)) {
         result.append(exp);
     }
 
@@ -985,7 +985,7 @@ void ExpeditionManager::progressExpedition(const CSteamID &uid, int mapUnionId, 
         "SET CurrentNode = :nextNode, LastProgressTime = :currentTime "
         "WHERE User = :user AND MapUnionId = :mapUnionId AND Diff = :diff"
         );
-    qint64 currentTime = QDateTime::currentDateTimeUtc().toSecsSinceEpoch();
+    qint64 currentTime = QDateTime::currentSecsSinceEpoch();
     query.bindValue(":nextNode", nextNode);
     query.bindValue(":currentTime", currentTime);
     query.bindValue(":user", uid.ConvertToUint64());

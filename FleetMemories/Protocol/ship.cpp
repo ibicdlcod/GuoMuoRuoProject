@@ -97,6 +97,34 @@ Ship::Ship(int shipId, QObject *parent)
     }
 }
 
+Ship::Ship(int shipId, QObject *parent,
+           const QMap<QString, QString> &names,
+           const QMap<QString, int> &attrs)
+    : shipRegId(shipId), QObject(parent) {
+    for(auto it = names.cbegin(); it != names.cend(); ++it) {
+        const QString &key = it.key();
+        if(key.startsWith(QStringLiteral("shipclasstext"))) {
+            shipClassText[key.mid(13)] = it.value();
+        }
+        else if(key.startsWith(QStringLiteral("shipordertext"))) {
+            shipOrderText[key.mid(14)] = it.value();
+        }
+        else if(key.startsWith(QStringLiteral("name"))) {
+            localNames[key.mid(4)] = it.value();
+        }
+    }
+    for(auto it = attrs.cbegin(); it != attrs.cend(); ++it) {
+        if(it.key().startsWith("CUSTOM")) {
+            customFlags[it.key().mid(
+                QStringLiteral("CUSTOM").length())]
+                = it.value();
+        }
+        else {
+            attr[it.key()] = it.value();
+        }
+    }
+}
+
 Ship::Ship(const QJsonObject &input, QObject *parent)
     : QObject(parent){
     shipRegId = input["sid"].toInt();

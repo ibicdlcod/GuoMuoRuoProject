@@ -102,9 +102,9 @@ int main(int argc, char *argv[]) {
 
             QSqlDatabase db = QSqlDatabase::addDatabase(
                 QStringLiteral("QSQLITE"));
-            db.setDatabaseName(QStringLiteral(":memory:"));
+            db.setDatabaseName(QStringLiteral("ocean.db"));
             if(!db.open()) {
-                qCritical() << "Failed to open in-memory database";
+                qCritical() << "Failed to open ocean.db";
                 return 1;
             }
 

@@ -2469,8 +2469,6 @@ FleetInfo Server::buildFleetFromLua(sol::table t) {
     for(int pos = 0; pos < fleetSize; ++pos) {
         sol::optional<int> shipIdOpt = shipsTbl[pos];
         if(!shipIdOpt.has_value() || shipIdOpt.value() == 0) {
-            info.ships.push_back(nullptr);
-            info.shipDynamics.emplace_back();
             continue;
         }
         int shipId = shipIdOpt.value();
@@ -2659,16 +2657,15 @@ static QString phaseLabelForReport(int phase) {
 static int parseCutInFromJson(const QJsonObject &e) {
     QJsonValue cv = e["cutInType"];
     if(cv.isDouble())
-        return cv.toInt(-1);
+        return cv.toInt(-3);
     if(cv.isString()) {
         QString s = cv.toString();
         if(s == QStringLiteral("spotting"))
             return -1;
         if(s == QStringLiteral("gun-torp"))
             return -2;
-        return -1;
     }
-    return -1;
+    return -3;
 }
 
 void Server::writeMarkdownReport(const QString &path,
@@ -2694,6 +2691,20 @@ void Server::writeMarkdownReport(const QString &path,
                      : 0;
         out << "| " << (i + 1) << " | "
             << friendFleet.ships[i]->toString()
+            << " | " << hp << " |\n";
+    }
+    out << "\n### Enemy Fleet\n\n";
+    out << "| # | Enemy | HP |\n";
+    out << "|---|-------|----|\n";
+    for(int i = 0;
+         i < static_cast<int>(enemyFleet.ships.size()); ++i) {
+        if(!enemyFleet.ships[i])
+            continue;
+        int hp = enemyFleet.shipDynamics[i]
+                     ? enemyFleet.shipDynamics[i]->currentHP
+                     : 0;
+        out << "| " << (i + 1) << " | "
+            << enemyFleet.ships[i]->toString()
             << " | " << hp << " |\n";
     }
 
@@ -2866,6 +2877,20 @@ void Server::writeMarkdownReport(const QString &path,
             << friendFleet.ships[i]->toString()
             << " | " << hp << " |\n";
     }
+    out << "\n### Enemy Results\n\n";
+    out << "| # | Enemy | HP |\n";
+    out << "|---|-------|----|\n";
+    for(int i = 0;
+         i < static_cast<int>(enemyFleet.ships.size()); ++i) {
+        if(!enemyFleet.ships[i])
+            continue;
+        int hp = enemyFleet.shipDynamics[i]
+                     ? enemyFleet.shipDynamics[i]->currentHP
+                     : 0;
+        out << "| " << (i + 1) << " | "
+            << enemyFleet.ships[i]->toString()
+            << " | " << hp << " |\n";
+    }
 
     out.flush();
     f.close();
@@ -2960,22 +2985,22 @@ void Server::writeAggregateReport(
                   QString label;
               };
               QList<AtkCol> cols = {
-                  {KP::MainGunAttack, -1,
+                  {KP::MainGunAttack, -3,
                    QStringLiteral("Main Gun")},
-                  {KP::SecondaryGunAttack, -1,
+                  {KP::SecondaryGunAttack, -3,
                    QStringLiteral("Sec Gun")},
-                  {KP::TorpedoAttack, -1,
+                  {KP::TorpedoAttack, -3,
                    QStringLiteral("Torpedo")},
                   {KP::TorpedoAttack,
                    static_cast<int>(KP::PlainTorp),
                    QStringLiteral("Torp Cut-in")},
                   {KP::TorpedoAttack, -2,
                    QStringLiteral("Gun-Torp Cut-in")},
-                  {KP::AirTorpedoAttack, -1,
+                  {KP::AirTorpedoAttack, -3,
                    QStringLiteral("Air Torpedo")},
-                  {KP::AirDiveAttack, -1,
+                  {KP::AirDiveAttack, -3,
                    QStringLiteral("Air Dive")},
-                  {KP::AirCutInAttack, -1,
+                  {KP::AirCutInAttack, -3,
                    QStringLiteral("Air Cut-in")},
                   {KP::GunshotCutInAttack, -1,
                    QStringLiteral("Spotting Cut-in")},
@@ -3148,8 +3173,30 @@ bool Server::runTestBattle(const QString &luaPath,
                            const QString &reportPath,
                            int repeatCount) {
     sqlinit();
-    importEquipFromCSV();
-    importShipFromCSV();
+    if(!equipmentRefresh()) {
+        qCritical()
+            << "Equipment registry is empty — run importcsv equip "
+               "or provide a populated ocean.db";
+        return false;
+    }
+    if(!shipRefresh()) {
+        qCritical()
+            << "Ship registry is empty — run importcsv ship "
+               "or provide a populated ocean.db";
+        return false;
+    }
+    if(equipRegistry.isEmpty()) {
+        qCritical()
+            << "EquipRegistry is empty — run importcsv equip "
+               "or provide a populated ocean.db";
+        return false;
+    }
+    if(shipRegistry.isEmpty()) {
+        qCritical()
+            << "ShipRegistry is empty — run importcsv ship "
+               "or provide a populated ocean.db";
+        return false;
+    }
     luaInitEquipable();
 
     sol::protected_function_result loadResult

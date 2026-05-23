@@ -4,6 +4,10 @@
 #include <cmath>
 #include <numeric>
 
+namespace {
+constexpr double kLog10 = 2.30258509299404568402;
+}
+
 Battle::Battle(std::mt19937 &rng,
                const QMap<int, Equipment *> &equipRegistry)
     : rng(rng), equipRegistry(equipRegistry) {
@@ -336,7 +340,7 @@ void Battle::approachingPhase() {
                         if(et > 0)
                             x += static_cast<double>(et);
                     };
-                    for(const QUuid &uuid : dyn->slotEquip)
+                    for(const QUuid &uuid : std::as_const(dyn->slotEquip))
                         addEquipTorp(uuid);
                     addEquipTorp(dyn->slotEquipEx);
                 }
@@ -371,9 +375,9 @@ void Battle::centralPhase() {
         log["battlePhase"] = static_cast<int>(KP::CentralPhase);
         m_damageLog.append(log);
     }
-    setupAirReloading(20, 90);
-    setupSecondaryGunshots(20, 90);
-    setupTorpedoAttacks(20, 90);
+    setupAirReloading(clock, 90);
+    setupSecondaryGunshots(clock, 90);
+    setupTorpedoAttacks(clock, 90);
     advanceClockTime(90);
 }
 
@@ -483,7 +487,7 @@ bool Battle::hasTorpedo(bool isFriend, int index) const {
         Equipment *eq = fleet->equipMap.value(uuid, nullptr);
         return eq && eq->type.isTorp();
     };
-    for(const QUuid &uuid : dyn->slotEquip)
+    for(const QUuid &uuid : std::as_const(dyn->slotEquip))
         if(check(uuid))
             return true;
     return check(dyn->slotEquipEx);
@@ -504,7 +508,7 @@ bool Battle::hasTorpReloadingDevice(bool isFriend,
         return eq->attr.value(QStringLiteral("Firingspeed"),
                               0) > 0;
     };
-    for(const QUuid &uuid : dyn->slotEquip)
+    for(const QUuid &uuid : std::as_const(dyn->slotEquip))
         if(check(uuid))
             return true;
     return check(dyn->slotEquipEx);
@@ -541,7 +545,7 @@ double Battle::maxTorpedoStat(bool isFriend, int index) const {
         int t = eq->attr.value(QStringLiteral("Torpedo"), 0);
         result = std::max(result, static_cast<double>(t));
     };
-    for(const QUuid &uuid : dyn->slotEquip)
+    for(const QUuid &uuid : std::as_const(dyn->slotEquip))
         check(uuid);
     check(dyn->slotEquipEx);
     return result;
@@ -564,7 +568,7 @@ double Battle::torpCombinedAccuracy(bool isFriend,
             eq->attr.value(QStringLiteral("Torpedoaccuracy"),
                            0));
     };
-    for(const QUuid &uuid : dyn->slotEquip)
+    for(const QUuid &uuid : std::as_const(dyn->slotEquip))
         check(uuid);
     check(dyn->slotEquipEx);
     return result;
@@ -616,7 +620,7 @@ bool Battle::processTorpedoCutIn(FriendOrEnemyIndex attacker) {
         if(eq)
             equips.push_back(eq);
     };
-    for(const QUuid &uuid : attDyn->slotEquip)
+    for(const QUuid &uuid : std::as_const(attDyn->slotEquip))
         addEquip(uuid);
     addEquip(attDyn->slotEquipEx);
 
@@ -735,7 +739,7 @@ bool Battle::processTorpedoCutIn(FriendOrEnemyIndex attacker) {
                 if(et > 0)
                     b += static_cast<double>(et);
             };
-            for(const QUuid &uuid : attDyn->slotEquip)
+            for(const QUuid &uuid : std::as_const(attDyn->slotEquip))
                 addEquipTorp(uuid);
             addEquipTorp(attDyn->slotEquipEx);
         }
@@ -884,7 +888,7 @@ bool Battle::processTorpedoCutIn(FriendOrEnemyIndex attacker) {
                     if(edpm > 0)
                         dpm += static_cast<double>(edpm);
                 };
-                for(const QUuid &uuid : attDyn->slotEquip)
+                for(const QUuid &uuid : std::as_const(attDyn->slotEquip))
                     addEquipDPM(uuid);
                 addEquipDPM(attDyn->slotEquipEx);
             }
@@ -901,7 +905,7 @@ bool Battle::processTorpedoCutIn(FriendOrEnemyIndex attacker) {
                                   attDyn->slotEquip.front());
             double sigmoidTerm
                 = ap > 0.0 && armor > 0.0
-                      ? std::log(10.0 * ap / armor)
+                      ? std::log(ap) - std::log(armor) + kLog10
                       : -10.0;
             double sigmoid = sigmoidTerm
                              / std::hypot(1.0, sigmoidTerm);
@@ -961,7 +965,7 @@ bool Battle::processTorpedoCutIn(FriendOrEnemyIndex attacker) {
                     if(et > 0)
                         b2 += static_cast<double>(et);
                 };
-                for(const QUuid &uuid : attDyn->slotEquip)
+                for(const QUuid &uuid : std::as_const(attDyn->slotEquip))
                     addEquipTorp2(uuid);
                 addEquipTorp2(attDyn->slotEquipEx);
             }
@@ -1074,6 +1078,8 @@ void Battle::scheduleSubTorp(FriendOrEnemyIndex index) {
 }
 
 void Battle::cancelSubTorpEvents(FriendOrEnemyIndex index) {
+    if(!isSubmarine(index.isFriend, index.index))
+        return;
     events.remove_if([&](const Event &e) {
         return e.type == EventType::TorpedoAttack
                && e.index.isFriend == index.isFriend
@@ -1170,7 +1176,7 @@ void Battle::processTorpedoAttack(FriendOrEnemyIndex attacker) {
             if(et > 0)
                 b += static_cast<double>(et);
         };
-        for(const QUuid &uuid : attDyn->slotEquip)
+        for(const QUuid &uuid : std::as_const(attDyn->slotEquip))
             addEquipTorp(uuid);
         addEquipTorp(attDyn->slotEquipEx);
     }
@@ -1316,6 +1322,7 @@ void Battle::nightBattle() {
      * — see doc/worldview_and_mechanics/9.p5-nightbattle.md
      * [Implemented in Battle::nightBattle] */
     isNight = true;
+    computeFormationEfficiency();
     {
         QJsonObject log;
         log["type"] = KP::BattlePhaseCommence;
@@ -1357,7 +1364,7 @@ void Battle::nightBattle() {
                         return;
                     processSecondaryGunAttack({isFriend, i}, uuid);
                 };
-                for(const QUuid &uuid : dyn->slotEquip)
+                for(const QUuid &uuid : std::as_const(dyn->slotEquip))
                     fireSlot(uuid);
                 fireSlot(dyn->slotEquipEx);
             }
@@ -1373,9 +1380,9 @@ void Battle::nightBattle() {
              ++i)
             processTorpedoAttack({false, i});
     }
-    setupAirReloading(0, 30);
-    setupSecondaryGunshots(0, 30);
-    setupTorpedoAttacks(0, 30);
+    setupAirReloading(clock, 30);
+    setupSecondaryGunshots(clock, 30);
+    setupTorpedoAttacks(clock, 30);
 
     if(isNightCommence) {
         double attLos = currentFriendFleet->los(true);
@@ -1747,7 +1754,7 @@ void Battle::processReconGuidedStrike() {
                 if(acc > 0.0)
                     candidates.push_back({i, isFriend, acc});
             };
-            for(const QUuid &uuid : dyn->slotEquip)
+            for(const QUuid &uuid : std::as_const(dyn->slotEquip))
                 checkSlot(uuid);
             checkSlot(dyn->slotEquipEx);
         }
@@ -1830,7 +1837,7 @@ void Battle::processMidgetGuidedStrike() {
                     candidates.push_back(
                         {i, isFriend, uuid, ta, shipTorp});
             };
-            for(const QUuid &uuid : dyn->slotEquip)
+            for(const QUuid &uuid : std::as_const(dyn->slotEquip))
                 checkSlot(uuid);
             checkSlot(dyn->slotEquipEx);
         }
@@ -1891,7 +1898,7 @@ double Battle::maxEnemyFighterAA(const FleetInfo *fleet) const {
             if(aa > maxAA)
                 maxAA = aa;
         };
-        for(const auto &slot : fleet->shipDynamics[i]->slotEquip)
+        for(const auto &slot : std::as_const(fleet->shipDynamics[i]->slotEquip))
             checkSlot(slot);
         checkSlot(fleet->shipDynamics[i]->slotEquipEx);
     }
@@ -1926,7 +1933,7 @@ double Battle::fleetAirSuperiority(const FleetInfo *fleet,
                             hasNightPersonnel = true;
                     }
                 };
-                for(const auto &slot : fleet->shipDynamics[i]->slotEquip)
+                for(const auto &slot : std::as_const(fleet->shipDynamics[i]->slotEquip))
                     checkPersonnel(slot);
                 checkPersonnel(fleet->shipDynamics[i]->slotEquipEx);
                 skipAllEquip = !hasNightPersonnel;
@@ -2040,36 +2047,48 @@ void Battle::computeFormationEfficiency() {
 
     double maxFriend = *std::max_element(fSpeeds.begin(), fSpeeds.end());
     double maxEnemy = *std::max_element(eSpeeds.begin(), eSpeeds.end());
+    double losFriend = currentFriendFleet->los(isNight);
+    double losEnemy = currentEnemyFleet->los(isNight);
+    double logLosFriend = std::log(losFriend);
+    double logLosEnemy = std::log(losEnemy);
+    double logMaxFriend = std::log(maxFriend);
+    double logMaxEnemy = std::log(maxEnemy);
     {
-        double b = std::log(maxFriend / maxEnemy);
+        double a = logLosFriend - logLosEnemy;
+
+        double b = logMaxFriend - logMaxEnemy;
 
         double friendAvg = std::accumulate(fSpeeds.begin(), fSpeeds.end(), 0.0)
                            / fSpeeds.size();
+        double logFriendAvg = std::log(friendAvg);
         double c = 0.0;
         for(double s : fSpeeds)
-            c += -std::abs(std::log(s / friendAvg));
+            c += -std::abs(std::log(s) - logFriendAvg);
         c /= fSpeeds.size();
 
         std::normal_distribution<double> dist(0.0, 1.0);
         double d = dist(rng);
 
-        double total = b + c + d;
+        double total = a + b + c + d;
         friendFormationEfficiency = total / std::hypot(1.0, total);
     }
     {
-        double b = std::log(maxEnemy / maxFriend);
+        double a = logLosEnemy - logLosFriend;
+
+        double b = logMaxEnemy - logMaxFriend;
 
         double enemyAvg = std::accumulate(eSpeeds.begin(), eSpeeds.end(), 0.0)
                           / eSpeeds.size();
+        double logEnemyAvg = std::log(enemyAvg);
         double c = 0.0;
         for(double s : eSpeeds)
-            c += -std::abs(std::log(s / enemyAvg));
+            c += -std::abs(std::log(s) - logEnemyAvg);
         c /= eSpeeds.size();
 
         std::normal_distribution<double> dist(0.0, 1.0);
         double d = dist(rng);
 
-        double total = b + c + d;
+        double total = a + b + c + d;
         enemyFormationEfficiency = total / std::hypot(1.0, total);
     }
     if(!isAntagonistFleetSunk({false, 0})
@@ -2082,18 +2101,6 @@ void Battle::computeFormationEfficiency() {
         m_damageLog.append(log);
     }
 }
-
-/* Air attack — see doc/worldview_and_mechanics/9.a1-airattack.md
- * [Implemented in Battle::processAirAttack,
- *  Battle::executeAirTorpedoAttack,
- *  Battle::executeAirDiveAttack,
- *  Battle::executeAirAttackCutIn,
- *  Battle::processS1PlaneLoss,
- *  Battle::processS2PlaneLoss,
- *  Battle::processS3AACutIn,
- *  Battle::applyIndividualAntiAir,
- *  Battle::setupAirReloading,
- *  Battle::collectAirSquadrons] */
 
 FleetInfo *Battle::fleetOf(bool isFriend) const {
     return isFriend ? currentFriendFleet : currentEnemyFleet;
@@ -3181,7 +3188,7 @@ bool Battle::hasMainGun(bool isFriend, int index) const {
             return false;
         return eq->type.isMainGun();
     };
-    for(const QUuid &uuid : dyn->slotEquip) {
+    for(const QUuid &uuid : std::as_const(dyn->slotEquip)) {
         if(checkGun(uuid))
             return true;
     }
@@ -3216,7 +3223,7 @@ bool Battle::hasSecGun(bool isFriend, int index) const {
             return false;
         return eq->type.isSecGun();
     };
-    for(const QUuid &uuid : dyn->slotEquip) {
+    for(const QUuid &uuid : std::as_const(dyn->slotEquip)) {
         if(checkGun(uuid))
             return true;
     }
@@ -3242,7 +3249,7 @@ double Battle::maxMainGunFiringRange(bool isFriend,
         if(r > 0)
             result = std::max(result, static_cast<double>(r));
     };
-    for(const QUuid &uuid : dyn->slotEquip)
+    for(const QUuid &uuid : std::as_const(dyn->slotEquip))
         check(uuid);
     check(dyn->slotEquipEx);
     QList<int> startingEquip = fleet->ships[index]->getStartingEquip();
@@ -3278,7 +3285,7 @@ double Battle::maxMainGunFiringSpeed(bool isFriend,
         if(s > 0)
             result = std::max(result, static_cast<double>(s));
     };
-    for(const QUuid &uuid : dyn->slotEquip)
+    for(const QUuid &uuid : std::as_const(dyn->slotEquip))
         check(uuid);
     check(dyn->slotEquipEx);
     QList<int> startingEquip = fleet->ships[index]->getStartingEquip();
@@ -3315,7 +3322,7 @@ double Battle::maxMainGunArmorPenetration(bool isFriend,
         if(ap > 0)
             result = std::max(result, static_cast<double>(ap));
     };
-    for(const QUuid &uuid : dyn->slotEquip)
+    for(const QUuid &uuid : std::as_const(dyn->slotEquip))
         check(uuid);
     check(dyn->slotEquipEx);
     QList<int> startingEquip = fleet->ships[index]->getStartingEquip();
@@ -3343,7 +3350,7 @@ double Battle::mainGunBaseAccuracy(bool isFriend, int index) const {
         return 0.0;
     int lv = Ship::getLevel(dyn->exp);
     double ra = (lv + 25.0) / 100.0;
-    return 1000.0 * ra / std::hypot(1.0, ra);
+    return 500.0 * ra / std::hypot(1.0, ra);
 }
 
 double Battle::secGunFiringSpeed(bool isFriend, int index,
@@ -3389,7 +3396,7 @@ double Battle::secGunCombinedAccuracy(bool isFriend,
         result += static_cast<double>(
             eq->attr.value(QStringLiteral("Accuracy"), 0));
     };
-    for(const QUuid &uuid : dyn->slotEquip)
+    for(const QUuid &uuid : std::as_const(dyn->slotEquip))
         check(uuid);
     check(dyn->slotEquipEx);
     return result;
@@ -3469,7 +3476,7 @@ bool Battle::processGunshotCutIn(FriendOrEnemyIndex attacker) {
             equipToUuid[eq] = uuid;
         }
     };
-    for(const QUuid &uuid : attDyn->slotEquip)
+    for(const QUuid &uuid : std::as_const(attDyn->slotEquip))
         addEquip(uuid);
     addEquip(attDyn->slotEquipEx);
 
@@ -3567,7 +3574,7 @@ bool Battle::processGunshotCutIn(FriendOrEnemyIndex attacker) {
                 if(edpm > 0)
                     dpm += static_cast<double>(edpm);
             };
-            for(const QUuid &uuid : attDyn->slotEquip)
+            for(const QUuid &uuid : std::as_const(attDyn->slotEquip))
                 addEquipDPM(uuid);
             addEquipDPM(attDyn->slotEquipEx);
         }
@@ -3598,7 +3605,7 @@ bool Battle::processGunshotCutIn(FriendOrEnemyIndex attacker) {
             baseAcc += static_cast<double>(
                 eq->attr.value(QStringLiteral("Accuracy"), 0));
         };
-        for(const QUuid &uuid : attDyn->slotEquip)
+        for(const QUuid &uuid : std::as_const(attDyn->slotEquip))
             addEquipAcc(uuid);
         addEquipAcc(attDyn->slotEquipEx);
         double accuracy = baseAcc * accMul;
@@ -3615,7 +3622,7 @@ bool Battle::processGunshotCutIn(FriendOrEnemyIndex attacker) {
             = maxMainGunArmorPenetration(attacker.isFriend,
                                          attacker.index);
         double sigmoidTerm = ap > 0.0 && armor > 0.0
-                                 ? std::log(10.0 * ap / armor)
+                                 ? std::log(ap) - std::log(armor) + kLog10
                                  : -10.0;
         double sigmoid = sigmoidTerm
                          / std::hypot(1.0, sigmoidTerm);
@@ -3742,7 +3749,7 @@ bool Battle::processGunshotCutIn(FriendOrEnemyIndex attacker) {
                         return;
                 }
             };
-            for(const QUuid &uuid : otherDyn->slotEquip)
+            for(const QUuid &uuid : std::as_const(otherDyn->slotEquip))
                 checkSlot(uuid);
             checkSlot(otherDyn->slotEquipEx);
         }
@@ -3845,7 +3852,7 @@ bool Battle::processGunshotCutIn(FriendOrEnemyIndex attacker) {
                 if(edpm > 0)
                     dpm += static_cast<double>(edpm);
             };
-            for(const QUuid &uuid : attDyn->slotEquip)
+            for(const QUuid &uuid : std::as_const(attDyn->slotEquip))
                 addEquipDPM(uuid);
             addEquipDPM(attDyn->slotEquipEx);
         }
@@ -3876,7 +3883,7 @@ bool Battle::processGunshotCutIn(FriendOrEnemyIndex attacker) {
             baseAcc += static_cast<double>(
                 eq->attr.value(QStringLiteral("Accuracy"), 0));
         };
-        for(const QUuid &uuid : attDyn->slotEquip)
+        for(const QUuid &uuid : std::as_const(attDyn->slotEquip))
             addEquipAcc(uuid);
         addEquipAcc(attDyn->slotEquipEx);
         double accuracy = baseAcc;
@@ -3892,7 +3899,7 @@ bool Battle::processGunshotCutIn(FriendOrEnemyIndex attacker) {
         double ap = maxMainGunArmorPenetration(
             attacker.isFriend, attacker.index);
         double sigmoidTerm = ap > 0.0 && armor > 0.0
-                                 ? std::log(10.0 * ap / armor)
+                                 ? std::log(ap) - std::log(armor) + kLog10
                                  : -10.0;
         double sigmoid = sigmoidTerm
                          / std::hypot(1.0, sigmoidTerm);
@@ -4073,7 +4080,7 @@ void Battle::processMainGunAttack(FriendOrEnemyIndex attacker) {
             if(edpm > 0)
                 dpm += static_cast<double>(edpm);
         };
-        for(const QUuid &uuid : attDyn->slotEquip)
+        for(const QUuid &uuid : std::as_const(attDyn->slotEquip))
             addEquipDPM(uuid);
         addEquipDPM(attDyn->slotEquipEx);
     }
@@ -4119,7 +4126,7 @@ void Battle::processMainGunAttack(FriendOrEnemyIndex attacker) {
         = maxMainGunArmorPenetration(attacker.isFriend,
                                      attacker.index);
     double sigmoidTerm = ap > 0.0 && armor > 0.0
-                             ? std::log(10.0 * ap / armor)
+                             ? std::log(ap) - std::log(armor) + kLog10
                              : -10.0;
     double sigmoid = sigmoidTerm
                      / std::hypot(1.0, sigmoidTerm);
@@ -4227,7 +4234,7 @@ void Battle::setupSecondaryGunshots(clockTime phaseStart,
                                 });
                 }
             };
-            for(const QUuid &uuid : dyn->slotEquip)
+            for(const QUuid &uuid : std::as_const(dyn->slotEquip))
                 scheduleSlot(uuid);
             scheduleSlot(dyn->slotEquipEx);
         }
@@ -4392,7 +4399,7 @@ void Battle::processSecondaryGunAttack(FriendOrEnemyIndex attacker,
     double ap = secGunArmorPenetration(attacker.isFriend,
                                        attacker.index, slotUuid);
     double sigmoidTerm = ap > 0.0 && armor > 0.0
-                             ? std::log(10.0 * ap / armor)
+                             ? std::log(ap) - std::log(armor) + kLog10
                              : -10.0;
     double sigmoid = sigmoidTerm
                      / std::hypot(1.0, sigmoidTerm);

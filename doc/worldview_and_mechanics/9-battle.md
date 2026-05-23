@@ -4,6 +4,10 @@ The game features a battle mechanic somewhat different from Kantai Collection; w
 
 Unlike KC (but similar to KC arcade), some phase of battle have an internal clock which together with the firing speed attribute (absent in KC), simulates reloading of guns (torpedos have their own reloading mechanism).
 
+Sunk ships (HP ≤ 0) cannot make any attacks — their pending
+events are silently dropped when the attack-processing function
+encounters the HP guard.
+
 The battle have the following characteristics:
 
 - [Tactical Goal (for friend fleet)](9.c1-goal-friend.md)
