@@ -3185,6 +3185,61 @@ void Server::writeAggregateReport(
     out << "| Enemy Formation Efficiency | "
         << QString::number(avgEnemyEff, 'f', 3) << " |\n";
 
+    /* Average LOS */
+    double avgFriendLosDay = 0.0, avgFriendLosNight = 0.0;
+    double avgEnemyLosDay = 0.0, avgEnemyLosNight = 0.0;
+    for(const auto &rs : allRunStats) {
+        avgFriendLosDay += rs.friendLosDay;
+        avgFriendLosNight += rs.friendLosNight;
+        avgEnemyLosDay += rs.enemyLosDay;
+        avgEnemyLosNight += rs.enemyLosNight;
+    }
+    if(repeatCount > 0) {
+        avgFriendLosDay /= repeatCount;
+        avgFriendLosNight /= repeatCount;
+        avgEnemyLosDay /= repeatCount;
+        avgEnemyLosNight /= repeatCount;
+        out << "| Friend LOS (Day) | "
+            << QString::number(avgFriendLosDay, 'f', 1) << " |\n";
+        out << "| Friend LOS (Night) | "
+            << QString::number(avgFriendLosNight, 'f', 1) << " |\n";
+        out << "| Enemy LOS (Day) | "
+            << QString::number(avgEnemyLosDay, 'f', 1) << " |\n";
+        out << "| Enemy LOS (Night) | "
+            << QString::number(avgEnemyLosNight, 'f', 1) << " |\n";
+    }
+
+    /* Extra battle occurrence */
+    int nbOccurred = 0;
+    int nbSkipped = 0;
+    int nbSkippedSunk = 0;
+    for(const auto &rs : allRunStats) {
+        if(rs.nightBattleOccurred)
+            nbOccurred++;
+        else {
+            nbSkipped++;
+            if(rs.anyFleetSunk)
+                nbSkippedSunk++;
+        }
+    }
+    int nbSkippedOther = nbSkipped - nbSkippedSunk;
+    if(repeatCount > 0) {
+        out << "\n## Extra Battle\n\n";
+        out << "| Outcome | Count | Rate |\n";
+        out << "|---------|-------|------|\n";
+        out << "| Executed | " << nbOccurred << " | "
+            << QString::number(100.0 * nbOccurred / repeatCount, 'f', 1)
+            << "% |\n";
+        out << "| Skipped (mutual / pursuit) | " << nbSkippedOther
+            << " | "
+            << QString::number(100.0 * nbSkippedOther / repeatCount, 'f', 1)
+            << "% |\n";
+        out << "| Skipped (one side sunk) | " << nbSkippedSunk
+            << " | "
+            << QString::number(100.0 * nbSkippedSunk / repeatCount, 'f', 1)
+            << "% |\n";
+    }
+
     out.flush();
     f.close();
 
@@ -3197,30 +3252,8 @@ bool Server::runTestBattle(const QString &luaPath,
                            const QString &reportPath,
                            int repeatCount) {
     sqlinit();
-    if(!equipmentRefresh()) {
-        qCritical()
-            << "Equipment registry is empty — run importcsv equip "
-               "or provide a populated ocean.db";
-        return false;
-    }
-    if(!shipRefresh()) {
-        qCritical()
-            << "Ship registry is empty — run importcsv ship "
-               "or provide a populated ocean.db";
-        return false;
-    }
-    if(equipRegistry.isEmpty()) {
-        qCritical()
-            << "EquipRegistry is empty — run importcsv equip "
-               "or provide a populated ocean.db";
-        return false;
-    }
-    if(shipRegistry.isEmpty()) {
-        qCritical()
-            << "ShipRegistry is empty — run importcsv ship "
-               "or provide a populated ocean.db";
-        return false;
-    }
+    importEquipFromCSV();
+    importShipFromCSV();
     luaInitEquipable();
 
     sol::protected_function_result loadResult
@@ -3324,6 +3357,11 @@ bool Server::runTestBattle(const QString &luaPath,
             for(const auto &entryRef : damageLog) {
                 QJsonObject e = entryRef.toObject();
                 int type = e["type"].toInt();
+                if(type == KP::BattlePhaseCommence
+                    && e["battlePhase"].toInt()
+                           == KP::NightBattlePhase) {
+                    rs.nightBattleOccurred = true;
+                }
                 int attFId
                     = e["attackerFleet"].toBool() ? 0 : 1;
                 int attS = e["attackerShip"].toInt(-1);
@@ -3396,6 +3434,23 @@ bool Server::runTestBattle(const QString &luaPath,
                 if(fEnemy.shipDynamics[i] && fEnemy.ships[i])
                     rs.finalHP[QStringLiteral("1_%1").arg(i)]
                         = fEnemy.shipDynamics[i]->currentHP;
+            }
+            rs.friendLosDay = fFriend.los(false);
+            rs.friendLosNight = fFriend.los(true);
+            rs.enemyLosDay = fEnemy.los(false);
+            rs.enemyLosNight = fEnemy.los(true);
+            {
+                auto fleetSunk = [](const FleetInfo &f) {
+                    for(size_t i = 0;
+                         i < f.shipDynamics.size(); ++i) {
+                        if(f.shipDynamics[i] && f.ships[i]
+                            && f.shipDynamics[i]->currentHP > 0)
+                            return false;
+                    }
+                    return true;
+                };
+                if(fleetSunk(fFriend) || fleetSunk(fEnemy))
+                    rs.anyFleetSunk = true;
             }
             localStats.push_back(rs);
         }

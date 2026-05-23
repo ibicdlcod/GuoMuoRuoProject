@@ -329,6 +329,12 @@ private:
         double enemyFormEff = 0.0;
         bool hasAirSup = false;
         bool hasFormEff = false;
+        bool nightBattleOccurred = false;
+        bool anyFleetSunk = false;
+        double friendLosDay = 0.0;
+        double friendLosNight = 0.0;
+        double enemyLosDay = 0.0;
+        double enemyLosNight = 0.0;
     };
     QList<RunStats> allRunStats;
 

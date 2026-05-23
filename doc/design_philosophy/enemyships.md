@@ -4,6 +4,8 @@ This is an document describing how to generate enemy ("Amnesiac") ship stats.
 
 Combine this with [Enemy equip design philosophy](enemyequips.md) to generate their default equips. General design in [equip](equips.md) and [ship](ships.md) is also helpful.
 
+Enemy ships have no Wikidata Identifier; countryoforigin is 0; shiporder is 0; remodel is 0 (no need); rarity is 0 (unobtainable); Allegiance is 0 (Any Qt Territory).
+
 ## Normal Enemies
 
 ### Remodel stage

@@ -288,6 +288,15 @@ def load_amnesiac_equips():
 
 _PLANE_TYPES = {"Fighter","Bomb-dive","Bomb-torp","Sp-recon","Sp-fight","Sp-bomb"}
 
+def min_tier_for_type(equip_type):
+    """Return the lowest tier index where amnesiac equip of this type exists."""
+    tiers = set()
+    for eid, et, t in load_amnesiac_equips():
+        if et == equip_type:
+            tiers.add(t)
+    return min(tiers) if tiers else 6
+
+
 def find_amnesiac_equip(equip_type, tier_idx):
     for eid, et, t in load_amnesiac_equips():
         if et == equip_type and t == tier_idx:
@@ -465,7 +474,9 @@ def generate_all():
             # Equipment
             equips = []
             for eq_type, start_t in eq_specs:
-                if start_t is not None and tier_i < start_t:
+                effective_start = max(start_t if start_t is not None else 0,
+                                      min_tier_for_type(eq_type))
+                if tier_i < effective_start:
                     continue
                 eid = find_amnesiac_equip(eq_type, tier_i)
                 if eid:
@@ -506,13 +517,18 @@ def generate_all():
 
         all_rows.extend(class_rows)
 
-    with open(SHIP_CSV, "a+", encoding="utf-8") as f:
-        # Ensure file ends with newline before appending
-        f.seek(0, 2)
-        if f.tell() > 0:
-            f.seek(f.tell() - 1, 0)
-            if f.read(1) != "\n":
-                f.write("\n")
+    # Read existing CSV, strip old amnesiac rows, then append new ones
+    existing = []
+    with open(SHIP_CSV, "r", encoding="utf-8") as f:
+        existing = f.readlines()
+    with open(SHIP_CSV, "w", encoding="utf-8") as f:
+        for line in existing:
+            # Keep header rows and non-amnesiac (id < 0x70000000) entries
+            sid_str = line.split(",")[0].strip()
+            if not sid_str or not sid_str.isdigit():
+                f.write(line)
+            elif int(sid_str) < 0x70000000:
+                f.write(line)
         for row in all_rows:
             f.write(",".join(str(v) for v in row) + "\n")
 

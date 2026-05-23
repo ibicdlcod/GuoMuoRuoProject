@@ -2,11 +2,9 @@
 """Generate amnesiac (enemy) equipment rows for Equip.csv.
 
 ID starts at 8192. Stats grow monotonically with tier — every stat for a type
-is >= its value at lower tiers. All 6 tiers generated for every type, even
-where player equips don't yet exist at that tech level.
-
-Where target tech is before/after the player equip range, stats are
-extrapolated using the slope from the first/last two player equips.
+is >= its value at lower tiers. Tiers are only generated if the target tech
+year is >= the earliest player equipment of that type; backward-extrapolated
+entries for equipment that doesn't exist yet are skipped.
 """
 
 import csv
@@ -164,6 +162,8 @@ def gen_type(etype, jp_cat, is_plane, player_rows, start_id):
 
     for tier_i, (ship_yr, plane_yr) in enumerate(TIERS):
         tgt = plane_yr if is_plane else ship_yr
+        if techs and tgt < techs[0]:
+            continue  # skip tiers before earliest player equip
         row = [""] * 34
         row[C["id"]] = str(start_id)
         row[C["name"]] = f"Amnesiac {etype.replace('-', ' ')} Version {int(tgt)}"
@@ -197,15 +197,35 @@ def fmt(row):
 def main():
     player_rows = load()
     print(f"Parsed {len(player_rows)} player entries", file=sys.stderr)
+
+    # Separate player (id < 8192) from old amnesiac rows
+    player_part = [r for r in player_rows
+                   if int(sv(r[C['id']])) < 8192]
+
     nid = 8192
     all_out = []
     for etype, jp_cat, is_plane in NEEDED:
-        rows, nid = gen_type(etype, jp_cat, is_plane, player_rows, nid)
+        rows, nid = gen_type(etype, jp_cat, is_plane,
+                             [r for r in player_rows
+                              if int(sv(r[C['id']])) < 8192],
+                             nid)
         for r in rows:
-            print(f"  [{r[C['id']]}] {r[C['name']]}", file=sys.stderr)
+            print(f"  [{r[C['id']]}] {r[C['name']]}",
+                  file=sys.stderr)
         all_out.extend(rows)
 
-    with open(CSV_PATH, "a", encoding="utf-8") as f:
+    # Rewrite CSV: headers first, then player rows, then amnesiac rows
+    HEADER1 = "id,name,,,type,attr,attr,attr,attr,attr,attr,attr,attr,attr,attr,attr,attr,attr,attr,attr,attr,attr,attr,attr,attr,attr,attr,attr,attr,attr,attr,attr,attr,attr"
+    HEADER2 = "No.,ja_JP,Identifier,種別,equiptype,Tech,Father,Father2,Mother,Disallowmassproduction,Hitpoints,DPM,Armor,Armorpenetration,Accuracy,Torpedoaccuracy,Evasion,Los,Concealment,Firingrange,Firingspeed,Speed,Torpedo,Airtorpedo,Bombing,Antiair,Asw,Interception,Antibomber,Antiland,Transport,Flightrange,Homeport,Storeprice"
+    with open(CSV_PATH, "w", encoding="utf-8") as f:
+        f.write(HEADER1 + "\n")
+        f.write(HEADER2 + "\n")
+        for row in player_part:
+            try:
+                if int(sv(row[0])) > 0 and int(sv(row[0])) < 8192:
+                    f.write(fmt(row) + "\n")
+            except:
+                pass
         for row in all_out:
             f.write(fmt(row) + "\n")
     print(f"Generated {len(all_out)} entries (IDs 8192-{nid - 1})",

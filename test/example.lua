@@ -30,25 +30,25 @@ return {
             [6] = 0x10120408,  
         },
         shipDynamics = {
-            [0] = { lv = 10, slotEquip = {125, 125, 0, 0, 0},
+            [0] = { lv = 10, slotEquip = {535, 0, 0, 0, 0},
                     slotEquipEx = 0, slotPlanes = {0, 0, 0, 0, 0},
                     fuel = 1.0, ammo = 1.0 },
-            [1] = { lv = 10, slotEquip = {125, 125, 0, 0, 0},
+            [1] = { lv = 10, slotEquip = {535, 0, 0, 0, 0},
                     slotEquipEx = 0, slotPlanes = {0, 0, 0, 0, 0},
                     fuel = 1.0, ammo = 1.0 },
-            [2] = { lv = 10, slotEquip = {125, 125, 0, 0, 0},
+            [2] = { lv = 10, slotEquip = {535, 0, 0, 0, 0},
                     slotEquipEx = 0, slotPlanes = {0, 0, 0, 0, 0},
                     fuel = 1.0, ammo = 1.0 },
-            [3] = { lv = 10, slotEquip = {125, 125, 0, 0, 0},
+            [3] = { lv = 10, slotEquip = {535, 0, 0, 0, 0},
                     slotEquipEx = 0, slotPlanes = {0, 0, 0, 0, 0},
                     fuel = 1.0, ammo = 1.0 },
-            [4] = { lv = 10, slotEquip = {125, 125, 0, 0, 0},
+            [4] = { lv = 10, slotEquip = {535, 0, 0, 0, 0},
                     slotEquipEx = 0, slotPlanes = {0, 0, 0, 0, 0},
                     fuel = 1.0, ammo = 1.0 },
-            [5] = { lv = 10, slotEquip = {125, 125, 0, 0, 0},
+            [5] = { lv = 10, slotEquip = {535, 0, 0, 0, 0},
                     slotEquipEx = 0, slotPlanes = {0, 0, 0, 0, 0},
                     fuel = 1.0, ammo = 1.0 },
-            [6] = { lv = 10, slotEquip = {125, 125, 0, 0, 0},
+            [6] = { lv = 10, slotEquip = {535, 0, 0, 0, 0},
                     slotEquipEx = 0, slotPlanes = {0, 0, 0, 0, 0},
                     fuel = 1.0, ammo = 1.0 },
         },
@@ -57,13 +57,13 @@ return {
     },
     EnemyFleetInfo = {
         ships = {
-            [0] = 0x7A020100,   -- 駆逐ㄅ級Base
-            [1] = 0x7A020100,   -- 駆逐ㄅ級Base
-            [2] = 0x7A020100,   -- 駆逐ㄅ級Base
-            [3] = 0x7A020100,   -- 駆逐ㄅ級Base
-            [4] = 0x7A020100,   -- 駆逐ㄅ級Base
-            [5] = 0x7A020100,   -- 駆逐ㄅ級Base
-            [6] = 0x7A020100,   -- 駆逐ㄅ級Base
+            [0] = 0x7E020100,   -- 駆逐ㄅ級Base
+            [1] = 0x7E020100,   -- 駆逐ㄅ級Base
+            [2] = 0x7E020100,   -- 駆逐ㄅ級Base
+            [3] = 0x7E020100,   -- 駆逐ㄅ級Base
+            [4] = 0x7E020100,   -- 駆逐ㄅ級Base
+            [5] = 0x7E020100,   -- 駆逐ㄅ級Base
+            [6] = 0x7E020100,   -- 駆逐ㄅ級Base
         },
         shipDynamics = {
             [0] = { lv = 100, fuel = 1.0, ammo = 1.0 },

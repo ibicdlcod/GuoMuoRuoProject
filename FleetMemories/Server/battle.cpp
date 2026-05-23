@@ -441,11 +441,20 @@ void Battle::disengagingPhase() {
         double losE = currentEnemyFleet->los(false);
 
         double x = std::min(
-            1.0, losF * speedF
-                / std::max(1.0, speedE
-                                    * std::hypot(losF, losE)));
+            1.0, speedF
+                / std::max(1.0, speedE)
+                    * losF
+                    / std::max(1.0, losF + losE));
         double y = std::min(
             20.0, 2000.0 / std::max(1.0, std::sqrt(speedE * speedF)));
+
+        if(isAntagonistFleetSunk({true, 0})
+            || isAntagonistFleetSunk({false, 0})) {
+            extraBattle = false;
+            advanceClockTime(
+                static_cast<clockTime>(y));
+            return;
+        }
 
         double phaseDuration;
         if(ourWantsNightBattle && enemyWantsNightBattle) {
@@ -525,7 +534,7 @@ double Battle::torpBaseAccuracy(bool isFriend, int index) const {
     int lv = Ship::getLevel(dyn->exp);
     if(isNight) {
         double ra = (lv + 25.0) / 100.0;
-        return 1000.0 * ra / std::hypot(1.0, ra);
+    return 2000.0 * ra / std::hypot(1.0, ra);
     }
     double ra = (lv + 50.0) / 100.0;
     return 250.0 * ra / std::hypot(1.0, ra);
@@ -1401,7 +1410,8 @@ void Battle::nightBattle() {
             double losF = isFriend ? attLos : defLos;
             double losE = isFriend ? defLos : attLos;
             double pUnloaded
-                = losE / std::hypot(losE, losF);
+                = losE / std::hypot(std::max(1.0, losE),
+                                     std::max(1.0, losF));
             std::bernoulli_distribution unloadDist(pUnloaded);
             for(int i = 0;
                  i < static_cast<int>(
@@ -3495,12 +3505,19 @@ bool Battle::processGunshotCutIn(FriendOrEnemyIndex attacker) {
     QList<int> startingEquip = attShip->getStartingEquip();
     if(!startingEquip.isEmpty()) {
         int defaultId = startingEquip.first();
+        bool found = false;
         for(auto it = attFleet->equipMap.cbegin();
              it != attFleet->equipMap.cend(); ++it) {
             if(it.value()->getId() == defaultId) {
                 equips.push_back(it.value());
+                equipToUuid[it.value()] = it.key();
+                found = true;
                 break;
             }
+        }
+        if(!found && equipRegistry.contains(defaultId)) {
+            Equipment *eq = equipRegistry[defaultId];
+            equips.push_back(eq);
         }
     }
 
@@ -3820,7 +3837,7 @@ bool Battle::processGunshotCutIn(FriendOrEnemyIndex attacker) {
                 return ps / 50.0;
             if(eq->type.isAntilandShell())
                 return 5.0;
-            return ps / 100.0;
+            return ps / 50.0;
         };
         double p1 = getP(e1);
         double p2 = getP(e2);

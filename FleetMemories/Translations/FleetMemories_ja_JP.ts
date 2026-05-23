@@ -3203,7 +3203,7 @@ Great at battle and bad at politics--so cool!</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="test-battle-agg-report-written">
-        <location filename="../Server/server_battle.cpp" line="3192"/>
+        <location filename="../Server/server_battle.cpp" line="3247"/>
         <source>Wrote aggregate battle report to %1</source>
         <translation type="unfinished"></translation>
     </message>
