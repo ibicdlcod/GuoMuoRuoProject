@@ -2,9 +2,9 @@
 """Generate amnesiac (enemy) equipment rows for Equip.csv.
 
 ID starts at 8192. Stats grow monotonically with tier — every stat for a type
-is >= its value at lower tiers. Tiers are only generated if the target tech
-year is >= the earliest player equipment of that type; backward-extrapolated
-entries for equipment that doesn't exist yet are skipped.
+is >= its value at lower tiers. All 6 tiers generated for every type — where
+target tech is before the player equip range, stats are backward-extrapolated
+to produce weaker (but functional) versions.
 """
 
 import csv
@@ -162,8 +162,6 @@ def gen_type(etype, jp_cat, is_plane, player_rows, start_id):
 
     for tier_i, (ship_yr, plane_yr) in enumerate(TIERS):
         tgt = plane_yr if is_plane else ship_yr
-        if techs and tgt < techs[0]:
-            continue  # skip tiers before earliest player equip
         row = [""] * 34
         row[C["id"]] = str(start_id)
         row[C["name"]] = f"Amnesiac {etype.replace('-', ' ')} Version {int(tgt)}"
