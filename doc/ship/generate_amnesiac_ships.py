@@ -60,15 +60,20 @@ def tech_intervals(is_plane):
 # bak_target_type / bak_target_class identify the ship in Ship.xlsx.bak
 # to reference via the `remodel` column.
 
+# Cross-type fallback: if primary type unavailable at this tier, try this instead
+EQUIP_FALLBACK = {
+    "Mid-gun-flat-ca": "Mid-gun-flat",
+}
+
 ENEMY_CLASSES = [
 
-    ("魚雷艇", "魚雷艇", 0x10, False,
-     0x010, 0x100,
+    ("魚雷艇", "魚雷艇", 0x11, False,
+     0x011, 0x100,
      [("Small-gun-flat", 0)],
      {"DPM":0.5, "Hitpoints":0.4, "Evasion":1.5, "Armor":0.3}),
 
-    ("海防ㄖ級", "海防ㄖ級", 0x11, False,
-     0x011, 0x100,
+    ("海防ㄖ級", "海防ㄖ級", 0x10, False,
+     0x010, 0x100,
      [("Small-gun-flat", 0), ("Sonar-passive", 1), ("Depthc-projector", 1)],
      {"Asw":1.4, "DPM":0.8}),
 
@@ -94,22 +99,26 @@ ENEMY_CLASSES = [
 
     ("軽巡ㄉ級", "軽巡ㄉ級", 0x30, False,
      0x030, 0x100,
-     [("Mid-gun-flat", 0), ("Sp-recon", 0), ("Sonar-passive", 0), ("Depthc-projector", 0)],
+     [("Mid-gun-flat", 0), ("Sp-recon", 3), ("Sonar-passive", 0),
+      ("Depthc-projector", 0)],
      {"Asw":1.3, "Los":1.1}),
 
     ("軽巡ㄊ級", "軽巡ㄊ級", 0x30, False,
      0x030, 0x200,
-     [("Mid-gun-flat", 0), ("Radar-small-flak", 0), ("AA-gun", 0)],
+     [("Mid-gun-flat", 0), ("Radar-small-flak", 0), ("AA-gun", 0),
+      ("Sp-recon", 3)],
      {"Antiair":1.4, "Los":1.2, "Accuracy":1.1}),
 
     ("雷巡ㄋ級", "雷巡ㄋ級", 0x32, False,
      0x032, 0x300,
-     [("Mid-gun-flat", 0), ("Torp", 0), ("Midget-sub", 0), ("Midget-sub", 3)],
+     [("Mid-gun-flat", 0), ("Torp", 0), ("Midget-sub", 0), ("Midget-sub", 3),
+      ("Sp-recon", 3)],
      {"Torpedo":1.5, "DPM":0.85}),
 
     ("重巡ㄍ級", "重巡ㄍ級", 0x40, False,
      0x040, 0x100,
-     [("Mid-gun-flat-ca", 0), ("Midget-sub", 5)],
+     [("Mid-gun-flat-ca", 0), ("Second-gun-flat", 3),
+      ("Sp-recon", 2), ("Midget-sub", 5)],
      {"DPM":1.0, "Armor":1.0}),
 
     ("航巡ㄎ級", "航巡ㄎ級", 0x44, False,
@@ -119,17 +128,18 @@ ENEMY_CLASSES = [
 
     ("戦巡ㄕ級", "戦巡ㄕ級", 0x51, False,
      0x050, 0x100,
-     [("Big-gun", 0), ("Torp", 0), ("Midget-sub", 2)],
-     {"Speed":1.15, "Torpedo":1.2, "Evasion":1.1}),
+     [("Big-gun", 0), ("Second-gun-flat", 2), ("Torp", 0),
+      ("Sp-recon", 3), ("Midget-sub", 2)],
+     {"Speed":1.1, "Torpedo":1.05, "Evasion":1.05, "DPM":0.95}),
 
     ("戦艦ㄐ級", "戦艦ㄐ級", 0x50, False,
      0x050, 0x100,
-     [("Big-gun", 0)],
+     [("Big-gun", 0), ("Second-gun-flat", 2), ("Sp-recon", 3)],
      {"DPM":1.2, "Armor":1.15}),
 
     ("戦艦ㄑ級", "戦艦ㄑ級", 0x52, False,
      0x052, 0x200,
-     [("Big-gun", 0)],
+     [("Big-gun", 0), ("Second-gun-flak", 3), ("Sp-recon", 3)],
      {"Speed":1.2, "Evasion":1.15, "Accuracy":1.15, "DPM":0.9, "Armor":0.9}),
 
     ("軽母ㄓ級", "軽母ㄓ級", 0x61, True,
@@ -137,7 +147,7 @@ ENEMY_CLASSES = [
      [("Fighter", 0), ("Bomb-torp", 0), ("Bomb-dive", 0)],
      {"DPM":1.1, "Armor":1.1, "Planes":1.1}),
 
-    ("軽母ㄔ級", "軽母ㄔ級", 0x62, True,
+    ("軽母ㄔ級", "軽母ㄔ級", 0x61, True,
      0x061, 0x200,
      [("Fighter", 0), ("Bomb-dive", 0)],
      {"Asw":1.8, "Planes":1.1}),
@@ -350,11 +360,14 @@ def level_scale(stats, lv):
 
 # ── row building ───────────────────────────────────────────
 def build_row(sid, name_ja, cls_text, type_code, tech_yr,
-              equips, stats, tier_i, remodel_target):
+              equips, stats, tier_i, remodel_target,
+              tier_display=""):
+
     inds, titles = header_cols()
     ncols = len(inds)
     row = [""] * ncols
     row[0] = str(sid)
+    row[3] = format(sid, "X")              # D: HEXNo
 
     for i in range(ncols):
         ind = inds[i]
@@ -378,9 +391,9 @@ def build_row(sid, name_ja, cls_text, type_code, tech_yr,
             elif ttl == "Tech":
                 row[i] = str(int(tech_yr))
             elif ttl == "Rarity":
-                row[i] = str(int(stats.get("Rarity", 0)))
+                row[i] = "0"  # amnesiac ships are unobtainable
             elif ttl == "Allegiance":
-                row[i] = "120"
+                row[i] = "0"  # no specific allegiance
             elif ttl in stats:
                 v = stats[ttl]
                 if isinstance(v, float):
@@ -397,8 +410,6 @@ def build_row(sid, name_ja, cls_text, type_code, tech_yr,
             row[i] = name_ja
         elif ind == "shipclasstext" and ttl == "ja_JP":
             row[i] = cls_text
-        elif ind == "shipordertext" and ttl == "ja_JP":
-            row[i] = ""
 
     # Set empty-indicator columns that import code checks by title
     for i, ttl in enumerate(titles):
@@ -407,11 +418,21 @@ def build_row(sid, name_ja, cls_text, type_code, tech_yr,
         if ttl == "countryoforigin":
             row[i] = "0"
         if ttl == "shiptypeHEX":
-            row[i] = format(0x100000, "X")
+            row[i] = format(sid & 0x00FFF000, "X")  # K
         if ttl == "shipclassHEX":
-            row[i] = format(0x10000, "X")
+            row[i] = format(sid & 0x00000FF0, "X")  # L
         if ttl == "shiporder":
             row[i] = str(tier_i)
+
+    hex_d = format(sid, "X")
+    row[8] = hex_d[:2] + "000000"              # I: e.g. "7F000000"
+    row[9] = "0"                              # J
+    row[12] = "0"                             # M
+    row[13] = "0"                             # N
+    row[15] = "0"                             # P
+    row[16] = "0"                             # Q
+    if tier_display:
+        row[7] = tier_display                  # H: shipordertext = tier name
 
     return row
 
@@ -430,20 +451,41 @@ def generate_all():
         0x50: 4, 0x60: 4, 0x70: 1, 0x90: 2,
     }
     # Default planes by type (for carriers)
-    DEFAULT_PLANES = {0x60: 20, 0x61: 12, 0x62: 12}
+    DEFAULT_PLANES = {0x60: 72, 0x61: 48, 0x62: 48}
 
     all_rows = []
     for cl_idx, eclass in enumerate(ENEMY_CLASSES):
         (name_base, cls_text, type_code, is_plane,
          bak_type, bak_class, eq_specs, mods) = eclass
         mids = tech_intervals(is_plane)
-        class_index = cl_idx + 1
+        class_index = bak_class
 
         class_rows = []
         for tier_i in range(6):
             ti = TIERS[tier_i]
             lv = ti["lv"]
             tech_yr = ti["plane" if is_plane else "ship"]
+
+            # Carrier type mutations by tier
+            effective_type = type_code
+            if is_plane:
+                if type_code == 0x60:
+                    # Standard carrier l-class: ASW at Elite+, Night at Chief+
+                    if tier_i >= 3:
+                        effective_type = 0x62
+                    if tier_i >= 4:
+                        effective_type = 0x6A
+                elif type_code == 0x61:
+                    if class_index == 0x200:
+                        # Light carrier ch-class: ASW at Elite+, Night at Chief+
+                        if tier_i >= 3:
+                            effective_type = 0x63
+                        if tier_i >= 4:
+                            effective_type = 0x6B
+                    else:
+                        # Light carrier zh-class: Night at Chief+ only
+                        if tier_i >= 4:
+                            effective_type = 0x69
 
             low = mids[tier_i]
             high = mids[tier_i + 1]
@@ -466,43 +508,113 @@ def generate_all():
             if mt in DEFAULT_SLOTS:
                 stats["Equipslots"] = DEFAULT_SLOTS[mt]
             if type_code in DEFAULT_PLANES:
-                stats["Planes"] = DEFAULT_PLANES[type_code] * LV_EFF[lv]
+                stats["Planes"] = int(DEFAULT_PLANES[type_code] * LV_EFF[lv])
+            # MT: Why no log for the else branch?
 
             # ID
-            sid = (ti["byte"] << 24) | (type_code << 12) | class_index
+            sid = (ti["byte"] << 24) | (effective_type << 12) | class_index
 
             # Equipment
             equips = []
+            plane_fallback_used = 0
             for eq_type, start_t in eq_specs:
-                effective_start = max(start_t if start_t is not None else 0,
-                                      min_tier_for_type(eq_type))
-                if tier_i < effective_start:
+                if start_t is not None and tier_i < start_t:
                     continue
                 eid = find_amnesiac_equip(eq_type, tier_i)
+                if not eid:
+                    # Cross-type fallback first (e.g. CA gun -> regular medium gun)
+                    if eq_type in EQUIP_FALLBACK:
+                        fb_type = EQUIP_FALLBACK[eq_type]
+                        eid = find_amnesiac_equip(fb_type, tier_i)
+                        if not eid:
+                            for fb_t in range(tier_i + 1, len(TIERS)):
+                                eid = find_amnesiac_equip(fb_type, fb_t)
+                                if eid: break
+                    # Forward-tier fallback as secondary option
+                    if not eid:
+                        for fb_t in range(tier_i + 1, len(TIERS)):
+                            eid = find_amnesiac_equip(eq_type, fb_t)
+                            if eid:
+                                if eq_type in _PLANE_TYPES:
+                                    plane_fallback_used += 1
+                                break
                 if eid:
                     equips.append(eid)
+            if plane_fallback_used > 0 and "Planes" in stats:
+                stats["Planes"] = max(1, int(stats["Planes"] * 0.5))
             while len(equips) < 5:
                 equips.append(0)
 
             tier_name = ti["name"]
+            tier_display = "" if tier_name == "Base" else tier_name
             # ja_JP name: Japanese class name + English tier (no separator)
-            full_name = f"{name_base}{tier_name}"
+            full_name = f"{name_base}{tier_display}"
 
             # Find target from bak: same (type, tier)
             remodel_id = find_remodel_target(bak_type, bak_class,
                                              ti["byte"])
 
             row = build_row(sid, full_name, cls_text, type_code,
-                            tech_yr, equips, stats, tier_i, remodel_id)
+                            tech_yr, equips, stats, tier_i, remodel_id,
+                            tier_display)
             class_rows.append(row)
             print(f"  [{sid}] {name_base}{tier_name} tier={tier_i} "
                   f"remodel=0x{remodel_id:08X} ({cnt} ref ships)",
                   file=sys.stderr)
 
-        # Monotonic enforcement: each stat >= previous tier
+        # Buff carrier Base/Flagship Planes 1.5x
+        if type_code in DEFAULT_PLANES:
+            for ci, (ind, ttl) in enumerate(zip(*header_cols())):
+                if ind == "attr" and ttl == "Planes":
+                    for ti in (0, 5):
+                        if ti < len(class_rows):
+                            pv = int(class_rows[ti][ci]) if class_rows[ti][ci] else 0
+                            class_rows[ti][ci] = str(int(pv * 1.5))
+                    break
+
+        # Geometric progression: Base/Flagship stats as anchors,
+        # middle tiers interpolated so (tier i+1)/(tier i) ≈ constant.
         _ROUND_KEYS = {"Hitpoints","DPM","Armor","Evasion","Los","Concealment",
                        "Speed","Torpedo","Antiair","Asw","Antiland","Transport",
                        "Planes","Accuracy"}
+        if len(class_rows) >= 6:
+            base_row = class_rows[0]
+            flag_row = class_rows[5]
+            for k in _ROUND_KEYS:
+                for ci, (ind, ttl) in enumerate(zip(*header_cols())):
+                    if ind == "attr" and ttl == k:
+                        bv = int(base_row[ci]) if base_row[ci] else 0
+                        fv = int(flag_row[ci]) if flag_row[ci] else 0
+                        if bv > 0 and fv > bv:
+                            ratio = (fv / bv) ** (1.0 / 5.0)
+                            for ti in range(1, 5):
+                                geo_val = int(round(bv * (ratio ** ti)))
+                                orig_val = int(class_rows[ti][ci]) if class_rows[ti][ci] else 0
+                                # Preserve ASW jumps from enemyships design
+                                if k == "Asw" and orig_val > geo_val * 1.5:
+                                    geo_val = max(geo_val, orig_val)
+                                # Planes always use geometric; others keep best of both
+                                elif k == "Planes":
+                                    pass  # geo_val stays
+                                else:
+                                    geo_val = max(geo_val, orig_val)
+                                # Ensure no regression
+                                class_rows[ti][ci] = str(geo_val)
+                        break
+
+        # Dampen Veteran+ stats to reduce regular→veteran enhancement jump
+        _DAMPEN = {2: 0.85, 3: 0.82, 4: 0.85, 5: 0.90}
+        for ti in _DAMPEN:
+            if ti < len(class_rows):
+                row = class_rows[ti]
+                for k in _ROUND_KEYS:
+                    for ci, (ind, ttl) in enumerate(zip(*header_cols())):
+                        if ind == "attr" and ttl == k:
+                            cv = int(row[ci]) if row[ci] else 0
+                            row[ci] = str(int(round(cv * _DAMPEN[ti])))
+                            break
+
+        # Final monotonic pass: ensure no tier regresses on any stat
         for i in range(1, len(class_rows)):
             prev = class_rows[i - 1]
             curr = class_rows[i]

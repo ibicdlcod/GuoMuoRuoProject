@@ -10,9 +10,9 @@ Enemy ships have no Wikidata Identifier; countryoforigin is 0; shiporder is 0; r
 
 ### Remodel stage
 
-- **Base**: `id & 0xFF000000 = 0x7F000000`, colored Grey, Equivalent to Lv 10 player ship at tech 1922 (For plane equipment, 1930)
+- **Base**: `id & 0xFF000000 = 0x7F000000`, colored Grey, Equivalent to Lv 10 player ship at tech 1922
 
-- **Regular**:`id & 0xFF000000 = 0x7E000000`, colored Red, Equivalent to Lv 40 player ship at tech 1925 (For plane equipment, 1937)
+- **Regular**:`id & 0xFF000000 = 0x7E000000`, colored Red, Equivalent to Lv 40 player ship at tech 1925
 
 - **Veteran**:`id & 0xFF000000 = 0x7D000000`, colored Yellow, Equivalent to Lv 100 player ship at tech 1930 (For plane equipment, 1940)
 

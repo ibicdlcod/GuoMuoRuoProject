@@ -1744,7 +1744,8 @@ void Battle::processReconGuidedStrike() {
 /* Reconnaissance plane guided strike
  * — see doc/worldview_and_mechanics/9.c6-guidedstrikes.md
  * [Implemented in Battle::processReconGuidedStrike] */
-    if(airSuperiorityCoefficient <= 0.0)
+    if(airSuperiorityCoefficient >= -0.001
+        && airSuperiorityCoefficient <= 0.001)
         return;
 
     struct Candidate {
@@ -2280,7 +2281,10 @@ void Battle::setupAirReloading(clockTime phaseStart, clockTime phaseLength) {
                 double interval = 600.0 / fs;
                 if(interval <= 0.0)
                     continue;
-                if(airSuperiorityCoefficient <= 0.0)
+                double effCoeff = isFriend
+                    ? airSuperiorityCoefficient
+                    : -airSuperiorityCoefficient;
+                if(effCoeff <= 0.0)
                     continue;
                 for(clockTime t = static_cast<clockTime>(interval);
                      t < phaseLength;
@@ -2517,7 +2521,7 @@ void Battle::executeAirTorpedoAttack(FriendOrEnemyIndex attacker,
     double pHit = std::exp(-x) / std::hypot(1.0, std::exp(-x));
 
     double torp = squadron.equip
-                      ? squadron.equip->attr.value(QStringLiteral("Torpedo"), 0)
+                      ? squadron.equip->attr.value(QStringLiteral("Airtorpedo"), 0)
                       : 0;
     if(torp <= 0)
         return;
@@ -2613,7 +2617,10 @@ void Battle::executeAirDiveAttack(FriendOrEnemyIndex attacker,
 
 void Battle::executeAirAttackCutIn(FriendOrEnemyIndex attacker,
                                    FriendOrEnemyIndex defender) {
-    if(airSuperiorityCoefficient <= 0.0)
+    double effCoeff = attacker.isFriend
+        ? airSuperiorityCoefficient
+        : -airSuperiorityCoefficient;
+    if(effCoeff <= 0.0)
         return;
 
     FleetInfo *attFleet = fleetOf(attacker.isFriend);
