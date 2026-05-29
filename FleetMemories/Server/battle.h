@@ -161,7 +161,6 @@ private:
 
     /* ——— air attack ————————————————————————————————————————— */
 
-    bool isCarrier(const Ship *ship) const;
     bool isArmoredCarrier(const Ship *ship) const;
     bool isSeaplaneShip(const Ship *ship) const;
     double carrierFiringSpeed(const Ship *ship,

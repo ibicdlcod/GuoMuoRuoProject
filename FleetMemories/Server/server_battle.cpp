@@ -2518,10 +2518,14 @@ FleetInfo Server::buildFleetFromLua(sol::table t) {
                 equipDefs = ship->getStartingEquip();
             }
             for(int equipDef : equipDefs) {
-                if(equipDef == 0 || !equipRegistry.contains(
-                        equipDef)) {
+                if(equipDef == 0) {
                     dyn->slotEquip.append(QUuid());
                     continue;
+                }
+                if(!equipRegistry.contains(equipDef)) {
+                    /* Load from database directly for test mode */
+                    equipRegistry[equipDef]
+                        = new Equipment(equipDef, this);
                 }
                 QUuid uuid = QUuid::createUuid();
                 info.equipMap.insert(uuid,
@@ -2545,22 +2549,49 @@ FleetInfo Server::buildFleetFromLua(sol::table t) {
             sol::optional<sol::table> planesTbl = sd["slotPlanes"];
             if(planesTbl.has_value()) {
                 sol::table pt = planesTbl.value();
-                for(std::size_t i = 0;
-                     i < pt.size() && i < 5; ++i)
+                for(std::size_t i = 1;
+                     i <= pt.size() && i <= 5; ++i)
                     dyn->slotPlanes.append(pt.get_or(i, 0));
             }
             else {
-                for(const QUuid &uuid : dyn->slotEquip) {
+                /* Distribute ship's Planes evenly among plane-type
+                 * equipment slots. Non-plane slots get 0. */
+                int totalPlanes = ship->attr.value(
+                    QStringLiteral("Planes"), 0);
+                auto isPlaneSlot = [&](const QUuid &uuid) -> bool {
                     Equipment *eq
                         = info.equipMap.value(uuid, nullptr);
-                    if(eq)
-                        dyn->slotPlanes.append(
-                            eq->attr.value(
-                                QStringLiteral("Planes"),
-                                0));
+                    return eq && eq->isPlane();
+                };
+                int planeSlots = 0;
+                for(const QUuid &uuid : dyn->slotEquip) {
+                    if(isPlaneSlot(uuid))
+                        planeSlots++;
+                }
+                bool exIsPlane = isPlaneSlot(dyn->slotEquipEx);
+                if(exIsPlane)
+                    planeSlots++;
+                int perSlot = planeSlots > 0
+                                  ? totalPlanes / planeSlots
+                                  : 0;
+                int remainder = planeSlots > 0
+                                    ? totalPlanes % planeSlots
+                                    : 0;
+                int assigned = 0;
+                auto assignSlot = [&]() -> int {
+                    int count
+                        = perSlot + (assigned < remainder ? 1 : 0);
+                    assigned++;
+                    return count;
+                };
+                for(const QUuid &uuid : dyn->slotEquip) {
+                    if(isPlaneSlot(uuid))
+                        dyn->slotPlanes.append(assignSlot());
                     else
                         dyn->slotPlanes.append(0);
                 }
+                if(exIsPlane)
+                    dyn->slotPlanes.append(assignSlot());
             }
             while(dyn->slotPlanes.size() < 5)
                 dyn->slotPlanes.append(0);

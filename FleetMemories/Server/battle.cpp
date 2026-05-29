@@ -2161,12 +2161,6 @@ QMap<QString, int> Battle::shipAttrOf(bool isFriend, int index) const {
     return FleetInfo::attrFromShip(ship, dyn);
 }
 
-bool Battle::isCarrier(const Ship *ship) const {
-    if(!ship)
-        return false;
-    return (ship->getId() & 0x000f0000) == 0x00060000;
-}
-
 bool Battle::isArmoredCarrier(const Ship *ship) const {
     if(!ship)
         return false;
@@ -2176,7 +2170,7 @@ bool Battle::isArmoredCarrier(const Ship *ship) const {
 bool Battle::isSeaplaneShip(const Ship *ship) const {
     if(!ship)
         return false;
-    if(isCarrier(ship))
+    if(ship->isCarrier())
         return false;
     return (ship->getId() & 0x000f0000) == 0x00080000
            || (ship->getId() & 0x000f4000) == 0x00054000
@@ -2274,7 +2268,7 @@ void Battle::setupAirReloading(clockTime phaseStart, clockTime phaseLength) {
             ShipDynamic *dyn = fleet->shipDynamics[i].get();
             if(!ship || !dyn || dyn->fleetFled || dyn->currentHP <= 0)
                 continue;
-            if(isCarrier(ship)) {
+            if(ship->isCarrier()) {
                 double fs = carrierFiringSpeed(ship, dyn, fleet);
                 if(fs <= 0.0)
                     continue;
@@ -2499,7 +2493,7 @@ void Battle::executeAirTorpedoAttack(FriendOrEnemyIndex attacker,
         return;
 
     QMap<QString, int> attrs = shipAttrOf(attacker.isFriend, attacker.index);
-    double dpm = isCarrier(attShip)
+    double dpm = attShip->isCarrier()
                      ? attrs.value(QStringLiteral("DPM"), 0)
                      : attShip->getType().getCapitalness();
     if(dpm <= 0.0)
@@ -2571,7 +2565,7 @@ void Battle::executeAirDiveAttack(FriendOrEnemyIndex attacker,
         return;
 
     QMap<QString, int> attrs = shipAttrOf(attacker.isFriend, attacker.index);
-    double dpm = isCarrier(attShip)
+    double dpm = attShip->isCarrier()
                      ? attrs.value(QStringLiteral("DPM"), 0)
                      : attShip->getType().getCapitalness();
     if(dpm <= 0.0)
@@ -2649,7 +2643,7 @@ void Battle::executeAirAttackCutIn(FriendOrEnemyIndex attacker,
         return;
 
     QMap<QString, int> attrs = shipAttrOf(attacker.isFriend, attacker.index);
-    double dpm = isCarrier(attShip)
+    double dpm = attShip->isCarrier()
                      ? attrs.value(QStringLiteral("DPM"), 0)
                      : attShip->getType().getCapitalness();
     if(dpm <= 0.0)
@@ -3090,7 +3084,7 @@ void Battle::processS3AACutIn() {
                                     { return eq->type.isAAControl(); });
                 if(!f1.empty() && !f2.empty()
                     && !f3.empty()
-                    && ship->isBattleShip()) {
+                    && ship->isCarrier()) {
                     chosen = {f1[0], f2[0], f3[0]};
                     matchType = 6;
                 }
@@ -4008,7 +4002,7 @@ void Battle::processMainGunAttack(FriendOrEnemyIndex attacker) {
         return;
 
     forceVisible(attacker);
-    if(attShip->isBattleShip()) {
+    if(attShip->isCarrier()) {
         qCritical() << clock;
     }
 

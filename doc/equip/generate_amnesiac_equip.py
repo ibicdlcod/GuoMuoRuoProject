@@ -65,7 +65,6 @@ C = {
     "Antiair": 25, "Asw": 26, "Interception": 27,
     "Antibomber": 28, "Antiland": 29, "Transport": 30,
     "Flightrange": 31, "Homeport": 32, "Storeprice": 33,
-    "Planes": 34,
 }
 
 STATS = [
@@ -73,7 +72,6 @@ STATS = [
     "Evasion", "Los", "Concealment", "Firingrange", "Firingspeed",
     "Speed", "Torpedo", "Airtorpedo", "Bombing", "Antiair", "Asw",
     "Interception", "Antibomber", "Antiland", "Transport", "Flightrange",
-    "Planes",
 ]
 
 
@@ -180,11 +178,7 @@ def gen_type(etype, jp_cat, is_plane, player_rows, start_id):
 
         for stat in STATS:
             ci = C[stat]
-            if stat == "Planes" and is_plane:
-                # Tier-dependent plane count, matching player plane progression
-                val = [5, 8, 12, 16, 20, 24][tier_i]
-            else:
-                val = extrap_one(tgt, techs, pstats[stat], is_plane)
+            val = extrap_one(tgt, techs, pstats[stat], is_plane)
             # monotonic enforcement
             if stat in prev_value and prev_value[stat] >= 0:
                 val = max(val, prev_value[stat])
@@ -225,15 +219,15 @@ def main():
         all_out.extend(rows)
 
     # Rewrite CSV: headers first, then player rows, then amnesiac rows
-    HEADER1 = "id,name,,,type,attr,attr,attr,attr,attr,attr,attr,attr,attr,attr,attr,attr,attr,attr,attr,attr,attr,attr,attr,attr,attr,attr,attr,attr,attr,attr,attr,attr,attr,attr"
-    HEADER2 = "No.,ja_JP,Identifier,種別,equiptype,Tech,Father,Father2,Mother,Disallowmassproduction,Hitpoints,DPM,Armor,Armorpenetration,Accuracy,Torpedoaccuracy,Evasion,Los,Concealment,Firingrange,Firingspeed,Speed,Torpedo,Airtorpedo,Bombing,Antiair,Asw,Interception,Antibomber,Antiland,Transport,Flightrange,Homeport,Storeprice,Planes"
+    HEADER1 = "id,name,,,type,attr,attr,attr,attr,attr,attr,attr,attr,attr,attr,attr,attr,attr,attr,attr,attr,attr,attr,attr,attr,attr,attr,attr,attr,attr,attr,attr,attr,attr"
+    HEADER2 = "No.,ja_JP,Identifier,種別,equiptype,Tech,Father,Father2,Mother,Disallowmassproduction,Hitpoints,DPM,Armor,Armorpenetration,Accuracy,Torpedoaccuracy,Evasion,Los,Concealment,Firingrange,Firingspeed,Speed,Torpedo,Airtorpedo,Bombing,Antiair,Asw,Interception,Antibomber,Antiland,Transport,Flightrange,Homeport,Storeprice"
     with open(CSV_PATH, "w", encoding="utf-8") as f:
         f.write(HEADER1 + "\n")
         f.write(HEADER2 + "\n")
         for row in player_part:
             try:
                 if int(sv(row[0])) > 0 and int(sv(row[0])) < 8192:
-                    while len(row) < 35:
+                    while len(row) < 34:
                         row.append("")
                     f.write(fmt(row) + "\n")
             except:
