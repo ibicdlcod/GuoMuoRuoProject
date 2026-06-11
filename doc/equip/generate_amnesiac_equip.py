@@ -50,6 +50,8 @@ NEEDED = [
     ("Radar-small-dual",   "小型電探", False),
     ("Radar-big-flat",     "大型電探", False),
     ("Radar-big-flak",     "大型電探", False),
+    ("Patrol-liaison",     "対潜哨戒機", True),
+    ("Patrol-autogyro",    "回転翼機", True),
     ("Drum",               "簡易輸送部材", False),
     ("Searchlight",        "探照灯", False),
 ]

@@ -457,12 +457,13 @@ bool Ship::isAmnesiac() const {
 }
 
 bool Ship::isBattleShip() const {
-    /* mask 0x000f0000 isolates ship‑type bits; carrier = 0x00060000 */
-    return (shipRegId & 0x000f0000) == 0x00060000;
+    /* mask 0x000f0000 isolates ship‑type bits; battleship = 0x00050000 */
+    return (shipRegId & 0x000f0000) == 0x00050000;
 }
 
 bool Ship::isCarrier() const {
-    return isBattleShip();
+    /* mask 0x000f0000 isolates ship‑type bits; carrier = 0x00060000 */
+    return (shipRegId & 0x000f0000) == 0x00060000;
 }
 
 bool Ship::isDestroyer() const {

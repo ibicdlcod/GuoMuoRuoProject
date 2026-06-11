@@ -40,9 +40,9 @@ public:
     ShipType getType() const;
     QList<std::tuple<int, int>> getVisibleBonuses() const;
     bool isAmnesiac() const;
-    /* Returns true if ship is a carrier (mask 0x000f0000 == 0x00060000) */
+    /* Returns true if ship is a battleship (mask 0x000f0000 == 0x00050000) */
     bool isBattleShip() const;
-    /* Returns true if ship is a carrier (same as isBattleShip) */
+    /* Returns true if ship is a carrier (mask 0x000f0000 == 0x00060000) */
     bool isCarrier() const;
     /* Returns true if ship is a destroyer (mask 0x000f0000 == 0x00020000) */
     bool isDestroyer() const;

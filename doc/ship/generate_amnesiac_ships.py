@@ -145,17 +145,18 @@ ENEMY_CLASSES = [
     ("軽母ㄓ級", "軽母ㄓ級", 0x61, True,
      0x061, 0x100,
      [("Fighter", 0), ("Bomb-torp", 0), ("Bomb-dive", 0)],
-     {"DPM":1.1, "Armor":1.1, "Planes":1.1}),
+     {"DPM":1.15, "Armor":1.15, "Planes":1.15}),
 
     ("軽母ㄔ級", "軽母ㄔ級", 0x61, True,
      0x061, 0x200,
-     [("Fighter", 0), ("Bomb-dive", 0)],
-     {"Asw":1.8, "Planes":1.1}),
+     [("Fighter", 0), ("Bomb-dive", 0),
+      ("Patrol-liaison", 2), ("Patrol-autogyro", 3)],
+     {"Asw":1.8, "Planes":1.15, "DPM":1.05}),
 
     ("空母ㄌ級", "空母ㄌ級", 0x60, True,
      0x060, 0x100,
      [("Fighter", 0), ("Bomb-dive", 0), ("Bomb-torp", 0)],
-     {"Planes":1.2}),
+     {"Planes":1.25, "DPM":1.05, "Armor":1.05}),
 
     ("潜水ㄒ級", "潜水ㄒ級", 0x70, False,
      0x070, 0x100,
@@ -296,7 +297,8 @@ def load_amnesiac_equips():
     _EQUIP_CACHE = el
     return el
 
-_PLANE_TYPES = {"Fighter","Bomb-dive","Bomb-torp","Sp-recon","Sp-fight","Sp-bomb"}
+_PLANE_TYPES = {"Fighter","Bomb-dive","Bomb-torp","Sp-recon","Sp-fight","Sp-bomb",
+                "Patrol-liaison","Patrol-autogyro"}
 
 def min_tier_for_type(equip_type):
     """Return the lowest tier index where amnesiac equip of this type exists."""
