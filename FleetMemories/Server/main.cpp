@@ -51,11 +51,21 @@ int main(int argc, char *argv[]) {
         QString reportPath;
         int repeatCount = 1;
         bool isTestMode = false;
+        bool isGenerateMode = false;
+        QString outputPath;
+        uint64 generateUserId = 0;
+        int generateFleet = 0;
+        int generateMap = 0;
+        int generateNode = 0;
+        QString generateDiff = QStringLiteral("C");
         for(int i = 1; i < argc; ++i) {
             QString arg = QString::fromLocal8Bit(argv[i]);
             if(arg == QStringLiteral("--testbattle") && i + 1 < argc) {
                 luaPath = QString::fromLocal8Bit(argv[++i]);
                 isTestMode = true;
+            }
+            else if(arg == QStringLiteral("--generatetest")) {
+                isGenerateMode = true;
             }
             else if(arg == QStringLiteral("--report") && i + 1 < argc) {
                 reportPath = QString::fromLocal8Bit(argv[++i]);
@@ -64,8 +74,85 @@ int main(int argc, char *argv[]) {
                 repeatCount
                     = QString::fromLocal8Bit(argv[++i]).toInt();
             }
+            else if(arg == QStringLiteral("--output") && i + 1 < argc) {
+                outputPath = QString::fromLocal8Bit(argv[++i]);
+            }
+            else if(arg == QStringLiteral("--user") && i + 1 < argc) {
+                generateUserId
+                    = QString::fromLocal8Bit(argv[++i])
+                          .toULongLong();
+            }
+            else if(arg == QStringLiteral("--fleet") && i + 1 < argc) {
+                generateFleet
+                    = QString::fromLocal8Bit(argv[++i]).toInt();
+            }
+            else if(arg == QStringLiteral("--enemymap") && i + 1 < argc) {
+                generateMap
+                    = QString::fromLocal8Bit(argv[++i]).toInt();
+            }
+            else if(arg == QStringLiteral("--enemynode") && i + 1 < argc) {
+                generateNode
+                    = QString::fromLocal8Bit(argv[++i]).toInt();
+            }
+            else if(arg == QStringLiteral("--difficulty") && i + 1 < argc) {
+                generateDiff
+                    = QString::fromLocal8Bit(argv[++i]);
+            }
         }
-        if(isTestMode) {
+        if(isGenerateMode) {
+            if(outputPath.isEmpty()) {
+                qCritical()
+                    << "--generatetest requires --output <path>";
+                return 1;
+            }
+            if(generateUserId == 0) {
+                qCritical()
+                    << "--generatetest requires --user <steamid64>";
+                return 1;
+            }
+            if(generateMap == 0 || generateNode == 0) {
+                qCritical()
+                    << "--generatetest requires --enemymap <id>"
+                       " and --enemynode <id>";
+                return 1;
+            }
+
+            QT_USE_NAMESPACE
+            Server server(argc, argv);
+            server.setApplicationName("FleetMemories Server");
+            server.setApplicationVersion("0.60.1");
+            server.setOrganizationName("Harusame Software");
+            server.setOrganizationDomain("fleetmemories.moe");
+            settings = std::make_unique<QSettings>(new QSettings);
+            settings->setValue("server/language", "en_US");
+            KP::initLog(true);
+
+            QTranslator translator;
+            const QString baseName
+                = QStringLiteral("FleetMemories_")
+                  + QLocale(
+                        settings->value("server/language",
+                                        "en_US")
+                            .toString())
+                        .name();
+            if(translator.load(
+                   QStringLiteral(":/i18n/") + baseName))
+                server.installTranslator(&translator);
+
+            QSqlDatabase db = QSqlDatabase::addDatabase(
+                QStringLiteral("QSQLITE"));
+            db.setDatabaseName(QStringLiteral("ocean.db"));
+            if(!db.open()) {
+                qCritical() << "Failed to open ocean.db";
+                return 1;
+            }
+
+            server.generateTestLua(outputPath, generateUserId,
+                                   generateFleet, generateMap,
+                                   generateNode, generateDiff);
+            return 0;
+        }
+        else if(isTestMode) {
             if(luaPath.isEmpty()) {
                 qCritical() << "--testbattle requires a lua file path";
                 return 1;

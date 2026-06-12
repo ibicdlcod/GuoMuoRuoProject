@@ -48,6 +48,10 @@ public:
     bool runTestBattle(const QString &luaPath,
                        const QString &reportPath,
                        int repeatCount = 1);
+    bool generateTestLua(const QString &outputPath, uint64 steamId,
+                         int fleetIndex, int enemyMapId,
+                         int enemyNodeId,
+                         const QString &difficulty);
 
 public slots:
     void displayPrompt() override;

@@ -3511,4 +3511,337 @@ bool Server::runTestBattle(const QString &luaPath,
     return false;
 }
 
+bool Server::generateTestLua(const QString &outputPath,
+                             uint64 steamId, int fleetIndex,
+                             int enemyMapId, int enemyNodeId,
+                             const QString &difficulty) {
+    sqlinit();
+    importEquipFromCSV();
+    importShipFromCSV();
+    luaInitEquipable();
+
+    QString mapFile
+        = QStringLiteral("lua/map%1.lua").arg(enemyMapId);
+    auto mapResult = lua.safe_script_file(
+        mapFile.toStdString(), sol::script_pass_on_error);
+    if(!mapResult.valid()) {
+        sol::error err = mapResult;
+        qCritical() << "Failed to load map lua:" << err.what();
+        return false;
+    }
+
+    sol::table enemyTable;
+    {
+        sol::optional<sol::table> mapsTbl
+            = lua["maps"];
+        if(!mapsTbl.has_value()) {
+            qCritical() << "Maps table not found in lua";
+            return false;
+        }
+        sol::optional<sol::table> nodeTbl
+            = mapsTbl.value()[enemyMapId][enemyNodeId];
+        if(!nodeTbl.has_value()) {
+            qCritical() << "Node" << enemyNodeId
+                        << "not found in map" << enemyMapId;
+            return false;
+        }
+        sol::optional<sol::table> enemyOpt
+            = nodeTbl.value()["enemy"];
+        if(!enemyOpt.has_value()) {
+            qCritical() << "No enemy definition at node"
+                        << enemyNodeId;
+            return false;
+        }
+        sol::object enemyFunc
+            = enemyOpt.value()[difficulty.toStdString()];
+        if(!enemyFunc.valid() || !enemyFunc.is<sol::function>()) {
+            qCritical()
+                << "No enemy function for difficulty"
+                << difficulty << "at node" << enemyNodeId;
+            return false;
+        }
+        sol::protected_function_result enemyResult
+            = enemyFunc.as<sol::function>()();
+        if(!enemyResult.valid()) {
+            sol::error err = enemyResult;
+            qCritical()
+                << "Enemy function call failed:" << err.what();
+            return false;
+        }
+        if(enemyResult.get_type()
+               != sol::type::table) {
+            qCritical()
+                << "Enemy function did not return a table";
+            return false;
+        }
+        enemyTable = enemyResult;
+    }
+
+    QList<int> enemyShipIds;
+    for(const auto &pair : enemyTable) {
+        sol::object val = pair.second;
+        if(val.is<int>())
+            enemyShipIds.append(val.as<int>());
+    }
+
+    struct ShipRow {
+        int def;
+        int star, currentHP, condition, exp, expCap;
+        QList<QUuid> equipSlots;
+        QUuid slotEx;
+        QList<int> planes;
+        int fleetPosIndex;
+        double fuel, ammo;
+        bool fleetFled;
+    };
+    QList<ShipRow> playerRows;
+    QHash<QUuid, int> uuidToEquipDef;
+
+    {
+        QSqlQuery query;
+        query.prepare(
+            "SELECT UserShip.ShipDef, "
+            "Star, CurrentHP, Condition, "
+            "UserShip.Exp + COALESCE(UserKCShip.Exp, 0) AS Exp, "
+            "ExpCap, "
+            "Slot1, Slot2, Slot3, Slot4, Slot5, SlotEX, "
+            "Slot1Planes, Slot2Planes, Slot3Planes, Slot4Planes, "
+            "Slot5Planes, "
+            "FleetPosIndex, Fuel, Ammo, FleetFled "
+            "FROM UserShip "
+            "LEFT JOIN UserKCShip "
+            "ON UserShip.ShipUuid = UserKCShip.ShipUuid "
+            "WHERE User = :uid AND FleetIndex = :fleet "
+            "ORDER BY FleetPosIndex");
+        query.bindValue(":uid", steamId);
+        query.bindValue(":fleet", fleetIndex);
+        if(!query.exec() || !query.isSelect()) {
+            qCritical() << "Query player fleet failed:"
+                        << query.lastError().text()
+                        << query.lastQuery();
+            return false;
+        }
+        while(query.next()) {
+            auto rec = query.record();
+            ShipRow row;
+            row.def = query.value(rec.indexOf("ShipDef")).toInt();
+            row.star = query.value(rec.indexOf("Star")).toInt();
+            row.currentHP
+                = query.value(rec.indexOf("CurrentHP")).toInt();
+            row.condition
+                = query.value(rec.indexOf("Condition")).toInt();
+            row.exp = query.value(rec.indexOf("Exp")).toInt();
+            row.expCap
+                = query.value(rec.indexOf("ExpCap")).toInt();
+            for(int s = 1; s <= 5; ++s) {
+                row.equipSlots.append(
+                    query
+                        .value(rec.indexOf(
+                            QStringLiteral("Slot")
+                            + QString::number(s)))
+                        .toUuid());
+                row.planes.append(
+                    query
+                        .value(rec.indexOf(
+                            QStringLiteral("Slot")
+                            + QString::number(s)
+                            + QStringLiteral("Planes")))
+                        .toInt());
+            }
+            row.slotEx
+                = query.value(rec.indexOf("SlotEX")).toUuid();
+            row.fleetPosIndex
+                = query.value(rec.indexOf("FleetPosIndex"))
+                      .toInt();
+            row.fuel
+                = query.value(rec.indexOf("Fuel")).toDouble();
+            row.ammo
+                = query.value(rec.indexOf("Ammo")).toDouble();
+            row.fleetFled
+                = query.value(rec.indexOf("FleetFled"))
+                      .toBool();
+            playerRows.append(row);
+        }
+
+        QList<QUuid> allUuids;
+        for(const auto &r : playerRows) {
+            for(const auto &u : r.equipSlots)
+                if(!u.isNull()) allUuids.append(u);
+            if(!r.slotEx.isNull()) allUuids.append(r.slotEx);
+        }
+        if(!allUuids.isEmpty()) {
+            QStringList phs;
+            for(int i = 0; i < allUuids.size(); ++i)
+                phs.append(QStringLiteral(":u")
+                           + QString::number(i));
+            QSqlQuery eqQuery;
+            eqQuery.prepare(
+                QStringLiteral(
+                    "SELECT EquipUuid, EquipDef FROM UserEquip "
+                    "WHERE EquipUuid IN (%1)")
+                    .arg(phs.join(QStringLiteral(", "))));
+            for(int i = 0; i < allUuids.size(); ++i) {
+                eqQuery.bindValue(
+                    QStringLiteral(":u") + QString::number(i),
+                    allUuids[i].toString());
+            }
+            if(eqQuery.exec() && eqQuery.isSelect()) {
+                while(eqQuery.next()) {
+                    uuidToEquipDef.insert(
+                        eqQuery.value(0).toUuid(),
+                        eqQuery.value(1).toInt());
+                }
+            }
+        }
+    }
+
+    KP::FleetType fleetType = KP::NormalFleet;
+    {
+        QSqlQuery ftQuery;
+        ftQuery.prepare(
+            "SELECT Intvalue FROM UserAttr "
+            "WHERE UserID = :uid AND Attribute = :attr");
+        ftQuery.bindValue(":uid", steamId);
+        ftQuery.bindValue(":attr",
+                          QStringLiteral("Fleet")
+                              + QString::number(fleetIndex + 1));
+        if(ftQuery.exec() && ftQuery.isSelect()
+            && ftQuery.next()) {
+            fleetType = static_cast<KP::FleetType>(
+                ftQuery.value(0).toInt());
+        }
+    }
+
+    QFile f(outputPath);
+    if(!f.open(QIODevice::WriteOnly | QIODevice::Text)) {
+        qCritical() << "Cannot open output file" << outputPath;
+        return false;
+    }
+    QTextStream out(&f);
+
+    out << "-- Generated by CFServer --generatetest\n"
+        << "-- User " << steamId << ", fleet " << fleetIndex
+        << ", map " << enemyMapId << ", node " << enemyNodeId
+        << "\n\nreturn {\n";
+
+    auto writeShipDynamics
+        = [&](const ShipRow &row,
+              const QString &indent) {
+              int lv = Ship::getLevel(row.exp);
+              out << indent << "lv = " << lv << ",\n";
+              out << indent << "currentHP = " << row.currentHP
+                  << ",\n";
+              out << indent
+                  << QStringLiteral("fuel = %1,\n")
+                         .arg(row.fuel, 0, 'f', 4);
+              out << indent
+                  << QStringLiteral("ammo = %1,\n")
+                         .arg(row.ammo, 0, 'f', 4);
+              out << indent << "slotEquip = {";
+              bool first = true;
+              for(const auto &u : row.equipSlots) {
+                  if(!first) out << ", ";
+                  first = false;
+                  if(u.isNull()) {
+                      out << "0";
+                  }
+                  else {
+                      int defId
+                          = uuidToEquipDef.value(u, 0);
+                      out << defId;
+                  }
+              }
+              out << "},\n";
+              if(!row.slotEx.isNull()) {
+                  int exDefId
+                      = uuidToEquipDef.value(row.slotEx, 0);
+                  out << indent << "slotEquipEx = " << exDefId
+                      << ",\n";
+              }
+              else {
+                  out << indent << "slotEquipEx = 0,\n";
+              }
+              out << indent << "slotPlanes = {";
+              first = true;
+              for(int p : row.planes) {
+                  if(!first) out << ", ";
+                  first = false;
+                  out << p;
+              }
+              out << "},\n";
+          };
+
+    out << "    FriendFleetInfo = {\n";
+    out << "        type = "
+        << static_cast<int>(fleetType) << ",\n";
+    out << "        ships = {\n";
+    for(const auto &row : playerRows) {
+        out << QStringLiteral("            [%1] = %2,\n")
+                   .arg(row.fleetPosIndex)
+                   .arg(row.def);
+    }
+    out << "        },\n";
+    out << "        shipDynamics = {\n";
+    for(const auto &row : playerRows) {
+        out << QStringLiteral("            [%1] = {\n")
+                   .arg(row.fleetPosIndex);
+        writeShipDynamics(row, QStringLiteral("                "));
+        out << "            },\n";
+    }
+    out << "        },\n";
+
+    QSet<int> equipDefIds;
+    for(const auto &u : uuidToEquipDef)
+        equipDefIds.insert(u);
+    if(!equipDefIds.isEmpty()) {
+        out << "        equipSkillEffects = {\n";
+        for(int defId : equipDefIds) {
+            out << QStringLiteral("            [%1] = 1.0,\n")
+                       .arg(defId);
+        }
+        out << "        },\n";
+    }
+
+    out << "    },\n\n";
+    out << "    EnemyFleetInfo = {\n";
+    out << "        type = 0,\n";
+    out << "        ships = {\n";
+    for(int i = 0; i < enemyShipIds.size(); ++i) {
+        out << QStringLiteral("            [%1] = %2,\n")
+                   .arg(i)
+                   .arg(enemyShipIds[i]);
+    }
+    out << "        },\n";
+    out << "        shipDynamics = {\n";
+    for(int i = 0; i < enemyShipIds.size(); ++i) {
+        out << QStringLiteral("            [%1] = {\n")
+                   .arg(i);
+        out << "                lv = 1,\n";
+        out << "                fuel = 1.0,\n";
+        out << "                ammo = 1.0,\n";
+        out << "                slotEquipEx = 0,\n";
+        out << "            },\n";
+    }
+    out << "        },\n";
+    out << "    },\n\n";
+    out << "    BattlePlan = {\n";
+    out << "        friendFleetPriority = 0,\n";
+    out << "        enemyFleetPriority = 0,\n";
+    out << "        extraBattle = true,\n";
+    out << "        extraBattleWhenLosing = false,\n";
+    out << "        extraBattleWhenFlagship = false,\n";
+    out << "        extraBattleWhenBorBelow = false,\n";
+    out << "        extraBattleWhenAorBelow = false,\n";
+    out << "    },\n";
+    out << "}\n";
+
+    out.flush();
+    f.close();
+
+    //% "Generated test battle file to %1"
+    qInfo() << qtTrId("test-battle-generated")
+                   .arg(outputPath);
+    return true;
+}
+
 QT_END_NAMESPACE
