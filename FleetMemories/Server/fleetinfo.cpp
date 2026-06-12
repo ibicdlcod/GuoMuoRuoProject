@@ -103,6 +103,55 @@ double FleetInfo::los(bool isNight) const {
     return result;
 }
 
+double FleetInfo::asw() const {
+    std::vector<double> aswValues;
+    aswValues.reserve(ships.size());
+    for(int i = 0; i < static_cast<int>(ships.size()); ++i) {
+        if(!ships[i] || !shipDynamics[i] || shipDynamics[i]->fleetFled)
+            continue;
+
+        double shipAsw = 0.0;
+
+        LuaMap attrs = attrFromShip(ships[i], shipDynamics[i].get());
+        shipAsw = attrs.value(QStringLiteral("Asw"), 0);
+
+        auto addEquipAsw = [&](const QUuid &slot, int pos) {
+            Equipment *eq = equipMap.value(slot, nullptr);
+            if(!eq)
+                return;
+            double skillEff = equipSkillEffects.value(slot, 1.0);
+            double visBonus = getVisibleBonusFirstType(
+                ships[i], shipDynamics[i].get(), pos);
+            int asw =
+                eq->attr.value(QStringLiteral("Asw"), 0);
+            shipAsw += std::round(asw * skillEff * visBonus);
+        };
+        int slotCount = shipDynamics[i]->slotEquip.size();
+        for(int j = 0; j < slotCount; ++j)
+            addEquipAsw(shipDynamics[i]->slotEquip[j], j);
+        addEquipAsw(shipDynamics[i]->slotEquipEx, slotCount);
+
+        {
+            LuaMap c = getVisibleBonusSecondType(ships[i],
+                                                  shipDynamics[i].get());
+            shipAsw += c.value(QStringLiteral("Asw"), 0);
+        }
+
+        aswValues.push_back(shipAsw);
+    }
+
+    std::sort(aswValues.begin(), aswValues.end(), std::greater<double>());
+
+    double result = 0.0;
+    double weight = 1.0;
+    double a = settings->value("rule/aswcontrol", 0.5).toDouble();
+    for(double v : aswValues) {
+        result += weight * v;
+        weight *= a;
+    }
+    return result;
+}
+
 int FleetInfo::transportCapacity(const CSteamID &uid, TransportMode mode) {
     if(mode != Default) {
         qWarning() << "FleetInfo::transportCapacity: unknown mode"

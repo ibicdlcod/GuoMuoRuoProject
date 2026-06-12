@@ -714,23 +714,35 @@ bool Battle::processTorpedoCutIn(FriendOrEnemyIndex attacker) {
 
         QMap<QString, int> defAttrs
             = shipAttrOf(defender.isFriend, defender.index);
-        double evasion
-            = defAttrs.value(QStringLiteral("Evasion"), 0);
-        double armor
-            = defAttrs.value(QStringLiteral("Armor"), 0);
-        if(armor <= 0)
-            armor = 1;
-        int defMaxHP
-            = defShip->attr.value(QStringLiteral("Hitpoints"), 1);
-
-        double baseAcc = torpBaseAccuracy(attacker.isFriend,
+    double evasion
+        = defAttrs.value(QStringLiteral("Evasion"), 0);
+    {
+        auto addSonar = [&](const QUuid &uuid) {
+            Equipment *eq = defFleet->equipMap.value(uuid, nullptr);
+            if(eq && eq->type.getPrimaryAttr()
+                          == QStringLiteral("Asw"))
+                evasion += static_cast<double>(
+                    eq->attr.value(QStringLiteral("Asw"), 0));
+        };
+        for(const auto &u : defDyn->slotEquip)
+            addSonar(u);
+        addSonar(defDyn->slotEquipEx);
+    }
+    double armor
+        = defAttrs.value(QStringLiteral("Armor"), 0);
+    if(armor <= 0)
+        armor = 1;
+    int defMaxHP
+        = defShip->attr.value(QStringLiteral("Hitpoints"), 1);
+    double baseAcc = torpBaseAccuracy(attacker.isFriend,
                                           attacker.index);
         double equipAcc = torpCombinedAccuracy(
             attacker.isFriend, attacker.index);
-        double accuracy = (baseAcc + equipAcc) * accMul;
+        double accuracy = (baseAcc + equipAcc) * accMul
+                          * m_surpriseMul;
 
         double evasionChance = evasion > 0.0
-            ? std::exp2(-accuracy / evasion) : 0.0;
+            ? std::exp2(-accuracy / subEffectiveEvasion(defender, evasion)) : 0.0;
         evasionChance = std::clamp(evasionChance, 0.0, 1.0);
         std::uniform_real_distribution<double> evadeDist(
             0.0, 1.0);
@@ -774,7 +786,7 @@ bool Battle::processTorpedoCutIn(FriendOrEnemyIndex attacker) {
             static_cast<double>(defMaxHP) / 8.0, 512.0);
         double x = w * u * z / std::hypot(w * u, z);
         int totalDmg = static_cast<int>(std::round(
-            std::round(x * dmgMul)));
+            std::round(x * dmgMul * m_surpriseMul)));
         defDyn->currentHP
             = std::max(0, defDyn->currentHP - totalDmg);
 
@@ -862,6 +874,18 @@ bool Battle::processTorpedoCutIn(FriendOrEnemyIndex attacker) {
             = shipAttrOf(defender.isFriend, defender.index);
         double evasion
             = defAttrs.value(QStringLiteral("Evasion"), 0);
+        {
+            auto addSonar = [&](const QUuid &uuid) {
+                Equipment *eq = defFleet->equipMap.value(uuid, nullptr);
+                if(eq && eq->type.getPrimaryAttr()
+                              == QStringLiteral("Asw"))
+                    evasion += static_cast<double>(
+                        eq->attr.value(QStringLiteral("Asw"), 0));
+            };
+            for(const auto &u : defDyn->slotEquip)
+                addSonar(u);
+            addSonar(defDyn->slotEquipEx);
+        }
         double armor
             = defAttrs.value(QStringLiteral("Armor"), 0);
         if(armor <= 0)
@@ -875,10 +899,10 @@ bool Battle::processTorpedoCutIn(FriendOrEnemyIndex attacker) {
         double equipTorpAcc = torpCombinedAccuracy(
             attacker.isFriend, attacker.index);
         double torpAccuracy = (baseTorpAcc + equipTorpAcc)
-                              * accMul;
+                              * accMul * m_surpriseMul;
 
         double evasionChance = evasion > 0.0
-            ? std::exp2(-torpAccuracy / evasion) : 0.0;
+            ? std::exp2(-torpAccuracy / subEffectiveEvasion(defender, evasion)) : 0.0;
         evasionChance = std::clamp(evasionChance, 0.0, 1.0);
         std::uniform_real_distribution<double> evadeDist(
             0.0, 1.0);
@@ -1007,7 +1031,7 @@ bool Battle::processTorpedoCutIn(FriendOrEnemyIndex attacker) {
         }
 
         totalDmg = static_cast<int>(
-            std::round(totalDmg * dmgMul));
+            std::round(totalDmg * dmgMul * m_surpriseMul));
         defDyn->currentHP
             = std::max(0, defDyn->currentHP - totalDmg);
 
@@ -1118,6 +1142,14 @@ void Battle::processTorpedoAttack(FriendOrEnemyIndex attacker) {
     if(!hasTorpedo(attacker.isFriend, attacker.index))
         return;
 
+    const auto &surConceal = attacker.isFriend
+        ? friendFleetConcealmentStatus
+        : enemyFleetConcealmentStatus;
+    m_surpriseMul = surConceal[attacker.index]
+                            == ConcealmentStatus::Concealed
+                        ? 1.5
+                        : 1.0;
+
     if(processTorpedoCutIn(attacker))
         return;
 
@@ -1140,21 +1172,32 @@ void Battle::processTorpedoAttack(FriendOrEnemyIndex attacker) {
         = shipAttrOf(defender.isFriend, defender.index);
     double evasion
         = defAttrs.value(QStringLiteral("Evasion"), 0);
+    {
+        auto addSonar = [&](const QUuid &uuid) {
+            Equipment *eq = defFleet->equipMap.value(uuid, nullptr);
+            if(eq && eq->type.getPrimaryAttr()
+                          == QStringLiteral("Asw"))
+                evasion += static_cast<double>(
+                    eq->attr.value(QStringLiteral("Asw"), 0));
+        };
+        for(const auto &u : defDyn->slotEquip)
+            addSonar(u);
+        addSonar(defDyn->slotEquipEx);
+    }
     double armor
         = defAttrs.value(QStringLiteral("Armor"), 0);
     if(armor <= 0)
         armor = 1;
     int defMaxHP
         = defShip->attr.value(QStringLiteral("Hitpoints"), 1);
-
     double baseAcc = torpBaseAccuracy(attacker.isFriend,
                                       attacker.index);
     double equipAcc = torpCombinedAccuracy(attacker.isFriend,
                                            attacker.index);
-    double accuracy = baseAcc + equipAcc;
+    double accuracy = (baseAcc + equipAcc) * m_surpriseMul;
 
     double evasionChance = evasion > 0.0
-        ? std::exp2(-accuracy / evasion) : 0.0;
+        ? std::exp2(-accuracy / subEffectiveEvasion(defender, evasion)) : 0.0;
     evasionChance = std::clamp(evasionChance, 0.0, 1.0);
     std::uniform_real_distribution<double> evadeDist(
         0.0, 1.0);
@@ -1211,7 +1254,8 @@ void Battle::processTorpedoAttack(FriendOrEnemyIndex attacker) {
     double z = std::max(static_cast<double>(defMaxHP) / 8.0,
                         512.0);
     double x = w * u * z / std::hypot(w * u, z);
-    int totalDmg = static_cast<int>(std::round(x));
+    int totalDmg = static_cast<int>(std::round(
+        x * m_surpriseMul));
     defDyn->currentHP
         = std::max(0, defDyn->currentHP - totalDmg);
 
@@ -1493,13 +1537,17 @@ void Battle::insertEvent(EventType type, clockTime time,
  *  Battle::forceVisible] */
 
 void Battle::decideHidden(FriendOrEnemyIndex index) {
+    Ship *ship = index.isFriend ? currentFriendFleet->ships[index.index]
+                                : currentEnemyFleet->ships[index.index];
+    if(ship && ship->isSubmarine()) {
+        decideSubHidden(index);
+        return;
+    }
     bool result;
 
     /* placeholder */
     int hideChance = 0;
 
-    Ship *ship = index.isFriend ? currentFriendFleet->ships[index.index]
-                                : currentEnemyFleet->ships[index.index];
     ShipDynamic *shipDyn = index.isFriend ? currentFriendFleet->shipDynamics[index.index].get()
                                           : currentEnemyFleet->shipDynamics[index.index].get();
     LuaMap attrs = index.isFriend
@@ -1583,6 +1631,94 @@ void Battle::forceVisible(FriendOrEnemyIndex index) {
                     decideHidden(idx); });
 }
 
+/* Submarine concealment and detection
+ * — see doc/worldview_and_mechanics/9.a4-asw.md
+ * [Implemented in Battle::decideSubHidden,
+ *  Battle::forceSurface] */
+
+void Battle::decideSubHidden(FriendOrEnemyIndex index) {
+    Ship *ship = index.isFriend ? currentFriendFleet->ships[index.index]
+                                : currentEnemyFleet->ships[index.index];
+    ShipDynamic *dyn = index.isFriend
+        ? currentFriendFleet->shipDynamics[index.index].get()
+        : currentEnemyFleet->shipDynamics[index.index].get();
+    if(!ship || !dyn || dyn->fleetFled || dyn->currentHP <= 0)
+        return;
+
+    auto &concealStatus = index.isFriend
+        ? friendFleetConcealmentStatus
+        : enemyFleetConcealmentStatus;
+    ConcealmentStatus currentState = concealStatus[index.index];
+
+    /* Surfaced subs: detection check runs, producing Concealed or Detected */
+    if(currentState == ConcealmentStatus::Surfaced) {
+        /* fall through to detection check below */
+    }
+
+    /* ASW detection check */
+    FleetInfo *enemyFleet = index.isFriend
+        ? currentEnemyFleet : currentFriendFleet;
+    double conceal = FleetInfo::attrFromShip(ship, dyn)
+                         .value(QStringLiteral("Concealment"), 0);
+    double asw = enemyFleet->asw();
+    double nonDetectChance = 0.5;
+    if(conceal > 0 && asw > 0) {
+        double x = conceal / asw;
+        double logx = std::log(x);
+        nonDetectChance = logx / (2.0 * std::hypot(logx, 1.0)) + 0.5;
+    }
+    nonDetectChance = std::clamp(nonDetectChance, 0.0, 1.0);
+
+    std::bernoulli_distribution dist(nonDetectChance);
+    bool notDetected = dist(rng);
+
+    if(notDetected) {
+        concealStatus[index.index] = ConcealmentStatus::Concealed;
+        /* Recheck in 15 seconds */
+        insertEvent(EventType::DecideSubHidden, clock + 15, index,
+                    [this](FriendOrEnemyIndex idx) {
+                        decideSubHidden(idx); });
+    }
+    else {
+        concealStatus[index.index] = ConcealmentStatus::Detected;
+        /* Detected: visible to ASW; recheck in 15 seconds */
+        insertEvent(EventType::DecideSubHidden, clock + 15, index,
+                    [this](FriendOrEnemyIndex idx) {
+                        decideSubHidden(idx); });
+    }
+}
+
+void Battle::forceSurface(FriendOrEnemyIndex index) {
+    /* ASW attack hit — surface the submarine for 15 seconds
+     * — see doc/worldview_and_mechanics/9.a4-asw.md */
+    auto &concealStatus = index.isFriend
+        ? friendFleetConcealmentStatus
+        : enemyFleetConcealmentStatus;
+    concealStatus[index.index] = ConcealmentStatus::Surfaced;
+    /* Cancel any pending detection check, reschedule for 15s */
+    events.remove_if([&](const Event &e) {
+        return e.type == EventType::DecideSubHidden
+               && e.index.isFriend == index.isFriend
+               && e.index.index == index.index;
+    });
+    insertEvent(EventType::DecideSubHidden, clock + 15, index,
+                [this](FriendOrEnemyIndex idx) {
+                    decideSubHidden(idx); });
+}
+
+double Battle::subEffectiveEvasion(FriendOrEnemyIndex defender,
+                                    double baseEvasion) const {
+    FleetInfo *defFleet = fleetOf(defender.isFriend);
+    if(defender.index < 0
+        || defender.index >= static_cast<int>(defFleet->ships.size()))
+        return baseEvasion;
+    Ship *defShip = defFleet->ships[defender.index];
+    if(!defShip || !defShip->isSubmarine())
+        return baseEvasion;
+    LuaMap attrs = shipAttrOf(defender.isFriend, defender.index);
+    return attrs.value(QStringLiteral("Concealment"), 0) * 16.0;
+}
+
 /* Target selection
  * — see doc/worldview_and_mechanics/9-battle.md
  * [Implemented in Battle::selectEnemyTarget,
@@ -1599,6 +1735,10 @@ int Battle::selectEnemyTarget(int friendIndex) const {
             || currentEnemyFleet->shipDynamics[i]->currentHP <= 0)
             continue;
         if(enemyFleetConcealmentStatus[i] != ConcealmentStatus::Visible)
+            continue;
+        /* Submarines are immune to gun/torpedo unless surfaced */
+        if(currentEnemyFleet->ships[i]->isSubmarine()
+            && enemyFleetConcealmentStatus[i] != ConcealmentStatus::Surfaced)
             continue;
         visible.push_back(i);
     }
@@ -1627,6 +1767,10 @@ int Battle::selectFriendTarget(int enemyIndex) const {
             || currentFriendFleet->shipDynamics[i]->currentHP <= 0)
             continue;
         if(friendFleetConcealmentStatus[i] != ConcealmentStatus::Visible)
+            continue;
+        /* Submarines are immune to gun/torpedo unless surfaced */
+        if(currentFriendFleet->ships[i]->isSubmarine()
+            && friendFleetConcealmentStatus[i] != ConcealmentStatus::Surfaced)
             continue;
         visible.push_back(i);
     }
@@ -2722,7 +2866,8 @@ void Battle::executeAirAttackCutIn(FriendOrEnemyIndex attacker,
                 * reconGuidedStrikeMultiplier
                 * settings->value("rule/airpotency", 4.0).toDouble()));
 
-            defDyn->currentHP = std::max(0, defDyn->currentHP - totalDmg);
+    defDyn->currentHP = std::max(0, defDyn->currentHP
+        - static_cast<int>(totalDmg * m_surpriseMul));
 
             {
                 QJsonObject log;
@@ -3653,10 +3798,10 @@ bool Battle::processGunshotCutIn(FriendOrEnemyIndex attacker) {
         for(const QUuid &uuid : std::as_const(attDyn->slotEquip))
             addEquipAcc(uuid);
         addEquipAcc(attDyn->slotEquipEx);
-        double accuracy = baseAcc * accMul;
+        double accuracy = baseAcc * accMul * m_surpriseMul;
 
         double evasionChance = evasion > 0.0
-            ? std::exp2(-accuracy / evasion) : 0.0;
+            ? std::exp2(-accuracy / subEffectiveEvasion(defender, evasion)) : 0.0;
         evasionChance = std::clamp(evasionChance, 0.0, 1.0);
         std::uniform_real_distribution<double> evadeDist(
             0.0, 1.0);
@@ -3698,7 +3843,7 @@ bool Battle::processGunshotCutIn(FriendOrEnemyIndex attacker) {
             u = std::max(u, 0.0);
             double x = w * u * z / std::hypot(w * u, z);
             int totalDmg = static_cast<int>(std::round(
-                std::round(x * dmgMul)));
+                std::round(x * dmgMul * m_surpriseMul)));
             defDyn->currentHP
                 = std::max(0, defDyn->currentHP - totalDmg);
             {
@@ -3708,7 +3853,6 @@ bool Battle::processGunshotCutIn(FriendOrEnemyIndex attacker) {
                 log["attackerFleet"] = attacker.isFriend;
                 log["attackerShip"] = attacker.index;
                 log["defenderFleet"] = defender.isFriend;
-                log["defenderShip"] = defender.index;
                 log["cutInType"]
                     = QStringLiteral("spotting");
                 log["damage"] = totalDmg;
@@ -3934,7 +4078,7 @@ bool Battle::processGunshotCutIn(FriendOrEnemyIndex attacker) {
         double accuracy = baseAcc;
 
         double evasionChance = evasion > 0.0
-            ? std::exp2(-accuracy / evasion) : 0.0;
+            ? std::exp2(-accuracy / subEffectiveEvasion(defender, evasion)) : 0.0;
         evasionChance = std::clamp(evasionChance, 0.0, 1.0);
         std::uniform_real_distribution<double> evadeDist(
             0.0, 1.0);
@@ -3975,7 +4119,7 @@ bool Battle::processGunshotCutIn(FriendOrEnemyIndex attacker) {
             u = std::max(u, 0.0);
             double x = w * u * z / std::hypot(w * u, z);
             int totalDmg = static_cast<int>(std::round(
-                std::round(x * dmgMul)));
+                std::round(x * dmgMul * m_surpriseMul)));
             defDyn->currentHP
                 = std::max(0, defDyn->currentHP - totalDmg);
             {
@@ -4012,6 +4156,13 @@ void Battle::processMainGunAttack(FriendOrEnemyIndex attacker) {
         || attDyn->currentHP <= 0)
         return;
 
+    const auto &surConceal = attacker.isFriend
+        ? friendFleetConcealmentStatus
+        : enemyFleetConcealmentStatus;
+    m_surpriseMul = surConceal[attacker.index]
+                            == ConcealmentStatus::Concealed
+                        ? 1.5
+                        : 1.0;
     forceVisible(attacker);
     if(attShip->isCarrier()) {
         qCritical() << clock;
@@ -4142,11 +4293,11 @@ void Battle::processMainGunAttack(FriendOrEnemyIndex attacker) {
         QStringLiteral("Hitpoints"), 1);
 
     double baseAcc
-        = mainGunBaseAccuracy(attacker.isFriend, attacker.index);
-    double equipAcc = attrs.value(QStringLiteral("Accuracy"), 0);
-    double accuracy = baseAcc + equipAcc;
+       = mainGunBaseAccuracy(attacker.isFriend, attacker.index);
+   double equipAcc = attrs.value(QStringLiteral("Accuracy"), 0);
+   double accuracy = (baseAcc + equipAcc) * m_surpriseMul;
     double evasionChance = evasion > 0.0
-        ? std::exp2(-accuracy / evasion) : 0.0;
+        ? std::exp2(-accuracy / subEffectiveEvasion(defender, evasion)) : 0.0;
 
     std::uniform_real_distribution<double> evadeDist(0.0, 1.0);
 
@@ -4305,6 +4456,13 @@ void Battle::processSecondaryGunAttack(FriendOrEnemyIndex attacker,
     if(!secEq || !secEq->type.isSecGun())
         return;
 
+    const auto &surConceal = attacker.isFriend
+        ? friendFleetConcealmentStatus
+        : enemyFleetConcealmentStatus;
+    m_surpriseMul = surConceal[attacker.index]
+                            == ConcealmentStatus::Concealed
+                        ? 1.5
+                        : 1.0;
     forceVisible(attacker);
 
     auto scheduleReload = [&]() {
@@ -4387,15 +4545,15 @@ void Battle::processSecondaryGunAttack(FriendOrEnemyIndex attacker,
     int defMaxHP = defShip->attr.value(
         QStringLiteral("Hitpoints"), 1);
 
-    double baseAcc = secGunBaseAccuracy(attacker.isFriend,
+   double baseAcc = secGunBaseAccuracy(attacker.isFriend,
                                         attacker.index);
-    double equipAcc = secGunCombinedAccuracy(attacker.isFriend,
+   double equipAcc = secGunCombinedAccuracy(attacker.isFriend,
                                              attacker.index);
-    double accuracy = baseAcc + equipAcc;
+   double accuracy = (baseAcc + equipAcc) * m_surpriseMul;
 
     auto checkPointBlank = [&]() {
         double pbChance
-            = std::exp((accuracy - 4.0 * evasion) / 1000.0);
+            = std::exp((accuracy - 4.0 * subEffectiveEvasion(defender, evasion)) / 1000.0);
         pbChance = std::clamp(pbChance, 0.0, 1.0);
         std::bernoulli_distribution pbDist(pbChance);
         if(pbDist(rng)) {
@@ -4418,7 +4576,7 @@ void Battle::processSecondaryGunAttack(FriendOrEnemyIndex attacker,
     };
 
     double evasionChance = evasion > 0.0
-        ? std::exp2(-accuracy / evasion) : 0.0;
+        ? std::exp2(-accuracy / subEffectiveEvasion(defender, evasion)) : 0.0;
     evasionChance = std::clamp(evasionChance, 0.0, 1.0);
 
     std::uniform_real_distribution<double> evadeDist(0.0, 1.0);
@@ -4491,9 +4649,10 @@ void Battle::processSecondaryGunAttack(FriendOrEnemyIndex attacker,
         double u = firepowerDist(rng);
         u = std::max(u, 0.0);
         double x = w * u * z / std::hypot(w * u, z);
-        int totalDmg = static_cast<int>(std::round(x));
-        defDyn->currentHP = std::max(0,
-                                     defDyn->currentHP - totalDmg);
+       int totalDmg = static_cast<int>(
+           std::round(x * m_surpriseMul));
+       defDyn->currentHP = std::max(0,
+                                    defDyn->currentHP - totalDmg);
         {
             QJsonObject log;
             log["type"] = KP::SecondaryGunAttack;

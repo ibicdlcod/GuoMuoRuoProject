@@ -24,6 +24,7 @@ public:
     FleetInfo(const FleetInfo &) = delete;
     FleetInfo &operator=(const FleetInfo &) = delete;
     double los(bool isNight = false) const;
+    double asw() const;
     QMap<KP::CapitalType, int> capitalness() const;
     std::vector<int> shipSpeeds() const;
     int transportCapacity(const CSteamID &uid, TransportMode mode = Default);

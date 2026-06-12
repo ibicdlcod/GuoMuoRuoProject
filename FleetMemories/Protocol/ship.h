@@ -51,6 +51,7 @@ public:
     /* Returns true if ship is a light cruiser (mask 0x000f0000 == 0x00030000) */
     bool isLightCruiser() const;
     bool isLightTorpedoCruiser() const;
+    bool isSubmarine() const;
     bool isAAFocused() const;
     bool isShiratsuyu() const;
     bool isNotEqual(const Ship &) const;

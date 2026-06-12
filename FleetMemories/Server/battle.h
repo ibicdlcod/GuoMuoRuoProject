@@ -21,6 +21,8 @@ public:
         Unclear,
         Visible,   /* for 30 seconds */
         Concealed, /* for 15 seconds or upon attacking */
+        Detected,  /* submarine only: visible to ASW attacks, immune to others */
+        Surfaced,  /* submarine only: fully targetable for 15 seconds */
     };
 
     struct FriendOrEnemyIndex {
@@ -30,6 +32,7 @@ public:
 
     enum class EventType {
         DecideHidden,
+        DecideSubHidden,
         ForceVisible,
         AirAttack,
         MainGunAttack,
@@ -65,6 +68,8 @@ public:
 
     int selectEnemyTarget(int friendIndex) const;
     int selectFriendTarget(int enemyIndex) const;
+
+    double m_surpriseMul = 1.0;
 
 private:
     /* ——— random ———————————————————————————————————————————— */
@@ -142,7 +147,11 @@ private:
     /* ——— concealment ———————————————————————————————————————— */
 
     void decideHidden(FriendOrEnemyIndex);
+    void decideSubHidden(FriendOrEnemyIndex);
     void forceVisible(FriendOrEnemyIndex);
+    void forceSurface(FriendOrEnemyIndex);
+    double subEvasionMultiplier(FriendOrEnemyIndex defender) const;
+    double subEffectiveEvasion(FriendOrEnemyIndex defender, double baseEvasion) const;
 
     /* ——— air superiority / formation ——————————————————————— */
 

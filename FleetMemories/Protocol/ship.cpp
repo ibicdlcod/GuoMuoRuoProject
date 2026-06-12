@@ -471,6 +471,11 @@ bool Ship::isDestroyer() const {
     return (shipRegId & 0x000f0000) == 0x00020000;
 }
 
+bool Ship::isSubmarine() const {
+    /* mask 0x000f0000 isolates ship‑type bits; submarine = 0x00070000 */
+    return (shipRegId & 0x000f0000) == 0x00070000;
+}
+
 bool Ship::isHealthy(const ShipDynamic *dyn) const {
     if (!dyn) return false;
     int maxHP = attr.value("Hitpoints", 1);
