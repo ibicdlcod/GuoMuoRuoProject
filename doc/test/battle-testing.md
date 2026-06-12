@@ -216,6 +216,26 @@ Single run without report (battle executes but no output file):
 CFServer --testbattle test/example.lua
 ```
 
+## Tuning
+
+The following settings can be adjusted to influence battle balance:
+
+### `rule/airpotency`
+
+| Property | Value |
+|----------|-------|
+| Type | `double` |
+| Default | `4.0` |
+| Effect | Flat multiplier applied to all air torpedo, air dive, and air cut-in damage |
+
+Higher values increase carrier air strike damage proportionally. Example:
+```
+settings->setValue("rule/airpotency", 8.0);  // double carrier air damage above default 4.0
+```
+
+Applied in `Battle::executeAirTorpedoAttack()`, `executeAirDiveAttack()`, and
+`executeAirAttackCutIn()`.
+
 ## See Also
 
 - Production battle code: `FleetMemories/Server/battle.cpp`

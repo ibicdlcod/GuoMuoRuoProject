@@ -51,6 +51,7 @@ int main(int argc, char *argv[]) {
         QString reportPath;
         int repeatCount = 1;
         bool isTestMode = false;
+        double airPotency = 4.0;
         bool isGenerateMode = false;
         QString outputPath;
         uint64 generateUserId = 0;
@@ -58,6 +59,7 @@ int main(int argc, char *argv[]) {
         int generateMap = 0;
         int generateNode = 0;
         QString generateDiff = QStringLiteral("C");
+        bool generateFixHP = false;
         for(int i = 1; i < argc; ++i) {
             QString arg = QString::fromLocal8Bit(argv[i]);
             if(arg == QStringLiteral("--testbattle") && i + 1 < argc) {
@@ -97,6 +99,13 @@ int main(int argc, char *argv[]) {
             else if(arg == QStringLiteral("--difficulty") && i + 1 < argc) {
                 generateDiff
                     = QString::fromLocal8Bit(argv[++i]);
+            }
+            else if(arg == QStringLiteral("--fixhp")) {
+                generateFixHP = true;
+            }
+            else if(arg == QStringLiteral("--airpotency") && i + 1 < argc) {
+                airPotency
+                    = QString::fromLocal8Bit(argv[++i]).toDouble();
             }
         }
         if(isGenerateMode) {
@@ -147,9 +156,11 @@ int main(int argc, char *argv[]) {
                 return 1;
             }
 
+            settings->setValue("rule/airpotency", airPotency);
             server.generateTestLua(outputPath, generateUserId,
                                    generateFleet, generateMap,
-                                   generateNode, generateDiff);
+                                   generateNode, generateDiff,
+                                   generateFixHP);
             return 0;
         }
         else if(isTestMode) {
@@ -195,6 +206,7 @@ int main(int argc, char *argv[]) {
                 return 1;
             }
 
+            settings->setValue("rule/airpotency", airPotency);
             server.runTestBattle(luaPath, reportPath, repeatCount);
             return 0;
         }

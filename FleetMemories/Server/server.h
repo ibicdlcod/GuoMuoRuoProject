@@ -51,7 +51,8 @@ public:
     bool generateTestLua(const QString &outputPath, uint64 steamId,
                          int fleetIndex, int enemyMapId,
                          int enemyNodeId,
-                         const QString &difficulty);
+                         const QString &difficulty,
+                         bool fixHP = false);
 
 public slots:
     void displayPrompt() override;

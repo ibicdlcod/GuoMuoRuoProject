@@ -2272,7 +2272,7 @@ void Battle::setupAirReloading(clockTime phaseStart, clockTime phaseLength) {
                 double fs = carrierFiringSpeed(ship, dyn, fleet);
                 if(fs <= 0.0)
                     continue;
-                double interval = 600.0 / fs;
+                double interval = 400.0 / fs;
                 if(interval <= 0.0)
                     continue;
                 double effCoeff = isFriend
@@ -2449,7 +2449,7 @@ void Battle::applyIndividualAntiAir(FriendOrEnemyIndex defender,
     double planeEvasion = squadron.equip
                               ? squadron.equip->attr.value(QStringLiteral("Evasion"), 0)
                               : 0;
-    double lossChance = std::exp(16.0 * (x - 1.0))
+    double lossChance = std::exp(64.0 * (x - 1.0))
                         * std::exp(-planeEvasion / 100.0);
     lossChance = std::clamp(lossChance, 0.0, 1.0);
 
@@ -2526,7 +2526,8 @@ void Battle::executeAirTorpedoAttack(FriendOrEnemyIndex attacker,
     int hits = hitDist(rng);
     int totalDmg = static_cast<int>(std::round(
         std::round(hits * perPlaneDmg)
-        * reconGuidedStrikeMultiplier));
+        * reconGuidedStrikeMultiplier
+        * settings->value("rule/airpotency", 4.0).toDouble()));
     defDyn->currentHP = std::max(0, defDyn->currentHP - totalDmg);
 
     {
@@ -2589,7 +2590,8 @@ void Battle::executeAirDiveAttack(FriendOrEnemyIndex attacker,
     int totalDmg = static_cast<int>(std::round(
         std::max(x, 0.0) * dpm
         * bombing / std::hypot(static_cast<double>(armor), bombing)
-        * reconGuidedStrikeMultiplier));
+        * reconGuidedStrikeMultiplier
+        * settings->value("rule/airpotency", 4.0).toDouble()));
 
     defDyn->currentHP = std::max(0, defDyn->currentHP - totalDmg);
 
@@ -2717,7 +2719,8 @@ void Battle::executeAirAttackCutIn(FriendOrEnemyIndex attacker,
                 std::exp(totalEquips / 16.0) * dpm * maxPlanes
                 * maxPrimary
                 / std::hypot(static_cast<double>(armor), maxPrimary)
-                * reconGuidedStrikeMultiplier));
+                * reconGuidedStrikeMultiplier
+                * settings->value("rule/airpotency", 4.0).toDouble()));
 
             defDyn->currentHP = std::max(0, defDyn->currentHP - totalDmg);
 
@@ -2884,7 +2887,7 @@ void Battle::processS2PlaneLoss() {
                 QStringLiteral("Evasion"), 0);
             double y = evasion / 100.0;
             double lossChance = std::exp(
-                4.0 * (fleetAA - 1.0) - y + inter);
+                16.0 * (fleetAA - 1.0) - y + inter);
             lossChance = std::clamp(lossChance, 0.0, 1.0);
             std::binomial_distribution<int> dist(
                 sq.planeCount, lossChance);
@@ -3135,7 +3138,7 @@ void Battle::processS3AACutIn() {
             double x
                 = productY / std::hypot(1.0, productY);
             double lossMult
-                = std::exp(8.0 * (x - 1.0))
+                = std::exp(16.0 * (x - 1.0))
                   / std::max(0.001, 1.0 - x);
 
             auto &enemySquadrons
@@ -3525,7 +3528,11 @@ bool Battle::processGunshotCutIn(FriendOrEnemyIndex attacker) {
     double fCoeff = attacker.isFriend
                         ? friendFormationEfficiency
                         : enemyFormationEfficiency;
-    double aCoeff = airSuperiorityCoefficient;
+    double aCoeff = attacker.isFriend
+                        ? airSuperiorityCoefficient
+                        : -airSuperiorityCoefficient;
+
+    double fleetLos = static_cast<double>(attFleet->los(isNight));
 
     auto primaryStatOf = [&](Equipment *eq) -> double {
         QString attrName = eq->type.getPrimaryAttr();
@@ -3562,11 +3569,15 @@ bool Battle::processGunshotCutIn(FriendOrEnemyIndex attacker) {
                                double commMult, int reconPlanes) -> bool {
         if(reconPlanes <= 0)
             return false;
-        double q = primaryStatOf(reconEq) / 400.0;
+        double q = primaryStatOf(reconEq) / 400.0
+                   + fleetLos / 10000.0;
         double s = static_cast<double>(reconPlanes);
-        double qs = q * s;
+        double q2 = q / std::hypot(1.0, q);
+        double prod = 1.0;
+        for(int x = 0; x < reconPlanes; ++x)
+            prod *= 1.0 - q2 * std::pow(0.5, static_cast<double>(x));
         double triggerChance
-            = std::max(0.0, aCoeff) * qs / std::hypot(1.0, qs);
+            = std::max(0.0, aCoeff / 2.0) * (1.0 - prod);
         triggerChance *= commMult;
         triggerChance = std::clamp(triggerChance, 0.0, 1.0);
         std::bernoulli_distribution trigDist(triggerChance);

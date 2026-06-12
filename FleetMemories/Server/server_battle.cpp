@@ -2511,7 +2511,7 @@ FleetInfo Server::buildFleetFromLua(sol::table t) {
             QList<int> equipDefs;
             if(slotsTbl.has_value()) {
                 sol::table st = slotsTbl.value();
-                for(std::size_t i = 0; i < st.size(); ++i)
+                for(std::size_t i = 1; i <= st.size(); ++i)
                     equipDefs.append(st.get_or(i, 0));
             }
             else {
@@ -3514,7 +3514,8 @@ bool Server::runTestBattle(const QString &luaPath,
 bool Server::generateTestLua(const QString &outputPath,
                              uint64 steamId, int fleetIndex,
                              int enemyMapId, int enemyNodeId,
-                             const QString &difficulty) {
+                             const QString &difficulty,
+                             bool fixHP) {
     sqlinit();
     importEquipFromCSV();
     importShipFromCSV();
@@ -3726,10 +3727,15 @@ bool Server::generateTestLua(const QString &outputPath,
 
     auto writeShipDynamics
         = [&](const ShipRow &row,
-              const QString &indent) {
+              const QString &indent, Ship *ship) {
               int lv = Ship::getLevel(row.exp);
               out << indent << "lv = " << lv << ",\n";
-              out << indent << "currentHP = " << row.currentHP
+              int hp = fixHP
+                  ? row.currentHP
+                  : (ship ? ship->attr.value(
+                         QStringLiteral("Hitpoints"), 0)
+                          : row.currentHP);
+              out << indent << "currentHP = " << hp
                   << ",\n";
               out << indent
                   << QStringLiteral("fuel = %1,\n")
@@ -3763,9 +3769,20 @@ bool Server::generateTestLua(const QString &outputPath,
               }
               out << indent << "slotPlanes = {";
               first = true;
-              for(int p : row.planes) {
+              for(int s = 0; s < row.planes.size(); ++s) {
                   if(!first) out << ", ";
                   first = false;
+                  int p = row.planes[s];
+                  if(p > 0 && s < row.equipSlots.size()) {
+                      int defId = 0;
+                      if(!row.equipSlots[s].isNull())
+                          defId = uuidToEquipDef.value(
+                              row.equipSlots[s], 0);
+                      if(defId > 0
+                          && equipRegistry.contains(defId)
+                          && !equipRegistry[defId]->isPlane())
+                          p = 0;
+                  }
                   out << p;
               }
               out << "},\n";
@@ -3785,7 +3802,9 @@ bool Server::generateTestLua(const QString &outputPath,
     for(const auto &row : playerRows) {
         out << QStringLiteral("            [%1] = {\n")
                    .arg(row.fleetPosIndex);
-        writeShipDynamics(row, QStringLiteral("                "));
+        writeShipDynamics(
+            row, QStringLiteral("                "),
+            shipRegistry.value(row.def, nullptr));
         out << "            },\n";
     }
     out << "        },\n";
@@ -3816,7 +3835,7 @@ bool Server::generateTestLua(const QString &outputPath,
     for(int i = 0; i < enemyShipIds.size(); ++i) {
         out << QStringLiteral("            [%1] = {\n")
                    .arg(i);
-        out << "                lv = 1,\n";
+        out << "                lv = 100,\n";
         out << "                fuel = 1.0,\n";
         out << "                ammo = 1.0,\n";
         out << "                slotEquipEx = 0,\n";
