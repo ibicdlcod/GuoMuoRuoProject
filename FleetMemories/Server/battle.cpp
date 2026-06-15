@@ -10,9 +10,10 @@ constexpr double kTwoOverE = 0.73575888234288464319;
 }
 
 Battle::Battle(std::mt19937 &rng,
-               const QMap<int, Equipment *> &equipRegistry)
-    : rng(rng), equipRegistry(equipRegistry) {
-
+               const QMap<int, Equipment *> &equipRegistry,
+               const QMap<int, Ship *> *shipRegistry)
+    : rng(rng), equipRegistry(equipRegistry),
+      m_shipRegistry(shipRegistry) {
 }
 
 void Battle::battleProcessor(FleetInfo *friendf, FleetInfo *enemyf,
@@ -69,6 +70,8 @@ void Battle::battleProcessor(FleetInfo *friendf, FleetInfo *enemyf,
     enemyReducedConcealment.resize(KP::combinedFleetSize, false);
     friendSubTorpLastFire.resize(KP::combinedFleetSize, 0);
     enemySubTorpLastFire.resize(KP::combinedFleetSize, 0);
+    friendLastDepthCharge.resize(KP::combinedFleetSize, 0);
+    enemyLastDepthCharge.resize(KP::combinedFleetSize, 0);
     for(int i = 0; i < KP::combinedFleetSize; ++i) {
         if(i < currentFriendFleet->ships.size() && currentFriendFleet->ships[i]) {
             decideHidden({true, i});
@@ -379,6 +382,7 @@ void Battle::centralPhase() {
     setupAirReloading(clock, 90);
     setupSecondaryGunshots(clock, 90);
     setupTorpedoAttacks(clock, 90);
+    setupDepthChargeAttacks(clock, 90);
     advanceClockTime(90);
 }
 
@@ -1660,6 +1664,8 @@ void Battle::decideSubHidden(FriendOrEnemyIndex index) {
         ? currentEnemyFleet : currentFriendFleet;
     double conceal = FleetInfo::attrFromShip(ship, dyn)
                          .value(QStringLiteral("Concealment"), 0);
+    if(isNight)
+        conceal *= 5.0;
     double asw = enemyFleet->asw();
     double nonDetectChance = 0.5;
     if(conceal > 0 && asw > 0) {
@@ -1717,6 +1723,245 @@ double Battle::subEffectiveEvasion(FriendOrEnemyIndex defender,
         return baseEvasion;
     LuaMap attrs = shipAttrOf(defender.isFriend, defender.index);
     return attrs.value(QStringLiteral("Concealment"), 0) * 16.0;
+}
+
+/* Depth charge attack
+ * — see doc/worldview_and_mechanics/9.a4-asw.md
+ * [Implemented in Battle::hasDepthCharge, Battle::hasSonar,
+ *  Battle::setupDepthChargeAttacks,
+ *  Battle::processDepthChargeAttack] */
+
+bool Battle::hasDepthCharge(bool isFriend, int index) const {
+    FleetInfo *fleet = fleetOf(isFriend);
+    if(index < 0 || index >= static_cast<int>(fleet->ships.size()))
+        return false;
+    Ship *ship = fleet->ships[index];
+    ShipDynamic *dyn = fleet->shipDynamics[index].get();
+    if(!ship || !dyn)
+        return false;
+
+    auto equipIsDC = [&](int equipDefId) -> bool {
+        if(equipDefId <= 0)
+            return false;
+        if(!equipRegistry.contains(equipDefId))
+            return false;
+        return equipRegistry[equipDefId]->type.getSpecial() == 2;
+    };
+
+    /* Check current equipment slots */
+    auto slotIsDC = [&](const QUuid &uuid) -> bool {
+        Equipment *eq = fleet->equipMap.value(uuid, nullptr);
+        return eq && eq->type.getSpecial() == 2;
+    };
+    for(const auto &u : dyn->slotEquip)
+        if(slotIsDC(u)) return true;
+    if(slotIsDC(dyn->slotEquipEx)) return true;
+
+    /* Check current ship's default equipment */
+    for(int defId : ship->getStartingEquip())
+        if(equipIsDC(defId)) return true;
+
+    /* Check previous models in remodel chain (direct and indirect) */
+    if(m_shipRegistry) {
+        QSet<int> prevIds;
+        QList<int> queue;
+        queue.append(ship->getId());
+        while(!queue.isEmpty()) {
+            int targetId = queue.takeFirst();
+            for(auto it = m_shipRegistry->cbegin();
+                 it != m_shipRegistry->cend(); ++it) {
+                Ship *prevShip = it.value();
+                if(!prevShip) continue;
+                int prevRemodel = prevShip->attr.value(
+                    QStringLiteral("remodel"), 0);
+                if(prevRemodel == targetId
+                    && !prevIds.contains(prevShip->getId())) {
+                    prevIds.insert(prevShip->getId());
+                    queue.append(prevShip->getId());
+                    for(int defId : prevShip->getStartingEquip())
+                        if(equipIsDC(defId)) return true;
+                }
+            }
+        }
+    }
+
+    return false;
+}
+
+bool Battle::hasSonar(bool isFriend, int index) const {
+    FleetInfo *fleet = fleetOf(isFriend);
+    if(index < 0 || index >= static_cast<int>(fleet->ships.size()))
+        return false;
+    ShipDynamic *dyn = fleet->shipDynamics[index].get();
+    if(!dyn)
+        return false;
+    auto isSonar = [&](const QUuid &uuid) -> bool {
+        Equipment *eq = fleet->equipMap.value(uuid, nullptr);
+        return eq && eq->type.getSpecial() == 4;
+    };
+    for(const auto &u : dyn->slotEquip)
+        if(isSonar(u)) return true;
+    if(isSonar(dyn->slotEquipEx)) return true;
+    return false;
+}
+
+int Battle::selectDetectedSubTarget(int attackerIndex,
+                                    bool isFriend) const {
+    FleetInfo *defFleet = fleetOf(!isFriend);
+    const auto &conceal = isFriend
+        ? enemyFleetConcealmentStatus
+        : friendFleetConcealmentStatus;
+    std::vector<int> targets;
+    for(int i = 0;
+         i < static_cast<int>(defFleet->ships.size()); ++i) {
+        if(!defFleet->ships[i] || !defFleet->shipDynamics[i]
+            || defFleet->shipDynamics[i]->fleetFled
+            || defFleet->shipDynamics[i]->currentHP <= 0)
+            continue;
+        if(!defFleet->ships[i]->isSubmarine())
+            continue;
+        if(conceal[i] == ConcealmentStatus::Detected
+            || conceal[i] == ConcealmentStatus::Surfaced)
+            targets.push_back(i);
+    }
+    if(targets.empty())
+        return -1;
+    return targets[std::uniform_int_distribution<int>(
+        0, static_cast<int>(targets.size()) - 1)(rng)];
+}
+
+void Battle::processDepthChargeAttack(FriendOrEnemyIndex attacker) {
+    FleetInfo *attFleet = fleetOf(attacker.isFriend);
+    if(attacker.index < 0
+        || attacker.index >= static_cast<int>(attFleet->ships.size()))
+        return;
+    Ship *attShip = attFleet->ships[attacker.index];
+    ShipDynamic *attDyn = attFleet->shipDynamics[attacker.index].get();
+    if(!attShip || !attDyn || attDyn->fleetFled
+        || attDyn->currentHP <= 0)
+        return;
+
+    int targetIdx = selectDetectedSubTarget(attacker.index,
+                                            attacker.isFriend);
+    if(targetIdx < 0)
+        return;
+
+    FriendOrEnemyIndex defender{!attacker.isFriend, targetIdx};
+    FleetInfo *defFleet = fleetOf(defender.isFriend);
+    Ship *defShip = defFleet->ships[defender.index];
+    ShipDynamic *defDyn = defFleet->shipDynamics[defender.index].get();
+    if(!defShip || !defDyn || defDyn->fleetFled
+        || defDyn->currentHP <= 0)
+        return;
+
+    double attAsw = 0.0;
+    {
+        LuaMap attrs = shipAttrOf(attacker.isFriend, attacker.index);
+        attAsw = attrs.value(QStringLiteral("Asw"), 0);
+        auto addEquipAsw = [&](const QUuid &uuid, int pos) {
+            Equipment *eq = attFleet->equipMap.value(uuid, nullptr);
+            if(!eq) return;
+            double skillEff = attFleet->equipSkillEffects.value(uuid, 1.0);
+            double visBonus = FleetInfo::getVisibleBonusFirstType(
+                attShip, attDyn, pos);
+            attAsw += eq->attr.value(QStringLiteral("Asw"), 0)
+                      * skillEff * visBonus;
+        };
+        for(int j = 0; j < attDyn->slotEquip.size(); ++j)
+            addEquipAsw(attDyn->slotEquip[j], j);
+        addEquipAsw(attDyn->slotEquipEx, attDyn->slotEquip.size());
+    }
+
+    double depthChargeAsw = 10.0;
+    {
+        auto findDC = [&](const QUuid &uuid) -> double {
+            Equipment *eq = attFleet->equipMap.value(uuid, nullptr);
+            if(!eq) return 0.0;
+            if(eq->type.getSpecial() != 2)
+                return 0.0;
+            double skillEff = attFleet->equipSkillEffects.value(uuid, 1.0);
+            return eq->attr.value(QStringLiteral("Asw"), 0) * skillEff;
+        };
+        for(const auto &u : attDyn->slotEquip) {
+            double dc = findDC(u);
+            if(dc > depthChargeAsw) depthChargeAsw = dc;
+        }
+        double dcEx = findDC(attDyn->slotEquipEx);
+        if(dcEx > depthChargeAsw) depthChargeAsw = dcEx;
+    }
+
+    double conceal = FleetInfo::attrFromShip(defShip, defDyn)
+                         .value(QStringLiteral("Concealment"), 0);
+
+    bool isCentralOrNight = false;  /* TBD: detect current phase */
+    double a = isCentralOrNight ? 2.0 : 4.0;
+
+    double evasionChance = conceal > 0.0 && attAsw > 0.0
+        ? std::pow(a, -attAsw / conceal) : 1.0;
+    evasionChance = std::clamp(evasionChance, 0.0, 1.0);
+    std::uniform_real_distribution<double> evadeDist(0.0, 1.0);
+    if(evadeDist(rng) < evasionChance) {
+        /* evaded */
+        return;
+    }
+
+    int subHP = defDyn->currentHP;
+    double h = static_cast<double>(subHP);
+    double b = attAsw;
+    double c = depthChargeAsw;
+    double q = b * c / a;
+    double r = h / 4.0;
+    int totalDmg = static_cast<int>(
+        std::round(r * std::log(1.0 + q / r)));
+    totalDmg = std::max(1, totalDmg);
+    defDyn->currentHP = std::max(0, defDyn->currentHP - totalDmg);
+
+    forceSurface(defender);
+
+    {
+        QJsonObject log;
+        log["type"] = KP::DepthChargeAttack;
+        log["clock"] = clock;
+        log["attackerFleet"] = attacker.isFriend;
+        log["attackerShip"] = attacker.index;
+        log["defenderFleet"] = defender.isFriend;
+        log["defenderShip"] = defender.index;
+        log["damage"] = totalDmg;
+        log["defenderHP"] = defDyn->currentHP;
+        m_damageLog.append(log);
+    }
+}
+
+void Battle::setupDepthChargeAttacks(clockTime phaseStart,
+                                     clockTime phaseLength) {
+    auto scheduleFleet = [&](bool isFriend) {
+        FleetInfo *fleet = fleetOf(isFriend);
+        for(int i = 0;
+             i < static_cast<int>(fleet->ships.size()); ++i) {
+            if(!fleet->ships[i] || !fleet->shipDynamics[i]
+                || fleet->shipDynamics[i]->fleetFled
+                || fleet->shipDynamics[i]->currentHP <= 0)
+                continue;
+            if(!hasDepthCharge(isFriend, i))
+                continue;
+            double reloadSpeed = 1.0;
+            if(!hasSonar(isFriend, i))
+                reloadSpeed *= 0.5;
+            clockTime interval = static_cast<clockTime>(
+                14.0 / reloadSpeed);
+            for(clockTime t = interval; t < phaseLength;
+                 t += interval) {
+                insertEvent(EventType::DepthChargeAttack,
+                            phaseStart + t,
+                            {isFriend, i},
+                            [this](FriendOrEnemyIndex idx) {
+                                processDepthChargeAttack(idx);
+                            });
+            }
+        }
+    };
+    scheduleFleet(true);
+    scheduleFleet(false);
 }
 
 /* Target selection

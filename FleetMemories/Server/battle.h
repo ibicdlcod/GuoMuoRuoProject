@@ -11,7 +11,8 @@ class Battle
 {
 public:
     Battle(std::mt19937 &rng,
-           const QMap<int, Equipment *> &equipRegistry);
+           const QMap<int, Equipment *> &equipRegistry,
+           const QMap<int, Ship *> *shipRegistry = nullptr);
 
     /* ——— types ————————————————————————————————————————————— */
 
@@ -34,6 +35,7 @@ public:
         DecideHidden,
         DecideSubHidden,
         ForceVisible,
+        DepthChargeAttack,
         AirAttack,
         MainGunAttack,
         SecondaryGunAttack,
@@ -76,6 +78,7 @@ private:
 
     std::mt19937 &rng;
     const QMap<int, Equipment *> &equipRegistry;
+    const QMap<int, Ship *> *m_shipRegistry = nullptr;
 
     /* ——— battle state —————————————————————————————————————— */
 
@@ -96,6 +99,8 @@ private:
     std::vector<bool> enemyReducedConcealment;
     std::vector<clockTime> friendSubTorpLastFire;
     std::vector<clockTime> enemySubTorpLastFire;
+    std::vector<clockTime> friendLastDepthCharge;
+    std::vector<clockTime> enemyLastDepthCharge;
 
     /* ——— command / orders —————————————————————————————————— */
 
@@ -150,8 +155,15 @@ private:
     void decideSubHidden(FriendOrEnemyIndex);
     void forceVisible(FriendOrEnemyIndex);
     void forceSurface(FriendOrEnemyIndex);
-    double subEvasionMultiplier(FriendOrEnemyIndex defender) const;
     double subEffectiveEvasion(FriendOrEnemyIndex defender, double baseEvasion) const;
+
+    /* ——— depth charge ——————————————————————————————————————— */
+
+    bool hasDepthCharge(bool isFriend, int index) const;
+    bool hasSonar(bool isFriend, int index) const;
+    int selectDetectedSubTarget(int attackerIndex, bool isFriend) const;
+    void processDepthChargeAttack(FriendOrEnemyIndex attacker);
+    void setupDepthChargeAttacks(clockTime phaseStart, clockTime phaseLength);
 
     /* ——— air superiority / formation ——————————————————————— */
 

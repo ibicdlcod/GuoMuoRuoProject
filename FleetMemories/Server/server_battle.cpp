@@ -1061,7 +1061,7 @@ const QJsonObject Server::processBattleCore(const CSteamID &uid,
     // Now compute losses and update fleets
     if(playerFleet) {
         bool isExpedition = fleetIndex & KP::expeditionFleetMask;
-        Battle battleProcessor(mt, equipRegistry);
+        Battle battleProcessor(mt, equipRegistry, &shipRegistry);
         battleProcessor.battleProcessor(playerFleet, &enemyFleet, battlePlan, isExpedition);
         result["damageLog"] = battleProcessor.getDamageLog();
 
@@ -2671,6 +2671,8 @@ static QString typeLabelForReport(int attackType, int cutInType) {
         return QStringLiteral("[Cut-in]");
     case KP::AntiAirPlaneLoss:
         return QStringLiteral("[AA loss]");
+    case KP::DepthChargeAttack:
+        return QStringLiteral("[Depth charge]");
     default: return QString();
     }
 }
@@ -2847,6 +2849,15 @@ void Server::writeMarkdownReport(const QString &path,
                 << ": -" << e["planesLost"].toInt() << " ("
                 << e["planesRemaining"].toInt()
                 << " remaining)\n";
+            break;
+        }
+        case KP::DepthChargeAttack: {
+            out << "- " << timeStr
+                << "   [Depth charge] "
+                << shipLabel(friendFleet, enemyFleet, attFId == 0, attS)
+                << " → " << shipLabel(
+                       friendFleet, enemyFleet, attFId != 0, defS)
+                << ": " << dmg << " damage\n";
             break;
         }
         default: {
@@ -3062,6 +3073,8 @@ void Server::writeAggregateReport(
                   {KP::GunshotCutInAttack,
                    static_cast<int>(KP::PlainGun),
                    QStringLiteral("Gun Cut-in")},
+                  {KP::DepthChargeAttack, -3,
+                   QStringLiteral("Depth Charge")},
               };
               out << "## " << title
                   << " Damage Composition (avg per run)\n\n";
@@ -3347,7 +3360,7 @@ bool Server::runTestBattle(const QString &luaPath,
         deepCopyFleetInfo(friendFleet, fFriend);
         FleetInfo fEnemy;
         deepCopyFleetInfo(enemyFleet, fEnemy);
-        Battle battle(mt, equipRegistry);
+        Battle battle(mt, equipRegistry, &shipRegistry);
         battle.battleProcessor(&fFriend, &fEnemy, battlePlan);
         if(!reportPath.isEmpty())
             writeMarkdownReport(reportPath,
@@ -3379,7 +3392,7 @@ bool Server::runTestBattle(const QString &luaPath,
             FleetInfo fEnemy;
             deepCopyFleetInfo(enemyFleet, fEnemy);
 
-            Battle battle(threadMt, equipRegistry);
+            Battle battle(threadMt, equipRegistry, &shipRegistry);
             battle.battleProcessor(&fFriend, &fEnemy,
                                    battlePlan);
             QJsonArray damageLog = battle.getDamageLog();

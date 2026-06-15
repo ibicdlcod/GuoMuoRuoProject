@@ -731,7 +731,8 @@ enum BattleActionType {
     AirSuperiorityValue = 10,
     FormationEfficiencyValue = 11,
     GuidedStrikeTrigger = 12,
-    TorpedoAttack = 13
+    TorpedoAttack = 13,
+    DepthChargeAttack = 14
 };
 Q_ENUM_NS(BattleActionType)
 
