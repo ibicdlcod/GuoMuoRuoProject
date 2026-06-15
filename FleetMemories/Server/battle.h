@@ -58,6 +58,7 @@ public:
         bool isTorpBomber = false;
         bool isDiveBomber = false;
         bool isRecon = false;
+        bool isPatrol = false;
     };
 
     /* ——— public api ———————————————————————————————————————— */
@@ -65,7 +66,8 @@ public:
     void battleProcessor(FleetInfo *friendf, FleetInfo *enemyf,
                          const QJsonObject &battlePlan,
                          bool isExpedition = false,
-                         bool isNightCommence = false);
+                         bool isNightCommence = false,
+                         bool isAirOnly = false);
     QJsonArray getDamageLog() const { return m_damageLog; }
 
     int selectEnemyTarget(int friendIndex) const;
@@ -157,13 +159,18 @@ private:
     void forceSurface(FriendOrEnemyIndex);
     double subEffectiveEvasion(FriendOrEnemyIndex defender, double baseEvasion) const;
 
+    double decideExtraBattle();
+
     /* ——— depth charge ——————————————————————————————————————— */
 
     bool hasDepthCharge(bool isFriend, int index) const;
+    bool hasPatrolPlane(bool isFriend, int index) const;
     bool hasSonar(bool isFriend, int index) const;
+    bool hasSearchlight(bool isFriend, int index) const;
     int selectDetectedSubTarget(int attackerIndex, bool isFriend) const;
     void processDepthChargeAttack(FriendOrEnemyIndex attacker);
     void setupDepthChargeAttacks(clockTime phaseStart, clockTime phaseLength);
+    bool processASWCutIn(FriendOrEnemyIndex attacker);
 
     /* ——— air superiority / formation ——————————————————————— */
 

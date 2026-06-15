@@ -743,6 +743,11 @@ void Server::processBattle(const CSteamID &uid, QSslSocket *connection,
     case KP::NIGHT: [[fallthrough]];
     case KP::NIGHTBOSS: [[fallthrough]];
     case KP::AIR: {
+        QJsonObject plan = battlePlan;
+        if(type == KP::NIGHT || type == KP::NIGHTBOSS)
+            plan["isNightCommence"] = true;
+        if(type == KP::AIR)
+            plan["isAirOnly"] = true;
         QSqlQuery query;
         query.prepare("UPDATE UserAttr SET Intvalue = :type "
                       "WHERE Attribute = 'InBattle' "
@@ -762,7 +767,7 @@ void Server::processBattle(const CSteamID &uid, QSslSocket *connection,
                                 mapId,
                                 nodeId,
                                 result.value()[3], // activefleet
-                                battlePlan);
+                                plan);
         QByteArray msg = KP::serverBattleProcess(battleProcess);
         senderM.sendMessage(connection, msg);
     after_battle:
@@ -1062,7 +1067,11 @@ const QJsonObject Server::processBattleCore(const CSteamID &uid,
     if(playerFleet) {
         bool isExpedition = fleetIndex & KP::expeditionFleetMask;
         Battle battleProcessor(mt, equipRegistry, &shipRegistry);
-        battleProcessor.battleProcessor(playerFleet, &enemyFleet, battlePlan, isExpedition);
+        bool isNightCommence
+            = battlePlan.value("isNightCommence").toBool(false);
+        bool isAirOnly
+            = battlePlan.value("isAirOnly").toBool(false);
+        battleProcessor.battleProcessor(playerFleet, &enemyFleet, battlePlan, isExpedition, isNightCommence, isAirOnly);
         result["damageLog"] = battleProcessor.getDamageLog();
 
         // Database connection

@@ -25,7 +25,8 @@ double FleetInfo::los(bool isNight) const {
     std::vector<double> losValues;
     losValues.reserve(ships.size());
     for(int i = 0; i < static_cast<int>(ships.size()); ++i) {
-        if(!ships[i] || !shipDynamics[i] || shipDynamics[i]->fleetFled)
+        if(!ships[i] || !shipDynamics[i] || shipDynamics[i]->fleetFled
+            || shipDynamics[i]->currentHP <= 0)
             continue;
 
         double shipLos = 0.0;
@@ -107,7 +108,8 @@ double FleetInfo::asw() const {
     std::vector<double> aswValues;
     aswValues.reserve(ships.size());
     for(int i = 0; i < static_cast<int>(ships.size()); ++i) {
-        if(!ships[i] || !shipDynamics[i] || shipDynamics[i]->fleetFled)
+        if(!ships[i] || !shipDynamics[i] || shipDynamics[i]->fleetFled
+            || shipDynamics[i]->currentHP <= 0)
             continue;
 
         double shipAsw = 0.0;
@@ -161,7 +163,8 @@ int FleetInfo::transportCapacity(const CSteamID &uid, TransportMode mode) {
     
     int total = 0;
     for(int i = 0; i < static_cast<int>(ships.size()); ++i) {
-        if(!ships[i] || !shipDynamics[i] || shipDynamics[i]->fleetFled)
+        if(!ships[i] || !shipDynamics[i] || shipDynamics[i]->fleetFled
+            || shipDynamics[i]->currentHP <= 0)
             continue;
         LuaMap attrs = effectiveAttr(uid, i);
         total += attrs.value(QStringLiteral("Transport"), 0);
@@ -175,7 +178,8 @@ QMap<KP::CapitalType, int> FleetInfo::capitalness() const {
     int surface = 0;
     int carrier = 0;
     for(int i = 0; i < static_cast<int>(ships.size()); ++i) {
-        if(!ships[i] || !shipDynamics[i] || shipDynamics[i]->fleetFled)
+        if(!ships[i] || !shipDynamics[i] || shipDynamics[i]->fleetFled
+            || shipDynamics[i]->currentHP <= 0)
             continue;
         int capi = ships[i]->getType().getCapitalness();
         any += capi;
@@ -197,7 +201,8 @@ std::vector<int> FleetInfo::shipSpeeds() const {
     std::vector<int> result;
     for(int i = 0; i < static_cast<int>(ships.size()); ++i) {
         bool absent = !ships[i] || !shipDynamics[i] ||
-            shipDynamics[i]->fleetFled;
+            shipDynamics[i]->fleetFled
+            || shipDynamics[i]->currentHP <= 0;
         result.push_back(absent ? -1 : ships[i]->attr["Speed"]);
     }
     return result;

@@ -111,7 +111,7 @@ Condition: `isseaplane = 0 and islb = 0 and ispatrol = 0 and (isfighter = 1 or i
 
 The most common aircraft in the game, generally operated by aircraft carriers.
 
-#### Land-based aircraft
+#### Land-based aircraft [NOTIMPLEMENTED]
 
 Condition: `islb = 1 and ispatrol = 0 and (isfighter = 1 or istorpbomber = 1 or isdivebomber = 1 or isrecon = 1)`
 
@@ -209,7 +209,7 @@ Increase gunshot power; extra damage against heavily armored targets and land ba
 
 Unlike Kantai collection, can be equipped by heavy cruisers besides battleships.
 
-#### Type 3 Shell (al-shell)
+#### Type 3 Shell (al-shell) [NOTIMPLEMENTED]
 
 Effective against soft-skin land structures.
 
@@ -310,7 +310,7 @@ Does not count as a torpedo; increases the accuracy and chance of preemptive tor
 - Midget submarines are a pure offensive upgrade for already torpedo-focused ships, amplifying their alpha-strike potential.
 - They create a distinct "torpedo squadron" playstyle that relies on overwhelming opening damage.
 
-### Landing Craft / Special Amphibious Tanks / Land corps
+### Landing Craft / Special Amphibious Tanks / Land corps [NOTIMPLEMENTED]
 
 "Tranposrt" attribute > 0: Used for transport mission-critical material (for transport gauge maps)
 
@@ -379,13 +379,13 @@ Boost map supremacy gained from expedition. [NOTIMPLEMENTED]
 
 Used for transport mission-critical material (for transport gauge maps), like landing-craft.
 
-### Repair facilities (repair-fac)
+### Repair facilities (repair-fac) [NOTIMPLEMENTED]
 
-Increase the number of ships a repair ship can service simultaneously; enable battleship repair.
+Enable battlefield repair.
 
 ### Aircraft personnel (aircraft-personnel)
 
-- **Skilled aircraft mechanics**: Extend range and increase firepower of carrier aircraft.
+- **Skilled aircraft mechanics**: Increase reloading speed and firepower of carrier aircraft.
 
 - **Night-operation aircraft personnel**: Enable night-time carrier air attacks.
 
@@ -399,11 +399,11 @@ Increase the number of ships a repair ship can service simultaneously; enable ba
 
 **Telecommunication antenna/device**: Increase communication efficiency.
 
-### Rocket launchers (al-rocket)
+### Rocket launchers (al-rocket) [NOTIMPLEMENTED]
 
 Specialized anti-land weaponry.
 
-### Large flying boats (flyingboat)
+### Large flying boats (flyingboat) [NOTIMPLEMENTED]
 
 Exceptional scouting and contact rates; minor ASW capability. Extends the range of LBAS squadrons.
 
@@ -411,7 +411,7 @@ Exceptional scouting and contact rates; minor ASW capability. Extends the range 
 
 Lets replenishment ships refuel/reammo the fleet at sea.
 
-### Combat rations (food)
+### Combat rations (food) [NOTIMPLEMENTED]
 
 Not a consumable item (unlike KC), but boost stats of ship at the expense of one equip slot.
 

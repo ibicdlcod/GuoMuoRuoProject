@@ -37,7 +37,7 @@ The battle have the following characteristics:
    Battle::processMidgetGuidedStrike]
 - [Formation efficiency](9.c7-formation.md)
   [Implemented in Battle::computeFormationEfficiency]
-- [Commander's abilities](9.c8-abilities.md)
+- [Commander's abilities](9.c8-abilities.md) [NOTIMPLEMENTED]
 - [LBAS](9.c9-lbas.md)
 - Radiation (TBD)
 
@@ -46,7 +46,7 @@ In the battle the following attack against enemies can occur:
 - [Air attack ](9.a1-airattack.md)
   [Implemented in Battle::airBattle,
    Battle::processAirAttack]
-   
+  
   - Air bombing + individual anti-air
   - Air torpedo + individual anti-air
   - Air attack cut-in + individual anti-air
@@ -62,13 +62,13 @@ In the battle the following attack against enemies can occur:
 
 - [Torpedo attack](9.a3-torpedoattack.md)
   [Implemented in Battle::processTorpedoAttack]
-   
+  
   - Torpedo reloading device
   - Torpedo attack
   - Torpedo cut-in
   - Gunshot+Torpedo cut-in
 
-- [ASW attack](9.a4-asw.md) [NOTIMPLEMENTED]
+- [ASW attack](9.a4-asw.md)
   
   - ASW detection vs concealment
   - ASW depth charge attack
@@ -92,7 +92,7 @@ The battle is organized into the following phases:
 The battle have the following special modes worthy of attention:
 
 - [Night-battle-start node](9.s1-nightstart.md) 
-- [Air-battle-only node](9.s2-aironly.md) [NOTIMPLEMENTED]
+- [Air-battle-only node](9.s2-aironly.md)
 
 ## Target selection
 
@@ -101,3 +101,10 @@ When friend fleet attack enemy fleet, "Tactical Goal (against enemy fleet)" is a
 When enemy fleet attack friend fleet, "Tactical Goal (for friend fleet)" is activated and enemy ships will select randomly from a list of **visible** friend ships. If the target is not protected, it is selected; else another random selection would be made.
 
 Of course, ships that are sunk (hp <= 0) is excluded from target selection.
+
+During night battle, if any visible enemy has a searchlight equipped,
+attackers preferentially target searchlight bearers: selection retries
+up to 1 additional time for searchlights, or 2 additional times for
+searchlight-big, to pick the illuminated target.
+
+[Implemented in Battle::selectEnemyTarget, Battle::selectFriendTarget]
