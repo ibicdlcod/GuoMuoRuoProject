@@ -2451,6 +2451,15 @@ void Server::luaInitEquipable() {
         //% "Load equipability table success!"
         qInfo() << qtTrId("lua-canequip-success");
     }
+
+    auto vb1Value = lua.safe_script_file("lua/vb1.lua",
+                                          sol::script_pass_on_error);
+    if(!vb1Value.valid()) {
+        sol::error err = vb1Value;
+        qCritical()
+                << "Failed to load lua/vb1.lua:" << err.what();
+    }
+    FleetInfo::setLuaForVB1(&lua);
 }
 
 void Server::luaInitMap() {
@@ -4863,11 +4872,27 @@ anti_ddos:
         Ship *ship = shipRegistry.value(User::getShipDef(shipUuid), nullptr);
         const QJsonArray &equips = djson["equip"].toArray();
         QJsonArray bonuses;
-        /* ShipDynamic not fetched here; pass nullptr until
-         * the visible bonus functions gain real logic */
-        for(int slot = 0; slot < equips.size(); ++slot)
-            bonuses.append(
-                FleetInfo::getVisibleBonusFirstType(ship, nullptr, slot));
+        for(int slot = 0; slot < equips.size(); ++slot) {
+            QUuid equipUuid = QUuid(equips[slot].toString());
+            double bonus = 1.0;
+            int equipDefId = 0;
+            int star = 0;
+            if(!equipUuid.isNull()) {
+                QSqlQuery eqQuery;
+                eqQuery.prepare(
+                    "SELECT EquipDef, Star FROM UserEquip "
+                    "WHERE EquipUuid = :uuid");
+                eqQuery.bindValue(":uuid", equipUuid.toString());
+                if(eqQuery.exec() && eqQuery.isSelect()
+                    && eqQuery.next()) {
+                    equipDefId = eqQuery.value(0).toInt();
+                    star = eqQuery.value(1).toInt();
+                }
+            }
+            bonus = FleetInfo::getVisibleBonusFirstType(
+                ship ? ship->getId() : 0, equipDefId, star);
+            bonuses.append(bonus);
+        }
         LuaMap c = FleetInfo::getVisibleBonusSecondType(ship, nullptr);
         QJsonObject bonuses2;
         for(auto it = c.cbegin(); it != c.cend(); ++it)

@@ -91,6 +91,7 @@ private:
     int equipSlotsColumn = 4;
 
     bool ready = false;
+    bool m_loadingFleet = true;
 };
 
 #endif // FLEETVIEW_H

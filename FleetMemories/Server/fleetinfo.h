@@ -71,7 +71,14 @@ public:
      * definition, dynamic state, and slot position. */
     static double getVisibleBonusFirstType(const Ship *ship,
                                            const ShipDynamic *dyn,
-                                           int equipPos);
+                                           int equipPos,
+                                           const QHash<QUuid, Equipment *> &equipMap);
+
+    /* Lua-based alternative: calls vb1(shipDefId, equipDefId, star). */
+    static double getVisibleBonusFirstType(int shipDefId,
+                                           int equipDefId,
+                                           int equipStar);
+    static void setLuaForVB1(sol::state *lua);
 
     /* Returns the second-type (virtual-equipment) visible bonus addend.
      * Always an empty map for now; future implementations may add
@@ -93,6 +100,8 @@ public:
     QList<QUuid> m_consumedEquip;
     bool performEmergencyRepair();
     QList<QUuid> takeConsumedEquip();
+
+    static sol::state *s_luaVB1;
 };
 
 #endif // FLEETINFO_H

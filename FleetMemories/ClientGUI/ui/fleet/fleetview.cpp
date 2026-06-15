@@ -345,6 +345,7 @@ void FleetView::modifyFleetIndex(bool checked) {
 }
 
 void FleetView::modifyFleetShip(int posIndex, QUuid uid) {
+    m_loadingFleet = true;
     Client &engine = Client::getInstance();
     auto shipModel = &engine.shipModel;
     FleetPos oldPos = FleetPos({-1, -1});
@@ -457,7 +458,6 @@ void FleetView::modifyFleetShip(int posIndex, QUuid uid) {
             = -1;
     }
     ships[newPos] = uid;
-    Client::getInstance().requestVisibleBonus(uid);
     qobject_cast<InteractiveLabel *>
         (grid->itemAtPosition(newPos.posindex + 1, shipIconColumn)->widget())
             ->updateShipUId(uid);
@@ -566,6 +566,8 @@ void FleetView::modifyFleetShip(int posIndex, QUuid uid) {
             counts.fill(0, KP::maxEquipSlots);
     }
     emit newPlaneCountInfo(newPos.posindex, ship ? ship->attr["Planes"] : 0);
+    m_loadingFleet = false;
+    Client::getInstance().requestVisibleBonus(uid);
 }
 
 void FleetView::modifyFleetType(int index) {
@@ -721,7 +723,6 @@ void FleetView::equipSelected(int shipPosIndex,
                               int equipSlotIndex,
                               QUuid equipUid) {
     emit modifyEquip(getShipUuid(shipPosIndex), equipSlotIndex, equipUid);
-    Client::getInstance().requestVisibleBonus(getShipUuid(shipPosIndex));
 }
 
 void FleetView::equipSelectedPassive(QUuid shipUid,
@@ -736,5 +737,6 @@ void FleetView::equipSelectedPassive(QUuid shipUid,
                 ->updateEquipName(equipUid);
         }
     }
-    Client::getInstance().requestVisibleBonus(shipUid);
+    if(!m_loadingFleet)
+        Client::getInstance().requestVisibleBonus(shipUid);
 }

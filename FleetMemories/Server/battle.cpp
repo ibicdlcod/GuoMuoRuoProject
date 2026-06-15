@@ -142,7 +142,8 @@ void Battle::battleProcessor(FleetInfo *friendf, FleetInfo *enemyf,
                                     currentFriendFleet
                                         ->shipDynamics[idx]
                                         .get(),
-                                    pos);
+                                    pos,
+                                    currentFriendFleet->equipMap);
                             int rawLos =
                                 eq->attr.value(
                                     QStringLiteral("Los"),
@@ -1911,7 +1912,7 @@ void Battle::processDepthChargeAttack(FriendOrEnemyIndex attacker) {
             if(!eq) return;
             double skillEff = attFleet->equipSkillEffects.value(uuid, 1.0);
             double visBonus = FleetInfo::getVisibleBonusFirstType(
-                attShip, attDyn, pos);
+                attShip, attDyn, pos, attFleet->equipMap);
             attAsw += eq->attr.value(QStringLiteral("Asw"), 0)
                       * skillEff * visBonus;
         };
@@ -2131,7 +2132,7 @@ bool Battle::processASWCutIn(FriendOrEnemyIndex attacker) {
                         uuid, 1.0);
                 double visBonus
                     = FleetInfo::getVisibleBonusFirstType(
-                        attShip, attDyn, pos);
+                        attShip, attDyn, pos, attFleet->equipMap);
                 attAsw += eq->attr.value(
                               QStringLiteral("Asw"), 0)
                           * skillEff * visBonus;
@@ -2700,7 +2701,7 @@ double Battle::fleetAirSuperiority(const FleetInfo *fleet,
                 double visBonus
                     = FleetInfo::getVisibleBonusFirstType(
                         fleet->ships[i],
-                        fleet->shipDynamics[i].get(), pos);
+                        fleet->shipDynamics[i].get(), pos, fleet->equipMap);
                 double contrib
                     = (std::sqrt(a + planeCount * planeCount) - std::sqrt(a))
                       * aa * skillEff * visBonus;
@@ -2921,7 +2922,7 @@ double Battle::carrierFiringSpeed(const Ship *ship,
             return;
         double skillEff = fleet->equipSkillEffects.value(uuid, 1.0);
         double visBonus = FleetInfo::getVisibleBonusFirstType(
-            ship, dyn, pos);
+            ship, dyn, pos, fleet->equipMap);
         speed += fs * skillEff * visBonus;
     };
     for(int j = 0; j < dyn->slotEquip.size(); ++j)
@@ -3156,7 +3157,7 @@ void Battle::processAirAttack(FriendOrEnemyIndex attacker) {
                               double visBonus
                                   = FleetInfo
                                         ::getVisibleBonusFirstType(
-                                            attShip, attDyn, pos);
+                                            attShip, attDyn, pos, attFleet->equipMap);
                               attAsw
                                   += eq->attr.value(
                                          QStringLiteral("Asw"), 0)
@@ -3352,7 +3353,7 @@ void Battle::applyIndividualAntiAir(FriendOrEnemyIndex defender,
             double skillEff
                 = defFleet->equipSkillEffects.value(uuid, 1.0);
             double visBonus = FleetInfo::getVisibleBonusFirstType(
-                ship, dyn, pos);
+                ship, dyn, pos, defFleet->equipMap);
             double scaledAA = aa * skillEff * visBonus / 100.0;
             int sp = eq->type.getSpecial();
             if(sp == 1 || sp == 2 || sp == 3 || sp == 4 || sp == 16) {
@@ -3688,7 +3689,7 @@ double Battle::individualShipFleetAA(const FleetInfo *fleet,
         double skillEff = fleet->equipSkillEffects.value(uuid,
                                                          1.0);
         double visBonus = FleetInfo::getVisibleBonusFirstType(
-            ship, dyn, pos);
+            ship, dyn, pos, fleet->equipMap);
         double scaledAA = aa * skillEff * visBonus;
         bool isFlakGun = eq->type.isFlak()
                          && (eq->type.isMainGun()
@@ -3748,7 +3749,7 @@ double Battle::fleetInterception(const FleetInfo *fleet) const {
                 = fleet->equipSkillEffects.value(uuid, 1.0);
             double visBonus
                 = FleetInfo::getVisibleBonusFirstType(
-                    ship, dyn, pos);
+                ship, dyn, pos, fleet->equipMap);
             total += inter * skillEff * visBonus;
         };
         for(int j = 0; j < dyn->slotEquip.size(); ++j)
@@ -3852,7 +3853,7 @@ void Battle::processS3AACutIn() {
         double skillEff = fleet->equipSkillEffects.value(uuid,
                                                          1.0);
         double visBonus = FleetInfo::getVisibleBonusFirstType(
-            ship, dyn, pos);
+            ship, dyn, pos, fleet->equipMap);
         return aa * skillEff * visBonus;
     };
 

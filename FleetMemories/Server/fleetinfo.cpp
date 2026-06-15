@@ -72,7 +72,7 @@ double FleetInfo::los(bool isNight) const {
                 }
                 double skillEff = equipSkillEffects.value(slot, 1.0);
                 double visBonus = getVisibleBonusFirstType(
-                    ships[i], shipDynamics[i].get(), pos);
+                    ships[i], shipDynamics[i].get(), pos, equipMap);
                 int los =
                     eq->attr.value(QStringLiteral("Los"), 0);
                 shipLos +=
@@ -123,7 +123,7 @@ double FleetInfo::asw() const {
                 return;
             double skillEff = equipSkillEffects.value(slot, 1.0);
             double visBonus = getVisibleBonusFirstType(
-                ships[i], shipDynamics[i].get(), pos);
+                ships[i], shipDynamics[i].get(), pos, equipMap);
             int asw =
                 eq->attr.value(QStringLiteral("Asw"), 0);
             shipAsw += std::round(asw * skillEff * visBonus);
@@ -494,7 +494,7 @@ LuaMap FleetInfo::attrFromEquipment(const Ship *ship, const ShipDynamic *dyn,
         if(!eq)
             return;
         double skillEff  = skillEffects.value(uuid, 1.0);
-        double visBonus  = getVisibleBonusFirstType(ship, dyn, equipPos);
+        double visBonus  = getVisibleBonusFirstType(ship, dyn, equipPos, equipMap);
         for(auto it = eq->attr.cbegin(); it != eq->attr.cend(); ++it) {
             result[it.key()] +=
                 static_cast<int>(std::round(it.value() * skillEff * visBonus));
@@ -506,11 +506,41 @@ LuaMap FleetInfo::attrFromEquipment(const Ship *ship, const ShipDynamic *dyn,
     return result;
 }
 
-double FleetInfo::getVisibleBonusFirstType(const Ship * /* ship */,
-                                           const ShipDynamic * /* dyn */,
-                                           int /* equipPos */) {
-    /* TODO: implement actual visible bonus logic */
-    return 1.0;
+double FleetInfo::getVisibleBonusFirstType(const Ship *ship,
+                                           const ShipDynamic *dyn,
+                                           int equipPos,
+                                           const QHash<QUuid, Equipment *> &equipMap) {
+    if(!ship || !dyn)
+        return 1.0;
+    if(equipPos < 0
+        || equipPos >= static_cast<int>(dyn->slotEquip.size()))
+        return 1.0;
+    const QUuid &uuid = dyn->slotEquip[equipPos];
+    if(uuid.isNull())
+        return 1.0;
+    Equipment *eq = equipMap.value(uuid, nullptr);
+    if(!eq)
+        return 1.0;
+    return getVisibleBonusFirstType(ship->getId(), eq->getId(),
+                                    dyn->star);
+}
+
+double FleetInfo::getVisibleBonusFirstType(int shipDefId,
+                                           int equipDefId,
+                                           int equipStar) {
+    if(!s_luaVB1)
+        return 1.0;
+    sol::protected_function_result result
+        = (*s_luaVB1)["vb1"](shipDefId, equipDefId, equipStar);
+    if(!result.valid())
+        return 1.0;
+    return result.get<double>();
+}
+
+sol::state *FleetInfo::s_luaVB1 = nullptr;
+
+void FleetInfo::setLuaForVB1(sol::state *lua) {
+    s_luaVB1 = lua;
 }
 
 LuaMap FleetInfo::getVisibleBonusSecondType(const Ship * /* ship */,
