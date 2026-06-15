@@ -189,27 +189,71 @@ function vb1(shipid, equipid, equipstar)
 			if shipid & 0x000F0000 == 0x00030000 then
 				return 1.1
 			end
-		end
 
 			-- ============== Small-gun-flak ==============
 			-- 3: 10cm連装高角砲
-			-- 48: 12cm単装高角砲
-			-- 91: 12.7cm連装高角砲(後期型)
+		elseif equipid == 3 then
+			if (shipclass == 0x00120B00) then
+				return 1.5
+			end
+			-- 553: 10cm連装高角砲改
+		elseif equipid == 553 then
+			if (shipclass == 0x00120B00) and remodelstage >= 0x20 then
+				return 1.5
+			end
+			if (0x00120909 <= shipchar <= 0x00120913) and remodelstage >= 0x30 then
+				return 1.3
+			end
+			if (0x00120401 <= shipchar <= 0x00120403) and remodelstage >= 0x30 then
+				return 1.3
+			end
+			-- 398: 現地改装10cm連装高角砲
+		elseif equipid == 398 then
+			if (shipchar == 0x00820A00) then
+				return 1.5
+			end
 			-- 122: 10cm高角砲＋高射装置
+		elseif equipid == 122 then
+			if (shipclass == 0x00120B00) and remodelstage >= 0x20 then
+				return 1.5
+			end
+			if (0x00120909 <= shipchar <= 0x00120913) and remodelstage >= 0x30 then
+				return 1.3
+			end
+			if (0x00120401 <= shipchar <= 0x00120403) and remodelstage >= 0x30 then
+				return 1.3
+			end
+			if (shipchar == 0x00120808) and remodelstage >= 0x30 then
+				return 1.3
+			end
+			-- 533: 10cm連装高角砲改＋高射装置改
+		elseif equipid == 533 then
+			if (shipclass == 0x00120B00) and remodelstage >= 0x30 then
+				return 1.5
+			end
+			if (0x00120909 <= shipchar <= 0x00120913) and remodelstage >= 0x30 then
+				return 1.2
+			end
+			if (0x00120401 <= shipchar <= 0x00120403) and remodelstage >= 0x30 then
+				return 1.2
+			end
+			if (shipchar == 0x00120808) and remodelstage >= 0x30 then
+				return 1.3
+			end
+		end
+			-- 48: 12cm単装高角砲
+			-- 382: 12cm単装高角砲E型
+			-- 509: 12cm単装高角砲E型改
+			-- 91: 12.7cm連装高角砲(後期型)
+			-- 397: 現地改装12.7cm連装高角砲
+			-- 380: 12.7cm連装高角砲改二
 			-- 229: 12.7cm単装高角砲(後期型)
+			-- 379: 12.7cm単装高角砲改二
 			-- 284: 5inch単装砲 Mk.30
+			-- 313: 5inch単装砲 Mk.30 改
+			-- 308: 5inch単装砲 Mk.30改＋GFCS Mk.37
 			-- 295: 12.7cm連装砲A型改三(戦時改修)＋高射装置
 			-- 296: 12.7cm連装砲B型改四(戦時改修)＋高射装置
-			-- 308: 5inch単装砲 Mk.30改＋GFCS Mk.37
-			-- 313: 5inch単装砲 Mk.30 改
-			-- 379: 12.7cm単装高角砲改二
-			-- 380: 12.7cm連装高角砲改二
-			-- 382: 12cm単装高角砲E型
-			-- 397: 現地改装12.7cm連装高角砲
-			-- 398: 現地改装10cm連装高角砲
-			-- 509: 12cm単装高角砲E型改
-			-- 533: 10cm連装高角砲改＋高射装置改
-			-- 553: 10cm連装高角砲改
 
 			-- ============== Mid-gun-flat ==============
 			-- 4: 14cm単装砲
