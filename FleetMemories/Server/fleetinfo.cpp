@@ -522,16 +522,18 @@ double FleetInfo::getVisibleBonusFirstType(const Ship *ship,
     if(!eq)
         return 1.0;
     return getVisibleBonusFirstType(ship->getId(), eq->getId(),
-                                    dyn->star);
+                                    dyn->star, eq->type.toInt());
 }
 
 double FleetInfo::getVisibleBonusFirstType(int shipDefId,
                                            int equipDefId,
-                                           int equipStar) {
+                                           int equipStar,
+                                           int equipType) {
     if(!s_luaVB1)
         return 1.0;
     sol::protected_function_result result
-        = (*s_luaVB1)["vb1"](shipDefId, equipDefId, equipStar);
+        = (*s_luaVB1)["vb1"](shipDefId, equipDefId,
+                             equipStar, equipType);
     if(!result.valid())
         return 1.0;
     return result.get<double>();

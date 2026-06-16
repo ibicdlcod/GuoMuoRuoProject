@@ -95,6 +95,7 @@ public:
 private:
 #pragma message(USED_CXX17)
     /* see equiptype.xlsx in doc for explanation */
+    /* When updating: beware that canequip.lua, vb1.lua must be updated! */
     inline static const QMap<QString, int> result = {
         std::pair("Small-gun-flat",         0x8001),
         std::pair("Small-gun-flak",         0xA001),

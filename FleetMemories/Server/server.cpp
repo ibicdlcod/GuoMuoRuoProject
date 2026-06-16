@@ -4890,7 +4890,9 @@ anti_ddos:
                 }
             }
             bonus = FleetInfo::getVisibleBonusFirstType(
-                ship ? ship->getId() : 0, equipDefId, star);
+                ship ? ship->getId() : 0, equipDefId, star,
+                equipRegistry.contains(equipDefId)
+                    ? equipRegistry[equipDefId]->type.toInt() : 0);
             bonuses.append(bonus);
         }
         LuaMap c = FleetInfo::getVisibleBonusSecondType(ship, nullptr);

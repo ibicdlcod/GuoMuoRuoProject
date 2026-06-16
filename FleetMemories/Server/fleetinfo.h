@@ -77,7 +77,8 @@ public:
     /* Lua-based alternative: calls vb1(shipDefId, equipDefId, star). */
     static double getVisibleBonusFirstType(int shipDefId,
                                            int equipDefId,
-                                           int equipStar);
+                                           int equipStar,
+                                           int equipType);
     static void setLuaForVB1(sol::state *lua);
 
     /* Returns the second-type (virtual-equipment) visible bonus addend.
