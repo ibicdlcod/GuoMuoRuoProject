@@ -7,11 +7,15 @@ function vb1(shipid, equipid, equipstar, equiptype)
 	VB_shipclass2 = shipid & 0x00FFFF00
 	VB_remodelstage = shipid >> 24
 	VB_shipchar = shipid & 0x00FF0FFF
+	VB_shipchar2 = shipid & 0x00FFFFFF
 	VB_toku1 = shipid & 0x00FF0FF0 == 0x00120400
 	VB_toku2 = shipid & 0x00FF0FF0 == 0x00120410
 	VB_toku3 = shipid & 0x00FF0FF0 == 0x00120420
 	VB_equipid = equipid
 	VB_stareff = (equipstar/16) / math.sqrt(1+(equipstar*equipstar / 256))
+	VB_shipclassCL = VB_shipid & 0x00FF1F00
+	VB_shipclassBB = VB_shipid & 0x00FF3F00
+	VB_shipclassBB2 = VB_shipclassCL
 
 	if equiptype == 0x8001 then
 		local r = dofile("lua/vb1/Small-gun-flat.lua")

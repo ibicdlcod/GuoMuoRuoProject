@@ -1,7 +1,6 @@
 -- vb1/Mid-gun-flat
 -- Equipment visible bonuses for Mid-gun-flat
 
-	VB_shipclassCL = VB_shipid & 0x00FF1F00
 -- 4: 14cm単装砲
 	if VB_equipid == 4 then
 		if (0x00130100 <= VB_shipclassCL and VB_shipclassCL <= 0x00130400) then
