@@ -26,7 +26,6 @@
 		if (VB_shipclass2 == 0x00135200 or VB_shipclass2 == 0x00182400) then
 			return 1.25
 		end
-	end
 -- 5: 15.5cm三連装砲
 -- 235: 15.5cm三連装砲改
 	elseif VB_equipid == 5 or VB_equipid == 235 then
@@ -97,10 +96,10 @@
 		if (VB_shipclassCL == 0x00730500) then
 			return 1.25
 		end
-		elseif (VB_shipid & 0x00F00000 == 0x00700000) then
+		if (VB_shipid & 0x00F00000 == 0x00700000) then
 			return 1.1
 		end
-		elseif (VB_shipid & 0x000F0000 == 0x00030000) then
+		if (VB_shipid & 0x000F0000 == 0x00030000) then
 			return 0.9
 		end
 	end

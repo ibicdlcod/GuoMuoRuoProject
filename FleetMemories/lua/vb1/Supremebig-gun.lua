@@ -10,7 +10,8 @@
 -- 465: 試製51cm三連装砲
 	elseif VB_equipid == 465 then
 		if VB_shipid == 0x3F15C401 then
-			return 1.2
+			return 1.25
+		end
 		if (VB_shipclassBB == 0x00150400) and VB_remodelstage >= 0x30 then
 			return 1.15
 		end

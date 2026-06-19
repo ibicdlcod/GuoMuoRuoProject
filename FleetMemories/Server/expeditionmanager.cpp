@@ -1220,6 +1220,42 @@ void ExpeditionManager::executeExpeditionBattle(const CSteamID &uid,
                 /* Calculate new supremacy: (a/2 + base) * factor */
                 double newSupremacy = (currentSupremacy / 2.0 + baseSupremacy2Times / 2.0) * factor;
 
+                /* Drum bonus — see doc/worldview_and_mechanics/4-equipment.md */
+                {
+                    QPair<CSteamID, int> fleetKey(uid, expeditionFleetIndex);
+                    FleetInfo *fi
+                        = server->sortieFleets.value(fleetKey, nullptr);
+                    if(fi) {
+                        int drumCount = 0;
+                        for(const auto &dyn : fi->shipDynamics) {
+                            if(!dyn) continue;
+                            auto countEquip
+                                = [&](const QUuid &uuid) {
+                                    Equipment *eq
+                                        = fi->equipMap.value(uuid, nullptr);
+                                    if(eq && eq->type.getSpecial() == 11)
+                                        ++drumCount;
+                                };
+                            for(const auto &u : dyn->slotEquip)
+                                countEquip(u);
+                            countEquip(dyn->slotEquipEx);
+                        }
+                        double a = static_cast<double>(drumCount);
+                        double drumBoost
+                            = (a / 16.0)
+                              / std::sqrt(1.0 + a * a / 256.0);
+                        double b;
+                        switch(diff) {
+                        case KP::EarlyWar: b = 10; break;
+                        case KP::MidWar: b = 20; break;
+                        case KP::LateWar: b = 30; break;
+                        default: b = 40; break;
+                        }
+                        newSupremacy += drumBoost * b
+                                         * (baseSupremacy2Times / 2.0);
+                    }
+                }
+
                 /* Only apply if new value is higher than current */
                 if (newSupremacy > currentSupremacy) {
                     User::setMapSupremacy(uid, mapUnionId, newSupremacy, 0);

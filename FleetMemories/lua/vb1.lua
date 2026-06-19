@@ -16,6 +16,7 @@ function vb1(shipid, equipid, equipstar, equiptype)
 	VB_shipclassCL = VB_shipid & 0x00FF1F00
 	VB_shipclassBB = VB_shipid & 0x00FF3F00
 	VB_shipclassBB2 = VB_shipclassCL
+	VB_shipclassCV = VB_shipclassBB
 
 	if equiptype == 0x8001 then
 		local r = dofile("lua/vb1/Small-gun-flat.lua")
@@ -115,6 +116,9 @@ function vb1(shipid, equipid, equipstar, equiptype)
 		if r ~= nil then return r end
 	elseif equiptype == 1824 then
 		local r = dofile("lua/vb1/Attack-lb-fight.lua")
+		if r ~= nil then return r end
+	elseif equiptype == 1836832 then
+		local r = dofile("lua/vb1/Attack-lb-fight-jet.lua")
 		if r ~= nil then return r end
 	elseif equiptype == 805 then
 		local r = dofile("lua/vb1/Attack-lb-big.lua")

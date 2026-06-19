@@ -59,6 +59,7 @@ public:
         bool isDiveBomber = false;
         bool isRecon = false;
         bool isPatrol = false;
+        bool isNight2 = false;
     };
 
     /* ——— public api ———————————————————————————————————————— */

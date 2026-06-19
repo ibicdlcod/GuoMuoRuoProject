@@ -2960,7 +2960,8 @@ void Battle::collectAirSquadrons() {
                 Equipment *eq = fleet->equipMap.value(uuid, nullptr);
                 if(!eq || !eq->isPlane())
                     return;
-                if(isNight && !eq->type.isNight())
+                if(isNight && !eq->type.isNight()
+                    && !eq->type.isNight2())
                     return;
                 if(!eq->type.isFighter()
                     && !eq->type.isTorpBomber()
@@ -2968,12 +2969,17 @@ void Battle::collectAirSquadrons() {
                     && !eq->type.isRecon()
                     && !eq->type.isPatrol())
                     return;
-                squadrons.push_back({i, slot, eq, planeCount,
+                bool n2 = eq->type.isNight2();
+                int effPlanes = planeCount;
+                if(isNight && n2)
+                    effPlanes = std::max(1, planeCount / 2);
+                squadrons.push_back({i, slot, eq, effPlanes,
                                      eq->type.isFighter(),
                                      eq->type.isTorpBomber(),
                                      eq->type.isDiveBomber(),
                                      eq->type.isRecon(),
-                                     eq->type.isPatrol()});
+                                     eq->type.isPatrol(),
+                                     n2});
             };
             for(int j = 0; j < dyn->slotEquip.size(); ++j)
                 addSlot(dyn->slotEquip[j], j,

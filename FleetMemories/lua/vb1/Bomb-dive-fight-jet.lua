@@ -2,7 +2,9 @@
 -- Equipment visible bonuses for Bomb-dive-fight-jet
 
 -- 199: 噴式景雲改
+	if VB_equipid == 199 then
+		return 1.0
 -- 200: 橘花改
--- 561: Ho229
-
-return nil  -- no bonuses defined yet
+	elseif VB_equipid == 200 then
+		return 1.0
+	end

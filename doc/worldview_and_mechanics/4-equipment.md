@@ -375,7 +375,9 @@ Increase night battle LOS.
 
 ### Drum cans (drum)
 
-Boost map supremacy gained from expedition. [NOTIMPLEMENTED]
+Boost naval supremacy gained from expedition. (boost value is $(a/16)/(\sqrt{1+a^2/256})*b$. $a$ is num of drums in the fleet; $b$ is 10%/20%/30% for early/medium/late difficulties.
+
+[Implemented in ExpeditionManager::executeExpeditionBattle]
 
 Used for transport mission-critical material (for transport gauge maps), like landing-craft.
 
