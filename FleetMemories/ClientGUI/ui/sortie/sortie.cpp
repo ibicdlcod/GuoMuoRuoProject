@@ -651,11 +651,6 @@ void Sortie::battleEnd() {
     if(!currentMap) {
         return;
     }
-    if(mapProgressPending) {
-        //% "Map progress request already in flight; ignoring battle-end advance."
-        qWarning() << qtTrId("sortie-battleend-pending");
-        return;
-    }
     /* Arm guard before ConfirmSortie::exec()'s nested event loop so a
      * re-entrant battleEnd cannot advance the same node twice. */
     mapProgressPending = true;

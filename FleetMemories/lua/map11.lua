@@ -13,7 +13,7 @@ maps[11] = {
 }
 
 maps[11][1] = {
-    x = 0.15, y = 0.55,
+    x = 0.40, y = 0.60,
     battle_type = maps.Battle_type.STARTING,
     next_nodes = {2, 5},
     lb_distance = 99,
@@ -30,7 +30,7 @@ maps[11][1] = {
 }
 
 maps[11][2] = {
-    x = 0.35, y = 0.30,
+    x = 0.46, y = 0.40,
     battle_type = maps.Battle_type.NORMAL,
     next_nodes = {3, 4},
     lb_distance = 99,
@@ -59,7 +59,7 @@ maps[11][2] = {
 }
 
 maps[11][3] = {
-    x = 0.65, y = 0.30,
+    x = 0.52, y = 0.22,
     battle_type = maps.Battle_type.BOSS,
     next_nodes = {},
     lb_distance = 99,
@@ -84,7 +84,7 @@ maps[11][3] = {
 }
 
 maps[11][4] = {
-    x = 0.35, y = 0.70,
+    x = 0.60, y = 0.45,
     battle_type = maps.Battle_type.NORMAL,
     next_nodes = {},
     lb_distance = 99,
@@ -109,7 +109,7 @@ maps[11][4] = {
 }
 
 maps[11][5] = {
-    x = 0.20, y = 0.80,
+    x = 0.42, y = 0.79,
     battle_type = maps.Battle_type.DISASTER,
     next_nodes = {6},
     lb_distance = 99,
@@ -123,7 +123,7 @@ maps[11][5] = {
 }
 
 maps[11][6] = {
-    x = 0.35, y = 0.80,
+    x = 0.52, y = 0.86,
     battle_type = maps.Battle_type.NORMAL,
     next_nodes = {},
     lb_distance = 99,

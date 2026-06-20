@@ -13,9 +13,9 @@ maps[2] = {
 }
 
 maps[2][1] = {
-    x = 0.20, y = 0.50,
+    x = 0.46, y = 0.66,
     battle_type = maps.Battle_type.STARTING,
-    next_nodes = {2, 4},
+    next_nodes = {2, 5},
     lb_distance = 99,
     branch_rule = {
         C = function(ships, los, fleet_type, capitalness, ship_tags, ship_speeds, equipment_list, user_state)
@@ -24,14 +24,14 @@ maps[2][1] = {
             if capital >= 0.5 then
                 return 2
             end
-            return 4
+            return 5
         end,
     },
 }
 
 maps[2][2] = {
-    x = 0.50, y = 0.30,
-    battle_type = maps.Battle_type.EMPTY,
+    x = 0.58, y = 0.41,
+    battle_type = maps.Battle_type.NORMAL,
     next_nodes = {3},
     lb_distance = 99,
     branch_rule = {
@@ -55,7 +55,7 @@ maps[2][2] = {
 }
 
 maps[2][3] = {
-    x = 0.80, y = 0.30,
+    x = 0.78, y = 0.24,
     battle_type = maps.Battle_type.BOSS,
     next_nodes = {},
     lb_distance = 99,
@@ -80,7 +80,7 @@ maps[2][3] = {
 }
 
 maps[2][4] = {
-    x = 0.50, y = 0.80,
+    x = 0.82, y = 0.69,
     battle_type = maps.Battle_type.NORMAL,
     next_nodes = {},
     lb_distance = 99,
@@ -100,6 +100,18 @@ maps[2][4] = {
     exec = {
         C = function(battleresult, user_state)
             return false
+        end,
+    },
+}
+
+maps[2][5] = {
+    x = 0.62, y = 0.79,
+    battle_type = maps.Battle_type.EMPTY,
+    next_nodes = {4},
+    lb_distance = 99,
+    branch_rule = {
+        C = function(ships, los, fleet_type, capitalness, ship_tags, ship_speeds, equipment_list, user_state)
+            return 4
         end,
     },
 }

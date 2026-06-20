@@ -94,6 +94,7 @@ void Client::sortie(int mapId, int fleetIndex, bool isExpedition) {
 }
 
 void Client::queryNextNode(int mapId, int prevNode, bool retreat) {
+
     if(!isInBattle()) {
         return;
     }
