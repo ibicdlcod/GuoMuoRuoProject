@@ -3885,4 +3885,861 @@ bool Server::generateTestLua(const QString &outputPath,
     return true;
 }
 
+/* Map test mode — see docs/superpowers/specs/2026-06-20-map-test-design.md */
+
+static QJsonObject battlePlanFromLuaTable(sol::table t)
+{
+    QJsonObject obj;
+    t.for_each([&obj](sol::object k, sol::object v) {
+        if(!k.is<std::string>()) {
+            return;
+        }
+        QString key = QString::fromUtf8(k.as<std::string>());
+        if(v.is<bool>()) {
+            obj[key] = v.as<bool>();
+        }
+        else if(v.is<int>()) {
+            obj[key] = v.as<int>();
+        }
+        else if(v.is<double>()) {
+            obj[key] = v.as<double>();
+        }
+        else if(v.is<std::string>()) {
+            obj[key] = QString::fromUtf8(v.as<std::string>());
+        }
+    });
+    return obj;
+}
+
+static bool checkTestFleetCriticalDamage(FleetInfo *fleetInfo,
+                                         bool isExpedition)
+{
+    if(!fleetInfo) {
+        return false;
+    }
+    for(int i = 0; i < static_cast<int>(fleetInfo->ships.size()); ++i) {
+        Ship *ship = fleetInfo->ships[i];
+        ShipDynamic *dyn = fleetInfo->shipDynamics[i].get();
+        if(!ship || !dyn || dyn->fleetFled) {
+            continue;
+        }
+        if(!dyn->isCriticallyDamaged(ship)) {
+            continue;
+        }
+        if(!fleetInfo->performEscortRetreat(i, isExpedition)) {
+            return true;
+        }
+    }
+    return false;
+}
+
+static int techYearFromStarDiff(double starDiff)
+{
+    if(starDiff <= 1.0) {
+        return 1924;
+    }
+    if(starDiff <= 5.0) {
+        return 1935;
+    }
+    if(starDiff <= 10.0) {
+        return 1941;
+    }
+    if(starDiff <= 15.0) {
+        return 1944;
+    }
+    return 1945;
+}
+
+static QString outcomeLabel(Server::MapTestRunResult::Outcome outcome)
+{
+    switch(outcome) {
+    case Server::MapTestRunResult::SortieSuccess:
+        return QStringLiteral("Sortie Success");
+    case Server::MapTestRunResult::ExpeditionSuccess:
+        return QStringLiteral("Expedition Success");
+    case Server::MapTestRunResult::ExpeditionPartial:
+        return QStringLiteral("Expedition Partial");
+    case Server::MapTestRunResult::Failure:
+        return QStringLiteral("Failure");
+    case Server::MapTestRunResult::Aborted:
+        return QStringLiteral("Aborted");
+    case Server::MapTestRunResult::InvalidStart:
+        return QStringLiteral("Invalid Start");
+    }
+    return QStringLiteral("Unknown");
+}
+
+Server::MapTestRunResult Server::runSingleMapTest(
+    int mapUnionId,
+    KP::Difficulty diff,
+    const FleetInfo &initialFleet,
+    const QJsonObject &battlePlan,
+    const QMap<int, int> &choiceOverrides)
+{
+    MapTestRunResult result;
+    FleetInfo fleet;
+    deepCopyFleetInfo(initialFleet, fleet);
+
+    int currentNode = evaluateMapBranchRule(mapUnionId, diff, fleet);
+    if(currentNode == 0) {
+        result.outcome = MapTestRunResult::InvalidStart;
+        return result;
+    }
+
+    while(currentNode != 0) {
+        result.visitedNodes.append(currentNode);
+
+        int totalHpBefore = 0;
+        for(const auto &dyn : fleet.shipDynamics) {
+            if(dyn && !dyn->fleetFled) {
+                totalHpBefore += dyn->currentHP;
+            }
+        }
+        result.nodeHpBefore[currentNode] = totalHpBefore;
+        result.nodeFuelBefore[currentNode] = fleet.shipDynamics.empty()
+            ? 1.0 : fleet.shipDynamics[0]->fuel;
+        result.nodeAmmoBefore[currentNode] = fleet.shipDynamics.empty()
+            ? 1.0 : fleet.shipDynamics[0]->ammo;
+
+        KP::NodeType type = getNodeTypeFromLua(mapUnionId, currentNode);
+        bool isEndNode = getNextNodesFromLua(mapUnionId, currentNode).isEmpty();
+
+        switch(type) {
+        case KP::NORMAL: [[fallthrough]];
+        case KP::BOSS: [[fallthrough]];
+        case KP::NIGHT: [[fallthrough]];
+        case KP::NIGHTBOSS: [[fallthrough]];
+        case KP::AIR: {
+            QJsonObject plan = battlePlan;
+            if(plan.isEmpty()) {
+                plan["friendFleetPriority"] = 0;
+                plan["enemyFleetPriority"]
+                    = static_cast<int>(KP::EnemyBalanced);
+                plan["extraBattle"] = true;
+            }
+            bool isNightCommence = (type == KP::NIGHT
+                                    || type == KP::NIGHTBOSS);
+            bool isAirOnly = (type == KP::AIR);
+
+            FleetInfo enemyFleet = createEnemyFleetInfo(
+                mapUnionId + diff * KP::mapIDDifficultyMask,
+                currentNode, diff, 0);
+
+            int friendHpBefore = 0;
+            int enemyHpBefore = 0;
+            for(const auto &dyn : fleet.shipDynamics) {
+                if(dyn && !dyn->fleetFled) {
+                    friendHpBefore += dyn->currentHP;
+                }
+            }
+            for(const auto &dyn : enemyFleet.shipDynamics) {
+                if(dyn && !dyn->fleetFled) {
+                    enemyHpBefore += dyn->currentHP;
+                }
+            }
+
+            Battle battle(mt, equipRegistry, &shipRegistry);
+            battle.battleProcessor(&fleet, &enemyFleet, plan,
+                                   false, isNightCommence, isAirOnly);
+
+            int friendHpAfter = 0;
+            int enemyHpAfter = 0;
+            for(const auto &dyn : fleet.shipDynamics) {
+                if(dyn && !dyn->fleetFled) {
+                    friendHpAfter += dyn->currentHP;
+                }
+            }
+            for(const auto &dyn : enemyFleet.shipDynamics) {
+                if(dyn && !dyn->fleetFled) {
+                    enemyHpAfter += dyn->currentHP;
+                }
+            }
+
+            result.nodeDamageTaken[currentNode]
+                = friendHpBefore - friendHpAfter;
+            result.nodeDamageDealt[currentNode]
+                = enemyHpBefore - enemyHpAfter;
+
+            bool enemySunk = enemyHpAfter == 0;
+            bool friendSunk = friendHpAfter == 0;
+            if(enemySunk) {
+                result.nodeAssessments[currentNode] = KP::SVictory;
+            }
+            else if(friendSunk) {
+                result.nodeAssessments[currentNode] = KP::EDefeat;
+            }
+            else {
+                double friendRatio =
+                    (double)friendHpAfter
+                    / std::max(1, friendHpBefore);
+                double enemyRatio =
+                    (double)enemyHpAfter
+                    / std::max(1, enemyHpBefore);
+                if(friendRatio >= 0.9 && enemyRatio <= 0.5) {
+                    result.nodeAssessments[currentNode]
+                        = KP::SVictory;
+                }
+                else if(friendRatio >= 0.75 && enemyRatio <= 0.75) {
+                    result.nodeAssessments[currentNode]
+                        = KP::AVictory;
+                }
+                else if(friendRatio >= 0.5 && enemyRatio <= 0.9) {
+                    result.nodeAssessments[currentNode]
+                        = KP::BVictory;
+                }
+                else if(enemyRatio < friendRatio) {
+                    result.nodeAssessments[currentNode]
+                        = KP::CDefeat;
+                }
+                else {
+                    result.nodeAssessments[currentNode]
+                        = KP::DDefeat;
+                }
+            }
+
+            if(type == KP::BOSS || type == KP::NIGHTBOSS) {
+                result.bossSunk = enemySunk;
+                result.bossDamageDealt
+                    = result.nodeDamageDealt[currentNode];
+            }
+            break;
+        }
+        case KP::TRANSPORT: {
+            int capacity = fleet.transportCapacity(CSteamID((uint64)1));
+            result.endTotalFreight += capacity;
+            break;
+        }
+        case KP::DISASTER: {
+            for(auto &dyn : fleet.shipDynamics) {
+                if(dyn && !dyn->fleetFled) {
+                    dyn->fuel = std::max(0.0, dyn->fuel - 0.1);
+                    dyn->ammo = std::max(0.0, dyn->ammo - 0.1);
+                }
+            }
+            break;
+        }
+        case KP::CHOICE: {
+            if(!choiceOverrides.contains(currentNode)) {
+                result.outcome = MapTestRunResult::Aborted;
+                result.abortReason
+                    = QStringLiteral(
+                          "Missing ChoiceOverrides for node %1")
+                          .arg(currentNode);
+                return result;
+            }
+            int chosen = choiceOverrides[currentNode];
+            currentNode = chosen;
+            continue;
+        }
+        case KP::EMPTY: [[fallthrough]];
+        case KP::STARTING:
+            break;
+        }
+
+        double fuelFrac = KP::defaultFuelUsage(type);
+        double ammoFrac = KP::defaultAmmoUsage(type);
+        if(lua["maps"][mapUnionId][currentNode]["fuel"] != sol::nil) {
+            fuelFrac = lua["maps"][mapUnionId][currentNode]["fuel"];
+        }
+        if(lua["maps"][mapUnionId][currentNode]["ammo"] != sol::nil) {
+            ammoFrac = lua["maps"][mapUnionId][currentNode]["ammo"];
+        }
+        for(auto &dyn : fleet.shipDynamics) {
+            if(dyn && !dyn->fleetFled) {
+                dyn->fuel = std::max(0.0, dyn->fuel - fuelFrac);
+                dyn->ammo = std::max(0.0, dyn->ammo - ammoFrac);
+            }
+        }
+
+        bool outOfSupplies = false;
+        for(const auto &dyn : fleet.shipDynamics) {
+            if(dyn && !dyn->fleetFled
+               && (dyn->fuel <= 0.0 || dyn->ammo <= 0.0)) {
+                outOfSupplies = true;
+                break;
+            }
+        }
+        if(outOfSupplies) {
+            result.outcome = MapTestRunResult::Failure;
+            result.abortReason = QStringLiteral(
+                "Fuel or ammo exhausted");
+            return result;
+        }
+
+        if(!isEndNode) {
+            bool fleetFailed = checkTestFleetCriticalDamage(&fleet,
+                                                            false);
+            if(fleetFailed) {
+                result.outcome = MapTestRunResult::Failure;
+                result.abortReason = QStringLiteral(
+                    "Critical damage");
+                return result;
+            }
+        }
+
+        int nextNode = evaluateBranchRule(mapUnionId, currentNode,
+                                          diff, fleet);
+        result.nextNodeFrequency[currentNode] = nextNode;
+        currentNode = nextNode;
+    }
+
+    if(result.visitedNodes.isEmpty()) {
+        result.outcome = MapTestRunResult::Failure;
+        return result;
+    }
+    int lastNode = result.visitedNodes.last();
+    KP::NodeType lastType = getNodeTypeFromLua(mapUnionId, lastNode);
+    bool lastIsBoss = (lastType == KP::BOSS
+                       || lastType == KP::NIGHTBOSS);
+
+    if(lastIsBoss && result.bossSunk) {
+        result.outcome = MapTestRunResult::SortieSuccess;
+    }
+    else if(!lastIsBoss
+            && result.nodeAssessments.contains(lastNode)) {
+        KP::BattleAssessment ass = result.nodeAssessments[lastNode];
+        if(ass == KP::SVictory) {
+            result.outcome = MapTestRunResult::ExpeditionSuccess;
+        }
+        else if(ass == KP::AVictory || ass == KP::BVictory) {
+            result.outcome = MapTestRunResult::ExpeditionPartial;
+        }
+        else {
+            result.outcome = MapTestRunResult::Failure;
+        }
+    }
+    else {
+        result.outcome = MapTestRunResult::Failure;
+    }
+
+    if(!fleet.ships.empty() && fleet.ships[0]
+       && fleet.shipDynamics[0]
+       && fleet.shipDynamics[0]->currentHP <= 0) {
+        result.flagshipSurvived = false;
+    }
+
+    int totalHpAfter = 0;
+    for(const auto &dyn : fleet.shipDynamics) {
+        if(dyn && !dyn->fleetFled) {
+            totalHpAfter += dyn->currentHP;
+        }
+    }
+    result.nodeHpAfter[lastNode] = totalHpAfter;
+
+    return result;
+}
+
+bool Server::runTestMap(const QString &luaPath,
+                        int mapUnionId,
+                        KP::Difficulty diff,
+                        const QString &reportPath,
+                        const QString &jsonPath,
+                        int repeatCount,
+                        int seed,
+                        int autoFleetTechCap)
+{
+    sqlinit();
+    importEquipFromCSV();
+    importShipFromCSV();
+    luaInitEquipable();
+    if(!mapRefresh()) {
+        qCritical() << "Map refresh failed";
+        return false;
+    }
+    luaInitMap();
+
+    if(lua["maps"] == sol::nil
+       || lua["maps"][mapUnionId] == sol::nil) {
+        qCritical() << "Map" << mapUnionId << "not loaded in Lua";
+        return false;
+    }
+    if(seed >= 0) {
+        mt.seed(static_cast<unsigned int>(seed));
+    }
+
+    FleetInfo fleet;
+    QJsonObject battlePlan;
+    QMap<int, int> choiceOverrides;
+
+    if(!luaPath.isEmpty()) {
+        auto loadResult = lua.safe_script_file(luaPath.toStdString(),
+                                               sol::script_pass_on_error);
+        if(!loadResult.valid()) {
+            sol::error err = loadResult;
+            qCritical() << "Failed to load test map lua:" << err.what();
+            return false;
+        }
+        sol::table testData = loadResult;
+        if(testData["FriendFleetInfo"] != sol::nil) {
+            fleet = buildFleetFromLua(testData["FriendFleetInfo"]);
+        }
+        if(testData["BattlePlan"] != sol::nil) {
+            battlePlan = battlePlanFromLuaTable(testData["BattlePlan"]);
+        }
+        if(testData["ChoiceOverrides"] != sol::nil) {
+            sol::table coTbl = testData["ChoiceOverrides"];
+            coTbl.for_each(
+                [&choiceOverrides](sol::object k, sol::object v) {
+                    if(k.is<int>() && v.is<int>()) {
+                        choiceOverrides[k.as<int>()] = v.as<int>();
+                    }
+                });
+        }
+    }
+
+    bool autoFleet = false;
+    if(fleet.ships.empty()) {
+        fleet = buildAutoFleetForMap(mapUnionId, diff,
+                                     autoFleetTechCap);
+        autoFleet = true;
+    }
+
+    if(fleet.ships.empty()) {
+        qCritical() << "Could not build a fleet for map" << mapUnionId;
+        return false;
+    }
+
+    QVector<MapTestRunResult> results;
+    results.reserve(repeatCount);
+    for(int i = 0; i < repeatCount; ++i) {
+        results.append(runSingleMapTest(mapUnionId, diff, fleet,
+                                        battlePlan, choiceOverrides));
+    }
+
+    QMap<int, MapTestNodeStats> nodeStats;
+    for(const auto &run : results) {
+        for(int nodeId : run.visitedNodes) {
+            MapTestNodeStats &ns = nodeStats[nodeId];
+            ns.visits++;
+            if(run.nodeAssessments.contains(nodeId)) {
+                ns.assessments[run.nodeAssessments[nodeId]]++;
+            }
+            ns.totalDamageTaken += run.nodeDamageTaken.value(nodeId, 0);
+            ns.totalDamageDealt += run.nodeDamageDealt.value(nodeId, 0);
+            if(run.nodeHpAfter.value(nodeId, 1) > 0) {
+                ns.playerSurvived++;
+            }
+            int nextNode = run.nextNodeFrequency.value(nodeId, 0);
+            if(nextNode != 0) {
+                ns.nextNodeFrequency[nextNode]++;
+            }
+        }
+        if(run.bossSunk && !run.visitedNodes.isEmpty()) {
+            nodeStats[run.visitedNodes.last()].enemyFlagshipSunk++;
+        }
+    }
+
+    if(!reportPath.isEmpty()) {
+        writeMapTestMarkdownReport(reportPath, mapUnionId, diff,
+                                   repeatCount, autoFleet, fleet,
+                                   results, nodeStats);
+    }
+    if(!jsonPath.isEmpty()) {
+        writeMapTestJsonReport(jsonPath, mapUnionId, diff, repeatCount,
+                               seed, autoFleet, fleet, results,
+                               nodeStats);
+    }
+    return true;
+}
+
+FleetInfo Server::buildAutoFleetForMap(int mapUnionId,
+                                       KP::Difficulty diff,
+                                       int techYearCap)
+{
+    Q_UNUSED(diff)
+    FleetInfo fleet;
+    if(techYearCap < 0) {
+        MapWithDiff *map = getMapByUnionId(mapUnionId);
+        double starDiff = map ? map->starDiff : 0.0;
+        techYearCap = techYearFromStarDiff(starDiff);
+    }
+
+    QList<Ship *> candidates;
+    for(Ship *ship : shipRegistry) {
+        int shipTech = ship->attr.value(QStringLiteral("Tech"),
+                                        9999);
+        if(shipTech <= techYearCap) {
+            candidates.append(ship);
+        }
+    }
+    auto scoreShip = [](Ship *s) -> double {
+        return s->attr.value(QStringLiteral("Firepower"), 0)
+            + s->attr.value(QStringLiteral("Torpedo"), 0)
+            + s->attr.value(QStringLiteral("AntiAir"), 0)
+            + s->attr.value(QStringLiteral("ASW"), 0)
+            + s->attr.value(QStringLiteral("Hitpoints"), 0) / 10.0;
+    };
+    std::sort(candidates.begin(), candidates.end(),
+              [&](Ship *a, Ship *b) {
+                  return scoreShip(a) > scoreShip(b);
+              });
+
+    int capitalCount = 0;
+    int screenCount = 0;
+    int subCount = 0;
+    for(Ship *ship : candidates) {
+        if(fleet.ships.size() >= 6) {
+            break;
+        }
+        int type = ship->attr.value(QStringLiteral("Type"), 0);
+        bool isSubmarine = false;
+        bool isCapital = false;
+        // Coarse heuristic: submarines have ASW-ish typing 0x13 or similar;
+        // capitals are CV/BB/CV(L) types.
+        if(type == 0x9 || type == 0xa || type == 0xb || type == 0xf) {
+            isSubmarine = true;
+        }
+        else if(type == 0x1 || type == 0x2 || type == 0x3
+                || type == 0x5 || type == 0x6 || type == 0x8) {
+            isCapital = true;
+        }
+        if(isCapital && capitalCount < 2) {
+            capitalCount++;
+        }
+        else if(isSubmarine && subCount < 1) {
+            subCount++;
+        }
+        else {
+            if(screenCount >= 4) {
+                continue;
+            }
+            screenCount++;
+        }
+
+        fleet.ships.push_back(ship);
+        auto dyn = std::make_unique<ShipDynamic>();
+        dyn->currentHP = ship->attr.value(QStringLiteral("Hitpoints"), 1);
+        dyn->condition = KP::conditionMax;
+        dyn->fuel = 1.0;
+        dyn->ammo = 1.0;
+        dyn->exp = Ship::expCap(0);
+        dyn->expCap = Ship::expCap(0);
+        dyn->star = 0;
+        dyn->fleetIndex = 0;
+        dyn->fleetPosIndex = fleet.shipDynamics.size();
+        dyn->fleetFled = false;
+
+        QList<int> startingEquip = ship->getStartingEquip();
+        for(int equipId : startingEquip) {
+            if(equipId == 0) {
+                dyn->slotEquip.append(QUuid());
+                continue;
+            }
+            if(!equipRegistry.contains(equipId)) {
+                equipRegistry[equipId] = new Equipment(equipId, nullptr);
+            }
+            QUuid uuid = QUuid::createUuid();
+            fleet.equipMap.insert(uuid, equipRegistry[equipId]);
+            fleet.equipSkillEffects.insert(uuid, 1.0);
+            dyn->slotEquip.append(uuid);
+        }
+        dyn->slotEquipEx = QUuid();
+
+        int totalPlanes = ship->attr.value(QStringLiteral("Planes"), 0);
+        int planeSlots = 0;
+        for(const QUuid &uuid : dyn->slotEquip) {
+            Equipment *eq = fleet.equipMap.value(uuid, nullptr);
+            if(eq && eq->isPlane()) {
+                planeSlots++;
+            }
+        }
+        int perSlot = planeSlots > 0 ? totalPlanes / planeSlots : 0;
+        int remainder = planeSlots > 0 ? totalPlanes % planeSlots : 0;
+        int assigned = 0;
+        for(const QUuid &uuid : dyn->slotEquip) {
+            Equipment *eq = fleet.equipMap.value(uuid, nullptr);
+            if(eq && eq->isPlane()) {
+                dyn->slotPlanes.append(perSlot
+                                       + (assigned < remainder ? 1 : 0));
+                assigned++;
+            }
+            else {
+                dyn->slotPlanes.append(0);
+            }
+        }
+        while(dyn->slotPlanes.size() < 5) {
+            dyn->slotPlanes.append(0);
+        }
+
+        fleet.shipDynamics.push_back(std::move(dyn));
+    }
+    fleet.shipTags.resize(fleet.ships.size(), 0);
+    return fleet;
+}
+
+void Server::writeMapTestMarkdownReport(
+    const QString &path,
+    int mapUnionId,
+    KP::Difficulty diff,
+    int repeatCount,
+    bool autoFleet,
+    const FleetInfo &fleet,
+    const QVector<MapTestRunResult> &results,
+    const QMap<int, MapTestNodeStats> &nodeStats)
+{
+    QFile f(path);
+    if(!f.open(QIODevice::WriteOnly | QIODevice::Text)) {
+        qWarning() << "Cannot open map test report file" << path;
+        return;
+    }
+    QTextStream out(&f);
+
+    out << QStringLiteral("# Map Test Report\n\n");
+    out << QStringLiteral("- **Map:** %1\n").arg(mapUnionId);
+    out << QStringLiteral("- **Difficulty:** %1\n")
+               .arg((*KP::diffEnumtoStr)[diff]);
+    out << QStringLiteral("- **Runs:** %1\n").arg(repeatCount);
+    out << QStringLiteral("- **Fleet source:** %1\n\n")
+               .arg(autoFleet ? QStringLiteral("auto")
+                              : QStringLiteral("explicit"));
+
+    out << QStringLiteral("## Fleet Composition\n\n");
+    out << QStringLiteral("| # | Ship | HP |\n");
+    out << QStringLiteral("|---|------|----|\n");
+    for(size_t i = 0; i < fleet.ships.size(); ++i) {
+        if(!fleet.ships[i]) continue;
+        out << QStringLiteral("| %1 | %2 | %3 |\n")
+                   .arg(i + 1)
+                   .arg(fleet.ships[i]->toString())
+                   .arg(fleet.shipDynamics[i]
+                            ? fleet.shipDynamics[i]->currentHP
+                            : 0);
+    }
+
+    QMap<MapTestRunResult::Outcome, int> outcomeCounts;
+    for(const auto &run : results) {
+        outcomeCounts[run.outcome]++;
+    }
+    out << QStringLiteral("\n## Outcomes\n\n");
+    out << QStringLiteral("| Outcome | Count | % |\n");
+    out << QStringLiteral("|---------|-------|---|\n");
+    for(auto it = outcomeCounts.begin(); it != outcomeCounts.end(); ++it) {
+        double pct = 100.0 * it.value() / results.size();
+        out << QStringLiteral("| %1 | %2 | %3 |\n")
+                   .arg(outcomeLabel(it.key()))
+                   .arg(it.value())
+                   .arg(pct, 0, 'f', 1);
+    }
+
+    out << QStringLiteral("\n## Per-Node Statistics\n\n");
+    out << QStringLiteral(
+        "| Node | Type | Visits | S | A | B | C | D | E | Avg Dmg "
+        "Taken | Avg Dmg Dealt | Player Survival | Enemy FS Sunk |\n");
+    out << QStringLiteral(
+        "|------|------|--------|---|---|---|---|---|---|------"
+        "-------------|---------------|-----------------|---------------|\n");
+    for(auto it = nodeStats.begin(); it != nodeStats.end(); ++it) {
+        int nodeId = it.key();
+        const MapTestNodeStats &ns = it.value();
+        KP::NodeType type = getNodeTypeFromLua(mapUnionId, nodeId);
+        out << QStringLiteral("| %1 | %2 | %3 | %4 | %5 | %6 | %7 | %8 | %9 | %10 | %11 | %12 | %13 |\n")
+                   .arg(nodeId)
+                   .arg(static_cast<int>(type))
+                   .arg(ns.visits)
+                   .arg(ns.assessments.value(KP::SVictory, 0))
+                   .arg(ns.assessments.value(KP::AVictory, 0))
+                   .arg(ns.assessments.value(KP::BVictory, 0))
+                   .arg(ns.assessments.value(KP::CDefeat, 0))
+                   .arg(ns.assessments.value(KP::DDefeat, 0))
+                   .arg(ns.assessments.value(KP::EDefeat, 0))
+                   .arg(ns.totalDamageTaken / std::max(1, ns.visits), 0, 'f', 1)
+                   .arg(ns.totalDamageDealt / std::max(1, ns.visits), 0, 'f', 1)
+                   .arg(100.0 * ns.playerSurvived / std::max(1, ns.visits), 0, 'f', 1)
+                   .arg(100.0 * ns.enemyFlagshipSunk / std::max(1, ns.visits), 0, 'f', 1);
+    }
+
+    out << QStringLiteral("\n## End State\n\n");
+    out << QStringLiteral("| Metric | Value |\n");
+    out << QStringLiteral("|--------|-------|\n");
+    int flagshipSurvived = 0;
+    double avgFuel = 0.0;
+    double avgAmmo = 0.0;
+    int endCount = 0;
+    for(const auto &run : results) {
+        if(run.flagshipSurvived) flagshipSurvived++;
+        if(!run.visitedNodes.isEmpty()) {
+            int lastNode = run.visitedNodes.last();
+            avgFuel += run.nodeFuelBefore.value(lastNode, 1.0);
+            avgAmmo += run.nodeAmmoBefore.value(lastNode, 1.0);
+            endCount++;
+        }
+    }
+    out << QStringLiteral("| Flagship survival rate | %1% |\n")
+               .arg(100.0 * flagshipSurvived / results.size(), 0, 'f', 1);
+    if(endCount > 0) {
+        out << QStringLiteral("| Avg fuel remaining | %1% |\n")
+                   .arg(100.0 * avgFuel / endCount, 0, 'f', 1);
+        out << QStringLiteral("| Avg ammo remaining | %1% |\n")
+                   .arg(100.0 * avgAmmo / endCount, 0, 'f', 1);
+    }
+
+    bool hasFreight = false;
+    double totalFreight = 0.0;
+    for(const auto &run : results) {
+        if(run.endTotalFreight > 0) {
+            hasFreight = true;
+        }
+        totalFreight += run.endTotalFreight;
+    }
+    if(hasFreight) {
+        out << QStringLiteral("\n## Freight\n\n");
+        out << QStringLiteral("| Avg transported |\n");
+        out << QStringLiteral("|------------------|\n");
+        out << QStringLiteral("| %1 |\n")
+                   .arg(totalFreight / results.size(), 0, 'f', 1);
+    }
+
+    bool hasBoss = false;
+    int bossDepletion = 0;
+    for(const auto &run : results) {
+        if(run.bossDamageDealt > 0) {
+            hasBoss = true;
+            bossDepletion += run.bossDamageDealt;
+        }
+    }
+    if(hasBoss) {
+        out << QStringLiteral("\n## Boss Gauge\n\n");
+        out << QStringLiteral("| Avg depletion |\n");
+        out << QStringLiteral("|---------------|\n");
+        out << QStringLiteral("| %1 |\n").arg(bossDepletion / results.size());
+    }
+
+    out.flush();
+    f.close();
+    qInfo() << "Map test markdown report written to" << path;
+}
+
+void Server::writeMapTestJsonReport(
+    const QString &path,
+    int mapUnionId,
+    KP::Difficulty diff,
+    int repeatCount,
+    int seed,
+    bool autoFleet,
+    const FleetInfo &fleet,
+    const QVector<MapTestRunResult> &results,
+    const QMap<int, MapTestNodeStats> &nodeStats)
+{
+    QJsonObject root;
+    root["mapId"] = mapUnionId;
+    root["difficulty"] = (*KP::diffEnumtoStr)[diff];
+    root["runs"] = repeatCount;
+    root["seed"] = seed;
+    root["fleetSource"] = autoFleet ? QStringLiteral("auto")
+                                    : QStringLiteral("explicit");
+
+    QJsonArray fleetArr;
+    for(size_t i = 0; i < fleet.ships.size(); ++i) {
+        if(!fleet.ships[i]) continue;
+        QJsonObject shipObj;
+        shipObj["pos"] = static_cast<int>(i);
+        shipObj["name"] = fleet.ships[i]->toString();
+        shipObj["hp"] = fleet.shipDynamics[i]
+                            ? fleet.shipDynamics[i]->currentHP
+                            : 0;
+        fleetArr.append(shipObj);
+    }
+    root["fleet"] = fleetArr;
+
+    QMap<MapTestRunResult::Outcome, int> outcomeCounts;
+    for(const auto &run : results) {
+        outcomeCounts[run.outcome]++;
+    }
+    QJsonObject outcomes;
+    outcomes["sortieSuccess"]
+        = outcomeCounts.value(MapTestRunResult::SortieSuccess, 0);
+    outcomes["expeditionSuccess"]
+        = outcomeCounts.value(MapTestRunResult::ExpeditionSuccess, 0);
+    outcomes["expeditionPartial"]
+        = outcomeCounts.value(MapTestRunResult::ExpeditionPartial, 0);
+    outcomes["failure"]
+        = outcomeCounts.value(MapTestRunResult::Failure, 0);
+    outcomes["aborted"]
+        = outcomeCounts.value(MapTestRunResult::Aborted, 0);
+    outcomes["invalidStart"]
+        = outcomeCounts.value(MapTestRunResult::InvalidStart, 0);
+    root["outcomes"] = outcomes;
+
+    QJsonObject nodesObj;
+    for(auto it = nodeStats.begin(); it != nodeStats.end(); ++it) {
+        int nodeId = it.key();
+        const MapTestNodeStats &ns = it.value();
+        QJsonObject nodeObj;
+        nodeObj["type"] = static_cast<int>(
+            getNodeTypeFromLua(mapUnionId, nodeId));
+        nodeObj["visits"] = ns.visits;
+        QJsonObject assessments;
+        assessments["S"] = ns.assessments.value(KP::SVictory, 0);
+        assessments["A"] = ns.assessments.value(KP::AVictory, 0);
+        assessments["B"] = ns.assessments.value(KP::BVictory, 0);
+        assessments["C"] = ns.assessments.value(KP::CDefeat, 0);
+        assessments["D"] = ns.assessments.value(KP::DDefeat, 0);
+        assessments["E"] = ns.assessments.value(KP::EDefeat, 0);
+        nodeObj["assessments"] = assessments;
+        nodeObj["avgDamageTaken"]
+            = ns.totalDamageTaken / std::max(1, ns.visits);
+        nodeObj["avgDamageDealt"]
+            = ns.totalDamageDealt / std::max(1, ns.visits);
+        nodeObj["playerSurvivalRate"]
+            = (double)ns.playerSurvived / std::max(1, ns.visits);
+        nodeObj["enemyFlagshipSunkRate"]
+            = (double)ns.enemyFlagshipSunk / std::max(1, ns.visits);
+        QJsonObject nextFreq;
+        for(auto nfIt = ns.nextNodeFrequency.begin();
+            nfIt != ns.nextNodeFrequency.end(); ++nfIt) {
+            nextFreq[QString::number(nfIt.key())] = nfIt.value();
+        }
+        nodeObj["nextNodeFrequency"] = nextFreq;
+        nodesObj[QString::number(nodeId)] = nodeObj;
+    }
+    root["nodes"] = nodesObj;
+
+    int flagshipSurvived = 0;
+    double avgFuel = 0.0;
+    double avgAmmo = 0.0;
+    int endCount = 0;
+    for(const auto &run : results) {
+        if(run.flagshipSurvived) flagshipSurvived++;
+        if(!run.visitedNodes.isEmpty()) {
+            int lastNode = run.visitedNodes.last();
+            avgFuel += run.nodeFuelBefore.value(lastNode, 1.0);
+            avgAmmo += run.nodeAmmoBefore.value(lastNode, 1.0);
+            endCount++;
+        }
+    }
+    QJsonObject endState;
+    endState["flagshipSurvivalRate"]
+        = (double)flagshipSurvived / results.size();
+    if(endCount > 0) {
+        endState["avgFuel"] = avgFuel / endCount;
+        endState["avgAmmo"] = avgAmmo / endCount;
+    }
+    root["endState"] = endState;
+
+    double totalFreight = 0.0;
+    for(const auto &run : results) {
+        totalFreight += run.endTotalFreight;
+    }
+    QJsonObject freight;
+    freight["avgTransported"] = totalFreight / results.size();
+    root["freight"] = freight;
+
+    int bossDepletion = 0;
+    for(const auto &run : results) {
+        bossDepletion += run.bossDamageDealt;
+    }
+    QJsonObject bossGauge;
+    bossGauge["avgDepletion"] = bossDepletion / results.size();
+    root["bossGauge"] = bossGauge;
+
+    QFile f(path);
+    if(!f.open(QIODevice::WriteOnly | QIODevice::Text)) {
+        qWarning() << "Cannot open map test json file" << path;
+        return;
+    }
+    f.write(QJsonDocument(root).toJson(QJsonDocument::Indented));
+    f.close();
+    qInfo() << "Map test JSON report written to" << path;
+}
+
 QT_END_NAMESPACE

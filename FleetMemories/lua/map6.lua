@@ -1,171 +1,145 @@
 maps = require('lua/maps')
 
---this is a placeholder map
+-- Map 6 -- Yangtze Estuary (star 3, Pattern D -- DISASTER on sub route)
 maps[6] = {
-	starting_nodes = {1},
-	branch_rule = {
-		C = function(
-			ships,
-			los,
-			fleet_type,
-			capitalness, --[0]total/[1]surface/[2]carrier/[3]screens
-			ship_tags,
-			ship_speeds,
-			equipment_list, --list of lists
-			user_state)
-			return 1
-		end,
-		B = function(
-			ships,
-			los,
-			fleet_type,
-			capitalness,
-			ship_tags,
-			ship_speeds,
-			equipment_list,
-			user_state)
-			return 1
-		end,
-		A = function(
-			ships,
-			los,
-			fleet_type,
-			capitalness,
-			ship_tags,
-			ship_speeds,
-			equipment_list,
-			user_state)
-			return 1
-		end,
-	},
+    starting_nodes = {1},
+    branch_rule = {
+        C = function(ships, los, fleet_type, capitalness, ship_tags, ship_speeds, equipment_list, user_state)
+            return 1
+        end,
+    },
+    gauge = 0,
+    softfactor = 20000,
 }
 
 maps[6][1] = {
-	x = 0.200,
-	y = 0.500,
-	battle_type = maps.Battle_type.STARTING,
-	next_nodes = {2},
-	lb_distance = 99,
-	branch_rule = {
-		C = function(
-			ships,
-			los,
-			fleet_type,
-			capitalness, --[0]total/[1]surface/[2]carrier/[3]screens
-			ship_tags,
-			ship_speeds,
-			equipment_list, --list of lists
-			user_state)
-			return 2
-		end,
-		B = function(
-			ships,
-			los,
-			fleet_type,
-			capitalness,
-			ship_tags,
-			ship_speeds,
-			equipment_list,
-			user_state)
-			return 2
-		end,
-		A = function(
-			ships,
-			los,
-			fleet_type,
-			capitalness,
-			ship_tags,
-			ship_speeds,
-			equipment_list,
-			user_state)
-			return 2
-		end,
-	},
+    x = 0.15, y = 0.55,
+    battle_type = maps.Battle_type.STARTING,
+    next_nodes = {2, 5},
+    lb_distance = 99,
+    branch_rule = {
+        C = function(ships, los, fleet_type, capitalness, ship_tags, ship_speeds, equipment_list, user_state)
+            if capitalness[1] <= 0.3 then
+                return 5
+            end
+            return 2
+        end,
+    },
 }
 
 maps[6][2] = {
-	x = 0.800,
-	y = 0.500,
-	battle_type = maps.Battle_type.BOSS,
-	lb_distance = 99,
-	next_nodes = {},
-	branch_rule = {
-		C = function(
-			ships,
-			los,
-			fleet_type,
-			capitalness, --[0]total/[1]surface/[2]carrier/[3]screens
-			ship_tags,
-			ship_speeds,
-			equipment_list, --list of lists
-			user_state)
-			return 0
-		end,
-		B = function(
-			ships,
-			los,
-			fleet_type,
-			capitalness,
-			ship_tags,
-			ship_speeds,
-			equipment_list,
-			user_state)
-			return 0
-		end,
-		A = function(
-			ships,
-			los,
-			fleet_type,
-			capitalness,
-			ship_tags,
-			ship_speeds,
-			equipment_list,
-			user_state)
-			return 0
-		end,
-	},
-	enemy = {
-		C = function()
-			return {}
-		end,
-		B = function()
-			return {}
-		end,
-		A = function()
-			return {}
-		end,
-	},
-	droptable = {
-		C = {
-		},
-		B = {
-		},
-		A = {
-		},
-	},
-	raredroptable = {
-		C = {
-		},
-		B = {
-		},
-		A = {
-		},
-	},
-	exec = {
-		C = function(battleresult, user_state)
-			return false --user state not modified
-		end,
-		B = function(battleresult, user_state)
-			return false --user state not modified
-		end,
-		A = function(battleresult, user_state)
-			return false --user state not modified
-		end,
-	},
-	expr = {
-		C = 200,
-		B = 400,
-		A = 600,
-	},
+    x = 0.40, y = 0.40,
+    battle_type = maps.Battle_type.NORMAL,
+    next_nodes = {3, 4},
+    lb_distance = 99,
+    branch_rule = {
+        C = function(ships, los, fleet_type, capitalness, ship_tags, ship_speeds, equipment_list, user_state)
+            if capitalness[4] >= 0.4 then
+                return 3
+            end
+            return 4
+        end,
+    },
+    enemy = {
+        C = function()
+            return {0x7F010100, 0x7F010100, 0x7F010100, 0x7F020100, 0x7F030100}
+        end,
+    },
+    expr = {
+        C = 100,
+    },
+    exec = {
+        C = function(battleresult, user_state)
+            return false
+        end,
+    },
 }
 
+maps[6][3] = {
+    x = 0.70, y = 0.40,
+    battle_type = maps.Battle_type.BOSS,
+    next_nodes = {},
+    lb_distance = 99,
+    branch_rule = {
+        C = function(ships, los, fleet_type, capitalness, ship_tags, ship_speeds, equipment_list, user_state)
+            return 0
+        end,
+    },
+    enemy = {
+        C = function()
+            return {0x7F010100, 0x7F010100, 0x7F010100, 0x7F030100, 0x7F030100}
+        end,
+    },
+    expr = {
+        C = 350,
+    },
+    exec = {
+        C = function(battleresult, user_state)
+            return false
+        end,
+    },
+}
+
+maps[6][4] = {
+    x = 0.40, y = 0.70,
+    battle_type = maps.Battle_type.NORMAL,
+    next_nodes = {},
+    lb_distance = 99,
+    branch_rule = {
+        C = function(ships, los, fleet_type, capitalness, ship_tags, ship_speeds, equipment_list, user_state)
+            return 0
+        end,
+    },
+    enemy = {
+        C = function()
+            return {0x7F010100, 0x7F010100, 0x7F020100}
+        end,
+    },
+    expr = {
+        C = 100,
+    },
+    exec = {
+        C = function(battleresult, user_state)
+            return false
+        end,
+    },
+}
+
+maps[6][5] = {
+    x = 0.20, y = 0.80,
+    battle_type = maps.Battle_type.DISASTER,
+    next_nodes = {6},
+    lb_distance = 99,
+    fuel = 0.15,
+    ammo = 0.15,
+    branch_rule = {
+        C = function(ships, los, fleet_type, capitalness, ship_tags, ship_speeds, equipment_list, user_state)
+            return 6
+        end,
+    },
+}
+
+maps[6][6] = {
+    x = 0.40, y = 0.85,
+    battle_type = maps.Battle_type.NORMAL,
+    next_nodes = {},
+    lb_distance = 99,
+    branch_rule = {
+        C = function(ships, los, fleet_type, capitalness, ship_tags, ship_speeds, equipment_list, user_state)
+            return 0
+        end,
+    },
+    enemy = {
+        C = function()
+            return {0x7F010100, 0x7F010100, 0x7F020100}
+        end,
+    },
+    expr = {
+        C = 100,
+    },
+    exec = {
+        C = function(battleresult, user_state)
+            return false
+        end,
+    },
+}

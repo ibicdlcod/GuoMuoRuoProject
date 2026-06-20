@@ -47,6 +47,9 @@ ConfirmSortie::ConfirmSortie(QWidget *parent, QString mapText, QString diffText)
         if(qobject_cast<MainWindow *>(widget)) {
             MainWindow *mainWindowM = qobject_cast<MainWindow *>(widget);
             fv = mainWindowM->getFleetArea();
+            if(!fv) {
+                break;
+            }
             mainWindowM->getFleetAreaWidget()->removeWidget(fv);
             ui->fleetLayout->addWidget(fv);
             fv->show();
@@ -57,6 +60,10 @@ ConfirmSortie::ConfirmSortie(QWidget *parent, QString mapText, QString diffText)
 }
 
 ConfirmSortie::~ConfirmSortie() {
+    if(!fv) {
+        delete ui;
+        return;
+    }
     for(auto *widget: QApplication::topLevelWidgets()) {
         if(qobject_cast<MainWindow *>(widget)) {
             fv->hide();

@@ -60,6 +60,15 @@ int main(int argc, char *argv[]) {
         int generateNode = 0;
         QString generateDiff = QStringLiteral("C");
         bool generateFixHP = false;
+        QString testMapLuaPath;
+        int testMapId = 0;
+        QString testMapDifficulty;
+        QString testMapReportPath;
+        QString testMapJsonPath;
+        int testMapRepeatCount = 1;
+        int testMapSeed = -1;
+        int testMapAutoFleetTech = -1;
+        bool isTestMapMode = false;
         for(int i = 1; i < argc; ++i) {
             QString arg = QString::fromLocal8Bit(argv[i]);
             if(arg == QStringLiteral("--testbattle") && i + 1 < argc) {
@@ -70,11 +79,14 @@ int main(int argc, char *argv[]) {
                 isGenerateMode = true;
             }
             else if(arg == QStringLiteral("--report") && i + 1 < argc) {
-                reportPath = QString::fromLocal8Bit(argv[++i]);
+                QString value = QString::fromLocal8Bit(argv[++i]);
+                reportPath = value;
+                testMapReportPath = value;
             }
             else if(arg == QStringLiteral("--repeat") && i + 1 < argc) {
-                repeatCount
-                    = QString::fromLocal8Bit(argv[++i]).toInt();
+                int value = QString::fromLocal8Bit(argv[++i]).toInt();
+                repeatCount = value;
+                testMapRepeatCount = value;
             }
             else if(arg == QStringLiteral("--output") && i + 1 < argc) {
                 outputPath = QString::fromLocal8Bit(argv[++i]);
@@ -97,8 +109,9 @@ int main(int argc, char *argv[]) {
                     = QString::fromLocal8Bit(argv[++i]).toInt();
             }
             else if(arg == QStringLiteral("--difficulty") && i + 1 < argc) {
-                generateDiff
-                    = QString::fromLocal8Bit(argv[++i]);
+                QString value = QString::fromLocal8Bit(argv[++i]);
+                generateDiff = value;
+                testMapDifficulty = value.toUpper();
             }
             else if(arg == QStringLiteral("--fixhp")) {
                 generateFixHP = true;
@@ -106,6 +119,31 @@ int main(int argc, char *argv[]) {
             else if(arg == QStringLiteral("--airpotency") && i + 1 < argc) {
                 airPotency
                     = QString::fromLocal8Bit(argv[++i]).toDouble();
+            }
+            else if(arg == QStringLiteral("--testmap")) {
+                isTestMapMode = true;
+                if(i + 1 < argc) {
+                    QString nextArg
+                        = QString::fromLocal8Bit(argv[i + 1]);
+                    if(!nextArg.startsWith(QStringLiteral("--"))) {
+                        testMapLuaPath = nextArg;
+                        ++i;
+                    }
+                }
+            }
+            else if(arg == QStringLiteral("--map") && i + 1 < argc) {
+                testMapId = QString::fromLocal8Bit(argv[++i]).toInt();
+            }
+            else if(arg == QStringLiteral("--json") && i + 1 < argc) {
+                testMapJsonPath = QString::fromLocal8Bit(argv[++i]);
+            }
+            else if(arg == QStringLiteral("--seed") && i + 1 < argc) {
+                testMapSeed = QString::fromLocal8Bit(argv[++i]).toInt();
+            }
+            else if(arg == QStringLiteral("--auto-fleet-tech")
+                    && i + 1 < argc) {
+                testMapAutoFleetTech
+                    = QString::fromLocal8Bit(argv[++i]).toInt();
             }
         }
         if(isGenerateMode) {
@@ -208,6 +246,70 @@ int main(int argc, char *argv[]) {
 
             settings->setValue("rule/airpotency", airPotency);
             server.runTestBattle(luaPath, reportPath, repeatCount);
+            return 0;
+        }
+        else if(isTestMapMode) {
+            if(testMapId == 0) {
+                qCritical() << "--testmap requires --map <union-id>";
+                return 1;
+            }
+            if(testMapDifficulty.isEmpty()
+               || !QStringLiteral("CBAH").contains(testMapDifficulty)) {
+                qCritical()
+                    << "--testmap requires --difficulty <C|B|A|H>";
+                return 1;
+            }
+            if(testMapReportPath.isEmpty() && testMapJsonPath.isEmpty()) {
+                qCritical()
+                    << "--testmap requires --report and/or --json";
+                return 1;
+            }
+            if(testMapRepeatCount < 1)
+                testMapRepeatCount = 1;
+
+            KP::Difficulty diff = KP::EarlyWar;
+            if(testMapDifficulty == QStringLiteral("B"))
+                diff = KP::MidWar;
+            else if(testMapDifficulty == QStringLiteral("A"))
+                diff = KP::LateWar;
+            else if(testMapDifficulty == QStringLiteral("H"))
+                diff = KP::Historical;
+
+            QT_USE_NAMESPACE
+            Server server(argc, argv);
+            server.setApplicationName("FleetMemories Server");
+            server.setApplicationVersion("0.60.1");
+            server.setOrganizationName("Harusame Software");
+            server.setOrganizationDomain("fleetmemories.moe");
+            settings = std::make_unique<QSettings>(new QSettings);
+            settings->setValue("server/language", "en_US");
+            KP::initLog(true);
+
+            QTranslator translator;
+            const QString baseName
+                = QStringLiteral("FleetMemories_")
+                  + QLocale(
+                        settings->value("server/language",
+                                        "en_US")
+                            .toString())
+                        .name();
+            if(translator.load(
+                   QStringLiteral(":/i18n/") + baseName))
+                server.installTranslator(&translator);
+
+            QSqlDatabase db = QSqlDatabase::addDatabase(
+                QStringLiteral("QSQLITE"));
+            db.setDatabaseName(QStringLiteral("ocean.db"));
+            if(!db.open()) {
+                qCritical() << "Failed to open ocean.db";
+                return 1;
+            }
+
+            settings->setValue("rule/airpotency", airPotency);
+            server.runTestMap(testMapLuaPath, testMapId, diff,
+                              testMapReportPath, testMapJsonPath,
+                              testMapRepeatCount, testMapSeed,
+                              testMapAutoFleetTech);
             return 0;
         }
     }

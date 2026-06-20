@@ -63,18 +63,32 @@
           </property>
          </widget>
         </item>
-        <item>
-         <widget class="QComboBox" name="diffChoice">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-            <horstretch>100</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <spacer name="horizontalSpacer_3">
+         <item>
+          <widget class="QComboBox" name="diffChoice">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+             <horstretch>100</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="starDiffLabel">
+           <property name="text">
+            <string id="star-diff-label">Star Diff:</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="starDiffValue">
+           <property name="text">
+            <string id="star-diff-value-na">N/A</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <spacer name="horizontalSpacer_3">
           <property name="orientation">
            <enum>Qt::Horizontal</enum>
           </property>

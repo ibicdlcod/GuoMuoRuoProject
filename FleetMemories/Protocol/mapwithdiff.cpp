@@ -4,14 +4,16 @@
 #include "mapwithdiff.h"
 #include <QJsonArray>
 
-MapWithDiff::MapWithDiff(const Map &map, KP::Difficulty diff)
-    : Map{map}, diff(diff)
+MapWithDiff::MapWithDiff(const Map &map, KP::Difficulty diff,
+                           double starDiff)
+    : Map{map}, diff(diff), starDiff(starDiff)
 {
 
 }
 
 MapWithDiff::MapWithDiff(const QJsonObject &input)
     : diff(static_cast<KP::Difficulty>(input["diff"].toInt())),
+    starDiff(input["stardiff"].toDouble()),
     Map(input["id"].toInt(), input["x"].toInt(), input["y"].toInt(),
         input["nodeinfo"].toObject())
 {

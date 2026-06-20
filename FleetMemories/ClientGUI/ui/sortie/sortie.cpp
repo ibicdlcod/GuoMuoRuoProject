@@ -187,6 +187,7 @@ Sortie::Sortie(QWidget *parent)
     connect(ui->diffChoice, &QComboBox::currentTextChanged,
             this, [this](const QString &) {
                 recalculateAttrition();
+                updateStarDiff();
             });
     connect(&engine, &Client::mapSupremacyChanged,
             this, &Sortie::recalculateAttrition);
@@ -417,6 +418,33 @@ void Sortie::recalculateAttrition() {
         QString::number(attrition * 100.0, 'f', 1) + "%");
 }
 
+void Sortie::updateStarDiff() {
+    Client &engine = Client::getInstance();
+    if(mapIndex == 0 || !engine.mapRegistryCacheGood) {
+        ui->starDiffValue->setText(qtTrId("star-diff-value-na"));
+        return;
+    }
+    KP::Difficulty selected = KP::EarlyWar;
+    QString diffText = ui->diffChoice->currentText();
+    if(diffText == qtTrId("diff-b")) {
+        selected = KP::MidWar;
+    }
+    else if(diffText == qtTrId("diff-a")) {
+        selected = KP::LateWar;
+    }
+    else if(diffText == qtTrId("diff-s")) {
+        selected = KP::Historical;
+    }
+    int mapIdWithDiff = mapIndex + selected * KP::mapIDDifficultyMask;
+    MapWithDiff *map = engine.mapRegistryCache.value(mapIdWithDiff, nullptr);
+    if(map) {
+        ui->starDiffValue->setText(QString::number(map->starDiff, 'f', 1));
+    }
+    else {
+        ui->starDiffValue->setText(qtTrId("star-diff-value-na"));
+    }
+}
+
 void Sortie::switchMap(int mapId) {
     mapIndex = mapId;
     Client &engine = Client::getInstance();
@@ -479,6 +507,7 @@ void Sortie::switchMap(int mapId) {
         ui->diffChoice->setCurrentIndex(index);
     }
     recalculateAttrition();
+    updateStarDiff();
     /* Update expedition UI state if in expedition mode */
     if (expeditionMode && currentMap) {
         /* Send map union ID to get expedition status for this map */
@@ -619,9 +648,17 @@ void Sortie::transportFreightInfo(const QJsonObject &djson) {
 
 void Sortie::battleEnd() {
     Client &engine = Client::getInstance();
+    if(!currentMap) {
+        return;
+    }
+    if(mapProgressPending) {
+        //% "Map progress request already in flight; ignoring battle-end advance."
+        qWarning() << qtTrId("sortie-battleend-pending");
+        return;
+    }
     /* Show battle result dialog if we have stored results */
     bool hasBattleResults = !currentBattleProcess.isEmpty();
-    
+
     // Existing battle‑end logic */
     switchToState(KP::MapDetail);
     if(currentMap->nodes[currentNodeId].type == KP::CHOICE) {
@@ -647,6 +684,7 @@ ask_for_retreat:
     } else {
         engine.queryNextNode(currentMap->getAbsoluteId(), currentNodeId);
     }
+    mapProgressPending = true;
     delete conf;
 }
 
@@ -656,6 +694,7 @@ void Sortie::sortieEnd() {
     mapIndex = 0;
     currentMap = nullptr;
     currentNodeId = 0;
+    mapProgressPending = false;
     //% "This sortie ended successfully."
     qInfo() << qtTrId("sortie-end");
     switchToState(KP::MapView);
@@ -664,11 +703,13 @@ void Sortie::sortieEnd() {
 
 void Sortie::dealWithNode(const MapNode &node, int nodeId) {
     currentNodeId = nodeId;
+    mapProgressPending = false;
     Client &engine = Client::getInstance();
     detail->changeCurrentNode(node);
     switch(node.type) {
     case KP::STARTING:
         engine.queryNextNode(currentMap->getAbsoluteId(), nodeId);
+        mapProgressPending = true;
         break;
     case KP::TRANSPORT:
         [[fallthrough]];
@@ -1140,8 +1181,15 @@ bool Sortie::cliSortieRetreat(bool retreat) {
         qWarning() << qtTrId("sortie-cli-no-active");
         return false;
     }
+    if(mapProgressPending) {
+        //% "Map progress request already in flight; ignoring sortie %1."
+        qWarning() << qtTrId("sortie-cli-pending")
+                          .arg(retreat ? "retreat" : "advance");
+        return false;
+    }
     Client &engine = Client::getInstance();
     engine.queryNextNode(currentMap->getAbsoluteId(), currentNodeId, retreat);
+    mapProgressPending = true;
     return true;
 }
 

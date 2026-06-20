@@ -11,11 +11,13 @@ class MapWithDiff : public Map
 {
 
 public:
-    explicit MapWithDiff(const Map &Map, KP::Difficulty diff);
+    explicit MapWithDiff(const Map &map, KP::Difficulty diff,
+                         double starDiff = 0.0);
     explicit MapWithDiff(const QJsonObject &);
     bool operator==(const MapWithDiff &other);
 
     KP::Difficulty diff;
+    double starDiff;
 
     static KP::Difficulty getDiff(int mapId);
     static int getUnionId(int mapId);

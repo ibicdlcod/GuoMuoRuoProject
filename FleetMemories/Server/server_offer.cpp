@@ -403,6 +403,7 @@ void Server::offerMapInfo(const CSteamID &uid, QSslSocket *connection)
         mapInfo["x"] = map->worldX;
         mapInfo["y"] = map->worldY;
         mapInfo["diff"] = map->diff;
+        mapInfo["stardiff"] = map->starDiff;
 
         if(lua["maps"][unionId] != sol::nil) {
             QJsonArray startingNodes;

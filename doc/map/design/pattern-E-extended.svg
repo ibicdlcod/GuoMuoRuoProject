@@ -1,0 +1,82 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 460" font-family="monospace">
+  <defs>
+    <marker id="arrow" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+      <path d="M0,0 L8,3 L0,6 Z" fill="#333"/>
+    </marker>
+  </defs>
+  <text x="250" y="28" text-anchor="middle" font-size="16" font-weight="bold">Pattern E — Extended Fork (star 3)</text>
+
+  <!-- START -->
+  <circle cx="250" cy="60" r="20" fill="#4CAF50" stroke="#333" stroke-width="2"/>
+  <text x="250" y="65" text-anchor="middle" fill="white" font-size="11" font-weight="bold">1</text>
+  <text x="250" y="95" text-anchor="middle" font-size="10">START</text>
+
+  <line x1="250" y1="80" x2="250" y2="118" stroke="#333" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <!-- NORMAL 2 -->
+  <circle cx="250" cy="138" r="20" fill="#FF9800" stroke="#333" stroke-width="2"/>
+  <text x="250" y="143" text-anchor="middle" fill="white" font-size="11" font-weight="bold">2</text>
+  <text x="250" y="170" text-anchor="middle" font-size="10">NORMAL</text>
+
+  <!-- Branch 1: expedition off-ramp early -->
+  <line x1="250" y1="158" x2="250" y2="195" stroke="#333" stroke-width="2"/>
+  <rect x="150" y="192" width="200" height="18" rx="4" fill="#E3F2FD" stroke="#2196F3"/>
+  <text x="250" y="206" text-anchor="middle" font-size="9" fill="#1565C0">branch: screens ≥ 0.4?</text>
+
+  <line x1="250" y1="210" x2="440" y2="250" stroke="#333" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <text x="350" y="228" text-anchor="middle" font-size="9" fill="#388E3C">Y</text>
+
+  <circle cx="440" cy="268" r="20" fill="#FF9800" stroke="#333" stroke-width="2"/>
+  <text x="440" y="273" text-anchor="middle" fill="white" font-size="11" font-weight="bold">5</text>
+  <text x="440" y="300" text-anchor="middle" font-size="10">NORMAL</text>
+  <text x="440" y="315" text-anchor="middle" font-size="8" fill="#777">(end node)</text>
+  <text x="440" y="328" text-anchor="middle" font-size="8" fill="#777">Expedition</text>
+  <text x="440" y="341" text-anchor="middle" font-size="8" fill="#777">S→Success</text>
+  <text x="440" y="354" text-anchor="middle" font-size="8" fill="#777">A/B→Partial</text>
+
+  <!-- Main route continues -->
+  <line x1="250" y1="210" x2="250" y2="250" stroke="#333" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <text x="275" y="235" text-anchor="middle" font-size="9" fill="#D32F2F">N</text>
+
+  <!-- NORMAL 3 -->
+  <circle cx="250" cy="270" r="20" fill="#FF9800" stroke="#333" stroke-width="2"/>
+  <text x="250" y="275" text-anchor="middle" fill="white" font-size="11" font-weight="bold">3</text>
+  <text x="250" y="305" text-anchor="middle" font-size="10">NORMAL</text>
+
+  <!-- Branch 2: LOS check for shorter path -->
+  <line x1="250" y1="290" x2="250" y2="322" stroke="#333" stroke-width="2"/>
+  <rect x="155" y="319" width="190" height="18" rx="4" fill="#E3F2FD" stroke="#2196F3"/>
+  <text x="250" y="333" text-anchor="middle" font-size="9" fill="#1565C0">branch: los ≥ 30? (LOS)</text>
+
+  <line x1="250" y1="337" x2="100" y2="370" stroke="#333" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <text x="165" y="350" text-anchor="middle" font-size="9" fill="#388E3C">Y</text>
+
+  <circle cx="100" cy="390" r="20" fill="#FF9800" stroke="#333" stroke-width="2"/>
+  <text x="100" y="395" text-anchor="middle" fill="white" font-size="11" font-weight="bold">4a</text>
+
+  <line x1="100" y1="410" x2="100" y2="430" stroke="#333" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <circle cx="100" cy="448" r="20" fill="#F44336" stroke="#333" stroke-width="3"/>
+  <text x="100" y="453" text-anchor="middle" fill="white" font-size="11" font-weight="bold">BOSS</text>
+
+  <line x1="250" y1="337" x2="400" y2="370" stroke="#333" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <text x="330" y="350" text-anchor="middle" font-size="9" fill="#D32F2F">N</text>
+
+  <circle cx="400" cy="390" r="20" fill="#FF9800" stroke="#333" stroke-width="2"/>
+  <text x="400" y="395" text-anchor="middle" fill="white" font-size="11" font-weight="bold">4b</text>
+
+  <line x1="400" y1="410" x2="400" y2="430" stroke="#333" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <circle cx="400" cy="448" r="20" fill="#F44336" stroke="#333" stroke-width="3"/>
+  <text x="400" y="453" text-anchor="middle" fill="white" font-size="11" font-weight="bold">BOSS</text>
+
+  <text x="250" y="430" text-anchor="middle" font-size="8" fill="#777">(4a: short path | 4b: long path → same boss)</text>
+
+  <!-- Legend -->
+  <rect x="370" y="10" width="120" height="80" fill="#f9f9f9" stroke="#ccc"/>
+  <circle cx="385" cy="25" r="8" fill="#4CAF50"/><text x="398" y="29" font-size="9">START</text>
+  <circle cx="385" cy="40" r="8" fill="#FF9800"/><text x="398" y="44" font-size="9">NORMAL</text>
+  <circle cx="385" cy="55" r="8" fill="#F44336"/><text x="398" y="59" font-size="9">BOSS (end)</text>
+  <rect x="376" y="63" width="18" height="10" rx="2" fill="#E3F2FD" stroke="#2196F3"/>
+  <text x="398" y="72" font-size="9">branch</text>
+</svg>

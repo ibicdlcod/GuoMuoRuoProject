@@ -1,0 +1,54 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 550 340" font-family="monospace">
+  <defs>
+    <marker id="arrow" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+      <path d="M0,0 L8,3 L0,6 Z" fill="#333"/>
+    </marker>
+  </defs>
+  <text x="275" y="30" text-anchor="middle" font-size="16" font-weight="bold">Pattern F — Fork</text>
+
+  <!-- START -->
+  <circle cx="275" cy="65" r="22" fill="#4CAF50" stroke="#333" stroke-width="2"/>
+  <text x="275" y="70" text-anchor="middle" fill="white" font-size="12" font-weight="bold">1</text>
+  <text x="275" y="100" text-anchor="middle" font-size="11">START</text>
+
+  <!-- Branch label -->
+  <line x1="275" y1="87" x2="275" y2="120" stroke="#333" stroke-width="2"/>
+  <rect x="180" y="115" width="190" height="20" rx="4" fill="#E3F2FD" stroke="#2196F3"/>
+  <text x="275" y="130" text-anchor="middle" font-size="10" fill="#1565C0">branch: capital ≥ 0.5?</text>
+
+  <!-- Left (boss route) -->
+  <line x1="275" y1="135" x2="110" y2="170" stroke="#333" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <text x="190" y="150" text-anchor="middle" font-size="9" fill="#388E3C">Y</text>
+
+  <circle cx="110" cy="190" r="22" fill="#FF9800" stroke="#333" stroke-width="2"/>
+  <text x="110" y="195" text-anchor="middle" fill="white" font-size="12" font-weight="bold">2</text>
+  <text x="110" y="225" text-anchor="middle" font-size="11">NORMAL</text>
+
+  <line x1="110" y1="212" x2="110" y2="245" stroke="#333" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <circle cx="110" cy="265" r="22" fill="#F44336" stroke="#333" stroke-width="3"/>
+  <text x="110" y="270" text-anchor="middle" fill="white" font-size="12" font-weight="bold">3</text>
+  <text x="110" y="300" text-anchor="middle" font-size="10">BOSS (end)</text>
+
+  <!-- Right (expedition route) -->
+  <line x1="275" y1="135" x2="445" y2="170" stroke="#333" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <text x="360" y="150" text-anchor="middle" font-size="9" fill="#D32F2F">N</text>
+
+  <circle cx="445" cy="190" r="22" fill="#FF9800" stroke="#333" stroke-width="2"/>
+  <text x="445" y="195" text-anchor="middle" fill="white" font-size="12" font-weight="bold">4</text>
+  <text x="445" y="225" text-anchor="middle" font-size="10">NORMAL</text>
+
+  <text x="445" y="260" text-anchor="middle" font-size="10" fill="#555">(end node)</text>
+  <text x="445" y="275" text-anchor="middle" font-size="9" fill="#777">Expedition</text>
+  <text x="445" y="288" text-anchor="middle" font-size="9" fill="#777">S→Success</text>
+  <text x="445" y="301" text-anchor="middle" font-size="9" fill="#777">A/B→Partial</text>
+
+  <!-- Legend -->
+  <rect x="10" y="10" width="140" height="55" fill="#f9f9f9" stroke="#ccc"/>
+  <circle cx="25" cy="25" r="8" fill="#4CAF50"/>
+  <text x="40" y="29" font-size="10">START</text>
+  <circle cx="25" cy="40" r="8" fill="#FF9800"/>
+  <text x="40" y="44" font-size="10">NORMAL</text>
+  <circle cx="25" cy="55" r="8" fill="#F44336"/>
+  <text x="40" y="59" font-size="10">BOSS</text>
+</svg>

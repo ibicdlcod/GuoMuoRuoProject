@@ -419,7 +419,18 @@ bool Server::importMapNodeFromCSV() {
                         == 0) {
                     insertMapResource.bindValue(":id", mapNodeId);
                     insertMapResource.bindValue(":attr", titleParts[i]);
-                    insertMapResource.bindValue(":value", lineParts[i].toInt());
+                    /* Star-difficulty columns may be non-integer. */
+                    if(titleParts[i].compare("diffC", Qt::CaseInsensitive) == 0
+                        || titleParts[i].compare("diffB", Qt::CaseInsensitive) == 0
+                        || titleParts[i].compare("diffA", Qt::CaseInsensitive) == 0
+                        || titleParts[i].compare("diffH", Qt::CaseInsensitive) == 0) {
+                        insertMapResource.bindValue(":value",
+                                                    lineParts[i].toDouble());
+                    }
+                    else {
+                        insertMapResource.bindValue(":value",
+                                                    lineParts[i].toInt());
+                    }
                     if(!insertMapResource.exec()) {
                         db.rollback();
                         //% "Import map node database failed!"
@@ -850,25 +861,25 @@ bool Server::mapRefresh()
             while(query.next()) {
                 QString attr = query.value(attrCol).toString();
                 int val = query.value(valueCol).toInt();
-                if(attr.compare("O", Qt::CaseInsensitive)) {
+                if(attr.compare("O", Qt::CaseInsensitive) == 0) {
                     O = val;
                 }
-                if(attr.compare("E", Qt::CaseInsensitive)) {
+                if(attr.compare("E", Qt::CaseInsensitive) == 0) {
                     E = val;
                 }
-                if(attr.compare("S", Qt::CaseInsensitive)) {
+                if(attr.compare("S", Qt::CaseInsensitive) == 0) {
                     S = val;
                 }
-                if(attr.compare("R", Qt::CaseInsensitive)) {
+                if(attr.compare("R", Qt::CaseInsensitive) == 0) {
                     R = val;
                 }
-                if(attr.compare("A", Qt::CaseInsensitive)) {
+                if(attr.compare("A", Qt::CaseInsensitive) == 0) {
                     A = val;
                 }
-                if(attr.compare("W", Qt::CaseInsensitive)) {
+                if(attr.compare("W", Qt::CaseInsensitive) == 0) {
                     W = val;
                 }
-                if(attr.compare("C", Qt::CaseInsensitive)) {
+                if(attr.compare("C", Qt::CaseInsensitive) == 0) {
                     C = val;
                 }
             }
@@ -922,21 +933,71 @@ bool Server::mapRefresh()
                     }
                 }
             }
+            double starDiffC = 0.0;
+            double starDiffB = 0.0;
+            double starDiffA = 0.0;
+            double starDiffH = 0.0;
+            {
+                QSqlQuery query;
+                query.prepare("SELECT Attribute, Intvalue FROM MapResource "
+                              "WHERE MapID = :id "
+                              "AND (Attribute = 'diffC' OR Attribute = 'diffB' "
+                              "     OR Attribute = 'diffA' OR Attribute = 'diffH');");
+                query.bindValue(":id", mapID);
+                if(!query.exec()) {
+                    //% "Load map table failed!"
+                    throw DBError(qtTrId("map-refresh-failed"),
+                                  query.lastError(), query.lastQuery());
+                    return false;
+                }
+                query.isSelect();
+                QSqlRecord rec = query.record();
+                int attrCol = rec.indexOf("Attribute");
+                int valueCol = rec.indexOf("Intvalue");
+                while(query.next()) {
+                    QString attr2 = query.value(attrCol).toString();
+                    double val = query.value(valueCol).toDouble();
+                    if(attr2.compare("diffC", Qt::CaseInsensitive) == 0) {
+                        starDiffC = val;
+                    }
+                    else if(attr2.compare("diffB", Qt::CaseInsensitive) == 0) {
+                        starDiffB = val;
+                    }
+                    else if(attr2.compare("diffA", Qt::CaseInsensitive) == 0) {
+                        starDiffA = val;
+                    }
+                    else if(attr2.compare("diffH", Qt::CaseInsensitive) == 0) {
+                        starDiffH = val;
+                    }
+                }
+            }
             if(mapID == KP::hiddenMap) {
                 normalMaps.insert(
                     mapID + KP::Historical * KP::mapIDDifficultyMask,
-                    new MapWithDiff(m, KP::Historical));
+                    new MapWithDiff(m, KP::Historical, starDiffH));
             }
             else {
                 auto meta = QMetaEnum::fromType<KP::Difficulty>();
                 for(int i = 0; i < meta.keyCount(); ++i) {
                     auto diff = static_cast<KP::Difficulty>(meta.value(i));
-                    if(diff == KP::Historical) {
-                        continue;
+                    double starDiff = 0.0;
+                    switch(diff) {
+                    case KP::EarlyWar:
+                        starDiff = starDiffC;
+                        break;
+                    case KP::MidWar:
+                        starDiff = starDiffB;
+                        break;
+                    case KP::LateWar:
+                        starDiff = starDiffA;
+                        break;
+                    case KP::Historical:
+                        starDiff = starDiffH;
+                        break;
                     }
                     normalMaps.insert(
                         mapID + meta.value(i) * KP::mapIDDifficultyMask,
-                        new MapWithDiff(m, diff));
+                        new MapWithDiff(m, diff, starDiff));
                 }
             }
         }

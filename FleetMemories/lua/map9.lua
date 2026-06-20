@@ -1,171 +1,245 @@
 maps = require('lua/maps')
 
---this is a placeholder map
+-- Map 9 -- Attu (star 4, Pattern M -- DISASTER on sub, 3-way branch)
 maps[9] = {
-	starting_nodes = {1},
-	branch_rule = {
-		C = function(
-			ships,
-			los,
-			fleet_type,
-			capitalness, --[0]total/[1]surface/[2]carrier/[3]screens
-			ship_tags,
-			ship_speeds,
-			equipment_list, --list of lists
-			user_state)
-			return 1
-		end,
-		B = function(
-			ships,
-			los,
-			fleet_type,
-			capitalness,
-			ship_tags,
-			ship_speeds,
-			equipment_list,
-			user_state)
-			return 1
-		end,
-		A = function(
-			ships,
-			los,
-			fleet_type,
-			capitalness,
-			ship_tags,
-			ship_speeds,
-			equipment_list,
-			user_state)
-			return 1
-		end,
-	},
+    starting_nodes = {1},
+    branch_rule = {
+        C = function(ships, los, fleet_type, capitalness, ship_tags, ship_speeds, equipment_list, user_state)
+            return 1
+        end,
+    },
+    gauge = 0,
+    softfactor = 20000,
 }
 
 maps[9][1] = {
-	x = 0.200,
-	y = 0.500,
-	battle_type = maps.Battle_type.STARTING,
-	next_nodes = {2},
-	lb_distance = 99,
-	branch_rule = {
-		C = function(
-			ships,
-			los,
-			fleet_type,
-			capitalness, --[0]total/[1]surface/[2]carrier/[3]screens
-			ship_tags,
-			ship_speeds,
-			equipment_list, --list of lists
-			user_state)
-			return 2
-		end,
-		B = function(
-			ships,
-			los,
-			fleet_type,
-			capitalness,
-			ship_tags,
-			ship_speeds,
-			equipment_list,
-			user_state)
-			return 2
-		end,
-		A = function(
-			ships,
-			los,
-			fleet_type,
-			capitalness,
-			ship_tags,
-			ship_speeds,
-			equipment_list,
-			user_state)
-			return 2
-		end,
-	},
+    x = 0.15, y = 0.55,
+    battle_type = maps.Battle_type.STARTING,
+    next_nodes = {2},
+    lb_distance = 99,
+    branch_rule = {
+        C = function(ships, los, fleet_type, capitalness, ship_tags, ship_speeds, equipment_list, user_state)
+            return 2
+        end,
+    },
 }
 
 maps[9][2] = {
-	x = 0.800,
-	y = 0.500,
-	battle_type = maps.Battle_type.BOSS,
-	lb_distance = 99,
-	next_nodes = {},
-	branch_rule = {
-		C = function(
-			ships,
-			los,
-			fleet_type,
-			capitalness, --[0]total/[1]surface/[2]carrier/[3]screens
-			ship_tags,
-			ship_speeds,
-			equipment_list, --list of lists
-			user_state)
-			return 0
-		end,
-		B = function(
-			ships,
-			los,
-			fleet_type,
-			capitalness,
-			ship_tags,
-			ship_speeds,
-			equipment_list,
-			user_state)
-			return 0
-		end,
-		A = function(
-			ships,
-			los,
-			fleet_type,
-			capitalness,
-			ship_tags,
-			ship_speeds,
-			equipment_list,
-			user_state)
-			return 0
-		end,
-	},
-	enemy = {
-		C = function()
-			return {}
-		end,
-		B = function()
-			return {}
-		end,
-		A = function()
-			return {}
-		end,
-	},
-	droptable = {
-		C = {
-		},
-		B = {
-		},
-		A = {
-		},
-	},
-	raredroptable = {
-		C = {
-		},
-		B = {
-		},
-		A = {
-		},
-	},
-	exec = {
-		C = function(battleresult, user_state)
-			return false --user state not modified
-		end,
-		B = function(battleresult, user_state)
-			return false --user state not modified
-		end,
-		A = function(battleresult, user_state)
-			return false --user state not modified
-		end,
-	},
-	expr = {
-		C = 200,
-		B = 400,
-		A = 600,
-	},
+    x = 0.30, y = 0.40,
+    battle_type = maps.Battle_type.NORMAL,
+    next_nodes = {3, 6, 8},
+    lb_distance = 99,
+    branch_rule = {
+        C = function(ships, los, fleet_type, capitalness, ship_tags, ship_speeds, equipment_list, user_state)
+            if capitalness[1] <= 0.2 then
+                return 6
+            end
+            if fleet_type == 2 then
+                return 3
+            end
+            return 8
+        end,
+    },
+    enemy = {
+        C = function()
+            return {0x7F010100, 0x7F010100, 0x7F010100, 0x7F020100, 0x7F030100}
+        end,
+    },
+    expr = {
+        C = 100,
+    },
+    exec = {
+        C = function(battleresult, user_state)
+            return false
+        end,
+    },
 }
 
+maps[9][3] = {
+    x = 0.50, y = 0.25,
+    battle_type = maps.Battle_type.NORMAL,
+    next_nodes = {4},
+    lb_distance = 99,
+    branch_rule = {
+        C = function(ships, los, fleet_type, capitalness, ship_tags, ship_speeds, equipment_list, user_state)
+            return 4
+        end,
+    },
+    enemy = {
+        C = function()
+            return {0x7F010100, 0x7F010100, 0x7F010100, 0x7F020100, 0x7F030100}
+        end,
+    },
+    expr = {
+        C = 100,
+    },
+    exec = {
+        C = function(battleresult, user_state)
+            return false
+        end,
+    },
+}
+
+maps[9][4] = {
+    x = 0.65, y = 0.25,
+    battle_type = maps.Battle_type.NORMAL,
+    next_nodes = {5},
+    lb_distance = 99,
+    branch_rule = {
+        C = function(ships, los, fleet_type, capitalness, ship_tags, ship_speeds, equipment_list, user_state)
+            return 5
+        end,
+    },
+    enemy = {
+        C = function()
+            return {0x7F010100, 0x7F010100, 0x7F010100, 0x7F020100, 0x7F030100}
+        end,
+    },
+    expr = {
+        C = 100,
+    },
+    exec = {
+        C = function(battleresult, user_state)
+            return false
+        end,
+    },
+}
+
+maps[9][6] = {
+    x = 0.10, y = 0.70,
+    battle_type = maps.Battle_type.DISASTER,
+    next_nodes = {7},
+    lb_distance = 99,
+    fuel = 0.15,
+    ammo = 0.15,
+    branch_rule = {
+        C = function(ships, los, fleet_type, capitalness, ship_tags, ship_speeds, equipment_list, user_state)
+            return 7
+        end,
+    },
+}
+
+maps[9][7] = {
+    x = 0.25, y = 0.70,
+    battle_type = maps.Battle_type.NORMAL,
+    next_nodes = {5},
+    lb_distance = 99,
+    branch_rule = {
+        C = function(ships, los, fleet_type, capitalness, ship_tags, ship_speeds, equipment_list, user_state)
+            return 5
+        end,
+    },
+    enemy = {
+        C = function()
+            return {0x7F010100, 0x7F010100, 0x7F020100}
+        end,
+    },
+    expr = {
+        C = 50,
+    },
+    exec = {
+        C = function(battleresult, user_state)
+            return false
+        end,
+    },
+}
+
+maps[9][8] = {
+    x = 0.50, y = 0.70,
+    battle_type = maps.Battle_type.NORMAL,
+    next_nodes = {9},
+    lb_distance = 99,
+    branch_rule = {
+        C = function(ships, los, fleet_type, capitalness, ship_tags, ship_speeds, equipment_list, user_state)
+            return 9
+        end,
+    },
+    enemy = {
+        C = function()
+            return {0x7F010100, 0x7F010100, 0x7F010100, 0x7F020100, 0x7F030100}
+        end,
+    },
+    expr = {
+        C = 100,
+    },
+    exec = {
+        C = function(battleresult, user_state)
+            return false
+        end,
+    },
+}
+
+maps[9][9] = {
+    x = 0.65, y = 0.70,
+    battle_type = maps.Battle_type.NORMAL,
+    next_nodes = {},
+    lb_distance = 99,
+    branch_rule = {
+        C = function(ships, los, fleet_type, capitalness, ship_tags, ship_speeds, equipment_list, user_state)
+            return 0
+        end,
+    },
+    enemy = {
+        C = function()
+            return {0x7F010100, 0x7F010100, 0x7F010100, 0x7F020100, 0x7F030100}
+        end,
+    },
+    expr = {
+        C = 100,
+    },
+    exec = {
+        C = function(battleresult, user_state)
+            return false
+        end,
+    },
+}
+
+maps[9][5] = {
+    x = 0.80, y = 0.45,
+    battle_type = maps.Battle_type.NORMAL,
+    next_nodes = {10},
+    lb_distance = 99,
+    branch_rule = {
+        C = function(ships, los, fleet_type, capitalness, ship_tags, ship_speeds, equipment_list, user_state)
+            return 10
+        end,
+    },
+    enemy = {
+        C = function()
+            return {0x7F010100, 0x7F010100, 0x7F010100, 0x7F020100, 0x7F030100}
+        end,
+    },
+    expr = {
+        C = 100,
+    },
+    exec = {
+        C = function(battleresult, user_state)
+            return false
+        end,
+    },
+}
+
+maps[9][10] = {
+    x = 0.95, y = 0.45,
+    battle_type = maps.Battle_type.BOSS,
+    next_nodes = {},
+    lb_distance = 99,
+    branch_rule = {
+        C = function(ships, los, fleet_type, capitalness, ship_tags, ship_speeds, equipment_list, user_state)
+            return 0
+        end,
+    },
+    enemy = {
+        C = function()
+            return {0x7F010100, 0x7F010100, 0x7F010100, 0x7F010100, 0x7F030100, 0x7B050100}
+        end,
+    },
+    expr = {
+        C = 450,
+    },
+    exec = {
+        C = function(battleresult, user_state)
+            return false
+        end,
+    },
+}

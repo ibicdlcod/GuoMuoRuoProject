@@ -48,6 +48,51 @@ public:
     bool runTestBattle(const QString &luaPath,
                        const QString &reportPath,
                        int repeatCount = 1);
+    bool runTestMap(const QString &luaPath,
+                    int mapUnionId,
+                    KP::Difficulty diff,
+                    const QString &reportPath,
+                    const QString &jsonPath,
+                    int repeatCount = 1,
+                    int seed = -1,
+                    int autoFleetTechCap = -1);
+
+    struct MapTestNodeStats {
+        int visits = 0;
+        QMap<KP::BattleAssessment, int> assessments;
+        double totalDamageTaken = 0.0;
+        double totalDamageDealt = 0.0;
+        int playerSurvived = 0;
+        int enemyFlagshipSunk = 0;
+        QMap<int, int> nextNodeFrequency;
+    };
+
+    struct MapTestRunResult {
+        enum Outcome {
+            SortieSuccess,
+            ExpeditionSuccess,
+            ExpeditionPartial,
+            Failure,
+            Aborted,
+            InvalidStart
+        };
+        Outcome outcome = Failure;
+        QVector<int> visitedNodes;
+        QMap<int, KP::BattleAssessment> nodeAssessments;
+        QMap<int, int> nodeDamageTaken;
+        QMap<int, int> nodeDamageDealt;
+        QMap<int, int> nodeHpBefore;
+        QMap<int, int> nodeHpAfter;
+        QMap<int, double> nodeFuelBefore;
+        QMap<int, double> nodeAmmoBefore;
+        QMap<int, int> nextNodeFrequency;
+        int endTotalFreight = 0;
+        int bossDamageDealt = 0;
+        bool bossSunk = false;
+        bool flagshipSurvived = true;
+        QString abortReason;
+    };
+
     bool generateTestLua(const QString &outputPath, uint64 steamId,
                          int fleetIndex, int enemyMapId,
                          int enemyNodeId,
@@ -277,6 +322,30 @@ private:
                               int repeatCount,
                               const FleetInfo &friendFleet,
                               const FleetInfo &enemyFleet) const;
+
+    FleetInfo buildAutoFleetForMap(int mapUnionId, KP::Difficulty diff,
+                                   int techYearCap);
+    MapTestRunResult runSingleMapTest(int mapUnionId, KP::Difficulty diff,
+                                      const FleetInfo &initialFleet,
+                                      const QJsonObject &battlePlan,
+                                      const QMap<int, int> &choiceOverrides);
+    void writeMapTestMarkdownReport(const QString &path,
+                                    int mapUnionId,
+                                    KP::Difficulty diff,
+                                    int repeatCount,
+                                    bool autoFleet,
+                                    const FleetInfo &fleet,
+                                    const QVector<MapTestRunResult> &results,
+                                    const QMap<int, MapTestNodeStats> &nodeStats);
+    void writeMapTestJsonReport(const QString &path,
+                                int mapUnionId,
+                                KP::Difficulty diff,
+                                int repeatCount,
+                                int seed,
+                                bool autoFleet,
+                                const FleetInfo &fleet,
+                                const QVector<MapTestRunResult> &results,
+                                const QMap<int, MapTestNodeStats> &nodeStats);
     std::pair<KP::FleetFailType, int> updateFleet(const CSteamID &,
                                                   const QJsonArray &);
     void updateFleetIntoDatabase(const CSteamID &,

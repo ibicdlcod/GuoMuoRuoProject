@@ -88,6 +88,7 @@ private slots:
     void updateAutoRestartLabel();
     void saveExpeditionSettings();
     void planExpeditionNodes();
+    void updateStarDiff();
 
 private:
     Ui::Sortie *ui;
@@ -112,6 +113,7 @@ private:
     MapWithDiff *currentMap = nullptr;
     int currentNodeId = 0;
     QJsonObject currentBattleProcess;
+    bool mapProgressPending = false;
 
     // Expedition state
     bool expeditionMode = false;

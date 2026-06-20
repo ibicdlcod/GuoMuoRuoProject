@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" font-family="monospace">
+  <defs>
+    <marker id="arrow" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+      <path d="M0,0 L8,3 L0,6 Z" fill="#333"/>
+    </marker>
+  </defs>
+  <text x="200" y="30" text-anchor="middle" font-size="16" font-weight="bold">Pattern L — Linear</text>
+
+  <!-- START node -->
+  <circle cx="200" cy="70" r="22" fill="#4CAF50" stroke="#333" stroke-width="2"/>
+  <text x="200" y="75" text-anchor="middle" fill="white" font-size="12" font-weight="bold">1</text>
+  <text x="200" y="105" text-anchor="middle" font-size="11">START</text>
+
+  <!-- Arrow -->
+  <line x1="200" y1="92" x2="200" y2="128" stroke="#333" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <!-- NORMAL node -->
+  <circle cx="200" cy="150" r="22" fill="#FF9800" stroke="#333" stroke-width="2"/>
+  <text x="200" y="155" text-anchor="middle" fill="white" font-size="12" font-weight="bold">2</text>
+  <text x="200" y="185" text-anchor="middle" font-size="11">NORMAL</text>
+
+  <!-- Arrow -->
+  <line x1="200" y1="172" x2="200" y2="208" stroke="#333" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <!-- BOSS node -->
+  <circle cx="200" cy="230" r="22" fill="#F44336" stroke="#333" stroke-width="3"/>
+  <text x="200" y="235" text-anchor="middle" fill="white" font-size="12" font-weight="bold">3</text>
+  <text x="200" y="265" text-anchor="middle" font-size="11">BOSS (end)</text>
+
+  <!-- Legend -->
+  <rect x="10" y="10" width="140" height="65" fill="#f9f9f9" stroke="#ccc"/>
+  <circle cx="25" cy="30" r="8" fill="#4CAF50"/>
+  <text x="40" y="34" font-size="10">START</text>
+  <circle cx="25" cy="45" r="8" fill="#FF9800"/>
+  <text x="40" y="49" font-size="10">NORMAL</text>
+  <circle cx="25" cy="60" r="8" fill="#F44336"/>
+  <text x="40" y="64" font-size="10">BOSS</text>
+</svg>
