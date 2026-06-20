@@ -656,6 +656,9 @@ void Sortie::battleEnd() {
         qWarning() << qtTrId("sortie-battleend-pending");
         return;
     }
+    /* Arm guard before ConfirmSortie::exec()'s nested event loop so a
+     * re-entrant battleEnd cannot advance the same node twice. */
+    mapProgressPending = true;
     /* Show battle result dialog if we have stored results */
     bool hasBattleResults = !currentBattleProcess.isEmpty();
 
@@ -684,7 +687,6 @@ ask_for_retreat:
     } else {
         engine.queryNextNode(currentMap->getAbsoluteId(), currentNodeId);
     }
-    mapProgressPending = true;
     delete conf;
 }
 
