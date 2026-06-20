@@ -45,5 +45,6 @@
 		if (VB_shipclass == 0x00470A00) or (VB_shipclass == 0x00470800) then
 			return 1.25
 		end
+	end
 
 return nil  -- no bonuses defined yet

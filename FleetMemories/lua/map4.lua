@@ -40,7 +40,7 @@ maps[4][2] = {
     },
     enemy = {
         C = function()
-            return {0x7F010100, 0x7F010100, 0x7F020100}
+            return {0x7C030100, 0x7C030100}
         end,
     },
     expr = {
@@ -68,7 +68,7 @@ maps[4][3] = {
     },
     enemy = {
         C = function()
-            return {0x7F010100, 0x7F010100, 0x7F010100, 0x7F020100}
+            return {0x7C030100, 0x7C030100}
         end,
     },
     expr = {
@@ -93,7 +93,7 @@ maps[4][4] = {
     },
     enemy = {
         C = function()
-            return {0x7F010100, 0x7F010100, 0x7F020100}
+            return {0x7C030100, 0x7C030100}
         end,
     },
     expr = {
@@ -132,7 +132,7 @@ maps[4][6] = {
     },
     enemy = {
         C = function()
-            return {0x7F010100, 0x7F010100, 0x7F010100, 0x7F020100}
+            return {0x7C030100, 0x7C030100}
         end,
     },
     expr = {
@@ -157,7 +157,7 @@ maps[4][7] = {
     },
     enemy = {
         C = function()
-            return {0x7F010100, 0x7F010100, 0x7F010100, 0x7F030100, 0x7F030100}
+            return {0x7B030100, 0x7C030100, 0x7C050100}
         end,
     },
     expr = {

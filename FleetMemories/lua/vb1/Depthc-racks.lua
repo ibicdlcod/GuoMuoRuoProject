@@ -7,12 +7,12 @@
 			return 1.1 + VB_stareff * 0.05
 		end
 -- 227: 二式爆雷
-	if VB_equipid == 227 then
+	elseif VB_equipid == 227 then
 		if (VB_shipid & 0x00F00000 == 0x00100000) then
 			return 1.1 + VB_stareff * 0.1
 		end
 -- 488: 二式爆雷改二
-	if VB_equipid == 488 then
+	elseif VB_equipid == 488 then
 		if (VB_shipchar == 0x00120602) and VB_remodelstage >= 0x30 then
 			return 1.25 + VB_stareff * 0.05
 		end

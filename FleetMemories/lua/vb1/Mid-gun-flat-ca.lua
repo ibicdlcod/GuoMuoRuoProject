@@ -13,7 +13,7 @@
 		end
 -- 50: 20.3cm(3号)連装砲
 	elseif VB_equipid == 50 then
-		if VB_shipclass == 0x00140500 and VB_remodelstage >= 0x20) or VB_shipid == 0x3F182602 then
+		if (VB_shipclass == 0x00140500 and VB_remodelstage >= 0x20) or VB_shipid == 0x3F182602 then
 			return 1.25
 		end
 		if (VB_shipclass == 0x00140300 or VB_shipclass == 0x00140600) and VB_remodelstage >= 0x20 then
@@ -24,7 +24,7 @@
 		end
 -- 520: 試製20.3cm(4号)連装砲
 	elseif VB_equipid == 520 then
-		if VB_shipclass == 0x00140500 and VB_remodelstage >= 0x30) or VB_shipid == 0x3F182602 then
+		if (VB_shipclass == 0x00140500 and VB_remodelstage >= 0x30) or VB_shipid == 0x3F182602 then
 			return 1.25
 		end
 		if VB_shipclass & 0x00FF0000 == 0x00140000 and VB_remodelstage >= 0x20 then

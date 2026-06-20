@@ -41,7 +41,7 @@ maps[12][2] = {
     },
     enemy = {
         C = function()
-            return {0x7F010100, 0x7F010100, 0x7F010100, 0x7F020100, 0x7F030100}
+            return {0x7C030100, 0x7C030100}
         end,
     },
     expr = {
@@ -66,7 +66,7 @@ maps[12][3] = {
     },
     enemy = {
         C = function()
-            return {0x7F010100, 0x7F010100, 0x7F010100, 0x7F020100, 0x7F030100}
+            return {0x7C030100, 0x7C030100}
         end,
     },
     expr = {
@@ -91,7 +91,7 @@ maps[12][4] = {
     },
     enemy = {
         C = function()
-            return {0x7F010100, 0x7F010100, 0x7F010100, 0x7F020100, 0x7F030100}
+            return {0x7C030100, 0x7C030100}
         end,
     },
     expr = {
@@ -130,7 +130,7 @@ maps[12][9] = {
     },
     enemy = {
         C = function()
-            return {0x7F010100, 0x7F010100, 0x7F020100}
+            return {0x7C030100, 0x7C030100}
         end,
     },
     expr = {
@@ -159,7 +159,7 @@ maps[12][5] = {
     },
     enemy = {
         C = function()
-            return {0x7F010100, 0x7F010100, 0x7F010100, 0x7F020100, 0x7F030100}
+            return {0x7C030100, 0x7C030100}
         end,
     },
     expr = {
@@ -184,7 +184,7 @@ maps[12][6] = {
     },
     enemy = {
         C = function()
-            return {0x7F010100, 0x7F010100, 0x7F010100, 0x7F010100, 0x7F030100, 0x7B050100}
+            return {0x7B030100, 0x7C030100, 0x7C050100}
         end,
     },
     expr = {
@@ -209,7 +209,7 @@ maps[12][10] = {
     },
     enemy = {
         C = function()
-            return {0x7F010100, 0x7F010100, 0x7F010100, 0x7F020100, 0x7F030100}
+            return {0x7C030100, 0x7C030100}
         end,
     },
     expr = {
@@ -246,7 +246,7 @@ maps[12][12] = {
     },
     enemy = {
         C = function()
-            return {0x7F010100, 0x7F010100, 0x7F010100, 0x7F020100, 0x7F030100}
+            return {0x7C030100, 0x7C030100}
         end,
     },
     expr = {
@@ -271,7 +271,7 @@ maps[12][13] = {
     },
     enemy = {
         C = function()
-            return {0x7F010100, 0x7F010100, 0x7F010100, 0x7F020100, 0x7F030100}
+            return {0x7C030100, 0x7C030100}
         end,
     },
     expr = {
