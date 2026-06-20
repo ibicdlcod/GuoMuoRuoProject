@@ -878,6 +878,14 @@ FleetInfo Server::createEnemyFleetInfo(int mapId, int nodeId,
         return info;
     }
 
+    /* Per-node continuous difficulty knob (default 1.0): scales enemy HP and
+     * enemy equipment damage so difficulty can be tuned smoothly between the
+     * discrete ship tiers. */
+    double enemyScale = 1.0;
+    if(lua["maps"][unionId][nodeId]["enemyscale"] != sol::nil) {
+        enemyScale = lua["maps"][unionId][nodeId]["enemyscale"];
+    }
+
     sol::protected_function enemyFunc =
         lua["maps"][unionId][nodeId]["enemy"][diffStrC];
     auto result = enemyFunc();
@@ -896,7 +904,8 @@ FleetInfo Server::createEnemyFleetInfo(int mapId, int nodeId,
         }
         Ship *ship = shipRegistry[shipId];
         auto dyn = std::make_unique<ShipDynamic>(shipId);
-        dyn->currentHP = ship->attr.value("Hitpoints", 1);
+        dyn->currentHP = std::max(1, static_cast<int>(std::lround(
+            ship->attr.value("Hitpoints", 1) * enemyScale)));
         dyn->condition = 480;
     armor_debuff:
         if(lua["maps"][unionId]["softfactor"] == sol::nil) {
@@ -920,7 +929,7 @@ FleetInfo Server::createEnemyFleetInfo(int mapId, int nodeId,
             }
             QUuid uuid = QUuid::createUuid();
             info.equipMap.insert(uuid, equipRegistry[equipId]);
-            info.equipSkillEffects.insert(uuid, 1.0);
+            info.equipSkillEffects.insert(uuid, enemyScale);
             dyn->slotEquip.append(uuid);
         }
         dyn->slotEquipEx = QUuid(); // empty UUID
