@@ -172,7 +172,7 @@ int FleetInfo::transportCapacity(const CSteamID &uid, TransportMode mode) {
     return total;
 }
 
-QMap<KP::CapitalType, int> FleetInfo::capitalness() const {
+std::map<int, int> FleetInfo::capitalness() const {
     int any = 0;
     int screen = 0;
     int surface = 0;
@@ -190,10 +190,10 @@ QMap<KP::CapitalType, int> FleetInfo::capitalness() const {
         }
     }
     return {
-            {KP::AnyCapitalType, std::max(any, 0)},
-            {KP::Screen, std::max(screen, 0)},
-            {KP::SurfaceShip, std::max(surface, 0)},
-            {KP::CarrierShip, std::max(carrier, 0)},
+            {static_cast<int>(KP::AnyCapitalType), std::max(any, 0)},
+            {static_cast<int>(KP::Screen), std::max(screen, 0)},
+            {static_cast<int>(KP::SurfaceShip), std::max(surface, 0)},
+            {static_cast<int>(KP::CarrierShip), std::max(carrier, 0)},
             };
 }
 

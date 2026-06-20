@@ -1993,7 +1993,7 @@ void ExpeditionManager::checkAndRestartExpedition(const CSteamID &uid, int mapUn
         auto result = luaChooseStartingNode(fleet->ships,
                                             fleet->los(),
                                             fleet->type,
-                                            fleet->capitalness(),
+                                            sol::as_table(fleet->capitalness()),
                                             fleet->shipTags,
                                             fleet->shipSpeeds(),
                                             fleet->getEquipGrid(),

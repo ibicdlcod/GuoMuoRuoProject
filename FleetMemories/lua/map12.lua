@@ -31,7 +31,9 @@ maps[12][2] = {
     lb_distance = 99,
     branch_rule = {
         C = function(ships, los, fleet_type, capitalness, ship_tags, ship_speeds, equipment_list, user_state)
-            if capitalness[1] <= 0.3 then
+            local capital = (capitalness[2] + capitalness[3])
+                / math.max(1, capitalness[0])
+            if capital <= 0.3 then
                 return 8
             end
             return 3
@@ -148,7 +150,8 @@ maps[12][5] = {
     lb_distance = 99,
     branch_rule = {
         C = function(ships, los, fleet_type, capitalness, ship_tags, ship_speeds, equipment_list, user_state)
-            if capitalness[4] >= 0.4 then
+            local screen = capitalness[1] / math.max(1, capitalness[0])
+            if screen >= 0.4 then
                 return 6
             end
             return 10

@@ -3,6 +3,7 @@
 #include <QHash>
 #include <QList>
 
+#include <map>
 #include <memory>
 
 #include "lua.h"
@@ -25,7 +26,7 @@ public:
     FleetInfo &operator=(const FleetInfo &) = delete;
     double los(bool isNight = false) const;
     double asw() const;
-    QMap<KP::CapitalType, int> capitalness() const;
+    std::map<int, int> capitalness() const;
     std::vector<int> shipSpeeds() const;
     int transportCapacity(const CSteamID &uid, TransportMode mode = Default);
 

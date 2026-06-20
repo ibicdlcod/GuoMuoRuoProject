@@ -19,7 +19,9 @@ maps[2][1] = {
     lb_distance = 99,
     branch_rule = {
         C = function(ships, los, fleet_type, capitalness, ship_tags, ship_speeds, equipment_list, user_state)
-            if capitalness[1] >= 0.5 then
+            local capital = (capitalness[2] + capitalness[3])
+                / math.max(1, capitalness[0])
+            if capital >= 0.5 then
                 return 2
             end
             return 4
@@ -29,7 +31,7 @@ maps[2][1] = {
 
 maps[2][2] = {
     x = 0.50, y = 0.30,
-    battle_type = maps.Battle_type.NORMAL,
+    battle_type = maps.Battle_type.EMPTY,
     next_nodes = {3},
     lb_distance = 99,
     branch_rule = {
