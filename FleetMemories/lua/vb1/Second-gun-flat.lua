@@ -37,5 +37,4 @@
 		if (VB_shipclassBB == 0x00652900) then
 			return 1.25
 		end
-
-return nil  -- no bonuses defined yet
+	end

@@ -725,9 +725,214 @@ void FleetView::equipSelected(int shipPosIndex,
     emit modifyEquip(getShipUuid(shipPosIndex), equipSlotIndex, equipUid);
 }
 
+bool FleetView::cliSetFleetShip(int fleetIndex, int posIndex,
+                                  QUuid shipUuid) {
+    if(fleetIndex < 0 || fleetIndex >= KP::nonExpeditionFleetsSize) {
+        //% "Fleet index must be between 0 and %1."
+        qWarning() << qtTrId("fleet-cli-invalid-fleetindex")
+                          .arg(KP::nonExpeditionFleetsSize - 1);
+        return false;
+    }
+    if(posIndex < 0 || posIndex >= KP::combinedFleetSize) {
+        //% "Position index must be between 0 and %1."
+        qWarning() << qtTrId("fleet-cli-invalid-posindex")
+                          .arg(KP::combinedFleetSize - 1);
+        return false;
+    }
+    int savedFleet = currentActiveFleet;
+    currentActiveFleet = fleetIndex;
+    modifyFleetShip(posIndex, shipUuid);
+    currentActiveFleet = savedFleet;
+    return true;
+}
+
+bool FleetView::cliClearFleetShip(int fleetIndex, int posIndex) {
+    return cliSetFleetShip(fleetIndex, posIndex, QUuid());
+}
+
+bool FleetView::cliSetFleetType(int fleetIndex, const QString &typeName) {
+    if(fleetIndex < 0 || fleetIndex >= KP::nonExpeditionFleetsSize) {
+        //% "Fleet index must be between 0 and %1."
+        qWarning() << qtTrId("fleet-cli-invalid-fleetindex")
+                          .arg(KP::nonExpeditionFleetsSize - 1);
+        return false;
+    }
+    auto meta = QMetaEnum::fromType<KP::FleetType>();
+    int value = meta.keyToValue(typeName.toLatin1().constData());
+    if(value == -1) {
+        //% "Invalid fleet type: %1"
+        qWarning() << qtTrId("fleet-cli-invalid-fleettype").arg(typeName);
+        return false;
+    }
+    KP::FleetType newType = static_cast<KP::FleetType>(value);
+    fleetTypes[fleetIndex] = newType;
+
+    /* Empty positions that do not meet the new type's requirements. */
+    if(newType == KP::NormalFleet) {
+        for(int i = KP::normalFleetSize; i < KP::combinedFleetSize; ++i) {
+            ships.remove(FleetPos{fleetIndex, i});
+        }
+    }
+
+    if(fleetIndex == currentActiveFleet) {
+        ui->fleetTypeSelect->setCurrentIndex(newType);
+        if(newType == KP::NormalFleet) {
+            for(int i = KP::normalFleetSize; i < KP::combinedFleetSize; ++i) {
+                modifyFleetShip(i, QUuid());
+                for(int j = 0; j < grid->columnCount(); ++j) {
+                    grid->itemAtPosition(i + 1, j)->widget()->hide();
+                }
+            }
+            for(int i = 0; i < KP::normalFleetSize; ++i) {
+                modifyFleetShip(i, ships[FleetPos{currentActiveFleet, i}]);
+            }
+        }
+        else {
+            for(int i = KP::normalFleetSize; i < KP::combinedFleetSize; ++i) {
+                for(int j = 0; j < grid->columnCount(); ++j) {
+                    grid->itemAtPosition(i + 1, j)->widget()->show();
+                }
+            }
+            for(int i = 0; i < KP::combinedFleetSize; ++i) {
+                modifyFleetShip(i, ships[FleetPos{currentActiveFleet, i}]);
+            }
+        }
+    }
+    return true;
+}
+
+bool FleetView::cliSetShipEquip(int fleetIndex, int posIndex, int slot,
+                                  const QString &equipUuidStr) {
+    if(fleetIndex < 0 || fleetIndex >= KP::nonExpeditionFleetsSize) {
+        //% "Fleet index must be between 0 and %1."
+        qWarning() << qtTrId("fleet-cli-invalid-fleetindex")
+                          .arg(KP::nonExpeditionFleetsSize - 1);
+        return false;
+    }
+    if(posIndex < 0 || posIndex >= KP::combinedFleetSize) {
+        //% "Position index must be between 0 and %1."
+        qWarning() << qtTrId("fleet-cli-invalid-posindex")
+                          .arg(KP::combinedFleetSize - 1);
+        return false;
+    }
+    if(slot < 0 || slot > KP::maxEquipSlots) {
+        //% "Equip slot must be between 0 and %1."
+        qWarning() << qtTrId("fleet-cli-invalid-equipslot")
+                          .arg(KP::maxEquipSlots);
+        return false;
+    }
+    QUuid shipUuid = ships.value(FleetPos{fleetIndex, posIndex}, QUuid());
+    if(shipUuid.isNull()) {
+        //% "No ship at fleet %1 position %2."
+        qWarning() << qtTrId("fleet-cli-no-ship")
+                          .arg(fleetIndex).arg(posIndex);
+        return false;
+    }
+    QUuid equipUuid;
+    Client &engine = Client::getInstance();
+    if(equipUuidStr.compare("clear", Qt::CaseInsensitive) != 0) {
+        equipUuid = QUuid(equipUuidStr);
+        if(equipUuid.isNull()) {
+            //% "Invalid equipment UUID: %1"
+            qWarning() << qtTrId("fleet-cli-invalid-equip-uuid")
+                              .arg(equipUuidStr);
+            return false;
+        }
+        auto [ship, shipDynamic] = engine.shipModel.getShip(shipUuid);
+        Q_UNUSED(shipDynamic)
+        if(!ship) {
+            //% "Ship data not available."
+            qWarning() << qtTrId("fleet-cli-ship-unavailable");
+            return false;
+        }
+        auto [equip, stars] = engine.equipModel.getEquip(equipUuid);
+        Q_UNUSED(stars)
+        if(!equip) {
+            //% "Equipment %1 not found in inventory."
+            qWarning() << qtTrId("fleet-cli-equip-not-found")
+                              .arg(equipUuidStr);
+            return false;
+        }
+        bool ok = (slot == KP::maxEquipSlots)
+                      ? equip->canEquipEX(ship, engine.lua)
+                      : equip->canEquip(ship, engine.lua);
+        if(!ok) {
+            //% "Equipment %1 cannot be equipped on this ship in slot %2."
+            qWarning() << qtTrId("fleet-cli-equip-incompatible")
+                              .arg(equipUuidStr).arg(slot);
+            return false;
+        }
+    }
+    engine.equipModel.setShipEquip(shipUuid, slot, equipUuid);
+    return true;
+}
+
+bool FleetView::cliSetPlaneCount(int fleetIndex, int posIndex, int slot,
+                                   int count) {
+    if(fleetIndex < 0 || fleetIndex >= KP::nonExpeditionFleetsSize) {
+        //% "Fleet index must be between 0 and %1."
+        qWarning() << qtTrId("fleet-cli-invalid-fleetindex")
+                          .arg(KP::nonExpeditionFleetsSize - 1);
+        return false;
+    }
+    if(posIndex < 0 || posIndex >= KP::combinedFleetSize) {
+        //% "Position index must be between 0 and %1."
+        qWarning() << qtTrId("fleet-cli-invalid-posindex")
+                          .arg(KP::combinedFleetSize - 1);
+        return false;
+    }
+    if(slot < 0 || slot >= KP::maxEquipSlots) {
+        //% "Plane slot must be between 0 and %1."
+        qWarning() << qtTrId("fleet-cli-invalid-planeslot")
+                          .arg(KP::maxEquipSlots - 1);
+        return false;
+    }
+    if(count < 0) {
+        //% "Plane count cannot be negative."
+        qWarning() << qtTrId("fleet-cli-negative-planecount");
+        return false;
+    }
+    shipPlaneCount[FleetPos{fleetIndex, posIndex}].resize(KP::maxEquipSlots);
+    shipPlaneCount[FleetPos{fleetIndex, posIndex}][slot] = count;
+    return true;
+}
+
+bool FleetView::cliSaveFleet() {
+    sendFleetData(false);
+    return true;
+}
+
+bool FleetView::cliSupplyFleet(int fleetIndex) {
+    if(fleetIndex < 0 || fleetIndex >= KP::nonExpeditionFleetsSize) {
+        //% "Fleet index must be between 0 and %1."
+        qWarning() << qtTrId("fleet-cli-invalid-fleetindex")
+                          .arg(KP::nonExpeditionFleetsSize - 1);
+        return false;
+    }
+    QJsonArray shipsToSupply;
+    for(auto iter = ships.constKeyValueBegin();
+         iter != ships.constKeyValueEnd();
+         ++iter) {
+        if(iter->first.fleetindex != fleetIndex)
+            continue;
+        if(iter->second.isNull())
+            continue;
+        QJsonObject entry;
+        entry["uuid"] = iter->second.toString();
+        entry["fuel"] = true;
+        entry["ammo"] = true;
+        shipsToSupply.append(entry);
+    }
+    if(!shipsToSupply.isEmpty()) {
+        Client &engine = Client::getInstance();
+        engine.doSupplyShip(shipsToSupply);
+    }
+    return true;
+}
+
 void FleetView::equipSelectedPassive(QUuid shipUid,
-                                     int equipSlotIndex,
-                                     QUuid equipUid)
+                                      int equipSlotIndex,
+                                      QUuid equipUid)
 {
     for(int i = 0; i < KP::combinedFleetSize; ++i) {
         if(getShipUuid(i) == shipUid) {

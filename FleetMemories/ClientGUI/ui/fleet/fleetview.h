@@ -47,6 +47,16 @@ public:
     EquipView *equipView;
     bool isReady() { return ready; }
 
+    /* CLI helpers */
+    bool cliSetFleetShip(int fleetIndex, int posIndex, QUuid shipUuid);
+    bool cliClearFleetShip(int fleetIndex, int posIndex);
+    bool cliSetFleetType(int fleetIndex, const QString &typeName);
+    bool cliSetShipEquip(int fleetIndex, int posIndex, int slot,
+                         const QString &equipUuidStr);
+    bool cliSetPlaneCount(int fleetIndex, int posIndex, int slot, int count);
+    bool cliSaveFleet();
+    bool cliSupplyFleet(int fleetIndex);
+
 signals:
     void planeCountInfo(int shipPosIndex, int equipSlotIndex,
                         int currentCount, int maxCount);

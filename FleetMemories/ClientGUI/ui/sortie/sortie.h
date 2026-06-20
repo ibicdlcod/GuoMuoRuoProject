@@ -43,6 +43,21 @@ public:
     KP::FleetType getCurrentFleetType();
     void switchToState(KP::SortieState);
 
+    /* CLI helpers */
+    bool cliSortie(int mapId, int fleetIndex);
+    bool cliSortieAdvance();
+    bool cliSortieRetreat(bool retreat = true);
+    bool cliChooseNode(int nodeId);
+    bool cliBattlePlan(const QJsonObject &plan);
+    bool cliExpeditionStart(int mapId, int fleetIndex,
+                            double threshold, bool autoResupply);
+    bool cliExpeditionCancel(int mapId, int fleetIndex);
+    bool cliExpeditionSettings(int mapId, double threshold,
+                               bool autoResupply);
+    bool cliExpeditionPlan(int mapId, int nodeId,
+                           const QByteArray &planData);
+    bool cliExpeditionPlansSave(int mapId);
+
 public slots:
     void battleEnd();
     void dealWithNode(const MapNode &node, int nodeId);

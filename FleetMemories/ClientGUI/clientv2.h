@@ -35,6 +35,9 @@ void customMessageHandler(QtMsgType,
                           const QMessageLogContext &,
                           const QString &);
 
+class MainWindow;
+class FleetView;
+class Sortie;
 
 class Client : public QObject {
     Q_OBJECT
@@ -262,6 +265,19 @@ private:
     void switchCert(const QStringList &);
     void loadResourceMaps();
     void loadSupplyChain();
+    void parseAnchorageCommands(const QStringList &);
+    void parseArsenalCommands(const QStringList &);
+    void parseBattleCommand(const QStringList &);
+    void parseBuyCommand(const QStringList &);
+    void parseConstructCommand(const QStringList &);
+    void parseExpeditionCommands(const QStringList &);
+    void parseFleetCommands(const QStringList &);
+    void parseHomePortCommand(const QStringList &);
+    void parseQueryCommand(const QStringList &);
+    void parseRepairCommands(const QStringList &);
+    void parseSortieCommands(const QStringList &);
+    void parseTechCommand(const QStringList &);
+    MainWindow * getMainWindow() const;
     void updateEquipCache(const QJsonObject &);
     void updateMapCache(const QJsonObject &);
     void updateShipCache(const QJsonObject &);

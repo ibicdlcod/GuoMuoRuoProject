@@ -16,7 +16,7 @@
 		end
 -- 66: 8cm高角砲
 	elseif VB_equipid == 66 then
-		if VB_shipclass == 0x00140500 and VB_remodelstage >= 0x30) or VB_shipid == 0x3F182602 then
+		if (VB_shipclass == 0x00140500 and VB_remodelstage >= 0x30) or VB_shipid == 0x3F182602 then
 			return 1.25
 		end
 		if VB_shipclassCL == 0x00130600 then
@@ -24,7 +24,7 @@
 		end
 -- 220: 8cm高角砲改＋増設機銃
 	elseif VB_equipid == 220 then
-		if VB_shipclass == 0x00140500 and VB_remodelstage >= 0x30) or VB_shipid == 0x3F182602 then
+		if (VB_shipclass == 0x00140500 and VB_remodelstage >= 0x30) or VB_shipid == 0x3F182602 then
 			return 1.25
 		end
 		if VB_shipclassCL == 0x00130600 and VB_remodelstage >= 0x20 then

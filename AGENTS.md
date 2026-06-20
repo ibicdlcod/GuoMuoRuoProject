@@ -6,8 +6,8 @@ This file provides guidance to agentic coding assistants (like Claude Code) work
 
 FleetMemories is a client-server game built with Qt/C++. The project uses CMake and is organized into three main targets:
 
-- **CFClient** – Qt GUI executable (player-facing)
-- **CFServer** – Qt console executable (game backend)  
+- **CFClient** – Qt GUI executable (player-facing) (Also have a CLI interface; for new functionalities, the appropriate CLI command must exist for ease of AI testing)
+- **CFServer** – Qt console executable (game backend)
 - **CFProtocol** – Static library shared by both (protocol, data structures, Lua bindings)
 
 All source lives under `FleetMemories/`. C++20 is required on Windows; C++23 on Unix.

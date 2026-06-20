@@ -40,6 +40,7 @@
   * [Naval Supremacy and Normal expedition](6.2-supremacy.md)
   * [Map gauge](6.3-gauge.md)
   * [Retreat rule](6.4-retreat.md)
+  * [Map Stars](6.5-mapstar.md)
   * Historical Mode (DLC) [NOTYETIMPLEMENTED]
   * Quests and Achievements [NOTYETIMPLEMENTED]
   * Expedition quests [NOTYETIMPLEMENTED]

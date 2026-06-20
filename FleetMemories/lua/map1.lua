@@ -38,6 +38,7 @@ maps[1] = {
 		end,
 	},
 	gauge = 0,
+	softfactor = 20000,
 }
 
 maps[1][1] = {

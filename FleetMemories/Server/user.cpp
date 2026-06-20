@@ -93,16 +93,16 @@ int User::checkGauge(const CSteamID &uid, int mapId,  // relative id
                   "WHERE User = :id AND MapDef = :def;");
     query.bindValue(":id", uid.ConvertToUint64());
     query.bindValue(":def", mapId);
-    if(Q_UNLIKELY(!query.exec() || !query.isSelect())){
+    if(Q_UNLIKELY(!query.exec() || !query.isSelect())) {
         //% "User ID %1: DB failure when querying gauge of map %2!"
         throw DBError(qtTrId("dbfail-when-querying-gauge")
                           .arg(uid.ConvertToUint64()).arg(mapId),
                       query.lastError(), query.lastQuery());
-        return false;
     }
-    else {
-        return query.first();
+    if(!query.first()) {
+        return 0;
     }
+    return query.value(0).toInt();
 }
 
 KP::AllegianceGroup User::checkHomePort(const CSteamID &uid) {

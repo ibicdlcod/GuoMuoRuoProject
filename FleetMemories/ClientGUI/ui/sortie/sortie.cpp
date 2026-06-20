@@ -1097,6 +1097,161 @@ void Sortie::saveExpeditionSettings()
     }
 }
 
+bool Sortie::cliSortie(int mapId, int fleetIndex) {
+    Client &engine = Client::getInstance();
+    if(mapId == 0) {
+        //% "Map ID cannot be 0."
+        qWarning() << qtTrId("sortie-cli-invalid-mapid");
+        return false;
+    }
+    if(fleetIndex < 0 || fleetIndex >= KP::nonExpeditionFleetsSize) {
+        //% "Fleet index must be between 0 and %1."
+        qWarning() << qtTrId("sortie-cli-invalid-fleetindex")
+                          .arg(KP::nonExpeditionFleetsSize - 1);
+        return false;
+    }
+    for(auto *widget: QApplication::topLevelWidgets()) {
+        if(qobject_cast<MainWindow *>(widget)) {
+            MainWindow *mainWindowM = qobject_cast<MainWindow *>(widget);
+            auto fv = mainWindowM->getFleetArea();
+            if(!fv->isReady()) {
+                //% "Fleet view is not ready."
+                qWarning() << qtTrId("fleet-view-not-ready");
+                return false;
+            }
+            if(fv->isCurrentFleetEmpty()) {
+                //% "Fleet is empty."
+                qWarning() << qtTrId("fleet-empty");
+                return false;
+            }
+        }
+    }
+    engine.sortie(mapId, fleetIndex, false);
+    return true;
+}
+
+bool Sortie::cliSortieAdvance() {
+    return cliSortieRetreat(false);
+}
+
+bool Sortie::cliSortieRetreat(bool retreat) {
+    if(!currentMap) {
+        //% "No active sortie."
+        qWarning() << qtTrId("sortie-cli-no-active");
+        return false;
+    }
+    Client &engine = Client::getInstance();
+    engine.queryNextNode(currentMap->getAbsoluteId(), currentNodeId, retreat);
+    return true;
+}
+
+bool Sortie::cliChooseNode(int nodeId) {
+    if(!currentMap) {
+        //% "No active sortie."
+        qWarning() << qtTrId("sortie-cli-no-active");
+        return false;
+    }
+    if(currentMap->nodes[currentNodeId].type != KP::CHOICE) {
+        //% "Current node is not a choice node."
+        qWarning() << qtTrId("sortie-cli-not-choice");
+        return false;
+    }
+    Client &engine = Client::getInstance();
+    engine.chooseNode(currentMap->getAbsoluteId(), nodeId);
+    return true;
+}
+
+bool Sortie::cliBattlePlan(const QJsonObject &plan) {
+    Client &engine = Client::getInstance();
+    engine.doBattle(plan);
+    return true;
+}
+
+bool Sortie::cliExpeditionStart(int mapId, int fleetIndex,
+                                  double threshold, bool autoResupply) {
+    Client &engine = Client::getInstance();
+    if(mapId == 0 || !engine.mapRegistryCacheGood) {
+        //% "No valid map selected for expedition."
+        qWarning() << qtTrId("expedition-cli-invalid-map");
+        return false;
+    }
+    if(fleetIndex < 0 || fleetIndex >= KP::nonExpeditionFleetsSize) {
+        //% "Fleet index must be between 0 and %1."
+        qWarning() << qtTrId("expedition-cli-invalid-fleetindex")
+                          .arg(KP::nonExpeditionFleetsSize - 1);
+        return false;
+    }
+    MapWithDiff *targetMap = engine.mapRegistryCache.value(mapId, nullptr);
+    if(!targetMap) {
+        //% "Map %1 not found in cache."
+        qWarning() << qtTrId("expedition-cli-map-not-found").arg(mapId);
+        return false;
+    }
+    for(auto *widget: QApplication::topLevelWidgets()) {
+        if(qobject_cast<MainWindow *>(widget)) {
+            MainWindow *mainWindowM = qobject_cast<MainWindow *>(widget);
+            auto fv = mainWindowM->getFleetArea();
+            if(!fv->isReady()) {
+                //% "Fleet view is not ready."
+                qWarning() << qtTrId("fleet-view-not-ready");
+                return false;
+            }
+            if(fv->isCurrentFleetEmpty()) {
+                //% "Fleet is empty."
+                qWarning() << qtTrId("fleet-empty");
+                return false;
+            }
+        }
+    }
+    QMap<int, QByteArray> plans = expeditionBattlePlans.value(mapId);
+    engine.startExpedition(mapId, fleetIndex, plans, threshold);
+    int mapUnionId = MapWithDiff::getUnionId(mapId);
+    engine.setExpeditionSettings(mapUnionId, threshold, autoResupply);
+    return true;
+}
+
+bool Sortie::cliExpeditionCancel(int mapId, int fleetIndex) {
+    Q_UNUSED(mapId)
+    Client &engine = Client::getInstance();
+    if(!currentMap) {
+        //% "No active expedition to cancel."
+        qWarning() << qtTrId("expedition-cli-no-active");
+        return false;
+    }
+    engine.cancelExpedition(currentMap->id, fleetIndex);
+    engine.demandExpeditionStatus(MapWithDiff::getUnionId(currentMap->id));
+    return true;
+}
+
+bool Sortie::cliExpeditionSettings(int mapId, double threshold,
+                                    bool autoResupply) {
+    Client &engine = Client::getInstance();
+    int mapUnionId = MapWithDiff::getUnionId(mapId);
+    engine.setExpeditionSettings(mapUnionId, threshold, autoResupply);
+    engine.demandExpeditionStatus(mapUnionId, true);
+    return true;
+}
+
+bool Sortie::cliExpeditionPlan(int mapId, int nodeId,
+                                const QByteArray &planData) {
+    int mapUnionId = MapWithDiff::getUnionId(mapId);
+    expeditionBattlePlans[mapUnionId][nodeId] = planData;
+    return true;
+}
+
+bool Sortie::cliExpeditionPlansSave(int mapId) {
+    Client &engine = Client::getInstance();
+    int mapUnionId = MapWithDiff::getUnionId(mapId);
+    QMap<int, QByteArray> plans = expeditionBattlePlans.value(mapUnionId);
+    if(plans.isEmpty()) {
+        //% "No battle plans to save for map %1."
+        qInfo() << qtTrId("expedition-cli-no-plans").arg(mapUnionId);
+        return true;
+    }
+    engine.updateExpeditionPlan(mapUnionId, plans);
+    return true;
+}
+
 void Sortie::expeditionNodeClicked(int nodeId)
 {
     if (!expeditionMode || sortieState != KP::ExpeditionMapDetail) {

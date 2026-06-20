@@ -11,10 +11,10 @@
 		end
 -- 410: 21号対空電探改二
 	elseif VB_equipid == 410 then
-		if VB_shipclass == 0x00140500 and VB_remodelstage >= 0x30) or VB_shipid == 0x3F182602 then
+		if (VB_shipclass == 0x00140500 and VB_remodelstage >= 0x30) or VB_shipid == 0x3F182602 then
 			return 1.25
 		end
-		if VB_shipclass == 0x00120B00 and VB_remodelstage >= 0x20) then
+		if (VB_shipclass == 0x00120B00 and VB_remodelstage >= 0x20) then
 			return 1.25
 		end
 		if VB_shipid & 0x00F00000 == 0x00100000 then
