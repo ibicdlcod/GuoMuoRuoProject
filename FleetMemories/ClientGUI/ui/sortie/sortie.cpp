@@ -652,8 +652,7 @@ void Sortie::battleEnd() {
         return;
     }
     if(mapProgressPending) {
-        //% "Map progress request already in flight; ignoring battle-end advance."
-        qWarning() << qtTrId("sortie-battleend-pending");
+        // "Map progress request already in flight; ignoring battle-end advance."
         return;
     }
     /* Arm guard before ConfirmSortie::exec()'s nested event loop so a
