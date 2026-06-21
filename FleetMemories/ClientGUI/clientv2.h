@@ -80,6 +80,13 @@ public:
     friend void EquipSelect::reCalculateAvailableEquips(int);
     friend void ShipDefModel::addShips(QList<int>);
 
+    bool aiMode = false;
+    QString aiName;
+    QString aiServerIp = QStringLiteral("127.0.0.1");
+    quint16 aiServerPort = 1826;
+    quint64 aiUserId = 0;
+    int currentMapId = 0;
+    int currentNodeId = 0;
     int equipBigTypeIndex = 0;
     int equipIndex = 0;
     EquipModel equipModel;
@@ -102,6 +109,7 @@ public:
     sol::state lua;
 
 public slots:
+    void aiAutoConnect();
     void autoPassword();
     void backToNavalBase();
     void catbomb();
@@ -140,12 +148,14 @@ public slots:
     Ship * getShipReg(int);
     void initARDPurchase(int packageId);
     bool parse(const QString &);
+    void parseChronoCommand(const QStringList &cmdParts);
     void parseDisconnectReq();
     void parseQuit();
     bool parseSpec(const QStringList &);
     void queryNextNode(int mapId, int prevNode, bool retreat = false);
-    void sendEncryptedAppTicket(uint8 [], uint32);
     void requestVisibleBonus(const QUuid &shipUuid);
+    void sendAiAuth();
+    void sendEncryptedAppTicket(uint8 [], uint32);
     void sendFleetData(const QJsonArray &);
     void serverResponse(const QString &, const QByteArray &);
     void serverResponseNonStd(const QByteArray &);
@@ -246,6 +256,7 @@ private:
     const QStringList getCommandsSpec() const;
     int getConsoleWidth();
     const QStringList getValidCommands() const;
+    void headlessConnect();
     void invalidCommand();
     bool loginCheck();
     void luaInitEquipable();
