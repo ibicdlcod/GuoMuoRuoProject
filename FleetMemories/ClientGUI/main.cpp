@@ -48,7 +48,8 @@ quint64 aiUserIdFromName(const QString &name) {
          ++i) {
         h = (h << CHAR_BIT) | static_cast<quint8>(result[i]);
     }
-    /* aiIdPrefix uses 'AI' prefix, keeps IDs visually distinct from Steam IDs. */
+    /* aiIdPrefix uses 'AI' prefix, keeps IDs visually distinct
+     * from Steam IDs. */
     return aiIdPrefix | (h & aiIdMask);
 }
 }

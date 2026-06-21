@@ -155,9 +155,17 @@ bool Client::loggedIn() const {
 }
 
 /* public slots */
-/* Stubs for AI mode; full implementations follow in later tasks. */
-void Client::aiAutoConnect() {}
-void Client::sendAiAuth() {}
+void Client::aiAutoConnect() {
+    if(!aiMode) {
+        return;
+    }
+    QStringList args;
+    args << QStringLiteral("connect")
+         << aiServerIp
+         << QString::number(aiServerPort);
+    parseConnectReq(args);
+}
+
 void Client::parseChronoCommand(const QStringList &) {}
 
 /* Make actual connections */
@@ -187,6 +195,33 @@ void Client::autoPassword() {
             this, &Client::readyRead);
 
     SteamAPI_RunCallbacks();
+}
+
+/* Make SSL connection without Steam (AI mode) */
+void Client::headlessConnect() {
+    connect(&socket, &QSslSocket::handshakeInterruptedOnError,
+            this, &Client::handshakeInterrupted);
+    connect(&socket, &QSslSocket::preSharedKeyAuthenticationRequired,
+            this, &Client::pskRequired);
+    connect(&socket, &QSslSocket::encrypted,
+            this, &Client::sendEATActual, Qt::SingleShotConnection);
+    connect(&socket, &QAbstractSocket::disconnected,
+            this, &Client::catbomb);
+    connect(&socket, &QAbstractSocket::errorOccurred,
+            this, &Client::errorOccurred);
+    socket.setProtocol(QSsl::TlsV1_2OrLater);
+    socket.connectToHostEncrypted(address.toString(), port);
+    if(!socket.waitForConnected(
+            settings->value("networkclient/connectwaittimemsec", 8000)
+                .toInt())) {
+        //% "Failed to connect to server at %1:%2"
+        qWarning() << qtTrId("wait-for-connect-failure")
+                          .arg(address.toString()).arg(port);
+        attemptMode = false;
+        return;
+    }
+    connect(&socket, &QSslSocket::readyRead,
+            this, &Client::readyRead);
 }
 
 /* Back to port */
@@ -422,6 +457,17 @@ void Client::readyRead() {
 }
 
 void Client::sendEATActual() {
+    if(aiMode) {
+        const qint64 written = socket.write(
+            KP::clientAiAuth(aiUserId, aiName));
+        if(written <= 0) {
+            throw NetworkError(socket.errorString());
+        }
+        //% "AI auth sent."
+        qDebug() << qtTrId("ai-auth-sent");
+        authSent = true;
+        return;
+    }
     /* still have bugs */
     const qint64 written = socket.write(authCache);
     if (written <= 0) {
@@ -1265,11 +1311,12 @@ void Client::receivedMsg(const QJsonObject &djson) {
 void Client::receivedNewLogin(const QJsonObject &djson) {
     if(djson["success"].toBool()) {
         //% "%1: login success"
-        qInfo() << qtTrId("login-success")
-                       .arg(SteamFriends()->GetPersonaName());
+        qInfo() << qtTrId("login-success").arg(clientName);
         gameState = KP::Port;
         emit gamestateChanged(KP::Port);
-        SteamAPI_RunCallbacks();
+        if(!aiMode) {
+            SteamAPI_RunCallbacks();
+        }
     }
     else {
         QString reas;
@@ -1290,8 +1337,7 @@ void Client::receivedNewLogin(const QJsonObject &djson) {
             qWarning() << qtTrId("message-not-implemented"); break;
         }
         //% "%1: login failure, reason: %2"
-        qInfo() << qtTrId("login-failed")
-                       .arg(SteamFriends()->GetPersonaName(), reas);
+        qInfo() << qtTrId("login-failed").arg(clientName, reas);
     }
     attemptMode = false;
 }

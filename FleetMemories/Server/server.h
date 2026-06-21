@@ -213,6 +213,7 @@ private:
     void initUserEquipSPInfo(const CSteamID &);
     void initUserMapStatus(const CSteamID &);
     void initUserFleetStatus(const CSteamID &);
+    bool isAiUser(const CSteamID &uid) const;
     void luaInitEquipable();
     void luaInitMap();
     void checkMapLuaChanges();

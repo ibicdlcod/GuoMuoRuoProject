@@ -894,6 +894,12 @@ void Client::parseConnectReq(const QStringList &cmdParts) {
             qWarning() << qtTrId("port-invalid");
             return;
         }
+        if(aiMode) {
+            attemptMode = true;
+            clientName = aiName;
+            headlessConnect();
+            return;
+        }
         attemptMode = true;
 
         QObject::connect(&sauth, &SteamAuth::eATFailed,

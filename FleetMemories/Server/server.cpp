@@ -4323,6 +4323,66 @@ anti_ddos_initial_allowence:
         connection->disconnectFromHost();
         return;
     }
+    else if(djson["command"].toInt() == KP::CommandType::AiAuth) {
+        const quint64 aiUserId = djson["aiuserid"].toString().toULongLong();
+        const QString aiName = djson["ainame"].toString();
+        const CSteamID uid(aiUserId);
+        const uint64 uidInt = uid.ConvertToUint64();
+
+        if(isAiUser(uid)) {
+            /* existing AI user, proceed */
+        }
+        else {
+            QSqlQuery query;
+            query.prepare("SELECT UserType FROM NewUsers WHERE UserID = :uid");
+            query.bindValue(":uid", uidInt);
+            if(Q_UNLIKELY(!query.exec() || !query.isSelect())) {
+                //% "AI auth query failed for user %1"
+                throw DBError(qtTrId("ai-auth-query-failed").arg(uidInt),
+                              query.lastError(), query.lastQuery());
+            }
+            if(query.first()) {
+                const QString userType = query.value(0).toString();
+                //% "AI auth rejected: ID %1 already exists as %2"
+                qWarning() << qtTrId("ai-auth-rejected")
+                                  .arg(uidInt).arg(userType);
+                QByteArray msg = KP::serverLogFail(KP::SteamAuthFail);
+                senderM.sendMessage(connection, msg);
+                connection->disconnectFromHost();
+                return;
+            }
+            else {
+                /* create new AI user */
+                QSqlQuery insert;
+                if(!insert.prepare("INSERT INTO NewUsers (UserID, UserType) "
+                                   "VALUES (:uid, :type);")) {
+                    connection->disconnectFromHost();
+                    throw DBError(qtTrId("add-user-fail").arg(uidInt),
+                                  insert.lastError(), insert.lastQuery());
+                }
+                insert.bindValue(":uid", uidInt);
+                insert.bindValue(":type", QStringLiteral("ai"));
+                if(!insert.exec()) {
+                    connection->disconnectFromHost();
+                    throw DBError(qtTrId("add-user-fail").arg(uidInt),
+                                  insert.lastError(), insert.lastQuery());
+                }
+                userInit(uid);
+            }
+        }
+
+        if(connectedPeers.contains(uid)) {
+            receivedForceLogout(uid);
+        }
+        receivedLogin(uid, peerInfo, connection);
+        if(!allowedPackets.contains(uid)) {
+            allowedPackets[uid] =
+                settings->value("server/packetallowed", 3600).toInt();
+        }
+        //% "AI user login: %1 (%2)"
+        qInfo() << qtTrId("ai-user-login").arg(aiName).arg(uidInt);
+        return;
+    }
     else if(djson["command"].toInt() == KP::CommandType::CHello) {
         if(connectedUsers.contains(connection)) {
             QByteArray msg = KP::weighAnchor();
@@ -4358,6 +4418,22 @@ void Server::receivedForceLogout(const CSteamID &uid) {
         connectedUsers.remove(client);
         senderM.removeSender(client);
     }
+}
+
+bool Server::isAiUser(const CSteamID &uid) const {
+    QSqlQuery query;
+    query.prepare("SELECT UserType FROM NewUsers WHERE UserID = :uid");
+    query.bindValue(":uid", uid.ConvertToUint64());
+    if(Q_UNLIKELY(!query.exec() || !query.isSelect())) {
+        //% "AI user type query failed for user %1"
+        throw DBError(qtTrId("ai-usertype-query-failed")
+                          .arg(uid.ConvertToUint64()),
+                      query.lastError(), query.lastQuery());
+    }
+    if(query.first()) {
+        return query.value(0).toString() == QStringLiteral("ai");
+    }
+    return false;
 }
 
 /* nothing could shrink this function efficiently either */

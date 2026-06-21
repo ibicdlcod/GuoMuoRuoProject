@@ -154,7 +154,6 @@ public slots:
     bool parseSpec(const QStringList &);
     void queryNextNode(int mapId, int prevNode, bool retreat = false);
     void requestVisibleBonus(const QUuid &shipUuid);
-    void sendAiAuth();
     void sendEncryptedAppTicket(uint8 [], uint32);
     void sendFleetData(const QJsonArray &);
     void serverResponse(const QString &, const QByteArray &);
