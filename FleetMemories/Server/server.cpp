@@ -3842,6 +3842,117 @@ void Server::handleCancelExpedition(const CSteamID &uid, QSslSocket *connection,
     qInfo() << "Cancel expedition result:" << success;
 }
 
+void Server::handleChronoAdvance(const CSteamID &uid, QSslSocket *connection,
+                                 qint64 seconds) {
+    try {
+        if(seconds < 0 || seconds > KP::chronoMaxSeconds) {
+            //% "Chrono value %1 out of range for user %2"
+            qWarning() << qtTrId("chrono-out-of-range")
+                              .arg(seconds).arg(uid.ConvertToUint64());
+            return;
+        }
+        if(!isAiUser(uid)) {
+            //% "Chrono rejected for non-AI user %1"
+            qWarning() << qtTrId("chrono-rejected-non-ai")
+                              .arg(uid.ConvertToUint64());
+            return;
+        }
+
+        uint64 uidInt = uid.ConvertToUint64();
+
+        auto advance = [&](const QString &sql) {
+            QSqlQuery query;
+            query.prepare(sql);
+            query.bindValue(":uid", uidInt);
+            query.bindValue(":sec", seconds);
+            if(Q_UNLIKELY(!query.exec())) {
+                //% "Failed to advance time for user %1"
+                throw DBError(qtTrId("chrono-advance-failed").arg(uidInt),
+                              query.lastError(), query.lastQuery());
+            }
+        };
+
+        advance("UPDATE Factories SET StartTime = max(0, StartTime - :sec), "
+                "SuccessTime = max(0, SuccessTime - :sec) "
+                "WHERE UserID = :uid AND Done = 0");
+        advance("UPDATE Docks SET StartTime = max(0, StartTime - :sec), "
+                "SuccessTime = max(0, SuccessTime - :sec) "
+                "WHERE UserID = :uid");
+        advance("UPDATE UserShip SET CondRecovTime = "
+                "CASE WHEN CondRecovTime IS NULL THEN NULL "
+                "ELSE max(0, CondRecovTime - :sec) END "
+                "WHERE User = :uid");
+        advance("UPDATE UserPlaneLosses SET Timestamp = "
+                "max(0, Timestamp - :sec) WHERE User = :uid");
+        advance("UPDATE UserExpedition SET "
+                "LastProgressTime = max(0, LastProgressTime - :sec), "
+                "NextProgressTime = max(0, NextProgressTime - :sec) "
+                "WHERE User = :uid AND IsActive = TRUE");
+        advance("UPDATE UserAttr SET Intvalue = "
+                "max(0, Intvalue - :sec) "
+                "WHERE UserID = :uid AND Attribute = 'RecoverTime'");
+
+        {
+            QSqlQuery condQuery;
+            condQuery.prepare("UPDATE UserShip SET Condition = "
+                              "min(:maxcond, Condition + :gain) "
+                              "WHERE User = :uid");
+            condQuery.bindValue(":maxcond", KP::conditionMax);
+            condQuery.bindValue(":gain", seconds / 180);
+            condQuery.bindValue(":uid", uidInt);
+            if(Q_UNLIKELY(!condQuery.exec())) {
+                //% "Failed to update condition for user %1"
+                throw DBError(qtTrId("chrono-condition-failed").arg(uidInt),
+                              condQuery.lastError(), condQuery.lastQuery());
+            }
+        }
+
+        {
+            QSqlQuery trackQuery;
+            trackQuery.prepare("SELECT Intvalue FROM UserAttr "
+                               "WHERE UserID = :uid AND "
+                               "Attribute = 'AIChronoSeconds'");
+            trackQuery.bindValue(":uid", uidInt);
+            qint64 existing = 0;
+            bool trackOk = trackQuery.exec() && trackQuery.isSelect()
+                           && trackQuery.first();
+            if(trackOk) {
+                existing = trackQuery.value(0).toLongLong();
+            }
+            QSqlQuery replaceQuery;
+            replaceQuery.prepare(
+                "REPLACE INTO UserAttr (UserID, Attribute, Intvalue) "
+                "VALUES (:uid, 'AIChronoSeconds', :val)");
+            replaceQuery.bindValue(":uid", uidInt);
+            replaceQuery.bindValue(":val", existing + seconds);
+            if(Q_UNLIKELY(!replaceQuery.exec())) {
+                //% "Failed to track chrono seconds for user %1"
+                throw DBError(
+                    qtTrId("chrono-track-failed").arg(uidInt),
+                    replaceQuery.lastError(), replaceQuery.lastQuery());
+            }
+        }
+
+        naturalRegen(uid);
+        User::refreshFactory(this, uid);
+        refreshClientFactory(uid, connection);
+        refreshClientDock(uid, connection);
+        expeditionManager.processUserExpeditions(uid);
+
+        //% "Chrono advanced user %1 by %2 second(s)"
+        qInfo() << qtTrId("chrono-advanced").arg(uidInt).arg(seconds);
+    }
+    catch(DBError &e) {
+        for(QString &i : e.whats()) {
+            qCritical() << i;
+        }
+    }
+    catch(std::exception &e) {
+        //% "Chrono handler exception: %1"
+        qCritical() << qtTrId("chrono-handler-exception").arg(e.what());
+    }
+}
+
 void Server::handleUpdateExpeditionPlan(const CSteamID &uid,
                                         QSslSocket *connection,
                                         const QJsonObject &djson) {
@@ -5092,6 +5203,9 @@ anti_ddos:
         doBuyOrdinaryResources(uid, djson["attr"].toString(),
                                djson["coupons"].toInt(), connection);
     }
+        break;
+    case KP::CommandType::ChronoAdvance:
+        handleChronoAdvance(uid, connection, djson["seconds"].toInteger());
         break;
 home_port:
     case KP::CommandType::SelectHomePort: {

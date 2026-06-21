@@ -34,6 +34,7 @@ public:
     
     // Periodic processing
     void processExpeditions(); // Called by Server::minutePulse()
+    void processUserExpeditions(const CSteamID &uid);
     
     // Queries
     QJsonArray getUserExpeditions(const CSteamID &uid) const;

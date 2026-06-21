@@ -71,6 +71,7 @@ static constexpr int mapIDDifficultyMask = 4096;
 static constexpr int mapResourceControlDefault = 1000;
 static constexpr int hiddenMap = 99;
 static constexpr qint64 secsinMin = 60;
+static constexpr qint64 chronoMaxSeconds = 31536000;
 static constexpr int equipIdMax = 0x10000;
 /* Headquarters equipment IDs (see doc/...) */
 static constexpr int headquartersEquipMobileStrike = 272;

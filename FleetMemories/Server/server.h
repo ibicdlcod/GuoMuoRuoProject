@@ -191,6 +191,7 @@ private:
                            const QJsonArray &);
     // Expedition handlers
     void handleCancelExpedition(const CSteamID &, QSslSocket *, const QJsonObject &);
+    void handleChronoAdvance(const CSteamID &, QSslSocket *, qint64 seconds);
     void handleQueryExpeditionStatus(const CSteamID &, QSslSocket *, const QJsonObject &);
 
     void handleSetExpeditionSettings(const CSteamID &, QSslSocket *, const QJsonObject &);

@@ -691,6 +691,48 @@ void ExpeditionManager::processExpeditions() {
     }
 }
 
+void ExpeditionManager::processUserExpeditions(const CSteamID &uid) {
+    if(!server) {
+        //% "ExpeditionManager: server pointer is null"
+        qWarning() << qtTrId("expedition-server-null");
+        return;
+    }
+    qint64 currentTime = QDateTime::currentSecsSinceEpoch();
+    QSqlQuery query;
+    query.prepare(
+        "SELECT MapUnionId, Diff FROM UserExpedition "
+        "WHERE User = :user AND IsActive = TRUE "
+        "AND NextProgressTime <= :currentTime"
+        );
+    query.bindValue(":user", uid.ConvertToUint64());
+    query.bindValue(":currentTime", currentTime);
+    
+    if(!query.exec()) {
+        //% "Failed to query expeditions for processing"
+        throw DBError(qtTrId("expedition-query-for-processing-failed"),
+                      query.lastError(), query.lastQuery());
+    }
+    
+    while(query.next()) {
+        int mapUnionId = query.value(0).toInt();
+        int diff = query.value(1).toInt();
+        try {
+            progressExpedition(uid, mapUnionId,
+                               static_cast<KP::Difficulty>(diff));
+        }
+        catch(DBError &e) {
+            for(QString &i : e.whats()) {
+                qCritical() << i;
+            }
+        }
+        catch(...) {
+            //% "Unknown error progressing expedition for user %1 map %2"
+            qWarning() << qtTrId("expedition-unknown-error-progressing")
+                            .arg(uid.ConvertToUint64()).arg(mapUnionId);
+        }
+    }
+}
+
 QJsonArray ExpeditionManager::getUserExpeditions(const CSteamID &uid) const {
     return getUserExpeditions(uid, std::nullopt, false);
 }
