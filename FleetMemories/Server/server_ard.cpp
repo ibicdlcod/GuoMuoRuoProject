@@ -133,6 +133,57 @@ void Server::handleInitARDPurchase(const CSteamID &uid,
         senderM.sendMessage(connection, msg);
         return;
     }
+
+    if(isAiUser(uid)) {
+        int priceHKDCents = KP::ardRealPriceHKDCents(units);
+        QSqlQuery addQuery;
+        addQuery.prepare("UPDATE UserAttr SET Intvalue = Intvalue + :units "
+                         "WHERE Attribute = :attr AND UserID = :uid");
+        addQuery.bindValue(":units", units);
+        addQuery.bindValue(":attr", KP::attrARDCoupon);
+        addQuery.bindValue(":uid", uid.ConvertToUint64());
+        if(Q_UNLIKELY(!addQuery.exec())) {
+            //% "AI ARD add failed for user %1"
+            throw DBError(qtTrId("ai-ard-add-failed")
+                              .arg(uid.ConvertToUint64()),
+                          addQuery.lastError(), addQuery.lastQuery());
+        }
+
+        QSqlQuery trackQuery;
+        trackQuery.prepare("SELECT Intvalue FROM UserAttr "
+                           "WHERE UserID = :uid AND Attribute = "
+                           "'AIARDSpentHKDCents'");
+        trackQuery.bindValue(":uid", uid.ConvertToUint64());
+        qint64 existing = 0;
+        if(trackQuery.exec() && trackQuery.isSelect()
+           && trackQuery.first()) {
+            existing = trackQuery.value(0).toLongLong();
+        }
+        QSqlQuery replaceQuery;
+        replaceQuery.prepare(
+            "REPLACE INTO UserAttr (UserID, Attribute, Intvalue) "
+            "VALUES (:uid, 'AIARDSpentHKDCents', :val)");
+        replaceQuery.bindValue(":uid", uid.ConvertToUint64());
+        replaceQuery.bindValue(":val", existing + priceHKDCents);
+        if(Q_UNLIKELY(!replaceQuery.exec())) {
+            //% "AI ARD track failed for user %1"
+            throw DBError(qtTrId("ai-ard-track-failed")
+                              .arg(uid.ConvertToUint64()),
+                          replaceQuery.lastError(), replaceQuery.lastQuery());
+        }
+
+        //% "AI account %1 fake-purchased %2 ARD coupons (HKD %3 cents)"
+        qWarning() << qtTrId("ai-ard-purchase")
+                          .arg(uid.ConvertToUint64())
+                          .arg(units)
+                          .arg(priceHKDCents);
+
+        QByteArray msg = KP::serverARDPurchaseSuccess(units);
+        senderM.sendMessage(connection, msg);
+        offerResourceInfo(connection, uid);
+        return;
+    }
+
     int priceHKDCents = KP::ardRealPriceHKDCents(units);
     quint64 orderId;
     do {
