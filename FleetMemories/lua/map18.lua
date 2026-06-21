@@ -33,6 +33,8 @@ maps[18][2] = {
     battle_type = maps.Battle_type.NORMAL,
     next_nodes = {3},
     lb_distance = 99,
+    droptable = { C = {[269615873]=1.0, [269615876]=1.0, [269616150]=1.0, [538051073]=1.0, [269615620]=1.0, [269616137]=1.0} },
+    raredroptable = { C = {} },
     enemyscale = 1.400,
     branch_rule = {
         C = function(ships, los, fleet_type, capitalness, ship_tags, ship_speeds, equipment_list, user_state)
@@ -53,6 +55,8 @@ maps[18][3] = {
     battle_type = maps.Battle_type.NORMAL,
     next_nodes = {4},
     lb_distance = 99,
+    droptable = { C = {[269616130]=1.0, [269615877]=1.0, [269616151]=1.0, [538051074]=1.0, [269615621]=1.0, [269616138]=1.0} },
+    raredroptable = { C = {} },
     enemyscale = 1.400,
     branch_rule = {
         C = function(ships, los, fleet_type, capitalness, ship_tags, ship_speeds, equipment_list, user_state)
@@ -73,6 +77,8 @@ maps[18][4] = {
     battle_type = maps.Battle_type.NORMAL,
     next_nodes = {5},
     lb_distance = 99,
+    droptable = { C = {[538116354]=1.0, [269746690]=1.0, [269681413]=1.0, [269746433]=1.0, [538117123]=1.0} },
+    raredroptable = { C = {[538117377]=1.0} },
     enemyscale = 1.400,
     branch_rule = {
         C = function(ships, los, fleet_type, capitalness, ship_tags, ship_speeds, equipment_list, user_state)
@@ -93,6 +99,8 @@ maps[18][5] = {
     battle_type = maps.Battle_type.BOSS,
     next_nodes = {},
     lb_distance = 99,
+    droptable = { C = {[538116610]=1.0, [269616152]=1.0, [269681666]=1.0, [269812226]=1.0, [269681153]=1.0} },
+    raredroptable = { C = {[269812481]=1.0} },
     enemyscale = 1.400,
     branch_rule = {
         C = function(ships, los, fleet_type, capitalness, ship_tags, ship_speeds, equipment_list, user_state)
@@ -139,6 +147,8 @@ maps[18][8] = {
     battle_type = maps.Battle_type.NORMAL,
     next_nodes = {},
     lb_distance = 99,
+    droptable = { C = {[538116609]=1.0, [538251524]=1.0, [269681414]=1.0, [269816068]=1.0, [269680897]=1.0} },
+    raredroptable = { C = {[269684994]=1.0} },
     enemyscale = 1.400,
     branch_rule = {
         C = function(ships, los, fleet_type, capitalness, ship_tags, ship_speeds, equipment_list, user_state)

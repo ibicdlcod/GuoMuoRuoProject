@@ -52,6 +52,8 @@ maps[19][3] = {
     battle_type = maps.Battle_type.NORMAL,
     next_nodes = {4},
     lb_distance = 99,
+    droptable = { C = {[538051329]=1.0, [538051585]=1.0, [269616648]=1.0, [538051337]=1.0, [269616645]=1.0, [538051335]=1.0} },
+    raredroptable = { C = {} },
     branch_rule = {
         C = function(ships, los, fleet_type, capitalness, ship_tags, ship_speeds, equipment_list, user_state)
             return 4
@@ -71,6 +73,8 @@ maps[19][4] = {
     battle_type = maps.Battle_type.NORMAL,
     next_nodes = {5},
     lb_distance = 99,
+    droptable = { C = {[538116867]=1.0, [269616649]=1.0, [269616646]=1.0, [538051336]=1.0} },
+    raredroptable = { C = {[538137089]=1.0, [538137090]=1.0} },
     branch_rule = {
         C = function(ships, los, fleet_type, capitalness, ship_tags, ship_speeds, equipment_list, user_state)
             return 5
@@ -90,6 +94,8 @@ maps[19][5] = {
     battle_type = maps.Battle_type.NIGHTBOSS,
     next_nodes = {},
     lb_distance = 99,
+    droptable = { C = {[538051586]=1.0, [269616898]=1.0, [538051339]=1.0, [269616648]=1.0} },
+    raredroptable = { C = {[269877761]=1.0, [538137089]=1.0} },
     branch_rule = {
         C = function(ships, los, fleet_type, capitalness, ship_tags, ship_speeds, equipment_list, user_state)
             return 0
@@ -135,6 +141,8 @@ maps[19][8] = {
     battle_type = maps.Battle_type.NORMAL,
     next_nodes = {},
     lb_distance = 99,
+    droptable = { C = {[806686977]=1.0, [269616650]=1.0, [269616647]=1.0} },
+    raredroptable = { C = {[538137090]=1.0, [538137089]=1.0, [538640898]=1.0} },
     branch_rule = {
         C = function(ships, los, fleet_type, capitalness, ship_tags, ship_speeds, equipment_list, user_state)
             return 0

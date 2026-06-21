@@ -33,6 +33,8 @@ maps[40][2] = {
     battle_type = maps.Battle_type.NORMAL,
     next_nodes = {3},
     lb_distance = 99,
+    droptable = { C = {[538051339]=1.0, [269616643]=1.0, [538051335]=1.0, [538051619]=1.0, [538051333]=1.0, [538051610]=1.0} },
+    raredroptable = { C = {} },
     branch_rule = {
         C = function(ships, los, fleet_type, capitalness, ship_tags, ship_speeds, equipment_list, user_state)
             return 3
@@ -52,6 +54,8 @@ maps[40][3] = {
     battle_type = maps.Battle_type.NORMAL,
     next_nodes = {4},
     lb_distance = 99,
+    droptable = { C = {[538055434]=1.0, [269616644]=1.0, [538051336]=1.0, [538051620]=1.0, [538051334]=1.0, [538051617]=1.0} },
+    raredroptable = { C = {} },
     branch_rule = {
         C = function(ships, los, fleet_type, capitalness, ship_tags, ship_speeds, equipment_list, user_state)
             return 4
@@ -71,6 +75,8 @@ maps[40][4] = {
     battle_type = maps.Battle_type.NORMAL,
     next_nodes = {5},
     lb_distance = 99,
+    droptable = { C = {[538116870]=1.0, [269616646]=1.0, [269616643]=1.0, [538051619]=1.0} },
+    raredroptable = { C = {[269747460]=1.0, [269747459]=1.0} },
     branch_rule = {
         C = function(ships, los, fleet_type, capitalness, ship_tags, ship_speeds, equipment_list, user_state)
             return 5
@@ -90,6 +96,8 @@ maps[40][5] = {
     battle_type = maps.Battle_type.NIGHTBOSS,
     next_nodes = {},
     lb_distance = 99,
+    droptable = { C = {[538117121]=1.0, [269616647]=1.0, [269616644]=1.0, [538051620]=1.0} },
+    raredroptable = { C = {[538640898]=1.0, [269747460]=1.0} },
     branch_rule = {
         C = function(ships, los, fleet_type, capitalness, ship_tags, ship_speeds, equipment_list, user_state)
             return 0
@@ -123,6 +131,8 @@ maps[40][7] = {
     battle_type = maps.Battle_type.NORMAL,
     next_nodes = {},
     lb_distance = 99,
+    droptable = { C = {[538116869]=1.0, [269616645]=1.0, [269616642]=1.0, [538182146]=1.0, [538051618]=1.0} },
+    raredroptable = { C = {[269747459]=1.0} },
     branch_rule = {
         C = function(ships, los, fleet_type, capitalness, ship_tags, ship_speeds, equipment_list, user_state)
             return 0
