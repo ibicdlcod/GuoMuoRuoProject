@@ -4,6 +4,8 @@ This document describes the Lua files that define playable maps. For the
 high-level mechanics see [doc/worldview_and_mechanics/6.1-map.md](../worldview_and_mechanics/6.1-map.md)
 and [doc/worldview_and_mechanics/6.5-mapstar.md](../worldview_and_mechanics/6.5-mapstar.md);
 for design guidance see [doc/design_philosophy/maps.md](../design_philosophy/maps.md).
+For how maps 13–86 are auto-generated (node-structure types per star tier,
+placement, and tuning) see [map-generation.md](map-generation.md).
 
 The server maintains a single `sol::state` and loads all map scripts into the
 global `maps` table. The client does **not** load these files; it receives the
