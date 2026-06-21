@@ -112,17 +112,38 @@ DISASTER nodes only appear on **non-boss** branches (matching the design intent
 that disasters are shortcut/expedition hazards), so they don't confound the
 boss-route difficulty measurement.
 
-### ★4 — Multi-route / Network (patterns M/N) *(planned)*
+### ★4 — Multi-route / Network (patterns M/N)
 
-Multiple routes converging on the boss, 3-way branches, and a **CHOICE** node.
+A 3-battle boss spine plus a forked sub-route through a **DISASTER** node and a
+**CHOICE** node that either converges back to the spine or ends in expedition.
+
+```
+START(1) --cap>=0.5--> NORMAL(2) -> NORMAL(3) -> NORMAL(4) -> BOSS(5)
+         --else------> DISASTER(6) -> CHOICE(7) --> NORMAL(8)   (expedition end)
+                                              `-->  NORMAL(3)    (converge to spine)
+```
+
+| Node | Type | next | branch | notes |
+|------|------|------|--------|-------|
+| 1 | STARTING | {2,6} | `cap>=0.5 ? 2 : 6` | |
+| 2,3,4 | NORMAL | →next | linear | boss spine (3 battles) |
+| 5 | BOSS | {} | return 0 | |
+| 6 | DISASTER | {7} | return 7 | `fuel=0.15, ammo=0.15` |
+| 7 | CHOICE | {8,3} | return 0 | resolved by `ChoiceOverrides`; converges to spine N3 |
+| 8 | NORMAL | {} | return 0 | expedition end |
+
 CHOICE nodes need `ChoiceOverrides` to traverse in testing, so the boss route is
-kept off the CHOICE branch (the test fleet reaches the boss without choosing),
-exactly as in hand-designed map 12.
+kept off the CHOICE branch — the boss-seeking fleet takes the capital-gated
+spine and never reaches node 7 (as in hand-designed map 12). When the
+convergence/expedition edges can't be placed on water, the sub-route falls back
+to `DISASTER -> NORMAL` (no CHOICE); on broken water the whole map falls back to
+a longer fork or linear route.
 
-### ★5 — Staggered / Elite (pattern S) *(planned)*
+### ★5 — Elite (pattern S)
 
-10–12 nodes, layered routes; same placement and tuning rules at the highest
-enemy tiers.
+Reuses the ★4 M/N topology (3-battle spine + DISASTER/CHOICE sub-route) tuned at
+the strongest enemy ladder levels (≈ level 11, A/B-tier). The higher difficulty
+comes from enemy composition rather than extra nodes.
 
 ## Difficulty model
 
