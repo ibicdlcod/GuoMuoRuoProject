@@ -39,7 +39,7 @@ maps[40][2] = {
         end,
     },
     enemy = {
-        C = function() return {0x7B030100, 0x7B030100} end,
+        C = function() return {0x7D030100, 0x7D030100} end,
     },
     expr = { C = 60 },
     exec = {
@@ -58,7 +58,7 @@ maps[40][3] = {
         end,
     },
     enemy = {
-        C = function() return {0x7B030100, 0x7B030100} end,
+        C = function() return {0x7D030100, 0x7D030100} end,
     },
     expr = { C = 60 },
     exec = {
@@ -77,7 +77,7 @@ maps[40][4] = {
         end,
     },
     enemy = {
-        C = function() return {0x7B030100, 0x7B030100} end,
+        C = function() return {0x7D030100, 0x7D030100} end,
     },
     expr = { C = 60 },
     exec = {
@@ -87,7 +87,7 @@ maps[40][4] = {
 
 maps[40][5] = {
     x = 0.99, y = 0.98,
-    battle_type = maps.Battle_type.BOSS,
+    battle_type = maps.Battle_type.NIGHTBOSS,
     next_nodes = {},
     lb_distance = 99,
     branch_rule = {
@@ -96,7 +96,7 @@ maps[40][5] = {
         end,
     },
     enemy = {
-        C = function() return {0x7A030100, 0x7B030100, 0x7B050100} end,
+        C = function() return {0x7D030100, 0x7D030100, 0x7D050100} end,
     },
     expr = { C = 200 },
     exec = {
@@ -129,7 +129,7 @@ maps[40][7] = {
         end,
     },
     enemy = {
-        C = function() return {0x7B030100, 0x7B030100} end,
+        C = function() return {0x7D030100, 0x7D030100} end,
     },
     expr = { C = 60 },
     exec = {
