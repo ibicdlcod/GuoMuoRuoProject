@@ -4672,7 +4672,7 @@ void Server::receivedReq(const QJsonObject &djson,
         return;
     }
     CSteamID uid = connectedUsers[connection];
-    if(!uid.IsValid()) {
+    if(!uid.IsValid() && !isAiUser(uid)) {
         //% "Invalid-uid: %1"
         qWarning() << qtTrId("invalid-uid")
                       .arg(uid.ConvertToUint64());

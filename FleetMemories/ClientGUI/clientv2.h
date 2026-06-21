@@ -5,8 +5,9 @@
 #define CLIENTV2_H
 
 #include <QColor>
-#include <QtNetwork>
 #include <QHttpServer>
+#include <QSocketNotifier>
+#include <QtNetwork>
 #include <optional>
 #include "ui/factory/developwindow.h"
 #include "ui/factory/constructwindow.h"
@@ -301,6 +302,7 @@ private:
     QSslConfiguration conf;
     Receiver recv;
     QPointer<Sender> sender;
+    QSocketNotifier *stdinNotifier = nullptr;
 
     unsigned int maxRetransmit;
     unsigned int retransmitTimes = 0;

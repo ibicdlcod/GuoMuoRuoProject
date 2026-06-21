@@ -6,12 +6,16 @@
 #include <QCoreApplication>
 #include <QPasswordDigestor>
 #include <QSettings>
+#include <QSocketNotifier>
+#include <QTextStream>
 #include <QThread>
 
-#include "../steam/isteamfriends.h"
+#include <cstdio>
+
 #include "../Protocol/commandline.h"
 #include "../Protocol/kp.h"
 #include "../Protocol/utility.h"
+#include "../steam/isteamfriends.h"
 #include "networkerror.h"
 #include "steamauth.h"
 
@@ -158,6 +162,23 @@ bool Client::loggedIn() const {
 void Client::aiAutoConnect() {
     if(!aiMode) {
         return;
+    }
+    if(stdinNotifier == nullptr) {
+        stdinNotifier = new QSocketNotifier(
+            fileno(stdin), QSocketNotifier::Read, this);
+        connect(stdinNotifier, &QSocketNotifier::activated,
+                this, [this](QSocketDescriptor, QSocketNotifier::Type) {
+                    stdinNotifier->setEnabled(false);
+                    QTextStream in(stdin);
+                    while(!in.atEnd()) {
+                        QString line = in.readLine();
+                        if(line.isNull()) {
+                            break;
+                        }
+                        parse(line);
+                    }
+                    stdinNotifier->setEnabled(true);
+                });
     }
     QStringList args;
     args << QStringLiteral("connect")
