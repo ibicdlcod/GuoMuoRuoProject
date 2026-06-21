@@ -156,6 +156,10 @@ bool Client::parseGameCommands(const QString &primary,
         parseQueryCommand(cmdParts);
         return true;
     }
+    if(primaryLower == "chrono") {
+        parseChronoCommand(cmdParts);
+        return true;
+    }
 
     auto meta = QMetaEnum::fromType<KP::CommandType>();
     QString primaryNonConst = primary;
@@ -1037,6 +1041,7 @@ const QStringList Client::getCommandsSpec() const {
         "buy medal",
         "buy resources",
         "buy ard",
+        "chrono",
         "tech",
         "tech demand",
         "tech skillpoints",

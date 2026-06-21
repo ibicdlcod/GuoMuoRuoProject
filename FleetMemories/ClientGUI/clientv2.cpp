@@ -166,7 +166,21 @@ void Client::aiAutoConnect() {
     parseConnectReq(args);
 }
 
-void Client::parseChronoCommand(const QStringList &) {}
+void Client::parseChronoCommand(const QStringList &cmdParts) {
+    if(cmdParts.length() < 2) {
+        //% "Usage: chrono <seconds>"
+        emit qout(qtTrId("chrono-usage"));
+        return;
+    }
+    bool ok = false;
+    qint64 seconds = cmdParts[1].toLongLong(&ok);
+    if(!ok || seconds < 0) {
+        //% "Invalid chrono value: %1"
+        qWarning() << qtTrId("chrono-invalid").arg(cmdParts[1]);
+        return;
+    }
+    sender->enqueue(KP::clientChronoAdvance(static_cast<quint64>(seconds)));
+}
 
 /* Make actual connections */
 void Client::autoPassword() {
