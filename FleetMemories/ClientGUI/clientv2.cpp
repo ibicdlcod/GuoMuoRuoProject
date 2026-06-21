@@ -844,9 +844,9 @@ void Client::receivedMsg(const QJsonObject &djson) {
             //% "Process battle info failed due to error on server side."
             qWarning() << qtTrId("battle-failed-server");
             break;
-        case KP::DropError:
-            //% "Process blueprint drop info failed due to error on server side."
-            qWarning() << qtTrId("battle-failed-server-drop");
+        case KP::NoDrop:
+            //% "No blueprint drop was available from this battle."
+            qInfo() << qtTrId("battle-no-drop");
             break;
         default:
             //% "Process battle info failed."

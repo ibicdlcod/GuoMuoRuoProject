@@ -294,7 +294,7 @@ enum GameError{
     FleetBusy,
     FleetLost,
     ServerError,
-    DropError,
+    NoDrop,
     ExpeditionMapNotExist,
     ExpeditionInvalidFleetIndex,
     ExpeditionInvalidBattlePlans,

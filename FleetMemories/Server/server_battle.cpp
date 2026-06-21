@@ -1427,7 +1427,7 @@ condition_drop:
 drop_ship:
     int dropShip = drop(uid, mapId, nodeId, assm);
     if(dropShip == -1) {
-        QByteArray msg = KP::serverBattleError(KP::DropError);
+        QByteArray msg = KP::serverBattleError(KP::NoDrop);
         senderM.sendMessage(connection, msg);
     }
     else if(dropShip != 0) {
