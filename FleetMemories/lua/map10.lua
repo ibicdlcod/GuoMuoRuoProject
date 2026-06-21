@@ -13,7 +13,7 @@ maps[10] = {
 }
 
 maps[10][1] = {
-    x = 0.15, y = 0.55,
+    x = 0.18, y = 0.58,
     battle_type = maps.Battle_type.STARTING,
     next_nodes = {2},
     lb_distance = 99,
@@ -25,7 +25,7 @@ maps[10][1] = {
 }
 
 maps[10][2] = {
-    x = 0.30, y = 0.35,
+    x = 0.34, y = 0.38,
     battle_type = maps.Battle_type.NORMAL,
     next_nodes = {3, 5},
     lb_distance = 99,
@@ -40,7 +40,7 @@ maps[10][2] = {
     },
     enemy = {
         C = function()
-            return {0x7F010100, 0x7F010100, 0x7F020100}
+            return {0x7C030100, 0x7C030100}
         end,
     },
     expr = {
@@ -54,7 +54,7 @@ maps[10][2] = {
 }
 
 maps[10][3] = {
-    x = 0.50, y = 0.35,
+    x = 0.52, y = 0.30,
     battle_type = maps.Battle_type.NORMAL,
     next_nodes = {4, 6},
     lb_distance = 99,
@@ -68,7 +68,7 @@ maps[10][3] = {
     },
     enemy = {
         C = function()
-            return {0x7F010100, 0x7F010100, 0x7F010100, 0x7F020100, 0x7F030100}
+            return {0x7C030100, 0x7C030100}
         end,
     },
     expr = {
@@ -82,7 +82,7 @@ maps[10][3] = {
 }
 
 maps[10][5] = {
-    x = 0.30, y = 0.70,
+    x = 0.30, y = 0.74,
     battle_type = maps.Battle_type.NORMAL,
     next_nodes = {},
     lb_distance = 99,
@@ -93,7 +93,7 @@ maps[10][5] = {
     },
     enemy = {
         C = function()
-            return {0x7F010100, 0x7F010100, 0x7F020100}
+            return {0x7C030100, 0x7C030100}
         end,
     },
     expr = {
@@ -121,7 +121,7 @@ maps[10][4] = {
 }
 
 maps[10][6] = {
-    x = 0.70, y = 0.50,
+    x = 0.66, y = 0.50,
     battle_type = maps.Battle_type.NORMAL,
     next_nodes = {7},
     lb_distance = 99,
@@ -132,7 +132,7 @@ maps[10][6] = {
     },
     enemy = {
         C = function()
-            return {0x7F010100, 0x7F010100, 0x7F010100, 0x7F020100, 0x7F030100}
+            return {0x7C030100, 0x7C030100}
         end,
     },
     expr = {
@@ -146,7 +146,7 @@ maps[10][6] = {
 }
 
 maps[10][7] = {
-    x = 0.90, y = 0.35,
+    x = 0.90, y = 0.38,
     battle_type = maps.Battle_type.BOSS,
     next_nodes = {},
     lb_distance = 99,
@@ -157,7 +157,7 @@ maps[10][7] = {
     },
     enemy = {
         C = function()
-            return {0x7F010100, 0x7F010100, 0x7F010100, 0x7F030100, 0x7F030100}
+            return {0x7C030100, 0x7C030100, 0x7C050100}
         end,
     },
     expr = {

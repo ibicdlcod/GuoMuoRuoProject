@@ -4,6 +4,8 @@ This document describes the Lua files that define playable maps. For the
 high-level mechanics see [doc/worldview_and_mechanics/6.1-map.md](../worldview_and_mechanics/6.1-map.md)
 and [doc/worldview_and_mechanics/6.5-mapstar.md](../worldview_and_mechanics/6.5-mapstar.md);
 for design guidance see [doc/design_philosophy/maps.md](../design_philosophy/maps.md).
+For how maps 13–86 are auto-generated (node-structure types per star tier,
+placement, and tuning) see [map-generation.md](map-generation.md).
 
 The server maintains a single `sol::state` and loads all map scripts into the
 global `maps` table. The client does **not** load these files; it receives the
@@ -58,6 +60,7 @@ ID**; returning `0` rejects the sortie.
 | `lb_distance` | int | No | Land-based air distance used for air support calculations. Defaults to `0` which means LBAS is prohibited for this node. [Implemented in Server::getNodeFromLua, Server::offerMapInfo] |
 | `branch_rule` | `{C/B/A: function}` | No | If present, called after the node to pick the next node automatically. If absent or returning `0`, the sortie ends. [Implemented in Server::evaluateBranchRule, Server::nextNode] |
 | `enemy` | `{C/B/A: function}` | For battle nodes | Returns a list of enemy ship IDs. [Implemented in Server::createEnemyFleetInfo] |
+| `enemyscale` | double | No | Continuous difficulty multiplier (default `1.0`) applied to this node's enemy fleet. See [Enemy scaling](#enemy-scaling-enemyscale). [Implemented in Server::createEnemyFleetInfo] |
 | `droptable` | `{C/B/A: {shipId: weight}}` | For battle nodes | Normal drop table. [Implemented in Server::drop] |
 | `raredroptable` | `{C/B/A: {shipId: weight}}` | For battle nodes | Rare drop table consumed first. [Implemented in Server::drop] |
 | `exec` | `{C/B/A: function(battleresult, user_state)}` | No | Defined in existing maps but **not currently called by the server**. Reserved for future node-side state mutation. |
@@ -125,6 +128,32 @@ end
 
 The returned IDs are looked up in the server's `shipRegistry`. Missing IDs are
 skipped with a warning.
+
+[Implemented in Server::createEnemyFleetInfo]
+
+### Enemy scaling (`enemyscale`)
+
+`enemyscale` is an optional per-node `double` (default `1.0`) that multiplies the
+node's enemy fleet strength continuously:
+
+- each enemy ship's starting **HP** is multiplied by `enemyscale`;
+- each enemy equipment's **skill effect** (its damage contribution) is set to
+  `enemyscale`.
+
+Values above `1.0` make the node harder (tankier, deadlier enemies); values
+below `1.0` make it easier. It is a continuous lever *between* the discrete
+enemy ship tiers, intended for fine-tuning a map's flagship-sunk (pass) rate
+toward its star-difficulty target `e^(-St/10)` (see
+[6.5-mapstar.md](../worldview_and_mechanics/6.5-mapstar.md)). Omitting it (or
+setting `1.0`) leaves the enemy fleet at its unscaled stats.
+
+```lua
+maps[N][nodeId] = {
+    -- ...
+    enemy = { C = function() return {0x7C030100, 0x7C030100, 0x7C050100} end },
+    enemyscale = 1.3,   -- 30% tougher enemies at this node
+}
+```
 
 [Implemented in Server::createEnemyFleetInfo]
 

@@ -277,7 +277,7 @@ void ConfirmSortie::populateBattleResult(const QJsonObject &battleProcess)
                           int row, const QString &shipName, int shipLevel,
                           int shipIconId, int hpBefore, int hpAfter, int totalHP,
                           const QVector<int> &planesBefore, const QVector<int> &planesAfter,
-                          bool inverted, int maxPlanes,
+                          bool inverted, int maxPlanes, int equipSlots,
                           const QStringList &equipNames, bool fled) {
         QLabel *iconLabel = new QLabel(container);
         QPixmap icon = Icute::shipIcon(shipIconId);
@@ -318,10 +318,12 @@ void ConfirmSortie::populateBattleResult(const QJsonObject &battleProcess)
         QStringList capturedEquipNames = equipNames;
         QObject::connect(planeButton, &QPushButton::clicked,
                          planeButton, [capturedName, capturedBefore, capturedAfter,
-                                       capturedEquipNames,
+                                       capturedEquipNames, equipSlots,
                                        trCountsFor, trSlotCount, trTitle, planeButton]() {
             QString msg = trCountsFor.arg(capturedName);
             int slotCount = std::max(capturedBefore.size(), capturedAfter.size());
+            if (equipSlots > 0)
+                slotCount = std::min(slotCount, equipSlots);
             for (int s = 0; s < slotCount; ++s) {
                 int before = s < capturedBefore.size() ? capturedBefore[s] : 0;
                 int after  = s < capturedAfter.size()  ? capturedAfter[s]  : 0;
@@ -354,12 +356,14 @@ void ConfirmSortie::populateBattleResult(const QJsonObject &battleProcess)
         int shipLevel  = 1;
         int shipIconId = 0;
         int maxPlanes = 0;
+        int equipSlots = 0;
         if (fleetView) {
             if (Ship *ship = fleetView->getShip(i)) {
                 shipName   = ship->toString();
                 totalHP    = ship->attr.value("Hitpoints", hpBefore);
                 shipIconId = ship->attr.value("OldInternalNo.", 0);
                 maxPlanes  = ship->attr.value("Planes", 0);
+                equipSlots = ship->attr.value("Equipslots", 0);
                 if (ShipDynamic *dyn = fleetView->getShipDynamic(i)) {
                     shipLevel = Ship::getLevel(std::min(dyn->exp, dyn->expCap));
                     fled = dyn->fleetFled;
@@ -407,7 +411,7 @@ void ConfirmSortie::populateBattleResult(const QJsonObject &battleProcess)
 
         addShipRow(m_playerLayout, m_playerContainer, displayRow,
                    shipName, shipLevel, shipIconId, hpBefore, hpAfter, totalHP,
-                   planesBefore, planesAfter, true, maxPlanes, equipNames, fled);
+                   planesBefore, planesAfter, true, maxPlanes, equipSlots, equipNames, fled);
         ++displayRow;
     }
 
@@ -420,6 +424,7 @@ void ConfirmSortie::populateBattleResult(const QJsonObject &battleProcess)
         QString enemyName;
         int shipIconId = 0;
         int maxPlanes  = 0;
+        int equipSlots = 0;
         if (i < enemyShipIds.size()) {
             int enemyShipId = enemyShipIds[i].toInt();
             if (Ship *s = engine.getShipReg(enemyShipId)) {
@@ -427,6 +432,7 @@ void ConfirmSortie::populateBattleResult(const QJsonObject &battleProcess)
                 totalHP    = s->attr.value("Hitpoints", hpBefore);
                 shipIconId = s->attr.value("OldInternalNo.", 0);
                 maxPlanes  = s->attr.value("Planes", 0);
+                equipSlots = s->attr.value("Equipslots", 0);
             } else {
                 //% "Enemy Ship #%1"
                 enemyName = qtTrId("battle-result-enemy-ship-id").arg(enemyShipId);
@@ -445,7 +451,7 @@ void ConfirmSortie::populateBattleResult(const QJsonObject &battleProcess)
         int enemyLevel = i < enemyLevels.size() ? enemyLevels[i].toInt(0) : 0;
         addShipRow(m_enemyLayout, m_enemyContainer, i,
                    enemyName, enemyLevel, shipIconId, hpBefore, hpAfter, totalHP,
-                   planesBefore, planesAfter, false, maxPlanes, QStringList{}, false);
+                   planesBefore, planesAfter, false, maxPlanes, equipSlots, QStringList{}, false);
     }
 }
 

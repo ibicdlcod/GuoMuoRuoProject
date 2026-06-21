@@ -878,6 +878,14 @@ FleetInfo Server::createEnemyFleetInfo(int mapId, int nodeId,
         return info;
     }
 
+    /* Per-node continuous difficulty knob (default 1.0): scales enemy HP and
+     * enemy equipment damage so difficulty can be tuned smoothly between the
+     * discrete ship tiers. */
+    double enemyScale = 1.0;
+    if(lua["maps"][unionId][nodeId]["enemyscale"] != sol::nil) {
+        enemyScale = lua["maps"][unionId][nodeId]["enemyscale"];
+    }
+
     sol::protected_function enemyFunc =
         lua["maps"][unionId][nodeId]["enemy"][diffStrC];
     auto result = enemyFunc();
@@ -896,7 +904,8 @@ FleetInfo Server::createEnemyFleetInfo(int mapId, int nodeId,
         }
         Ship *ship = shipRegistry[shipId];
         auto dyn = std::make_unique<ShipDynamic>(shipId);
-        dyn->currentHP = ship->attr.value("Hitpoints", 1);
+        dyn->currentHP = std::max(1, static_cast<int>(std::lround(
+            ship->attr.value("Hitpoints", 1) * enemyScale)));
         dyn->condition = 480;
     armor_debuff:
         if(lua["maps"][unionId]["softfactor"] == sol::nil) {
@@ -920,7 +929,7 @@ FleetInfo Server::createEnemyFleetInfo(int mapId, int nodeId,
             }
             QUuid uuid = QUuid::createUuid();
             info.equipMap.insert(uuid, equipRegistry[equipId]);
-            info.equipSkillEffects.insert(uuid, 1.0);
+            info.equipSkillEffects.insert(uuid, enemyScale);
             dyn->slotEquip.append(uuid);
         }
         dyn->slotEquipEx = QUuid(); // empty UUID
@@ -3933,23 +3942,6 @@ static bool checkTestFleetCriticalDamage(FleetInfo *fleetInfo,
     return false;
 }
 
-static int techYearFromStarDiff(double starDiff)
-{
-    if(starDiff <= 1.0) {
-        return 1924;
-    }
-    if(starDiff <= 5.0) {
-        return 1935;
-    }
-    if(starDiff <= 10.0) {
-        return 1941;
-    }
-    if(starDiff <= 15.0) {
-        return 1944;
-    }
-    return 1945;
-}
-
 static QString outcomeLabel(Server::MapTestRunResult::Outcome outcome)
 {
     switch(outcome) {
@@ -4159,7 +4151,7 @@ Server::MapTestRunResult Server::runSingleMapTest(
                 break;
             }
         }
-        if(outOfSupplies) {
+        if(outOfSupplies && !isEndNode) {
             result.outcome = MapTestRunResult::Failure;
             result.abortReason = QStringLiteral(
                 "Fuel or ammo exhausted");
@@ -4242,6 +4234,7 @@ bool Server::runTestMap(const QString &luaPath,
     importEquipFromCSV();
     importShipFromCSV();
     luaInitEquipable();
+    importMapFromCSV();
     if(!mapRefresh()) {
         qCritical() << "Map refresh failed";
         return false;
@@ -4348,20 +4341,43 @@ FleetInfo Server::buildAutoFleetForMap(int mapUnionId,
 {
     Q_UNUSED(diff)
     FleetInfo fleet;
-    if(techYearCap < 0) {
+    /* 6.5-mapstar.md: test fleet uses the strongest ships/equipment within
+     * tech <= [St], ship level [St]*10, and equip skillpoints
+     * [St]/10 * skillPointsStd() (improvement 0). */
+    double st;
+    if(techYearCap >= 0) {
+        st = techYearCap;
+    }
+    else {
         MapWithDiff *map = getMapByUnionId(mapUnionId);
-        double starDiff = map ? map->starDiff : 0.0;
-        techYearCap = techYearFromStarDiff(starDiff);
+        st = map ? map->starDiff : 0.0;
     }
 
     QList<Ship *> candidates;
     for(Ship *ship : shipRegistry) {
-        int shipTech = ship->attr.value(QStringLiteral("Tech"),
-                                        9999);
-        if(shipTech <= techYearCap) {
+        if((static_cast<unsigned>(ship->getId()) & 0xF0000000u)
+                == 0x70000000u) {
+            continue;  /* exclude amnesiac/enemy-only ships (id 0x7.......) */
+        }
+        if(ship->getTech() <= st) {
             candidates.append(ship);
         }
     }
+    if(candidates.isEmpty()) {
+        /* Fall back to the lowest-tech ships available. */
+        candidates = shipRegistry.values();
+        std::sort(candidates.begin(), candidates.end(),
+                  [](Ship *a, Ship *b) {
+                      return a->getTech() < b->getTech();
+                  });
+        candidates = candidates.mid(0, 12);
+    }
+
+    /* Equipment skill effect for the test fleet, derived from
+     * skillpoints = [St]/10 * skillPointsStd() with no improvement star:
+     * 1 - sqrt(0.5) + (St/10) / hypot(1, St/10). */
+    const double skillEff = 1.0 - std::sqrt(0.5)
+                            + (st / 10.0) / std::hypot(1.0, st / 10.0);
     auto scoreShip = [](Ship *s) -> double {
         return s->attr.value(QStringLiteral("Firepower"), 0)
             + s->attr.value(QStringLiteral("Torpedo"), 0)
@@ -4374,96 +4390,157 @@ FleetInfo Server::buildAutoFleetForMap(int mapUnionId,
                   return scoreShip(a) > scoreShip(b);
               });
 
-    int capitalCount = 0;
-    int screenCount = 0;
-    int subCount = 0;
-    for(Ship *ship : candidates) {
-        if(fleet.ships.size() >= 6) {
-            break;
+    auto shipKind = [](Ship *ship) -> int {
+        /* 0 = capital (surface/carrier), 1 = screen / other */
+        KP::CapitalType ct = ship->getType().getCapitalType();
+        if(ct == KP::SurfaceShip || ct == KP::CarrierShip) {
+            return 0;
         }
-        int type = ship->attr.value(QStringLiteral("Type"), 0);
-        bool isSubmarine = false;
-        bool isCapital = false;
-        // Coarse heuristic: submarines have ASW-ish typing 0x13 or similar;
-        // capitals are CV/BB/CV(L) types.
-        if(type == 0x9 || type == 0xa || type == 0xb || type == 0xf) {
-            isSubmarine = true;
-        }
-        else if(type == 0x1 || type == 0x2 || type == 0x3
-                || type == 0x5 || type == 0x6 || type == 0x8) {
-            isCapital = true;
-        }
-        if(isCapital && capitalCount < 2) {
-            capitalCount++;
-        }
-        else if(isSubmarine && subCount < 1) {
-            subCount++;
-        }
-        else {
-            if(screenCount >= 4) {
-                continue;
+        return 1;
+    };
+    auto selectShips = [&](int wantCapital) -> QList<Ship *> {
+        QList<Ship *> chosen;
+        QSet<Ship *> used;
+        for(Ship *s : std::as_const(candidates)) {
+            if(chosen.size() >= wantCapital) break;
+            if(shipKind(s) == 0 && !used.contains(s)) {
+                chosen.append(s); used.insert(s);
             }
-            screenCount++;
         }
+        for(Ship *s : std::as_const(candidates)) {
+            if(chosen.size() >= 6) break;
+            if(shipKind(s) == 1 && !used.contains(s)) {
+                chosen.append(s); used.insert(s);
+            }
+        }
+        for(Ship *s : std::as_const(candidates)) {
+            if(chosen.size() >= 6) break;
+            if(!used.contains(s)) { chosen.append(s); used.insert(s); }
+        }
+        return chosen;
+    };
 
-        fleet.ships.push_back(ship);
-        auto dyn = std::make_unique<ShipDynamic>();
-        dyn->currentHP = ship->attr.value(QStringLiteral("Hitpoints"), 1);
-        dyn->condition = KP::conditionMax;
-        dyn->fuel = 1.0;
-        dyn->ammo = 1.0;
-        dyn->exp = Ship::expCap(0);
-        dyn->expCap = Ship::expCap(0);
-        dyn->star = 0;
-        dyn->fleetIndex = 0;
-        dyn->fleetPosIndex = fleet.shipDynamics.size();
-        dyn->fleetFled = false;
+    /* Build the full battle-ready fleet for a chosen ship list / fleet type. */
+    auto buildFull = [&](const QList<Ship *> &ships, KP::FleetType ftype) {
+        fleet = FleetInfo();
+        fleet.type = ftype;
+        int lv = std::max(1, static_cast<int>(std::lround(st * 10)));
+        double expScale = settings->value(
+            QStringLiteral("rule/shipexpscale"), 100.0).toDouble();
+        for(Ship *ship : ships) {
+            fleet.ships.push_back(ship);
+            auto dyn = std::make_unique<ShipDynamic>();
+            dyn->currentHP = ship->attr.value(QStringLiteral("Hitpoints"), 1);
+            dyn->condition = KP::conditionMax;
+            dyn->fuel = 1.0;
+            dyn->ammo = 1.0;
+            dyn->exp = static_cast<int>(expScale * lv * (lv - 1) / 2.0);
+            dyn->expCap = std::max(dyn->exp, Ship::expCap(0));
+            dyn->star = 0;
+            dyn->fleetIndex = 0;
+            dyn->fleetPosIndex = fleet.shipDynamics.size();
+            dyn->fleetFled = false;
 
-        QList<int> startingEquip = ship->getStartingEquip();
-        for(int equipId : startingEquip) {
-            if(equipId == 0) {
-                dyn->slotEquip.append(QUuid());
-                continue;
+            QList<int> startingEquip = ship->getStartingEquip();
+            for(int equipId : startingEquip) {
+                if(equipId == 0) {
+                    dyn->slotEquip.append(QUuid());
+                    continue;
+                }
+                if(!equipRegistry.contains(equipId)) {
+                    equipRegistry[equipId] = new Equipment(equipId, nullptr);
+                }
+                QUuid uuid = QUuid::createUuid();
+                fleet.equipMap.insert(uuid, equipRegistry[equipId]);
+                fleet.equipSkillEffects.insert(uuid, skillEff);
+                dyn->slotEquip.append(uuid);
             }
-            if(!equipRegistry.contains(equipId)) {
-                equipRegistry[equipId] = new Equipment(equipId, nullptr);
-            }
-            QUuid uuid = QUuid::createUuid();
-            fleet.equipMap.insert(uuid, equipRegistry[equipId]);
-            fleet.equipSkillEffects.insert(uuid, 1.0);
-            dyn->slotEquip.append(uuid);
-        }
-        dyn->slotEquipEx = QUuid();
+            dyn->slotEquipEx = QUuid();
 
-        int totalPlanes = ship->attr.value(QStringLiteral("Planes"), 0);
-        int planeSlots = 0;
-        for(const QUuid &uuid : dyn->slotEquip) {
-            Equipment *eq = fleet.equipMap.value(uuid, nullptr);
-            if(eq && eq->isPlane()) {
-                planeSlots++;
+            int totalPlanes = ship->attr.value(QStringLiteral("Planes"), 0);
+            int planeSlots = 0;
+            for(const QUuid &uuid : dyn->slotEquip) {
+                Equipment *eq = fleet.equipMap.value(uuid, nullptr);
+                if(eq && eq->isPlane()) {
+                    planeSlots++;
+                }
             }
-        }
-        int perSlot = planeSlots > 0 ? totalPlanes / planeSlots : 0;
-        int remainder = planeSlots > 0 ? totalPlanes % planeSlots : 0;
-        int assigned = 0;
-        for(const QUuid &uuid : dyn->slotEquip) {
-            Equipment *eq = fleet.equipMap.value(uuid, nullptr);
-            if(eq && eq->isPlane()) {
-                dyn->slotPlanes.append(perSlot
-                                       + (assigned < remainder ? 1 : 0));
-                assigned++;
+            int perSlot = planeSlots > 0 ? totalPlanes / planeSlots : 0;
+            int remainder = planeSlots > 0 ? totalPlanes % planeSlots : 0;
+            int assigned = 0;
+            for(const QUuid &uuid : dyn->slotEquip) {
+                Equipment *eq = fleet.equipMap.value(uuid, nullptr);
+                if(eq && eq->isPlane()) {
+                    dyn->slotPlanes.append(perSlot
+                                           + (assigned < remainder ? 1 : 0));
+                    assigned++;
+                }
+                else {
+                    dyn->slotPlanes.append(0);
+                }
             }
-            else {
+            while(dyn->slotPlanes.size() < 5) {
                 dyn->slotPlanes.append(0);
             }
+            fleet.shipDynamics.push_back(std::move(dyn));
         }
-        while(dyn->slotPlanes.size() < 5) {
-            dyn->slotPlanes.append(0);
-        }
+        fleet.shipTags.resize(fleet.ships.size(), 0);
+    };
 
-        fleet.shipDynamics.push_back(std::move(dyn));
+    /* Deterministic route check: does this fleet reach a boss node? */
+    auto reachesBoss = [&](const FleetInfo &f) -> bool {
+        int node = evaluateMapBranchRule(mapUnionId, diff, f);
+        QSet<int> seen;
+        int guard = 0;
+        while(node != 0 && !seen.contains(node) && guard++ < 64) {
+            seen.insert(node);
+            KP::NodeType t = getNodeTypeFromLua(mapUnionId, node);
+            if(t == KP::BOSS || t == KP::NIGHTBOSS) {
+                return true;
+            }
+            node = evaluateBranchRule(mapUnionId, node, diff, f);
+        }
+        return false;
+    };
+
+    /* Try composition archetypes; keep the first that routes to the boss so
+     * the test measures boss difficulty (6.5-mapstar pass rate). */
+    struct Archetype { int capital; KP::FleetType ftype; };
+    const Archetype archetypes[] = {
+        {4, KP::SurfaceFleet}, {3, KP::SurfaceFleet}, {2, KP::SurfaceFleet},
+        {5, KP::SurfaceFleet}, {1, KP::SurfaceFleet}, {6, KP::SurfaceFleet},
+        {0, KP::SurfaceFleet},
+    };
+    QList<Ship *> chosen;
+    KP::FleetType chosenType = KP::SurfaceFleet;
+    bool found = false;
+    for(const Archetype &a : archetypes) {
+        QList<Ship *> sel = selectShips(a.capital);
+        if(sel.isEmpty()) {
+            continue;
+        }
+        FleetInfo probe;
+        probe.type = a.ftype;
+        for(Ship *s : std::as_const(sel)) {
+            probe.ships.push_back(s);
+            auto d = std::make_unique<ShipDynamic>();
+            d->currentHP = 1;
+            d->fleetFled = false;
+            d->fleetPosIndex = probe.shipDynamics.size();
+            probe.shipDynamics.push_back(std::move(d));
+        }
+        probe.shipTags.resize(probe.ships.size(), 0);
+        if(reachesBoss(probe)) {
+            chosen = sel;
+            chosenType = a.ftype;
+            found = true;
+            break;
+        }
     }
-    fleet.shipTags.resize(fleet.ships.size(), 0);
+    if(!found) {
+        chosen = selectShips(3);  /* balanced fallback */
+    }
+    buildFull(chosen, chosenType);
     return fleet;
 }
 
