@@ -118,20 +118,29 @@ QByteArray KP::clientAdminTestShip() {
     return QCborValue::fromJsonValue(result).toCbor();
 }
 
+QByteArray KP::clientAdminTestShipRemove() {
+    QJsonObject result;
+    result["type"] = DgramType::Request;
+    result["command"] = CommandType::Admingenerateships;
+    result["remove"] = true;
+    return QCborValue::fromJsonValue(result).toCbor();
+}
+
+QByteArray KP::clientAiAuth(quint64 aiUserId, const QString &aiName) {
+    QJsonObject result;
+    result["type"] = DgramType::Auth;
+    result["command"] = CommandType::AiAuth;
+    result["aiuserid"] = QString::number(aiUserId);
+    result["ainame"] = aiName;
+    return QCborValue::fromJsonValue(result).toCbor();
+}
+
 QByteArray KP::clientARDPurchaseAuth(quint64 orderId, bool authorized) {
     QJsonObject result;
     result["type"] = DgramType::Request;
     result["command"] = CommandType::ARDPurchaseAuth;
     result["orderid"] = QString::number(orderId);
     result["authorized"] = authorized;
-    return QCborValue::fromJsonValue(result).toCbor();
-}
-
-QByteArray KP::clientAdminTestShipRemove() {
-    QJsonObject result;
-    result["type"] = DgramType::Request;
-    result["command"] = CommandType::Admingenerateships;
-    result["remove"] = true;
     return QCborValue::fromJsonValue(result).toCbor();
 }
 
@@ -175,6 +184,14 @@ QByteArray KP::clientChooseNode(int mapId, int chosenNodeId) {
     result["command"] = CommandType::ChooseNode;
     result["mapid"] = mapId;
     result["chosennode"] = chosenNodeId;
+    return QCborValue::fromJsonValue(result).toCbor();
+}
+
+QByteArray KP::clientChronoAdvance(quint64 seconds) {
+    QJsonObject result;
+    result["type"] = DgramType::Request;
+    result["command"] = CommandType::ChronoAdvance;
+    result["seconds"] = static_cast<qint64>(seconds);
     return QCborValue::fromJsonValue(result).toCbor();
 }
 

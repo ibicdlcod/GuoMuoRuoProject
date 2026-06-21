@@ -271,6 +271,8 @@ enum CommandType{
     SupplyShip,
     BuyOrdinaryResources,
     RequestVisibleBonus,
+    AiAuth,
+    ChronoAdvance,
 };
 Q_ENUM_NS(CommandType)
 
@@ -811,12 +813,14 @@ QByteArray clientAdminTestEquip();
 QByteArray clientAdminTestEquipRemove();
 QByteArray clientAdminTestShip();
 QByteArray clientAdminTestShipRemove();
+QByteArray clientAiAuth(quint64 aiUserId, const QString &aiName);
 QByteArray clientARDPurchaseAuth(quint64 orderId, bool authorized);
 QByteArray clientBuy(int);
 QByteArray clientBuyFromStore(int equipDef);
 QByteArray clientBuyMedal(int amount);
 QByteArray clientBuyOrdinaryResources(const QString &attr, int coupons);
 QByteArray clientChooseNode(int mapId, int chosenNodeId);
+QByteArray clientChronoAdvance(quint64 seconds);
 QByteArray clientConstruct(int,
                            const QList<QUuid> &,
                            QUuid &,
