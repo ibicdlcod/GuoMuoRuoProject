@@ -155,6 +155,11 @@ bool Client::loggedIn() const {
 }
 
 /* public slots */
+/* Stubs for AI mode; full implementations follow in later tasks. */
+void Client::aiAutoConnect() {}
+void Client::sendAiAuth() {}
+void Client::parseChronoCommand(const QStringList &) {}
+
 /* Make actual connections */
 void Client::autoPassword() {
     connect(&socket, &QSslSocket::handshakeInterruptedOnError,

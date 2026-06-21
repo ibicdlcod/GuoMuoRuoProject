@@ -83,7 +83,7 @@ public:
     bool aiMode = false;
     QString aiName;
     QString aiServerIp = QStringLiteral("127.0.0.1");
-    quint16 aiServerPort = 1826;
+    quint16 aiServerPort = KP::aiDefaultServerPort;
     quint64 aiUserId = 0;
     int currentMapId = 0;
     int currentNodeId = 0;

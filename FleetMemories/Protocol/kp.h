@@ -124,6 +124,7 @@ static constexpr const char *microTxnBaseUrl =
     "https://partner.steam-api.com/ISteamMicroTxnSandbox/";
 #endif
 const int steamAppId = 2632870; // Go request your own steam appid if modding!
+static constexpr quint16 aiDefaultServerPort = 1826;
 Q_GLOBAL_STATIC(QStringList,
                 supportedLangs,
                 QStringList(
