@@ -142,8 +142,27 @@ a longer fork or linear route.
 ### ★5 — Elite (pattern S)
 
 Reuses the ★4 M/N topology (3-battle spine + DISASTER/CHOICE sub-route) tuned at
-the strongest enemy ladder levels (≈ level 11, A/B-tier). The higher difficulty
-comes from enemy composition rather than extra nodes.
+the strongest enemy ladder levels. The higher difficulty comes from enemy
+composition rather than extra nodes.
+
+★5 maps may also re-theme their battle nodes to **NIGHT** and **AIR**, with the
+boss as **NIGHTBOSS**:
+
+- **map32 (Solomon)** is entirely NIGHT — every battle node is `NIGHT` and the
+  boss is `NIGHTBOSS`, reflecting the Solomon night battles.
+- Other ★5 maps mix in a few NIGHT/AIR nodes (e.g. an `AIR` mid node and a
+  `NIGHTBOSS` boss).
+
+Night and air combat are much harder for the surface test fleet, so themed maps
+retune to far weaker enemy tiers (≈ level 4–5) than plain day ★5 maps
+(≈ level 11) to still land near the 60.7 % target.
+
+> **NOTE — AIR node placement.** An `AIR` node must **not** be the boss or any
+> end node (a node with empty `next_nodes`). Air/anti-air battles are a transit
+> hazard, not a decisive engagement, and an air "boss" can't be cleared by the
+> boss-flagship-sunk metric. Use `NIGHTBOSS`/`BOSS` for the boss and
+> `NIGHT`/`NORMAL` for end nodes; place `AIR` only on interior nodes that have a
+> next node.
 
 ## Difficulty model
 
