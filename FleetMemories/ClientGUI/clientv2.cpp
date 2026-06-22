@@ -6,11 +6,11 @@
 #include <QCoreApplication>
 #include <QPasswordDigestor>
 #include <QSettings>
-#include <QSocketNotifier>
-#include <QTextStream>
 #include <QThread>
 
 #include <cstdio>
+#include <iostream>
+#include <string>
 
 #include "../Protocol/commandline.h"
 #include "../Protocol/kp.h"
@@ -163,22 +163,26 @@ void Client::aiAutoConnect() {
     if(!aiMode) {
         return;
     }
-    if(stdinNotifier == nullptr) {
-        stdinNotifier = new QSocketNotifier(
-            fileno(stdin), QSocketNotifier::Read, this);
-        connect(stdinNotifier, &QSocketNotifier::activated,
-                this, [this](QSocketDescriptor, QSocketNotifier::Type) {
-                    stdinNotifier->setEnabled(false);
-                    QTextStream in(stdin);
-                    while(!in.atEnd()) {
-                        QString line = in.readLine();
-                        if(line.isNull()) {
-                            break;
-                        }
-                        parse(line);
-                    }
-                    stdinNotifier->setEnabled(true);
-                });
+    if(stdinReaderThread == nullptr) {
+        stdinReaderThread = new QThread(this);
+        QObject *worker = new QObject();
+        worker->moveToThread(stdinReaderThread);
+        connect(stdinReaderThread, &QThread::finished,
+                worker, &QObject::deleteLater);
+        connect(stdinReaderThread, &QThread::finished,
+                stdinReaderThread, &QObject::deleteLater);
+        connect(stdinReaderThread, &QThread::started, worker, [this]() {
+            std::string line;
+            while(std::getline(std::cin, line)) {
+                QString qLine = QString::fromStdString(line);
+                QMetaObject::invokeMethod(this,
+                                          [this, qLine]() {
+                                              parse(qLine);
+                                          },
+                                          Qt::QueuedConnection);
+            }
+        });
+        stdinReaderThread->start();
     }
     QStringList args;
     args << QStringLiteral("connect")
@@ -245,6 +249,7 @@ void Client::headlessConnect() {
     connect(&socket, &QAbstractSocket::errorOccurred,
             this, &Client::errorOccurred);
     socket.setProtocol(QSsl::TlsV1_2OrLater);
+    socket.setPeerVerifyMode(QSslSocket::VerifyNone);
     socket.connectToHostEncrypted(address.toString(), port);
     if(!socket.waitForConnected(
             settings->value("networkclient/connectwaittimemsec", 8000)
@@ -690,8 +695,15 @@ void Client::receivedInfo(const QJsonObject &djson) {
     }
     break;
     case KP::InfoType::MapStart:
-        gameState = KP::SortieMapView;
-        emit gamestateChanged(KP::SortieMapView);
+        currentMapId = djson["mapid"].toInt();
+        currentNodeId = djson["start"].toInt(-1);
+        if(aiMode) {
+            enterBattle();
+        }
+        else {
+            gameState = KP::SortieMapView;
+            emit gamestateChanged(KP::SortieMapView);
+        }
         emit receivedMapStart(djson);
         break;
     case KP::InfoType::VisibleBonusInfo: {
@@ -735,13 +747,17 @@ void Client::receivedInfo(const QJsonObject &djson) {
     case KP::InfoType::MapProgress: {
         int mapId = djson["mapid"].toInt();
         int nextNodeId = djson["next"].toInt();
+        currentMapId = mapId;
+        currentNodeId = nextNodeId;
         if(nextNodeId == 0) {
             leaveBattle();
             emit mapEnd();
             break;
         }
-        MapNode node = mapRegistryCache[mapId]->nodes[nextNodeId];
-        emit progressToNode(node, nextNodeId);
+        if(mapRegistryCache.contains(mapId)) {
+            MapNode node = mapRegistryCache[mapId]->nodes[nextNodeId];
+            emit progressToNode(node, nextNodeId);
+        }
         break;
     }
     case KP::InfoType::ExpeditionStartResult: {
@@ -946,7 +962,11 @@ void Client::receivedMsg(const QJsonObject &djson) {
             emit battleEnd();
         }
         else {
-            emit battleProcess(djson["content"].toObject());
+            QJsonObject content = djson["content"].toObject();
+            if(aiMode) {
+                printBattleReport(content);
+            }
+            emit battleProcess(content);
         }
     } break;
     case KP::ResourceRequired: {
@@ -1348,6 +1368,8 @@ void Client::receivedNewLogin(const QJsonObject &djson) {
         //% "%1: login success"
         qInfo() << qtTrId("login-success").arg(clientName);
         gameState = KP::Port;
+        currentMapId = 0;
+        currentNodeId = 0;
         emit gamestateChanged(KP::Port);
         if(!aiMode) {
             SteamAPI_RunCallbacks();
@@ -1587,4 +1609,124 @@ void Client::queryExpeditionStatus() {
     }
     QByteArray msg = KP::clientQueryExpeditionStatus();
     sender->enqueue(msg);
+}
+
+/* Print the battle report to the console (AI/headless accounts). The
+ * server sends the battle process unconditionally; this renders it via
+ * qInfo() so it appears in the AI console log. */
+void Client::printBattleReport(const QJsonObject &battleProcess) {
+    QJsonObject before = battleProcess["before"].toObject();
+    QJsonObject after = battleProcess["after"].toObject();
+    QJsonObject playerBefore = before["player"].toObject();
+    QJsonObject playerAfter = after["player"].toObject();
+    QJsonArray playerHPBefore = playerBefore["hp"].toArray();
+    QJsonArray playerHPAfter = playerAfter["hp"].toArray();
+    QJsonArray playerFled = playerAfter["fled"].toArray();
+
+    QJsonObject enemyBefore = before["enemy"].toObject();
+    QJsonObject enemyAfter = after["enemy"].toObject();
+    QJsonArray enemyHPBefore = enemyBefore["hp"].toArray();
+    QJsonArray enemyHPAfter = enemyAfter["hp"].toArray();
+    QJsonArray enemyShipIds = battleProcess["enemyShipIds"].toArray();
+
+    int assmValue = battleProcess["assm"].toInt(0);
+    KP::BattleAssessment assm =
+        static_cast<KP::BattleAssessment>(assmValue);
+    QString assessmentText;
+    switch(assm) {
+    case KP::SVictory:
+        assessmentText = qtTrId("battle-assm-s-victory");
+        break;
+    case KP::AVictory:
+        assessmentText = qtTrId("battle-assm-a-victory");
+        break;
+    case KP::BVictory:
+        assessmentText = qtTrId("battle-assm-b-victory");
+        break;
+    case KP::CDefeat:
+        assessmentText = qtTrId("battle-assm-c-defeat");
+        break;
+    case KP::DDefeat:
+        assessmentText = qtTrId("battle-assm-d-defeat");
+        break;
+    case KP::EDefeat:
+        assessmentText = qtTrId("battle-assm-e-defeat");
+        break;
+    default:
+        assessmentText = qtTrId("battle-assm-unknown");
+        break;
+    }
+
+    //% "Battle result: %1"
+    qInfo().noquote() << qtTrId("battle-report-result").arg(assessmentText);
+
+    //% "Player ships:"
+    qInfo().noquote() << qtTrId("battle-report-player-header");
+    int playerRows = playerHPAfter.size();
+    for(int i = 0; i < playerRows; ++i) {
+        int fleetPos = lastSortieFleetIndex * KP::fleetRepSize + i;
+        QUuid shipUuid;
+        if(headlessFleetData.contains(fleetPos)) {
+            shipUuid = QUuid(headlessFleetData[fleetPos]["uuid"]
+                             .toString());
+        }
+        QString name;
+        if(!shipUuid.isNull()) {
+            auto [s, dyn] = shipModel.getShip(shipUuid);
+            Q_UNUSED(dyn)
+            if(s) {
+                name = s->toString();
+            }
+        }
+        if(name.isEmpty()) {
+            //% "Player Ship %1"
+            name = qtTrId("battle-result-player-ship").arg(i + 1);
+        }
+
+        int hpBefore = playerHPBefore[i].toInt(0);
+        int hpAfter = playerHPAfter[i].toInt(0);
+        if(hpBefore == 0 && hpAfter == 0) {
+            continue;
+        }
+        bool fled = false;
+        if(i < playerFled.size()) {
+            fled = playerFled[i].toBool(false);
+        }
+        QString status;
+        if(fled) {
+            //% "retreated"
+            status = QStringLiteral(" (%1)")
+                     .arg(qtTrId("battle-report-retreated"));
+        }
+
+        //% "%1: %2/%3 HP%4"
+        qInfo().noquote() << qtTrId("battle-report-ship-line")
+                                 .arg(name).arg(hpAfter).arg(hpBefore)
+                                 .arg(status);
+    }
+
+    //% "Enemy ships:"
+    qInfo().noquote() << qtTrId("battle-report-enemy-header");
+    int enemyRows = enemyHPAfter.size();
+    for(int i = 0; i < enemyRows; ++i) {
+        QString name;
+        if(i < enemyShipIds.size()) {
+            int enemyId = enemyShipIds[i].toInt(0);
+            if(Ship *s = getShipReg(enemyId); s) {
+                name = s->toString();
+            } else {
+                //% "Enemy Ship #%1"
+                name = qtTrId("battle-result-enemy-ship-id").arg(enemyId);
+            }
+        } else {
+            //% "Enemy Ship %1"
+            name = qtTrId("battle-report-enemy-ship").arg(i + 1);
+        }
+        int hpBefore = enemyHPBefore[i].toInt(0);
+        int hpAfter = enemyHPAfter[i].toInt(0);
+        //% "%1: %2/%3 HP%4"
+        qInfo().noquote() << qtTrId("battle-report-ship-line")
+                                 .arg(name).arg(hpAfter).arg(hpBefore)
+                                 .arg(QString());
+    }
 }

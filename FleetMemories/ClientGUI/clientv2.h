@@ -6,7 +6,6 @@
 
 #include <QColor>
 #include <QHttpServer>
-#include <QSocketNotifier>
 #include <QtNetwork>
 #include <optional>
 #include "ui/factory/developwindow.h"
@@ -88,6 +87,8 @@ public:
     quint64 aiUserId = 0;
     int currentMapId = 0;
     int currentNodeId = 0;
+    int lastSortieFleetIndex = 0;
+    QMap<int, QJsonObject> headlessFleetData;
     int equipBigTypeIndex = 0;
     int equipIndex = 0;
     EquipModel equipModel;
@@ -157,6 +158,7 @@ public slots:
     void requestVisibleBonus(const QUuid &shipUuid);
     void sendEncryptedAppTicket(uint8 [], uint32);
     void sendFleetData(const QJsonArray &);
+    void sendHeadlessFleetEntry(int fleetPos);
     void serverResponse(const QString &, const QByteArray &);
     void serverResponseNonStd(const QByteArray &);
     void serverResponseStd(const QJsonObject &);
@@ -283,11 +285,15 @@ private:
     void parseConstructCommand(const QStringList &);
     void parseExpeditionCommands(const QStringList &);
     void parseFleetCommands(const QStringList &);
+    void parseFleetCommandsHeadless(const QStringList &);
     void parseHomePortCommand(const QStringList &);
+    void parseListCommands(const QStringList &);
     void parseQueryCommand(const QStringList &);
     void parseRepairCommands(const QStringList &);
     void parseSortieCommands(const QStringList &);
+    void parseSortieCommandsHeadless(const QStringList &);
     void parseTechCommand(const QStringList &);
+    void printBattleReport(const QJsonObject &);
     MainWindow * getMainWindow() const;
     void updateEquipCache(const QJsonObject &);
     void updateMapCache(const QJsonObject &);
@@ -302,7 +308,6 @@ private:
     QSslConfiguration conf;
     Receiver recv;
     QPointer<Sender> sender;
-    QSocketNotifier *stdinNotifier = nullptr;
 
     unsigned int maxRetransmit;
     unsigned int retransmitTimes = 0;
@@ -363,6 +368,7 @@ private:
 
     QTimer *timer;
     QThread *steamThread = nullptr;
+    QThread *stdinReaderThread = nullptr;
 
     Q_DISABLE_COPY_MOVE(Client)
 };

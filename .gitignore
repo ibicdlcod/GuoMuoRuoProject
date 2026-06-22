@@ -100,9 +100,13 @@ static_build/
 *.bak
 *.bak*
 *.db
+APIPrivate
+serverprivate.key
+servertest.pem
 
 # Temp folder
 temp/
+TsunkitMode/
 
 # Claude Code
 .claude/settings.local.json

@@ -66,8 +66,14 @@ int main(int argc, char *argv[]) {
     for (int i = 1; i < argc; ++i) {
         QString arg = QString::fromLocal8Bit(argv[i]);
         if(arg == QStringLiteral("--ai") && i + 1 < argc) {
+#if PRODUCTION_ENV
+            //% "AI mode is disabled in production builds."
+            qWarning() << qtTrId("ai-mode-disabled-production");
+            ++i;
+#else
             aiMode = true;
             aiName = QString::fromLocal8Bit(argv[++i]);
+#endif
         }
         else if(arg == QStringLiteral("--server-ip") && i + 1 < argc) {
             aiServerIp = QString::fromLocal8Bit(argv[++i]);
@@ -173,6 +179,12 @@ int main(int argc, char *argv[]) {
             }
         }
     }
+    else {
+        translator = std::make_unique<QTranslator>();
+        if(translator->load(":/i18n/FleetMemories_en_US")) {
+            client.installTranslator(translator.get());
+        }
+    }
 
     /* Single instance check */
     if(!aiMode) {
@@ -214,6 +226,25 @@ int main(int argc, char *argv[]) {
 
     using namespace std::chrono_literals;
     if(aiMode) {
+        QObject::connect(&clientInstance, &Client::qout,
+                         [](const QString &msg, QColor, QColor) {
+                             QTextStream out(stdout);
+                             out << msg << Qt::endl;
+                         });
+        QObject::connect(&clientInstance, &Client::receivedResourceGainInfo,
+                         [&clientInstance](const QJsonObject &info) {
+                             //% "Resource gain cache refreshed, %1 entries."
+                             emit clientInstance.qout(
+                                 qtTrId("ai-resource-gain-refreshed")
+                                     .arg(info.size()));
+                         });
+        QObject::connect(&clientInstance, &Client::mapSupremacyChanged,
+                         [&clientInstance]() {
+                             //% "Map supremacy cache refreshed, %1 entries."
+                             emit clientInstance.qout(
+                                 qtTrId("ai-map-supremacy-refreshed")
+                                     .arg(clientInstance.mapSupremacies.size()));
+                         });
         QTimer::singleShot(0ms, &clientInstance, &Client::aiAutoConnect);
     }
 

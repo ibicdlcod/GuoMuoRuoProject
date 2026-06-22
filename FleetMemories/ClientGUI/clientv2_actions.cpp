@@ -91,6 +91,7 @@ void Client::takeAndSubmitScreenshot() {
 void Client::sortie(int mapId, int fleetIndex, bool isExpedition) {
     QByteArray msg = KP::clientSortie(mapId, fleetIndex, isExpedition);
     sender->enqueue(msg);
+    socket.flush();
 }
 
 void Client::queryNextNode(int mapId, int prevNode, bool retreat) {
@@ -108,6 +109,7 @@ void Client::queryNextNode(int mapId, int prevNode, bool retreat) {
 void Client::doBattle(const QJsonObject &contents) {
     QByteArray msg = KP::clientDoBattleNode(contents);
     sender->enqueue(msg);
+    socket.flush();
 }
 
 void Client::requestVisibleBonus(const QUuid &shipUuid) {

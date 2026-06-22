@@ -960,7 +960,7 @@ const QJsonObject Server::processBattleCore(const CSteamID &uid,
                                             int fleetIndex,
                                             const QJsonObject &battlePlan) {
     QJsonObject result;
-    result["time"] = 5000; // in milliseconds;
+    result["time"] = isAiUser(uid) ? 0 : 5000; // in milliseconds;
     result["assm"] = KP::SVictory; // assessment
     // night battle occured for daystart, or reverse
     result["extrastage"] = false;
