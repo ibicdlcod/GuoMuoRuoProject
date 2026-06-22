@@ -65,7 +65,8 @@ maps[1][3] = {
     },
     enemy = {
         C = function()
-            return {0x7F010100}
+            return {0x7E040100, 0x7E030100,
+                    0x7F030100, 0x7F020100}
         end,
     },
     expr = {

@@ -400,13 +400,21 @@ void Client::parseFleetCommands(const QStringList &cmdParts) {
     qWarning() << qtTrId("fleet-unknown-subcommand").arg(sub);
 }
 
-/* Send one headless fleet entry to the server. */
+/* Submit the whole cached fleet to the server. A FleetData submission
+ * replaces the entire fleet, so every cached position of the fleet that
+ * fleetPos belongs to must be sent together. */
 void Client::sendHeadlessFleetEntry(int fleetPos) {
     if(!headlessFleetData.contains(fleetPos)) {
         return;
     }
+    int fleetIndex = fleetPos / KP::fleetRepSize;
     QJsonArray content;
-    content.append(headlessFleetData[fleetPos]);
+    for(int posIndex = 0; posIndex < KP::combinedFleetSize; ++posIndex) {
+        int pos = fleetIndex * KP::fleetRepSize + posIndex;
+        if(headlessFleetData.contains(pos)) {
+            content.append(headlessFleetData[pos]);
+        }
+    }
     sendFleetData(content);
 }
 
