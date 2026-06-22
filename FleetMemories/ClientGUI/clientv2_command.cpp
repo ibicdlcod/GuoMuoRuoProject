@@ -115,6 +115,10 @@ bool Client::parseGameCommands(const QString &primary,
         parseHomePortCommand(cmdParts);
         return true;
     }
+    if(primaryLower == "list") {
+        parseListCommands(cmdParts);
+        return true;
+    }
     if(primaryLower == "fleet") {
         parseFleetCommands(cmdParts);
         return true;
@@ -170,7 +174,7 @@ bool Client::parseGameCommands(const QString &primary,
         doSwitch(cmdParts);
         return true;
     case KP::Develop:
-        if(gameState != KP::Factory) {
+        if(!aiMode && gameState != KP::Factory) {
             return false;
         }
         else {
@@ -178,7 +182,7 @@ bool Client::parseGameCommands(const QString &primary,
             return true;
         }
     case KP::Fetch:
-        if(gameState != KP::Factory) {
+        if(!aiMode && gameState != KP::Factory) {
             return false;
         }
         else {
@@ -241,11 +245,64 @@ void Client::parseHomePortCommand(const QStringList &cmdParts) {
     chooseHomePort(static_cast<KP::AllegianceGroup>(value));
 }
 
+/* list <subcommand> ... */
+void Client::parseListCommands(const QStringList &cmdParts) {
+    if(cmdParts.length() < 2) {
+        //% "Usage: list <ships|equips|blueprints>"
+        emit qout(qtTrId("list-usage"));
+        return;
+    }
+    QString sub = cmdParts[1].toLower();
+    if(sub == "ships") {
+        QHash<QUuid, Ship *> ships = shipModel.getAllShips();
+        if(ships.isEmpty()) {
+            //% "No ships available."
+            emit qout(qtTrId("list-ships-empty"));
+            return;
+        }
+        for(auto it = ships.cbegin(); it != ships.cend(); ++it) {
+            emit qout(it.key().toString());
+        }
+        return;
+    }
+    if(sub == "equips") {
+        const QHash<QUuid, Equipment *> equips =
+            equipModel.getClientEquips();
+        if(equips.isEmpty()) {
+            //% "No equipment available."
+            emit qout(qtTrId("list-equips-empty"));
+            return;
+        }
+        for(auto it = equips.cbegin(); it != equips.cend(); ++it) {
+            emit qout(it.key().toString());
+        }
+        return;
+    }
+    if(sub == "blueprints") {
+        const QHash<int, int> blueprints = shipBPModel.getClientShipBPs();
+        if(blueprints.isEmpty()) {
+            //% "No blueprints available."
+            emit qout(qtTrId("list-blueprints-empty"));
+            return;
+        }
+        for(auto it = blueprints.cbegin(); it != blueprints.cend(); ++it) {
+            emit qout(QStringLiteral("%1 %2").arg(it.key()).arg(it.value()));
+        }
+        return;
+    }
+    //% "Unknown list target: %1"
+    qWarning() << qtTrId("list-unknown-target").arg(sub);
+}
+
 /* fleet <subcommand> ... */
 void Client::parseFleetCommands(const QStringList &cmdParts) {
     if(cmdParts.length() < 2) {
         //% "Usage: fleet <set|clear|type|equip|planes|save|supply> ..."
         emit qout(qtTrId("fleet-usage"));
+        return;
+    }
+    if(aiMode) {
+        parseFleetCommandsHeadless(cmdParts);
         return;
     }
     MainWindow *mainWindow = getMainWindow();
@@ -343,8 +400,182 @@ void Client::parseFleetCommands(const QStringList &cmdParts) {
     qWarning() << qtTrId("fleet-unknown-subcommand").arg(sub);
 }
 
+/* Send one headless fleet entry to the server. */
+void Client::sendHeadlessFleetEntry(int fleetPos) {
+    if(!headlessFleetData.contains(fleetPos)) {
+        return;
+    }
+    QJsonArray content;
+    content.append(headlessFleetData[fleetPos]);
+    sendFleetData(content);
+}
+
+/* Headless fleet command: edit and submit FleetData. */
+void Client::parseFleetCommandsHeadless(const QStringList &cmdParts) {
+    QString sub = cmdParts[1].toLower();
+    if(sub == "supply") {
+        if(cmdParts.length() < 3) {
+            //% "Usage: fleet supply <fleetindex>"
+            emit qout(qtTrId("fleet-supply-usage"));
+            return;
+        }
+        int fleetIndex = cmdParts[2].toInt();
+        QJsonArray shipsToSupply;
+        for(int posIndex = 0; posIndex < KP::combinedFleetSize; ++posIndex) {
+            int fleetPos = fleetIndex * KP::fleetRepSize + posIndex;
+            if(!headlessFleetData.contains(fleetPos)) {
+                continue;
+            }
+            QUuid shipUuid(headlessFleetData[fleetPos]["uuid"].toString());
+            if(shipUuid.isNull()) {
+                continue;
+            }
+            QJsonObject entry;
+            entry["uuid"] = shipUuid.toString();
+            entry["fuel"] = true;
+            entry["ammo"] = true;
+            shipsToSupply.append(entry);
+        }
+        if(shipsToSupply.isEmpty()) {
+            //% "Fleet %1 is empty; nothing to supply."
+            qWarning() << qtTrId("fleet-headless-supply-empty").arg(fleetIndex);
+            return;
+        }
+        doSupplyShip(shipsToSupply);
+        return;
+    }
+    if(sub == "equip" || sub == "planes") {
+        if(cmdParts.length() < 6) {
+            //% "Usage: fleet equip|planes <fleetindex> <posindex> <slot> "
+            //% "<equip-uuid|clear|count>"
+            emit qout(qtTrId("fleet-headless-equip-usage"));
+            return;
+        }
+        int fleetIndex = cmdParts[2].toInt();
+        int posIndex = cmdParts[3].toInt();
+        int fleetPos = fleetIndex * KP::fleetRepSize + posIndex;
+        if(!headlessFleetData.contains(fleetPos)) {
+            //% "No ship at fleet %1 position %2."
+            qWarning() << qtTrId("fleet-headless-no-ship")
+                              .arg(fleetIndex).arg(posIndex);
+            return;
+        }
+        int slot = cmdParts[4].toInt();
+        QJsonObject ship = headlessFleetData[fleetPos];
+        if(sub == "equip") {
+            if(slot < 0 || slot > KP::maxEquipSlots) {
+                //% "Equipment slot must be 0..%1"
+                qWarning() << qtTrId("fleet-headless-bad-equip-slot")
+                                  .arg(KP::maxEquipSlots);
+                return;
+            }
+            QJsonArray equips = ship["equip"].toArray();
+            while(equips.size() <= KP::maxEquipSlots) {
+                equips.append(QUuid().toString());
+            }
+            QString value = cmdParts[5].toLower();
+            if(value == "clear") {
+                equips[slot] = QUuid().toString();
+            }
+            else {
+                QUuid equipUuid(value);
+                if(equipUuid.isNull()) {
+                    //% "Invalid equipment UUID: %1"
+                    qWarning() << qtTrId("fleet-invalid-equip-uuid")
+                                      .arg(cmdParts[5]);
+                    return;
+                }
+                equips[slot] = equipUuid.toString();
+            }
+            ship["equip"] = equips;
+        }
+        else {
+            if(slot < 0 || slot >= KP::maxEquipSlots) {
+                //% "Plane slot must be 0..%1"
+                qWarning() << qtTrId("fleet-headless-bad-plane-slot")
+                                  .arg(KP::maxEquipSlots - 1);
+                return;
+            }
+            QJsonArray planes = ship["plane"].toArray();
+            while(planes.size() < KP::maxEquipSlots) {
+                planes.append(0);
+            }
+            planes[slot] = cmdParts[5].toInt();
+            ship["plane"] = planes;
+        }
+        headlessFleetData[fleetPos] = ship;
+        sendHeadlessFleetEntry(fleetPos);
+        return;
+    }
+    if(sub != "set" && sub != "clear") {
+        //% "Headless fleet only supports set/clear/supply/equip/planes."
+        qWarning() << qtTrId("fleet-headless-unsupported");
+        return;
+    }
+    if(cmdParts.length() < 4) {
+        //% "Usage: fleet set|clear <fleetindex> <posindex> [ship-uuid]"
+        emit qout(qtTrId("fleet-headless-usage"));
+        return;
+    }
+    int fleetIndex = cmdParts[2].toInt();
+    int posIndex = cmdParts[3].toInt();
+    int fleetPos = fleetIndex * KP::fleetRepSize + posIndex;
+    if(sub == "set") {
+        if(cmdParts.length() < 5) {
+            emit qout(qtTrId("fleet-headless-usage"));
+            return;
+        }
+        QUuid shipUuid(cmdParts[4]);
+        if(shipUuid.isNull()) {
+            //% "Invalid ship UUID: %1"
+            qWarning() << qtTrId("fleet-invalid-ship-uuid").arg(cmdParts[4]);
+            return;
+        }
+        QJsonObject ship;
+        ship["uuid"] = shipUuid.toString();
+        ship["pos"] = fleetPos;
+        ship["fleettype"] = 0;
+        QJsonArray equips;
+        for(int i = 0; i <= KP::maxEquipSlots; ++i) {
+            equips.append(QUuid().toString());
+        }
+        ship["equip"] = equips;
+        QJsonArray planes;
+        for(int i = 0; i < KP::maxEquipSlots; ++i) {
+            planes.append(0);
+        }
+        ship["plane"] = planes;
+        headlessFleetData.insert(fleetPos, ship);
+        sendHeadlessFleetEntry(fleetPos);
+    }
+    else {
+        headlessFleetData.remove(fleetPos);
+        QJsonArray content;
+        QJsonObject ship;
+        ship["uuid"] = QUuid().toString();
+        ship["pos"] = fleetPos;
+        ship["fleettype"] = 0;
+        QJsonArray equips;
+        for(int i = 0; i <= KP::maxEquipSlots; ++i) {
+            equips.append(QUuid().toString());
+        }
+        ship["equip"] = equips;
+        QJsonArray planes;
+        for(int i = 0; i < KP::maxEquipSlots; ++i) {
+            planes.append(0);
+        }
+        ship["plane"] = planes;
+        content.append(ship);
+        sendFleetData(content);
+    }
+}
+
 /* sortie / node / battle commands */
 void Client::parseSortieCommands(const QStringList &cmdParts) {
+    if(aiMode) {
+        parseSortieCommandsHeadless(cmdParts);
+        return;
+    }
     MainWindow *mainWindow = getMainWindow();
     if(!mainWindow) {
         //% "Main window not available."
@@ -424,6 +655,81 @@ void Client::parseSortieCommands(const QStringList &cmdParts) {
     }
 }
 
+/* Headless sortie/node/battle: send raw builders. */
+void Client::parseSortieCommandsHeadless(const QStringList &cmdParts) {
+    QString primary = cmdParts[0].toLower();
+    if(primary == "sortie") {
+        if(cmdParts.length() < 2) {
+            //% "Usage: sortie <mapid> <fleetindex> | sortie retreat | sortie advance"
+            emit qout(qtTrId("sortie-usage"));
+            return;
+        }
+        QString arg1 = cmdParts[1].toLower();
+        if(arg1 == "retreat") {
+            queryNextNode(currentMapId, currentNodeId, true);
+            return;
+        }
+        if(arg1 == "advance") {
+            queryNextNode(currentMapId, currentNodeId, false);
+            return;
+        }
+        if(cmdParts.length() < 3) {
+            //% "Usage: sortie <mapid> <fleetindex>"
+            emit qout(qtTrId("sortie-map-usage"));
+            return;
+        }
+        bool okMap = false;
+        bool okFleet = false;
+        int mapId = cmdParts[1].toInt(&okMap);
+        int fleetIndex = cmdParts[2].toInt(&okFleet);
+        if(!okMap || !okFleet) {
+            emit qout(qtTrId("sortie-map-usage"));
+            return;
+        }
+        currentMapId = mapId;
+        currentNodeId = -1;
+        lastSortieFleetIndex = fleetIndex;
+        sortie(mapId, fleetIndex, false);
+        return;
+    }
+    if(primary == "node") {
+        if(cmdParts.length() < 3 || cmdParts[1].toLower() != "choose") {
+            //% "Usage: node choose <nodeid>"
+            emit qout(qtTrId("node-choose-usage"));
+            return;
+        }
+        bool ok = false;
+        int nodeId = cmdParts[2].toInt(&ok);
+        if(!ok) {
+            emit qout(qtTrId("node-choose-usage"));
+            return;
+        }
+        chooseNode(currentMapId, nodeId);
+        return;
+    }
+    if(primary == "battle") {
+        if(cmdParts.length() < 3 || cmdParts[1].toLower() != "plan") {
+            //% "Usage: battle plan <path-to-json>"
+            emit qout(qtTrId("battle-plan-usage"));
+            return;
+        }
+        QFile file(cmdParts[2]);
+        if(!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+            //% "Cannot open battle plan file: %1"
+            qWarning() << qtTrId("battle-plan-file-error").arg(cmdParts[2]);
+            return;
+        }
+        QJsonDocument doc = QJsonDocument::fromJson(file.readAll());
+        if(!doc.isObject()) {
+            //% "Battle plan file must contain a JSON object."
+            qWarning() << qtTrId("battle-plan-invalid-json");
+            return;
+        }
+        doBattle(doc.object());
+        return;
+    }
+}
+
 /* expedition <subcommand> ... */
 void Client::parseExpeditionCommands(const QStringList &cmdParts) {
     MainWindow *mainWindow = getMainWindow();
@@ -443,6 +749,11 @@ void Client::parseExpeditionCommands(const QStringList &cmdParts) {
     if(!sortie) {
         //% "Sortie view not available."
         qWarning() << qtTrId("cli-no-sortie");
+        return;
+    }
+    if(aiMode) {
+        //% "Expedition commands are not supported in headless AI mode."
+        qWarning() << qtTrId("expedition-headless-unsupported");
         return;
     }
     if(cmdParts.length() < 2) {
@@ -565,6 +876,10 @@ void Client::parseConstructCommand(const QStringList &cmdParts) {
     }
     QList<QUuid> defaultEquips;
     for(int i = equipStart; i < cmdParts.length(); ++i) {
+        if(cmdParts[i].compare("none", Qt::CaseInsensitive) == 0) {
+            defaultEquips.append(QUuid());
+            continue;
+        }
         QUuid equipUuid(cmdParts[i]);
         if(equipUuid.isNull()) {
             //% "Invalid equipment UUID: %1"
@@ -998,6 +1313,10 @@ const QStringList Client::getCommandsSpec() const {
         "admingenerateships",
         "adminremoveships",
         "homeport",
+        "list",
+        "list ships",
+        "list equips",
+        "list blueprints",
         "fleet",
         "fleet set",
         "fleet clear",
