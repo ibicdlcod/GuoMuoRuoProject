@@ -24,14 +24,18 @@ QVariant SpecEquipModel::data(const QModelIndex &index,
     if(index.row() >= rowCount() || index.column() >= columnCount())
         return QVariant();
     auto realRowIndex = index.row();
+    if(realRowIndex < 0 || realRowIndex >= sortedEquipIds.length())
+        return QVariant();
     QUuid uidToDisplay = sortedEquipIds[realRowIndex];
-    Equipment *equipToDisplay = clientEquips[uidToDisplay];
-    int starToDisplay = clientEquipStars[uidToDisplay];
 
     Client &engine = Client::getInstance();
-    bool ready = engine.isEquipRegistryCacheGood();
-    if(!ready)
+    if(!engine.isEquipRegistryCacheGood())
         return QVariant();
+    if(!clientEquips.contains(uidToDisplay) || !clientEquips[uidToDisplay])
+        return QVariant();
+
+    Equipment *equipToDisplay = clientEquips[uidToDisplay];
+    int starToDisplay = clientEquipStars[uidToDisplay];
     switch (role) {
     case Qt::ToolTipRole:
         return uidToDisplay.toString();

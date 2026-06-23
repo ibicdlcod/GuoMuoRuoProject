@@ -404,8 +404,16 @@ QVariant EquipModel::data(const QModelIndex &index, int role) const {
     if(index.row() >= rowCount() || index.column() >= columnCount())
         return QVariant();
     int realRowIndex = index.row() + rowsPerPage * pageNum;
-    Q_ASSERT(sortedEquipIds.length() > realRowIndex);
+    if(realRowIndex < 0 || realRowIndex >= sortedEquipIds.length())
+        return QVariant();
     QUuid uidToDisplay = sortedEquipIds[realRowIndex];
+
+    Client &engine = Client::getInstance();
+    if(!engine.isEquipRegistryCacheGood())
+        return QVariant();
+    if(!clientEquips.contains(uidToDisplay) || !clientEquips[uidToDisplay])
+        return QVariant();
+
     Equipment *equipToDisplay = clientEquips[uidToDisplay];
     int starToDisplay = clientEquipStars[uidToDisplay];
     int additionalStar = 0;
@@ -415,11 +423,6 @@ QVariant EquipModel::data(const QModelIndex &index, int role) const {
             skillPointReg[equipToDisplay->getId()]
             / equipToDisplay->skillPointsStd();
     }
-
-    Client &engine = Client::getInstance();
-    bool ready = engine.isEquipRegistryCacheGood();
-    if(!ready)
-        return QVariant();
     switch (role) {
     case Qt::ToolTipRole:
         if(index.column() == uidCol) {
