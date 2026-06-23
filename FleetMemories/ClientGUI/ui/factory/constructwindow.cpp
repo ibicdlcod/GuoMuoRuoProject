@@ -39,6 +39,13 @@ ConstructWindow::ConstructWindow(QWidget *parent)
     equipBoxes = {ui->equip1, ui->equip2, ui->equip3, ui->equip4, ui->equip5};
     assert(equipBoxes.size() == KP::maxEquipSlots);
     for(int i = 0; i < KP::maxEquipSlots; ++i) {
+        if(Q_UNLIKELY(i >= equipBoxes.size()
+                      || i >= engine.specModels.size()
+                      || !equipBoxes[i] || !engine.specModels[i])) {
+            //% "ConstructWindow: equip slot %1 not ready, skipping setModel."
+            qWarning() << qtTrId("construct-equip-slot-not-ready").arg(i);
+            continue;
+        }
         equipBoxes[i]->setModel(engine.specModels[i]);
     }
 }
