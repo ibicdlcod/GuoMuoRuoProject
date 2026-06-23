@@ -18,7 +18,7 @@ NewLoginS::NewLoginS(QWidget *parent) :
     ui->setupUi(this);
     ui->ServerEdit->setInputMethodHints(Qt::ImhNone);
     ui->PortEdit->setInputMethodHints(Qt::ImhDigitsOnly);
-    ui->ServerEdit->setText("127.0.0.1");
+    ui->ServerEdit->setText("fleetmemories.moe");
     ui->PortEdit->setText("1826");
 }
 
