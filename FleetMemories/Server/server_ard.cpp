@@ -96,7 +96,8 @@ void Server::handleARDPurchaseAuth(const CSteamID &uid,
                         throw DBError(qtTrId("store-purchase-info-failed")
                                           .arg(uid.ConvertToUint64())
                                           .arg(orderId),
-                                      query.lastError(), query.lastQuery());
+                                      orderRecord.lastError(),
+                                      orderRecord.lastQuery());
                     }
                     if(connectedPeers.contains(uid)) {
                         QByteArray msg = KP::serverARDPurchaseSuccess(unitsToAdd);
@@ -187,7 +188,10 @@ void Server::handleInitARDPurchase(const CSteamID &uid,
     int priceHKDCents = KP::ardRealPriceHKDCents(units);
     quint64 orderId;
     do {
-        orderId = QRandomGenerator::global()->generate64();
+        /* Mask high bit: SQLite INTEGER PRIMARY KEY is signed 64-bit, so
+         * an orderId > INT64_MAX fails to insert into ARDOrders. */
+        orderId = QRandomGenerator::global()->generate64()
+                  & Q_UINT64_C(0x7FFFFFFFFFFFFFFF);
     } while(orderId == 0 || pendingARDOrders.contains(orderId));
     QNetworkRequest request(QUrl(QString(KP::microTxnBaseUrl)
                                  + QStringLiteral("InitTxn/v3/")));
