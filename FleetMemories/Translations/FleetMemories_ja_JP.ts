@@ -2161,7 +2161,7 @@ Great at battle and bad at politics--so cool!</source>
         <translation type="unfinished">購入処理中にデータベースエラーが発生しました。</translation>
     </message>
     <message id="ard-coupon-description">
-        <location filename="../Server/server_ard.cpp" line="218"/>
+        <location filename="../Server/server_ard.cpp" line="222"/>
         <source>%1 ARD Coupons</source>
         <translation type="unfinished">無効なARDクーポン数量です。</translation>
     </message>
@@ -2989,37 +2989,37 @@ Great at battle and bad at politics--so cool!</source>
         <translation type="unfinished">ユーザー%1：海域ステータスの初期化に失敗しました！</translation>
     </message>
     <message id="ai-ard-add-failed">
-        <location filename="../Server/server_ard.cpp" line="147"/>
+        <location filename="../Server/server_ard.cpp" line="148"/>
         <source>AI ARD add failed for user %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="ai-ard-track-failed">
-        <location filename="../Server/server_ard.cpp" line="170"/>
+        <location filename="../Server/server_ard.cpp" line="171"/>
         <source>AI ARD track failed for user %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="ai-ard-purchase">
-        <location filename="../Server/server_ard.cpp" line="176"/>
+        <location filename="../Server/server_ard.cpp" line="177"/>
         <source>AI account %1 fake-purchased %2 ARD coupons (HKD %3 cents)</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="ard-refund-poll-failed">
-        <location filename="../Server/server_ard.cpp" line="284"/>
+        <location filename="../Server/server_ard.cpp" line="288"/>
         <source>ARD refund poll failed: %1</source>
         <translation type="unfinished">ユーザー%1：海域ステータスの初期化に成功しました！</translation>
     </message>
     <message id="ard-clawback-lookup-failed">
-        <location filename="../Server/server_ard.cpp" line="310"/>
+        <location filename="../Server/server_ard.cpp" line="314"/>
         <source>ARD clawback: order lookup failed</source>
         <translation type="unfinished">ARD返金ポーリングに失敗しました：%1</translation>
     </message>
     <message id="ard-clawback-deduct-failed">
-        <location filename="../Server/server_ard.cpp" line="329"/>
+        <location filename="../Server/server_ard.cpp" line="333"/>
         <source>ARD clawback: deduct failed for order %1</source>
         <translation type="unfinished">ARD回収：注文検索に失敗しました</translation>
     </message>
     <message id="ard-clawback-mark-failed">
-        <location filename="../Server/server_ard.cpp" line="338"/>
+        <location filename="../Server/server_ard.cpp" line="342"/>
         <source>ARD clawback: mark failed for order %1</source>
         <translation type="unfinished">ARD回収：注文%1の差し引きに失敗しました</translation>
     </message>

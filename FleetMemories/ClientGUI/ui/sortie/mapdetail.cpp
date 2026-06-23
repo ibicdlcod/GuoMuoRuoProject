@@ -6,6 +6,7 @@
 #include <QDebug>
 #include <QFont>
 #include <QGuiApplication>
+#include <QHash>
 #include <QMouseEvent>
 #include <QPainter>
 #include <QStyleHints>
@@ -14,6 +15,38 @@
 #include "../../clientv2.h"
 #include "../mainwindow.h"
 #include "maprender.h"
+
+/* Resource filenames are kept ASCII-only so AutoRcc and runtime lookups
+ * work on non-UTF-8 Windows codepages (e.g. GBK), where a non-ASCII path
+ * is mangled to '?' and the file is not found. Transliterate the localized
+ * map name to ASCII for the on-disk lookup; the displayed name is unchanged. */
+static QString asciiResourceName(const QString &name) {
+    static const QHash<QChar, QString> special = {
+        {QChar(0x00D8), QStringLiteral("O")},  // Ø
+        {QChar(0x00F8), QStringLiteral("o")},  // ø
+        {QChar(0x00C6), QStringLiteral("AE")}, // Æ
+        {QChar(0x00E6), QStringLiteral("ae")}, // æ
+        {QChar(0x0110), QStringLiteral("D")},  // Đ
+        {QChar(0x0111), QStringLiteral("d")},  // đ
+        {QChar(0x0141), QStringLiteral("L")},  // Ł
+        {QChar(0x0142), QStringLiteral("l")},  // ł
+        {QChar(0x00DF), QStringLiteral("ss")}, // ß
+    };
+    /* NFKD splits accented letters into base + combining mark; we keep the
+     * ASCII base, drop combining marks, and map a few stroke/ligature
+     * letters that do not decompose. */
+    const QString decomposed = name.normalized(QString::NormalizationForm_KD);
+    QString result;
+    for(const QChar &c: decomposed) {
+        if(special.contains(c)) {
+            result.append(special.value(c));
+        }
+        else if(c.unicode() < 0x80) {
+            result.append(c);
+        }
+    }
+    return result;
+}
 
 static QColor getIconColor() {
     if(QApplication::styleHints()->colorScheme() == Qt::ColorScheme::Dark) {
@@ -102,6 +135,7 @@ void MapDetail::displayDetailedMap(Map *map) {
     QString enName = map->localNames.value("en_US");
     enName.replace(QLatin1String(" "), QLatin1String("_"));
     enName.remove(QLatin1Char('\''));
+    enName = asciiResourceName(enName);
     QString path = QString(":/resources/map/geographical/map%1_%2.png")
                        .arg(map->id).arg(enName);
     QImage geoImage(path);

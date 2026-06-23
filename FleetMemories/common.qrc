@@ -68,7 +68,6 @@
         <file>resources/map/geographical/map51_Northwestern.png</file>
         <file>resources/map/geographical/map52_Baltic_North.png</file>
         <file>resources/map/geographical/map53_Baltic_South.png</file>
-        <file>resources/map/geographical/map54_Øresund.png</file>
         <file>resources/map/geographical/map55_Aberdeen.png</file>
         <file>resources/map/geographical/map56_Juntland.png</file>
         <file>resources/map/geographical/map57_East_Channel.png</file>
@@ -135,5 +134,6 @@
         <file>resources/Image/fleetIcons/transport.png</file>
         <file>ClientGUI/ui/sortie/opengl/fshader.glsl</file>
         <file>ClientGUI/ui/sortie/opengl/vshader.glsl</file>
+        <file>resources/map/geographical/map54_Oresund.png</file>
     </qresource>
 </RCC>

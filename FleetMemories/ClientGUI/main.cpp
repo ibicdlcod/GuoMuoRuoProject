@@ -101,6 +101,22 @@ int main(int argc, char *argv[]) {
         // Otherwise let Qt use default platform input context
     }
     qDebug() << "Using input method module:" << qgetenv("QT_IM_MODULE");
+
+    /* The Steam overlay on Linux is injected via gameoverlayrenderer.so, which
+     * interposes glXSwapBuffers() and only draws onto top-level windows that
+     * present through OpenGL. Qt Widgets default to a raster backingstore that
+     * is blitted with XCB/XRender (no GL swap on the window), so the overlay
+     * never appears. Routing the widget backingstore composition through the
+     * OpenGL RHI backend produces the glXSwapBuffers() call Steam hooks. Only
+     * enable this when the overlay is actually present (LD_PRELOAD is set by
+     * Steam) so non-Steam launches keep the lighter raster path. Must run
+     * before QApplication so the backingstore picks up the change. */
+    if(!aiMode && qgetenv("LD_PRELOAD").contains("gameoverlayrenderer")) {
+        qputenv("QT_WIDGETS_RHI", "1");
+        if(qEnvironmentVariableIsEmpty("QT_WIDGETS_RHI_BACKEND")) {
+            qputenv("QT_WIDGETS_RHI_BACKEND", "opengl");
+        }
+    }
 #endif
 
     std::unique_ptr<QCoreApplication> coreApp;

@@ -30,7 +30,13 @@
       "Skill(claude-reflect:reflect)",
       "Bash(while read:*)",
       "Bash(grep:*)",
-      "Bash(git push:*)"
+      "Bash(git push:*)",
+      "Bash(xxd)",
+      "PowerShell(cmake *)",
+      "PowerShell(\"--- Qt dirs ---\"; Get-ChildItem \"C:\\\\Qt\" -ErrorAction SilentlyContinue | Select-Object Name; \"--- find rcc anywhere ---\"; @\\(\"C:\\\\\",\"D:\\\\\"\\) | ForEach-Object { Get-ChildItem $_ -Recurse -Filter \"rcc.exe\" -ErrorAction SilentlyContinue -Depth 6 | Select-Object -First 3 -ExpandProperty FullName })",
+      "PowerShell(\"--- jom ---\"; Get-ChildItem \"D:\\\\Qt\\\\Tools\" -Recurse -Filter \"jom.exe\" -ErrorAction SilentlyContinue | Select-Object -First 1 -ExpandProperty FullName; \"--- vcvars ---\"; @\\(\"C:\\\\Program Files\\\\Microsoft Visual Studio\",\"C:\\\\Program Files \\(x86\\)\\\\Microsoft Visual Studio\"\\) | ForEach-Object { Get-ChildItem $_ -Recurse -Filter \"vcvars64.bat\" -ErrorAction SilentlyContinue | Select-Object -First 1 -ExpandProperty FullName })",
+      "PowerShell(Push-Location \"D:\\\\GuoMuoRuoProject\\\\FleetMemories\"; & \"D:\\\\Qt\\\\6.11.0\\\\msvc2022_64\\\\bin\\\\rcc.exe\" --binary common.qrc -o \"$env:TEMP\\\\common_test.rcc\"; \"rcc exit code: $LASTEXITCODE\"; Pop-Location)",
+      "WebSearch"
     ]
   }
 }

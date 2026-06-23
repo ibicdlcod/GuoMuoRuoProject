@@ -2194,7 +2194,7 @@ Great at battle and bad at politics--so cool!</source>
         <translation type="unfinished">高级物资调度券数量无效。</translation>
     </message>
     <message id="ard-coupon-description">
-        <location filename="../Server/server_ard.cpp" line="218"/>
+        <location filename="../Server/server_ard.cpp" line="222"/>
         <source>%1 ARD Coupons</source>
         <translation type="unfinished">%1张高级物资调度券</translation>
     </message>
@@ -3022,37 +3022,37 @@ Great at battle and bad at politics--so cool!</source>
         <translation type="unfinished">用户%1：初始化海域状态成功！</translation>
     </message>
     <message id="ai-ard-add-failed">
-        <location filename="../Server/server_ard.cpp" line="147"/>
+        <location filename="../Server/server_ard.cpp" line="148"/>
         <source>AI ARD add failed for user %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="ai-ard-track-failed">
-        <location filename="../Server/server_ard.cpp" line="170"/>
+        <location filename="../Server/server_ard.cpp" line="171"/>
         <source>AI ARD track failed for user %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="ai-ard-purchase">
-        <location filename="../Server/server_ard.cpp" line="176"/>
+        <location filename="../Server/server_ard.cpp" line="177"/>
         <source>AI account %1 fake-purchased %2 ARD coupons (HKD %3 cents)</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="ard-refund-poll-failed">
-        <location filename="../Server/server_ard.cpp" line="284"/>
+        <location filename="../Server/server_ard.cpp" line="288"/>
         <source>ARD refund poll failed: %1</source>
         <translation type="unfinished">ARD退款轮询失败：%1</translation>
     </message>
     <message id="ard-clawback-lookup-failed">
-        <location filename="../Server/server_ard.cpp" line="310"/>
+        <location filename="../Server/server_ard.cpp" line="314"/>
         <source>ARD clawback: order lookup failed</source>
         <translation type="unfinished">ARD回收：订单查询失败</translation>
     </message>
     <message id="ard-clawback-deduct-failed">
-        <location filename="../Server/server_ard.cpp" line="329"/>
+        <location filename="../Server/server_ard.cpp" line="333"/>
         <source>ARD clawback: deduct failed for order %1</source>
         <translation type="unfinished">ARD回收：订单%1扣除失败</translation>
     </message>
     <message id="ard-clawback-mark-failed">
-        <location filename="../Server/server_ard.cpp" line="338"/>
+        <location filename="../Server/server_ard.cpp" line="342"/>
         <source>ARD clawback: mark failed for order %1</source>
         <translation type="unfinished">ARD回收：订单%1标记失败</translation>
     </message>
