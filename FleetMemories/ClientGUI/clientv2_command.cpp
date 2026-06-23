@@ -7,6 +7,7 @@
 #include <QFile>
 #include <QJsonDocument>
 #include <QSettings>
+#include <QSslConfiguration>
 
 #include "../steam/isteamfriends.h"
 #include "../Protocol/commandline.h"
@@ -1188,9 +1189,6 @@ void Client::parseQueryCommand(const QStringList &cmdParts) {
 /* Parse connection request */
 void Client::parseConnectReq(const QStringList &cmdParts) {
 
-    conf.addCaCertificates(settings->value("networkclient/pem",
-                                           ":/harusoft.pem").toString());
-    socket.setSslConfiguration(conf);
     if(socket.isEncrypted()) {
         //% "Already connected, disconnect first."
         qInfo() << qtTrId("connected-already");
@@ -1207,21 +1205,37 @@ void Client::parseConnectReq(const QStringList &cmdParts) {
         emit qout(qtTrId("connect-usage"));
         return;
     }
+    /* Send App ticek to server */
+    address = cmdParts[1];
+    if(address.isEmpty()) {
+        //% "Address isn't valid."
+        qWarning() << qtTrId("address-invalid");
+        return;
+    }
+    port = QString(cmdParts[2]).toInt();
+    if(port < 1024 || port > 49151) {
+        //% "Port isn't valid, it must fall between 1024 and 49151"
+        qWarning() << qtTrId("port-invalid");
+        return;
+    }
+    conf = QSslConfiguration::defaultConfiguration();
+    if(address == QStringLiteral("127.0.0.1")) {
+        conf.addCaCertificates(settings->value("networkclient/pem",
+                                               ":/harusoft.pem").toString());
+    }
     else {
-        /* Send App ticek to server */
-        address = QHostAddress(cmdParts[1]);
-        if(address.isNull()) {
-            //% "IP isn't valid."
-            qWarning() << qtTrId("ip-invalid");
-            return;
-        }
-        port = QString(cmdParts[2]).toInt();
-        if(port < 1024 || port > 49151) {
-            //% "Port isn't valid, it must fall between 1024 and 49151"
-            qWarning() << qtTrId("port-invalid");
-            return;
-        }
-        if(aiMode) {
+        conf.addCaCertificates(settings->value("networkclient/cert",
+                                               QStringLiteral("cert.pem"))
+                               .toString());
+        conf.addCaCertificates(settings->value("networkclient/chain",
+                                               QStringLiteral("chain.pem"))
+                               .toString());
+        conf.addCaCertificates(settings->value("networkclient/fullchain",
+                                               QStringLiteral("fullchain.pem"))
+                               .toString());
+    }
+    socket.setSslConfiguration(conf);
+    if(aiMode) {
             attemptMode = true;
             clientName = aiName;
             headlessConnect();
@@ -1241,7 +1255,6 @@ void Client::parseConnectReq(const QStringList &cmdParts) {
         clientName = SteamFriends()->GetPersonaName();
 
         return;
-    }
 }
 
 /* Parse disconnection request */

@@ -220,13 +220,13 @@ void Client::autoPassword() {
             this, &Client::errorOccurred);
     /* FUCK, aliyun server don't offer TlsV1_3 */
     socket.setProtocol(QSsl::TlsV1_2OrLater);
-    socket.connectToHostEncrypted(address.toString(), port);
+    socket.connectToHostEncrypted(address, port);
     if(!socket.waitForConnected(
             settings->value("networkclient/connectwaittimemsec", 8000)
                 .toInt())) {
         //% "Failed to connect to server at %1:%2"
         qWarning() << qtTrId("wait-for-connect-failure")
-                          .arg(address.toString()).arg(port);
+                          .arg(address).arg(port);
         attemptMode = false;
         return;
     }
@@ -250,13 +250,13 @@ void Client::headlessConnect() {
             this, &Client::errorOccurred);
     socket.setProtocol(QSsl::TlsV1_2OrLater);
     socket.setPeerVerifyMode(QSslSocket::VerifyNone);
-    socket.connectToHostEncrypted(address.toString(), port);
+    socket.connectToHostEncrypted(address, port);
     if(!socket.waitForConnected(
             settings->value("networkclient/connectwaittimemsec", 8000)
                 .toInt())) {
         //% "Failed to connect to server at %1:%2"
         qWarning() << qtTrId("wait-for-connect-failure")
-                          .arg(address.toString()).arg(port);
+                          .arg(address).arg(port);
         attemptMode = false;
         return;
     }

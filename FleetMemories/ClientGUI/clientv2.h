@@ -301,7 +301,7 @@ private:
 
     explicit Client(QObject * parent = nullptr);
 
-    QHostAddress address;
+    QString address;
     quint16 port;
 
     QSslSocket socket;
