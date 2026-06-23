@@ -1647,60 +1647,60 @@ Great at battle and bad at politics--so cool!</source>
         <translation type="unfinished">海域キャッシュ数：%1</translation>
     </message>
     <message id="equip-star-tooltip">
-        <location filename="../ClientGUI/model/equipmodel.cpp" line="433"/>
+        <location filename="../ClientGUI/model/equipmodel.cpp" line="436"/>
         <source>Current Star %1, maximum star %2</source>
         <translation type="unfinished">艦船キャッシュ数：%1</translation>
     </message>
     <message id="equip-idle">
-        <location filename="../ClientGUI/model/equipmodel.cpp" line="474"/>
-        <location filename="../ClientGUI/model/equipmodel.cpp" line="479"/>
+        <location filename="../ClientGUI/model/equipmodel.cpp" line="477"/>
+        <location filename="../ClientGUI/model/equipmodel.cpp" line="482"/>
         <source>Idle</source>
         <translation type="unfinished">現在の改修値%1、最大改修値%2</translation>
     </message>
     <message id="equip-uuid">
-        <location filename="../ClientGUI/model/equipmodel.cpp" line="547"/>
-        <location filename="../ClientGUI/model/equipmodel.cpp" line="714"/>
-        <location filename="../ClientGUI/model/specequipmodel.cpp" line="59"/>
+        <location filename="../ClientGUI/model/equipmodel.cpp" line="550"/>
+        <location filename="../ClientGUI/model/equipmodel.cpp" line="717"/>
+        <location filename="../ClientGUI/model/specequipmodel.cpp" line="63"/>
         <source>Equipment UUID</source>
         <translation type="unfinished">待機中</translation>
     </message>
     <message id="equip-name">
-        <location filename="../ClientGUI/model/equipmodel.cpp" line="551"/>
-        <location filename="../ClientGUI/model/equipmodel.cpp" line="716"/>
+        <location filename="../ClientGUI/model/equipmodel.cpp" line="554"/>
+        <location filename="../ClientGUI/model/equipmodel.cpp" line="719"/>
         <source>Equipment name</source>
         <translation type="unfinished">装備UUID</translation>
     </message>
     <message id="equip-star">
-        <location filename="../ClientGUI/model/equipmodel.cpp" line="555"/>
-        <location filename="../ClientGUI/model/equipmodel.cpp" line="718"/>
+        <location filename="../ClientGUI/model/equipmodel.cpp" line="558"/>
+        <location filename="../ClientGUI/model/equipmodel.cpp" line="721"/>
         <source>Improvement level</source>
         <oldsource>Equipment improvement level</oldsource>
         <translation type="unfinished">装備名</translation>
     </message>
     <message id="equip-attr">
-        <location filename="../ClientGUI/model/equipmodel.cpp" line="559"/>
-        <location filename="../ClientGUI/model/equipmodel.cpp" line="720"/>
+        <location filename="../ClientGUI/model/equipmodel.cpp" line="562"/>
+        <location filename="../ClientGUI/model/equipmodel.cpp" line="723"/>
         <source>Attributes</source>
         <oldsource>Equipment attributes</oldsource>
         <translation type="unfinished">改修値</translation>
     </message>
     <message id="destruct">
-        <location filename="../ClientGUI/model/equipmodel.cpp" line="563"/>
-        <location filename="../ClientGUI/model/equipmodel.cpp" line="722"/>
+        <location filename="../ClientGUI/model/equipmodel.cpp" line="566"/>
+        <location filename="../ClientGUI/model/equipmodel.cpp" line="725"/>
         <source>Destruct</source>
         <oldsource>Destruct this equipment</oldsource>
         <translation type="unfinished">属性</translation>
     </message>
     <message id="equip-select">
-        <location filename="../ClientGUI/model/equipmodel.cpp" line="567"/>
-        <location filename="../ClientGUI/model/equipmodel.cpp" line="724"/>
+        <location filename="../ClientGUI/model/equipmodel.cpp" line="570"/>
+        <location filename="../ClientGUI/model/equipmodel.cpp" line="727"/>
         <source>Select</source>
         <oldsource>Select this equipment</oldsource>
         <translation type="unfinished">解体</translation>
     </message>
     <message id="equip-pos">
-        <location filename="../ClientGUI/model/equipmodel.cpp" line="571"/>
-        <location filename="../ClientGUI/model/equipmodel.cpp" line="726"/>
+        <location filename="../ClientGUI/model/equipmodel.cpp" line="574"/>
+        <location filename="../ClientGUI/model/equipmodel.cpp" line="729"/>
         <source>Position</source>
         <translation type="unfinished">位置</translation>
     </message>
@@ -2002,9 +2002,14 @@ Great at battle and bad at politics--so cool!</source>
         <source>Decorate</source>
         <translation type="unfinished">近代化改修</translation>
     </message>
+    <message id="construct-equip-slot-not-ready">
+        <location filename="../ClientGUI/ui/factory/constructwindow.cpp" line="46"/>
+        <source>ConstructWindow: equip slot %1 not ready, skipping setModel.</source>
+        <translation type="unfinished"></translation>
+    </message>
     <message id="all-nationality">
-        <location filename="../ClientGUI/ui/factory/constructwindow.cpp" line="54"/>
-        <location filename="../ClientGUI/ui/factory/constructwindow.cpp" line="220"/>
+        <location filename="../ClientGUI/ui/factory/constructwindow.cpp" line="61"/>
+        <location filename="../ClientGUI/ui/factory/constructwindow.cpp" line="227"/>
         <location filename="../ClientGUI/ui/techview.cpp" line="62"/>
         <location filename="../ClientGUI/ui/techview.cpp" line="462"/>
         <location filename="../ClientGUI/ui/views/shipselect.cpp" line="95"/>
@@ -2016,13 +2021,13 @@ Great at battle and bad at politics--so cool!</source>
         <translation type="unfinished">殊勲</translation>
     </message>
     <message id="wait-for-blueprint">
-        <location filename="../ClientGUI/ui/factory/constructwindow.cpp" line="70"/>
+        <location filename="../ClientGUI/ui/factory/constructwindow.cpp" line="77"/>
         <source>Fetching ship blueprint data, please wait...</source>
         <oldsource>Fetching ship bluepring data, please wait...</oldsource>
         <translation type="unfinished">全国籍</translation>
     </message>
     <message id="wait-for-equip">
-        <location filename="../ClientGUI/ui/factory/constructwindow.cpp" line="84"/>
+        <location filename="../ClientGUI/ui/factory/constructwindow.cpp" line="91"/>
         <source>Fetching equipment data, please wait...</source>
         <translation type="unfinished">艦船設計図データを取得中、お待ちください…</translation>
     </message>
@@ -2161,7 +2166,7 @@ Great at battle and bad at politics--so cool!</source>
         <translation type="unfinished">購入処理中にデータベースエラーが発生しました。</translation>
     </message>
     <message id="ard-coupon-description">
-        <location filename="../Server/server_ard.cpp" line="218"/>
+        <location filename="../Server/server_ard.cpp" line="222"/>
         <source>%1 ARD Coupons</source>
         <translation type="unfinished">無効なARDクーポン数量です。</translation>
     </message>
@@ -2989,37 +2994,37 @@ Great at battle and bad at politics--so cool!</source>
         <translation type="unfinished">ユーザー%1：海域ステータスの初期化に失敗しました！</translation>
     </message>
     <message id="ai-ard-add-failed">
-        <location filename="../Server/server_ard.cpp" line="147"/>
+        <location filename="../Server/server_ard.cpp" line="148"/>
         <source>AI ARD add failed for user %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="ai-ard-track-failed">
-        <location filename="../Server/server_ard.cpp" line="170"/>
+        <location filename="../Server/server_ard.cpp" line="171"/>
         <source>AI ARD track failed for user %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="ai-ard-purchase">
-        <location filename="../Server/server_ard.cpp" line="176"/>
+        <location filename="../Server/server_ard.cpp" line="177"/>
         <source>AI account %1 fake-purchased %2 ARD coupons (HKD %3 cents)</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="ard-refund-poll-failed">
-        <location filename="../Server/server_ard.cpp" line="284"/>
+        <location filename="../Server/server_ard.cpp" line="288"/>
         <source>ARD refund poll failed: %1</source>
         <translation type="unfinished">ユーザー%1：海域ステータスの初期化に成功しました！</translation>
     </message>
     <message id="ard-clawback-lookup-failed">
-        <location filename="../Server/server_ard.cpp" line="310"/>
+        <location filename="../Server/server_ard.cpp" line="314"/>
         <source>ARD clawback: order lookup failed</source>
         <translation type="unfinished">ARD返金ポーリングに失敗しました：%1</translation>
     </message>
     <message id="ard-clawback-deduct-failed">
-        <location filename="../Server/server_ard.cpp" line="329"/>
+        <location filename="../Server/server_ard.cpp" line="333"/>
         <source>ARD clawback: deduct failed for order %1</source>
         <translation type="unfinished">ARD回収：注文検索に失敗しました</translation>
     </message>
     <message id="ard-clawback-mark-failed">
-        <location filename="../Server/server_ard.cpp" line="338"/>
+        <location filename="../Server/server_ard.cpp" line="342"/>
         <source>ARD clawback: mark failed for order %1</source>
         <translation type="unfinished">ARD回収：注文%1の差し引きに失敗しました</translation>
     </message>
@@ -4526,10 +4531,10 @@ Great at battle and bad at politics--so cool!</source>
     <message id="all-shiptypes">
         <location filename="../ClientGUI/model/shipbpmodel.cpp" line="263"/>
         <location filename="../ClientGUI/model/shipmodel.cpp" line="61"/>
-        <location filename="../ClientGUI/ui/factory/constructwindow.cpp" line="58"/>
-        <location filename="../ClientGUI/ui/factory/constructwindow.cpp" line="99"/>
-        <location filename="../ClientGUI/ui/factory/constructwindow.cpp" line="136"/>
-        <location filename="../ClientGUI/ui/factory/constructwindow.cpp" line="184"/>
+        <location filename="../ClientGUI/ui/factory/constructwindow.cpp" line="65"/>
+        <location filename="../ClientGUI/ui/factory/constructwindow.cpp" line="106"/>
+        <location filename="../ClientGUI/ui/factory/constructwindow.cpp" line="143"/>
+        <location filename="../ClientGUI/ui/factory/constructwindow.cpp" line="191"/>
         <location filename="../ClientGUI/ui/views/shipselect.cpp" line="161"/>
         <location filename="../ClientGUI/ui/views/shipselect.cpp" line="173"/>
         <location filename="../ClientGUI/ui/views/shipselect.cpp" line="220"/>
@@ -4540,10 +4545,10 @@ Great at battle and bad at politics--so cool!</source>
     <message id="all-shipclasses">
         <location filename="../ClientGUI/model/shipbpmodel.cpp" line="265"/>
         <location filename="../ClientGUI/model/shipmodel.cpp" line="63"/>
-        <location filename="../ClientGUI/ui/factory/constructwindow.cpp" line="62"/>
-        <location filename="../ClientGUI/ui/factory/constructwindow.cpp" line="101"/>
-        <location filename="../ClientGUI/ui/factory/constructwindow.cpp" line="156"/>
-        <location filename="../ClientGUI/ui/factory/constructwindow.cpp" line="198"/>
+        <location filename="../ClientGUI/ui/factory/constructwindow.cpp" line="69"/>
+        <location filename="../ClientGUI/ui/factory/constructwindow.cpp" line="108"/>
+        <location filename="../ClientGUI/ui/factory/constructwindow.cpp" line="163"/>
+        <location filename="../ClientGUI/ui/factory/constructwindow.cpp" line="205"/>
         <location filename="../ClientGUI/ui/views/shipselect.cpp" line="176"/>
         <location filename="../ClientGUI/ui/views/shipselect.cpp" line="264"/>
         <location filename="../ClientGUI/ui/views/shipselect.cpp" line="268"/>
@@ -4551,7 +4556,7 @@ Great at battle and bad at politics--so cool!</source>
         <translation type="unfinished">全艦種</translation>
     </message>
     <message id="fleet-idle">
-        <location filename="../ClientGUI/model/equipmodel.cpp" line="515"/>
+        <location filename="../ClientGUI/model/equipmodel.cpp" line="518"/>
         <location filename="../ClientGUI/model/shipmodel.cpp" line="387"/>
         <source>Idle</source>
         <translation type="unfinished">全艦型</translation>
@@ -4586,7 +4591,7 @@ Great at battle and bad at politics--so cool!</source>
         <translation type="unfinished">現在の改修値%1、最大改修値%2</translation>
     </message>
     <message id="fleet-disabled">
-        <location filename="../ClientGUI/model/equipmodel.cpp" line="518"/>
+        <location filename="../ClientGUI/model/equipmodel.cpp" line="521"/>
         <location filename="../ClientGUI/model/shipmodel.cpp" line="391"/>
         <location filename="../ClientGUI/ui/views/selectdelegate.cpp" line="87"/>
         <source>Disabled</source>
@@ -6435,7 +6440,7 @@ Great at battle and bad at politics--so cool!</source>
         <location filename="../ClientGUI/ui/factory/constructwindow.ui" line="251"/>
         <location filename="../ClientGUI/ui/factory/constructwindow.ui" line="334"/>
         <location filename="../ClientGUI/ui/factory/constructwindow.ui" line="423"/>
-        <location filename="../ClientGUI/ui/factory/constructwindow.cpp" line="265"/>
+        <location filename="../ClientGUI/ui/factory/constructwindow.cpp" line="272"/>
         <source>(Not required)</source>
         <translation type="unfinished">（不要）</translation>
     </message>
@@ -6511,7 +6516,7 @@ Great at battle and bad at politics--so cool!</source>
     <message id="construct-ships">
         <location filename="../ClientGUI/ui/factory/constructwindow.ui" line="14"/>
         <location filename="../ClientGUI/ui/mainwindow.ui" line="360"/>
-        <location filename="../ClientGUI/ui/factory/constructwindow.cpp" line="388"/>
+        <location filename="../ClientGUI/ui/factory/constructwindow.cpp" line="395"/>
         <location filename="../ClientGUI/ui/factory/factoryarea.cpp" line="193"/>
         <source>Construct Ships</source>
         <oldsource>Consturct Ships</oldsource>
@@ -6769,7 +6774,7 @@ Great at battle and bad at politics--so cool!</source>
     </message>
     <message id="cloning-vats">
         <location filename="../ClientGUI/ui/mainwindow.ui" line="450"/>
-        <location filename="../ClientGUI/ui/factory/constructwindow.cpp" line="384"/>
+        <location filename="../ClientGUI/ui/factory/constructwindow.cpp" line="391"/>
         <location filename="../ClientGUI/ui/factory/factoryarea.cpp" line="200"/>
         <source>Cloning Vats</source>
         <translation type="unfinished">クローニング施設</translation>
